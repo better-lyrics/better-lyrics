@@ -4,12 +4,12 @@ on:
   workflow_dispatch:
     inputs:
       version:
-        description: 'The new version number (e.g., 2.1.0 or 2.1.0.1-canary)'
+        description: 'The new version number. Use 3 digits for a release (e.g., 2.1.0) and 4 digits for a canary (e.g., 2.1.0.1-canary).'
         required: true
       is_canary:
-        description: 'Is this a canary (pre-release) build?'
+        description: 'This a canary (pre-release) build?'
         type: boolean
-        default: false
+        default: true
 
 jobs:
   release:
@@ -19,6 +19,26 @@ jobs:
     outputs:
       version: ${{ github.event.inputs.version }}
     steps:
+      - name: ⛔ Validate Version Format
+        run: |
+          IS_CANARY='${{ github.event.inputs.is_canary }}'
+          VERSION='${{ github.event.inputs.version }}'
+
+          if [[ "$IS_CANARY" == "true" ]]; then
+            # Rule: Must be 4 digits, optional suffix
+            if [[ ! $VERSION =~ ^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+ ]]; then
+              echo "::error::Canary releases must use a 4-digit version (e.g., 2.1.0.1 or 2.1.0.1-canary)."
+              exit 1
+            fi
+            echo "Version format is valid for canary."
+          else
+            # Rule: Must be exactly 3 digits
+            if [[ ! $VERSION =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+              echo "::error::Full releases must use a 3-digit version (e.g., 2.1.0)."
+              exit 1
+            fi
+            echo "Version format is valid for release."
+          fi
       - uses: actions/checkout@v3
         with:
           fetch-depth: 0
