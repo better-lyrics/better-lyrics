@@ -37,22 +37,22 @@ jobs:
       - name: Upload Chrome artifact
         uses: actions/upload-artifact@v4
         with:
-          name: chrome-nightly-${{ env.NIGHTLY_VERSION }}
+          name: chrome-${{ env.NIGHTLY_VERSION }}
           path: dist/chrome
 
       - name: Upload Edge artifact
         uses: actions/upload-artifact@v4
         with:
-          name: edge-nightly-${{ env.NIGHTLY_VERSION }}
+          name: edge-${{ env.NIGHTLY_VERSION }}
           path: dist/edge
 
       - name: Sign Firefox extension
         run: |
           npm install -g web-ext
-          web-ext sign --channel=unlisted --api-key=${{ secrets.FIREFOX_JWT_ISSUER }} --api-secret=${{ secrets.FIREFOX_JWT_SECRET }} --upload-source-code
+          web-ext sign --channel=unlisted --source-dir ./dist/firefox --artifacts-dir .dist/firefox/web-ext-artifacts/ --api-key=${{ secrets.FIREFOX_JWT_ISSUER }} --api-secret=${{ secrets.FIREFOX_JWT_SECRET }} --upload-source-code
 
       - name: Upload Firefox artifact
         uses: actions/upload-artifact@v4
         with:
-          name: firefox-nightly-${{ env.NIGHTLY_VERSION }}
+          name: firefox-${{ env.NIGHTLY_VERSION }}
           path: dist/firefox/web-ext-artifacts/*.xpi
