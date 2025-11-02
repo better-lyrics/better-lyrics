@@ -49,7 +49,7 @@ jobs:
       - name: Sign Firefox extension
         run: |
           npm install -g web-ext
-          web-ext sign --channel=unlisted --source-dir ./dist/firefox --artifacts-dir .dist/firefox/web-ext-artifacts/ --api-key=${{ secrets.FIREFOX_JWT_ISSUER }} --api-secret=${{ secrets.FIREFOX_JWT_SECRET }} --upload-source-code
+          web-ext sign --channel=unlisted --source-dir ./dist/firefox --artifacts-dir ./dist/firefox/web-ext-artifacts --api-key=${{ secrets.FIREFOX_JWT_ISSUER }} --api-secret=${{ secrets.FIREFOX_JWT_SECRET }} --upload-source-code
 
       - name: Upload Firefox artifact
         uses: actions/upload-artifact@v4
