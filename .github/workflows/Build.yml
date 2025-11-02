@@ -28,6 +28,9 @@ jobs:
       - name: Update version in files
         run: npm run update-version -- "${{ env.NIGHTLY_VERSION }}"
 
+      - name: Run Typescript
+        run: npm run typecheck
+
       - name: Build extension
         run: npm run build
 
