@@ -46,11 +46,20 @@ jobs:
           unzip $XPI_FILE -d firefox-build
           web-ext sign --channel unlisted --source-dir firefox-build --artifacts-dir dist/firefox
 
-      - name: Upload artifacts
+      - name: Upload Chrome artifact
         uses: actions/upload-artifact@v4
         with:
-          name: nightly-build
-          path: |
-            dist/chrome/better-lyrics-*.zip
-            dist/edge/better-lyrics-*.zip
-            dist/firefox/web-ext-artifacts/*.xpi
+          name: chrome-nightly
+          path: dist/chrome/better-lyrics-*.zip
+
+      - name: Upload Edge artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: edge-nightly
+          path: dist/edge/better-lyrics-*.zip
+
+      - name: Upload Firefox artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: firefox-nightly
+          path: dist/firefox/web-ext-artifacts/*.xpi
