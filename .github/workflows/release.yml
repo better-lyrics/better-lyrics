@@ -110,7 +110,8 @@ jobs:
       - name: Zip Chrome artifact
         run: |
           VERSION=${{ needs.release.outputs.version }}
-          zip -r dist/chrome-v$VERSION.zip dist/chrome
+          cd dist/chrome
+          zip -r ../chrome-v$VERSION.zip .
 
       - name: Publish to Chrome Web Store
         if: github.event.inputs.is_canary == 'false'
@@ -210,7 +211,8 @@ jobs:
       - name: Zip Edge artifact
         run: |
           VERSION=${{ needs.release.outputs.version }}
-          zip -r dist/edge-v$VERSION.zip dist/edge
+          cd dist/edge
+          zip -r ../edge-v$VERSION.zip .
 
       - name: Publish to Edge Add-ons
         if: github.event.inputs.is_canary == 'false'
