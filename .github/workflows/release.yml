@@ -124,7 +124,7 @@ jobs:
       - name: Upload Chrome Zip for release
         uses: actions/upload-artifact@v4
         with:
-          name: release-assets
+          name: chrome-release-asset
           path: dist/chrome-v${{ needs.release.outputs.version }}.zip
 
   publish-firefox:
@@ -187,7 +187,7 @@ jobs:
       - name: Upload Firefox XPI for release
         uses: actions/upload-artifact@v4
         with:
-          name: release-assets
+          name: firefox-release-asset
           path: dist/signed-firefox/firefox-v${{ env.RELEASE_VERSION }}.xpi
 
   publish-edge:
@@ -223,7 +223,7 @@ jobs:
       - name: Upload Edge Zip for release
         uses: actions/upload-artifact@v4
         with:
-          name: release-assets
+          name: edge-release-asset
           path: dist/edge-v${{ needs.release.outputs.version }}.zip
 
   create-github-release:
@@ -233,12 +233,23 @@ jobs:
     permissions:
       contents: write
     steps:
-      - name: Download all release files
+      - name: Download chrome release files
         uses: actions/download-artifact@v4
         with:
-          # This name matches the 'name' in the upload steps
-          name: release-assets
-          path: release-artifacts
+          name: chrome-release-asset
+          path: release-artifacts/chrome
+
+      - name: Download firefox release files
+        uses: actions/download-artifact@v4
+        with:
+          name: firefox-release-asset
+          path: release-artifacts/firefox
+
+      - name: Download edge release files
+        uses: actions/download-artifact@v4
+        with:
+          name: edge-release-asset
+          path: release-artifacts/edge
 
       - name: Create GitHub Release
         uses: ncipollo/release-action@v1
