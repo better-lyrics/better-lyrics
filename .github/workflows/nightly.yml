@@ -46,13 +46,8 @@ jobs:
           name: edge-v${{ env.NIGHTLY_VERSION }}
           path: dist/edge
 
-      - name: Sign Firefox extension
-        run: |
-          npm install -g web-ext
-          web-ext sign --channel=unlisted --source-dir ./dist/firefox --artifacts-dir ./dist/firefox/web-ext-artifacts --api-key=${{ secrets.FIREFOX_JWT_ISSUER }} --api-secret=${{ secrets.FIREFOX_JWT_SECRET }} --upload-source-code
-
       - name: Upload Firefox artifact
         uses: actions/upload-artifact@v4
         with:
           name: firefox-v${{ env.NIGHTLY_VERSION }}
-          path: dist/firefox/web-ext-artifacts/*.xpi
+          path: dist/firefox
