@@ -20,17 +20,25 @@ try {
     throw new Error("Version not found in package.json");
   }
 
-  const semverVersion = version.match(/^(\d+\.\d+\.\d+)(\.\d+)?/)?.[0];
-  if (!semverVersion) {
+  const semverMatch = version.match(/^(\d+\.\d+\.\d+)(\.\d+)?/);
+  if (!semverMatch) {
     throw new Error(`Invalid SemVer version: ${version}`);
   }
 
+  // semverVersion is the full 4-digit match (e.g., "1.2.3.12")
+  const semverVersion = semverMatch[0];
+
+  // friendlyVersion is just the 3-digit first capture group (e.g., "1.2.3")
+  let friendlyVersion = semverMatch[1];
+
   console.log(`Bumping version to ${version}`);
+  console.log(`  SemVer (4-digit): ${semverVersion}`);
+  console.log(`  Friendly (3-digit): ${friendlyVersion}`);
 
   // Update manifest.json
   const manifest = JSON.parse(readFileSync(manifestPath, "utf-8"));
   manifest.version = semverVersion;
-  manifest.version_name = version;
+  manifest.version_name = friendlyVersion;
   writeFileSync(manifestPath, JSON.stringify(manifest, null, 2) + "\n");
 
   packageJson.version = semverVersion;
@@ -38,7 +46,7 @@ try {
 
   // Update src/options/options.html
   let optionsHtml = readFileSync(optionsHtmlPath, "utf-8");
-  optionsHtml = optionsHtml.replace(/v[0-9]*\.[0-9]*\.[0-9]*/, `v${version}`);
+  optionsHtml = optionsHtml.replace(/v[0-9.]*(-[a-zA-Z]*)?/, `v${friendlyVersion}`);
   writeFileSync(optionsHtmlPath, optionsHtml);
 
   // Run biome
