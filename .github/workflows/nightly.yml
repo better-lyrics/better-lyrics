@@ -29,7 +29,7 @@ jobs:
         run: npm install
 
       - name: Update version in files
-        run: npm run update-version -- ${{ env.NIGHTLY_VERSION }}
+        run: npm run update-version -- "${{ env.NIGHTLY_VERSION }}"
 
       - name: Build extension
         run: npm run build
