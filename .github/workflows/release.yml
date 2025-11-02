@@ -237,19 +237,19 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: chrome-release-asset
-          path: release-artifacts/chrome
+          path: release-artifacts
 
       - name: Download firefox release files
         uses: actions/download-artifact@v4
         with:
           name: firefox-release-asset
-          path: release-artifacts/firefox
+          path: release-artifacts
 
       - name: Download edge release files
         uses: actions/download-artifact@v4
         with:
           name: edge-release-asset
-          path: release-artifacts/edge
+          path: release-artifacts
 
       - name: Create GitHub Release
         uses: ncipollo/release-action@v1
@@ -260,3 +260,4 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
           # Mark as pre-release if it's a canary build
           prerelease: ${{ github.event.inputs.is_canary == 'true' }}
+          draft: true
