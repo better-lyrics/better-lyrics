@@ -4,8 +4,12 @@ on:
   workflow_dispatch:
     inputs:
       version:
-        description: 'The new version number (e.g., 2.1.0)'
+        description: 'The new version number (e.g., 2.1.0 or 2.1.0.1-canary)'
         required: true
+      is_canary:
+        description: 'Is this a canary (pre-release) build?'
+        type: boolean
+        default: false
 
 jobs:
   release:
@@ -42,27 +46,29 @@ jobs:
           git tag -a "v${{ github.event.inputs.version }}" -m "Version ${{ github.event.inputs.version }}"
           git push --follow-tags
 
-      # Uploading raw build directories, not zips
+      # Uploading raw build directories for other jobs
       - name: Upload Chrome build
         uses: actions/upload-artifact@v4
         with:
-          name: chrome-build-${{ github.event.inputs.version }}
+          name: chrome-build
           path: dist/chrome
 
       - name: Upload Edge build
         uses: actions/upload-artifact@v4
         with:
-          name: edge-build-${{ github.event.inputs.version }}
+          name: edge-build
           path: dist/edge
 
       - name: Upload Firefox build
         uses: actions/upload-artifact@v4
         with:
-          name: firefox-build-${{ github.event.inputs.version }}
+          name: firefox-build
           path: dist/firefox
 
   publish-chrome:
     needs: release
+    # Only run for non-canary releases
+    if: github.event.inputs.is_canary == 'false'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -91,9 +97,19 @@ jobs:
           REFRESH_TOKEN: ${{ secrets.GOOGLE_REFRESH_TOKEN }}
         run: tsx tooling/publish-chrome.ts dist/chrome-v${{ needs.release.outputs.version }}.zip
 
+      - name: Upload Chrome Zip for release
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-assets
+          path: dist/chrome-v${{ needs.release.outputs.version }}.zip
+
   publish-firefox:
     needs: release
     runs-on: ubuntu-latest
+    env:
+      FIREFOX_JWT_ISSUER: ${{ secrets.FIREFOX_JWT_ISSUER }}
+      FIREFOX_JWT_SECRET: ${{ secrets.FIREFOX_JWT_SECRET }}
+      RELEASE_VERSION: ${{ needs.release.outputs.version }}
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-node@v3
@@ -108,15 +124,52 @@ jobs:
           name: firefox-build
           path: dist/firefox
 
-      - name: Publish to Firefox Add-ons
-        env:
-          FIREFOX_JWT_ISSUER: ${{ secrets.FIREFOX_JWT_ISSUER }}
-          FIREFOX_JWT_SECRET: ${{ secrets.FIREFOX_JWT_SECRET }}
-          RELEASE_VERSION: ${{ needs.release.outputs.version }}
-        run: tsx tooling/publish-firefox.ts dist/firefox
+      - name: Install web-ext
+        run: npm install -g web-ext
+
+      - name: Sign Firefox Add-on (Canary - Unlisted)
+        if: github.event.inputs.is_canary == 'true'
+        run: |
+          web-ext sign --channel=unlisted \
+                       --api-key=${{ env.FIREFOX_JWT_ISSUER }} \
+                       --api-secret=${{ env.FIREFOX_JWT_SECRET }} \
+                       --artifacts-dir=dist/signed-firefox \
+                       --source-dir=dist/firefox
+          echo "Canary version signed."
+
+      - name: Sign and Publish Firefox Add-on (Regular - Listed)
+        if: github.event.inputs.is_canary == 'false'
+        run: |
+          web-ext sign --channel=listed \
+                       --api-key=${{ env.FIREFOX_JWT_ISSUER }} \
+                       --api-secret=${{ env.FIREFOX_JWT_SECRET }} \
+                       --upload-source-code \
+                       --artifacts-dir=dist/signed-firefox \
+                       --source-dir=dist/firefox
+          echo "Regular version signed and published."
+
+      - name: Rename signed artifact
+        run: |
+          ARTIFACT_DIR=dist/signed-firefox
+          SIGNED_FILE=$(find $ARTIFACT_DIR -name "*.xpi")
+          if [ -n "$SIGNED_FILE" ]; then
+            mv "$SIGNED_FILE" "$ARTIFACT_DIR/firefox-v${{ env.RELEASE_VERSION }}.xpi"
+            echo "Renamed artifact to firefox-v${{ env.RELEASE_VERSION }}.xpi"
+          else
+            echo "::error::Signed .xpi file not found!"
+            exit 1
+          fi
+
+      - name: Upload Firefox XPI for release
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-assets
+          path: dist/signed-firefox/firefox-v${{ env.RELEASE_VERSION }}.xpi
 
   publish-edge:
     needs: release
+    # Only run for non-canary releases
+    if: github.event.inputs.is_canary == 'false'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -144,8 +197,15 @@ jobs:
           PRODUCT_ID: ${{ secrets.EDGE_PRODUCT_ID }}
         run: tsx tooling/publish-edge.ts dist/edge-v${{ needs.release.outputs.version }}.zip
 
+      - name: Upload Edge Zip for release
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-assets
+          path: dist/edge-v${{ needs.release.outputs.version }}.zip
+
   create-github-release:
     name: Create GitHub Release
+    # This job now waits for all others, which will be skipped if canary.
     needs: [ release, publish-chrome, publish-edge, publish-firefox ]
     runs-on: ubuntu-latest
     permissions:
@@ -154,7 +214,8 @@ jobs:
       - name: Download all release files
         uses: actions/download-artifact@v4
         with:
-          name: release-files
+          # This name matches the 'name' in the upload steps
+          name: release-assets
           path: release-artifacts
 
       - name: Create GitHub Release
@@ -164,3 +225,5 @@ jobs:
           tag: "v${{ needs.release.outputs.version }}"
           name: "Release ${{ needs.release.outputs.version }}"
           token: ${{ secrets.GITHUB_TOKEN }}
+          # Mark as pre-release if it's a canary build
+          prerelease: ${{ github.event.inputs.is_canary == 'true' }}

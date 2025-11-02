@@ -37,13 +37,13 @@ jobs:
       - name: Upload Chrome artifact
         uses: actions/upload-artifact@v4
         with:
-          name: chrome-${{ env.NIGHTLY_VERSION }}
+          name: chrome-v${{ env.NIGHTLY_VERSION }}
           path: dist/chrome
 
       - name: Upload Edge artifact
         uses: actions/upload-artifact@v4
         with:
-          name: edge-${{ env.NIGHTLY_VERSION }}
+          name: edge-v${{ env.NIGHTLY_VERSION }}
           path: dist/edge
 
       - name: Sign Firefox extension
@@ -54,5 +54,5 @@ jobs:
       - name: Upload Firefox artifact
         uses: actions/upload-artifact@v4
         with:
-          name: firefox-${{ env.NIGHTLY_VERSION }}
+          name: firefox-v${{ env.NIGHTLY_VERSION }}
           path: dist/firefox/web-ext-artifacts/*.xpi
