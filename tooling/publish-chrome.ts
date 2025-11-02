@@ -20,12 +20,12 @@ if (!zipPath) {
 try {
   execSync("npm install -g chrome-webstore-upload-cli");
   execSync(
-      `chrome-webstore-upload upload --source ${zipPath} --extension-id ${extensionId} --client-id ${clientId} --client-secret ${clientSecret} --refresh-token ${refreshToken}`,
-      {stdio: "inherit"}
+    `chrome-webstore-upload upload --source ${zipPath} --extension-id ${extensionId} --client-id ${clientId} --client-secret ${clientSecret} --refresh-token ${refreshToken}`,
+    { stdio: "inherit" }
   );
   execSync(
-      `chrome-webstore-upload publish --extension-id ${extensionId} --client-id ${clientId} --client-secret ${clientSecret} --refresh-token ${refreshToken}`,
-      {stdio: "inherit"}
+    `chrome-webstore-upload publish --extension-id ${extensionId} --client-id ${clientId} --client-secret ${clientSecret} --refresh-token ${refreshToken}`,
+    { stdio: "inherit" }
   );
   console.log("Successfully published to Chrome Web Store.");
 } catch (error) {
