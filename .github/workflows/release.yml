@@ -92,8 +92,6 @@ jobs:
 
   publish-chrome:
     needs: release
-    # Only run for non-canary releases
-    if: github.event.inputs.is_canary == 'false'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -115,6 +113,7 @@ jobs:
           zip -r dist/chrome-v$VERSION.zip dist/chrome
 
       - name: Publish to Chrome Web Store
+        if: github.event.inputs.is_canary == 'false'
         env:
           EXTENSION_ID: ${{ secrets.GOOGLE_EXTENSION_ID }}
           CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
@@ -193,8 +192,6 @@ jobs:
 
   publish-edge:
     needs: release
-    # Only run for non-canary releases
-    if: github.event.inputs.is_canary == 'false'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -216,6 +213,7 @@ jobs:
           zip -r dist/edge-v$VERSION.zip dist/edge
 
       - name: Publish to Edge Add-ons
+        if: github.event.inputs.is_canary == 'false'
         env:
           CLIENT_ID: ${{ secrets.EDGE_CLIENT_ID }}
           API_KEY: ${{ secrets.EDGE_API_KEY }}
@@ -230,7 +228,6 @@ jobs:
 
   create-github-release:
     name: Create GitHub Release
-    # This job now waits for all others, which will be skipped if canary.
     needs: [ release, publish-chrome, publish-edge, publish-firefox ]
     runs-on: ubuntu-latest
     permissions:
