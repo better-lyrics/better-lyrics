@@ -32,15 +32,12 @@ jobs:
         run: npm run build
 
       - name: Sign Firefox extension
-        env:
-          WEB_EXT_API_KEY: ${{ secrets.FIREFOX_CLIENT_ID}}
-          WEB_EXT_API_SECRET: ${{ secrets.FIREFOX_CLIENT_SECRET}}
         run: |
           npm install -g web-ext
           XPI_FILE=$(find dist/firefox -name "*.xpi")
           mkdir -p firefox-build
           unzip $XPI_FILE -d firefox-build
-          web-ext sign --source-dir firefox-build --artifacts-dir dist/firefox
+          web-ext sign --channel=unlisted --api-key=${{ secrets.FIREFOX_JWT_ISSUER }} --api-secret=${{ secrets.FIREFOX_JWT_SECRET }} --upload-source-code
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v3
@@ -84,7 +81,7 @@ jobs:
           path: dist
       - name: Publish to Chrome Web Store
         env:
-          EXTENSION_ID: ${{ secrets.CHROME_EXTENSION_ID }}
+          EXTENSION_ID: ${{ secrets.GOOGLE_EXTENSION_ID }}
           CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
           CLIENT_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET}}
           REFRESH_TOKEN: ${{ secrets.GOOGLE_REFRESH_TOKEN }}

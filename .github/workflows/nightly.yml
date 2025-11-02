@@ -36,15 +36,12 @@ jobs:
 
       - name: Sign Firefox extension
         continue-on-error: true
-        env:
-          WEB_EXT_API_KEY: ${{ secrets.FIREFOX_CLIENT_ID }}
-          WEB_EXT_API_SECRET: ${{ secrets.FIREFOX_CLIENT_SECRET }}
         run: |
           npm install -g web-ext
           XPI_FILE=$(find dist/firefox -name "*.xpi")
           mkdir -p firefox-build
           unzip $XPI_FILE -d firefox-build
-          web-ext sign --channel unlisted --source-dir firefox-build --artifacts-dir dist/firefox
+          web-ext sign --channel=unlisted --api-key=${{ secrets.FIREFOX_JWT_ISSUER }} --api-secret=${{ secrets.FIREFOX_JWT_SECRET }} --upload-source-code
 
       - name: Upload Chrome artifact
         uses: actions/upload-artifact@v4

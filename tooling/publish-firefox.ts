@@ -3,8 +3,8 @@ import { mkdtempSync } from "fs";
 import { tmpdir } from "os";
 import { join } from "path";
 
-const jwtIssuer = process.env.FIREFOX_CLIENT_ID;
-const jwtSecret = process.env.FIREFOX_CLIENT_SECRET;
+const jwtIssuer = process.env.FIREFOX_JWT_ISSUER;
+const jwtSecret = process.env.FIREFOX_JWT_SECRET;
 
 const zipPath = "dist/better-lyrics-firefox.zip";
 
