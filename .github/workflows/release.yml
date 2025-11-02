@@ -33,8 +33,8 @@ jobs:
 
       - name: Sign Firefox extension
         env:
-          WEB_EXT_API_KEY: ${{ secrets.WEB_EXT_API_KEY }}
-          WEB_EXT_API_SECRET: ${{ secrets.WEB_EXT_API_SECRET }}
+          WEB_EXT_API_KEY: ${{ secrets.FIREFOX_CLIENT_ID}}
+          WEB_EXT_API_SECRET: ${{ secrets.FIREFOX_CLIENT_SECRET}}
         run: |
           npm install -g web-ext
           XPI_FILE=$(find dist/firefox -name "*.xpi")
@@ -85,9 +85,9 @@ jobs:
       - name: Publish to Chrome Web Store
         env:
           EXTENSION_ID: ${{ secrets.CHROME_EXTENSION_ID }}
-          CLIENT_ID: ${{ secrets.CHROME_CLIENT_ID }}
-          CLIENT_SECRET: ${{ secrets.CHROME_CLIENT_SECRET }}
-          REFRESH_TOKEN: ${{ secrets.CHROME_REFRESH_TOKEN }}
+          CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
+          CLIENT_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET}}
+          REFRESH_TOKEN: ${{ secrets.GOOGLE_REFRESH_TOKEN }}
         run: tsx tooling/publish-chrome.ts
 
   publish-firefox:
