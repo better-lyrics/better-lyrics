@@ -1,7 +1,7 @@
 import { execSync } from "child_process";
 import { readFileSync, writeFileSync } from "fs";
 import { join } from "path";
-import {JSDOM} from "jsdom";
+import { JSDOM } from "jsdom";
 
 const rootDir = process.cwd();
 const packageJsonPath = join(rootDir, "package.json");
