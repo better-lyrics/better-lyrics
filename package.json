@@ -30,7 +30,6 @@
     },
     "homepage": "https://github.com/better-lyrics/better-lyrics#readme",
     "dependencies": {
-        "@codemirror/basic-setup": "^0.20.0",
         "@codemirror/commands": "^6.9.0",
         "@codemirror/lang-css": "^6.3.1",
         "@codemirror/lint": "^6.9.0",
@@ -51,9 +50,11 @@
         "@prefresh/utils": "^1.2.1",
         "@types/chrome": "^0.1.24",
         "@types/codemirror": "^5.60.16",
+        "@types/jsdom": "^27.0.0",
         "@types/sortablejs": "^1.15.8",
         "@typescript/lib-dom": "npm:@types/web@^0.0.280",
         "axios": "^1.13.1",
+        "jsdom": "^27.1.0",
         "tsx": "^4.20.6",
         "typescript": "^5.9.2"
     }

@@ -1,6 +1,7 @@
 import { execSync } from "child_process";
 import { readFileSync, writeFileSync } from "fs";
 import { join } from "path";
+import {JSDOM} from "jsdom";
 
 const rootDir = process.cwd();
 const packageJsonPath = join(rootDir, "package.json");
@@ -28,8 +29,9 @@ try {
   // semverVersion is the full 4-digit match (e.g., "1.2.3.12")
   const semverVersion = semverMatch[0];
 
+  const remainder = version.slice(semverMatch[0].length);
   // friendlyVersion is just the 3-digit first capture group (e.g., "1.2.3")
-  let friendlyVersion = semverMatch[1];
+  let friendlyVersion = semverMatch[1] + remainder;
 
   console.log(`Bumping version to ${version}`);
   console.log(`  SemVer (4-digit): ${semverVersion}`);
@@ -46,8 +48,14 @@ try {
 
   // Update src/options/options.html
   let optionsHtml = readFileSync(optionsHtmlPath, "utf-8");
-  optionsHtml = optionsHtml.replace(/v[0-9.]*(-[a-zA-Z]*)?/, `v${friendlyVersion}`);
-  writeFileSync(optionsHtmlPath, optionsHtml);
+  const optionsHtmlDom = new JSDOM(optionsHtml);
+  let versionElement = optionsHtmlDom.window.document.querySelector("#navbar > h1 > div > span");
+  if (!versionElement) {
+    console.error("Failed to find version element in options.html");
+    process.exit(1);
+  }
+  versionElement.textContent = friendlyVersion;
+  writeFileSync(optionsHtmlPath, optionsHtmlDom.serialize());
 
   // Run biome
   console.log("Running biome...");
