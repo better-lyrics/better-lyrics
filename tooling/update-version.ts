@@ -11,7 +11,7 @@ const readmePath = join(rootDir, "README.md");
 
 try {
   const packageJson = JSON.parse(readFileSync(packageJsonPath, "utf-8"));
-  let version = packageJson.version;
+  let version = packageJson.version as String;
 
   if (process.argv[2]) {
     version = process.argv[2];
@@ -58,22 +58,23 @@ try {
   versionElement.textContent = friendlyVersion;
   writeFileSync(optionsHtmlPath, optionsHtmlDom.serialize());
 
-  let badgeFriendlyVersion = friendlyVersion.replaceAll("-", " ");
 
-  let readme = readFileSync(readmePath, "utf-8");
-  const versionBadgeRegex = /https:\/\/img\.shields\.io\/badge\/version-\d+\.\d+\.\d+(\.\d)?( ?.*?)?-blue\.svg/;
-  const updatedReadme = readme.replace(
-    versionBadgeRegex,
-    "https://img.shields.io/badge/version-" + encodeURIComponent(badgeFriendlyVersion) + "-blue.svg"
-  );
+  if (version.indexOf("-") >= 0) {
+    let readme = readFileSync(readmePath, "utf-8");
+    const versionBadgeRegex = /https:\/\/img\.shields\.io\/badge\/version-\d+\.\d+\.\d+(\.\d)?( ?.*?)?-blue\.svg/;
+    const updatedReadme = readme.replace(
+        versionBadgeRegex,
+        "https://img.shields.io/badge/version-" + encodeURIComponent(friendlyVersion) + "-blue.svg"
+    );
 
-  if (updatedReadme === readme) {
-    console.warn("Warning: Version badge not found or not updated in README.md");
-  } else {
-    console.log(`Updated README.md version badge to ${badgeFriendlyVersion}`);
+    if (updatedReadme === readme) {
+      console.warn("Warning: Version badge not found or not updated in README.md");
+    } else {
+      console.log(`Updated README.md version badge to ${friendlyVersion}`);
+    }
+
+    writeFileSync(readmePath, updatedReadme);
   }
-
-  writeFileSync(readmePath, updatedReadme);
 
   // Run biome
   console.log("Running biome...");
