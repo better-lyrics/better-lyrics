@@ -7,6 +7,7 @@ const rootDir = process.cwd();
 const packageJsonPath = join(rootDir, "package.json");
 const manifestPath = join(rootDir, "manifest.json");
 const optionsHtmlPath = join(rootDir, "src", "options", "options.html");
+const readmePath = join(rootDir, "README.md");
 
 try {
   const packageJson = JSON.parse(readFileSync(packageJsonPath, "utf-8"));
@@ -56,6 +57,15 @@ try {
   }
   versionElement.textContent = friendlyVersion;
   writeFileSync(optionsHtmlPath, optionsHtmlDom.serialize());
+
+  let badgeFriendlyVersion = friendlyVersion.replaceAll("-", " ");
+
+  let readme = readFileSync(readmePath, "utf-8");
+  readme = readme.replace(
+    /https:\/\/img.shields.io\/badge\/version-\d+\.\d+\.\d+(\.\d)?( ?.*?)?-blue.svg/,
+    "https://img.shields.io/badge/version-" + badgeFriendlyVersion + "-blue.svg"
+  );
+  writeFileSync(readmePath, readme);
 
   // Run biome
   console.log("Running biome...");
