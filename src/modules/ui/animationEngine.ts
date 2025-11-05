@@ -278,7 +278,9 @@ export function animationEngine(
         firstActiveScrollPos = targetScrollPos;
       }
 
-      // offset so lyrics appear towards the center of the screen
+      // Offset so lyrics appear towards the center of the screen.
+      // We subtract selectedLyricHeight / 2 to center the selected lyric line vertically within the offset region,
+      // so the lyric is not aligned at the very top of the offset but is visually centered.
       const scrollPosOffset = tabRendererHeight * topOffsetMultiplier - selectedLyricHeight / 2;
 
       // Base position
