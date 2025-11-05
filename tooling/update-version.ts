@@ -58,13 +58,12 @@ try {
   versionElement.textContent = friendlyVersion;
   writeFileSync(optionsHtmlPath, optionsHtmlDom.serialize());
 
-
   if (version.indexOf("-") >= 0) {
     let readme = readFileSync(readmePath, "utf-8");
     const versionBadgeRegex = /https:\/\/img\.shields\.io\/badge\/version-\d+\.\d+\.\d+(\.\d)?( ?.*?)?-blue\.svg/;
     const updatedReadme = readme.replace(
-        versionBadgeRegex,
-        "https://img.shields.io/badge/version-" + encodeURIComponent(friendlyVersion) + "-blue.svg"
+      versionBadgeRegex,
+      "https://img.shields.io/badge/version-" + encodeURIComponent(friendlyVersion) + "-blue.svg"
     );
 
     if (updatedReadme === readme) {
