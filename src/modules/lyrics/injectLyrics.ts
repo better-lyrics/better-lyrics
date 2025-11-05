@@ -1,13 +1,14 @@
 import * as Constants from "@constants";
-import { BACKGROUND_LYRIC_CLASS } from "@constants";
+import {BACKGROUND_LYRIC_CLASS} from "@constants";
 import * as DOM from "@modules/ui/dom";
 import * as Utils from "@utils";
+import type {TranslationResult} from "@modules/lyrics/translation";
 import * as Translation from "@modules/lyrics/translation";
-import { containsNonLatin, testRtl } from "@modules/lyrics/lyricParseUtils";
-import { AppState } from "@/index";
-import type { LyricSourceResultWithMeta } from "@modules/lyrics/lyrics";
-import type { Lyric, LyricPart } from "@modules/lyrics/providers/shared";
-import type { TranslationResult } from "@modules/lyrics/translation";
+import {containsNonLatin, testRtl} from "@modules/lyrics/lyricParseUtils";
+import {AppState} from "@/index";
+import type {LyricSourceResultWithMeta} from "@modules/lyrics/lyrics";
+import type {Lyric, LyricPart} from "@modules/lyrics/providers/shared";
+import {animEngineState, lyricsElementAdded} from "@modules/ui/animationEngine";
 
 export interface PartData {
   time: number;
@@ -235,7 +236,7 @@ export function injectLyrics(data: LyricSourceResultWithMeta, keepLoaderVisible 
         `const player = document.getElementById("movie_player"); player.seekTo(${item.startTimeMs / 1000}, true);player.playVideo();`
       );
       lyricElement.addEventListener("click", _e => {
-        DOM.animEngineState.scrollResumeTime = 0;
+        animEngineState.scrollResumeTime = 0;
       });
     } else {
       lyricElement.style.cursor = "unset";
@@ -324,7 +325,7 @@ export function injectLyrics(data: LyricSourceResultWithMeta, keepLoaderVisible 
               romanizedLine.textContent = result ? "\n" + result : "\n";
               romanizedLine.style.order = "5";
               lyricElement.appendChild(romanizedLine);
-              DOM.lyricsElementAdded();
+              lyricsElementAdded();
             }
           }
         }
@@ -369,7 +370,7 @@ export function injectLyrics(data: LyricSourceResultWithMeta, keepLoaderVisible 
               translatedLine.style.order = "7";
               lyricElement.appendChild(translatedLine);
 
-              DOM.lyricsElementAdded();
+              lyricsElementAdded();
             }
           }
         }
@@ -384,12 +385,12 @@ export function injectLyrics(data: LyricSourceResultWithMeta, keepLoaderVisible 
     }
   });
 
-  DOM.animEngineState.skipScrolls = 2;
-  DOM.animEngineState.skipScrollsDecayTimes = [];
-  for (let i = 0; i < DOM.animEngineState.skipScrolls; i++) {
-    DOM.animEngineState.skipScrollsDecayTimes.push(Date.now() + 2000);
+  animEngineState.skipScrolls = 2;
+  animEngineState.skipScrollsDecayTimes = [];
+  for (let i = 0; i < animEngineState.skipScrolls; i++) {
+    animEngineState.skipScrollsDecayTimes.push(Date.now() + 2000);
   }
-  DOM.animEngineState.scrollResumeTime = 0;
+  animEngineState.scrollResumeTime = 0;
 
   if (lyrics[0].words !== Constants.NO_LYRICS_TEXT) {
     DOM.addFooter(data.source, data.sourceHref, data.song, data.artist, data.album, data.duration);

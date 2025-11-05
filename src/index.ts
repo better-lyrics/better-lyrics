@@ -6,8 +6,9 @@ import * as Constants from "@constants";
 import * as RequestSniffing from "@modules/lyrics/requestSniffer";
 import * as Lyrics from "@modules/lyrics/lyrics";
 import * as Storage from "@core/storage";
-import { initProviders } from "@modules/lyrics/providers/shared";
-import type { LyricsData } from "@modules/lyrics/injectLyrics";
+import {initProviders} from "@modules/lyrics/providers/shared";
+import type {LyricsData} from "@modules/lyrics/injectLyrics";
+import {animationEngine} from "@modules/ui/animationEngine";
 
 export interface PlayerDetails {
   currentTime: number;
@@ -105,7 +106,7 @@ export function handleModifications(detail: PlayerDetails): void {
     AppState.lyricAbortController = new AbortController();
     AppState.lyricInjectionPromise = Lyrics.createLyrics(detail, AppState.lyricAbortController.signal)
       .then(() => {
-        return DOM.tickLyrics(detail.currentTime, Date.now(), detail.playing);
+        return animationEngine(detail.currentTime, Date.now(), detail.playing);
       })
       .catch(err => {
         Utils.log(Constants.GENERAL_ERROR_LOG, err);

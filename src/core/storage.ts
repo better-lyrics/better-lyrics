@@ -1,6 +1,6 @@
 import * as Utils from "@utils";
-import * as Dom from "@modules/ui/dom";
 import * as Constants from "@constants";
+import {cachedDurations} from "@modules/ui/animationEngine";
 
 /**
  * Cross-browser storage getter that works with both Chrome and Firefox.
@@ -34,11 +34,11 @@ export function subscribeToCustomCSS(): void {
   chrome.storage.onChanged.addListener((changes, area) => {
     if (area === "sync" && changes.customCSS) {
       Utils.applyCustomCSS(changes.customCSS.newValue);
-      Dom.cachedDurations.clear();
+      cachedDurations.clear();
     }
   });
   getAndApplyCustomCSS();
-  Dom.cachedDurations.clear();
+  cachedDurations.clear();
 }
 
 /**

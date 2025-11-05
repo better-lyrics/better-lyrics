@@ -1,10 +1,11 @@
 import * as Settings from "@modules/settings/settings";
 import * as Dom from "./dom";
 import * as Constants from "@constants";
+import type {PlayerDetails} from "@/index";
 import * as BetterLyrics from "@/index";
+import {AppState} from "@/index";
 import * as Utils from "@utils";
-import { AppState } from "@/index";
-import type { PlayerDetails } from "@/index";
+import {animEngineState, getResumeScrollElement, animationEngine} from "@modules/ui/animationEngine";
 
 /**
  * Enables the lyrics tab and prevents it from being disabled by YouTube Music.
@@ -87,7 +88,7 @@ export function lyricReloader(): void {
     }
 
     tab2.addEventListener("click", () => {
-      Dom.getResumeScrollElement().classList.remove("blyrics-hidden");
+      getResumeScrollElement().classList.remove("blyrics-hidden");
       if (!AppState.areLyricsLoaded) {
         Utils.log(Constants.LYRICS_TAB_CLICKED_LOG);
         Dom.cleanup();
@@ -96,7 +97,7 @@ export function lyricReloader(): void {
       }
     });
 
-    const hideAutoscrollResume = () => Dom.getResumeScrollElement().classList.add("blyrics-hidden");
+    const hideAutoscrollResume = () => getResumeScrollElement().classList.add("blyrics-hidden");
     tab1.addEventListener("click", hideAutoscrollResume);
     tab3.addEventListener("click", hideAutoscrollResume);
   } else {
@@ -171,7 +172,7 @@ export function initializeLyrics(): void {
         BetterLyrics.handleModifications(detail);
       }
     }
-    Dom.tickLyrics(detail.currentTime, detail.browserTime, detail.playing);
+    animationEngine(detail.currentTime, detail.browserTime, detail.playing);
   });
 }
 
@@ -185,16 +186,16 @@ export function scrollEventHandler(): void {
     return;
   }
 
-  if (Dom.animEngineState.skipScrolls > 0) {
-    Dom.animEngineState.skipScrolls--;
-    Dom.animEngineState.skipScrollsDecayTimes.shift();
+  if (animEngineState.skipScrolls > 0) {
+    animEngineState.skipScrolls--;
+    animEngineState.skipScrollsDecayTimes.shift();
     // Utils.log("[BetterLyrics] Skipping Lyrics Scroll");
     return;
   }
   if (!Dom.isLoaderActive()) {
-    if (Dom.animEngineState.scrollResumeTime < Date.now()) {
+    if (animEngineState.scrollResumeTime < Date.now()) {
       Utils.log(Constants.PAUSING_LYRICS_SCROLL_LOG);
     }
-    Dom.animEngineState.scrollResumeTime = Date.now() + 25000;
+    animEngineState.scrollResumeTime = Date.now() + 25000;
   }
 }
