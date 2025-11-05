@@ -14,6 +14,7 @@ interface AnimEngineState {
     lastTime: number;
     lastPlayState: boolean;
     lastEventCreationTime: number;
+    lastFirstActiveElement: number;
 }
 
 export let animEngineState: AnimEngineState = {
@@ -27,6 +28,7 @@ export let animEngineState: AnimEngineState = {
     lastTime: 0,
     lastPlayState: false,
     lastEventCreationTime: 0,
+    lastFirstActiveElement: -1,
 };
 /**
  * @type {Map<string, number>}
@@ -120,6 +122,7 @@ export function animationEngine(
         }
 
         const lyricScrollTime = currentTime + getCSSDurationInMs(lyricsElement, "--blyrics-scroll-timing-offset") / 1000;
+        let firstActiveScrollPos = -1
 
         let selectedLyricHeight = 0;
         let targetScrollPos = 0;
@@ -134,9 +137,20 @@ export function animationEngine(
 
             if (lyricScrollTime >= time && (lyricScrollTime < nextTime || lyricScrollTime < time + lineData.duration)) {
                 const elemBounds = getRelativeBounds(lyricsElement, lineData.lyricElement);
+
                 targetScrollPos = elemBounds.y;
                 selectedLyricHeight = elemBounds.height;
                 availableScrollTime = nextTime - lyricScrollTime;
+
+                // Avoid micro scrolls when the previous element ends just slightly after the next elm starts.
+                let significantTimeRemainingInLyric = (lyricScrollTime < nextTime - 0.3 || lyricScrollTime < time + lineData.duration - 0.3)
+
+                if (firstActiveScrollPos <= 0 &&
+                    (significantTimeRemainingInLyric || animEngineState.lastFirstActiveElement === index)) {
+                    firstActiveScrollPos = elemBounds.y;
+                    animEngineState.lastFirstActiveElement = index;
+                }
+
                 // const timeDelta = lyricScrollTime - time;
                 // if (animEngineState.selectedElementIndex !== index && timeDelta > 0.05 && index > 0) {
                 //   Utils.log(`[BetterLyrics] Scrolling to new lyric was late, dt: ${timeDelta.toFixed(5)}s`);
@@ -232,6 +246,11 @@ export function animationEngine(
             return true;
         });
 
+        if (animEngineState.lastFirstActiveElement === animEngineState.selectedElementIndex) {
+            // We don't want it to track as the last first elem if it currently the primary element.
+            animEngineState.lastFirstActiveElement = -1;
+        }
+
         // lyricsHeight can change slightly due to animations
         const lyricsHeight = lyricsElement.getBoundingClientRect().height;
         const tabRenderer = document.querySelector(Constants.TAB_RENDERER_SELECTOR) as HTMLElement;
@@ -247,9 +266,29 @@ export function animationEngine(
                 animEngineState.wasUserScrolling = false;
             }
 
-            const scrollPosOffset = Math.max(0, tabRendererHeight * topOffsetMultiplier - selectedLyricHeight / 2);
-            let scrollPos = Math.max(0, targetScrollPos - scrollPosOffset);
-            scrollPos = Math.max(Math.min(lyricsHeight - tabRendererHeight, scrollPos), 0);
+            if (firstActiveScrollPos <= 0) {
+                // Was not set, don't scroll to the top b/c of this
+                firstActiveScrollPos = targetScrollPos;
+            }
+
+            // offset so lyrics appear towards the center of the screen
+            const scrollPosOffset = tabRendererHeight * topOffsetMultiplier - selectedLyricHeight / 2
+
+            // Base position
+            let scrollPos = targetScrollPos - scrollPosOffset;
+
+            // Make sure the first selected line is stays visible
+            scrollPos = Math.min(scrollPos, firstActiveScrollPos);
+
+            // Make sure bottom of last active lyric is visible
+            scrollPos = Math.max(scrollPos, targetScrollPos - tabRendererHeight + selectedLyricHeight);
+
+            // Make sure top of last active lyric is visible.
+            scrollPos = Math.min(scrollPos, targetScrollPos);
+
+            // Make sure we're not trying to scroll to negative values
+            scrollPos = Math.max(0, scrollPos);
+
 
             if (Math.abs(scrollTop - scrollPos) > 2 && Date.now() > animEngineState.nextScrollAllowedTime) {
                 if (smoothScroll) {
