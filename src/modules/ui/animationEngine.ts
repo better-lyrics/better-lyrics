@@ -3,6 +3,8 @@ import * as Constants from "@constants";
 import * as Utils from "@utils";
 import { isLoaderActive } from "@modules/ui/dom";
 
+const MIRCO_SCROLL_THRESHOLD_S = 0.3;
+
 interface AnimEngineState {
   skipScrolls: number;
   skipScrollsDecayTimes: number[];
@@ -30,6 +32,7 @@ export let animEngineState: AnimEngineState = {
   lastEventCreationTime: 0,
   lastFirstActiveElement: -1,
 };
+
 /**
  * @type {Map<string, number>}
  */
@@ -144,7 +147,7 @@ export function animationEngine(
 
         // Avoid micro scrolls when the previous element ends just slightly after the next elm starts.
         let significantTimeRemainingInLyric =
-          lyricScrollTime < nextTime - 0.3 || lyricScrollTime < time + lineData.duration - 0.3;
+          lyricScrollTime < nextTime - MIRCO_SCROLL_THRESHOLD_S || lyricScrollTime < time + lineData.duration - MIRCO_SCROLL_THRESHOLD_S;
 
         if (
           firstActiveScrollPos <= 0 &&
