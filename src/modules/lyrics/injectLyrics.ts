@@ -96,7 +96,7 @@ function createLyricsLine(parts: LyricPart[], line: LineData, lyricElement: HTML
     rtlBuffer.forEach(part => {
       lyricElementsBuffer.push(part);
     });
-  } else if (rtlBuffer.length > 0){
+  } else if (rtlBuffer.length > 0) {
     rtlBuffer.reverse().forEach(part => {
       lyricElementsBuffer.push(part);
     });

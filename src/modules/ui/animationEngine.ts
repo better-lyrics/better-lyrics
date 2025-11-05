@@ -147,7 +147,8 @@ export function animationEngine(
 
         // Avoid micro scrolls when the previous element ends just slightly after the next elm starts.
         let significantTimeRemainingInLyric =
-          lyricScrollTime < nextTime - MIRCO_SCROLL_THRESHOLD_S || lyricScrollTime < time + lineData.duration - MIRCO_SCROLL_THRESHOLD_S;
+          lyricScrollTime < nextTime - MIRCO_SCROLL_THRESHOLD_S ||
+          lyricScrollTime < time + lineData.duration - MIRCO_SCROLL_THRESHOLD_S;
 
         if (
           firstActiveScrollPos <= 0 &&
