@@ -14,7 +14,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
+          ssh-key: ${{ secrets.DEPLOY_KEY }}
           fetch-depth: 0
 
       - name: Use Node.js
@@ -32,18 +32,39 @@ jobs:
 
       - name: Check for changes and commit
         run: |
-          if [ -n "$(git status --porcelain)" ]; then
-            git config --local user.email "harmonizer@betterlyrics.dev"
-            git config --local user.name "Better Lyrics Harmonizer"
-            git add .
-            git commit -m "Auto-fix: Apply Biome lint and format fixes"
-
-            if git symbolic-ref HEAD >/dev/null 2>&1; then
-              git push
-              echo "✅ Auto-fixed Biome issues and committed changes"
+            # First, check if there are any changes.
+            if [ -n "$(git status --porcelain)" ]; then
+            
+              # Define the auto-fix commit message
+              AUTO_FIX_MSG="Auto-fix: Apply Biome lint and format fixes"
+            
+              # Get the subject of the very last commit.
+              # "|| true" prevents the script from failing if there are no commits yet.
+              LAST_COMMIT_MSG=$(git log -1 --pretty=%s || true)
+            
+              # Check if the last commit was ALSO an auto-fix
+              if [ "$LAST_COMMIT_MSG" = "$AUTO_FIX_MSG" ]; then
+                echo "❌ ERROR: Potential auto-fix loop detected!"
+                echo "The previous commit was an auto-fix, but this run *still* found Biome issues."
+                echo "This means the auto-fix is not succeeding in one pass."
+                echo "Failing the job to prevent an infinite commit loop."
+                echo "Please review the Biome output and fix the remaining issues manually."
+                exit 1
+              fi
+            
+              # If we're here, it's safe to commit.
+              echo "✅ Found Biome issues. Proceeding with auto-fix commit."
+              git config --local user.email "harmonizer@betterlyrics.dev"
+              git config --local user.name "Better Lyrics Harmonizer"
+              git add .
+              git commit -m "$AUTO_FIX_MSG"
+            
+              if git symbolic-ref HEAD >/dev/null 2>&1; then
+                git push
+                echo "✅ Auto-fixed Biome issues and pushed changes."
+              else
+                echo "✅ Auto-fixed Biome issues (detached HEAD - changes committed locally)"
+              fi
             else
-              echo "✅ Auto-fixed Biome issues (detached HEAD - changes committed locally)"
+              echo "✅ No Biome issues found - skipping commit"
             fi
-          else
-            echo "✅ No Biome issues found - skipping commit"
-          fi
