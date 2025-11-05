@@ -61,11 +61,19 @@ try {
   let badgeFriendlyVersion = friendlyVersion.replaceAll("-", " ");
 
   let readme = readFileSync(readmePath, "utf-8");
-  readme = readme.replace(
-    /https:\/\/img.shields.io\/badge\/version-\d+\.\d+\.\d+(\.\d)?( ?.*?)?-blue.svg/,
-    "https://img.shields.io/badge/version-" + badgeFriendlyVersion + "-blue.svg"
-  );
-  writeFileSync(readmePath, readme);
+const versionBadgeRegex = /https:\/\/img\.shields\.io\/badge\/version-\d+\.\d+\.\d+(\.\d)?( ?.*?)?-blue\.svg/;
+const updatedReadme = readme.replace(
+  versionBadgeRegex,
+  "https://img.shields.io/badge/version-" + encodeURIComponent(badgeFriendlyVersion) + "-blue.svg"
+);
+
+if (updatedReadme === readme) {
+  console.warn("Warning: Version badge not found or not updated in README.md");
+} else {
+  console.log(`Updated README.md version badge to ${badgeFriendlyVersion}`);
+}
+
+writeFileSync(readmePath, updatedReadme);
 
   // Run biome
   console.log("Running biome...");
