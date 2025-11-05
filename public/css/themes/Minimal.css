@@ -1,140 +1,251 @@
-/* 2025-10-04T13-07-00 v1.3.0 */
-/* changed bg, font, albm-art shdw, no animations */
-/* cuztomized the portrait-mode lyrics tab thing */
+/* 2025-11-05T09-37-05 v1.4.2 */
+/* Better- portrait mode (inspo @chengg) & player bar */
+/* Removed- permanent notifications & context comments (issues) */
 
-:root {
-   /* FONT BABY! */
-   --blyrics-font-family: system-ui, sans-serif, var(--noto-sans-universal);
-   --blyrics-footer-font-family: var(--blyrics-font-family);
-
-   /* someone said oklach is modern so here ya go */
-   --blyrics-lyric-inactive-color: oklch(1 0 0 / 0.3) !important;
-   --blyrics-lyric-active-color: oklch(1 0 0 / 1) !important;
-   --blyrics-error-color: oklch(from rgb(99.2% 88.2% 88.2%) l c h);
-   --blyrics-ui-text-color: var(--blyrics-lyric-active-color);
-   --blyrics-translated-color: oklch(1 0 0 / 0.6);
-
-   /* blur and saturatiom changes */
-   --blyrics-background-blur: 50px;
-   --blyrics-background-saturate: 1.3;
-
-   /* Remove unnecessary delays */
-   --blyrics-anim-delay: 0s !important;
-   --blyrics-swipe-delay: 0s !important;
-
-   /* no thank you */
-   --blyrics-gradient-stops: none !important;
-
-   /* Smooth scroll timing */
-   --blyrics-lyric-scroll-duration: 0.5s !important;
-   --blyrics-lyric-scroll-timing-function: cubic-bezier(
-      0.645,
-      0.045,
-      0.355,
-      1
-   ) !important;
+* {
+  font-family: system-ui, sans-serif !important;
+  scrollbar-width: thin;
 }
 
-/* bye bye animations and swipy */
+html {
+  scrollbar-width: none;
+}
+
+ytmusic-app-layout > [slot="player-bar"] {
+  width: 100vw;
+}
+
+:root {
+  --blyrics-font-family: system-ui, sans-serif;
+  --blyrics-footer-font-family: var(--blyrics-font-family);
+  --blyrics-font-weight: 600;
+  --blyrics-font-size: 3.5rem;
+  --blyrics-translated-font-size: 2.33rem;
+
+  --blyrics-lyric-inactive-color: oklch(1 0 0 / 0.35) !important;
+  --blyrics-lyric-active-color: oklch(1 0 0 / 1) !important;
+  --blyrics-error-color: oklch(from rgb(99.2% 88.2% 88.2%) l c h);
+  --blyrics-ui-text-color: var(--blyrics-lyric-active-color);
+  --blyrics-translated-color: oklch(1 0 0 / 0.6);
+
+  --blyrics-background-blur: 40px;
+  --blyrics-background-saturate: 1.3;
+
+  --blyrics-anim-delay: 0s !important;
+  --blyrics-swipe-delay: 0s !important;
+
+  --blyrics-gradient-stops: none !important;
+
+  --blyrics-lyric-scroll-duration: 0.4s !important;
+  --blyrics-lyric-scroll-timing-function: cubic-bezier(
+    0.645,
+    0.045,
+    0.355,
+    1
+  ) !important;
+
+  --background-image-transition: background 3s ease-in-out 1s;
+}
+
 .blyrics-container > div > span::after {
-   display: none !important;
-   content: none !important;
-   animation: none !important;
+  display: none !important;
+  content: none !important;
+  animation: none !important;
 }
 
 .blyrics-container > div > span.blyrics--animating {
-   animation: none !important;
+  animation: none !important;
 }
 
-/* fade in instead of whatever the hell was that */
-/* transition to reomve low opacity letter joint artifacts */
 .blyrics-container > div {
-   transform: none !important;
-   transition: opacity 0.5s ease !important;
-   opacity: 0.3;
+  transform: none !important;
+  transition: opacity 0.4s ease-in-out !important;
+  opacity: 0.35;
 }
 
-/* active vs inactive color changes. */
-/* transition to reomve low opacity letter joint artifacts */
 .blyrics-container > div > span {
-   color: var(--blyrics-lyric-active-color) !important;
-   transition: color 0.5s ease !important;
+  color: var(--blyrics-lyric-active-color) !important;
+  transition: color 0.4s ease-in-out !important;
 }
 
-/* you can't rely on previous color setting opacity */
 .blyrics-container > div.blyrics--active {
-   opacity: 1;
+  opacity: 1;
 }
 
-/* Inactive state translated/roman color, and color fade-in */
-/* don't treat letters, treat em as whole */
 .blyrics--translated,
 .blyrics--romanized {
-   opacity: 0.6 !important;
-   color: oklch(1 0 0 / 1) !important;
-   transition: opacity 0.5s ease !important;
+  color: oklch(1 0 0 / 1) !important;
+  line-height: 1.4em;
+  opacity: 0.8 !important;
+  transition: opacity 0.4s ease-in-out !important;
 }
 
-/* active translation / romanization */
 .blyrics-container > div.blyrics--active .blyrics--translated,
 .blyrics-container > div.blyrics--active .blyrics--romanized {
-   opacity: 0.6 !important;
-   transition: opacity 0.5s ease !important;
+  opacity: 0.8 !important;
+  transition: opacity 0.4s ease-in-out !important;
 }
 
-/* black blur from background go away */
-ytmusic-player-page:before {
-   position: fixed !important;
-   top: -18% !important;
-   left: -5% !important;
-   width: 100vw !important;
-   height: 100vh !important;
-   filter: saturate(var(--blyrics-background-saturate)) brightness(0.3)
-      blur(var(--blyrics-background-blur));
+ytmusic-player-page::before {
+  content: "";
+  position: fixed;
+  left: calc(0px - var(--ytmusic-guide-width));
+  top: calc(0px - var(--ytmusic-nav-bar-height));
+  bottom: 0;
+  right: 0;
+  height: 100vh;
+  width: 100vw;
+  scale: 115%;
+  background: var(--blyrics-background-img);
+  background-position: center;
+  background-size: cover;
+  background-repeat: no-repeat;
+  filter: saturate(var(--blyrics-background-saturate)) brightness(0.3)
+    blur(var(--blyrics-background-blur));
+  transition: var(--background-image-transition);
 }
 
-/* album shadow, SIMMER DOWN */
+ytmusic-player-page[is-mweb-modernization-enabled]::before {
+  inset: 0;
+}
+
+ytmusic-player-page[player-fullscreened]::before {
+  top: calc(0px - var(--ytmusic-player-bar-height));
+  bottom: 0;
+  left: 0;
+  right: 0;
+}
+
 #player.ytmusic-player-page {
-   box-shadow: oklch(0.18 0 0 / 0.1) 0 4px 12px !important;
-   border-radius: 8px !important;
+  box-shadow: oklch(0.18 0 0 / 0.1) 0 4px 12px !important;
+  border-radius: 8px !important;
 }
 
 ytmusic-player-page[player-fullscreened] .song-media-controls.ytmusic-player {
-   background-image: none !important;
+  background-image: none !important;
 }
 
-@media (max-width: 615px) {
-   ytmusic-player-page:before {
-      position: fixed !important;
-      top: 0 !important;
-      left: 0 !important;
-      filter: saturate(var(--blyrics-background-saturate)) brightness(0.7)
-         blur(var(--blyrics-background-blur));
-   }
+[is-mweb-modernization-enabled][page-type="MUSIC_PAGE_TYPE_TRACK_LYRICS"],
+.blyrics-container:before,
+.blyrics-container,
+.blyrics-container:after {
+  background: none !important;
+  filter: none !important;
+}
 
-   [page-type="MUSIC_PAGE_TYPE_TRACK_LYRICS"],
-   .blyrics-container:before,
-   .blyrics-container,
-   .blyrics-container:after {
-      background: none !important;
-      filter: none !important;
-   }
+ytmusic-player-page[is-mweb-modernization-enabled]
+  .background-gradient.ytmusic-player-page {
+  display: none;
+}
 
-   #tab-renderer::before {
-      content: "";
-      position: fixed;
-      z-index: -100;
-      background: var(--blyrics-background-img) !important;
-      background-position: center !important;
-      top: 0;
-      top: 0;
-      left: -6%;
-      /*  background-attachment: fixed !important; */
-      width: 110% !important;
-      height: 100% !important;
-      background-repeat: no-repeat !important;
-      background-size: cover !important;
-      filter: saturate(var(--blyrics-background-saturate)) brightness(0.3)
-         blur(var(--blyrics-background-blur)) !important;
-   }
+ytmusic-player-page[is-mweb-modernization-enabled]
+  .background-thumbnail.ytmusic-player-page {
+  display: none;
+}
+
+#layout:not([player-ui-state="PLAYER_PAGE_OPEN"])
+  ytmusic-player-bar:not([player-fullscreened]),
+#layout:not([player-ui-state="PLAYER-PAGE-OPEN"])
+  #player-bar-background.ytmusic-app-layout:not([player-fullscreened]) {
+  background: transparent;
+}
+
+#layout:not([player-ui-state="PLAYER_PAGE_OPEN"])
+  ytmusic-player-bar:not([player-fullscreened]) {
+  backdrop-filter: saturate(var(--blyrics-background-saturate)) brightness(0.3)
+    blur(var(--blyrics-background-blur));
+}
+
+#layout:not([player-ui-state="PLAYER_PAGE_OPEN"])
+  #player-bar-background.ytmusic-app-layout:not([player-fullscreened])::before {
+  content: "";
+  z-index: -1;
+  background: var(--blyrics-background-img);
+  background-position: center;
+  background-size: cover;
+  position: absolute;
+  inset: 0;
+  transition: var(--background-image-transition);
+}
+
+ytmusic-app-layout[is-mweb-modernization-enabled]:not(
+    [player-ui-state="PLAYER_BAR_ONLY"]
+  )
+  [slot="player-page"]
+  ~ #player-bar-background.ytmusic-app-layout::before {
+  background: none !important;
+  backdrop-filter: none !important;
+  content: none !important;
+}
+
+ytmusic-player-queue-item[play-button-state="loading"],
+ytmusic-player-queue-item[play-button-state="playing"],
+ytmusic-player-queue-item[play-button-state="paused"] {
+  border-radius: 8px;
+}
+
+ytmusic-player-page[is-mweb-modernization-enabled]
+  .background-image.ytmusic-player-page,
+ytmusic-player-page[is-mweb-modernization-enabled]
+  .side-panel.ytmusic-player-page,
+ytmusic-player-page[is-mweb-modernization-enabled]
+  .background-thumbnail.ytmusic-player-page,
+ytmusic-player-page[is-mweb-modernization-enabled]
+  .background-gradient.ytmusic-player-page {
+  background: none;
+  backdrop-filter: none;
+  filter: none;
+}
+
+ytmusic-player-page[is-mweb-modernization-enabled]
+  .background-thumbnail.ytmusic-player-page,
+ytmusic-player-page[is-mweb-modernization-enabled]
+  .background-gradient.ytmusic-player-page {
+  display: none;
+}
+
+ytmusic-player-page[is-mweb-modernization-enabled][player-page-ui-state="TABS_VIEW"]
+  #top-player-bar.ytmusic-player-page,
+ytmusic-player-page[is-mweb-modernization-enabled][player-page-ui-state="TABS_VIEW"]
+  #side-panel.ytmusic-player-page {
+  background: transparent !important;
+  backdrop-filter: none;
+  filter: none;
+}
+
+ytmusic-app-layout .ytmusic-app[is-mweb-modernization-enabled],
+[is-mweb-modernization-enabled] #player-bar-background.ytmusic-app-layout {
+  background: none !important;
+  filter: none !important;
+  backdrop-filter: none;
+}
+
+#tab-renderer[page-type="MUSIC_PAGE_TYPE_TRACK_LYRICS"],
+[is-mweb-modernization-enabled][page-type="MUSIC_PAGE_TYPE_TRACK_LYRICS"],
+[is-mweb-modernization-enabled] .blyrics-container {
+  background: none !important;
+  filter: none !important;
+  backdrop-filter: none;
+}
+
+[is-mweb-modernization-enabled] .blyrics-container:before,
+[is-mweb-modernization-enabled] .blyrics-container:after {
+  opacity: 0;
+}
+
+@keyframes idontwannaseeyouanymore-billie {
+  to {
+    opacity: 0;
+    transform: translateY(100px);
+    visibility: hidden;
+  }
+}
+
+tp-yt-paper-toast.paper-toast-open:not(:hover) {
+  animation: idontwannaseeyouanymore-billie 0.3s ease-in-out 4.7s forwards;
+}
+
+tp-yt-paper-toast #close-button {
+  display: none;
+  visibility: hidden;
 }

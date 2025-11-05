@@ -15,7 +15,7 @@ Better Lyrics upgrades your YouTube Music experience by providing beautiful time
  <a aria-label="Better Stack Badge" href="https://better-lyrics-status.boidu.dev"><img height="20" src="https://uptime.betterstack.com/status-badges/v2/monitor/1dqoz.svg" alt="Better Stack Badge" /></a>
 
  <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
-<img src="https://img.shields.io/badge/all_contributors-6-orange.svg" alt=""/>
+<img src="https://img.shields.io/badge/all_contributors-9-orange.svg" alt=""/>
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 </p>
 
@@ -273,9 +273,13 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/Myse1f"><img src="https://avatars.githubusercontent.com/u/28757057?v=4?s=100" width="100px;" alt="Yvon"/><br /><sub><b>Yvon</b></sub></a><br /><a href="https://github.com/better-lyrics/better-lyrics/commits?author=Myse1f" title="Code">💻</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/nitinmano"><img src="https://avatars.githubusercontent.com/u/55648552?v=4?s=100" width="100px;" alt="NMPro"/><br /><sub><b>NMPro</b></sub></a><br /><a href="https://github.com/better-lyrics/better-lyrics/commits?author=nitinmano" title="Code">💻</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/adaliea"><img src="https://avatars.githubusercontent.com/u/59785640?v=4?s=100" width="100px;" alt="Adalie Ahuja"/><br /><sub><b>Adalie Ahuja</b></sub></a><br /><a href="https://github.com/better-lyrics/better-lyrics/commits?author=adaliea" title="Code">💻</a></td>
-      <td align="center" valign="top" width="14.28%"><a href="https://gustavostz.com/"><img src="https://avatars.githubusercontent.com/u/48111506?v=4?s=100" width="100px;" alt="Gustavo Steinmetz"/><br /><sub><b>Gustavo Steinmetz</b></sub></a><br /><a href="https://github.com/better-lyrics/better-lyrics/commits?author=gustavostz" title="Code">💻</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/Kiroolos"><img src="https://avatars.githubusercontent.com/u/43939903?v=4?s=100" width="100px;" alt="Kirolos ☃️"/><br /><sub><b>Kirolos ☃️</b></sub></a><br /><a href="https://github.com/better-lyrics/better-lyrics/commits?author=Kiroolos" title="Code">💻</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/cschot"><img src="https://avatars.githubusercontent.com/u/40297097?v=4?s=100" width="100px;" alt="cschot"/><br /><sub><b>cschot</b></sub></a><br /><a href="https://github.com/better-lyrics/better-lyrics/commits?author=cschot" title="Code">💻</a></td>
+    </tr>
+    <tr>
+      <td align="center" valign="top" width="14.28%"><a href="https://gustavostz.com/"><img src="https://avatars.githubusercontent.com/u/48111506?v=4?s=100" width="100px;" alt="Gustavo Steinmetz"/><br /><sub><b>Gustavo Steinmetz</b></sub></a><br /><a href="https://github.com/better-lyrics/better-lyrics/commits?author=gustavostz" title="Code">💻</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://aircraft192.de/"><img src="https://avatars.githubusercontent.com/u/92523442?v=4?s=100" width="100px;" alt="Aircraft192"/><br /><sub><b>Aircraft192</b></sub></a><br /><a href="https://github.com/better-lyrics/better-lyrics/commits?author=Aircraft192" title="Code">💻</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/ramansg"><img src="https://avatars.githubusercontent.com/u/19746632?v=4?s=100" width="100px;" alt="ramansg"/><br /><sub><b>ramansg</b></sub></a><br /><a href="#plugin-ramansg" title="Plugin/utility libraries">🔌</a></td>
     </tr>
   </tbody>
 </table>

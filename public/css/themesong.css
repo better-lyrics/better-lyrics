@@ -8,6 +8,12 @@
 
 @supports (selector(:root:has(#ThemeSong-MainContainer))) {
   :root:has(#ThemeSong-MainContainer) {
+    --blyrics-text-color: var(--ts-primary-text-color);
+    --blyrics-footer-text-color: var(--ts-secondary-text-color);
+    --blyrics-footer-link-color: var(--ts-secondary-text-color);
+    --blyrics-footer-bg-color: var(--ts-pill-color);
+    --blyrics-footer-border-color: var(--ts-pill-color);
+    
     #player-page {
       top: 0 !important;
       padding-block: 64px;
