@@ -1,11 +1,11 @@
 import * as Settings from "@modules/settings/settings";
 import * as Dom from "./dom";
 import * as Constants from "@constants";
-import type {PlayerDetails} from "@/index";
+import type { PlayerDetails } from "@/index";
 import * as BetterLyrics from "@/index";
-import {AppState} from "@/index";
+import { AppState } from "@/index";
 import * as Utils from "@utils";
-import {animEngineState, getResumeScrollElement, animationEngine} from "@modules/ui/animationEngine";
+import { animEngineState, getResumeScrollElement, animationEngine } from "@modules/ui/animationEngine";
 
 /**
  * Enables the lyrics tab and prevents it from being disabled by YouTube Music.

@@ -1,8 +1,8 @@
 import * as Utils from "@utils";
 import * as Constants from "@constants";
 import * as Observer from "./observer";
-import {AppState} from "@/index";
-import {animEngineState, getResumeScrollElement, reflow, toMs} from "@modules/ui/animationEngine";
+import { AppState } from "@/index";
+import { animEngineState, getResumeScrollElement, reflow, toMs } from "@modules/ui/animationEngine";
 
 let backgroundChangeObserver: MutationObserver | null = null;
 let lyricsObserver: MutationObserver | null = null;
@@ -459,4 +459,3 @@ export function injectSongAttributes(title: string, artist: string): void {
   songInfoWrapper.appendChild(artistElm);
   mainPanel.appendChild(songInfoWrapper);
 }
-

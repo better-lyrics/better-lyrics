@@ -1,14 +1,14 @@
 import * as Constants from "@constants";
-import {BACKGROUND_LYRIC_CLASS} from "@constants";
+import { BACKGROUND_LYRIC_CLASS } from "@constants";
 import * as DOM from "@modules/ui/dom";
 import * as Utils from "@utils";
-import type {TranslationResult} from "@modules/lyrics/translation";
+import type { TranslationResult } from "@modules/lyrics/translation";
 import * as Translation from "@modules/lyrics/translation";
-import {containsNonLatin, testRtl} from "@modules/lyrics/lyricParseUtils";
-import {AppState} from "@/index";
-import type {LyricSourceResultWithMeta} from "@modules/lyrics/lyrics";
-import type {Lyric, LyricPart} from "@modules/lyrics/providers/shared";
-import {animEngineState, lyricsElementAdded} from "@modules/ui/animationEngine";
+import { containsNonLatin, testRtl } from "@modules/lyrics/lyricParseUtils";
+import { AppState } from "@/index";
+import type { LyricSourceResultWithMeta } from "@modules/lyrics/lyrics";
+import type { Lyric, LyricPart } from "@modules/lyrics/providers/shared";
+import { animEngineState, lyricsElementAdded } from "@modules/ui/animationEngine";
 
 export interface PartData {
   time: number;

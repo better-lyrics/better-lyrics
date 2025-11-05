@@ -6,9 +6,9 @@ import * as Constants from "@constants";
 import * as RequestSniffing from "@modules/lyrics/requestSniffer";
 import * as Lyrics from "@modules/lyrics/lyrics";
 import * as Storage from "@core/storage";
-import {initProviders} from "@modules/lyrics/providers/shared";
-import type {LyricsData} from "@modules/lyrics/injectLyrics";
-import {animationEngine} from "@modules/ui/animationEngine";
+import { initProviders } from "@modules/lyrics/providers/shared";
+import type { LyricsData } from "@modules/lyrics/injectLyrics";
+import { animationEngine } from "@modules/ui/animationEngine";
 
 export interface PlayerDetails {
   currentTime: number;

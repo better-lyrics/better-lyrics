@@ -1,6 +1,6 @@
 import * as Utils from "@utils";
 import * as Constants from "@constants";
-import {cachedDurations} from "@modules/ui/animationEngine";
+import { cachedDurations } from "@modules/ui/animationEngine";
 
 /**
  * Cross-browser storage getter that works with both Chrome and Firefox.
