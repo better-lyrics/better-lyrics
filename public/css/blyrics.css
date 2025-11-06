@@ -366,6 +366,8 @@
 	display: flex;
 	justify-content: flex-start;
 	opacity: 0.9;
+	z-index: 1;
+	position:relative;
 	transition: opacity 0.3s ease;
 }
 
