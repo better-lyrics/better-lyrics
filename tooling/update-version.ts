@@ -63,7 +63,7 @@ try {
     const versionBadgeRegex = /https:\/\/img\.shields\.io\/badge\/version-\d+\.\d+\.\d+(\.\d)?( ?.*?)?-blue\.svg/;
     const updatedReadme = readme.replace(
       versionBadgeRegex,
-      "https://img.shields.io/badge/version-" + encodeURIComponent(friendlyVersion) + "-blue.svg"
+      "https://img.shields.io/badge/version-" + friendlyVersion + "-blue.svg"
     );
 
     if (updatedReadme === readme) {
