@@ -58,7 +58,7 @@ try {
   versionElement.textContent = friendlyVersion;
   writeFileSync(optionsHtmlPath, optionsHtmlDom.serialize());
 
-  if (version.indexOf("-") >= 0) {
+  if (version.indexOf("-") < 0) {
     let readme = readFileSync(readmePath, "utf-8");
     const versionBadgeRegex = /https:\/\/img\.shields\.io\/badge\/version-\d+\.\d+\.\d+(\.\d)?( ?.*?)?-blue\.svg/;
     const updatedReadme = readme.replace(
@@ -73,6 +73,8 @@ try {
     }
 
     writeFileSync(readmePath, updatedReadme);
+  } else {
+    console.log("Canary Version Detected: Not updating version in README.md");
   }
 
   // Run biome
