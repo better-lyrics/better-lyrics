@@ -11,7 +11,7 @@ const readmePath = join(rootDir, "README.md");
 
 try {
   const packageJson = JSON.parse(readFileSync(packageJsonPath, "utf-8"));
-  let version = packageJson.version as String;
+  let version = packageJson.version as string;
 
   if (process.argv[2]) {
     version = process.argv[2];
