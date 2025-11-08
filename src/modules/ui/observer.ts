@@ -167,6 +167,7 @@ export function initializeLyrics(): void {
           Settings.onAutoSwitchEnabled(() => {
             tabSelector.click();
             Utils.log(Constants.AUTO_SWITCH_ENABLED_LOG);
+            getResumeScrollElement().classList.remove("blyrics-hidden");
           });
         }
         BetterLyrics.handleModifications(detail);
