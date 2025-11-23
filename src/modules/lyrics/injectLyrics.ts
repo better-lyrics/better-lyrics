@@ -323,9 +323,14 @@ export function injectLyrics(data: LyricSourceResultWithMeta, keepLoaderVisible 
     let translationResult: TranslationResult | null;
 
     let currentTranslationLang = Translation.getCurrentTranslationLanguage();
+    // Compare base language codes, e.g. "en" matches "en-US"
+    function langCodesMatch(lang1: string, lang2: string): boolean {
+      const base1 = lang1.split('-')[0];
+      const base2 = lang2.split('-')[0];
+      return base1 === base2;
+    }
     if (item.translation &&
-        // Match strings en to en-US and vice versa
-        (currentTranslationLang.includes(item.translation.lang) || item.translation.lang.includes(currentTranslationLang))) {
+        langCodesMatch(currentTranslationLang, item.translation.lang)) {
       translationResult = {
         originalLanguage: item.translation.lang,
         translatedText: item.translation.text,
