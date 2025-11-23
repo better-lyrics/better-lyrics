@@ -236,6 +236,9 @@ export function injectLyrics(data: LyricSourceResultWithMeta, keepLoaderVisible 
     lyricElement.dataset.duration = String(line.duration);
     lyricElement.dataset.lineNumber = String(lineIndex);
     lyricElement.style.setProperty("--blyrics-duration", item.durationMs + "ms");
+    if (item.agent) {
+      lyricElement.dataset.agent = item.agent;
+    }
 
     if (!allZero) {
       lyricElement.setAttribute(
