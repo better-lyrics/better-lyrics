@@ -242,7 +242,15 @@ export function injectLyrics(data: LyricSourceResultWithMeta, keepLoaderVisible 
       lyricElement.style.cursor = "unset";
     }
 
-    // Synchronously check cache and inject if found
+
+    // Create elems for romanized lines
+
+    createBreakElem(lyricElement, 4);
+    let romanizedLine = document.createElement("div");
+    romanizedLine.classList.add(Constants.ROMANIZED_LYRICS_CLASS);
+    romanizedLine.style.order = "5";
+    lyricElement.appendChild(romanizedLine);
+
 
     let romanizedCacheResult = Translation.getRomanizationFromCache(item.words);
 
@@ -250,28 +258,53 @@ export function injectLyrics(data: LyricSourceResultWithMeta, keepLoaderVisible 
     const shouldRomanize =
       (data.language && Constants.romanizationLanguages.includes(data.language)) || containsNonLatin(item.words);
     const canInjectRomanizationsEarly = (shouldRomanize && item.romanization) || romanizedCacheResult !== null;
-
-    if (canInjectRomanizationsEarly) {
-      if (item.romanization) {
-        romanizedCacheResult = item.romanization;
-      }
-
-      if (romanizedCacheResult !== item.words) {
-        createBreakElem(lyricElement, 4);
-
-        let romanizedLine = document.createElement("div");
-        romanizedLine.classList.add(Constants.ROMANIZED_LYRICS_CLASS);
-
-        if (item.timedRomanization && item.timedRomanization.length > 0) {
-          createLyricsLine(item.timedRomanization, line, romanizedLine);
-        } else {
-          romanizedLine.textContent = "\n" + romanizedCacheResult;
-        }
-        romanizedLine.style.order = "5";
-        lyricElement.appendChild(romanizedLine);
-        lyricElement.dataset.romanized = "true";
-      }
+    if (item.romanization) {
+      romanizedCacheResult = item.romanization;
     }
+
+
+    if (canInjectRomanizationsEarly && romanizedCacheResult !== item.words) {
+      if (item.timedRomanization && item.timedRomanization.length > 0) {
+        createLyricsLine(item.timedRomanization, line, romanizedLine);
+      } else {
+        romanizedLine.textContent = "\n" + romanizedCacheResult;
+      }
+      lyricElement.dataset.romanized = "true";
+
+    } else {
+      langPromise.then(source_language => {
+        Translation.onRomanizationEnabled(async () => {
+          let isNonLatin = containsNonLatin(item.words);
+          if (Constants.romanizationLanguages.includes(source_language) || isNonLatin) {
+            let usableLang = source_language;
+            if (isNonLatin && !Constants.romanizationLanguages.includes(source_language)) {
+              usableLang = "auto";
+            }
+
+            if (item.words.trim() !== "♪" && item.words.trim() !== "") {
+              let result;
+              if (item.romanization) {
+                result = item.romanization;
+              } else {
+                result = await Translation.translateTextIntoRomaji(usableLang, item.words);
+              }
+
+              if (result && result.trim() !== item.words.trim()) {
+                romanizedLine.textContent = result ? result : "";
+                lyricsElementAdded();
+              }
+            }
+          }
+        });
+      });
+    }
+
+    // Create translation elm
+    createBreakElem(lyricElement, 6);
+    let translatedLine = document.createElement("div");
+    translatedLine.classList.add(Constants.TRANSLATED_LYRICS_CLASS);
+    translatedLine.style.order = "7";
+    lyricElement.appendChild(translatedLine);
 
     let translationResult: TranslationResult | null;
 
@@ -285,97 +318,33 @@ export function injectLyrics(data: LyricSourceResultWithMeta, keepLoaderVisible 
     }
 
     if (translationResult) {
-      createBreakElem(lyricElement, 6);
-
-      let translatedLine = document.createElement("div");
-      translatedLine.classList.add(Constants.TRANSLATED_LYRICS_CLASS);
       translatedLine.textContent = "\n" + translationResult.translatedText;
-      translatedLine.style.order = "7";
-      lyricElement.appendChild(translatedLine);
-      lyricElement.dataset.translated = "true";
-    }
+    } else {
+      langPromise.then(source_language => {
+        Translation.onTranslationEnabled(async items => {
+          let target_language = items.translationLanguage || "en";
 
-    langPromise.then(source_language => {
-      Translation.onRomanizationEnabled(async () => {
-        let romanizedLine = document.createElement("div");
-        romanizedLine.classList.add(Constants.ROMANIZED_LYRICS_CLASS);
-
-        if (lyricElement.dataset.romanized === "true") {
-          return;
-        }
-
-        let isNonLatin = containsNonLatin(item.words);
-        if (Constants.romanizationLanguages.includes(source_language) || isNonLatin) {
-          let usableLang = source_language;
-          if (isNonLatin && !Constants.romanizationLanguages.includes(source_language)) {
-            usableLang = "auto";
-          }
-
-          if (item.words.trim() !== "♪" && item.words.trim() !== "") {
-            let result;
-            if (item.romanization) {
-              result = item.romanization;
-            } else {
-              result = await Translation.translateTextIntoRomaji(usableLang, item.words);
-            }
-
-            if (result && result.trim() !== item.words.trim()) {
-              createBreakElem(lyricElement, 4);
-
-              romanizedLine.textContent = result ? "\n" + result : "\n";
-              romanizedLine.style.order = "5";
-              lyricElement.appendChild(romanizedLine);
-              lyricsElementAdded();
-            }
-          }
-        }
-      });
-
-      Translation.onTranslationEnabled(async items => {
-        if (
-          lyricElement.dataset.translated === "true" &&
-          (items.translationLanguage || "en") === Translation.getCurrentTranslationLanguage()
-        ) {
-          return;
-        }
-
-        let translatedLine = document.createElement("div");
-        translatedLine.classList.add(Constants.TRANSLATED_LYRICS_CLASS);
-
-        let target_language = items.translationLanguage || "en";
-
-        if (source_language !== target_language || containsNonLatin(item.words)) {
-          if (item.words.trim() !== "♪" && item.words.trim() !== "") {
-            let result;
-            if (item.translation && target_language === item.translation.lang) {
-              result = {
-                originalLanguage: item.translation.lang,
-                translatedText: item.translation.text,
-              };
-            } else {
-              result = await Translation.translateText(item.words, target_language);
-            }
-
-            if (result) {
-              // Remove existing translated line if language changed
-              const existingTranslatedLine = lyricElement.querySelector("." + Constants.TRANSLATED_LYRICS_CLASS);
-              if (existingTranslatedLine) {
-                existingTranslatedLine.remove();
+          if (source_language !== target_language || containsNonLatin(item.words)) {
+            if (item.words.trim() !== "♪" && item.words.trim() !== "") {
+              let result;
+              if (item.translation && target_language === item.translation.lang) {
+                result = {
+                  originalLanguage: item.translation.lang,
+                  translatedText: item.translation.text,
+                };
               } else {
-                // Only add the breakElem if there is no existing translation
-                createBreakElem(lyricElement, 6);
+                result = await Translation.translateText(item.words, target_language);
               }
 
-              translatedLine.textContent = "\n" + result.translatedText;
-              translatedLine.style.order = "7";
-              lyricElement.appendChild(translatedLine);
-
-              lyricsElementAdded();
+              if (result) {
+                translatedLine.textContent = "\n" + result.translatedText;
+                lyricsElementAdded();
+              }
             }
           }
-        }
+        });
       });
-    });
+    }
 
     try {
       lines.push(line);
