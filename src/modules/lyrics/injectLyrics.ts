@@ -14,8 +14,9 @@ import {getRelativeBounds} from "@utils";
 const resizeObserver = new ResizeObserver(entries => {
   for (const entry of entries) {
     if (entry.target.id === Constants.LYRICS_WRAPPER_ID) {
-      if (AppState.lyricData && entry.target.clientWidth !== AppState.lyricData.lyricWidth)
-      calculateLyricPositions();
+      if (AppState.lyricData && entry.target.clientWidth !== AppState.lyricData.lyricWidth) {
+        calculateLyricPositions();
+      }
     }
   }
 });

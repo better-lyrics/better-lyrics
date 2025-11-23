@@ -18,6 +18,10 @@ interface AnimEngineState {
   lastPlayState: boolean;
   lastEventCreationTime: number;
   lastFirstActiveElement: number;
+  /**
+   * Track if this is the first new tick to avoid rescrolls when opening the lyrics
+   */
+  doneFirstInstantScroll: boolean;
 }
 
 export let animEngineState: AnimEngineState = {
@@ -32,6 +36,7 @@ export let animEngineState: AnimEngineState = {
   lastPlayState: false,
   lastEventCreationTime: 0,
   lastFirstActiveElement: -1,
+  doneFirstInstantScroll: true,
 };
 
 /**
@@ -71,7 +76,7 @@ export function animationEngine(
   eventCreationTime: number,
   isPlaying = true,
   smoothScroll = true
-): void | boolean {
+) {
   const now = Date.now();
   if (isLoaderActive() || !AppState.areLyricsTicking || (currentTime === 0 && !isPlaying)) {
     return;
@@ -98,6 +103,7 @@ export function animationEngine(
     playerState === "MINIPLAYER_IN_PLAYER_PAGE";
   // Don't tick lyrics if they're not visible
   if (tabSelector.getAttribute("aria-selected") !== "true" || !isPlayerOpen) {
+    animEngineState.doneFirstInstantScroll = false;
     return;
   }
 
@@ -294,6 +300,15 @@ export function animationEngine(
       // Make sure we're not trying to scroll to negative values
       scrollPos = Math.max(0, scrollPos);
 
+
+      if (scrollTop === 0 && !animEngineState.doneFirstInstantScroll) {
+        // For some reason when the panel is opened our pos is set to zero. This instant scrolls to the correct position
+        // to avoid always scrolling from the top when the panel is opened.
+        smoothScroll = false;
+        animEngineState.doneFirstInstantScroll = true;
+        animEngineState.nextScrollAllowedTime = 0;
+      }
+
       if (Math.abs(scrollTop - scrollPos) > 2 && Date.now() > animEngineState.nextScrollAllowedTime) {
         if (smoothScroll) {
           lyricsElement.style.transitionTimingFunction = "";
@@ -354,11 +369,11 @@ export function animationEngine(
     if (animEngineState.skipScrolls < 1) {
       animEngineState.skipScrolls = 1; // Always leave at least one for when the window is refocused.
     }
+
   } catch (err) {
     if (!(err as Error).message?.includes("undefined")) {
       Utils.log(Constants.LYRICS_CHECK_INTERVAL_ERROR, err);
     }
-    return true;
   }
 }
 
