@@ -54,3 +54,16 @@ export function applyCustomCSS(css: string): void {
     document.head.appendChild(styleTag);
   }
 }
+
+/**
+ * Returns the position and dimensions of a child element relative to its parent.
+ *
+ * @param parent - The parent element
+ * @param child - The child element
+ * @returns Rectangle with relative position and dimensions
+ */
+export function getRelativeBounds(parent: Element, child: Element): DOMRect {
+  const parentBound = parent.getBoundingClientRect();
+  const childBound = child.getBoundingClientRect();
+  return new DOMRect(childBound.x - parentBound.x, childBound.y - parentBound.y, childBound.width, childBound.height);
+}

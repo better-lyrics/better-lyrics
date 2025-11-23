@@ -2,6 +2,7 @@ import { AppState } from "@/index";
 import * as Constants from "@constants";
 import * as Utils from "@utils";
 import { isLoaderActive } from "@modules/ui/dom";
+import {calculateLyricPositions, type LineData} from "@modules/lyrics/injectLyrics";
 
 const MIRCO_SCROLL_THRESHOLD_S = 0.3;
 
@@ -125,11 +126,10 @@ export function animationEngine(
     }
 
     const lyricScrollTime = currentTime + getCSSDurationInMs(lyricsElement, "--blyrics-scroll-timing-offset") / 1000;
-    let firstActiveScrollPos = -1;
-
-    let selectedLyricHeight = 0;
-    let targetScrollPos = 0;
+    let firstActiveElem: LineData | null = null;
+    let selectedLyric: LineData = lines[0];
     let availableScrollTime = 999;
+
     lines.every((lineData: any, index: number) => {
       const time = lineData.time;
       let nextTime = Infinity;
@@ -139,10 +139,7 @@ export function animationEngine(
       }
 
       if (lyricScrollTime >= time && (lyricScrollTime < nextTime || lyricScrollTime < time + lineData.duration)) {
-        const elemBounds = getRelativeBounds(lyricsElement, lineData.lyricElement);
-
-        targetScrollPos = elemBounds.y;
-        selectedLyricHeight = elemBounds.height;
+        selectedLyric = lineData;
         availableScrollTime = nextTime - lyricScrollTime;
 
         // Avoid micro scrolls when the previous element ends just slightly after the next elm starts.
@@ -150,11 +147,10 @@ export function animationEngine(
           lyricScrollTime < nextTime - MIRCO_SCROLL_THRESHOLD_S ||
           lyricScrollTime < time + lineData.duration - MIRCO_SCROLL_THRESHOLD_S;
 
-        if (
-          firstActiveScrollPos <= 0 &&
+        if (firstActiveElem == null &&
           (significantTimeRemainingInLyric || animEngineState.lastFirstActiveElement === index)
         ) {
-          firstActiveScrollPos = elemBounds.y;
+          firstActiveElem = lineData;
           animEngineState.lastFirstActiveElement = index;
         }
 
@@ -273,27 +269,27 @@ export function animationEngine(
         animEngineState.wasUserScrolling = false;
       }
 
-      if (firstActiveScrollPos <= 0) {
+      if (firstActiveElem == null) {
         // Was not set, don't scroll to the top b/c of this
-        firstActiveScrollPos = targetScrollPos;
+        firstActiveElem = selectedLyric;
       }
 
       // Offset so lyrics appear towards the center of the screen.
       // We subtract selectedLyricHeight / 2 to center the selected lyric line vertically within the offset region,
       // so the lyric is not aligned at the very top of the offset but is visually centered.
-      const scrollPosOffset = tabRendererHeight * topOffsetMultiplier - selectedLyricHeight / 2;
+      const scrollPosOffset = tabRendererHeight * topOffsetMultiplier - selectedLyric.height / 2;
 
       // Base position
-      let scrollPos = targetScrollPos - scrollPosOffset;
+      let scrollPos = selectedLyric.position - scrollPosOffset;
 
       // Make sure the first selected line is stays visible
-      scrollPos = Math.min(scrollPos, firstActiveScrollPos);
+      scrollPos = Math.min(scrollPos, firstActiveElem.position);
 
       // Make sure bottom of last active lyric is visible
-      scrollPos = Math.max(scrollPos, targetScrollPos - tabRendererHeight + selectedLyricHeight);
+      scrollPos = Math.max(scrollPos, selectedLyric.position - tabRendererHeight + selectedLyric.height);
 
       // Make sure top of last active lyric is visible.
-      scrollPos = Math.min(scrollPos, targetScrollPos);
+      scrollPos = Math.min(scrollPos, selectedLyric.position);
 
       // Make sure we're not trying to scroll to negative values
       scrollPos = Math.max(0, scrollPos);
@@ -373,6 +369,7 @@ export function lyricsElementAdded(): void {
   if (!AppState.areLyricsTicking) {
     return;
   }
+  calculateLyricPositions();
   animationEngine(
     animEngineState.lastTime,
     animEngineState.lastEventCreationTime,
@@ -406,19 +403,6 @@ export function getResumeScrollElement(): HTMLElement {
     wrapper.appendChild(elem);
   }
   return elem as HTMLElement;
-}
-
-/**
- * Returns the position and dimensions of a child element relative to its parent.
- *
- * @param parent - The parent element
- * @param child - The child element
- * @returns Rectangle with relative position and dimensions
- */
-function getRelativeBounds(parent: Element, child: Element): DOMRect {
-  const parentBound = parent.getBoundingClientRect();
-  const childBound = child.getBoundingClientRect();
-  return new DOMRect(childBound.x - parentBound.x, childBound.y - parentBound.y, childBound.width, childBound.height);
 }
 
 /**
