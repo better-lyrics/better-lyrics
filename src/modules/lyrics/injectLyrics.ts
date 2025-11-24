@@ -297,7 +297,7 @@ export function injectLyrics(data: LyricSourceResultWithMeta, keepLoaderVisible 
                 result = await Translation.translateTextIntoRomaji(usableLang, item.words);
               }
 
-              if (result && result.trim() !== item.words.trim()) {
+              if (result && !isSameText(result, item.words)) {
                 createRomanizedElem().textContent = result;
                 lyricsElementAdded();
               }
@@ -337,7 +337,7 @@ export function injectLyrics(data: LyricSourceResultWithMeta, keepLoaderVisible 
     }
 
     if (translationResult) {
-      if (translationResult.translatedText !== item.words) {
+      if (!isSameText(translationResult.translatedText, item.words)) {
         createTranslationElem().textContent = "\n" + translationResult.translatedText;
       }
     } else {
@@ -357,7 +357,7 @@ export function injectLyrics(data: LyricSourceResultWithMeta, keepLoaderVisible 
                 result = await Translation.translateText(item.words, target_language);
               }
 
-              if (result) {
+              if (result && !isSameText(result.translatedText, item.words)) {
                 createTranslationElem().textContent = "\n" + result.translatedText;
                 lyricsElementAdded();
               }
@@ -482,4 +482,11 @@ function groupByWordAndInsert(lyricElement: HTMLDivElement, lyricElementsBuffer:
 
   //add remaining
   pushWordGroupBuffer();
+}
+
+function isSameText(str1: string, str2: string): boolean {
+  str1 = str1.toLowerCase().replaceAll(/(\p{P})/ug, "").trim();
+  str2 = str2.toLowerCase().replaceAll(/(\p{P})/ug, "").trim();
+
+  return str1 === str2;
 }
