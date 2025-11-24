@@ -319,12 +319,7 @@ export function injectLyrics(data: LyricSourceResultWithMeta, keepLoaderVisible 
     let translationResult: TranslationResult | null;
 
     let currentTranslationLang = Translation.getCurrentTranslationLanguage();
-    // Compare base language codes, e.g. "en" matches "en-US"
-    function langCodesMatch(lang1: string, lang2: string): boolean {
-      const base1 = lang1.split('-')[0];
-      const base2 = lang2.split('-')[0];
-      return base1 === base2;
-    }
+
     if (item.translation &&
         langCodesMatch(currentTranslationLang, item.translation.lang)
     ) {
@@ -484,9 +479,23 @@ function groupByWordAndInsert(lyricElement: HTMLDivElement, lyricElementsBuffer:
   pushWordGroupBuffer();
 }
 
+/**
+ * Compares strings without care for punctuation or capitalization
+ * @param str1
+ * @param str2
+ */
 function isSameText(str1: string, str2: string): boolean {
   str1 = str1.toLowerCase().replaceAll(/(\p{P})/ug, "").trim();
   str2 = str2.toLowerCase().replaceAll(/(\p{P})/ug, "").trim();
 
   return str1 === str2;
+}
+
+/**
+ * Compare base language codes, e.g. "en" matches "en-US"
+ */
+function langCodesMatch(lang1: string, lang2: string): boolean {
+  const base1 = lang1.split('-')[0];
+  const base2 = lang2.split('-')[0];
+  return base1 === base2;
 }
