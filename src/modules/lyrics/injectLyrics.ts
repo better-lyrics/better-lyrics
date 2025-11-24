@@ -298,7 +298,7 @@ export function injectLyrics(data: LyricSourceResultWithMeta, keepLoaderVisible 
               }
 
               if (result && result.trim() !== item.words.trim()) {
-                createRomanizedElem().textContent = result ? result : "";
+                createRomanizedElem().textContent = result;
                 lyricsElementAdded();
               }
             }
