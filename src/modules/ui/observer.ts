@@ -83,13 +83,12 @@ export function lyricReloader(): void {
         const tabRenderer = document.querySelector(Constants.TAB_RENDERER_SELECTOR) as HTMLElement;
         console.log(scrollPositions, currentTab, tabRenderer.scrollTop, i);
         scrollPositions[currentTab] = tabRenderer.scrollTop;
-        tabRenderer.scrollTop = scrollPositions[i]
+        tabRenderer.scrollTop = scrollPositions[i];
         setTimeout(() => {
-          tabRenderer.scrollTop = scrollPositions[i]
+          tabRenderer.scrollTop = scrollPositions[i];
           // Don't start ticking until we set the height
-          BetterLyrics.AppState.areLyricsTicking = BetterLyrics.AppState.areLyricsLoaded
-              && BetterLyrics.AppState.lyricData?.syncType !== "none"
-              && i == 1;
+          BetterLyrics.AppState.areLyricsTicking =
+            BetterLyrics.AppState.areLyricsLoaded && BetterLyrics.AppState.lyricData?.syncType !== "none" && i == 1;
         }, 100);
         currentTab = i;
 
@@ -97,10 +96,7 @@ export function lyricReloader(): void {
           // stop ticking immediately
           BetterLyrics.AppState.areLyricsTicking = false;
         }
-
       });
-
-
     }
 
     tab2.addEventListener("click", () => {

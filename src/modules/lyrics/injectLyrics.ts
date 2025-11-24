@@ -9,7 +9,7 @@ import { AppState } from "@/index";
 import type { LyricSourceResultWithMeta } from "@modules/lyrics/lyrics";
 import type { Lyric, LyricPart } from "@modules/lyrics/providers/shared";
 import { animEngineState, lyricsElementAdded } from "@modules/ui/animationEngine";
-import {getRelativeBounds} from "@utils";
+import { getRelativeBounds } from "@utils";
 
 const resizeObserver = new ResizeObserver(entries => {
   for (const entry of entries) {
@@ -139,7 +139,7 @@ function createBreakElem(lyricElement: HTMLDivElement, order: number) {
 export function injectLyrics(data: LyricSourceResultWithMeta, keepLoaderVisible = false): void {
   const lyrics = data.lyrics!;
   DOM.cleanup();
-  resizeObserver.disconnect()
+  resizeObserver.disconnect();
 
   let lyricsWrapper = DOM.createLyricsWrapper();
 
@@ -147,7 +147,6 @@ export function injectLyrics(data: LyricSourceResultWithMeta, keepLoaderVisible 
   const lyricsContainer = document.createElement("div");
   lyricsContainer.className = Constants.LYRICS_CLASS;
   lyricsWrapper.appendChild(lyricsContainer);
-
 
   lyricsWrapper.removeAttribute("is-empty");
 
@@ -253,7 +252,6 @@ export function injectLyrics(data: LyricSourceResultWithMeta, keepLoaderVisible 
       lyricElement.style.cursor = "unset";
     }
 
-
     let createRomanizedElem = () => {
       createBreakElem(lyricElement, 4);
       let romanizedLine = document.createElement("div");
@@ -261,8 +259,7 @@ export function injectLyrics(data: LyricSourceResultWithMeta, keepLoaderVisible 
       romanizedLine.style.order = "5";
       lyricElement.appendChild(romanizedLine);
       return romanizedLine;
-    }
-
+    };
 
     let romanizedCacheResult = Translation.getRomanizationFromCache(item.words);
 
@@ -273,7 +270,6 @@ export function injectLyrics(data: LyricSourceResultWithMeta, keepLoaderVisible 
     if (item.romanization) {
       romanizedCacheResult = item.romanization;
     }
-
 
     if (canInjectRomanizationsEarly) {
       if (romanizedCacheResult !== item.words) {
@@ -318,7 +314,7 @@ export function injectLyrics(data: LyricSourceResultWithMeta, keepLoaderVisible 
       translatedLine.style.order = "7";
       lyricElement.appendChild(translatedLine);
       return translatedLine;
-    }
+    };
 
     let translationResult: TranslationResult | null;
 
@@ -330,7 +326,8 @@ export function injectLyrics(data: LyricSourceResultWithMeta, keepLoaderVisible 
       return base1 === base2;
     }
     if (item.translation &&
-        langCodesMatch(currentTranslationLang, item.translation.lang)) {
+        langCodesMatch(currentTranslationLang, item.translation.lang)
+    ) {
       translationResult = {
         originalLanguage: item.translation.lang,
         translatedText: item.translation.text,
@@ -399,11 +396,10 @@ export function injectLyrics(data: LyricSourceResultWithMeta, keepLoaderVisible 
   spacingElement.style.margin = "0";
   lyricsContainer.appendChild(spacingElement);
 
-
   AppState.lyricData = {
     lines: lines,
     syncType: syncType,
-    lyricWidth: lyricsContainer.clientWidth
+    lyricWidth: lyricsContainer.clientWidth,
   };
 
   if (!allZero) {
@@ -418,7 +414,6 @@ export function injectLyrics(data: LyricSourceResultWithMeta, keepLoaderVisible 
   AppState.areLyricsLoaded = true;
 }
 
-
 export function calculateLyricPositions() {
   if (AppState.lyricData && AppState.areLyricsTicking) {
     const lyricsElement = document.getElementsByClassName(Constants.LYRICS_CLASS)[0] as HTMLElement;
@@ -430,7 +425,7 @@ export function calculateLyricPositions() {
       let bounds = getRelativeBounds(lyricsElement, line.lyricElement);
       line.position = bounds.y;
       line.height = bounds.height;
-    })
+    });
   }
 }
 

@@ -2,7 +2,7 @@ import { AppState } from "@/index";
 import * as Constants from "@constants";
 import * as Utils from "@utils";
 import { isLoaderActive } from "@modules/ui/dom";
-import {calculateLyricPositions, type LineData} from "@modules/lyrics/injectLyrics";
+import { calculateLyricPositions, type LineData } from "@modules/lyrics/injectLyrics";
 
 const MIRCO_SCROLL_THRESHOLD_S = 0.3;
 
@@ -71,12 +71,7 @@ export function getCSSDurationInMs(lyricsElement: HTMLElement, property: string)
  * @param [isPlaying=true] - Whether audio is currently playing
  * @param [smoothScroll=true] - Whether to use smooth scrolling
  */
-export function animationEngine(
-  currentTime: number,
-  eventCreationTime: number,
-  isPlaying = true,
-  smoothScroll = true
-) {
+export function animationEngine(currentTime: number, eventCreationTime: number, isPlaying = true, smoothScroll = true) {
   const now = Date.now();
   if (isLoaderActive() || !AppState.areLyricsTicking || (currentTime === 0 && !isPlaying)) {
     return;
@@ -153,7 +148,8 @@ export function animationEngine(
           lyricScrollTime < nextTime - MIRCO_SCROLL_THRESHOLD_S ||
           lyricScrollTime < time + lineData.duration - MIRCO_SCROLL_THRESHOLD_S;
 
-        if (firstActiveElem == null &&
+        if (
+          firstActiveElem == null &&
           (significantTimeRemainingInLyric || animEngineState.lastFirstActiveElement === index)
         ) {
           firstActiveElem = lineData;
@@ -300,7 +296,6 @@ export function animationEngine(
       // Make sure we're not trying to scroll to negative values
       scrollPos = Math.max(0, scrollPos);
 
-
       if (scrollTop === 0 && !animEngineState.doneFirstInstantScroll) {
         // For some reason when the panel is opened our pos is set to zero. This instant scrolls to the correct position
         // to avoid always scrolling from the top when the panel is opened.
@@ -369,7 +364,6 @@ export function animationEngine(
     if (animEngineState.skipScrolls < 1) {
       animEngineState.skipScrolls = 1; // Always leave at least one for when the window is refocused.
     }
-
   } catch (err) {
     if (!(err as Error).message?.includes("undefined")) {
       Utils.log(Constants.LYRICS_CHECK_INTERVAL_ERROR, err);

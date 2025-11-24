@@ -5,7 +5,7 @@ import * as Translation from "@modules/lyrics/translation";
 import * as Storage from "@core/storage";
 import { AppState } from "@/index";
 import * as BetterLyrics from "@/index";
-import {calculateLyricPositions} from "@modules/lyrics/injectLyrics";
+import { calculateLyricPositions } from "@modules/lyrics/injectLyrics";
 
 type EnableDisableCallback = () => void;
 
@@ -166,11 +166,11 @@ export function listenForPopupMessages(): void {
       if (request.css) {
         // Direct CSS provided (from editor)
         Utils.applyCustomCSS(request.css);
-        calculateLyricPositions()
+        calculateLyricPositions();
       } else {
         // Load CSS from storage (hybrid storage support)
         Storage.getAndApplyCustomCSS().then(() => {
-          calculateLyricPositions()
+          calculateLyricPositions();
         });
       }
     } else if (request.action === "updateSettings") {
