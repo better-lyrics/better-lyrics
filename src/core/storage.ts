@@ -143,14 +143,10 @@ export function subscribeToCustomCSS(): void {
           css = await decompressCSS(css);
         }
         Utils.applyCustomCSS(css);
-        cachedDurations.clear();
-        cachedProperties.clear();
       }
     }
   });
   getAndApplyCustomCSS();
-  cachedDurations.clear();
-  cachedProperties.clear();
 }
 
 /**

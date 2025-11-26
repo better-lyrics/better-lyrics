@@ -40,6 +40,10 @@ interface AppState {
   loaderAnimationEndTimeout: number | undefined;
   lastLoadedVideoId: string | null;
   lyricAbortController: AbortController | null;
+  animationSettings: {
+    disableRichSynchronization: boolean;
+    lineSyncedWordDelayMs: number;
+  }
 }
 
 export let AppState: AppState = {
@@ -57,6 +61,10 @@ export let AppState: AppState = {
   loaderAnimationEndTimeout: undefined,
   lastLoadedVideoId: null,
   lyricAbortController: null,
+  animationSettings: {
+    disableRichSynchronization: false,
+    lineSyncedWordDelayMs: 0.05,
+  }
 };
 
 /**

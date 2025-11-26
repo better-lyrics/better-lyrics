@@ -195,13 +195,14 @@ export function injectLyrics(data: LyricSourceResultWithMeta, keepLoaderVisible 
 
     let item = lyricItem as Required<Pick<Lyric, "parts">> & Lyric;
 
-    if (item.parts.length === 0) {
+    if (item.parts.length === 0 || AppState.animationSettings.disableRichSynchronization) {
+      lyricItem.parts = [];
       const words = item.words.split(" ");
 
       words.forEach((word, index) => {
         word = word.trim().length < 1 ? word : word + " ";
         item.parts.push({
-          startTimeMs: item.startTimeMs + index * 50,
+          startTimeMs: item.startTimeMs + index * AppState.animationSettings.lineSyncedWordDelayMs,
           words: word,
           durationMs: 0,
         });
