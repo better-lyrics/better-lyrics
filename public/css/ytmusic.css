@@ -193,6 +193,10 @@ ytmusic-player-page:not([is-mweb-modernization-enabled])[player-fullscreened] .a
   opacity: 0;
 }
 
+#side-panel {
+  min-width: 33em;
+}
+
 
 /* Media queries */
 @media (min-width: 936px) {
