@@ -389,6 +389,9 @@ export function injectLyrics(data: LyricSourceResultWithMeta, keepLoaderVisible 
   spacingElement.style.margin = "0";
   lyricsContainer.appendChild(spacingElement);
 
+  lyricsContainer.dataset.sync = syncType;
+  lyricsContainer.dataset.loaderVisible = String(keepLoaderVisible);
+
   AppState.lyricData = {
     lines: lines,
     syncType: syncType,
