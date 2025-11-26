@@ -1,3 +1,11 @@
+:root {
+  --blyrics-panel-size: 50%;
+  --blyrics-video-panel-size: 30%;
+  --blyrics-fullscreen-panel-size: 66%;
+  --blyrics-fullscreen-video-panel-size: 25%;
+}
+
+
 /* Player page styles */
 ytmusic-player-page:before {
   background: var(--blyrics-background-img);
@@ -215,23 +223,23 @@ ytmusic-player-page:not([is-mweb-modernization-enabled])[player-fullscreened]
   /* Normal panel sizes */
   ytmusic-player-page:not([is-mweb-modernization-enabled])[video-mode]
   #side-panel {
-    width: 30%;
+    width: var(--blyrics-video-panel-size);
   }
 
   ytmusic-player-page:not([is-mweb-modernization-enabled]):not([video-mode])
   #side-panel {
-    width: 50%;
+    width: var(--blyrics-panel-size);
   }
 
   /* Fullscreen panel sizes */
   ytmusic-player-page:not([is-mweb-modernization-enabled])[player-fullscreened]:not([video-mode])
   #side-panel {
-    width: 66%;
+    width: var(--blyrics-fullscreen-panel-size);
   }
 
   ytmusic-player-page:not([is-mweb-modernization-enabled])[player-fullscreened][video-mode]
   #side-panel {
-    width: 25%;
+    width: var(--blyrics-fullscreen-video-panel-size);
   }
 
   /* Keep album art small */

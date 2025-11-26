@@ -145,11 +145,15 @@ These custom properties allow for easy customization of colors, sizes, and other
 
 ### Layout
 
-| Variable                  | Default Value | Description            |
-| ------------------------- | ------------- | ---------------------- |
-| `--blyrics-padding`       | `2rem`        | Standard padding       |
-| `--blyrics-margin`        | `2rem`        | Standard margin        |
-| `--blyrics-border-radius` | `1000rem`     | Standard border radius |
+| Variable                                | Default Value | Description                                       |
+|-----------------------------------------|---------------|---------------------------------------------------|
+| `--blyrics-padding`                     | `2rem`        | Standard padding                                  |
+| `--blyrics-margin`                      | `2rem`        | Standard margin                                   |
+| `--blyrics-border-radius`               | `1000rem`     | Standard border radius                            |
+| `--blyrics-panel-size `                 | `50%`         | Size of lyrics panel (not fullscreen, audio only) |
+| `--blyrics-video-panel-size`            | `30%`         | Size of lyrics panel (not fullscreen, video mode) |
+| `--blyrics-fullscreen-panel-size`       | `66%`         | Size of lyrics panel (fullscreen, audio only)     |
+| `--blyrics-fullscreen-video-panel-size` | `25%`         | Size of lyrics panel (fullscreen, video mode)     |
 
 ### Effects
 
