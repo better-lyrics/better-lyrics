@@ -172,13 +172,11 @@ ytmusic-player-page:not([is-mweb-modernization-enabled])[video-mode]
 }
 
 ytmusic-player-page:not([is-mweb-modernization-enabled])[player-fullscreened] .av.ytmusic-player-page {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  visibility: visible;
-  z-index: 2;
-  opacity: 0;
+  position: relative;
+  width: fit-content;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 15px;
 }
 
 #side-panel {
@@ -321,3 +319,8 @@ ytmusic-player-page:not([is-mweb-modernization-enabled])[player-fullscreened]
   > yt-formatted-string.non-expandable.description.style-scope.ytmusic-description-shelf-renderer {
   display: none;
 }
+
+.ytmusic-av-toggle{
+  border-radius: 1000rem !important;
+}
+
