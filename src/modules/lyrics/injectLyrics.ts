@@ -277,7 +277,8 @@ export function injectLyrics(data: LyricSourceResultWithMeta, keepLoaderVisible 
 
     if (canInjectRomanizationsEarly) {
       if (romanizedCacheResult !== item.words) {
-        if (item.timedRomanization && item.timedRomanization.length > 0) {
+        if (item.timedRomanization && item.timedRomanization.length > 0
+            && !AppState.animationSettings.disableRichSynchronization) {
           createLyricsLine(item.timedRomanization, line, createRomanizedElem());
         } else {
           createRomanizedElem().textContent = "\n" + romanizedCacheResult;
