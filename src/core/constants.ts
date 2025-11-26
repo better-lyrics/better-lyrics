@@ -159,3 +159,5 @@ export const CACHE_PARSING_ERROR: string = "[BetterLyrics] Error parsing cached 
 export const LYRICS_CHECK_INTERVAL_ERROR: string = "[BetterLyrics] Error in lyrics check interval:";
 export const NO_LYRICS_TEXT: string = "No lyrics found for this song";
 export const MUSIC_NOTES: string = "♪𝅘𝅥𝅮𝅘𝅥𝅯𝅘𝅥𝅰𝅘𝅥𝅱𝅘𝅥𝅲";
+
+export const DEFAULT_LINE_SYNCED_WORD_DELAY_MS = 50;

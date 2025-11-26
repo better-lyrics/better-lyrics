@@ -9,6 +9,7 @@ import * as Storage from "@core/storage";
 import { initProviders } from "@modules/lyrics/providers/shared";
 import type { LyricsData } from "@modules/lyrics/injectLyrics";
 import { animationEngine } from "@modules/ui/animationEngine";
+import {DEFAULT_LINE_SYNCED_WORD_DELAY_MS} from "@constants";
 
 export interface PlayerDetails {
   currentTime: number;
@@ -63,7 +64,7 @@ export let AppState: AppState = {
   lyricAbortController: null,
   animationSettings: {
     disableRichSynchronization: false,
-    lineSyncedWordDelayMs: 0.05,
+    lineSyncedWordDelayMs: DEFAULT_LINE_SYNCED_WORD_DELAY_MS,
   }
 };
 

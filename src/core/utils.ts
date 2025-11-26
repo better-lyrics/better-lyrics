@@ -2,6 +2,7 @@ import { getStorage } from "./storage";
 import {cachedDurations, cachedProperties} from "@modules/ui/animationEngine";
 import {AppState} from "@/index";
 import * as App from "@/index"
+import {DEFAULT_LINE_SYNCED_WORD_DELAY_MS} from "@constants";
 
 /**
  * Conditionally logs messages based on the isLogsEnabled setting.
@@ -57,7 +58,7 @@ export function applyCustomCSS(css: string): void {
     AppState.animationSettings.disableRichSynchronization = disableRichSync;
   }
 
-  let lineSyncedAnimationDelayMs = Number(config.get("blyrics-line-synced-animation-delay")) || 0;
+  let lineSyncedAnimationDelayMs = Number(config.get("blyrics-line-synced-animation-delay") || DEFAULT_LINE_SYNCED_WORD_DELAY_MS);
   if (lineSyncedAnimationDelayMs !== AppState.animationSettings.lineSyncedWordDelayMs) {
     needsLyricReload = true;
     AppState.animationSettings.lineSyncedWordDelayMs = lineSyncedAnimationDelayMs;
