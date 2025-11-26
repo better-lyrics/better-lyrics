@@ -22,26 +22,29 @@ const resizeObserver = new ResizeObserver(entries => {
 });
 
 export interface PartData {
+  /**
+   * Time of this part in seconds
+   */
   time: number;
+
+  /**
+   * Duration of this part in seconds
+   */
   duration: number;
-  lyricElement: Element;
+  lyricElement: HTMLElement;
   animationStartTimeMs: number;
 }
 
-export interface LineData {
-  lyricElement: Element;
-  time: number;
-  duration: number;
+export type LineData = {
   parts: PartData[];
   isScrolled: boolean;
-  animationStartTimeMs: number;
   isAnimationPlayStatePlaying: boolean;
   accumulatedOffsetMs: number;
   isAnimating: boolean;
   isSelected: boolean;
   height: number;
   position: number;
-}
+} & PartData;
 
 export type SyncType = "richsync" | "synced" | "none";
 
@@ -70,7 +73,7 @@ function createLyricsLine(parts: LyricPart[], line: LineData, lyricElement: HTML
 
     let span = document.createElement("span");
     span.classList.add(Constants.WORD_CLASS);
-    if (Number(part.durationMs) === 0) {
+    if (part.durationMs === 0) {
       span.classList.add(Constants.ZERO_DURATION_ANIMATION_CLASS);
     }
     if (isRtl) {

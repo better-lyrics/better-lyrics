@@ -2,7 +2,7 @@ import { AppState } from "@/index";
 import * as Constants from "@constants";
 import * as Utils from "@utils";
 import { isLoaderActive } from "@modules/ui/dom";
-import { calculateLyricPositions, type LineData } from "@modules/lyrics/injectLyrics";
+import {calculateLyricPositions, type LineData} from "@modules/lyrics/injectLyrics";
 
 const MIRCO_SCROLL_THRESHOLD_S = 0.3;
 
@@ -39,9 +39,6 @@ export let animEngineState: AnimEngineState = {
   doneFirstInstantScroll: true,
 };
 
-/**
- * @type {Map<string, number>}
- */
 export let cachedDurations: Map<string, number> = new Map();
 
 /**
@@ -61,6 +58,27 @@ export function getCSSDurationInMs(lyricsElement: HTMLElement, property: string)
   }
 
   return duration;
+}
+
+export let cachedProperties: Map<string, string> = new Map();
+
+/**
+ * Gets and caches a css duration.
+ * Note this function does not key its cache on the element provided --
+ * it assumes that it isn't relevant to the calling code
+ *
+ * @param lyricsElement - the element to look up against
+ * @param property - the css property to look up
+ * @return - in ms
+ */
+export function getCSSProperty(lyricsElement: HTMLElement, property: string): string {
+  let value = cachedProperties.get(property);
+  if (value === undefined) {
+    value = window.getComputedStyle(lyricsElement).getPropertyValue(property);
+    cachedProperties.set(property, value);
+  }
+
+  return value;
 }
 
 /**
@@ -131,7 +149,7 @@ export function animationEngine(currentTime: number, eventCreationTime: number, 
     let selectedLyric: LineData = lines[0];
     let availableScrollTime = 999;
 
-    lines.every((lineData: any, index: number) => {
+    lines.every((lineData, index) => {
       const time = lineData.time;
       let nextTime = Infinity;
       if (index + 1 < lines.length) {
@@ -184,7 +202,7 @@ export function animationEngine(currentTime: number, eventCreationTime: number, 
         currentTime + setUpAnimationEarlyTime >= time &&
         (currentTime < nextTime || currentTime < time + lineData.duration + 0.05)
       ) {
-        lineData.selected = true;
+        lineData.isSelected = true;
 
         const timeDelta = currentTime - time;
         const animationTimingOffset = (now - lineData.animationStartTimeMs) / 1000 - timeDelta;
@@ -198,7 +216,7 @@ export function animationEngine(currentTime: number, eventCreationTime: number, 
 
         if (!lineData.isAnimating) {
           const children = [lineData, ...lineData.parts];
-          children.forEach((part: any) => {
+          children.forEach((part) => {
             const elDuration = part.duration;
             const elTime = part.time;
             const timeDelta = currentTime - elTime;
@@ -224,9 +242,9 @@ export function animationEngine(currentTime: number, eventCreationTime: number, 
         if (isPlaying !== lineData.isAnimationPlayStatePlaying) {
           lineData.isAnimationPlayStatePlaying = isPlaying;
           if (!isPlaying) {
-            lineData.selected = false;
+            lineData.isSelected = false;
             const children = [lineData, ...lineData.parts];
-            children.forEach((part: any) => {
+            children.forEach((part) => {
               if (part.animationStartTimeMs > now) {
                 part.lyricElement.classList.remove(Constants.ANIMATING_CLASS);
                 part.lyricElement.classList.remove(Constants.PRE_ANIMATING_CLASS);
@@ -235,17 +253,17 @@ export function animationEngine(currentTime: number, eventCreationTime: number, 
           }
         }
       } else {
-        if (lineData.selected) {
+        if (lineData.isSelected) {
           const children = [lineData, ...lineData.parts];
-          children.forEach((part: any) => {
+          children.forEach((part) => {
             part.lyricElement.style.setProperty("--blyrics-swipe-delay", "");
             part.lyricElement.style.setProperty("--blyrics-anim-delay", "");
             part.lyricElement.classList.remove(Constants.ANIMATING_CLASS);
             part.lyricElement.classList.remove(Constants.PRE_ANIMATING_CLASS);
-            part.isAnimating = false;
             part.animationStartTimeMs = Infinity;
           });
-          lineData.selected = false;
+          lineData.isSelected = false;
+          lineData.isAnimating = false;
         }
       }
       return true;
@@ -421,10 +439,10 @@ export function getResumeScrollElement(): HTMLElement {
  */
 export function toMs(cssDuration: string): number {
   if (!cssDuration) return 0;
-  if (cssDuration.endsWith("s")) {
-    return parseFloat(cssDuration.slice(0, -1)) * 1000;
-  } else if (cssDuration.endsWith("ms")) {
+  if (cssDuration.endsWith("ms")) {
     return parseFloat(cssDuration.slice(0, -2));
+  } else if (cssDuration.endsWith("s")) {
+    return parseFloat(cssDuration.slice(0, -1)) * 1000;
   }
   return 0;
 }
