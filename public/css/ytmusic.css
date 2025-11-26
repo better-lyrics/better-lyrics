@@ -255,6 +255,32 @@ ytmusic-player-page:not([is-mweb-modernization-enabled])[player-fullscreened]
     margin-bottom: 0;
     margin-top: 0;
   }
+
+  ytmusic-app-layout[player-fullscreened][show-fullscreen-controls]:not([blyrics-dfs]) > [slot="player-bar"] {
+    width: 100%;
+  }
+  ytmusic-app-layout[player-fullscreened][show-fullscreen-controls]:not([blyrics-dfs])
+  > [slot="player-bar"]
+  .right-controls-buttons.ytmusic-player-bar,
+  ytmusic-app-layout[player-fullscreened][show-fullscreen-controls]:not([blyrics-dfs])
+  > [slot="player-bar"]
+  .time-info.ytmusic-player-bar {
+    color: var(--blyrics-ui-text-color);
+  }
+  ytmusic-app-layout[player-fullscreened][show-fullscreen-controls]:not([blyrics-dfs]) > [slot="player-bar"]:before {
+    background: linear-gradient(to bottom, var(--blyrics-gradient-stops));
+    content: "";
+    height: 100%;
+    left: 0;
+    opacity: 0.3;
+    position: absolute;
+    top: 0;
+    width: 100%;
+  }
+  ytmusic-player-bar[player-fullscreened] #play-pause-button>.yt-icon-button>yt-icon {
+    width: 32px;
+    height: 32px;
+  }
 }
 
 @media (max-width: 936px) {
@@ -288,10 +314,10 @@ ytmusic-player-page:not([is-mweb-modernization-enabled])[player-fullscreened]
 
 /*Hide Yt's lyrics*/
 #contents
-> ytmusic-description-shelf-renderer
-> yt-formatted-string.footer.style-scope.ytmusic-description-shelf-renderer,
+  > ytmusic-description-shelf-renderer
+  > yt-formatted-string.footer.style-scope.ytmusic-description-shelf-renderer,
 #contents
-> ytmusic-description-shelf-renderer
-> yt-formatted-string.non-expandable.description.style-scope.ytmusic-description-shelf-renderer {
+  > ytmusic-description-shelf-renderer
+  > yt-formatted-string.non-expandable.description.style-scope.ytmusic-description-shelf-renderer {
   display: none;
 }
