@@ -295,20 +295,19 @@ ytmusic-player-page:not([is-mweb-modernization-enabled])[player-fullscreened]
   }
 }
 
-@media (max-width: 615px) {
-  /* Styles for smaller screens */
-  #tab-renderer[page-type="MUSIC_PAGE_TYPE_TRACK_LYRICS"] {
-    mask-image: none;
-    -webkit-mask-image: none;
-  }
-  ytmusic-player-page[is-mweb-modernization-enabled][player-fullscreened]
-    #player-controls.ytmusic-player-page {
-    max-width: 100vw;
-  }
-  ytmusic-player-page[is-mweb-modernization-enabled][player-fullscreened]
-    #main-panel.ytmusic-player-page {
-    padding: 0 !important;
-  }
+
+/* Styles for mobile screens */
+#tab-renderer[is-mweb-modernization-enabled][page-type="MUSIC_PAGE_TYPE_TRACK_LYRICS"] {
+  mask-image: none;
+  -webkit-mask-image: none;
+}
+ytmusic-player-page[is-mweb-modernization-enabled][player-fullscreened]
+#player-controls.ytmusic-player-page {
+  max-width: 100vw;
+}
+ytmusic-player-page[is-mweb-modernization-enabled][player-fullscreened]
+#main-panel.ytmusic-player-page {
+  padding: 0 !important;
 }
 
 /*Hide Yt's lyrics*/
