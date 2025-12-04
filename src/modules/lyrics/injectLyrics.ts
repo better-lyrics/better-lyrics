@@ -326,15 +326,15 @@ export function injectLyrics(data: LyricSourceResultWithMeta, keepLoaderVisible 
 
     let translationResult: TranslationResult | null;
 
-    let currentTranslationLang = AppState.translationLanguage;
+    let targetTranslationLang = AppState.translationLanguage;
 
-    if (item.translation && langCodesMatch(currentTranslationLang, item.translation.lang)) {
+    if (item.translation && langCodesMatch(targetTranslationLang, item.translation.lang)) {
       translationResult = {
         originalLanguage: item.translation.lang,
         translatedText: item.translation.text,
       };
     } else {
-      translationResult = Translation.getTranslationFromCache(item.words, currentTranslationLang);
+      translationResult = Translation.getTranslationFromCache(item.words, targetTranslationLang);
     }
 
     if (translationResult && AppState.isTranslateEnabled) {
