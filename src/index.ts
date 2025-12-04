@@ -45,6 +45,9 @@ interface AppState {
     disableRichSynchronization: boolean;
     lineSyncedWordDelayMs: number;
   };
+  isTranslateEnabled: boolean;
+  isRomanizationEnabled: boolean;
+  translationLanguage: string;
 }
 
 export let AppState: AppState = {
@@ -66,6 +69,9 @@ export let AppState: AppState = {
     disableRichSynchronization: false,
     lineSyncedWordDelayMs: DEFAULT_LINE_SYNCED_WORD_DELAY_MS,
   },
+  isTranslateEnabled: false,
+  isRomanizationEnabled: false,
+  translationLanguage: "en",
 };
 
 /**
@@ -79,6 +85,7 @@ export async function modify(): Promise<void> {
   Observer.enableLyricsTab();
   Settings.hideCursorOnIdle();
   Settings.handleSettings();
+  Settings.loadTranslationSettings();
   Storage.subscribeToCustomCSS();
   await Storage.purgeExpiredKeys();
   await Storage.saveCacheInfo();
