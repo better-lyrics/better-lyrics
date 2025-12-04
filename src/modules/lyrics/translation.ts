@@ -90,7 +90,6 @@ export function onTranslationEnabled(
 ): void {
   Storage.getStorage({ isTranslateEnabled: false, translationLanguage: "en" }, items => {
     if (items.isTranslateEnabled) {
-      currentTranslationLanguage = items.translationLanguage || "en";
       callback(items as { isTranslateEnabled: boolean; translationLanguage: string });
     }
   });
@@ -109,10 +108,4 @@ export function getTranslationFromCache(text: string, targetLanguage: string): T
 export function getRomanizationFromCache(text: string): string | null {
   const cacheKey = text;
   return cache.romanization.get(cacheKey) || null;
-}
-
-let currentTranslationLanguage = "en";
-
-export function getCurrentTranslationLanguage(): string {
-  return currentTranslationLanguage;
 }
