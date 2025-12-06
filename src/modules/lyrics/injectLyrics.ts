@@ -6,7 +6,7 @@ import type { TranslationResult } from "@modules/lyrics/translation";
 import * as Translation from "@modules/lyrics/translation";
 import { containsNonLatin, testRtl } from "@modules/lyrics/lyricParseUtils";
 import { AppState } from "@/index";
-import type { LyricSourceResultWithMeta } from "@modules/lyrics/lyrics";
+import {applySegmentMapToLyrics, type LyricSourceResultWithMeta} from "@modules/lyrics/lyrics";
 import type { Lyric, LyricPart } from "@modules/lyrics/providers/shared";
 import { animEngineState, lyricsElementAdded } from "@modules/ui/animationEngine";
 import { getRelativeBounds } from "@utils";
@@ -52,6 +52,40 @@ export interface LyricsData {
   lines: LineData[];
   syncType: SyncType;
   lyricWidth: number;
+  isMusicVideoSynced: boolean;
+}
+
+
+/**
+ * Processes lyrics data and prepares it for rendering.
+ * Sets language settings, validates data, and initiates DOM injection.
+ *
+ * @param data - Processed lyrics data
+ * @param keepLoaderVisible
+ * @param data.language - Language code for the lyrics
+ * @param data.lyrics - Array of lyric lines
+ */
+export function processLyrics(data: LyricSourceResultWithMeta, keepLoaderVisible = false): void {
+  const lyrics = data.lyrics;
+  if (!lyrics || lyrics.length === 0) {
+    throw new Error(Constants.NO_LYRICS_FOUND_LOG);
+  }
+
+  Utils.log(Constants.LYRICS_FOUND_LOG);
+
+  const ytMusicLyrics = document.querySelector(Constants.NO_LYRICS_TEXT_SELECTOR)?.parentElement;
+  if (ytMusicLyrics) {
+    ytMusicLyrics.classList.add("blyrics-hidden");
+  }
+
+  try {
+    const lyricsElement = document.getElementsByClassName(Constants.LYRICS_CLASS)[0] as HTMLElement;
+    lyricsElement.innerHTML = "";
+  } catch (_err) {
+    Utils.log(Constants.LYRICS_TAB_NOT_DISABLED_LOG);
+  }
+
+  injectLyrics(data, keepLoaderVisible);
 }
 
 function createLyricsLine(parts: LyricPart[], line: LineData, lyricElement: HTMLDivElement) {
@@ -400,11 +434,18 @@ export function injectLyrics(data: LyricSourceResultWithMeta, keepLoaderVisible 
   lyricsContainer.dataset.sync = syncType;
   lyricsContainer.dataset.loaderVisible = String(keepLoaderVisible);
 
-  AppState.lyricData = {
+  let lyricsData = {
     lines: lines,
     syncType: syncType,
     lyricWidth: lyricsContainer.clientWidth,
+    isMusicVideoSynced: data.musicVideoSynced === true
   };
+
+  if (data.segmentMap) {
+    applySegmentMapToLyrics(lyricsData, data.segmentMap);
+  }
+  
+  AppState.lyricData = lyricsData;
 
   if (!allZero) {
     AppState.areLyricsTicking = true;

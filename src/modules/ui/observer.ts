@@ -132,27 +132,20 @@ export function initializeLyrics(): void {
     const currentVideoDetails = detail.song + " " + detail.artist;
 
     if (currentVideoId !== AppState.lastVideoId || currentVideoDetails !== AppState.lastVideoDetails) {
-      try {
-        if (currentVideoId === AppState.lastVideoId && AppState.areLyricsLoaded) {
-          console.log(Constants.SKIPPING_LOAD_WITH_META);
-          return; // We already loaded this video
-        }
-      } finally {
-        AppState.lastVideoId = currentVideoId;
-        AppState.lastVideoDetails = currentVideoDetails;
-      }
-
-      if (!detail.song || !detail.artist) {
-        console.log(Constants.LOADING_WITHOUT_SONG_META);
-      }
-
-      Utils.log(Constants.SONG_SWITCHED_LOG, detail.videoId);
       AppState.areLyricsTicking = false;
-      AppState.areLyricsLoaded = false;
+      if (!detail.song || !detail.artist) {
+        Utils.log("Lyrics switched: Still waiting for metadata ", detail.videoId);
+        return;
+      }
+
+      AppState.lastVideoId = currentVideoId;
+      AppState.lastVideoDetails = currentVideoDetails;
+      Utils.log(Constants.SONG_SWITCHED_LOG, detail.videoId);
 
       AppState.queueLyricInjection = true;
       AppState.queueAlbumArtInjection = true;
       AppState.queueSongDetailsInjection = true;
+      AppState.suppressZeroTime = Date.now() + 5000;
     }
 
     if (AppState.queueSongDetailsInjection && detail.song && detail.artist && document.getElementById("main-panel")) {
@@ -187,7 +180,11 @@ export function initializeLyrics(): void {
         BetterLyrics.handleModifications(detail);
       }
     }
-    animationEngine(detail.currentTime, detail.browserTime, detail.playing);
+
+    if (AppState.suppressZeroTime < Date.now() || detail.currentTime !== 0) {
+      animationEngine(detail.currentTime, detail.browserTime, detail.playing);
+    }
+
   });
 }
 

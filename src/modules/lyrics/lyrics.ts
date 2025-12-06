@@ -5,7 +5,7 @@
 
 import * as Constants from "@constants";
 import * as Storage from "@core/storage";
-import { injectLyrics } from "@modules/lyrics/injectLyrics";
+import {injectLyrics, type LyricsData, processLyrics} from "@modules/lyrics/injectLyrics";
 import { stringSimilarity } from "@modules/lyrics/lyricParseUtils";
 import * as DOM from "@modules/ui/dom";
 import * as Utils from "@utils";
@@ -21,7 +21,7 @@ import * as RequestSniffing from "./requestSniffer";
 import * as Translation from "./translation";
 
 /** Current version of the lyrics cache format */
-const LYRIC_CACHE_VERSION = "1.3.0";
+const LYRIC_CACHE_VERSION = "2.0.0";
 
 export type LyricSourceResultWithMeta = LyricSourceResult & {
   song: string;
@@ -29,12 +29,8 @@ export type LyricSourceResultWithMeta = LyricSourceResult & {
   album: string;
   duration: number;
   videoId: string;
+  segmentMap: SegmentMap | null;
 };
-
-type LyricSourceResultWithMetaAndVersion = LyricSourceResultWithMeta & {
-  version: string;
-};
-
 /**
  * Main function to create and inject lyrics for the current song.
  * Handles caching, API requests, and fallback mechanisms.
@@ -55,57 +51,43 @@ export async function createLyrics(detail: PlayerDetails, signal: AbortSignal): 
     return;
   }
 
-  // Try to get lyrics from cache with validation
-  const cacheKey = `blyrics_${videoId}`;
-
-  const cachedLyrics = await Storage.getTransientStorage(cacheKey);
-  if (cachedLyrics) {
-    try {
-      const data = JSON.parse(cachedLyrics);
-      // Validate cached data structure
-      if (
-        data &&
-        (Array.isArray(data.lyrics) || data.syncedLyrics) &&
-        data.version &&
-        data.version === LYRIC_CACHE_VERSION
-      ) {
-        Utils.log(Constants.LYRICS_CACHE_FOUND_LOG);
-        processLyrics(data);
-        return;
-      }
-    } catch (cacheError) {
-      Utils.log(Constants.CACHE_PARSING_ERROR, cacheError);
-      // Invalid cache, continue to fetch fresh data
-    }
-  }
-
   // We should get recalled if we were executed without a valid song/artist and aren't able to get lyrics
 
-  let segmentMap: SegmentMap | null = null;
   let matchingSong = await RequestSniffer.getMatchingSong(videoId, 1);
   let swappedVideoId = false;
-  if (
-    (!matchingSong ||
-      !matchingSong.counterpartVideoId ||
-      matchingSong.counterpartVideoId !== AppState.lastLoadedVideoId) &&
-    AppState.lastLoadedVideoId !== videoId
-  ) {
+  let isAVSwitch = (matchingSong &&
+          matchingSong.counterpartVideoId &&
+          matchingSong.counterpartVideoId === AppState.lastLoadedVideoId) ||
+      AppState.lastLoadedVideoId === videoId;
+
+  let segmentMap = matchingSong?.segmentMap || null;
+
+  if (isAVSwitch && segmentMap) {
+    applySegmentMapToLyrics(AppState.lyricData, segmentMap);
+    AppState.areLyricsTicking = true; // Keep lyrics ticking while new lyrics are fetched.
+    Utils.log("Switching between audio/video: Skipping Loader", segmentMap);
+  } else {
+    Utils.log("Not Switching between audio/video", isAVSwitch, segmentMap);
     DOM.renderLoader(); // Only render the loader after we've checked the cache & we're not switching between audio and video
     Translation.clearCache();
     matchingSong = await RequestSniffer.getMatchingSong(videoId);
-  } else {
-    Utils.log("Switching between audio/video: Skipping Loader");
+    AppState.areLyricsLoaded = false;
+    AppState.areLyricsTicking = false;
   }
+
   if (isMusicVideo && matchingSong && matchingSong.counterpartVideoId && matchingSong.segmentMap) {
     Utils.log("Switching VideoId to Audio Id");
     swappedVideoId = true;
     videoId = matchingSong.counterpartVideoId;
-    segmentMap = matchingSong.segmentMap;
   }
+
 
   const tabSelector = document.getElementsByClassName(Constants.TAB_HEADER_CLASS)[1];
   console.assert(tabSelector != null);
   if (tabSelector.getAttribute("aria-selected") !== "true") {
+    AppState.areLyricsLoaded = false;
+    AppState.areLyricsTicking = false;
+    AppState.lyricInjectionFailed = true;
     Utils.log(Constants.LYRICS_TAB_HIDDEN_LOG);
     return;
   }
@@ -141,6 +123,7 @@ export async function createLyrics(detail: PlayerDetails, signal: AbortSignal): 
     signal,
   };
 
+
   let ytLyricsPromise = LyricProviders.getLyrics(providerParameters, "yt-lyrics").then(lyrics => {
     if (!AppState.areLyricsLoaded && lyrics) {
       Utils.log("[BetterLyrics] Temporarily Using YT Music Lyrics while we wait for synced lyrics to load");
@@ -152,6 +135,7 @@ export async function createLyrics(detail: PlayerDetails, signal: AbortSignal): 
         duration: providerParameters.duration,
         videoId: providerParameters.videoId,
         album: providerParameters.album || "",
+        segmentMap: null,
       };
       processLyrics(lyricsWithMeta, true);
     }
@@ -237,35 +221,8 @@ export async function createLyrics(detail: PlayerDetails, signal: AbortSignal): 
     throw new Error("Lyrics.lyrics is null or undefined. Report this bug");
   }
 
-  if (isMusicVideo && !lyrics.musicVideoSynced && segmentMap) {
-    Utils.log("Applying segment map", segmentMap);
-    // We're in a music video and need to sync lyrics to the music video
-    const allZero = lyrics.lyrics.every(item => item.startTimeMs === 0);
-
-    if (!allZero) {
-      for (let lyric of lyrics.lyrics) {
-        let lastTimeChange = 0;
-        for (let segment of segmentMap.segment) {
-          if (lyric.startTimeMs >= segment.counterpartVideoStartTimeMilliseconds) {
-            lastTimeChange = segment.primaryVideoStartTimeMilliseconds - segment.counterpartVideoStartTimeMilliseconds;
-            if (lyric.startTimeMs <= segment.counterpartVideoStartTimeMilliseconds + segment.durationMilliseconds) {
-              break;
-            }
-          }
-        }
-        lyric.startTimeMs = Number(lyric.startTimeMs) + lastTimeChange;
-        if (lyric.parts) {
-          lyric.parts.forEach(part => {
-            part.startTimeMs = Number(part.startTimeMs) + lastTimeChange;
-          });
-        }
-        if (lyric.timedRomanization) {
-          lyric.timedRomanization.forEach(part => {
-            part.startTimeMs = Number(part.startTimeMs) + lastTimeChange;
-          });
-        }
-      }
-    }
+  if (isMusicVideo === (lyrics.musicVideoSynced === true)) {
+    segmentMap = null; // The timing matches, we don't need to apply a segment map!
   }
 
   Utils.log("Got Lyrics from " + lyrics.source);
@@ -278,6 +235,7 @@ export async function createLyrics(detail: PlayerDetails, signal: AbortSignal): 
     album: providerParameters.album || "",
     duration: providerParameters.duration,
     videoId: providerParameters.videoId,
+    segmentMap,
     ...lyrics,
   };
 
@@ -285,55 +243,37 @@ export async function createLyrics(detail: PlayerDetails, signal: AbortSignal): 
   if (signal.aborted) {
     return;
   }
-  cacheAndProcessLyrics(cacheKey, lyricsWithMeta);
+  processLyrics(lyricsWithMeta);
 }
 
-/**
- * Caches lyrics data and initiates processing.
- *
- * @param cacheKey - Storage key for caching
- * @param data - Lyrics data to cache and process
- */
-function cacheAndProcessLyrics(cacheKey: string, data: LyricSourceResultWithMeta): void {
-  if (data.cacheAllowed) {
-    let versionedData: LyricSourceResultWithMetaAndVersion = {
-      version: LYRIC_CACHE_VERSION,
-      ...data,
-    };
-    const oneWeekInMs = 7 * 24 * 60 * 60 * 1000;
-    Storage.setTransientStorage(cacheKey, JSON.stringify(versionedData), oneWeekInMs);
-  }
-  processLyrics(data);
-}
 
-/**
- * Processes lyrics data and prepares it for rendering.
- * Sets language settings, validates data, and initiates DOM injection.
- *
- * @param data - Processed lyrics data
- * @param keepLoaderVisible
- * @param data.language - Language code for the lyrics
- * @param data.lyrics - Array of lyric lines
- */
-function processLyrics(data: LyricSourceResultWithMeta, keepLoaderVisible = false): void {
-  const lyrics = data.lyrics;
-  if (!lyrics || lyrics.length === 0) {
-    throw new Error(Constants.NO_LYRICS_FOUND_LOG);
+export function applySegmentMapToLyrics(lyricData: LyricsData | null, segmentMap: SegmentMap) {
+  if (segmentMap && lyricData) {
+    lyricData.isMusicVideoSynced = !lyricData.isMusicVideoSynced;
+    // We're sync lyrics using segment map
+    const allZero = lyricData.syncType === "none";
+
+    if (!allZero) {
+      for (let lyric of lyricData.lines) {
+        lyric.accumulatedOffsetMs = 1000000; // Trigger a resync
+        let lastTimeChange = 0;
+        for (let segment of segmentMap.segment) {
+          let lyricTimeMs = lyric.time * 1000;
+          if (lyricTimeMs >= segment.counterpartVideoStartTimeMilliseconds) {
+            lastTimeChange = segment.primaryVideoStartTimeMilliseconds - segment.counterpartVideoStartTimeMilliseconds;
+            if (lyricTimeMs <= segment.counterpartVideoStartTimeMilliseconds + segment.durationMilliseconds) {
+              break;
+            }
+          }
+        }
+
+        let changeS = lastTimeChange / 1000;
+        lyric.time = lyric.time + changeS;
+        lyric.parts.forEach(part => {
+          part.time = part.time + changeS;
+        });
+      }
+    }
   }
 
-  Utils.log(Constants.LYRICS_FOUND_LOG);
-
-  const ytMusicLyrics = document.querySelector(Constants.NO_LYRICS_TEXT_SELECTOR)?.parentElement;
-  if (ytMusicLyrics) {
-    ytMusicLyrics.classList.add("blyrics-hidden");
-  }
-
-  try {
-    const lyricsElement = document.getElementsByClassName(Constants.LYRICS_CLASS)[0] as HTMLElement;
-    lyricsElement.innerHTML = "";
-  } catch (_err) {
-    Utils.log(Constants.LYRICS_TAB_NOT_DISABLED_LOG);
-  }
-
-  injectLyrics(data, keepLoaderVisible);
 }

@@ -27,6 +27,7 @@ export interface PlayerDetails {
 }
 
 interface AppState {
+  suppressZeroTime: number;
   areLyricsTicking: boolean;
   lyricData: LyricsData | null;
   areLyricsLoaded: boolean;
@@ -51,6 +52,7 @@ interface AppState {
 }
 
 export let AppState: AppState = {
+  suppressZeroTime: 0,
   areLyricsTicking: false,
   lyricData: null,
   areLyricsLoaded: false,
@@ -121,9 +123,6 @@ export function handleModifications(detail: PlayerDetails): void {
   } else {
     AppState.lyricAbortController = new AbortController();
     AppState.lyricInjectionPromise = Lyrics.createLyrics(detail, AppState.lyricAbortController.signal)
-      .then(() => {
-        return animationEngine(detail.currentTime, Date.now(), detail.playing);
-      })
       .catch(err => {
         Utils.log(Constants.GENERAL_ERROR_LOG, err);
         AppState.areLyricsLoaded = false;
