@@ -161,7 +161,7 @@ export function initializeLyrics(): void {
     if (AppState.lyricInjectionFailed) {
       const tabSelector = document.getElementsByClassName(Constants.TAB_HEADER_CLASS)[1];
       if (tabSelector && tabSelector.getAttribute("aria-selected") !== "true") {
-        AppState.lyricInjectionFailed = false; //ignore failure b/c the tab isn't visible
+        return; // wait to resolve until tab is visible
       }
     }
 
