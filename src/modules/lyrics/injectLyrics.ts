@@ -6,7 +6,7 @@ import type { TranslationResult } from "@modules/lyrics/translation";
 import * as Translation from "@modules/lyrics/translation";
 import { containsNonLatin, testRtl } from "@modules/lyrics/lyricParseUtils";
 import { AppState } from "@/index";
-import {applySegmentMapToLyrics, type LyricSourceResultWithMeta} from "@modules/lyrics/lyrics";
+import { applySegmentMapToLyrics, type LyricSourceResultWithMeta } from "@modules/lyrics/lyrics";
 import type { Lyric, LyricPart } from "@modules/lyrics/providers/shared";
 import { animEngineState, lyricsElementAdded } from "@modules/ui/animationEngine";
 import { getRelativeBounds } from "@utils";
@@ -54,7 +54,6 @@ export interface LyricsData {
   lyricWidth: number;
   isMusicVideoSynced: boolean;
 }
-
 
 /**
  * Processes lyrics data and prepares it for rendering.
@@ -438,13 +437,13 @@ export function injectLyrics(data: LyricSourceResultWithMeta, keepLoaderVisible 
     lines: lines,
     syncType: syncType,
     lyricWidth: lyricsContainer.clientWidth,
-    isMusicVideoSynced: data.musicVideoSynced === true
+    isMusicVideoSynced: data.musicVideoSynced === true,
   };
 
   if (data.segmentMap) {
     applySegmentMapToLyrics(lyricsData, data.segmentMap);
   }
-  
+
   AppState.lyricData = lyricsData;
 
   if (!allZero) {

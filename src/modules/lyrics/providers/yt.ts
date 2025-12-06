@@ -24,5 +24,4 @@ export default async function ytLyrics(providerParameters: ProviderParameters): 
 
     providerParameters.sourceMap["yt-lyrics"].filled = true;
   }
-
 }

@@ -7,7 +7,6 @@ import ytLyrics, { type YTLyricSourceResult } from "./yt";
 import { ytCaptions } from "./ytCaptions";
 import * as Storage from "@core/storage";
 
-
 /** Current version of the lyrics cache format */
 const LYRIC_CACHE_VERSION = "2.0.0";
 
@@ -44,7 +43,7 @@ interface AudioTrackData {
 
 interface LyricSource {
   filled: boolean;
-  resultCached: boolean
+  resultCached: boolean;
   lyricSourceResult: LyricSourceResult | CubeyLyricSourceResult | YTLyricSourceResult | null;
   lyricSourceFiller: (providerParameters: ProviderParameters) => Promise<void>;
 }
@@ -191,7 +190,6 @@ export async function getLyrics(
     }
 
     await lyricSource.lyricSourceFiller(providerParameters);
-
   }
 
   // Save result to cache for each provider
@@ -208,7 +206,7 @@ export async function getLyrics(
       const cacheTime = 7 * 24 * 60 * 60 * 1000;
       Storage.setTransientStorage(cacheKey, JSON.stringify(versionedData), cacheTime);
     }
-  })
+  });
 
   return lyricSource.lyricSourceResult;
 }

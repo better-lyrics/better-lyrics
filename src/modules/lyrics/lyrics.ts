@@ -4,7 +4,7 @@
  */
 
 import * as Constants from "@constants";
-import {injectLyrics, type LyricsData, processLyrics} from "@modules/lyrics/injectLyrics";
+import { injectLyrics, type LyricsData, processLyrics } from "@modules/lyrics/injectLyrics";
 import { stringSimilarity } from "@modules/lyrics/lyricParseUtils";
 import * as DOM from "@modules/ui/dom";
 import * as Utils from "@utils";
@@ -51,10 +51,11 @@ export async function createLyrics(detail: PlayerDetails, signal: AbortSignal): 
 
   let matchingSong = await RequestSniffer.getMatchingSong(videoId, 1);
   let swappedVideoId = false;
-  let isAVSwitch = (matchingSong &&
-          matchingSong.counterpartVideoId &&
-          matchingSong.counterpartVideoId === AppState.lastLoadedVideoId) ||
-      AppState.lastLoadedVideoId === videoId;
+  let isAVSwitch =
+    (matchingSong &&
+      matchingSong.counterpartVideoId &&
+      matchingSong.counterpartVideoId === AppState.lastLoadedVideoId) ||
+    AppState.lastLoadedVideoId === videoId;
 
   let segmentMap = matchingSong?.segmentMap || null;
 
@@ -76,7 +77,6 @@ export async function createLyrics(detail: PlayerDetails, signal: AbortSignal): 
     swappedVideoId = true;
     videoId = matchingSong.counterpartVideoId;
   }
-
 
   const tabSelector = document.getElementsByClassName(Constants.TAB_HEADER_CLASS)[1];
   console.assert(tabSelector != null);
@@ -118,7 +118,6 @@ export async function createLyrics(detail: PlayerDetails, signal: AbortSignal): 
     alwaysFetchMetadata: swappedVideoId,
     signal,
   };
-
 
   let ytLyricsPromise = LyricProviders.getLyrics(providerParameters, "yt-lyrics").then(lyrics => {
     if (!AppState.areLyricsLoaded && lyrics) {
@@ -242,7 +241,6 @@ export async function createLyrics(detail: PlayerDetails, signal: AbortSignal): 
   processLyrics(lyricsWithMeta);
 }
 
-
 export function applySegmentMapToLyrics(lyricData: LyricsData | null, segmentMap: SegmentMap) {
   if (segmentMap && lyricData) {
     lyricData.isMusicVideoSynced = !lyricData.isMusicVideoSynced;
@@ -271,5 +269,4 @@ export function applySegmentMapToLyrics(lyricData: LyricsData | null, segmentMap
       }
     }
   }
-
 }

@@ -122,12 +122,11 @@ export function handleModifications(detail: PlayerDetails): void {
     });
   } else {
     AppState.lyricAbortController = new AbortController();
-    AppState.lyricInjectionPromise = Lyrics.createLyrics(detail, AppState.lyricAbortController.signal)
-      .catch(err => {
-        Utils.log(Constants.GENERAL_ERROR_LOG, err);
-        AppState.areLyricsLoaded = false;
-        AppState.lyricInjectionFailed = true;
-      });
+    AppState.lyricInjectionPromise = Lyrics.createLyrics(detail, AppState.lyricAbortController.signal).catch(err => {
+      Utils.log(Constants.GENERAL_ERROR_LOG, err);
+      AppState.areLyricsLoaded = false;
+      AppState.lyricInjectionFailed = true;
+    });
   }
 }
 

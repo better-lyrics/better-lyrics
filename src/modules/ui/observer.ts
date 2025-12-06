@@ -184,7 +184,6 @@ export function initializeLyrics(): void {
     if (AppState.suppressZeroTime < Date.now() || detail.currentTime !== 0) {
       animationEngine(detail.currentTime, detail.browserTime, detail.playing);
     }
-
   });
 }
 
