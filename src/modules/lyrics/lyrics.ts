@@ -68,6 +68,13 @@ export function applySegmentMapToLyrics(lyricData: LyricsData | null, segmentMap
 }
 
 
+/**
+ * Main function to create and inject lyrics for the current song.
+ * Handles caching, API requests, and fallback mechanisms.
+ *
+ * @param detail - Song and player details
+ * @param signal - signal to cancel injection
+ */
 export async function createLyrics(detail: PlayerDetails, signal: AbortSignal): Promise<void> {
   let song = detail.song;
   let artist = detail.artist;
@@ -277,7 +284,7 @@ export async function createLyrics(detail: PlayerDetails, signal: AbortSignal): 
 
 
 /**
- * Warm caches so lyric fetching is faster
+ * Warms caches so lyric fetching is faster
  *
  * @param detail - Song and player details
  * @param signal
