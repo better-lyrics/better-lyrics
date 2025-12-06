@@ -18,6 +18,7 @@ import type { SegmentMap } from "./requestSniffer";
 import * as RequestSniffer from "./requestSniffer";
 import * as RequestSniffing from "./requestSniffer";
 import * as Translation from "./translation";
+import {animEngineState} from "@modules/ui/animationEngine";
 
 export type LyricSourceResultWithMeta = LyricSourceResult & {
   song: string;
@@ -27,13 +28,46 @@ export type LyricSourceResultWithMeta = LyricSourceResult & {
   videoId: string;
   segmentMap: SegmentMap | null;
 };
-/**
- * Main function to create and inject lyrics for the current song.
- * Handles caching, API requests, and fallback mechanisms.
- *
- * @param detail - Song and player details
- * @param signal
- */
+
+export function applySegmentMapToLyrics(lyricData: LyricsData | null, segmentMap: SegmentMap) {
+  if (segmentMap && lyricData) {
+    lyricData.isMusicVideoSynced = !lyricData.isMusicVideoSynced;
+    // We're sync lyrics using segment map
+    const allZero = lyricData.syncType === "none";
+
+    if (!allZero) {
+      for (let lyric of lyricData.lines) {
+        lyric.accumulatedOffsetMs = 1000000;  // Force resync by setting to a very large value
+        let lastTimeChange = 0;
+        for (let segment of segmentMap.segment) {
+          let lyricTimeMs = lyric.time * 1000;
+          if (lyricTimeMs >= segment.counterpartVideoStartTimeMilliseconds) {
+            lastTimeChange = segment.primaryVideoStartTimeMilliseconds - segment.counterpartVideoStartTimeMilliseconds;
+            if (lyricTimeMs <= segment.counterpartVideoStartTimeMilliseconds + segment.durationMilliseconds) {
+              break;
+            }
+          }
+        }
+
+        let changeS = lastTimeChange / 1000;
+        lyric.time = lyric.time + changeS;
+        lyric.parts.forEach(part => {
+          part.time = part.time + changeS;
+        });
+
+        lyric.lyricElement.setAttribute(
+            "onClick",
+            `const player = document.getElementById("movie_player"); player.seekTo(${lyric.time}, true);player.playVideo();`
+        );
+        lyric.lyricElement.addEventListener("click", _e => {
+          animEngineState.scrollResumeTime = 0;
+        });
+      }
+    }
+  }
+}
+
+
 export async function createLyrics(detail: PlayerDetails, signal: AbortSignal): Promise<void> {
   let song = detail.song;
   let artist = detail.artist;
@@ -52,10 +86,10 @@ export async function createLyrics(detail: PlayerDetails, signal: AbortSignal): 
   let matchingSong = await RequestSniffer.getMatchingSong(videoId, 1);
   let swappedVideoId = false;
   let isAVSwitch =
-    (matchingSong &&
-      matchingSong.counterpartVideoId &&
-      matchingSong.counterpartVideoId === AppState.lastLoadedVideoId) ||
-    AppState.lastLoadedVideoId === videoId;
+      (matchingSong &&
+          matchingSong.counterpartVideoId &&
+          matchingSong.counterpartVideoId === AppState.lastLoadedVideoId) ||
+      AppState.lastLoadedVideoId === videoId;
 
   let segmentMap = matchingSong?.segmentMap || null;
 
@@ -139,8 +173,8 @@ export async function createLyrics(detail: PlayerDetails, signal: AbortSignal): 
 
   try {
     let cubyLyrics = (await LyricProviders.getLyrics(
-      providerParameters,
-      "musixmatch-richsync"
+        providerParameters,
+        "musixmatch-richsync"
     )) as CubeyLyricSourceResult;
     if (cubyLyrics && cubyLyrics.album && cubyLyrics.album.length > 0 && album !== cubyLyrics.album) {
       providerParameters.album = cubyLyrics.album;
@@ -183,7 +217,7 @@ export async function createLyrics(detail: PlayerDetails, signal: AbortSignal): 
           let matchAmount = stringSimilarity(lyricText.toLowerCase(), ytLyrics.text.toLowerCase());
           if (matchAmount < 0.5) {
             Utils.log(
-              `Got lyrics from ${sourceLyrics.source}, but they don't match yt lyrics. Rejecting: Match: ${matchAmount}%`
+                `Got lyrics from ${sourceLyrics.source}, but they don't match yt lyrics. Rejecting: Match: ${matchAmount}%`
             );
             continue;
           }
@@ -241,32 +275,92 @@ export async function createLyrics(detail: PlayerDetails, signal: AbortSignal): 
   processLyrics(lyricsWithMeta);
 }
 
-export function applySegmentMapToLyrics(lyricData: LyricsData | null, segmentMap: SegmentMap) {
-  if (segmentMap && lyricData) {
-    lyricData.isMusicVideoSynced = !lyricData.isMusicVideoSynced;
-    // We're sync lyrics using segment map
-    const allZero = lyricData.syncType === "none";
 
-    if (!allZero) {
-      for (let lyric of lyricData.lines) {
-        lyric.accumulatedOffsetMs = 1000000;  // Force resync by setting to a very large value
-        let lastTimeChange = 0;
-        for (let segment of segmentMap.segment) {
-          let lyricTimeMs = lyric.time * 1000;
-          if (lyricTimeMs >= segment.counterpartVideoStartTimeMilliseconds) {
-            lastTimeChange = segment.primaryVideoStartTimeMilliseconds - segment.counterpartVideoStartTimeMilliseconds;
-            if (lyricTimeMs <= segment.counterpartVideoStartTimeMilliseconds + segment.durationMilliseconds) {
-              break;
-            }
-          }
-        }
+/**
+ * Warm caches so lyric fetching is faster
+ *
+ * @param detail - Song and player details
+ * @param signal
+ */
+export async function preFetchLyrics(detail: PlayerDetails, signal: AbortSignal): Promise<void> {
+  let song = detail.song;
+  let artist = detail.artist;
+  let videoId = detail.videoId;
+  let duration = Number(detail.duration);
+  const audioTrackData = detail.audioTrackData;
+  const isMusicVideo = detail.contentRect.width !== 0 && detail.contentRect.height !== 0;
 
-        let changeS = lastTimeChange / 1000;
-        lyric.time = lyric.time + changeS;
-        lyric.parts.forEach(part => {
-          part.time = part.time + changeS;
-        });
+
+  let matchingSong = await RequestSniffer.getMatchingSong(videoId);
+  let swappedVideoId = false;
+
+  if (isMusicVideo && matchingSong && matchingSong.counterpartVideoId && matchingSong.segmentMap) {
+    swappedVideoId = true;
+    videoId = matchingSong.counterpartVideoId;
+  }
+
+  song = song.trim();
+  artist = artist.trim();
+  artist = artist.replace(", & ", ", ");
+  let album = await RequestSniffing.getSongAlbum(videoId);
+  if (!album) {
+    album = "";
+  }
+
+  Utils.log("Prefetching for: ", song, artist);
+
+  let sourceMap = LyricProviders.newSourceMap();
+  // We depend on the cubey lyrics to fetch certain metadata, so we always call it even if it isn't the top priority
+  let providerParameters: ProviderParameters = {
+    song,
+    artist,
+    duration,
+    videoId,
+    audioTrackData,
+    album,
+    sourceMap,
+    alwaysFetchMetadata: swappedVideoId,
+    signal,
+  };
+
+  try {
+    let cubyLyrics = (await LyricProviders.getLyrics(
+        providerParameters,
+        "musixmatch-richsync"
+    )) as CubeyLyricSourceResult;
+    if (cubyLyrics && cubyLyrics.album && cubyLyrics.album.length > 0 && album !== cubyLyrics.album) {
+      providerParameters.album = cubyLyrics.album;
+    }
+    if (cubyLyrics && cubyLyrics.song && cubyLyrics.song.length > 0 && song !== cubyLyrics.song) {
+      providerParameters.song = cubyLyrics.song;
+    }
+
+    if (cubyLyrics && cubyLyrics.artist && cubyLyrics.artist.length > 0 && artist !== cubyLyrics.artist) {
+      providerParameters.artist = cubyLyrics.artist;
+    }
+
+    if (cubyLyrics && cubyLyrics.duration && duration !== cubyLyrics.duration) {
+      providerParameters.duration = cubyLyrics.duration;
+    }
+  } catch (err) {
+    Utils.log(err);
+  }
+
+  for (let provider of LyricProviders.providerPriority) {
+    if (signal.aborted) {
+      return;
+    }
+
+    try {
+      let sourceLyrics = await LyricProviders.getLyrics(providerParameters, provider);
+
+      if (sourceLyrics && sourceLyrics.lyrics && sourceLyrics.lyrics.length > 0) {
+        break;
       }
+    } catch (err) {
+      Utils.log(err);
     }
   }
 }
+
+
