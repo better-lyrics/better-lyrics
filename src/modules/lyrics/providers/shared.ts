@@ -185,6 +185,9 @@ export async function getLyrics(
     if (cachedData) {
       const data = JSON.parse(cachedData);
       if (data && data.version && data.version === LYRIC_CACHE_VERSION) {
+        lyricSource.filled = true;
+        lyricSource.lyricSourceResult = data;
+        lyricSource.resultCached = true;
         return data;
       }
     }

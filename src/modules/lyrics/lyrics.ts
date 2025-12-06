@@ -249,7 +249,7 @@ export function applySegmentMapToLyrics(lyricData: LyricsData | null, segmentMap
 
     if (!allZero) {
       for (let lyric of lyricData.lines) {
-        lyric.accumulatedOffsetMs = 1000000; // Trigger a resync
+        lyric.accumulatedOffsetMs = 1000000;  // Force resync by setting to a very large value
         let lastTimeChange = 0;
         for (let segment of segmentMap.segment) {
           let lyricTimeMs = lyric.time * 1000;
