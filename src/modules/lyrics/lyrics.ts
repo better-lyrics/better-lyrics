@@ -4,7 +4,6 @@
  */
 
 import * as Constants from "@constants";
-import * as Storage from "@core/storage";
 import {injectLyrics, type LyricsData, processLyrics} from "@modules/lyrics/injectLyrics";
 import { stringSimilarity } from "@modules/lyrics/lyricParseUtils";
 import * as DOM from "@modules/ui/dom";
@@ -19,9 +18,6 @@ import type { SegmentMap } from "./requestSniffer";
 import * as RequestSniffer from "./requestSniffer";
 import * as RequestSniffing from "./requestSniffer";
 import * as Translation from "./translation";
-
-/** Current version of the lyrics cache format */
-const LYRIC_CACHE_VERSION = "2.0.0";
 
 export type LyricSourceResultWithMeta = LyricSourceResult & {
   song: string;

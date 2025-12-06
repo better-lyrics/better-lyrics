@@ -21,7 +21,8 @@ export default async function ytLyrics(providerParameters: ProviderParameters): 
       musicVideoSynced: false,
       cacheAllowed: false,
     };
+
+    providerParameters.sourceMap["yt-lyrics"].filled = true;
   }
 
-  providerParameters.sourceMap["yt-lyrics"].filled = true;
 }

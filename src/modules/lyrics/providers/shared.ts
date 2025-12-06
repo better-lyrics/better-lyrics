@@ -5,6 +5,11 @@ import cubey, { type CubeyLyricSourceResult } from "./cubey";
 import lyricLib from "./lrclib";
 import ytLyrics, { type YTLyricSourceResult } from "./yt";
 import { ytCaptions } from "./ytCaptions";
+import * as Storage from "@core/storage";
+
+
+/** Current version of the lyrics cache format */
+const LYRIC_CACHE_VERSION = "2.0.0";
 
 interface AudioTrackData {
   id: string;
@@ -39,6 +44,7 @@ interface AudioTrackData {
 
 interface LyricSource {
   filled: boolean;
+  resultCached: boolean
   lyricSourceResult: LyricSourceResult | CubeyLyricSourceResult | YTLyricSourceResult | null;
   lyricSourceFiller: (providerParameters: ProviderParameters) => Promise<void>;
 }
@@ -88,7 +94,7 @@ export type SourceMapType = {
   [key in LyricSourceKey]: LyricSource;
 };
 
-let defaultPreferredProviderList = [
+let defaultPreferredProviderList: LyricSourceKey[] = [
   "bLyrics-richsynced",
   "musixmatch-richsync",
   "yt-captions",
@@ -149,7 +155,7 @@ const sourceKeyToFillFn = {
 
 export type LyricSourceKey = Readonly<keyof typeof sourceKeyToFillFn>;
 
-export function newSourceMap() {
+export function newSourceMap(): SourceMapType {
   function mapValues<T extends object, U>(obj: T, fn: (value: T[keyof T], key: keyof T) => U): { [K in keyof T]: U } {
     return Object.fromEntries(
       Object.entries(obj).map(([key, value]) => [key, fn(value as T[keyof T], key as keyof T)])
@@ -159,21 +165,50 @@ export function newSourceMap() {
   return mapValues(sourceKeyToFillFn, filler => ({
     filled: false,
     lyricSourceResult: null,
+    resultCached: false,
     lyricSourceFiller: filler,
   }));
 }
 
 /**
  * @param providerParameters
- * @param source
+ * @param sourceName
  */
 export async function getLyrics(
   providerParameters: ProviderParameters,
-  source: LyricSourceKey
+  sourceName: LyricSourceKey
 ): Promise<LyricSourceResult | null> {
-  let lyricSource = providerParameters.sourceMap[source];
+  let lyricSource = providerParameters.sourceMap[sourceName];
   if (!lyricSource.filled) {
+    // Check cache first
+    const cacheKey = `blyrics_${providerParameters.videoId}_${sourceName}`;
+    const cachedData = await Storage.getTransientStorage(cacheKey);
+    if (cachedData) {
+      const data = JSON.parse(cachedData);
+      if (data && data.version && data.version === LYRIC_CACHE_VERSION) {
+        return data;
+      }
+    }
+
     await lyricSource.lyricSourceFiller(providerParameters);
+
   }
+
+  // Save result to cache for each provider
+  defaultPreferredProviderList.forEach(provider => {
+    let source = providerParameters.sourceMap[provider];
+    if (source.filled && !source.resultCached && source.lyricSourceResult?.cacheAllowed !== false) {
+      source.resultCached = true;
+
+      const cacheKey = `blyrics_${providerParameters.videoId}_${provider}`;
+      let versionedData = {
+        version: LYRIC_CACHE_VERSION,
+        ...source.lyricSourceResult,
+      };
+      const cacheTime = 7 * 24 * 60 * 60 * 1000;
+      Storage.setTransientStorage(cacheKey, JSON.stringify(versionedData), cacheTime);
+    }
+  })
+
   return lyricSource.lyricSourceResult;
 }

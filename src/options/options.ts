@@ -27,9 +27,7 @@ const saveOptions = (): void => {
     { preferredProviderList: null },
     (currentOptions: { preferredProviderList: string[] | null }) => {
       if (!arrayEqual(currentOptions.preferredProviderList, options.preferredProviderList)) {
-        clearTransientLyrics(() => {
-          saveOptionsToStorage(options);
-        });
+        saveOptionsToStorage(options);
       } else {
         saveOptionsToStorage(options);
       }
