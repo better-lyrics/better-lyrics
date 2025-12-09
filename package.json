@@ -53,7 +53,7 @@
         "@types/codemirror": "^5.60.16",
         "@types/jsdom": "^27.0.0",
         "@types/node": "^24.10.1",
-        "@types/sortablejs": "^1.15.8",
+        "@types/sortablejs": "^1.15.9",
         "@typescript/lib-dom": "npm:@types/web@^0.0.280",
         "axios": "^1.13.1",
         "jsdom": "^27.1.0",
