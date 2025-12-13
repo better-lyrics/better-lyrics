@@ -27,7 +27,8 @@ jobs:
         with:
           token: ${{ steps.app-token.outputs.token || github.token }}
           fetch-depth: 0
-          ref: ${{ github.head_ref || github.ref }}
+          repository: ${{ github.event.pull_request.head.repo.full_name || github.repository }}
+          ref: ${{ github.event.pull_request.head.ref || github.ref }}
 
       - name: Use Node.js
         uses: actions/setup-node@v4
