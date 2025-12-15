@@ -377,6 +377,11 @@ export async function injectHeadTags(): Promise<void> {
   fontLink.rel = "stylesheet";
   document.head.appendChild(fontLink);
 
+  const notoFontLink = document.createElement("link");
+  notoFontLink.href = Constants.NOTO_SANS_UNIVERSAL_LINK;
+  notoFontLink.rel = "stylesheet";
+  document.head.appendChild(notoFontLink);
+
   const cssFiles = ["css/ytmusic.css", "css/blyrics.css", "css/themesong.css"];
 
   let css = "";
