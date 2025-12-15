@@ -49,7 +49,7 @@
         "@biomejs/biome": "^2.0.4",
         "@prefresh/core": "^1.5.8",
         "@prefresh/utils": "^1.2.1",
-        "@types/chrome": "^0.1.24",
+        "@types/chrome": "^0.1.32",
         "@types/codemirror": "^5.60.16",
         "@types/jsdom": "^27.0.0",
         "@types/node": "^24.10.2",
