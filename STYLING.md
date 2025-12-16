@@ -115,7 +115,7 @@ These custom properties allow for easy customization of colors, sizes, and other
 
 | Variable                           | Default Value                                                                                                                                                        | Description                                                              |
 | ---------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------ |
-| `--blyrics-font-family`            | `Satoshi, var(--noto-sans-universal), Avenir, -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, Cantarell, Open Sans, Helvetica Neue, sans-serif` | Font family for lyrics                                                   |
+| `--blyrics-font-family`            | `Satoshi, var(--noto-sans-universal), Avenir, -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, Cantarell, Open Sans, Helvetica Neue, sans-serif` | Font family for lyrics¹                                                   |
 | `--blyrics-font-size`              | `3rem`                                                                                                                                                               | Font size for lyrics                                                     |
 | `--blyrics-font-weight`            | `700`                                                                                                                                                                | Font weight for lyrics                                                   |
 | `--blyrics-line-height`            | `1.333`                                                                                                                                                              | Line height for lyrics                                                   |
@@ -126,9 +126,11 @@ These custom properties allow for easy customization of colors, sizes, and other
 | `--blyrics-footer-font-family`     | `Roboto, Noto Naskh Arabic UI, Arial, sans-serif`                                                                                                                    | Font family of footer                                                    |
 | `--blyrics-footer-font-size`       | `14px`                                                                                                                                                               | Font size of footer                                                      |
 | `--blyrics-footer-font-weight`     | `400`                                                                                                                                                                | Font weight of footer                                                    |
-| `--noto-sans-universal)`           | Omitted                                                                                                                                                              | A family of NotoSans fonts covering a large majority of langauges used.¹ |
+| `--noto-sans-universal`           | Omitted                                                                                                                                                              | A family of NotoSans fonts covering a large majority of langauges used.² |
 
-¹You don't want to override this. You should use this in your own font families as a fallback.
+¹To add a custom web-font, use `@import`. It must be placed at the very top of your theme.
+
+²You don't want to override this. You should use this in your own font families as a fallback.
 
 ### Animations
 
