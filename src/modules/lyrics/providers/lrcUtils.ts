@@ -125,15 +125,15 @@ export function parseLRC(lrcText: string, songDuration: number): LyricsArray {
     if (index + 1 < result.length) {
       const nextLyric = result[index + 1];
       if (lyric.durationMs === 0) {
-        lyric.durationMs = nextLyric.startTimeMs - lyric.startTimeMs;
+        lyric.durationMs = Math.max(nextLyric.startTimeMs - lyric.startTimeMs, 0);
       }
       if (lyric.parts && lyric.parts.length > 0) {
-        let longestStart = nextLyric.startTimeMs;
-        lyric.parts.forEach(val => { longestStart = Math.max(longestStart, val.startTimeMs) });
+        let latestStart = nextLyric.startTimeMs;
+        lyric.parts.forEach(val => { latestStart = Math.max(latestStart, val.startTimeMs) });
 
         const lastPartInLyric = lyric.parts[lyric.parts.length - 1];
-        lastPartInLyric.durationMs = nextLyric.startTimeMs - lastPartInLyric.startTimeMs;
-        lyric.durationMs = Math.max(longestStart, 0) - lyric.startTimeMs;
+        lastPartInLyric.durationMs = Math.max(nextLyric.startTimeMs - lastPartInLyric.startTimeMs, 0);
+        lyric.durationMs = Math.max(latestStart - lyric.startTimeMs, 0) ;
       }
     } else {
       if (lyric.durationMs === 0) {
