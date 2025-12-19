@@ -71,6 +71,7 @@ interface DivAttributes {
   "@_begin": string;
   "@_end": string;
   "@_songPart": string;
+  "@_key"?: string; // For translations and transliterations
   "@_agent"?: string; // Optional, seen in line-sync example
 }
 
