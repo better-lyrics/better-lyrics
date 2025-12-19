@@ -198,7 +198,7 @@ export async function getLyrics(
   // Save result to cache for each provider
   defaultPreferredProviderList.forEach(provider => {
     let source = providerParameters.sourceMap[provider];
-    if (source.filled && !source.resultCached && source.lyricSourceResult?.cacheAllowed !== false) {
+    if (source.filled && !source.resultCached && source.lyricSourceResult && source.lyricSourceResult.cacheAllowed !== false) {
       source.resultCached = true;
 
       const cacheKey = `blyrics_${providerParameters.videoId}_${provider}`;
