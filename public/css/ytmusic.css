@@ -137,8 +137,8 @@ ytmusic-player-page:not([is-mweb-modernization-enabled])[player-fullscreened]
 #main-panel.ytmusic-player-page {
   display: flex;
   justify-content: center;
+  flex-direction: column;
 }
-
 
 ytmusic-app-layout:not([is-mweb-modernization-enabled])[player-fullscreened]
 > [slot="player-page"] {
@@ -218,6 +218,7 @@ ytmusic-player-page:not([is-mweb-modernization-enabled]):not([is-mweb-modernizat
 
 ytmusic-player-page:not([is-mweb-modernization-enabled])[player-fullscreened]
 #player.ytmusic-player-page {
+  flex: none;
   margin: 0 auto;
 }
 
