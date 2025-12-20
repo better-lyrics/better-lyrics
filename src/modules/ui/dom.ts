@@ -23,15 +23,15 @@ function parseSvgString(svgString: string): SVGElement | null {
   return null;
 }
 
-const providerDisplayInfo: Record<string, { name: string; syncType: SyncType }> = {
-  "bLyrics-richsynced": { name: "Better Lyrics", syncType: "syllable" },
-  "bLyrics-synced": { name: "Better Lyrics", syncType: "line" },
-  "musixmatch-richsync": { name: "Musixmatch", syncType: "word" },
-  "musixmatch-synced": { name: "Musixmatch", syncType: "line" },
-  "lrclib-synced": { name: "LRCLib", syncType: "line" },
-  "lrclib-plain": { name: "LRCLib", syncType: "unsynced" },
-  "yt-captions": { name: "Youtube Captions", syncType: "line" },
-  "yt-lyrics": { name: "Youtube", syncType: "unsynced" },
+const providerDisplayInfo: Record<string, { icon: string; name: string; syncType: SyncType }> = {
+  "bLyrics-richsynced": { icon: "https://better-lyrics.boidu.dev/icon-512.png", name: "Better Lyrics", syncType: "syllable" },
+  "bLyrics-synced": { icon: "https://better-lyrics.boidu.dev/icon-512.png", name: "Better Lyrics", syncType: "line" },
+  "musixmatch-richsync": { icon: "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e3/Musixmatch_logo_icon_only.svg/64px-Musixmatch_logo_icon_only.svg.png?20220531132958", name: "Musixmatch", syncType: "word" },
+  "musixmatch-synced": { icon: "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e3/Musixmatch_logo_icon_only.svg/64px-Musixmatch_logo_icon_only.svg.png?20220531132958", name: "Musixmatch", syncType: "line" },
+  "lrclib-synced": { icon: "https://lrclib.net/assets/lrclib-370c57eb.png", name: "LRCLib", syncType: "line" },
+  "lrclib-plain": { icon: "https://lrclib.net/assets/lrclib-370c57eb.png", name: "LRCLib", syncType: "unsynced" },
+  "yt-captions": { icon: "https://upload.wikimedia.org/wikipedia/commons/thumb/6/6a/Youtube_Music_icon.svg/512px-Youtube_Music_icon.svg.png?20230802004652", name: "YouTube Captions", syncType: "line" },
+  "yt-lyrics": { icon: "https://upload.wikimedia.org/wikipedia/commons/thumb/6/6a/Youtube_Music_icon.svg/512px-Youtube_Music_icon.svg.png?20230802004652", name: "YouTube", syncType: "unsynced" },
 };
 
 let backgroundChangeObserver: MutationObserver | null = null;
@@ -104,6 +104,9 @@ export function addFooter(
   footerLink.href = sourceHref;
 
   if (info) {
+    const logo = document.getElementById("betterLyricsFooterLogo") as HTMLImageElement;
+    logo.src = info.icon;
+
     footerLink.appendChild(document.createTextNode(info.name));
     const iconWrapper = document.createElement("span");
     iconWrapper.style.opacity = "0.5";
@@ -137,6 +140,7 @@ export function createFooter(song: string, artist: string, album: string, durati
     footerContainer.className = `${Constants.FOOTER_CLASS}__container`;
 
     const footerImage = document.createElement("img");
+    footerImage.id = "betterLyricsFooterLogo";
     footerImage.src = "https://better-lyrics.boidu.dev/icon-512.png";
     footerImage.alt = "Better Lyrics Logo";
     footerImage.width = 20;

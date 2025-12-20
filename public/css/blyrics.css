@@ -547,7 +547,8 @@
 
 .blyrics-footer__container > img {
 	margin-left: -6px;
-	margin-right: 1rem;
+	margin-right: 0.5rem;
+	border-radius: 1rem;
 }
 
 .autoscroll-resume-wrapper {
