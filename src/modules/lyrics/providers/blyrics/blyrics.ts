@@ -123,7 +123,7 @@ export async function fillTtml(responseString: string, providerParameters: Provi
 
   const rawObj = (await parser.parse(responseString)) as TtmlRoot;
 
-  let lyrics = [] as Lyric[];
+  const lyrics = new Map() as Map<string, Lyric>;
 
   const tt = rawObj[0].tt;
   const ttHead = tt.find(e => e.head)!.head!;
@@ -145,8 +145,7 @@ export async function fillTtml(responseString: string, providerParameters: Provi
       isWordSynced = true;
     }
 
-    lyrics.push({
-      key: meta["@_key"],
+    lyrics.set(meta["@_key"] || lyrics.size.toString(), {
       agent: meta["@_agent"],
       durationMs: endTimeMs - beginTimeMs,
       parts: partParse.parts,
@@ -157,9 +156,6 @@ export async function fillTtml(responseString: string, providerParameters: Provi
       translation: undefined,
     });
   });
-
-  const songDurationMs = parseTime(ttMeta["@_dur"]);
-  lyrics = insertInstrumentalBreaks(lyrics, songDurationMs);
 
   let metadata = ttHead[0].metadata.find(e => e.iTunesMetadata);
   if (metadata) {
@@ -173,8 +169,7 @@ export async function fillTtml(responseString: string, providerParameters: Provi
         let line = translation[":@"]["@_for"];
         
         if (lang && text && line) {
-          const lyricIndex = lyrics.findIndex(lyricLine => lyricLine.key == line)
-          lyrics[lyricIndex].translation = {
+          lyrics.get(line)!.translation = {
             text,
             lang,
           }
@@ -186,21 +181,25 @@ export async function fillTtml(responseString: string, providerParameters: Provi
       transliterations.transliterations[0].transliteration.forEach(transliteration => {
         let line = transliteration[":@"]["@_for"];
         if (line) {
-          const lyricIndex = lyrics.findIndex(lyricLine => lyricLine.key == line)
-          let beginTime = lyrics[lyricIndex].startTimeMs;
+          const lyricLine = lyrics.get(line)!
+          let beginTime = lyricLine.startTimeMs;
           let parseResult = parseLyricPart(transliteration.text, beginTime, false);
 
-          lyrics[lyricIndex].romanization = parseResult.text;
-          lyrics[lyricIndex].timedRomanization = parseResult.parts;
+          lyricLine.romanization = parseResult.text;
+          lyricLine.timedRomanization = parseResult.parts;
         }
       });
     }
   }
 
+  let lyricArray = lyrics.values().toArray()
+  const songDurationMs = parseTime(ttMeta["@_dur"]);
+  lyricArray = insertInstrumentalBreaks(lyricArray, songDurationMs);
+
   let result: LyricSourceResult = {
     cacheAllowed: true,
     language: ttMeta["@_lang"],
-    lyrics: lyrics,
+    lyrics: lyricArray,
     musicVideoSynced: false,
     source: "boidu.dev",
     sourceHref: "https://boidu.dev/",
