@@ -38,7 +38,7 @@
         "@codemirror/state": "^6.5.2",
         "@codemirror/view": "^6.38.4",
         "@fsegurai/codemirror-theme-material-dark": "^6.2.3",
-        "codemirror": "^5.65.20",
+        "codemirror": "^6.0.2",
         "extension": "2.1.3",
         "fast-xml-parser": "^5.3.3",
         "lz-string": "^1.5.0",
