@@ -6,11 +6,12 @@ on:
       - master
   pull_request:
 
+env:
+  HAS_CF_SECRETS: ${{ secrets.CF_ACCOUNT_ID && secrets.CF_ZONE_ID && secrets.CF_API_TOKEN && secrets.SOURCEMAPS_API_KEY && env.SOURCEMAPS_API_URL }}
+
 jobs:
   build:
     runs-on: ubuntu-latest
-    env:
-      HAS_CF_SECRETS: ${{ secrets.CF_ACCOUNT_ID && secrets.CF_ZONE_ID && secrets.CF_API_TOKEN && secrets.SOURCEMAPS_API_KEY && env.SOURCEMAPS_API_URL }}
       
     steps:
       - uses: actions/checkout@v3
