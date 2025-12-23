@@ -7,8 +7,8 @@ on:
   pull_request:
 
 env:
-  HAS_CF_SECRETS: ${{ secrets.CF_ACCOUNT_ID && secrets.CF_ZONE_ID && secrets.CF_API_TOKEN && secrets.SOURCEMAPS_API_KEY && env.SOURCEMAPS_API_URL }}
-
+  HAS_CF_SECRETS: ${{ secrets.CF_ACCOUNT_ID && secrets.CF_ZONE_ID && secrets.CF_API_TOKEN && secrets.SOURCEMAPS_API_KEY && vars.SOURCEMAPS_API_URL }}
+  
 jobs:
   build:
     runs-on: ubuntu-latest
