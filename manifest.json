@@ -35,7 +35,7 @@
         "css/themesong.css",
         "css/themes/*.css",
         "*.js.map",
-        "src/options/standalone-editor.html"
+        "pages/standalone-editor.html"
       ]
     }
   ],
