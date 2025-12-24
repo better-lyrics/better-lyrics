@@ -151,6 +151,12 @@ jobs:
           cd dist/chrome
           zip -r ../chrome-v$VERSION.zip .
 
+      - name: Upload Chrome Zip for release
+        uses: actions/upload-artifact@v4
+        with:
+          name: chrome-release-asset
+          path: dist/chrome-v${{ needs.release.outputs.version }}.zip
+
       - name: Publish to Chrome Web Store
         if: github.event.inputs.is_canary == 'false'
         env:
@@ -159,12 +165,6 @@ jobs:
           CLIENT_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET}}
           REFRESH_TOKEN: ${{ secrets.GOOGLE_REFRESH_TOKEN }}
         run: npx tsx tooling/publish-chrome.ts dist/chrome-v${{ needs.release.outputs.version }}.zip
-
-      - name: Upload Chrome Zip for release
-        uses: actions/upload-artifact@v4
-        with:
-          name: chrome-release-asset
-          path: dist/chrome-v${{ needs.release.outputs.version }}.zip
 
   publish-firefox:
     needs: release
@@ -251,6 +251,12 @@ jobs:
           VERSION=${{ needs.release.outputs.version }}
           cd dist/edge
           zip -r ../edge-v$VERSION.zip .
+          
+      - name: Upload Edge Zip for release
+        uses: actions/upload-artifact@v4
+        with:
+          name: edge-release-asset
+          path: dist/edge-v${{ needs.release.outputs.version }}.zip
 
       - name: Publish to Edge Add-ons
         if: github.event.inputs.is_canary == 'false'
@@ -260,15 +266,10 @@ jobs:
           PRODUCT_ID: ${{ secrets.EDGE_PRODUCT_ID }}
         run: npx tsx tooling/publish-edge.ts dist/edge-v${{ needs.release.outputs.version }}.zip
 
-      - name: Upload Edge Zip for release
-        uses: actions/upload-artifact@v4
-        with:
-          name: edge-release-asset
-          path: dist/edge-v${{ needs.release.outputs.version }}.zip
-
   create-github-release:
     name: Create GitHub Release
     needs: [release, publish-chrome, publish-edge, publish-firefox]
+    if: always()
     runs-on: ubuntu-latest
     permissions:
       contents: write
