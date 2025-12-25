@@ -83,7 +83,7 @@ const themes: Theme[] = [
 ];
 
 export async function getCustomThemes(): Promise<CustomTheme[]> {
-  const result = await chrome.storage.local.get("customThemes");
+  const result = (await chrome.storage.local.get("customThemes")) as { customThemes?: CustomTheme[] };
   return result.customThemes || [];
 }
 

@@ -4,77 +4,9 @@ import * as Observer from "@modules/ui/observer";
 import * as Settings from "@modules/settings/settings";
 import * as Constants from "@constants";
 import * as RequestSniffing from "@modules/lyrics/requestSniffer";
-import * as Lyrics from "@modules/lyrics/lyrics";
 import * as Storage from "@core/storage";
 import { initProviders } from "@modules/lyrics/providers/shared";
-import type { LyricsData } from "@modules/lyrics/injectLyrics";
-import { animationEngine } from "@modules/ui/animationEngine";
-import { DEFAULT_LINE_SYNCED_WORD_DELAY_MS } from "@constants";
-
-export interface PlayerDetails {
-  currentTime: number;
-  videoId: string;
-  song: string;
-  artist: string;
-  duration: string;
-  audioTrackData: any;
-  browserTime: number;
-  playing: boolean;
-  contentRect: {
-    width: number;
-    height: number;
-  };
-}
-
-interface AppState {
-  suppressZeroTime: number;
-  areLyricsTicking: boolean;
-  lyricData: LyricsData | null;
-  areLyricsLoaded: boolean;
-  lyricInjectionFailed: boolean;
-  lastVideoId: string | null;
-  lastVideoDetails: any | null;
-  lyricInjectionPromise: Promise<any> | null;
-  queueLyricInjection: boolean;
-  queueAlbumArtInjection: boolean;
-  shouldInjectAlbumArt: string | boolean;
-  queueSongDetailsInjection: boolean;
-  loaderAnimationEndTimeout: number | undefined;
-  lastLoadedVideoId: string | null;
-  lyricAbortController: AbortController | null;
-  animationSettings: {
-    disableRichSynchronization: boolean;
-    lineSyncedWordDelayMs: number;
-  };
-  isTranslateEnabled: boolean;
-  isRomanizationEnabled: boolean;
-  translationLanguage: string;
-}
-
-export let AppState: AppState = {
-  suppressZeroTime: 0,
-  areLyricsTicking: false,
-  lyricData: null,
-  areLyricsLoaded: false,
-  lyricInjectionFailed: false,
-  lastVideoId: null,
-  lastVideoDetails: null,
-  lyricInjectionPromise: null,
-  queueLyricInjection: false,
-  queueAlbumArtInjection: false,
-  shouldInjectAlbumArt: "Unknown",
-  queueSongDetailsInjection: false,
-  loaderAnimationEndTimeout: undefined,
-  lastLoadedVideoId: null,
-  lyricAbortController: null,
-  animationSettings: {
-    disableRichSynchronization: false,
-    lineSyncedWordDelayMs: DEFAULT_LINE_SYNCED_WORD_DELAY_MS,
-  },
-  isTranslateEnabled: false,
-  isRomanizationEnabled: false,
-  translationLanguage: "en",
-};
+import { AppState } from "@core/appState";
 
 /**
  * Initializes the BetterLyrics extension by setting up all required components.
@@ -109,37 +41,6 @@ export async function modify(): Promise<void> {
     () => (AppState.shouldInjectAlbumArt = true),
     () => (AppState.shouldInjectAlbumArt = false)
   );
-}
-
-/**
- * Handles modifications to player state and manages lyric injection.
- * Ensures only one lyric injection process runs at a time by queueing subsequent calls.
- *
- * @param detail - Player state details
- */
-export function handleModifications(detail: PlayerDetails): void {
-  if (AppState.lyricInjectionPromise) {
-    AppState.lyricAbortController?.abort("New song is being loaded");
-    AppState.lyricInjectionPromise.then(() => {
-      AppState.lyricInjectionPromise = null;
-      handleModifications(detail);
-    });
-  } else {
-    AppState.lyricAbortController = new AbortController();
-    AppState.lyricInjectionPromise = Lyrics.createLyrics(detail, AppState.lyricAbortController.signal).catch(err => {
-      Utils.log(Constants.GENERAL_ERROR_LOG, err);
-      AppState.areLyricsLoaded = false;
-      AppState.lyricInjectionFailed = true;
-    });
-  }
-}
-
-/**
- * Reloads lyrics by resetting the last video ID.
- * Forces the extension to re-fetch lyrics for the current video.
- */
-export function reloadLyrics(): void {
-  AppState.lastVideoId = null;
 }
 
 /**

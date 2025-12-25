@@ -152,7 +152,7 @@ const subscribeToCacheInfo = (): void => {
 
   chrome.storage.onChanged.addListener((changes, area) => {
     if (area === "sync" && changes.cacheInfo) {
-      updateCacheInfo({ cacheInfo: changes.cacheInfo.newValue });
+      updateCacheInfo({ cacheInfo: changes.cacheInfo.newValue as { count: number; size: number } });
     }
   });
 };
@@ -381,6 +381,7 @@ document.addEventListener("DOMContentLoaded", () => {
   new Sortable(document.getElementById("providers-list")!, {
     animation: 150,
     ghostClass: "dragging",
+    forceFallback: true,
     onUpdate: saveOptions,
   });
 });

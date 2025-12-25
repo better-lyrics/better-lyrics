@@ -1,7 +1,7 @@
 {
     "type": "module",
     "name": "better-lyrics",
-    "version": "2.1.1",
+    "version": "2.1.2.1",
     "description": "Enhance YouTube Music with beautiful time-synced lyrics, multilingual support, real-time translations and more",
     "main": "index.js",
     "scripts": {

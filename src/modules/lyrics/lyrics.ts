@@ -8,8 +8,7 @@ import { injectLyrics, type LyricsData, processLyrics } from "@modules/lyrics/in
 import { stringSimilarity } from "@modules/lyrics/lyricParseUtils";
 import * as DOM from "@modules/ui/dom";
 import * as Utils from "@utils";
-import type { PlayerDetails } from "@/index";
-import { AppState } from "@/index";
+import { AppState, type PlayerDetails } from "@core/appState";
 import type { CubeyLyricSourceResult } from "./providers/cubey";
 import type { LyricSourceResult, ProviderParameters } from "./providers/shared";
 import * as LyricProviders from "./providers/shared";

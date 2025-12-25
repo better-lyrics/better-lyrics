@@ -107,7 +107,7 @@ export default async function cubey(providerParameters: ProviderParameters): Pro
       Utils.log("[BetterLyrics] Forcing new token, removing any existing one.");
       await chrome.storage.local.remove("jwtToken");
     } else {
-      const storedData = await chrome.storage.local.get("jwtToken");
+      const storedData = (await chrome.storage.local.get("jwtToken")) as { jwtToken?: string };
       if (storedData.jwtToken) {
         if (isJwtExpired(storedData.jwtToken)) {
           Utils.log("[BetterLyrics]Local JWT has expired. Removing and requesting a new one.");

@@ -1,4 +1,4 @@
-import { AppState } from "@/index";
+import { AppState } from "@core/appState";
 import * as Constants from "@constants";
 import * as Utils from "@utils";
 import { isLoaderActive, isAdPlaying, showAdOverlay, hideAdOverlay } from "@modules/ui/dom";

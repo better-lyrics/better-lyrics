@@ -6,7 +6,7 @@ import { getRelativeBounds } from "@utils";
 import type { TranslationResult } from "@modules/lyrics/translation";
 import * as Translation from "@modules/lyrics/translation";
 import { containsNonLatin, testRtl } from "@modules/lyrics/lyricParseUtils";
-import { AppState } from "@/index";
+import { AppState } from "@core/appState";
 import { applySegmentMapToLyrics, type LyricSourceResultWithMeta } from "@modules/lyrics/lyrics";
 import type { Lyric, LyricPart } from "@modules/lyrics/providers/shared";
 import { animEngineState, lyricsElementAdded } from "@modules/ui/animationEngine";

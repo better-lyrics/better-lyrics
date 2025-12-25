@@ -136,12 +136,12 @@ export function initProviders(): void {
 
   chrome.storage.onChanged.addListener((changes, area) => {
     if (area === "sync" && changes.preferredProviderList) {
-      updateProvidersList(changes.preferredProviderList.newValue);
+      updateProvidersList(changes.preferredProviderList.newValue as string[] | null);
     }
   });
 
   chrome.storage.sync.get({ preferredProviderList: null }, function (items) {
-    updateProvidersList(items.preferredProviderList);
+    updateProvidersList(items.preferredProviderList as string[] | null);
   });
 }
 

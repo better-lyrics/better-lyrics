@@ -333,8 +333,11 @@
 	content: "";
 	display: block;
 	height: 3rem;
+	min-height: 3rem;
 	margin-top: 3rem;
 	width: 3rem;
+	min-width: 3rem;
+	flex-shrink: 0;
 }
 
 #blyrics-loader:after {

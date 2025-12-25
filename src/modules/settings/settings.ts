@@ -3,8 +3,7 @@ import * as Constants from "@constants";
 import * as Utils from "@core/utils";
 import * as Translation from "@modules/lyrics/translation";
 import * as Storage from "@core/storage";
-import { AppState } from "@/index";
-import * as BetterLyrics from "@/index";
+import { AppState, reloadLyrics } from "@core/appState";
 import { calculateLyricPositions } from "@modules/lyrics/injectLyrics";
 
 type EnableDisableCallback = () => void;
@@ -187,11 +186,11 @@ export function listenForPopupMessages(): void {
           DOM.removeAlbumArtFromLayout();
         }
       );
-      BetterLyrics.reloadLyrics();
+      reloadLyrics();
     } else if (request.action === "clearCache") {
       try {
         Storage.clearCache();
-        BetterLyrics.reloadLyrics();
+        reloadLyrics();
 
         sendResponse({ success: true });
       } catch {

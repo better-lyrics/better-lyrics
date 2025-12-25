@@ -1,7 +1,6 @@
 import { getStorage } from "./storage";
 import { cachedDurations, cachedProperties } from "@modules/ui/animationEngine";
-import { AppState } from "@/index";
-import * as App from "@/index";
+import { AppState, reloadLyrics } from "@core/appState";
 import { DEFAULT_LINE_SYNCED_WORD_DELAY_MS } from "@constants";
 
 /**
@@ -67,7 +66,7 @@ export function applyCustomCSS(css: string): void {
   }
 
   if (needsLyricReload) {
-    App.reloadLyrics();
+    reloadLyrics();
   }
 
   let styleTag = document.getElementById("blyrics-custom-style");

@@ -1,5 +1,8 @@
 
-/* 2025-12-19T19-13-13 v1.6.1 Beta-4 */
+/* 2025-12-24T13-43-40 v1.6.1 */
+/* Make sure to turn off 'show stylized animations' from display settings */
+/* please report all bugs and suggestions on discord */
+/* time, tide, & I wait for nothing- boidu (probably) */
 
 @import url("https://fonts.googleapis.com/css2?family=Roboto+Flex:opsz,wght@8..144,100..1000&display=swap");
 
@@ -126,7 +129,7 @@ ytmusic-app-layout > [slot="player-bar"] {
   padding-block: 0 !important;
   margin-top: 0.5em;
 }
-.blyrics-container .blyrics--romanized{
+.blyrics-container .blyrics--romanized {
   margin-top: 0.2em !important;
   margin-bottom: 0.2em;
 }
@@ -161,11 +164,17 @@ ytmusic-app-layout:not([is-mweb-modernization-enabled])
 }
 @keyframes blyrics-shimmer {
   0% {
-    background-position: 200% 0; mask-position: 200% 0;
+    background-position: 200% 0;
+    mask-position: 200% 0;
   }
   100% {
-    background-position: -200% 0; mask-position: -200% 0;
+    background-position: -200% 0;
+    mask-position: -200% 0;
   }
+}
+#blyrics-loader::after {
+  opacity: 1;
+  line-height: 1.5;
 }
 ytmusic-player-page::before {
   background: var(--blyrics-background-img);
@@ -370,7 +379,7 @@ tp-yt-paper-listbox#items {
   scroll-behavior: smooth;
 }
 ytmusic-queue-header-renderer {
-  border: 1px solid oklch(1 0 0 / 0.1);
+  border: 1.5px solid oklch(1 0 0 / 0.1);
   border-top: none;
   border-radius: 0px 0px 24px 24px;
   align-items: flex-start;
@@ -379,7 +388,22 @@ ytmusic-queue-header-renderer {
   position: sticky;
   top: 0;
   z-index: 1000;
-  background: oklch(from #212121 l c h / 0.87);
+}
+ytmusic-queue-header-renderer::before {
+  content: "";
+  overflow: hidden;
+  position: absolute;
+  background: var(--blyrics-background-img);
+  background-position: 50%;
+  background-repeat: no-repeat;
+  background-size: cover;
+  transition: var(--background-image-transition);
+  filter: brightness(0.35) contrast(0.95);
+  z-index: -1;
+  inset: 0;
+  border: none;
+  border-radius: inherit;
+  opacity: 1;
 }
 ytmusic-chip-cloud-chip-renderer[chip-style="STYLE_TRANSPARENT"]
   a.ytmusic-chip-cloud-chip-renderer {
@@ -457,28 +481,31 @@ ytmusic-browse-response:has([main-page-type="MUSIC_PAGE_TYPE_ARTIST"])
   left: 0;
   width: 100%;
   height: 200dvh;
-  --fade-height: calc(var(--ytmusic-immersive-header-padding-top) + var(--ytmusic-immersive-header-gradient-padding-top));
+  --fade-height: calc(
+    var(--ytmusic-immersive-header-padding-top) +
+      var(--ytmusic-immersive-header-gradient-padding-top)
+  );
   mask-image: linear-gradient(
     to bottom,
     transparent 0dvh,
-    oklch(0 0 0 / 0.05) calc(var(--fade-height) * 1/3),
-    oklch(0 0 0 / 0.2)  calc(var(--fade-height) * 2/3),
-    oklch(0 0 0 / 0.45) calc(var(--fade-height) * 3/3),
-    oklch(0 0 0 / 0.75) calc(var(--fade-height) * 4/3),
-    oklch(0 0 0 / 0.9)  calc(var(--fade-height) * 5/3),
-    oklch(0 0 0 / 0.97) calc(var(--fade-height) * 6/3),
-    black               calc(var(--fade-height) * 7/3)
+    oklch(0 0 0 / 0.05) calc(var(--fade-height) * 1 / 3),
+    oklch(0 0 0 / 0.2)  calc(var(--fade-height) * 2 / 3),
+    oklch(0 0 0 / 0.45) calc(var(--fade-height) * 3 / 3),
+    oklch(0 0 0 / 0.75) calc(var(--fade-height) * 4 / 3),
+    oklch(0 0 0 / 0.9)  calc(var(--fade-height) * 5 / 3),
+    oklch(0 0 0 / 0.97) calc(var(--fade-height) * 6 / 3),
+    black               calc(var(--fade-height) * 7 / 3)
   );
   -webkit-mask-image: linear-gradient(
     to bottom,
     transparent 0dvh,
-    oklch(0 0 0 / 0.05) calc(var(--fade-height) * 1/3),
-    oklch(0 0 0 / 0.2)  calc(var(--fade-height) * 2/3),
-    oklch(0 0 0 / 0.45) calc(var(--fade-height) * 3/3),
-    oklch(0 0 0 / 0.75) calc(var(--fade-height) * 4/3),
-    oklch(0 0 0 / 0.9)  calc(var(--fade-height) * 5/3),
-    oklch(0 0 0 / 0.97) calc(var(--fade-height) * 6/3),
-    black               calc(var(--fade-height) * 7/3)
+    oklch(0 0 0 / 0.05) calc(var(--fade-height) * 1 / 3),
+    oklch(0 0 0 / 0.2)  calc(var(--fade-height) * 2 / 3),
+    oklch(0 0 0 / 0.45) calc(var(--fade-height) * 3 / 3),
+    oklch(0 0 0 / 0.75) calc(var(--fade-height) * 4 / 3),
+    oklch(0 0 0 / 0.9)  calc(var(--fade-height) * 5 / 3),
+    oklch(0 0 0 / 0.97) calc(var(--fade-height) * 6 / 3),
+    black               calc(var(--fade-height) * 7 / 3)
   );
   backdrop-filter: brightness(0.28);
   z-index: 1;
@@ -496,8 +523,65 @@ ytmusic-browse-response:has([main-page-type="MUSIC_PAGE_TYPE_ARTIST"])
   }
 }
 @media {
-    ytmusic-immersive-header-renderer {
-        --ytmusic-immersive-header-padding-top: 48dvh;
-        --ytmusic-immersive-header-gradient-padding-top: 12dvh;
-    }
+  ytmusic-immersive-header-renderer {
+    --ytmusic-immersive-header-padding-top: 48dvh;
+    --ytmusic-immersive-header-gradient-padding-top: 12dvh;
+  }
+}
+
+/* credit goes to chengg, i just have it all copied for easy modification */
+ytmusic-player-page[player-fullscreened]:not([video-mode]):not(
+    [blyrics-dfs]
+  ):has(.blyrics-container[data-no-lyrics="true"])
+  #main-panel {
+  position: relative;
+  z-index: 2;
+  transform: translateX(
+    calc(50vw - 50% - var(--ytmusic-player-page-horizontal-padding))
+  );
+  transition: transform 1.3s ease-in-out;
+  transition-delay: var(--blyrics-no-lyrics-slide-delay);
+}
+
+ytmusic-player-page[player-fullscreened][video-mode]:not([blyrics-dfs]):has(
+    .blyrics-container[data-no-lyrics="true"]
+  )
+  #main-panel {
+  transform: translateX(
+    calc(50vw - 50% - var(--ytmusic-player-page-horizontal-padding) / 2)
+  );
+  transition: transform 1.3s ease-in-out;
+  transition-delay: var(--blyrics-no-lyrics-slide-delay);
+}
+
+ytmusic-player-page[player-fullscreened]:not([video-mode]):not(
+    [blyrics-dfs]
+  ):has(.blyrics-container[data-no-lyrics="true"])
+  #player {
+  max-width: inherit;
+  transition: max-width 1.3s ease-in-out;
+  transition-delay: var(--blyrics-no-lyrics-slide-delay);
+}
+
+ytmusic-player-page[player-fullscreened]:not([blyrics-dfs])
+  .blyrics-no-lyrics-button-container {
+  display: none;
+}
+
+ytmusic-player-page[player-fullscreened]:not([blyrics-dfs])
+  #blyrics-wrapper:has(.blyrics-container[data-no-lyrics="true"]) {
+  display: flex !important;
+  height: 100%;
+  justify-content: center;
+  align-items: center;
+  opacity: 0;
+  transition: opacity 1.3s ease;
+  transition-delay: var(--blyrics-no-lyrics-slide-delay);
+}
+/* temporary workaround until i finalize replacement */
+.blyrics--instrumental-icon {
+  display: none;
+}
+.blyrics--instrumental.blyrics--line::after {
+  content: "♫";
 }

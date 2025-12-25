@@ -1,9 +1,7 @@
 import * as Settings from "@modules/settings/settings";
 import * as Dom from "./dom";
 import * as Constants from "@constants";
-import type { PlayerDetails } from "@/index";
-import * as BetterLyrics from "@/index";
-import { AppState } from "@/index";
+import { AppState, handleModifications, reloadLyrics, type PlayerDetails } from "@core/appState";
 import * as Utils from "@utils";
 import { animEngineState, getResumeScrollElement, animationEngine } from "@modules/ui/animationEngine";
 import {
@@ -166,14 +164,13 @@ export function lyricReloader(): void {
         setTimeout(() => {
           tabRenderer.scrollTop = scrollPositions[i];
           // Don't start ticking until we set the height
-          BetterLyrics.AppState.areLyricsTicking =
-            BetterLyrics.AppState.areLyricsLoaded && BetterLyrics.AppState.lyricData?.syncType !== "none" && i === 1;
+          AppState.areLyricsTicking = AppState.areLyricsLoaded && AppState.lyricData?.syncType !== "none" && i === 1;
         }, 0);
         currentTab = i;
 
         if (i !== 1) {
           // stop ticking immediately
-          BetterLyrics.AppState.areLyricsTicking = false;
+          AppState.areLyricsTicking = false;
         }
       });
     }
@@ -184,7 +181,7 @@ export function lyricReloader(): void {
         Utils.log(Constants.LYRICS_TAB_CLICKED_LOG);
         Dom.cleanup();
         Dom.renderLoader();
-        BetterLyrics.reloadLyrics();
+        reloadLyrics();
       }
     });
 
@@ -256,7 +253,7 @@ export function initializeLyrics(): void {
             getResumeScrollElement().classList.remove("blyrics-hidden");
           });
         }
-        BetterLyrics.handleModifications(detail);
+        handleModifications(detail);
       }
     }
 
