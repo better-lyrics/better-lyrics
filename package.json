@@ -56,7 +56,7 @@
         "@prefresh/core": "^1.5.9",
         "@prefresh/utils": "^1.2.1",
         "@types/chrome": "^0.1.24",
-        "@types/dompurify": "^3.0.5",
+        "@types/dompurify": "^3.2.0",
         "@types/jsdom": "^27.0.0",
         "@types/node": "^24.10.2",
         "@types/sortablejs": "^1.15.9",
