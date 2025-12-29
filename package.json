@@ -58,7 +58,7 @@
         "@types/chrome": "^0.1.24",
         "@types/dompurify": "^3.2.0",
         "@types/jsdom": "^27.0.0",
-        "@types/node": "^24.10.2",
+        "@types/node": "^25.0.3",
         "@types/sortablejs": "^1.15.9",
         "@typescript/lib-dom": "npm:@types/web@^0.0.280",
         "axios": "^1.13.2",
