@@ -172,7 +172,7 @@ export async function createLyrics(detail: PlayerDetails, signal: AbortSignal): 
         album: providerParameters.album || "",
         segmentMap: null,
       };
-      processLyrics(lyricsWithMeta, true);
+      processLyrics(lyricsWithMeta, true, providerParameters.signal);
     }
     return lyrics;
   });
@@ -279,7 +279,7 @@ export async function createLyrics(detail: PlayerDetails, signal: AbortSignal): 
   if (signal.aborted) {
     return;
   }
-  processLyrics(lyricsWithMeta);
+  processLyrics(lyricsWithMeta, false, signal);
 }
 
 /**

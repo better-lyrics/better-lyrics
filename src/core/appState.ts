@@ -1,5 +1,6 @@
 import { DEFAULT_LINE_SYNCED_WORD_DELAY_MS, GENERAL_ERROR_LOG } from "@constants";
 import type { LyricsData } from "@modules/lyrics/injectLyrics";
+import type { AIProviderKey } from "@modules/lyrics/aiTranslationTypes";
 import { createLyrics } from "@modules/lyrics/lyrics";
 import { log } from "@utils";
 
@@ -41,6 +42,8 @@ export interface AppStateType {
   isTranslateEnabled: boolean;
   isRomanizationEnabled: boolean;
   translationLanguage: string;
+  aiTranslationProvider: AIProviderKey | null;
+  lastAITranslation: { provider: AIProviderKey; model: string } | null;
 }
 
 export const AppState: AppStateType = {
@@ -66,6 +69,8 @@ export const AppState: AppStateType = {
   isTranslateEnabled: false,
   isRomanizationEnabled: false,
   translationLanguage: "en",
+  aiTranslationProvider: null,
+  lastAITranslation: null,
 };
 
 export function reloadLyrics(): void {

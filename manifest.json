@@ -43,7 +43,8 @@
         "css/themes/*.css",
         "*.js.map",
         "pages/standalone-editor.html",
-        "pages/marketplace.html"
+        "pages/marketplace.html",
+        "icons/*.svg"
       ]
     }
   ],

@@ -234,6 +234,14 @@ select option {
     height: 0.875rem;
 }
 
+/* AI Translation Config Button */
+
+.ai-config-btn .ai-config-icon {
+    width: 14px;
+    height: 14px;
+    border-radius: 2px;
+}
+
 #css {
     display: none;
 }
@@ -1532,4 +1540,17 @@ input.cm-textfield:focus-visible {
 
 .modal-btn-danger:hover {
 	background: rgb(220, 38, 38);
+}
+
+/* -- AI Translation Config --------------------------  */
+
+.ai-translation-config {
+	display: flex;
+	align-items: center;
+	gap: 0.75rem;
+}
+
+.ai-status-text {
+	font-size: 0.875rem;
+	color: rgba(255, 255, 255, 0.6);
 }

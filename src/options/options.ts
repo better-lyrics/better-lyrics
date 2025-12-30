@@ -1,5 +1,8 @@
 // Function to save user options
+
+import { clearAITranslationCache } from "@modules/lyrics/aiTranslation";
 import Sortable from "sortablejs";
+import { openAITranslationModal, updateAITranslationStatus } from "./aiTranslation/aiTranslationModal";
 import { initStoreUI, setupYourThemesButton } from "./store/store";
 
 interface Options {
@@ -202,6 +205,15 @@ const restoreOptions = (): void => {
   chrome.storage.sync.get(defaultOptions, setOptionsInForm);
 
   document.getElementById("clear-cache")!.addEventListener("click", () => clearTransientLyrics());
+  document.getElementById("clear-ai-cache")!.addEventListener("click", async () => {
+    await clearAITranslationCache();
+    showAlert("AI translation cache cleared!");
+    chrome.tabs.query({ url: "https://music.youtube.com/*" }, tabs => {
+      tabs.forEach(tab => {
+        chrome.tabs.sendMessage(tab.id!, { action: "reloadLyrics" });
+      });
+    });
+  });
 };
 
 // Function to set options in form elements
@@ -391,5 +403,22 @@ document.addEventListener("DOMContentLoaded", () => {
 
   document.getElementById("browse-themes-btn")?.addEventListener("click", () => {
     chrome.tabs.create({ url: chrome.runtime.getURL("pages/marketplace.html") });
+  });
+
+  document.getElementById("configure-ai-btn")?.addEventListener("click", openAITranslationModal);
+
+  updateAITranslationStatus().then(({ text, iconSrc }) => {
+    const statusEl = document.getElementById("ai-translation-status");
+    const iconEl = document.getElementById("ai-translation-icon") as HTMLImageElement;
+
+    if (statusEl) statusEl.textContent = text;
+    if (iconEl) {
+      if (iconSrc) {
+        iconEl.src = iconSrc;
+        iconEl.style.display = "";
+      } else {
+        iconEl.style.display = "none";
+      }
+    }
   });
 });

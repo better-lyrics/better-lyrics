@@ -681,6 +681,21 @@
 	margin-top: 8px;
 }
 
+.blyrics--translated.blyrics--shimmer {
+	background: linear-gradient(
+		110deg,
+		color-mix(in srgb, var(--blyrics-translated-color, var(--blyrics-ui-text-color)) 40%, transparent) 30%,
+		var(--blyrics-translated-color, var(--blyrics-ui-text-color)) 50%,
+		color-mix(in srgb, var(--blyrics-translated-color, var(--blyrics-ui-text-color)) 40%, transparent) 70%
+	);
+	background-size: 200% 100%;
+	-webkit-background-clip: text;
+	background-clip: text;
+	color: transparent;
+	animation: blyrics-shimmer 2s linear infinite;
+	animation-delay: var(--shimmer-delay, 0s);
+}
+
 .blyrics--romanized > span {
 	color: var(--blyrics-lyric-inactive-color);
 	display: inline-block;

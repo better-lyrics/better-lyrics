@@ -2,6 +2,8 @@ import { LOG_PREFIX_CONTENT, LYRICS_DISABLED_ATTR } from "@constants";
 import { AppState, reloadLyrics } from "@core/appState";
 import { clearCache, compileRicsToStyles, getStorage } from "@core/storage";
 import { log, setUpLog } from "@core/utils";
+import { clearAITranslationCache } from "@modules/lyrics/aiTranslation";
+import type { AIProviderKey } from "@modules/lyrics/aiTranslationTypes";
 import { calculateLyricPositions } from "@modules/lyrics/injectLyrics";
 import { clearCache as clearTranslationCache } from "@modules/lyrics/translation";
 import { removeAlbumArtFromLayout } from "@modules/ui/dom";
@@ -201,6 +203,9 @@ export function listenForPopupMessages(): void {
       } catch {
         sendResponse({ success: false });
       }
+    } else if (request.action === "reloadLyrics") {
+      reloadLyrics();
+      sendResponse({ success: true });
     }
   });
 }
@@ -209,9 +214,28 @@ export function listenForPopupMessages(): void {
  * Loads translation and romanization settings from storage and updates AppState.
  */
 export function loadTranslationSettings(): void {
-  getStorage({ isTranslateEnabled: false, isRomanizationEnabled: false, translationLanguage: "en" }, items => {
-    AppState.isTranslateEnabled = items.isTranslateEnabled;
-    AppState.isRomanizationEnabled = items.isRomanizationEnabled;
-    AppState.translationLanguage = items.translationLanguage || "en";
-  });
+  getStorage(
+    {
+      isTranslateEnabled: false,
+      isRomanizationEnabled: false,
+      translationLanguage: "en",
+      aiTranslationProvider: null,
+    },
+    items => {
+      AppState.isTranslateEnabled = items.isTranslateEnabled;
+      AppState.isRomanizationEnabled = items.isRomanizationEnabled;
+      AppState.translationLanguage = items.translationLanguage || "en";
+
+      const newProvider = (items.aiTranslationProvider as AIProviderKey) || null;
+      const previousProvider = AppState.aiTranslationProvider;
+      if (newProvider !== previousProvider) {
+        AppState.aiTranslationProvider = newProvider;
+        AppState.lastAITranslation = null;
+        // Only clear cache on actual provider change, not initial load
+        if (previousProvider !== null) {
+          clearAITranslationCache();
+        }
+      }
+    }
+  );
 }

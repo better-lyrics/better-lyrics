@@ -1,6 +1,7 @@
 import {
   BACKGROUND_LYRIC_CLASS,
   LOG_PREFIX,
+  LOG_PREFIX_AI_TRANSLATION,
   LYRICS_CLASS,
   LYRICS_FOUND_LOG,
   LYRICS_SPACING_ELEMENT_ID,
@@ -10,9 +11,9 @@ import {
   NO_LYRICS_FOUND_LOG,
   NO_LYRICS_TEXT,
   NO_LYRICS_TEXT_SELECTOR,
-  romanizationLanguages,
   ROMANIZED_LYRICS_CLASS,
   RTL_CLASS,
+  romanizationLanguages,
   SYNC_DISABLED_LOG,
   TRANSLATED_LYRICS_CLASS,
   TRANSLATION_ENABLED_LOG,
@@ -20,11 +21,11 @@ import {
   ZERO_DURATION_ANIMATION_CLASS,
 } from "@constants";
 import { AppState } from "@core/appState";
-import { containsNonLatin, testRtl } from "@modules/lyrics/lyricParseUtils";
+import { checkAITranslationCache, fetchAITranslation } from "@modules/lyrics/aiTranslation";
 import { createInstrumentalElement } from "@modules/lyrics/createInstrumentalElement";
+import { containsNonLatin, testRtl } from "@modules/lyrics/lyricParseUtils";
 import { applySegmentMapToLyrics, type LyricSourceResultWithMeta } from "@modules/lyrics/lyrics";
 import type { Lyric, LyricPart } from "@modules/lyrics/providers/shared";
-import type { TranslationResult } from "@modules/lyrics/translation";
 import {
   getRomanizationFromCache,
   getTranslationFromCache,
@@ -34,7 +35,15 @@ import {
   translateTextIntoRomaji,
 } from "@modules/lyrics/translation";
 import { animEngineState, lyricsElementAdded } from "@modules/ui/animationEngine";
-import { addFooter, addNoLyricsButton, cleanup, createLyricsWrapper, flushLoader, renderLoader } from "@modules/ui/dom";
+import {
+  addFooter,
+  addNoLyricsButton,
+  addTranslationBadge,
+  cleanup,
+  createLyricsWrapper,
+  flushLoader,
+  renderLoader,
+} from "@modules/ui/dom";
 import { getRelativeBounds, log } from "@utils";
 
 function findNearestAgent(lyrics: Lyric[], fromIndex: number): string | undefined {
@@ -110,7 +119,7 @@ export interface LyricsData {
  * @param data.language - Language code for the lyrics
  * @param data.lyrics - Array of lyric lines
  */
-export function processLyrics(data: LyricSourceResultWithMeta, keepLoaderVisible = false): void {
+export function processLyrics(data: LyricSourceResultWithMeta, keepLoaderVisible = false, signal?: AbortSignal): void {
   const lyrics = data.lyrics;
   if (!lyrics || lyrics.length === 0) {
     throw new Error(NO_LYRICS_FOUND_LOG);
@@ -130,7 +139,7 @@ export function processLyrics(data: LyricSourceResultWithMeta, keepLoaderVisible
     log(LYRICS_TAB_NOT_DISABLED_LOG);
   }
 
-  injectLyrics(data, keepLoaderVisible);
+  injectLyrics(data, keepLoaderVisible, signal);
 }
 
 function createLyricsLine(parts: LyricPart[], line: LineData, lyricElement: HTMLDivElement) {
@@ -218,10 +227,11 @@ function createBreakElem(lyricElement: HTMLDivElement, order: number) {
  * @param [data.source] - Source attribution for lyrics
  * @param [data.sourceHref] - URL for source link
  */
-export function injectLyrics(data: LyricSourceResultWithMeta, keepLoaderVisible = false): void {
+export function injectLyrics(data: LyricSourceResultWithMeta, keepLoaderVisible = false, signal?: AbortSignal): void {
   const lyrics = data.lyrics!;
   cleanup();
   resizeObserver.disconnect();
+  AppState.lastAITranslation = null;
 
   let lyricsWrapper = createLyricsWrapper();
 
@@ -263,6 +273,92 @@ export function injectLyrics(data: LyricSourceResultWithMeta, keepLoaderVisible 
       resolve(data.language);
     }
   });
+
+  const aiTranslationsMap = new Map<number, string>();
+
+  log(
+    LOG_PREFIX_AI_TRANSLATION,
+    `Checking AI: translate=${AppState.isTranslateEnabled}, provider=${AppState.aiTranslationProvider}, keepLoader=${keepLoaderVisible}`
+  );
+
+  // -- AI Translation Setup --
+  const shouldCheckAI =
+    AppState.isTranslateEnabled && AppState.aiTranslationProvider && data.videoId && !keepLoaderVisible;
+
+  function applyAITranslations(
+    translations: string[],
+    provider: string,
+    model: string,
+    source: "cache" | "fetch"
+  ): void {
+    let textIndex = 0;
+    lyrics.forEach((lyric, lineIndex) => {
+      if (!lyric.isInstrumental && lyric.words.trim() !== "♪") {
+        if (textIndex < translations.length) {
+          const translated = translations[textIndex];
+          if (translated && translated !== lyric.words) {
+            aiTranslationsMap.set(lineIndex, translated);
+          }
+        }
+        textIndex++;
+      }
+    });
+
+    if (aiTranslationsMap.size > 0) {
+      AppState.lastAITranslation = { provider, model };
+      applyAITranslationsToDOM(aiTranslationsMap);
+      updateAITranslationBadge();
+      log(LOG_PREFIX_AI_TRANSLATION, `Applied ${aiTranslationsMap.size} AI translations (${source})`);
+    } else {
+      AppState.lastAITranslation = null;
+      log(LOG_PREFIX_AI_TRANSLATION, "No translations needed (all matched original)");
+    }
+  }
+
+  if (shouldCheckAI) {
+    langPromise.then(sourceLang => {
+      const targetLang = AppState.translationLanguage;
+      const baseSource = sourceLang?.split("-")[0] || "";
+      const baseTarget = targetLang.split("-")[0];
+
+      if (baseSource && baseSource === baseTarget) {
+        log(LOG_PREFIX_AI_TRANSLATION, `Skipping: source (${sourceLang}) matches target (${targetLang})`);
+        AppState.lastAITranslation = null;
+        return;
+      }
+
+      checkAITranslationCache(data.videoId!, targetLang).then(check => {
+        if (signal?.aborted) return;
+
+        if (check.cached) {
+          applyAITranslations(check.cached.translations, check.cached.provider, check.cached.model, "cache");
+        } else if (check.canFetch) {
+          addTranslationShimmer();
+
+          const timeoutSignal = AbortSignal.timeout(60000);
+          const combinedSignal = signal ? AbortSignal.any([signal, timeoutSignal]) : timeoutSignal;
+          const lyricTexts = lyrics.filter(l => !l.isInstrumental && l.words.trim() !== "♪").map(l => l.words);
+
+          fetchAITranslation(data.videoId, lyricTexts, targetLang, data.language ?? undefined, combinedSignal)
+            .then(result => {
+              removeTranslationShimmer();
+              if (result) {
+                applyAITranslations(result.translations, result.provider, result.model, "fetch");
+              }
+            })
+            .catch(error => {
+              removeTranslationShimmer();
+              if (combinedSignal.aborted) {
+                log(LOG_PREFIX_AI_TRANSLATION, "Aborted (song change or timeout)");
+                return;
+              }
+              log(LOG_PREFIX_AI_TRANSLATION, "Failed, Google translations will be used:", error);
+              AppState.lastAITranslation = null;
+            });
+        }
+      });
+    });
+  }
 
   let lines: LineData[] = [];
   let syncType: SyncType = allZero ? "none" : "synced";
@@ -470,58 +566,8 @@ export function injectLyrics(data: LyricSourceResultWithMeta, keepLoaderVisible 
       });
     }
 
-    let createTranslationElem = () => {
-      createBreakElem(lyricElement, 6);
-      let translatedLine = document.createElement("div");
-      translatedLine.classList.add(TRANSLATED_LYRICS_CLASS);
-      translatedLine.style.order = "7";
-      lyricElement.appendChild(translatedLine);
-      return translatedLine;
-    };
-
-    let translationResult: TranslationResult | null;
-
-    let targetTranslationLang = AppState.translationLanguage;
-
-    if (item.translation && langCodesMatch(targetTranslationLang, item.translation.lang)) {
-      translationResult = {
-        originalLanguage: item.translation.lang,
-        translatedText: item.translation.text,
-      };
-    } else {
-      translationResult = getTranslationFromCache(item.words, targetTranslationLang);
-    }
-
-    if (translationResult && AppState.isTranslateEnabled) {
-      if (!isSameText(translationResult.translatedText, item.words)) {
-        createTranslationElem().textContent = "\n" + translationResult.translatedText;
-      }
-    } else {
-      langPromise.then(source_language => {
-        onTranslationEnabled(async items => {
-          let target_language = items.translationLanguage || "en";
-
-          if (source_language !== target_language || containsNonLatin(item.words)) {
-            if (item.words.trim() !== "♪" && item.words.trim() !== "") {
-              let result;
-              if (item.translation && target_language === item.translation.lang) {
-                result = {
-                  originalLanguage: item.translation.lang,
-                  translatedText: item.translation.text,
-                };
-              } else {
-                result = await translateText(item.words, target_language);
-              }
-
-              if (result && !isSameText(result.translatedText, item.words)) {
-                createTranslationElem().textContent = "\n" + result.translatedText;
-                lyricsElementAdded();
-              }
-            }
-          }
-        });
-      });
-    }
+    // -- Google Translation --
+    applyGoogleTranslation(lyricElement, item, langPromise);
 
     try {
       lines.push(line);
@@ -582,6 +628,41 @@ export function injectLyrics(data: LyricSourceResultWithMeta, keepLoaderVisible 
   AppState.areLyricsLoaded = true;
 }
 
+function ensureTranslationElementsExist(): void {
+  const lyricsContainer = document.querySelector(`.${LYRICS_CLASS}`);
+  if (!lyricsContainer) return;
+
+  const lyricLines = lyricsContainer.querySelectorAll(".blyrics--line");
+  lyricLines.forEach(line => {
+    const lyricElement = line as HTMLElement;
+    if (lyricElement.dataset.instrumental === "true") return;
+
+    // Check if translation element already exists
+    if (!lyricElement.querySelector(`.${TRANSLATED_LYRICS_CLASS}`)) {
+      getOrCreateTranslationElement(lyricElement);
+    }
+  });
+}
+
+function addTranslationShimmer(): void {
+  // First ensure all translation elements exist
+  ensureTranslationElementsExist();
+
+  const translations = document.querySelectorAll(`.${TRANSLATED_LYRICS_CLASS}`);
+  translations.forEach((el, index) => {
+    el.classList.add("blyrics--shimmer");
+    (el as HTMLElement).style.setProperty("--shimmer-delay", `${index * 0.05}s`);
+  });
+}
+
+function removeTranslationShimmer(): void {
+  const translations = document.querySelectorAll(`.${TRANSLATED_LYRICS_CLASS}.blyrics--shimmer`);
+  translations.forEach(el => {
+    el.classList.remove("blyrics--shimmer");
+    (el as HTMLElement).style.removeProperty("--shimmer-delay");
+  });
+}
+
 export function calculateLyricPositions() {
   if (AppState.lyricData && AppState.areLyricsTicking) {
     const lyricsElement = document.getElementsByClassName(LYRICS_CLASS)[0] as HTMLElement;
@@ -594,6 +675,109 @@ export function calculateLyricPositions() {
       line.position = bounds.y;
       line.height = bounds.height;
     });
+  }
+}
+
+// -- Google Translation Helpers --------------------------
+
+function getOrCreateTranslationElement(lyricElement: HTMLElement): HTMLElement {
+  let translatedLine = lyricElement.querySelector(`.${TRANSLATED_LYRICS_CLASS}`) as HTMLElement;
+  if (translatedLine) return translatedLine;
+
+  const breakElm = document.createElement("span");
+  breakElm.classList.add("blyrics--break");
+  breakElm.style.order = "6";
+  lyricElement.appendChild(breakElm);
+
+  translatedLine = document.createElement("div");
+  translatedLine.classList.add(TRANSLATED_LYRICS_CLASS);
+  translatedLine.style.order = "7";
+  lyricElement.appendChild(translatedLine);
+
+  return translatedLine;
+}
+
+function setTranslationText(lyricElement: HTMLElement, text: string, originalWords: string): boolean {
+  if (isSameText(text, originalWords)) return false;
+
+  const translatedLine = getOrCreateTranslationElement(lyricElement);
+  translatedLine.textContent = "\n" + text;
+  return true;
+}
+
+function applyGoogleTranslation(lyricElement: HTMLElement, item: Lyric, langPromise: Promise<string>): void {
+  const targetLang = AppState.translationLanguage;
+
+  // Skip instrumental markers
+  if (item.words.trim() === "♪" || item.words.trim() === "") return;
+
+  // Check embedded translation first
+  if (item.translation && langCodesMatch(targetLang, item.translation.lang)) {
+    if (AppState.isTranslateEnabled) {
+      setTranslationText(lyricElement, item.translation.text, item.words);
+    }
+    return;
+  }
+
+  // Check cache
+  const cached = getTranslationFromCache(item.words, targetLang);
+  if (cached && AppState.isTranslateEnabled) {
+    setTranslationText(lyricElement, cached.translatedText, item.words);
+    return;
+  }
+
+  // Async translation flow
+  langPromise.then(sourceLang => {
+    onTranslationEnabled(async items => {
+      const targetLanguage = items.translationLanguage || "en";
+
+      // Skip if same language and not non-Latin
+      if (sourceLang === targetLanguage && !containsNonLatin(item.words)) return;
+
+      // Check embedded translation again with resolved target
+      if (item.translation && targetLanguage === item.translation.lang) {
+        if (setTranslationText(lyricElement, item.translation.text, item.words)) {
+          lyricsElementAdded();
+        }
+        return;
+      }
+
+      // Fetch from Google
+      const result = await translateText(item.words, targetLanguage);
+      if (result && setTranslationText(lyricElement, result.translatedText, item.words)) {
+        lyricsElementAdded();
+      }
+    });
+  });
+}
+
+// -- AI Translation Helpers --------------------------
+
+function applyAITranslationsToDOM(translationsMap: Map<number, string>): void {
+  const lyricsContainer = document.querySelector(`.${LYRICS_CLASS}`);
+  if (!lyricsContainer) return;
+
+  const lyricLines = lyricsContainer.querySelectorAll(".blyrics--line");
+  translationsMap.forEach((translation, lineIndex) => {
+    const lyricElement = lyricLines[lineIndex] as HTMLElement;
+    if (!lyricElement || lyricElement.dataset.instrumental === "true") return;
+
+    const originalText = lyricElement.querySelector(`.${WORD_CLASS}`)?.textContent?.trim() || "";
+    if (setTranslationText(lyricElement, translation, originalText)) {
+      lyricsElementAdded();
+    }
+  });
+
+  updateAITranslationBadge();
+  calculateLyricPositions();
+}
+
+function updateAITranslationBadge(): void {
+  if (!AppState.lastAITranslation) return;
+
+  const footerContainer = document.querySelector(".blyrics-footer") as HTMLElement;
+  if (footerContainer) {
+    addTranslationBadge(footerContainer, AppState.lastAITranslation.provider);
   }
 }
 
