@@ -21,8 +21,10 @@ import {
   NOTO_SANS_UNIVERSAL_LINK,
   PLAYER_BAR_SELECTOR,
   PROVIDER_CONFIGS,
+  ROMANIZED_LYRICS_CLASS,
   SONG_IMAGE_SELECTOR,
   TAB_RENDERER_SELECTOR,
+  TRANSLATED_LYRICS_CLASS,
   type SyncType,
 } from "@constants";
 import { AppState } from "@core/appState";
@@ -84,6 +86,46 @@ export function createLyricsWrapper(): HTMLElement {
   const wrapper = document.createElement("div");
   wrapper.id = LYRICS_WRAPPER_ID;
   tabRenderer.appendChild(wrapper);
+
+  wrapper.addEventListener("copy", (e: ClipboardEvent) => {
+    const selection = window.getSelection();
+    if (!selection || selection.isCollapsed) return;
+
+    const range = selection.getRangeAt(0);
+    const fragment = range.cloneContents();
+
+    const lineElements = fragment.querySelectorAll(".blyrics--line");
+
+    if (lineElements.length === 0) {
+      const text = fragment.textContent?.replace(/\s+/g, " ").trim();
+      if (text) {
+        e.preventDefault();
+        e.clipboardData?.setData("text/plain", text);
+      }
+      return;
+    }
+
+    const lines: string[] = [];
+
+    for (const line of lineElements) {
+      const words = line.querySelectorAll(".blyrics--word");
+      const mainText = Array.from(words)
+        .map(w => w.textContent?.trim())
+        .filter(Boolean)
+        .join(" ");
+
+      const romanized = line.querySelector(`.${ROMANIZED_LYRICS_CLASS}`)?.textContent?.trim();
+      const translated = line.querySelector(`.${TRANSLATED_LYRICS_CLASS}`)?.textContent?.trim();
+
+      const lineParts = [mainText, romanized, translated].filter(Boolean);
+      if (lineParts.length > 0) lines.push(lineParts.join("\n"));
+    }
+
+    if (lines.length > 0) {
+      e.preventDefault();
+      e.clipboardData?.setData("text/plain", lines.join("\n"));
+    }
+  });
 
   log(LYRICS_WRAPPER_CREATED_LOG);
   return wrapper;
