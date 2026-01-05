@@ -29,7 +29,13 @@ import {
   type SyncType,
 } from "@constants";
 import { AppState } from "@core/appState";
-import { animEngineState, getResumeScrollElement, reflow, toMs } from "@modules/ui/animationEngine";
+import {
+  animEngineState,
+  getResumeScrollElement,
+  reflow,
+  resetAnimEngineState,
+  toMs,
+} from "@modules/ui/animationEngine";
 import { log } from "@utils";
 import { scrollEventHandler } from "./observer";
 
@@ -99,6 +105,8 @@ function createActionButton(options: ActionButtonOptions): HTMLElement {
 let backgroundChangeObserver: MutationObserver | null = null;
 let albumArtResizeObserver: ResizeObserver | null = null;
 let lyricsObserver: MutationObserver | null = null;
+let adStateObserver: MutationObserver | null = null;
+let albumArtResizeTimeout: ReturnType<typeof setTimeout> | null = null;
 
 /**
  * Creates or reuses the lyrics wrapper element and sets up scroll event handling.
@@ -429,6 +437,10 @@ export function setupAdObserver(): void {
     return;
   }
 
+  if (adStateObserver) {
+    adStateObserver.disconnect();
+  }
+
   let adOverlay = document.getElementById(LYRICS_AD_OVERLAY_ID);
   if (!adOverlay) {
     adOverlay = document.createElement("div");
@@ -440,7 +452,7 @@ export function setupAdObserver(): void {
     showAdOverlay();
   }
 
-  const observer = new MutationObserver(() => {
+  adStateObserver = new MutationObserver(() => {
     if (isAdPlaying()) {
       showAdOverlay();
     } else {
@@ -448,7 +460,7 @@ export function setupAdObserver(): void {
     }
   });
 
-  observer.observe(playerBar, { attributes: true, attributeFilter: [AD_PLAYING_ATTR] });
+  adStateObserver.observe(playerBar, { attributes: true, attributeFilter: [AD_PLAYING_ATTR] });
 }
 
 /**
@@ -531,12 +543,15 @@ export function addAlbumArtToLayout(videoId: string): void {
   const albumArt = document.querySelector(SONG_IMAGE_SELECTOR) as HTMLImageElement;
 
   const resizeObserver = new ResizeObserver(() => {
-    setTimeout(() => {
+    if (albumArtResizeTimeout) {
+      clearTimeout(albumArtResizeTimeout);
+    }
+    albumArtResizeTimeout = setTimeout(() => {
+      albumArtResizeTimeout = null;
       setAlbumArtSize(screen.height);
     }, 1000);
   });
 
-  // the observer firing up probably a rare case (only fires when user change screenres)
   resizeObserver.observe(document.documentElement);
   albumArtResizeObserver = resizeObserver;
 
@@ -573,6 +588,14 @@ export function removeAlbumArtFromLayout(): void {
   if (backgroundChangeObserver) {
     backgroundChangeObserver.disconnect();
     backgroundChangeObserver = null;
+  }
+  if (albumArtResizeObserver) {
+    albumArtResizeObserver.disconnect();
+    albumArtResizeObserver = null;
+  }
+  if (albumArtResizeTimeout) {
+    clearTimeout(albumArtResizeTimeout);
+    albumArtResizeTimeout = null;
   }
   const layout = document.getElementById("layout");
   if (layout) {
@@ -668,10 +691,17 @@ export async function injectHeadTags(): Promise<void> {
  */
 export function cleanup(): void {
   animEngineState.scrollPos = -1;
+  resetAnimEngineState();
 
   if (lyricsObserver) {
     lyricsObserver.disconnect();
     lyricsObserver = null;
+  }
+
+  // Clear lyricData BEFORE clearing DOM to release element references
+  if (AppState.lyricData) {
+    AppState.lyricData.lines = [];
+    AppState.lyricData = null;
   }
 
   const ytMusicLyrics = (document.querySelector(NO_LYRICS_TEXT_SELECTOR) as HTMLElement)?.parentElement;

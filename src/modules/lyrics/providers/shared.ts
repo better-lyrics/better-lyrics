@@ -111,7 +111,13 @@ function isLyricSourceKey(provider: string): provider is LyricSourceKey {
 
 export let providerPriority: LyricSourceKey[] = [];
 
+let hasInitializedProviders = false;
+
 export function initProviders(): void {
+  if (hasInitializedProviders) {
+    return;
+  }
+  hasInitializedProviders = true;
   const updateProvidersList = (preferredProviderList: string[] | null) => {
     let activeProviderList: string[] = preferredProviderList ?? [...defaultPreferredProviderList];
 

@@ -5,6 +5,8 @@ import { log } from "@utils";
 import { cachedDurations, cachedProperties } from "./animationEngine";
 import { setThemeSettings } from "@modules/settings/themeOptions";
 
+let hasSubscribedToStyles = false;
+
 function parseBlyricsConfig(cssContent: string): Map<string, string> {
   const configMap = new Map<string, string>();
 
@@ -133,6 +135,11 @@ async function handleStoreThemeChange(key: string, change: { oldValue?: any; new
 }
 
 export function subscribeToCustomStyles(): void {
+  if (hasSubscribedToStyles) {
+    return;
+  }
+  hasSubscribedToStyles = true;
+
   chrome.storage.onChanged.addListener(async (changes, area) => {
     if ((area === "sync" || area === "local") && changes.customCSS) {
       if (changes.customCSS.newValue) {

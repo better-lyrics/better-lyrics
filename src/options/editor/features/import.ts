@@ -27,7 +27,7 @@ export const saveCSSToFile = (css: string, defaultFilename: string): void => {
 };
 
 const downloadFile = (content: string, defaultFilename: string): void => {
-  const blob = new Blob([content], { type: "text/plain" });
+  const blob = new Blob([content], { type: "application/octet-stream" });
   const url = URL.createObjectURL(blob);
 
   if (chrome.downloads) {
@@ -52,7 +52,7 @@ const downloadFile = (content: string, defaultFilename: string): void => {
 };
 
 const fallbackSaveMethod = (content: string, defaultFilename: string): void => {
-  const blob = new Blob([content], { type: "text/plain" });
+  const blob = new Blob([content], { type: "application/octet-stream" });
   const url = URL.createObjectURL(blob);
 
   const a = document.createElement("a");

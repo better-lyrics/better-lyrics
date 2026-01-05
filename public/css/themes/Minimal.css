@@ -1,5 +1,5 @@
 
-/* 2026-01-01T16-14-51 v1.6.2 */
+/* 2026-01-04T11-07-52 v1.6.3 */
 /* Make sure to turn off 'show stylized animations' from display settings */
 /* please report all bugs and suggestions on discord */
 /* time, tide, & I wait for nothing- boidu (probably) */
@@ -307,20 +307,32 @@ ytmusic-app-layout .ytmusic-app[is-mweb-modernization-enabled] {
 [is-mweb-modernization-enabled] .blyrics-container::before {
   opacity: 0;
 }
+
+tp-yt-paper-toast #close-button {
+  display: none;
+  visibility: hidden;
+}
+
 @keyframes idontwannaseeyouanymore-billie {
   to {
     opacity: 0;
     transform: translateY(500px);
     visibility: hidden;
+    pointer-events: none;
+  }
+}
+@keyframes no-clicks-please {
+  to {
+    pointer-events: none !important;
   }
 }
 tp-yt-paper-toast.paper-toast-open:not(:hover) {
   animation: idontwannaseeyouanymore-billie 0.3s ease-in-out 4.7s forwards;
 }
-tp-yt-paper-toast #close-button {
-  display: none;
-  visibility: hidden;
+tp-yt-paper-toast.paper-toast-open:not(:hover) #action-button {
+  animation: no-clicks-please 1ms linear 5s forwards;
 }
+
 ytmusic-player-expanding-menu {
   border-radius: 8px;
   max-height: 60px;
@@ -378,20 +390,45 @@ ytmusic-browse-response[has-background]:not([disable-gradient])
 ytmusic-search-box[is-bauhaus-sidenav-enabled] {
   --ytmusic-search-background: #212121;
 }
-tp-yt-paper-listbox.ytmusic-menu-popup-renderer {
-  border-radius: 8px;
-  width: auto;
-}
+
 ytmusic-menu-popup-renderer {
-  max-height: 80dvh;
   display: flex;
   flex-direction: column;
+  max-height: 100% !important;
+  overflow-y: auto !important;
 }
+
+tp-yt-paper-listbox.ytmusic-menu-popup-renderer {
+  width: auto;
+  padding: 16px 0;
+  border-radius: 8px;
+}
+
 tp-yt-paper-listbox#items {
-  overflow-y: auto;
   flex: 1 1 auto;
+  overflow-y: auto;
   scroll-behavior: smooth;
 }
+
+ytmusic-popup-container tp-yt-iron-dropdown {
+  bottom: calc(5px + var(--ytmusic-player-bar-height)) !important;
+  width: auto !important;
+  height: auto !important;
+  max-width: none !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  pointer-events: none !important;
+}
+
+ytmusic-popup-container #contentWrapper {
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: flex-start !important;
+  width: max-content !important;
+  max-height: 100% !important;
+  pointer-events: auto !important;
+}
+
 ytmusic-queue-header-renderer {
   border: 1.5px solid oklch(1 0 0 / 0.1);
   border-top: none;
@@ -407,7 +444,7 @@ ytmusic-queue-header-renderer::before {
   content: "";
   overflow: hidden;
   position: absolute;
-  background: var(--blyrics-background-img);
+  background: var(--blyrics-background-img, var(--ytmusic-brand-background-solid));
   background-position: 50%;
   background-repeat: no-repeat;
   background-size: cover;
@@ -427,10 +464,11 @@ ytmusic-chip-cloud-chip-renderer[chip-style="STYLE_TRANSPARENT"]
   color: oklch(0 0 0 / 0.87);
 }
 #tab-renderer
-  > div.style-scope.ytmusic-tab-renderer
-  > ytmusic-queue-header-renderer
-  > div.container-name.style-scope.ytmusic-queue-header-renderer
-  > yt-formatted-string.title.style-scope.ytmusic-queue-header-renderer {
+    > div.style-scope.ytmusic-tab-renderer
+    > ytmusic-queue-header-renderer
+    > div.container-name.style-scope.ytmusic-queue-header-renderer
+    > yt-formatted-string.title.style-scope.ytmusic-queue-header-renderer
+  {
   padding-top: 8px;
 }
 #buttons > ytmusic-chip-cloud-chip-renderer > div > a > yt-icon {
@@ -455,9 +493,9 @@ ytmusic-player-queue-item:is(
   margin: 0 !important;
 }
 ytmusic-playlist-panel-video-wrapper-renderer:is(
-  [style*="z-index: 9"],
-  [style*="cursor: move"]
-) {
+    [style*="z-index: 9"],
+    [style*="cursor: move"]
+  ) {
   box-sizing: border-box !important;
   height: var(--ytmusic-list-item-height, 56px) !important;
   width: auto !important;
@@ -488,7 +526,7 @@ ytmusic-browse-response:has([main-page-type="MUSIC_PAGE_TYPE_ARTIST"])
   opacity: 1 !important;
 }
 ytmusic-browse-response:has([main-page-type="MUSIC_PAGE_TYPE_ARTIST"])
-  ytmusic-fullbleed-thumbnail-renderer::after {
+  ytmusic-fullbleed-thumbnail-renderer::before {
   content: "";
   position: absolute;
   top: 0;
@@ -533,6 +571,59 @@ ytmusic-browse-response:has([main-page-type="MUSIC_PAGE_TYPE_ARTIST"])
     --ytmusic-immersive-header-gradient-padding-top: 12dvh;
   }
 }
+
+@media {
+[is-mweb-modernization-enabled]  ytmusic-immersive-header-renderer {
+    --ytmusic-immersive-header-padding-top: 28dvh;
+    --ytmusic-immersive-header-gradient-padding-top: 12dvh;
+  }
+}
+
+@property --fade-stop {
+  syntax: '<percentage>';
+  inherits: false;
+  initial-value: 70%;
+}
+
+[is-mweb-modernization-enabled] ytmusic-browse-response:has([main-page-type="MUSIC_PAGE_TYPE_ARTIST"]) .image.ytmusic-fullbleed-thumbnail-renderer.ytmusic-fullbleed-thumbnail-renderer {
+  position: fixed !important;
+  top: 0;
+  left: 0;
+  z-index: 0;
+  width: 100dvw;       
+  height: 45dvh;
+  object-fit: cover;
+  --fade-stop: 70%;
+  mask-image: linear-gradient(to bottom, black var(--fade-stop), transparent 100%);
+  -webkit-mask-image: linear-gradient(to bottom, black var(--fade-stop), transparent 100%);
+  animation-name: expand-dim-stick;
+  animation-timeline: scroll(root);
+  animation-range: 0vh 70vh;
+  animation-fill-mode: both;
+  animation-timing-function: linear;
+}
+
+[is-mweb-modernization-enabled] ytmusic-browse-response:has([main-page-type="MUSIC_PAGE_TYPE_ARTIST"]) .image.ytmusic-fullbleed-thumbnail-renderer img,
+[is-mweb-modernization-enabled] ytmusic-browse-response:has([main-page-type="MUSIC_PAGE_TYPE_ARTIST"]) .image.ytmusic-fullbleed-thumbnail-renderer picture {
+  width: 100dvw !important;
+  height: 100dvh !important;
+  object-fit: cover !important;
+}
+
+@keyframes expand-dim-stick {
+  90% {
+    width: 100dvw;
+    height: 100dvh;
+    --fade-stop: 90%;
+  }
+
+  to {
+    width: 100dvw;
+    height: 100dvh;
+    --fade-stop: 100%;
+  }
+}
+
 
 /* credit goes to chengg, i just have it all copied for easy modification */
 ytmusic-player-page[player-fullscreened]:not([video-mode]):not(
@@ -655,3 +746,5 @@ ytmusic-player-page[is-mweb-modernization-enabled] #blyrics-wrapper > div.blyric
 ytmusic-player-page[is-mweb-modernization-enabled] #blyrics-wrapper > div.blyrics-container[data-no-lyrics="true"] #blyrics-spacing-element {
   display:none !important;
 }
+
+

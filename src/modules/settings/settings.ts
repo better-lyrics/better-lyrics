@@ -7,6 +7,8 @@ import { clearCache as clearTranslationCache } from "@modules/lyrics/translation
 import { removeAlbumArtFromLayout } from "@modules/ui/dom";
 import { applyCustomStyles, getAndApplyCustomStyles } from "@modules/ui/styleInjector";
 
+let hasInitializedMessageListener = false;
+
 type EnableDisableCallback = () => void;
 
 /**
@@ -160,6 +162,11 @@ export function hideCursorOnIdle(): void {
 }
 
 export function listenForPopupMessages(): void {
+  if (hasInitializedMessageListener) {
+    return;
+  }
+  hasInitializedMessageListener = true;
+
   chrome.runtime.onMessage.addListener((request, _, sendResponse) => {
     log(LOG_PREFIX_CONTENT, "Received message:", request.action);
     if (request.action === "applyStyles") {

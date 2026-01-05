@@ -275,7 +275,7 @@ No, Better Lyrics is specifically designed for YouTube Music. If you want someth
 >
 > Your support helps cover the costs of hosting and development, and ensures continued improvements and stability.
 
-<a href="https://optimism.drips.network/app/projects/github/better-lyrics/better-lyrics" target="_blank"><img src="https://optimism.drips.network/api/embed/project/https%3A%2F%2Fgithub.com%2Fbetter-lyrics%2Fbetter-lyrics/support.png?background=dark&style=drips&text=project&stat=support" alt="Support better-lyrics on drips.network" height="32"></a>
+<a href="https://www.buymeacoffee.com/boidu" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee" height="42" /></a>
 
 [![Github Sponsors](https://img.shields.io/static/v1?label=Sponsor&message=%E2%9D%A4&logo=GitHub&color=%23F20C33)](https://github.com/sponsors/boidushya)
 

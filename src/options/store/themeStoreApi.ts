@@ -213,6 +213,13 @@ export async function fetchUserRatings(): Promise<ApiResult<Record<string, numbe
       }
     }
 
+    if (response.status === 404) {
+      const errorData = await response.json().catch(() => null);
+      if (errorData?.error === "KEY_NOT_FOUND") {
+        return { success: true, data: {} };
+      }
+    }
+
     if (!response.ok) {
       const error = `Failed to fetch user ratings: ${response.status}`;
       console.warn(LOG_PREFIX_STORE, error);

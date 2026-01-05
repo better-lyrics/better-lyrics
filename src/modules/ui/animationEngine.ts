@@ -75,6 +75,21 @@ export let animEngineState: AnimEngineState = {
   },
 };
 
+/**
+ * Resets anim engine states
+ * Called when song is switched or cleaned up
+ */
+export function resetAnimEngineState(): void {
+  animEngineState.skipScrollsDecayTimes = [];
+  animEngineState.lastActiveElements = [];
+  animEngineState.lastScrollDebugContext.activeElms = [];
+  animEngineState.lastScrollDebugContext.centers = [];
+  animEngineState.doneFirstInstantScroll = false;
+  animEngineState.queuedScroll = false;
+  cachedDurations.clear();
+  cachedProperties.clear();
+}
+
 export let cachedDurations: Map<string, number> = new Map();
 
 /**

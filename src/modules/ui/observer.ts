@@ -29,6 +29,18 @@ import { addAlbumArtToLayout, cleanup, injectSongAttributes, isLoaderActive, ren
 
 let wakeLock: WakeLockSentinel | null = null;
 
+// -- Observer Storage & Init Guards --------------------------
+let fullscreenObserver: MutationObserver | null = null;
+let lyricsTabObserver: MutationObserver | null = null;
+let inertObserver: MutationObserver | null = null;
+let fullscreenExitObserver: MutationObserver | null = null;
+let avButtonObserver: MutationObserver | null = null;
+
+let hasInitializedLyricReloader = false;
+let hasInitializedHomepageFullscreen = false;
+let hasInitializedAltHover = false;
+let hasInitializedLyrics = false;
+
 async function requestWakeLock(): Promise<void> {
   if (!("wakeLock" in navigator)) {
     log(GENERAL_ERROR_LOG, "Wake Lock API not supported in this browser.");
@@ -73,9 +85,13 @@ export function onFullscreenChange(onEnter: FullscreenCallback, onExit: Fullscre
     return;
   }
 
+  if (fullscreenObserver) {
+    fullscreenObserver.disconnect();
+  }
+
   let wasFullscreen = appLayout.hasAttribute("player-fullscreened");
 
-  const observer = new MutationObserver(() => {
+  fullscreenObserver = new MutationObserver(() => {
     const isFullscreen = appLayout.hasAttribute("player-fullscreened");
 
     if (!wasFullscreen && isFullscreen) {
@@ -87,7 +103,7 @@ export function onFullscreenChange(onEnter: FullscreenCallback, onExit: Fullscre
     wasFullscreen = isFullscreen;
   });
 
-  observer.observe(appLayout, { attributes: true, attributeFilter: ["player-fullscreened"] });
+  fullscreenObserver.observe(appLayout, { attributes: true, attributeFilter: ["player-fullscreened"] });
 }
 
 export function setupWakeLockForFullscreen(): void {
@@ -109,9 +125,15 @@ export function enableLyricsTab(): void {
     }, 1000);
     return;
   }
+
+  if (lyricsTabObserver) {
+    lyricsTabObserver.disconnect();
+  }
+
   tabSelector.removeAttribute("disabled");
   tabSelector.setAttribute("aria-disabled", "false");
-  const observer = new MutationObserver(mutations => {
+
+  lyricsTabObserver = new MutationObserver(mutations => {
     mutations.forEach(mutation => {
       if (mutation.attributeName === "disabled") {
         tabSelector.removeAttribute("disabled");
@@ -119,7 +141,7 @@ export function enableLyricsTab(): void {
       }
     });
   });
-  observer.observe(tabSelector, { attributes: true });
+  lyricsTabObserver.observe(tabSelector, { attributes: true });
 }
 
 /**
@@ -134,24 +156,27 @@ export function disableInertWhenFullscreen(): void {
     }, 1000);
     return;
   }
-  const observer = new MutationObserver(mutations => {
+
+  if (inertObserver) {
+    inertObserver.disconnect();
+  }
+
+  inertObserver = new MutationObserver(mutations => {
     onFullScreenDisabled(
       () => {},
       () =>
         mutations.forEach(mutation => {
           if (mutation.attributeName === "inert") {
-            // entering fullscreen mode
             (mutation.target as HTMLElement).removeAttribute("inert");
             const tabSelector = document.getElementsByClassName(TAB_HEADER_CLASS)[1] as HTMLElement;
             if (tabSelector && tabSelector.getAttribute("aria-selected") !== "true") {
-              // ensure lyrics tab is selected
               tabSelector.click();
             }
           }
         })
     );
   });
-  observer.observe(panelElem, { attributes: true });
+  inertObserver.observe(panelElem, { attributes: true });
   panelElem.removeAttribute("inert");
 }
 
@@ -163,11 +188,17 @@ let scrollPositions = [0, 0, 0];
  * Handles lyrics reloading when the lyrics tab is clicked.
  */
 export function lyricReloader(): void {
+  if (hasInitializedLyricReloader) {
+    return;
+  }
+
   const tabs = document.getElementsByClassName(TAB_CONTENT_CLASS);
 
   const [tab1, tab2, tab3] = Array.from(tabs);
 
   if (tab1 !== undefined && tab2 !== undefined && tab3 !== undefined) {
+    hasInitializedLyricReloader = true;
+
     for (let i = 0; i < tabs.length; i++) {
       tabs[i].addEventListener("click", () => {
         const tabRenderer = document.querySelector(TAB_RENDERER_SELECTOR) as HTMLElement;
@@ -214,6 +245,11 @@ export function lyricReloader(): void {
  * > Runs indefinitely
  */
 export function initializeLyrics(): void {
+  if (hasInitializedLyrics) {
+    return;
+  }
+  hasInitializedLyrics = true;
+
   // @ts-ignore
   document.addEventListener("blyrics-send-player-time", (event: CustomEvent<PlayerDetails>) => {
     const detail = event.detail;
@@ -348,6 +384,11 @@ export function scrollEventHandler(): void {
  * Also sets up a listener to return to the previous view when exiting fullscreen.
  */
 export function setupHomepageFullscreenHandler(): void {
+  if (hasInitializedHomepageFullscreen) {
+    return;
+  }
+  hasInitializedHomepageFullscreen = true;
+
   document.addEventListener(
     "keydown",
     (event: KeyboardEvent) => {
@@ -407,9 +448,13 @@ function setupFullscreenExitListener(): void {
     return;
   }
 
+  if (fullscreenExitObserver) {
+    fullscreenExitObserver.disconnect();
+  }
+
   let wasFullscreen = false;
 
-  const observer = new MutationObserver(() => {
+  fullscreenExitObserver = new MutationObserver(() => {
     const currentState = appLayout.getAttribute("player-ui-state");
     const isFullscreen = currentState === "FULLSCREEN";
 
@@ -420,7 +465,7 @@ function setupFullscreenExitListener(): void {
     wasFullscreen = isFullscreen;
   });
 
-  observer.observe(appLayout, { attributes: true, attributeFilter: ["player-ui-state"] });
+  fullscreenExitObserver.observe(appLayout, { attributes: true, attributeFilter: ["player-ui-state"] });
 }
 
 function triggerFullscreen(): void {
@@ -452,6 +497,11 @@ function setupMiniplayerFullscreenHandler(): void {
 }
 
 export function setupAltHoverHandler(): void {
+  if (hasInitializedAltHover) {
+    return;
+  }
+  hasInitializedAltHover = true;
+
   const updateAltState = (isAltPressed: boolean) => {
     const lyricsWrapper = document.getElementById(LYRICS_WRAPPER_ID);
     if (!lyricsWrapper) return;
@@ -487,6 +537,10 @@ export function setUpAvButtonListener(): void {
     return;
   }
 
+  if (avButtonObserver) {
+    avButtonObserver.disconnect();
+  }
+
   let handleAVSwitch = (isVideo: boolean) => {
     let playerPage = document.querySelector("#player-page");
 
@@ -507,11 +561,11 @@ export function setUpAvButtonListener(): void {
     }
   };
 
-  const observer = new MutationObserver(observerCallback);
+  avButtonObserver = new MutationObserver(observerCallback);
 
-  observer.observe(avToggle, {
+  avButtonObserver.observe(avToggle, {
     attributes: true,
-    attributeFilter: ["is-video-playback-mode-selected"], // Only listen to this specific attribute
+    attributeFilter: ["is-video-playback-mode-selected"],
   });
   handleAVSwitch(avToggle.getAttribute("is-video-playback-mode-selected") === "true");
   log(LOG_PREFIX, "Set up a/v toggle observer");
