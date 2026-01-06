@@ -940,7 +940,7 @@
 }
 
 /* Fullscreen autoscroll button fix */
-ytmusic-app-layout[player-fullscreened] .autoscroll-resume-wrapper {
+ytmusic-app-layout[player-fullscreened]:not([blyrics-dfs]) .autoscroll-resume-wrapper {
 	position: fixed;
 	top: 1rem;
 	left: 50%;
@@ -949,12 +949,12 @@ ytmusic-app-layout[player-fullscreened] .autoscroll-resume-wrapper {
 	width: fit-content;
 }
 
-ytmusic-app-layout[player-fullscreened] .autoscroll-resume-button {
+ytmusic-app-layout[player-fullscreened]:not([blyrics-dfs]) .autoscroll-resume-button {
 	position: relative;
 	left: unset;
 	transform: none;
 }
 
-ytmusic-app-layout[player-fullscreened] .autoscroll-resume-button[autoscroll-hidden="true"] {
+ytmusic-app-layout[player-fullscreened]:not([blyrics-dfs]) .autoscroll-resume-button[autoscroll-hidden="true"] {
 	transform: translateY(-3rem);
 }

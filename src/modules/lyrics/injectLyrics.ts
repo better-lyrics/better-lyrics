@@ -392,28 +392,32 @@ export function injectLyrics(data: LyricSourceResultWithMeta, keepLoaderVisible 
 
         let seekTime: number;
         if (isRichsync) {
-          let wordElement = target.closest(`.${WORD_CLASS}`) as HTMLElement | null;
+          if (e.altKey) {
+            let wordElement = target.closest(`.${WORD_CLASS}`) as HTMLElement | null;
 
-          if (!wordElement) {
-            const words = lyricElement.querySelectorAll(`.${WORD_CLASS}`);
-            let closestDist = Infinity;
-            words.forEach(word => {
-              const rect = word.getBoundingClientRect();
-              const centerX = rect.left + rect.width / 2;
-              const centerY = rect.top + rect.height / 2;
-              const dist = Math.hypot(e.clientX - centerX, e.clientY - centerY);
-              if (dist < closestDist) {
-                closestDist = dist;
-                wordElement = word as HTMLElement;
-              }
-            });
+            if (!wordElement) {
+              const words = lyricElement.querySelectorAll(`.${WORD_CLASS}`);
+              let closestDist = Infinity;
+              words.forEach(word => {
+                const rect = word.getBoundingClientRect();
+                const centerX = rect.left + rect.width / 2;
+                const centerY = rect.top + rect.height / 2;
+                const dist = Math.hypot(e.clientX - centerX, e.clientY - centerY);
+                if (dist < closestDist) {
+                  closestDist = dist;
+                  wordElement = word as HTMLElement;
+                }
+              });
+            }
+
+            if (!wordElement) {
+              return;
+            }
+
+            seekTime = parseFloat(wordElement.dataset.time || "0");
+          } else {
+            seekTime = parseFloat(lyricElement.dataset.time || "0");
           }
-
-          if (!wordElement) {
-            return;
-          }
-
-          seekTime = parseFloat(wordElement.dataset.time || "0");
         } else {
           seekTime = parseFloat(lyricElement.dataset.time || "0");
         }

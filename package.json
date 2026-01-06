@@ -53,7 +53,7 @@
         "sortablejs": "^1.15.6"
     },
     "devDependencies": {
-        "@biomejs/biome": "2.3.11",
+        "@biomejs/biome": "2.0.4",
         "@prefresh/core": "^1.5.9",
         "@prefresh/utils": "^1.2.1",
         "@types/chrome": "^0.1.24",
