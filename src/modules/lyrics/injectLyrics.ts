@@ -300,7 +300,7 @@ export function injectLyrics(data: LyricSourceResultWithMeta, keepLoaderVisible 
         const seekTime = lyricItem.startTimeMs / 1000;
         instrumentalElement.addEventListener("click", () => {
           log(LOG_PREFIX, `Seeking to ${seekTime.toFixed(2)}s`);
-          document.dispatchEvent(new CustomEvent("blyrics-seek-to", { detail: { time: seekTime } }));
+          document.dispatchEvent(new CustomEvent("blyrics-seek-to", { detail: seekTime }));
           animEngineState.scrollResumeTime = 0;
         });
       }
@@ -423,7 +423,7 @@ export function injectLyrics(data: LyricSourceResultWithMeta, keepLoaderVisible 
         }
 
         log(LOG_PREFIX, `Seeking to ${seekTime.toFixed(2)}s`);
-        document.dispatchEvent(new CustomEvent("blyrics-seek-to", { detail: { time: seekTime } }));
+        document.dispatchEvent(new CustomEvent("blyrics-seek-to", { detail: seekTime }));
         animEngineState.scrollResumeTime = 0;
       });
     } else {
