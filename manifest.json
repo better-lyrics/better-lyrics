@@ -15,6 +15,7 @@
   ],
   "permissions": [
     "storage",
+    "unlimited_storage",
     "alarms"
   ],
   "optional_permissions": [

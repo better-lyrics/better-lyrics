@@ -563,7 +563,7 @@ select option {
 
 .tab-container {
     display: flex;
-    gap: 0.5rem;
+    justify-content: space-between;
     margin-bottom: 1.5rem;
     background: rgba(255, 255, 255, 0.05);
     padding: 0.25rem;

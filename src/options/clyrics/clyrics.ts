@@ -134,7 +134,7 @@ async function formNewLyrics(): Promise<void> {
   // Span info
   const clyricsSpan = document.createElement("span");
   clyricsSpan.className = "clyrics-span"
-  clyricsSpan.innerHTML = "Your lyrics will be saved and synchronized across all of your devices.<br/>Any changes you made with your lyrics will be immediately saved to prevent losing all of your progress"
+  clyricsSpan.innerHTML = "Your lyrics will be saved on your computer.<br/>Any changes you made with your lyrics will be immediately saved to prevent losing all of your progress"
 
   clyricsNewLyrics.appendChild(clyricsSpan);
 

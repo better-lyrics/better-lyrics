@@ -42,12 +42,9 @@ export function parseTime(timeStr: string | number | undefined): number {
 
 /**
  * Formats a time number in milliseconds to `mm:ss` or `mm:ss.xxx` with `useMs` on `true`
- * 
- * @param isSec Decides whether the given `timeNum` are a rounded seconds, possibly one from `Date.now()`
  */
-export function formatTime(timeNum: number, isSec?: boolean, useMs?: boolean): string {
-  if (!timeNum) return "0";
-  if (isSec) timeNum *= 1000
+export function formatTime(timeNum: number, useMs?: boolean, whole?: boolean): string {
+  if (typeof timeNum != "number") return whole ? (useMs ? "00:00.000" : "00:00") : (useMs ? "0.000" : "0");
 
   const totalSec = Math.floor(timeNum / 1000);
   const minutes = Math.floor(totalSec / 60);
@@ -58,15 +55,11 @@ export function formatTime(timeNum: number, isSec?: boolean, useMs?: boolean): s
     return num.toString().padStart(length, "0");
   };
   
-  if (useMs) {
-    return `${padZero(minutes)}:${padZero(seconds)}.${padZero(Math.floor(millisec / 10))}`
-  } else {
-    return `${padZero(minutes)}:${padZero(seconds)}`
-  }
+  if (whole) return `${padZero(minutes)}:${padZero(seconds)}${useMs ? `.${padZero(millisec, 3)}` : ""}`;
+  else return (minutes > 0 ? `${padZero(minutes)}:` : "") + `${padZero(seconds)}${useMs ? `.${padZero(millisec, 3)}` : ""}`;
 }
 
 /**
- *
  * @param lrcText
  * @param songDuration
  * @return

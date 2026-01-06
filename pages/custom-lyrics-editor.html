@@ -18,7 +18,10 @@
 		<!-- TOPBAR -->
 		<div id="topbar" class="topbar">			
 			<div class="top-left">
-				<img class="icon" src="../images/icons/icon-512.png" draggable="false" />
+				<svg xmlns="http://www.w3.org/2000/svg" class="icon" viewBox="0 0 512 512">
+					<path fill="#f20c32" d="M512 256a256 256 0 1 1-512 0 256 256 0 0 1 512 0M216.9 101.5a159.7 159.7 0 0 0-113.7 200.1 159 159 0 0 0 137.2 113.2 155 155 0 0 0 124.2-42.1 153 153 0 0 0 49.9-132.9c-6-57-36-99-87-126.4a159 159 0 0 0-110.6-12M111.5 258c.2-54.7 23.5-97.7 70.4-126a144.1 144.1 0 0 1 207.4 67.5c36 83.6-15.1 181.2-104.5 198.3-54.3 10.3-100.2-6-137.7-46.4a139.5 139.5 0 0 1-35.6-93.4m164.3-52.2h28.6c7.9 0 12-4 12-12v-16.5c-.1-7.7-4.2-11.6-11.9-11.6H268c-9 0-12.3 3.3-12.3 12.4v87.5l-.2 5.4c-2.6-1-4.5-2-6.5-2.7a38.3 38.3 0 0 0-39 7.1 38.1 38.1 0 0 0-13.8 38 40 40 0 0 0 79.5-7.5c.2-18.9 0-37.7 0-57z"/>
+					<path fill="#fff" d="M216.9 101.5a159.7 159.7 0 0 0-113.7 200.1 159 159 0 0 0 137.2 113.2 155 155 0 0 0 124.2-42.1 153 153 0 0 0 49.9-132.9c-6-57-36-99-87-126.4a159 159 0 0 0-110.6-12M111.5 258c.2-54.7 23.5-97.7 70.4-126a144.1 144.1 0 0 1 207.4 67.5c36 83.6-15.1 181.2-104.5 198.3-54.3 10.3-100.2-6-137.7-46.4a139.5 139.5 0 0 1-35.6-93.4m164.3-52.2h28.6c7.9 0 12-4 12-12v-16.5c-.1-7.7-4.2-11.6-11.9-11.6H268c-9 0-12.3 3.3-12.3 12.4v87.5l-.2 5.4c-2.6-1-4.5-2-6.5-2.7a38.3 38.3 0 0 0-39 7.1 38.1 38.1 0 0 0-13.8 38 40 40 0 0 0 79.5-7.5c.2-18.9 0-37.7 0-57z"/>
+				</svg>
 				
 				<button id="actions-expand-btn" class="icon-btn tab-btns active-btn" style="padding: .625rem;">
 					<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24">
@@ -96,21 +99,21 @@
 			<div class="separator-row"></div>
 
 			<div id="line-timing" class="tool">
-				<div class="actions2">
+				<div class="actions2 tools-items">
 					<div id="start-time" class="tool-input">
 						<span class="tool-property">Start Time</span>
 						<div id="start-time-input" class="tool-input-multiple">
-							<input id="start-time-input-minutes" type="number" class="input" placeholder="min" />
-							<input id="start-time-input-seconds" type="number" class="input" placeholder="sec" min="-59" max="59" />
-							<input id="start-time-input-ms" type="number" class="input" placeholder="ms" min="-999" max="999" />
+							<input id="start-time-input-minutes" type="number" class="input" placeholder="min" disabled/>
+							<input id="start-time-input-seconds" type="number" class="input" placeholder="sec" min="-59" max="59" disabled/>
+							<input id="start-time-input-ms" type="number" class="input" placeholder="ms" min="-999" max="999" disabled/>
 						</div>
 					</div>
 					<div id="duration" class="tool-input">
 						<span class="tool-property">Duration</span>
 						<div id="duration-input" class="tool-input-multiple">
-							<input id="duration-input-minutes" type="number" class="input" placeholder="min" />
-							<input id="duration-input-seconds" type="number" class="input" placeholder="sec" min="-59" max="59" />
-							<input id="duration-input-ms" type="number" class="input" placeholder="ms" min="-999" max="999" />
+							<input id="duration-input-minutes" type="number" class="input" placeholder="min" disabled/>
+							<input id="duration-input-seconds" type="number" class="input" placeholder="sec" min="-59" max="59" disabled/>
+							<input id="duration-input-ms" type="number" class="input" placeholder="ms" min="-999" max="999" disabled/>
 						</div>
 					</div>
 				</div>
@@ -120,18 +123,18 @@
 			<div class="separator-row"></div>
 
 			<div id="line-properties" class="tool" style="width: 150px">
-				<div class="actions3">
-					<div id="instrumental" class="tool-input">
+				<div class="tools-items">
+					<div id="instrumental-line" class="tool-input">
 						<span class="tool-property">Instrumental</span>
-						<button id="instrumental-btn" class="checkbox">
+						<button id="instrumental-btn" class="checkbox" disabled>
 							<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24">
 								<path fill="black" d="m9.55 18l-5.7-5.7l1.425-1.425L9.55 15.15l9.175-9.175L20.15 7.4z"/>
 							</svg>
 						</button>
 					</div>
-					<div id="background" class="tool-input">
+					<div id="background-line" class="tool-input">
 						<span class="tool-property">Background</span>
-						<button id="background-btn" class="checkbox">
+						<button id="background-btn" class="checkbox" disabled>
 							<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24">
 								<path fill="black" d="m9.55 18l-5.7-5.7l1.425-1.425L9.55 15.15l9.175-9.175L20.15 7.4z"/>
 							</svg>
@@ -144,7 +147,7 @@
 			<div class="separator-row"></div>
 
 			<div id="line-display" class="tool" style="width: 150px;">
-				<div class="actions3">
+				<div class="tools-items">
 					<div id="show-timeline" class="tool-input">
 						<span class="tool-property">Timeline</span>
 						<button id="show-timeline-btn" class="checkbox">
@@ -176,83 +179,9 @@
 
 		<!-- LYRIC LINES -->
 		<div id="lyric-lines" class="lyric-lines">
-			<div class="no-lyrics" style="display: none">
+			<div id="no-lyrics" class="no-lyrics">
 				<h1><strong>No Lyrics</strong></h1>
 				<span>Add a new lyric line from the top left or import the lyrics from a file or provider!</span>
-			</div>
-
-			<div class="lyric-line">
-				<!-- <div class="line-suggestions">
-					<div class="line-warning">
-						<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24">
-							<path fill="currentColor" d="M2.725 21q-.275 0-.5-.137t-.35-.363t-.137-.488t.137-.512l9.25-16q.15-.25.388-.375T12 3t.488.125t.387.375l9.25 16q.15.25.138.513t-.138.487t-.35.363t-.5.137zM12 18q.425 0 .713-.288T13 17t-.288-.712T12 16t-.712.288T11 17t.288.713T12 18m0-3q.425 0 .713-.288T13 14v-3q0-.425-.288-.712T12 10t-.712.288T11 11v3q0 .425.288.713T12 15"/>
-						</svg>
-						<span>Start time is lower than the previous line. Move the line up or change the start time!</span>
-					</div>
-	
-					<div class="line-info">
-						<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24">
-							<path fill="currentColor" d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10s10-4.48 10-10S17.52 2 12 2m1 15h-2v-6h2zm0-8h-2V7h2z"/>
-						</svg>
-	
-						<span>Suggestion: Make the instrumental line only if there's a 5 seconds or more gap between the previous line and the next line</span>
-					</div>
-				</div> -->
-
-				<span class="line-timeline">
-					<span id="line-start-time"><strong class="code">00:06.216</strong></span>
-					<div class="span-separator"></div>
-					<span id="line-duration" class="code">4.145s</span>
-					<div class="span-separator"></div>
-					<span id="line-voice" class="code">v1</span>
-				</span>
-
-				<div id="normal-line" class="line">
-					<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" class="line-svg" viewBox="0 0 24 24">
-						<g fill="none">
-							<path fill="currentColor" d="M14 18a1 1 0 0 1 0 2H4a1 1 0 0 1 0-2zm6-5a1 1 0 1 1 0 2H4a1 1 0 1 1 0-2zm-6-5a1 1 0 0 1 0 2H4a1 1 0 0 1 0-2zm6-5a1 1 0 0 1 0 2H4a1 1 0 0 1 0-2z" />
-						</g>
-					</svg>
-					<div class="words-wrapper">
-						<div class="words">
-							<!-- <button class="word"><span class="word-text">Don't</span></button>
-							<button class="word"><span class="word-space word-text">1x</span></button> -->
-							<input id="new-word-line" type="text" class="input" placeholder="Type a word or line"/>
-						</div>
-					</div>
-					<button class="add-new-line icon-btn left-tooltip-icon-btn" data-tooltip="Add new line">
-						<svg class="plus" width="16" height="16" viewBox="0 0 16 16">
-							<path d="M8.00016 3.33337V12.6667M3.3335 8.00004H12.6668" stroke="currentColor" stroke-width="1.2" />
-						</svg>
-					</button>
-				</div>
-
-				<!-- <div class="separator-column"></div>
-
-				<div id="background-line" class="line">
-					<svg class="line-svg" xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24">
-						<path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 6h4m4 0h-4m0 0v12M4 11h3m3 0H7m0 0v7"/>
-					</svg>
-					<div class="words-wrapper">
-						<div class="words">
-							<button class="word"><span class="word-text">Don't</span></button>
-							<button class="word"><span class="word-space word-text">1x</span></button>
-							<input id="new-word-line" type="text" class="input" placeholder="Type a word or line"/>
-						</div>
-					</div>
-				</div> -->
-				
-				<div class="line-romanization">
-					<strong class="code">Romanization:</strong>
-					<div class="line-romans">
-						<button class="line-roman">don krai s'nowmen</button>
-						<input id="new-roman-word" type="text" class="input line-roman" placeholder="Type a word or line"/>
-					</div>
-				</div>
-				
-				<div class="line-translate">
-					<input id="line-translate-input" />
-				</div>
 			</div>
 		</div>
 
@@ -277,6 +206,27 @@
 		</div>
 
 		<!-- FREEFORM ELEMENTS (CONTEXT MENU, MODAL) -->
+		<div id="modal-overlay" class="modal-overlay">
+			<div class="modal">
+				<div class="modal-header">
+					<h3 id="modal-title" class="modal-title"></h3>
+					<button id="modal-close" class="modal-close-btn" aria-label="Close">
+						<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+							<path d="M6.28 5.22a.75.75 0 0 0-1.06 1.06L8.94 10l-3.72 3.72a.75.75 0 1 0 1.06 1.06L10 11.06l3.72 3.72a.75.75 0 1 0 1.06-1.06L11.06 10l3.72-3.72a.75.75 0 0 0-1.06-1.06L10 8.94 6.28 5.22Z"></path>
+						</svg>
+					</button>
+				</div>
+				<div class="modal-body">
+					<span id="modal-message" class="modal-message">By confirming, you acknowledge that the following lyrics you're about to publish abides the rules for the following provider and are not against their terms.</span>
+					<!-- <input type="text" id="modal-input" class="modal-input" placeholder=""> -->
+				</div>
+				<div class="modal-footer">
+					<button id="modal-cancel" class="modal-btn modal-btn-secondary">Cancel</button>
+					<button id="modal-confirm" class="modal-btn modal-btn-primary">Confirm</button>
+				</div>
+			</div>
+		</div>
+
 		<div id="clyrics-modal-overlay" class="modal-overlay">
 			<div class="modal clyrics-modal">
 				<div class="modal-header">
@@ -302,15 +252,12 @@
 			<button id="import-lyrics-btn" class="list-btn">Import Lyrics<strong>></strong></button>
 			<button id="export-lyrics-btn" class="list-btn">Export Lyrics<strong>></strong></button>
 			<div class="separator-column"></div>
+			<button id="publish-lyrics-btn" class="list-btn">Publish Lyrics</button>
 			<button id="search-lyrics-btn" class="list-btn">Search Lyrics</button>
 		</div>
 
-		<div id="context-menu" class="list-buttons hidden" style="opacity: 0;">
-			<!-- <button id="split-word-btn" class="list-btn">Split Word Line<strong>(Ctrl+Q)</strong></button>
-			<button id="delete-word-btn" class="list-btn" disabled>Delete Word Line<strong>(Ctrl+Del)</strong></button>
-			<div class="separator-column"></div> -->
-		</div>
+		<div id="context-menu" class="list-buttons hidden" style="opacity: 0;"></div>
 	</body>
-	<script type="module" defer src="./clyrics/editor.js"></script>
+	<script type="module" defer src="../src/options/clyrics/editor.ts"></script>
 	<script type="module" defer src="../src/options/clyrics.ts"></script>
 </html>

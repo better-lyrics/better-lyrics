@@ -5,7 +5,7 @@ import type { CLyricsData } from "./types";
  * Returns a list of all created custom lyrics
  */
 export async function listCustomLyrics(): Promise<CLyricsData[]> {
-    const clyrics = await chrome.storage.sync.get<{ customLyrics: CLyricsData[] }>("customLyrics");
+    const clyrics = await chrome.storage.local.get<{ customLyrics: CLyricsData[] }>("customLyrics");
     return clyrics.customLyrics || [];
 }
 
@@ -31,6 +31,6 @@ export async function createCustomLyrics(parameters: TrackInfoProvider, videoId:
     }
 
     clyrics.push(data);
-    await chrome.storage.sync.set({ "customLyrics": clyrics });
+    await chrome.storage.local.set({ "customLyrics": clyrics });
     return data;
 }

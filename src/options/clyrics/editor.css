@@ -325,17 +325,10 @@ button {
 }
 
 .actions2 {
-    display: flex;
-    flex-direction: column;
-    gap: .25rem;
-    align-items: flex-start;
-    justify-content: center;
-    flex-shrink: 0;
     height: 4rem;
-    position: relative;
 }
 
-.actions3 {
+.tools-items {
     display: flex;
     flex-direction: column;
     gap: .25rem;
@@ -438,6 +431,10 @@ button {
     aspect-ratio: 1;
 }
 
+.checkbox:disabled:hover {
+    background: none; 
+}
+
 .checkbox:not(.checked) > svg {
     opacity: 0;
 }
@@ -452,7 +449,7 @@ button {
 
 /* LYRIC LIENS */
 .lyric-lines {
-    padding: .3125rem 0;
+    padding: .3125rem 0 0;
     display: flex;
     flex-direction: column;
     gap: .5rem;
@@ -798,6 +795,8 @@ button {
     border-style: solid;
     align-items: stretch;
     flex-direction: column;
+    overflow-y: auto;
+    max-height: 55%;
     box-shadow: 0 .25rem 2rem .25rem rgba(0, 0, 0, 0.15);
     gap: .2rem;
 }

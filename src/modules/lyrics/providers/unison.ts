@@ -36,7 +36,7 @@ export default async function unison(providerParameters: ProviderParameters): Pr
     }
     
     let responseString: string = await response.json().then(json => json.data.lyrics);
-    const filled = await fillTtml(responseString, providerParameters);
+    const filled = await fillTtml(responseString);
 
     if (!filled) {
         providerParameters.sourceMap["unison-richsynced"].filled = true;

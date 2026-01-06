@@ -16,16 +16,12 @@ export default async function customLyrics(providerParameters: ProviderParameter
     
     if (!clyric) {
         let lyrics = custom;
-    
-        if (providerParameters.album) {
-            lyrics = lyrics.filter(t => { return t.album == providerParameters.album; });
-        }
-    
-        clyric = lyrics.find(t => {
-            return t.song == providerParameters.song &&
-                t.artist == providerParameters.artist &&
-                Math.abs(t.duration - providerParameters.duration) <= 2;
-        });
+        
+        lyrics = lyrics.filter(t => { return t.song == providerParameters.song && t.artist == providerParameters.artist; });
+        if (providerParameters.album) lyrics = lyrics.filter(t => { return t.album == providerParameters.album; });
+        if (providerParameters.duration) lyrics = lyrics.filter(t => { return Math.abs(t.duration - providerParameters.duration) <= 2; });
+        
+        clyric = lyrics[0];
     }
 
     if (clyric) {

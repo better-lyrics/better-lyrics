@@ -105,7 +105,7 @@ function insertInstrumentalBreaks(lyrics: Lyric[], songDurationMs: number): Lyri
   return result;
 }
 
-export async function fillTtml(responseString: string, providerParameters: ProviderParameters) {
+export async function fillTtml(responseString: string) {
   const options: X2jOptions = {
     ignoreAttributes: false,
     attributeNamePrefix: "@_",
@@ -242,12 +242,12 @@ export default async function bLyrics(providerParameters: ProviderParameters): P
   }
 
   let responseString: string = await response.json().then(json => json.ttml);
-  const filled = await fillTtml(responseString, providerParameters);
+  const filled = await fillTtml(responseString);
+  providerParameters.sourceMap["bLyrics-richsynced"].filled = true;
+  providerParameters.sourceMap["bLyrics-synced"].filled = true;
 
   if (!filled) {
-    providerParameters.sourceMap["bLyrics-richsynced"].filled = true;
     providerParameters.sourceMap["bLyrics-richsynced"].lyricSourceResult = null;
-    providerParameters.sourceMap["bLyrics-synced"].filled = true;
     providerParameters.sourceMap["bLyrics-synced"].lyricSourceResult = null;
     return;
   }
@@ -259,7 +259,4 @@ export default async function bLyrics(providerParameters: ProviderParameters): P
     providerParameters.sourceMap["bLyrics-richsynced"].lyricSourceResult = null;
     providerParameters.sourceMap["bLyrics-synced"].lyricSourceResult = filled.result;
   }
-  
-  providerParameters.sourceMap["bLyrics-richsynced"].filled = true;
-  providerParameters.sourceMap["bLyrics-synced"].filled = true;
 }
