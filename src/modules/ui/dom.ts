@@ -24,9 +24,9 @@ import {
   PROVIDER_CONFIGS,
   ROMANIZED_LYRICS_CLASS,
   SONG_IMAGE_SELECTOR,
+  type SyncType,
   TAB_RENDERER_SELECTOR,
   TRANSLATED_LYRICS_CLASS,
-  type SyncType,
 } from "@constants";
 import { AppState } from "@core/appState";
 import {
@@ -757,16 +757,16 @@ export function injectSongAttributes(title: string, artist: string): void {
 
 /**
  * Sets the size of the album art image
- * 
+ *
  * @param size - Size quality
- */ 
+ */
 function setAlbumArtSize(size: string | number): void {
   const albumArt = document.querySelector(SONG_IMAGE_SELECTOR) as HTMLImageElement;
   const origSrc = albumArt.src;
 
   const img = new Image();
   img.src = albumArt.src;
-  
+
   if (/w\d+-h\d+/.test(albumArt.src)) {
     const replaced = albumArt.src.replace(/w\d+-h\d+/, `w${size}-h${size}`);
 

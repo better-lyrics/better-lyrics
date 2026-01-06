@@ -1,5 +1,5 @@
-import { gzipSync, gunzipSync, strToU8, strFromU8 } from "fflate";
 import { LOG_PREFIX } from "@constants";
+import { gunzipSync, gzipSync, strFromU8, strToU8 } from "fflate";
 
 const COMPRESSED_PREFIX = "__COMPRESSED__";
 

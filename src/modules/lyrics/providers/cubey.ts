@@ -73,9 +73,9 @@ export type CubeyLyricSourceResult = LyricSourceResult & {
 };
 
 import { log } from "@core/utils";
-import { lrcFixers, parseLRC, parsePlainLyrics } from "./lrcUtils";
 import { fillTtml } from "@modules/lyrics/providers/blyrics/blyrics";
 import { CUBEY_LYRICS_API_URL, CUBEY_LYRICS_API_URL_TURNSTILE } from "@/core/constants";
+import { lrcFixers, parseLRC, parsePlainLyrics } from "./lrcUtils";
 
 /**
  *
@@ -294,7 +294,7 @@ export default async function cubey(providerParameters: ProviderParameters): Pro
       providerParameters.sourceMap["bLyrics-synced"].lyricSourceResult = null;
       return;
     }
-    
+
     if (filled.isWordSynced) {
       providerParameters.sourceMap["bLyrics-richsynced"].lyricSourceResult = filled.result;
       providerParameters.sourceMap["bLyrics-synced"].lyricSourceResult = null;

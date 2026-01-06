@@ -19,16 +19,16 @@ export interface CLyricsEditor {
   voices?: { [voice: string]: CLyricsEditorVoices };
   /**
    * For storing line words.
-   * 
+   *
    * Enabling instrumental line would make the
    * words of the line disappear from the lyrics data
    * but would be stored here just in case.
    */
   lines?: {
     [line: string | number]: {
-      words: string | CLyricsLine[],
-      bgLine: string | CLyricsLine[]
-    }
+      words: string | CLyricsLine[];
+      bgLine: string | CLyricsLine[];
+    };
   };
 }
 

@@ -7,6 +7,7 @@ import type {
   ThemeLockfile,
   ThemeValidationResult,
 } from "./types";
+
 const DEFAULT_TIMEOUT_MS = 10000;
 
 export async function fetchWithTimeout(

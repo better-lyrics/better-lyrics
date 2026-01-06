@@ -1,29 +1,28 @@
+import { LOG_PREFIX_STORE } from "@constants";
+import { getLocalStorage, getSyncStorage } from "@core/storage";
 import autoAnimate, { type AnimationController } from "@formkit/auto-animate";
 import DOMPurify from "dompurify";
 import { marked } from "marked";
-import { LOG_PREFIX_STORE } from "@constants";
-import { getLocalStorage, getSyncStorage } from "@core/storage";
 import { applyStoreThemeComplete } from "../editor/features/storage";
 import type { AllThemeStats, InstalledStoreTheme, StoreTheme, ThemeStats } from "./types";
 
 let gridAnimationController: AnimationController | null = null;
 
-import { showAlert, type AlertAction } from "../editor/ui/feedback";
-import { fetchAllStats, fetchUserRatings, submitRating, trackInstall } from "./themeStoreApi";
+import { type AlertAction, showAlert } from "../editor/ui/feedback";
 import { getDisplayName, hasCertificate } from "./keyIdentity";
-import { getTurnstileToken, cleanupTurnstile } from "./turnstile";
+import { fetchAllStats, fetchUserRatings, submitRating, trackInstall } from "./themeStoreApi";
 import {
   applyStoreTheme,
   clearActiveStoreTheme,
   getActiveStoreTheme,
   getInstalledStoreThemes,
+  type InstallOptions,
   installTheme,
   isThemeInstalled,
   isVersionCompatible,
   performSilentUpdates,
   refreshUrlThemesMetadata,
   removeTheme,
-  type InstallOptions,
 } from "./themeStoreManager";
 import {
   checkStorePermissions,
@@ -37,6 +36,7 @@ import {
   requestUrlInstallPermissions,
   validateThemeRepo,
 } from "./themeStoreService";
+import { cleanupTurnstile, getTurnstileToken } from "./turnstile";
 
 let detailModalOverlay: HTMLElement | null = null;
 let urlModalOverlay: HTMLElement | null = null;

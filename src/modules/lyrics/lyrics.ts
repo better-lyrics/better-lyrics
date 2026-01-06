@@ -20,7 +20,7 @@ import type { CubeyLyricSourceResult } from "./providers/cubey";
 import type { LyricSourceResult, ProviderParameters } from "./providers/shared";
 import { getLyrics, newSourceMap, providerPriority } from "./providers/shared";
 import type { YTLyricSourceResult } from "./providers/yt";
-import { getSongMetadata, getSongAlbum, type SegmentMap } from "./requestSniffer/requestSniffer";
+import { getSongAlbum, getSongMetadata, type SegmentMap } from "./requestSniffer/requestSniffer";
 import { clearCache as clearTranslationCache } from "./translation";
 
 export type LyricSourceResultWithMeta = LyricSourceResult & {
@@ -167,8 +167,8 @@ export async function createLyrics(detail: PlayerDetails, signal: AbortSignal): 
       duration,
       song,
       artist,
-      album
-    }
+      album,
+    },
   });
 
   let ytLyricsPromise = getLyrics(providerParameters, "yt-lyrics").then(lyrics => {

@@ -1,13 +1,11 @@
 import { LOG_PREFIX_EDITOR } from "@constants";
 import { getSyncStorage } from "@core/storage";
-
-import type { ThemeSource } from "../../store/types";
-import type { ThemeCardOptions } from "../types";
-
 import { getInstalledTheme } from "../../store/themeStoreManager";
+import type { ThemeSource } from "../../store/types";
 import THEMES, { deleteCustomTheme, getCustomThemes, renameCustomTheme, saveCustomTheme } from "../../themes";
 import { SAVE_CUSTOM_THEME_DEBOUNCE, SAVE_DEBOUNCE_DELAY } from "../core/editor";
 import { editorStateManager } from "../core/state";
+import type { ThemeCardOptions } from "../types";
 import {
   deleteThemeBtn,
   editThemeBtn,
@@ -16,8 +14,8 @@ import {
   themeModalOverlay,
   themeNameDisplay,
   themeNameText,
-  themeSourceBadge,
   themeSelectorBtn,
+  themeSourceBadge,
 } from "../ui/dom";
 import { showAlert, showConfirm, showPrompt } from "../ui/feedback";
 import { broadcastRICSToTabs, saveToStorageWithFallback, showSyncError, showSyncSuccess } from "./storage";
@@ -424,7 +422,7 @@ export async function populateThemeModal(): Promise<void> {
   builtInSection.className = "modal-section";
 
   const builtInHeader = document.createElement("div");
-  builtInHeader.className = "modal-section-header"
+  builtInHeader.className = "modal-section-header";
 
   const builtInTitle = document.createElement("h3");
   builtInTitle.className = "modal-section-title";
@@ -453,9 +451,9 @@ export async function populateThemeModal(): Promise<void> {
   if (customThemes.length > 0) {
     const customSection = document.createElement("div");
     customSection.className = "modal-section";
-    
+
     const customHeader = document.createElement("div");
-    customHeader.className = "modal-section-header"
+    customHeader.className = "modal-section-header";
 
     const customTitle = document.createElement("h3");
     customTitle.className = "modal-section-title";

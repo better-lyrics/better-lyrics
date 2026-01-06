@@ -1,14 +1,14 @@
 import { LYRIC_SOURCE_KEYS, PROVIDER_CONFIGS, PROVIDER_SWITCHED_LOG } from "@constants";
+import { getTransientStorage, setTransientStorage } from "@core/storage";
 import { log } from "@utils";
 import bLyrics from "./blyrics/blyrics";
-import cubey, { type CubeyLyricSourceResult } from "./cubey";
-import lyricLib from "./lrclib";
-import ytLyrics, { type YTLyricSourceResult } from "./yt";
 import customLyrics from "./clyrics";
-import { ytCaptions } from "./ytCaptions";
+import cubey, { type CubeyLyricSourceResult } from "./cubey";
 import legato from "./legato";
-import { getTransientStorage, setTransientStorage } from "@core/storage";
+import lyricLib from "./lrclib";
 import unison from "./unison";
+import ytLyrics, { type YTLyricSourceResult } from "./yt";
+import { ytCaptions } from "./ytCaptions";
 
 /** Current version of the lyrics cache format */
 const LYRIC_CACHE_VERSION = "2.0.0";

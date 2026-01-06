@@ -1,6 +1,6 @@
-import { log } from "@utils";
-import type { LongBylineText, NextResponse } from "@modules/lyrics/requestSniffer/NextResponse";
 import { parseTime } from "@modules/lyrics/providers/lrcUtils";
+import type { LongBylineText, NextResponse } from "@modules/lyrics/requestSniffer/NextResponse";
+import { log } from "@utils";
 
 interface Segment {
   primaryVideoStartTimeMilliseconds: number;

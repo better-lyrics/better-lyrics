@@ -215,8 +215,8 @@ export async function fillTtml(responseString: string) {
 
   return {
     isWordSynced,
-    result
-  }
+    result,
+  };
 }
 
 export default async function bLyrics(providerParameters: ProviderParameters): Promise<void> {
@@ -251,7 +251,7 @@ export default async function bLyrics(providerParameters: ProviderParameters): P
     providerParameters.sourceMap["bLyrics-synced"].lyricSourceResult = null;
     return;
   }
-  
+
   if (filled.isWordSynced) {
     providerParameters.sourceMap["bLyrics-richsynced"].lyricSourceResult = filled.result;
     providerParameters.sourceMap["bLyrics-synced"].lyricSourceResult = null;

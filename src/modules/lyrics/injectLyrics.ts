@@ -10,9 +10,9 @@ import {
   NO_LYRICS_FOUND_LOG,
   NO_LYRICS_TEXT,
   NO_LYRICS_TEXT_SELECTOR,
-  romanizationLanguages,
   ROMANIZED_LYRICS_CLASS,
   RTL_CLASS,
+  romanizationLanguages,
   SYNC_DISABLED_LOG,
   TRANSLATED_LYRICS_CLASS,
   TRANSLATION_ENABLED_LOG,
@@ -20,8 +20,8 @@ import {
   ZERO_DURATION_ANIMATION_CLASS,
 } from "@constants";
 import { AppState } from "@core/appState";
-import { containsNonLatin, testRtl } from "@modules/lyrics/lyricParseUtils";
 import { createInstrumentalElement } from "@modules/lyrics/createInstrumentalElement";
+import { containsNonLatin, testRtl } from "@modules/lyrics/lyricParseUtils";
 import { applySegmentMapToLyrics, type LyricSourceResultWithMeta } from "@modules/lyrics/lyrics";
 import type { Lyric, LyricPart } from "@modules/lyrics/providers/shared";
 import type { TranslationResult } from "@modules/lyrics/translation";
@@ -33,16 +33,16 @@ import {
   translateText,
   translateTextIntoRomaji,
 } from "@modules/lyrics/translation";
+import { registerThemeSetting } from "@modules/settings/themeOptions";
 import {
   ADD_EXTRA_PADDING_TOP,
   animEngineState,
   lyricsElementAdded,
   SCROLL_POS_OFFSET_RATIO,
 } from "@modules/ui/animationEngine";
+import { resizeCanvas } from "@modules/ui/animationEngineDebug";
 import { addFooter, addNoLyricsButton, cleanup, createLyricsWrapper, flushLoader, renderLoader } from "@modules/ui/dom";
 import { getRelativeBounds, log } from "@utils";
-import { resizeCanvas } from "@modules/ui/animationEngineDebug";
-import { registerThemeSetting } from "@modules/settings/themeOptions";
 
 let disableRichsync = registerThemeSetting("blyrics-disable-richsync", false, true);
 let lineSyncedAnimationDelay = registerThemeSetting("blyrics-line-synced-animation-delay", 50, true);
