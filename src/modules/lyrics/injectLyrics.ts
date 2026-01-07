@@ -46,6 +46,7 @@ import { getRelativeBounds, log } from "@utils";
 
 let disableRichsync = registerThemeSetting("blyrics-disable-richsync", false, true);
 let lineSyncedAnimationDelay = registerThemeSetting("blyrics-line-synced-animation-delay", 50, true);
+let longWordThreshold = registerThemeSetting("blyrics-long-word-threshold", 1500, true);
 
 function findNearestAgent(lyrics: Lyric[], fromIndex: number): string | undefined {
   for (let i = fromIndex - 1; i >= 0; i--) {
@@ -59,6 +60,20 @@ function findNearestAgent(lyrics: Lyric[], fromIndex: number): string | undefine
     }
   }
   return undefined;
+}
+
+function isNearestLyricRtl(lyrics: Lyric[], fromIndex: number): boolean {
+  for (let i = fromIndex - 1; i >= 0; i--) {
+    if (!lyrics[i].isInstrumental && lyrics[i].words?.trim()) {
+      return testRtl(lyrics[i].words);
+    }
+  }
+  for (let i = fromIndex + 1; i < lyrics.length; i++) {
+    if (!lyrics[i].isInstrumental && lyrics[i].words?.trim()) {
+      return testRtl(lyrics[i].words);
+    }
+  }
+  return false;
 }
 
 const resizeObserver = new ResizeObserver(entries => {
@@ -186,6 +201,9 @@ function createLyricsLine(parts: LyricPart[], line: LineData, lyricElement: HTML
     span.dataset.duration = String(partData.duration);
     span.dataset.content = part.words;
     span.style.setProperty("--blyrics-duration", part.durationMs + "ms");
+    if (part.durationMs > longWordThreshold.getNumberValue()) {
+      span.dataset.longWord = "true";
+    }
     if (part.isBackground) {
       span.classList.add(BACKGROUND_LYRIC_CLASS);
     }
@@ -294,6 +312,10 @@ export function injectLyrics(data: LyricSourceResultWithMeta, keepLoaderVisible 
       const agent = findNearestAgent(lyrics, lineIndex);
       if (agent) {
         instrumentalElement.dataset.agent = agent;
+      }
+
+      if (isNearestLyricRtl(lyrics, lineIndex)) {
+        instrumentalElement.classList.add(RTL_CLASS);
       }
 
       if (!allZero) {

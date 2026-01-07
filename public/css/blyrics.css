@@ -310,6 +310,22 @@
 	direction: rtl;
 }
 
+.blyrics-rtl.blyrics--word::after {
+	background-image: linear-gradient(
+		270deg,
+		var(--blyrics-lyric-active-color)
+			calc(
+				100% * var(--lyric-transition-amount-start) - 4rem *
+					var(--lyric-transition-amount-start) + 2rem
+			),
+		#00000000
+			calc(
+				100% * var(--lyric-transition-amount-end) - 4rem *
+					var(--lyric-transition-amount-end) + 2rem + 1px
+			)
+	);
+}
+
 /* Loader styles */
 #blyrics-loader {
 	align-items: center;
@@ -721,6 +737,11 @@
 	width: calc(var(--blyrics-font-size) + var(--blyrics-font-size) / 3);
 	overflow: visible;
 	margin-left: calc(var(--blyrics-font-size) / -3);
+}
+
+.blyrics-rtl.blyrics--instrumental .blyrics--instrumental-icon {
+	margin-left: 0;
+	margin-right: calc(var(--blyrics-font-size) / -3);
 }
 
 .blyrics--instrumental[data-agent="v2"] .blyrics--instrumental-icon,
