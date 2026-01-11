@@ -234,7 +234,7 @@ export async function createLyrics(detail: PlayerDetails, signal: AbortSignal): 
           let matchAmount = stringSimilarity(lyricText.toLowerCase(), ytLyrics.text.toLowerCase());
           if (matchAmount < 0.5) {
             log(
-              `Got lyrics from ${sourceLyrics.source}, but they don't match yt lyrics. Rejecting: Match: ${matchAmount}%`
+              `Got lyrics from ${sourceLyrics.source}, but they don't match YT lyrics. Rejecting: Match: ${matchAmount}%`
             );
             continue;
           }

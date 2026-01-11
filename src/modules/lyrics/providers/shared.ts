@@ -149,8 +149,10 @@ export function initProviders(): void {
 }
 
 const sourceKeyToFillFn = {
+  "custom-lyrics": customLyrics,
   "bLyrics-richsynced": bLyrics,
   "bLyrics-synced": bLyrics,
+  "unison-richsynced": unison,
   "musixmatch-richsync": cubey,
   "musixmatch-synced": cubey,
   "lrclib-synced": lyricLib,
@@ -158,8 +160,6 @@ const sourceKeyToFillFn = {
   "yt-captions": ytCaptions,
   "yt-lyrics": ytLyrics,
   "legato-synced": legato,
-  "unison-richsynced": unison,
-  "custom-lyrics": customLyrics,
 } as const;
 
 export type LyricSourceKey = Readonly<keyof typeof sourceKeyToFillFn>;
@@ -188,6 +188,7 @@ export async function getLyrics(
   sourceName: LyricSourceKey
 ): Promise<LyricSourceResult | null> {
   let lyricSource = providerParameters.sourceMap[sourceName];
+  console.log(sourceName, lyricSource);
   if (!lyricSource.filled) {
     // Check cache first
     const cacheKey = `blyrics_${providerParameters.videoId}_${sourceName}`;

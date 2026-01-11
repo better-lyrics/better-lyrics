@@ -191,8 +191,8 @@
 				<button id="edit-mode-simple-btn" class="tab-first-btn edit-mode-btn tab-btns active-btn">
 					<div class="label">Simple</div>
 				</button>
-				<button id="edit-mode-lrc-btn" class="tab-secondary-btn edit-mode-btn tab-btns">
-					<div class="label">LRC</div>
+				<button id="edit-mode-timeline-btn" class="tab-secondary-btn edit-mode-btn tab-btns">
+					<div class="label">Timeline</div>
 				</button>
 				<button id="edit-mode-json-btn" class="tab-last-btn edit-mode-btn tab-btns">
 					<div class="label">JSON</div>
@@ -206,23 +206,44 @@
 		</div>
 
 		<!-- FREEFORM ELEMENTS (CONTEXT MENU, MODAL) -->
+		<!-- Basic Modal -->
 		<div id="modal-overlay" class="modal-overlay">
 			<div class="modal">
 				<div class="modal-header">
 					<h3 id="modal-title" class="modal-title"></h3>
 					<button id="modal-close" class="modal-close-btn" aria-label="Close">
 						<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-							<path d="M6.28 5.22a.75.75 0 0 0-1.06 1.06L8.94 10l-3.72 3.72a.75.75 0 1 0 1.06 1.06L10 11.06l3.72 3.72a.75.75 0 1 0 1.06-1.06L11.06 10l3.72-3.72a.75.75 0 0 0-1.06-1.06L10 8.94 6.28 5.22Z"></path>
+							<path d="M6.28 5.22a.75.75 0 0 0-1.06 1.06L8.94 10l-3.72 3.72a.75.75 0 1 0 1.06 1.06L10 11.06l3.72 3.72a.75.75 0 1 0 1.06-1.06L11.06 10l3.72-3.72a.75.75 0 0 0-1.06-1.06L10 8.94 6.28 5.22Z"/>
 						</svg>
 					</button>
 				</div>
 				<div class="modal-body">
-					<span id="modal-message" class="modal-message">By confirming, you acknowledge that the following lyrics you're about to publish abides the rules for the following provider and are not against their terms.</span>
+					<!-- <span id="modal-message" class="modal-message">By confirming, you acknowledge that the following lyrics you're about to publish abides the rules for the following provider and are not against their terms.</span> -->
 					<!-- <input type="text" id="modal-input" class="modal-input" placeholder=""> -->
 				</div>
 				<div class="modal-footer">
-					<button id="modal-cancel" class="modal-btn modal-btn-secondary">Cancel</button>
-					<button id="modal-confirm" class="modal-btn modal-btn-primary">Confirm</button>
+					<!-- <button id="modal-cancel" class="modal-btn modal-btn-secondary">Cancel</button>
+					<button id="modal-confirm" class="modal-btn modal-btn-primary">Confirm</button> -->
+				</div>
+			</div>
+		</div>
+
+		<!-- Long Modal -->
+		<div id="long-modal-overlay" class="modal-overlay">
+			<div class="long-modal modal">
+				<div class="modal-header">
+					<h3 id="modal-title" class="modal-title"></h3>
+					<button id="modal-close" class="modal-close-btn" aria-label="Close">
+						<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+							<path d="M6.28 5.22a.75.75 0 0 0-1.06 1.06L8.94 10l-3.72 3.72a.75.75 0 1 0 1.06 1.06L10 11.06l3.72 3.72a.75.75 0 1 0 1.06-1.06L11.06 10l3.72-3.72a.75.75 0 0 0-1.06-1.06L10 8.94 6.28 5.22Z"/>
+						</svg>
+					</button>
+				</div>
+				<div class="modal-body">
+
+				</div>
+				<div class="modal-footer">
+					
 				</div>
 			</div>
 		</div>
@@ -233,28 +254,19 @@
 					<h3 class="modal-title">Custom Lyrics</h3>
 					<button id="clyrics-modal-close" class="modal-close-btn" aria-label="Close">
 						<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-							<path d="M6.28 5.22a.75.75 0 0 0-1.06 1.06L8.94 10l-3.72 3.72a.75.75 0 1 0 1.06 1.06L10 11.06l3.72 3.72a.75.75 0 1 0 1.06-1.06L11.06 10l3.72-3.72a.75.75 0 0 0-1.06-1.06L10 8.94 6.28 5.22Z"></path>
+							<path d="M6.28 5.22a.75.75 0 0 0-1.06 1.06L8.94 10l-3.72 3.72a.75.75 0 1 0 1.06 1.06L10 11.06l3.72 3.72a.75.75 0 1 0 1.06-1.06L11.06 10l3.72-3.72a.75.75 0 0 0-1.06-1.06L10 8.94 6.28 5.22Z"/>
 						</svg>
 					</button>
 				</div>
 
 				<div class="modal-body-wrapped modal-body">
 					<div id="clyrics-modal-list"></div>
-					<div id="clyrics-new-lyric" style="display: none;"></div>
+					<div id="clyrics-new-lyrics" style="display: none;"></div>
 				</div>
 			</div>
 		</div>
 
-		<div id="action-file-menu" class="list-buttons hidden" style="opacity: 0;">
-			<button id="new-lyrics-btn" class="list-btn">New Lyrics<strong>(Ctrl+N)</strong></button>
-			<button id="open-lyrics-btn" class="list-btn">Open Lyrics<strong>(Ctrl+O)</strong></button>
-			<div class="separator-column"></div>
-			<button id="import-lyrics-btn" class="list-btn">Import Lyrics<strong>></strong></button>
-			<button id="export-lyrics-btn" class="list-btn">Export Lyrics<strong>></strong></button>
-			<div class="separator-column"></div>
-			<button id="publish-lyrics-btn" class="list-btn">Publish Lyrics</button>
-			<button id="search-lyrics-btn" class="list-btn">Search Lyrics</button>
-		</div>
+		<div id="action-file-menu" class="list-buttons hidden" style="opacity: 0;"></div>
 
 		<div id="context-menu" class="list-buttons hidden" style="opacity: 0;"></div>
 	</body>

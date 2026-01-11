@@ -1,18 +1,15 @@
 import { UNISON_API_URL } from "@/core/constants";
-import { getLocalStorage } from "@/core/storage";
 import { fillTtml } from "./blyrics/blyrics";
 import type { ProviderParameters } from "./shared";
+import { parseLRC, parsePlainLyrics } from "./lrcUtils";
+
+interface UnisonResponse {
+  format: "ttml" | "lrc" | "plain";
+  lyrics: string;
+  duration: number;
+}
 
 export default async function unison(providerParameters: ProviderParameters): Promise<void> {
-  async function obtainDeviceId(): Promise<string | null> {
-    const authData = await getLocalStorage<{ odid?: string }>(["odid"]);
-    if (authData.odid) return authData.odid;
-
-    const uuid = crypto.randomUUID();
-    chrome.storage.local.set({ odid: uuid });
-    return uuid;
-  }
-
   const url = new URL(UNISON_API_URL);
   // url.searchParams.append("v", providerParameters.videoId);
   url.searchParams.append("song", providerParameters.song);
@@ -23,27 +20,41 @@ export default async function unison(providerParameters: ProviderParameters): Pr
   }
 
   const response = await fetch(url.toString(), {
-    headers: {
-      "X-Device-ID": `${await obtainDeviceId()}`,
-    },
     signal: AbortSignal.any([providerParameters.signal, AbortSignal.timeout(10000)]),
   });
 
-  if (!response.ok) {
-    providerParameters.sourceMap["unison-richsynced"].filled = true;
-    providerParameters.sourceMap["unison-richsynced"].lyricSourceResult = null;
-    return;
-  }
-
-  let responseString: string = await response.json().then(json => json.data.lyrics);
-  const filled = await fillTtml(responseString);
-
-  if (!filled) {
-    providerParameters.sourceMap["unison-richsynced"].filled = true;
-    providerParameters.sourceMap["unison-richsynced"].lyricSourceResult = null;
-    return;
-  }
-
   providerParameters.sourceMap["unison-richsynced"].filled = true;
-  providerParameters.sourceMap["unison-richsynced"].lyricSourceResult = filled.result;
+
+  if (!response.ok) {
+    providerParameters.sourceMap["unison-richsynced"].lyricSourceResult = null;
+    return;
+  }
+
+  const responseString: UnisonResponse = await response.json().then(json => json.data);
+  switch (responseString.format) {
+    case "ttml":
+      const filled = await fillTtml(responseString.lyrics);
+      providerParameters.sourceMap["unison-richsynced"].lyricSourceResult = filled ? filled.result : null;
+      break;
+    case "lrc":
+      const lrc = parseLRC(responseString.lyrics, responseString.duration);
+      providerParameters.sourceMap["unison-richsynced"].lyricSourceResult = lrc ? {
+        cacheAllowed: true,
+        lyrics: lrc,
+        musicVideoSynced: false,
+        source: "boidu.dev",
+        sourceHref: "https://boidu.dev/",
+      } : null
+      break;
+    case "plain":
+      const plain = parsePlainLyrics(responseString.lyrics);
+      providerParameters.sourceMap["unison-richsynced"].lyricSourceResult = plain ? {
+        cacheAllowed: true,
+        lyrics: plain,
+        musicVideoSynced: false,
+        source: "boidu.dev",
+        sourceHref: "https://boidu.dev/",
+      } : null
+      break;
+  }
 }

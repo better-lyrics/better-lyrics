@@ -449,7 +449,7 @@ button {
 
 /* LYRIC LIENS */
 .lyric-lines {
-    padding: .3125rem 0 0;
+    margin-top: .3125rem;
     display: flex;
     flex-direction: column;
     gap: .5rem;
@@ -577,13 +577,6 @@ button {
     align-self: stretch;
     flex: 1;
     position: relative;
-}
-
-.span-separator {
-    background: hsl(0, 0%, 100%, .5);
-    border-radius: 50%;
-    width: .25rem;
-    aspect-ratio: 1;
 }
 
 .line-timeline {
@@ -813,7 +806,7 @@ button {
 .list-btn {
     display: flex;
     justify-content: space-between;
-    gap: 1rem;
+    gap: 1.5rem;
     /* font-size: 1rem; */
     padding: .375rem;
     border-radius: .25rem;

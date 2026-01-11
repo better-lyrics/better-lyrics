@@ -1599,3 +1599,14 @@ input.cm-textfield:focus-visible {
 .modal-btn-danger:hover {
 	background: rgb(220, 38, 38);
 }
+
+.long-modal {
+	max-width: 700px;
+}
+
+.span-separator {
+    background: hsl(0, 0%, 100%, .5);
+    border-radius: 50%;
+    width: .25rem;
+    aspect-ratio: 1;
+}

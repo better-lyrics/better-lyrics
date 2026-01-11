@@ -263,9 +263,10 @@ export default async function cubey(providerParameters: ProviderParameters): Pro
 
   if (responseData.lrclibSyncedLyrics) {
     let lrclibSyncedLyrics = parseLRC(responseData.lrclibSyncedLyrics, Number(providerParameters.duration));
+    if (lrclibSyncedLyrics) providerParameters.sourceMap["lrclib-synced"].filled = true;
     providerParameters.sourceMap["lrclib-synced"].lyricSourceResult = {
       lyrics: lrclibSyncedLyrics,
-      source: "LRCLib",
+      source: "LRCLIB",
       sourceHref: "https://lrclib.net",
       musicVideoSynced: false,
     };
@@ -273,10 +274,10 @@ export default async function cubey(providerParameters: ProviderParameters): Pro
 
   if (responseData.lrclibPlainLyrics) {
     let lrclibPlainLyrics = parsePlainLyrics(responseData.lrclibPlainLyrics);
-
+    if (lrclibPlainLyrics) providerParameters.sourceMap["lrclib-plain"].filled = true;
     providerParameters.sourceMap["lrclib-plain"].lyricSourceResult = {
       lyrics: lrclibPlainLyrics,
-      source: "LRCLib",
+      source: "LRCLIB",
       sourceHref: "https://lrclib.net",
       musicVideoSynced: false,
       cacheAllowed: false,
@@ -308,8 +309,6 @@ export default async function cubey(providerParameters: ProviderParameters): Pro
     [
       "musixmatch-synced",
       "musixmatch-richsync",
-      "lrclib-synced",
-      "lrclib-plain",
       "bLyrics-richsynced",
       "bLyrics-synced",
     ] as const

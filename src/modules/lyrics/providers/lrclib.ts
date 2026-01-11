@@ -11,7 +11,7 @@ export default async function lyricLib(providerParameters: ProviderParameters): 
     url.searchParams.append("album_name", providerParameters.album);
   }
   url.searchParams.append("duration", String(providerParameters.duration));
-
+  
   const response = await fetch(url.toString(), {
     headers: {
       "Lrclib-Client": LRCLIB_CLIENT_HEADER,
@@ -19,11 +19,13 @@ export default async function lyricLib(providerParameters: ProviderParameters): 
     signal: AbortSignal.any([providerParameters.signal, AbortSignal.timeout(10000)]),
   });
 
+  providerParameters.sourceMap["lrclib-synced"].filled = true;
+  providerParameters.sourceMap["lrclib-plain"].filled = true;
+
   if (!response.ok) {
-    providerParameters.sourceMap["lrclib-synced"].filled = true;
-    providerParameters.sourceMap["lrclib-plain"].filled = true;
     providerParameters.sourceMap["lrclib-synced"].lyricSourceResult = null;
     providerParameters.sourceMap["lrclib-plain"].lyricSourceResult = null;
+    return;
   }
 
   const data = await response.json();
@@ -34,7 +36,7 @@ export default async function lyricLib(providerParameters: ProviderParameters): 
     if (data.syncedLyrics) {
       providerParameters.sourceMap["lrclib-synced"].lyricSourceResult = {
         lyrics: parseLRC(data.syncedLyrics, data.duration),
-        source: "LRCLib",
+        source: "LRCLIB",
         sourceHref: "https://lrclib.net",
         musicVideoSynced: false,
       };
@@ -42,14 +44,11 @@ export default async function lyricLib(providerParameters: ProviderParameters): 
     if (data.plainLyrics) {
       providerParameters.sourceMap["lrclib-plain"].lyricSourceResult = {
         lyrics: parsePlainLyrics(data.plainLyrics),
-        source: "LRCLib",
+        source: "LRCLIB",
         sourceHref: "https://lrclib.net",
         musicVideoSynced: false,
         cacheAllowed: false,
       };
     }
   }
-
-  providerParameters.sourceMap["lrclib-synced"].filled = true;
-  providerParameters.sourceMap["lrclib-plain"].filled = true;
 }

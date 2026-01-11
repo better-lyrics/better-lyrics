@@ -340,7 +340,7 @@ function createCLyricsCard(options: CLyricsOverview): HTMLElement {
 
   const metadata = document.createElement("div");
   metadata.className = "clyrics-input-span";
-  metadata.textContent = `Duration: ${formatTime(options.duration, true)} · Modified: ${new Date(options.modified).toLocaleString()}`;
+  metadata.innerHTML = `Duration: ${formatTime(options.duration, true)} <div class="span-separator"></div> Modified: ${new Date(options.modified).toLocaleString()}`;
 
   const name = document.createElement("div");
   name.className = "clyrics-input-title";
@@ -348,7 +348,7 @@ function createCLyricsCard(options: CLyricsOverview): HTMLElement {
 
   const artistAlbum = document.createElement("div");
   artistAlbum.className = "clyrics-input-description";
-  artistAlbum.textContent = `${options.artist} · ${options.album}`;
+  artistAlbum.innerHTML = `${options.artist} <div class="span-separator"></div> ${options.album}`;
 
   info.appendChild(metadata);
   info.appendChild(name);

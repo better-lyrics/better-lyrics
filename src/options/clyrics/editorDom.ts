@@ -11,7 +11,19 @@ export interface ContextData {
   disabled?: boolean;
 }
 
-export const actionMenus: { [key: string]: ContextData[] } = {};
+export const actionMenus: { [key: string]: ContextData[] } = {
+  file: [
+    { id: "new-lyrics-btn", type: "button", content: "New Lyrics", rightCont: "(Ctrl+N)" },
+    { id: "open-lyrics-btn", type: "button", content: "Open Lyrics", rightCont: "(Ctrl+O)" },
+    { id: "save-lyrics-btn", type: "button", content: "Save as another lyrics" },
+    { type: "separator" },
+    { id: "import-lyrics-btn", type: "button", content: "Import Lyrics", rightCont: ">" },
+    { id: "export-lyrics-btn", type: "button", content: "Export Lyrics", rightCont: ">" },
+    { type: "separator" },
+    { id: "publish-lyrics-btn", type: "button", content: "Publish Lyrics" },
+    { id: "search-lyrics-btn", type: "button", content: "Search Lyrics" },
+  ]
+};
 
 export const contextMenus: { [key: string]: ContextData[] } = {
   default: [
@@ -26,6 +38,7 @@ export const contextMenus: { [key: string]: ContextData[] } = {
     { id: "split-word", type: "button", content: "Split Word", rightCont: "(Shift+S)" },
     { id: "duplicate-word", type: "button", content: "Duplicate Word", rightCont: "(Ctrl+Shift+D)" },
     { id: "delete-word", type: "button", content: "Delete Word", rightCont: "(Ctrl+Del)" },
+    { id: "combine-words", type: "button", content: "Combine Words", rightCont: "(Ctrl+Shift+B)" },
   ],
   line: [
     { id: "toggle-instrumental-line", type: "button", content: "Instrumental Line" }, // rightCont: "✓"
@@ -33,6 +46,7 @@ export const contextMenus: { [key: string]: ContextData[] } = {
     { type: "separator" },
     { id: "duplicate-line", type: "button", content: "Duplicate Line", rightCont: "(Ctrl+D)" },
     { id: "delete-line", type: "button", content: "Delete Line", rightCont: "(Del)" },
+    { id: "combine-lines", type: "button", content: "Combine Lines", rightCont: "(Ctrl+B)" },
     { id: "add-new-line-after", type: "button", content: "Add new line after", rightCont: "(Ctrl+Plus)" },
     { id: "add-new-line-before", type: "button", content: "Add new line before", rightCont: "(Ctrl+Shift+Plus)" },
     { type: "separator" },
@@ -44,6 +58,8 @@ export const domDefaults = {
   svg: {
     // math equation
     plus: `<svg class="plus" width="16" height="16" viewBox="0 0 16 16"><path d="M8 3.333v9.334M3.334 8h9.333" stroke="currentColor" stroke-width="1.2"/></svg>`,
+
+    close: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path d="M6.28 5.22a.75.75 0 0 0-1.06 1.06L8.94 10l-3.72 3.72a.75.75 0 1 0 1.06 1.06L10 11.06l3.72 3.72a.75.75 0 1 0 1.06-1.06L11.06 10l3.72-3.72a.75.75 0 0 0-1.06-1.06L10 8.94z"/></svg>`,
 
     // line suggestive
     warning: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="currentColor" d="M2.725 21q-.275 0-.5-.137t-.35-.363-.137-.488.137-.512l9.25-16q.15-.25.388-.375T12 3t.488.125.387.375l9.25 16q.15.25.138.513t-.138.487-.35.363-.5.137zM12 18q.425 0 .713-.288T13 17t-.288-.712T12 16t-.712.288T11 17t.288.713T12 18m0-3q.425 0 .713-.288T13 14v-3q0-.425-.288-.712T12 10t-.712.288T11 11v3q0 .425.288.713T12 15"/></svg>`,
@@ -70,6 +86,10 @@ export const domDefaults = {
     INSTRUMENTAL_GAP: {
       level: 0,
       msg: "Make the instrumental line only if there's a 5 seconds or more start time gap between the previous line and the next line",
+    },
+    DUPLICATE_INSTRUMENTAL: {
+      level: 0,
+      msg: "There's already an instrumental line before this line. Remove the previous one or this line instead",
     },
 
     // Level 1 - Warns user that the experience will not be as good if ignored

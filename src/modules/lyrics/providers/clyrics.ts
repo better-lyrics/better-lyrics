@@ -2,7 +2,7 @@ import type { CLyricsData } from "@/options/clyrics/types";
 import type { ProviderParameters } from "./shared";
 
 export default async function customLyrics(providerParameters: ProviderParameters): Promise<void> {
-  const result = await chrome.storage.sync.get(["customLyrics"]);
+  const result = await chrome.storage.local.get(["customLyrics"]);
   const raw = result.customLyrics;
   const custom: CLyricsData[] = Array.isArray(raw) ? (raw as CLyricsData[]) : [];
 
@@ -20,14 +20,18 @@ export default async function customLyrics(providerParameters: ProviderParameter
     lyrics = lyrics.filter(t => {
       return t.song == providerParameters.song && t.artist == providerParameters.artist;
     });
-    if (providerParameters.album)
+
+    if (providerParameters.album) {
       lyrics = lyrics.filter(t => {
         return t.album == providerParameters.album;
       });
-    if (providerParameters.duration)
+    }
+
+    if (providerParameters.duration) {
       lyrics = lyrics.filter(t => {
         return Math.abs(t.duration - providerParameters.duration) <= 2;
       });
+    }
 
     clyric = lyrics[0];
   }

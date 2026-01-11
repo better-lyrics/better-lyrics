@@ -70,9 +70,23 @@ export const defaults: {
   actionMenu: {
     "new-lyrics-btn": () => {
       openCLyricsModal();
-      if (clyricsNewLyrics) clyricsNewLyrics.style.display = "";
-      if (clyricsModalList) clyricsModalList.style.display = "none";
+      if (clyricsNewLyrics) {
+        clyricsNewLyrics.style.display = "";
+      }
+      if (clyricsModalList) {
+        clyricsModalList.style.display = "none";
+      }
     },
+
+    "open-lyrics-btn": () => {
+      openCLyricsModal();
+      if (clyricsModalList) {
+        clyricsModalList.style.display = "";
+      }
+      if (clyricsNewLyrics) {
+        clyricsNewLyrics.style.display = "none";
+      }
+    }
   },
 
   contextMenu: {
@@ -151,7 +165,36 @@ export const noLyrics = document.getElementById("no-lyrics");
 // Data functions
 function _save() {}
 
-function _setupActionMenu(id: string) {
+function loadContextMenu(element: HTMLElement, menus: ContextData[]) {
+    if (!element) return;
+    const buttons = [...menus];
+    buttons.forEach(btn => {
+      if (typeof btn != "object" || !btn.type) return;
+      if (btn.type == "button") {
+        const button = document.createElement("button");
+        button.className = "list-btn";
+        button.innerHTML = btn.content + (btn.rightCont ? `<strong>${btn.rightCont}</strong>` : "");
+        button.disabled = btn.disabled || false;
+        if (typeof btn.func == "function")
+          button.addEventListener("click", () => {
+            btn.func!();
+          });
+        element.appendChild(button);
+      } else if (btn.type == "separator") {
+        const separator = document.createElement("div");
+        separator.className = "separator-column";
+        element.appendChild(separator);
+      } else if (btn.type == "span") {
+        const span = document.createElement("span");
+        span.className = "code";
+        span.style.opacity = ".5";
+        span.innerHTML = btn.content || "";
+        element.appendChild(span);
+      }
+    });
+  }
+
+function setupActionMenu(id: string) {
   const selActionMenu = actionMenus[id];
   if (loadedActionMenu[id] || !selActionMenu) {
     return selActionMenu;
@@ -159,8 +202,8 @@ function _setupActionMenu(id: string) {
 
   selActionMenu.forEach(btn => {
     if (typeof btn != "object" || !btn.type || btn.type != "button" || !btn.id) return;
-    if (defaults.contextMenu[btn.id]) {
-      btn.func = () => btn.id && defaults.contextMenu[btn.id]();
+    if (defaults.actionMenu[btn.id]) {
+      btn.func = () => btn.id && defaults.actionMenu[btn.id]();
     }
   });
 
@@ -410,8 +453,9 @@ function handleActionsMenu() {
     actionMenuOpen = null;
   }
 
-  const actionFunc: { [key: string]: { menu: HTMLElement | null; func: (btn: HTMLElement) => void } } = {
+  const actionFunc: { [key: string]: { id: string, menu: HTMLElement | null; func: (btn: HTMLElement) => void } } = {
     "action-file-btn": {
+      id: "file",
       menu: actionFile,
       func: function (btn) {
         if (!actionFile) return;
@@ -430,11 +474,14 @@ function handleActionsMenu() {
     if (!(button instanceof HTMLElement)) return;
     button.addEventListener("click", _e => {
       const act = actionFunc[button.id];
-      if (act && actionMenuOpen == act.menu) {
+      if (!act || !act.menu) return;
+      if (actionMenuOpen == act.menu) {
         return closeActionMenu();
       }
       closeActionMenu();
-      if (act && act.func) act.func(button);
+      act.menu.innerHTML = "";
+      loadContextMenu(act.menu, setupActionMenu(act.id));
+      if (typeof act.func == "function") act.func(button);
     });
   });
 }
@@ -510,37 +557,8 @@ function handleContextMenu() {
     console.warn("No context menu loaded. Refresh to reload handler");
     return;
   }
-  let contextMenuOpen = false;
 
-  function loadContextMenu() {
-    if (!contextMenu) return;
-    const buttons = [...contextMenuB];
-    buttons.forEach(btn => {
-      if (typeof btn != "object" || !btn.type) return;
-      if (btn.type == "button") {
-        const button = document.createElement("button");
-        button.className = "list-btn";
-        button.innerHTML = btn.content + (btn.rightCont ? `<strong>${btn.rightCont}</strong>` : "");
-        button.disabled = btn.disabled || false;
-        if (typeof btn.func == "function")
-          button.addEventListener("click", () => {
-            btn.func!();
-            closeContextMenu();
-          });
-        contextMenu.appendChild(button);
-      } else if (btn.type == "separator") {
-        const separator = document.createElement("div");
-        separator.className = "separator-column";
-        contextMenu.appendChild(separator);
-      } else if (btn.type == "span") {
-        const span = document.createElement("span");
-        span.className = "code";
-        span.style.opacity = ".5";
-        span.innerHTML = btn.content || "";
-        contextMenu.appendChild(span);
-      }
-    });
-  }
+  let contextMenuOpen = false;
 
   function closeContextMenu() {
     contextMenuOpen = false;
@@ -569,7 +587,7 @@ function handleContextMenu() {
         return;
       }
       closeContextMenu();
-      loadContextMenu();
+      loadContextMenu(contextMenu, contextMenuB);
 
       const docRect = document.documentElement.getBoundingClientRect();
       contextMenuOpen = true;
