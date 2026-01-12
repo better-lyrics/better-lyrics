@@ -306,7 +306,7 @@ For a complete overview, please read our full [**Privacy Policy**](PRIVACY.md).
 
 ## Trademarks
 
-YouTube Music™, YouTube™, and Google™ are trademarks of Google LLC. Use of these trademarks is subject to Google Permissions.
+YouTube Music™, YouTube™, Google™, and Chrome™ are trademarks of Google LLC. Firefox® is a trademark of the Mozilla Foundation. Microsoft Edge is a trademark of Microsoft Corporation. Musixmatch® is a trademark of Musixmatch S.p.A. Use of these trademarks is subject to their respective owners' guidelines.
 
 ## Contributors ✨
 
