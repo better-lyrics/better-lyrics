@@ -2,7 +2,7 @@
 
 # Better Lyrics
 
-Better Lyrics upgrades your YouTube Music experience by providing beautiful time-synced lyrics for your favorite songs.
+Better Lyrics upgrades your YouTube Music™ experience by providing beautiful time-synced lyrics for your favorite songs.
 
 ## Stats
 
@@ -54,6 +54,7 @@ Better Lyrics upgrades your YouTube Music experience by providing beautiful time
 - [Contributing](#contributing)
 - [License](#license)
 - [Privacy](#privacy)
+- [Trademarks](#trademarks)
 - [Contributors ✨](#contributors-)
 
 > [!TIP]
@@ -62,7 +63,7 @@ Better Lyrics upgrades your YouTube Music experience by providing beautiful time
 
 ## Features
 
-🎵 Displays beautiful time-synced lyrics on YouTube Music\
+🎵 Displays beautiful time-synced lyrics on YouTube Music™\
 📦 Requires no external dependencies or configurations\
 ⏩ Lets you seek by clicking on any line\
 🌏 Supports multiple languages\
@@ -83,7 +84,7 @@ Better Lyrics upgrades your YouTube Music experience by providing beautiful time
 
 ## Usage
 
-1. Open [YouTube Music](https://music.youtube.com) and start playing a song.
+1. Open [YouTube Music™](https://music.youtube.com) and start playing a song.
 2. Click on the lyrics tab to view time-synced lyrics. (This might take a few seconds to load)
 3. Click on a specific line to seek to that part of the song.
 
@@ -155,7 +156,7 @@ Better Lyrics **does not** collect any personal data or track your browsing acti
 ### Chrome
 
 1. Clone this repository or download the ZIP file from [releases](https://github.com/better-lyrics/better-lyrics/releases) page.
-2. Open Google Chrome and go to `chrome://extensions`.
+2. Open Google Chrome™ and go to `chrome://extensions`.
 3. Enable "Developer mode" by toggling the switch in top right corner.
 4. Click on "Load unpacked" and select the folder where you cloned/downloaded this repository.
 5. Better Lyrics should now be installed and ready to use!
@@ -263,7 +264,7 @@ Right now, Better Lyrics is available for Chrome, Firefox, and Edge (and other C
 
 ### Can I use Better Lyrics on other music streaming services?
 
-No, Better Lyrics is specifically designed for YouTube Music. If you want something similar for other streaming services, check out these extensions. If you have suggestions for others, open a PR to add them to this list:
+No, Better Lyrics is specifically designed for YouTube Music™. If you want something similar for other streaming services, check out these extensions. If you have suggestions for others, open a PR to add them to this list:
 
 - [Beautiful Lyrics](https://github.com/surfbryce/beautiful-lyrics) - Spotify
 
@@ -302,6 +303,10 @@ We take your privacy very seriously. Better Lyrics is built to be privacy-consci
 - **We never have and never will sell or monetize your personal data.**
 
 For a complete overview, please read our full [**Privacy Policy**](PRIVACY.md).
+
+## Trademarks
+
+YouTube Music™, YouTube™, and Google™ are trademarks of Google LLC. Use of these trademarks is subject to Google Permissions.
 
 ## Contributors ✨
 

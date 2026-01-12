@@ -212,9 +212,9 @@ ytmusic-player-page:not([is-mweb-modernization-enabled]):not([blyrics-video-mode
   margin-right: auto;
 }
 
-ytmusic-player-page:not([is-mweb-modernization-enabled]):not([is-mweb-modernization-enabled]):not([blyrics-video-mode])
+ytmusic-player-page:not([is-mweb-modernization-enabled]):not([blyrics-video-mode]):not([video-mode])
 #player.ytmusic-player-page {
-  max-width: 400px !important;
+  max-width: 400px;
 }
 
 ytmusic-player-page:not([is-mweb-modernization-enabled])[player-fullscreened]:not([blyrics-dfs])

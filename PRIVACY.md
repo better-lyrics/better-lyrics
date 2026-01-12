@@ -6,7 +6,7 @@ Thank you for using Better Lyrics! This Privacy Policy outlines how we collect, 
 
 ## 1. Introduction
 
-Better Lyrics is an open-source browser extension that enhances the Youtube Music experience with features like time-synced lyrics and an improved user interface. Our goal is to provide these features while collecting the minimum amount of information necessary.
+Better Lyrics is an open-source browser extension that enhances the YouTube Music™ experience with features like time-synced lyrics and an improved user interface. Our goal is to provide these features while collecting the minimum amount of information necessary.
 
 ## 2. Information We Collect
 
@@ -18,7 +18,7 @@ When you use Better Lyrics, we automatically collect certain information that yo
 
 * **IP Address:** Your IP address is automatically sent with every request as part of standard internet protocol - this is necessary for our servers to send lyrics back to your browser. We only use it temporarily for security purposes (rate limiting, authentication and abuse prevention). Your IP address is *not* permanently stored and is automatically deleted from our logs after a maximum of 7 days.
 * **User-Agent:** Your browser's user-agent string, which includes information about your browser type, version, and operating system. This helps us debug issues and understand our user base. Your User-Agent is *not* permanently stored and is automatically deleted from our logs after a maximum of 7 days.
-* **Song Metadata:** To fetch lyrics, we send the song name, artist name, album name, and the Youtube video ID to our API.
+* **Song Metadata:** To fetch lyrics, we send the song name, artist name, album name, and the YouTube™ video ID to our API.
 
 ### 2.2. Information You Provide to Us
 
@@ -72,4 +72,4 @@ We may update this Privacy Policy from time to time. We will notify you of any c
 
 If you have any questions about this Privacy Policy, please contact us at:
 
-<hi@boidushya.com>
+<better-lyrics@boidu.dev>

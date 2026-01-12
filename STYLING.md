@@ -63,7 +63,7 @@
 
 CSS (Cascading Style Sheets) is a styling language used to describe the presentation of a document written in HTML or XML. It allows you to control the layout, colors, fonts, and other visual aspects of web pages.
 
-The Better Lyrics CSS files are designed to enhance the lyrics viewing experience on YouTube Music. They modify the appearance of the lyrics display, add animations, and adjust the layout to create a more immersive and user-friendly experience.
+The Better Lyrics CSS files are designed to enhance the lyrics viewing experience on YouTube Music™. They modify the appearance of the lyrics display, add animations, and adjust the layout to create a more immersive and user-friendly experience.
 
 The extension lets you modify the CSS in real-time, so you can see the changes immediately.
 
@@ -585,7 +585,7 @@ These animations create:
 
 ## 7. Modifying YouTube Music's Layout
 
-The `ytmusic.css` file contains extensive modifications to YouTube Music's interface to create a more immersive lyrics experience.
+The `ytmusic.css` file contains extensive modifications to YouTube Music™'s interface to create a more immersive lyrics experience.
 
 ### Background and Transparency Effects
 
