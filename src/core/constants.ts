@@ -70,35 +70,35 @@ export const CUBEY_LYRICS_API_URL_TURNSTILE = "https://lyrics.api.dacubeking.com
 
 export const CUBEY_LYRICS_API_URL = "https://lyrics.api.dacubeking.com/";
 
-// Supported Languages
-export const romanizationLanguages: string[] = [
-  "ja", // Japanese - Romaji
-  "ru", // Russian - Romanization
-  "ko", // Korean - Romanization
-  "zh-CN", // Simplified Chinese - Pinyin
-  "zh-TW", // Traditional Chinese - Pinyin
-  // "hi" , // Hindi
-  "zh", // Chinese
-  "bn", // Bengali - Romanization
-  "th", // Thai - Romanization
-  "el", // Greek - Romanization
-  "he", // Hebrew - Romanization
-  "ar", // Arabic - Romanization
-  "ta", // Tamil - Romanization
-  "te", // Telugu - Romanization
-  "ml", // Malayalam - Romanization
-  "kn", // Kannada - Romanization
-  "gu", // Gujarati - Romanization
-  "pa", // Punjabi - Romanization
-  "mr", // Marathi - Romanization
-  "ur", // Urdu - Romanization
-  "si", // Sinhala - Romanization
-  "my", // Burmese - Romanization
-  "ka", // Georgian - Romanization
-  "km", // Khmer - Romanization
-  "lo", // Lao - Romanization
-  "fa", // Persian - Romanization
-];
+// Supported Romanization Languages (code → display name)
+export const ROMANIZATION_LANGUAGES: Record<string, string> = {
+  ja: "Japanese",
+  ko: "Korean",
+  zh: "Chinese",
+  "zh-CN": "Chinese (Simplified)",
+  "zh-TW": "Chinese (Traditional)",
+  ru: "Russian",
+  hi: "Hindi",
+  ar: "Arabic",
+  th: "Thai",
+  el: "Greek",
+  he: "Hebrew",
+  bn: "Bengali",
+  ta: "Tamil",
+  te: "Telugu",
+  ml: "Malayalam",
+  kn: "Kannada",
+  gu: "Gujarati",
+  pa: "Punjabi",
+  mr: "Marathi",
+  ur: "Urdu",
+  si: "Sinhala",
+  my: "Burmese",
+  ka: "Georgian",
+  km: "Khmer",
+  lo: "Lao",
+  fa: "Persian",
+};
 
 // Log Prefixes
 export const LOG_PREFIX: string = "[BetterLyrics]";

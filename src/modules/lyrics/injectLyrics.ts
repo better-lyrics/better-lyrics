@@ -10,7 +10,7 @@ import {
   NO_LYRICS_FOUND_LOG,
   NO_LYRICS_TEXT,
   NO_LYRICS_TEXT_SELECTOR,
-  romanizationLanguages,
+  ROMANIZATION_LANGUAGES,
   ROMANIZED_LYRICS_CLASS,
   RTL_CLASS,
   SYNC_DISABLED_LOG,
@@ -47,6 +47,14 @@ import { registerThemeSetting } from "@modules/settings/themeOptions";
 let disableRichsync = registerThemeSetting("blyrics-disable-richsync", false, true);
 let lineSyncedAnimationDelay = registerThemeSetting("blyrics-line-synced-animation-delay", 50, true);
 let longWordThreshold = registerThemeSetting("blyrics-long-word-threshold", 1500, true);
+
+function isRomanizationDisabledForLang(lang: string): boolean {
+  const disabled = AppState.romanizationDisabledLanguages;
+  if (disabled.includes(lang)) return true;
+  const baseLang = lang.split("-")[0];
+  if (baseLang !== lang && disabled.includes(baseLang)) return true;
+  return false;
+}
 
 function findNearestAgent(lyrics: Lyric[], fromIndex: number): string | undefined {
   for (let i = fromIndex - 1; i >= 0; i--) {
@@ -464,14 +472,15 @@ export function injectLyrics(data: LyricSourceResultWithMeta, keepLoaderVisible 
     let romanizedCacheResult = getRomanizationFromCache(item.words);
 
     // Language should always exist if item.timedRomanization exists
-    const shouldRomanize =
-      (data.language && romanizationLanguages.includes(data.language)) || containsNonLatin(item.words);
+    const shouldRomanize = (data.language && data.language in ROMANIZATION_LANGUAGES) || containsNonLatin(item.words);
     const canInjectRomanizationsEarly = (shouldRomanize && item.romanization) || romanizedCacheResult !== null;
     if (item.romanization) {
       romanizedCacheResult = item.romanization;
     }
 
-    if (canInjectRomanizationsEarly && AppState.isRomanizationEnabled) {
+    const isLanguageDisabledForRomanization = data.language && isRomanizationDisabledForLang(data.language);
+
+    if (canInjectRomanizationsEarly && AppState.isRomanizationEnabled && !isLanguageDisabledForRomanization) {
       if (romanizedCacheResult !== item.words) {
         if (item.timedRomanization && item.timedRomanization.length > 0 && !disableRichsync.getBooleanValue()) {
           createLyricsLine(item.timedRomanization, line, createRomanizedElem());
@@ -479,13 +488,15 @@ export function injectLyrics(data: LyricSourceResultWithMeta, keepLoaderVisible 
           createRomanizedElem().textContent = "\n" + romanizedCacheResult;
         }
       }
-    } else {
+    } else if (!isLanguageDisabledForRomanization) {
       langPromise.then(source_language => {
         onRomanizationEnabled(async () => {
+          if (isRomanizationDisabledForLang(source_language)) return;
+
           let isNonLatin = containsNonLatin(item.words);
-          if (romanizationLanguages.includes(source_language) || isNonLatin) {
+          if (source_language in ROMANIZATION_LANGUAGES || isNonLatin) {
             let usableLang = source_language;
-            if (isNonLatin && !romanizationLanguages.includes(source_language)) {
+            if (isNonLatin && !(source_language in ROMANIZATION_LANGUAGES)) {
               usableLang = "auto";
             }
 
