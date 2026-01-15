@@ -20,7 +20,7 @@ import {
   ZERO_DURATION_ANIMATION_CLASS,
 } from "@constants";
 import { AppState } from "@core/appState";
-import { containsNonLatin, testRtl } from "@modules/lyrics/lyricParseUtils";
+import { containsNonLatin, detectNonLatinLanguage, testRtl } from "@modules/lyrics/lyricParseUtils";
 import { createInstrumentalElement } from "@modules/lyrics/createInstrumentalElement";
 import { applySegmentMapToLyrics, type LyricSourceResultWithMeta } from "@modules/lyrics/lyrics";
 import type { Lyric, LyricPart } from "@modules/lyrics/providers/shared";
@@ -481,7 +481,9 @@ export function injectLyrics(data: LyricSourceResultWithMeta, keepLoaderVisible 
     const isLanguageDisabledForRomanization = data.language && isRomanizationDisabledForLang(data.language);
 
     if (canInjectRomanizationsEarly && AppState.isRomanizationEnabled && !isLanguageDisabledForRomanization) {
-      if (romanizedCacheResult !== item.words) {
+      const detectedLang = detectNonLatinLanguage(item.words);
+      const isDetectedLangDisabled = detectedLang && isRomanizationDisabledForLang(detectedLang);
+      if (!isDetectedLangDisabled && romanizedCacheResult !== item.words) {
         if (item.timedRomanization && item.timedRomanization.length > 0 && !disableRichsync.getBooleanValue()) {
           createLyricsLine(item.timedRomanization, line, createRomanizedElem());
         } else {
@@ -494,11 +496,11 @@ export function injectLyrics(data: LyricSourceResultWithMeta, keepLoaderVisible 
           if (isRomanizationDisabledForLang(source_language)) return;
 
           let isNonLatin = containsNonLatin(item.words);
-          if (source_language in ROMANIZATION_LANGUAGES || isNonLatin) {
-            let usableLang = source_language;
-            if (isNonLatin && !(source_language in ROMANIZATION_LANGUAGES)) {
-              usableLang = "auto";
-            }
+          if (isNonLatin) {
+            const detectedLang = detectNonLatinLanguage(item.words);
+            if (detectedLang && isRomanizationDisabledForLang(detectedLang)) return;
+
+            let usableLang = source_language in ROMANIZATION_LANGUAGES ? source_language : "auto";
 
             if (item.words.trim() !== "♪" && item.words.trim() !== "") {
               let result;
