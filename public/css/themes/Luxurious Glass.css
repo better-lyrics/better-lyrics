@@ -112,7 +112,8 @@ ytmusic-player-page::before {
 /* Main Lyrics Container */
 .blyrics-container {
   text-align: var(--main-lyrics-align);
-  overflow: hidden;
+  overflow-y: auto;
+  scroll-behavior: smooth;
   padding: var(--blyrics-padding);
   padding-bottom: 0;
 }
