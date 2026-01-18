@@ -7,7 +7,6 @@
     "message": "Melhore o YouTube Music com belas letras sincronizadas, suporte multilíngue, traduções em tempo real e mais",
     "description": "The description of the extension"
   },
-
   "options_tab_general": {
     "message": "Geral",
     "description": "General settings tab label"
@@ -32,7 +31,6 @@
     "message": "Temas",
     "description": "Themes settings tab label"
   },
-
   "options_general_title": {
     "message": "Configurações gerais",
     "description": "General settings section title"
@@ -65,7 +63,6 @@
     "message": "Tamanho do cache",
     "description": "Cache size label"
   },
-
   "options_display_title": {
     "message": "Configurações de exibição",
     "description": "Display settings section title"
@@ -90,7 +87,6 @@
     "message": "Mostrar animações estilizadas",
     "description": "Show stylized animations setting label"
   },
-
   "options_language_title": {
     "message": "Configurações de idioma",
     "description": "Language settings section title"
@@ -111,7 +107,6 @@
     "message": "Idioma de tradução",
     "description": "Translation language setting label"
   },
-
   "options_sources_title": {
     "message": "Preferência de fonte de letras",
     "description": "Sources settings section title"
@@ -120,7 +115,6 @@
     "message": "Arraste para reordenar a prioridade. Fontes superiores são tentadas primeiro. Desmarque para desativar.",
     "description": "Sources settings section description"
   },
-
   "options_themes_title": {
     "message": "Configurações de tema",
     "description": "Theme settings section title"
@@ -153,7 +147,6 @@
     "message": "Temas instalados",
     "description": "Installed themes button label"
   },
-
   "options_identity_title": {
     "message": "Identidade",
     "description": "Identity settings section title"
@@ -182,7 +175,6 @@
     "message": "Importar chave",
     "description": "Import key button label"
   },
-
   "options_modal_selectTheme": {
     "message": "Selecionar um tema",
     "description": "Theme modal title"
@@ -195,7 +187,6 @@
     "message": "Confirmar",
     "description": "Confirm button label"
   },
-
   "options_alert_cacheCleared": {
     "message": "Cache limpo com sucesso!",
     "description": "Cache cleared success message"
@@ -232,7 +223,6 @@
     "message": "Erro ao carregar a identidade",
     "description": "Identity load error message"
   },
-
   "options_editor_saving": {
     "message": "Salvando...",
     "description": "Saving indicator text"
@@ -281,7 +271,6 @@
     "message": "Clique duplo para renomear",
     "description": "Double-click to rename tooltip"
   },
-
   "options_provider_betterLyrics": {
     "message": "Better Lyrics",
     "description": "Better Lyrics provider name"
@@ -306,7 +295,6 @@
     "message": "Legendas do YouTube",
     "description": "Youtube Captions provider name"
   },
-
   "options_syncType_syllable": {
     "message": "Sílaba",
     "description": "Syllable sync type label"
@@ -339,7 +327,6 @@
     "message": "Letras sem informações de tempo. Letras não sincronizadas oferecem uma experiência mínima.",
     "description": "Unsynced sync type tooltip"
   },
-
   "options_detail_rateTheme": {
     "message": "Avaliar este tema",
     "description": "Rate theme label"
@@ -364,7 +351,6 @@
     "message": "e importe em",
     "description": "Shader import suffix text before Better Lyrics Shaders link"
   },
-
   "marketplace_pageTitle": {
     "message": "Loja de temas Better Lyrics",
     "description": "Page title"
@@ -389,7 +375,6 @@
     "message": "Atalhos de teclado",
     "description": "Keyboard shortcuts button label"
   },
-
   "marketplace_sortBy": {
     "message": "Ordenar por",
     "description": "Sort filter group label"
@@ -418,7 +403,6 @@
     "message": "Mais antigos",
     "description": "Sort by oldest"
   },
-
   "marketplace_show": {
     "message": "Mostrar",
     "description": "Show filter group label"
@@ -435,7 +419,6 @@
     "message": "Não instalados",
     "description": "Show not installed themes"
   },
-
   "marketplace_options": {
     "message": "Opções",
     "description": "Options filter group label"
@@ -448,7 +431,6 @@
     "message": "Apenas compatíveis",
     "description": "Filter for compatible themes"
   },
-
   "marketplace_installFromUrl": {
     "message": "Instalar de URL",
     "description": "Install from URL button"
@@ -457,7 +439,6 @@
     "message": "Enviar um tema",
     "description": "Submit a theme link"
   },
-
   "marketplace_loading": {
     "message": "Carregando temas...",
     "description": "Loading message"
@@ -470,7 +451,6 @@
     "message": "Nenhum tema corresponde aos seus filtros",
     "description": "Empty state message"
   },
-
   "marketplace_permissionTitle": {
     "message": "Permissão necessária",
     "description": "Permission required title"
@@ -483,7 +463,6 @@
     "message": "Conceder permissão",
     "description": "Grant permission button"
   },
-
   "marketplace_install": {
     "message": "Instalar",
     "description": "Install button"
@@ -500,7 +479,6 @@
     "message": "Ativo",
     "description": "Active theme indicator"
   },
-
   "marketplace_shadersBadge": {
     "message": "Shaders",
     "description": "Shaders badge text"
@@ -509,7 +487,6 @@
     "message": "GitHub",
     "description": "GitHub badge text"
   },
-
   "marketplace_urlModalTitle": {
     "message": "Instalar de URL",
     "description": "URL install modal title"
@@ -530,7 +507,6 @@
     "message": "Cancelar",
     "description": "Cancel button"
   },
-
   "marketplace_urlPermissionTitle": {
     "message": "Permissão adicional necessária",
     "description": "URL permission modal title"
@@ -559,7 +535,6 @@
     "message": "Esta permissão só é usada ao instalar temas via URL. Temas da loja não precisam dela.",
     "description": "URL permission note"
   },
-
   "marketplace_shortcutsTitle": {
     "message": "Atalhos de teclado",
     "description": "Shortcuts modal title"
@@ -588,7 +563,6 @@
     "message": "Próxima página",
     "description": "Next page shortcut label"
   },
-
   "marketplace_shortcutsSort": {
     "message": "Ordenar",
     "description": "Sort shortcuts group"
@@ -609,7 +583,6 @@
     "message": "Por data",
     "description": "Sort by date shortcut"
   },
-
   "marketplace_shortcutsFilters": {
     "message": "Filtros",
     "description": "Filters shortcuts group"
@@ -634,7 +607,6 @@
     "message": "Alternar compatível",
     "description": "Toggle compatible shortcut"
   },
-
   "marketplace_shortcutsDetails": {
     "message": "Detalhes do tema",
     "description": "Theme details shortcuts group"
@@ -651,7 +623,6 @@
     "message": "Próxima imagem",
     "description": "Next image shortcut"
   },
-
   "marketplace_shortcutsGeneral": {
     "message": "Geral",
     "description": "General shortcuts group"
@@ -668,7 +639,6 @@
     "message": "Aplicar tema (após instalar)",
     "description": "Apply theme shortcut"
   },
-
   "marketplace_ratingFailed": {
     "message": "Falha ao enviar avaliação",
     "description": "Rating submission error"
@@ -685,7 +655,6 @@
     "message": "Nenhum tema instalado",
     "description": "Empty installed themes message"
   },
-
   "editor_pageTitle": {
     "message": "Editor CSS Better Lyrics",
     "description": "Standalone editor page title"
@@ -722,7 +691,6 @@
     "message": "Docs",
     "description": "Docs link text"
   },
-
   "lyrics_source": {
     "message": "Fonte: ",
     "description": "Lyrics source label"
@@ -735,7 +703,6 @@
     "message": "Pesquisar no Genius",
     "description": "Search on Genius button text"
   },
-
   "lyrics_searching": {
     "message": "Better Lyrics está buscando letras...",
     "description": "Loading message while searching for lyrics"
