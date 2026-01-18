@@ -7,7 +7,6 @@
     "message": "使用精美的同步歌詞、多語言支援、即時翻譯等功能增強 YouTube Music",
     "description": "The description of the extension"
   },
-
   "options_tab_general": {
     "message": "一般",
     "description": "General settings tab label"
@@ -32,7 +31,6 @@
     "message": "主題",
     "description": "Themes settings tab label"
   },
-
   "options_general_title": {
     "message": "一般設定",
     "description": "General settings section title"
@@ -65,7 +63,6 @@
     "message": "快取大小",
     "description": "Cache size label"
   },
-
   "options_display_title": {
     "message": "顯示設定",
     "description": "Display settings section title"
@@ -90,7 +87,6 @@
     "message": "顯示風格化動畫",
     "description": "Show stylized animations setting label"
   },
-
   "options_language_title": {
     "message": "語言設定",
     "description": "Language settings section title"
@@ -111,7 +107,6 @@
     "message": "翻譯語言",
     "description": "Translation language setting label"
   },
-
   "options_sources_title": {
     "message": "歌詞來源優先順序",
     "description": "Sources settings section title"
@@ -120,7 +115,6 @@
     "message": "拖曳以重新排序優先順序。排在前面的來源會先嘗試。取消勾選可停用。",
     "description": "Sources settings section description"
   },
-
   "options_themes_title": {
     "message": "主題設定",
     "description": "Theme settings section title"
@@ -153,7 +147,6 @@
     "message": "已安裝主題",
     "description": "Installed themes button label"
   },
-
   "options_identity_title": {
     "message": "身分",
     "description": "Identity settings section title"
@@ -182,7 +175,6 @@
     "message": "匯入金鑰",
     "description": "Import key button label"
   },
-
   "options_modal_selectTheme": {
     "message": "選擇主題",
     "description": "Theme modal title"
@@ -195,7 +187,6 @@
     "message": "確認",
     "description": "Confirm button label"
   },
-
   "options_alert_cacheCleared": {
     "message": "快取已成功清除！",
     "description": "Cache cleared success message"
@@ -232,7 +223,6 @@
     "message": "載入身分時發生錯誤",
     "description": "Identity load error message"
   },
-
   "options_editor_saving": {
     "message": "儲存中...",
     "description": "Saving indicator text"
@@ -281,7 +271,6 @@
     "message": "按兩下以重新命名",
     "description": "Double-click to rename tooltip"
   },
-
   "options_provider_betterLyrics": {
     "message": "Better Lyrics",
     "description": "Better Lyrics provider name"
@@ -306,7 +295,6 @@
     "message": "YouTube 字幕",
     "description": "Youtube Captions provider name"
   },
-
   "options_syncType_syllable": {
     "message": "音節",
     "description": "Syllable sync type label"
@@ -339,7 +327,6 @@
     "message": "沒有時間資訊的歌詞。未同步歌詞提供最小體驗。",
     "description": "Unsynced sync type tooltip"
   },
-
   "options_detail_rateTheme": {
     "message": "評價此主題",
     "description": "Rate theme label"
@@ -364,7 +351,6 @@
     "message": "並匯入到",
     "description": "Shader import suffix text before Better Lyrics Shaders link"
   },
-
   "marketplace_pageTitle": {
     "message": "Better Lyrics 主題市集",
     "description": "Page title"
@@ -389,7 +375,6 @@
     "message": "鍵盤快速鍵",
     "description": "Keyboard shortcuts button label"
   },
-
   "marketplace_sortBy": {
     "message": "排序方式",
     "description": "Sort filter group label"
@@ -418,7 +403,6 @@
     "message": "最舊",
     "description": "Sort by oldest"
   },
-
   "marketplace_show": {
     "message": "顯示",
     "description": "Show filter group label"
@@ -435,7 +419,6 @@
     "message": "未安裝",
     "description": "Show not installed themes"
   },
-
   "marketplace_options": {
     "message": "選項",
     "description": "Options filter group label"
@@ -448,7 +431,6 @@
     "message": "僅相容的",
     "description": "Filter for compatible themes"
   },
-
   "marketplace_installFromUrl": {
     "message": "從 URL 安裝",
     "description": "Install from URL button"
@@ -457,7 +439,6 @@
     "message": "提交主題",
     "description": "Submit a theme link"
   },
-
   "marketplace_loading": {
     "message": "載入主題中...",
     "description": "Loading message"
@@ -470,7 +451,6 @@
     "message": "沒有符合您篩選條件的主題",
     "description": "Empty state message"
   },
-
   "marketplace_permissionTitle": {
     "message": "需要權限",
     "description": "Permission required title"
@@ -483,7 +463,6 @@
     "message": "授予權限",
     "description": "Grant permission button"
   },
-
   "marketplace_install": {
     "message": "安裝",
     "description": "Install button"
@@ -500,7 +479,6 @@
     "message": "已啟用",
     "description": "Active theme indicator"
   },
-
   "marketplace_shadersBadge": {
     "message": "著色器",
     "description": "Shaders badge text"
@@ -509,7 +487,6 @@
     "message": "GitHub",
     "description": "GitHub badge text"
   },
-
   "marketplace_urlModalTitle": {
     "message": "從 URL 安裝",
     "description": "URL install modal title"
@@ -530,7 +507,6 @@
     "message": "取消",
     "description": "Cancel button"
   },
-
   "marketplace_urlPermissionTitle": {
     "message": "需要額外權限",
     "description": "URL permission modal title"
@@ -559,7 +535,6 @@
     "message": "此權限僅在透過 URL 安裝主題時使用。市集主題不需要此權限。",
     "description": "URL permission note"
   },
-
   "marketplace_shortcutsTitle": {
     "message": "鍵盤快速鍵",
     "description": "Shortcuts modal title"
@@ -588,7 +563,6 @@
     "message": "下一頁",
     "description": "Next page shortcut label"
   },
-
   "marketplace_shortcutsSort": {
     "message": "排序",
     "description": "Sort shortcuts group"
@@ -609,7 +583,6 @@
     "message": "依日期",
     "description": "Sort by date shortcut"
   },
-
   "marketplace_shortcutsFilters": {
     "message": "篩選",
     "description": "Filters shortcuts group"
@@ -634,7 +607,6 @@
     "message": "切換相容性",
     "description": "Toggle compatible shortcut"
   },
-
   "marketplace_shortcutsDetails": {
     "message": "主題詳情",
     "description": "Theme details shortcuts group"
@@ -651,7 +623,6 @@
     "message": "下一張圖片",
     "description": "Next image shortcut"
   },
-
   "marketplace_shortcutsGeneral": {
     "message": "一般",
     "description": "General shortcuts group"
@@ -668,7 +639,6 @@
     "message": "套用主題（安裝後）",
     "description": "Apply theme shortcut"
   },
-
   "marketplace_ratingFailed": {
     "message": "提交評分失敗",
     "description": "Rating submission error"
@@ -685,7 +655,6 @@
     "message": "尚未安裝任何主題",
     "description": "Empty installed themes message"
   },
-
   "editor_pageTitle": {
     "message": "Better Lyrics CSS 編輯器",
     "description": "Standalone editor page title"
@@ -722,7 +691,6 @@
     "message": "文件",
     "description": "Docs link text"
   },
-
   "lyrics_source": {
     "message": "來源：",
     "description": "Lyrics source label"
@@ -735,7 +703,6 @@
     "message": "在 Genius 上搜尋",
     "description": "Search on Genius button text"
   },
-
   "lyrics_searching": {
     "message": "Better Lyrics 正在搜尋歌詞...",
     "description": "Loading message while searching for lyrics"
