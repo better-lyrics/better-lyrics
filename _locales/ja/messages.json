@@ -7,7 +7,6 @@
     "message": "YouTube Musicを美しい同期歌詞、多言語サポート、リアルタイム翻訳などで強化します",
     "description": "The description of the extension"
   },
-
   "options_tab_general": {
     "message": "一般",
     "description": "General settings tab label"
@@ -32,7 +31,6 @@
     "message": "テーマ",
     "description": "Themes settings tab label"
   },
-
   "options_general_title": {
     "message": "一般設定",
     "description": "General settings section title"
@@ -65,7 +63,6 @@
     "message": "キャッシュサイズ",
     "description": "Cache size label"
   },
-
   "options_display_title": {
     "message": "表示設定",
     "description": "Display settings section title"
@@ -90,7 +87,6 @@
     "message": "スタイリッシュなアニメーションを表示",
     "description": "Show stylized animations setting label"
   },
-
   "options_language_title": {
     "message": "言語設定",
     "description": "Language settings section title"
@@ -111,7 +107,6 @@
     "message": "翻訳言語",
     "description": "Translation language setting label"
   },
-
   "options_sources_title": {
     "message": "歌詞ソースの優先順位",
     "description": "Sources settings section title"
@@ -120,7 +115,6 @@
     "message": "ドラッグして優先順位を変更。上位のソースが先に試行されます。チェックを外すと無効化。",
     "description": "Sources settings section description"
   },
-
   "options_themes_title": {
     "message": "テーマ設定",
     "description": "Theme settings section title"
@@ -153,7 +147,6 @@
     "message": "インストール済みテーマ",
     "description": "Installed themes button label"
   },
-
   "options_identity_title": {
     "message": "ID",
     "description": "Identity settings section title"
@@ -182,7 +175,6 @@
     "message": "キーをインポート",
     "description": "Import key button label"
   },
-
   "options_modal_selectTheme": {
     "message": "テーマを選択",
     "description": "Theme modal title"
@@ -195,7 +187,6 @@
     "message": "確認",
     "description": "Confirm button label"
   },
-
   "options_alert_cacheCleared": {
     "message": "キャッシュをクリアしました！",
     "description": "Cache cleared success message"
@@ -232,7 +223,6 @@
     "message": "IDの読み込み中にエラーが発生しました",
     "description": "Identity load error message"
   },
-
   "options_editor_saving": {
     "message": "保存中...",
     "description": "Saving indicator text"
@@ -281,7 +271,6 @@
     "message": "ダブルクリックで名前を変更",
     "description": "Double-click to rename tooltip"
   },
-
   "options_provider_betterLyrics": {
     "message": "Better Lyrics",
     "description": "Better Lyrics provider name"
@@ -306,7 +295,6 @@
     "message": "YouTube字幕",
     "description": "Youtube Captions provider name"
   },
-
   "options_syncType_syllable": {
     "message": "音節",
     "description": "Syllable sync type label"
@@ -339,7 +327,6 @@
     "message": "タイミング情報のない歌詞。同期なしの歌詞は最小限の体験を提供します。",
     "description": "Unsynced sync type tooltip"
   },
-
   "options_detail_rateTheme": {
     "message": "このテーマを評価",
     "description": "Rate theme label"
@@ -364,7 +351,6 @@
     "message": "してインポート：",
     "description": "Shader import suffix text before Better Lyrics Shaders link"
   },
-
   "marketplace_pageTitle": {
     "message": "Better Lyricsテーママーケットプレイス",
     "description": "Page title"
@@ -389,7 +375,6 @@
     "message": "キーボードショートカット",
     "description": "Keyboard shortcuts button label"
   },
-
   "marketplace_sortBy": {
     "message": "並び替え",
     "description": "Sort filter group label"
@@ -418,7 +403,6 @@
     "message": "古い順",
     "description": "Sort by oldest"
   },
-
   "marketplace_show": {
     "message": "表示",
     "description": "Show filter group label"
@@ -435,7 +419,6 @@
     "message": "未インストール",
     "description": "Show not installed themes"
   },
-
   "marketplace_options": {
     "message": "オプション",
     "description": "Options filter group label"
@@ -448,7 +431,6 @@
     "message": "互換性のあるもののみ",
     "description": "Filter for compatible themes"
   },
-
   "marketplace_installFromUrl": {
     "message": "URLからインストール",
     "description": "Install from URL button"
@@ -457,7 +439,6 @@
     "message": "テーマを投稿",
     "description": "Submit a theme link"
   },
-
   "marketplace_loading": {
     "message": "テーマを読み込み中...",
     "description": "Loading message"
@@ -470,7 +451,6 @@
     "message": "フィルターに一致するテーマがありません",
     "description": "Empty state message"
   },
-
   "marketplace_permissionTitle": {
     "message": "権限が必要です",
     "description": "Permission required title"
@@ -483,7 +463,6 @@
     "message": "権限を許可",
     "description": "Grant permission button"
   },
-
   "marketplace_install": {
     "message": "インストール",
     "description": "Install button"
@@ -500,7 +479,6 @@
     "message": "有効",
     "description": "Active theme indicator"
   },
-
   "marketplace_shadersBadge": {
     "message": "シェーダー",
     "description": "Shaders badge text"
@@ -509,7 +487,6 @@
     "message": "GitHub",
     "description": "GitHub badge text"
   },
-
   "marketplace_urlModalTitle": {
     "message": "URLからインストール",
     "description": "URL install modal title"
@@ -530,7 +507,6 @@
     "message": "キャンセル",
     "description": "Cancel button"
   },
-
   "marketplace_urlPermissionTitle": {
     "message": "追加の権限が必要です",
     "description": "URL permission modal title"
@@ -559,7 +535,6 @@
     "message": "この権限はURL経由でテーマをインストールする場合にのみ使用されます。マーケットプレイスのテーマには必要ありません。",
     "description": "URL permission note"
   },
-
   "marketplace_shortcutsTitle": {
     "message": "キーボードショートカット",
     "description": "Shortcuts modal title"
@@ -588,7 +563,6 @@
     "message": "次のページ",
     "description": "Next page shortcut label"
   },
-
   "marketplace_shortcutsSort": {
     "message": "並び替え",
     "description": "Sort shortcuts group"
@@ -609,7 +583,6 @@
     "message": "日付順",
     "description": "Sort by date shortcut"
   },
-
   "marketplace_shortcutsFilters": {
     "message": "フィルター",
     "description": "Filters shortcuts group"
@@ -634,7 +607,6 @@
     "message": "互換性切り替え",
     "description": "Toggle compatible shortcut"
   },
-
   "marketplace_shortcutsDetails": {
     "message": "テーマの詳細",
     "description": "Theme details shortcuts group"
@@ -651,7 +623,6 @@
     "message": "次の画像",
     "description": "Next image shortcut"
   },
-
   "marketplace_shortcutsGeneral": {
     "message": "一般",
     "description": "General shortcuts group"
@@ -668,7 +639,6 @@
     "message": "テーマを適用（インストール後）",
     "description": "Apply theme shortcut"
   },
-
   "marketplace_ratingFailed": {
     "message": "評価の送信に失敗しました",
     "description": "Rating submission error"
@@ -685,7 +655,6 @@
     "message": "インストールされたテーマはありません",
     "description": "Empty installed themes message"
   },
-
   "editor_pageTitle": {
     "message": "Better Lyrics CSSエディター",
     "description": "Standalone editor page title"
@@ -722,7 +691,6 @@
     "message": "Docs",
     "description": "Docs link text"
   },
-
   "lyrics_source": {
     "message": "ソース：",
     "description": "Lyrics source label"
@@ -735,7 +703,6 @@
     "message": "Geniusで検索",
     "description": "Search on Genius button text"
   },
-
   "lyrics_searching": {
     "message": "Better Lyricsが歌詞を検索中...",
     "description": "Loading message while searching for lyrics"
