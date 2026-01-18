@@ -7,7 +7,6 @@
     "message": "아름다운 싱크 가사, 다국어 지원, 실시간 번역 등으로 YouTube Music을 향상시킵니다",
     "description": "The description of the extension"
   },
-
   "options_tab_general": {
     "message": "일반",
     "description": "General settings tab label"
@@ -32,7 +31,6 @@
     "message": "테마",
     "description": "Themes settings tab label"
   },
-
   "options_general_title": {
     "message": "일반 설정",
     "description": "General settings section title"
@@ -65,7 +63,6 @@
     "message": "캐시 크기",
     "description": "Cache size label"
   },
-
   "options_display_title": {
     "message": "디스플레이 설정",
     "description": "Display settings section title"
@@ -90,7 +87,6 @@
     "message": "스타일리시한 애니메이션 표시",
     "description": "Show stylized animations setting label"
   },
-
   "options_language_title": {
     "message": "언어 설정",
     "description": "Language settings section title"
@@ -111,7 +107,6 @@
     "message": "번역 언어",
     "description": "Translation language setting label"
   },
-
   "options_sources_title": {
     "message": "가사 소스 우선순위",
     "description": "Sources settings section title"
@@ -120,7 +115,6 @@
     "message": "드래그하여 우선순위 변경. 상위 소스가 먼저 시도됩니다. 체크 해제하면 비활성화.",
     "description": "Sources settings section description"
   },
-
   "options_themes_title": {
     "message": "테마 설정",
     "description": "Theme settings section title"
@@ -153,7 +147,6 @@
     "message": "설치된 테마",
     "description": "Installed themes button label"
   },
-
   "options_identity_title": {
     "message": "신원",
     "description": "Identity settings section title"
@@ -182,7 +175,6 @@
     "message": "키 가져오기",
     "description": "Import key button label"
   },
-
   "options_modal_selectTheme": {
     "message": "테마 선택",
     "description": "Theme modal title"
@@ -195,7 +187,6 @@
     "message": "확인",
     "description": "Confirm button label"
   },
-
   "options_alert_cacheCleared": {
     "message": "캐시가 성공적으로 지워졌습니다!",
     "description": "Cache cleared success message"
@@ -232,7 +223,6 @@
     "message": "신원 로딩 중 오류 발생",
     "description": "Identity load error message"
   },
-
   "options_editor_saving": {
     "message": "저장 중...",
     "description": "Saving indicator text"
@@ -281,7 +271,6 @@
     "message": "더블 클릭하여 이름 변경",
     "description": "Double-click to rename tooltip"
   },
-
   "options_provider_betterLyrics": {
     "message": "Better Lyrics",
     "description": "Better Lyrics provider name"
@@ -306,7 +295,6 @@
     "message": "YouTube 자막",
     "description": "Youtube Captions provider name"
   },
-
   "options_syncType_syllable": {
     "message": "음절",
     "description": "Syllable sync type label"
@@ -339,7 +327,6 @@
     "message": "타이밍 정보가 없는 가사입니다. 동기화되지 않은 가사는 최소한의 경험을 제공합니다.",
     "description": "Unsynced sync type tooltip"
   },
-
   "options_detail_rateTheme": {
     "message": "이 테마 평가",
     "description": "Rate theme label"
@@ -364,7 +351,6 @@
     "message": "후 가져오기:",
     "description": "Shader import suffix text before Better Lyrics Shaders link"
   },
-
   "marketplace_pageTitle": {
     "message": "Better Lyrics 테마 마켓플레이스",
     "description": "Page title"
@@ -389,7 +375,6 @@
     "message": "키보드 단축키",
     "description": "Keyboard shortcuts button label"
   },
-
   "marketplace_sortBy": {
     "message": "정렬",
     "description": "Sort filter group label"
@@ -418,7 +403,6 @@
     "message": "오래된순",
     "description": "Sort by oldest"
   },
-
   "marketplace_show": {
     "message": "표시",
     "description": "Show filter group label"
@@ -435,7 +419,6 @@
     "message": "미설치",
     "description": "Show not installed themes"
   },
-
   "marketplace_options": {
     "message": "옵션",
     "description": "Options filter group label"
@@ -448,7 +431,6 @@
     "message": "호환되는 것만",
     "description": "Filter for compatible themes"
   },
-
   "marketplace_installFromUrl": {
     "message": "URL에서 설치",
     "description": "Install from URL button"
@@ -457,7 +439,6 @@
     "message": "테마 제출",
     "description": "Submit a theme link"
   },
-
   "marketplace_loading": {
     "message": "테마 로딩 중...",
     "description": "Loading message"
@@ -470,7 +451,6 @@
     "message": "필터와 일치하는 테마가 없습니다",
     "description": "Empty state message"
   },
-
   "marketplace_permissionTitle": {
     "message": "권한 필요",
     "description": "Permission required title"
@@ -483,7 +463,6 @@
     "message": "권한 부여",
     "description": "Grant permission button"
   },
-
   "marketplace_install": {
     "message": "설치",
     "description": "Install button"
@@ -500,7 +479,6 @@
     "message": "활성",
     "description": "Active theme indicator"
   },
-
   "marketplace_shadersBadge": {
     "message": "셰이더",
     "description": "Shaders badge text"
@@ -509,7 +487,6 @@
     "message": "GitHub",
     "description": "GitHub badge text"
   },
-
   "marketplace_urlModalTitle": {
     "message": "URL에서 설치",
     "description": "URL install modal title"
@@ -530,7 +507,6 @@
     "message": "취소",
     "description": "Cancel button"
   },
-
   "marketplace_urlPermissionTitle": {
     "message": "추가 권한 필요",
     "description": "URL permission modal title"
@@ -559,7 +535,6 @@
     "message": "이 권한은 URL을 통해 테마를 설치할 때만 사용됩니다. 마켓플레이스 테마는 필요하지 않습니다.",
     "description": "URL permission note"
   },
-
   "marketplace_shortcutsTitle": {
     "message": "키보드 단축키",
     "description": "Shortcuts modal title"
@@ -588,7 +563,6 @@
     "message": "다음 페이지",
     "description": "Next page shortcut label"
   },
-
   "marketplace_shortcutsSort": {
     "message": "정렬",
     "description": "Sort shortcuts group"
@@ -609,7 +583,6 @@
     "message": "날짜순",
     "description": "Sort by date shortcut"
   },
-
   "marketplace_shortcutsFilters": {
     "message": "필터",
     "description": "Filters shortcuts group"
@@ -634,7 +607,6 @@
     "message": "호환성 전환",
     "description": "Toggle compatible shortcut"
   },
-
   "marketplace_shortcutsDetails": {
     "message": "테마 상세",
     "description": "Theme details shortcuts group"
@@ -651,7 +623,6 @@
     "message": "다음 이미지",
     "description": "Next image shortcut"
   },
-
   "marketplace_shortcutsGeneral": {
     "message": "일반",
     "description": "General shortcuts group"
@@ -668,7 +639,6 @@
     "message": "테마 적용 (설치 후)",
     "description": "Apply theme shortcut"
   },
-
   "marketplace_ratingFailed": {
     "message": "평가 제출 실패",
     "description": "Rating submission error"
@@ -685,7 +655,6 @@
     "message": "설치된 테마 없음",
     "description": "Empty installed themes message"
   },
-
   "editor_pageTitle": {
     "message": "Better Lyrics CSS 편집기",
     "description": "Standalone editor page title"
@@ -722,7 +691,6 @@
     "message": "Docs",
     "description": "Docs link text"
   },
-
   "lyrics_source": {
     "message": "소스: ",
     "description": "Lyrics source label"
@@ -735,7 +703,6 @@
     "message": "Genius에서 검색",
     "description": "Search on Genius button text"
   },
-
   "lyrics_searching": {
     "message": "Better Lyrics가 가사를 검색 중...",
     "description": "Loading message while searching for lyrics"
