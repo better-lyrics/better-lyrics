@@ -1,287 +1,276 @@
 {
   "extensionName": {
-    "message": "Better Lyrics (YouTube Music 가사)",
+    "message": "Better Lyrics (Lyrics for Youtube Music)",
     "description": "The name of the extension"
   },
   "extensionDescription": {
-    "message": "아름다운 싱크 가사, 다국어 지원, 실시간 번역 등으로 YouTube Music을 향상시킵니다",
+    "message": "Enhance YouTube Music with beautiful time-synced lyrics, multilingual support, real-time translations and more",
     "description": "The description of the extension"
   },
-
   "options_tab_general": {
-    "message": "일반",
+    "message": "General",
     "description": "General settings tab label"
   },
   "options_tab_display": {
-    "message": "디스플레이",
+    "message": "Display",
     "description": "Display settings tab label"
   },
   "options_tab_language": {
-    "message": "언어",
+    "message": "Language",
     "description": "Language settings tab label"
   },
   "options_tab_sources": {
-    "message": "소스",
+    "message": "Sources",
     "description": "Sources settings tab label"
   },
   "options_tab_identity": {
-    "message": "신원",
+    "message": "Identity",
     "description": "Identity settings tab label"
   },
   "options_tab_themes": {
-    "message": "테마",
+    "message": "Themes",
     "description": "Themes settings tab label"
   },
-
   "options_general_title": {
-    "message": "일반 설정",
+    "message": "General Settings",
     "description": "General settings section title"
   },
   "options_general_description": {
-    "message": "Better Lyrics의 전반적인 동작에 영향을 주는 설정입니다.",
+    "message": "Settings that affect the general behavior of Better Lyrics.",
     "description": "General settings section description"
   },
   "options_general_showLogs": {
-    "message": "로그 표시",
+    "message": "Show logs",
     "description": "Show logs setting label"
   },
   "options_general_autoSwitch": {
-    "message": "가사 탭으로 자동 전환",
+    "message": "Auto switch to lyrics tab",
     "description": "Auto switch to lyrics tab setting label"
   },
   "options_general_cache": {
-    "message": "캐시",
+    "message": "Cache",
     "description": "Cache section label"
   },
   "options_general_clearCache": {
-    "message": "캐시 지우기",
+    "message": "Clear Cache",
     "description": "Clear cache button label"
   },
   "options_general_totalLyrics": {
-    "message": "캐시된 가사 수",
+    "message": "Total lyrics in cache",
     "description": "Total lyrics in cache label"
   },
   "options_general_cacheSize": {
-    "message": "캐시 크기",
+    "message": "Cache size",
     "description": "Cache size label"
   },
-
   "options_display_title": {
-    "message": "디스플레이 설정",
+    "message": "Display Settings",
     "description": "Display settings section title"
   },
   "options_display_description": {
-    "message": "Better Lyrics의 외관을 조정합니다.",
+    "message": "Fine-tune the appearance of Better Lyrics.",
     "description": "Display settings section description"
   },
   "options_display_disableFullscreen": {
-    "message": "전체 화면 모드 비활성화",
+    "message": "Disable fullscreen mode",
     "description": "Disable fullscreen mode setting label"
   },
   "options_display_autoHideCursor": {
-    "message": "전체 화면에서 커서 자동 숨기기",
+    "message": "Auto-hide cursor in fullscreen mode",
     "description": "Auto-hide cursor setting label"
   },
   "options_display_albumArt": {
-    "message": "흐린 앨범 아트 배경 표시",
+    "message": "Show blurred album art background",
     "description": "Show album art background setting label"
   },
   "options_display_stylizedAnimations": {
-    "message": "스타일리시한 애니메이션 표시",
+    "message": "Show stylized animations",
     "description": "Show stylized animations setting label"
   },
-
   "options_language_title": {
-    "message": "언어 설정",
+    "message": "Language Settings",
     "description": "Language settings section title"
   },
   "options_language_description": {
-    "message": "Better Lyrics의 언어 및 번역 설정입니다.",
+    "message": "Language and translation settings for Better Lyrics.",
     "description": "Language settings section description"
   },
   "options_language_romanization": {
-    "message": "로마자 표기",
+    "message": "Romanization",
     "description": "Romanization setting label"
   },
   "options_language_translate": {
-    "message": "가사 번역",
+    "message": "Translate song lyrics",
     "description": "Translate song lyrics setting label"
   },
   "options_language_translationLanguage": {
-    "message": "번역 언어",
+    "message": "Translation language",
     "description": "Translation language setting label"
   },
-
   "options_sources_title": {
-    "message": "가사 소스 우선순위",
+    "message": "Lyric Source Preference",
     "description": "Sources settings section title"
   },
   "options_sources_description": {
-    "message": "드래그하여 우선순위 변경. 상위 소스가 먼저 시도됩니다. 체크 해제하면 비활성화.",
+    "message": "Drag to reorder priority. Higher sources are tried first. Uncheck to disable.",
     "description": "Sources settings section description"
   },
-
   "options_themes_title": {
-    "message": "테마 설정",
+    "message": "Theme Settings",
     "description": "Theme settings section title"
   },
   "options_themes_description": {
-    "message": "Better Lyrics의 외관을 사용자 정의합니다.",
+    "message": "Customize the appearance of Better Lyrics.",
     "description": "Theme settings section description"
   },
   "options_themes_theme": {
-    "message": "테마",
+    "message": "Theme",
     "description": "Theme label"
   },
   "options_themes_chooseTheme": {
-    "message": "테마 선택",
+    "message": "Choose a theme",
     "description": "Choose a theme button label"
   },
   "options_themes_customStyles": {
-    "message": "사용자 정의 스타일",
+    "message": "Custom Styles",
     "description": "Custom styles label"
   },
   "options_themes_create": {
-    "message": "만들기",
+    "message": "Create",
     "description": "Create button label"
   },
   "options_themes_marketplace": {
-    "message": "테마 마켓플레이스",
+    "message": "Theme Marketplace",
     "description": "Theme marketplace button label"
   },
   "options_themes_installedThemes": {
-    "message": "설치된 테마",
+    "message": "Installed Themes",
     "description": "Installed themes button label"
   },
-
   "options_identity_title": {
-    "message": "신원",
+    "message": "Identity",
     "description": "Identity settings section title"
   },
   "options_identity_description": {
-    "message": "Better Lyrics를 위한 고유한 익명 신원입니다.",
+    "message": "Your unique anonymous identity for Better Lyrics.",
     "description": "Identity settings section description"
   },
   "options_identity_yourIdentity": {
-    "message": "내 신원",
+    "message": "Your identity",
     "description": "Your identity label"
   },
   "options_identity_loading": {
-    "message": "로딩 중...",
+    "message": "Loading...",
     "description": "Loading identity placeholder"
   },
   "options_identity_exportImport": {
-    "message": "내보내기/가져오기",
+    "message": "Export/Import",
     "description": "Export/Import section label"
   },
   "options_identity_exportKey": {
-    "message": "키 내보내기",
+    "message": "Export Key",
     "description": "Export key button label"
   },
   "options_identity_importKey": {
-    "message": "키 가져오기",
+    "message": "Import Key",
     "description": "Import key button label"
   },
-
   "options_modal_selectTheme": {
-    "message": "테마 선택",
+    "message": "Select a Theme",
     "description": "Theme modal title"
   },
   "options_modal_cancel": {
-    "message": "취소",
+    "message": "Cancel",
     "description": "Cancel button label"
   },
   "options_modal_confirm": {
-    "message": "확인",
+    "message": "Confirm",
     "description": "Confirm button label"
   },
-
   "options_alert_cacheCleared": {
-    "message": "캐시가 성공적으로 지워졌습니다!",
+    "message": "Cache cleared successfully!",
     "description": "Cache cleared success message"
   },
   "options_alert_cacheClearFailed": {
-    "message": "캐시 지우기 실패!",
+    "message": "Failed to clear cache!",
     "description": "Cache clear failed message"
   },
   "options_alert_nothingToClear": {
-    "message": "지울 것이 없습니다!",
+    "message": "Nothing to clear!",
     "description": "Nothing to clear message"
   },
   "options_alert_exportFailed": {
-    "message": "신원 내보내기 실패",
+    "message": "Failed to export identity",
     "description": "Export identity failed message"
   },
   "options_alert_fileSaveDialogOpened": {
-    "message": "파일 저장 대화 상자가 열렸습니다.",
+    "message": "Identity file save dialog opened.",
     "description": "File save dialog opened message"
   },
   "options_alert_fileSaveFailed": {
-    "message": "파일 저장 중 오류가 발생했습니다. 다시 시도해 주세요.",
+    "message": "Error saving file. Please try again.",
     "description": "File save failed message"
   },
   "options_alert_downloadInitiated": {
-    "message": "신원 파일 다운로드가 시작되었습니다.",
+    "message": "Identity file download initiated.",
     "description": "Download initiated message"
   },
   "options_alert_importSuccess": {
-    "message": "신원을 성공적으로 가져왔습니다!",
+    "message": "Identity imported successfully!",
     "description": "Import success message"
   },
   "options_alert_identityLoadError": {
-    "message": "신원 로딩 중 오류 발생",
+    "message": "Error loading identity",
     "description": "Identity load error message"
   },
-
   "options_editor_saving": {
-    "message": "저장 중...",
+    "message": "Saving...",
     "description": "Saving indicator text"
   },
   "options_editor_importFile": {
-    "message": "파일에서 가져오기",
+    "message": "Import from file",
     "description": "Import from file tooltip"
   },
   "options_editor_exportFile": {
-    "message": "파일로 내보내기",
+    "message": "Export to file",
     "description": "Export to file tooltip"
   },
   "options_editor_saveAsTheme": {
-    "message": "테마로 저장",
+    "message": "Save as theme",
     "description": "Save as theme tooltip"
   },
   "options_editor_openInNewTab": {
-    "message": "새 탭에서 열기",
+    "message": "Open in new tab",
     "description": "Open in new tab tooltip"
   },
   "options_editor_backToSettings": {
-    "message": "설정으로 돌아가기",
+    "message": "Back to Settings",
     "description": "Back to settings button label"
   },
   "options_editor_fullExperienceNote": {
-    "message": "전체 편집기 경험을 위해, ",
+    "message": "For the full editor experience, ",
     "description": "Full editor experience note prefix"
   },
   "options_editor_openInNewTabLink": {
-    "message": "이 편집기를 새 탭에서 여세요",
+    "message": "open this editor in a new tab",
     "description": "Open in new tab link text"
   },
   "options_editor_stylingGuide": {
-    "message": "스타일링 가이드",
+    "message": "Styling Guide",
     "description": "Styling guide link text"
   },
   "options_editor_renameTheme": {
-    "message": "사용자 정의 테마 이름 변경",
+    "message": "Rename custom theme",
     "description": "Rename theme button title"
   },
   "options_editor_deleteTheme": {
-    "message": "사용자 정의 테마 삭제",
+    "message": "Delete custom theme",
     "description": "Delete theme button title"
   },
   "options_editor_doubleClickRename": {
-    "message": "더블 클릭하여 이름 변경",
+    "message": "Double-click to rename",
     "description": "Double-click to rename tooltip"
   },
-
   "options_provider_betterLyrics": {
     "message": "Better Lyrics",
     "description": "Better Lyrics provider name"
@@ -299,415 +288,395 @@
     "description": "LRClib provider name"
   },
   "options_provider_youtube": {
-    "message": "YouTube",
+    "message": "Youtube",
     "description": "Youtube provider name"
   },
   "options_provider_youtubeCaptions": {
-    "message": "YouTube 자막",
+    "message": "Youtube Captions",
     "description": "Youtube Captions provider name"
   },
-
   "options_syncType_syllable": {
-    "message": "음절",
+    "message": "Syllable",
     "description": "Syllable sync type label"
   },
   "options_syncType_syllable_tooltip": {
-    "message": "노래에 맞춰 개별 음절을 하이라이트합니다. 음절 싱크가 최고의 경험을 제공합니다.",
+    "message": "Highlights individual syllables as they're sung. Syllable syncing provides the best experience.",
     "description": "Syllable sync type tooltip"
   },
   "options_syncType_word": {
-    "message": "단어",
+    "message": "Word",
     "description": "Word sync type label"
   },
   "options_syncType_word_tooltip": {
-    "message": "노래에 맞춰 개별 단어를 하이라이트합니다. 단어 싱크가 좋은 경험을 제공합니다.",
+    "message": "Highlights individual words as they're sung. Word syncing provides a good experience.",
     "description": "Word sync type tooltip"
   },
   "options_syncType_line": {
-    "message": "줄",
+    "message": "Line",
     "description": "Line sync type label"
   },
   "options_syncType_line_tooltip": {
-    "message": "노래에 맞춰 전체 줄을 하이라이트합니다. 줄 싱크가 기본적인 경험을 제공합니다.",
+    "message": "Highlights entire lines as they're sung. Line syncing provides a basic experience.",
     "description": "Line sync type tooltip"
   },
   "options_syncType_unsynced": {
-    "message": "동기화 없음",
+    "message": "Unsynced",
     "description": "Unsynced sync type label"
   },
   "options_syncType_unsynced_tooltip": {
-    "message": "타이밍 정보가 없는 가사입니다. 동기화되지 않은 가사는 최소한의 경험을 제공합니다.",
+    "message": "Lyrics without timing information. Unsynced lyrics provide a minimal experience.",
     "description": "Unsynced sync type tooltip"
   },
-
   "options_detail_rateTheme": {
-    "message": "이 테마 평가",
+    "message": "Rate this theme",
     "description": "Rate theme label"
   },
   "options_detail_install": {
-    "message": "설치",
+    "message": "Install",
     "description": "Install button label"
   },
   "options_detail_viewOnGitHub": {
-    "message": "GitHub에서 보기",
+    "message": "View on GitHub",
     "description": "View on GitHub link text"
   },
   "options_detail_shaderInfo": {
-    "message": "이 테마에는 셰이더 구성이 포함되어 있습니다.",
+    "message": "This theme includes a shader config.",
     "description": "Shader info text prefix"
   },
   "options_detail_downloadShader": {
-    "message": "shader.json 다운로드",
+    "message": "Download shader.json",
     "description": "Download shader link text"
   },
   "options_detail_shaderImportSuffix": {
-    "message": "후 가져오기:",
+    "message": "and import it in",
     "description": "Shader import suffix text before Better Lyrics Shaders link"
   },
-
   "marketplace_pageTitle": {
-    "message": "Better Lyrics 테마 마켓플레이스",
+    "message": "Better Lyrics Theme Marketplace",
     "description": "Page title"
   },
   "marketplace_title": {
-    "message": "테마 마켓플레이스",
+    "message": "Theme Marketplace",
     "description": "Header title"
   },
   "marketplace_subtitle": {
-    "message": "커뮤니티 테마를 발견하고 설치하세요",
+    "message": "Discover and install community themes",
     "description": "Header subtitle"
   },
   "marketplace_searchPlaceholder": {
-    "message": "테마 검색...",
+    "message": "Search themes...",
     "description": "Search input placeholder"
   },
   "marketplace_refresh": {
-    "message": "새로고침",
+    "message": "Refresh",
     "description": "Refresh button label"
   },
   "marketplace_keyboardShortcuts": {
-    "message": "키보드 단축키",
+    "message": "Keyboard shortcuts",
     "description": "Keyboard shortcuts button label"
   },
-
   "marketplace_sortBy": {
-    "message": "정렬",
+    "message": "Sort by",
     "description": "Sort filter group label"
   },
   "marketplace_sortRatingDesc": {
-    "message": "높은 평점순",
+    "message": "Highest rated",
     "description": "Sort by highest rating"
   },
   "marketplace_sortRatingAsc": {
-    "message": "낮은 평점순",
+    "message": "Lowest rated",
     "description": "Sort by lowest rating"
   },
   "marketplace_sortDownloadsDesc": {
-    "message": "다운로드 많은순",
+    "message": "Most downloaded",
     "description": "Sort by most downloads"
   },
   "marketplace_sortDownloadsAsc": {
-    "message": "다운로드 적은순",
+    "message": "Least downloaded",
     "description": "Sort by least downloads"
   },
   "marketplace_sortNewest": {
-    "message": "최신순",
+    "message": "Newest",
     "description": "Sort by newest"
   },
   "marketplace_sortOldest": {
-    "message": "오래된순",
+    "message": "Oldest",
     "description": "Sort by oldest"
   },
-
   "marketplace_show": {
-    "message": "표시",
+    "message": "Show",
     "description": "Show filter group label"
   },
   "marketplace_showAll": {
-    "message": "전체",
+    "message": "All",
     "description": "Show all themes"
   },
   "marketplace_showInstalled": {
-    "message": "설치됨",
+    "message": "Installed",
     "description": "Show installed themes"
   },
   "marketplace_showNotInstalled": {
-    "message": "미설치",
+    "message": "Not installed",
     "description": "Show not installed themes"
   },
-
   "marketplace_options": {
-    "message": "옵션",
+    "message": "Options",
     "description": "Options filter group label"
   },
   "marketplace_hasShaders": {
-    "message": "셰이더 포함",
+    "message": "Has shaders",
     "description": "Filter for themes with shaders"
   },
   "marketplace_compatibleOnly": {
-    "message": "호환되는 것만",
+    "message": "Compatible only",
     "description": "Filter for compatible themes"
   },
-
   "marketplace_installFromUrl": {
-    "message": "URL에서 설치",
+    "message": "Install from URL",
     "description": "Install from URL button"
   },
   "marketplace_submitTheme": {
-    "message": "테마 제출",
+    "message": "Submit a theme",
     "description": "Submit a theme link"
   },
-
   "marketplace_loading": {
-    "message": "테마 로딩 중...",
+    "message": "Loading themes...",
     "description": "Loading message"
   },
   "marketplace_retry": {
-    "message": "재시도",
+    "message": "Retry",
     "description": "Retry button"
   },
   "marketplace_noThemesMatch": {
-    "message": "필터와 일치하는 테마가 없습니다",
+    "message": "No themes match your filters",
     "description": "Empty state message"
   },
-
   "marketplace_permissionTitle": {
-    "message": "권한 필요",
+    "message": "Permission Required",
     "description": "Permission required title"
   },
   "marketplace_permissionMessage": {
-    "message": "테마를 탐색하고 설치하려면 Better Lyrics가 테마가 호스팅된 GitHub와 마켓플레이스 API에 액세스할 권한이 필요합니다.",
+    "message": "To browse and install themes, Better Lyrics needs permission to access GitHub where themes are hosted & the marketplace api.",
     "description": "Permission required message"
   },
   "marketplace_grantPermission": {
-    "message": "권한 부여",
+    "message": "Grant Permission",
     "description": "Grant permission button"
   },
-
   "marketplace_install": {
-    "message": "설치",
+    "message": "Install",
     "description": "Install button"
   },
   "marketplace_remove": {
-    "message": "제거",
+    "message": "Remove",
     "description": "Remove button"
   },
   "marketplace_apply": {
-    "message": "적용",
+    "message": "Apply",
     "description": "Apply button"
   },
   "marketplace_active": {
-    "message": "활성",
+    "message": "Active",
     "description": "Active theme indicator"
   },
-
   "marketplace_shadersBadge": {
-    "message": "셰이더",
+    "message": "Shaders",
     "description": "Shaders badge text"
   },
   "marketplace_githubBadge": {
     "message": "GitHub",
     "description": "GitHub badge text"
   },
-
   "marketplace_urlModalTitle": {
-    "message": "URL에서 설치",
+    "message": "Install from URL",
     "description": "URL install modal title"
   },
   "marketplace_urlModalMessage": {
-    "message": "GitHub 저장소 URL을 입력하여 테마를 직접 설치하세요:",
+    "message": "Enter a GitHub repository URL to install a theme directly:",
     "description": "URL install modal message"
   },
   "marketplace_urlModalPlaceholder": {
-    "message": "github.com/user/repo 또는 github.com/user/repo/tree/branch",
+    "message": "github.com/user/repo or github.com/user/repo/tree/branch",
     "description": "URL input placeholder"
   },
   "marketplace_urlModalError": {
-    "message": "GitHub 저장소 URL을 입력하세요",
+    "message": "Please enter a GitHub repository URL",
     "description": "URL validation error"
   },
   "marketplace_cancel": {
-    "message": "취소",
+    "message": "Cancel",
     "description": "Cancel button"
   },
-
   "marketplace_urlPermissionTitle": {
-    "message": "추가 권한 필요",
+    "message": "Additional Permission Required",
     "description": "URL permission modal title"
   },
   "marketplace_urlPermissionWhy": {
-    "message": "왜 필요한가요?",
+    "message": "Why is this needed?",
     "description": "URL permission explanation title"
   },
   "marketplace_urlPermissionDesc": {
-    "message": "사용자 정의 GitHub URL에서 테마를 설치하려면 마켓플레이스보다 더 넓은 액세스가 필요합니다. 이를 통해 Better Lyrics는:",
+    "message": "Installing themes from custom GitHub URLs requires broader access than the marketplace. This allows Better Lyrics to:",
     "description": "URL permission description"
   },
   "marketplace_urlPermissionItem1": {
-    "message": "모든 GitHub 저장소에서 테마 파일 가져오기",
+    "message": "Fetch theme files from any GitHub repository",
     "description": "URL permission list item 1"
   },
   "marketplace_urlPermissionItem2": {
-    "message": "저장소의 기본 브랜치 감지",
+    "message": "Detect the default branch of the repository",
     "description": "URL permission list item 2"
   },
   "marketplace_urlPermissionItem3": {
-    "message": "설치 전 테마 구조 검증",
+    "message": "Validate the theme structure before installation",
     "description": "URL permission list item 3"
   },
   "marketplace_urlPermissionNote": {
-    "message": "이 권한은 URL을 통해 테마를 설치할 때만 사용됩니다. 마켓플레이스 테마는 필요하지 않습니다.",
+    "message": "This permission is only used when you install themes via URL. Marketplace themes don't require this.",
     "description": "URL permission note"
   },
-
   "marketplace_shortcutsTitle": {
-    "message": "키보드 단축키",
+    "message": "Keyboard Shortcuts",
     "description": "Shortcuts modal title"
   },
   "marketplace_shortcutsNavigation": {
-    "message": "탐색",
+    "message": "Navigation",
     "description": "Navigation shortcuts group"
   },
   "marketplace_shortcutsSearch": {
-    "message": "테마 검색",
+    "message": "Search themes",
     "description": "Search shortcut label"
   },
   "marketplace_shortcutsRefresh": {
-    "message": "마켓플레이스 새로고침",
+    "message": "Refresh marketplace",
     "description": "Refresh shortcut label"
   },
   "marketplace_shortcutsInstallUrl": {
-    "message": "URL에서 설치",
+    "message": "Install from URL",
     "description": "Install from URL shortcut label"
   },
   "marketplace_shortcutsPrevPage": {
-    "message": "이전 페이지",
+    "message": "Previous page",
     "description": "Previous page shortcut label"
   },
   "marketplace_shortcutsNextPage": {
-    "message": "다음 페이지",
+    "message": "Next page",
     "description": "Next page shortcut label"
   },
-
   "marketplace_shortcutsSort": {
-    "message": "정렬",
+    "message": "Sort",
     "description": "Sort shortcuts group"
   },
   "marketplace_shortcutsSortHint": {
-    "message": "다시 누르면 역순",
+    "message": "press again to toggle direction",
     "description": "Sort toggle hint"
   },
   "marketplace_shortcutsByRating": {
-    "message": "평점순",
+    "message": "By rating",
     "description": "Sort by rating shortcut"
   },
   "marketplace_shortcutsByDownloads": {
-    "message": "다운로드순",
+    "message": "By downloads",
     "description": "Sort by downloads shortcut"
   },
   "marketplace_shortcutsByDate": {
-    "message": "날짜순",
+    "message": "By date",
     "description": "Sort by date shortcut"
   },
-
   "marketplace_shortcutsFilters": {
-    "message": "필터",
+    "message": "Filters",
     "description": "Filters shortcuts group"
   },
   "marketplace_shortcutsShowAll": {
-    "message": "전체 표시",
+    "message": "Show all",
     "description": "Show all shortcut"
   },
   "marketplace_shortcutsShowInstalled": {
-    "message": "설치됨 표시",
+    "message": "Show installed",
     "description": "Show installed shortcut"
   },
   "marketplace_shortcutsShowNotInstalled": {
-    "message": "미설치 표시",
+    "message": "Show not installed",
     "description": "Show not installed shortcut"
   },
   "marketplace_shortcutsToggleShaders": {
-    "message": "셰이더 전환",
+    "message": "Toggle shaders",
     "description": "Toggle shaders shortcut"
   },
   "marketplace_shortcutsToggleCompatible": {
-    "message": "호환성 전환",
+    "message": "Toggle compatible",
     "description": "Toggle compatible shortcut"
   },
-
   "marketplace_shortcutsDetails": {
-    "message": "테마 상세",
+    "message": "Theme Details",
     "description": "Theme details shortcuts group"
   },
   "marketplace_shortcutsInstallRemove": {
-    "message": "설치 / 제거",
+    "message": "Install / Remove",
     "description": "Install/remove shortcut"
   },
   "marketplace_shortcutsPrevImage": {
-    "message": "이전 이미지",
+    "message": "Previous image",
     "description": "Previous image shortcut"
   },
   "marketplace_shortcutsNextImage": {
-    "message": "다음 이미지",
+    "message": "Next image",
     "description": "Next image shortcut"
   },
-
   "marketplace_shortcutsGeneral": {
-    "message": "일반",
+    "message": "General",
     "description": "General shortcuts group"
   },
   "marketplace_shortcutsCloseModal": {
-    "message": "모달 닫기",
+    "message": "Close modal",
     "description": "Close modal shortcut"
   },
   "marketplace_shortcutsShowShortcuts": {
-    "message": "단축키 표시",
+    "message": "Show shortcuts",
     "description": "Show shortcuts shortcut"
   },
   "marketplace_shortcutsApplyTheme": {
-    "message": "테마 적용 (설치 후)",
+    "message": "Apply theme (after install)",
     "description": "Apply theme shortcut"
   },
-
   "marketplace_ratingFailed": {
-    "message": "평가 제출 실패",
+    "message": "Failed to submit rating",
     "description": "Rating submission error"
   },
   "marketplace_shaderFetchFailed": {
-    "message": "셰이더 구성 가져오기 실패",
+    "message": "Failed to fetch shader config",
     "description": "Shader fetch error"
   },
   "marketplace_applyFailed": {
-    "message": "테마 적용 실패",
+    "message": "Failed to apply theme",
     "description": "Theme apply error"
   },
   "marketplace_noThemesInstalled": {
-    "message": "설치된 테마 없음",
+    "message": "No themes installed yet",
     "description": "Empty installed themes message"
   },
-
   "editor_pageTitle": {
-    "message": "Better Lyrics CSS 편집기",
+    "message": "Better Lyrics CSS Editor",
     "description": "Standalone editor page title"
   },
   "editor_importFromFile": {
-    "message": "파일에서 가져오기",
+    "message": "Import from file",
     "description": "Import from file button"
   },
   "editor_exportToFile": {
-    "message": "파일로 내보내기",
+    "message": "Export to file",
     "description": "Export to file button"
   },
   "editor_saveAsTheme": {
-    "message": "테마로 저장",
+    "message": "Save as theme",
     "description": "Save as theme button"
   },
   "editor_stylingGuide": {
-    "message": "스타일링 가이드",
+    "message": "Styling guide",
     "description": "Styling guide button"
   },
   "editor_tip": {
-    "message": "팁: 이 독립형 탭은 별도 창으로 이동하거나 YouTube Music과 분할 화면으로 사용하여 실시간으로 변경 사항을 확인할 수 있습니다. 자세한 정보는",
+    "message": "Tip: This is a standalone tab, you can move this editor to a separate window or use split-screen view alongside YouTube Music to see your changes in real-time. For more info, visit the",
     "description": "Editor tip text"
   },
   "editor_poweredBy": {
@@ -722,38 +691,36 @@
     "message": "Docs",
     "description": "Docs link text"
   },
-
   "lyrics_source": {
-    "message": "소스: ",
+    "message": "Source: ",
     "description": "Lyrics source label"
   },
   "lyrics_addToLrclib": {
-    "message": "LRCLib에 가사 추가",
+    "message": "Add Lyrics to LRCLib",
     "description": "Add lyrics button text"
   },
   "lyrics_searchOnGenius": {
-    "message": "Genius에서 검색",
+    "message": "Search on Genius",
     "description": "Search on Genius button text"
   },
-
   "lyrics_searching": {
-    "message": "Better Lyrics가 가사를 검색 중...",
+    "message": "Better Lyrics is searching for lyrics...",
     "description": "Loading message while searching for lyrics"
   },
   "lyrics_stillSearching": {
-    "message": "싱크 가사를 계속 검색 중...",
+    "message": "Still searching for synced lyrics...",
     "description": "Loading message while still searching"
   },
   "lyrics_noSyncedLyrics": {
-    "message": "Better Lyrics가 싱크 가사를 찾을 수 없습니다",
+    "message": "Better Lyrics could not find synced lyrics",
     "description": "Message when no synced lyrics found"
   },
   "lyrics_adPlaying": {
-    "message": "[엘리베이터 음악]",
+    "message": "[elevator music]",
     "description": "Message shown during ad playback"
   },
   "lyrics_notFound": {
-    "message": "이 노래의 가사를 찾을 수 없습니다",
+    "message": "No lyrics found for this song",
     "description": "Message when no lyrics are available"
   }
 }
