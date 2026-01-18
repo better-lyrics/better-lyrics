@@ -1,4 +1,10 @@
 preserve_hierarchy: false
+pull_request_title: "chore(i18n): sync translations"
+pull_request_labels:
+  - i18n
+  - crowdin
+commit_message: "chore(i18n): update %language% translations [ci skip]"
+append_commit_message: false
 files:
   - source: "/_locales/en/messages.json"
     translation: "/_locales/%two_letters_code%/messages.json"
