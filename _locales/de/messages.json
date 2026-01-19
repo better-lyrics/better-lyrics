@@ -456,7 +456,7 @@
     "description": "Permission required title"
   },
   "marketplace_permissionMessage": {
-    "message": "Um Designs zu durchsuchen und zu installieren, benötigt Better Lyrics Zugriff auf GitHub, wo die Themes gehostet werden, sowie die Marktplatz-api.",
+    "message": "Um Designs zu durchsuchen und zu installieren, benötigt Better Lyrics Zugriff auf GitHub, wo die Designs gehostet werden, sowie die Marktplatz-API.",
     "description": "Permission required message"
   },
   "marketplace_grantPermission": {
