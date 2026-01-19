@@ -128,7 +128,7 @@
     "description": "Theme label"
   },
   "options_themes_chooseTheme": {
-    "message": "Design auswählen",
+    "message": "Designs auswählen",
     "description": "Choose a theme button label"
   },
   "options_themes_customStyles": {
@@ -360,7 +360,7 @@
     "description": "Header title"
   },
   "marketplace_subtitle": {
-    "message": "Entdecke und installiere Community-Designs",
+    "message": "Entdecke und installiere Community-Design",
     "description": "Header subtitle"
   },
   "marketplace_searchPlaceholder": {
@@ -456,7 +456,7 @@
     "description": "Permission required title"
   },
   "marketplace_permissionMessage": {
-    "message": "Um Designs zu durchsuchen und zu installieren, benötigt Better Lyrics Zugriff auf GitHub, wo die Designs gehostet werden, sowie die Marktplatz-API.",
+    "message": "Um Designs zu durchsuchen und zu installieren, benötigt Better Lyrics Zugriff auf GitHub, wo die Themes gehostet werden, sowie die Marktplatz-api.",
     "description": "Permission required message"
   },
   "marketplace_grantPermission": {
