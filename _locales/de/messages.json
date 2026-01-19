@@ -128,7 +128,7 @@
     "description": "Theme label"
   },
   "options_themes_chooseTheme": {
-    "message": "Designs auswählen",
+    "message": "Design auswählen",
     "description": "Choose a theme button label"
   },
   "options_themes_customStyles": {
@@ -456,7 +456,7 @@
     "description": "Permission required title"
   },
   "marketplace_permissionMessage": {
-    "message": "Um Designs zu durchsuchen und zu installieren, benötigt Better Lyrics Zugriff auf GitHub, wo die Themes gehostet werden, sowie die Marktplatz-api.",
+    "message": "Um Designs zu durchsuchen und zu installieren, benötigt Better Lyrics Zugriff auf GitHub, wo die Designs gehostet werden, sowie die Marktplatz-api.",
     "description": "Permission required message"
   },
   "marketplace_grantPermission": {
@@ -636,7 +636,7 @@
     "description": "Show shortcuts shortcut"
   },
   "marketplace_shortcutsApplyTheme": {
-    "message": "Nach der Installation Design anwenden",
+    "message": "Design anwenden (nach der Installation)",
     "description": "Apply theme shortcut"
   },
   "marketplace_ratingFailed": {
