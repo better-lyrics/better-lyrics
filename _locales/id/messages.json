@@ -300,103 +300,103 @@
     "description": "Syllable sync type label"
   },
   "options_syncType_syllable_tooltip": {
-    "message": "Highlights individual syllables as they're sung. Syllable syncing provides the best experience.",
+    "message": "Menyoroti individual suku kata secara langsung. Sinkron sukukata memberikan pengalaman terbaik.",
     "description": "Syllable sync type tooltip"
   },
   "options_syncType_word": {
-    "message": "Word",
+    "message": "Kata",
     "description": "Word sync type label"
   },
   "options_syncType_word_tooltip": {
-    "message": "Highlights individual words as they're sung. Word syncing provides a good experience.",
+    "message": "Menyoroti individual kata secara langsung. Sinkron kata memberikan pengalaman baik.",
     "description": "Word sync type tooltip"
   },
   "options_syncType_line": {
-    "message": "Line",
+    "message": "Baris",
     "description": "Line sync type label"
   },
   "options_syncType_line_tooltip": {
-    "message": "Highlights entire lines as they're sung. Line syncing provides a basic experience.",
+    "message": "Menyoroti sebaris secara langsung. Sinkron baris memberikan pengalaman dasar.",
     "description": "Line sync type tooltip"
   },
   "options_syncType_unsynced": {
-    "message": "Unsynced",
+    "message": "Taksinkron",
     "description": "Unsynced sync type label"
   },
   "options_syncType_unsynced_tooltip": {
-    "message": "Lyrics without timing information. Unsynced lyrics provide a minimal experience.",
+    "message": "Lirik tanpa informasi waktu. Lirik tak disinkron memberikan pengalaman minimal.",
     "description": "Unsynced sync type tooltip"
   },
   "options_detail_rateTheme": {
-    "message": "Rate this theme",
+    "message": "Nilai tema ini",
     "description": "Rate theme label"
   },
   "options_detail_install": {
-    "message": "Install",
+    "message": "Pasang",
     "description": "Install button label"
   },
   "options_detail_viewOnGitHub": {
-    "message": "View on GitHub",
+    "message": "Buka di GitHub",
     "description": "View on GitHub link text"
   },
   "options_detail_shaderInfo": {
-    "message": "This theme includes a shader config.",
+    "message": "Tema ini memiliki konfigurasi shader.",
     "description": "Shader info text prefix"
   },
   "options_detail_downloadShader": {
-    "message": "Download shader.json",
+    "message": "Unduh shader.json",
     "description": "Download shader link text"
   },
   "options_detail_shaderImportSuffix": {
-    "message": "and import it in",
+    "message": "dan impor filenya",
     "description": "Shader import suffix text before Better Lyrics Shaders link"
   },
   "marketplace_pageTitle": {
-    "message": "Better Lyrics Theme Marketplace",
+    "message": "Better Lyrics Toko Tema",
     "description": "Page title"
   },
   "marketplace_title": {
-    "message": "Theme Marketplace",
+    "message": "Toko Tema",
     "description": "Header title"
   },
   "marketplace_subtitle": {
-    "message": "Discover and install community themes",
+    "message": "Temukan dan pasang tema komunitas",
     "description": "Header subtitle"
   },
   "marketplace_searchPlaceholder": {
-    "message": "Search themes...",
+    "message": "Cari tema...",
     "description": "Search input placeholder"
   },
   "marketplace_refresh": {
-    "message": "Refresh",
+    "message": "Segarkan",
     "description": "Refresh button label"
   },
   "marketplace_keyboardShortcuts": {
-    "message": "Keyboard shortcuts",
+    "message": "Pintasan keyboard",
     "description": "Keyboard shortcuts button label"
   },
   "marketplace_sortBy": {
-    "message": "Sort by",
+    "message": "Urutkan dari",
     "description": "Sort filter group label"
   },
   "marketplace_sortRatingDesc": {
-    "message": "Highest rated",
+    "message": "Rating tertinggi",
     "description": "Sort by highest rating"
   },
   "marketplace_sortRatingAsc": {
-    "message": "Lowest rated",
+    "message": "Rating terendah",
     "description": "Sort by lowest rating"
   },
   "marketplace_sortDownloadsDesc": {
-    "message": "Most downloaded",
+    "message": "Paling banyak diunduh",
     "description": "Sort by most downloads"
   },
   "marketplace_sortDownloadsAsc": {
-    "message": "Least downloaded",
+    "message": "Paling sedikit diunduh",
     "description": "Sort by least downloads"
   },
   "marketplace_sortNewest": {
-    "message": "Newest",
+    "message": "Terbaru",
     "description": "Sort by newest"
   },
   "marketplace_sortOldest": {
@@ -600,87 +600,87 @@
     "description": "Show not installed shortcut"
   },
   "marketplace_shortcutsToggleShaders": {
-    "message": "Toggle shaders",
+    "message": "Alihkan shader",
     "description": "Toggle shaders shortcut"
   },
   "marketplace_shortcutsToggleCompatible": {
-    "message": "Toggle compatible",
+    "message": "Alihkan kompatibel",
     "description": "Toggle compatible shortcut"
   },
   "marketplace_shortcutsDetails": {
-    "message": "Theme Details",
+    "message": "Detail Tema",
     "description": "Theme details shortcuts group"
   },
   "marketplace_shortcutsInstallRemove": {
-    "message": "Install / Remove",
+    "message": "Pasang / Hapus",
     "description": "Install/remove shortcut"
   },
   "marketplace_shortcutsPrevImage": {
-    "message": "Previous image",
+    "message": "Gambar sebelumnya",
     "description": "Previous image shortcut"
   },
   "marketplace_shortcutsNextImage": {
-    "message": "Next image",
+    "message": "Gambar berikutnya",
     "description": "Next image shortcut"
   },
   "marketplace_shortcutsGeneral": {
-    "message": "General",
+    "message": "Umum",
     "description": "General shortcuts group"
   },
   "marketplace_shortcutsCloseModal": {
-    "message": "Close modal",
+    "message": "Tutup modal",
     "description": "Close modal shortcut"
   },
   "marketplace_shortcutsShowShortcuts": {
-    "message": "Show shortcuts",
+    "message": "Tampilkan pintasan",
     "description": "Show shortcuts shortcut"
   },
   "marketplace_shortcutsApplyTheme": {
-    "message": "Apply theme (after install)",
+    "message": "Terapkan tema (setelah pemasangan)",
     "description": "Apply theme shortcut"
   },
   "marketplace_ratingFailed": {
-    "message": "Failed to submit rating",
+    "message": "Gagal mengirim rating",
     "description": "Rating submission error"
   },
   "marketplace_shaderFetchFailed": {
-    "message": "Failed to fetch shader config",
+    "message": "Gagal mengambil konfigurasi shader",
     "description": "Shader fetch error"
   },
   "marketplace_applyFailed": {
-    "message": "Failed to apply theme",
+    "message": "Gagal menerapkan tema",
     "description": "Theme apply error"
   },
   "marketplace_noThemesInstalled": {
-    "message": "No themes installed yet",
+    "message": "Tidak ada tema yang dipasang",
     "description": "Empty installed themes message"
   },
   "editor_pageTitle": {
-    "message": "Better Lyrics CSS Editor",
+    "message": "Better Lyrics Editor CSS",
     "description": "Standalone editor page title"
   },
   "editor_importFromFile": {
-    "message": "Import from file",
+    "message": "Impor dari file",
     "description": "Import from file button"
   },
   "editor_exportToFile": {
-    "message": "Export to file",
+    "message": "Ekspor ke file",
     "description": "Export to file button"
   },
   "editor_saveAsTheme": {
-    "message": "Save as theme",
+    "message": "Simpan sebagai tema",
     "description": "Save as theme button"
   },
   "editor_stylingGuide": {
-    "message": "Styling guide",
+    "message": "Panduan penataan gaya",
     "description": "Styling guide button"
   },
   "editor_tip": {
-    "message": "Tip: This is a standalone tab, you can move this editor to a separate window or use split-screen view alongside YouTube Music to see your changes in real-time. For more info, visit the",
+    "message": "Tip: Ini adalah tab tersendiri, kamu bisa memindahkan editor ini ke jendela terpisah atau menggunakan layar terpisah di samping YouTube Music untuk melihat perubahanmu secara langsung. Untuk info lebih lanjut, kunjungi",
     "description": "Editor tip text"
   },
   "editor_poweredBy": {
-    "message": "Powered by",
+    "message": "Diberdayakan oleh",
     "description": "Powered by label"
   },
   "editor_playground": {
@@ -688,39 +688,39 @@
     "description": "Playground link text"
   },
   "editor_docs": {
-    "message": "Docs",
+    "message": "Dokumen",
     "description": "Docs link text"
   },
   "lyrics_source": {
-    "message": "Source: ",
+    "message": "Sumber: ",
     "description": "Lyrics source label"
   },
   "lyrics_addToLrclib": {
-    "message": "Add Lyrics to LRCLib",
+    "message": "Tambahkan Lirik ke LRCLIB",
     "description": "Add lyrics button text"
   },
   "lyrics_searchOnGenius": {
-    "message": "Search on Genius",
+    "message": "Cari di Genius",
     "description": "Search on Genius button text"
   },
   "lyrics_searching": {
-    "message": "Better Lyrics is searching for lyrics...",
+    "message": "Better Lyrics sedang mencari lirik...",
     "description": "Loading message while searching for lyrics"
   },
   "lyrics_stillSearching": {
-    "message": "Still searching for synced lyrics...",
+    "message": "Masih mencari lirik tersinkron...",
     "description": "Loading message while still searching"
   },
   "lyrics_noSyncedLyrics": {
-    "message": "Better Lyrics could not find synced lyrics",
+    "message": "Better Lyrics tidak bisa mencari lirik tersinkron",
     "description": "Message when no synced lyrics found"
   },
   "lyrics_adPlaying": {
-    "message": "[elevator music]",
+    "message": "[tutututu tutututu]",
     "description": "Message shown during ad playback"
   },
   "lyrics_notFound": {
-    "message": "No lyrics found for this song",
+    "message": "Tidak ketemu lirik untuk lagu ini",
     "description": "Message when no lyrics are available"
   }
 }
