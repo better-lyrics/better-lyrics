@@ -3,7 +3,7 @@ pull_request_title: "chore(i18n): sync translations"
 pull_request_labels:
   - i18n
   - crowdin
-commit_message: "chore(i18n): update %language% translations [ci skip]"
+commit_message: "chore(i18n): update %language% translations [skip ci]"
 append_commit_message: false
 files:
   - source: "/_locales/en/messages.json"
