@@ -56,6 +56,14 @@ function isRomanizationDisabledForLang(lang: string): boolean {
   return false;
 }
 
+function isTranslationDisabledForLang(lang: string): boolean {
+  const disabled = AppState.translationDisabledLanguages;
+  if (disabled.includes(lang)) return true;
+  const baseLang = lang.split("-")[0];
+  if (baseLang !== lang && disabled.includes(baseLang)) return true;
+  return false;
+}
+
 function findNearestAgent(lyrics: Lyric[], fromIndex: number): string | undefined {
   for (let i = fromIndex - 1; i >= 0; i--) {
     if (!lyrics[i].isInstrumental && lyrics[i].agent) {
@@ -542,13 +550,16 @@ export function injectLyrics(data: LyricSourceResultWithMeta, keepLoaderVisible 
       translationResult = getTranslationFromCache(item.words, targetTranslationLang);
     }
 
-    if (translationResult && AppState.isTranslateEnabled) {
+    const isSourceLangDisabled = data.language && isTranslationDisabledForLang(data.language);
+    if (translationResult && AppState.isTranslateEnabled && !isSourceLangDisabled) {
       if (!isSameText(translationResult.translatedText, item.words)) {
         createTranslationElem().textContent = "\n" + translationResult.translatedText;
       }
-    } else {
+    } else if (!isSourceLangDisabled) {
       langPromise.then(source_language => {
         onTranslationEnabled(async items => {
+          if (isTranslationDisabledForLang(source_language)) return;
+
           let target_language = items.translationLanguage || "en";
 
           if (source_language !== target_language || containsNonLatin(item.words)) {

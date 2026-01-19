@@ -222,12 +222,14 @@ export function loadTranslationSettings(): void {
       isRomanizationEnabled: false,
       translationLanguage: "en",
       romanizationDisabledLanguages: [],
+      translationDisabledLanguages: [],
     },
     items => {
       AppState.isTranslateEnabled = items.isTranslateEnabled;
       AppState.isRomanizationEnabled = items.isRomanizationEnabled;
       AppState.translationLanguage = items.translationLanguage || "en";
       AppState.romanizationDisabledLanguages = items.romanizationDisabledLanguages || [];
+      AppState.translationDisabledLanguages = items.translationDisabledLanguages || [];
     }
   );
 }

@@ -310,12 +310,12 @@
 						</div>
 					</div>
 					<div class="container" id="romanization-config-container" style="display: none;">
-						<span>Language exclusions</span>
+						<span>__MSG_options_language_exclusions__</span>
 						<button class="small-btn" id="romanization-config-btn">
 							<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
 								<path fill-rule="evenodd" d="M11.828 2.25c-.916 0-1.699.663-1.85 1.567l-.091.549a.798.798 0 0 1-.517.608 7.45 7.45 0 0 0-.478.198.798.798 0 0 1-.796-.064l-.453-.324a1.875 1.875 0 0 0-2.416.2l-.243.243a1.875 1.875 0 0 0-.2 2.416l.324.453a.798.798 0 0 1 .064.796 7.448 7.448 0 0 0-.198.478.798.798 0 0 1-.608.517l-.55.092a1.875 1.875 0 0 0-1.566 1.849v.344c0 .916.663 1.699 1.567 1.85l.549.091c.281.047.508.25.608.517.06.162.127.321.198.478a.798.798 0 0 1-.064.796l-.324.453a1.875 1.875 0 0 0 .2 2.416l.243.243c.648.648 1.67.733 2.416.2l.453-.324a.798.798 0 0 1 .796-.064c.157.071.316.137.478.198.267.1.47.327.517.608l.092.55c.15.903.932 1.566 1.849 1.566h.344c.916 0 1.699-.663 1.85-1.567l.091-.549a.798.798 0 0 1 .517-.608 7.52 7.52 0 0 0 .478-.198.798.798 0 0 1 .796.064l.453.324a1.875 1.875 0 0 0 2.416-.2l.243-.243c.648-.648.733-1.67.2-2.416l-.324-.453a.798.798 0 0 1-.064-.796c.071-.157.137-.316.198-.478.1-.267.327-.47.608-.517l.55-.091a1.875 1.875 0 0 0 1.566-1.85v-.344c0-.916-.663-1.699-1.567-1.85l-.549-.091a.798.798 0 0 1-.608-.517 7.507 7.507 0 0 0-.198-.478.798.798 0 0 1 .064-.796l.324-.453a1.875 1.875 0 0 0-.2-2.416l-.243-.243a1.875 1.875 0 0 0-2.416-.2l-.453.324a.798.798 0 0 1-.796.064 7.462 7.462 0 0 0-.478-.198.798.798 0 0 1-.517-.608l-.091-.55a1.875 1.875 0 0 0-1.85-1.566h-.344ZM12 15.75a3.75 3.75 0 1 0 0-7.5 3.75 3.75 0 0 0 0 7.5Z" clip-rule="evenodd" />
 							</svg>
-							<span>Manage</span>
+							<span>__MSG_options_manage__</span>
 						</button>
 					</div>
 				</div>
@@ -446,28 +446,49 @@
 			</div>
 		</div>
 
-		<div id="romanization-modal-overlay" class="modal-overlay">
-			<div class="modal romanization-modal">
+		<div id="lang-exclusions-modal-overlay" class="modal-overlay">
+			<div class="modal lang-exclusions-modal">
 				<div class="modal-header">
-					<h3 class="modal-title">Romanization Exclusions</h3>
-					<button id="romanization-modal-close" class="modal-close-btn" aria-label="Close">
+					<h3 class="modal-title">__MSG_options_language_exclusionsTitle__</h3>
+					<button id="lang-exclusions-modal-close" class="modal-close-btn" aria-label="Close">
 						<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
 							<path d="M6.28 5.22a.75.75 0 0 0-1.06 1.06L8.94 10l-3.72 3.72a.75.75 0 1 0 1.06 1.06L10 11.06l3.72 3.72a.75.75 0 1 0 1.06-1.06L11.06 10l3.72-3.72a.75.75 0 0 0-1.06-1.06L10 8.94 6.28 5.22Z"></path>
 						</svg>
 					</button>
 				</div>
-				<div class="romanization-modal-body">
-					<div class="romanization-search-container">
-						<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="romanization-search-icon">
+
+				<!-- Tabs -->
+				<div class="modal-tab-container">
+					<button class="modal-tab active" data-tab="romanization">__MSG_options_romanization_tab__</button>
+					<button class="modal-tab" data-tab="translation">__MSG_options_translation_tab__</button>
+				</div>
+
+				<!-- Romanization Tab Content -->
+				<div class="lang-exclusions-tab-content active" id="romanization-tab-content">
+					<div class="lang-search-container">
+						<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="lang-search-icon">
 							<path fill-rule="evenodd" d="M9 3.5a5.5 5.5 0 100 11 5.5 5.5 0 000-11zM2 9a7 7 0 1112.452 4.391l3.328 3.329a.75.75 0 11-1.06 1.06l-3.329-3.328A7 7 0 012 9z" clip-rule="evenodd" />
 						</svg>
-						<input type="text" id="romanization-search" placeholder="Search languages..." class="romanization-search-input">
+						<input type="text" id="romanization-search" placeholder="__MSG_options_searchLanguages__" class="lang-search-input">
 					</div>
-					<p class="romanization-hint">Click to toggle. Excluded languages will not be romanized.</p>
-					<div id="romanization-pills-container" class="romanization-pills"></div>
+					<p class="lang-hint">__MSG_options_romanization_hint__</p>
+					<div id="romanization-pills-container" class="lang-pills"></div>
 				</div>
+
+				<!-- Translation Tab Content -->
+				<div class="lang-exclusions-tab-content" id="translation-tab-content">
+					<div class="lang-search-container">
+						<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="lang-search-icon">
+							<path fill-rule="evenodd" d="M9 3.5a5.5 5.5 0 100 11 5.5 5.5 0 000-11zM2 9a7 7 0 1112.452 4.391l3.328 3.329a.75.75 0 11-1.06 1.06l-3.329-3.328A7 7 0 012 9z" clip-rule="evenodd" />
+						</svg>
+						<input type="text" id="translation-search" placeholder="__MSG_options_searchLanguages__" class="lang-search-input">
+					</div>
+					<p class="lang-hint">__MSG_options_translation_hint__</p>
+					<div id="translation-pills-container" class="lang-pills"></div>
+				</div>
+
 				<div class="modal-footer">
-					<button id="romanization-reset-btn" class="modal-btn modal-btn-secondary">Reset to default</button>
+					<button id="lang-exclusions-reset-btn" class="modal-btn modal-btn-secondary">__MSG_options_resetToDefault__</button>
 				</div>
 			</div>
 		</div>

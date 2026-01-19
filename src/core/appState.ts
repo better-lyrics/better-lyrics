@@ -37,6 +37,7 @@ export interface AppStateType {
   isTranslateEnabled: boolean;
   isRomanizationEnabled: boolean;
   romanizationDisabledLanguages: string[];
+  translationDisabledLanguages: string[];
   translationLanguage: string;
   hasPreloadedNextSong: boolean;
 }
@@ -60,6 +61,7 @@ export const AppState: AppStateType = {
   isTranslateEnabled: false,
   isRomanizationEnabled: false,
   romanizationDisabledLanguages: [],
+  translationDisabledLanguages: [],
   translationLanguage: "en",
   hasPreloadedNextSong: false,
 };

@@ -3,6 +3,15 @@ export function t(key: string, substitutions?: string | string[]): string {
   return message || key;
 }
 
+export function getLanguageDisplayName(langCode: string): string {
+  try {
+    const displayNames = new Intl.DisplayNames([navigator.language], { type: "language" });
+    return displayNames.of(langCode) ?? langCode;
+  } catch {
+    return langCode;
+  }
+}
+
 export function injectI18nCssVars(): void {
   const vars: Record<string, string> = {
     "--blyrics-text-searching": t("lyrics_searching"),

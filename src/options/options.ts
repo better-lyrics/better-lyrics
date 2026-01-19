@@ -1,7 +1,7 @@
 // Function to save user options
 import Sortable from "sortablejs";
 import { LOG_PREFIX, ROMANIZATION_LANGUAGES } from "@constants";
-import { t, initI18n } from "@core/i18n";
+import { t, initI18n, getLanguageDisplayName } from "@core/i18n";
 import { initStoreUI, setupYourThemesButton } from "./store/store";
 import { getIdentity, exportIdentity, importIdentity, type KeyIdentity } from "./store/keyIdentity";
 import { showModal } from "./editor/ui/feedback";
@@ -18,6 +18,7 @@ interface Options {
   isRomanizationEnabled: boolean;
   preferredProviderList: string[];
   romanizationDisabledLanguages: string[];
+  translationDisabledLanguages: string[];
 }
 
 const saveOptions = (): void => {
@@ -65,6 +66,7 @@ const getOptionsFromForm = (): Options => {
     isRomanizationEnabled: (document.getElementById("isRomanizationEnabled") as HTMLInputElement).checked,
     preferredProviderList: preferredProviderList,
     romanizationDisabledLanguages: romanizationDisabledLanguages,
+    translationDisabledLanguages: translationDisabledLanguages,
   };
 };
 
@@ -204,6 +206,7 @@ const restoreOptions = (): void => {
       "lrclib-plain",
     ],
     romanizationDisabledLanguages: [],
+    translationDisabledLanguages: [],
   };
 
   chrome.storage.sync.get(defaultOptions, setOptionsInForm);
@@ -224,8 +227,10 @@ const setOptionsInForm = (items: Options): void => {
   (document.getElementById("translationLanguage") as HTMLInputElement).value = items.translationLanguage;
   (document.getElementById("isRomanizationEnabled") as HTMLInputElement).checked = items.isRomanizationEnabled;
   romanizationDisabledLanguages = items.romanizationDisabledLanguages || [];
-  updateRomanizationConfigVisibility();
-  renderLanguagePills();
+  translationDisabledLanguages = items.translationDisabledLanguages || [];
+  updateExclusionsConfigVisibility();
+  renderRomanizationLanguagePills();
+  renderTranslationLanguagePills();
 
   const providersListElem = document.getElementById("providers-list")!;
   providersListElem.innerHTML = "";
@@ -402,7 +407,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   initStoreUI();
   setupYourThemesButton();
-  initRomanizationModal();
+  initLangExclusionsModal();
 
   document.getElementById("browse-themes-btn")?.addEventListener("click", () => {
     chrome.tabs.create({ url: chrome.runtime.getURL("pages/marketplace.html") });
@@ -523,86 +528,154 @@ function updateIdentityDisplay(identity: KeyIdentity): void {
   }
 }
 
-// -- Romanization Modal --------------------------
+// -- Language Exclusions Modal --------------------------
 
 let romanizationDisabledLanguages: string[] = [];
+let translationDisabledLanguages: string[] = [];
+let activeExclusionTab: "romanization" | "translation" = "romanization";
 
-function updateRomanizationConfigVisibility(): void {
+function updateExclusionsConfigVisibility(): void {
   const romanizationToggle = document.getElementById("isRomanizationEnabled") as HTMLInputElement;
+  const translateToggle = document.getElementById("translate") as HTMLInputElement;
   const configContainer = document.getElementById("romanization-config-container");
-  if (!romanizationToggle || !configContainer) return;
+  if (!configContainer) return;
 
-  configContainer.style.display = romanizationToggle.checked ? "flex" : "none";
+  const shouldShow = romanizationToggle?.checked || translateToggle?.checked;
+  configContainer.style.display = shouldShow ? "flex" : "none";
 }
 
-function initRomanizationModal(): void {
+function initLangExclusionsModal(): void {
   const romanizationToggle = document.getElementById("isRomanizationEnabled") as HTMLInputElement;
+  const translateToggle = document.getElementById("translate") as HTMLInputElement;
   const configBtn = document.getElementById("romanization-config-btn");
-  const modalOverlay = document.getElementById("romanization-modal-overlay");
-  const modalClose = document.getElementById("romanization-modal-close");
-  const searchInput = document.getElementById("romanization-search") as HTMLInputElement;
-  const resetBtn = document.getElementById("romanization-reset-btn");
+  const modalOverlay = document.getElementById("lang-exclusions-modal-overlay");
+  const modalClose = document.getElementById("lang-exclusions-modal-close");
+  const romanizationSearchInput = document.getElementById("romanization-search") as HTMLInputElement;
+  const translationSearchInput = document.getElementById("translation-search") as HTMLInputElement;
+  const resetBtn = document.getElementById("lang-exclusions-reset-btn");
+  const tabButtons = modalOverlay?.querySelectorAll(".modal-tab");
 
-  if (!romanizationToggle || !configBtn || !modalOverlay) return;
+  if (!configBtn || !modalOverlay) return;
 
-  romanizationToggle.addEventListener("change", updateRomanizationConfigVisibility);
+  romanizationToggle?.addEventListener("change", updateExclusionsConfigVisibility);
+  translateToggle?.addEventListener("change", updateExclusionsConfigVisibility);
 
   configBtn.addEventListener("click", () => {
-    modalOverlay!.classList.add("active");
-    searchInput?.focus();
+    modalOverlay.classList.add("active");
+    const tabName = t(activeExclusionTab === "romanization" ? "options_romanization_tab" : "options_translation_tab");
+    if (resetBtn) resetBtn.textContent = t("options_resetToDefault", tabName);
+    if (activeExclusionTab === "romanization") {
+      romanizationSearchInput?.focus();
+    } else {
+      translationSearchInput?.focus();
+    }
   });
 
-  modalClose?.addEventListener("click", closeRomanizationModal);
+  modalClose?.addEventListener("click", closeLangExclusionsModal);
 
   modalOverlay.addEventListener("click", e => {
     if (e.target === modalOverlay) {
-      closeRomanizationModal();
+      closeLangExclusionsModal();
     }
   });
 
   document.addEventListener("keydown", e => {
     if (e.key === "Escape" && modalOverlay.classList.contains("active")) {
-      closeRomanizationModal();
+      closeLangExclusionsModal();
     }
   });
 
-  searchInput?.addEventListener("input", () => {
-    filterLanguagePills(searchInput.value);
+  // Tab switching
+  tabButtons?.forEach(btn => {
+    btn.addEventListener("click", () => {
+      const tab = (btn as HTMLElement).dataset.tab as "romanization" | "translation";
+      switchExclusionTab(tab);
+    });
+  });
+
+  romanizationSearchInput?.addEventListener("input", () => {
+    filterLanguagePills("romanization-pills-container", romanizationSearchInput.value);
+  });
+
+  translationSearchInput?.addEventListener("input", () => {
+    filterLanguagePills("translation-pills-container", translationSearchInput.value);
   });
 
   resetBtn?.addEventListener("click", async () => {
+    const tabName = activeExclusionTab === "romanization" ? t("options_romanization_tab") : t("options_translation_tab");
     const result = await showModal({
-      title: "Reset Romanization Exclusions",
-      message: "This will clear all excluded languages. Continue?",
-      confirmText: "Reset",
-      cancelText: "Cancel",
+      title: t("options_romanization_resetTitle", tabName),
+      message: t("options_romanization_resetMessage"),
+      confirmText: t("options_reset"),
+      cancelText: t("options_cancel"),
     });
     if (result === null) return;
-    romanizationDisabledLanguages = [];
+
+    if (activeExclusionTab === "romanization") {
+      romanizationDisabledLanguages = [];
+      renderRomanizationLanguagePills();
+    } else {
+      translationDisabledLanguages = [];
+      renderTranslationLanguagePills();
+    }
     saveOptions();
-    renderLanguagePills();
-    closeRomanizationModal();
-    showAlert("Romanization exclusions reset to default");
+    closeLangExclusionsModal();
+    showAlert(t("options_romanization_resetSuccess", tabName));
   });
 }
 
-function closeRomanizationModal(): void {
-  const modalOverlay = document.getElementById("romanization-modal-overlay");
-  const searchInput = document.getElementById("romanization-search") as HTMLInputElement;
+function switchExclusionTab(tab: "romanization" | "translation"): void {
+  activeExclusionTab = tab;
+
+  const tabButtons = document.querySelectorAll("#lang-exclusions-modal-overlay .modal-tab");
+  const tabContents = document.querySelectorAll(".lang-exclusions-tab-content");
+  const resetBtn = document.getElementById("lang-exclusions-reset-btn");
+
+  tabButtons.forEach(btn => {
+    const btnTab = (btn as HTMLElement).dataset.tab;
+    btn.classList.toggle("active", btnTab === tab);
+  });
+
+  tabContents.forEach(content => {
+    const contentId = content.id;
+    content.classList.toggle("active", contentId === `${tab}-tab-content`);
+  });
+
+  if (resetBtn) {
+    const tabName = t(tab === "romanization" ? "options_romanization_tab" : "options_translation_tab");
+    resetBtn.textContent = t("options_resetToDefault", tabName);
+  }
+
+  // Focus the search input of the active tab
+  const searchInput = document.getElementById(`${tab}-search`) as HTMLInputElement;
+  searchInput?.focus();
+}
+
+function closeLangExclusionsModal(): void {
+  const modalOverlay = document.getElementById("lang-exclusions-modal-overlay");
+  const romanizationSearchInput = document.getElementById("romanization-search") as HTMLInputElement;
+  const translationSearchInput = document.getElementById("translation-search") as HTMLInputElement;
+
   modalOverlay?.classList.remove("active");
-  if (searchInput) {
-    searchInput.value = "";
-    filterLanguagePills("");
+
+  if (romanizationSearchInput) {
+    romanizationSearchInput.value = "";
+    filterLanguagePills("romanization-pills-container", "");
+  }
+  if (translationSearchInput) {
+    translationSearchInput.value = "";
+    filterLanguagePills("translation-pills-container", "");
   }
 }
 
-function renderLanguagePills(): void {
+function renderRomanizationLanguagePills(): void {
   const container = document.getElementById("romanization-pills-container");
   if (!container) return;
 
   container.replaceChildren();
 
-  for (const [langCode, langName] of Object.entries(ROMANIZATION_LANGUAGES)) {
+  for (const langCode of Object.keys(ROMANIZATION_LANGUAGES)) {
+    const langName = getLanguageDisplayName(langCode);
     const isDisabled = romanizationDisabledLanguages.includes(langCode);
 
     const pill = document.createElement("div");
@@ -610,13 +683,34 @@ function renderLanguagePills(): void {
     pill.dataset.langCode = langCode;
     pill.dataset.langName = langName.toLowerCase();
     pill.textContent = langName;
-    pill.addEventListener("click", () => toggleLanguage(langCode));
+    pill.addEventListener("click", () => toggleRomanizationLanguage(langCode));
 
     container.appendChild(pill);
   }
 }
 
-function toggleLanguage(langCode: string): void {
+function renderTranslationLanguagePills(): void {
+  const container = document.getElementById("translation-pills-container");
+  if (!container) return;
+
+  container.replaceChildren();
+
+  for (const langCode of Object.keys(ROMANIZATION_LANGUAGES)) {
+    const langName = getLanguageDisplayName(langCode);
+    const isDisabled = translationDisabledLanguages.includes(langCode);
+
+    const pill = document.createElement("div");
+    pill.className = `lang-pill${isDisabled ? " disabled" : ""}`;
+    pill.dataset.langCode = langCode;
+    pill.dataset.langName = langName.toLowerCase();
+    pill.textContent = langName;
+    pill.addEventListener("click", () => toggleTranslationLanguage(langCode));
+
+    container.appendChild(pill);
+  }
+}
+
+function toggleRomanizationLanguage(langCode: string): void {
   const index = romanizationDisabledLanguages.indexOf(langCode);
   if (index === -1) {
     romanizationDisabledLanguages.push(langCode);
@@ -624,11 +718,22 @@ function toggleLanguage(langCode: string): void {
     romanizationDisabledLanguages.splice(index, 1);
   }
   saveOptions();
-  renderLanguagePills();
+  renderRomanizationLanguagePills();
 }
 
-function filterLanguagePills(query: string): void {
-  const container = document.getElementById("romanization-pills-container");
+function toggleTranslationLanguage(langCode: string): void {
+  const index = translationDisabledLanguages.indexOf(langCode);
+  if (index === -1) {
+    translationDisabledLanguages.push(langCode);
+  } else {
+    translationDisabledLanguages.splice(index, 1);
+  }
+  saveOptions();
+  renderTranslationLanguagePills();
+}
+
+function filterLanguagePills(containerId: string, query: string): void {
+  const container = document.getElementById(containerId);
   if (!container) return;
 
   const normalizedQuery = query.toLowerCase().trim();

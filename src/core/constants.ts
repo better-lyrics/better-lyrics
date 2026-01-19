@@ -70,7 +70,9 @@ export const CUBEY_LYRICS_API_URL_TURNSTILE = "https://lyrics.api.dacubeking.com
 
 export const CUBEY_LYRICS_API_URL = "https://lyrics.api.dacubeking.com/";
 
-// Supported Romanization Languages (code → display name)
+// Supported Romanization Languages
+// Display names are fallback only - use getLanguageDisplayName() from @core/i18n for UI
+// to get auto-localized names via Intl.DisplayNames API
 export const ROMANIZATION_LANGUAGES: Record<string, string> = {
   ja: "Japanese",
   ko: "Korean",
