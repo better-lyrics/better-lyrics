@@ -40,7 +40,7 @@ import {
   SCROLL_POS_OFFSET_RATIO,
 } from "@modules/ui/animationEngine";
 import { addFooter, addNoLyricsButton, cleanup, createLyricsWrapper, flushLoader, renderLoader } from "@modules/ui/dom";
-import { getRelativeBounds, log } from "@utils";
+import { getRelativeBounds, languageMatchesAny, log } from "@utils";
 import { resizeCanvas } from "@modules/ui/animationEngineDebug";
 import { registerThemeSetting } from "@modules/settings/themeOptions";
 
@@ -49,19 +49,11 @@ let lineSyncedAnimationDelay = registerThemeSetting("blyrics-line-synced-animati
 let longWordThreshold = registerThemeSetting("blyrics-long-word-threshold", 1500, true);
 
 function isRomanizationDisabledForLang(lang: string): boolean {
-  const disabled = AppState.romanizationDisabledLanguages;
-  if (disabled.includes(lang)) return true;
-  const baseLang = lang.split("-")[0];
-  if (baseLang !== lang && disabled.includes(baseLang)) return true;
-  return false;
+  return languageMatchesAny(lang, AppState.romanizationDisabledLanguages);
 }
 
 function isTranslationDisabledForLang(lang: string): boolean {
-  const disabled = AppState.translationDisabledLanguages;
-  if (disabled.includes(lang)) return true;
-  const baseLang = lang.split("-")[0];
-  if (baseLang !== lang && disabled.includes(baseLang)) return true;
-  return false;
+  return languageMatchesAny(lang, AppState.translationDisabledLanguages);
 }
 
 function findNearestAgent(lyrics: Lyric[], fromIndex: number): string | undefined {
@@ -480,7 +472,8 @@ export function injectLyrics(data: LyricSourceResultWithMeta, keepLoaderVisible 
     let romanizedCacheResult = getRomanizationFromCache(item.words);
 
     // Language should always exist if item.timedRomanization exists
-    const shouldRomanize = (data.language && data.language in ROMANIZATION_LANGUAGES) || containsNonLatin(item.words);
+    const shouldRomanize =
+      (data.language && languageMatchesAny(data.language, ROMANIZATION_LANGUAGES)) || containsNonLatin(item.words);
     const canInjectRomanizationsEarly = (shouldRomanize && item.romanization) || romanizedCacheResult !== null;
     if (item.romanization) {
       romanizedCacheResult = item.romanization;
@@ -508,7 +501,7 @@ export function injectLyrics(data: LyricSourceResultWithMeta, keepLoaderVisible 
             const detectedLang = detectNonLatinLanguage(item.words);
             if (detectedLang && isRomanizationDisabledForLang(detectedLang)) return;
 
-            let usableLang = source_language in ROMANIZATION_LANGUAGES ? source_language : "auto";
+            let usableLang = languageMatchesAny(source_language, ROMANIZATION_LANGUAGES) ? source_language : "auto";
 
             if (item.words.trim() !== "♪" && item.words.trim() !== "") {
               let result;
