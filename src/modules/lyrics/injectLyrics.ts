@@ -8,7 +8,6 @@ import {
   LYRICS_WRAPPER_ID,
   LYRICS_WRAPPER_NOT_VISIBLE_LOG,
   NO_LYRICS_FOUND_LOG,
-  NO_LYRICS_TEXT,
   NO_LYRICS_TEXT_SELECTOR,
   ROMANIZED_LYRICS_CLASS,
   RTL_CLASS,
@@ -19,6 +18,7 @@ import {
   WORD_CLASS,
   ZERO_DURATION_ANIMATION_CLASS,
 } from "@constants";
+import { t } from "@core/i18n";
 import { AppState } from "@core/appState";
 import { createInstrumentalElement } from "@modules/lyrics/createInstrumentalElement";
 import { containsNonLatin, testRtl } from "@modules/lyrics/lyricParseUtils";
@@ -274,7 +274,7 @@ export function injectLyrics(data: LyricSourceResultWithMeta, keepLoaderVisible 
   if (keepLoaderVisible) {
     renderLoader(true);
   } else {
-    flushLoader(allZero && lyrics[0].words !== NO_LYRICS_TEXT);
+    flushLoader(allZero && lyrics[0].words !== t("lyrics_notFound"));
   }
 
   const langPromise = new Promise<string>(async resolve => {
@@ -575,7 +575,7 @@ export function injectLyrics(data: LyricSourceResultWithMeta, keepLoaderVisible 
   }
   animEngineState.scrollResumeTime = 0;
 
-  if (lyrics[0].words !== NO_LYRICS_TEXT) {
+  if (lyrics[0].words !== t("lyrics_notFound")) {
     addFooter(data.source, data.sourceHref, data.song, data.artist, data.album, data.duration, data.providerKey);
   } else {
     addNoLyricsButton(data.song, data.artist, data.album, data.duration);
@@ -591,7 +591,7 @@ export function injectLyrics(data: LyricSourceResultWithMeta, keepLoaderVisible 
 
   lyricsContainer.dataset.sync = syncType;
   lyricsContainer.dataset.loaderVisible = String(keepLoaderVisible);
-  if (lyrics[0].words === NO_LYRICS_TEXT) {
+  if (lyrics[0].words === t("lyrics_notFound")) {
     lyricsContainer.dataset.noLyrics = "true";
   }
 

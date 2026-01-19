@@ -380,8 +380,24 @@ export function saveToStorage(isTheme = false) {
     });
 }
 
+export async function updateCreateEditButton(): Promise<void> {
+  const textSpan = document.getElementById("edit-css-btn-text");
+  if (!textSpan) return;
+
+  const themeName = editorStateManager.getCurrentThemeName();
+  const isDefaultTheme = themeName === "Default";
+
+  const { customCSS } = (await chrome.storage.sync.get("customCSS")) as { customCSS?: string };
+  const hasContent = customCSS && customCSS.trim().length > 0;
+
+  const showEdit = !isDefaultTheme && hasContent;
+  textSpan.textContent = showEdit ? "Edit" : "Create";
+}
+
 export async function updateThemeSelectorButton(): Promise<void> {
   if (!themeSelectorBtn) return;
+
+  updateCreateEditButton();
 
   const themeName = editorStateManager.getCurrentThemeName();
   themeSelectorBtn.replaceChildren();

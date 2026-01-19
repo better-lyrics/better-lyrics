@@ -1,0 +1,726 @@
+{
+  "extensionName": {
+    "message": "Better Lyrics (Paroles pour YouTube Music)",
+    "description": "The name of the extension"
+  },
+  "extensionDescription": {
+    "message": "Améliorez YouTube Music avec de belles paroles synchronisées, support multilingue, traductions en temps réel et plus encore",
+    "description": "The description of the extension"
+  },
+  "options_tab_general": {
+    "message": "Général",
+    "description": "General settings tab label"
+  },
+  "options_tab_display": {
+    "message": "Affichage",
+    "description": "Display settings tab label"
+  },
+  "options_tab_language": {
+    "message": "Langue",
+    "description": "Language settings tab label"
+  },
+  "options_tab_sources": {
+    "message": "Sources",
+    "description": "Sources settings tab label"
+  },
+  "options_tab_identity": {
+    "message": "Identité",
+    "description": "Identity settings tab label"
+  },
+  "options_tab_themes": {
+    "message": "Thèmes",
+    "description": "Themes settings tab label"
+  },
+  "options_general_title": {
+    "message": "Paramètres généraux",
+    "description": "General settings section title"
+  },
+  "options_general_description": {
+    "message": "Paramètres affectant le comportement général de Better Lyrics.",
+    "description": "General settings section description"
+  },
+  "options_general_showLogs": {
+    "message": "Afficher les journaux",
+    "description": "Show logs setting label"
+  },
+  "options_general_autoSwitch": {
+    "message": "Basculer automatiquement vers l'onglet paroles",
+    "description": "Auto switch to lyrics tab setting label"
+  },
+  "options_general_cache": {
+    "message": "Cache",
+    "description": "Cache section label"
+  },
+  "options_general_clearCache": {
+    "message": "Vider le cache",
+    "description": "Clear cache button label"
+  },
+  "options_general_totalLyrics": {
+    "message": "Total des paroles en cache",
+    "description": "Total lyrics in cache label"
+  },
+  "options_general_cacheSize": {
+    "message": "Taille du cache",
+    "description": "Cache size label"
+  },
+  "options_display_title": {
+    "message": "Paramètres d'affichage",
+    "description": "Display settings section title"
+  },
+  "options_display_description": {
+    "message": "Personnalisez l'apparence de Better Lyrics.",
+    "description": "Display settings section description"
+  },
+  "options_display_disableFullscreen": {
+    "message": "Désactiver le mode plein écran",
+    "description": "Disable fullscreen mode setting label"
+  },
+  "options_display_autoHideCursor": {
+    "message": "Masquer automatiquement le curseur en plein écran",
+    "description": "Auto-hide cursor setting label"
+  },
+  "options_display_albumArt": {
+    "message": "Afficher la pochette d'album floue en arrière-plan",
+    "description": "Show album art background setting label"
+  },
+  "options_display_stylizedAnimations": {
+    "message": "Afficher les animations stylisées",
+    "description": "Show stylized animations setting label"
+  },
+  "options_language_title": {
+    "message": "Paramètres de langue",
+    "description": "Language settings section title"
+  },
+  "options_language_description": {
+    "message": "Paramètres de langue et de traduction pour Better Lyrics.",
+    "description": "Language settings section description"
+  },
+  "options_language_romanization": {
+    "message": "Romanisation",
+    "description": "Romanization setting label"
+  },
+  "options_language_translate": {
+    "message": "Traduire les paroles",
+    "description": "Translate song lyrics setting label"
+  },
+  "options_language_translationLanguage": {
+    "message": "Langue de traduction",
+    "description": "Translation language setting label"
+  },
+  "options_sources_title": {
+    "message": "Préférence de source des paroles",
+    "description": "Sources settings section title"
+  },
+  "options_sources_description": {
+    "message": "Glissez pour réorganiser la priorité. Les sources en haut sont essayées en premier. Décochez pour désactiver.",
+    "description": "Sources settings section description"
+  },
+  "options_themes_title": {
+    "message": "Paramètres de thème",
+    "description": "Theme settings section title"
+  },
+  "options_themes_description": {
+    "message": "Personnalisez l'apparence de Better Lyrics.",
+    "description": "Theme settings section description"
+  },
+  "options_themes_theme": {
+    "message": "Thème",
+    "description": "Theme label"
+  },
+  "options_themes_chooseTheme": {
+    "message": "Choisir un thème",
+    "description": "Choose a theme button label"
+  },
+  "options_themes_customStyles": {
+    "message": "Styles personnalisés",
+    "description": "Custom styles label"
+  },
+  "options_themes_create": {
+    "message": "Créer",
+    "description": "Create button label"
+  },
+  "options_themes_marketplace": {
+    "message": "Marché des thèmes",
+    "description": "Theme marketplace button label"
+  },
+  "options_themes_installedThemes": {
+    "message": "Thèmes installés",
+    "description": "Installed themes button label"
+  },
+  "options_identity_title": {
+    "message": "Identité",
+    "description": "Identity settings section title"
+  },
+  "options_identity_description": {
+    "message": "Votre identité anonyme unique pour Better Lyrics.",
+    "description": "Identity settings section description"
+  },
+  "options_identity_yourIdentity": {
+    "message": "Votre identité",
+    "description": "Your identity label"
+  },
+  "options_identity_loading": {
+    "message": "Chargement...",
+    "description": "Loading identity placeholder"
+  },
+  "options_identity_exportImport": {
+    "message": "Exporter/Importer",
+    "description": "Export/Import section label"
+  },
+  "options_identity_exportKey": {
+    "message": "Exporter la clé",
+    "description": "Export key button label"
+  },
+  "options_identity_importKey": {
+    "message": "Importer la clé",
+    "description": "Import key button label"
+  },
+  "options_modal_selectTheme": {
+    "message": "Sélectionner un thème",
+    "description": "Theme modal title"
+  },
+  "options_modal_cancel": {
+    "message": "Annuler",
+    "description": "Cancel button label"
+  },
+  "options_modal_confirm": {
+    "message": "Confirmer",
+    "description": "Confirm button label"
+  },
+  "options_alert_cacheCleared": {
+    "message": "Cache vidé avec succès !",
+    "description": "Cache cleared success message"
+  },
+  "options_alert_cacheClearFailed": {
+    "message": "Échec du vidage du cache !",
+    "description": "Cache clear failed message"
+  },
+  "options_alert_nothingToClear": {
+    "message": "Rien à vider !",
+    "description": "Nothing to clear message"
+  },
+  "options_alert_exportFailed": {
+    "message": "Échec de l'exportation de l'identité",
+    "description": "Export identity failed message"
+  },
+  "options_alert_fileSaveDialogOpened": {
+    "message": "Boîte de dialogue d'enregistrement ouverte.",
+    "description": "File save dialog opened message"
+  },
+  "options_alert_fileSaveFailed": {
+    "message": "Erreur lors de l'enregistrement. Veuillez réessayer.",
+    "description": "File save failed message"
+  },
+  "options_alert_downloadInitiated": {
+    "message": "Téléchargement du fichier d'identité lancé.",
+    "description": "Download initiated message"
+  },
+  "options_alert_importSuccess": {
+    "message": "Identité importée avec succès !",
+    "description": "Import success message"
+  },
+  "options_alert_identityLoadError": {
+    "message": "Erreur lors du chargement de l'identité",
+    "description": "Identity load error message"
+  },
+  "options_editor_saving": {
+    "message": "Enregistrement...",
+    "description": "Saving indicator text"
+  },
+  "options_editor_importFile": {
+    "message": "Importer depuis un fichier",
+    "description": "Import from file tooltip"
+  },
+  "options_editor_exportFile": {
+    "message": "Exporter vers un fichier",
+    "description": "Export to file tooltip"
+  },
+  "options_editor_saveAsTheme": {
+    "message": "Enregistrer comme thème",
+    "description": "Save as theme tooltip"
+  },
+  "options_editor_openInNewTab": {
+    "message": "Ouvrir dans un nouvel onglet",
+    "description": "Open in new tab tooltip"
+  },
+  "options_editor_backToSettings": {
+    "message": "Retour aux paramètres",
+    "description": "Back to settings button label"
+  },
+  "options_editor_fullExperienceNote": {
+    "message": "Pour l'expérience complète de l'éditeur, ",
+    "description": "Full editor experience note prefix"
+  },
+  "options_editor_openInNewTabLink": {
+    "message": "ouvrez cet éditeur dans un nouvel onglet",
+    "description": "Open in new tab link text"
+  },
+  "options_editor_stylingGuide": {
+    "message": "Guide de style",
+    "description": "Styling guide link text"
+  },
+  "options_editor_renameTheme": {
+    "message": "Renommer le thème",
+    "description": "Rename theme button title"
+  },
+  "options_editor_deleteTheme": {
+    "message": "Supprimer le thème",
+    "description": "Delete theme button title"
+  },
+  "options_editor_doubleClickRename": {
+    "message": "Double-cliquez pour renommer",
+    "description": "Double-click to rename tooltip"
+  },
+  "options_provider_betterLyrics": {
+    "message": "Better Lyrics",
+    "description": "Better Lyrics provider name"
+  },
+  "options_provider_betterLyricsLegato": {
+    "message": "Better Lyrics Legato",
+    "description": "Better Lyrics Legato provider name"
+  },
+  "options_provider_musixmatch": {
+    "message": "Musixmatch",
+    "description": "Musixmatch provider name"
+  },
+  "options_provider_lrclib": {
+    "message": "LRClib",
+    "description": "LRClib provider name"
+  },
+  "options_provider_youtube": {
+    "message": "YouTube",
+    "description": "Youtube provider name"
+  },
+  "options_provider_youtubeCaptions": {
+    "message": "Sous-titres YouTube",
+    "description": "Youtube Captions provider name"
+  },
+  "options_syncType_syllable": {
+    "message": "Syllabe",
+    "description": "Syllable sync type label"
+  },
+  "options_syncType_syllable_tooltip": {
+    "message": "Met en évidence les syllabes individuelles au fur et à mesure. La synchronisation par syllabe offre la meilleure expérience.",
+    "description": "Syllable sync type tooltip"
+  },
+  "options_syncType_word": {
+    "message": "Mot",
+    "description": "Word sync type label"
+  },
+  "options_syncType_word_tooltip": {
+    "message": "Met en évidence les mots individuels au fur et à mesure. La synchronisation par mot offre une bonne expérience.",
+    "description": "Word sync type tooltip"
+  },
+  "options_syncType_line": {
+    "message": "Ligne",
+    "description": "Line sync type label"
+  },
+  "options_syncType_line_tooltip": {
+    "message": "Met en évidence les lignes entières au fur et à mesure. La synchronisation par ligne offre une expérience basique.",
+    "description": "Line sync type tooltip"
+  },
+  "options_syncType_unsynced": {
+    "message": "Non synchronisé",
+    "description": "Unsynced sync type label"
+  },
+  "options_syncType_unsynced_tooltip": {
+    "message": "Paroles sans informations de timing. Les paroles non synchronisées offrent une expérience minimale.",
+    "description": "Unsynced sync type tooltip"
+  },
+  "options_detail_rateTheme": {
+    "message": "Noter ce thème",
+    "description": "Rate theme label"
+  },
+  "options_detail_install": {
+    "message": "Installer",
+    "description": "Install button label"
+  },
+  "options_detail_viewOnGitHub": {
+    "message": "Voir sur GitHub",
+    "description": "View on GitHub link text"
+  },
+  "options_detail_shaderInfo": {
+    "message": "Ce thème inclut une configuration de shader.",
+    "description": "Shader info text prefix"
+  },
+  "options_detail_downloadShader": {
+    "message": "Télécharger shader.json",
+    "description": "Download shader link text"
+  },
+  "options_detail_shaderImportSuffix": {
+    "message": "et importez-le dans",
+    "description": "Shader import suffix text before Better Lyrics Shaders link"
+  },
+  "marketplace_pageTitle": {
+    "message": "Marché des thèmes Better Lyrics",
+    "description": "Page title"
+  },
+  "marketplace_title": {
+    "message": "Marché des thèmes",
+    "description": "Header title"
+  },
+  "marketplace_subtitle": {
+    "message": "Découvrez et installez des thèmes de la communauté",
+    "description": "Header subtitle"
+  },
+  "marketplace_searchPlaceholder": {
+    "message": "Rechercher des thèmes...",
+    "description": "Search input placeholder"
+  },
+  "marketplace_refresh": {
+    "message": "Actualiser",
+    "description": "Refresh button label"
+  },
+  "marketplace_keyboardShortcuts": {
+    "message": "Raccourcis clavier",
+    "description": "Keyboard shortcuts button label"
+  },
+  "marketplace_sortBy": {
+    "message": "Trier par",
+    "description": "Sort filter group label"
+  },
+  "marketplace_sortRatingDesc": {
+    "message": "Mieux notés",
+    "description": "Sort by highest rating"
+  },
+  "marketplace_sortRatingAsc": {
+    "message": "Moins bien notés",
+    "description": "Sort by lowest rating"
+  },
+  "marketplace_sortDownloadsDesc": {
+    "message": "Plus téléchargés",
+    "description": "Sort by most downloads"
+  },
+  "marketplace_sortDownloadsAsc": {
+    "message": "Moins téléchargés",
+    "description": "Sort by least downloads"
+  },
+  "marketplace_sortNewest": {
+    "message": "Plus récents",
+    "description": "Sort by newest"
+  },
+  "marketplace_sortOldest": {
+    "message": "Plus anciens",
+    "description": "Sort by oldest"
+  },
+  "marketplace_show": {
+    "message": "Afficher",
+    "description": "Show filter group label"
+  },
+  "marketplace_showAll": {
+    "message": "Tous",
+    "description": "Show all themes"
+  },
+  "marketplace_showInstalled": {
+    "message": "Installés",
+    "description": "Show installed themes"
+  },
+  "marketplace_showNotInstalled": {
+    "message": "Non installés",
+    "description": "Show not installed themes"
+  },
+  "marketplace_options": {
+    "message": "Options",
+    "description": "Options filter group label"
+  },
+  "marketplace_hasShaders": {
+    "message": "Avec shaders",
+    "description": "Filter for themes with shaders"
+  },
+  "marketplace_compatibleOnly": {
+    "message": "Compatibles uniquement",
+    "description": "Filter for compatible themes"
+  },
+  "marketplace_installFromUrl": {
+    "message": "Installer depuis URL",
+    "description": "Install from URL button"
+  },
+  "marketplace_submitTheme": {
+    "message": "Soumettre un thème",
+    "description": "Submit a theme link"
+  },
+  "marketplace_loading": {
+    "message": "Chargement des thèmes...",
+    "description": "Loading message"
+  },
+  "marketplace_retry": {
+    "message": "Réessayer",
+    "description": "Retry button"
+  },
+  "marketplace_noThemesMatch": {
+    "message": "Aucun thème ne correspond à vos filtres",
+    "description": "Empty state message"
+  },
+  "marketplace_permissionTitle": {
+    "message": "Permission requise",
+    "description": "Permission required title"
+  },
+  "marketplace_permissionMessage": {
+    "message": "Pour parcourir et installer des thèmes, Better Lyrics a besoin d'accéder à GitHub où les thèmes sont hébergés et à l'api du marché.",
+    "description": "Permission required message"
+  },
+  "marketplace_grantPermission": {
+    "message": "Accorder la permission",
+    "description": "Grant permission button"
+  },
+  "marketplace_install": {
+    "message": "Installer",
+    "description": "Install button"
+  },
+  "marketplace_remove": {
+    "message": "Supprimer",
+    "description": "Remove button"
+  },
+  "marketplace_apply": {
+    "message": "Appliquer",
+    "description": "Apply button"
+  },
+  "marketplace_active": {
+    "message": "Actif",
+    "description": "Active theme indicator"
+  },
+  "marketplace_shadersBadge": {
+    "message": "Shaders",
+    "description": "Shaders badge text"
+  },
+  "marketplace_githubBadge": {
+    "message": "GitHub",
+    "description": "GitHub badge text"
+  },
+  "marketplace_urlModalTitle": {
+    "message": "Installer depuis URL",
+    "description": "URL install modal title"
+  },
+  "marketplace_urlModalMessage": {
+    "message": "Entrez l'URL d'un dépôt GitHub pour installer un thème directement :",
+    "description": "URL install modal message"
+  },
+  "marketplace_urlModalPlaceholder": {
+    "message": "github.com/user/repo ou github.com/user/repo/tree/branch",
+    "description": "URL input placeholder"
+  },
+  "marketplace_urlModalError": {
+    "message": "Veuillez entrer l'URL d'un dépôt GitHub",
+    "description": "URL validation error"
+  },
+  "marketplace_cancel": {
+    "message": "Annuler",
+    "description": "Cancel button"
+  },
+  "marketplace_urlPermissionTitle": {
+    "message": "Permission supplémentaire requise",
+    "description": "URL permission modal title"
+  },
+  "marketplace_urlPermissionWhy": {
+    "message": "Pourquoi est-ce nécessaire ?",
+    "description": "URL permission explanation title"
+  },
+  "marketplace_urlPermissionDesc": {
+    "message": "L'installation de thèmes depuis des URLs GitHub personnalisées nécessite un accès plus large que le marché. Cela permet à Better Lyrics de :",
+    "description": "URL permission description"
+  },
+  "marketplace_urlPermissionItem1": {
+    "message": "Récupérer les fichiers de thème depuis n'importe quel dépôt GitHub",
+    "description": "URL permission list item 1"
+  },
+  "marketplace_urlPermissionItem2": {
+    "message": "Détecter la branche par défaut du dépôt",
+    "description": "URL permission list item 2"
+  },
+  "marketplace_urlPermissionItem3": {
+    "message": "Valider la structure du thème avant l'installation",
+    "description": "URL permission list item 3"
+  },
+  "marketplace_urlPermissionNote": {
+    "message": "Cette permission n'est utilisée que pour installer des thèmes via URL. Les thèmes du marché n'en ont pas besoin.",
+    "description": "URL permission note"
+  },
+  "marketplace_shortcutsTitle": {
+    "message": "Raccourcis clavier",
+    "description": "Shortcuts modal title"
+  },
+  "marketplace_shortcutsNavigation": {
+    "message": "Navigation",
+    "description": "Navigation shortcuts group"
+  },
+  "marketplace_shortcutsSearch": {
+    "message": "Rechercher des thèmes",
+    "description": "Search shortcut label"
+  },
+  "marketplace_shortcutsRefresh": {
+    "message": "Actualiser le marché",
+    "description": "Refresh shortcut label"
+  },
+  "marketplace_shortcutsInstallUrl": {
+    "message": "Installer depuis URL",
+    "description": "Install from URL shortcut label"
+  },
+  "marketplace_shortcutsPrevPage": {
+    "message": "Page précédente",
+    "description": "Previous page shortcut label"
+  },
+  "marketplace_shortcutsNextPage": {
+    "message": "Page suivante",
+    "description": "Next page shortcut label"
+  },
+  "marketplace_shortcutsSort": {
+    "message": "Tri",
+    "description": "Sort shortcuts group"
+  },
+  "marketplace_shortcutsSortHint": {
+    "message": "appuyez à nouveau pour inverser",
+    "description": "Sort toggle hint"
+  },
+  "marketplace_shortcutsByRating": {
+    "message": "Par note",
+    "description": "Sort by rating shortcut"
+  },
+  "marketplace_shortcutsByDownloads": {
+    "message": "Par téléchargements",
+    "description": "Sort by downloads shortcut"
+  },
+  "marketplace_shortcutsByDate": {
+    "message": "Par date",
+    "description": "Sort by date shortcut"
+  },
+  "marketplace_shortcutsFilters": {
+    "message": "Filtres",
+    "description": "Filters shortcuts group"
+  },
+  "marketplace_shortcutsShowAll": {
+    "message": "Tout afficher",
+    "description": "Show all shortcut"
+  },
+  "marketplace_shortcutsShowInstalled": {
+    "message": "Afficher installés",
+    "description": "Show installed shortcut"
+  },
+  "marketplace_shortcutsShowNotInstalled": {
+    "message": "Afficher non installés",
+    "description": "Show not installed shortcut"
+  },
+  "marketplace_shortcutsToggleShaders": {
+    "message": "Basculer shaders",
+    "description": "Toggle shaders shortcut"
+  },
+  "marketplace_shortcutsToggleCompatible": {
+    "message": "Basculer compatible",
+    "description": "Toggle compatible shortcut"
+  },
+  "marketplace_shortcutsDetails": {
+    "message": "Détails du thème",
+    "description": "Theme details shortcuts group"
+  },
+  "marketplace_shortcutsInstallRemove": {
+    "message": "Installer / Supprimer",
+    "description": "Install/remove shortcut"
+  },
+  "marketplace_shortcutsPrevImage": {
+    "message": "Image précédente",
+    "description": "Previous image shortcut"
+  },
+  "marketplace_shortcutsNextImage": {
+    "message": "Image suivante",
+    "description": "Next image shortcut"
+  },
+  "marketplace_shortcutsGeneral": {
+    "message": "Général",
+    "description": "General shortcuts group"
+  },
+  "marketplace_shortcutsCloseModal": {
+    "message": "Fermer la fenêtre",
+    "description": "Close modal shortcut"
+  },
+  "marketplace_shortcutsShowShortcuts": {
+    "message": "Afficher les raccourcis",
+    "description": "Show shortcuts shortcut"
+  },
+  "marketplace_shortcutsApplyTheme": {
+    "message": "Appliquer le thème (après installation)",
+    "description": "Apply theme shortcut"
+  },
+  "marketplace_ratingFailed": {
+    "message": "Échec de l'envoi de la note",
+    "description": "Rating submission error"
+  },
+  "marketplace_shaderFetchFailed": {
+    "message": "Échec de la récupération de la configuration shader",
+    "description": "Shader fetch error"
+  },
+  "marketplace_applyFailed": {
+    "message": "Échec de l'application du thème",
+    "description": "Theme apply error"
+  },
+  "marketplace_noThemesInstalled": {
+    "message": "Aucun thème installé",
+    "description": "Empty installed themes message"
+  },
+  "editor_pageTitle": {
+    "message": "Éditeur CSS Better Lyrics",
+    "description": "Standalone editor page title"
+  },
+  "editor_importFromFile": {
+    "message": "Importer depuis un fichier",
+    "description": "Import from file button"
+  },
+  "editor_exportToFile": {
+    "message": "Exporter vers un fichier",
+    "description": "Export to file button"
+  },
+  "editor_saveAsTheme": {
+    "message": "Enregistrer comme thème",
+    "description": "Save as theme button"
+  },
+  "editor_stylingGuide": {
+    "message": "Guide de style",
+    "description": "Styling guide button"
+  },
+  "editor_tip": {
+    "message": "Astuce : Cet onglet autonome peut être déplacé dans une fenêtre séparée ou en mode écran partagé avec YouTube Music pour voir vos modifications en temps réel. Pour plus d'infos, visitez le",
+    "description": "Editor tip text"
+  },
+  "editor_poweredBy": {
+    "message": "Propulsé par",
+    "description": "Powered by label"
+  },
+  "editor_playground": {
+    "message": "Playground",
+    "description": "Playground link text"
+  },
+  "editor_docs": {
+    "message": "Docs",
+    "description": "Docs link text"
+  },
+  "lyrics_source": {
+    "message": "Source : ",
+    "description": "Lyrics source label"
+  },
+  "lyrics_addToLrclib": {
+    "message": "Ajouter des paroles à LRCLib",
+    "description": "Add lyrics button text"
+  },
+  "lyrics_searchOnGenius": {
+    "message": "Rechercher sur Genius",
+    "description": "Search on Genius button text"
+  },
+  "lyrics_searching": {
+    "message": "Better Lyrics recherche les paroles...",
+    "description": "Loading message while searching for lyrics"
+  },
+  "lyrics_stillSearching": {
+    "message": "Recherche de paroles synchronisées en cours...",
+    "description": "Loading message while still searching"
+  },
+  "lyrics_noSyncedLyrics": {
+    "message": "Better Lyrics n'a pas trouvé de paroles synchronisées",
+    "description": "Message when no synced lyrics found"
+  },
+  "lyrics_adPlaying": {
+    "message": "[musique d'ascenseur]",
+    "description": "Message shown during ad playback"
+  },
+  "lyrics_notFound": {
+    "message": "Aucune parole trouvée pour cette chanson",
+    "description": "Message when no lyrics are available"
+  }
+}

@@ -1,0 +1,726 @@
+{
+  "extensionName": {
+    "message": "Better Lyrics (YouTube Music 歌词)",
+    "description": "The name of the extension"
+  },
+  "extensionDescription": {
+    "message": "使用精美的同步歌词、多语言支持、实时翻译等功能增强 YouTube Music",
+    "description": "The description of the extension"
+  },
+  "options_tab_general": {
+    "message": "常规",
+    "description": "General settings tab label"
+  },
+  "options_tab_display": {
+    "message": "显示",
+    "description": "Display settings tab label"
+  },
+  "options_tab_language": {
+    "message": "语言",
+    "description": "Language settings tab label"
+  },
+  "options_tab_sources": {
+    "message": "来源",
+    "description": "Sources settings tab label"
+  },
+  "options_tab_identity": {
+    "message": "身份",
+    "description": "Identity settings tab label"
+  },
+  "options_tab_themes": {
+    "message": "主题",
+    "description": "Themes settings tab label"
+  },
+  "options_general_title": {
+    "message": "常规设置",
+    "description": "General settings section title"
+  },
+  "options_general_description": {
+    "message": "影响 Better Lyrics 整体行为的设置。",
+    "description": "General settings section description"
+  },
+  "options_general_showLogs": {
+    "message": "显示日志",
+    "description": "Show logs setting label"
+  },
+  "options_general_autoSwitch": {
+    "message": "自动切换到歌词标签",
+    "description": "Auto switch to lyrics tab setting label"
+  },
+  "options_general_cache": {
+    "message": "缓存",
+    "description": "Cache section label"
+  },
+  "options_general_clearCache": {
+    "message": "清除缓存",
+    "description": "Clear cache button label"
+  },
+  "options_general_totalLyrics": {
+    "message": "缓存中的歌词总数",
+    "description": "Total lyrics in cache label"
+  },
+  "options_general_cacheSize": {
+    "message": "缓存大小",
+    "description": "Cache size label"
+  },
+  "options_display_title": {
+    "message": "显示设置",
+    "description": "Display settings section title"
+  },
+  "options_display_description": {
+    "message": "调整 Better Lyrics 的外观。",
+    "description": "Display settings section description"
+  },
+  "options_display_disableFullscreen": {
+    "message": "禁用全屏模式",
+    "description": "Disable fullscreen mode setting label"
+  },
+  "options_display_autoHideCursor": {
+    "message": "全屏时自动隐藏光标",
+    "description": "Auto-hide cursor setting label"
+  },
+  "options_display_albumArt": {
+    "message": "显示模糊的专辑封面背景",
+    "description": "Show album art background setting label"
+  },
+  "options_display_stylizedAnimations": {
+    "message": "显示风格化动画",
+    "description": "Show stylized animations setting label"
+  },
+  "options_language_title": {
+    "message": "语言设置",
+    "description": "Language settings section title"
+  },
+  "options_language_description": {
+    "message": "Better Lyrics 的语言和翻译设置。",
+    "description": "Language settings section description"
+  },
+  "options_language_romanization": {
+    "message": "罗马化",
+    "description": "Romanization setting label"
+  },
+  "options_language_translate": {
+    "message": "翻译歌词",
+    "description": "Translate song lyrics setting label"
+  },
+  "options_language_translationLanguage": {
+    "message": "翻译语言",
+    "description": "Translation language setting label"
+  },
+  "options_sources_title": {
+    "message": "歌词来源优先级",
+    "description": "Sources settings section title"
+  },
+  "options_sources_description": {
+    "message": "拖动以重新排序优先级。排在前面的来源会先尝试。取消勾选可禁用。",
+    "description": "Sources settings section description"
+  },
+  "options_themes_title": {
+    "message": "主题设置",
+    "description": "Theme settings section title"
+  },
+  "options_themes_description": {
+    "message": "自定义 Better Lyrics 的外观。",
+    "description": "Theme settings section description"
+  },
+  "options_themes_theme": {
+    "message": "主题",
+    "description": "Theme label"
+  },
+  "options_themes_chooseTheme": {
+    "message": "选择主题",
+    "description": "Choose a theme button label"
+  },
+  "options_themes_customStyles": {
+    "message": "自定义样式",
+    "description": "Custom styles label"
+  },
+  "options_themes_create": {
+    "message": "创建",
+    "description": "Create button label"
+  },
+  "options_themes_marketplace": {
+    "message": "主题市场",
+    "description": "Theme marketplace button label"
+  },
+  "options_themes_installedThemes": {
+    "message": "已安装主题",
+    "description": "Installed themes button label"
+  },
+  "options_identity_title": {
+    "message": "身份",
+    "description": "Identity settings section title"
+  },
+  "options_identity_description": {
+    "message": "您在 Better Lyrics 的唯一匿名身份。",
+    "description": "Identity settings section description"
+  },
+  "options_identity_yourIdentity": {
+    "message": "您的身份",
+    "description": "Your identity label"
+  },
+  "options_identity_loading": {
+    "message": "加载中...",
+    "description": "Loading identity placeholder"
+  },
+  "options_identity_exportImport": {
+    "message": "导出/导入",
+    "description": "Export/Import section label"
+  },
+  "options_identity_exportKey": {
+    "message": "导出密钥",
+    "description": "Export key button label"
+  },
+  "options_identity_importKey": {
+    "message": "导入密钥",
+    "description": "Import key button label"
+  },
+  "options_modal_selectTheme": {
+    "message": "选择主题",
+    "description": "Theme modal title"
+  },
+  "options_modal_cancel": {
+    "message": "取消",
+    "description": "Cancel button label"
+  },
+  "options_modal_confirm": {
+    "message": "确认",
+    "description": "Confirm button label"
+  },
+  "options_alert_cacheCleared": {
+    "message": "缓存已成功清除！",
+    "description": "Cache cleared success message"
+  },
+  "options_alert_cacheClearFailed": {
+    "message": "清除缓存失败！",
+    "description": "Cache clear failed message"
+  },
+  "options_alert_nothingToClear": {
+    "message": "没有可清除的内容！",
+    "description": "Nothing to clear message"
+  },
+  "options_alert_exportFailed": {
+    "message": "导出身份失败",
+    "description": "Export identity failed message"
+  },
+  "options_alert_fileSaveDialogOpened": {
+    "message": "文件保存对话框已打开。",
+    "description": "File save dialog opened message"
+  },
+  "options_alert_fileSaveFailed": {
+    "message": "保存文件时出错。请重试。",
+    "description": "File save failed message"
+  },
+  "options_alert_downloadInitiated": {
+    "message": "身份文件下载已开始。",
+    "description": "Download initiated message"
+  },
+  "options_alert_importSuccess": {
+    "message": "身份导入成功！",
+    "description": "Import success message"
+  },
+  "options_alert_identityLoadError": {
+    "message": "加载身份时出错",
+    "description": "Identity load error message"
+  },
+  "options_editor_saving": {
+    "message": "保存中...",
+    "description": "Saving indicator text"
+  },
+  "options_editor_importFile": {
+    "message": "从文件导入",
+    "description": "Import from file tooltip"
+  },
+  "options_editor_exportFile": {
+    "message": "导出到文件",
+    "description": "Export to file tooltip"
+  },
+  "options_editor_saveAsTheme": {
+    "message": "另存为主题",
+    "description": "Save as theme tooltip"
+  },
+  "options_editor_openInNewTab": {
+    "message": "在新标签页中打开",
+    "description": "Open in new tab tooltip"
+  },
+  "options_editor_backToSettings": {
+    "message": "返回设置",
+    "description": "Back to settings button label"
+  },
+  "options_editor_fullExperienceNote": {
+    "message": "要获得完整的编辑器体验，",
+    "description": "Full editor experience note prefix"
+  },
+  "options_editor_openInNewTabLink": {
+    "message": "在新标签页中打开此编辑器",
+    "description": "Open in new tab link text"
+  },
+  "options_editor_stylingGuide": {
+    "message": "样式指南",
+    "description": "Styling guide link text"
+  },
+  "options_editor_renameTheme": {
+    "message": "重命名自定义主题",
+    "description": "Rename theme button title"
+  },
+  "options_editor_deleteTheme": {
+    "message": "删除自定义主题",
+    "description": "Delete theme button title"
+  },
+  "options_editor_doubleClickRename": {
+    "message": "双击重命名",
+    "description": "Double-click to rename tooltip"
+  },
+  "options_provider_betterLyrics": {
+    "message": "Better Lyrics",
+    "description": "Better Lyrics provider name"
+  },
+  "options_provider_betterLyricsLegato": {
+    "message": "Better Lyrics Legato",
+    "description": "Better Lyrics Legato provider name"
+  },
+  "options_provider_musixmatch": {
+    "message": "Musixmatch",
+    "description": "Musixmatch provider name"
+  },
+  "options_provider_lrclib": {
+    "message": "LRClib",
+    "description": "LRClib provider name"
+  },
+  "options_provider_youtube": {
+    "message": "YouTube",
+    "description": "Youtube provider name"
+  },
+  "options_provider_youtubeCaptions": {
+    "message": "YouTube 字幕",
+    "description": "Youtube Captions provider name"
+  },
+  "options_syncType_syllable": {
+    "message": "音节",
+    "description": "Syllable sync type label"
+  },
+  "options_syncType_syllable_tooltip": {
+    "message": "随着演唱逐个高亮显示音节。音节同步提供最佳体验。",
+    "description": "Syllable sync type tooltip"
+  },
+  "options_syncType_word": {
+    "message": "单词",
+    "description": "Word sync type label"
+  },
+  "options_syncType_word_tooltip": {
+    "message": "随着演唱逐个高亮显示单词。单词同步提供良好体验。",
+    "description": "Word sync type tooltip"
+  },
+  "options_syncType_line": {
+    "message": "行",
+    "description": "Line sync type label"
+  },
+  "options_syncType_line_tooltip": {
+    "message": "随着演唱高亮显示整行。行同步提供基本体验。",
+    "description": "Line sync type tooltip"
+  },
+  "options_syncType_unsynced": {
+    "message": "未同步",
+    "description": "Unsynced sync type label"
+  },
+  "options_syncType_unsynced_tooltip": {
+    "message": "没有时间信息的歌词。未同步歌词提供最小体验。",
+    "description": "Unsynced sync type tooltip"
+  },
+  "options_detail_rateTheme": {
+    "message": "评价此主题",
+    "description": "Rate theme label"
+  },
+  "options_detail_install": {
+    "message": "安装",
+    "description": "Install button label"
+  },
+  "options_detail_viewOnGitHub": {
+    "message": "在 GitHub 上查看",
+    "description": "View on GitHub link text"
+  },
+  "options_detail_shaderInfo": {
+    "message": "此主题包含着色器配置。",
+    "description": "Shader info text prefix"
+  },
+  "options_detail_downloadShader": {
+    "message": "下载 shader.json",
+    "description": "Download shader link text"
+  },
+  "options_detail_shaderImportSuffix": {
+    "message": "并导入到",
+    "description": "Shader import suffix text before Better Lyrics Shaders link"
+  },
+  "marketplace_pageTitle": {
+    "message": "Better Lyrics 主题市场",
+    "description": "Page title"
+  },
+  "marketplace_title": {
+    "message": "主题市场",
+    "description": "Header title"
+  },
+  "marketplace_subtitle": {
+    "message": "发现并安装社区主题",
+    "description": "Header subtitle"
+  },
+  "marketplace_searchPlaceholder": {
+    "message": "搜索主题...",
+    "description": "Search input placeholder"
+  },
+  "marketplace_refresh": {
+    "message": "刷新",
+    "description": "Refresh button label"
+  },
+  "marketplace_keyboardShortcuts": {
+    "message": "键盘快捷键",
+    "description": "Keyboard shortcuts button label"
+  },
+  "marketplace_sortBy": {
+    "message": "排序方式",
+    "description": "Sort filter group label"
+  },
+  "marketplace_sortRatingDesc": {
+    "message": "评分最高",
+    "description": "Sort by highest rating"
+  },
+  "marketplace_sortRatingAsc": {
+    "message": "评分最低",
+    "description": "Sort by lowest rating"
+  },
+  "marketplace_sortDownloadsDesc": {
+    "message": "下载最多",
+    "description": "Sort by most downloads"
+  },
+  "marketplace_sortDownloadsAsc": {
+    "message": "下载最少",
+    "description": "Sort by least downloads"
+  },
+  "marketplace_sortNewest": {
+    "message": "最新",
+    "description": "Sort by newest"
+  },
+  "marketplace_sortOldest": {
+    "message": "最旧",
+    "description": "Sort by oldest"
+  },
+  "marketplace_show": {
+    "message": "显示",
+    "description": "Show filter group label"
+  },
+  "marketplace_showAll": {
+    "message": "全部",
+    "description": "Show all themes"
+  },
+  "marketplace_showInstalled": {
+    "message": "已安装",
+    "description": "Show installed themes"
+  },
+  "marketplace_showNotInstalled": {
+    "message": "未安装",
+    "description": "Show not installed themes"
+  },
+  "marketplace_options": {
+    "message": "选项",
+    "description": "Options filter group label"
+  },
+  "marketplace_hasShaders": {
+    "message": "包含着色器",
+    "description": "Filter for themes with shaders"
+  },
+  "marketplace_compatibleOnly": {
+    "message": "仅兼容",
+    "description": "Filter for compatible themes"
+  },
+  "marketplace_installFromUrl": {
+    "message": "从 URL 安装",
+    "description": "Install from URL button"
+  },
+  "marketplace_submitTheme": {
+    "message": "提交主题",
+    "description": "Submit a theme link"
+  },
+  "marketplace_loading": {
+    "message": "加载主题中...",
+    "description": "Loading message"
+  },
+  "marketplace_retry": {
+    "message": "重试",
+    "description": "Retry button"
+  },
+  "marketplace_noThemesMatch": {
+    "message": "没有匹配您筛选条件的主题",
+    "description": "Empty state message"
+  },
+  "marketplace_permissionTitle": {
+    "message": "需要权限",
+    "description": "Permission required title"
+  },
+  "marketplace_permissionMessage": {
+    "message": "要浏览和安装主题，Better Lyrics 需要访问托管主题的 GitHub 和市场 API 的权限。",
+    "description": "Permission required message"
+  },
+  "marketplace_grantPermission": {
+    "message": "授予权限",
+    "description": "Grant permission button"
+  },
+  "marketplace_install": {
+    "message": "安装",
+    "description": "Install button"
+  },
+  "marketplace_remove": {
+    "message": "移除",
+    "description": "Remove button"
+  },
+  "marketplace_apply": {
+    "message": "应用",
+    "description": "Apply button"
+  },
+  "marketplace_active": {
+    "message": "已启用",
+    "description": "Active theme indicator"
+  },
+  "marketplace_shadersBadge": {
+    "message": "着色器",
+    "description": "Shaders badge text"
+  },
+  "marketplace_githubBadge": {
+    "message": "GitHub",
+    "description": "GitHub badge text"
+  },
+  "marketplace_urlModalTitle": {
+    "message": "从 URL 安装",
+    "description": "URL install modal title"
+  },
+  "marketplace_urlModalMessage": {
+    "message": "输入 GitHub 仓库 URL 以直接安装主题：",
+    "description": "URL install modal message"
+  },
+  "marketplace_urlModalPlaceholder": {
+    "message": "github.com/用户/仓库 或 github.com/用户/仓库/tree/分支",
+    "description": "URL input placeholder"
+  },
+  "marketplace_urlModalError": {
+    "message": "请输入 GitHub 仓库 URL",
+    "description": "URL validation error"
+  },
+  "marketplace_cancel": {
+    "message": "取消",
+    "description": "Cancel button"
+  },
+  "marketplace_urlPermissionTitle": {
+    "message": "需要额外权限",
+    "description": "URL permission modal title"
+  },
+  "marketplace_urlPermissionWhy": {
+    "message": "为什么需要这个？",
+    "description": "URL permission explanation title"
+  },
+  "marketplace_urlPermissionDesc": {
+    "message": "从自定义 GitHub URL 安装主题需要比市场更广泛的访问权限。这使 Better Lyrics 能够：",
+    "description": "URL permission description"
+  },
+  "marketplace_urlPermissionItem1": {
+    "message": "从任何 GitHub 仓库获取主题文件",
+    "description": "URL permission list item 1"
+  },
+  "marketplace_urlPermissionItem2": {
+    "message": "检测仓库的默认分支",
+    "description": "URL permission list item 2"
+  },
+  "marketplace_urlPermissionItem3": {
+    "message": "在安装前验证主题结构",
+    "description": "URL permission list item 3"
+  },
+  "marketplace_urlPermissionNote": {
+    "message": "此权限仅在通过 URL 安装主题时使用。市场主题不需要此权限。",
+    "description": "URL permission note"
+  },
+  "marketplace_shortcutsTitle": {
+    "message": "键盘快捷键",
+    "description": "Shortcuts modal title"
+  },
+  "marketplace_shortcutsNavigation": {
+    "message": "导航",
+    "description": "Navigation shortcuts group"
+  },
+  "marketplace_shortcutsSearch": {
+    "message": "搜索主题",
+    "description": "Search shortcut label"
+  },
+  "marketplace_shortcutsRefresh": {
+    "message": "刷新市场",
+    "description": "Refresh shortcut label"
+  },
+  "marketplace_shortcutsInstallUrl": {
+    "message": "从 URL 安装",
+    "description": "Install from URL shortcut label"
+  },
+  "marketplace_shortcutsPrevPage": {
+    "message": "上一页",
+    "description": "Previous page shortcut label"
+  },
+  "marketplace_shortcutsNextPage": {
+    "message": "下一页",
+    "description": "Next page shortcut label"
+  },
+  "marketplace_shortcutsSort": {
+    "message": "排序",
+    "description": "Sort shortcuts group"
+  },
+  "marketplace_shortcutsSortHint": {
+    "message": "再次按下以切换方向",
+    "description": "Sort toggle hint"
+  },
+  "marketplace_shortcutsByRating": {
+    "message": "按评分",
+    "description": "Sort by rating shortcut"
+  },
+  "marketplace_shortcutsByDownloads": {
+    "message": "按下载量",
+    "description": "Sort by downloads shortcut"
+  },
+  "marketplace_shortcutsByDate": {
+    "message": "按日期",
+    "description": "Sort by date shortcut"
+  },
+  "marketplace_shortcutsFilters": {
+    "message": "筛选",
+    "description": "Filters shortcuts group"
+  },
+  "marketplace_shortcutsShowAll": {
+    "message": "显示全部",
+    "description": "Show all shortcut"
+  },
+  "marketplace_shortcutsShowInstalled": {
+    "message": "显示已安装",
+    "description": "Show installed shortcut"
+  },
+  "marketplace_shortcutsShowNotInstalled": {
+    "message": "显示未安装",
+    "description": "Show not installed shortcut"
+  },
+  "marketplace_shortcutsToggleShaders": {
+    "message": "切换着色器",
+    "description": "Toggle shaders shortcut"
+  },
+  "marketplace_shortcutsToggleCompatible": {
+    "message": "切换兼容性",
+    "description": "Toggle compatible shortcut"
+  },
+  "marketplace_shortcutsDetails": {
+    "message": "主题详情",
+    "description": "Theme details shortcuts group"
+  },
+  "marketplace_shortcutsInstallRemove": {
+    "message": "安装 / 移除",
+    "description": "Install/remove shortcut"
+  },
+  "marketplace_shortcutsPrevImage": {
+    "message": "上一张图片",
+    "description": "Previous image shortcut"
+  },
+  "marketplace_shortcutsNextImage": {
+    "message": "下一张图片",
+    "description": "Next image shortcut"
+  },
+  "marketplace_shortcutsGeneral": {
+    "message": "常规",
+    "description": "General shortcuts group"
+  },
+  "marketplace_shortcutsCloseModal": {
+    "message": "关闭弹窗",
+    "description": "Close modal shortcut"
+  },
+  "marketplace_shortcutsShowShortcuts": {
+    "message": "显示快捷键",
+    "description": "Show shortcuts shortcut"
+  },
+  "marketplace_shortcutsApplyTheme": {
+    "message": "应用主题（安装后）",
+    "description": "Apply theme shortcut"
+  },
+  "marketplace_ratingFailed": {
+    "message": "提交评分失败",
+    "description": "Rating submission error"
+  },
+  "marketplace_shaderFetchFailed": {
+    "message": "获取着色器配置失败",
+    "description": "Shader fetch error"
+  },
+  "marketplace_applyFailed": {
+    "message": "应用主题失败",
+    "description": "Theme apply error"
+  },
+  "marketplace_noThemesInstalled": {
+    "message": "尚未安装任何主题",
+    "description": "Empty installed themes message"
+  },
+  "editor_pageTitle": {
+    "message": "Better Lyrics CSS 编辑器",
+    "description": "Standalone editor page title"
+  },
+  "editor_importFromFile": {
+    "message": "从文件导入",
+    "description": "Import from file button"
+  },
+  "editor_exportToFile": {
+    "message": "导出到文件",
+    "description": "Export to file button"
+  },
+  "editor_saveAsTheme": {
+    "message": "另存为主题",
+    "description": "Save as theme button"
+  },
+  "editor_stylingGuide": {
+    "message": "样式指南",
+    "description": "Styling guide button"
+  },
+  "editor_tip": {
+    "message": "提示：此独立标签页可移动到单独窗口或与 YouTube Music 分屏使用，实时查看更改。更多信息请访问",
+    "description": "Editor tip text"
+  },
+  "editor_poweredBy": {
+    "message": "技术支持",
+    "description": "Powered by label"
+  },
+  "editor_playground": {
+    "message": "Playground",
+    "description": "Playground link text"
+  },
+  "editor_docs": {
+    "message": "文档",
+    "description": "Docs link text"
+  },
+  "lyrics_source": {
+    "message": "来源：",
+    "description": "Lyrics source label"
+  },
+  "lyrics_addToLrclib": {
+    "message": "添加歌词到 LRCLib",
+    "description": "Add lyrics button text"
+  },
+  "lyrics_searchOnGenius": {
+    "message": "在 Genius 上搜索",
+    "description": "Search on Genius button text"
+  },
+  "lyrics_searching": {
+    "message": "Better Lyrics 正在搜索歌词...",
+    "description": "Loading message while searching for lyrics"
+  },
+  "lyrics_stillSearching": {
+    "message": "仍在搜索同步歌词...",
+    "description": "Loading message while still searching"
+  },
+  "lyrics_noSyncedLyrics": {
+    "message": "Better Lyrics 未能找到同步歌词",
+    "description": "Message when no synced lyrics found"
+  },
+  "lyrics_adPlaying": {
+    "message": "[电梯音乐]",
+    "description": "Message shown during ad playback"
+  },
+  "lyrics_notFound": {
+    "message": "未找到此歌曲的歌词",
+    "description": "Message when no lyrics are available"
+  }
+}

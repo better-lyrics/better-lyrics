@@ -28,6 +28,7 @@ import {
   TAB_RENDERER_SELECTOR,
   TRANSLATED_LYRICS_CLASS,
 } from "@constants";
+import { t } from "@core/i18n";
 import { AppState } from "@core/appState";
 import {
   animEngineState,
@@ -255,7 +256,7 @@ export function createFooter(song: string, artist: string, album: string, durati
     footerImage.height = 20;
 
     footerContainer.appendChild(footerImage);
-    footerContainer.appendChild(document.createTextNode("Source: "));
+    footerContainer.appendChild(document.createTextNode(t("lyrics_source")));
 
     const footerLink = document.createElement("a");
     footerLink.target = "_blank";
@@ -284,12 +285,12 @@ export function createFooter(song: string, artist: string, album: string, durati
     footerLink.target = "_blank";
 
     const addLyricsContainer = createActionButton({
-      text: "Add Lyrics to LRCLib",
+      text: t("lyrics_addToLrclib"),
       href: lrclibUrl.toString(),
     });
 
     const geniusContainer = createActionButton({
-      text: "Search on Genius",
+      text: t("lyrics_searchOnGenius"),
       href: getGeniusLink(song, artist),
       logoSrc: GENIUS_LOGO_SRC,
       logoAlt: "Genius",
@@ -626,12 +627,12 @@ export function addNoLyricsButton(song: string, artist: string, album: string, d
   if (duration) lrclibUrl.searchParams.append("duration", duration.toString());
 
   const addLyricsButton = createActionButton({
-    text: "Add Lyrics to LRCLib",
+    text: t("lyrics_addToLrclib"),
     href: lrclibUrl.toString(),
   });
 
   const geniusSearch = createActionButton({
-    text: "Search on Genius",
+    text: t("lyrics_searchOnGenius"),
     href: getGeniusLink(song, artist),
     logoSrc: GENIUS_LOGO_SRC,
     logoAlt: "Genius",

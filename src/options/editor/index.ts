@@ -1,5 +1,6 @@
 import { openSearchPanel } from "@codemirror/search";
 import { LOG_PREFIX_EDITOR } from "@constants";
+import { initI18n } from "@core/i18n";
 import { createEditorState, createEditorView } from "./core/editor";
 import { editorStateManager } from "./core/state";
 import { generateDefaultFilename, importManager, saveCSSToFile } from "./features/import";
@@ -176,6 +177,7 @@ export async function initializeEditor() {
 
 export function initialize() {
   document.addEventListener("DOMContentLoaded", async () => {
+    initI18n();
     await initializeEditor();
     initializeNavigation();
     initializeEditorKeyboardShortcuts();

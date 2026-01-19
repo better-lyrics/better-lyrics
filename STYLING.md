@@ -123,7 +123,7 @@ These custom properties allow for easy customization of colors, sizes, and other
 
 | Variable                           | Default Value                                                                                                                                                        | Description                                                              |
 | ---------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------ |
-| `--blyrics-font-family`            | `Satoshi, var(--noto-sans-universal), Avenir, -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, Cantarell, Open Sans, Helvetica Neue, sans-serif` | Font family for lyrics¹                                                  |
+| `--blyrics-font-family`¹           | `Satoshi, var(--noto-sans-universal), Avenir, -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, Cantarell, Open Sans, Helvetica Neue, sans-serif` | Font family for lyrics                                                 |
 | `--blyrics-font-size`              | `3rem`                                                                                                                                                               | Font size for lyrics                                                     |
 | `--blyrics-font-weight`            | `700`                                                                                                                                                                | Font weight for lyrics                                                   |
 | `--blyrics-line-height`            | `1.333`                                                                                                                                                              | Line height for lyrics                                                   |
@@ -134,7 +134,7 @@ These custom properties allow for easy customization of colors, sizes, and other
 | `--blyrics-footer-font-family`     | `Roboto, Noto Naskh Arabic UI, Arial, sans-serif`                                                                                                                    | Font family of footer                                                    |
 | `--blyrics-footer-font-size`       | `14px`                                                                                                                                                               | Font size of footer                                                      |
 | `--blyrics-footer-font-weight`     | `400`                                                                                                                                                                | Font weight of footer                                                    |
-| `--noto-sans-universal`            | Omitted                                                                                                                                                              | A family of NotoSans fonts covering a large majority of langauges used.² |
+| `--noto-sans-universal`²           | Omitted                                                                                                                                                              | A family of NotoSans fonts covering a large majority of langauges used.  |
 
 ¹To add a custom web-font, use `@import`. It must be placed at the very top of your theme.
 
@@ -179,8 +179,11 @@ These custom properties allow for easy customization of colors, sizes, and other
 
 | Variable                                 | Default Value                    | Description                                     |
 | ---------------------------------------- | -------------------------------- | ----------------------------------------------- |
-| `--blyrics-lyric-scroll-duration`        | `750ms`                          | Duration for scrolling lyric transitions        |
+| `--blyrics-lyric-scroll-duration`³       | `750ms`                          | Duration for scrolling lyric transitions        |
 | `--blyrics-lyric-scroll-timing-function` | `cubic-bezier(0.86, 0, 0.07, 1)` | Timing function for scrolling lyric transitions |
+
+³Modifying this variable alone may introduce glitches to lyric-scroll animation. To maintain smoothness, you should also adjust  `blyrics-early-scroll-consider-s` +
+`blyrics-queue-scroll-ms` knobs. See [Additional Configuration Options (Knobs)](#additional-configuration-options-knobs) for details.
 
 ### Gradient Stops
 
@@ -227,16 +230,22 @@ The following options are avalible:
 | `blyrics-disable-richsync`            | `false`       | Set to `true` to disable richsynced lyrics from displaying.                                                                                |
 | `blyrics-line-synced-animation-delay` | `50`          | For non-richsynced lyrics, this value controls the delay each word gets when highlighting (in ms).                                         |
 | `blyrics-lyric-ending-threshold-s`    | `0.5`         | Controls the time (in seconds) before a lyric line is finished that we consider it completed for scrolling purposes.                       |
-| `blyrics-early-scroll-consider-s`     | `0.62`        | Controls how far into the future (in seconds) we should look for lines to group together for scrolling purposes.                           |
-| `blyrics-queue-scroll-ms`             | `150`         | If we're unable to scroll due to having scrolled recently, what is the maximum amount of time that a scroll can be "queued" for.           |
+| `blyrics-early-scroll-consider-s`⁴    | `0.62`        | Controls how far into the future (in seconds) we should look for lines to group together for scrolling purposes.                           |
+| `blyrics-queue-scroll-ms`⁴            | `150`         | If we're unable to scroll due to having scrolled recently, what is the maximum amount of time that a scroll can be "queued" for.           |
 | `blyrics-debug-renderer`              | `false`       | Set to `true` to enable the debug renderer.                                                                                                |
 | `blyrics-target-scroll-pos-ratio`     | `0.37`        | Position on the screen lyrics should be at. 0.5 means the selected lyric will be in the middle of the screen, 0 means top, 1 means bottom. |
 | `blyrics-add-extra-top-padding`       | `false`       | Should extra spacing be added to the top of the lyrics container to allow the lyrics to always scroll.                                     |
 | `blyrics-long-word-threshold`         | `1500`        | Duration threshold (in ms) above which words get `data-long-word="true"`. Useful for glow effects on held notes.                           |
 
-Tip:
-Make it so `var(--blyrics-lyric-scroll-duration)` + `0.02s` = `blyrics-early-scroll-consider-s` +
+⁴Make sure that the following equation is met
+
+`var(--blyrics-lyric-scroll-duration)` + `0.02s` = `blyrics-early-scroll-consider-s` +
 `blyrics-queue-scroll-ms`
+
+An unbalanced equation may cause dropped frames or missed scrolls. The default values of all three variables are already balanced.
+
+Tip: Pay attention to the units of the values; Some values are in *seconds* (s), while others are in *milliseconds* (ms).
+
 ### Dynamic Properties
 
 `--blyrics-duration` is a special custom property that is set dynamically by the extension's main script. It represents the duration of the current lyric line and is used to ensure that animations are synchronized with the music playback.
