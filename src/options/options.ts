@@ -602,7 +602,8 @@ function initLangExclusionsModal(): void {
   });
 
   resetBtn?.addEventListener("click", async () => {
-    const tabName = activeExclusionTab === "romanization" ? t("options_romanization_tab") : t("options_translation_tab");
+    const tabName =
+      activeExclusionTab === "romanization" ? t("options_romanization_tab") : t("options_translation_tab");
     const result = await showModal({
       title: t("options_romanization_resetTitle", tabName),
       message: t("options_romanization_resetMessage"),
