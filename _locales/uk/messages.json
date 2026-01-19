@@ -4,155 +4,155 @@
     "description": "The name of the extension"
   },
   "extensionDescription": {
-    "message": "Enhance YouTube Music with beautiful time-synced lyrics, multilingual support, real-time translations and more",
+    "message": "Розширте можливості YouTube Music — красиві тексти пісень із синхронізацією, багатомовність, переклад у реальному часі та ще більше функцій",
     "description": "The description of the extension"
   },
   "options_tab_general": {
-    "message": "General",
+    "message": "Загальне",
     "description": "General settings tab label"
   },
   "options_tab_display": {
-    "message": "Display",
+    "message": "Відображення",
     "description": "Display settings tab label"
   },
   "options_tab_language": {
-    "message": "Language",
+    "message": "Мова",
     "description": "Language settings tab label"
   },
   "options_tab_sources": {
-    "message": "Sources",
+    "message": "Джерела",
     "description": "Sources settings tab label"
   },
   "options_tab_identity": {
-    "message": "Identity",
+    "message": "Особисті дані",
     "description": "Identity settings tab label"
   },
   "options_tab_themes": {
-    "message": "Themes",
+    "message": "Оформлення",
     "description": "Themes settings tab label"
   },
   "options_general_title": {
-    "message": "General Settings",
+    "message": "Загальні налаштування",
     "description": "General settings section title"
   },
   "options_general_description": {
-    "message": "Settings that affect the general behavior of Better Lyrics.",
+    "message": "Налаштування загальної роботи Better Lyrics.",
     "description": "General settings section description"
   },
   "options_general_showLogs": {
-    "message": "Show logs",
+    "message": "Показати логи",
     "description": "Show logs setting label"
   },
   "options_general_autoSwitch": {
-    "message": "Auto switch to lyrics tab",
+    "message": "Автоперехід на вкладку з текстами",
     "description": "Auto switch to lyrics tab setting label"
   },
   "options_general_cache": {
-    "message": "Cache",
+    "message": "Кеш-пам’ять",
     "description": "Cache section label"
   },
   "options_general_clearCache": {
-    "message": "Clear Cache",
+    "message": "Очистити",
     "description": "Clear cache button label"
   },
   "options_general_totalLyrics": {
-    "message": "Total lyrics in cache",
+    "message": "Усього текстів у кеші",
     "description": "Total lyrics in cache label"
   },
   "options_general_cacheSize": {
-    "message": "Cache size",
+    "message": "Обсяг кеш-пам’яті",
     "description": "Cache size label"
   },
   "options_display_title": {
-    "message": "Display Settings",
+    "message": "Налаштування відображення",
     "description": "Display settings section title"
   },
   "options_display_description": {
-    "message": "Fine-tune the appearance of Better Lyrics.",
+    "message": "Налаштуйте зовнішній вигляд Better Lyrics.",
     "description": "Display settings section description"
   },
   "options_display_disableFullscreen": {
-    "message": "Disable fullscreen mode",
+    "message": "Вимкнути повноекранний режим",
     "description": "Disable fullscreen mode setting label"
   },
   "options_display_autoHideCursor": {
-    "message": "Auto-hide cursor in fullscreen mode",
+    "message": "Автоприховування курсора в повноекранному режимі",
     "description": "Auto-hide cursor setting label"
   },
   "options_display_albumArt": {
-    "message": "Show blurred album art background",
+    "message": "Розмитий фон з обкладинки альбому",
     "description": "Show album art background setting label"
   },
   "options_display_stylizedAnimations": {
-    "message": "Show stylized animations",
+    "message": "Стилізовані анімації",
     "description": "Show stylized animations setting label"
   },
   "options_language_title": {
-    "message": "Language Settings",
+    "message": "Налаштування мови",
     "description": "Language settings section title"
   },
   "options_language_description": {
-    "message": "Language and translation settings for Better Lyrics.",
+    "message": "Налаштування мови та перекладу для Better Lyrics.",
     "description": "Language settings section description"
   },
   "options_language_romanization": {
-    "message": "Romanization",
+    "message": "Романізація (транслітерація)",
     "description": "Romanization setting label"
   },
   "options_language_translate": {
-    "message": "Translate song lyrics",
+    "message": "Переклад текстів пісень",
     "description": "Translate song lyrics setting label"
   },
   "options_language_translationLanguage": {
-    "message": "Translation language",
+    "message": "Мова перекладу",
     "description": "Translation language setting label"
   },
   "options_sources_title": {
-    "message": "Lyric Source Preference",
+    "message": "Пріоритет джерела до текстів пісень",
     "description": "Sources settings section title"
   },
   "options_sources_description": {
-    "message": "Drag to reorder priority. Higher sources are tried first. Uncheck to disable.",
+    "message": "Перетягніть, щоб змінити пріоритет. Джерела розміщені вище використовуються першими. Зніміть прапорець, щоб вимкнути.",
     "description": "Sources settings section description"
   },
   "options_themes_title": {
-    "message": "Theme Settings",
+    "message": "Налаштування теми оформлення",
     "description": "Theme settings section title"
   },
   "options_themes_description": {
-    "message": "Customize the appearance of Better Lyrics.",
+    "message": "Кастомізуйте вигляд Better Lyrics.",
     "description": "Theme settings section description"
   },
   "options_themes_theme": {
-    "message": "Theme",
+    "message": "Тема",
     "description": "Theme label"
   },
   "options_themes_chooseTheme": {
-    "message": "Choose a theme",
+    "message": "Виберіть тему",
     "description": "Choose a theme button label"
   },
   "options_themes_customStyles": {
-    "message": "Custom Styles",
+    "message": "Користувацькі стилі",
     "description": "Custom styles label"
   },
   "options_themes_create": {
-    "message": "Create",
+    "message": "Створити",
     "description": "Create button label"
   },
   "options_themes_marketplace": {
-    "message": "Theme Marketplace",
+    "message": "Магазин тем",
     "description": "Theme marketplace button label"
   },
   "options_themes_installedThemes": {
-    "message": "Installed Themes",
+    "message": "Встановлені теми",
     "description": "Installed themes button label"
   },
   "options_identity_title": {
-    "message": "Identity",
+    "message": "Особисті",
     "description": "Identity settings section title"
   },
   "options_identity_description": {
-    "message": "Your unique anonymous identity for Better Lyrics.",
+    "message": "Ваша унікальна анонімна особистість у Better Lyrics.",
     "description": "Identity settings section description"
   },
   "options_identity_yourIdentity": {
