@@ -456,7 +456,7 @@
     "description": "Permission required title"
   },
   "marketplace_permissionMessage": {
-    "message": "Um Themes zu durchsuchen und zu installieren, benötigt Better Lyrics Zugriff auf GitHub, wo die Themes gehostet werden, und die Marktplatz-API.",
+    "message": "Um Themes zu durchsuchen und zu installieren, benötigt Better Lyrics Zugriff auf GitHub, wo die Themes gehostet werden, und das Marktplatz-api.",
     "description": "Permission required message"
   },
   "marketplace_grantPermission": {
@@ -676,7 +676,7 @@
     "description": "Styling guide button"
   },
   "editor_tip": {
-    "message": "Tipp: Dieser eigenständige Tab kann in ein separates Fenster verschoben oder neben YouTube Music in geteilter Ansicht verwendet werden, um Änderungen in Echtzeit zu sehen. Mehr Infos auf",
+    "message": "Tipp: Dieser eigenständige Tab kann in ein separates Fenster verschoben oder neben YouTube Music in geteilter Ansicht verwendet werden, um Änderungen in Echtzeit zu sehen. Mehr Informationen auf",
     "description": "Editor tip text"
   },
   "editor_poweredBy": {
