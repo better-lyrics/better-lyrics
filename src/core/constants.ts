@@ -179,7 +179,6 @@ export const NO_VALID_LRCLIB_LYRICS_LOG: string = "[BetterLyrics] No valid lyric
 export const INVALID_CACHE_DATA_LOG: string = "[BetterLyrics] Invalid data structure in cache";
 export const CACHE_PARSING_ERROR: string = "[BetterLyrics] Error parsing cached data";
 export const LYRICS_CHECK_INTERVAL_ERROR: string = "[BetterLyrics] Error in lyrics check interval:";
-export const NO_LYRICS_TEXT: string = "No lyrics found for this song";
 export const MUSIC_NOTES: string = "♪𝅘𝅥𝅮𝅘𝅥𝅯𝅘𝅥𝅰𝅘𝅥𝅱𝅘𝅥𝅲";
 
 export const BLYRICS_INSTRUMENTAL_GAP_MS = 5000;

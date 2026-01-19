@@ -17,7 +17,13 @@ body:
     attributes:
       label: Pre-checks
       description: |
-        By submitting this issue, you confirm that you are on the latest version of Better Lyrics & you don't have other extensions enabled that could be causing this issue. Additionally, you are not submitting a feature request, question or a compatibility issue with another extension.
+        By submitting this issue, you confirm:
+        - You are on the latest version of Better Lyrics
+        - The bug reproduces with ONLY Better Lyrics enabled (disable all other extensions)
+        - The bug does NOT occur in incognito/guest mode without Better Lyrics installed
+        - This is not a feature request, question, or compatibility issue with another extension
+
+        Issues that skip these verification steps will be closed without investigation or clarification.
       options:
         - label: I confirm that I am following the pre-checks
           required: true

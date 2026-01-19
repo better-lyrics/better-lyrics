@@ -17,6 +17,7 @@ Better Lyrics upgrades your YouTube Music™ experience by providing beautiful t
  <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
 <img src="https://img.shields.io/badge/all_contributors-14-orange.svg" alt=""/>
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
+ <a aria-label="Crowdin" href="https://crowdin.com/project/better-lyrics"><img alt="Crowdin" src="https://badges.crowdin.net/better-lyrics/localized.svg"></a>
 </p>
 
 <p align="left">
@@ -55,6 +56,7 @@ Better Lyrics upgrades your YouTube Music™ experience by providing beautiful t
 - [License](#license)
 - [Privacy](#privacy)
 - [Trademarks](#trademarks)
+- [Star History](#star-history)
 - [Contributors ✨](#contributors-)
 
 > [!TIP]
@@ -288,7 +290,15 @@ Join our Discord community to discuss Better Lyrics and get support from develop
 
 ## Contributing
 
-Contributions are welcome! If you have any ideas, suggestions, or bug reports, please open an issue or submit a pull request.
+Contributions are welcome! If you have any ideas, suggestions, or bug reports, please open an issue or submit a pull request. See our [Contributing Guide](CONTRIBUTING.md) for details on code and translation contributions.
+
+<a href="https://crowdin.com/project/better-lyrics?utm_source=badge&utm_medium=referral&utm_campaign=badge-add-on">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="https://badges.crowdin.net/badge/light/crowdin-on-dark@2x.png" />
+    <source media="(prefers-color-scheme: light)" srcset="https://badges.crowdin.net/badge/dark/crowdin-on-light@2x.png" />
+    <img alt="Crowdin" src="https://badges.crowdin.net/badge/dark/crowdin-on-light@2x.png" width="140" height="40" />
+  </picture>
+</a>
 
 ## License
 
@@ -307,6 +317,16 @@ For a complete overview, please read our full [**Privacy Policy**](PRIVACY.md).
 ## Trademarks
 
 YouTube Music™, YouTube™, Google™, and Chrome™ are trademarks of Google LLC. Firefox® is a trademark of the Mozilla Foundation. Microsoft Edge is a trademark of Microsoft Corporation. Musixmatch® is a trademark of Musixmatch S.p.A. Use of these trademarks is subject to their respective owners' guidelines.
+
+## Star History
+
+<a href="https://www.star-history.com/#better-lyrics/better-lyrics&type=date&legend=top-left">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=better-lyrics/better-lyrics&type=date&theme=dark&legend=top-left" />
+    <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/svg?repos=better-lyrics/better-lyrics&type=date&legend=top-left" />
+    <img alt="Star History Chart" src="https://api.star-history.com/svg?repos=better-lyrics/better-lyrics&type=date&legend=top-left" />
+  </picture>
+</a>
 
 ## Contributors ✨
 

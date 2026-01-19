@@ -1,6 +1,7 @@
 // Function to save user options
 import Sortable from "sortablejs";
 import { LOG_PREFIX, ROMANIZATION_LANGUAGES } from "@constants";
+import { t, initI18n } from "@core/i18n";
 import { initStoreUI, setupYourThemesButton } from "./store/store";
 import { getIdentity, exportIdentity, importIdentity, type KeyIdentity } from "./store/keyIdentity";
 import { showModal } from "./editor/ui/feedback";
@@ -114,7 +115,7 @@ const clearTransientLyrics = (callback?: () => void): void => {
   chrome.tabs.query({ url: "https://music.youtube.com/*" }, tabs => {
     if (tabs.length === 0) {
       updateCacheInfo(null);
-      showAlert("Cache cleared successfully!");
+      showAlert(t("options_alert_cacheCleared"));
       if (callback && typeof callback === "function") callback();
       return;
     }
@@ -126,9 +127,9 @@ const clearTransientLyrics = (callback?: () => void): void => {
         if (completedTabs === tabs.length) {
           if (response?.success) {
             updateCacheInfo(null);
-            showAlert("Cache cleared successfully!");
+            showAlert(t("options_alert_cacheCleared"));
           } else {
-            showAlert("Failed to clear cache!");
+            showAlert(t("options_alert_cacheClearFailed"));
           }
           if (callback && typeof callback === "function") callback();
         }
@@ -166,7 +167,7 @@ const subscribeToCacheInfo = (): void => {
 // Function to update cache info
 const updateCacheInfo = (items: { cacheInfo: { count: number; size: number } } | null): void => {
   if (!items) {
-    showAlert("Nothing to clear!");
+    showAlert(t("options_alert_nothingToClear"));
     return;
   }
   const cacheInfo = items.cacheInfo || { count: 0, size: 0 };
@@ -267,49 +268,50 @@ interface ProviderInfo {
   syncType: SyncType;
 }
 
-const providerIdToInfoMap: { [key: string]: ProviderInfo } = {
-  "musixmatch-richsync": { name: "Musixmatch", syncType: "word" },
-  "musixmatch-synced": { name: "Musixmatch", syncType: "line" },
-  "yt-captions": { name: "Youtube Captions", syncType: "line" },
-  "lrclib-synced": { name: "LRClib", syncType: "line" },
-  "bLyrics-richsynced": { name: "Better Lyrics", syncType: "syllable" },
-  "bLyrics-synced": { name: "Better Lyrics", syncType: "line" },
-  "legato-synced": { name: "Better Lyrics Legato", syncType: "line" },
-  "yt-lyrics": { name: "Youtube", syncType: "unsynced" },
-  "lrclib-plain": { name: "LRClib", syncType: "unsynced" },
-};
+const getProviderIdToInfoMap = (): { [key: string]: ProviderInfo } => ({
+  "musixmatch-richsync": { name: t("options_provider_musixmatch"), syncType: "word" },
+  "musixmatch-synced": { name: t("options_provider_musixmatch"), syncType: "line" },
+  "yt-captions": { name: t("options_provider_youtubeCaptions"), syncType: "line" },
+  "lrclib-synced": { name: t("options_provider_lrclib"), syncType: "line" },
+  "bLyrics-richsynced": { name: t("options_provider_betterLyrics"), syncType: "syllable" },
+  "bLyrics-synced": { name: t("options_provider_betterLyrics"), syncType: "line" },
+  "legato-synced": { name: t("options_provider_betterLyricsLegato"), syncType: "line" },
+  "yt-lyrics": { name: t("options_provider_youtube"), syncType: "unsynced" },
+  "lrclib-plain": { name: t("options_provider_lrclib"), syncType: "unsynced" },
+});
 
-const syncTypeConfig: { [key in SyncType]: { label: string; icon: string; tooltip: string } } = {
+const getSyncTypeConfig = (): { [key in SyncType]: { label: string; icon: string; tooltip: string } } => ({
   syllable: {
-    label: "Syllable",
-    tooltip: "Highlights individual syllables as they're sung. Syllable syncing provides the best experience.",
+    label: t("options_syncType_syllable"),
+    tooltip: t("options_syncType_syllable_tooltip"),
     icon: `<svg width="16" height="16" viewBox="0 0 1024 1024" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><rect x="636" y="239" width="389.981" height="233.271" rx="48" fill-opacity="0.5"/><path d="M0 335C0 289.745 0 267.118 14.0589 253.059C28.1177 239 50.7452 239 96 239H213C243.17 239 258.255 239 267.627 248.373C277 257.745 277 272.83 277 303V408C277 438.17 277 453.255 267.627 462.627C258.255 472 243.17 472 213 472H96C50.7452 472 28.1177 472 14.0589 457.941C0 443.882 0 421.255 0 376V335Z"/><path d="M337 304C337 273.83 337 258.745 346.373 249.373C355.745 240 370.83 240 401 240H460C505.255 240 527.882 240 541.941 254.059C556 268.118 556 290.745 556 336V377C556 422.255 556 444.882 541.941 458.941C527.882 473 505.255 473 460 473H401C370.83 473 355.745 473 346.373 463.627C337 454.255 337 439.17 337 409V304Z" fill-opacity="0.5"/><rect y="552.271" width="1024" height="233" rx="48" fill-opacity="0.5"/></svg>`,
   },
   word: {
-    label: "Word",
-    tooltip: "Highlights individual words as they're sung. Word syncing provides a good experience.",
+    label: t("options_syncType_word"),
+    tooltip: t("options_syncType_word_tooltip"),
     icon: `<svg width="16" height="16" viewBox="0 0 1024 1024" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><rect x="636" y="239" width="389.981" height="233.271" rx="48" fill-opacity="0.5"/><path d="M0 335C0 289.745 0 267.118 14.0589 253.059C28.1177 239 50.7452 239 96 239H213C243.17 239 258.255 239 267.627 248.373C277 257.745 277 272.83 277 303V408C277 438.17 277 453.255 267.627 462.627C258.255 472 243.17 472 213 472H96C50.7452 472 28.1177 472 14.0589 457.941C0 443.882 0 421.255 0 376V335Z"/><path d="M337 304C337 273.83 337 258.745 346.373 249.373C355.745 240 370.83 240 401 240H460C505.255 240 527.882 240 541.941 254.059C556 268.118 556 290.745 556 336V377C556 422.255 556 444.882 541.941 458.941C527.882 473 505.255 473 460 473H401C370.83 473 355.745 473 346.373 463.627C337 454.255 337 439.17 337 409V304Z"/><rect y="552.271" width="1024" height="233" rx="48" fill-opacity="0.5"/></svg>`,
   },
   line: {
-    label: "Line",
-    tooltip: "Highlights entire lines as they're sung. Line syncing provides a basic experience.",
+    label: t("options_syncType_line"),
+    tooltip: t("options_syncType_line_tooltip"),
     icon: `<svg width="16" height="16" viewBox="0 0 1024 1024" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><rect x="636" y="239" width="389.981" height="233.271" rx="48"/><path d="M0 335C0 289.745 0 267.118 14.0589 253.059C28.1177 239 50.7452 239 96 239H213C243.17 239 258.255 239 267.627 248.373C277 257.745 277 272.83 277 303V408C277 438.17 277 453.255 267.627 462.627C258.255 472 243.17 472 213 472H96C50.7452 472 28.1177 472 14.0589 457.941C0 443.882 0 421.255 0 376V335Z"/><path d="M337 304C337 273.83 337 258.745 346.373 249.373C355.745 240 370.83 240 401 240H460C505.255 240 527.882 240 541.941 254.059C556 268.118 556 290.745 556 336V377C556 422.255 556 444.882 541.941 458.941C527.882 473 505.255 473 460 473H401C370.83 473 355.745 473 346.373 463.627C337 454.255 337 439.17 337 409V304Z"/><rect y="552.271" width="1024" height="233" rx="48" fill-opacity="0.5"/></svg>`,
   },
   unsynced: {
-    label: "Unsynced",
-    tooltip: "Lyrics without timing information. Unsynced lyrics provide a minimal experience.",
+    label: t("options_syncType_unsynced"),
+    tooltip: t("options_syncType_unsynced_tooltip"),
     icon: `<svg width="16" height="16" viewBox="0 0 1024 1024" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><rect x="636" y="239" width="389.981" height="233.271" rx="48" fill-opacity="0.5"/><path d="M0 335C0 289.745 0 267.118 14.0589 253.059C28.1177 239 50.7452 239 96 239H213C243.17 239 258.255 239 267.627 248.373C277 257.745 277 272.83 277 303V408C277 438.17 277 453.255 267.627 462.627C258.255 472 243.17 472 213 472H96C50.7452 472 28.1177 472 14.0589 457.941C0 443.882 0 421.255 0 376V335Z" fill-opacity="0.5"/><path d="M337 304C337 273.83 337 258.745 346.373 249.373C355.745 240 370.83 240 401 240H460C505.255 240 527.882 240 541.941 254.059C556 268.118 556 290.745 556 336V377C556 422.255 556 444.882 541.941 458.941C527.882 473 505.255 473 460 473H401C370.83 473 355.745 473 346.373 463.627C337 454.255 337 439.17 337 409V304Z" fill-opacity="0.5"/><rect y="552.271" width="1024" height="233" rx="48" fill-opacity="0.5"/></svg>`,
   },
-};
+});
 
 function createProviderElem(providerId: string, checked = true): HTMLLIElement | null {
+  const providerIdToInfoMap = getProviderIdToInfoMap();
   if (!Object.hasOwn(providerIdToInfoMap, providerId)) {
     console.warn("Unknown provider ID:", providerId);
     return null;
   }
 
   const providerInfo = providerIdToInfoMap[providerId];
-  const syncConfig = syncTypeConfig[providerInfo.syncType];
+  const syncConfig = getSyncTypeConfig()[providerInfo.syncType];
 
   const liElem = document.createElement("li");
   liElem.classList.add("sortable-item");
@@ -368,7 +370,10 @@ function createProviderElem(providerId: string, checked = true): HTMLLIElement |
 }
 
 // Event listeners
-document.addEventListener("DOMContentLoaded", restoreOptions);
+document.addEventListener("DOMContentLoaded", () => {
+  initI18n();
+  restoreOptions();
+});
 document.querySelectorAll("#options input, #options select").forEach(element => {
   element.addEventListener("change", saveOptions);
 });
@@ -415,7 +420,7 @@ async function initIdentityUI(): Promise<void> {
     displayNameEl.textContent = identity.displayName;
   } catch (error) {
     console.error(LOG_PREFIX, "Failed to load identity:", error);
-    displayNameEl.textContent = "Error loading identity";
+    displayNameEl.textContent = t("options_alert_identityLoadError");
   }
 
   document.getElementById("export-identity-btn")?.addEventListener("click", handleExportIdentity);
@@ -443,7 +448,7 @@ async function handleExportIdentity(): Promise<void> {
     });
   } catch (error) {
     console.error(LOG_PREFIX, "Failed to export identity:", error);
-    showAlert("Failed to export identity");
+    showAlert(t("options_alert_exportFailed"));
   }
 }
 
@@ -459,11 +464,11 @@ function downloadIdentityFile(content: string, filename: string): void {
         saveAs: true,
       })
       .then(() => {
-        showAlert("Identity file save dialog opened.");
+        showAlert(t("options_alert_fileSaveDialogOpened"));
         URL.revokeObjectURL(url);
       })
       .catch(() => {
-        showAlert("Error saving file. Please try again.");
+        showAlert(t("options_alert_fileSaveFailed"));
         URL.revokeObjectURL(url);
       });
   } else {
@@ -485,7 +490,7 @@ function fallbackDownloadIdentity(content: string, filename: string): void {
 
   setTimeout(() => URL.revokeObjectURL(url), 100);
 
-  showAlert("Identity file download initiated.");
+  showAlert(t("options_alert_downloadInitiated"));
 }
 
 async function handleImportIdentity(): Promise<void> {
@@ -501,7 +506,7 @@ async function handleImportIdentity(): Promise<void> {
       const text = await file.text();
       const imported = await importIdentity(text);
       updateIdentityDisplay(imported);
-      showAlert("Identity imported successfully!");
+      showAlert(t("options_alert_importSuccess"));
     } catch (err) {
       const message = err instanceof Error ? err.message : "Invalid identity file";
       showAlert(message);

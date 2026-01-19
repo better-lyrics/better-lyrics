@@ -3,14 +3,8 @@
  * Manages lyrics fetching, caching, processing, and rendering.
  */
 
-import {
-  FETCH_LYRICS_LOG,
-  LOG_PREFIX,
-  LYRICS_TAB_HIDDEN_LOG,
-  NO_LYRICS_TEXT,
-  SERVER_ERROR_LOG,
-  TAB_HEADER_CLASS,
-} from "@constants";
+import { FETCH_LYRICS_LOG, LOG_PREFIX, LYRICS_TAB_HIDDEN_LOG, SERVER_ERROR_LOG, TAB_HEADER_CLASS } from "@constants";
+import { t } from "@core/i18n";
 import { AppState, type PlayerDetails } from "@core/appState";
 import { type LyricsData, processLyrics } from "@modules/lyrics/injectLyrics";
 import { stringSimilarity } from "@modules/lyrics/lyricParseUtils";
@@ -242,7 +236,7 @@ export async function createLyrics(detail: PlayerDetails, signal: AbortSignal): 
       lyrics: [
         {
           startTimeMs: 0,
-          words: NO_LYRICS_TEXT,
+          words: t("lyrics_notFound"),
           durationMs: 0,
         },
       ],
