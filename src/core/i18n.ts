@@ -1,3 +1,5 @@
+import { LOG_PREFIX } from "@constants";
+
 export function t(key: string, substitutions?: string | string[]): string {
   const message = chrome.i18n.getMessage(key, substitutions);
   return message || key;
@@ -14,7 +16,7 @@ export function getLanguageDisplayName(langCode: string): string {
     const displayNames = new Intl.DisplayNames([navigator.language], { type: "language" });
     return displayNames.of(displayCode) ?? langCode;
   } catch (e) {
-    console.warn(`[i18n] Failed to get display name for "${langCode}":`, e);
+    console.warn(`${LOG_PREFIX} Failed to get display name for "${langCode}":`, e);
     return langCode;
   }
 }
