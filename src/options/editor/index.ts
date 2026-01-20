@@ -56,10 +56,17 @@ export function initializeEditorKeyboardShortcuts() {
           openSearchPanel(view);
         }
       } else {
+        const message = document.createDocumentFragment();
+        message.append("Find & Replace is only available in the fullscreen editor.");
+        message.append(document.createElement("br"), document.createElement("br"));
+        message.append("Click ");
+        const strong = document.createElement("strong");
+        strong.textContent = "Open Fullscreen Editor";
+        message.append(strong, " to access all editor features.");
+
         showModal({
           title: "Find & Replace",
-          message:
-            "Find & Replace is only available in the fullscreen editor.<br><br>Click <strong>Open Fullscreen Editor</strong> to access all editor features.",
+          message,
           confirmText: "Open Fullscreen Editor",
           cancelText: "Close",
         }).then(result => {

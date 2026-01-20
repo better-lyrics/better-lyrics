@@ -155,7 +155,7 @@ export function processLyrics(data: LyricSourceResultWithMeta, keepLoaderVisible
 
   try {
     const lyricsElement = document.getElementsByClassName(LYRICS_CLASS)[0] as HTMLElement;
-    lyricsElement.innerHTML = "";
+    lyricsElement.replaceChildren();
   } catch (_err) {
     log(LYRICS_TAB_NOT_DISABLED_LOG);
   }
@@ -258,7 +258,7 @@ export function injectLyrics(data: LyricSourceResultWithMeta, keepLoaderVisible 
 
   let lyricsWrapper = createLyricsWrapper();
 
-  lyricsWrapper.innerHTML = "";
+  lyricsWrapper.replaceChildren();
   const lyricsContainer = document.createElement("div");
   lyricsContainer.className = LYRICS_CLASS;
   lyricsWrapper.appendChild(lyricsContainer);

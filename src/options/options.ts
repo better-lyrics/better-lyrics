@@ -221,7 +221,7 @@ const setOptionsInForm = (items: Options): void => {
   (document.getElementById("isRomanizationEnabled") as HTMLInputElement).checked = items.isRomanizationEnabled;
 
   const providersListElem = document.getElementById("providers-list")!;
-  providersListElem.innerHTML = "";
+  providersListElem.replaceChildren();
 
   // Always recreate in the default order to make sure no items go missing
   let unseenProviders = [
@@ -338,7 +338,8 @@ function createProviderElem(providerId: string, checked = true): HTMLLIElement |
   const tagElem = document.createElement("span");
   tagElem.classList.add("sync-tag", `sync-tag--${providerInfo.syncType}`);
   tagElem.dataset.tooltip = syncConfig.tooltip;
-  tagElem.innerHTML = syncConfig.icon;
+  const svgDoc = new DOMParser().parseFromString(syncConfig.icon, "image/svg+xml");
+  tagElem.appendChild(svgDoc.documentElement);
   const tagLabel = document.createElement("span");
   tagLabel.textContent = syncConfig.label;
   tagElem.appendChild(tagLabel);
