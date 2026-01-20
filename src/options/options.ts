@@ -690,13 +690,21 @@ function renderRomanizationLanguagePills(): void {
   }
 }
 
+function getTranslationLanguagesFromSelect(): string[] {
+  const select = document.getElementById("translationLanguage") as HTMLSelectElement;
+  if (!select) return [];
+  return Array.from(select.options)
+    .map(opt => opt.value)
+    .filter(Boolean);
+}
+
 function renderTranslationLanguagePills(): void {
   const container = document.getElementById("translation-pills-container");
   if (!container) return;
 
   container.replaceChildren();
 
-  for (const langCode of Object.keys(ROMANIZATION_LANGUAGES)) {
+  for (const langCode of getTranslationLanguagesFromSelect()) {
     const langName = getLanguageDisplayName(langCode);
     const isDisabled = translationDisabledLanguages.includes(langCode);
 
