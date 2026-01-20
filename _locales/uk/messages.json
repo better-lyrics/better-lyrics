@@ -24,7 +24,7 @@
     "description": "Sources settings tab label"
   },
   "options_tab_identity": {
-    "message": "Особисті дані",
+    "message": "Профіль",
     "description": "Identity settings tab label"
   },
   "options_tab_themes": {
@@ -148,127 +148,127 @@
     "description": "Installed themes button label"
   },
   "options_identity_title": {
-    "message": "Особисті",
+    "message": "Особисті дані",
     "description": "Identity settings section title"
   },
   "options_identity_description": {
-    "message": "Ваша унікальна анонімна особистість у Better Lyrics.",
+    "message": "Ваші унікальні попередні налаштування в Better Lyrics.",
     "description": "Identity settings section description"
   },
   "options_identity_yourIdentity": {
-    "message": "Your identity",
+    "message": "Ваша особистість",
     "description": "Your identity label"
   },
   "options_identity_loading": {
-    "message": "Loading...",
+    "message": "Завантаження...",
     "description": "Loading identity placeholder"
   },
   "options_identity_exportImport": {
-    "message": "Export/Import",
+    "message": "Експорт/Імпорт",
     "description": "Export/Import section label"
   },
   "options_identity_exportKey": {
-    "message": "Export Key",
+    "message": "Експортувати",
     "description": "Export key button label"
   },
   "options_identity_importKey": {
-    "message": "Import Key",
+    "message": "Імпортувати",
     "description": "Import key button label"
   },
   "options_modal_selectTheme": {
-    "message": "Select a Theme",
+    "message": "Обрати тему",
     "description": "Theme modal title"
   },
   "options_modal_cancel": {
-    "message": "Cancel",
+    "message": "Скасувати",
     "description": "Cancel button label"
   },
   "options_modal_confirm": {
-    "message": "Confirm",
+    "message": "Підтвердити",
     "description": "Confirm button label"
   },
   "options_alert_cacheCleared": {
-    "message": "Cache cleared successfully!",
+    "message": "Кеш-пам'ять успішно очищено!",
     "description": "Cache cleared success message"
   },
   "options_alert_cacheClearFailed": {
-    "message": "Failed to clear cache!",
+    "message": "Не вдалося очистити кеш-пам'ять!",
     "description": "Cache clear failed message"
   },
   "options_alert_nothingToClear": {
-    "message": "Nothing to clear!",
+    "message": "Очищення не потрібно!",
     "description": "Nothing to clear message"
   },
   "options_alert_exportFailed": {
-    "message": "Failed to export identity",
+    "message": "Не вдалось імпортувати дані",
     "description": "Export identity failed message"
   },
   "options_alert_fileSaveDialogOpened": {
-    "message": "Identity file save dialog opened.",
+    "message": "Діалогове вікно збереження файлу особистих даних.",
     "description": "File save dialog opened message"
   },
   "options_alert_fileSaveFailed": {
-    "message": "Error saving file. Please try again.",
+    "message": "Помилка під час збереження файлу. Будь ласка, спробуйте ще раз.",
     "description": "File save failed message"
   },
   "options_alert_downloadInitiated": {
-    "message": "Identity file download initiated.",
+    "message": "Завантаження файлу особистих даних розпочато.",
     "description": "Download initiated message"
   },
   "options_alert_importSuccess": {
-    "message": "Identity imported successfully!",
+    "message": "Особисті дані успішно імпортовано!",
     "description": "Import success message"
   },
   "options_alert_identityLoadError": {
-    "message": "Error loading identity",
+    "message": "Помилка при завантаженні",
     "description": "Identity load error message"
   },
   "options_editor_saving": {
-    "message": "Saving...",
+    "message": "Збереження...",
     "description": "Saving indicator text"
   },
   "options_editor_importFile": {
-    "message": "Import from file",
+    "message": "Імпортувати з файлу",
     "description": "Import from file tooltip"
   },
   "options_editor_exportFile": {
-    "message": "Export to file",
+    "message": "Експорт до файлу",
     "description": "Export to file tooltip"
   },
   "options_editor_saveAsTheme": {
-    "message": "Save as theme",
+    "message": "Зберегти тему",
     "description": "Save as theme tooltip"
   },
   "options_editor_openInNewTab": {
-    "message": "Open in new tab",
+    "message": "Відкривати в новій вкладці",
     "description": "Open in new tab tooltip"
   },
   "options_editor_backToSettings": {
-    "message": "Back to Settings",
+    "message": "Назад до налаштувань",
     "description": "Back to settings button label"
   },
   "options_editor_fullExperienceNote": {
-    "message": "For the full editor experience, ",
+    "message": "Для повноцінної роботи редактора ",
     "description": "Full editor experience note prefix"
   },
   "options_editor_openInNewTabLink": {
-    "message": "open this editor in a new tab",
+    "message": "відкрити редактор у новій вкладці",
     "description": "Open in new tab link text"
   },
   "options_editor_stylingGuide": {
-    "message": "Styling Guide",
+    "message": "Посібник зі стилізації",
     "description": "Styling guide link text"
   },
   "options_editor_renameTheme": {
-    "message": "Rename custom theme",
+    "message": "Перейменувати користувацьку тему",
     "description": "Rename theme button title"
   },
   "options_editor_deleteTheme": {
-    "message": "Delete custom theme",
+    "message": "Видалити користувацьку тему",
     "description": "Delete theme button title"
   },
   "options_editor_doubleClickRename": {
-    "message": "Double-click to rename",
+    "message": "Двічі клацніть, щоб перейменувати",
     "description": "Double-click to rename tooltip"
   },
   "options_provider_betterLyrics": {
@@ -296,191 +296,191 @@
     "description": "Youtube Captions provider name"
   },
   "options_syncType_syllable": {
-    "message": "Syllable",
+    "message": "Склади",
     "description": "Syllable sync type label"
   },
   "options_syncType_syllable_tooltip": {
-    "message": "Highlights individual syllables as they're sung. Syllable syncing provides the best experience.",
+    "message": "Виділяє склади в міру виконання. Найвищий рівень синхронізації.",
     "description": "Syllable sync type tooltip"
   },
   "options_syncType_word": {
-    "message": "Word",
+    "message": "Слово",
     "description": "Word sync type label"
   },
   "options_syncType_word_tooltip": {
-    "message": "Highlights individual words as they're sung. Word syncing provides a good experience.",
+    "message": "Виділяє кожне слово, коли воно звучить. Кращий рівень синхронізації.",
     "description": "Word sync type tooltip"
   },
   "options_syncType_line": {
-    "message": "Line",
+    "message": "Рядок",
     "description": "Line sync type label"
   },
   "options_syncType_line_tooltip": {
-    "message": "Highlights entire lines as they're sung. Line syncing provides a basic experience.",
+    "message": "Виділяє весь рядок, коли він звучить. Базовий рівень синхронізації.",
     "description": "Line sync type tooltip"
   },
   "options_syncType_unsynced": {
-    "message": "Unsynced",
+    "message": "Несинхронізоване",
     "description": "Unsynced sync type label"
   },
   "options_syncType_unsynced_tooltip": {
-    "message": "Lyrics without timing information. Unsynced lyrics provide a minimal experience.",
+    "message": "Тексти без прив'язки до таймінгу. Несинхронізовані тексти мають обмежений функціонал.",
     "description": "Unsynced sync type tooltip"
   },
   "options_detail_rateTheme": {
-    "message": "Rate this theme",
+    "message": "Оцінити цю тему",
     "description": "Rate theme label"
   },
   "options_detail_install": {
-    "message": "Install",
+    "message": "Встановити",
     "description": "Install button label"
   },
   "options_detail_viewOnGitHub": {
-    "message": "View on GitHub",
+    "message": "Переглянути на GitHub",
     "description": "View on GitHub link text"
   },
   "options_detail_shaderInfo": {
-    "message": "This theme includes a shader config.",
+    "message": "У цій темі використовується конфігурація шейдера.",
     "description": "Shader info text prefix"
   },
   "options_detail_downloadShader": {
-    "message": "Download shader.json",
+    "message": "Завантажити shader.json",
     "description": "Download shader link text"
   },
   "options_detail_shaderImportSuffix": {
-    "message": "and import it in",
+    "message": "та імпортувати його в",
     "description": "Shader import suffix text before Better Lyrics Shaders link"
   },
   "marketplace_pageTitle": {
-    "message": "Better Lyrics Theme Marketplace",
+    "message": "Магазин тем Better Lyrics",
     "description": "Page title"
   },
   "marketplace_title": {
-    "message": "Theme Marketplace",
+    "message": "Магазин тем",
     "description": "Header title"
   },
   "marketplace_subtitle": {
-    "message": "Discover and install community themes",
+    "message": "Знаходьте та встановлюйте теми від спільноти",
     "description": "Header subtitle"
   },
   "marketplace_searchPlaceholder": {
-    "message": "Search themes...",
+    "message": "Пошук тем...",
     "description": "Search input placeholder"
   },
   "marketplace_refresh": {
-    "message": "Refresh",
+    "message": "Оновити",
     "description": "Refresh button label"
   },
   "marketplace_keyboardShortcuts": {
-    "message": "Keyboard shortcuts",
+    "message": "Гарячі клавіші",
     "description": "Keyboard shortcuts button label"
   },
   "marketplace_sortBy": {
-    "message": "Sort by",
+    "message": "Сортувати",
     "description": "Sort filter group label"
   },
   "marketplace_sortRatingDesc": {
-    "message": "Highest rated",
+    "message": "Найвище оцінені",
     "description": "Sort by highest rating"
   },
   "marketplace_sortRatingAsc": {
-    "message": "Lowest rated",
+    "message": "Найнижче оцінені",
     "description": "Sort by lowest rating"
   },
   "marketplace_sortDownloadsDesc": {
-    "message": "Most downloaded",
+    "message": "Найчастіше завантажувані",
     "description": "Sort by most downloads"
   },
   "marketplace_sortDownloadsAsc": {
-    "message": "Least downloaded",
+    "message": "Найменш завантажувані",
     "description": "Sort by least downloads"
   },
   "marketplace_sortNewest": {
-    "message": "Newest",
+    "message": "Найновіші",
     "description": "Sort by newest"
   },
   "marketplace_sortOldest": {
-    "message": "Oldest",
+    "message": "Найстаріші",
     "description": "Sort by oldest"
   },
   "marketplace_show": {
-    "message": "Show",
+    "message": "Показати",
     "description": "Show filter group label"
   },
   "marketplace_showAll": {
-    "message": "All",
+    "message": "Усі",
     "description": "Show all themes"
   },
   "marketplace_showInstalled": {
-    "message": "Installed",
+    "message": "Встановлені",
     "description": "Show installed themes"
   },
   "marketplace_showNotInstalled": {
-    "message": "Not installed",
+    "message": "Не встановлені",
     "description": "Show not installed themes"
   },
   "marketplace_options": {
-    "message": "Options",
+    "message": "Опції",
     "description": "Options filter group label"
   },
   "marketplace_hasShaders": {
-    "message": "Has shaders",
+    "message": "Має шейдери",
     "description": "Filter for themes with shaders"
   },
   "marketplace_compatibleOnly": {
-    "message": "Compatible only",
+    "message": "Тільки сумісні",
     "description": "Filter for compatible themes"
   },
   "marketplace_installFromUrl": {
-    "message": "Install from URL",
+    "message": "Встановити з URL-адреси",
     "description": "Install from URL button"
   },
   "marketplace_submitTheme": {
-    "message": "Submit a theme",
+    "message": "Подати тему",
     "description": "Submit a theme link"
   },
   "marketplace_loading": {
-    "message": "Loading themes...",
+    "message": "Завантаження...",
     "description": "Loading message"
   },
   "marketplace_retry": {
-    "message": "Retry",
+    "message": "Повторити спробу",
     "description": "Retry button"
   },
   "marketplace_noThemesMatch": {
-    "message": "No themes match your filters",
+    "message": "Немає тем, що відповідають вашим фільтрам",
     "description": "Empty state message"
   },
   "marketplace_permissionTitle": {
-    "message": "Permission Required",
+    "message": "Необхідні дозволи",
     "description": "Permission required title"
   },
   "marketplace_permissionMessage": {
-    "message": "To browse and install themes, Better Lyrics needs permission to access GitHub where themes are hosted & the marketplace api.",
+    "message": "Для перегляду й встановлення тем Better Lyrics потрібен доступ до GitHub (де зберігаються теми) та api магазину тем.",
     "description": "Permission required message"
   },
   "marketplace_grantPermission": {
-    "message": "Grant Permission",
+    "message": "Надати дозвіл",
     "description": "Grant permission button"
   },
   "marketplace_install": {
-    "message": "Install",
+    "message": "Встановити",
     "description": "Install button"
   },
   "marketplace_remove": {
-    "message": "Remove",
+    "message": "Видалити",
     "description": "Remove button"
   },
   "marketplace_apply": {
-    "message": "Apply",
+    "message": "Застосувати",
     "description": "Apply button"
   },
   "marketplace_active": {
-    "message": "Active",
+    "message": "Активний",
     "description": "Active theme indicator"
   },
   "marketplace_shadersBadge": {
-    "message": "Shaders",
+    "message": "Шейдери",
     "description": "Shaders badge text"
   },
   "marketplace_githubBadge": {
@@ -488,239 +488,239 @@
     "description": "GitHub badge text"
   },
   "marketplace_urlModalTitle": {
-    "message": "Install from URL",
+    "message": "Встановити з URL-адреси",
     "description": "URL install modal title"
   },
   "marketplace_urlModalMessage": {
-    "message": "Enter a GitHub repository URL to install a theme directly:",
+    "message": "Вкажіть посилання на репозиторій GitHub для прямого встановлення теми:",
     "description": "URL install modal message"
   },
   "marketplace_urlModalPlaceholder": {
-    "message": "github.com/user/repo or github.com/user/repo/tree/branch",
+    "message": "github.com/user/repo чи github.com/user/repo/tree/branch",
     "description": "URL input placeholder"
   },
   "marketplace_urlModalError": {
-    "message": "Please enter a GitHub repository URL",
+    "message": "Потрібно вказати URL репозиторію GitHub",
     "description": "URL validation error"
   },
   "marketplace_cancel": {
-    "message": "Cancel",
+    "message": "Скасувати",
     "description": "Cancel button"
   },
   "marketplace_urlPermissionTitle": {
-    "message": "Additional Permission Required",
+    "message": "Необхідний додатковий дозвіл",
     "description": "URL permission modal title"
   },
   "marketplace_urlPermissionWhy": {
-    "message": "Why is this needed?",
+    "message": "Чому це необхідно?",
     "description": "URL permission explanation title"
   },
   "marketplace_urlPermissionDesc": {
-    "message": "Installing themes from custom GitHub URLs requires broader access than the marketplace. This allows Better Lyrics to:",
+    "message": "Для встановлення тем із користувацьких URL GitHub Better Lyrics потрібні розширені дозволи. Це дає змогу:",
     "description": "URL permission description"
   },
   "marketplace_urlPermissionItem1": {
-    "message": "Fetch theme files from any GitHub repository",
+    "message": "Завантажувати файли тем з будь-якого репозиторію GitHub",
     "description": "URL permission list item 1"
   },
   "marketplace_urlPermissionItem2": {
-    "message": "Detect the default branch of the repository",
+    "message": "Виявляти стандартну гілку репозиторію",
     "description": "URL permission list item 2"
   },
   "marketplace_urlPermissionItem3": {
-    "message": "Validate the theme structure before installation",
+    "message": "Перевіряти структуру теми перед встановленням",
     "description": "URL permission list item 3"
   },
   "marketplace_urlPermissionNote": {
-    "message": "This permission is only used when you install themes via URL. Marketplace themes don't require this.",
+    "message": "Цей доступ потрібен тільки для встановлення тем через URL; для тем із магазину він не використовується.",
     "description": "URL permission note"
   },
   "marketplace_shortcutsTitle": {
-    "message": "Keyboard Shortcuts",
+    "message": "Гарячі клавіші",
     "description": "Shortcuts modal title"
   },
   "marketplace_shortcutsNavigation": {
-    "message": "Navigation",
+    "message": "Навігація",
     "description": "Navigation shortcuts group"
   },
   "marketplace_shortcutsSearch": {
-    "message": "Search themes",
+    "message": "Пошук тем",
     "description": "Search shortcut label"
   },
   "marketplace_shortcutsRefresh": {
-    "message": "Refresh marketplace",
+    "message": "Оновити асортимент",
     "description": "Refresh shortcut label"
   },
   "marketplace_shortcutsInstallUrl": {
-    "message": "Install from URL",
+    "message": "Встановити з URL-адреси",
     "description": "Install from URL shortcut label"
   },
   "marketplace_shortcutsPrevPage": {
-    "message": "Previous page",
+    "message": "Попередня сторінка",
     "description": "Previous page shortcut label"
   },
   "marketplace_shortcutsNextPage": {
-    "message": "Next page",
+    "message": "Наступна сторінка",
     "description": "Next page shortcut label"
   },
   "marketplace_shortcutsSort": {
-    "message": "Sort",
+    "message": "Сортувати",
     "description": "Sort shortcuts group"
   },
   "marketplace_shortcutsSortHint": {
-    "message": "press again to toggle direction",
+    "message": "повторне натискання змінить порядок",
     "description": "Sort toggle hint"
   },
   "marketplace_shortcutsByRating": {
-    "message": "By rating",
+    "message": "За рейтингом",
     "description": "Sort by rating shortcut"
   },
   "marketplace_shortcutsByDownloads": {
-    "message": "By downloads",
+    "message": "За завантаженнями",
     "description": "Sort by downloads shortcut"
   },
   "marketplace_shortcutsByDate": {
-    "message": "By date",
+    "message": "За датою",
     "description": "Sort by date shortcut"
   },
   "marketplace_shortcutsFilters": {
-    "message": "Filters",
+    "message": "Фільтри",
     "description": "Filters shortcuts group"
   },
   "marketplace_shortcutsShowAll": {
-    "message": "Show all",
+    "message": "Показати усі",
     "description": "Show all shortcut"
   },
   "marketplace_shortcutsShowInstalled": {
-    "message": "Show installed",
+    "message": "Показати встановлені",
     "description": "Show installed shortcut"
   },
   "marketplace_shortcutsShowNotInstalled": {
-    "message": "Show not installed",
+    "message": "Показати не встановлені",
     "description": "Show not installed shortcut"
   },
   "marketplace_shortcutsToggleShaders": {
-    "message": "Toggle shaders",
+    "message": "Перемкнути шейдери",
     "description": "Toggle shaders shortcut"
   },
   "marketplace_shortcutsToggleCompatible": {
-    "message": "Toggle compatible",
+    "message": "Перемкнути сумісні",
     "description": "Toggle compatible shortcut"
   },
   "marketplace_shortcutsDetails": {
-    "message": "Theme Details",
+    "message": "Дії щодо теми",
     "description": "Theme details shortcuts group"
   },
   "marketplace_shortcutsInstallRemove": {
-    "message": "Install / Remove",
+    "message": "Встановити / Видалити",
     "description": "Install/remove shortcut"
   },
   "marketplace_shortcutsPrevImage": {
-    "message": "Previous image",
+    "message": "Попереднє зображення",
     "description": "Previous image shortcut"
   },
   "marketplace_shortcutsNextImage": {
-    "message": "Next image",
+    "message": "Наступне зображення",
     "description": "Next image shortcut"
   },
   "marketplace_shortcutsGeneral": {
-    "message": "General",
+    "message": "Загальні",
     "description": "General shortcuts group"
   },
   "marketplace_shortcutsCloseModal": {
-    "message": "Close modal",
+    "message": "Закрити модальне вікно",
     "description": "Close modal shortcut"
   },
   "marketplace_shortcutsShowShortcuts": {
-    "message": "Show shortcuts",
+    "message": "Показати гарячі клавіші",
     "description": "Show shortcuts shortcut"
   },
   "marketplace_shortcutsApplyTheme": {
-    "message": "Apply theme (after install)",
+    "message": "Застосувати тему (після встановлення)",
     "description": "Apply theme shortcut"
   },
   "marketplace_ratingFailed": {
-    "message": "Failed to submit rating",
+    "message": "Не вдалося надіслати оцінку",
     "description": "Rating submission error"
   },
   "marketplace_shaderFetchFailed": {
-    "message": "Failed to fetch shader config",
+    "message": "Не вдалося отримати налаштування шейдера",
     "description": "Shader fetch error"
   },
   "marketplace_applyFailed": {
-    "message": "Failed to apply theme",
+    "message": "Не вдалося застосувати тему",
     "description": "Theme apply error"
   },
   "marketplace_noThemesInstalled": {
-    "message": "No themes installed yet",
+    "message": "Немає встановлених тем",
     "description": "Empty installed themes message"
   },
   "editor_pageTitle": {
-    "message": "Better Lyrics CSS Editor",
+    "message": "Better Lyrics Редактор CSS",
     "description": "Standalone editor page title"
   },
   "editor_importFromFile": {
-    "message": "Import from file",
+    "message": "Імпортувати з файлу",
     "description": "Import from file button"
   },
   "editor_exportToFile": {
-    "message": "Export to file",
+    "message": "Експорт до файлу",
     "description": "Export to file button"
   },
   "editor_saveAsTheme": {
-    "message": "Save as theme",
+    "message": "Зберегти тему",
     "description": "Save as theme button"
   },
   "editor_stylingGuide": {
-    "message": "Styling guide",
+    "message": "Посібнику зі стилізації",
     "description": "Styling guide button"
   },
   "editor_tip": {
-    "message": "Tip: This is a standalone tab, you can move this editor to a separate window or use split-screen view alongside YouTube Music to see your changes in real-time. For more info, visit the",
+    "message": "Порада: це окрема вкладка — перемістіть редактор у нове вікно або відкрийте розділений екран із YouTube Music, щоб спостерігати зміни в реальному часі. Дізнайтеся більше в",
     "description": "Editor tip text"
   },
   "editor_poweredBy": {
-    "message": "Powered by",
+    "message": "Працює на основі",
     "description": "Powered by label"
   },
   "editor_playground": {
-    "message": "Playground",
+    "message": "Майданчик",
     "description": "Playground link text"
   },
   "editor_docs": {
-    "message": "Docs",
+    "message": "Документація",
     "description": "Docs link text"
   },
   "lyrics_source": {
-    "message": "Source: ",
+    "message": "Джерело: ",
     "description": "Lyrics source label"
   },
   "lyrics_addToLrclib": {
-    "message": "Add Lyrics to LRCLib",
+    "message": "Додати тексти пісень до LRCLib",
     "description": "Add lyrics button text"
   },
   "lyrics_searchOnGenius": {
-    "message": "Search on Genius",
+    "message": "Пошук на Genius",
     "description": "Search on Genius button text"
   },
   "lyrics_searching": {
-    "message": "Better Lyrics is searching for lyrics...",
+    "message": "Better Lyrics шукає текст пісні...",
     "description": "Loading message while searching for lyrics"
   },
   "lyrics_stillSearching": {
-    "message": "Still searching for synced lyrics...",
+    "message": "Все ще шукаємо...",
     "description": "Loading message while still searching"
   },
   "lyrics_noSyncedLyrics": {
-    "message": "Better Lyrics could not find synced lyrics",
+    "message": "Better Lyrics не вдалося знайти синхронізований текст пісні",
     "description": "Message when no synced lyrics found"
   },
   "lyrics_adPlaying": {
-    "message": "[elevator music]",
+    "message": "[фонова музика]",
     "description": "Message shown during ad playback"
   },
   "lyrics_notFound": {
-    "message": "No lyrics found for this song",
+    "message": "Не знайдено текстів для цієї пісні",
     "description": "Message when no lyrics are available"
   }
 }
