@@ -107,7 +107,13 @@ export const showAlert = (message: string, action?: AlertAction): void => {
 export function showModal(options: ModalOptions): Promise<string | null> {
   return new Promise(resolve => {
     modalTitle.textContent = options.title;
-    modalMessage.innerHTML = options.message;
+    if (typeof options.message === "string") {
+      modalMessage.textContent = options.message;
+    } else if (Array.isArray(options.message)) {
+      modalMessage.replaceChildren(...options.message);
+    } else {
+      modalMessage.replaceChildren(options.message);
+    }
     modalConfirmBtn.textContent = options.confirmText || "Confirm";
     modalCancelBtn.textContent = options.cancelText || "Cancel";
 
@@ -211,7 +217,7 @@ export function showModal(options: ModalOptions): Promise<string | null> {
 
 export async function showPrompt(
   title: string,
-  message: string,
+  message: string | Node | Node[],
   defaultValue = "",
   placeholder = "",
   confirmText = "OK"
@@ -228,7 +234,7 @@ export async function showPrompt(
 
 export async function showConfirm(
   title: string,
-  message: string,
+  message: string | Node | Node[],
   danger = false,
   confirmText?: string
 ): Promise<boolean> {

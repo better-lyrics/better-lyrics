@@ -676,11 +676,13 @@ export async function handleDeleteTheme() {
 
   if (!themeName || !isCustom) return;
 
-  const confirmed = await showConfirm(
-    "Delete Theme",
-    `Are you sure you want to delete the theme <code>${themeName}</code>?`,
-    true
-  );
+  const message = document.createDocumentFragment();
+  message.append("Are you sure you want to delete the theme ");
+  const code = document.createElement("code");
+  code.textContent = themeName;
+  message.append(code, "?");
+
+  const confirmed = await showConfirm("Delete Theme", message, true);
   if (!confirmed) return;
 
   try {

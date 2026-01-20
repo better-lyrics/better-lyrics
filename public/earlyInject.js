@@ -18,8 +18,8 @@ window.fetch = async function (request, init) {
   const urlString = typeof request === "string" ? request : request.url;
 
   if (
-    urlString.includes("https://music.youtube.com/youtubei/v1/browse") ||
-    urlString.includes("https://music.youtube.com/youtubei/v1/next")
+    urlString.startsWith("https://music.youtube.com/youtubei/v1/browse") ||
+    urlString.startsWith("https://music.youtube.com/youtubei/v1/next")
   ) {
     try {
       const requestToFetch = typeof request === "string" ? request : request.clone();

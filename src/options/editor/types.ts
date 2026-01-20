@@ -1,6 +1,6 @@
 export interface ModalOptions {
   title: string;
-  message: string;
+  message: string | Node | Node[];
   inputPlaceholder?: string;
   inputValue?: string;
   confirmText?: string;
