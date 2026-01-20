@@ -81,25 +81,6 @@ export async function getIdentity(): Promise<KeyIdentity> {
   return identity;
 }
 
-export async function hasIdentity(): Promise<boolean> {
-  if (cachedIdentity) return true;
-  const stored = await loadFromStorage();
-  return stored !== null;
-}
-
-export function clearIdentityCache(): void {
-  cachedIdentity = null;
-}
-
-export async function createIdentity(): Promise<KeyIdentity> {
-  const identity = await generateKeyIdentity();
-  await saveToStorage(identity);
-  await chrome.storage.local.remove(REGISTERED_KEY);
-  await chrome.storage.local.remove(CERTIFICATE_KEY);
-  cachedIdentity = identity;
-  return identity;
-}
-
 export async function signRating(themeId: string, rating: number): Promise<SignedRating> {
   const identity = await getIdentity();
 
@@ -234,11 +215,6 @@ export async function getDisplayName(): Promise<string> {
   return identity.displayName;
 }
 
-export async function getShortKeyId(): Promise<string> {
-  const identity = await getIdentity();
-  return identity.keyId.slice(0, 8);
-}
-
 export async function isKeyRegistered(): Promise<boolean> {
   const result = await getLocalStorage<{ [REGISTERED_KEY]?: boolean }>([REGISTERED_KEY]);
   return result[REGISTERED_KEY] === true;
@@ -262,7 +238,7 @@ export async function hasCertificate(): Promise<boolean> {
   return cert !== null;
 }
 
-export async function clearCertificate(): Promise<void> {
+async function clearCertificate(): Promise<void> {
   await chrome.storage.local.remove(CERTIFICATE_KEY);
 }
 

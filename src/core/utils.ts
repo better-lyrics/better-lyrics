@@ -32,22 +32,6 @@ export function truncateSource(source: string): string {
 }
 
 /**
- * Converts time string in MM:SS format to total seconds.
- */
-export function timeToInt(time: string): number {
-  const parts = time.split(":");
-  return parseFloat(parts[0]) * 60 + parseFloat(parts[1]);
-}
-
-/**
- * Unescapes HTML entities in a string.
- * Converts &amp;, &lt;, and &gt; back to their original characters.
- */
-export function unEntity(str: string): string {
-  return str.replace(/&amp;/g, "&").replace(/&lt;/g, "<").replace(/&gt;/g, ">");
-}
-
-/**
  * Returns the position and dimensions of a child element relative to its parent.
  *
  * @param parent - The parent element

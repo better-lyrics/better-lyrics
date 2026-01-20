@@ -1877,7 +1877,7 @@ function goToSlide(index: number): void {
   updateSlideshowState();
 }
 
-export function openUrlModal(): void {
+function openUrlModal(): void {
   if (urlModalOverlay) {
     const input = document.getElementById("url-modal-input") as HTMLInputElement;
     if (input) input.value = "";
@@ -2001,7 +2001,7 @@ async function handleUrlInstall(): Promise<void> {
   }
 }
 
-export async function updateYourThemesDropdown(): Promise<void> {
+async function updateYourThemesDropdown(): Promise<void> {
   const dropdown = document.getElementById("your-themes-dropdown");
   if (!dropdown) return;
 
@@ -2098,7 +2098,7 @@ async function handleApplyTheme(theme: InstalledStoreTheme): Promise<void> {
   }
 }
 
-export function toggleYourThemesDropdown(show?: boolean): void {
+function toggleYourThemesDropdown(show?: boolean): void {
   const dropdown = document.getElementById("your-themes-dropdown");
   const btn = document.getElementById("your-themes-btn");
 
