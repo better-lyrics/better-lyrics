@@ -509,10 +509,8 @@ export function clearLyrics(): void {
   }
 }
 
+let lastAlbumArtSrc: string | null = null;
 
-let albumArtSizes = registerThemeSetting("blyrics-album-art-sizes", "");
-
-let lastAlbumSrc: string | null = null;
 /**
  * Adds album art as a background image to the layout
  * and resizes the album art resolution to match user's
@@ -529,35 +527,27 @@ export function addAlbumArtToLayout(videoId: string): void {
     const albumArt = document.querySelector(SONG_IMAGE_SELECTOR) as HTMLImageElement;
     const origSrc = albumArt.src;
 
-    if (origSrc !== lastAlbumSrc) {
-      lastAlbumSrc = origSrc;
+    let containerSize = document.getElementById("thumbnail")?.getBoundingClientRect().width || 400;
 
-      let srcset = "";
-      if (/w\d+-h\d+/.test(origSrc)) {
-        console.log("orig size", albumArt.src.match(/w(\d+)-h\d+/)?.[1]);
-        const origSize = Math.max(Number(albumArt.src.match(/w(\d)+-h\d+/)?.[1]) || 400, 400);
-        for (let size = origSize; size < Math.max(screen.width, screen.height); size += 100) {
-          const modifiedSize = origSrc.replace(/w\d+-h\d+/, `w${size}-h${size}`);
-          srcset += `${modifiedSize} ${size}w,\n`;
-        }
-      }
-      albumArt.srcset = srcset;
-    }
+    containerSize = Math.round(containerSize);
 
-    let sizes = albumArtSizes.getStringValue();
-    if (!sizes) {
-      let containerSize = document.getElementById("thumbnail")?.getBoundingClientRect().width || 400;
-      sizes = containerSize + "px";
-    }
-    albumArt.sizes = sizes;
-
-    const chosenSrc = albumArt.currentSrc;
-    console.log(chosenSrc);
-
-    if (origSrc.startsWith("data:image")) {
-      injectAlbumArt("https://img.youtube.com/vi/" + videoId + "/0.jpg");
+    let newSrc = origSrc;
+    if (/w\d+-h\d+/.test(origSrc)) {
+      newSrc = origSrc.replace(/w\d+-h\d+/, `w${containerSize}-h${containerSize}`);
     } else {
-      injectAlbumArt(origSrc);
+      newSrc = "https://img.youtube.com/vi/" + videoId + "/0.jpg"
+    }
+
+    if (newSrc !== lastAlbumArtSrc) {
+      lastAlbumArtSrc = newSrc;
+      let img = new Image();
+      img.src = newSrc;
+
+      img.onload = () => {
+        console.log(newSrc);
+        albumArt.src = newSrc;
+        injectAlbumArt(newSrc);
+      }
     }
   };
 
@@ -587,12 +577,8 @@ export function addAlbumArtToLayout(videoId: string): void {
  * @param src - Image source URL
  */
 export function injectAlbumArt(src: string): void {
-  const img = new Image();
-  img.src = src;
+  document.getElementById("layout")?.style.setProperty("--blyrics-background-img", `url('${src}')`);
 
-  img.onload = () => {
-    (document.getElementById("layout") as HTMLElement).style.setProperty("--blyrics-background-img", `url('${src}')`);
-  };
 }
 
 /**
