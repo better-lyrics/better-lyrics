@@ -40,14 +40,6 @@ export function timeToInt(time: string): number {
 }
 
 /**
- * Unescapes HTML entities in a string.
- * Converts &amp;, &lt;, and &gt; back to their original characters.
- */
-export function unEntity(str: string): string {
-  return str.replace(/&amp;/g, "&").replace(/&lt;/g, "<").replace(/&gt;/g, ">");
-}
-
-/**
  * Returns the position and dimensions of a child element relative to its parent.
  *
  * @param parent - The parent element
