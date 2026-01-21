@@ -33,6 +33,7 @@ interface VideoMetadata {
   durationMs: number;
   counterpartVideoId: string | null;
   segmentMap: SegmentMap | null;
+  thumbnailUrl?: string;
 }
 
 const browseIdToVideoIdMap = new Map<string, string>();
@@ -216,6 +217,7 @@ export function setupRequestSniffer(): void {
               album: primaryAlbum,
               isVideo: primaryIsVideo,
               durationMs: parseTime(primaryRenderer.lengthText.runs[0].text),
+              thumbnailUrl: primaryThumbnail?.url,
             };
 
             if (counterPartRenderer) {
@@ -237,6 +239,7 @@ export function setupRequestSniffer(): void {
                   isVideo: counterpartIsVideo,
                   durationMs: parseTime(counterPartRenderer.playlistPanelVideoRenderer.lengthText.runs[0].text),
                   segmentMap: content.playlistPanelVideoWrapperRenderer!.counterpart[0].segmentMap,
+                  thumbnailUrl: counterpartThumbnail?.url,
                 },
               };
             } else {
@@ -288,6 +291,7 @@ export function setupRequestSniffer(): void {
               segmentMap: numSegmentMap,
               durationMs: videoPair.primary.durationMs,
               id: videoPair.primary.id,
+              thumbnailUrl: videoPair.primary.thumbnailUrl,
             });
 
             videoMetaDataMap.set(counterpart.id, {
@@ -300,6 +304,7 @@ export function setupRequestSniffer(): void {
               segmentMap: reversedSegmentMap,
               durationMs: counterpart.durationMs,
               id: counterpart.id,
+              thumbnailUrl: counterpart.thumbnailUrl,
             });
 
             videoIdToAlbumMap.set(counterpart.id, counterpart.album);
@@ -314,6 +319,7 @@ export function setupRequestSniffer(): void {
               segmentMap: null,
               durationMs: videoPair.primary.durationMs,
               id: videoPair.primary.id,
+              thumbnailUrl: videoPair.primary.thumbnailUrl,
             });
           }
           videoIdToAlbumMap.set(videoPair.primary.id, videoPair.primary.album);

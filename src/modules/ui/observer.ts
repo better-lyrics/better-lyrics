@@ -25,7 +25,14 @@ import {
 import { getSongMetadata } from "@modules/lyrics/requestSniffer/requestSniffer";
 import { preFetchLyrics } from "@modules/lyrics/lyrics";
 import { log } from "@utils";
-import { addAlbumArtToLayout, cleanup, injectSongAttributes, isLoaderActive, renderLoader } from "./dom";
+import {
+  addAlbumArtToLayout,
+  cleanup,
+  injectSongAttributes,
+  isLoaderActive,
+  prefetchAlbumArt,
+  renderLoader,
+} from "./dom";
 
 let wakeLock: WakeLockSentinel | null = null;
 
@@ -270,6 +277,7 @@ export function initializeLyrics(): void {
       AppState.queueAlbumArtInjection = true;
       AppState.queueSongDetailsInjection = true;
       AppState.hasPreloadedNextSong = false;
+      AppState.hasPreloadedNextAlbumArt = false;
     }
 
     if (AppState.areLyricsTicking && AppState.areLyricsLoaded && !AppState.hasPreloadedNextSong) {
@@ -295,6 +303,21 @@ export function initializeLyrics(): void {
               },
               next.isVideo
             );
+          }
+        }
+      });
+    }
+
+    if (AppState.areLyricsTicking && AppState.areLyricsLoaded && !AppState.hasPreloadedNextAlbumArt) {
+      AppState.hasPreloadedNextAlbumArt = true;
+      log(LOG_PREFIX, "Trying to preload next album art");
+      getSongMetadata(AppState.lastVideoId).then(async data => {
+        log(LOG_PREFIX, "Current song metadata:", data?.id, "nextVideoId:", data?.nextVideoId);
+        if (data?.nextVideoId) {
+          const next = await getSongMetadata(data.nextVideoId);
+          log(LOG_PREFIX, "Next song metadata:", next?.id, next?.title);
+          if (next) {
+            prefetchAlbumArt(next.thumbnailUrl, next.id);
           }
         }
       });

@@ -6,6 +6,15 @@
   --blyrics-no-lyrics-slide-delay: 1.8s;
 }
 
+/* Prevent album art flicker on song change */
+#song-image > #thumbnail {
+  opacity: 1 !important;
+}
+
+ytmusic-player {
+  background-color: transparent;
+}
+
 /* Player page styles */
 ytmusic-player-page:before {
   background: var(--blyrics-background-img);

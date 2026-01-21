@@ -38,6 +38,7 @@ export interface AppStateType {
   isRomanizationEnabled: boolean;
   translationLanguage: string;
   hasPreloadedNextSong: boolean;
+  hasPreloadedNextAlbumArt: boolean;
 }
 
 export const AppState: AppStateType = {
@@ -60,6 +61,7 @@ export const AppState: AppStateType = {
   isRomanizationEnabled: false,
   translationLanguage: "en",
   hasPreloadedNextSong: false,
+  hasPreloadedNextAlbumArt: false,
 };
 
 export function reloadLyrics(): void {

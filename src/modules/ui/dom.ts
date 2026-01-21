@@ -2,6 +2,7 @@ import {
   AD_PLAYING_ATTR,
   ALBUM_ART_ADDED_FROM_MUTATION_LOG,
   ALBUM_ART_ADDED_LOG,
+  ALBUM_ART_PREFETCHED_LOG,
   ALBUM_ART_REMOVED_LOG,
   ALBUM_ART_SIZE_CHANGED,
   DISCORD_INVITE_URL,
@@ -108,6 +109,39 @@ let adStateObserver: MutationObserver | null = null;
 let albumArtResizeTimeout: ReturnType<typeof setTimeout> | null = null;
 let lastInjectedAlbumArtUrl: string | null = null;
 let albumArtLoadListener: (() => void) | null = null;
+
+const prefetchedAlbumArt = new Set<string>();
+
+/**
+ * Prefetches album art images for the next song to prevent flicker on song change.
+ *
+ * @param thumbnailUrl - The thumbnail URL from metadata
+ * @param videoId - YouTube video ID for fallback image
+ */
+export function prefetchAlbumArt(thumbnailUrl: string | undefined, videoId: string): void {
+  if (prefetchedAlbumArt.has(videoId)) {
+    log(ALBUM_ART_PREFETCHED_LOG, videoId, "(already cached)");
+    return;
+  }
+  prefetchedAlbumArt.add(videoId);
+
+  log(ALBUM_ART_PREFETCHED_LOG, videoId, "thumbnailUrl:", thumbnailUrl?.substring(0, 60));
+
+  if (thumbnailUrl && thumbnailUrl.includes("=w")) {
+    const sizes = [226, 544, 800, screen.height];
+    for (const size of sizes) {
+      const img = new Image();
+      img.src = thumbnailUrl.replace(/=w\d+-h\d+/, `=w${size}-h${size}`);
+      log(ALBUM_ART_PREFETCHED_LOG, videoId, `size=${size}`);
+    }
+  } else {
+    log(ALBUM_ART_PREFETCHED_LOG, videoId, "no valid thumbnailUrl, skipping size variants");
+  }
+
+  const ytThumb = new Image();
+  ytThumb.src = `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg`;
+  log(ALBUM_ART_PREFETCHED_LOG, videoId, "yt maxres");
+}
 
 /**
  * Creates or reuses the lyrics wrapper element and sets up scroll event handling.
@@ -556,10 +590,10 @@ export function addAlbumArtToLayout(videoId: string): void {
     albumArtLoadListener = null;
   }
 
-  const injectAlbumArtFn = () => {
+  const injectAlbumArtFn = (trigger: string) => {
     const currentAlbumArt = document.querySelector(SONG_IMAGE_SELECTOR) as HTMLImageElement | null;
-    if (!currentAlbumArt) return;
 
+    if (!currentAlbumArt) return;
     if (!currentAlbumArt.complete || currentAlbumArt.naturalWidth === 0) return;
 
     let srcToInject: string;
@@ -570,17 +604,18 @@ export function addAlbumArtToLayout(videoId: string): void {
     }
 
     if (srcToInject === lastInjectedAlbumArtUrl) return;
+
     injectAlbumArt(srcToInject);
-    log(ALBUM_ART_ADDED_FROM_MUTATION_LOG);
+    log(trigger === "initial" ? ALBUM_ART_ADDED_LOG : ALBUM_ART_ADDED_FROM_MUTATION_LOG);
   };
 
   const observer = new MutationObserver(() => {
-    injectAlbumArtFn();
+    injectAlbumArtFn("mutation");
   });
   observer.observe(albumArt, { attributes: true });
   backgroundChangeObserver = observer;
 
-  albumArtLoadListener = injectAlbumArtFn;
+  albumArtLoadListener = () => injectAlbumArtFn("load");
   albumArt.addEventListener("load", albumArtLoadListener);
 
   const resizeObserver = new ResizeObserver(() => {
@@ -595,8 +630,7 @@ export function addAlbumArtToLayout(videoId: string): void {
   resizeObserver.observe(document.documentElement);
   albumArtResizeObserver = resizeObserver;
 
-  injectAlbumArtFn();
-  log(ALBUM_ART_ADDED_LOG);
+  injectAlbumArtFn("initial");
 }
 
 /**
@@ -608,13 +642,20 @@ export function injectAlbumArt(src: string): void {
   const img = new Image();
   img.src = src;
 
-  img.onload = () => {
+  const applyBackground = () => {
     lastInjectedAlbumArtUrl = src;
     const layout = document.getElementById("layout");
     if (layout) {
       layout.style.setProperty("--blyrics-background-img", `url('${src}')`);
     }
   };
+
+  img
+    .decode()
+    .then(applyBackground)
+    .catch(() => {
+      img.onload = applyBackground;
+    });
 }
 
 /**
@@ -803,11 +844,13 @@ export function injectSongAttributes(title: string, artist: string): void {
  */
 function setAlbumArtSize(size: string | number): void {
   const albumArt = document.querySelector(SONG_IMAGE_SELECTOR) as HTMLImageElement;
-  const origSrc = albumArt.src;
-  const origSize = albumArt.src.match(/\d+/);
 
-  // If the size is the same, discard the changes
-  if (origSize && origSize[0] == size) return;
+  if (!albumArt) return;
+
+  const origSrc = albumArt.src;
+  const origSize = albumArt.src.match(/=w(\d+)-h\d+/);
+
+  if (origSize && origSize[1] == size) return;
 
   const img = new Image();
   img.src = albumArt.src;
@@ -816,9 +859,18 @@ function setAlbumArtSize(size: string | number): void {
     img.src = albumArt.src.replace(/w\d+-h\d+/, `w${size}-h${size}`);
   }
 
-  img.onload = () => {
-    if (origSrc == albumArt.src) albumArt.src = img.src;
+  const applyHighRes = () => {
+    if (origSrc === albumArt.src) {
+      albumArt.src = img.src;
+    }
   };
+
+  img
+    .decode()
+    .then(applyHighRes)
+    .catch(() => {
+      img.onload = applyHighRes;
+    });
 
   log(ALBUM_ART_SIZE_CHANGED, size);
 }

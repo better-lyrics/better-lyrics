@@ -129,6 +129,7 @@ export const ALBUM_ART_ADDED_FROM_MUTATION_LOG =
   "[BetterLyrics] Album art added to the layout from mutation event" as const;
 export const ALBUM_ART_SIZE_CHANGED = "[BetterLyrics] Album art size changed to" as const;
 export const ALBUM_ART_REMOVED_LOG = "[BetterLyrics] Album art removed from the layout" as const;
+export const ALBUM_ART_PREFETCHED_LOG = "[BetterLyrics] Prefetched album art for" as const;
 export const LOADER_TRANSITION_ENDED = "[BetterLyrics] Loader Transition Ended" as const;
 export const LOADER_ANIMATION_END_FAILED = "[BetterLyrics] Loader Animation Didn't End" as const;
 export const PAUSING_LYRICS_SCROLL_LOG = "[BetterLyrics] Pausing Lyrics Autoscroll Due to User Scroll" as const;
