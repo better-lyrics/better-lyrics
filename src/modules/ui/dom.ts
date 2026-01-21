@@ -563,7 +563,10 @@ export function addAlbumArtToLayout(videoId: string): void {
 
   backgroundChangeObserver?.disconnect();
   backgroundResizeObserver?.disconnect();
-  const albumArt = document.querySelector(SONG_IMAGE_SELECTOR) as HTMLImageElement;
+  const albumArt = document.querySelector(SONG_IMAGE_SELECTOR) as HTMLImageElement | undefined;
+  if (!albumArt) {
+    return;
+  }
 
   backgroundChangeObserver = new MutationObserver(() => {
     injectAlbumArtFn(false);
