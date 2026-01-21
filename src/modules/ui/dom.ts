@@ -510,6 +510,7 @@ export function clearLyrics(): void {
 }
 
 let lastAlbumArtSrc: string | null = null;
+let lastAlbumSetSource: string | null = null;
 
 /**
  * Adds album art as a background image to the layout
@@ -523,9 +524,17 @@ let lastAlbumArtSrc: string | null = null;
 export function addAlbumArtToLayout(videoId: string): void {
   if (!videoId) return;
 
-  const injectAlbumArtFn = () => {
+  const injectAlbumArtFn = (resize: boolean) => {
     const albumArt = document.querySelector(SONG_IMAGE_SELECTOR) as HTMLImageElement;
     const origSrc = albumArt.src;
+
+    if (lastAlbumSetSource !== null && origSrc !== lastAlbumSetSource) {
+      albumArt.src = lastAlbumSetSource;
+    }
+
+    if (origSrc === lastAlbumSetSource && !resize) {
+      return;
+    }
 
     let containerSize = document.getElementById("thumbnail")?.getBoundingClientRect().width || 400;
 
@@ -535,7 +544,7 @@ export function addAlbumArtToLayout(videoId: string): void {
     if (/w\d+-h\d+/.test(origSrc)) {
       newSrc = origSrc.replace(/w\d+-h\d+/, `w${containerSize}-h${containerSize}`);
     } else {
-      newSrc = "https://img.youtube.com/vi/" + videoId + "/0.jpg";
+      return;
     }
 
     if (newSrc !== lastAlbumArtSrc) {
@@ -544,6 +553,7 @@ export function addAlbumArtToLayout(videoId: string): void {
       img.src = newSrc;
 
       img.onload = () => {
+        lastAlbumSetSource = newSrc;
         console.log(newSrc);
         albumArt.src = newSrc;
         injectAlbumArt(newSrc);
@@ -556,18 +566,18 @@ export function addAlbumArtToLayout(videoId: string): void {
   const albumArt = document.querySelector(SONG_IMAGE_SELECTOR) as HTMLImageElement;
 
   backgroundChangeObserver = new MutationObserver(() => {
-    injectAlbumArtFn();
+    injectAlbumArtFn(false);
     log(ALBUM_ART_ADDED_FROM_MUTATION_LOG);
   });
   backgroundChangeObserver.observe(albumArt, { attributes: true, attributeFilter: ["src"] });
 
   backgroundResizeObserver = new ResizeObserver(() => {
-    injectAlbumArtFn();
+    injectAlbumArtFn(true);
     log(ALBUM_ART_ADDED_FROM_MUTATION_LOG, "resizeObserver");
   });
   backgroundResizeObserver.observe(albumArt);
 
-  injectAlbumArtFn();
+  injectAlbumArtFn(false);
   log(ALBUM_ART_ADDED_LOG);
 }
 
