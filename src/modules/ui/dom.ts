@@ -616,10 +616,6 @@ export function injectAlbumArt(src: string): void {
       layout.style.setProperty("--blyrics-background-img", `url('${src}')`);
     }
   };
-
-  img.onerror = () => {
-    log("Failed to load album art:", src);
-  };
 }
 
 /**
