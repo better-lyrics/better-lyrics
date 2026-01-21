@@ -18,8 +18,7 @@
         "typecheck": "tsc --noEmit",
         "knip": "knip --cache",
         "knip:fix": "knip --fix",
-        "knip:ci": "knip --no-exit-code --reporter github-actions",
-        "knip:prod": "knip --production --strict"
+        "knip:ci": "knip --no-exit-code --reporter github-actions"
     },
     "repository": {
         "type": "git",
