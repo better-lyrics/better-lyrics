@@ -279,9 +279,9 @@ const getProviderIdToInfoMap = (): { [key: string]: ProviderInfo } => ({
   "musixmatch-synced": { name: t("options_provider_musixmatch"), syncType: "line" },
   "yt-captions": { name: t("options_provider_youtubeCaptions"), syncType: "line" },
   "lrclib-synced": { name: t("options_provider_lrclib"), syncType: "line" },
-  "unison-richsynced": { name: t("options_provider_unison"), syncType: "vary" },
-  "unison-synced": { name: t("options_provider_unison"), syncType: "line" },
-  "unison-plain": { name: t("options_provider_unison"), syncType: "unsynced" },
+  "unison-richsynced": { name: t("options_provider_betterLyricsUnison"), syncType: "vary" },
+  "unison-synced": { name: t("options_provider_betterLyricsUnison"), syncType: "line" },
+  "unison-plain": { name: t("options_provider_betterLyricsUnison"), syncType: "unsynced" },
   "bLyrics-richsynced": { name: t("options_provider_betterLyrics"), syncType: "syllable" },
   "bLyrics-synced": { name: t("options_provider_betterLyrics"), syncType: "line" },
   "legato-synced": { name: t("options_provider_betterLyricsLegato"), syncType: "line" },
@@ -292,9 +292,8 @@ const getProviderIdToInfoMap = (): { [key: string]: ProviderInfo } => ({
 
 const getSyncTypeConfig = (): { [key in SyncType]: { label: string; icon: string; tooltip: string } } => ({
   vary: {
-    label: "Vary",
-    tooltip:
-      "Combination of syllable, word, and line synced. A track can have syllable syncing, word syncing, or line syncing.",
+    label: t("options_syncType_vary"),
+    tooltip: t("options_syncType_vary_tooltip"),
     icon: `<svg width="14" height="14" viewBox="0 0 1024 1024" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><rect x="636" y="239" width="389.981" height="233.271" rx="48"/><path d="M0 335c0-45.255 0-67.882 14.059-81.941S50.745 239 96 239h117c30.17 0 45.255 0 54.627 9.373S277 272.83 277 303v105c0 30.17 0 45.255-9.373 54.627S243.17 472 213 472H96c-45.255 0-67.882 0-81.941-14.059S0 421.255 0 376zm337-31c0-30.17 0-45.255 9.373-54.627S370.83 240 401 240h59c45.255 0 67.882 0 81.941 14.059S556 290.745 556 336v41c0 45.255 0 67.882-14.059 81.941S505.255 473 460 473h-59c-30.17 0-45.255 0-54.627-9.373S337 439.17 337 409z"/><rect y="552.271" width="1024" height="233" rx="48"/></svg>`,
   },
   syllable: {

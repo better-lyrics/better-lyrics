@@ -290,6 +290,10 @@
     "message": "Better Lyrics Legato",
     "description": "Better Lyrics Legato provider name"
   },
+  "options_provider_betterLyricsUnison": {
+    "message": "Better Lyrics Unison",
+    "description": "Better Lyrics Unison provider name"
+  },
   "options_provider_musixmatch": {
     "message": "Musixmatch",
     "description": "Musixmatch provider name"
@@ -306,7 +310,19 @@
     "message": "Youtube Captions",
     "description": "Youtube Captions provider name"
   },
+  "options_provider_clyrics": {
+    "message": "Custom Lyrics",
+    "description": "Custom Lyrics provider name"
+  },
 
+  "options_syncType_vary": {
+    "message": "Vary",
+    "description": "Vary sync type label"
+  },
+  "options_syncType_vary_tooltip": {
+    "message": "Highlights syllables and words as they're sung, depending on availability. Varying sync provides the best experience when available.",
+    "description": "Vary sync type tooltip"
+  },
   "options_syncType_syllable": {
     "message": "Syllable",
     "description": "Syllable sync type label"
