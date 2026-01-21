@@ -16,7 +16,10 @@
         "lint": "biome lint --write . && biome format --write .",
         "update-version": "tsx tooling/update-version.ts",
         "typecheck": "tsc --noEmit",
-        "knip": "knip --fix"
+        "knip": "knip --cache",
+        "knip:fix": "knip --fix",
+        "knip:ci": "knip --no-exit-code --reporter github-actions",
+        "knip:prod": "knip --production --strict"
     },
     "repository": {
         "type": "git",

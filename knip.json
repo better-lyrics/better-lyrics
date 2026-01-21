@@ -15,5 +15,6 @@
     "@codemirror/language",
     "@types/chrome",
     "@typescript/lib-dom"
-  ]
+  ],
+  "includeEntryExports": true
 }
