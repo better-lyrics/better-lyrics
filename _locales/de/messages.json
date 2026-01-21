@@ -28,7 +28,7 @@
     "description": "Identity settings tab label"
   },
   "options_tab_themes": {
-    "message": "Themes",
+    "message": "Designs",
     "description": "Themes settings tab label"
   },
   "options_general_title": {
@@ -56,7 +56,7 @@
     "description": "Clear cache button label"
   },
   "options_general_totalLyrics": {
-    "message": "Songtexte im Cache",
+    "message": "Alle Songtexte im Cache",
     "description": "Total lyrics in cache label"
   },
   "options_general_cacheSize": {
@@ -76,7 +76,7 @@
     "description": "Disable fullscreen mode setting label"
   },
   "options_display_autoHideCursor": {
-    "message": "Cursor im Vollbildmodus automatisch ausblenden",
+    "message": "Zeiger im Vollbildmodus automatisch ausblenden",
     "description": "Auto-hide cursor setting label"
   },
   "options_display_albumArt": {
@@ -116,19 +116,19 @@
     "description": "Sources settings section description"
   },
   "options_themes_title": {
-    "message": "Theme-Einstellungen",
+    "message": "Design-Einstellungen",
     "description": "Theme settings section title"
   },
   "options_themes_description": {
-    "message": "Passe das Erscheinungsbild von Better Lyrics an.",
+    "message": "Das Erscheinungsbild von Better Lyrics anpassen.",
     "description": "Theme settings section description"
   },
   "options_themes_theme": {
-    "message": "Theme",
+    "message": "Design",
     "description": "Theme label"
   },
   "options_themes_chooseTheme": {
-    "message": "Theme auswählen",
+    "message": "Design auswählen",
     "description": "Choose a theme button label"
   },
   "options_themes_customStyles": {
@@ -140,11 +140,11 @@
     "description": "Create button label"
   },
   "options_themes_marketplace": {
-    "message": "Theme-Marktplatz",
+    "message": "Design-Marktplatz",
     "description": "Theme marketplace button label"
   },
   "options_themes_installedThemes": {
-    "message": "Installierte Themes",
+    "message": "Installierte Designs",
     "description": "Installed themes button label"
   },
   "options_identity_title": {
@@ -164,7 +164,7 @@
     "description": "Loading identity placeholder"
   },
   "options_identity_exportImport": {
-    "message": "Export/Import",
+    "message": "Exportieren/Importieren",
     "description": "Export/Import section label"
   },
   "options_identity_exportKey": {
@@ -236,7 +236,7 @@
     "description": "Export to file tooltip"
   },
   "options_editor_saveAsTheme": {
-    "message": "Als Theme speichern",
+    "message": "Als Design speichern",
     "description": "Save as theme tooltip"
   },
   "options_editor_openInNewTab": {
@@ -260,11 +260,11 @@
     "description": "Styling guide link text"
   },
   "options_editor_renameTheme": {
-    "message": "Theme umbenennen",
+    "message": "Design umbenennen",
     "description": "Rename theme button title"
   },
   "options_editor_deleteTheme": {
-    "message": "Theme löschen",
+    "message": "Design löschen",
     "description": "Delete theme button title"
   },
   "options_editor_doubleClickRename": {
@@ -328,7 +328,7 @@
     "description": "Unsynced sync type tooltip"
   },
   "options_detail_rateTheme": {
-    "message": "Theme bewerten",
+    "message": "Design bewerten",
     "description": "Rate theme label"
   },
   "options_detail_install": {
@@ -348,23 +348,23 @@
     "description": "Download shader link text"
   },
   "options_detail_shaderImportSuffix": {
-    "message": "und importiere es in",
+    "message": "und importiere es im",
     "description": "Shader import suffix text before Better Lyrics Shaders link"
   },
   "marketplace_pageTitle": {
-    "message": "Better Lyrics Theme-Marktplatz",
+    "message": "Better Lyrics Design-Marktplatz",
     "description": "Page title"
   },
   "marketplace_title": {
-    "message": "Theme-Marktplatz",
+    "message": "Design-Marktplatz",
     "description": "Header title"
   },
   "marketplace_subtitle": {
-    "message": "Entdecke und installiere Community-Themes",
+    "message": "Entdecke und installiere Community-Design",
     "description": "Header subtitle"
   },
   "marketplace_searchPlaceholder": {
-    "message": "Themes suchen...",
+    "message": "Designs suchen...",
     "description": "Search input placeholder"
   },
   "marketplace_refresh": {
@@ -436,11 +436,11 @@
     "description": "Install from URL button"
   },
   "marketplace_submitTheme": {
-    "message": "Theme einreichen",
+    "message": "Design einreichen",
     "description": "Submit a theme link"
   },
   "marketplace_loading": {
-    "message": "Themes werden geladen...",
+    "message": "Designs werden geladen...",
     "description": "Loading message"
   },
   "marketplace_retry": {
@@ -448,7 +448,7 @@
     "description": "Retry button"
   },
   "marketplace_noThemesMatch": {
-    "message": "Keine Themes entsprechen deinen Filtern",
+    "message": "Keine Designs entsprechen deinen Filtern",
     "description": "Empty state message"
   },
   "marketplace_permissionTitle": {
@@ -456,7 +456,7 @@
     "description": "Permission required title"
   },
   "marketplace_permissionMessage": {
-    "message": "Um Themes zu durchsuchen und zu installieren, benötigt Better Lyrics Zugriff auf GitHub, wo die Themes gehostet werden, und die Marktplatz-API.",
+    "message": "Um Designs zu durchsuchen und zu installieren, benötigt Better Lyrics Zugriff auf GitHub, wo die Designs gehostet werden, sowie die Marktplatz-api.",
     "description": "Permission required message"
   },
   "marketplace_grantPermission": {
@@ -492,7 +492,7 @@
     "description": "URL install modal title"
   },
   "marketplace_urlModalMessage": {
-    "message": "Gib eine GitHub-Repository-URL ein, um ein Theme direkt zu installieren:",
+    "message": "Gib eine GitHub-Repository-URL ein, um ein Design direkt zu installieren:",
     "description": "URL install modal message"
   },
   "marketplace_urlModalPlaceholder": {
@@ -520,7 +520,7 @@
     "description": "URL permission description"
   },
   "marketplace_urlPermissionItem1": {
-    "message": "Theme-Dateien von beliebigen GitHub-Repositories abrufen",
+    "message": "Design-Dateien von beliebigen GitHub-Repositories abrufen",
     "description": "URL permission list item 1"
   },
   "marketplace_urlPermissionItem2": {
@@ -528,11 +528,11 @@
     "description": "URL permission list item 2"
   },
   "marketplace_urlPermissionItem3": {
-    "message": "Die Theme-Struktur vor der Installation validieren",
+    "message": "Die Design-Struktur vor der Installation validieren",
     "description": "URL permission list item 3"
   },
   "marketplace_urlPermissionNote": {
-    "message": "Diese Berechtigung wird nur für URL-Installationen verwendet. Marktplatz-Themes benötigen sie nicht.",
+    "message": "Diese Berechtigung wird nur für URL-Installationen verwendet. Marktplatz-Designs benötigen sie nicht.",
     "description": "URL permission note"
   },
   "marketplace_shortcutsTitle": {
@@ -544,7 +544,7 @@
     "description": "Navigation shortcuts group"
   },
   "marketplace_shortcutsSearch": {
-    "message": "Themes suchen",
+    "message": "Designs durchsuchen",
     "description": "Search shortcut label"
   },
   "marketplace_shortcutsRefresh": {
@@ -608,7 +608,7 @@
     "description": "Toggle compatible shortcut"
   },
   "marketplace_shortcutsDetails": {
-    "message": "Theme-Details",
+    "message": "Design-Details",
     "description": "Theme details shortcuts group"
   },
   "marketplace_shortcutsInstallRemove": {
@@ -636,7 +636,7 @@
     "description": "Show shortcuts shortcut"
   },
   "marketplace_shortcutsApplyTheme": {
-    "message": "Theme anwenden (nach Installation)",
+    "message": "Design anwenden (nach der Installation)",
     "description": "Apply theme shortcut"
   },
   "marketplace_ratingFailed": {
@@ -648,11 +648,11 @@
     "description": "Shader fetch error"
   },
   "marketplace_applyFailed": {
-    "message": "Theme konnte nicht angewendet werden",
+    "message": "Design konnte nicht angewendet werden",
     "description": "Theme apply error"
   },
   "marketplace_noThemesInstalled": {
-    "message": "Noch keine Themes installiert",
+    "message": "Noch keine Designs installiert",
     "description": "Empty installed themes message"
   },
   "editor_pageTitle": {
@@ -668,7 +668,7 @@
     "description": "Export to file button"
   },
   "editor_saveAsTheme": {
-    "message": "Als Theme speichern",
+    "message": "Als Design speichern",
     "description": "Save as theme button"
   },
   "editor_stylingGuide": {
@@ -676,7 +676,7 @@
     "description": "Styling guide button"
   },
   "editor_tip": {
-    "message": "Tipp: Dieser eigenständige Tab kann in ein separates Fenster verschoben oder neben YouTube Music in geteilter Ansicht verwendet werden, um Änderungen in Echtzeit zu sehen. Mehr Infos auf",
+    "message": "Tipp: Dieser eigenständige Tab kann in ein separates Fenster verschoben oder neben YouTube Music in geteilter Ansicht verwendet werden, um Änderungen in Echtzeit zu sehen. Mehr Informationen auf",
     "description": "Editor tip text"
   },
   "editor_poweredBy": {
@@ -684,11 +684,11 @@
     "description": "Powered by label"
   },
   "editor_playground": {
-    "message": "Playground",
+    "message": "Spielplatz",
     "description": "Playground link text"
   },
   "editor_docs": {
-    "message": "Docs",
+    "message": "Dokumentation",
     "description": "Docs link text"
   },
   "lyrics_source": {

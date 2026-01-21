@@ -123,7 +123,7 @@ export function createLyricsWrapper(): HTMLElement {
   const existingWrapper = document.getElementById(LYRICS_WRAPPER_ID);
 
   if (existingWrapper) {
-    existingWrapper.innerHTML = "";
+    existingWrapper.replaceChildren();
     existingWrapper.style.top = "";
     existingWrapper.style.transition = "";
     return existingWrapper;
@@ -244,7 +244,7 @@ export function addFooter(
 export function createFooter(song: string, artist: string, album: string, duration: number): void {
   try {
     const footer = document.getElementsByClassName(FOOTER_CLASS)[0] as HTMLElement;
-    footer.innerHTML = "";
+    footer.replaceChildren();
 
     const footerContainer = document.createElement("div");
     footerContainer.className = `${FOOTER_CLASS}__container`;
@@ -505,7 +505,7 @@ export function clearLyrics(): void {
   try {
     const lyricsWrapper = document.getElementById(LYRICS_WRAPPER_ID);
     if (lyricsWrapper) {
-      lyricsWrapper.innerHTML = "";
+      lyricsWrapper.replaceChildren();
     }
   } catch (err) {
     log(err);
