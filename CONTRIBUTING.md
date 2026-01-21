@@ -87,6 +87,18 @@ Better Lyrics uses [Crowdin](https://crowdin.com/project/better-lyrics) for tran
 - Keep translations concise - UI space is limited
 - Preserve placeholders like `$1`, `$2` in strings
 - Check context in the `description` field for each string
+- **Match word count** - If the original is one word, use one word in translation. Multi-word translations can break layouts
+- When confused between options, use your best judgement to pick the most concise term
+- Avoid literal translations that sound unnatural - prefer what a native speaker would say
+
+### Quality Standards
+
+Translations that don't follow these guidelines may be removed:
+- Using multiple words when the original is a single word
+- Ignoring UI space constraints
+- Translations that don't match the tone/context
+
+When in doubt, check how similar apps translate the term in your language.
 
 ### I18n Key Naming Convention
 
