@@ -177,11 +177,11 @@ export function addNewLine(data: Lyric) {
 
   timeLine.appendChild(separator("span-separator"));
 
-  const durationTimeLine = document.createElement("span");
-  durationTimeLine.id = "line-duration";
-  durationTimeLine.className = "code";
-  durationTimeLine.textContent = `${formatTime(data.durationMs, true)}s`;
-  timeLine.appendChild(durationTimeLine);
+  const endTimeLine = document.createElement("span");
+  endTimeLine.id = "line-end-time";
+  endTimeLine.className = "code";
+  endTimeLine.textContent = `${formatTime(data.startTimeMs + data.durationMs, true, true)}`;
+  timeLine.appendChild(endTimeLine);
 
   const belowSep = separator("span-separator");
   belowSep.style.display = instrumenone;

@@ -187,10 +187,11 @@ select option {
     min-width: 10ch;
     max-width: 30ch;
     border: 2px solid hsla(0, 0%, 100%, 0.1);
-    padding: 0.25em 0.5em;
+    padding: 0.375em 0.5em;
     cursor: pointer;
     font-size: 0.875rem;
     background-color: hsla(0, 0%, 100%, 0.1);
+	border-radius: 0.25rem;
 }
 
 .select-large {
@@ -1621,9 +1622,21 @@ input.cm-textfield:focus-visible {
 	max-width: 700px;
 }
 
+.medium-modal {
+	max-width: 500px;
+}
+
 .span-separator {
     background: hsl(0, 0%, 100%, .5);
     border-radius: 50%;
     width: .25rem;
     aspect-ratio: 1;
+}
+
+.span-wseparator {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    column-gap: .25rem;
+	flex-wrap: wrap;
 }

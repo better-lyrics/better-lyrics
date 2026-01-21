@@ -104,6 +104,7 @@ async function formNewLyrics(): Promise<void> {
   /// Return button
   const returnButton = document.createElement("button");
   returnButton.className = "icon-btn";
+  returnButton.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="currentColor" d="m6.8 13 2.9 2.9q.275.275.275.7t-.275.7-.7.275-.7-.275l-4.6-4.6q-.15-.15-.213-.325T3.426 12t.063-.375.212-.325l4.6-4.6q.275-.275.7-.275t.7.275.275.7-.275.7L6.8 11H19V8q0-.425.288-.712T20 7t.713.288T21 8v3q0 .825-.587 1.413T19 13z"/></svg>`;
   returnButton.setAttribute("data-tooltip", "Return");
 
   returnButton.addEventListener("click", () => {
@@ -126,7 +127,8 @@ async function formNewLyrics(): Promise<void> {
       if (!registeredInputs[key]) {
         continue;
       }
-      registeredInputs[key].value = lastPlayed[key];
+
+      registeredInputs[key].value = typeof lastPlayed[key] == "number" ? Math.round(lastPlayed[key]) : lastPlayed[key];
     }
   });
 
@@ -339,15 +341,15 @@ function createCLyricsCard(options: CLyricsOverview): HTMLElement {
   info.className = "clyrics-card-info";
 
   const metadata = document.createElement("div");
-  metadata.className = "clyrics-input-span";
-  metadata.innerHTML = `Duration: ${formatTime(options.duration, true)} <div class="span-separator"></div> Modified: ${new Date(options.modified).toLocaleString()}`;
+  metadata.className = "clyrics-input-span span-wseparator";
+  metadata.innerHTML = `Duration: ${formatTime(options.duration * 1000)} <div class="span-separator"></div> Modified: ${new Date(options.modified).toLocaleString()}`;
 
   const name = document.createElement("div");
   name.className = "clyrics-input-title";
   name.innerHTML = `<strong>${options.song}</strong>`;
 
   const artistAlbum = document.createElement("div");
-  artistAlbum.className = "clyrics-input-description";
+  artistAlbum.className = "clyrics-input-description span-wseparator";
   artistAlbum.innerHTML = `${options.artist} <div class="span-separator"></div> ${options.album}`;
 
   info.appendChild(metadata);

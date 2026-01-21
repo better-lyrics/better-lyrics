@@ -368,16 +368,18 @@ export interface ProviderConfig {
 
 export const PROVIDER_CONFIGS: ProviderConfig[] = [
   { key: "bLyrics-richsynced", displayName: "Better Lyrics", syncType: "syllable", priority: 0 },
-  { key: "unison-richsynced", displayName: "Unison", syncType: "vary", priority: 1 },
+  { key: "unison-richsynced", displayName: "Unison", syncType: "syllable", priority: 1 },
   { key: "musixmatch-richsync", displayName: "Musixmatch", syncType: "word", priority: 2 },
   { key: "yt-captions", displayName: "YouTube Captions", syncType: "line", priority: 3 },
   { key: "bLyrics-synced", displayName: "Better Lyrics", syncType: "line", priority: 4 },
-  { key: "lrclib-synced", displayName: "LRCLIB", syncType: "line", priority: 5 },
-  { key: "legato-synced", displayName: "Legato", syncType: "line", priority: 6 },
-  { key: "musixmatch-synced", displayName: "Musixmatch", syncType: "line", priority: 7 },
-  { key: "yt-lyrics", displayName: "YouTube", syncType: "unsynced", priority: 8 },
-  { key: "lrclib-plain", displayName: "LRCLIB", syncType: "unsynced", priority: 9 },
-  { key: "custom-lyrics", displayName: "Custom Lyrics (Local)", syncType: "vary", priority: 10 },
+  { key: "unison-synced", displayName: "Unison", syncType: "line", priority: 5 },
+  { key: "lrclib-synced", displayName: "LRCLIB", syncType: "line", priority: 6 },
+  { key: "legato-synced", displayName: "Legato", syncType: "line", priority: 7 },
+  { key: "musixmatch-synced", displayName: "Musixmatch", syncType: "line", priority: 8 },
+  { key: "yt-lyrics", displayName: "YouTube", syncType: "unsynced", priority: 9 },
+  { key: "unison-plain", displayName: "Unison", syncType: "unsynced", priority: 10 },
+  { key: "lrclib-plain", displayName: "LRCLIB", syncType: "unsynced", priority: 11 },
+  { key: "custom-lyrics", displayName: "Custom Lyrics (Local)", syncType: "vary", priority: 12 },
 ] as const;
 
 export const LYRIC_SOURCE_KEYS = PROVIDER_CONFIGS.map(p => p.key);

@@ -48,161 +48,188 @@
 				<button id="tab-timing-btn" class="tab-secondary-btn tab-btn tab-btns">
 					<span class="label">Timing</span>
 				</button>
-				<button id="tab-preview-btn" class="tab-last-btn tab-btn tab-btns">
+				<button id="tab-preview-btn" class="tab-secondary-btn tab-btn tab-btns">
 					<span class="label">Preview</span>
+				</button>
+				<button id="tab-export-btn" class="tab-last-btn tab-btn tab-btns">
+					<span class="label">Export</span>
 				</button>
 			</div>
 
 			<div class="metadata">
-				<span>
-					<strong id="metadata-name">Snowman</strong>
+				<span class="span-wseparator">
+					<!-- <strong id="metadata-name">Snowman</strong>
 					<div class="span-separator"></div>
-					<strong id="metadata-duration">04:30</strong>
+					<strong id="metadata-duration">04:30</strong> -->
 				</span>
-				<span>
-					<span id="metadata-artist">Sia</span>
+				<span class="span-wseparator">
+					<!-- <span id="metadata-artist">Sia</span>
 					<div class="span-separator"></div>
-					<span id="metadata-album">Everyday is Christmas (Deluxe Edition)</span>
+					<span id="metadata-album">Everyday is Christmas (Deluxe Edition)</span> -->
 				</span>
 			</div>
 		</div>
 		
-		<!-- TOOLS -->
-		<div class="tools">
-			<div id="new-lyric-line" class="tool">
-				<div class="actions">
-					<button id="add-line" class="add-line active-btn">
-						<svg class="plus-middle" width="16" height="16" viewBox="0 0 16 16">
-							<path d="M7.99992 3.33331V12.6666M3.33325 7.99998H12.6666" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" />
-						</svg>
-						<span class="add-line-label-bottom">Line</span>
+		<!-- EDITOR -->
+		<div id="tab-editor" class="clyrics-container">
+			<div class="small-topbar">
+				<div id="agents-presets" class="rows">
+					<button id="add-agent" class="small-btn">Add</button>
+					<div id="added-agents" class="rows">
+						<button class="small-btn">
+							<div class="span-separator agent-col" style="background-color: #ff595e;"></div>
+							Lead
+						</button>
+						<button class="small-btn">
+							<div class="span-separator agent-col" style="background-color: #ff55ff;"></div>
+							Duet
+						</button>
+					</div>
+				</div>
+				<div id="editor-layout" class="rows">
+					<span id="current-editor-layout">Powerhouse</span>
+					<button id="switch-layout" class="icon-btn left-tooltip-icon-btn" data-tooltip="Switch Layout">
+						<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="currentColor" d="M9 3a2 2 0 0 1 2 2v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2zm0 12a2 2 0 0 1 2 2v2a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-2a2 2 0 0 1 2-2zm10-4a2 2 0 0 1 2 2v6a2 2 0 0 1-2 2h-4a2 2 0 0 1-2-2v-6a2 2 0 0 1 2-2zm0-8a2 2 0 0 1 2 2v2a2 2 0 0 1-2 2h-4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2z"/></svg>
 					</button>
-					<div class="add-line-types">
-						<button id="add-line-instrumental" class="add-line-type-btn active-btn">
-							<svg class="plus-side" width="16" height="16" viewBox="0 0 16 16">
+				</div>
+			</div>
+			<!-- TOOLS -->
+			<div class="tools">
+				<div id="new-lyric-line" class="tool">
+					<div class="actions">
+						<button id="add-line" class="add-line active-btn">
+							<svg class="plus-middle" width="16" height="16" viewBox="0 0 16 16">
 								<path d="M7.99992 3.33331V12.6666M3.33325 7.99998H12.6666" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" />
 							</svg>
-							<span class="add-line-label-side">Instrumental</span>
+							<span class="add-line-label-bottom">Line</span>
 						</button>
-
-						<button id="add-line-together" class="add-line-type-btn active-btn">
-							<svg class="plus-side" width="16" height="16" viewBox="0 0 16 16">
-								<path d="M7.99992 3.33331V12.6666M3.33325 7.99998H12.6666" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" />
-							</svg>
-							<span class="add-line-label-side">Together</span>
-						</button>
-					</div>
-				</div>
-				<span class="tool-section-span">New Lyric Line</span>
-			</div>
-
-			<div class="separator-row"></div>
-
-			<div id="line-timing" class="tool">
-				<div class="actions2 tools-items">
-					<div id="start-time" class="tool-input">
-						<span class="tool-property">Start Time</span>
-						<div id="start-time-input" class="tool-input-multiple">
-							<input id="start-time-input-minutes" type="number" class="input" placeholder="min" disabled/>
-							<input id="start-time-input-seconds" type="number" class="input" placeholder="sec" min="-59" max="59" disabled/>
-							<input id="start-time-input-ms" type="number" class="input" placeholder="ms" min="-999" max="999" disabled/>
+						<div class="add-line-types">
+							<button id="add-line-instrumental" class="add-line-type-btn active-btn">
+								<svg class="plus-side" width="16" height="16" viewBox="0 0 16 16">
+									<path d="M7.99992 3.33331V12.6666M3.33325 7.99998H12.6666" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" />
+								</svg>
+								<span class="add-line-label-side">Instrumental</span>
+							</button>
+	
+							<button id="add-line-together" class="add-line-type-btn active-btn">
+								<svg class="plus-side" width="16" height="16" viewBox="0 0 16 16">
+									<path d="M7.99992 3.33331V12.6666M3.33325 7.99998H12.6666" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" />
+								</svg>
+								<span class="add-line-label-side">Together</span>
+							</button>
 						</div>
 					</div>
-					<div id="duration" class="tool-input">
-						<span class="tool-property">Duration</span>
-						<div id="duration-input" class="tool-input-multiple">
-							<input id="duration-input-minutes" type="number" class="input" placeholder="min" disabled/>
-							<input id="duration-input-seconds" type="number" class="input" placeholder="sec" min="-59" max="59" disabled/>
-							<input id="duration-input-ms" type="number" class="input" placeholder="ms" min="-999" max="999" disabled/>
+					<span class="tool-section-span">New Lyric Line</span>
+				</div>
+	
+				<div class="separator-row"></div>
+	
+				<div id="line-timing" class="tool">
+					<div class="actions2 tools-items">
+						<div id="start-time" class="tool-input">
+							<span class="tool-property">Start Time</span>
+							<div id="start-time-input" class="tool-input-multiple">
+								<input id="start-time-input-minutes" type="number" class="input" placeholder="min" disabled/>
+								<input id="start-time-input-seconds" type="number" class="input" placeholder="sec" min="-59" max="59" disabled/>
+								<input id="start-time-input-ms" type="number" class="input" placeholder="ms" min="-999" max="999" disabled/>
+							</div>
+						</div>
+						<div id="end-time" class="tool-input">
+							<span class="tool-property">End Time</span>
+							<div id="end-time-input" class="tool-input-multiple">
+								<input id="end-time-input-minutes" type="number" class="input" placeholder="min" disabled/>
+								<input id="end-time-input-seconds" type="number" class="input" placeholder="sec" min="-59" max="59" disabled/>
+								<input id="end-time-input-ms" type="number" class="input" placeholder="ms" min="-999" max="999" disabled/>
+							</div>
 						</div>
 					</div>
+					<span class="tool-section-span">Line Timing</span>
 				</div>
-				<span class="tool-section-span">Line Timing</span>
-			</div>
-
-			<div class="separator-row"></div>
-
-			<div id="line-properties" class="tool" style="width: 150px">
-				<div class="tools-items">
-					<div id="instrumental-line" class="tool-input">
-						<span class="tool-property">Instrumental</span>
-						<button id="instrumental-btn" class="checkbox" disabled>
-							<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24">
-								<path fill="black" d="m9.55 18l-5.7-5.7l1.425-1.425L9.55 15.15l9.175-9.175L20.15 7.4z"/>
-							</svg>
-						</button>
+	
+				<div class="separator-row"></div>
+	
+				<div id="line-properties" class="tool" style="width: 150px">
+					<div class="tools-items">
+						<div id="instrumental-line" class="tool-input">
+							<span class="tool-property">Instrumental</span>
+							<button id="instrumental-btn" class="checkbox" disabled>
+								<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24">
+									<path fill="black" d="m9.55 18l-5.7-5.7l1.425-1.425L9.55 15.15l9.175-9.175L20.15 7.4z"/>
+								</svg>
+							</button>
+						</div>
+						<div id="background-line" class="tool-input">
+							<span class="tool-property">Background</span>
+							<button id="background-btn" class="checkbox" disabled>
+								<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24">
+									<path fill="black" d="m9.55 18l-5.7-5.7l1.425-1.425L9.55 15.15l9.175-9.175L20.15 7.4z"/>
+								</svg>
+							</button>
+						</div>
 					</div>
-					<div id="background-line" class="tool-input">
-						<span class="tool-property">Background</span>
-						<button id="background-btn" class="checkbox" disabled>
-							<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24">
-								<path fill="black" d="m9.55 18l-5.7-5.7l1.425-1.425L9.55 15.15l9.175-9.175L20.15 7.4z"/>
-							</svg>
-						</button>
-					</div>
+					<span class="tool-section-span">Line Properties</span>
 				</div>
-				<span class="tool-section-span">Line Properties</span>
-			</div>
-			
-			<div class="separator-row"></div>
-
-			<div id="line-display" class="tool" style="width: 150px;">
-				<div class="tools-items">
-					<div id="show-timeline" class="tool-input">
-						<span class="tool-property">Timeline</span>
-						<button id="show-timeline-btn" class="checkbox">
-							<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24">
-								<path fill="black" d="m9.55 18l-5.7-5.7l1.425-1.425L9.55 15.15l9.175-9.175L20.15 7.4z"/>
-							</svg>
-						</button>
+				
+				<div class="separator-row"></div>
+	
+				<div id="line-display" class="tool" style="width: 150px;">
+					<div class="tools-items">
+						<div id="show-timeline" class="tool-input">
+							<span class="tool-property">Timeline</span>
+							<button id="show-timeline-btn" class="checkbox">
+								<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24">
+									<path fill="black" d="m9.55 18l-5.7-5.7l1.425-1.425L9.55 15.15l9.175-9.175L20.15 7.4z"/>
+								</svg>
+							</button>
+						</div>
+						<div id="show-roman" class="tool-input">
+							<span class="tool-property">Romanization</span>
+							<button id="show-roman-btn" class="checkbox">
+								<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24">
+									<path fill="black" d="m9.55 18l-5.7-5.7l1.425-1.425L9.55 15.15l9.175-9.175L20.15 7.4z"/>
+								</svg>
+							</button>
+						</div>
+						<div id="show-translate" class="tool-input">
+							<span class="tool-property">Translation</span>
+							<button id="show-translate-btn" class="checkbox">
+								<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24">
+									<path fill="black" d="m9.55 18l-5.7-5.7l1.425-1.425L9.55 15.15l9.175-9.175L20.15 7.4z"/>
+								</svg>
+							</button>
+						</div>
 					</div>
-					<div id="show-roman" class="tool-input">
-						<span class="tool-property">Romanization</span>
-						<button id="show-roman-btn" class="checkbox">
-							<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24">
-								<path fill="black" d="m9.55 18l-5.7-5.7l1.425-1.425L9.55 15.15l9.175-9.175L20.15 7.4z"/>
-							</svg>
-						</button>
-					</div>
-					<div id="show-translate" class="tool-input">
-						<span class="tool-property">Translation</span>
-						<button id="show-translate-btn" class="checkbox">
-							<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24">
-								<path fill="black" d="m9.55 18l-5.7-5.7l1.425-1.425L9.55 15.15l9.175-9.175L20.15 7.4z"/>
-							</svg>
-						</button>
-					</div>
+					<span class="tool-section-span">Line Display</span>
 				</div>
-				<span class="tool-section-span">Line Display</span>
 			</div>
+	
+			<!-- LYRIC LINES -->
+			<div id="lyric-lines" class="lyric-lines">
+				<div id="no-lyrics" class="no-lyrics">
+					<h1><strong>No Lyrics</strong></h1>
+					<h3>Add a new lyric line from the top left or import the lyrics from a file or provider!</h3>
+				</div>
+			</div>
+	
 		</div>
-
-		<!-- LYRIC LINES -->
-		<div id="lyric-lines" class="lyric-lines">
-			<div id="no-lyrics" class="no-lyrics">
-				<h1><strong>No Lyrics</strong></h1>
-				<span>Add a new lyric line from the top left or import the lyrics from a file or provider!</span>
-			</div>
-		</div>
-
-		<!-- TOOLBAR -->
-		<div class="toolbar">
-			<div class="edit-modes">
-				<button id="edit-mode-simple-btn" class="tab-first-btn edit-mode-btn tab-btns active-btn">
-					<div class="label">Simple</div>
+		
+		<!-- PLAYBAR -->
+		<div class="playbar">
+			<label class="drag-audio" for="audio-file-playbar">
+				<input id="audio-file-playbar" accept="audio/*" type="file"/>
+				<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="currentColor" d="M6 22q-.82 0-1.41-.59T4 20V4q0-.82.59-1.41T6 2h7.17q.4 0 .77.15t.64.42l4.85 4.85q.27.28.42.64t.15.76V20q0 .82-.59 1.41T18 22zm7-14q0 .42.29.71T14 9h4l-5-5zm-2.25 11q.95 0 1.6-.65t.65-1.6V13h2q.42 0 .71-.29T16 12t-.29-.71T15 11h-2q-.42 0-.71.29T12 12v2.88q-.28-.2-.59-.3t-.66-.08q-.95 0-1.6.65t-.65 1.6.65 1.6 1.6.65"/></svg>
+				<h3>Drag or select an audio file here</h3>
+			</label>
+			<!-- <div class="audio-controls">
+				<button id="play-pause-btn" class="icon-btn play-pause-btn" disabled>
+					<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+						<path fill="currentColor" d="M8 19h2V5H8v14m6-14v14h2V5h-2z"/>
+					</svg>
 				</button>
-				<button id="edit-mode-timeline-btn" class="tab-secondary-btn edit-mode-btn tab-btns">
-					<div class="label">Timeline</div>
-				</button>
-				<button id="edit-mode-json-btn" class="tab-last-btn edit-mode-btn tab-btns">
-					<div class="label">JSON</div>
-				</button>
-			</div>
-			<button class="topright-tooltip-icon-btn icon-btn" data-tooltip="No warnings. You're good!" style="padding: .5rem">
-				<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24">
-					<path fill="currentColor" d="M2.725 21q-.275 0-.5-.137t-.35-.363t-.137-.488t.137-.512l9.25-16q.15-.25.388-.375T12 3t.488.125t.387.375l9.25 16q.15.25.138.513t-.138.487t-.35.363t-.5.137zM12 18q.425 0 .713-.288T13 17t-.288-.712T12 16t-.712.288T11 17t.288.713T12 18m0-3q.425 0 .713-.288T13 14v-3q0-.425-.288-.712T12 10t-.712.288T11 11v3q0 .425.288.713T12 15"/>
-				</svg>
-			</button>
+				<span id="current-time" class="time-display">00:00.000</span>
+				<input id="seek-bar" type="range" class="seek-bar" min="0" max="100" value="0" step="0.01" disabled/>
+				<span id="total-duration" class="time-display">00:00.000</span>
+			</div> -->
 		</div>
 
 		<!-- FREEFORM ELEMENTS (CONTEXT MENU, MODAL) -->
@@ -249,7 +276,7 @@
 		</div>
 
 		<div id="clyrics-modal-overlay" class="modal-overlay">
-			<div class="modal clyrics-modal">
+			<div class="medium-modal modal clyrics-modal">
 				<div class="modal-header">
 					<h3 class="modal-title">Custom Lyrics</h3>
 					<button id="clyrics-modal-close" class="modal-close-btn" aria-label="Close">

@@ -153,6 +153,8 @@ const sourceKeyToFillFn = {
   "bLyrics-richsynced": bLyrics,
   "bLyrics-synced": bLyrics,
   "unison-richsynced": unison,
+  "unison-synced": unison,
+  "unison-plain": unison,
   "musixmatch-richsync": cubey,
   "musixmatch-synced": cubey,
   "lrclib-synced": lyricLib,

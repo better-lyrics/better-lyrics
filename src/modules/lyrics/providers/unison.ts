@@ -4,14 +4,21 @@ import type { ProviderParameters } from "./shared";
 import { parseLRC, parsePlainLyrics } from "./lrcUtils";
 
 interface UnisonResponse {
-  format: "ttml" | "lrc" | "plain";
-  lyrics: string;
-  duration: number;
+  videoId: string
+  song: string
+  artist: string
+  duration: number
+  lyrics: string
+  format: "ttml" | "lrc" | "plain"
+  syncType: "richsync" | "linesync" | "plain"
 }
 
 export default async function unison(providerParameters: ProviderParameters): Promise<void> {
   const url = new URL(UNISON_API_URL);
+
+  // which is better - videoId or song metadata?
   // url.searchParams.append("v", providerParameters.videoId);
+
   url.searchParams.append("song", providerParameters.song);
   url.searchParams.append("artist", providerParameters.artist);
   url.searchParams.append("duration", String(providerParameters.duration));
@@ -34,6 +41,8 @@ export default async function unison(providerParameters: ProviderParameters): Pr
   switch (responseString.format) {
     case "ttml":
       const filled = await fillTtml(responseString.lyrics);
+      if (!filled) return;
+      
       providerParameters.sourceMap["unison-richsynced"].lyricSourceResult = filled ? filled.result : null;
       break;
     case "lrc":

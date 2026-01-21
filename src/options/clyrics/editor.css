@@ -21,11 +21,15 @@ body {
     height: 100%;
     display: flex;
     flex-direction: column;
-    gap: .25rem;
+    /* gap: .25rem; */
     align-items: center;
     justify-content: flex-start;
     position: relative;
     overflow: hidden;
+}
+
+h3 {
+    margin: 0;
 }
 
 button {
@@ -155,12 +159,49 @@ button {
     translate: 0 -50%;
 }
 
-.metadata > span {
+.metadata .span-wseparator {
+    justify-content: flex-end;
+}
+
+/* TAB CONTAINER */
+.clyrics-container {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    justify-content: flex-start;
+    align-self: stretch;
+    gap: .25rem;
+    height: 100%;
+    overflow: auto;
+}
+
+/* SMALL TOPBAR */
+.small-topbar {
+    display: flex;
+    gap: .5rem;
+    flex-direction: row;
+    justify-content: space-between;
+    align-self: stretch;
+    background-color: rgba(0, 0, 0, .2);
+    border: solid;
+    border-radius: .5rem;
+    border-color: hsl(0, 0%, 100%, .25);
+    border-width: .0625rem;
+    padding: .5rem;
+}
+
+.rows {
     display: flex;
     flex-direction: row;
-    justify-content: flex-end;
-    align-items: center;
     gap: .25rem;
+    align-items: center;
+    justify-content: flex-start;
+    align-self: stretch;
+    position: relative;
+}
+
+.agent-col {
+    width: .5rem;
 }
 
 /* TOOLS */
@@ -449,7 +490,7 @@ button {
 
 /* LYRIC LIENS */
 .lyric-lines {
-    margin-top: .3125rem;
+    margin: .3125rem 0;
     display: flex;
     flex-direction: column;
     gap: .5rem;
@@ -458,6 +499,7 @@ button {
     align-self: stretch;
     flex: 1;
     position: relative;
+    padding-right: .5rem;
     overflow: auto;
 }
 
@@ -468,6 +510,7 @@ button {
     position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
     text-align: center;
     gap: .5rem;
+    scale: 1.2;
 }
 
 .lyric-line {
@@ -726,51 +769,49 @@ button {
     overflow: visible;
 }
 
-/* TOOLBAR */
-.toolbar {
-    padding: .5rem 0;
-    display: flex;
-    flex-direction: row;
-    align-items: flex-end;
-    justify-content: space-between;
-    align-self: stretch;
+/* PLAYBAR */
+.playbar {
+    background: rgba(0, 0, 0, 0.25);
     flex-shrink: 0;
-    gap: .5rem;
-    height: 2rem;
+    height: 3rem;
+    border-radius: .5rem .5rem 0 0;
+    align-self: stretch;
     position: relative;
 }
 
-.edit-modes {
-    border-radius: .5rem;
+.drag-audio {
     display: flex;
     flex-direction: row;
-    gap: .25rem;
     align-items: center;
-    justify-content: flex-start;
-    align-self: stretch;
-    flex-shrink: 0;
-    position: relative;
-    overflow: hidden;
+    justify-content: center;
+    width: auto;
+    height: 100%;
+    gap: .25rem;
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+}
+
+.drag-audio:hover {
+    background: none;
 }
 
 /* TOOLTIP BUTTON */
 .left-tooltip-icon-btn:hover::after {
-    transform: translateX(-.3rem) translateY(0);
+    transform: translate(calc(-100% - .3rem));
 }
 
 .left-tooltip-icon-btn::after {
     bottom: auto;
     left: 0;
-    translate: -100%;
-    transform: translateY(0);
+    transform: translate(-100%);
 }
 
 .topright-tooltip-icon-btn:hover::after {
-    transform: translateX(-100%) translateY(0);
+    transform: translate(-100%);
 }
 
 .topright-tooltip-icon-btn::after {
-    transform: translateX(-100%) translateY(4px);
+    transform: translate(-100%) translateY(4px);
     left: 100%;
 }
 
@@ -818,93 +859,6 @@ button {
 .list-btn:disabled {
     opacity: .25;
     pointer-events: none;
-}
-
-/* Custom Lyrics Modal */
-.clyrics-modal-items {
-	display: flex;
-	flex-direction: column;
-	align-items: stretch;
-	gap: 0.5rem;
-}
-
-.clyrics-card {
-	background: rgba(255, 255, 255, 0.05);
-	border: 1px solid rgba(255, 255, 255, 0.1);
-	border-radius: 0.5rem;
-	padding: 0.625rem 0.75rem;
-	transition: all 0.2s;
-	position: relative;
-	width: auto;
-	display: flex;
-	flex-direction: row;
-	justify-content: space-between;
-	/* flex: 0 0 auto; */
-}
-
-.clyrics-card-info {
-	display: flex;
-	gap: 0.125rem;
-	flex-direction: column;
-	justify-content: flex-start;
-}
-
-.clyrics-card-buttons {
-	display: flex;
-	gap: 0.5rem;
-	flex-direction: row;
-}
-
-.clyrics-top-buttons {
-	display: flex;
-	justify-content: space-between;
-	align-items: center;
-}
-
-.clyrics-input-title {
-	font-size: 1.125rem;
-}
-
-.clyrics-input-description {
-	opacity: 0.5;
-	font-size: .75rem;
-}
-
-.clyrics-input-span {
-	opacity: 0.5;
-	font-size: .625rem;
-}
-
-.clyrics-input-info {
-	display: flex;
-	flex-direction: column;
-	gap: 4px;
-}
-
-.clyrics-long-input {
-	display: flex;
-	gap: 4px;
-	flex-direction: column;
-	align-items: flex-start;
-	justify-content: flex-start;
-}
-
-.clyrics-short-input {
-	display: flex;
-	flex-direction: row;
-	justify-content: space-between;
-	align-items: center;
-}
-
-.clyrics-span {
-	font-size: 0.8rem;
-}
-
-.clyrics-input {
-	border-radius: 0.25rem;
-	padding: 0.5rem 0.5rem;
-	width: auto;
-	align-self: stretch;
 }
 
 /* MEDIA */

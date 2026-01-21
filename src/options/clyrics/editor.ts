@@ -2,11 +2,14 @@ import type { Lyric, LyricPart } from "@/modules/lyrics/providers/shared";
 import { clyricsModalList, clyricsNewLyrics } from ".";
 import { openCLyricsModal } from "./clyrics";
 import { actionMenus, addNewLine, type ContextData, contextMenus, domDefaults } from "./editorDom";
+import { getLocalStorage } from "@/core/storage";
+
+let loaded = false;
 
 // Variables
-let _selectedFile = 1;
+let selectedFile = -1;
 let historyStack = [];
-let _historyVer = -1;
+let historyVer = -1;
 
 let lyrics: Lyric[] = [];
 
@@ -120,6 +123,9 @@ export function logAction(type: any, value: any, args: { [key: string]: any } = 
     "moved-line": ["line", "from", "to"],
     "moved-word-line": ["line", "word", "from", "to"],
     "moved-roman-line": ["line", "word", "from", "to"],
+
+    // "type" = "advance" | "rewind"
+    "time-shift": ["time", "type", "line"],
   };
 
   const action = validActions[type];
@@ -135,7 +141,7 @@ export function logAction(type: any, value: any, args: { [key: string]: any } = 
     ...args,
   });
 
-  _historyVer += 1;
+  historyVer += 1;
 }
 
 // Initiate elements
@@ -158,6 +164,9 @@ export const addLineInstrumental = document.getElementById("add-line-instrumenta
 export const addLineTogether = document.getElementById("add-line-together");
 export const startTimeInput = document.getElementById("start-time-input");
 export const durationInput = document.getElementById("duration-input");
+//// Playbar
+export const playbar = document.getElementById("playbar");
+export const audioFile = document.getElementById("audio-file-playbar");
 //// Lyric Lines Editor
 export const lyricLines = document.getElementById("lyric-lines");
 export const noLyrics = document.getElementById("no-lyrics");
@@ -551,6 +560,16 @@ function handleLyricLine() {
   });
 }
 
+function handlePlaybar() {
+  if (!audioFile) {
+    console.warn("No audio file loader. Refresh to reload handler");
+    return;
+  }
+  audioFile.addEventListener("drop", e => {
+
+  })
+}
+
 /// Context Menu
 function handleContextMenu() {
   if (!contextMenu) {
@@ -631,11 +650,31 @@ function handleKeybind() {
 }
 
 // Set up the handlers on load
-document.addEventListener("DOMContentLoaded", () => {
+function load() {
+  if (loaded) return;
+  loaded = true;
   handleActionsMenu();
   handleTabs();
   handleTools();
   handleLyricLine();
+  handlePlaybar();
   handleContextMenu();
   handleKeybind();
+}
+
+document.addEventListener("DOMContentLoaded", async () => {
+  const lastFile: any = await getLocalStorage("clyrics:lastFile");
+  selectedFile = lastFile && typeof lastFile["clyrics:lastFile"] == "number" ? lastFile["clyrics:lastFile"] : -1;
+
+  if (selectedFile < 0) {
+    openCLyricsModal();
+    if (clyricsModalList) {
+      clyricsModalList.style.display = "";
+    }
+    if (clyricsNewLyrics) {
+      clyricsNewLyrics.style.display = "none";
+    }
+  }
+
+  load();
 });
