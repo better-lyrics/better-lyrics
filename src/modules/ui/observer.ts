@@ -310,12 +310,9 @@ export function initializeLyrics(): void {
 
     if (AppState.areLyricsTicking && AppState.areLyricsLoaded && !AppState.hasPreloadedNextAlbumArt) {
       AppState.hasPreloadedNextAlbumArt = true;
-      log(LOG_PREFIX, "Trying to preload next album art");
       getSongMetadata(AppState.lastVideoId).then(async data => {
-        log(LOG_PREFIX, "Current song metadata:", data?.id, "nextVideoId:", data?.nextVideoId);
         if (data?.nextVideoId) {
           const next = await getSongMetadata(data.nextVideoId);
-          log(LOG_PREFIX, "Next song metadata:", next?.id, next?.title);
           if (next) {
             prefetchAlbumArt(next.thumbnailUrl, next.id);
           }
