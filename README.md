@@ -141,6 +141,8 @@ Settings are organized into tabs in the extension popup:
 
 Custom styling for lyrics is available from Better Lyrics v1.7.0 onwards. This allows you to personalize the appearance of both lyrics and the entire YouTube Music interface. For detailed instructions on customizing styles, importing/exporting themes, and using pre-made themes, please consult our [Styling Guide](./STYLING.md).
 
+For AI agents creating themes, see the [Theme Creation Guide for AI Agents](./STYLING-SKILL.md).
+
 ## Theme Marketplace
 
 Browse and install community-created themes directly from the extension. Access the Marketplace via the Themes tab in extension settings. You can search, filter by ratings or downloads, and install themes with one click. Installed themes auto-update when creators publish new versions. You can also install themes from GitHub repositories by entering a repo URL.
