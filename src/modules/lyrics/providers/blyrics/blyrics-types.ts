@@ -158,6 +158,29 @@ interface MetadataAttributes {
 }
 
 /**
+ * Represents a <ttm:name> element within an agent.
+ */
+interface AgentName {
+  "#text": string;
+}
+
+/**
+ * Represents a <ttm:agent> element attributes.
+ */
+interface AgentAttributes {
+  "@_type"?: string;
+  "@_id": string;
+}
+
+/**
+ * Represents a <ttm:agent> element.
+ */
+interface _AgentElement {
+  name?: AgentName[];
+  ":@": AgentAttributes;
+}
+
+/**
  * Represents any metadata element (agent, translations, transliterations, or nested containers).
  */
 export type MetadataElement = {
@@ -199,3 +222,41 @@ interface TtmlRootObject {
  * The final Root type for your TTML JSON output.
  */
 export type TtmlRoot = TtmlRootObject[];
+
+// Friendly Types
+
+/** A single, timed element. This can be a word, a syllable, or a space. */
+interface CleanWord {
+  begin: number;
+  end: number;
+  text: string;
+  isBackground: boolean;
+}
+
+/** A single line of lyrics */
+interface CleanLine {
+  key: string;
+  begin: number;
+  end: number;
+  text?: string;
+  words?: CleanWord[];
+}
+
+/** A section of the song (e.g., "Verse", "Chorus") */
+interface CleanSection {
+  begin: number;
+  end: number;
+  songPart: string;
+  lines: CleanLine[];
+}
+
+/** The root object containing all processed lyric data */
+interface _CleanTtml {
+  timing: "Line" | "Word";
+  lang: string;
+  duration: number;
+  songwriters: string[];
+  translations?: Record<string, string>;
+  transliterations?: Record<string, CleanWord[]>;
+  sections: CleanSection[];
+}
