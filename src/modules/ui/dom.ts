@@ -595,7 +595,6 @@ export function addAlbumArtToLayout(videoId: string): void {
   resizeObserver.observe(document.documentElement);
   albumArtResizeObserver = resizeObserver;
 
-  // Initial injection
   injectAlbumArtFn();
   log(ALBUM_ART_ADDED_LOG);
 }
