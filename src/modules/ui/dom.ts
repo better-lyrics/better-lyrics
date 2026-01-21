@@ -106,6 +106,8 @@ let albumArtResizeObserver: ResizeObserver | null = null;
 let lyricsObserver: MutationObserver | null = null;
 let adStateObserver: MutationObserver | null = null;
 let albumArtResizeTimeout: ReturnType<typeof setTimeout> | null = null;
+let lastInjectedAlbumArtUrl: string | null = null;
+let albumArtLoadListener: (() => void) | null = null;
 
 /**
  * Creates or reuses the lyrics wrapper element and sets up scroll event handling.
@@ -511,6 +513,22 @@ export function clearLyrics(): void {
 }
 
 /**
+ * Validates that a URL is a legitimate YouTube Music album art URL.
+ */
+function isValidAlbumArtUrl(url: string | null | undefined): boolean {
+  if (!url || typeof url !== "string" || url.trim() === "") return false;
+  if (url.startsWith("data:image")) return false;
+  const validPatterns = [
+    "lh3.googleusercontent.com",
+    "yt3.googleusercontent.com",
+    "ytimg.com",
+    "img.youtube.com",
+    "i.ytimg.com",
+  ];
+  return validPatterns.some(pattern => url.includes(pattern));
+}
+
+/**
  * Adds album art as a background image to the layout
  * and resizes the album art resolution to match user's
  * screen height.
@@ -530,16 +548,40 @@ export function addAlbumArtToLayout(videoId: string): void {
     backgroundChangeObserver.disconnect();
   }
 
+  const albumArt = document.querySelector(SONG_IMAGE_SELECTOR) as HTMLImageElement | null;
+  if (!albumArt) return;
+
+  if (albumArtLoadListener) {
+    albumArt.removeEventListener("load", albumArtLoadListener);
+    albumArtLoadListener = null;
+  }
+
   const injectAlbumArtFn = () => {
-    const albumArt = document.querySelector(SONG_IMAGE_SELECTOR) as HTMLImageElement;
-    if (albumArt.src.startsWith("data:image")) {
-      injectAlbumArt("https://img.youtube.com/vi/" + videoId + "/0.jpg");
+    const currentAlbumArt = document.querySelector(SONG_IMAGE_SELECTOR) as HTMLImageElement | null;
+    if (!currentAlbumArt) return;
+
+    if (!currentAlbumArt.complete || currentAlbumArt.naturalWidth === 0) return;
+
+    let srcToInject: string;
+    if (isValidAlbumArtUrl(currentAlbumArt.src)) {
+      srcToInject = currentAlbumArt.src;
     } else {
-      injectAlbumArt(albumArt.src);
+      srcToInject = `https://img.youtube.com/vi/${videoId}/0.jpg`;
     }
+
+    if (srcToInject === lastInjectedAlbumArtUrl) return;
+    injectAlbumArt(srcToInject);
+    log(ALBUM_ART_ADDED_FROM_MUTATION_LOG);
   };
 
-  const albumArt = document.querySelector(SONG_IMAGE_SELECTOR) as HTMLImageElement;
+  const observer = new MutationObserver(() => {
+    injectAlbumArtFn();
+  });
+  observer.observe(albumArt, { attributes: true });
+  backgroundChangeObserver = observer;
+
+  albumArtLoadListener = injectAlbumArtFn;
+  albumArt.addEventListener("load", albumArtLoadListener);
 
   const resizeObserver = new ResizeObserver(() => {
     if (albumArtResizeTimeout) {
@@ -550,18 +592,10 @@ export function addAlbumArtToLayout(videoId: string): void {
       setAlbumArtSize(screen.height);
     }, 1000);
   });
-
   resizeObserver.observe(document.documentElement);
   albumArtResizeObserver = resizeObserver;
 
-  const observer = new MutationObserver(() => {
-    injectAlbumArtFn();
-    log(ALBUM_ART_ADDED_FROM_MUTATION_LOG);
-  });
-
-  observer.observe(albumArt, { attributes: true });
-  backgroundChangeObserver = observer;
-
+  // Initial injection
   injectAlbumArtFn();
   log(ALBUM_ART_ADDED_LOG);
 }
@@ -576,7 +610,15 @@ export function injectAlbumArt(src: string): void {
   img.src = src;
 
   img.onload = () => {
-    (document.getElementById("layout") as HTMLElement).style.setProperty("--blyrics-background-img", `url('${src}')`);
+    lastInjectedAlbumArtUrl = src;
+    const layout = document.getElementById("layout");
+    if (layout) {
+      layout.style.setProperty("--blyrics-background-img", `url('${src}')`);
+    }
+  };
+
+  img.onerror = () => {
+    log("Failed to load album art:", src);
   };
 }
 
@@ -584,6 +626,13 @@ export function injectAlbumArt(src: string): void {
  * Removes album art from layout and disconnects observers.
  */
 export function removeAlbumArtFromLayout(): void {
+  if (albumArtLoadListener) {
+    const albumArt = document.querySelector(SONG_IMAGE_SELECTOR) as HTMLImageElement | null;
+    if (albumArt) albumArt.removeEventListener("load", albumArtLoadListener);
+    albumArtLoadListener = null;
+  }
+  lastInjectedAlbumArtUrl = null;
+
   if (backgroundChangeObserver) {
     backgroundChangeObserver.disconnect();
     backgroundChangeObserver = null;
