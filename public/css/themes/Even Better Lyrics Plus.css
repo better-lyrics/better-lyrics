@@ -137,9 +137,13 @@ ytmusic-player-bar {
   padding-left: 24px;
 }
 
+.middle-controls.ytmusic-player-bar span.yt-formatted-string{
+  overflow: visible !important;
+}
+
 .middle-controls.ytmusic-player-bar:hover yt-formatted-string.byline {
   will-change: transform;
-  animation: marquee-scroll 5s linear infinite;
+  animation: marquee-scroll 8s linear infinite;
   overflow: visible;
 }
 
