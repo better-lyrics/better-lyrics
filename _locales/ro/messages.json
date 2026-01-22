@@ -280,7 +280,7 @@
     "description": "Better Lyrics Legato provider name"
   },
   "options_provider_musixmatch": {
-    "message": "Musicxmatch",
+    "message": "Musixmatch",
     "description": "Musixmatch provider name"
   },
   "options_provider_lrclib": {
@@ -324,7 +324,7 @@
     "description": "Unsynced sync type label"
   },
   "options_syncType_unsynced_tooltip": {
-    "message": "Versuri fără informații despre sincronizate. Versurile nesincronizate oferă o experiență minimă.",
+    "message": "Versuri fără informații de sincronizate. Versurile nesincronizate oferă o experiență minimă.",
     "description": "Unsynced sync type tooltip"
   },
   "options_detail_rateTheme": {
