@@ -144,9 +144,9 @@ ytmusic-player-bar {
 }
 
 .middle-controls.ytmusic-player-bar .byline-wrapper{
-  mask-image: linear-gradient(90deg,transparent,#000 5%,#000 95%,transparent 100%);
-  mask-size: 110%;
-  mask-position: center;
+  mask-image: linear-gradient(90deg,transparent,#000 7.5%,#000 92.5%,transparent 100%);
+  mask-size: 115%;
+  mask-position: right;
   transition: mask-size 0.15s linear;
 }
 
