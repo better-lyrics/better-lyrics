@@ -16,17 +16,17 @@ function suppressConsoleDuringCompile<T>(fn: () => T): T {
   }
 }
 
-export interface DiagnosticLocation {
+interface DiagnosticLocation {
   line?: number;
   column?: number;
 }
 
-export interface CompileDiagnostic {
+interface CompileDiagnostic {
   message: string;
   location?: DiagnosticLocation;
 }
 
-export interface CompilationState {
+interface CompilationState {
   sourceCode: string;
   compiledCSS: string;
   errors: CompileDiagnostic[];
@@ -34,7 +34,7 @@ export interface CompilationState {
   isValid: boolean;
 }
 
-export class RicsCompilerService {
+class RicsCompilerService {
   private lastCompilationState: CompilationState | null = null;
 
   compile(sourceCode: string): CompilationState {

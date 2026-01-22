@@ -239,7 +239,7 @@ export function addFooter(
  * @param album - Album name
  * @param duration - Song duration in seconds
  */
-export function createFooter(song: string, artist: string, album: string, duration: number): void {
+function createFooter(song: string, artist: string, album: string, duration: number): void {
   try {
     const footer = document.getElementsByClassName(FOOTER_CLASS)[0] as HTMLElement;
     footer.replaceChildren();
@@ -499,7 +499,7 @@ export function hideAdOverlay(): void {
 /**
  * Clears all lyrics content from the wrapper element.
  */
-export function clearLyrics(): void {
+function clearLyrics(): void {
   try {
     const lyricsWrapper = document.getElementById(LYRICS_WRAPPER_ID);
     if (lyricsWrapper) {
@@ -571,7 +571,7 @@ export function addAlbumArtToLayout(videoId: string): void {
  *
  * @param src - Image source URL
  */
-export function injectAlbumArt(src: string): void {
+function injectAlbumArt(src: string): void {
   const img = new Image();
   img.src = src;
 

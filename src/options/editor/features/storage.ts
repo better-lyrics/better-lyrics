@@ -111,7 +111,7 @@ async function saveChunkedCSS(css: string): Promise<void> {
   console.log(LOG_PREFIX_EDITOR, `Storage usage after save: ${finalUsage.used} / ${finalUsage.total} bytes`);
 }
 
-export const getStorageStrategy = (css: string): "local" | "sync" | "chunked" => {
+const getStorageStrategy = (css: string): "local" | "sync" | "chunked" => {
   const cssSize = new Blob([css]).size;
   if (cssSize > LOCAL_STORAGE_SAFE_LIMIT) {
     return "chunked";
@@ -181,7 +181,7 @@ export const saveToStorageWithFallback = async (css: string, _isTheme = false, r
   }
 };
 
-export async function loadCustomCSS(): Promise<string> {
+async function loadCustomCSS(): Promise<string> {
   let css: string | null = null;
   let compressed = false;
 
@@ -331,7 +331,7 @@ export async function applyStoreThemeComplete(options: ApplyStoreThemeOptions): 
   }
 }
 
-export class StorageManager {
+class StorageManager {
   private isInitialized = false;
 
   initialize(): void {

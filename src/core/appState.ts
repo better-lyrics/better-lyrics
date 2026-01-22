@@ -18,7 +18,7 @@ export interface PlayerDetails {
   };
 }
 
-export interface AppStateType {
+interface AppStateType {
   suppressZeroTime: number;
   areLyricsTicking: boolean;
   lyricData: LyricsData | null;

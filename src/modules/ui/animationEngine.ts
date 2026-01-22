@@ -87,7 +87,6 @@ export function resetAnimEngineState(): void {
   animEngineState.doneFirstInstantScroll = false;
   animEngineState.queuedScroll = false;
   cachedDurations.clear();
-  cachedProperties.clear();
 }
 
 export let cachedDurations: Map<string, number> = new Map();
@@ -101,7 +100,7 @@ export let cachedDurations: Map<string, number> = new Map();
  * @param property - the css property to look up
  * @return - in ms
  */
-export function getCSSDurationInMs(lyricsElement: HTMLElement, property: string): number {
+function getCSSDurationInMs(lyricsElement: HTMLElement, property: string): number {
   let duration = cachedDurations.get(property);
   if (duration === undefined) {
     duration = toMs(window.getComputedStyle(lyricsElement).getPropertyValue(property));
@@ -109,27 +108,6 @@ export function getCSSDurationInMs(lyricsElement: HTMLElement, property: string)
   }
 
   return duration;
-}
-
-export let cachedProperties: Map<string, string> = new Map();
-
-/**
- * Gets and caches a css duration.
- * Note this function does not key its cache on the element provided --
- * it assumes that it isn't relevant to the calling code
- *
- * @param lyricsElement - the element to look up against
- * @param property - the css property to look up
- * @return - in ms
- */
-export function getCSSProperty(lyricsElement: HTMLElement, property: string): string {
-  let value = cachedProperties.get(property);
-  if (value === undefined) {
-    value = window.getComputedStyle(lyricsElement).getPropertyValue(property);
-    cachedProperties.set(property, value);
-  }
-
-  return value;
 }
 
 /**

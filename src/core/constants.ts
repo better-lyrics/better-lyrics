@@ -97,7 +97,6 @@ export const LOG_PREFIX_CONTENT = "[BetterLyrics:Content]" as const;
 export const LOG_PREFIX_BACKGROUND = "[BetterLyrics:Background]" as const;
 export const LOG_PREFIX_EDITOR = "[BetterLyrics:Editor]" as const;
 export const LOG_PREFIX_STORE = "[BetterLyrics:Store]" as const;
-export const IGNORE_PREFIX = "(Safe to ignore)" as const;
 
 // Initialization and General Logs
 export const INITIALIZE_LOG =
@@ -109,7 +108,6 @@ export const FETCH_LYRICS_LOG = "[BetterLyrics] Fetching lyrics for:" as const;
 export const LYRICS_FOUND_LOG = "[BetterLyrics] Lyrics found, injecting into the page" as const;
 export const NO_LYRICS_FOUND_LOG = "[BetterLyrics] No lyrics found for the current song" as const;
 export const LRCLIB_LYRICS_FOUND_LOG = "[BetterLyrics] Lyrics found from LRCLIB" as const;
-export const NO_LRCLIB_LYRICS_FOUND_LOG = "[BetterLyrics] No lyrics found on LRCLIB" as const;
 export const PROVIDER_SWITCHED_LOG = "[BetterLyrics] Switching to provider = " as const;
 
 // UI State Logs
@@ -358,7 +356,7 @@ export const IDENTITY_ACTIONS = [
   "Belt",
 ] as const;
 
-export interface ProviderConfig {
+interface ProviderConfig {
   key: LyricSourceKey;
   displayName: string;
   syncType: SyncType;

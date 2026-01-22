@@ -63,12 +63,12 @@ function handleVisibilityChange(): void {
   }
 }
 
-export function initWakeLock(): void {
+function initWakeLock(): void {
   requestWakeLock();
   document.addEventListener("visibilitychange", handleVisibilityChange);
 }
 
-export function cleanupWakeLock(): void {
+function cleanupWakeLock(): void {
   if (wakeLock) {
     wakeLock.release();
     wakeLock = null;
@@ -78,7 +78,7 @@ export function cleanupWakeLock(): void {
 
 type FullscreenCallback = () => void;
 
-export function onFullscreenChange(onEnter: FullscreenCallback, onExit: FullscreenCallback): void {
+function onFullscreenChange(onEnter: FullscreenCallback, onExit: FullscreenCallback): void {
   const appLayout = document.querySelector("ytmusic-app-layout");
   if (!appLayout) {
     setTimeout(() => onFullscreenChange(onEnter, onExit), 1000);

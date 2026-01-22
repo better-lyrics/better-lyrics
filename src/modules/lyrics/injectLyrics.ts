@@ -104,12 +104,6 @@ export interface PartData {
   animationStartTimeMs: number;
 }
 
-export interface InstrumentalElements {
-  waveClip: SVGElement;
-  wavePath: SVGElement;
-  fill: SVGElement;
-}
-
 export type LineData = {
   parts: PartData[];
   isScrolled: boolean;
@@ -251,7 +245,7 @@ function createBreakElem(lyricElement: HTMLDivElement, order: number) {
  * @param [data.source] - Source attribution for lyrics
  * @param [data.sourceHref] - URL for source link
  */
-export function injectLyrics(data: LyricSourceResultWithMeta, keepLoaderVisible = false): void {
+function injectLyrics(data: LyricSourceResultWithMeta, keepLoaderVisible = false): void {
   const lyrics = data.lyrics!;
   cleanup();
   resizeObserver.disconnect();

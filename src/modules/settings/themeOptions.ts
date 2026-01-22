@@ -2,7 +2,7 @@ import { reloadLyrics } from "@core/appState";
 
 let keyToSettingMap: Map<string, Setting> = new Map();
 
-export class Setting {
+class Setting {
   readonly type: "number" | "boolean" | "string";
   value: number | boolean | string;
   readonly defaultValue: number | boolean | string;
@@ -45,10 +45,6 @@ export function registerThemeSetting(
   let setting = new Setting(type, defaultValue, defaultValue, requiresLyricReload);
   keyToSettingMap.set(key, setting);
   return setting;
-}
-
-export function getThemeSetting(key: string) {
-  return keyToSettingMap.get(key);
 }
 
 export function setThemeSettings(map: Map<string, string>) {
