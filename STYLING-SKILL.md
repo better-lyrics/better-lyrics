@@ -53,10 +53,10 @@ Essential reference for creating custom themes. For deep dives, see [STYLING.md]
   --blyrics-padding: 2rem;
   --blyrics-margin: 2rem;
   --blyrics-border-radius: 1000rem;
-  --blyrics-panel-size: 50%;
-  --blyrics-video-panel-size: 30%;
-  --blyrics-fullscreen-panel-size: 66%;
-  --blyrics-fullscreen-video-panel-size: 25%;
+  --blyrics-panel-size: 50%;                     /* lyrics container width (audio mode) */
+  --blyrics-video-panel-size: 30%;               /* lyrics container width (video mode) */
+  --blyrics-fullscreen-panel-size: 66%;          /* lyrics container width (fullscreen audio) */
+  --blyrics-fullscreen-video-panel-size: 25%;    /* lyrics container width (fullscreen video) */
 }
 ```
 
