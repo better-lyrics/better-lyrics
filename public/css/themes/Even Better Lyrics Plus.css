@@ -136,3 +136,11 @@ ytmusic-player-bar {
 .volume-slider.ytmusic-player-bar {
   opacity: 1;
 }
+
+.blyrics--word::after {
+  --blyrics-glow-color: color(display-p3 1 1 1 / 0.0001);
+}
+
+.blyrics--word[data-long-word]::after{
+  --blyrics-glow-color: color(display-p3 1 1 1 / 1);
+}
