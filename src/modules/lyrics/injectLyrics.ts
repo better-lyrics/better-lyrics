@@ -530,7 +530,7 @@ function injectLyrics(data: LyricSourceResultWithMeta, keepLoaderVisible = false
 
     if (item.translation && langCodesMatch(targetTranslationLang, item.translation.lang)) {
       if (!data.language) {
-        console.warn("Found translations, but no original language")
+        console.warn("Found translations, but no original language");
       }
 
       translationResult = {
