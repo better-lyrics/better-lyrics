@@ -1,0 +1,726 @@
+{
+  "extensionName": {
+    "message": "Better Lyrics (YouTube Music用歌詞)",
+    "description": "The name of the extension"
+  },
+  "extensionDescription": {
+    "message": "YouTube Musicを美しい同期歌詞、多言語サポート、リアルタイム翻訳などで強化します",
+    "description": "The description of the extension"
+  },
+  "options_tab_general": {
+    "message": "一般",
+    "description": "General settings tab label"
+  },
+  "options_tab_display": {
+    "message": "表示",
+    "description": "Display settings tab label"
+  },
+  "options_tab_language": {
+    "message": "言語",
+    "description": "Language settings tab label"
+  },
+  "options_tab_sources": {
+    "message": "ソース",
+    "description": "Sources settings tab label"
+  },
+  "options_tab_identity": {
+    "message": "ID",
+    "description": "Identity settings tab label"
+  },
+  "options_tab_themes": {
+    "message": "テーマ",
+    "description": "Themes settings tab label"
+  },
+  "options_general_title": {
+    "message": "一般設定",
+    "description": "General settings section title"
+  },
+  "options_general_description": {
+    "message": "Better Lyricsの全般的な動作に影響する設定。",
+    "description": "General settings section description"
+  },
+  "options_general_showLogs": {
+    "message": "ログを表示",
+    "description": "Show logs setting label"
+  },
+  "options_general_autoSwitch": {
+    "message": "歌詞タブに自動切り替え",
+    "description": "Auto switch to lyrics tab setting label"
+  },
+  "options_general_cache": {
+    "message": "キャッシュ",
+    "description": "Cache section label"
+  },
+  "options_general_clearCache": {
+    "message": "キャッシュをクリア",
+    "description": "Clear cache button label"
+  },
+  "options_general_totalLyrics": {
+    "message": "キャッシュ内の歌詞数",
+    "description": "Total lyrics in cache label"
+  },
+  "options_general_cacheSize": {
+    "message": "キャッシュサイズ",
+    "description": "Cache size label"
+  },
+  "options_display_title": {
+    "message": "表示設定",
+    "description": "Display settings section title"
+  },
+  "options_display_description": {
+    "message": "Better Lyricsの外観を調整します。",
+    "description": "Display settings section description"
+  },
+  "options_display_disableFullscreen": {
+    "message": "フルスクリーンモードを無効化",
+    "description": "Disable fullscreen mode setting label"
+  },
+  "options_display_autoHideCursor": {
+    "message": "フルスクリーン時にカーソルを自動非表示",
+    "description": "Auto-hide cursor setting label"
+  },
+  "options_display_albumArt": {
+    "message": "ぼかしたアルバムアートを背景に表示",
+    "description": "Show album art background setting label"
+  },
+  "options_display_stylizedAnimations": {
+    "message": "スタイリッシュなアニメーションを表示",
+    "description": "Show stylized animations setting label"
+  },
+  "options_language_title": {
+    "message": "言語設定",
+    "description": "Language settings section title"
+  },
+  "options_language_description": {
+    "message": "Better Lyricsの言語と翻訳の設定。",
+    "description": "Language settings section description"
+  },
+  "options_language_romanization": {
+    "message": "ローマ字化",
+    "description": "Romanization setting label"
+  },
+  "options_language_translate": {
+    "message": "歌詞を翻訳",
+    "description": "Translate song lyrics setting label"
+  },
+  "options_language_translationLanguage": {
+    "message": "翻訳言語",
+    "description": "Translation language setting label"
+  },
+  "options_sources_title": {
+    "message": "歌詞ソースの優先順位",
+    "description": "Sources settings section title"
+  },
+  "options_sources_description": {
+    "message": "ドラッグして優先順位を変更。上位のソースが先に試行されます。チェックを外すと無効化。",
+    "description": "Sources settings section description"
+  },
+  "options_themes_title": {
+    "message": "テーマ設定",
+    "description": "Theme settings section title"
+  },
+  "options_themes_description": {
+    "message": "Better Lyricsの外観をカスタマイズします。",
+    "description": "Theme settings section description"
+  },
+  "options_themes_theme": {
+    "message": "テーマ",
+    "description": "Theme label"
+  },
+  "options_themes_chooseTheme": {
+    "message": "テーマを選択",
+    "description": "Choose a theme button label"
+  },
+  "options_themes_customStyles": {
+    "message": "カスタムスタイル",
+    "description": "Custom styles label"
+  },
+  "options_themes_create": {
+    "message": "作成",
+    "description": "Create button label"
+  },
+  "options_themes_marketplace": {
+    "message": "テーママーケットプレイス",
+    "description": "Theme marketplace button label"
+  },
+  "options_themes_installedThemes": {
+    "message": "インストール済みテーマ",
+    "description": "Installed themes button label"
+  },
+  "options_identity_title": {
+    "message": "ID",
+    "description": "Identity settings section title"
+  },
+  "options_identity_description": {
+    "message": "Better Lyrics用のあなた固有の匿名ID。",
+    "description": "Identity settings section description"
+  },
+  "options_identity_yourIdentity": {
+    "message": "あなたのID",
+    "description": "Your identity label"
+  },
+  "options_identity_loading": {
+    "message": "読み込み中...",
+    "description": "Loading identity placeholder"
+  },
+  "options_identity_exportImport": {
+    "message": "エクスポート/インポート",
+    "description": "Export/Import section label"
+  },
+  "options_identity_exportKey": {
+    "message": "キーをエクスポート",
+    "description": "Export key button label"
+  },
+  "options_identity_importKey": {
+    "message": "キーをインポート",
+    "description": "Import key button label"
+  },
+  "options_modal_selectTheme": {
+    "message": "テーマを選択",
+    "description": "Theme modal title"
+  },
+  "options_modal_cancel": {
+    "message": "キャンセル",
+    "description": "Cancel button label"
+  },
+  "options_modal_confirm": {
+    "message": "確認",
+    "description": "Confirm button label"
+  },
+  "options_alert_cacheCleared": {
+    "message": "キャッシュをクリアしました！",
+    "description": "Cache cleared success message"
+  },
+  "options_alert_cacheClearFailed": {
+    "message": "キャッシュのクリアに失敗しました！",
+    "description": "Cache clear failed message"
+  },
+  "options_alert_nothingToClear": {
+    "message": "クリアするものがありません！",
+    "description": "Nothing to clear message"
+  },
+  "options_alert_exportFailed": {
+    "message": "IDのエクスポートに失敗しました",
+    "description": "Export identity failed message"
+  },
+  "options_alert_fileSaveDialogOpened": {
+    "message": "ファイル保存ダイアログが開きました。",
+    "description": "File save dialog opened message"
+  },
+  "options_alert_fileSaveFailed": {
+    "message": "ファイルの保存中にエラーが発生しました。再試行してください。",
+    "description": "File save failed message"
+  },
+  "options_alert_downloadInitiated": {
+    "message": "IDファイルのダウンロードを開始しました。",
+    "description": "Download initiated message"
+  },
+  "options_alert_importSuccess": {
+    "message": "IDを正常にインポートしました！",
+    "description": "Import success message"
+  },
+  "options_alert_identityLoadError": {
+    "message": "IDの読み込み中にエラーが発生しました",
+    "description": "Identity load error message"
+  },
+  "options_editor_saving": {
+    "message": "保存中...",
+    "description": "Saving indicator text"
+  },
+  "options_editor_importFile": {
+    "message": "ファイルからインポート",
+    "description": "Import from file tooltip"
+  },
+  "options_editor_exportFile": {
+    "message": "ファイルにエクスポート",
+    "description": "Export to file tooltip"
+  },
+  "options_editor_saveAsTheme": {
+    "message": "テーマとして保存",
+    "description": "Save as theme tooltip"
+  },
+  "options_editor_openInNewTab": {
+    "message": "新しいタブで開く",
+    "description": "Open in new tab tooltip"
+  },
+  "options_editor_backToSettings": {
+    "message": "設定に戻る",
+    "description": "Back to settings button label"
+  },
+  "options_editor_fullExperienceNote": {
+    "message": "エディターの完全な機能を利用するには、",
+    "description": "Full editor experience note prefix"
+  },
+  "options_editor_openInNewTabLink": {
+    "message": "このエディターを新しいタブで開いてください",
+    "description": "Open in new tab link text"
+  },
+  "options_editor_stylingGuide": {
+    "message": "スタイリングガイド",
+    "description": "Styling guide link text"
+  },
+  "options_editor_renameTheme": {
+    "message": "カスタムテーマの名前を変更",
+    "description": "Rename theme button title"
+  },
+  "options_editor_deleteTheme": {
+    "message": "カスタムテーマを削除",
+    "description": "Delete theme button title"
+  },
+  "options_editor_doubleClickRename": {
+    "message": "ダブルクリックで名前を変更",
+    "description": "Double-click to rename tooltip"
+  },
+  "options_provider_betterLyrics": {
+    "message": "Better Lyrics",
+    "description": "Better Lyrics provider name"
+  },
+  "options_provider_betterLyricsLegato": {
+    "message": "Better Lyrics Legato",
+    "description": "Better Lyrics Legato provider name"
+  },
+  "options_provider_musixmatch": {
+    "message": "Musixmatch",
+    "description": "Musixmatch provider name"
+  },
+  "options_provider_lrclib": {
+    "message": "LRClib",
+    "description": "LRClib provider name"
+  },
+  "options_provider_youtube": {
+    "message": "YouTube",
+    "description": "Youtube provider name"
+  },
+  "options_provider_youtubeCaptions": {
+    "message": "YouTube字幕",
+    "description": "Youtube Captions provider name"
+  },
+  "options_syncType_syllable": {
+    "message": "音節",
+    "description": "Syllable sync type label"
+  },
+  "options_syncType_syllable_tooltip": {
+    "message": "歌われるごとに個々の音節をハイライトします。音節同期は最高の体験を提供します。",
+    "description": "Syllable sync type tooltip"
+  },
+  "options_syncType_word": {
+    "message": "単語",
+    "description": "Word sync type label"
+  },
+  "options_syncType_word_tooltip": {
+    "message": "歌われるごとに個々の単語をハイライトします。単語同期は良好な体験を提供します。",
+    "description": "Word sync type tooltip"
+  },
+  "options_syncType_line": {
+    "message": "行",
+    "description": "Line sync type label"
+  },
+  "options_syncType_line_tooltip": {
+    "message": "歌われるごとに行全体をハイライトします。行同期は基本的な体験を提供します。",
+    "description": "Line sync type tooltip"
+  },
+  "options_syncType_unsynced": {
+    "message": "同期なし",
+    "description": "Unsynced sync type label"
+  },
+  "options_syncType_unsynced_tooltip": {
+    "message": "タイミング情報のない歌詞。同期なしの歌詞は最小限の体験を提供します。",
+    "description": "Unsynced sync type tooltip"
+  },
+  "options_detail_rateTheme": {
+    "message": "このテーマを評価",
+    "description": "Rate theme label"
+  },
+  "options_detail_install": {
+    "message": "インストール",
+    "description": "Install button label"
+  },
+  "options_detail_viewOnGitHub": {
+    "message": "GitHubで見る",
+    "description": "View on GitHub link text"
+  },
+  "options_detail_shaderInfo": {
+    "message": "このテーマにはシェーダー設定が含まれています。",
+    "description": "Shader info text prefix"
+  },
+  "options_detail_downloadShader": {
+    "message": "shader.jsonをダウンロード",
+    "description": "Download shader link text"
+  },
+  "options_detail_shaderImportSuffix": {
+    "message": "してインポート：",
+    "description": "Shader import suffix text before Better Lyrics Shaders link"
+  },
+  "marketplace_pageTitle": {
+    "message": "Better Lyricsテーママーケットプレイス",
+    "description": "Page title"
+  },
+  "marketplace_title": {
+    "message": "テーママーケットプレイス",
+    "description": "Header title"
+  },
+  "marketplace_subtitle": {
+    "message": "コミュニティテーマを発見してインストール",
+    "description": "Header subtitle"
+  },
+  "marketplace_searchPlaceholder": {
+    "message": "テーマを検索...",
+    "description": "Search input placeholder"
+  },
+  "marketplace_refresh": {
+    "message": "更新",
+    "description": "Refresh button label"
+  },
+  "marketplace_keyboardShortcuts": {
+    "message": "キーボードショートカット",
+    "description": "Keyboard shortcuts button label"
+  },
+  "marketplace_sortBy": {
+    "message": "並び替え",
+    "description": "Sort filter group label"
+  },
+  "marketplace_sortRatingDesc": {
+    "message": "高評価順",
+    "description": "Sort by highest rating"
+  },
+  "marketplace_sortRatingAsc": {
+    "message": "低評価順",
+    "description": "Sort by lowest rating"
+  },
+  "marketplace_sortDownloadsDesc": {
+    "message": "ダウンロード数（多い順）",
+    "description": "Sort by most downloads"
+  },
+  "marketplace_sortDownloadsAsc": {
+    "message": "ダウンロード数（少ない順）",
+    "description": "Sort by least downloads"
+  },
+  "marketplace_sortNewest": {
+    "message": "新しい順",
+    "description": "Sort by newest"
+  },
+  "marketplace_sortOldest": {
+    "message": "古い順",
+    "description": "Sort by oldest"
+  },
+  "marketplace_show": {
+    "message": "表示",
+    "description": "Show filter group label"
+  },
+  "marketplace_showAll": {
+    "message": "すべて",
+    "description": "Show all themes"
+  },
+  "marketplace_showInstalled": {
+    "message": "インストール済み",
+    "description": "Show installed themes"
+  },
+  "marketplace_showNotInstalled": {
+    "message": "未インストール",
+    "description": "Show not installed themes"
+  },
+  "marketplace_options": {
+    "message": "オプション",
+    "description": "Options filter group label"
+  },
+  "marketplace_hasShaders": {
+    "message": "シェーダーあり",
+    "description": "Filter for themes with shaders"
+  },
+  "marketplace_compatibleOnly": {
+    "message": "互換性のあるもののみ",
+    "description": "Filter for compatible themes"
+  },
+  "marketplace_installFromUrl": {
+    "message": "URLからインストール",
+    "description": "Install from URL button"
+  },
+  "marketplace_submitTheme": {
+    "message": "テーマを投稿",
+    "description": "Submit a theme link"
+  },
+  "marketplace_loading": {
+    "message": "テーマを読み込み中...",
+    "description": "Loading message"
+  },
+  "marketplace_retry": {
+    "message": "再試行",
+    "description": "Retry button"
+  },
+  "marketplace_noThemesMatch": {
+    "message": "フィルターに一致するテーマがありません",
+    "description": "Empty state message"
+  },
+  "marketplace_permissionTitle": {
+    "message": "権限が必要です",
+    "description": "Permission required title"
+  },
+  "marketplace_permissionMessage": {
+    "message": "テーマを閲覧・インストールするには、Better LyricsがテーマがホストされているGitHubとマーケットプレイスAPIへのアクセス権限が必要です。",
+    "description": "Permission required message"
+  },
+  "marketplace_grantPermission": {
+    "message": "権限を許可",
+    "description": "Grant permission button"
+  },
+  "marketplace_install": {
+    "message": "インストール",
+    "description": "Install button"
+  },
+  "marketplace_remove": {
+    "message": "削除",
+    "description": "Remove button"
+  },
+  "marketplace_apply": {
+    "message": "適用",
+    "description": "Apply button"
+  },
+  "marketplace_active": {
+    "message": "有効",
+    "description": "Active theme indicator"
+  },
+  "marketplace_shadersBadge": {
+    "message": "シェーダー",
+    "description": "Shaders badge text"
+  },
+  "marketplace_githubBadge": {
+    "message": "GitHub",
+    "description": "GitHub badge text"
+  },
+  "marketplace_urlModalTitle": {
+    "message": "URLからインストール",
+    "description": "URL install modal title"
+  },
+  "marketplace_urlModalMessage": {
+    "message": "GitHubリポジトリのURLを入力してテーマを直接インストール：",
+    "description": "URL install modal message"
+  },
+  "marketplace_urlModalPlaceholder": {
+    "message": "github.com/user/repo または github.com/user/repo/tree/branch",
+    "description": "URL input placeholder"
+  },
+  "marketplace_urlModalError": {
+    "message": "GitHubリポジトリのURLを入力してください",
+    "description": "URL validation error"
+  },
+  "marketplace_cancel": {
+    "message": "キャンセル",
+    "description": "Cancel button"
+  },
+  "marketplace_urlPermissionTitle": {
+    "message": "追加の権限が必要です",
+    "description": "URL permission modal title"
+  },
+  "marketplace_urlPermissionWhy": {
+    "message": "なぜ必要ですか？",
+    "description": "URL permission explanation title"
+  },
+  "marketplace_urlPermissionDesc": {
+    "message": "カスタムGitHub URLからテーマをインストールするには、マーケットプレイスより広いアクセスが必要です。これにより、Better Lyricsは以下のことができます：",
+    "description": "URL permission description"
+  },
+  "marketplace_urlPermissionItem1": {
+    "message": "任意のGitHubリポジトリからテーマファイルを取得",
+    "description": "URL permission list item 1"
+  },
+  "marketplace_urlPermissionItem2": {
+    "message": "リポジトリのデフォルトブランチを検出",
+    "description": "URL permission list item 2"
+  },
+  "marketplace_urlPermissionItem3": {
+    "message": "インストール前にテーマ構造を検証",
+    "description": "URL permission list item 3"
+  },
+  "marketplace_urlPermissionNote": {
+    "message": "この権限はURL経由でテーマをインストールする場合にのみ使用されます。マーケットプレイスのテーマには必要ありません。",
+    "description": "URL permission note"
+  },
+  "marketplace_shortcutsTitle": {
+    "message": "キーボードショートカット",
+    "description": "Shortcuts modal title"
+  },
+  "marketplace_shortcutsNavigation": {
+    "message": "ナビゲーション",
+    "description": "Navigation shortcuts group"
+  },
+  "marketplace_shortcutsSearch": {
+    "message": "テーマを検索",
+    "description": "Search shortcut label"
+  },
+  "marketplace_shortcutsRefresh": {
+    "message": "マーケットプレイスを更新",
+    "description": "Refresh shortcut label"
+  },
+  "marketplace_shortcutsInstallUrl": {
+    "message": "URLからインストール",
+    "description": "Install from URL shortcut label"
+  },
+  "marketplace_shortcutsPrevPage": {
+    "message": "前のページ",
+    "description": "Previous page shortcut label"
+  },
+  "marketplace_shortcutsNextPage": {
+    "message": "次のページ",
+    "description": "Next page shortcut label"
+  },
+  "marketplace_shortcutsSort": {
+    "message": "並び替え",
+    "description": "Sort shortcuts group"
+  },
+  "marketplace_shortcutsSortHint": {
+    "message": "もう一度押すと逆順",
+    "description": "Sort toggle hint"
+  },
+  "marketplace_shortcutsByRating": {
+    "message": "評価順",
+    "description": "Sort by rating shortcut"
+  },
+  "marketplace_shortcutsByDownloads": {
+    "message": "ダウンロード順",
+    "description": "Sort by downloads shortcut"
+  },
+  "marketplace_shortcutsByDate": {
+    "message": "日付順",
+    "description": "Sort by date shortcut"
+  },
+  "marketplace_shortcutsFilters": {
+    "message": "フィルター",
+    "description": "Filters shortcuts group"
+  },
+  "marketplace_shortcutsShowAll": {
+    "message": "すべて表示",
+    "description": "Show all shortcut"
+  },
+  "marketplace_shortcutsShowInstalled": {
+    "message": "インストール済みを表示",
+    "description": "Show installed shortcut"
+  },
+  "marketplace_shortcutsShowNotInstalled": {
+    "message": "未インストールを表示",
+    "description": "Show not installed shortcut"
+  },
+  "marketplace_shortcutsToggleShaders": {
+    "message": "シェーダー切り替え",
+    "description": "Toggle shaders shortcut"
+  },
+  "marketplace_shortcutsToggleCompatible": {
+    "message": "互換性切り替え",
+    "description": "Toggle compatible shortcut"
+  },
+  "marketplace_shortcutsDetails": {
+    "message": "テーマの詳細",
+    "description": "Theme details shortcuts group"
+  },
+  "marketplace_shortcutsInstallRemove": {
+    "message": "インストール / 削除",
+    "description": "Install/remove shortcut"
+  },
+  "marketplace_shortcutsPrevImage": {
+    "message": "前の画像",
+    "description": "Previous image shortcut"
+  },
+  "marketplace_shortcutsNextImage": {
+    "message": "次の画像",
+    "description": "Next image shortcut"
+  },
+  "marketplace_shortcutsGeneral": {
+    "message": "一般",
+    "description": "General shortcuts group"
+  },
+  "marketplace_shortcutsCloseModal": {
+    "message": "モーダルを閉じる",
+    "description": "Close modal shortcut"
+  },
+  "marketplace_shortcutsShowShortcuts": {
+    "message": "ショートカットを表示",
+    "description": "Show shortcuts shortcut"
+  },
+  "marketplace_shortcutsApplyTheme": {
+    "message": "テーマを適用（インストール後）",
+    "description": "Apply theme shortcut"
+  },
+  "marketplace_ratingFailed": {
+    "message": "評価の送信に失敗しました",
+    "description": "Rating submission error"
+  },
+  "marketplace_shaderFetchFailed": {
+    "message": "シェーダー設定の取得に失敗しました",
+    "description": "Shader fetch error"
+  },
+  "marketplace_applyFailed": {
+    "message": "テーマの適用に失敗しました",
+    "description": "Theme apply error"
+  },
+  "marketplace_noThemesInstalled": {
+    "message": "インストールされたテーマはありません",
+    "description": "Empty installed themes message"
+  },
+  "editor_pageTitle": {
+    "message": "Better Lyrics CSSエディター",
+    "description": "Standalone editor page title"
+  },
+  "editor_importFromFile": {
+    "message": "ファイルからインポート",
+    "description": "Import from file button"
+  },
+  "editor_exportToFile": {
+    "message": "ファイルにエクスポート",
+    "description": "Export to file button"
+  },
+  "editor_saveAsTheme": {
+    "message": "テーマとして保存",
+    "description": "Save as theme button"
+  },
+  "editor_stylingGuide": {
+    "message": "スタイリングガイド",
+    "description": "Styling guide button"
+  },
+  "editor_tip": {
+    "message": "ヒント：このスタンドアロンタブは別ウィンドウに移動したり、YouTube Musicと分割画面で使用して変更をリアルタイムで確認できます。詳細は",
+    "description": "Editor tip text"
+  },
+  "editor_poweredBy": {
+    "message": "Powered by",
+    "description": "Powered by label"
+  },
+  "editor_playground": {
+    "message": "Playground",
+    "description": "Playground link text"
+  },
+  "editor_docs": {
+    "message": "Docs",
+    "description": "Docs link text"
+  },
+  "lyrics_source": {
+    "message": "ソース：",
+    "description": "Lyrics source label"
+  },
+  "lyrics_addToLrclib": {
+    "message": "LRCLibに歌詞を追加",
+    "description": "Add lyrics button text"
+  },
+  "lyrics_searchOnGenius": {
+    "message": "Geniusで検索",
+    "description": "Search on Genius button text"
+  },
+  "lyrics_searching": {
+    "message": "Better Lyricsが歌詞を検索中...",
+    "description": "Loading message while searching for lyrics"
+  },
+  "lyrics_stillSearching": {
+    "message": "同期歌詞を検索中...",
+    "description": "Loading message while still searching"
+  },
+  "lyrics_noSyncedLyrics": {
+    "message": "Better Lyricsは同期歌詞を見つけられませんでした",
+    "description": "Message when no synced lyrics found"
+  },
+  "lyrics_adPlaying": {
+    "message": "[エレベーターミュージック]",
+    "description": "Message shown during ad playback"
+  },
+  "lyrics_notFound": {
+    "message": "この曲の歌詞が見つかりませんでした",
+    "description": "Message when no lyrics are available"
+  }
+}

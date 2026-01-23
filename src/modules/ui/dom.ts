@@ -28,6 +28,7 @@ import {
   TRANSLATED_LYRICS_CLASS,
   type SyncType,
 } from "@constants";
+import { t } from "@core/i18n";
 import { AppState } from "@core/appState";
 import {
   animEngineState,
@@ -120,7 +121,7 @@ export function createLyricsWrapper(): HTMLElement {
   const existingWrapper = document.getElementById(LYRICS_WRAPPER_ID);
 
   if (existingWrapper) {
-    existingWrapper.innerHTML = "";
+    existingWrapper.replaceChildren();
     existingWrapper.style.top = "";
     existingWrapper.style.transition = "";
     return existingWrapper;
@@ -238,10 +239,10 @@ export function addFooter(
  * @param album - Album name
  * @param duration - Song duration in seconds
  */
-export function createFooter(song: string, artist: string, album: string, duration: number): void {
+function createFooter(song: string, artist: string, album: string, duration: number): void {
   try {
     const footer = document.getElementsByClassName(FOOTER_CLASS)[0] as HTMLElement;
-    footer.innerHTML = "";
+    footer.replaceChildren();
 
     const footerContainer = document.createElement("div");
     footerContainer.className = `${FOOTER_CLASS}__container`;
@@ -253,7 +254,7 @@ export function createFooter(song: string, artist: string, album: string, durati
     footerImage.height = 20;
 
     footerContainer.appendChild(footerImage);
-    footerContainer.appendChild(document.createTextNode("Source: "));
+    footerContainer.appendChild(document.createTextNode(t("lyrics_source")));
 
     const footerLink = document.createElement("a");
     footerLink.target = "_blank";
@@ -282,12 +283,12 @@ export function createFooter(song: string, artist: string, album: string, durati
     footerLink.target = "_blank";
 
     const addLyricsContainer = createActionButton({
-      text: "Add Lyrics to LRCLib",
+      text: t("lyrics_addToLrclib"),
       href: lrclibUrl.toString(),
     });
 
     const geniusContainer = createActionButton({
-      text: "Search on Genius",
+      text: t("lyrics_searchOnGenius"),
       href: getGeniusLink(song, artist),
       logoSrc: GENIUS_LOGO_SRC,
       logoAlt: "Genius",
@@ -498,11 +499,11 @@ export function hideAdOverlay(): void {
 /**
  * Clears all lyrics content from the wrapper element.
  */
-export function clearLyrics(): void {
+function clearLyrics(): void {
   try {
     const lyricsWrapper = document.getElementById(LYRICS_WRAPPER_ID);
     if (lyricsWrapper) {
-      lyricsWrapper.innerHTML = "";
+      lyricsWrapper.replaceChildren();
     }
   } catch (err) {
     log(err);
@@ -570,7 +571,7 @@ export function addAlbumArtToLayout(videoId: string): void {
  *
  * @param src - Image source URL
  */
-export function injectAlbumArt(src: string): void {
+function injectAlbumArt(src: string): void {
   const img = new Image();
   img.src = src;
 
@@ -624,12 +625,12 @@ export function addNoLyricsButton(song: string, artist: string, album: string, d
   if (duration) lrclibUrl.searchParams.append("duration", duration.toString());
 
   const addLyricsButton = createActionButton({
-    text: "Add Lyrics to LRCLib",
+    text: t("lyrics_addToLrclib"),
     href: lrclibUrl.toString(),
   });
 
   const geniusSearch = createActionButton({
-    text: "Search on Genius",
+    text: t("lyrics_searchOnGenius"),
     href: getGeniusLink(song, artist),
     logoSrc: GENIUS_LOGO_SRC,
     logoAlt: "Genius",

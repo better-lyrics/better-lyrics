@@ -8,7 +8,6 @@ import {
   LYRICS_WRAPPER_ID,
   LYRICS_WRAPPER_NOT_VISIBLE_LOG,
   NO_LYRICS_FOUND_LOG,
-  NO_LYRICS_TEXT,
   NO_LYRICS_TEXT_SELECTOR,
   romanizationLanguages,
   ROMANIZED_LYRICS_CLASS,
@@ -19,6 +18,7 @@ import {
   WORD_CLASS,
   ZERO_DURATION_ANIMATION_CLASS,
 } from "@constants";
+import { t } from "@core/i18n";
 import { AppState } from "@core/appState";
 import { containsNonLatin, testRtl } from "@modules/lyrics/lyricParseUtils";
 import { createInstrumentalElement } from "@modules/lyrics/createInstrumentalElement";
@@ -104,12 +104,6 @@ export interface PartData {
   animationStartTimeMs: number;
 }
 
-export interface InstrumentalElements {
-  waveClip: SVGElement;
-  wavePath: SVGElement;
-  fill: SVGElement;
-}
-
 export type LineData = {
   parts: PartData[];
   isScrolled: boolean;
@@ -155,7 +149,7 @@ export function processLyrics(data: LyricSourceResultWithMeta, keepLoaderVisible
 
   try {
     const lyricsElement = document.getElementsByClassName(LYRICS_CLASS)[0] as HTMLElement;
-    lyricsElement.innerHTML = "";
+    lyricsElement.replaceChildren();
   } catch (_err) {
     log(LYRICS_TAB_NOT_DISABLED_LOG);
   }
@@ -251,14 +245,14 @@ function createBreakElem(lyricElement: HTMLDivElement, order: number) {
  * @param [data.source] - Source attribution for lyrics
  * @param [data.sourceHref] - URL for source link
  */
-export function injectLyrics(data: LyricSourceResultWithMeta, keepLoaderVisible = false): void {
+function injectLyrics(data: LyricSourceResultWithMeta, keepLoaderVisible = false): void {
   const lyrics = data.lyrics!;
   cleanup();
   resizeObserver.disconnect();
 
   let lyricsWrapper = createLyricsWrapper();
 
-  lyricsWrapper.innerHTML = "";
+  lyricsWrapper.replaceChildren();
   const lyricsContainer = document.createElement("div");
   lyricsContainer.className = LYRICS_CLASS;
   lyricsWrapper.appendChild(lyricsContainer);
@@ -274,7 +268,7 @@ export function injectLyrics(data: LyricSourceResultWithMeta, keepLoaderVisible 
   if (keepLoaderVisible) {
     renderLoader(true);
   } else {
-    flushLoader(allZero && lyrics[0].words !== NO_LYRICS_TEXT);
+    flushLoader(allZero && lyrics[0].words !== t("lyrics_notFound"));
   }
 
   const langPromise = new Promise<string>(async resolve => {
@@ -575,7 +569,7 @@ export function injectLyrics(data: LyricSourceResultWithMeta, keepLoaderVisible 
   }
   animEngineState.scrollResumeTime = 0;
 
-  if (lyrics[0].words !== NO_LYRICS_TEXT) {
+  if (lyrics[0].words !== t("lyrics_notFound")) {
     addFooter(data.source, data.sourceHref, data.song, data.artist, data.album, data.duration, data.providerKey);
   } else {
     addNoLyricsButton(data.song, data.artist, data.album, data.duration);
@@ -591,7 +585,7 @@ export function injectLyrics(data: LyricSourceResultWithMeta, keepLoaderVisible 
 
   lyricsContainer.dataset.sync = syncType;
   lyricsContainer.dataset.loaderVisible = String(keepLoaderVisible);
-  if (lyrics[0].words === NO_LYRICS_TEXT) {
+  if (lyrics[0].words === t("lyrics_notFound")) {
     lyricsContainer.dataset.noLyrics = "true";
   }
 

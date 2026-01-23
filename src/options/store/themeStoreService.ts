@@ -98,12 +98,12 @@ async function getDefaultBranch(repo: string, testFile = "metadata.json"): Promi
   return "main";
 }
 
-export async function checkRegistryPermissions(): Promise<PermissionStatus> {
+async function checkRegistryPermissions(): Promise<PermissionStatus> {
   const granted = await chrome.permissions.contains({ origins: REGISTRY_ORIGINS });
   return { granted, canRequest: true };
 }
 
-export async function requestRegistryPermissions(): Promise<boolean> {
+async function requestRegistryPermissions(): Promise<boolean> {
   return chrome.permissions.request({ origins: REGISTRY_ORIGINS });
 }
 
@@ -132,7 +132,7 @@ function getLockfileUrl(): string {
   return `${THEME_REGISTRY_URL}/index.lock.json`;
 }
 
-export async function fetchThemeLockfile(): Promise<ThemeLockfile> {
+async function fetchThemeLockfile(): Promise<ThemeLockfile> {
   const url = `${getLockfileUrl()}?t=${Date.now()}`;
   const response = await fetchWithTimeout(url, { cache: "no-store" });
 
@@ -302,7 +302,7 @@ export async function fetchThemeShaderConfig(
   }
 }
 
-export async function fetchThemeDescription(repo: string, branchOverride?: string): Promise<string | null> {
+async function fetchThemeDescription(repo: string, branchOverride?: string): Promise<string | null> {
   const branch = branchOverride ?? (await getDefaultBranch(repo));
   const url = getRawGitHubUrl(repo, branch, "DESCRIPTION.md");
 

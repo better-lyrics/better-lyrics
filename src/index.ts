@@ -1,5 +1,6 @@
 import { AppState } from "@core/appState";
 import { INITIALIZE_LOG } from "@constants";
+import { injectI18nCssVars } from "@core/i18n";
 import { purgeExpiredKeys, saveCacheInfo } from "@core/storage";
 import { initProviders } from "@modules/lyrics/providers/shared";
 import { setupRequestSniffer } from "@modules/lyrics/requestSniffer/requestSniffer";
@@ -29,9 +30,10 @@ import { log, setUpLog } from "@utils";
  * This method orchestrates the setup of logging, DOM injection, observers, settings,
  * storage, and lyric providers.
  */
-export async function modify(): Promise<void> {
+async function modify(): Promise<void> {
   setUpLog();
   await injectHeadTags();
+  injectI18nCssVars();
   setupAdObserver();
   enableLyricsTab();
   setupHomepageFullscreenHandler();
@@ -64,7 +66,7 @@ export async function modify(): Promise<void> {
  * Initializes the application by setting up the DOM content loaded event listener.
  * Entry point for the BetterLyrics extension.
  */
-export function init(): void {
+function init(): void {
   document.addEventListener("DOMContentLoaded", modify);
 }
 

@@ -1,5 +1,6 @@
 import { openSearchPanel } from "@codemirror/search";
 import { LOG_PREFIX_EDITOR } from "@constants";
+import { initI18n } from "@core/i18n";
 import { createEditorState, createEditorView } from "./core/editor";
 import { editorStateManager } from "./core/state";
 import { generateDefaultFilename, importManager, saveCSSToFile } from "./features/import";
@@ -26,12 +27,12 @@ import {
 } from "./ui/dom";
 import { showAlert, showModal } from "./ui/feedback";
 
-export function initializeNavigation() {
+function initializeNavigation() {
   document.getElementById("edit-css-btn")?.addEventListener("click", openEditCSS);
   document.getElementById("back-btn")?.addEventListener("click", openOptions);
 }
 
-export function initializeEditorKeyboardShortcuts() {
+function initializeEditorKeyboardShortcuts() {
   const editorElement = document.getElementById("editor");
   if (!editorElement) return;
 
@@ -55,10 +56,17 @@ export function initializeEditorKeyboardShortcuts() {
           openSearchPanel(view);
         }
       } else {
+        const message = document.createDocumentFragment();
+        message.append("Find & Replace is only available in the fullscreen editor.");
+        message.append(document.createElement("br"), document.createElement("br"));
+        message.append("Click ");
+        const strong = document.createElement("strong");
+        strong.textContent = "Open Fullscreen Editor";
+        message.append(strong, " to access all editor features.");
+
         showModal({
           title: "Find & Replace",
-          message:
-            "Find & Replace is only available in the fullscreen editor.<br><br>Click <strong>Open Fullscreen Editor</strong> to access all editor features.",
+          message,
           confirmText: "Open Fullscreen Editor",
           cancelText: "Close",
         }).then(result => {
@@ -73,7 +81,7 @@ export function initializeEditorKeyboardShortcuts() {
   });
 }
 
-export function initializeThemeModal() {
+function initializeThemeModal() {
   themeSelectorBtn?.addEventListener("click", openThemeModal);
 
   themeModalClose?.addEventListener("click", closeThemeModal);
@@ -91,7 +99,7 @@ export function initializeThemeModal() {
   });
 }
 
-export function initializeThemeActions() {
+function initializeThemeActions() {
   document.getElementById("save-theme-btn")?.addEventListener("click", handleSaveTheme);
 
   deleteThemeBtn?.addEventListener("click", handleDeleteTheme);
@@ -100,7 +108,7 @@ export function initializeThemeActions() {
   themeNameText?.addEventListener("click", handleRenameTheme);
 }
 
-export function initializeFileOperations() {
+function initializeFileOperations() {
   document.getElementById("file-import-btn")?.addEventListener("click", () => {
     const input = document.createElement("input");
     input.type = "file";
@@ -136,11 +144,11 @@ export function initializeFileOperations() {
   });
 }
 
-export function initializeStorageListeners() {
+function initializeStorageListeners() {
   storageManager.initialize();
 }
 
-export async function initializeEditor() {
+async function initializeEditor() {
   console.log(LOG_PREFIX_EDITOR, "DOM loaded, initializing editor");
 
   const editorElement = document.getElementById("editor")!;
@@ -176,6 +184,7 @@ export async function initializeEditor() {
 
 export function initialize() {
   document.addEventListener("DOMContentLoaded", async () => {
+    initI18n();
     await initializeEditor();
     initializeNavigation();
     initializeEditorKeyboardShortcuts();

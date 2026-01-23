@@ -68,7 +68,7 @@ const fallbackSaveMethod = (content: string, defaultFilename: string): void => {
   showAlert("Theme file download initiated. Check your downloads folder.");
 };
 
-export class ImportManager {
+class ImportManager {
   async importCSSFile(file: File): Promise<void> {
     console.log(LOG_PREFIX_EDITOR, ` Starting import of file: ${file.name}`);
 

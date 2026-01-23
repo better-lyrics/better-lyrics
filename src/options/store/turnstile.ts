@@ -17,7 +17,7 @@ let messageListenerAttached = false;
 
 // -- Public API -------------------------------
 
-export function initTurnstileListener(): void {
+function initTurnstileListener(): void {
   if (messageListenerAttached) return;
 
   window.addEventListener("message", handleMessage);

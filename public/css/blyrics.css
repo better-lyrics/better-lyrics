@@ -368,7 +368,7 @@
 	-webkit-background-clip: text;
 	background-clip: text;
 	color: transparent;
-	content: "Better Lyrics is searching for lyrics...";
+	content: var(--blyrics-text-searching, "Better Lyrics is searching for lyrics...");
 	font-family: var(--blyrics-font-family);
 	font-size: 2rem;
 	font-weight: 700;
@@ -393,7 +393,7 @@
 }
 
 #blyrics-loader[small-loader]:after {
-	content: "Still searching for synced lyrics...";
+	content: var(--blyrics-text-still-searching, "Still searching for synced lyrics...");
 }
 
 #blyrics-loader[no-sync-available] {
@@ -406,7 +406,7 @@
 }
 
 #blyrics-loader[no-sync-available]:after {
-	content: "Better Lyrics could not find synced lyrics";
+	content: var(--blyrics-text-no-synced, "Better Lyrics could not find synced lyrics");
 }
 
 /* Ad overlay styles */
@@ -448,7 +448,7 @@
 	-webkit-background-clip: text;
 	background-clip: text;
 	color: transparent;
-	content: "[elevator music]";
+	content: var(--blyrics-text-ad-playing, "[elevator music]");
 	font-family: var(--blyrics-font-family);
 	font-size: 2rem;
 	font-weight: 700;

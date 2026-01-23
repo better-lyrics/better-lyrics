@@ -78,7 +78,7 @@ interface DivAttributes {
 /**
  * Represents a <div> element, which contains paragraphs.
  */
-export interface DivElement {
+interface DivElement {
   p: ParagraphElementOrBackground[];
   ":@": DivAttributes;
 }
@@ -120,7 +120,7 @@ interface TranslationItem {
 /**
  * A container for <translation> items.
  */
-interface TranslationContainer {
+export interface TranslationContainer {
   translation: TranslationItem[];
   ":@": {
     "@_type": string;
@@ -131,7 +131,7 @@ interface TranslationContainer {
 /**
  * Represents a single <transliteration> item.
  */
-interface TransliterationItem {
+export interface TransliterationItem {
   text: ParagraphElementOrBackground[];
   ":@": {
     "@_for": string;
@@ -141,21 +141,11 @@ interface TransliterationItem {
 /**
  * A container for <transliteration> items.
  */
-interface TransliterationContainer {
+export interface TransliterationContainer {
   transliteration: TransliterationItem[];
   ":@": {
     "@_lang": string;
   };
-}
-
-/**
- * Represents the <iTunesMetadata> element.
- */
-interface ITunesMetadata {
-  // Set to `any[]` or this structure, as one example showed `Array<any>`
-  translations?: TranslationContainer[];
-  songwriters?: SongwriterContainer[];
-  transliterations?: TransliterationContainer[]; // Optional
 }
 
 /**
@@ -164,17 +154,42 @@ interface ITunesMetadata {
 interface MetadataAttributes {
   "@_type"?: string;
   "@_id"?: string;
-  "@_leadingSilence"?: string; // Optional
+  "@_leadingSilence"?: string;
 }
 
 /**
- * Represents the <metadata> element.
+ * Represents a <ttm:name> element within an agent.
  */
-interface MetadataElement {
-  agent?: any[];
-  ":@": MetadataAttributes;
-  iTunesMetadata?: ITunesMetadata[];
+interface AgentName {
+  "#text": string;
 }
+
+/**
+ * Represents a <ttm:agent> element attributes.
+ */
+interface AgentAttributes {
+  "@_type"?: string;
+  "@_id": string;
+}
+
+/**
+ * Represents a <ttm:agent> element.
+ */
+interface _AgentElement {
+  name?: AgentName[];
+  ":@": AgentAttributes;
+}
+
+/**
+ * Represents any metadata element (agent, translations, transliterations, or nested containers).
+ */
+export type MetadataElement = {
+  agent?: unknown[];
+  translations?: TranslationContainer[];
+  transliterations?: TransliterationContainer[];
+  songwriters?: SongwriterContainer[];
+  ":@"?: MetadataAttributes;
+} & Record<string, unknown[] | MetadataAttributes | undefined>;
 
 /**
  * Represents the <head> element.
@@ -211,7 +226,7 @@ export type TtmlRoot = TtmlRootObject[];
 // Friendly Types
 
 /** A single, timed element. This can be a word, a syllable, or a space. */
-export interface CleanWord {
+interface CleanWord {
   begin: number;
   end: number;
   text: string;
@@ -219,7 +234,7 @@ export interface CleanWord {
 }
 
 /** A single line of lyrics */
-export interface CleanLine {
+interface CleanLine {
   key: string;
   begin: number;
   end: number;
@@ -228,7 +243,7 @@ export interface CleanLine {
 }
 
 /** A section of the song (e.g., "Verse", "Chorus") */
-export interface CleanSection {
+interface CleanSection {
   begin: number;
   end: number;
   songPart: string;
@@ -236,7 +251,7 @@ export interface CleanSection {
 }
 
 /** The root object containing all processed lyric data */
-export interface CleanTtml {
+interface _CleanTtml {
   timing: "Line" | "Word";
   lang: string;
   duration: number;

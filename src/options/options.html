@@ -38,22 +38,22 @@
 		<div id="options">
 			<div class="tab-container">
 				<button class="tab active" id="general-tab" data-target="#general-content">
-					General
+					__MSG_options_tab_general__
 				</button>
 				<button class="tab" id="display-tab" data-target="#display-content">
-					Display
+					__MSG_options_tab_display__
 				</button>
 				<button class="tab" id="language-tab" data-target="#language-content">
-					Language
+					__MSG_options_tab_language__
 				</button>
 				<button class="tab" id="sources-tab" data-target="#sources-content">
-					Sources
+					__MSG_options_tab_sources__
 				</button>
 				<button class="tab" id="identity-tab" data-target="#identity-content">
-					Identity
+					__MSG_options_tab_identity__
 				</button>
 				<button class="tab" id="themes-tab" data-target="#themes-content">
-					Themes
+					__MSG_options_tab_themes__
 				</button>
 			</div>
 			<div class="tab-content active" id="general-content">
@@ -63,41 +63,41 @@
 							<path fill-rule="evenodd" d="M11.078 2.25c-.917 0-1.699.663-1.85 1.567L9.05 4.889c-.02.12-.115.26-.297.348a7.493 7.493 0 0 0-.986.57c-.166.115-.334.126-.45.083L6.3 5.508a1.875 1.875 0 0 0-2.282.819l-.922 1.597a1.875 1.875 0 0 0 .432 2.385l.84.692c.095.078.17.229.154.43a7.598 7.598 0 0 0 0 1.139c.015.2-.059.352-.153.43l-.841.692a1.875 1.875 0 0 0-.432 2.385l.922 1.597a1.875 1.875 0 0 0 2.282.818l1.019-.382c.115-.043.283-.031.45.082.312.214.641.405.985.57.182.088.277.228.297.35l.178 1.071c.151.904.933 1.567 1.85 1.567h1.844c.916 0 1.699-.663 1.85-1.567l.178-1.072c.02-.12.114-.26.297-.349.344-.165.673-.356.985-.57.167-.114.335-.125.45-.082l1.02.382a1.875 1.875 0 0 0 2.28-.819l.923-1.597a1.875 1.875 0 0 0-.432-2.385l-.84-.692c-.095-.078-.17-.229-.154-.43a7.614 7.614 0 0 0 0-1.139c-.016-.2.059-.352.153-.43l.84-.692c.708-.582.891-1.59.433-2.385l-.922-1.597a1.875 1.875 0 0 0-2.282-.818l-1.02.382c-.114.043-.282.031-.449-.083a7.49 7.49 0 0 0-.985-.57c-.183-.087-.277-.227-.297-.348l-.179-1.072a1.875 1.875 0 0 0-1.85-1.567h-1.843ZM12 15.75a3.75 3.75 0 1 0 0-7.5 3.75 3.75 0 0 0 0 7.5Z" clip-rule="evenodd"></path>
 						</svg>
 
-						General Settings
+						__MSG_options_general_title__
 					</h2>
-					<p>Settings that affect the general behavior of Better Lyrics.</p>
+					<p>__MSG_options_general_description__</p>
 					<div class="container">
-						<span>Show logs</span>
+						<span>__MSG_options_general_showLogs__</span>
 						<label>
 							<input type="checkbox" id="logs">
 							<span class="checkmark"></span>
 						</label>
 					</div>
 					<div class="container">
-						<span>Auto switch to lyrics tab</span>
+						<span>__MSG_options_general_autoSwitch__</span>
 						<label>
 							<input type="checkbox" id="autoSwitch">
 							<span class="checkmark"></span>
 						</label>
 					</div>
 					<div class="container container--small">
-						<p>Cache</p>
+						<p>__MSG_options_general_cache__</p>
 						<button class="small-btn btn-danger" id="clear-cache">
 							<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
 								<path fill-rule="evenodd" d="M16.5 4.478v.227a48.816 48.816 0 0 1 3.878.512.75.75 0 1 1-.256 1.478l-.209-.035-1.005 13.07a3 3 0 0 1-2.991 2.77H8.084a3 3 0 0 1-2.991-2.77L4.087 6.66l-.209.035a.75.75 0 0 1-.256-1.478A48.567 48.567 0 0 1 7.5 4.705v-.227c0-1.564 1.213-2.9 2.816-2.951a52.662 52.662 0 0 1 3.369 0c1.603.051 2.815 1.387 2.815 2.951Zm-6.136-1.452a51.196 51.196 0 0 1 3.273 0C14.39 3.05 15 3.684 15 4.478v.113a49.488 49.488 0 0 0-6 0v-.113c0-.794.609-1.428 1.364-1.452Zm-.355 5.945a.75.75 0 1 0-1.5.058l.347 9a.75.75 0 1 0 1.499-.058l-.346-9Zm5.48.058a.75.75 0 1 0-1.498-.058l-.347 9a.75.75 0 0 0 1.5.058l.345-9Z" clip-rule="evenodd"></path>
 							</svg>
 
-							<span style="padding-top: 0.1rem">Clear Cache</span>
+							<span style="padding-top: 0.1rem">__MSG_options_general_clearCache__</span>
 						</button>
 					</div>
 					<div class="text-group">
 						<p>
-							<span class="text-group__title">Total lyrics in cache</span>
+							<span class="text-group__title">__MSG_options_general_totalLyrics__</span>
 							<span class="dots"></span>
 							<span id="lyrics-count">0</span>
 						</p>
 						<p>
-							<span class="text-group__title">Cache size</span>
+							<span class="text-group__title">__MSG_options_general_cacheSize__</span>
 							<span class="dots"></span>
 							<span id="cache-size">0 Bytes</span>
 						</p>
@@ -111,32 +111,32 @@
 							<path fill-rule="evenodd" d="M2.25 5.25a3 3 0 0 1 3-3h13.5a3 3 0 0 1 3 3V15a3 3 0 0 1-3 3h-3v.257c0 .597.237 1.17.659 1.591l.621.622a.75.75 0 0 1-.53 1.28h-9a.75.75 0 0 1-.53-1.28l.621-.622a2.25 2.25 0 0 0 .659-1.59V18h-3a3 3 0 0 1-3-3V5.25Zm1.5 0v7.5a1.5 1.5 0 0 0 1.5 1.5h13.5a1.5 1.5 0 0 0 1.5-1.5v-7.5a1.5 1.5 0 0 0-1.5-1.5H5.25a1.5 1.5 0 0 0-1.5 1.5Z" clip-rule="evenodd"></path>
 						</svg>
 
-						Display Settings
+						__MSG_options_display_title__
 					</h2>
-					<p>Fine-tune the appearance of Better Lyrics.</p>
+					<p>__MSG_options_display_description__</p>
 					<div class="container">
-						<span>Disable fullscreen mode</span>
+						<span>__MSG_options_display_disableFullscreen__</span>
 						<label>
 							<input type="checkbox" id="isFullScreenDisabled">
 							<span class="checkmark"></span>
 						</label>
 					</div>
 					<div class="container">
-						<span>Auto-hide cursor in fullscreen mode</span>
+						<span>__MSG_options_display_autoHideCursor__</span>
 						<label>
 							<input type="checkbox" id="cursorAutoHide">
 							<span class="checkmark"></span>
 						</label>
 					</div>
 					<div class="container">
-						<span>Show blurred album art background</span>
+						<span>__MSG_options_display_albumArt__</span>
 						<label>
 							<input type="checkbox" id="albumArt">
 							<span class="checkmark"></span>
 						</label>
 					</div>
 					<div class="container">
-						<span>Show stylized animations</span>
+						<span>__MSG_options_display_stylizedAnimations__</span>
 						<label>
 							<input type="checkbox" id="isStylizedAnimationsEnabled">
 							<span class="checkmark"></span>
@@ -151,25 +151,25 @@
 							<path fill-rule="evenodd" d="M9 2.25a.75.75 0 0 1 .75.75v1.506a49.384 49.384 0 0 1 5.343.371.75.75 0 1 1-.186 1.489c-.66-.083-1.323-.151-1.99-.206a18.67 18.67 0 0 1-2.97 6.323c.318.384.65.753 1 1.107a.75.75 0 0 1-1.07 1.052A18.902 18.902 0 0 1 9 13.687a18.823 18.823 0 0 1-5.656 4.482.75.75 0 0 1-.688-1.333 17.323 17.323 0 0 0 5.396-4.353A18.72 18.72 0 0 1 5.89 8.598a.75.75 0 0 1 1.388-.568A17.21 17.21 0 0 0 9 11.224a17.168 17.168 0 0 0 2.391-5.165 48.04 48.04 0 0 0-8.298.307.75.75 0 0 1-.186-1.489 49.159 49.159 0 0 1 5.343-.371V3A.75.75 0 0 1 9 2.25ZM15.75 9a.75.75 0 0 1 .68.433l5.25 11.25a.75.75 0 1 1-1.36.634l-1.198-2.567h-6.744l-1.198 2.567a.75.75 0 0 1-1.36-.634l5.25-11.25A.75.75 0 0 1 15.75 9Zm-2.672 8.25h5.344l-2.672-5.726-2.672 5.726Z" clip-rule="evenodd"></path>
 						</svg>
 
-						Language Settings
+						__MSG_options_language_title__
 					</h2>
-					<p>Language and translation settings for Better Lyrics.</p>
+					<p>__MSG_options_language_description__</p>
 					<div class="container">
-						<span>Romanization</span>
+						<span>__MSG_options_language_romanization__</span>
 						<label>
 							<input type="checkbox" id="isRomanizationEnabled">
 							<span class="checkmark"></span>
 						</label>
 					</div>
 					<div class="container">
-						<span>Translate song lyrics</span>
+						<span>__MSG_options_language_translate__</span>
 						<label>
 							<input type="checkbox" id="translate">
 							<span class="checkmark"></span>
 						</label>
 					</div>
 					<div class="container">
-						<span>Translation language</span>
+						<span>__MSG_options_language_translationLanguage__</span>
 						<div class="select">
 							<select id="translationLanguage">
 								<option value="af">Afrikaans</option>
@@ -318,11 +318,10 @@
 							<path strokelinecap="round" strokelinejoin="round" d="M12 21a9.004 9.004 0 0 0 8.716-6.747M12 21a9.004 9.004 0 0 1-8.716-6.747M12 21c2.485 0 4.5-4.03 4.5-9S14.485 3 12 3m0 18c-2.485 0-4.5-4.03-4.5-9S9.515 3 12 3m0 0a8.997 8.997 0 0 1 7.843 4.582M12 3a8.997 8.997 0 0 0-7.843 4.582m15.686 0A11.953 11.953 0 0 1 12 10.5c-2.998 0-5.74-1.1-7.843-2.918m15.686 0A8.959 8.959 0 0 1 21 12c0 .778-.099 1.533-.284 2.253m0 0A17.919 17.919 0 0 1 12 16.5c-3.162 0-6.133-.815-8.716-2.247m0 0A9.015 9.015 0 0 1 3 12c0-1.605.42-3.113 1.157-4.418"></path>
 						</svg>
 
-						Lyric Source Preference
+						__MSG_options_sources_title__
 					</h2>
 					<p>
-						Drag to reorder priority. Higher sources are tried first.
-						Uncheck to disable.
+						__MSG_options_sources_description__
 					</p>
 					<div class="container" style="margin-bottom: 0.2rem">
 						<ul id="providers-list" class="sortable-list"></ul>
@@ -337,23 +336,23 @@
 						<path fill-rule="evenodd" d="M20.599 1.5c-.376 0-.743.111-1.055.32l-5.08 3.385a18.747 18.747 0 0 0-3.471 2.987 10.04 10.04 0 0 1 4.815 4.815 18.748 18.748 0 0 0 2.987-3.472l3.386-5.079A1.902 1.902 0 0 0 20.599 1.5Zm-8.3 14.025a18.76 18.76 0 0 0 1.896-1.207 8.026 8.026 0 0 0-4.513-4.513A18.75 18.75 0 0 0 8.475 11.7l-.278.5a5.26 5.26 0 0 1 3.601 3.602l.502-.278ZM6.75 13.5A3.75 3.75 0 0 0 3 17.25a1.5 1.5 0 0 1-1.601 1.497.75.75 0 0 0-.7 1.123 5.25 5.25 0 0 0 9.8-2.62 3.75 3.75 0 0 0-3.75-3.75Z" clip-rule="evenodd"></path>
 					</svg>
 
-					Theme Settings
+					__MSG_options_themes_title__
 				</h2>
-				<p>Customize the appearance of Better Lyrics.</p>
+				<p>__MSG_options_themes_description__</p>
 				<div class="container">
-					<span>Theme</span>
+					<span>__MSG_options_themes_theme__</span>
 					<button class="small-btn" id="theme-selector-btn">
-						Choose a theme
+						__MSG_options_themes_chooseTheme__
 					</button>
 				</div>
 				<div class="container">
-					<span>Custom Styles</span>
+					<span>__MSG_options_themes_customStyles__</span>
 					<button class="small-btn" id="edit-css-btn">
 						<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor">
 							<path d="M13.488 2.513a1.75 1.75 0 0 0-2.475 0L6.75 6.774a2.75 2.75 0 0 0-.596.892l-.848 2.047a.75.75 0 0 0 .98.98l2.047-.848a2.75 2.75 0 0 0 .892-.596l4.261-4.262a1.75 1.75 0 0 0 0-2.474Z"></path>
 							<path d="M4.75 3.5c-.69 0-1.25.56-1.25 1.25v6.5c0 .69.56 1.25 1.25 1.25h6.5c.69 0 1.25-.56 1.25-1.25V9A.75.75 0 0 1 14 9v2.25A2.75 2.75 0 0 1 11.25 14h-6.5A2.75 2.75 0 0 1 2 11.25v-6.5A2.75 2.75 0 0 1 4.75 2H7a.75.75 0 0 1 0 1.5H4.75Z"></path>
 						</svg>
-						<span id="edit-css-btn-text">Create</span>
+						<span id="edit-css-btn-text">__MSG_options_themes_create__</span>
 					</button>
 				</div>
 				<div class="store-buttons-row">
@@ -362,14 +361,14 @@
 							<path d="M5.223 2.25c-.497 0-.974.198-1.325.55l-1.3 1.298A3.75 3.75 0 0 0 7.5 9.75c.627.47 1.406.75 2.25.75.844 0 1.624-.28 2.25-.75.626.47 1.406.75 2.25.75.844 0 1.623-.28 2.25-.75a3.75 3.75 0 0 0 4.902-5.652l-1.3-1.299a1.875 1.875 0 0 0-1.325-.549H5.223Z"></path>
 							<path fill-rule="evenodd" d="M3 20.25v-8.755c1.42.674 3.08.673 4.5 0A5.234 5.234 0 0 0 9.75 12c.804 0 1.568-.182 2.25-.506a5.234 5.234 0 0 0 2.25.506c.804 0 1.567-.182 2.25-.506 1.42.674 3.08.675 4.5.001v8.755h.75a.75.75 0 0 1 0 1.5H2.25a.75.75 0 0 1 0-1.5H3Zm3-6a.75.75 0 0 1 .75-.75h3a.75.75 0 0 1 .75.75v3a.75.75 0 0 1-.75.75h-3a.75.75 0 0 1-.75-.75v-3Zm8.25-.75a.75.75 0 0 0-.75.75v5.25c0 .414.336.75.75.75h3a.75.75 0 0 0 .75-.75v-5.25a.75.75 0 0 0-.75-.75h-3Z" clip-rule="evenodd"></path>
 						</svg>
-						Theme Marketplace
+						__MSG_options_themes_marketplace__
 					</button>
 					<div class="your-themes-container">
 						<button class="small-btn" id="your-themes-btn">
 							<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="installed-icon">
 								<path fill="currentColor" fill-rule="evenodd" d="M17.5 11c-2.121 0-3.182 0-3.841-.659S13 8.621 13 6.5s0-3.182.659-3.841S15.379 2 17.5 2s3.182 0 3.841.659S22 4.379 22 6.5s0 3.182-.659 3.841S19.621 11 17.5 11m-1.455-2.784c-.765-.67-1.545-1.564-1.545-2.418c0-1.773 1.65-2.435 3-1.065c1.35-1.37 3-.708 3 1.065c0 .854-.78 1.747-1.545 2.418c-.596.523-.894.784-1.455.784c-.56 0-.859-.261-1.455-.784" clip-rule="evenodd"></path><path fill="currentColor" d="M21.904 16.441c.083-1.024.094-2.274.096-3.743a.697.697 0 1 0-1.396 0c-.001 1.477-.012 2.658-.091 3.63c-.084 1.032-.242 1.763-.507 2.32l-2.633-2.37a2.79 2.79 0 0 0-3.471-.21l-.277.196a1.86 1.86 0 0 1-2.386-.207l-3.99-3.99a2.14 2.14 0 0 0-2.922-.097l-.931.814V12c0-2.212 0-3.801.163-5.01c.16-1.19.464-1.907.994-2.437S5.8 3.72 6.99 3.56c1.079-.145 2.458-.161 4.313-.163a.699.699 0 0 0 0-1.396c-1.829.002-3.33.02-4.499.177c-1.343.18-2.404.557-3.236 1.39s-1.21 1.893-1.39 3.236C2 8.116 2 9.8 2 11.947V12q0 .736.002 1.396c.007 1.729.044 3.121.243 4.24c.203 1.14.584 2.058 1.322 2.796c.832.833 1.893 1.21 3.236 1.39C8.116 22 9.8 22 11.947 22h.106c2.148 0 3.83 0 5.144-.177c1.344-.18 2.404-.557 3.236-1.39a4.2 4.2 0 0 0 .73-.983c.445-.825.644-1.82.74-3.009" opacity="0.66"></path>
 							</svg>
-							<span>Installed Themes</span>
+							<span>__MSG_options_themes_installedThemes__</span>
 							<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="chevron-icon">
 								<path fill-rule="evenodd" d="M5.22 8.22a.75.75 0 0 1 1.06 0L10 11.94l3.72-3.72a.75.75 0 1 1 1.06 1.06l-4.25 4.25a.75.75 0 0 1-1.06 0L5.22 9.28a.75.75 0 0 1 0-1.06Z" clip-rule="evenodd"></path>
 							</svg>
@@ -385,27 +384,27 @@
 					<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
 						<path d="M10.95 19.55q.5.3 1.05.288t1.05-.313l4.55-2.775q-1.25-.875-2.675-1.312T12 15t-2.937.438t-2.713 1.287zM12 13q1.45 0 2.475-1.025T15.5 9.5t-1.025-2.475T12 6T9.525 7.025T8.5 9.5t1.025 2.475T12 13m-1.05 8.875l-7-4.3q-.45-.275-.7-.725T3 15.875v-7.75q0-.525.25-.975t.7-.725l7-4.3q.5-.3 1.05-.3t1.05.3l7 4.3q.45.275.7.725t.25.975v7.75q0 .525-.25.975t-.7.725l-7 4.3q-.5.3-1.05.3t-1.05-.3"></path>
 					</svg>
-					Identity
+					__MSG_options_identity_title__
 				</h2>
-				<p>Your unique anonymous identity for Better Lyrics.</p>
+				<p>__MSG_options_identity_description__</p>
 				<div class="container container--small">
-					<p class="text-group__title">Your identity</p>
-					<code id="identity-display-name">Loading...</code>
+					<p class="text-group__title">__MSG_options_identity_yourIdentity__</p>
+					<code id="identity-display-name">__MSG_options_identity_loading__</code>
 				</div>
 				<div class="container container--small">
-					<p>Export/Import</p>
+					<p>__MSG_options_identity_exportImport__</p>
 					<div class="button-row">
 						<button class="small-btn" id="export-identity-btn">
 							<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="16" height="16">
 								<path fill-rule="evenodd" d="M11.47 2.47a.75.75 0 0 1 1.06 0l4.5 4.5a.75.75 0 0 1-1.06 1.06l-3.22-3.22V16.5a.75.75 0 0 1-1.5 0V4.81L8.03 8.03a.75.75 0 0 1-1.06-1.06l4.5-4.5ZM3 15.75a.75.75 0 0 1 .75.75v2.25a1.5 1.5 0 0 0 1.5 1.5h13.5a1.5 1.5 0 0 0 1.5-1.5V16.5a.75.75 0 0 1 1.5 0v2.25a3 3 0 0 1-3 3H5.25a3 3 0 0 1-3-3V16.5a.75.75 0 0 1 .75-.75Z" clip-rule="evenodd"></path>
 							</svg>
-							Export Key
+							__MSG_options_identity_exportKey__
 						</button>
 						<button class="small-btn" id="import-identity-btn">
 							<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="16" height="16">
 								<path fill-rule="evenodd" d="M12 2.25a.75.75 0 0 1 .75.75v11.69l3.22-3.22a.75.75 0 1 1 1.06 1.06l-4.5 4.5a.75.75 0 0 1-1.06 0l-4.5-4.5a.75.75 0 1 1 1.06-1.06l3.22 3.22V3a.75.75 0 0 1 .75-.75Zm-9 13.5a.75.75 0 0 1 .75.75v2.25a1.5 1.5 0 0 0 1.5 1.5h13.5a1.5 1.5 0 0 0 1.5-1.5V16.5a.75.75 0 0 1 1.5 0v2.25a3 3 0 0 1-3 3H5.25a3 3 0 0 1-3-3V16.5a.75.75 0 0 1 .75-.75Z" clip-rule="evenodd"></path>
 							</svg>
-							Import Key
+							__MSG_options_identity_importKey__
 						</button>
 					</div>
 				</div>
@@ -429,10 +428,10 @@
 				</div>
 				<div class="modal-footer">
 					<button id="modal-cancel" class="modal-btn modal-btn-secondary">
-						Cancel
+						__MSG_options_modal_cancel__
 					</button>
 					<button id="modal-confirm" class="modal-btn modal-btn-primary">
-						Confirm
+						__MSG_options_modal_confirm__
 					</button>
 				</div>
 			</div>
@@ -441,7 +440,7 @@
 		<div id="theme-modal-overlay" class="modal-overlay">
 			<div class="modal theme-modal">
 				<div class="modal-header">
-					<h3 class="modal-title">Select a Theme</h3>
+					<h3 class="modal-title">__MSG_options_modal_selectTheme__</h3>
 					<button id="theme-modal-close" class="modal-close-btn" aria-label="Close">
 						<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
 							<path d="M6.28 5.22a.75.75 0 0 0-1.06 1.06L8.94 10l-3.72 3.72a.75.75 0 1 0 1.06 1.06L10 11.06l3.72 3.72a.75.75 0 1 0 1.06-1.06L11.06 10l3.72-3.72a.75.75 0 0 0-1.06-1.06L10 8.94 6.28 5.22Z"></path>
@@ -468,17 +467,17 @@
 							<path fill="url(#gradient)" fill-rule="evenodd" d="M6.32 2.577a49.255 49.255 0 0 1 11.36 0c1.497.174 2.57 1.46 2.57 2.93V21a.75.75 0 0 1-1.085.67L12 18.089l-7.165 3.583A.75.75 0 0 1 3.75 21V5.507c0-1.47 1.073-2.756 2.57-2.93Z" clip-rule="evenodd"></path>
 						</svg>
 
-						<span id="theme-name-text" class="theme-name-text" title="Double-click to rename"></span>
+						<span id="theme-name-text" class="theme-name-text" title="__MSG_options_editor_doubleClickRename__"></span>
 					</div>
 					<span id="theme-source-badge" class="theme-source-badge"></span>
 					<div class="theme-btn-container">
-						<button id="edit-theme-btn" class="edit-theme-btn" title="Rename custom theme">
+						<button id="edit-theme-btn" class="edit-theme-btn" title="__MSG_options_editor_renameTheme__">
 							<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
 								<path d="m5.433 13.917 1.262-3.155A4 4 0 0 1 7.58 9.42l6.92-6.918a2.121 2.121 0 0 1 3 3l-6.92 6.918c-.383.383-.84.685-1.343.886l-3.154 1.262a.5.5 0 0 1-.65-.65Z"></path>
 								<path d="M3.5 5.75c0-.69.56-1.25 1.25-1.25H10A.75.75 0 0 0 10 3H4.75A2.75 2.75 0 0 0 2 5.75v9.5A2.75 2.75 0 0 0 4.75 18h9.5A2.75 2.75 0 0 0 17 15.25V10a.75.75 0 0 0-1.5 0v5.25c0 .69-.56 1.25-1.25 1.25h-9.5c-.69 0-1.25-.56-1.25-1.25v-9.5Z"></path>
 							</svg>
 						</button>
-						<button id="delete-theme-btn" class="delete-theme-btn" title="Delete custom theme">
+						<button id="delete-theme-btn" class="delete-theme-btn" title="__MSG_options_editor_deleteTheme__">
 							<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
 								<path fill="currentColor" d="M7 21q-.825 0-1.412-.587T5 19V6q-.425 0-.712-.288T4 5t.288-.712T5 4h4q0-.425.288-.712T10 3h4q.425 0 .713.288T15 4h4q.425 0 .713.288T20 5t-.288.713T19 6v13q0 .825-.587 1.413T17 21zM17 6H7v13h10zm-7 11q.425 0 .713-.288T11 16V9q0-.425-.288-.712T10 8t-.712.288T9 9v7q0 .425.288.713T10 17m4 0q.425 0 .713-.288T15 16V9q0-.425-.288-.712T14 8t-.712.288T13 9v7q0 .425.288.713T14 17M7 6v13z"></path>
 							</svg>
@@ -488,26 +487,26 @@
 			</div>
 			<div id="editor-container">
 				<div id="editor" style="height: 300px; overflow: auto"></div>
-				<div id="sync-indicator">Saving...</div>
+				<div id="sync-indicator">__MSG_options_editor_saving__</div>
 			</div>
 			<div class="ie-utils-container">
 				<div class="ie-utils">
-					<button id="file-import-btn" class="icon-btn" data-tooltip="Import from file">
+					<button id="file-import-btn" class="icon-btn" data-tooltip="__MSG_options_editor_importFile__">
 						<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24">
 							<path fill="currentColor" d="M11 16V7.85l-2.6 2.6L7 9l5-5l5 5l-1.4 1.45l-2.6-2.6V16zm-5 4q-.825 0-1.412-.587T4 18v-3h2v3h12v-3h2v3q0 .825-.587 1.413T18 20z"></path>
 						</svg>
 					</button>
-					<button id="file-export-btn" class="icon-btn" data-tooltip="Export to file">
+					<button id="file-export-btn" class="icon-btn" data-tooltip="__MSG_options_editor_exportFile__">
 						<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24">
 							<path fill="currentColor" d="M12 15.575q-.2 0-.375-.062T11.3 15.3l-3.6-3.6q-.3-.3-.288-.7t.288-.7q.3-.3.713-.312t.712.287L11 12.15V5q0-.425.288-.712T12 4t.713.288T13 5v7.15l1.875-1.875q.3-.3.713-.288t.712.313q.275.3.288.7t-.288.7l-3.6 3.6q-.15.15-.325.213t-.375.062M6 20q-.825 0-1.412-.587T4 18v-2q0-.425.288-.712T5 15t.713.288T6 16v2h12v-2q0-.425.288-.712T19 15t.713.288T20 16v2q0 .825-.587 1.413T18 20z"></path>
 						</svg>
 					</button>
-					<button id="save-theme-btn" class="icon-btn" data-tooltip="Save as theme">
+					<button id="save-theme-btn" class="icon-btn" data-tooltip="__MSG_options_editor_saveAsTheme__">
 						<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.75" stroke="currentColor">
 							<path stroke-linecap="round" stroke-linejoin="round" d="M17.593 3.322c1.1.128 1.907 1.077 1.907 2.185V21L12 17.25 4.5 21V5.507c0-1.108.806-2.057 1.907-2.185a48.507 48.507 0 0 1 11.186 0Z"></path>
 						</svg>
 					</button>
-						<button id="editor-popout-button" class="icon-btn" data-tooltip="Open in new tab">
+						<button id="editor-popout-button" class="icon-btn" data-tooltip="__MSG_options_editor_openInNewTab__">
 						<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.75" stroke="currentColor">
 							<path stroke-linecap="round" stroke-linejoin="round" d="M13.5 6H5.25A2.25 2.25 0 0 0 3 8.25v10.5A2.25 2.25 0 0 0 5.25 21h10.5A2.25 2.25 0 0 0 18 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25"></path>
 						</svg>
@@ -517,13 +516,13 @@
 					<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
 						<path fill="currentColor" d="m7.825 13l4.9 4.9q.3.3.288.7t-.313.7q-.3.275-.7.288t-.7-.288l-6.6-6.6q-.15-.15-.213-.325T4.426 12t.063-.375t.212-.325l6.6-6.6q.275-.275.688-.275t.712.275q.3.3.3.713t-.3.712L7.825 11H19q.425 0 .713.288T20 12t-.288.713T19 13z"></path>
 					</svg>
-					Back to Settings
+					__MSG_options_editor_backToSettings__
 				</button>
 			</div>
 			<p class="note" style="opacity: 0.8;">
 				<svg xmlns="http://www.w3.org/2000/svg" style="display:inline-block;margin-top: -1px;" width="0.75rem" height="0.75rem" viewBox="0 0 24 24"><path fill="currentColor" d="M3 21v-5h2v3h3v2zm13 0v-2h3v-3h2v5zM3 8V3h5v2H5v3zm16 0V5h-3V3h5v5z"></path></svg>
 				<span>
-					For the full editor experience, <a href="#" id="editor-popout-link" class="note-link">open this editor in a new tab</a>.
+					__MSG_options_editor_fullExperienceNote__<a href="#" id="editor-popout-link" class="note-link">__MSG_options_editor_openInNewTabLink__</a>.
 				</span>
 			</p>
 			<div class="rics-footer" style="margin:0;">
@@ -545,7 +544,7 @@
 				</div>
 				<a href="https://github.com/better-lyrics/better-lyrics/blob/master/STYLING.md" target="_blank" id="styling-guide-btn">
 					<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="12" height="12"><path fill="currentColor" d="M7.25 7A.75.75 0 0 1 8 6.25h8a.75.75 0 0 1 0 1.5H8A.75.75 0 0 1 7.25 7M8 9.75a.75.75 0 0 0 0 1.5h5a.75.75 0 0 0 0-1.5z"/><path fill="currentColor" fill-rule="evenodd" d="M9.945 1.25c-1.367 0-2.47 0-3.337.117c-.9.12-1.658.38-2.26.981c-.602.602-.86 1.36-.981 2.26c-.117.867-.117 1.97-.117 3.337v8.11c0 1.367 0 2.47.117 3.337c.12.9.38 1.658.981 2.26c.602.602 1.36.86 2.26.982c.867.116 1.97.116 3.337.116h4.11c1.367 0 2.47 0 3.337-.116c.9-.122 1.658-.38 2.26-.982s.86-1.36.982-2.26c.116-.867.116-1.97.116-3.337v-8.11c0-1.367 0-2.47-.116-3.337c-.122-.9-.38-1.658-.982-2.26s-1.36-.86-2.26-.981c-.867-.117-1.97-.117-3.337-.117zM5.41 3.409c.277-.277.665-.457 1.4-.556c.754-.101 1.756-.103 3.191-.103h4c1.435 0 2.436.002 3.192.103c.734.099 1.122.28 1.399.556c.277.277.457.665.556 1.4c.101.754.103 1.756.103 3.191v7.25H7.782c-.818 0-1.376 0-1.855.128a3.8 3.8 0 0 0-1.177.548V8c0-1.435.002-2.437.103-3.192c.099-.734.28-1.122.556-1.399m-.632 14.84c.015.354.039.665.076.943c.099.734.28 1.122.556 1.399c.277.277.665.457 1.4.556c.754.101 1.756.103 3.191.103h4c1.435 0 2.436-.002 3.192-.103c.734-.099 1.122-.28 1.399-.556c.277-.277.457-.665.556-1.4c.083-.615.099-1.395.102-2.441H7.898c-.978 0-1.32.006-1.583.077a2.25 2.25 0 0 0-1.538 1.422" clip-rule="evenodd"/></svg>
-					Styling Guide
+					__MSG_options_editor_stylingGuide__
 				</a>
 			</div>
 			<div id="status-css"></div>
@@ -559,7 +558,7 @@
 						<p id="detail-author"></p>
 					</div>
 					<div class="detail-header-actions">
-						<button id="detail-action-btn" class="store-card-btn store-card-btn-install">Install</button>
+						<button id="detail-action-btn" class="store-card-btn store-card-btn-install">__MSG_options_detail_install__</button>
 						<button id="detail-modal-close" class="modal-close-btn" aria-label="Close">
 							<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
 								<path d="M6.28 5.22a.75.75 0 0 0-1.06 1.06L8.94 10l-3.72 3.72a.75.75 0 1 0 1.06 1.06L10 11.06l3.72 3.72a.75.75 0 1 0 1.06-1.06L11.06 10l3.72-3.72a.75.75 0 0 0-1.06-1.06L10 8.94 6.28 5.22Z"></path>
@@ -588,13 +587,13 @@
 								<path fill-rule="evenodd" d="M8 2.25A6.75 6.75 0 0 0 1.25 9v6A6.75 6.75 0 0 0 8 21.75h8A6.75 6.75 0 0 0 22.75 15V9A6.75 6.75 0 0 0 16 2.25zm-2 6a.75.75 0 0 0-.75.75v6a.75.75 0 0 0 1.5 0v-2.25h2.821a.75.75 0 0 0 0-1.5H6.75v-1.5H11a.75.75 0 0 0 0-1.5zm7.576.27a.75.75 0 1 0-1.152.96l2.1 2.52l-2.1 2.52a.75.75 0 1 0 1.152.96l1.924-2.308l1.924 2.308a.75.75 0 1 0 1.152-.96l-2.1-2.52l2.1-2.52a.75.75 0 1 0-1.152-.96L15.5 10.829z" clip-rule="evenodd"></path>
 							</svg>
 							<span class="detail-shader-info-text">
-								This theme includes a shader config. <a id="detail-shader-download" href="#" class="detail-shader-link">Download shader.json</a> and import it in <a href="https://chromewebstore.google.com/detail/better-lyrics-shaders/mffpncjphfmkppebdoaehdlnagnlpfai" target="_blank" class="detail-shader-link">Better Lyrics Shaders</a>.
+								__MSG_options_detail_shaderInfo__ <a id="detail-shader-download" href="#" class="detail-shader-link">__MSG_options_detail_downloadShader__</a> __MSG_options_detail_shaderImportSuffix__ <a href="https://chromewebstore.google.com/detail/better-lyrics-shaders/mffpncjphfmkppebdoaehdlnagnlpfai" target="_blank" class="detail-shader-link">Better Lyrics Shaders</a>.
 							</span>
 						</div>
 						<p id="detail-description"></p>
 						<div id="detail-rating-section" class="detail-rating-section">
 							<div class="detail-rating-header">
-								<span class="detail-rating-label">Rate this theme</span>
+								<span class="detail-rating-label">__MSG_options_detail_rateTheme__</span>
 								<div id="detail-stats" class="detail-stats"></div>
 							</div>
 							<div class="detail-rating-row">
@@ -612,7 +611,7 @@
 							<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
 								<path fill-rule="evenodd" clip-rule="evenodd" d="M12.026 2c-5.509 0-9.974 4.465-9.974 9.974 0 4.406 2.857 8.145 6.821 9.465.499.09.679-.217.679-.481 0-.237-.008-.865-.011-1.696-2.775.602-3.361-1.338-3.361-1.338-.452-1.152-1.107-1.459-1.107-1.459-.905-.619.069-.605.069-.605 1.002.07 1.527 1.028 1.527 1.028.89 1.524 2.336 1.084 2.902.829.091-.645.351-1.085.635-1.334-2.214-.251-4.542-1.107-4.542-4.93 0-1.087.389-1.979 1.024-2.675-.101-.253-.446-1.268.099-2.64 0 0 .837-.269 2.742 1.021a9.582 9.582 0 0 1 2.496-.336 9.554 9.554 0 0 1 2.496.336c1.906-1.291 2.742-1.021 2.742-1.021.545 1.372.203 2.387.099 2.64.64.696 1.024 1.587 1.024 2.675 0 3.833-2.33 4.675-4.552 4.922.355.308.675.916.675 1.846 0 1.334-.012 2.41-.012 2.737 0 .267.178.577.687.479C19.146 20.115 22 16.379 22 11.974 22 6.465 17.535 2 12.026 2z"></path>
 							</svg>
-							<a id="detail-repo-anchor" href="#" target="_blank">View on GitHub</a>
+							<a id="detail-repo-anchor" href="#" target="_blank">__MSG_options_detail_viewOnGitHub__</a>
 						</div>
 					</div>
 				</div>

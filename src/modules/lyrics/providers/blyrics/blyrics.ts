@@ -1,12 +1,38 @@
 import { BLYRICS_INSTRUMENTAL_GAP_MS, LYRICS_API_URL } from "@constants";
 import type {
+  MetadataElement,
   ParagraphElementOrBackground,
   SpanElement,
+  TranslationContainer,
+  TransliterationContainer,
+  TransliterationItem,
   TtmlRoot,
 } from "@modules/lyrics/providers/blyrics/blyrics-types";
 import { parseTime } from "@modules/lyrics/providers/lrcUtils";
 import type { Lyric, LyricPart, LyricSourceResult, ProviderParameters } from "@modules/lyrics/providers/shared";
 import { type X2jOptions, XMLParser } from "fast-xml-parser";
+
+function extractAgentMapping(metadataElements: MetadataElement[]): Map<string, string> {
+  const mapping = new Map<string, string>();
+  if (!metadataElements || metadataElements.length === 0) return mapping;
+
+  const agentElements = metadataElements.filter(e => "agent" in e && e[":@"]);
+
+  let voiceIndex = 0;
+  agentElements.forEach(agent => {
+    const originalId = agent[":@"]?.["@_id"];
+    const agentType = agent[":@"]?.["@_type"];
+    if (!originalId) return;
+
+    if (agentType === "person" || agentType === "character") {
+      voiceIndex++;
+      mapping.set(originalId, `v${voiceIndex}`);
+    } else {
+      mapping.set(originalId, "v1000");
+    }
+  });
+  return mapping;
+}
 
 function parseLyricPart(p: ParagraphElementOrBackground[], beginTime: number, ignoreSpanSpace = false) {
   let text = "";
@@ -131,6 +157,8 @@ export async function fillTtml(responseString: string, providerParameters: Provi
   const ttBody = ttBodyContainer.body!;
   const ttMeta = ttBodyContainer[":@"];
 
+  const agentMapping = extractAgentMapping(ttHead[0].metadata);
+
   const lines = ttBody.flatMap(e => e.div);
 
   const hasTimingData = lines.length > 0 && lines[0][":@"] !== undefined;
@@ -154,8 +182,11 @@ export async function fillTtml(responseString: string, providerParameters: Provi
       isWordSynced = true;
     }
 
+    const rawAgent = meta?.["@_agent"];
+    const normalizedAgent = rawAgent ? (agentMapping.get(rawAgent) ?? rawAgent) : undefined;
+
     lyrics.set(meta?.["@_key"] || lyrics.size.toString(), {
-      agent: meta?.["@_agent"],
+      agent: normalizedAgent,
       durationMs: endTimeMs - beginTimeMs,
       parts: partParse.parts,
       startTimeMs: beginTimeMs,
@@ -166,42 +197,53 @@ export async function fillTtml(responseString: string, providerParameters: Provi
     });
   });
 
-  let metadata = ttHead[0].metadata.find(e => e.iTunesMetadata);
-  if (metadata) {
-    let translations = metadata.iTunesMetadata!.find(e => e.translations);
-    let transliterations = metadata.iTunesMetadata!.find(e => e.transliterations);
+  const metadataArray = ttHead[0].metadata;
 
-    if (translations && translations.translations && translations.translations.length > 0) {
-      let lang = translations.translations[0][":@"]["@_lang"];
-      translations.translations[0].translation.forEach(translation => {
-        let text = translation.text[0]["#text"];
-        let line = translation[":@"]["@_for"];
+  const findInMetadata = <T>(key: "translations" | "transliterations"): T | null => {
+    const direct = metadataArray.find(e => key in e);
+    if (direct?.[key]) return direct[key] as T;
 
-        if (lang && text && line) {
-          const lyricLine = lyrics.get(line);
-          if (lyricLine) {
-            lyricLine.translation = {
-              text,
-              lang,
-            };
-          }
+    for (const element of metadataArray) {
+      for (const value of Object.values(element)) {
+        if (Array.isArray(value)) {
+          const nested = value.find((e): e is MetadataElement => typeof e === "object" && e !== null && key in e);
+          if (nested?.[key]) return nested[key] as T;
         }
-      });
+      }
     }
+    return null;
+  };
 
-    if (transliterations && transliterations.transliterations && transliterations.transliterations.length > 0) {
-      transliterations.transliterations[0].transliteration.forEach(transliteration => {
-        let line = transliteration[":@"]["@_for"];
-        if (line) {
-          const lyricLine = lyrics.get(line)!;
-          let beginTime = lyricLine.startTimeMs;
-          let parseResult = parseLyricPart(transliteration.text, beginTime, false);
+  const translationsData = findInMetadata<TranslationContainer[]>("translations");
+  const transliterationsData = findInMetadata<TransliterationContainer[]>("transliterations");
 
-          lyricLine.romanization = parseResult.text;
-          lyricLine.timedRomanization = parseResult.parts;
+  if (translationsData && translationsData.length > 0) {
+    const lang = translationsData[0][":@"]["@_lang"];
+    translationsData[0].translation.forEach(translation => {
+      const text = translation.text[0]["#text"];
+      const line = translation[":@"]["@_for"];
+
+      if (lang && text && line) {
+        const lyricLine = lyrics.get(line);
+        if (lyricLine) {
+          lyricLine.translation = { text, lang };
         }
-      });
-    }
+      }
+    });
+  }
+
+  if (transliterationsData && transliterationsData.length > 0) {
+    transliterationsData[0].transliteration.forEach((transliteration: TransliterationItem) => {
+      const line = transliteration[":@"]["@_for"];
+      if (line) {
+        const lyricLine = lyrics.get(line)!;
+        const beginTime = lyricLine.startTimeMs;
+        const parseResult = parseLyricPart(transliteration.text, beginTime, false);
+
+        lyricLine.romanization = parseResult.text;
+        lyricLine.timedRomanization = parseResult.parts;
+      }
+    });
   }
 
   let lyricArray = Array.from(lyrics.values());

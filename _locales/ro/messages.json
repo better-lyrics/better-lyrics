@@ -1,0 +1,726 @@
+{
+  "extensionName": {
+    "message": "Better Lyrics (Versuri pentru YouTube Music)",
+    "description": "The name of the extension"
+  },
+  "extensionDescription": {
+    "message": "Îmbunătățește YouTube Music cu versuri minunate sincronizate, suport multilingv, traduceri în timp real și multe altele",
+    "description": "The description of the extension"
+  },
+  "options_tab_general": {
+    "message": "General",
+    "description": "General settings tab label"
+  },
+  "options_tab_display": {
+    "message": "Afișaj",
+    "description": "Display settings tab label"
+  },
+  "options_tab_language": {
+    "message": "Limbă",
+    "description": "Language settings tab label"
+  },
+  "options_tab_sources": {
+    "message": "Surse",
+    "description": "Sources settings tab label"
+  },
+  "options_tab_identity": {
+    "message": "Identitate",
+    "description": "Identity settings tab label"
+  },
+  "options_tab_themes": {
+    "message": "Teme",
+    "description": "Themes settings tab label"
+  },
+  "options_general_title": {
+    "message": "Setări Generale",
+    "description": "General settings section title"
+  },
+  "options_general_description": {
+    "message": "Setări care afectează comportamentul general al Better Lyrics.",
+    "description": "General settings section description"
+  },
+  "options_general_showLogs": {
+    "message": "Arată loguri",
+    "description": "Show logs setting label"
+  },
+  "options_general_autoSwitch": {
+    "message": "Comută automat la tab-ul cu versuri",
+    "description": "Auto switch to lyrics tab setting label"
+  },
+  "options_general_cache": {
+    "message": "Memorie cache",
+    "description": "Cache section label"
+  },
+  "options_general_clearCache": {
+    "message": "Golește memoria cache",
+    "description": "Clear cache button label"
+  },
+  "options_general_totalLyrics": {
+    "message": "Total versuri în cache",
+    "description": "Total lyrics in cache label"
+  },
+  "options_general_cacheSize": {
+    "message": "Dimensiunea cache-ului",
+    "description": "Cache size label"
+  },
+  "options_display_title": {
+    "message": "Setări Afișaj",
+    "description": "Display settings section title"
+  },
+  "options_display_description": {
+    "message": "Reglați aspectul Better Lyrics.",
+    "description": "Display settings section description"
+  },
+  "options_display_disableFullscreen": {
+    "message": "Dezactivează modul ecran complet",
+    "description": "Disable fullscreen mode setting label"
+  },
+  "options_display_autoHideCursor": {
+    "message": "Ascunde automat cursorul în modul ecran complet",
+    "description": "Auto-hide cursor setting label"
+  },
+  "options_display_albumArt": {
+    "message": "Arată coperta albumului blurată pe fundal",
+    "description": "Show album art background setting label"
+  },
+  "options_display_stylizedAnimations": {
+    "message": "Afișare animații stilizate",
+    "description": "Show stylized animations setting label"
+  },
+  "options_language_title": {
+    "message": "Setări Limbă",
+    "description": "Language settings section title"
+  },
+  "options_language_description": {
+    "message": "Setări de limbă și traducere pentru Better Lyrics.",
+    "description": "Language settings section description"
+  },
+  "options_language_romanization": {
+    "message": "Romanizare",
+    "description": "Romanization setting label"
+  },
+  "options_language_translate": {
+    "message": "Tradu versurile melodiilor",
+    "description": "Translate song lyrics setting label"
+  },
+  "options_language_translationLanguage": {
+    "message": "Limbă traducere",
+    "description": "Translation language setting label"
+  },
+  "options_sources_title": {
+    "message": "Preferința Sursei Versurilor",
+    "description": "Sources settings section title"
+  },
+  "options_sources_description": {
+    "message": "Trage pentru a reordona prioritatea. Sursele de sus sunt încercate mai întâi. Debifează pentru dezactivare.",
+    "description": "Sources settings section description"
+  },
+  "options_themes_title": {
+    "message": "Setări Temă",
+    "description": "Theme settings section title"
+  },
+  "options_themes_description": {
+    "message": "Personalizați aspectul Better Lyrics.",
+    "description": "Theme settings section description"
+  },
+  "options_themes_theme": {
+    "message": "Temă",
+    "description": "Theme label"
+  },
+  "options_themes_chooseTheme": {
+    "message": "Alegeți o temă",
+    "description": "Choose a theme button label"
+  },
+  "options_themes_customStyles": {
+    "message": "Stiluri personalizate",
+    "description": "Custom styles label"
+  },
+  "options_themes_create": {
+    "message": "Creează",
+    "description": "Create button label"
+  },
+  "options_themes_marketplace": {
+    "message": "Bazar de Teme",
+    "description": "Theme marketplace button label"
+  },
+  "options_themes_installedThemes": {
+    "message": "Teme Instalate",
+    "description": "Installed themes button label"
+  },
+  "options_identity_title": {
+    "message": "Identitate",
+    "description": "Identity settings section title"
+  },
+  "options_identity_description": {
+    "message": "Identitatea ta anonimă unică pentru Better Lyrics.",
+    "description": "Identity settings section description"
+  },
+  "options_identity_yourIdentity": {
+    "message": "Identitatea Ta",
+    "description": "Your identity label"
+  },
+  "options_identity_loading": {
+    "message": "Se încarcă...",
+    "description": "Loading identity placeholder"
+  },
+  "options_identity_exportImport": {
+    "message": "Export/Import",
+    "description": "Export/Import section label"
+  },
+  "options_identity_exportKey": {
+    "message": "Cheie Export",
+    "description": "Export key button label"
+  },
+  "options_identity_importKey": {
+    "message": "Cheie Import",
+    "description": "Import key button label"
+  },
+  "options_modal_selectTheme": {
+    "message": "Selectați o Temă",
+    "description": "Theme modal title"
+  },
+  "options_modal_cancel": {
+    "message": "Anulare",
+    "description": "Cancel button label"
+  },
+  "options_modal_confirm": {
+    "message": "Confirmă",
+    "description": "Confirm button label"
+  },
+  "options_alert_cacheCleared": {
+    "message": "Memoria cache a fost ștearsă cu succes!",
+    "description": "Cache cleared success message"
+  },
+  "options_alert_cacheClearFailed": {
+    "message": "Eroare la ștergerea cache-ului!",
+    "description": "Cache clear failed message"
+  },
+  "options_alert_nothingToClear": {
+    "message": "Nimic de șters!",
+    "description": "Nothing to clear message"
+  },
+  "options_alert_exportFailed": {
+    "message": "Nu s-a reușit exportarea identității",
+    "description": "Export identity failed message"
+  },
+  "options_alert_fileSaveDialogOpened": {
+    "message": "Dialog de salvare a fișierului de identitate deschis.",
+    "description": "File save dialog opened message"
+  },
+  "options_alert_fileSaveFailed": {
+    "message": "Eroare la salvarea fișierului. Vă rugăm să încercați din nou.",
+    "description": "File save failed message"
+  },
+  "options_alert_downloadInitiated": {
+    "message": "Descărcarea fișierului de identitate inițiată.",
+    "description": "Download initiated message"
+  },
+  "options_alert_importSuccess": {
+    "message": "Identitate importată cu succes!",
+    "description": "Import success message"
+  },
+  "options_alert_identityLoadError": {
+    "message": "Eroare la încărcarea identității",
+    "description": "Identity load error message"
+  },
+  "options_editor_saving": {
+    "message": "Se salvează...",
+    "description": "Saving indicator text"
+  },
+  "options_editor_importFile": {
+    "message": "Importați din fișier",
+    "description": "Import from file tooltip"
+  },
+  "options_editor_exportFile": {
+    "message": "Exportați în fișier",
+    "description": "Export to file tooltip"
+  },
+  "options_editor_saveAsTheme": {
+    "message": "Salvare ca temă",
+    "description": "Save as theme tooltip"
+  },
+  "options_editor_openInNewTab": {
+    "message": "Deschideți în filă nouă",
+    "description": "Open in new tab tooltip"
+  },
+  "options_editor_backToSettings": {
+    "message": "Înapoi la Setări",
+    "description": "Back to settings button label"
+  },
+  "options_editor_fullExperienceNote": {
+    "message": "Pentru experiența completă de editare, ",
+    "description": "Full editor experience note prefix"
+  },
+  "options_editor_openInNewTabLink": {
+    "message": "deschide acest editor într-o filă nouă",
+    "description": "Open in new tab link text"
+  },
+  "options_editor_stylingGuide": {
+    "message": "Ghid de stilizare",
+    "description": "Styling guide link text"
+  },
+  "options_editor_renameTheme": {
+    "message": "Redenumiți temă personalizată",
+    "description": "Rename theme button title"
+  },
+  "options_editor_deleteTheme": {
+    "message": "Ștergeți temă personalizată",
+    "description": "Delete theme button title"
+  },
+  "options_editor_doubleClickRename": {
+    "message": "Dublu-clic pentru a redenumi",
+    "description": "Double-click to rename tooltip"
+  },
+  "options_provider_betterLyrics": {
+    "message": "Better Lyrics",
+    "description": "Better Lyrics provider name"
+  },
+  "options_provider_betterLyricsLegato": {
+    "message": "Better Lyrics Legato",
+    "description": "Better Lyrics Legato provider name"
+  },
+  "options_provider_musixmatch": {
+    "message": "Musixmatch",
+    "description": "Musixmatch provider name"
+  },
+  "options_provider_lrclib": {
+    "message": "LRClib",
+    "description": "LRClib provider name"
+  },
+  "options_provider_youtube": {
+    "message": "Youtube",
+    "description": "Youtube provider name"
+  },
+  "options_provider_youtubeCaptions": {
+    "message": "Subtitrări YouTube",
+    "description": "Youtube Captions provider name"
+  },
+  "options_syncType_syllable": {
+    "message": "Silabe",
+    "description": "Syllable sync type label"
+  },
+  "options_syncType_syllable_tooltip": {
+    "message": "Evidențiază silabe individuale în timp ce sunt cântate. Sincronizare pe silabe oferă cea mai bună experiență.",
+    "description": "Syllable sync type tooltip"
+  },
+  "options_syncType_word": {
+    "message": "Cuvânt",
+    "description": "Word sync type label"
+  },
+  "options_syncType_word_tooltip": {
+    "message": "Evidențiază cuvinte individuale în timp ce sunt cântate. Sincronizarea pe cuvinte oferă o experiență bună.",
+    "description": "Word sync type tooltip"
+  },
+  "options_syncType_line": {
+    "message": "Rând",
+    "description": "Line sync type label"
+  },
+  "options_syncType_line_tooltip": {
+    "message": "Evidențiază un rând întreg în timp ce este cântat. Sincronizarea pe rânduri oferă experiența de bază.",
+    "description": "Line sync type tooltip"
+  },
+  "options_syncType_unsynced": {
+    "message": "Nesincronizat",
+    "description": "Unsynced sync type label"
+  },
+  "options_syncType_unsynced_tooltip": {
+    "message": "Versuri fără informații de sincronizate. Versurile nesincronizate oferă o experiență minimă.",
+    "description": "Unsynced sync type tooltip"
+  },
+  "options_detail_rateTheme": {
+    "message": "Evaluează această temă",
+    "description": "Rate theme label"
+  },
+  "options_detail_install": {
+    "message": "Instalează",
+    "description": "Install button label"
+  },
+  "options_detail_viewOnGitHub": {
+    "message": "Vedeți pe GitHub",
+    "description": "View on GitHub link text"
+  },
+  "options_detail_shaderInfo": {
+    "message": "Această temă include o configurare de shader.",
+    "description": "Shader info text prefix"
+  },
+  "options_detail_downloadShader": {
+    "message": "Descarcă shader.json",
+    "description": "Download shader link text"
+  },
+  "options_detail_shaderImportSuffix": {
+    "message": "și importați-l în",
+    "description": "Shader import suffix text before Better Lyrics Shaders link"
+  },
+  "marketplace_pageTitle": {
+    "message": "Bazarul de Teme Better Lyrics",
+    "description": "Page title"
+  },
+  "marketplace_title": {
+    "message": "Bazar de Teme",
+    "description": "Header title"
+  },
+  "marketplace_subtitle": {
+    "message": "Descoperă și instalează teme create de comunitate",
+    "description": "Header subtitle"
+  },
+  "marketplace_searchPlaceholder": {
+    "message": "Căutați teme...",
+    "description": "Search input placeholder"
+  },
+  "marketplace_refresh": {
+    "message": "Reîmprospătare",
+    "description": "Refresh button label"
+  },
+  "marketplace_keyboardShortcuts": {
+    "message": "Scurtături",
+    "description": "Keyboard shortcuts button label"
+  },
+  "marketplace_sortBy": {
+    "message": "Sortează după",
+    "description": "Sort filter group label"
+  },
+  "marketplace_sortRatingDesc": {
+    "message": "Cele mai apreciate",
+    "description": "Sort by highest rating"
+  },
+  "marketplace_sortRatingAsc": {
+    "message": "Cele mai puțin apreciate",
+    "description": "Sort by lowest rating"
+  },
+  "marketplace_sortDownloadsDesc": {
+    "message": "Cele mai descărcate",
+    "description": "Sort by most downloads"
+  },
+  "marketplace_sortDownloadsAsc": {
+    "message": "Cele mai puțin descărcate",
+    "description": "Sort by least downloads"
+  },
+  "marketplace_sortNewest": {
+    "message": "Cele mai noi",
+    "description": "Sort by newest"
+  },
+  "marketplace_sortOldest": {
+    "message": "Cele mai vechi",
+    "description": "Sort by oldest"
+  },
+  "marketplace_show": {
+    "message": "Arătați",
+    "description": "Show filter group label"
+  },
+  "marketplace_showAll": {
+    "message": "Toate",
+    "description": "Show all themes"
+  },
+  "marketplace_showInstalled": {
+    "message": "Instalate",
+    "description": "Show installed themes"
+  },
+  "marketplace_showNotInstalled": {
+    "message": "Neinstalate",
+    "description": "Show not installed themes"
+  },
+  "marketplace_options": {
+    "message": "Opțiuni",
+    "description": "Options filter group label"
+  },
+  "marketplace_hasShaders": {
+    "message": "Are shadere",
+    "description": "Filter for themes with shaders"
+  },
+  "marketplace_compatibleOnly": {
+    "message": "Doar compatibile",
+    "description": "Filter for compatible themes"
+  },
+  "marketplace_installFromUrl": {
+    "message": "Instalați din URL",
+    "description": "Install from URL button"
+  },
+  "marketplace_submitTheme": {
+    "message": "Trimiteți o temă",
+    "description": "Submit a theme link"
+  },
+  "marketplace_loading": {
+    "message": "Se încarcă temele...",
+    "description": "Loading message"
+  },
+  "marketplace_retry": {
+    "message": "Reîncercați",
+    "description": "Retry button"
+  },
+  "marketplace_noThemesMatch": {
+    "message": "Nicio temă se potrivește cu filtrele dvs.",
+    "description": "Empty state message"
+  },
+  "marketplace_permissionTitle": {
+    "message": "Necesită permisiune",
+    "description": "Permission required title"
+  },
+  "marketplace_permissionMessage": {
+    "message": "Pentru a răsfoi și a instala teme, Better Lyrics are nevoie de permisiunea de a accesa GitHub, unde temele sunt găzduite, și API-ul bazarului.",
+    "description": "Permission required message"
+  },
+  "marketplace_grantPermission": {
+    "message": "Acordați Permisiunea",
+    "description": "Grant permission button"
+  },
+  "marketplace_install": {
+    "message": "Instalează",
+    "description": "Install button"
+  },
+  "marketplace_remove": {
+    "message": "Elimină",
+    "description": "Remove button"
+  },
+  "marketplace_apply": {
+    "message": "Aplică",
+    "description": "Apply button"
+  },
+  "marketplace_active": {
+    "message": "Activă",
+    "description": "Active theme indicator"
+  },
+  "marketplace_shadersBadge": {
+    "message": "Shadere",
+    "description": "Shaders badge text"
+  },
+  "marketplace_githubBadge": {
+    "message": "GitHub",
+    "description": "GitHub badge text"
+  },
+  "marketplace_urlModalTitle": {
+    "message": "Instalați din URL",
+    "description": "URL install modal title"
+  },
+  "marketplace_urlModalMessage": {
+    "message": "Introduceți un URL al unui repozitoriu GitHub pentru a instala o temă direct:",
+    "description": "URL install modal message"
+  },
+  "marketplace_urlModalPlaceholder": {
+    "message": "github.com/user/repo sau github.com/user/repo/tree/branch",
+    "description": "URL input placeholder"
+  },
+  "marketplace_urlModalError": {
+    "message": "Introduceți un URL al unui repozitoriu GitHub",
+    "description": "URL validation error"
+  },
+  "marketplace_cancel": {
+    "message": "Anulare",
+    "description": "Cancel button"
+  },
+  "marketplace_urlPermissionTitle": {
+    "message": "Este necesară o permisiune suplimentară",
+    "description": "URL permission modal title"
+  },
+  "marketplace_urlPermissionWhy": {
+    "message": "De ce este necesar?",
+    "description": "URL permission explanation title"
+  },
+  "marketplace_urlPermissionDesc": {
+    "message": "Instalarea temelor din URL-uri GitHub personalizate necesită acces mai larg decât bazarul. Acest lucru permite Better Lyrics să:",
+    "description": "URL permission description"
+  },
+  "marketplace_urlPermissionItem1": {
+    "message": "Preia fișierele temei din orice repozitoriu GitHub",
+    "description": "URL permission list item 1"
+  },
+  "marketplace_urlPermissionItem2": {
+    "message": "Detecteze ramura implicită a repozitoriului",
+    "description": "URL permission list item 2"
+  },
+  "marketplace_urlPermissionItem3": {
+    "message": "Valideze structura temei înainte de instalare",
+    "description": "URL permission list item 3"
+  },
+  "marketplace_urlPermissionNote": {
+    "message": "Această permisiune este folosită doar atunci când instalați teme prin URL. Temele din bazar nu o necesită.",
+    "description": "URL permission note"
+  },
+  "marketplace_shortcutsTitle": {
+    "message": "Scurtături",
+    "description": "Shortcuts modal title"
+  },
+  "marketplace_shortcutsNavigation": {
+    "message": "Navigare",
+    "description": "Navigation shortcuts group"
+  },
+  "marketplace_shortcutsSearch": {
+    "message": "Căutați teme",
+    "description": "Search shortcut label"
+  },
+  "marketplace_shortcutsRefresh": {
+    "message": "Reîmprospătează bazarul",
+    "description": "Refresh shortcut label"
+  },
+  "marketplace_shortcutsInstallUrl": {
+    "message": "Instalare din URL",
+    "description": "Install from URL shortcut label"
+  },
+  "marketplace_shortcutsPrevPage": {
+    "message": "Pagina precedentă",
+    "description": "Previous page shortcut label"
+  },
+  "marketplace_shortcutsNextPage": {
+    "message": "Pagina următoare",
+    "description": "Next page shortcut label"
+  },
+  "marketplace_shortcutsSort": {
+    "message": "Sortare",
+    "description": "Sort shortcuts group"
+  },
+  "marketplace_shortcutsSortHint": {
+    "message": "apăsați din nou pentru a comuta direcția",
+    "description": "Sort toggle hint"
+  },
+  "marketplace_shortcutsByRating": {
+    "message": "După evaluare",
+    "description": "Sort by rating shortcut"
+  },
+  "marketplace_shortcutsByDownloads": {
+    "message": "După descărcări",
+    "description": "Sort by downloads shortcut"
+  },
+  "marketplace_shortcutsByDate": {
+    "message": "După dată",
+    "description": "Sort by date shortcut"
+  },
+  "marketplace_shortcutsFilters": {
+    "message": "Filtre",
+    "description": "Filters shortcuts group"
+  },
+  "marketplace_shortcutsShowAll": {
+    "message": "Afișează tot",
+    "description": "Show all shortcut"
+  },
+  "marketplace_shortcutsShowInstalled": {
+    "message": "Afișează instalate",
+    "description": "Show installed shortcut"
+  },
+  "marketplace_shortcutsShowNotInstalled": {
+    "message": "Afișează neinstalate",
+    "description": "Show not installed shortcut"
+  },
+  "marketplace_shortcutsToggleShaders": {
+    "message": "Comută shaderele",
+    "description": "Toggle shaders shortcut"
+  },
+  "marketplace_shortcutsToggleCompatible": {
+    "message": "Comută compatibile",
+    "description": "Toggle compatible shortcut"
+  },
+  "marketplace_shortcutsDetails": {
+    "message": "Detalii Temă",
+    "description": "Theme details shortcuts group"
+  },
+  "marketplace_shortcutsInstallRemove": {
+    "message": "Instalează / Șterge",
+    "description": "Install/remove shortcut"
+  },
+  "marketplace_shortcutsPrevImage": {
+    "message": "Imaginea anterioară",
+    "description": "Previous image shortcut"
+  },
+  "marketplace_shortcutsNextImage": {
+    "message": "Imaginea următoare",
+    "description": "Next image shortcut"
+  },
+  "marketplace_shortcutsGeneral": {
+    "message": "General",
+    "description": "General shortcuts group"
+  },
+  "marketplace_shortcutsCloseModal": {
+    "message": "Închide fereastra",
+    "description": "Close modal shortcut"
+  },
+  "marketplace_shortcutsShowShortcuts": {
+    "message": "Afișare scurtături",
+    "description": "Show shortcuts shortcut"
+  },
+  "marketplace_shortcutsApplyTheme": {
+    "message": "Aplică tema (după instalare)",
+    "description": "Apply theme shortcut"
+  },
+  "marketplace_ratingFailed": {
+    "message": "Trimiterea evaluării a eșuat",
+    "description": "Rating submission error"
+  },
+  "marketplace_shaderFetchFailed": {
+    "message": "Nu s-a reușit preluarea configurației shaderului",
+    "description": "Shader fetch error"
+  },
+  "marketplace_applyFailed": {
+    "message": "Nu s-a putut aplica tema",
+    "description": "Theme apply error"
+  },
+  "marketplace_noThemesInstalled": {
+    "message": "Nicio temă instalată încă",
+    "description": "Empty installed themes message"
+  },
+  "editor_pageTitle": {
+    "message": "Better Lyrics CSS Editor",
+    "description": "Standalone editor page title"
+  },
+  "editor_importFromFile": {
+    "message": "Importați din fișier",
+    "description": "Import from file button"
+  },
+  "editor_exportToFile": {
+    "message": "Exportați în fișier",
+    "description": "Export to file button"
+  },
+  "editor_saveAsTheme": {
+    "message": "Salvați ca temă",
+    "description": "Save as theme button"
+  },
+  "editor_stylingGuide": {
+    "message": "Ghid de stilizare",
+    "description": "Styling guide button"
+  },
+  "editor_tip": {
+    "message": "Sfat: Aceasta este o filă de sine stătătoare, poți muta acest editor într-o fereastră separată sau utiliza vizualizarea split-screen alături de YouTube Music pentru a-ți vedea modificările în timp real. Pentru mai multe informații, vizitați",
+    "description": "Editor tip text"
+  },
+  "editor_poweredBy": {
+    "message": "Dezvoltat cu",
+    "description": "Powered by label"
+  },
+  "editor_playground": {
+    "message": "Spațiu de încercare",
+    "description": "Playground link text"
+  },
+  "editor_docs": {
+    "message": "Documentație",
+    "description": "Docs link text"
+  },
+  "lyrics_source": {
+    "message": "Sursă: ",
+    "description": "Lyrics source label"
+  },
+  "lyrics_addToLrclib": {
+    "message": "Adaugă versuri la LRCLib",
+    "description": "Add lyrics button text"
+  },
+  "lyrics_searchOnGenius": {
+    "message": "Caută pe Genius",
+    "description": "Search on Genius button text"
+  },
+  "lyrics_searching": {
+    "message": "Better Lyrics caută versuri...",
+    "description": "Loading message while searching for lyrics"
+  },
+  "lyrics_stillSearching": {
+    "message": "Încă se caută versuri sincronizate...",
+    "description": "Loading message while still searching"
+  },
+  "lyrics_noSyncedLyrics": {
+    "message": "Better Lyrics nu a putut găsi versuri sincronizate",
+    "description": "Message when no synced lyrics found"
+  },
+  "lyrics_adPlaying": {
+    "message": "[muzică de lift]",
+    "description": "Message shown during ad playback"
+  },
+  "lyrics_notFound": {
+    "message": "Nu s-au găsit versuri pentru această melodie",
+    "description": "Message when no lyrics are available"
+  }
+}
