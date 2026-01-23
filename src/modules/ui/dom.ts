@@ -525,7 +525,10 @@ export function addAlbumArtToLayout(videoId: string): void {
   if (!videoId) return;
 
   const injectAlbumArtFn = (resize: boolean) => {
-    const albumArt = document.querySelector(SONG_IMAGE_SELECTOR) as HTMLImageElement;
+    const albumArt = document.querySelector(SONG_IMAGE_SELECTOR) as HTMLImageElement | undefined;
+    if (!albumArt) {
+      return;
+    }
     const origSrc = albumArt.src;
 
     if (lastAlbumSetSource !== null && origSrc !== lastAlbumSetSource) {
@@ -554,7 +557,6 @@ export function addAlbumArtToLayout(videoId: string): void {
 
       img.onload = () => {
         lastAlbumSetSource = newSrc;
-        console.log(newSrc);
         albumArt.src = newSrc;
         injectAlbumArt(newSrc);
       };
@@ -597,10 +599,11 @@ export function injectAlbumArt(src: string): void {
  * Removes album art from layout and disconnects observers.
  */
 export function removeAlbumArtFromLayout(): void {
-  if (backgroundChangeObserver) {
-    backgroundChangeObserver.disconnect();
+    backgroundChangeObserver?.disconnect();
+    backgroundResizeObserver?.disconnect()
     backgroundChangeObserver = null;
-  }
+    backgroundResizeObserver = null;
+
 
   const layout = document.getElementById("layout");
   if (layout) {
