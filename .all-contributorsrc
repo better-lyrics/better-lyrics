@@ -133,6 +133,15 @@
       "contributions": [
         "code"
       ]
+    },
+    {
+      "login": "ShuiGuiPoppy",
+      "name": "ShuiGuiPoppy",
+      "avatar_url": "https://avatars.githubusercontent.com/u/219837672?v=4",
+      "profile": "https://github.com/ShuiGuiPoppy",
+      "contributions": [
+        "code"
+      ]
     }
   ],
   "badgeTemplate": "<img src=\"https://img.shields.io/badge/all_contributors-<%= contributors.length %>-orange.svg\" alt=\"\"/>",
