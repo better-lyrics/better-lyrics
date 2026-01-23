@@ -599,11 +599,10 @@ export function injectAlbumArt(src: string): void {
  * Removes album art from layout and disconnects observers.
  */
 export function removeAlbumArtFromLayout(): void {
-    backgroundChangeObserver?.disconnect();
-    backgroundResizeObserver?.disconnect()
-    backgroundChangeObserver = null;
-    backgroundResizeObserver = null;
-
+  backgroundChangeObserver?.disconnect();
+  backgroundResizeObserver?.disconnect();
+  backgroundChangeObserver = null;
+  backgroundResizeObserver = null;
 
   const layout = document.getElementById("layout");
   if (layout) {
