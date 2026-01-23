@@ -27,12 +27,12 @@ import {
 } from "./ui/dom";
 import { showAlert, showModal } from "./ui/feedback";
 
-export function initializeNavigation() {
+function initializeNavigation() {
   document.getElementById("edit-css-btn")?.addEventListener("click", openEditCSS);
   document.getElementById("back-btn")?.addEventListener("click", openOptions);
 }
 
-export function initializeEditorKeyboardShortcuts() {
+function initializeEditorKeyboardShortcuts() {
   const editorElement = document.getElementById("editor");
   if (!editorElement) return;
 
@@ -81,7 +81,7 @@ export function initializeEditorKeyboardShortcuts() {
   });
 }
 
-export function initializeThemeModal() {
+function initializeThemeModal() {
   themeSelectorBtn?.addEventListener("click", openThemeModal);
 
   themeModalClose?.addEventListener("click", closeThemeModal);
@@ -99,7 +99,7 @@ export function initializeThemeModal() {
   });
 }
 
-export function initializeThemeActions() {
+function initializeThemeActions() {
   document.getElementById("save-theme-btn")?.addEventListener("click", handleSaveTheme);
 
   deleteThemeBtn?.addEventListener("click", handleDeleteTheme);
@@ -108,7 +108,7 @@ export function initializeThemeActions() {
   themeNameText?.addEventListener("click", handleRenameTheme);
 }
 
-export function initializeFileOperations() {
+function initializeFileOperations() {
   document.getElementById("file-import-btn")?.addEventListener("click", () => {
     const input = document.createElement("input");
     input.type = "file";
@@ -144,11 +144,11 @@ export function initializeFileOperations() {
   });
 }
 
-export function initializeStorageListeners() {
+function initializeStorageListeners() {
   storageManager.initialize();
 }
 
-export async function initializeEditor() {
+async function initializeEditor() {
   console.log(LOG_PREFIX_EDITOR, "DOM loaded, initializing editor");
 
   const editorElement = document.getElementById("editor")!;

@@ -1,0 +1,23 @@
+{
+  "$schema": "https://unpkg.com/knip@5/schema.json",
+  "entry": [
+    "src/index.ts",
+    "src/options/background.ts",
+    "src/options/options.ts",
+    "src/options/editor.ts",
+    "src/options/marketplace.ts",
+    "public/earlyInject.js",
+    "public/script.js"
+  ],
+  "project": ["src/**/*.ts", "public/**/*.js"],
+  "ignore": ["src/types/**"],
+  "ignoreDependencies": [
+    "@codemirror/language",
+    "@types/chrome",
+    "@typescript/lib-dom"
+  ],
+  "ignoreIssues": {
+    "src/modules/lyrics/providers/blyrics/blyrics-types.ts": ["exports", "types"]
+  },
+  "includeEntryExports": true
+}

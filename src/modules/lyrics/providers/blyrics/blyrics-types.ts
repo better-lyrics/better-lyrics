@@ -78,7 +78,7 @@ interface DivAttributes {
 /**
  * Represents a <div> element, which contains paragraphs.
  */
-export interface DivElement {
+interface DivElement {
   p: ParagraphElementOrBackground[];
   ":@": DivAttributes;
 }
@@ -175,7 +175,7 @@ interface AgentAttributes {
 /**
  * Represents a <ttm:agent> element.
  */
-export interface AgentElement {
+interface _AgentElement {
   name?: AgentName[];
   ":@": AgentAttributes;
 }
@@ -226,7 +226,7 @@ export type TtmlRoot = TtmlRootObject[];
 // Friendly Types
 
 /** A single, timed element. This can be a word, a syllable, or a space. */
-export interface CleanWord {
+interface CleanWord {
   begin: number;
   end: number;
   text: string;
@@ -234,7 +234,7 @@ export interface CleanWord {
 }
 
 /** A single line of lyrics */
-export interface CleanLine {
+interface CleanLine {
   key: string;
   begin: number;
   end: number;
@@ -243,7 +243,7 @@ export interface CleanLine {
 }
 
 /** A section of the song (e.g., "Verse", "Chorus") */
-export interface CleanSection {
+interface CleanSection {
   begin: number;
   end: number;
   songPart: string;
@@ -251,7 +251,7 @@ export interface CleanSection {
 }
 
 /** The root object containing all processed lyric data */
-export interface CleanTtml {
+interface _CleanTtml {
   timing: "Line" | "Word";
   lang: string;
   duration: number;

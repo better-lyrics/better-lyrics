@@ -90,7 +90,7 @@ export function onAlbumArtEnabled(enableAlbumArt: EnableDisableCallback, disable
   });
 }
 
-export function onStylizedAnimationsEnabled(
+function onStylizedAnimationsEnabled(
   enableAnimations: EnableDisableCallback,
   disableAnimations: EnableDisableCallback
 ): void {
@@ -103,7 +103,7 @@ export function onStylizedAnimationsEnabled(
   });
 }
 
-export function onAutoHideCursor(
+function onAutoHideCursor(
   enableCursorAutoHide: EnableDisableCallback,
   disableCursorAutoHide: EnableDisableCallback
 ): void {

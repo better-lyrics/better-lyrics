@@ -2,7 +2,7 @@ import { GENERAL_ERROR_LOG, LOG_PREFIX } from "@constants";
 import { decompressString, isCompressed } from "@core/compression";
 import { compileRicsToStyles, getLocalStorage, getSyncStorage, loadChunkedStyles } from "@core/storage";
 import { log } from "@utils";
-import { cachedDurations, cachedProperties } from "./animationEngine";
+import { cachedDurations } from "./animationEngine";
 import { setThemeSettings } from "@modules/settings/themeOptions";
 
 let hasSubscribedToStyles = false;
@@ -43,7 +43,6 @@ export function applyCustomStyles(css: string): void {
     document.head.appendChild(styleTag);
   }
   cachedDurations.clear();
-  cachedProperties.clear();
 }
 
 interface CSSStorageData {

@@ -13,23 +13,23 @@ export interface Contents {
   readonly singleColumnMusicWatchNextResultsRenderer: SingleColumnMusicWatchNextResultsRenderer;
 }
 
-export interface SingleColumnMusicWatchNextResultsRenderer {
+interface SingleColumnMusicWatchNextResultsRenderer {
   readonly tabbedRenderer: TabbedRenderer;
 }
 
-export interface TabbedRenderer {
+interface TabbedRenderer {
   readonly watchNextTabbedResultsRenderer: WatchNextTabbedResultsRenderer;
 }
 
-export interface WatchNextTabbedResultsRenderer {
+interface WatchNextTabbedResultsRenderer {
   readonly tabs: Tab[];
 }
 
-export interface Tab {
+interface Tab {
   readonly tabRenderer: TabRenderer;
 }
 
-export interface TabRenderer {
+interface TabRenderer {
   readonly title: TitleEnum;
   readonly content?: TabRendererContent;
   readonly trackingParams: string;
@@ -37,22 +37,22 @@ export interface TabRenderer {
   readonly unselectable?: boolean;
 }
 
-export interface TabRendererContent {
+interface TabRendererContent {
   readonly musicQueueRenderer: MusicQueueRenderer;
 }
 
-export interface MusicQueueRenderer {
+interface MusicQueueRenderer {
   readonly hack: boolean;
   readonly content?: MusicQueueRendererContent;
   readonly header?: Header;
   readonly subHeaderChipCloud?: SubHeaderChipCloud;
 }
 
-export interface MusicQueueRendererContent {
+interface MusicQueueRendererContent {
   readonly playlistPanelRenderer: PlaylistPanelRenderer;
 }
 
-export interface PlaylistPanelRenderer {
+interface PlaylistPanelRenderer {
   readonly contents: PlaylistPanelRendererContent[];
   readonly playlistId?: PlaylistID;
   readonly isInfinite: boolean;
@@ -62,39 +62,39 @@ export interface PlaylistPanelRenderer {
   readonly shuffleToggleButton: PlaylistPanelRendererShuffleToggleButton;
 }
 
-export interface PlaylistPanelRendererContent {
+interface PlaylistPanelRendererContent {
   readonly playlistPanelVideoWrapperRenderer?: PurplePlaylistPanelVideoWrapperRenderer;
   readonly playlistPanelVideoRenderer?: ContentPlaylistPanelVideoRenderer;
   readonly automixPreviewVideoRenderer?: AutomixPreviewVideoRenderer;
 }
 
-export interface AutomixPreviewVideoRenderer {
+interface AutomixPreviewVideoRenderer {
   readonly content: AutomixPreviewVideoRendererContent;
 }
 
-export interface AutomixPreviewVideoRendererContent {
+interface AutomixPreviewVideoRendererContent {
   readonly automixPlaylistVideoRenderer: AutomixPlaylistVideoRenderer;
 }
 
-export interface AutomixPlaylistVideoRenderer {
+interface AutomixPlaylistVideoRenderer {
   readonly navigationEndpoint: DefaultServiceEndpointClass;
   readonly trackingParams: string;
   readonly automixMode: string;
 }
 
-export interface DefaultServiceEndpointClass {
+interface DefaultServiceEndpointClass {
   readonly clickTrackingParams: string;
   readonly watchPlaylistEndpoint: WatchPlaylistEndpoint;
 }
 
-export interface WatchPlaylistEndpoint {
+interface WatchPlaylistEndpoint {
   readonly playlistId: PlaylistID;
   readonly params: string;
 }
 
-export type PlaylistID = string;
+type PlaylistID = string;
 
-export interface ContentPlaylistPanelVideoRenderer {
+interface ContentPlaylistPanelVideoRenderer {
   readonly title: TitleClass;
   readonly longBylineText: LongBylineText;
   readonly thumbnail: ThumbnailDetailsClass;
@@ -112,29 +112,29 @@ export interface ContentPlaylistPanelVideoRenderer {
   readonly badges?: Badge[];
 }
 
-export interface Badge {
+interface Badge {
   readonly musicInlineBadgeRenderer: MusicInlineBadgeRenderer;
 }
 
-export interface MusicInlineBadgeRenderer {
+interface MusicInlineBadgeRenderer {
   readonly trackingParams: string;
   readonly icon: Icon;
   readonly accessibilityData: Accessibility;
 }
 
-export interface Accessibility {
+interface Accessibility {
   readonly accessibilityData: AccessibilityData;
 }
 
-export interface AccessibilityData {
+interface AccessibilityData {
   readonly label: string;
 }
 
-export interface Icon {
+interface Icon {
   readonly iconType: IconType;
 }
 
-export type IconType =
+type IconType =
   | "MUSIC_EXPLICIT_BADGE"
   | "MIX"
   | "ADD_TO_PLAYLIST"
@@ -155,12 +155,12 @@ export type IconType =
   | "KEEP_OFF"
   | "MUSIC_SHUFFLE";
 
-export interface LengthText {
+interface LengthText {
   readonly runs: LengthTextRun[];
   readonly accessibility: Accessibility;
 }
 
-export interface LengthTextRun {
+interface LengthTextRun {
   readonly text: string;
 }
 
@@ -173,49 +173,49 @@ export interface PurpleRun {
   readonly navigationEndpoint?: Endpoint;
 }
 
-export interface Endpoint {
+interface Endpoint {
   readonly clickTrackingParams: string;
   readonly browseEndpoint: BrowseEndpoint;
 }
 
-export interface BrowseEndpoint {
+interface BrowseEndpoint {
   readonly browseId: string;
   readonly browseEndpointContextSupportedConfigs: BrowseEndpointContextSupportedConfigs;
 }
 
-export interface BrowseEndpointContextSupportedConfigs {
+interface BrowseEndpointContextSupportedConfigs {
   readonly browseEndpointContextMusicConfig: BrowseEndpointContextMusicConfig;
 }
 
-export interface BrowseEndpointContextMusicConfig {
+interface BrowseEndpointContextMusicConfig {
   readonly pageType: PageType;
 }
 
-export type PageType =
+type PageType =
   | "MUSIC_PAGE_TYPE_ARTIST"
   | "MUSIC_PAGE_TYPE_ALBUM"
   | "MUSIC_PAGE_TYPE_TRACK_CREDITS"
   | "MUSIC_PAGE_TYPE_TRACK_LYRICS"
   | "MUSIC_PAGE_TYPE_TRACK_RELATED";
 
-export interface PurpleMenu {
+interface PurpleMenu {
   readonly menuRenderer: PurpleMenuRenderer;
 }
 
-export interface PurpleMenuRenderer {
+interface PurpleMenuRenderer {
   readonly items: PurpleItem[];
   readonly trackingParams: string;
   readonly accessibility: Accessibility;
 }
 
-export interface PurpleItem {
+interface PurpleItem {
   readonly menuNavigationItemRenderer?: MenuItemRenderer;
   readonly menuServiceItemRenderer?: MenuItemRenderer;
   readonly toggleMenuServiceItemRenderer?: PurpleToggleMenuServiceItemRenderer;
   readonly menuServiceItemDownloadRenderer?: MenuServiceItemDownloadRenderer;
 }
 
-export interface MenuItemRenderer {
+interface MenuItemRenderer {
   readonly text: TitleClass;
   readonly icon: Icon;
   readonly navigationEndpoint?: MenuNavigationItemRendererNavigationEndpoint;
@@ -223,7 +223,7 @@ export interface MenuItemRenderer {
   readonly serviceEndpoint?: MenuNavigationItemRendererServiceEndpoint;
 }
 
-export interface MenuNavigationItemRendererNavigationEndpoint {
+interface MenuNavigationItemRendererNavigationEndpoint {
   readonly clickTrackingParams: string;
   readonly watchEndpoint?: PurpleWatchEndpoint;
   readonly addToPlaylistEndpoint?: Target;
@@ -231,18 +231,18 @@ export interface MenuNavigationItemRendererNavigationEndpoint {
   readonly shareEntityEndpoint?: ShareEntityEndpoint;
 }
 
-export interface Target {
+interface Target {
   readonly videoId: string;
 }
 
-export interface ShareEntityEndpoint {
+interface ShareEntityEndpoint {
   readonly serializedShareEntity: string;
   readonly sharePanelType: SharePanelType;
 }
 
-export type SharePanelType = "SHARE_PANEL_TYPE_UNIFIED_SHARE_PANEL";
+type SharePanelType = "SHARE_PANEL_TYPE_UNIFIED_SHARE_PANEL";
 
-export interface PurpleWatchEndpoint {
+interface PurpleWatchEndpoint {
   readonly videoId: string;
   readonly playlistId: string;
   readonly params: WatchEndpointParams;
@@ -251,29 +251,29 @@ export interface PurpleWatchEndpoint {
   readonly playerParams?: PlayerParams;
 }
 
-export interface LoggingContext {
+interface LoggingContext {
   readonly vssLoggingContext: VssLoggingContext;
 }
 
-export interface VssLoggingContext {
+interface VssLoggingContext {
   readonly serializedContextData: string;
 }
 
-export type WatchEndpointParams = "wAEB";
+type WatchEndpointParams = "wAEB";
 
-export type PlayerParams = "0gcJCZoAzrrq_1rT";
+type PlayerParams = "0gcJCZoAzrrq_1rT";
 
-export interface PurpleWatchEndpointMusicSupportedConfigs {
+interface PurpleWatchEndpointMusicSupportedConfigs {
   readonly watchEndpointMusicConfig: PurpleWatchEndpointMusicConfig;
 }
 
-export interface PurpleWatchEndpointMusicConfig {
+interface PurpleWatchEndpointMusicConfig {
   readonly musicVideoType: MusicVideoType;
 }
 
-export type MusicVideoType = "MUSIC_VIDEO_TYPE_ATV" | "MUSIC_VIDEO_TYPE_OMV";
+type MusicVideoType = "MUSIC_VIDEO_TYPE_ATV" | "MUSIC_VIDEO_TYPE_OMV";
 
-export interface MenuNavigationItemRendererServiceEndpoint {
+interface MenuNavigationItemRendererServiceEndpoint {
   readonly clickTrackingParams: string;
   readonly queueAddEndpoint?: ServiceEndpointQueueAddEndpoint;
   readonly removeFromQueueEndpoint?: RemoveFromQueueEndpoint;
@@ -281,98 +281,98 @@ export interface MenuNavigationItemRendererServiceEndpoint {
   readonly deletePlaylistEndpoint?: DeletePlaylistEndpoint;
 }
 
-export interface DeletePlaylistEndpoint {
+interface DeletePlaylistEndpoint {
   readonly playlistId: BackingQueuePlaylistIDEnum;
   readonly command: DeletePlaylistEndpointCommand;
 }
 
-export interface DeletePlaylistEndpointCommand {
+interface DeletePlaylistEndpointCommand {
   readonly clickTrackingParams: string;
   readonly dismissQueueCommand: Command;
 }
 
-export interface Command {}
+interface Command {}
 
-export type BackingQueuePlaylistIDEnum = string;
+type BackingQueuePlaylistIDEnum = string;
 
-export interface GetReportFormEndpoint {
+interface GetReportFormEndpoint {
   readonly params: string;
 }
 
-export interface ServiceEndpointQueueAddEndpoint {
+interface ServiceEndpointQueueAddEndpoint {
   readonly queueTarget: PurpleQueueTarget;
   readonly queueInsertPosition: QueueInsertPosition;
   readonly commands: CommandElement[];
 }
 
-export interface CommandElement {
+interface CommandElement {
   readonly clickTrackingParams: string;
   readonly addToToastAction: AddToToastAction;
 }
 
-export interface AddToToastAction {
+interface AddToToastAction {
   readonly item: AddToToastActionItem;
 }
 
-export interface AddToToastActionItem {
+interface AddToToastActionItem {
   readonly notificationTextRenderer: NotificationTextRenderer;
 }
 
-export interface NotificationTextRenderer {
+interface NotificationTextRenderer {
   readonly successResponseText: TitleClass;
   readonly trackingParams: string;
 }
 
-export interface TitleClass {
+interface TitleClass {
   readonly runs: LengthTextRun[];
 }
 
-export type QueueInsertPosition = "INSERT_AFTER_CURRENT_VIDEO" | "INSERT_AT_END";
+type QueueInsertPosition = "INSERT_AFTER_CURRENT_VIDEO" | "INSERT_AT_END";
 
-export interface PurpleQueueTarget {
+interface PurpleQueueTarget {
   readonly videoId: string;
   readonly onEmptyQueue: OnEmptyQueue;
   readonly backingQueuePlaylistId?: BackingQueuePlaylistIDEnum;
 }
 
-export interface OnEmptyQueue {
+interface OnEmptyQueue {
   readonly clickTrackingParams: string;
   readonly watchEndpoint: Target;
 }
 
-export interface RemoveFromQueueEndpoint {
+interface RemoveFromQueueEndpoint {
   readonly videoId: string;
   readonly commands: CommandElement[];
 }
 
-export interface MenuServiceItemDownloadRenderer {
+interface MenuServiceItemDownloadRenderer {
   readonly serviceEndpoint: MenuServiceItemDownloadRendererServiceEndpoint;
   readonly trackingParams: string;
 }
 
-export interface MenuServiceItemDownloadRendererServiceEndpoint {
+interface MenuServiceItemDownloadRendererServiceEndpoint {
   readonly clickTrackingParams: string;
   readonly offlineVideoEndpoint: OfflineVideoEndpoint;
 }
 
-export interface OfflineVideoEndpoint {
+interface OfflineVideoEndpoint {
   readonly videoId: string;
   readonly onAddCommand: OnAddCommand;
 }
 
-export interface OnAddCommand {
+interface OnAddCommand {
   readonly clickTrackingParams: string;
   readonly getDownloadActionCommand: GetDownloadActionCommand;
 }
 
-export interface GetDownloadActionCommand {
+interface GetDownloadActionCommand {
   readonly videoId: string;
   readonly params: GetDownloadActionCommandParams;
 }
 
-export type GetDownloadActionCommandParams = "CAI%3D";
+type GetDownloadActionCommandParams = "CAI%3D";
 
-export interface PurpleToggleMenuServiceItemRenderer {
+interface PurpleToggleMenuServiceItemRenderer {
   readonly defaultText: TitleClass;
   readonly defaultIcon: Icon;
   readonly defaultServiceEndpoint: PurpleServiceEndpoint;
@@ -382,17 +382,17 @@ export interface PurpleToggleMenuServiceItemRenderer {
   readonly trackingParams: string;
 }
 
-export interface PurpleServiceEndpoint {
+interface PurpleServiceEndpoint {
   readonly clickTrackingParams: string;
   readonly feedbackEndpoint?: FeedbackEndpoint;
   readonly likeEndpoint?: LikeEndpoint;
 }
 
-export interface FeedbackEndpoint {
+interface FeedbackEndpoint {
   readonly feedbackToken: string;
 }
 
-export interface LikeEndpoint {
+interface LikeEndpoint {
   readonly status: Status;
   readonly target: Target;
   readonly actions?: LikeEndpointAction[];
@@ -401,28 +401,28 @@ export interface LikeEndpoint {
   readonly dislikeParams?: LikeParams;
 }
 
-export interface LikeEndpointAction {
+interface LikeEndpointAction {
   readonly clickTrackingParams: string;
   readonly musicLibraryStatusUpdateCommand: MusicLibraryStatusUpdateCommand;
 }
 
-export interface MusicLibraryStatusUpdateCommand {
+interface MusicLibraryStatusUpdateCommand {
   readonly libraryStatus: LibraryStatus;
   readonly addToLibraryFeedbackToken: string;
 }
 
-export type LibraryStatus = "MUSIC_LIBRARY_STATUS_IN_LIBRARY";
+type LibraryStatus = "MUSIC_LIBRARY_STATUS_IN_LIBRARY";
 
-export type LikeParams = "OAI%3D";
+type LikeParams = "OAI%3D";
 
-export type Status = "LIKE" | "INDIFFERENT" | "DISLIKE";
+type Status = "LIKE" | "INDIFFERENT" | "DISLIKE";
 
 export interface CurrentVideoEndpointClass {
   readonly clickTrackingParams: string;
   readonly watchEndpoint: CurrentVideoEndpointWatchEndpoint;
 }
 
-export interface CurrentVideoEndpointWatchEndpoint {
+interface CurrentVideoEndpointWatchEndpoint {
   readonly videoId: string;
   readonly playlistId?: PlaylistID;
   readonly index?: number;
@@ -434,60 +434,60 @@ export interface CurrentVideoEndpointWatchEndpoint {
   readonly ustreamerConfig?: string;
 }
 
-export interface FluffyWatchEndpointMusicSupportedConfigs {
+interface FluffyWatchEndpointMusicSupportedConfigs {
   readonly watchEndpointMusicConfig: FluffyWatchEndpointMusicConfig;
 }
 
-export interface FluffyWatchEndpointMusicConfig {
+interface FluffyWatchEndpointMusicConfig {
   readonly hasPersistentPlaylistPanel: boolean;
   readonly musicVideoType: MusicVideoType;
 }
 
-export type PlaylistEditParams = string;
+type PlaylistEditParams = string;
 
-export interface PurpleQueueNavigationEndpoint {
+interface PurpleQueueNavigationEndpoint {
   readonly clickTrackingParams: string;
   readonly queueAddEndpoint: PurpleQueueAddEndpoint;
 }
 
-export interface PurpleQueueAddEndpoint {
+interface PurpleQueueAddEndpoint {
   readonly queueTarget: FluffyQueueTarget;
   readonly queueInsertPosition: QueueInsertPosition;
   readonly params: QueueAddEndpointParams;
 }
 
-export type QueueAddEndpointParams = "Q0FJJTNE";
+type QueueAddEndpointParams = "Q0FJJTNE";
 
-export interface FluffyQueueTarget {
+interface FluffyQueueTarget {
   readonly videoId: string;
   readonly backingQueuePlaylistId: BackingQueuePlaylistIDEnum;
 }
 
-export interface ThumbnailDetailsClass {
+interface ThumbnailDetailsClass {
   readonly thumbnails: ThumbnailElement[];
 }
 
-export interface ThumbnailElement {
+interface ThumbnailElement {
   readonly url: string;
   readonly width: number;
   readonly height: number;
 }
 
-export interface PurplePlaylistPanelVideoWrapperRenderer {
+interface PurplePlaylistPanelVideoWrapperRenderer {
   readonly primaryRenderer: PrimaryRenderer;
   readonly counterpart: PurpleCounterpart[];
 }
 
-export interface PurpleCounterpart {
+interface PurpleCounterpart {
   readonly counterpartRenderer: PurpleCounterpartRenderer;
   readonly segmentMap: SegmentMap;
 }
 
-export interface PurpleCounterpartRenderer {
+interface PurpleCounterpartRenderer {
   readonly playlistPanelVideoRenderer: PurplePlaylistPanelVideoRenderer;
 }
 
-export interface PurplePlaylistPanelVideoRenderer {
+interface PurplePlaylistPanelVideoRenderer {
   readonly title: TitleClass;
   readonly longBylineText: LongBylineText;
   readonly thumbnail: ThumbnailDetailsClass;
@@ -504,45 +504,45 @@ export interface PurplePlaylistPanelVideoRenderer {
   readonly queueNavigationEndpoint: FluffyQueueNavigationEndpoint;
 }
 
-export interface FluffyQueueNavigationEndpoint {
+interface FluffyQueueNavigationEndpoint {
   readonly clickTrackingParams: string;
   readonly queueAddEndpoint: FluffyQueueAddEndpoint;
 }
 
-export interface FluffyQueueAddEndpoint {
+interface FluffyQueueAddEndpoint {
   readonly queueTarget: Target;
   readonly queueInsertPosition: QueueInsertPosition;
   readonly params: QueueAddEndpointParams;
 }
 
-export interface SegmentMap {
+interface SegmentMap {
   readonly segment?: Segment[];
 }
 
-export interface Segment {
+interface Segment {
   readonly primaryVideoStartTimeMilliseconds: string;
   readonly counterpartVideoStartTimeMilliseconds: string;
   readonly durationMilliseconds: string;
 }
 
-export interface PrimaryRenderer {
+interface PrimaryRenderer {
   readonly playlistPanelVideoRenderer: ContentPlaylistPanelVideoRenderer;
 }
 
-export interface Continuation {
+interface Continuation {
   readonly nextRadioContinuationData: NextRadioContinuationData;
 }
 
-export interface NextRadioContinuationData {
+interface NextRadioContinuationData {
   readonly continuation: string;
   readonly clickTrackingParams: string;
 }
 
-export interface PlaylistPanelRendererShuffleToggleButton {
+interface PlaylistPanelRendererShuffleToggleButton {
   readonly toggleButtonRenderer: PurpleToggleButtonRenderer;
 }
 
-export interface PurpleToggleButtonRenderer {
+interface PurpleToggleButtonRenderer {
   readonly defaultIcon: Icon;
   readonly defaultServiceEndpoint: ToggleButtonRendererDefaultServiceEndpoint;
   readonly toggledIcon: Icon;
@@ -550,35 +550,35 @@ export interface PurpleToggleButtonRenderer {
   readonly trackingParams: string;
 }
 
-export interface ToggleButtonRendererDefaultServiceEndpoint {
+interface ToggleButtonRendererDefaultServiceEndpoint {
   readonly clickTrackingParams: string;
   readonly watchPlaylistEndpoint?: WatchPlaylistEndpoint;
   readonly watchEndpoint?: DefaultServiceEndpointWatchEndpoint;
 }
 
-export interface DefaultServiceEndpointWatchEndpoint {
+interface DefaultServiceEndpointWatchEndpoint {
   readonly playlistId: string;
   readonly params: string;
   readonly playerParams?: string;
   readonly loggingContext: LoggingContext;
 }
 
-export interface Header {
+interface Header {
   readonly musicQueueHeaderRenderer: MusicQueueHeaderRenderer;
 }
 
-export interface MusicQueueHeaderRenderer {
+interface MusicQueueHeaderRenderer {
   readonly title: TitleClass;
   readonly subtitle: TitleClass;
   readonly buttons: Button[];
   readonly trackingParams: string;
 }
 
-export interface Button {
+interface Button {
   readonly chipCloudChipRenderer: ButtonChipCloudChipRenderer;
 }
 
-export interface ButtonChipCloudChipRenderer {
+interface ButtonChipCloudChipRenderer {
   readonly style: StyleClass;
   readonly text: TitleClass;
   readonly navigationEndpoint: PurpleNavigationEndpoint;
@@ -589,30 +589,30 @@ export interface ButtonChipCloudChipRenderer {
   readonly uniqueId: string;
 }
 
-export interface PurpleNavigationEndpoint {
+interface PurpleNavigationEndpoint {
   readonly clickTrackingParams: string;
   readonly saveQueueToPlaylistCommand: Command;
 }
 
-export interface StyleClass {
+interface StyleClass {
   readonly styleType: string;
 }
 
-export interface SubHeaderChipCloud {
+interface SubHeaderChipCloud {
   readonly chipCloudRenderer: ChipCloudRenderer;
 }
 
-export interface ChipCloudRenderer {
+interface ChipCloudRenderer {
   readonly chips: Chip[];
   readonly trackingParams: string;
   readonly selectionBehavior: string;
 }
 
-export interface Chip {
+interface Chip {
   readonly chipCloudChipRenderer: ChipChipCloudChipRenderer;
 }
 
-export interface ChipChipCloudChipRenderer {
+interface ChipChipCloudChipRenderer {
   readonly text: TitleClass;
   readonly navigationEndpoint: FluffyNavigationEndpoint;
   readonly trackingParams: string;
@@ -621,34 +621,34 @@ export interface ChipChipCloudChipRenderer {
   readonly uniqueId: string;
 }
 
-export interface FluffyNavigationEndpoint {
+interface FluffyNavigationEndpoint {
   readonly clickTrackingParams: string;
   readonly queueUpdateCommand: QueueUpdateCommand;
 }
 
-export interface QueueUpdateCommand {
+interface QueueUpdateCommand {
   readonly queueUpdateSection: QueueUpdateSection;
   readonly fetchContentsCommand: FetchContentsCommand;
   readonly dedupeAgainstLocalQueue: boolean;
   readonly syncMode: SyncMode;
 }
 
-export interface FetchContentsCommand {
+interface FetchContentsCommand {
   readonly clickTrackingParams: string;
   readonly watchEndpoint: DefaultServiceEndpointWatchEndpoint;
 }
 
-export type QueueUpdateSection = "QUEUE_UPDATE_SECTION_QUEUE" | "QUEUE_UPDATE_SECTION_AUTOPLAY";
+type QueueUpdateSection = "QUEUE_UPDATE_SECTION_QUEUE" | "QUEUE_UPDATE_SECTION_AUTOPLAY";
 
-export type SyncMode = "QUEUE_UPDATE_SYNC_MODE_DEDUPE_AGAINST_LOCAL";
+type SyncMode = "QUEUE_UPDATE_SYNC_MODE_DEDUPE_AGAINST_LOCAL";
 
-export type TitleEnum = "Up next" | "Lyrics" | "Related";
+type TitleEnum = "Up next" | "Lyrics" | "Related";
 
 export interface ContinuationContents {
   readonly playlistPanelContinuation: PlaylistPanelContinuation;
 }
 
-export interface PlaylistPanelContinuation {
+interface PlaylistPanelContinuation {
   readonly contents: PlaylistPanelContinuationContent[];
   readonly playlistId: PlaylistID;
   readonly isInfinite: boolean;
@@ -658,26 +658,26 @@ export interface PlaylistPanelContinuation {
   readonly shuffleToggleButton: PlaylistPanelContinuationShuffleToggleButton;
 }
 
-export interface PlaylistPanelContinuationContent {
+interface PlaylistPanelContinuationContent {
   readonly playlistPanelVideoRenderer?: ContentPlaylistPanelVideoRenderer;
   readonly playlistPanelVideoWrapperRenderer?: FluffyPlaylistPanelVideoWrapperRenderer;
 }
 
-export interface FluffyPlaylistPanelVideoWrapperRenderer {
+interface FluffyPlaylistPanelVideoWrapperRenderer {
   readonly primaryRenderer: PrimaryRenderer;
   readonly counterpart: FluffyCounterpart[];
 }
 
-export interface FluffyCounterpart {
+interface FluffyCounterpart {
   readonly counterpartRenderer: FluffyCounterpartRenderer;
   readonly segmentMap: SegmentMap;
 }
 
-export interface FluffyCounterpartRenderer {
+interface FluffyCounterpartRenderer {
   readonly playlistPanelVideoRenderer: FluffyPlaylistPanelVideoRenderer;
 }
 
-export interface FluffyPlaylistPanelVideoRenderer {
+interface FluffyPlaylistPanelVideoRenderer {
   readonly title: TitleClass;
   readonly longBylineText: TitleClass;
   readonly thumbnail: ThumbnailDetailsClass;
@@ -694,24 +694,24 @@ export interface FluffyPlaylistPanelVideoRenderer {
   readonly queueNavigationEndpoint: FluffyQueueNavigationEndpoint;
 }
 
-export interface FluffyMenu {
+interface FluffyMenu {
   readonly menuRenderer: FluffyMenuRenderer;
 }
 
-export interface FluffyMenuRenderer {
+interface FluffyMenuRenderer {
   readonly items: FluffyItem[];
   readonly trackingParams: string;
   readonly accessibility: Accessibility;
 }
 
-export interface FluffyItem {
+interface FluffyItem {
   readonly menuNavigationItemRenderer?: MenuItemRenderer;
   readonly menuServiceItemRenderer?: MenuItemRenderer;
   readonly toggleMenuServiceItemRenderer?: FluffyToggleMenuServiceItemRenderer;
   readonly menuServiceItemDownloadRenderer?: MenuServiceItemDownloadRenderer;
 }
 
-export interface FluffyToggleMenuServiceItemRenderer {
+interface FluffyToggleMenuServiceItemRenderer {
   readonly defaultText: TitleClass;
   readonly defaultIcon: Icon;
   readonly defaultServiceEndpoint: ServiceEndpoint;
@@ -721,16 +721,16 @@ export interface FluffyToggleMenuServiceItemRenderer {
   readonly trackingParams: string;
 }
 
-export interface ServiceEndpoint {
+interface ServiceEndpoint {
   readonly clickTrackingParams: string;
   readonly likeEndpoint: LikeEndpoint;
 }
 
-export interface PlaylistPanelContinuationShuffleToggleButton {
+interface PlaylistPanelContinuationShuffleToggleButton {
   readonly toggleButtonRenderer: FluffyToggleButtonRenderer;
 }
 
-export interface FluffyToggleButtonRenderer {
+interface FluffyToggleButtonRenderer {
   readonly defaultIcon: Icon;
   readonly defaultServiceEndpoint: DefaultServiceEndpointClass;
   readonly toggledIcon: Icon;
@@ -742,16 +742,16 @@ export interface PlayerOverlays {
   readonly playerOverlayRenderer: PlayerOverlayRenderer;
 }
 
-export interface PlayerOverlayRenderer {
+interface PlayerOverlayRenderer {
   readonly actions: PlayerOverlayRendererAction[];
   readonly browserMediaSession: BrowserMediaSession;
 }
 
-export interface PlayerOverlayRendererAction {
+interface PlayerOverlayRendererAction {
   readonly likeButtonRenderer: LikeButtonRenderer;
 }
 
-export interface LikeButtonRenderer {
+interface LikeButtonRenderer {
   readonly target: Target;
   readonly likeStatus: Status;
   readonly trackingParams: string;
@@ -759,11 +759,11 @@ export interface LikeButtonRenderer {
   readonly serviceEndpoints: ServiceEndpoint[];
 }
 
-export interface BrowserMediaSession {
+interface BrowserMediaSession {
   readonly browserMediaSessionRenderer: BrowserMediaSessionRenderer;
 }
 
-export interface BrowserMediaSessionRenderer {
+interface BrowserMediaSessionRenderer {
   readonly album?: TitleClass;
   readonly thumbnailDetails: ThumbnailDetailsClass;
 }
@@ -773,36 +773,36 @@ export interface ResponseContext {
   readonly innertubeTokenJar?: InnertubeTokenJar;
 }
 
-export interface InnertubeTokenJar {
+interface InnertubeTokenJar {
   readonly appTokens: AppToken[];
 }
 
-export interface AppToken {
+interface AppToken {
   readonly type: number;
   readonly value: string;
   readonly maxAgeSeconds: number;
   readonly creationTimeUsec: string;
 }
 
-export interface ServiceTrackingParam {
+interface ServiceTrackingParam {
   readonly service: Service;
   readonly params: Param[];
 }
 
-export interface Param {
+interface Param {
   readonly key: Key;
   readonly value: string;
 }
 
-export type Key = "c" | "cver" | "yt_li" | "GetWatchNext_rid" | "logged_in" | "client.version" | "client.name";
+type Key = "c" | "cver" | "yt_li" | "GetWatchNext_rid" | "logged_in" | "client.version" | "client.name";
 
-export type Service = "CSI" | "GFEEDBACK" | "ECATCHER";
+type Service = "CSI" | "GFEEDBACK" | "ECATCHER";
 
 export interface VideoReporting {
   readonly reportFormModalRenderer: ReportFormModalRenderer;
 }
 
-export interface ReportFormModalRenderer {
+interface ReportFormModalRenderer {
   readonly optionsSupportedRenderers: OptionsSupportedRenderers;
   readonly trackingParams: string;
   readonly title: TitleClass;
@@ -811,61 +811,61 @@ export interface ReportFormModalRenderer {
   readonly footer: Footer;
 }
 
-export interface CancelButtonClass {
+interface CancelButtonClass {
   readonly buttonRenderer: ButtonRenderer;
 }
 
-export interface ButtonRenderer {
+interface ButtonRenderer {
   readonly style: StyleEnum;
   readonly isDisabled: boolean;
   readonly text: TitleClass;
   readonly trackingParams: string;
 }
 
-export type StyleEnum = "STYLE_TEXT" | "STYLE_BRAND";
+type StyleEnum = "STYLE_TEXT" | "STYLE_BRAND";
 
-export interface Footer {
+interface Footer {
   readonly runs: FooterRun[];
 }
 
-export interface FooterRun {
+interface FooterRun {
   readonly text: string;
   readonly navigationEndpoint?: RunNavigationEndpoint;
 }
 
-export interface RunNavigationEndpoint {
+interface RunNavigationEndpoint {
   readonly clickTrackingParams: string;
   readonly urlEndpoint: URLEndpoint;
 }
 
-export interface URLEndpoint {
+interface URLEndpoint {
   readonly url: string;
 }
 
-export interface OptionsSupportedRenderers {
+interface OptionsSupportedRenderers {
   readonly optionsRenderer: OptionsRenderer;
 }
 
-export interface OptionsRenderer {
+interface OptionsRenderer {
   readonly items: OptionsRendererItem[];
   readonly trackingParams: string;
 }
 
-export interface OptionsRendererItem {
+interface OptionsRendererItem {
   readonly optionSelectableItemRenderer: OptionSelectableItemRenderer;
 }
 
-export interface OptionSelectableItemRenderer {
+interface OptionSelectableItemRenderer {
   readonly text: TitleClass;
   readonly trackingParams: string;
   readonly submitEndpoint: SubmitEndpoint;
 }
 
-export interface SubmitEndpoint {
+interface SubmitEndpoint {
   readonly clickTrackingParams: string;
   readonly flagEndpoint: FlagEndpoint;
 }
 
-export interface FlagEndpoint {
+interface FlagEndpoint {
   readonly flagAction: string;
 }

@@ -184,7 +184,7 @@ function extractVideoIdFromCacheKey(key: string): string | null {
  *
  * @returns {Promise<{count: number, size: number}>} Cache statistics
  */
-export async function getUpdatedCacheInfo(): Promise<{ count: number; size: number }> {
+async function getUpdatedCacheInfo(): Promise<{ count: number; size: number }> {
   try {
     const result = await chrome.storage.local.get(null);
     const lyricsKeys = Object.keys(result).filter(key => key.startsWith("blyrics_"));

@@ -54,7 +54,7 @@ export const BRACKET_NESTING_LEVELS = 7;
 export const CHUNK_SIZE = 100 * 1024;
 export const LOCAL_STORAGE_SAFE_LIMIT = 500 * 1024;
 
-export const RICS_LINTER_DELAY = 150;
+const RICS_LINTER_DELAY = 150;
 
 export function createEditorState(initialContents: string, options: EditorOptions = {}) {
   const { enableSearch = false } = options;
