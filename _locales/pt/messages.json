@@ -276,7 +276,7 @@
     "description": "Better Lyrics provider name"
   },
   "options_provider_betterLyricsLegato": {
-    "message": "Better Lyrics Legato",
+    "message": "Better Lyrics antigo",
     "description": "Better Lyrics Legato provider name"
   },
   "options_provider_musixmatch": {
@@ -688,7 +688,7 @@
     "description": "Playground link text"
   },
   "editor_docs": {
-    "message": "Docs",
+    "message": "Documentação",
     "description": "Docs link text"
   },
   "lyrics_source": {
