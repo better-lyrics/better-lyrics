@@ -520,7 +520,7 @@
     "description": "URL permission description"
   },
   "marketplace_urlPermissionItem1": {
-    "message": "",
+    "message": "Fetch theme files from the repository",
     "description": "URL permission list item 1"
   },
   "marketplace_urlPermissionItem2": {
