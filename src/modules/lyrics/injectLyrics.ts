@@ -529,15 +529,21 @@ function injectLyrics(data: LyricSourceResultWithMeta, keepLoaderVisible = false
     let targetTranslationLang = AppState.translationLanguage;
 
     if (item.translation && langCodesMatch(targetTranslationLang, item.translation.lang)) {
+      if (!data.language) {
+        console.warn("Found translations, but no original language")
+      }
+
       translationResult = {
-        originalLanguage: item.translation.lang,
+        originalLanguage: data.language || "", // Should never be empty!
         translatedText: item.translation.text,
       };
     } else {
       translationResult = getTranslationFromCache(item.words, targetTranslationLang);
     }
 
-    const isSourceLangDisabled = data.language && isTranslationDisabledForLang(data.language);
+    let translationOriginalLang = translationResult?.originalLanguage || data.language;
+
+    const isSourceLangDisabled = !!translationOriginalLang && isTranslationDisabledForLang(translationOriginalLang);
     if (translationResult && AppState.isTranslateEnabled && !isSourceLangDisabled) {
       if (!isSameText(translationResult.translatedText, item.words)) {
         createTranslationElem().textContent = "\n" + translationResult.translatedText;
@@ -551,15 +557,7 @@ function injectLyrics(data: LyricSourceResultWithMeta, keepLoaderVisible = false
 
           if (source_language !== target_language || containsNonLatin(item.words)) {
             if (item.words.trim() !== "♪" && item.words.trim() !== "") {
-              let result;
-              if (item.translation && target_language === item.translation.lang) {
-                result = {
-                  originalLanguage: item.translation.lang,
-                  translatedText: item.translation.text,
-                };
-              } else {
-                result = await translateText(item.words, target_language);
-              }
+              let result = await translateText(item.words, target_language);
 
               if (result && !isSameText(result.translatedText, item.words)) {
                 createTranslationElem().textContent = "\n" + result.translatedText;

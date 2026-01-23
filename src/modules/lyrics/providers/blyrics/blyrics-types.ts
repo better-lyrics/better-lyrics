@@ -211,11 +211,16 @@ interface TtmlElement {
   };
 }
 
+export interface RootAttributes {
+  "@_lang"?: string;
+  "@_timing"?: string;
+}
 /**
  * Represents the object wrapper from the JSON parser.
  */
-interface TtmlRootObject {
+export interface TtmlRootObject {
   tt: TtmlElement[];
+  ":@": RootAttributes;
 }
 
 /**
