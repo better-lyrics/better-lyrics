@@ -560,6 +560,9 @@ export function addAlbumArtToLayout(videoId: string): void {
         albumArt.src = newSrc;
         injectAlbumArt(newSrc);
       };
+      img.onerror = () => {
+        lastAlbumArtSrc = null;
+      };
     }
   };
 
