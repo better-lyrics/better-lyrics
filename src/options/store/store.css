@@ -1232,6 +1232,12 @@
   margin: 0;
 }
 
+#detail-description h1 {
+	color: rgb(255, 255, 255);
+	margin: .25rem 0 0.75rem;
+	font-weight: 600;
+}
+
 #detail-description h2,
 #detail-description h3 {
   margin: 1rem 0 0.5rem;
