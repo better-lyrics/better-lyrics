@@ -684,11 +684,11 @@
     "description": "Powered by label"
   },
   "editor_playground": {
-    "message": "Playground",
+    "message": "Parco giochi",
     "description": "Playground link text"
   },
   "editor_docs": {
-    "message": "Docs",
+    "message": "Documentazione",
     "description": "Docs link text"
   },
   "lyrics_source": {
@@ -724,39 +724,39 @@
     "description": "Message when no lyrics are available"
   },
   "options_language_exclusions": {
-    "message": "Language exclusions",
+    "message": "Lingue escluse",
     "description": "Label for language exclusions setting"
   },
   "options_manage": {
-    "message": "Manage",
+    "message": "Gestisci",
     "description": "Manage button label"
   },
   "options_language_exclusionsTitle": {
-    "message": "Language Exclusions",
+    "message": "Lingue Escluse",
     "description": "Modal title for language exclusions"
   },
   "options_romanization_tab": {
-    "message": "Romanization",
+    "message": "Romanizzazione",
     "description": "Romanization tab label"
   },
   "options_translation_tab": {
-    "message": "Translation",
+    "message": "Traduzione",
     "description": "Translation tab label"
   },
   "options_searchLanguages": {
-    "message": "Search languages...",
+    "message": "Cerca lingue...",
     "description": "Search input placeholder"
   },
   "options_romanization_hint": {
-    "message": "Click to toggle. Excluded languages will not be romanized.",
+    "message": "Clicca per attivare. Le lingue escluse non verranno romanizzate.",
     "description": "Hint text for romanization exclusions"
   },
   "options_translation_hint": {
-    "message": "Click to toggle. Excluded source languages will not be translated.",
+    "message": "Clicca per attivare. Le fonti di lingua escluse non verranno tradotte.",
     "description": "Hint text for translation exclusions"
   },
   "options_resetToDefault": {
-    "message": "Reset $TYPE$ to Default",
+    "message": "Reimposta $TYPE$ all'opzione Predefinita",
     "description": "Reset to default button label",
     "placeholders": {
       "type": {
@@ -766,7 +766,7 @@
     }
   },
   "options_romanization_resetTitle": {
-    "message": "Reset $TYPE$ Exclusions",
+    "message": "Reimposta Esclusioni di $TYPE$",
     "description": "Modal title for resetting exclusions",
     "placeholders": {
       "type": {
@@ -776,19 +776,19 @@
     }
   },
   "options_romanization_resetMessage": {
-    "message": "This will clear all excluded languages. Continue?",
+    "message": "Questo eliminerà tutte le lingue escluse. Vuoi continuare?",
     "description": "Confirmation message for resetting exclusions"
   },
   "options_reset": {
-    "message": "Reset",
+    "message": "Reimposta",
     "description": "Reset button label"
   },
   "options_cancel": {
-    "message": "Cancel",
+    "message": "Annulla",
     "description": "Cancel button label"
   },
   "options_romanization_resetSuccess": {
-    "message": "$TYPE$ exclusions reset to default",
+    "message": "Esclusioni di $TYPE$ reimpostati alle opzioni predefinite",
     "description": "Success message after resetting exclusions",
     "placeholders": {
       "type": {
