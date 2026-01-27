@@ -23,23 +23,7 @@ interface Options {
 
 const saveOptions = (): void => {
   const options = getOptionsFromForm();
-
-  function arrayEqual(a: string[] | null, b: any[]): boolean {
-    return (
-      Array.isArray(a) && Array.isArray(b) && a.length === b.length && a.every((element, index) => element === b[index])
-    );
-  }
-
-  chrome.storage.sync.get(
-    { preferredProviderList: null },
-    (currentOptions: { preferredProviderList: string[] | null }) => {
-      if (!arrayEqual(currentOptions.preferredProviderList, options.preferredProviderList)) {
-        saveOptionsToStorage(options);
-      } else {
-        saveOptionsToStorage(options);
-      }
-    }
-  );
+  saveOptionsToStorage(options);
 };
 
 // Function to get options from form elements
@@ -670,9 +654,21 @@ function closeLangExclusionsModal(): void {
   }
 }
 
+let romanizationPillsDelegated = false;
+
 function renderRomanizationLanguagePills(): void {
   const container = document.getElementById("romanization-pills-container");
   if (!container) return;
+
+  if (!romanizationPillsDelegated) {
+    container.addEventListener("click", e => {
+      const pill = (e.target as HTMLElement).closest("[data-lang-code]") as HTMLElement | null;
+      if (pill?.dataset.langCode) {
+        toggleRomanizationLanguage(pill.dataset.langCode);
+      }
+    });
+    romanizationPillsDelegated = true;
+  }
 
   container.replaceChildren();
 
@@ -685,7 +681,6 @@ function renderRomanizationLanguagePills(): void {
     pill.dataset.langCode = langCode;
     pill.dataset.langName = langName.toLowerCase();
     pill.textContent = langName;
-    pill.addEventListener("click", () => toggleRomanizationLanguage(langCode));
 
     container.appendChild(pill);
   }
@@ -699,9 +694,21 @@ function getTranslationLanguagesFromSelect(): string[] {
     .filter(Boolean);
 }
 
+let translationPillsDelegated = false;
+
 function renderTranslationLanguagePills(): void {
   const container = document.getElementById("translation-pills-container");
   if (!container) return;
+
+  if (!translationPillsDelegated) {
+    container.addEventListener("click", e => {
+      const pill = (e.target as HTMLElement).closest("[data-lang-code]") as HTMLElement | null;
+      if (pill?.dataset.langCode) {
+        toggleTranslationLanguage(pill.dataset.langCode);
+      }
+    });
+    translationPillsDelegated = true;
+  }
 
   container.replaceChildren();
 
@@ -714,7 +721,6 @@ function renderTranslationLanguagePills(): void {
     pill.dataset.langCode = langCode;
     pill.dataset.langName = langName.toLowerCase();
     pill.textContent = langName;
-    pill.addEventListener("click", () => toggleTranslationLanguage(langCode));
 
     container.appendChild(pill);
   }

@@ -49,84 +49,100 @@ const videoIdToAlbumMap = new Map<string, string | null>();
 
 let firstRequestMissedVideoId: string | null = null;
 
-function delay(ms: number): Promise<void> {
-  return new Promise(resolve => setTimeout(resolve, ms));
-}
-
 /**
  *
  * @param videoId
  * @param maxRetries
+ * @param signal - AbortSignal to cancel polling
  * @return
  */
-export function getLyrics(videoId: string, maxRetries = 250): Promise<LyricsInfo> {
+export function getLyrics(videoId: string, maxRetries = 250, signal?: AbortSignal): Promise<LyricsInfo> {
   if (videoIdToLyricsMap.has(videoId)) {
     return Promise.resolve(videoIdToLyricsMap.get(videoId)!);
-  } else {
-    let checkCount = 0;
-    return new Promise(resolve => {
-      const checkInterval = setInterval(() => {
-        if (videoIdToLyricsMap.has(videoId)) {
-          clearInterval(checkInterval);
-          resolve(videoIdToLyricsMap.get(videoId)!);
-        }
-        if (videoMetaDataMap.get(videoId)) {
-          let counterpart = videoMetaDataMap.get(videoId)!.counterpartVideoId;
-          if (counterpart && videoIdToLyricsMap.has(counterpart)!) {
-            clearInterval(checkInterval);
-            resolve(videoIdToLyricsMap.get(counterpart)!);
-          }
-        }
-        if (checkCount > maxRetries) {
-          clearInterval(checkInterval);
-          log("Failed to sniff lyrics");
-          resolve({ hasLyrics: false, lyrics: "", sourceText: "" });
-        }
-        checkCount += 1;
-      }, 20);
-    });
   }
+
+  let checkCount = 0;
+  return new Promise(resolve => {
+    const checkInterval = setInterval(() => {
+      if (signal?.aborted) {
+        clearInterval(checkInterval);
+        resolve({ hasLyrics: false, lyrics: "", sourceText: "" });
+        return;
+      }
+      if (videoIdToLyricsMap.has(videoId)) {
+        clearInterval(checkInterval);
+        resolve(videoIdToLyricsMap.get(videoId)!);
+      }
+      const metadata = videoMetaDataMap.get(videoId);
+      if (metadata?.counterpartVideoId && videoIdToLyricsMap.has(metadata.counterpartVideoId)) {
+        clearInterval(checkInterval);
+        resolve(videoIdToLyricsMap.get(metadata.counterpartVideoId)!);
+      }
+      if (checkCount > maxRetries) {
+        clearInterval(checkInterval);
+        log("Failed to sniff lyrics");
+        resolve({ hasLyrics: false, lyrics: "", sourceText: "" });
+      }
+      checkCount += 1;
+    }, 20);
+
+    signal?.addEventListener("abort", () => clearInterval(checkInterval), { once: true });
+  });
 }
 
 /**
  *
  * @param videoId
  * @param maxCheckCount
+ * @param signal - AbortSignal to cancel polling
  * @return
  */
-export function getSongMetadata(videoId: string, maxCheckCount = 250): Promise<VideoMetadata | null> {
+export function getSongMetadata(
+  videoId: string,
+  maxCheckCount = 250,
+  signal?: AbortSignal
+): Promise<VideoMetadata | null> {
   if (videoMetaDataMap.has(videoId)) {
     return Promise.resolve(videoMetaDataMap.get(videoId)!);
-  } else {
-    let checkCount = 0;
-    return new Promise(resolve => {
-      const checkInterval = setInterval(() => {
-        let counterpart = videoMetaDataMap.get(videoId);
-        if (counterpart) {
-          clearInterval(checkInterval);
-          resolve(counterpart!);
-        }
-        if (checkCount > maxCheckCount) {
-          clearInterval(checkInterval);
-          log("Failed to find Segment Map for video");
-          resolve(null);
-        }
-        checkCount += 1;
-      }, 20);
-    });
   }
+
+  let checkCount = 0;
+  return new Promise(resolve => {
+    const checkInterval = setInterval(() => {
+      if (signal?.aborted) {
+        clearInterval(checkInterval);
+        resolve(null);
+        return;
+      }
+      const metadata = videoMetaDataMap.get(videoId);
+      if (metadata) {
+        clearInterval(checkInterval);
+        resolve(metadata);
+      }
+      if (checkCount > maxCheckCount) {
+        clearInterval(checkInterval);
+        log("Failed to find Segment Map for video");
+        resolve(null);
+      }
+      checkCount += 1;
+    }, 20);
+
+    signal?.addEventListener("abort", () => clearInterval(checkInterval), { once: true });
+  });
 }
 
 /**
  * @param videoId
+ * @param signal - AbortSignal to cancel polling
  * @return
  */
-export async function getSongAlbum(videoId: string): Promise<string | null | undefined> {
+export async function getSongAlbum(videoId: string, signal?: AbortSignal): Promise<string | null | undefined> {
   for (let i = 0; i < 250; i++) {
+    if (signal?.aborted) return undefined;
     if (videoIdToAlbumMap.has(videoId)) {
       return videoIdToAlbumMap.get(videoId);
     }
-    await delay(20);
+    await new Promise(resolve => setTimeout(resolve, 20));
   }
   log("Song album information didn't come in time for: ", videoId);
 }

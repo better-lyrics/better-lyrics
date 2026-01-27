@@ -39,6 +39,7 @@ interface AppStateType {
   translationDisabledLanguages: string[];
   translationLanguage: string;
   hasPreloadedNextSong: boolean;
+  currentInjectionId: number;
 }
 
 export const AppState: AppStateType = {
@@ -62,9 +63,11 @@ export const AppState: AppStateType = {
   translationDisabledLanguages: [],
   translationLanguage: "en",
   hasPreloadedNextSong: false,
+  currentInjectionId: 0,
 };
 
 export function reloadLyrics(): void {
+  AppState.lyricAbortController?.abort("Reloading lyrics");
   AppState.lastVideoId = null;
 }
 
@@ -76,6 +79,7 @@ export function handleModifications(detail: PlayerDetails): void {
       handleModifications(detail);
     });
   } else {
+    AppState.currentInjectionId++;
     AppState.lyricAbortController = new AbortController();
     AppState.lyricInjectionPromise = createLyrics(detail, AppState.lyricAbortController.signal).catch(err => {
       log(GENERAL_ERROR_LOG, err);

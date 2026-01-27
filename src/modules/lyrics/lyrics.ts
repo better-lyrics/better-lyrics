@@ -81,7 +81,7 @@ export async function createLyrics(detail: PlayerDetails, signal: AbortSignal): 
 
   // We should get recalled if we were executed without a valid song/artist and aren't able to get lyrics
 
-  let matchingSong = await getSongMetadata(videoId, 1);
+  let matchingSong = await getSongMetadata(videoId, 1, signal);
   let swappedVideoId = false;
   let isAVSwitch =
     (matchingSong &&
@@ -100,7 +100,7 @@ export async function createLyrics(detail: PlayerDetails, signal: AbortSignal): 
     log("Not Switching between audio/video", isAVSwitch, segmentMap);
     renderLoader();
     clearTranslationCache();
-    matchingSong = await getSongMetadata(videoId);
+    matchingSong = await getSongMetadata(videoId, 250, signal);
     segmentMap = matchingSong?.segmentMap || null;
     AppState.areLyricsLoaded = false;
     AppState.areLyricsTicking = false;
@@ -126,7 +126,7 @@ export async function createLyrics(detail: PlayerDetails, signal: AbortSignal): 
   song = song.trim();
   artist = artist.trim();
   artist = artist.replace(", & ", ", ");
-  let album = await getSongAlbum(videoId);
+  let album = await getSongAlbum(videoId, signal);
   if (!album) {
     album = "";
   }
@@ -136,6 +136,8 @@ export async function createLyrics(detail: PlayerDetails, signal: AbortSignal): 
     log(SERVER_ERROR_LOG, "Empty song or artist name");
     return;
   }
+
+  if (signal.aborted) return;
 
   log(FETCH_LYRICS_LOG, song, artist);
 
@@ -155,7 +157,7 @@ export async function createLyrics(detail: PlayerDetails, signal: AbortSignal): 
   };
 
   let ytLyricsPromise = getLyrics(providerParameters, "yt-lyrics").then(lyrics => {
-    if (!AppState.areLyricsLoaded && lyrics) {
+    if (!AppState.areLyricsLoaded && lyrics && !signal.aborted) {
       log(LOG_PREFIX, "Temporarily Using YT Music Lyrics while we wait for synced lyrics to load");
 
       let lyricsWithMeta = {
@@ -167,7 +169,7 @@ export async function createLyrics(detail: PlayerDetails, signal: AbortSignal): 
         album: providerParameters.album || "",
         segmentMap: null,
       };
-      processLyrics(lyricsWithMeta, true);
+      processLyrics(lyricsWithMeta, true, signal);
     }
     return lyrics;
   });
@@ -274,7 +276,7 @@ export async function createLyrics(detail: PlayerDetails, signal: AbortSignal): 
   if (signal.aborted) {
     return;
   }
-  processLyrics(lyricsWithMeta);
+  processLyrics(lyricsWithMeta, false, signal);
 }
 
 /**
@@ -294,7 +296,7 @@ export async function preFetchLyrics(
   let duration = Number(detail.duration);
   let signal = new AbortController().signal; // create a signal to pass to other funcs, not used
 
-  let matchingSong = await getSongMetadata(videoId);
+  let matchingSong = await getSongMetadata(videoId, 250, signal);
   let swappedVideoId = false;
 
   if (isMusicVideo && matchingSong && matchingSong.counterpartVideoId && matchingSong.segmentMap) {
@@ -305,7 +307,7 @@ export async function preFetchLyrics(
   song = song.trim();
   artist = artist.trim();
   artist = artist.replace(", & ", ", ");
-  let album = await getSongAlbum(videoId);
+  let album = await getSongAlbum(videoId, signal);
   if (!album) {
     album = "";
   }

@@ -531,20 +531,31 @@ export function animationEngine(currentTime: number, eventCreationTime: number, 
   }
 }
 
+// -- Debounced Lyrics Update --------------------------
+
+let pendingLyricsUpdate = false;
+
 /**
  * Called when a new lyrics element is added to trigger re-sync.
+ * Debounced via requestAnimationFrame to avoid O(n²) layout thrashing
+ * when translations/romanizations load (each addition would otherwise
+ * trigger calculateLyricPositions on ALL lines).
  */
 export function lyricsElementAdded(): void {
-  if (!AppState.areLyricsTicking) {
+  if (!AppState.areLyricsTicking || pendingLyricsUpdate) {
     return;
   }
-  calculateLyricPositions();
-  animationEngine(
-    animEngineState.lastTime,
-    animEngineState.lastEventCreationTime,
-    animEngineState.lastPlayState,
-    false
-  );
+  pendingLyricsUpdate = true;
+  requestAnimationFrame(() => {
+    pendingLyricsUpdate = false;
+    calculateLyricPositions();
+    animationEngine(
+      animEngineState.lastTime,
+      animEngineState.lastEventCreationTime,
+      animEngineState.lastPlayState,
+      false
+    );
+  });
 }
 
 /**
