@@ -89,24 +89,6 @@ export async function translateTextIntoRomaji(
     });
 }
 
-function onRomanizationEnabled(callback: (items: { isRomanizationEnabled: boolean }) => void): void {
-  getStorage({ isRomanizationEnabled: false }, items => {
-    if (items.isRomanizationEnabled) {
-      callback(items as { isRomanizationEnabled: boolean });
-    }
-  });
-}
-
-function onTranslationEnabled(
-  callback: (items: { isTranslateEnabled: boolean; translationLanguage: string }) => void
-): void {
-  getStorage({ isTranslateEnabled: false, translationLanguage: "en" }, items => {
-    if (items.isTranslateEnabled) {
-      callback(items as { isTranslateEnabled: boolean; translationLanguage: string });
-    }
-  });
-}
-
 export function clearCache(): void {
   cache.romanization.clear();
   cache.translation.clear();

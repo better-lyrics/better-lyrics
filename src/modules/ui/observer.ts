@@ -25,7 +25,15 @@ import {
 import { getSongMetadata } from "@modules/lyrics/requestSniffer/requestSniffer";
 import { preFetchLyrics } from "@modules/lyrics/lyrics";
 import { log } from "@utils";
-import { addThumbnail, cleanup, injectSongAttributes, isLoaderActive, renderLoader, resetThumbnailState, showYtThumbnail } from "./dom";
+import {
+  addThumbnail,
+  cleanup,
+  injectSongAttributes,
+  isLoaderActive,
+  renderLoader,
+  resetThumbnailState,
+  showYtThumbnail,
+} from "./dom";
 
 let wakeLock: WakeLockSentinel | null = null;
 
