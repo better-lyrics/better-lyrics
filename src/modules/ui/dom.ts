@@ -514,41 +514,46 @@ export function reloadAlbumArt() {
 
 let lastLoadedThumbnail: ThumbnailElement | null = null;
 let thumbnailResizeObserver: ResizeObserver | null;
+
+export function resetThumbnailState(): void {
+  lastLoadedThumbnail = null;
+}
+
+function setBackgroundImage(src: string): void {
+  const layout = document.getElementById("layout");
+  if (AppState.shouldInjectAlbumArt) {
+    layout?.style.setProperty("--blyrics-background-img", `url('${src}')`);
+  } else {
+    layout?.style.removeProperty("--blyrics-background-img");
+  }
+}
+
+function getContainerSize(): number {
+  return Math.round(Math.max(document.getElementById("thumbnail")?.getBoundingClientRect().width || 0, 544));
+}
+
 export function addThumbnail(smallThumbnail: ThumbnailElement): void {
   thumbnailResizeObserver?.disconnect();
-  let ytImgElem = document.querySelector("#thumbnail>#img");
-  if (ytImgElem) {
-    ytImgElem.classList.add(HIDDEN_CLASS);
-  }
 
   let imgElm = document.getElementById("blyrics-img") as HTMLImageElement | undefined;
   if (!imgElm) {
     imgElm = document.createElement("img");
     imgElm.id = "blyrics-img";
     imgElm.draggable = false;
-    imgElm.classList = "style-scope yt-img-shadow";
+    imgElm.classList.add("style-scope", "yt-img-shadow");
+    imgElm.style.position = "absolute";
+    imgElm.style.inset = "0";
     document.getElementById("thumbnail")?.appendChild(imgElm);
   }
 
-  let addBackground = (src: string) => {
-    if (AppState.shouldInjectAlbumArt) {
-      document.getElementById("layout")?.style.setProperty("--blyrics-background-img", `url('${src}')`);
-    } else {
-      document.getElementById("layout")?.style.removeProperty("--blyrics-background-img");
-    }
-  };
-
   if (lastLoadedThumbnail !== smallThumbnail) {
-    imgElm.src = smallThumbnail.url; // should already be loaded;
-    addBackground(smallThumbnail.url);
+    imgElm.src = smallThumbnail.url;
+    imgElm.classList.remove(HIDDEN_CLASS);
+    setBackgroundImage(smallThumbnail.url);
   }
   lastLoadedThumbnail = smallThumbnail;
 
-  function getContainerSize() {
-    return Math.round(Math.max(document.getElementById("thumbnail")?.getBoundingClientRect().width || 0, 544));
-  }
-
-  let containerSize = getContainerSize();
+  const containerSize = getContainerSize();
 
   let url = smallThumbnail.url;
   if (url && /w\d+-h\d+/.test(url)) {
@@ -557,36 +562,45 @@ export function addThumbnail(smallThumbnail: ThumbnailElement): void {
     url = url.replace(/\/(sd|hq|mq)?default\.jpg/, "/maxresdefault.jpg");
   }
 
-  let proxy = new Image();
+  const proxy = new Image();
   proxy.src = url;
 
   albumArtLoadController?.abort();
-  let loadController = new AbortController();
+  const loadController = new AbortController();
   albumArtLoadController = loadController;
 
   proxy.onload = () => {
     if (loadController.signal.aborted) return;
+
     imgElm.src = proxy.src;
-    addBackground(proxy.src);
-    if (getContainerSize() === containerSize) {
-      let thumbnailElm = document.getElementById("thumbnail")!;
-      thumbnailResizeObserver = new ResizeObserver(() => {
-        if (getContainerSize() !== containerSize) {
-          thumbnailResizeObserver?.disconnect();
-          reloadAlbumArt();
-        }
-      });
-      thumbnailResizeObserver.observe(thumbnailElm);
-    } else {
+    setBackgroundImage(proxy.src);
+
+    if (getContainerSize() !== containerSize) {
       reloadAlbumArt();
+      return;
     }
+
+    const thumbnailElm = document.getElementById("thumbnail")!;
+    thumbnailResizeObserver = new ResizeObserver(() => {
+      if (getContainerSize() !== containerSize) {
+        thumbnailResizeObserver?.disconnect();
+        reloadAlbumArt();
+      }
+    });
+    thumbnailResizeObserver.observe(thumbnailElm);
   };
 }
 
-export function showYtThumbnail() {
-  let ytImgElem = document.getElementById("img");
-  if (ytImgElem) {
-    ytImgElem.classList.remove(HIDDEN_CLASS);
+export function showYtThumbnail(): void {
+  const blyricsImg = document.getElementById("blyrics-img") as HTMLImageElement | null;
+  if (blyricsImg) {
+    blyricsImg.src = "";
+    blyricsImg.classList.add(HIDDEN_CLASS);
+  }
+
+  const ytImg = document.querySelector("#thumbnail>#img") as HTMLImageElement | null;
+  if (ytImg?.src && AppState.shouldInjectAlbumArt) {
+    setBackgroundImage(ytImg.src);
   }
 }
 

@@ -25,7 +25,7 @@ import {
 import { getSongMetadata } from "@modules/lyrics/requestSniffer/requestSniffer";
 import { preFetchLyrics } from "@modules/lyrics/lyrics";
 import { log } from "@utils";
-import { addThumbnail, cleanup, injectSongAttributes, isLoaderActive, renderLoader, showYtThumbnail } from "./dom";
+import { addThumbnail, cleanup, injectSongAttributes, isLoaderActive, renderLoader, resetThumbnailState, showYtThumbnail } from "./dom";
 
 let wakeLock: WakeLockSentinel | null = null;
 
@@ -260,6 +260,8 @@ export function initializeLyrics(): void {
       AppState.areLyricsTicking = false;
       AppState.lastVideoId = currentVideoId;
       AppState.lastVideoDetails = currentVideoDetails;
+      resetThumbnailState();
+      showYtThumbnail();
       if (!detail.song || !detail.artist) {
         log("Lyrics switched: Still waiting for metadata ", detail.videoId);
         return;
@@ -269,14 +271,17 @@ export function initializeLyrics(): void {
       AppState.queueLyricInjection = true;
       AppState.queueSongDetailsInjection = true;
       AppState.hasPreloadedNextSong = false;
+      const videoIdAtStart = detail.videoId;
       getSongMetadata(detail.videoId).then(async songMetadata => {
+        if (AppState.lastVideoId !== videoIdAtStart) return;
+
         if (songMetadata?.isVideo && songMetadata.counterpartVideoId) {
           songMetadata = await getSongMetadata(songMetadata.counterpartVideoId);
+          if (AppState.lastVideoId !== videoIdAtStart) return;
         }
+
         if (songMetadata) {
           addThumbnail(songMetadata.smallThumbnail);
-        } else {
-          showYtThumbnail();
         }
       });
     }
