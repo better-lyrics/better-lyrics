@@ -89,7 +89,7 @@ export async function translateTextIntoRomaji(
     });
 }
 
-export function onRomanizationEnabled(callback: (items: { isRomanizationEnabled: boolean }) => void): void {
+function onRomanizationEnabled(callback: (items: { isRomanizationEnabled: boolean }) => void): void {
   getStorage({ isRomanizationEnabled: false }, items => {
     if (items.isRomanizationEnabled) {
       callback(items as { isRomanizationEnabled: boolean });
@@ -97,7 +97,7 @@ export function onRomanizationEnabled(callback: (items: { isRomanizationEnabled:
   });
 }
 
-export function onTranslationEnabled(
+function onTranslationEnabled(
   callback: (items: { isTranslateEnabled: boolean; translationLanguage: string }) => void
 ): void {
   getStorage({ isTranslateEnabled: false, translationLanguage: "en" }, items => {
