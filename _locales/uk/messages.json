@@ -728,7 +728,7 @@
     "description": "Label for language exclusions setting"
   },
   "options_manage": {
-    "message": "Manage",
+    "message": "Налаштувати",
     "description": "Manage button label"
   },
   "options_language_exclusionsTitle": {
@@ -736,15 +736,15 @@
     "description": "Modal title for language exclusions"
   },
   "options_romanization_tab": {
-    "message": "Romanization",
+    "message": "Транслітерація",
     "description": "Romanization tab label"
   },
   "options_translation_tab": {
-    "message": "Translation",
+    "message": "Переклад",
     "description": "Translation tab label"
   },
   "options_searchLanguages": {
-    "message": "Search languages...",
+    "message": "Пошук...",
     "description": "Search input placeholder"
   },
   "options_romanization_hint": {
@@ -756,7 +756,7 @@
     "description": "Hint text for translation exclusions"
   },
   "options_resetToDefault": {
-    "message": "Reset $TYPE$ to Default",
+    "message": "Відновити $TYPE$ за замовчуванням",
     "description": "Reset to default button label",
     "placeholders": {
       "type": {
@@ -780,11 +780,11 @@
     "description": "Confirmation message for resetting exclusions"
   },
   "options_reset": {
-    "message": "Reset",
+    "message": "Скинути",
     "description": "Reset button label"
   },
   "options_cancel": {
-    "message": "Cancel",
+    "message": "Скасувати",
     "description": "Cancel button label"
   },
   "options_romanization_resetSuccess": {
