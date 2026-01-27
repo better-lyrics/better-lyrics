@@ -48,6 +48,7 @@ let hasInitializedLyricReloader = false;
 let hasInitializedHomepageFullscreen = false;
 let hasInitializedAltHover = false;
 let hasInitializedLyrics = false;
+let metadataAbortController: AbortController | null = null;
 
 async function requestWakeLock(): Promise<void> {
   if (!("wakeLock" in navigator)) {
@@ -279,12 +280,17 @@ export function initializeLyrics(): void {
       AppState.queueLyricInjection = true;
       AppState.queueSongDetailsInjection = true;
       AppState.hasPreloadedNextSong = false;
+
+      metadataAbortController?.abort();
+      const abortController = new AbortController();
+      metadataAbortController = abortController;
+
       const videoIdAtStart = detail.videoId;
-      getSongMetadata(detail.videoId).then(async songMetadata => {
+      getSongMetadata(detail.videoId, 250, abortController.signal).then(async songMetadata => {
         if (AppState.lastVideoId !== videoIdAtStart) return;
 
         if (songMetadata?.isVideo && songMetadata.counterpartVideoId) {
-          songMetadata = await getSongMetadata(songMetadata.counterpartVideoId);
+          songMetadata = await getSongMetadata(songMetadata.counterpartVideoId, 250, abortController.signal);
           if (AppState.lastVideoId !== videoIdAtStart) return;
         }
 
