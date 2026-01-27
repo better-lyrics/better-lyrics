@@ -63,30 +63,38 @@ export function getLyrics(videoId: string, maxRetries = 250, signal?: AbortSigna
 
   let checkCount = 0;
   return new Promise(resolve => {
+    const abortHandler = () => clearInterval(checkInterval);
     const checkInterval = setInterval(() => {
       if (signal?.aborted) {
         clearInterval(checkInterval);
+        signal?.removeEventListener("abort", abortHandler);
         resolve({ hasLyrics: false, lyrics: "", sourceText: "" });
         return;
       }
       if (videoIdToLyricsMap.has(videoId)) {
         clearInterval(checkInterval);
+        signal?.removeEventListener("abort", abortHandler);
         resolve(videoIdToLyricsMap.get(videoId)!);
+        return;
       }
       const metadata = videoMetaDataMap.get(videoId);
       if (metadata?.counterpartVideoId && videoIdToLyricsMap.has(metadata.counterpartVideoId)) {
         clearInterval(checkInterval);
+        signal?.removeEventListener("abort", abortHandler);
         resolve(videoIdToLyricsMap.get(metadata.counterpartVideoId)!);
+        return;
       }
       if (checkCount > maxRetries) {
         clearInterval(checkInterval);
+        signal?.removeEventListener("abort", abortHandler);
         log("Failed to sniff lyrics");
         resolve({ hasLyrics: false, lyrics: "", sourceText: "" });
+        return;
       }
       checkCount += 1;
     }, 20);
 
-    signal?.addEventListener("abort", () => clearInterval(checkInterval), { once: true });
+    signal?.addEventListener("abort", abortHandler, { once: true });
   });
 }
 
@@ -108,26 +116,32 @@ export function getSongMetadata(
 
   let checkCount = 0;
   return new Promise(resolve => {
+    const abortHandler = () => clearInterval(checkInterval);
     const checkInterval = setInterval(() => {
       if (signal?.aborted) {
         clearInterval(checkInterval);
+        signal?.removeEventListener("abort", abortHandler);
         resolve(null);
         return;
       }
       const metadata = videoMetaDataMap.get(videoId);
       if (metadata) {
         clearInterval(checkInterval);
+        signal?.removeEventListener("abort", abortHandler);
         resolve(metadata);
+        return;
       }
       if (checkCount > maxCheckCount) {
         clearInterval(checkInterval);
+        signal?.removeEventListener("abort", abortHandler);
         log("Failed to find Segment Map for video");
         resolve(null);
+        return;
       }
       checkCount += 1;
     }, 20);
 
-    signal?.addEventListener("abort", () => clearInterval(checkInterval), { once: true });
+    signal?.addEventListener("abort", abortHandler, { once: true });
   });
 }
 
