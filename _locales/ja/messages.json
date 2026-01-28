@@ -722,5 +722,79 @@
   "lyrics_notFound": {
     "message": "この曲の歌詞が見つかりませんでした",
     "description": "Message when no lyrics are available"
+  },
+  "options_language_exclusions": {
+    "message": "Language exclusions",
+    "description": "Label for language exclusions setting"
+  },
+  "options_manage": {
+    "message": "Manage",
+    "description": "Manage button label"
+  },
+  "options_language_exclusionsTitle": {
+    "message": "Language Exclusions",
+    "description": "Modal title for language exclusions"
+  },
+  "options_romanization_tab": {
+    "message": "Romanization",
+    "description": "Romanization tab label"
+  },
+  "options_translation_tab": {
+    "message": "Translation",
+    "description": "Translation tab label"
+  },
+  "options_searchLanguages": {
+    "message": "Search languages...",
+    "description": "Search input placeholder"
+  },
+  "options_romanization_hint": {
+    "message": "Click to toggle. Excluded languages will not be romanized.",
+    "description": "Hint text for romanization exclusions"
+  },
+  "options_translation_hint": {
+    "message": "Click to toggle. Excluded source languages will not be translated.",
+    "description": "Hint text for translation exclusions"
+  },
+  "options_resetToDefault": {
+    "message": "Reset $TYPE$ to Default",
+    "description": "Reset to default button label",
+    "placeholders": {
+      "type": {
+        "content": "$1",
+        "example": "Romanization"
+      }
+    }
+  },
+  "options_romanization_resetTitle": {
+    "message": "Reset $TYPE$ Exclusions",
+    "description": "Modal title for resetting exclusions",
+    "placeholders": {
+      "type": {
+        "content": "$1",
+        "example": "Romanization"
+      }
+    }
+  },
+  "options_romanization_resetMessage": {
+    "message": "This will clear all excluded languages. Continue?",
+    "description": "Confirmation message for resetting exclusions"
+  },
+  "options_reset": {
+    "message": "Reset",
+    "description": "Reset button label"
+  },
+  "options_cancel": {
+    "message": "Cancel",
+    "description": "Cancel button label"
+  },
+  "options_romanization_resetSuccess": {
+    "message": "$TYPE$ exclusions reset to default",
+    "description": "Success message after resetting exclusions",
+    "placeholders": {
+      "type": {
+        "content": "$1",
+        "example": "Romanization"
+      }
+    }
   }
 }

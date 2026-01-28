@@ -1,3 +1,5 @@
+import { ROMANIZATION_LANGUAGES } from "@constants";
+
 /**
  * @author Stephen Brown
  * Source: https://github.com/stephenjjbrown/string-similarity-js/
@@ -54,4 +56,37 @@ const nonLatinRegex = /[^\p{Script_Extensions=Latin}\p{Script_Extensions=Common}
  */
 export function containsNonLatin(text: string): boolean {
   return nonLatinRegex.test(text);
+}
+
+type RomanizationLangCode = keyof typeof ROMANIZATION_LANGUAGES;
+
+const SCRIPT_TO_LANG: [RegExp, RomanizationLangCode][] = [
+  [/\p{Script=Hiragana}|\p{Script=Katakana}/u, "ja"],
+  [/\p{Script=Hangul}/u, "ko"],
+  [/\p{Script=Han}/u, "zh"],
+  [/\p{Script=Cyrillic}/u, "ru"],
+  [/\p{Script=Devanagari}/u, "hi"],
+  [/\p{Script=Arabic}/u, "ar"],
+  [/\p{Script=Thai}/u, "th"],
+  [/\p{Script=Greek}/u, "el"],
+  [/\p{Script=Hebrew}/u, "he"],
+  [/\p{Script=Bengali}/u, "bn"],
+  [/\p{Script=Tamil}/u, "ta"],
+  [/\p{Script=Telugu}/u, "te"],
+  [/\p{Script=Malayalam}/u, "ml"],
+  [/\p{Script=Kannada}/u, "kn"],
+  [/\p{Script=Gujarati}/u, "gu"],
+  [/\p{Script=Gurmukhi}/u, "pa"],
+  [/\p{Script=Sinhala}/u, "si"],
+  [/\p{Script=Myanmar}/u, "my"],
+  [/\p{Script=Georgian}/u, "ka"],
+  [/\p{Script=Khmer}/u, "km"],
+  [/\p{Script=Lao}/u, "lo"],
+];
+
+export function detectNonLatinLanguage(text: string): RomanizationLangCode | null {
+  for (const [regex, lang] of SCRIPT_TO_LANG) {
+    if (regex.test(text)) return lang;
+  }
+  return null;
 }

@@ -81,7 +81,7 @@ export function themeSourceToEditorSource(source: ThemeSource | undefined): Edit
   return null;
 }
 
-export class ThemeManager {
+class ThemeManager {
   async applyTheme(isCustom: boolean, index: number, themeName: string): Promise<void> {
     console.log(LOG_PREFIX_EDITOR, `Applying ${isCustom ? "custom" : "built-in"} theme: ${themeName}`);
 
@@ -176,9 +176,9 @@ export class ThemeManager {
   }
 }
 
-export const themeManager = new ThemeManager();
+const themeManager = new ThemeManager();
 
-export async function applyStoreThemeToEditor(
+async function applyStoreThemeToEditor(
   themeId: string,
   css: string,
   title: string,
@@ -380,7 +380,7 @@ export function saveToStorage(isTheme = false) {
     });
 }
 
-export async function updateCreateEditButton(): Promise<void> {
+async function updateCreateEditButton(): Promise<void> {
   const textSpan = document.getElementById("edit-css-btn-text");
   if (!textSpan) return;
 
@@ -427,7 +427,7 @@ export async function updateThemeSelectorButton(): Promise<void> {
   }
 }
 
-export async function populateThemeModal(): Promise<void> {
+async function populateThemeModal(): Promise<void> {
   if (!themeModalGrid) return;
 
   themeModalGrid.replaceChildren();

@@ -221,7 +221,7 @@ export async function applyStoreTheme(themeId: string): Promise<string> {
   return theme.css;
 }
 
-export function parseVersion(version: string): number[] {
+function parseVersion(version: string): number[] {
   const cleanVersion = version.replace(/-.*$/, "");
   return cleanVersion.split(".").map(part => {
     const num = parseInt(part, 10);
@@ -233,7 +233,7 @@ export function parseVersion(version: string): number[] {
   });
 }
 
-export function compareVersions(current: string, required: string): boolean {
+function compareVersions(current: string, required: string): boolean {
   const currentParts = parseVersion(current);
   const requiredParts = parseVersion(required);
 
@@ -254,7 +254,7 @@ export function isVersionCompatible(themeMinVersion: string, extensionVersion: s
   return compareVersions(extensionVersion, themeMinVersion);
 }
 
-export async function checkForThemeUpdates(
+async function checkForThemeUpdates(
   installed: InstalledStoreTheme[],
   storeThemes: StoreTheme[]
 ): Promise<Map<string, StoreTheme>> {
@@ -270,7 +270,7 @@ export async function checkForThemeUpdates(
   return updates;
 }
 
-export async function updateTheme(theme: StoreTheme): Promise<InstalledStoreTheme> {
+async function updateTheme(theme: StoreTheme): Promise<InstalledStoreTheme> {
   return installTheme(theme);
 }
 

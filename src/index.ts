@@ -30,7 +30,7 @@ import { log, setUpLog } from "@utils";
  * This method orchestrates the setup of logging, DOM injection, observers, settings,
  * storage, and lyric providers.
  */
-export async function modify(): Promise<void> {
+async function modify(): Promise<void> {
   setUpLog();
   await injectHeadTags();
   injectI18nCssVars();
@@ -66,7 +66,7 @@ export async function modify(): Promise<void> {
  * Initializes the application by setting up the DOM content loaded event listener.
  * Entry point for the BetterLyrics extension.
  */
-export function init(): void {
+function init(): void {
   document.addEventListener("DOMContentLoaded", modify);
 }
 

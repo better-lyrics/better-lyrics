@@ -248,7 +248,7 @@ export async function fillTtml(responseString: string) {
 
   let result: LyricSourceResult = {
     cacheAllowed: true,
-    language: ttMeta["@_lang"],
+    language: rawObj[0][":@"]["@_lang"] || ttMeta["@_lang"],
     lyrics: lyricArray,
     musicVideoSynced: false,
     source: "boidu.dev",

@@ -1,274 +1,274 @@
 {
   "extensionName": {
-    "message": "Better Lyrics (YouTube Music 가사)",
+    "message": "Better Lyrics (Lời bài hát cho Youtube Music)",
     "description": "The name of the extension"
   },
   "extensionDescription": {
-    "message": "아름다운 싱크 가사, 다국어 지원, 실시간 번역 등으로 YouTube Music을 향상시킵니다",
+    "message": "Nâng cấp Youtube Music với lời bài hát đẹp mắt được đồng bộ hóa, hỗ trợ nhiều ngôn ngữ, dịch theo thời gian thực và hơn thế nữa",
     "description": "The description of the extension"
   },
   "options_tab_general": {
-    "message": "일반",
+    "message": "Chung",
     "description": "General settings tab label"
   },
   "options_tab_display": {
-    "message": "디스플레이",
+    "message": "Hiển thị",
     "description": "Display settings tab label"
   },
   "options_tab_language": {
-    "message": "언어",
+    "message": "Ngôn ngữ",
     "description": "Language settings tab label"
   },
   "options_tab_sources": {
-    "message": "소스",
+    "message": "Nguồn",
     "description": "Sources settings tab label"
   },
   "options_tab_identity": {
-    "message": "신원",
+    "message": "Danh tính",
     "description": "Identity settings tab label"
   },
   "options_tab_themes": {
-    "message": "테마",
+    "message": "Chủ đề",
     "description": "Themes settings tab label"
   },
   "options_general_title": {
-    "message": "일반 설정",
+    "message": "Cài đặt chung",
     "description": "General settings section title"
   },
   "options_general_description": {
-    "message": "Better Lyrics의 전반적인 동작에 영향을 주는 설정입니다.",
+    "message": "Cài đặt liên quan tới cách hoạt động chung của Better Lyrics.",
     "description": "General settings section description"
   },
   "options_general_showLogs": {
-    "message": "로그 표시",
+    "message": "Hiện các bản ghi",
     "description": "Show logs setting label"
   },
   "options_general_autoSwitch": {
-    "message": "가사 탭으로 자동 전환",
+    "message": "Tự động chuyển sang phần Lời bài hát",
     "description": "Auto switch to lyrics tab setting label"
   },
   "options_general_cache": {
-    "message": "캐시",
+    "message": "Bộ nhớ đệm",
     "description": "Cache section label"
   },
   "options_general_clearCache": {
-    "message": "캐시 지우기",
+    "message": "Xóa bộ nhớ đệm",
     "description": "Clear cache button label"
   },
   "options_general_totalLyrics": {
-    "message": "캐시된 가사 수",
+    "message": "Số lời bài hát trong bộ nhớ đệm",
     "description": "Total lyrics in cache label"
   },
   "options_general_cacheSize": {
-    "message": "캐시 크기",
+    "message": "Dung lượng bộ nhớ đệm",
     "description": "Cache size label"
   },
   "options_display_title": {
-    "message": "디스플레이 설정",
+    "message": "Cài đặt hiển thị",
     "description": "Display settings section title"
   },
   "options_display_description": {
-    "message": "Better Lyrics의 외관을 조정합니다.",
+    "message": "Tùy chỉnh hợp mắt hiển thị của Better Lyrics.",
     "description": "Display settings section description"
   },
   "options_display_disableFullscreen": {
-    "message": "전체 화면 모드 비활성화",
+    "message": "Tắt chế độ toàn màn hình",
     "description": "Disable fullscreen mode setting label"
   },
   "options_display_autoHideCursor": {
-    "message": "전체 화면에서 커서 자동 숨기기",
+    "message": "Tự động ẩn con trỏ chuột trong chế độ toàn màn hình",
     "description": "Auto-hide cursor setting label"
   },
   "options_display_albumArt": {
-    "message": "흐린 앨범 아트 배경 표시",
+    "message": "Hiển thị nền như ảnh bìa của bài hát được làm mờ",
     "description": "Show album art background setting label"
   },
   "options_display_stylizedAnimations": {
-    "message": "스타일리시한 애니메이션 표시",
+    "message": "Hiển thị hiệu ứng đẹp mắt",
     "description": "Show stylized animations setting label"
   },
   "options_language_title": {
-    "message": "언어 설정",
+    "message": "Cài đặt ngôn ngữ",
     "description": "Language settings section title"
   },
   "options_language_description": {
-    "message": "Better Lyrics의 언어 및 번역 설정입니다.",
+    "message": "Cài đặt ngôn ngữ cùng dịch thuật của Better Lyrics.",
     "description": "Language settings section description"
   },
   "options_language_romanization": {
-    "message": "로마자 표기",
+    "message": "Phiên âm",
     "description": "Romanization setting label"
   },
   "options_language_translate": {
-    "message": "가사 번역",
+    "message": "Dịch lời bài hát",
     "description": "Translate song lyrics setting label"
   },
   "options_language_translationLanguage": {
-    "message": "번역 언어",
+    "message": "Ngôn ngữ dịch",
     "description": "Translation language setting label"
   },
   "options_sources_title": {
-    "message": "가사 소스 우선순위",
+    "message": "Tùy chọn nguồn lời bài hát được ưu tiên",
     "description": "Sources settings section title"
   },
   "options_sources_description": {
-    "message": "드래그하여 우선순위 변경. 상위 소스가 먼저 시도됩니다. 체크 해제하면 비활성화.",
+    "message": "Kéo để sắp xếp độ ưu tiên. Nguồn cao hơn sẽ được tìm lời bài hát của nguồn đó trước. Gạt để không tìm của một nguồn.",
     "description": "Sources settings section description"
   },
   "options_themes_title": {
-    "message": "테마 설정",
+    "message": "Cài đặt chủ đề",
     "description": "Theme settings section title"
   },
   "options_themes_description": {
-    "message": "Better Lyrics의 외관을 사용자 정의합니다.",
+    "message": "Tùy chỉnh hiển thị của Better Lyrics.",
     "description": "Theme settings section description"
   },
   "options_themes_theme": {
-    "message": "테마",
+    "message": "Chủ đề",
     "description": "Theme label"
   },
   "options_themes_chooseTheme": {
-    "message": "테마 선택",
+    "message": "Chọn một chủ đề",
     "description": "Choose a theme button label"
   },
   "options_themes_customStyles": {
-    "message": "사용자 정의 스타일",
+    "message": "Chủ đề riêng",
     "description": "Custom styles label"
   },
   "options_themes_create": {
-    "message": "만들기",
+    "message": "Tạo mới",
     "description": "Create button label"
   },
   "options_themes_marketplace": {
-    "message": "테마 마켓플레이스",
+    "message": "Cửa hàng chủ đề",
     "description": "Theme marketplace button label"
   },
   "options_themes_installedThemes": {
-    "message": "설치된 테마",
+    "message": "Chủ đề đã tải",
     "description": "Installed themes button label"
   },
   "options_identity_title": {
-    "message": "신원",
+    "message": "Danh tính",
     "description": "Identity settings section title"
   },
   "options_identity_description": {
-    "message": "Better Lyrics를 위한 고유한 익명 신원입니다.",
+    "message": "Danh tính ẩn danh riêng của bạn trên Better Lyrics.",
     "description": "Identity settings section description"
   },
   "options_identity_yourIdentity": {
-    "message": "내 신원",
+    "message": "Danh tính của bạn",
     "description": "Your identity label"
   },
   "options_identity_loading": {
-    "message": "로딩 중...",
+    "message": "Đang tải...",
     "description": "Loading identity placeholder"
   },
   "options_identity_exportImport": {
-    "message": "내보내기/가져오기",
+    "message": "Nhập/Xuất",
     "description": "Export/Import section label"
   },
   "options_identity_exportKey": {
-    "message": "키 내보내기",
+    "message": "Xuất khóa",
     "description": "Export key button label"
   },
   "options_identity_importKey": {
-    "message": "키 가져오기",
+    "message": "Nhập khóa",
     "description": "Import key button label"
   },
   "options_modal_selectTheme": {
-    "message": "테마 선택",
+    "message": "Chọn một chủ đề",
     "description": "Theme modal title"
   },
   "options_modal_cancel": {
-    "message": "취소",
+    "message": "Hủy",
     "description": "Cancel button label"
   },
   "options_modal_confirm": {
-    "message": "확인",
+    "message": "Xác nhận",
     "description": "Confirm button label"
   },
   "options_alert_cacheCleared": {
-    "message": "캐시가 성공적으로 지워졌습니다!",
+    "message": "Bộ nhớ đệm đã được xóa sạch!",
     "description": "Cache cleared success message"
   },
   "options_alert_cacheClearFailed": {
-    "message": "캐시 지우기 실패!",
+    "message": "Xóa bộ nhớ đệm không thành công!",
     "description": "Cache clear failed message"
   },
   "options_alert_nothingToClear": {
-    "message": "지울 것이 없습니다!",
+    "message": "Không có gì để xóa!",
     "description": "Nothing to clear message"
   },
   "options_alert_exportFailed": {
-    "message": "신원 내보내기 실패",
+    "message": "Failed to export identity",
     "description": "Export identity failed message"
   },
   "options_alert_fileSaveDialogOpened": {
-    "message": "파일 저장 대화 상자가 열렸습니다.",
+    "message": "Đã mở hộp thoại lưu tệp danh tính.",
     "description": "File save dialog opened message"
   },
   "options_alert_fileSaveFailed": {
-    "message": "파일 저장 중 오류가 발생했습니다. 다시 시도해 주세요.",
+    "message": "Không lưu được tệp. Vui lòng thử lại.",
     "description": "File save failed message"
   },
   "options_alert_downloadInitiated": {
-    "message": "신원 파일 다운로드가 시작되었습니다.",
+    "message": "Quá trình tải tệp danh tính đã được khởi tạo.",
     "description": "Download initiated message"
   },
   "options_alert_importSuccess": {
-    "message": "신원을 성공적으로 가져왔습니다!",
+    "message": "Tệp danh tính đã nhập thành công!",
     "description": "Import success message"
   },
   "options_alert_identityLoadError": {
-    "message": "신원 로딩 중 오류 발생",
+    "message": "Lỗi tải danh tính",
     "description": "Identity load error message"
   },
   "options_editor_saving": {
-    "message": "저장 중...",
+    "message": "Đang lưu...",
     "description": "Saving indicator text"
   },
   "options_editor_importFile": {
-    "message": "파일에서 가져오기",
+    "message": "Nhập tệp",
     "description": "Import from file tooltip"
   },
   "options_editor_exportFile": {
-    "message": "파일로 내보내기",
+    "message": "Xuất ra tệp",
     "description": "Export to file tooltip"
   },
   "options_editor_saveAsTheme": {
-    "message": "테마로 저장",
+    "message": "Lưu thành một chủ đề",
     "description": "Save as theme tooltip"
   },
   "options_editor_openInNewTab": {
-    "message": "새 탭에서 열기",
+    "message": "Mở trong thẻ mới",
     "description": "Open in new tab tooltip"
   },
   "options_editor_backToSettings": {
-    "message": "설정으로 돌아가기",
+    "message": "Quay về Cài đặt",
     "description": "Back to settings button label"
   },
   "options_editor_fullExperienceNote": {
-    "message": "전체 편집기 경험을 위해, ",
+    "message": "Nếu muốn một trải nghiệm một trình chỉnh sửa thực thụ,",
     "description": "Full editor experience note prefix"
   },
   "options_editor_openInNewTabLink": {
-    "message": "이 편집기를 새 탭에서 여세요",
+    "message": "hãy mở trang này trong thẻ mới",
     "description": "Open in new tab link text"
   },
   "options_editor_stylingGuide": {
-    "message": "스타일링 가이드",
+    "message": "Hướng dẫn tạo chủ đề",
     "description": "Styling guide link text"
   },
   "options_editor_renameTheme": {
-    "message": "사용자 정의 테마 이름 변경",
+    "message": "Đổi tên chủ đề riêng",
     "description": "Rename theme button title"
   },
   "options_editor_deleteTheme": {
-    "message": "사용자 정의 테마 삭제",
+    "message": "Xóa chủ đề riêng",
     "description": "Delete theme button title"
   },
   "options_editor_doubleClickRename": {
-    "message": "더블 클릭하여 이름 변경",
+    "message": "Nháy đúp chuột để đổi tên",
     "description": "Double-click to rename tooltip"
   },
   "options_provider_betterLyrics": {
@@ -288,439 +288,439 @@
     "description": "LRClib provider name"
   },
   "options_provider_youtube": {
-    "message": "YouTube",
+    "message": "Youtube",
     "description": "Youtube provider name"
   },
   "options_provider_youtubeCaptions": {
-    "message": "YouTube 자막",
+    "message": "Phụ đề Youtube",
     "description": "Youtube Captions provider name"
   },
   "options_syncType_syllable": {
-    "message": "음절",
+    "message": "Âm tiết",
     "description": "Syllable sync type label"
   },
   "options_syncType_syllable_tooltip": {
-    "message": "노래에 맞춰 개별 음절을 하이라이트합니다. 음절 싱크가 최고의 경험을 제공합니다.",
+    "message": "Lướt qua từng âm tiết theo người hát. Đồng bộ âm tiết đưa ra trải nghiệm tuyệt vời nhất.",
     "description": "Syllable sync type tooltip"
   },
   "options_syncType_word": {
-    "message": "단어",
+    "message": "Từ",
     "description": "Word sync type label"
   },
   "options_syncType_word_tooltip": {
-    "message": "노래에 맞춰 개별 단어를 하이라이트합니다. 단어 싱크가 좋은 경험을 제공합니다.",
+    "message": "Lướt qua từng từ theo người hát. Đồng bộ theo từ đưa ra một trải nghiệm tốt.",
     "description": "Word sync type tooltip"
   },
   "options_syncType_line": {
-    "message": "줄",
+    "message": "Dòng",
     "description": "Line sync type label"
   },
   "options_syncType_line_tooltip": {
-    "message": "노래에 맞춰 전체 줄을 하이라이트합니다. 줄 싱크가 기본적인 경험을 제공합니다.",
+    "message": "Làm nổi cả một dòng lời bài hát theo người hát. Đồng bộ theo dòng đưa ra một trải nghiệm cơ bản.",
     "description": "Line sync type tooltip"
   },
   "options_syncType_unsynced": {
-    "message": "동기화 없음",
+    "message": "Không đồng bộ",
     "description": "Unsynced sync type label"
   },
   "options_syncType_unsynced_tooltip": {
-    "message": "타이밍 정보가 없는 가사입니다. 동기화되지 않은 가사는 최소한의 경험을 제공합니다.",
+    "message": "Lời bài hát để nguyên. Không đồng bộ đưa ra một trải nghiệm tối giản nhất.",
     "description": "Unsynced sync type tooltip"
   },
   "options_detail_rateTheme": {
-    "message": "이 테마 평가",
+    "message": "Đánh giá chủ đề này",
     "description": "Rate theme label"
   },
   "options_detail_install": {
-    "message": "설치",
+    "message": "Tải xuống",
     "description": "Install button label"
   },
   "options_detail_viewOnGitHub": {
-    "message": "GitHub에서 보기",
+    "message": "Xem trên GitHub",
     "description": "View on GitHub link text"
   },
   "options_detail_shaderInfo": {
-    "message": "이 테마에는 셰이더 구성이 포함되어 있습니다.",
+    "message": "Chủ đề này bao gồm một cấu hình shader.",
     "description": "Shader info text prefix"
   },
   "options_detail_downloadShader": {
-    "message": "shader.json 다운로드",
+    "message": "Tải shader.json xuống",
     "description": "Download shader link text"
   },
   "options_detail_shaderImportSuffix": {
-    "message": "후 가져오기:",
+    "message": "rồi hãy nhập nó vào",
     "description": "Shader import suffix text before Better Lyrics Shaders link"
   },
   "marketplace_pageTitle": {
-    "message": "Better Lyrics 테마 마켓플레이스",
+    "message": "Cửa hàng Chủ đề Better Lyrics",
     "description": "Page title"
   },
   "marketplace_title": {
-    "message": "테마 마켓플레이스",
+    "message": "Cửa hàng chủ đề",
     "description": "Header title"
   },
   "marketplace_subtitle": {
-    "message": "커뮤니티 테마를 발견하고 설치하세요",
+    "message": "Khám phá và tải xuống chủ đề từ chính tay cộng đồng chúng tôi",
     "description": "Header subtitle"
   },
   "marketplace_searchPlaceholder": {
-    "message": "테마 검색...",
+    "message": "Tìm chủ đề...",
     "description": "Search input placeholder"
   },
   "marketplace_refresh": {
-    "message": "새로고침",
+    "message": "Tải lại",
     "description": "Refresh button label"
   },
   "marketplace_keyboardShortcuts": {
-    "message": "키보드 단축키",
+    "message": "Phím tắt",
     "description": "Keyboard shortcuts button label"
   },
   "marketplace_sortBy": {
-    "message": "정렬",
+    "message": "Sắp xếp theo",
     "description": "Sort filter group label"
   },
   "marketplace_sortRatingDesc": {
-    "message": "높은 평점순",
+    "message": "Được đánh giá cao nhất",
     "description": "Sort by highest rating"
   },
   "marketplace_sortRatingAsc": {
-    "message": "낮은 평점순",
+    "message": "Được đánh giá thấp nhất",
     "description": "Sort by lowest rating"
   },
   "marketplace_sortDownloadsDesc": {
-    "message": "다운로드 많은순",
+    "message": "Được tải về nhiều nhất",
     "description": "Sort by most downloads"
   },
   "marketplace_sortDownloadsAsc": {
-    "message": "다운로드 적은순",
+    "message": "Được tải về ít nhất",
     "description": "Sort by least downloads"
   },
   "marketplace_sortNewest": {
-    "message": "최신순",
+    "message": "Mới nhất",
     "description": "Sort by newest"
   },
   "marketplace_sortOldest": {
-    "message": "오래된순",
+    "message": "Cũ nhất",
     "description": "Sort by oldest"
   },
   "marketplace_show": {
-    "message": "표시",
+    "message": "Show",
     "description": "Show filter group label"
   },
   "marketplace_showAll": {
-    "message": "전체",
+    "message": "Tất cả",
     "description": "Show all themes"
   },
   "marketplace_showInstalled": {
-    "message": "설치됨",
+    "message": "Đã tải về",
     "description": "Show installed themes"
   },
   "marketplace_showNotInstalled": {
-    "message": "미설치",
+    "message": "Chưa tải về",
     "description": "Show not installed themes"
   },
   "marketplace_options": {
-    "message": "옵션",
+    "message": "Tùy chọn",
     "description": "Options filter group label"
   },
   "marketplace_hasShaders": {
-    "message": "셰이더 포함",
+    "message": "Có cấu hình shader",
     "description": "Filter for themes with shaders"
   },
   "marketplace_compatibleOnly": {
-    "message": "호환되는 것만",
+    "message": "Chỉ tương thích",
     "description": "Filter for compatible themes"
   },
   "marketplace_installFromUrl": {
-    "message": "URL에서 설치",
+    "message": "Tải xuống từ URL",
     "description": "Install from URL button"
   },
   "marketplace_submitTheme": {
-    "message": "테마 제출",
+    "message": "Tải lên một chủ đề",
     "description": "Submit a theme link"
   },
   "marketplace_loading": {
-    "message": "테마 로딩 중...",
+    "message": "Đang tải chủ đề...",
     "description": "Loading message"
   },
   "marketplace_retry": {
-    "message": "재시도",
+    "message": "Thử lại",
     "description": "Retry button"
   },
   "marketplace_noThemesMatch": {
-    "message": "필터와 일치하는 테마가 없습니다",
+    "message": "Không chủ đề nào tương thích với bộ lọc của bạn",
     "description": "Empty state message"
   },
   "marketplace_permissionTitle": {
-    "message": "권한 필요",
+    "message": "Yêu cầu cấp quyền",
     "description": "Permission required title"
   },
   "marketplace_permissionMessage": {
-    "message": "테마를 탐색하고 설치하려면 Better Lyrics가 테마가 호스팅된 GitHub와 마켓플레이스 API에 액세스할 권한이 필요합니다.",
+    "message": "Để khám phá và cài đặt chủ đề, Better Lyrics cần quyền truy cập GitHub, nơi lưu trữ các giao diện, cùng với API của marketplace.",
     "description": "Permission required message"
   },
   "marketplace_grantPermission": {
-    "message": "권한 부여",
+    "message": "Cấp quyền",
     "description": "Grant permission button"
   },
   "marketplace_install": {
-    "message": "설치",
+    "message": "Tải về",
     "description": "Install button"
   },
   "marketplace_remove": {
-    "message": "제거",
+    "message": "Xóa",
     "description": "Remove button"
   },
   "marketplace_apply": {
-    "message": "적용",
+    "message": "Áp dụng",
     "description": "Apply button"
   },
   "marketplace_active": {
-    "message": "활성",
+    "message": "Đang hoạt động",
     "description": "Active theme indicator"
   },
   "marketplace_shadersBadge": {
-    "message": "셰이더",
+    "message": "Shaders",
     "description": "Shaders badge text"
   },
   "marketplace_githubBadge": {
-    "message": "GitHub",
+    "message": "Github",
     "description": "GitHub badge text"
   },
   "marketplace_urlModalTitle": {
-    "message": "URL에서 설치",
+    "message": "Tải về từ URL",
     "description": "URL install modal title"
   },
   "marketplace_urlModalMessage": {
-    "message": "GitHub 저장소 URL을 입력하여 테마를 직접 설치하세요:",
+    "message": "Nhập URL repository GitHub để cài đặt giao diện trực tiếp:",
     "description": "URL install modal message"
   },
   "marketplace_urlModalPlaceholder": {
-    "message": "github.com/user/repo 또는 github.com/user/repo/tree/branch",
+    "message": "github.com/user/repo hoặc github.com/user/repo/tree/branch",
     "description": "URL input placeholder"
   },
   "marketplace_urlModalError": {
-    "message": "GitHub 저장소 URL을 입력하세요",
+    "message": "Vui lòng nhập một URL repository GitHub",
     "description": "URL validation error"
   },
   "marketplace_cancel": {
-    "message": "취소",
+    "message": "Hủy",
     "description": "Cancel button"
   },
   "marketplace_urlPermissionTitle": {
-    "message": "추가 권한 필요",
+    "message": "Cần cấp quyền thêm",
     "description": "URL permission modal title"
   },
   "marketplace_urlPermissionWhy": {
-    "message": "왜 필요한가요?",
+    "message": "Sao cái này lại cần thiết vậy?",
     "description": "URL permission explanation title"
   },
   "marketplace_urlPermissionDesc": {
-    "message": "사용자 정의 GitHub URL에서 테마를 설치하려면 마켓플레이스보다 더 넓은 액세스가 필요합니다. 이를 통해 Better Lyrics는:",
+    "message": "Việc cài chủ đề từ URL của GitHub tùy chỉnh yêu cầu quyền truy cập cao hơn cửa hàng. Nhờ đó, Better Lyrics có thể:",
     "description": "URL permission description"
   },
   "marketplace_urlPermissionItem1": {
-    "message": "모든 GitHub 저장소에서 테마 파일 가져오기",
+    "message": "Tải các chủ đề từ bất kì kho lưu trữ GitHub nào",
     "description": "URL permission list item 1"
   },
   "marketplace_urlPermissionItem2": {
-    "message": "저장소의 기본 브랜치 감지",
+    "message": "Phát hiện nhánh mặc định của repository",
     "description": "URL permission list item 2"
   },
   "marketplace_urlPermissionItem3": {
-    "message": "설치 전 테마 구조 검증",
+    "message": "Kiểm tra cấu trúc giao diện trước khi cài đặt",
     "description": "URL permission list item 3"
   },
   "marketplace_urlPermissionNote": {
-    "message": "이 권한은 URL을 통해 테마를 설치할 때만 사용됩니다. 마켓플레이스 테마는 필요하지 않습니다.",
+    "message": "Chỉ cần cấp quyền khi bạn tải chủ đề qua URL. Tải qua cửa hàng thì không cần.",
     "description": "URL permission note"
   },
   "marketplace_shortcutsTitle": {
-    "message": "키보드 단축키",
+    "message": "Phím tắt",
     "description": "Shortcuts modal title"
   },
   "marketplace_shortcutsNavigation": {
-    "message": "탐색",
+    "message": "Điều hướng",
     "description": "Navigation shortcuts group"
   },
   "marketplace_shortcutsSearch": {
-    "message": "테마 검색",
+    "message": "Tìm kiếm chủ đề",
     "description": "Search shortcut label"
   },
   "marketplace_shortcutsRefresh": {
-    "message": "마켓플레이스 새로고침",
+    "message": "Tải lại cửa hàng",
     "description": "Refresh shortcut label"
   },
   "marketplace_shortcutsInstallUrl": {
-    "message": "URL에서 설치",
+    "message": "Tải qua URL",
     "description": "Install from URL shortcut label"
   },
   "marketplace_shortcutsPrevPage": {
-    "message": "이전 페이지",
+    "message": "Trang trước",
     "description": "Previous page shortcut label"
   },
   "marketplace_shortcutsNextPage": {
-    "message": "다음 페이지",
+    "message": "Trang sau",
     "description": "Next page shortcut label"
   },
   "marketplace_shortcutsSort": {
-    "message": "정렬",
+    "message": "Lọc",
     "description": "Sort shortcuts group"
   },
   "marketplace_shortcutsSortHint": {
-    "message": "다시 누르면 역순",
+    "message": "Nhấn lần nữa để đổi hướng",
     "description": "Sort toggle hint"
   },
   "marketplace_shortcutsByRating": {
-    "message": "평점순",
+    "message": "Theo đánh giá",
     "description": "Sort by rating shortcut"
   },
   "marketplace_shortcutsByDownloads": {
-    "message": "다운로드순",
+    "message": "Theo lượt tải xuống",
     "description": "Sort by downloads shortcut"
   },
   "marketplace_shortcutsByDate": {
-    "message": "날짜순",
+    "message": "Theo ngày",
     "description": "Sort by date shortcut"
   },
   "marketplace_shortcutsFilters": {
-    "message": "필터",
+    "message": "Bộ lọc",
     "description": "Filters shortcuts group"
   },
   "marketplace_shortcutsShowAll": {
-    "message": "전체 표시",
+    "message": "Hiển thị tất cả",
     "description": "Show all shortcut"
   },
   "marketplace_shortcutsShowInstalled": {
-    "message": "설치됨 표시",
+    "message": "Hiển thị đã tải",
     "description": "Show installed shortcut"
   },
   "marketplace_shortcutsShowNotInstalled": {
-    "message": "미설치 표시",
+    "message": "Hiển thị chưa tải",
     "description": "Show not installed shortcut"
   },
   "marketplace_shortcutsToggleShaders": {
-    "message": "셰이더 전환",
+    "message": "Bật/Tắt shaders",
     "description": "Toggle shaders shortcut"
   },
   "marketplace_shortcutsToggleCompatible": {
-    "message": "호환성 전환",
+    "message": "Bật/Tắt tương thích",
     "description": "Toggle compatible shortcut"
   },
   "marketplace_shortcutsDetails": {
-    "message": "테마 상세",
+    "message": "Thông tin về chủ đề này",
     "description": "Theme details shortcuts group"
   },
   "marketplace_shortcutsInstallRemove": {
-    "message": "설치 / 제거",
+    "message": "Tải xuống / Xóa",
     "description": "Install/remove shortcut"
   },
   "marketplace_shortcutsPrevImage": {
-    "message": "이전 이미지",
+    "message": "Ảnh trước đó",
     "description": "Previous image shortcut"
   },
   "marketplace_shortcutsNextImage": {
-    "message": "다음 이미지",
+    "message": "Ảnh tiếp theo",
     "description": "Next image shortcut"
   },
   "marketplace_shortcutsGeneral": {
-    "message": "일반",
+    "message": "Chung",
     "description": "General shortcuts group"
   },
   "marketplace_shortcutsCloseModal": {
-    "message": "모달 닫기",
+    "message": "Đóng cửa sổ",
     "description": "Close modal shortcut"
   },
   "marketplace_shortcutsShowShortcuts": {
-    "message": "단축키 표시",
+    "message": "Hiển thị phím tắt",
     "description": "Show shortcuts shortcut"
   },
   "marketplace_shortcutsApplyTheme": {
-    "message": "테마 적용 (설치 후)",
+    "message": "Áp dụng chủ đề (Sau khi tải)",
     "description": "Apply theme shortcut"
   },
   "marketplace_ratingFailed": {
-    "message": "평가 제출 실패",
+    "message": "Không thể đăng bài đánh giá",
     "description": "Rating submission error"
   },
   "marketplace_shaderFetchFailed": {
-    "message": "셰이더 구성 가져오기 실패",
+    "message": "Không thể tải cấu hình shader",
     "description": "Shader fetch error"
   },
   "marketplace_applyFailed": {
-    "message": "테마 적용 실패",
+    "message": "Không thể áp dụng chủ đề",
     "description": "Theme apply error"
   },
   "marketplace_noThemesInstalled": {
-    "message": "설치된 테마 없음",
+    "message": "Chưa cài đặt chủ đề nào",
     "description": "Empty installed themes message"
   },
   "editor_pageTitle": {
-    "message": "Better Lyrics CSS 편집기",
+    "message": "Better Lyrics Styles Editor",
     "description": "Standalone editor page title"
   },
   "editor_importFromFile": {
-    "message": "파일에서 가져오기",
+    "message": "Nhập file",
     "description": "Import from file button"
   },
   "editor_exportToFile": {
-    "message": "파일로 내보내기",
+    "message": "Xuất ra file",
     "description": "Export to file button"
   },
   "editor_saveAsTheme": {
-    "message": "테마로 저장",
+    "message": "Lưu thành chủ đề",
     "description": "Save as theme button"
   },
   "editor_stylingGuide": {
-    "message": "스타일링 가이드",
+    "message": "Hướng dẫn tùy chỉnh",
     "description": "Styling guide button"
   },
   "editor_tip": {
-    "message": "팁: 이 독립형 탭은 별도 창으로 이동하거나 YouTube Music과 분할 화면으로 사용하여 실시간으로 변경 사항을 확인할 수 있습니다. 자세한 정보는",
+    "message": "Mẹo: Đây là một tab độc lập. Bạn có thể kéo trình chỉnh sửa này ra cửa sổ riêng hoặc dùng chế độ chia màn hình cùng YouTube Music để xem thay đổi theo thời gian thực. Để biết thêm thông tin, hãy truy cập",
     "description": "Editor tip text"
   },
   "editor_poweredBy": {
-    "message": "Powered by",
+    "message": "Được cung cấp bởi",
     "description": "Powered by label"
   },
   "editor_playground": {
-    "message": "Playground",
+    "message": "Sân chơi",
     "description": "Playground link text"
   },
   "editor_docs": {
-    "message": "Docs",
+    "message": "Tài liệu",
     "description": "Docs link text"
   },
   "lyrics_source": {
-    "message": "소스: ",
+    "message": "Nguồn:",
     "description": "Lyrics source label"
   },
   "lyrics_addToLrclib": {
-    "message": "LRCLib에 가사 추가",
+    "message": "Thêm lời bài hát vào LRCLib",
     "description": "Add lyrics button text"
   },
   "lyrics_searchOnGenius": {
-    "message": "Genius에서 검색",
+    "message": "Tìm trên Genius",
     "description": "Search on Genius button text"
   },
   "lyrics_searching": {
-    "message": "Better Lyrics가 가사를 검색 중...",
+    "message": "Better Lyrics đang tìm lời bài hát...",
     "description": "Loading message while searching for lyrics"
   },
   "lyrics_stillSearching": {
-    "message": "싱크 가사를 계속 검색 중...",
+    "message": "Vẫn đang tìm lời bài hát được đồng bộ...",
     "description": "Loading message while still searching"
   },
   "lyrics_noSyncedLyrics": {
-    "message": "Better Lyrics가 싱크 가사를 찾을 수 없습니다",
+    "message": "Better Lyrics không thể tìm lời bài hát được đồng bộ",
     "description": "Message when no synced lyrics found"
   },
   "lyrics_adPlaying": {
-    "message": "[엘리베이터 음악]",
+    "message": "tu tu tu",
     "description": "Message shown during ad playback"
   },
   "lyrics_notFound": {
-    "message": "이 노래의 가사를 찾을 수 없습니다",
+    "message": "Không có lời bài hát được tìm thấy cho bài này",
     "description": "Message when no lyrics are available"
   },
   "options_language_exclusions": {

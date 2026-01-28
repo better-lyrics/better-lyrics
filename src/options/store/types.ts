@@ -25,7 +25,7 @@ export interface StoreThemeMetadata {
   images?: string[];
 }
 
-export interface ResolvedStoreThemeMetadata extends Omit<StoreThemeMetadata, "description"> {
+interface ResolvedStoreThemeMetadata extends Omit<StoreThemeMetadata, "description"> {
   description: string;
 }
 

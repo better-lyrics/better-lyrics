@@ -1,6 +1,24 @@
+import { LOG_PREFIX } from "@constants";
+
 export function t(key: string, substitutions?: string | string[]): string {
   const message = chrome.i18n.getMessage(key, substitutions);
   return message || key;
+}
+
+const DISPLAY_CODE_MAP: Record<string, string> = {
+  "zh-CN": "zh-Hans",
+  "zh-TW": "zh-Hant",
+};
+
+export function getLanguageDisplayName(langCode: string): string {
+  try {
+    const displayCode = DISPLAY_CODE_MAP[langCode] ?? langCode;
+    const displayNames = new Intl.DisplayNames([navigator.language], { type: "language" });
+    return displayNames.of(displayCode) ?? langCode;
+  } catch (e) {
+    console.warn(`${LOG_PREFIX} Failed to get display name for "${langCode}":`, e);
+    return langCode;
+  }
 }
 
 export function injectI18nCssVars(): void {

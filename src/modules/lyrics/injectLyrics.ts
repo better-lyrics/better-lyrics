@@ -9,6 +9,7 @@ import {
   LYRICS_WRAPPER_NOT_VISIBLE_LOG,
   NO_LYRICS_FOUND_LOG,
   NO_LYRICS_TEXT_SELECTOR,
+  ROMANIZATION_LANGUAGES,
   ROMANIZED_LYRICS_CLASS,
   RTL_CLASS,
   romanizationLanguages,
@@ -20,6 +21,7 @@ import {
 } from "@constants";
 import { t } from "@core/i18n";
 import { AppState } from "@core/appState";
+import { containsNonLatin, detectNonLatinLanguage, testRtl } from "@modules/lyrics/lyricParseUtils";
 import { createInstrumentalElement } from "@modules/lyrics/createInstrumentalElement";
 import { containsNonLatin, testRtl } from "@modules/lyrics/lyricParseUtils";
 import { applySegmentMapToLyrics, type LyricSourceResultWithMeta } from "@modules/lyrics/lyrics";
@@ -42,11 +44,21 @@ import {
 } from "@modules/ui/animationEngine";
 import { resizeCanvas } from "@modules/ui/animationEngineDebug";
 import { addFooter, addNoLyricsButton, cleanup, createLyricsWrapper, flushLoader, renderLoader } from "@modules/ui/dom";
-import { getRelativeBounds, log } from "@utils";
+import { getRelativeBounds, languageMatchesAny, log } from "@utils";
+import { resizeCanvas } from "@modules/ui/animationEngineDebug";
+import { registerThemeSetting } from "@modules/settings/themeOptions";
 
 let disableRichsync = registerThemeSetting("blyrics-disable-richsync", false, true);
 let lineSyncedAnimationDelay = registerThemeSetting("blyrics-line-synced-animation-delay", 50, true);
 let longWordThreshold = registerThemeSetting("blyrics-long-word-threshold", 1500, true);
+
+function isRomanizationDisabledForLang(lang: string): boolean {
+  return languageMatchesAny(lang, AppState.romanizationDisabledLanguages);
+}
+
+function isTranslationDisabledForLang(lang: string): boolean {
+  return languageMatchesAny(lang, AppState.translationDisabledLanguages);
+}
 
 function findNearestAgent(lyrics: Lyric[], fromIndex: number): string | undefined {
   for (let i = fromIndex - 1; i >= 0; i--) {
@@ -102,12 +114,6 @@ export interface PartData {
   duration: number;
   lyricElement: HTMLElement;
   animationStartTimeMs: number;
-}
-
-export interface InstrumentalElements {
-  waveClip: SVGElement;
-  wavePath: SVGElement;
-  fill: SVGElement;
 }
 
 export type LineData = {
@@ -251,7 +257,7 @@ function createBreakElem(lyricElement: HTMLDivElement, order: number) {
  * @param [data.source] - Source attribution for lyrics
  * @param [data.sourceHref] - URL for source link
  */
-export function injectLyrics(data: LyricSourceResultWithMeta, keepLoaderVisible = false): void {
+function injectLyrics(data: LyricSourceResultWithMeta, keepLoaderVisible = false): void {
   const lyrics = data.lyrics!;
   cleanup();
   resizeObserver.disconnect();
@@ -465,29 +471,35 @@ export function injectLyrics(data: LyricSourceResultWithMeta, keepLoaderVisible 
 
     // Language should always exist if item.timedRomanization exists
     const shouldRomanize =
-      (data.language && romanizationLanguages.includes(data.language)) || containsNonLatin(item.words);
+      (data.language && languageMatchesAny(data.language, ROMANIZATION_LANGUAGES)) || containsNonLatin(item.words);
     const canInjectRomanizationsEarly = (shouldRomanize && item.romanization) || romanizedCacheResult !== null;
     if (item.romanization) {
       romanizedCacheResult = item.romanization;
     }
 
-    if (canInjectRomanizationsEarly && AppState.isRomanizationEnabled) {
-      if (romanizedCacheResult !== item.words) {
+    const isLanguageDisabledForRomanization = data.language && isRomanizationDisabledForLang(data.language);
+
+    if (canInjectRomanizationsEarly && AppState.isRomanizationEnabled && !isLanguageDisabledForRomanization) {
+      const detectedLang = detectNonLatinLanguage(item.words);
+      const isDetectedLangDisabled = detectedLang && isRomanizationDisabledForLang(detectedLang);
+      if (!isDetectedLangDisabled && romanizedCacheResult !== item.words) {
         if (item.timedRomanization && item.timedRomanization.length > 0 && !disableRichsync.getBooleanValue()) {
           createLyricsLine(item.timedRomanization, line, createRomanizedElem());
         } else {
           createRomanizedElem().textContent = "\n" + romanizedCacheResult;
         }
       }
-    } else {
+    } else if (!isLanguageDisabledForRomanization) {
       langPromise.then(source_language => {
         onRomanizationEnabled(async () => {
+          if (isRomanizationDisabledForLang(source_language)) return;
+
           let isNonLatin = containsNonLatin(item.words);
-          if (romanizationLanguages.includes(source_language) || isNonLatin) {
-            let usableLang = source_language;
-            if (isNonLatin && !romanizationLanguages.includes(source_language)) {
-              usableLang = "auto";
-            }
+          if (isNonLatin) {
+            const detectedLang = detectNonLatinLanguage(item.words);
+            if (detectedLang && isRomanizationDisabledForLang(detectedLang)) return;
+
+            let usableLang = languageMatchesAny(source_language, ROMANIZATION_LANGUAGES) ? source_language : "auto";
 
             if (item.words.trim() !== "♪" && item.words.trim() !== "") {
               let result;
@@ -521,34 +533,35 @@ export function injectLyrics(data: LyricSourceResultWithMeta, keepLoaderVisible 
     let targetTranslationLang = AppState.translationLanguage;
 
     if (item.translation && langCodesMatch(targetTranslationLang, item.translation.lang)) {
+      if (!data.language) {
+        console.warn(`${LOG_PREFIX} Found translations, but no original language`);
+      }
+
       translationResult = {
-        originalLanguage: item.translation.lang,
+        originalLanguage: data.language || "", // Should never be empty!
         translatedText: item.translation.text,
       };
     } else {
       translationResult = getTranslationFromCache(item.words, targetTranslationLang);
     }
 
-    if (translationResult && AppState.isTranslateEnabled) {
+    let translationOriginalLang = translationResult?.originalLanguage || data.language;
+
+    const isSourceLangDisabled = !!translationOriginalLang && isTranslationDisabledForLang(translationOriginalLang);
+    if (translationResult && AppState.isTranslateEnabled && !isSourceLangDisabled) {
       if (!isSameText(translationResult.translatedText, item.words)) {
         createTranslationElem().textContent = "\n" + translationResult.translatedText;
       }
-    } else {
+    } else if (!isSourceLangDisabled) {
       langPromise.then(source_language => {
         onTranslationEnabled(async items => {
+          if (isTranslationDisabledForLang(source_language)) return;
+
           let target_language = items.translationLanguage || "en";
 
           if (source_language !== target_language || containsNonLatin(item.words)) {
             if (item.words.trim() !== "♪" && item.words.trim() !== "") {
-              let result;
-              if (item.translation && target_language === item.translation.lang) {
-                result = {
-                  originalLanguage: item.translation.lang,
-                  translatedText: item.translation.text,
-                };
-              } else {
-                result = await translateText(item.words, target_language);
-              }
+              let result = await translateText(item.words, target_language);
 
               if (result && !isSameText(result.translatedText, item.words)) {
                 createTranslationElem().textContent = "\n" + result.translatedText;

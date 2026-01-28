@@ -32,14 +32,6 @@ export function truncateSource(source: string): string {
 }
 
 /**
- * Converts time string in MM:SS format to total seconds.
- */
-export function timeToInt(time: string): number {
-  const parts = time.split(":");
-  return parseFloat(parts[0]) * 60 + parseFloat(parts[1]);
-}
-
-/**
  * Returns the position and dimensions of a child element relative to its parent.
  *
  * @param parent - The parent element
@@ -50,4 +42,16 @@ export function getRelativeBounds(parent: Element, child: Element): DOMRect {
   const parentBound = parent.getBoundingClientRect();
   const childBound = child.getBoundingClientRect();
   return new DOMRect(childBound.x - parentBound.x, childBound.y - parentBound.y, childBound.width, childBound.height);
+}
+
+/**
+ * Checks if a language code (or its base language) exists in a collection.
+ * Handles variants like "ja-JP" matching "ja", "zh-Hans" matching "zh".
+ */
+export function languageMatchesAny(lang: string, collection: string[] | Record<string, unknown>): boolean {
+  const check = Array.isArray(collection) ? (l: string) => collection.includes(l) : (l: string) => l in collection;
+
+  if (check(lang)) return true;
+  const baseLang = lang.split("-")[0];
+  return baseLang !== lang && check(baseLang);
 }

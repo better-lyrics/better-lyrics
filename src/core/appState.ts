@@ -18,7 +18,7 @@ export interface PlayerDetails {
   };
 }
 
-export interface AppStateType {
+interface AppStateType {
   suppressZeroTime: number;
   areLyricsTicking: boolean;
   lyricData: LyricsData | null;
@@ -37,6 +37,8 @@ export interface AppStateType {
   lyricAbortController: AbortController | null;
   isTranslateEnabled: boolean;
   isRomanizationEnabled: boolean;
+  romanizationDisabledLanguages: string[];
+  translationDisabledLanguages: string[];
   translationLanguage: string;
   hasPreloadedNextSong: boolean;
 }
@@ -60,6 +62,8 @@ export const AppState: AppStateType = {
   lyricAbortController: null,
   isTranslateEnabled: false,
   isRomanizationEnabled: false,
+  romanizationDisabledLanguages: [],
+  translationDisabledLanguages: [],
   translationLanguage: "en",
   hasPreloadedNextSong: false,
 };

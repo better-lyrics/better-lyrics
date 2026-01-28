@@ -9,7 +9,7 @@ interface Operation {
   id: string;
 }
 
-export class EditorStateManager {
+class EditorStateManager {
   private editor: EditorView | null = null;
   private operationQueue: Operation[] = [];
   private isProcessing = false;
