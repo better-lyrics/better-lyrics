@@ -44,7 +44,7 @@ import {
   createLyricsWrapper,
   flushLoader,
   renderLoader,
-  setExtraHeight
+  setExtraHeight,
 } from "@modules/ui/dom";
 import { getRelativeBounds, languageMatchesAny, log } from "@utils";
 import { resizeCanvas } from "@modules/ui/animationEngineDebug";
@@ -665,7 +665,7 @@ function injectLyrics(data: LyricSourceResultWithMeta, keepLoaderVisible = false
 }
 
 export function calculateLyricPositions() {
-  setExtraHeight()
+  setExtraHeight();
   if (AppState.lyricData && AppState.areLyricsTicking) {
     const lyricsElement = document.getElementsByClassName(LYRICS_CLASS)[0] as HTMLElement;
 
