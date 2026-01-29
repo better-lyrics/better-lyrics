@@ -367,8 +367,8 @@ export function initializeLyrics(): void {
  * Manages autoscroll pause/resume functionality.
  */
 export function scrollEventHandler(): void {
-  const tabSelector = document.getElementsByClassName(TAB_HEADER_CLASS)[1];
-  if (tabSelector.getAttribute("aria-selected") !== "true" || !AppState.areLyricsTicking) {
+  const tabSelector = AppState.lyricData?.tabSelector;
+  if (!tabSelector || tabSelector.getAttribute("aria-selected") !== "true" || !AppState.areLyricsTicking) {
     return;
   }
 

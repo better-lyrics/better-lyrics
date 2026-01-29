@@ -140,7 +140,14 @@ export function animationEngine(currentTime: number, eventCreationTime: number, 
 
   currentTime += timeOffset / 1000;
 
-  const tabSelector = document.getElementsByClassName(TAB_HEADER_CLASS)[1] as HTMLElement;
+  let lyricData = AppState.lyricData;
+  if (!lyricData) {
+    AppState.areLyricsTicking = false;
+    log("Lyrics are ticking, but lyricData are null!");
+    return;
+  }
+
+  const tabSelector = lyricData.tabSelector;
   console.assert(tabSelector != null);
 
   const playerState = document.getElementById("player-page")?.getAttribute("player-ui-state");
@@ -163,18 +170,11 @@ export function animationEngine(currentTime: number, eventCreationTime: number, 
   }
 
   try {
-    const lyricsElement = document.getElementsByClassName(LYRICS_CLASS)[0] as HTMLElement;
+    const lyricsElement = lyricData.lyricsContainer;
     // If lyrics element doesn't exist, clear the interval and return silently
     if (!lyricsElement) {
       AppState.areLyricsTicking = false;
       log(NO_LYRICS_ELEMENT_LOG);
-      return;
-    }
-
-    let lyricData = AppState.lyricData;
-    if (!lyricData) {
-      AppState.areLyricsTicking = false;
-      log("Lyrics are ticking, but lyricData are null!");
       return;
     }
 
@@ -473,7 +473,7 @@ export function animationEngine(currentTime: number, eventCreationTime: number, 
 
             let scrollTime = getCSSDurationInMs(lyricsElement, "transition-duration");
 
-            lyricsElement.style.transition = "transform 0s ease-in-out 0s";
+            lyricsElement.style.transition = "none";
             lyricsElement.style.transform = `translate(0px, ${-(scrollTop - scrollPos)}px)`;
             reflow(lyricsElement);
             lyricsElement.style.transition = "";
@@ -483,7 +483,11 @@ export function animationEngine(currentTime: number, eventCreationTime: number, 
           }
 
           scrollTop = scrollPos;
-          animEngineState.scrollPos = scrollPos;
+          animEngineState.scrollPos = scrollTop;
+          tabRenderer.scrollTop = scrollTop;
+          animEngineState.skipScrolls += 1;
+          animEngineState.skipScrollsDecayTimes.push(Date.now() + 2000);
+
         } else if (
           animEngineState.nextScrollAllowedTime - Date.now() < QUEUE_SCROLL_THRESHOLD.getNumberValue() ||
           timeJumped
@@ -498,12 +502,6 @@ export function animationEngine(currentTime: number, eventCreationTime: number, 
       getResumeScrollElement().setAttribute("autoscroll-hidden", "true");
       lyricsElement.classList.remove(USER_SCROLLING_CLASS);
       animEngineState.wasUserScrolling = false;
-    }
-
-    if (Math.abs(scrollTop - tabRenderer.scrollTop) > 1) {
-      tabRenderer.scrollTop = scrollTop;
-      animEngineState.skipScrolls += 1;
-      animEngineState.skipScrollsDecayTimes.push(Date.now() + 2000);
     }
 
     let j = 0;

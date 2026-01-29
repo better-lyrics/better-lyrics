@@ -12,7 +12,7 @@ import {
   ROMANIZATION_LANGUAGES,
   ROMANIZED_LYRICS_CLASS,
   RTL_CLASS,
-  SYNC_DISABLED_LOG,
+  SYNC_DISABLED_LOG, TAB_HEADER_CLASS,
   TRANSLATED_LYRICS_CLASS,
   TRANSLATION_ENABLED_LOG,
   WORD_CLASS,
@@ -150,6 +150,8 @@ export interface LyricsData {
   lyricWidth: number;
   lyricHeight: number;
   isMusicVideoSynced: boolean;
+  tabSelector: HTMLElement;
+  lyricsContainer: HTMLElement;
 }
 
 /**
@@ -639,12 +641,16 @@ function injectLyrics(data: LyricSourceResultWithMeta, keepLoaderVisible = false
     lyricsContainer.dataset.noLyrics = "true";
   }
 
+  const tabSelector = document.getElementsByClassName(TAB_HEADER_CLASS)[1] as HTMLElement;
+
   let lyricsData = {
     lines: lines,
     syncType: syncType,
     lyricWidth: lyricsContainer.clientWidth,
     lyricHeight: lyricsContainer.clientHeight,
     isMusicVideoSynced: data.musicVideoSynced === true,
+    tabSelector,
+    lyricsContainer
   };
 
   if (data.segmentMap) {
