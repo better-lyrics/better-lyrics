@@ -236,7 +236,10 @@ function createLyricsLine(parts: LyricPart[], line: LineData, lyricElement: HTML
       span.style.display = "inline";
     }
 
-    line.parts.push(partData);
+    if (part.words.trim().length !== 0) {
+      line.parts.push(partData);
+    }
+    
     if (isRtl) {
       rtlBuffer.push(span);
     } else {
