@@ -67,7 +67,10 @@ export function getLyrics(videoId: string, maxRetries = 250, signal?: AbortSigna
 
   let checkCount = 0;
   return new Promise(resolve => {
-    const abortHandler = () => clearInterval(checkInterval);
+    const abortHandler = () => {
+      clearInterval(checkInterval);
+      resolve({ hasLyrics: false, lyrics: "", sourceText: "" });
+    };
     const checkInterval = setInterval(() => {
       if (signal?.aborted) {
         clearInterval(checkInterval);
@@ -124,7 +127,10 @@ export function getSongMetadata(
 
   let checkCount = 0;
   return new Promise(resolve => {
-    const abortHandler = () => clearInterval(checkInterval);
+    const abortHandler = () => {
+      clearInterval(checkInterval);
+      resolve(null);
+    };
     const checkInterval = setInterval(() => {
       if (signal?.aborted) {
         clearInterval(checkInterval);
