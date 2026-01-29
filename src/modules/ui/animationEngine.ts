@@ -343,6 +343,8 @@ export function animationEngine(currentTime: number, eventCreationTime: number, 
       // });
     }
 
+    scrollTop = tabRenderer.scrollTop;
+
     if (animEngineState.scrollResumeTime < Date.now() || animEngineState.scrollPos === -1) {
       if (activeElems.length == 0) {
         activeElems.push(lyricData.lines[0]);
@@ -487,7 +489,7 @@ export function animationEngine(currentTime: number, eventCreationTime: number, 
       }
 
       if (animEngineState.wasUserScrolling || newLyricSelected || animEngineState.queuedScroll) {
-        if (Date.now() > animEngineState.nextScrollAllowedTime && Math.abs(scrollTop - scrollPos) > 2) {
+        if (Date.now() > animEngineState.nextScrollAllowedTime) {
           animEngineState.queuedScroll = false;
           animEngineState.lastScrollDebugContext.lyricScrollTime = lyricScrollTime;
           animEngineState.lastScrollDebugContext.centers = lyricPositions;
