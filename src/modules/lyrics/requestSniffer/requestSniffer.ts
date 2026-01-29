@@ -61,6 +61,10 @@ export function getLyrics(videoId: string, maxRetries = 250, signal?: AbortSigna
     return Promise.resolve(videoIdToLyricsMap.get(videoId)!);
   }
 
+  if (signal?.aborted) {
+    return Promise.resolve({ hasLyrics: false, lyrics: "", sourceText: "" });
+  }
+
   let checkCount = 0;
   return new Promise(resolve => {
     const abortHandler = () => clearInterval(checkInterval);
@@ -112,6 +116,10 @@ export function getSongMetadata(
 ): Promise<VideoMetadata | null> {
   if (videoMetaDataMap.has(videoId)) {
     return Promise.resolve(videoMetaDataMap.get(videoId)!);
+  }
+
+  if (signal?.aborted) {
+    return Promise.resolve(null);
   }
 
   let checkCount = 0;
