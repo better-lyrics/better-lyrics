@@ -37,7 +37,15 @@ import {
   lyricsElementAdded,
   SCROLL_POS_OFFSET_RATIO,
 } from "@modules/ui/animationEngine";
-import { addFooter, addNoLyricsButton, cleanup, createLyricsWrapper, flushLoader, renderLoader } from "@modules/ui/dom";
+import {
+  addFooter,
+  addNoLyricsButton,
+  cleanup,
+  createLyricsWrapper,
+  flushLoader,
+  renderLoader,
+  setExtraHeight
+} from "@modules/ui/dom";
 import { getRelativeBounds, languageMatchesAny, log } from "@utils";
 import { resizeCanvas } from "@modules/ui/animationEngineDebug";
 import { registerThemeSetting } from "@modules/settings/themeOptions";
@@ -657,6 +665,7 @@ function injectLyrics(data: LyricSourceResultWithMeta, keepLoaderVisible = false
 }
 
 export function calculateLyricPositions() {
+  setExtraHeight()
   if (AppState.lyricData && AppState.areLyricsTicking) {
     const lyricsElement = document.getElementsByClassName(LYRICS_CLASS)[0] as HTMLElement;
 

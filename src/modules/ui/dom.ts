@@ -22,7 +22,7 @@ import {
   TAB_RENDERER_SELECTOR,
   TRANSLATED_LYRICS_CLASS,
   type SyncType,
-  HIDDEN_CLASS,
+  HIDDEN_CLASS, LYRICS_SPACING_ELEMENT_ID,
 } from "@constants";
 import { t } from "@core/i18n";
 import { AppState } from "@core/appState";
@@ -30,7 +30,7 @@ import {
   animEngineState,
   getResumeScrollElement,
   reflow,
-  resetAnimEngineState,
+  resetAnimEngineState, SCROLL_POS_OFFSET_RATIO,
   toMs,
 } from "@modules/ui/animationEngine";
 import { log } from "@utils";
@@ -756,4 +756,21 @@ export function injectSongAttributes(title: string, artist: string): void {
 function getGeniusLink(song: string, artist: string): string {
   const searchQuery = encodeURIComponent(`${artist.trim()} - ${song.trim()}`);
   return `https://genius.com/search?q=${searchQuery}`;
+}
+
+
+export function setExtraHeight() {
+  const lyricsElement = document.getElementsByClassName(LYRICS_CLASS)[0] as HTMLElement;
+  const lyricsHeight = lyricsElement.getBoundingClientRect().height;
+  const tabRenderer = document.querySelector(TAB_RENDERER_SELECTOR) as HTMLElement;
+  const tabRendererHeight = tabRenderer.getBoundingClientRect().height;
+
+
+  let extraHeight = Math.max(
+      tabRendererHeight * (1 - SCROLL_POS_OFFSET_RATIO.getNumberValue()),
+      tabRendererHeight - lyricsHeight
+  );
+
+  (document.getElementById(LYRICS_SPACING_ELEMENT_ID) as HTMLElement).style.height =
+      `${extraHeight.toFixed(0)}px`;
 }

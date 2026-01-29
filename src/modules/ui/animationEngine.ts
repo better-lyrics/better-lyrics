@@ -312,7 +312,6 @@ export function animationEngine(currentTime: number, eventCreationTime: number, 
     });
 
     // lyricsHeight can change slightly due to animations
-    const lyricsHeight = lyricsElement.getBoundingClientRect().height;
     const tabRenderer = document.querySelector(TAB_RENDERER_SELECTOR) as HTMLElement;
     const tabRendererHeight = tabRenderer.getBoundingClientRect().height;
     let scrollTop = tabRenderer.scrollTop;
@@ -461,7 +460,7 @@ export function animationEngine(currentTime: number, eventCreationTime: number, 
       }
 
       if (animEngineState.wasUserScrolling || newLyricSelected || animEngineState.queuedScroll) {
-        if (Date.now() > animEngineState.nextScrollAllowedTime) {
+        if (Date.now() > animEngineState.nextScrollAllowedTime && Math.abs(scrollTop - scrollPos) > 2) {
           animEngineState.queuedScroll = false;
           animEngineState.lastScrollDebugContext.lyricScrollTime = lyricScrollTime;
           animEngineState.lastScrollDebugContext.centers = lyricPositions;
@@ -482,13 +481,7 @@ export function animationEngine(currentTime: number, eventCreationTime: number, 
 
             animEngineState.nextScrollAllowedTime = scrollTime + Date.now() + 20;
           }
-          let extraHeight = Math.max(
-            tabRendererHeight * (1 - SCROLL_POS_OFFSET_RATIO.getNumberValue()),
-            tabRendererHeight - lyricsHeight
-          );
 
-          (document.getElementById(LYRICS_SPACING_ELEMENT_ID) as HTMLElement).style.height =
-            `${extraHeight.toFixed(0)}px`;
           scrollTop = scrollPos;
           animEngineState.scrollPos = scrollPos;
         } else if (
