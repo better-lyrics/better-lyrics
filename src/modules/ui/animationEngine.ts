@@ -120,6 +120,7 @@ function getCSSDurationInMs(lyricsElement: HTMLElement, property: string): numbe
  */
 export function animationEngine(currentTime: number, eventCreationTime: number, isPlaying = true, smoothScroll = true) {
   const now = Date.now();
+  // const frameStart = performance.now();
   if (isLoaderActive() || !AppState.areLyricsTicking || (currentTime === 0 && !isPlaying)) {
     return;
   }
@@ -187,7 +188,14 @@ export function animationEngine(currentTime: number, eventCreationTime: number, 
     }
 
     const lyricScrollTime = currentTime + getCSSDurationInMs(lyricsElement, "--blyrics-scroll-timing-offset") / 1000;
+
+    // Read layout values before the loop writes class changes, to avoid forced reflow
+    const tabRenderer = document.querySelector(TAB_RENDERER_SELECTOR) as HTMLElement;
+    const tabRendererHeight = tabRenderer.getBoundingClientRect().height;
+    let scrollTop = tabRenderer.scrollTop;
+
     let activeElems = [] as LineData[];
+    const linesToAnimate: LineData[] = [];
     let newLyricSelected = timeJumped;
 
     lines.every((lineData, index) => {
@@ -241,9 +249,11 @@ export function animationEngine(currentTime: number, eventCreationTime: number, 
         lineData.accumulatedOffsetMs = lineData.accumulatedOffsetMs / 1.08;
         lineData.accumulatedOffsetMs += animationTimingOffset * 1000 * 0.4;
         if (lineData.isAnimating && Math.abs(lineData.accumulatedOffsetMs) > 100 && isPlaying) {
-          // Our sync is off for some reason
           lineData.isAnimating = false;
-          // Utils.log("[BetterLyrics] Animation time sync is off, resetting");
+          // console.warn("[BLyrics-diag] DRIFT RESET", {
+          //   accumulatedOffsetMs: lineData.accumulatedOffsetMs.toFixed(1),
+          //   animationTimingOffset: (animationTimingOffset * 1000).toFixed(1),
+          // });
         }
 
         if (isPlaying !== lineData.isAnimationPlayStatePlaying) {
@@ -267,30 +277,8 @@ export function animationEngine(currentTime: number, eventCreationTime: number, 
         }
 
         if (!lineData.isAnimating) {
-          const children = [lineData, ...lineData.parts];
-          children.forEach(part => {
-            const elDuration = part.duration;
-            const elTime = part.time;
-            const timeDelta = currentTime - elTime;
-
-            part.lyricElement.classList.remove(ANIMATING_CLASS);
-            part.lyricElement.classList.remove(PAUSED_CLASS);
-
-            //correct for the animation not starting at 0% and instead at -10%
-            const swipeAnimationDelay = -timeDelta - elDuration * 0.1 + "s";
-            const everythingElseDelay = -timeDelta + "s";
-            part.lyricElement.style.setProperty("--blyrics-swipe-delay", swipeAnimationDelay);
-            part.lyricElement.style.setProperty("--blyrics-anim-delay", everythingElseDelay);
-
-            part.lyricElement.classList.add(PRE_ANIMATING_CLASS);
-            reflow(part.lyricElement);
-            part.lyricElement.classList.add(ANIMATING_CLASS);
-            part.animationStartTimeMs = now - timeDelta * 1000;
-          });
-
-          lineData.isAnimating = true;
-          lineData.isAnimationPlayStatePlaying = true;
-          lineData.accumulatedOffsetMs = 0;
+          // We'll take care of the animation setup in a batch later
+          linesToAnimate.push(lineData);
         }
       } else {
         if (lineData.isSelected) {
@@ -311,10 +299,49 @@ export function animationEngine(currentTime: number, eventCreationTime: number, 
       return true;
     });
 
-    // lyricsHeight can change slightly due to animations
-    const tabRenderer = document.querySelector(TAB_RENDERER_SELECTOR) as HTMLElement;
-    const tabRendererHeight = tabRenderer.getBoundingClientRect().height;
-    let scrollTop = tabRenderer.scrollTop;
+    // Batched animation to avoid multiple reflows and bring reflows from O(n) to O(1)
+    if (linesToAnimate.length > 0) {
+      // Prepare: set delays and add pre animating class
+      for (const lineData of linesToAnimate) {
+        // const isReset = lineData.animationStartTimeMs !== Infinity;
+        // console.warn("[BLyrics-diag] ANIM " + (isReset ? "RESET" : "START"), {
+        //   wordCount: lineData.parts.length,
+        // });
+        const children = [lineData, ...lineData.parts];
+        for (const part of children) {
+          const timeDelta = currentTime - part.time;
+          const swipeAnimationDelay = -timeDelta - part.duration * 0.1 + "s";
+          const everythingElseDelay = -timeDelta + "s";
+
+          part.lyricElement.classList.remove(ANIMATING_CLASS);
+          part.lyricElement.classList.remove(PAUSED_CLASS);
+          part.lyricElement.style.setProperty("--blyrics-swipe-delay", swipeAnimationDelay);
+          part.lyricElement.style.setProperty("--blyrics-anim-delay", everythingElseDelay);
+          part.lyricElement.classList.add(PRE_ANIMATING_CLASS);
+        }
+      }
+
+      // Single reflow to flush all pending class/style changes
+      reflow(linesToAnimate[0].lyricElement);
+
+      // Activate: add animating class and update state
+      for (const lineData of linesToAnimate) {
+        const children = [lineData, ...lineData.parts];
+        for (const part of children) {
+          const timeDelta = currentTime - part.time;
+          part.lyricElement.classList.add(ANIMATING_CLASS);
+          part.animationStartTimeMs = now - timeDelta * 1000;
+        }
+        lineData.isAnimating = true;
+        lineData.isAnimationPlayStatePlaying = true;
+        lineData.accumulatedOffsetMs = 0;
+      }
+
+      // console.warn("[BLyrics-diag] BATCH ANIM", {
+      //   lines: linesToAnimate.length,
+      //   totalParts: linesToAnimate.reduce((s, l) => s + l.parts.length + 1, 0),
+      // });
+    }
 
     if (animEngineState.scrollResumeTime < Date.now() || animEngineState.scrollPos === -1) {
       if (activeElems.length == 0) {
@@ -467,6 +494,9 @@ export function animationEngine(currentTime: number, eventCreationTime: number, 
           animEngineState.lastScrollDebugContext.activeElms = activeElems;
 
           if (smoothScroll) {
+            // console.warn("[BLyrics-diag] SCROLL REFLOW", {
+            //   delta: Math.abs(scrollTop - scrollPos).toFixed(0),
+            // });
             lyricsElement.style.transitionTimingFunction = "";
             lyricsElement.style.transitionProperty = "";
             lyricsElement.style.transitionDuration = "";
@@ -514,6 +544,10 @@ export function animationEngine(currentTime: number, eventCreationTime: number, 
     if (animEngineState.skipScrolls < 1) {
       animEngineState.skipScrolls = 1; // Always leave at least one for when the window is refocused.
     }
+    // const frameTime = performance.now() - frameStart;
+    // if (frameTime > 5) {
+    //   console.warn("[BLyrics-diag] SLOW FRAME", { ms: frameTime.toFixed(1) });
+    // }
   } catch (err) {
     if (!(err as Error).message?.includes("undefined")) {
       log(LYRICS_CHECK_INTERVAL_ERROR, err);
