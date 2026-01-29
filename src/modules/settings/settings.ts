@@ -126,7 +126,9 @@ export function hideCursorOnIdle(): void {
 
       function disappearCursor() {
         mouseTimer = null;
-        document.getElementById("layout")!.setAttribute("cursor-hidden", "");
+        if (cursorVisible) {
+          document.getElementById("layout")!.setAttribute("cursor-hidden", "");
+        }
         cursorVisible = false;
       }
 
