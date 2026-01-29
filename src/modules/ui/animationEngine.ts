@@ -495,7 +495,7 @@ export function animationEngine(currentTime: number, eventCreationTime: number, 
           animEngineState.lastScrollDebugContext.centers = lyricPositions;
           animEngineState.lastScrollDebugContext.activeElms = activeElems;
 
-          if (smoothScroll) {
+          if (smoothScroll && Math.abs(scrollTop - scrollPos) > 2) {
             // console.warn("[BLyrics-diag] SCROLL REFLOW", {
             //   delta: Math.abs(scrollTop - scrollPos).toFixed(0),
             // });
