@@ -48,10 +48,10 @@ const startLyricsTick = () => {
       try {
         const now = Date.now();
 
-        const {video_id, title, author} = player.getVideoData();
+        const { video_id, title, author } = player.getVideoData();
         const audioTrackData = player.getAudioTrack();
         const duration = player.getDuration();
-        const {isPlaying, isBuffering} = player.getPlayerStateObject();
+        const { isPlaying, isBuffering } = player.getPlayerStateObject();
         const contentRect = player.getVideoContentRect();
 
         const currentTime = player.getCurrentTime();
@@ -80,19 +80,19 @@ const startLyricsTick = () => {
         const time = currentTime + timeDiff;
 
         document.dispatchEvent(
-            new CustomEvent("blyrics-send-player-time", {
-              detail: {
-                currentTime: time,
-                videoId: video_id,
-                song: title,
-                artist: author,
-                duration: duration,
-                audioTrackData: audioTrackData,
-                browserTime: now,
-                playing: playing,
-                contentRect,
-              },
-            })
+          new CustomEvent("blyrics-send-player-time", {
+            detail: {
+              currentTime: time,
+              videoId: video_id,
+              song: title,
+              artist: author,
+              duration: duration,
+              audioTrackData: audioTrackData,
+              browserTime: now,
+              playing: playing,
+              contentRect,
+            },
+          })
         );
       } catch (e) {
         console.log(e);
