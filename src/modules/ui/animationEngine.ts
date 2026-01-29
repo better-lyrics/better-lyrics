@@ -343,8 +343,6 @@ export function animationEngine(currentTime: number, eventCreationTime: number, 
       // });
     }
 
-    scrollTop = tabRenderer.scrollTop;
-
     if (animEngineState.scrollResumeTime < Date.now() || animEngineState.scrollPos === -1) {
       if (activeElems.length == 0) {
         activeElems.push(lyricData.lines[0]);
