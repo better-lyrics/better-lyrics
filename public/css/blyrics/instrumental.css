@@ -58,7 +58,7 @@
 }
 
 .blyrics--paused .blyrics--wave-clip {
-	transition-duration: 1000000s !important;
+	transition-duration: 100000000s !important;
 	transform: translateY(100%) !important;
 }
 
@@ -78,7 +78,7 @@
 }
 
 /* Trigger the Flattening */
-.blyrics--instrumental.blyrics--animating .blyrics--wave-path {
+.blyrics--instrumental.blyrics--animating:not(.blyrics--paused) .blyrics--wave-path {
 	animation-play-state: running;
 
 	/* Flatten the wave to 0 height */
@@ -93,14 +93,10 @@
 /* If paused, we freeze the flattening where it is */
 .blyrics--instrumental.blyrics--animating.blyrics--paused .blyrics--wave-path {
 	transform: scaleY(0.0001); /* slightly different to force recalculation */
-	transition-duration: 2s;
+	transition-duration: 10000000000s;
 	transition-property: transform;
 	transition-timing-function: ease-out;
 	transition-delay: 0s;
-}
-
-.blyrics--instrumental.blyrics--animating:not(.blyrics--paused) .blyrics--wave-path {
-	animation-play-state: running;
 }
 
 /* Update Keyframes for the "Split" shape */
