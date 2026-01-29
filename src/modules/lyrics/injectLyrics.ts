@@ -239,7 +239,7 @@ function createLyricsLine(parts: LyricPart[], line: LineData, lyricElement: HTML
     if (part.words.trim().length !== 0) {
       line.parts.push(partData);
     }
-    
+
     if (isRtl) {
       rtlBuffer.push(span);
     } else {
