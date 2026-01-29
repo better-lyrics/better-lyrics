@@ -12,7 +12,8 @@ import {
   ROMANIZATION_LANGUAGES,
   ROMANIZED_LYRICS_CLASS,
   RTL_CLASS,
-  SYNC_DISABLED_LOG, TAB_HEADER_CLASS,
+  SYNC_DISABLED_LOG,
+  TAB_HEADER_CLASS,
   TRANSLATED_LYRICS_CLASS,
   TRANSLATION_ENABLED_LOG,
   WORD_CLASS,
@@ -650,7 +651,7 @@ function injectLyrics(data: LyricSourceResultWithMeta, keepLoaderVisible = false
     lyricHeight: lyricsContainer.clientHeight,
     isMusicVideoSynced: data.musicVideoSynced === true,
     tabSelector,
-    lyricsContainer
+    lyricsContainer,
   };
 
   if (data.segmentMap) {

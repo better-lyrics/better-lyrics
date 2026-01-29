@@ -487,7 +487,6 @@ export function animationEngine(currentTime: number, eventCreationTime: number, 
           tabRenderer.scrollTop = scrollTop;
           animEngineState.skipScrolls += 1;
           animEngineState.skipScrollsDecayTimes.push(Date.now() + 2000);
-
         } else if (
           animEngineState.nextScrollAllowedTime - Date.now() < QUEUE_SCROLL_THRESHOLD.getNumberValue() ||
           timeJumped
