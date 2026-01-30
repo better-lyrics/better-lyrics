@@ -1,0 +1,7 @@
+:root {
+  --blyrics-panel-size: 50%;
+  --blyrics-video-panel-size: 30%;
+  --blyrics-fullscreen-panel-size: 66%;
+  --blyrics-fullscreen-video-panel-size: 25%;
+  --blyrics-no-lyrics-slide-delay: 1.8s;
+}

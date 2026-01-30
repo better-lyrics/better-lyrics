@@ -11,7 +11,7 @@ import {
   loadTranslationSettings,
   onAlbumArtEnabled,
 } from "@modules/settings/settings";
-import { injectHeadTags, setupAdObserver } from "@modules/ui/dom";
+import { injectHeadTags, reloadAlbumArt, setupAdObserver } from "@modules/ui/dom";
 import {
   disableInertWhenFullscreen,
   enableLyricsTab,
@@ -57,8 +57,14 @@ async function modify(): Promise<void> {
   );
 
   onAlbumArtEnabled(
-    () => (AppState.shouldInjectAlbumArt = true),
-    () => (AppState.shouldInjectAlbumArt = false)
+    () => {
+      AppState.shouldInjectAlbumArt = true;
+      reloadAlbumArt();
+    },
+    () => {
+      AppState.shouldInjectAlbumArt = false;
+      reloadAlbumArt();
+    }
   );
 }
 

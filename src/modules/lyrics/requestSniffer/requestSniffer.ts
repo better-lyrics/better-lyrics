@@ -1,5 +1,5 @@
 import { log } from "@utils";
-import type { LongBylineText, NextResponse } from "@modules/lyrics/requestSniffer/NextResponse";
+import type { LongBylineText, NextResponse, ThumbnailElement } from "@modules/lyrics/requestSniffer/NextResponse";
 import { parseTime } from "@modules/lyrics/providers/lrcUtils";
 
 interface Segment {
@@ -31,6 +31,8 @@ interface VideoMetadata {
   album: string;
   isVideo: boolean;
   durationMs: number;
+  thumbnail: ThumbnailElement;
+  smallThumbnail: ThumbnailElement;
   counterpartVideoId: string | null;
   segmentMap: SegmentMap | null;
 }
@@ -47,84 +49,128 @@ const videoIdToAlbumMap = new Map<string, string | null>();
 
 let firstRequestMissedVideoId: string | null = null;
 
-function delay(ms: number): Promise<void> {
-  return new Promise(resolve => setTimeout(resolve, ms));
-}
-
 /**
  *
  * @param videoId
  * @param maxRetries
+ * @param signal - AbortSignal to cancel polling
  * @return
  */
-export function getLyrics(videoId: string, maxRetries = 250): Promise<LyricsInfo> {
+export function getLyrics(videoId: string, maxRetries = 250, signal?: AbortSignal): Promise<LyricsInfo> {
   if (videoIdToLyricsMap.has(videoId)) {
     return Promise.resolve(videoIdToLyricsMap.get(videoId)!);
-  } else {
-    let checkCount = 0;
-    return new Promise(resolve => {
-      const checkInterval = setInterval(() => {
-        if (videoIdToLyricsMap.has(videoId)) {
-          clearInterval(checkInterval);
-          resolve(videoIdToLyricsMap.get(videoId)!);
-        }
-        if (videoMetaDataMap.get(videoId)) {
-          let counterpart = videoMetaDataMap.get(videoId)!.counterpartVideoId;
-          if (counterpart && videoIdToLyricsMap.has(counterpart)!) {
-            clearInterval(checkInterval);
-            resolve(videoIdToLyricsMap.get(counterpart)!);
-          }
-        }
-        if (checkCount > maxRetries) {
-          clearInterval(checkInterval);
-          log("Failed to sniff lyrics");
-          resolve({ hasLyrics: false, lyrics: "", sourceText: "" });
-        }
-        checkCount += 1;
-      }, 20);
-    });
   }
+
+  if (signal?.aborted) {
+    return Promise.resolve({ hasLyrics: false, lyrics: "", sourceText: "" });
+  }
+
+  let checkCount = 0;
+  return new Promise(resolve => {
+    const abortHandler = () => {
+      clearInterval(checkInterval);
+      resolve({ hasLyrics: false, lyrics: "", sourceText: "" });
+    };
+    const checkInterval = setInterval(() => {
+      if (signal?.aborted) {
+        clearInterval(checkInterval);
+        signal?.removeEventListener("abort", abortHandler);
+        resolve({ hasLyrics: false, lyrics: "", sourceText: "" });
+        return;
+      }
+      if (videoIdToLyricsMap.has(videoId)) {
+        clearInterval(checkInterval);
+        signal?.removeEventListener("abort", abortHandler);
+        resolve(videoIdToLyricsMap.get(videoId)!);
+        return;
+      }
+      const metadata = videoMetaDataMap.get(videoId);
+      if (metadata?.counterpartVideoId && videoIdToLyricsMap.has(metadata.counterpartVideoId)) {
+        clearInterval(checkInterval);
+        signal?.removeEventListener("abort", abortHandler);
+        resolve(videoIdToLyricsMap.get(metadata.counterpartVideoId)!);
+        return;
+      }
+      if (checkCount > maxRetries) {
+        clearInterval(checkInterval);
+        signal?.removeEventListener("abort", abortHandler);
+        log("Failed to sniff lyrics");
+        resolve({ hasLyrics: false, lyrics: "", sourceText: "" });
+        return;
+      }
+      checkCount += 1;
+    }, 20);
+
+    signal?.addEventListener("abort", abortHandler, { once: true });
+  });
 }
 
 /**
  *
  * @param videoId
  * @param maxCheckCount
+ * @param signal - AbortSignal to cancel polling
  * @return
  */
-export function getSongMetadata(videoId: string, maxCheckCount = 250): Promise<VideoMetadata | null> {
+export function getSongMetadata(
+  videoId: string,
+  maxCheckCount = 250,
+  signal?: AbortSignal
+): Promise<VideoMetadata | null> {
   if (videoMetaDataMap.has(videoId)) {
     return Promise.resolve(videoMetaDataMap.get(videoId)!);
-  } else {
-    let checkCount = 0;
-    return new Promise(resolve => {
-      const checkInterval = setInterval(() => {
-        let counterpart = videoMetaDataMap.get(videoId);
-        if (counterpart) {
-          clearInterval(checkInterval);
-          resolve(counterpart!);
-        }
-        if (checkCount > maxCheckCount) {
-          clearInterval(checkInterval);
-          log("Failed to find Segment Map for video");
-          resolve(null);
-        }
-        checkCount += 1;
-      }, 20);
-    });
   }
+
+  if (signal?.aborted) {
+    return Promise.resolve(null);
+  }
+
+  let checkCount = 0;
+  return new Promise(resolve => {
+    const abortHandler = () => {
+      clearInterval(checkInterval);
+      resolve(null);
+    };
+    const checkInterval = setInterval(() => {
+      if (signal?.aborted) {
+        clearInterval(checkInterval);
+        signal?.removeEventListener("abort", abortHandler);
+        resolve(null);
+        return;
+      }
+      const metadata = videoMetaDataMap.get(videoId);
+      if (metadata) {
+        clearInterval(checkInterval);
+        signal?.removeEventListener("abort", abortHandler);
+        resolve(metadata);
+        return;
+      }
+      if (checkCount > maxCheckCount) {
+        clearInterval(checkInterval);
+        signal?.removeEventListener("abort", abortHandler);
+        log("Failed to find Segment Map for video");
+        resolve(null);
+        return;
+      }
+      checkCount += 1;
+    }, 20);
+
+    signal?.addEventListener("abort", abortHandler, { once: true });
+  });
 }
 
 /**
  * @param videoId
+ * @param signal - AbortSignal to cancel polling
  * @return
  */
-export async function getSongAlbum(videoId: string): Promise<string | null | undefined> {
+export async function getSongAlbum(videoId: string, signal?: AbortSignal): Promise<string | null | undefined> {
   for (let i = 0; i < 250; i++) {
+    if (signal?.aborted) return undefined;
     if (videoIdToAlbumMap.has(videoId)) {
       return videoIdToAlbumMap.get(videoId);
     }
-    await delay(20);
+    await new Promise(resolve => setTimeout(resolve, 20));
   }
   log("Song album information didn't come in time for: ", videoId);
 }
@@ -206,7 +252,9 @@ export function setupRequestSniffer(): void {
 
             let [primaryArtist, primaryAlbum] = extractByLineInfo(primaryRenderer?.longBylineText);
 
-            let primaryThumbnail = primaryRenderer?.thumbnail.thumbnails[0];
+            let primaryThumbnails = primaryRenderer.thumbnail.thumbnails;
+            let primaryThumbnail = primaryThumbnails[primaryThumbnails.length - 1];
+            let primarySmallThumbnail = primaryThumbnails[0];
             let primaryIsVideo = primaryThumbnail?.height !== primaryThumbnail?.width;
 
             let primary = {
@@ -216,12 +264,16 @@ export function setupRequestSniffer(): void {
               album: primaryAlbum,
               isVideo: primaryIsVideo,
               durationMs: parseTime(primaryRenderer.lengthText.runs[0].text),
+              thumbnail: primaryThumbnail,
+              smallThumbnail: primarySmallThumbnail,
             };
 
             if (counterPartRenderer) {
               let counterpartId = counterPartRenderer?.playlistPanelVideoRenderer.videoId;
               let counterpartTitle = counterPartRenderer.playlistPanelVideoRenderer.title.runs[0].text;
-              let counterpartThumbnail = counterPartRenderer.playlistPanelVideoRenderer.thumbnail.thumbnails[0];
+              let counterpartThumbnails = counterPartRenderer.playlistPanelVideoRenderer.thumbnail.thumbnails;
+              let counterpartThumbnail = counterpartThumbnails[counterpartThumbnails.length - 1];
+              let counterpartSmallThumbnail = counterpartThumbnails[0];
               let counterpartIsVideo = counterpartThumbnail.height !== counterpartThumbnail.width;
               let [counterpartArtist, counterpartAlbum] = extractByLineInfo(
                 counterPartRenderer?.playlistPanelVideoRenderer.longBylineText
@@ -237,6 +289,8 @@ export function setupRequestSniffer(): void {
                   isVideo: counterpartIsVideo,
                   durationMs: parseTime(counterPartRenderer.playlistPanelVideoRenderer.lengthText.runs[0].text),
                   segmentMap: content.playlistPanelVideoWrapperRenderer!.counterpart[0].segmentMap,
+                  thumbnail: counterpartThumbnail,
+                  smallThumbnail: counterpartSmallThumbnail,
                 },
               };
             } else {
@@ -288,6 +342,8 @@ export function setupRequestSniffer(): void {
               segmentMap: numSegmentMap,
               durationMs: videoPair.primary.durationMs,
               id: videoPair.primary.id,
+              thumbnail: videoPair.primary.thumbnail,
+              smallThumbnail: videoPair.primary.smallThumbnail,
             });
 
             videoMetaDataMap.set(counterpart.id, {
@@ -300,6 +356,8 @@ export function setupRequestSniffer(): void {
               segmentMap: reversedSegmentMap,
               durationMs: counterpart.durationMs,
               id: counterpart.id,
+              thumbnail: counterpart.thumbnail,
+              smallThumbnail: counterpart.smallThumbnail,
             });
 
             videoIdToAlbumMap.set(counterpart.id, counterpart.album);
@@ -314,6 +372,8 @@ export function setupRequestSniffer(): void {
               segmentMap: null,
               durationMs: videoPair.primary.durationMs,
               id: videoPair.primary.id,
+              thumbnail: videoPair.primary.thumbnail,
+              smallThumbnail: videoPair.primary.smallThumbnail,
             });
           }
           videoIdToAlbumMap.set(videoPair.primary.id, videoPair.primary.album);

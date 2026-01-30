@@ -17,7 +17,11 @@ let cache: Cache = {
   translation: new Map(),
 };
 
-export async function translateText(text: string, targetLanguage: string): Promise<TranslationResult | null> {
+export async function translateText(
+  text: string,
+  targetLanguage: string,
+  signal?: AbortSignal
+): Promise<TranslationResult | null> {
   let url = TRANSLATE_LYRICS_URL(targetLanguage, text);
 
   const cacheKey = `${targetLanguage}_${text}`;
@@ -26,6 +30,7 @@ export async function translateText(text: string, targetLanguage: string): Promi
   }
   return fetch(url, {
     cache: "force-cache",
+    signal,
   })
     .then(response => response.json())
     .then(data => {
@@ -43,12 +48,17 @@ export async function translateText(text: string, targetLanguage: string): Promi
       }
     })
     .catch(error => {
+      if (error.name === "AbortError") return null;
       log(TRANSLATION_ERROR_LOG, error);
       return null;
     });
 }
 
-export async function translateTextIntoRomaji(lang: string, text: string): Promise<string | null> {
+export async function translateTextIntoRomaji(
+  lang: string,
+  text: string,
+  signal?: AbortSignal
+): Promise<string | null> {
   const cacheKey = text;
   if (cache.romanization.has(cacheKey)) {
     return cache.romanization.get(cacheKey) as string;
@@ -57,6 +67,7 @@ export async function translateTextIntoRomaji(lang: string, text: string): Promi
   let url = TRANSLATE_IN_ROMAJI(lang, text);
   return fetch(url, {
     cache: "force-cache",
+    signal,
   })
     .then(response => response.json())
     .then(data => {
@@ -72,27 +83,10 @@ export async function translateTextIntoRomaji(lang: string, text: string): Promi
       }
     })
     .catch(error => {
+      if (error.name === "AbortError") return null;
       log(TRANSLATION_ERROR_LOG, error);
       return null;
     });
-}
-
-export function onRomanizationEnabled(callback: (items: { isRomanizationEnabled: boolean }) => void): void {
-  getStorage({ isRomanizationEnabled: false }, items => {
-    if (items.isRomanizationEnabled) {
-      callback(items as { isRomanizationEnabled: boolean });
-    }
-  });
-}
-
-export function onTranslationEnabled(
-  callback: (items: { isTranslateEnabled: boolean; translationLanguage: string }) => void
-): void {
-  getStorage({ isTranslateEnabled: false, translationLanguage: "en" }, items => {
-    if (items.isTranslateEnabled) {
-      callback(items as { isTranslateEnabled: boolean; translationLanguage: string });
-    }
-  });
 }
 
 export function clearCache(): void {
@@ -106,6 +100,5 @@ export function getTranslationFromCache(text: string, targetLanguage: string): T
 }
 
 export function getRomanizationFromCache(text: string): string | null {
-  const cacheKey = text;
-  return cache.romanization.get(cacheKey) || null;
+  return cache.romanization.get(text) || null;
 }

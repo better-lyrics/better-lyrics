@@ -13,6 +13,7 @@ import {
   ROMANIZED_LYRICS_CLASS,
   RTL_CLASS,
   SYNC_DISABLED_LOG,
+  TAB_HEADER_CLASS,
   TRANSLATED_LYRICS_CLASS,
   TRANSLATION_ENABLED_LOG,
   WORD_CLASS,
@@ -28,8 +29,6 @@ import type { TranslationResult } from "@modules/lyrics/translation";
 import {
   getRomanizationFromCache,
   getTranslationFromCache,
-  onRomanizationEnabled,
-  onTranslationEnabled,
   translateText,
   translateTextIntoRomaji,
 } from "@modules/lyrics/translation";
@@ -39,7 +38,15 @@ import {
   lyricsElementAdded,
   SCROLL_POS_OFFSET_RATIO,
 } from "@modules/ui/animationEngine";
-import { addFooter, addNoLyricsButton, cleanup, createLyricsWrapper, flushLoader, renderLoader } from "@modules/ui/dom";
+import {
+  addFooter,
+  addNoLyricsButton,
+  cleanup,
+  createLyricsWrapper,
+  flushLoader,
+  renderLoader,
+  setExtraHeight,
+} from "@modules/ui/dom";
 import { getRelativeBounds, languageMatchesAny, log } from "@utils";
 import { resizeCanvas } from "@modules/ui/animationEngineDebug";
 import { registerThemeSetting } from "@modules/settings/themeOptions";
@@ -84,19 +91,32 @@ function isNearestLyricRtl(lyrics: Lyric[], fromIndex: number): boolean {
   return false;
 }
 
-const resizeObserver = new ResizeObserver(entries => {
-  for (const entry of entries) {
-    if (entry.target.id === LYRICS_WRAPPER_ID) {
-      if (
-        AppState.lyricData &&
-        (entry.target.clientWidth !== AppState.lyricData.lyricWidth ||
-          entry.target.clientHeight !== AppState.lyricData.lyricHeight)
-      ) {
-        calculateLyricPositions();
+let resizeObserver: ResizeObserver | null = null;
+
+function getResizeObserver(): ResizeObserver {
+  if (!resizeObserver) {
+    resizeObserver = new ResizeObserver(entries => {
+      for (const entry of entries) {
+        if (entry.target.id === LYRICS_WRAPPER_ID) {
+          if (
+            AppState.lyricData &&
+            (entry.target.clientWidth !== AppState.lyricData.lyricWidth ||
+              entry.target.clientHeight !== AppState.lyricData.lyricHeight)
+          ) {
+            calculateLyricPositions();
+          }
+        }
       }
-    }
+    });
   }
-});
+  return resizeObserver;
+}
+
+export function disconnectResizeObserver(): void {
+  if (resizeObserver) {
+    resizeObserver.disconnect();
+  }
+}
 
 export interface PartData {
   /**
@@ -131,6 +151,8 @@ export interface LyricsData {
   lyricWidth: number;
   lyricHeight: number;
   isMusicVideoSynced: boolean;
+  tabSelector: HTMLElement;
+  lyricsContainer: HTMLElement;
 }
 
 /**
@@ -139,10 +161,11 @@ export interface LyricsData {
  *
  * @param data - Processed lyrics data
  * @param keepLoaderVisible
+ * @param signal - AbortSignal to cancel async operations
  * @param data.language - Language code for the lyrics
  * @param data.lyrics - Array of lyric lines
  */
-export function processLyrics(data: LyricSourceResultWithMeta, keepLoaderVisible = false): void {
+export function processLyrics(data: LyricSourceResultWithMeta, keepLoaderVisible = false, signal?: AbortSignal): void {
   const lyrics = data.lyrics;
   if (!lyrics || lyrics.length === 0) {
     throw new Error(NO_LYRICS_FOUND_LOG);
@@ -162,7 +185,7 @@ export function processLyrics(data: LyricSourceResultWithMeta, keepLoaderVisible
     log(LYRICS_TAB_NOT_DISABLED_LOG);
   }
 
-  injectLyrics(data, keepLoaderVisible);
+  injectLyrics(data, keepLoaderVisible, signal);
 }
 
 function createLyricsLine(parts: LyricPart[], line: LineData, lyricElement: HTMLDivElement) {
@@ -213,7 +236,10 @@ function createLyricsLine(parts: LyricPart[], line: LineData, lyricElement: HTML
       span.style.display = "inline";
     }
 
-    line.parts.push(partData);
+    if (part.words.trim().length !== 0) {
+      line.parts.push(partData);
+    }
+
     if (isRtl) {
       rtlBuffer.push(span);
     } else {
@@ -249,14 +275,17 @@ function createBreakElem(lyricElement: HTMLDivElement, order: number) {
  *
  * @param data - Complete lyrics data object
  * @param keepLoaderVisible
+ * @param signal - AbortSignal to cancel async operations
  * @param data.lyrics - Array of lyric lines with timing
  * @param [data.source] - Source attribution for lyrics
  * @param [data.sourceHref] - URL for source link
  */
-function injectLyrics(data: LyricSourceResultWithMeta, keepLoaderVisible = false): void {
+function injectLyrics(data: LyricSourceResultWithMeta, keepLoaderVisible = false, signal?: AbortSignal): void {
+  const injectionId = AppState.currentInjectionId;
+  const isStale = () => AppState.currentInjectionId !== injectionId;
+
   const lyrics = data.lyrics!;
   cleanup();
-  resizeObserver.disconnect();
 
   let lyricsWrapper = createLyricsWrapper();
 
@@ -267,9 +296,9 @@ function injectLyrics(data: LyricSourceResultWithMeta, keepLoaderVisible = false
 
   lyricsWrapper.removeAttribute("is-empty");
 
-  onTranslationEnabled(items => {
-    log(TRANSLATION_ENABLED_LOG, items.translationLanguage);
-  });
+  if (AppState.isTranslateEnabled) {
+    log(TRANSLATION_ENABLED_LOG, AppState.translationLanguage);
+  }
 
   const allZero = lyrics.every(item => item.startTimeMs === 0);
 
@@ -279,22 +308,33 @@ function injectLyrics(data: LyricSourceResultWithMeta, keepLoaderVisible = false
     flushLoader(allZero && lyrics[0].words !== t("lyrics_notFound"));
   }
 
-  const langPromise = new Promise<string>(async resolve => {
+  const langPromise = new Promise<string>((resolve, reject) => {
+    if (signal?.aborted) {
+      reject(new Error("Aborted"));
+      return;
+    }
+
+    const abortHandler = () => reject(new Error("Aborted"));
+    signal?.addEventListener("abort", abortHandler, { once: true });
+
     if (!data.language) {
       let text = "";
       let lineCount = 0;
-      for (let item of lyrics) {
-        text += item.words.trim() + "\n";
+      for (let lyricLine of lyrics) {
+        text += lyricLine.words.trim() + "\n";
         lineCount++;
         if (lineCount >= 10) {
           break;
         }
       }
-      const translationResult = await translateText(text, "en");
-      const lang = translationResult?.originalLanguage || "";
-      log(LOG_PREFIX, "Lang was missing. Determined it is: " + lang);
-      return resolve(lang);
+      translateText(text, "en").then(translationResult => {
+        signal?.removeEventListener("abort", abortHandler);
+        const lang = translationResult?.originalLanguage || "";
+        log(LOG_PREFIX, "Lang was missing. Determined it is: " + lang);
+        resolve(lang);
+      });
     } else {
+      signal?.removeEventListener("abort", abortHandler);
       resolve(data.language);
     }
   });
@@ -486,8 +526,9 @@ function injectLyrics(data: LyricSourceResultWithMeta, keepLoaderVisible = false
         }
       }
     } else if (!isLanguageDisabledForRomanization) {
-      langPromise.then(source_language => {
-        onRomanizationEnabled(async () => {
+      langPromise
+        .then(async source_language => {
+          if (isStale() || signal?.aborted || !AppState.isRomanizationEnabled) return;
           if (isRomanizationDisabledForLang(source_language)) return;
 
           let isNonLatin = containsNonLatin(item.words);
@@ -497,22 +538,19 @@ function injectLyrics(data: LyricSourceResultWithMeta, keepLoaderVisible = false
 
             let usableLang = languageMatchesAny(source_language, ROMANIZATION_LANGUAGES) ? source_language : "auto";
 
-            if (item.words.trim() !== "♪" && item.words.trim() !== "") {
-              let result;
-              if (item.romanization) {
-                result = item.romanization;
-              } else {
-                result = await translateTextIntoRomaji(usableLang, item.words);
-              }
+            const trimmed = item.words.trim();
+            if (trimmed === "♪" || trimmed === "") return;
 
-              if (result && !isSameText(result, item.words)) {
-                createRomanizedElem().textContent = result;
-                lyricsElementAdded();
-              }
+            const result = item.romanization ?? (await translateTextIntoRomaji(usableLang, item.words, signal));
+
+            if (isStale() || signal?.aborted) return;
+            if (result && !isSameText(result, item.words)) {
+              createRomanizedElem().textContent = result;
+              lyricsElementAdded();
             }
           }
-        });
-      });
+        })
+        .catch(() => {});
     }
 
     let createTranslationElem = () => {
@@ -549,24 +587,27 @@ function injectLyrics(data: LyricSourceResultWithMeta, keepLoaderVisible = false
         createTranslationElem().textContent = "\n" + translationResult.translatedText;
       }
     } else if (!isSourceLangDisabled) {
-      langPromise.then(source_language => {
-        onTranslationEnabled(async items => {
+      langPromise
+        .then(async source_language => {
+          if (isStale() || signal?.aborted || !AppState.isTranslateEnabled) return;
           if (isTranslationDisabledForLang(source_language)) return;
 
-          let target_language = items.translationLanguage || "en";
+          let target_language = AppState.translationLanguage || "en";
 
           if (source_language !== target_language || containsNonLatin(item.words)) {
-            if (item.words.trim() !== "♪" && item.words.trim() !== "") {
-              let result = await translateText(item.words, target_language);
+            const trimmed = item.words.trim();
+            if (trimmed === "♪" || trimmed === "") return;
 
-              if (result && !isSameText(result.translatedText, item.words)) {
-                createTranslationElem().textContent = "\n" + result.translatedText;
-                lyricsElementAdded();
-              }
+            const result = await translateText(item.words, target_language, signal);
+
+            if (isStale() || signal?.aborted) return;
+            if (result && !isSameText(result.translatedText, item.words)) {
+              createTranslationElem().textContent = "\n" + result.translatedText;
+              lyricsElementAdded();
             }
           }
-        });
-      });
+        })
+        .catch(() => {});
     }
 
     try {
@@ -604,12 +645,16 @@ function injectLyrics(data: LyricSourceResultWithMeta, keepLoaderVisible = false
     lyricsContainer.dataset.noLyrics = "true";
   }
 
+  const tabSelector = document.getElementsByClassName(TAB_HEADER_CLASS)[1] as HTMLElement;
+
   let lyricsData = {
     lines: lines,
     syncType: syncType,
     lyricWidth: lyricsContainer.clientWidth,
     lyricHeight: lyricsContainer.clientHeight,
     isMusicVideoSynced: data.musicVideoSynced === true,
+    tabSelector,
+    lyricsContainer,
   };
 
   if (data.segmentMap) {
@@ -621,7 +666,7 @@ function injectLyrics(data: LyricSourceResultWithMeta, keepLoaderVisible = false
   if (!allZero) {
     AppState.areLyricsTicking = true;
     calculateLyricPositions();
-    resizeObserver.observe(lyricsWrapper);
+    getResizeObserver().observe(lyricsWrapper);
   } else {
     log(SYNC_DISABLED_LOG);
   }
@@ -630,6 +675,7 @@ function injectLyrics(data: LyricSourceResultWithMeta, keepLoaderVisible = false
 }
 
 export function calculateLyricPositions() {
+  setExtraHeight();
   if (AppState.lyricData && AppState.areLyricsTicking) {
     const lyricsElement = document.getElementsByClassName(LYRICS_CLASS)[0] as HTMLElement;
 

@@ -1,6 +1,7 @@
 import { GENERAL_ERROR_LOG } from "@constants";
 import type { LyricsData } from "@modules/lyrics/injectLyrics";
 import { createLyrics } from "@modules/lyrics/lyrics";
+import { flushLoader } from "@modules/ui/dom";
 import { log } from "@utils";
 
 export interface PlayerDetails {
@@ -28,8 +29,7 @@ interface AppStateType {
   lastVideoDetails: any | null;
   lyricInjectionPromise: Promise<any> | null;
   queueLyricInjection: boolean;
-  queueAlbumArtInjection: boolean;
-  shouldInjectAlbumArt: string | boolean;
+  shouldInjectAlbumArt: "Unknown" | boolean;
   queueSongDetailsInjection: boolean;
   loaderAnimationEndTimeout: number | undefined;
   lastLoadedVideoId: string | null;
@@ -40,6 +40,7 @@ interface AppStateType {
   translationDisabledLanguages: string[];
   translationLanguage: string;
   hasPreloadedNextSong: boolean;
+  currentInjectionId: number;
 }
 
 export const AppState: AppStateType = {
@@ -52,7 +53,6 @@ export const AppState: AppStateType = {
   lastVideoDetails: null,
   lyricInjectionPromise: null,
   queueLyricInjection: false,
-  queueAlbumArtInjection: false,
   shouldInjectAlbumArt: "Unknown",
   queueSongDetailsInjection: false,
   loaderAnimationEndTimeout: undefined,
@@ -64,25 +64,27 @@ export const AppState: AppStateType = {
   translationDisabledLanguages: [],
   translationLanguage: "en",
   hasPreloadedNextSong: false,
+  currentInjectionId: 0,
 };
 
 export function reloadLyrics(): void {
+  AppState.lyricAbortController?.abort("Reloading lyrics");
   AppState.lastVideoId = null;
 }
 
 export function handleModifications(detail: PlayerDetails): void {
   if (AppState.lyricInjectionPromise) {
     AppState.lyricAbortController?.abort("New song is being loaded");
-    AppState.lyricInjectionPromise.then(() => {
-      AppState.lyricInjectionPromise = null;
-      handleModifications(detail);
-    });
-  } else {
-    AppState.lyricAbortController = new AbortController();
-    AppState.lyricInjectionPromise = createLyrics(detail, AppState.lyricAbortController.signal).catch(err => {
-      log(GENERAL_ERROR_LOG, err);
-      AppState.areLyricsLoaded = false;
-      AppState.lyricInjectionFailed = true;
-    });
+    flushLoader(); // Flush loader immediately when aborting
+    // Don't wait for old promise - start new song immediately
+    // Old promise will complete eventually and its finally block will handle cleanup
   }
+
+  AppState.currentInjectionId++;
+  AppState.lyricAbortController = new AbortController();
+  AppState.lyricInjectionPromise = createLyrics(detail, AppState.lyricAbortController.signal).catch(err => {
+    log(GENERAL_ERROR_LOG, err);
+    AppState.areLyricsLoaded = false;
+    AppState.lyricInjectionFailed = true;
+  });
 }

@@ -467,7 +467,7 @@ interface ThumbnailDetailsClass {
   readonly thumbnails: ThumbnailElement[];
 }
 
-interface ThumbnailElement {
+export interface ThumbnailElement {
   readonly url: string;
   readonly width: number;
   readonly height: number;
