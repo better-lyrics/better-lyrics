@@ -378,6 +378,34 @@ function createStarIcon(): SVGSVGElement {
   return svg;
 }
 
+function createClockIcon(): SVGSVGElement {
+  const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+  svg.setAttribute("viewBox", "0 0 20 20");
+  svg.setAttribute("fill", "currentColor");
+  const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+  path.setAttribute("fill-rule", "evenodd");
+  path.setAttribute("clip-rule", "evenodd");
+  path.setAttribute(
+    "d",
+    "M10 18a8 8 0 1 0 0-16 8 8 0 0 0 0 16Zm.75-13a.75.75 0 0 0-1.5 0v5c0 .414.336.75.75.75h3.5a.75.75 0 0 0 0-1.5h-2.75V5Z"
+  );
+  svg.appendChild(path);
+  return svg;
+}
+
+function formatTimeAgo(isoDate: string): string {
+  const rtf = new Intl.RelativeTimeFormat(navigator.language, { numeric: "auto" });
+  const diffMs = new Date(isoDate).getTime() - Date.now();
+  const absDiffSeconds = Math.abs(diffMs / 1000);
+
+  if (absDiffSeconds < 60) return rtf.format(Math.round(diffMs / 1000), "second");
+  if (absDiffSeconds < 3600) return rtf.format(Math.round(diffMs / 60000), "minute");
+  if (absDiffSeconds < 86400) return rtf.format(Math.round(diffMs / 3600000), "hour");
+  if (absDiffSeconds < 2592000) return rtf.format(Math.round(diffMs / 86400000), "day");
+  if (absDiffSeconds < 31536000) return rtf.format(Math.round(diffMs / 2592000000), "month");
+  return rtf.format(Math.round(diffMs / 31536000000), "year");
+}
+
 function formatNumber(num: number): string {
   if (num >= 1000000) return (num / 1000000).toFixed(1) + "M";
   if (num >= 1000) return (num / 1000).toFixed(1) + "K";
@@ -1074,9 +1102,11 @@ async function applyFiltersToGrid(): Promise<void> {
       }
       return (statsB.ratingCount - statsA.ratingCount) * directionMultiplier;
     } else if (currentFilters.sortBy === "newest") {
-      const indexA = storeThemesCache.findIndex(t => t.id === a.dataset.themeId);
-      const indexB = storeThemesCache.findIndex(t => t.id === b.dataset.themeId);
-      return (indexB - indexA) * directionMultiplier;
+      const themeA = storeThemesCache.find(t => t.id === a.dataset.themeId);
+      const themeB = storeThemesCache.find(t => t.id === b.dataset.themeId);
+      const timeA = themeA?.locked ? new Date(themeA.locked).getTime() : 0;
+      const timeB = themeB?.locked ? new Date(themeB.locked).getTime() : 0;
+      return (timeB - timeA) * directionMultiplier;
     }
     return 0;
   });
@@ -1514,24 +1544,43 @@ async function openDetailModal(theme: StoreTheme, urlThemeInfo?: UrlThemeInfo): 
     if (!isUrlTheme) {
       const themeStats = storeStatsCache[theme.id];
       if (themeStats && (themeStats.installs > 0 || themeStats.ratingCount > 0)) {
+        const statsRow = document.createElement("div");
+        statsRow.className = "detail-stats-row";
         if (themeStats.installs > 0) {
           const installStat = document.createElement("span");
           installStat.className = "detail-stat";
           installStat.title = `${themeStats.installs} downloads`;
           installStat.appendChild(createDownloadIcon());
           installStat.appendChild(document.createTextNode(formatNumber(themeStats.installs)));
-          statsEl.appendChild(installStat);
+          statsRow.appendChild(installStat);
         }
         if (themeStats.ratingCount > 0) {
           const ratingStat = document.createElement("span");
-          ratingStat.className = "detail-stat";
+          ratingStat.className = "detail-stat detail-stat-rating";
           ratingStat.appendChild(createStarIcon());
           ratingStat.appendChild(
             document.createTextNode(`${themeStats.rating.toFixed(1)} (${themeStats.ratingCount})`)
           );
-          statsEl.appendChild(ratingStat);
+          statsRow.appendChild(ratingStat);
         }
+        statsEl.appendChild(statsRow);
       }
+    }
+
+    if (theme.locked) {
+      const timeStat = document.createElement("span");
+      timeStat.className = "detail-stat detail-stat-updated";
+      const localized = new Date(theme.locked).toLocaleString(navigator.language, {
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+        hour: "numeric",
+        minute: "2-digit",
+      });
+      timeStat.dataset.tooltip = t("marketplace_lastUpdatedOn", [localized]);
+      timeStat.appendChild(createClockIcon());
+      timeStat.appendChild(document.createTextNode(formatTimeAgo(theme.locked)));
+      statsEl.appendChild(timeStat);
     }
   }
 
@@ -1580,8 +1629,9 @@ async function openDetailModal(theme: StoreTheme, urlThemeInfo?: UrlThemeInfo): 
       });
     };
 
+    const ratingColumnEl = ratingSectionEl.querySelector<HTMLElement>(".detail-rating-column");
     updateRatingEnabled = (enabled: boolean) => {
-      ratingSectionEl.classList.toggle("disabled", !enabled);
+      ratingColumnEl?.classList.toggle("disabled", !enabled);
       starButtons.forEach(btn => {
         (btn as HTMLButtonElement).disabled = !enabled;
       });
@@ -1647,7 +1697,13 @@ async function openDetailModal(theme: StoreTheme, urlThemeInfo?: UrlThemeInfo): 
           }
 
           if (statsEl) {
-            const existingRatingStat = statsEl.querySelector(".detail-stat:nth-child(2)");
+            let statsRow = statsEl.querySelector(".detail-stats-row");
+            if (!statsRow) {
+              statsRow = document.createElement("div");
+              statsRow.className = "detail-stats-row";
+              statsEl.prepend(statsRow);
+            }
+            const existingRatingStat = statsRow.querySelector(".detail-stat-rating");
             if (existingRatingStat) {
               existingRatingStat.replaceChildren();
               existingRatingStat.appendChild(createStarIcon());
@@ -1656,10 +1712,10 @@ async function openDetailModal(theme: StoreTheme, urlThemeInfo?: UrlThemeInfo): 
               );
             } else {
               const ratingStat = document.createElement("span");
-              ratingStat.className = "detail-stat";
+              ratingStat.className = "detail-stat detail-stat-rating";
               ratingStat.appendChild(createStarIcon());
               ratingStat.appendChild(document.createTextNode(`${ratingData.average.toFixed(1)} (${ratingData.count})`));
-              statsEl.appendChild(ratingStat);
+              statsRow.appendChild(ratingStat);
             }
           }
         } else {
