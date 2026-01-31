@@ -724,39 +724,39 @@
     "description": "Message when no lyrics are available"
   },
   "options_language_exclusions": {
-    "message": "Language exclusions",
+    "message": "Danh sách ngôn ngữ bị loại trừ",
     "description": "Label for language exclusions setting"
   },
   "options_manage": {
-    "message": "Manage",
+    "message": "Quản lý",
     "description": "Manage button label"
   },
   "options_language_exclusionsTitle": {
-    "message": "Language Exclusions",
+    "message": "Danh sách ngôn ngữ bị loại trừ",
     "description": "Modal title for language exclusions"
   },
   "options_romanization_tab": {
-    "message": "Romanization",
+    "message": "Phiên âm",
     "description": "Romanization tab label"
   },
   "options_translation_tab": {
-    "message": "Translation",
+    "message": "Dịch thuật",
     "description": "Translation tab label"
   },
   "options_searchLanguages": {
-    "message": "Search languages...",
+    "message": "Tìm ngôn ngữ...",
     "description": "Search input placeholder"
   },
   "options_romanization_hint": {
-    "message": "Click to toggle. Excluded languages will not be romanized.",
+    "message": "Nhấn để bật/tắt. Các ngôn ngữ bị loại trừ sẽ không được phiên âm.",
     "description": "Hint text for romanization exclusions"
   },
   "options_translation_hint": {
-    "message": "Click to toggle. Excluded source languages will not be translated.",
+    "message": "Nhấn để bật/tắt. Các ngôn ngữ bị loại trừ sẽ không được dịch.",
     "description": "Hint text for translation exclusions"
   },
   "options_resetToDefault": {
-    "message": "Reset $TYPE$ to Default",
+    "message": "Đặt lại $TYPE$ về ban đầu",
     "description": "Reset to default button label",
     "placeholders": {
       "type": {
@@ -766,7 +766,7 @@
     }
   },
   "options_romanization_resetTitle": {
-    "message": "Reset $TYPE$ Exclusions",
+    "message": "Đặt lại loại trừ $TYPE$",
     "description": "Modal title for resetting exclusions",
     "placeholders": {
       "type": {
@@ -776,19 +776,19 @@
     }
   },
   "options_romanization_resetMessage": {
-    "message": "This will clear all excluded languages. Continue?",
+    "message": "Thao tác này sẽ xóa tất cả các ngôn ngữ đã bị loại trừ. Chắc chắn chứ?",
     "description": "Confirmation message for resetting exclusions"
   },
   "options_reset": {
-    "message": "Reset",
+    "message": "Đặt lại",
     "description": "Reset button label"
   },
   "options_cancel": {
-    "message": "Cancel",
+    "message": "Hủy",
     "description": "Cancel button label"
   },
   "options_romanization_resetSuccess": {
-    "message": "$TYPE$ exclusions reset to default",
+    "message": "Danh sách loại trừ $TYPE$ đã được đặt lại về mặc định",
     "description": "Success message after resetting exclusions",
     "placeholders": {
       "type": {
