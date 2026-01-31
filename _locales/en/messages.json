@@ -299,16 +299,16 @@
     "description": "Musixmatch provider name"
   },
   "options_provider_lrclib": {
-    "message": "LRClib",
-    "description": "LRClib provider name"
+    "message": "LRCLIB",
+    "description": "LRCLIB provider name"
   },
   "options_provider_youtube": {
-    "message": "Youtube",
-    "description": "Youtube provider name"
+    "message": "YouTube",
+    "description": "YouTube provider name"
   },
   "options_provider_youtubeCaptions": {
-    "message": "Youtube Captions",
-    "description": "Youtube Captions provider name"
+    "message": "YouTube Captions",
+    "description": "YouTube Captions provider name"
   },
   "options_provider_clyrics": {
     "message": "Custom Lyrics",
@@ -320,7 +320,7 @@
     "description": "Vary sync type label"
   },
   "options_syncType_vary_tooltip": {
-    "message": "Highlights syllables and words as they're sung, depending on availability. Varying sync provides the best experience when available.",
+    "message": "Highlights syllables, words, or lines as they're sung, depending on availability. Varying sync provides the best experience when available.",
     "description": "Vary sync type tooltip"
   },
   "options_syncType_syllable": {

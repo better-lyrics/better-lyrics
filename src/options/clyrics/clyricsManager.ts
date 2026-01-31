@@ -18,7 +18,11 @@ export async function getCustomLyrics(index: number): Promise<CLyricsData> {
   return clyrics[index];
 }
 
-export async function createCustomLyrics(parameters: TrackInfoProvider, videoId: string | null): Promise<CLyricsData> {
+export async function createCustomLyrics(parameters: TrackInfoProvider, videoId: string | null): Promise<CLyricsData | null> {
+  if (!parameters.song || parameters.song.length < 1 || !parameters.artist || parameters.artist.length < 1) {
+    return null;
+  }
+
   const clyrics = await listCustomLyrics();
   const data = {
     videoId,

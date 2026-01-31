@@ -25,8 +25,16 @@ async function populateCLyrics(): Promise<void> {
   const newLyric = document.createElement("button");
   newLyric.className = "small-svg-btn";
   newLyric.id = "create-new-clyric";
-  newLyric.innerHTML =
-    '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M11 13H5v-2h6V5h2v6h6v2h-6v6h-2z"/></svg>';
+
+  const newLyricSvg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+  newLyricSvg.setAttribute("viewBox", "0 0 24 24");
+  newLyricSvg.setAttribute("fill", "currentColor");
+
+  const newLyricSvgPath = document.createElementNS("http://www.w3.org/2000/svg", "path");
+  newLyricSvgPath.setAttribute("d", "M11 13H5v-2h6V5h2v6h6v2h-6v6h-2z");
+
+  newLyricSvg.appendChild(newLyricSvgPath);
+  newLyric.appendChild(newLyricSvg);
 
   newLyric.addEventListener("click", () => {
     if (clyricsModalList) clyricsModalList.style.display = "none";
@@ -70,7 +78,7 @@ async function populateCLyrics(): Promise<void> {
       duration: clyrics.duration,
       modified: clyrics.modified,
     });
-    yourLyricsItems.appendChild(card);
+    if (card) yourLyricsItems.appendChild(card);
   });
 
   clyricsModalList.appendChild(yourLyricsItems);
@@ -104,8 +112,16 @@ async function formNewLyrics(): Promise<void> {
   /// Return button
   const returnButton = document.createElement("button");
   returnButton.className = "icon-btn";
-  returnButton.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="currentColor" d="m6.8 13 2.9 2.9q.275.275.275.7t-.275.7-.7.275-.7-.275l-4.6-4.6q-.15-.15-.213-.325T3.426 12t.063-.375.212-.325l4.6-4.6q.275-.275.7-.275t.7.275.275.7-.275.7L6.8 11H19V8q0-.425.288-.712T20 7t.713.288T21 8v3q0 .825-.587 1.413T19 13z"/></svg>`;
   returnButton.setAttribute("data-tooltip", "Return");
+
+  const returnButtonSvg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+  returnButtonSvg.setAttribute("viewBox", "0 0 24 24");
+
+  const returnButtonSvgPath = document.createElementNS("http://www.w3.org/2000/svg", "path");
+  returnButtonSvgPath.setAttribute("fill", "currentColor");
+  returnButtonSvgPath.setAttribute("d", "m7.825 13l4.9 4.9q.3.3.288.7t-.313.7q-.3.275-.7.288t-.7-.288l-6.6-6.6q-.15-.15-.213-.325T4.426 12t.063-.375t.212-.325l6.6-6.6q.275-.275.688-.275t.712.275q.3.3.3.713t-.3.712L7.825 11H19q.425 0 .713.288T20 12t-.288.713T19 13z");
+  returnButtonSvg.appendChild(returnButtonSvgPath);
+  returnButton.appendChild(returnButtonSvg);
 
   returnButton.addEventListener("click", () => {
     if (clyricsModalList) clyricsModalList.style.display = "";
@@ -162,7 +178,7 @@ async function formNewLyrics(): Promise<void> {
       type: "text",
       length: "long",
       title: "Track Name",
-      description: "",
+      description: "For feature versions, add `(feat.)` and the collaborating artists within it",
       placeholder: "Name of the track",
     },
 
@@ -172,8 +188,8 @@ async function formNewLyrics(): Promise<void> {
       type: "text",
       length: "long",
       title: "Artist Name",
-      description: "",
-      placeholder: "Artist who performed the track (use & for multiple artists)",
+      description: "For multiple performing artists, separate them with commas (,)",
+      placeholder: "Artist who performed the track (e.g Justin Bieber, Dua Lipa)",
     },
 
     "album-name": {
@@ -279,8 +295,9 @@ async function formNewLyrics(): Promise<void> {
       inputter.placeholder = input.placeholder;
       inputter.classList.add("clyrics-input");
       inputter.classList.add("clyrics-card");
+
       if (input.type == "number") {
-        inputter.min = "1";
+        inputter.min = "0";
       }
 
       if ("id" in input && input.id) {
@@ -293,16 +310,20 @@ async function formNewLyrics(): Promise<void> {
     clyricsNewLyrics.appendChild(element);
   }
 
+  // Error Message
+  const errMsg = document.createElement("span");
+  errMsg.style.display = "none";
+  errMsg.style.color = "hsl(0, 100%, 60%)";
+  clyricsNewLyrics.appendChild(errMsg);
+
   // Create Button
   const createBtn = document.createElement("button");
   createBtn.id = "create-clyric-btn";
-  createBtn.classList.add("label-btn");
   createBtn.classList.add("btn-confirm");
-  createBtn.classList.add("icon-btn");
   createBtn.innerHTML = "<strong>Create</strong>";
 
-  createBtn.addEventListener("click", () => {
-    createCustomLyrics(
+  createBtn.addEventListener("click", async () => {
+    const data = await createCustomLyrics(
       {
         song: registeredInputs.song.value,
         artist: registeredInputs.artist.value,
@@ -311,29 +332,30 @@ async function formNewLyrics(): Promise<void> {
       },
       registeredInputs.videoId.value
     );
-    populateCLyrics();
-    if (clyricsModalList) clyricsModalList.style.display = "";
-    if (clyricsNewLyrics) clyricsNewLyrics.style.display = "none";
-    for (const input in registeredInputs) {
-      registeredInputs[input].value = "";
+
+    if (data) { 
+      populateCLyrics();
+      if (clyricsModalList) clyricsModalList.style.display = "";
+      if (clyricsNewLyrics) clyricsNewLyrics.style.display = "none";
+      for (const input in registeredInputs) {
+        registeredInputs[input].value = "";
+      }
+      errMsg.style.display = "none";
+      registeredInputs = {};
+    } else {
+      errMsg.textContent = "Please include atleast the Track Name and the Artist Name!"
+      errMsg.style.display = "";
     }
-    registeredInputs = {};
   });
 
   clyricsNewLyrics.appendChild(createBtn);
-
-  // Create & Edit Button
-  const createEditBtn = document.createElement("button");
-  createEditBtn.id = "create-clyric-btn";
-  createEditBtn.classList.add("label-btn");
-  createEditBtn.classList.add("btn-confirm");
-  createEditBtn.classList.add("icon-btn");
-  createEditBtn.innerHTML = "<strong>Create & Edit</strong>";
-
-  clyricsNewLyrics.appendChild(createEditBtn);
 }
 
-function createCLyricsCard(options: CLyricsOverview): HTMLElement {
+function createCLyricsCard(options: CLyricsOverview): HTMLElement | null {
+  if (!options.song || options.song.length < 1 || !options.artist || options.artist.length < 1) {
+    return null;
+  }
+
   const card = document.createElement("div");
   card.className = "clyrics-card";
 
@@ -350,7 +372,11 @@ function createCLyricsCard(options: CLyricsOverview): HTMLElement {
 
   const artistAlbum = document.createElement("div");
   artistAlbum.className = "clyrics-input-description span-wseparator";
-  artistAlbum.innerHTML = `${options.artist} <div class="span-separator"></div> ${options.album}`;
+  artistAlbum.textContent = options.artist;
+
+  if (options.album) {
+    artistAlbum.innerHTML += `<div class="span-separator"></div>${options.album}`
+  }
 
   info.appendChild(metadata);
   info.appendChild(name);
