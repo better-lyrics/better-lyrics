@@ -162,6 +162,7 @@ export async function fillTtml(responseString: string) {
   const lines = ttBody.flatMap(e => e.div);
 
   const hasTimingData = lines.length > 0 && lines[0][":@"] !== undefined;
+  console.log(hasTimingData);
   if (!hasTimingData) {
     return null;
   }
@@ -210,6 +211,7 @@ export async function fillTtml(responseString: string) {
     return null;
   };
 
+  console.log('transliterations and translations');
   const translationsData = findInMetadata<TranslationContainer[]>("translations");
   const transliterationsData = findInMetadata<TransliterationContainer[]>("transliterations");
 
@@ -242,6 +244,7 @@ export async function fillTtml(responseString: string) {
     });
   }
 
+  console.log("final")
   let lyricArray = Array.from(lyrics.values());
   const songDurationMs = parseTime(ttMeta["@_dur"]);
   lyricArray = insertInstrumentalBreaks(lyricArray, songDurationMs);
@@ -254,6 +257,8 @@ export async function fillTtml(responseString: string) {
     source: "boidu.dev",
     sourceHref: "https://boidu.dev/",
   };
+
+  console.log("results")
 
   return {
     isWordSynced,

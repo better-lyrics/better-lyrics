@@ -155,9 +155,8 @@ async function formNewLyrics(): Promise<void> {
   // Span info
   const clyricsSpan = document.createElement("span");
   clyricsSpan.className = "clyrics-span";
-  clyricsSpan.innerHTML =
-    "Your lyrics will be saved on your computer.<br/>Any changes you made with your lyrics will be immediately saved to prevent losing all of your progress";
-
+  clyricsSpan.innerHTML = "Your lyrics will be saved on your computer.<br/>Any changes you made with your lyrics will be immediately saved to prevent losing all of your progress";
+  
   clyricsNewLyrics.appendChild(clyricsSpan);
 
   // Inputs
@@ -178,7 +177,7 @@ async function formNewLyrics(): Promise<void> {
       type: "text",
       length: "long",
       title: "Track Name",
-      description: "For feature versions, add `(feat.)` and the collaborating artists within it",
+      description: `For collab versions, add <span class="code">(feat.)</span> and the collaborating artists within`,
       placeholder: "Name of the track",
     },
 
@@ -188,7 +187,7 @@ async function formNewLyrics(): Promise<void> {
       type: "text",
       length: "long",
       title: "Artist Name",
-      description: "For multiple performing artists, separate them with commas (,)",
+      description: "For multiple artists, separate them with commas (,)",
       placeholder: "Artist who performed the track (e.g Justin Bieber, Dua Lipa)",
     },
 
@@ -199,10 +198,10 @@ async function formNewLyrics(): Promise<void> {
       length: "long",
       title: "Album Name",
       description: "",
-      placeholder: "Album that the track are located at",
+      placeholder: "Album that the track is included with",
     },
 
-    duration: {
+    "duration": {
       id: "duration",
       required: false,
       type: "number",
@@ -243,7 +242,7 @@ async function formNewLyrics(): Promise<void> {
       //// Input Description
       const description = document.createElement("span");
       description.className = "clyrics-input-description";
-      description.textContent = input.description;
+      description.innerHTML = input.description;
       info.appendChild(description);
 
       element.appendChild(info);
@@ -320,6 +319,7 @@ async function formNewLyrics(): Promise<void> {
   const createBtn = document.createElement("button");
   createBtn.id = "create-clyric-btn";
   createBtn.classList.add("btn-confirm");
+  createBtn.classList.add("small-btn");
   createBtn.innerHTML = "<strong>Create</strong>";
 
   createBtn.addEventListener("click", async () => {
@@ -364,7 +364,7 @@ function createCLyricsCard(options: CLyricsOverview): HTMLElement | null {
 
   const metadata = document.createElement("div");
   metadata.className = "clyrics-input-span span-wseparator";
-  metadata.innerHTML = `Duration: ${formatTime(options.duration * 1000)} <div class="span-separator"></div> Modified: ${new Date(options.modified).toLocaleString()}`;
+  metadata.innerHTML = `Duration: ${formatTime(options.duration * 1000)}<div class="span-separator"></div>Modified: ${new Date(options.modified).toLocaleString()}`;
 
   const name = document.createElement("div");
   name.className = "clyrics-input-title";

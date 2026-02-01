@@ -12,8 +12,9 @@ export function parseTime(timeStr: string | number | undefined): number {
 
   if (typeof timeStr === "number") return timeStr;
 
-  const parts = timeStr.split(":");
+  const parts = timeStr.split(":").map(val => val.replace(/[^0-9.]/g, "")); // removes any non-numerical character except dots
   let totalMs = 0;
+  console.log(parts);
 
   try {
     if (parts.length === 1) {
@@ -31,7 +32,7 @@ export function parseTime(timeStr: string | number | undefined): number {
       const seconds = parseFloat(parts[2]);
       totalMs = hours * 3600 * 1000 + minutes * 60 * 1000 + seconds * 1000;
     }
-
+    
     // Return a rounded integer
     return Math.round(totalMs);
   } catch (e) {
@@ -218,7 +219,7 @@ export function lrcFixers(lyrics: LyricsArray): void {
   let durationCount = 0;
   for (let lyric of lyrics) {
     // skipping the last two parts is on purpose
-    // (weather they have a valid duration seems uncorrelated with the rest of them being correct)
+    // (whether they have a valid duration seems uncorrelated with the rest of them being correct)
     if (!lyric.parts || lyric.parts.length === 0) {
       continue;
     }

@@ -45,8 +45,8 @@
 				<button id="tab-editor-btn" class="tab-first-btn tab-btn tab-btns active-btn">
 					<span class="label">Editor</span>
 				</button>
-				<button id="tab-timing-btn" class="tab-secondary-btn tab-btn tab-btns">
-					<span class="label">Timing</span>
+				<button id="tab-syncing-btn" class="tab-secondary-btn tab-btn tab-btns">
+					<span class="label">Syncing</span>
 				</button>
 				<button id="tab-preview-btn" class="tab-secondary-btn tab-btn tab-btns">
 					<span class="label">Preview</span>
@@ -87,12 +87,13 @@
 					</div>
 				</div>
 				<div id="editor-layout" class="rows">
-					<span id="current-editor-layout">Powerhouse</span>
-					<button id="switch-layout" class="icon-btn left-tooltip-icon-btn" data-tooltip="Switch Layout">
-						<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="currentColor" d="M9 3a2 2 0 0 1 2 2v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2zm0 12a2 2 0 0 1 2 2v2a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-2a2 2 0 0 1 2-2zm10-4a2 2 0 0 1 2 2v6a2 2 0 0 1-2 2h-4a2 2 0 0 1-2-2v-6a2 2 0 0 1 2-2zm0-8a2 2 0 0 1 2 2v2a2 2 0 0 1-2 2h-4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2z"/></svg>
-					</button>
+					<select name="editor-layout-select" id="editor-layout-select">
+						<option value="0">Powerhouse</option>
+						<option value="1">Composer</option>
+					</select>
 				</div>
 			</div>
+
 			<!-- TOOLS -->
 			<div class="tools">
 				<div id="new-lyric-line" class="tool">
@@ -217,19 +218,18 @@
 		<div class="playbar">
 			<label class="drag-audio" for="audio-file-playbar">
 				<input id="audio-file-playbar" accept="audio/*" type="file"/>
-				<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="currentColor" d="M6 22q-.82 0-1.41-.59T4 20V4q0-.82.59-1.41T6 2h7.17q.4 0 .77.15t.64.42l4.85 4.85q.27.28.42.64t.15.76V20q0 .82-.59 1.41T18 22zm7-14q0 .42.29.71T14 9h4l-5-5zm-2.25 11q.95 0 1.6-.65t.65-1.6V13h2q.42 0 .71-.29T16 12t-.29-.71T15 11h-2q-.42 0-.71.29T12 12v2.88q-.28-.2-.59-.3t-.66-.08q-.95 0-1.6.65t-.65 1.6.65 1.6 1.6.65"/></svg>
 				<h3>Drag or select an audio file here</h3>
 			</label>
-			<!-- <div class="audio-controls">
-				<button id="play-pause-btn" class="icon-btn play-pause-btn" disabled>
+			<div class="audio-controls">
+				<button id="playback-btn" class="icon-btn playback-btn">
 					<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
 						<path fill="currentColor" d="M8 19h2V5H8v14m6-14v14h2V5h-2z"/>
 					</svg>
 				</button>
-				<span id="current-time" class="time-display">00:00.000</span>
-				<input id="seek-bar" type="range" class="seek-bar" min="0" max="100" value="0" step="0.01" disabled/>
-				<span id="total-duration" class="time-display">00:00.000</span>
-			</div> -->
+				<span id="current-time" class="code time-display">0:00.000</span>
+				<input id="seek-bar" type="range" class="seek-bar" min="0" max="100" value="0" step="0.01"/>
+				<span id="total-duration" class="code time-display">0:00.000</span>
+			</div>
 		</div>
 
 		<!-- FREEFORM ELEMENTS (CONTEXT MENU, MODAL) -->

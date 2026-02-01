@@ -309,8 +309,6 @@ export default async function cubey(providerParameters: ProviderParameters): Pro
     [
       "musixmatch-synced",
       "musixmatch-richsync",
-      "bLyrics-richsynced",
-      "bLyrics-synced",
     ] as const
   ).forEach(source => {
     providerParameters.sourceMap[source].filled = true;

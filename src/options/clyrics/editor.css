@@ -780,19 +780,36 @@ button {
 }
 
 .drag-audio {
+    background: none;
+    position: absolute;
+    border-radius: inherit;
+    z-index: 1;
     display: flex;
     flex-direction: row;
     align-items: center;
     justify-content: center;
-    width: auto;
+    width: 100%;
     height: 100%;
     gap: .25rem;
     backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
 }
 
-.drag-audio:hover {
-    background: none;
+.audio-controls {
+    padding: 0 .5rem 0 .5rem;
+    display: flex;
+    height: 100%;
+    justify-content: flex-start;
+    align-items: center;
+    flex-direction: row;
+    gap: .5rem;
+}
+
+.playback-btn {
+    border-radius: .2rem;
+}
+
+.seek-bar {
+    width: stretch;
 }
 
 /* TOOLTIP BUTTON */
