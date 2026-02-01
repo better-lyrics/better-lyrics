@@ -1,9 +1,5 @@
 import {
   AD_PLAYING_ATTR,
-  ALBUM_ART_ADDED_FROM_MUTATION_LOG,
-  ALBUM_ART_ADDED_LOG,
-  ALBUM_ART_REMOVED_LOG,
-  ALBUM_ART_SIZE_CHANGED,
   DISCORD_INVITE_URL,
   DISCORD_LOGO_SRC,
   FONT_LINK,
@@ -23,10 +19,11 @@ import {
   PLAYER_BAR_SELECTOR,
   PROVIDER_CONFIGS,
   ROMANIZED_LYRICS_CLASS,
-  SONG_IMAGE_SELECTOR,
-  type SyncType,
   TAB_RENDERER_SELECTOR,
   TRANSLATED_LYRICS_CLASS,
+  type SyncType,
+  HIDDEN_CLASS,
+  LYRICS_SPACING_ELEMENT_ID,
 } from "@constants";
 import { t } from "@core/i18n";
 import { AppState } from "@core/appState";
@@ -35,10 +32,13 @@ import {
   getResumeScrollElement,
   reflow,
   resetAnimEngineState,
+  SCROLL_POS_OFFSET_RATIO,
   toMs,
 } from "@modules/ui/animationEngine";
 import { log } from "@utils";
 import { scrollEventHandler } from "./observer";
+import type { ThumbnailElement } from "@modules/lyrics/requestSniffer/NextResponse";
+import { disconnectResizeObserver } from "@modules/lyrics/injectLyrics";
 
 const syncTypeIcons: Record<SyncType, string> = {
   vary: `<svg width="14" height="14" viewBox="0 0 1024 1024" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><rect x="636" y="239" width="389.981" height="233.271" rx="48"/><path d="M0 335c0-45.255 0-67.882 14.059-81.941S50.745 239 96 239h117c30.17 0 45.255 0 54.627 9.373S277 272.83 277 303v105c0 30.17 0 45.255-9.373 54.627S243.17 472 213 472H96c-45.255 0-67.882 0-81.941-14.059S0 421.255 0 376zm337-31c0-30.17 0-45.255 9.373-54.627S370.83 240 401 240h59c45.255 0 67.882 0 81.941 14.059S556 290.745 556 336v41c0 45.255 0 67.882-14.059 81.941S505.255 473 460 473h-59c-30.17 0-45.255 0-54.627-9.373S337 439.17 337 409z"/><rect y="552.271" width="1024" height="233" rx="48"/></svg>`,
@@ -103,12 +103,8 @@ function createActionButton(options: ActionButtonOptions): HTMLElement {
   return container;
 }
 
-let backgroundChangeObserver: MutationObserver | null = null;
-let albumArtResizeObserver: ResizeObserver | null = null;
 let lyricsObserver: MutationObserver | null = null;
 let adStateObserver: MutationObserver | null = null;
-let albumArtResizeTimeout: ReturnType<typeof setTimeout> | null = null;
-
 /**
  * Creates or reuses the lyrics wrapper element and sets up scroll event handling.
  *
@@ -512,96 +508,103 @@ function clearLyrics(): void {
   }
 }
 
-/**
- * Adds album art as a background image to the layout
- * and resizes the album art resolution to match user's
- * screen height.
- *
- * Sets up mutation observer to watch for art changes.
- *
- * @param videoId - YouTube video ID for fallback image
- */
-export function addAlbumArtToLayout(videoId: string): void {
-  if (!videoId) return;
+let albumArtLoadController: AbortController | null = null;
 
-  if (albumArtResizeObserver) {
-    albumArtResizeObserver.disconnect();
+export function reloadAlbumArt() {
+  if (lastLoadedThumbnail) {
+    addThumbnail(lastLoadedThumbnail);
   }
-
-  if (backgroundChangeObserver) {
-    backgroundChangeObserver.disconnect();
-  }
-
-  const injectAlbumArtFn = () => {
-    const albumArt = document.querySelector(SONG_IMAGE_SELECTOR) as HTMLImageElement;
-    if (albumArt.src.startsWith("data:image")) {
-      injectAlbumArt("https://img.youtube.com/vi/" + videoId + "/0.jpg");
-    } else {
-      injectAlbumArt(albumArt.src);
-    }
-  };
-
-  const albumArt = document.querySelector(SONG_IMAGE_SELECTOR) as HTMLImageElement;
-
-  const resizeObserver = new ResizeObserver(() => {
-    if (albumArtResizeTimeout) {
-      clearTimeout(albumArtResizeTimeout);
-    }
-    albumArtResizeTimeout = setTimeout(() => {
-      albumArtResizeTimeout = null;
-      setAlbumArtSize(screen.height);
-    }, 1000);
-  });
-
-  resizeObserver.observe(document.documentElement);
-  albumArtResizeObserver = resizeObserver;
-
-  const observer = new MutationObserver(() => {
-    injectAlbumArtFn();
-    log(ALBUM_ART_ADDED_FROM_MUTATION_LOG);
-  });
-
-  observer.observe(albumArt, { attributes: true });
-  backgroundChangeObserver = observer;
-
-  injectAlbumArtFn();
-  log(ALBUM_ART_ADDED_LOG);
 }
 
-/**
- * Injects album art URL as a CSS custom property.
- *
- * @param src - Image source URL
- */
-function injectAlbumArt(src: string): void {
-  const img = new Image();
-  img.src = src;
+let lastLoadedThumbnail: ThumbnailElement | null = null;
+let thumbnailResizeObserver: ResizeObserver | null;
 
-  img.onload = () => {
-    (document.getElementById("layout") as HTMLElement).style.setProperty("--blyrics-background-img", `url('${src}')`);
-  };
+export function resetThumbnailState(): void {
+  lastLoadedThumbnail = null;
 }
 
-/**
- * Removes album art from layout and disconnects observers.
- */
-export function removeAlbumArtFromLayout(): void {
-  if (backgroundChangeObserver) {
-    backgroundChangeObserver.disconnect();
-    backgroundChangeObserver = null;
-  }
-  if (albumArtResizeObserver) {
-    albumArtResizeObserver.disconnect();
-    albumArtResizeObserver = null;
-  }
-  if (albumArtResizeTimeout) {
-    clearTimeout(albumArtResizeTimeout);
-    albumArtResizeTimeout = null;
-  }
+function setBackgroundImage(src: string): void {
   const layout = document.getElementById("layout");
-  if (layout) {
-    layout.style.removeProperty("--blyrics-background-img");
-    log(ALBUM_ART_REMOVED_LOG);
+  if (AppState.shouldInjectAlbumArt) {
+    layout?.style.setProperty("--blyrics-background-img", `url('${src}')`);
+  } else {
+    layout?.style.removeProperty("--blyrics-background-img");
+  }
+}
+
+function getContainerSize(): number {
+  return Math.round(Math.max(document.getElementById("thumbnail")?.getBoundingClientRect().width || 0, 544));
+}
+
+export function addThumbnail(smallThumbnail: ThumbnailElement): void {
+  thumbnailResizeObserver?.disconnect();
+
+  let imgElm = document.getElementById("blyrics-img") as HTMLImageElement | undefined;
+  if (!imgElm) {
+    imgElm = document.createElement("img");
+    imgElm.id = "blyrics-img";
+    imgElm.draggable = false;
+    imgElm.classList.add("style-scope", "yt-img-shadow");
+    imgElm.style.position = "absolute";
+    imgElm.style.inset = "0";
+    document.getElementById("thumbnail")?.appendChild(imgElm);
+  }
+
+  if (lastLoadedThumbnail !== smallThumbnail) {
+    imgElm.src = smallThumbnail.url;
+    imgElm.classList.remove(HIDDEN_CLASS);
+    setBackgroundImage(smallThumbnail.url);
+  }
+  lastLoadedThumbnail = smallThumbnail;
+
+  const containerSize = getContainerSize();
+
+  let url = smallThumbnail.url;
+  if (url && /w\d+-h\d+/.test(url)) {
+    url = url.replace(/w\d+-h\d+/, `w${containerSize}-h${containerSize}`);
+  } else {
+    url = url.replace(/\/(sd|hq|mq)?default\.jpg/, "/maxresdefault.jpg");
+  }
+
+  const proxy = new Image();
+  proxy.src = url;
+
+  albumArtLoadController?.abort();
+  const loadController = new AbortController();
+  albumArtLoadController = loadController;
+
+  proxy.onload = () => {
+    if (loadController.signal.aborted) return;
+
+    imgElm.src = proxy.src;
+    setBackgroundImage(proxy.src);
+
+    if (getContainerSize() !== containerSize) {
+      reloadAlbumArt();
+      return;
+    }
+
+    const thumbnailElm = document.getElementById("thumbnail")!;
+    thumbnailResizeObserver = new ResizeObserver(() => {
+      if (getContainerSize() !== containerSize) {
+        thumbnailResizeObserver?.disconnect();
+        reloadAlbumArt();
+      }
+    });
+    thumbnailResizeObserver.observe(thumbnailElm);
+  };
+}
+
+export function showYtThumbnail(): void {
+  const blyricsImg = document.getElementById("blyrics-img") as HTMLImageElement | null;
+  if (blyricsImg) {
+    blyricsImg.src = "";
+    blyricsImg.classList.add(HIDDEN_CLASS);
+  }
+
+  const ytImg = document.querySelector("#thumbnail>#img") as HTMLImageElement | null;
+  if (ytImg?.src && AppState.shouldInjectAlbumArt) {
+    setBackgroundImage(ytImg.src);
   }
 }
 
@@ -666,25 +669,15 @@ export async function injectHeadTags(): Promise<void> {
   notoFontLink.rel = "stylesheet";
   document.head.appendChild(notoFontLink);
 
-  const cssFiles = ["css/ytmusic.css", "css/blyrics.css", "css/themesong.css"];
+  const cssFiles = ["css/ytmusic/index.css", "css/blyrics/index.css", "css/themesong.css"];
 
-  let css = "";
-  const responses = await Promise.all(
-    cssFiles.map(file =>
-      fetch(chrome.runtime.getURL(file), {
-        cache: "no-store",
-      })
-    )
-  );
-
-  for (let i = 0; i < cssFiles.length; i++) {
-    css += `/* ${cssFiles[i]} */\n`;
-    css += await responses[i].text();
+  for (const file of cssFiles) {
+    const link = document.createElement("link");
+    link.rel = "stylesheet";
+    link.href = chrome.runtime.getURL(file);
+    link.id = `blyrics-style-${file.replace(/(\/index)?\.css$/, "")}`;
+    document.head.appendChild(link);
   }
-
-  const style = document.createElement("style");
-  style.textContent = css;
-  document.head.appendChild(style);
 }
 
 /**
@@ -693,6 +686,8 @@ export async function injectHeadTags(): Promise<void> {
 export function cleanup(): void {
   animEngineState.scrollPos = -1;
   resetAnimEngineState();
+
+  disconnectResizeObserver();
 
   if (lyricsObserver) {
     lyricsObserver.disconnect();
@@ -757,34 +752,6 @@ export function injectSongAttributes(title: string, artist: string): void {
 }
 
 /**
- * Sets the size of the album art image
- *
- * @param size - Size quality
- */
-function setAlbumArtSize(size: string | number): void {
-  const albumArt = document.querySelector(SONG_IMAGE_SELECTOR) as HTMLImageElement;
-  const origSrc = albumArt.src;
-
-  const img = new Image();
-  img.src = albumArt.src;
-
-  if (/w\d+-h\d+/.test(albumArt.src)) {
-    const replaced = albumArt.src.replace(/w\d+-h\d+/, `w${size}-h${size}`);
-
-    // If the size is the same, discard the changes
-    if (origSrc == replaced) return;
-
-    img.src = replaced;
-  }
-
-  img.onload = () => {
-    if (origSrc == albumArt.src) albumArt.src = img.src;
-  };
-
-  log(ALBUM_ART_SIZE_CHANGED, size);
-}
-
-/**
  * Generates link to search on Genius
  *
  * @param song - Song name
@@ -793,4 +760,18 @@ function setAlbumArtSize(size: string | number): void {
 function getGeniusLink(song: string, artist: string): string {
   const searchQuery = encodeURIComponent(`${artist.trim()} - ${song.trim()}`);
   return `https://genius.com/search?q=${searchQuery}`;
+}
+
+export function setExtraHeight() {
+  const lyricsElement = document.getElementsByClassName(LYRICS_CLASS)[0] as HTMLElement;
+  const lyricsHeight = lyricsElement.getBoundingClientRect().height;
+  const tabRenderer = document.querySelector(TAB_RENDERER_SELECTOR) as HTMLElement;
+  const tabRendererHeight = tabRenderer.getBoundingClientRect().height;
+
+  let extraHeight = Math.max(
+    tabRendererHeight * (1 - SCROLL_POS_OFFSET_RATIO.getNumberValue()),
+    tabRendererHeight - lyricsHeight
+  );
+
+  (document.getElementById(LYRICS_SPACING_ELEMENT_ID) as HTMLElement).style.height = `${extraHeight.toFixed(0)}px`;
 }

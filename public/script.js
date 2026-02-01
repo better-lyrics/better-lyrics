@@ -21,6 +21,9 @@ let lastPlayerTime = 0;
  */
 let lastPlayerTimestamp = 0;
 
+let lastSentPlaying = null;
+let pausedTickCounter = 0;
+
 // Get all player methods (paste in broswer console)
 // for(i in document.getElementById("movie_player")) {
 //     if (typeof document.getElementById("movie_player")[i] === 'function' && i.includes("get")) {
@@ -37,9 +40,11 @@ let lastPlayerTimestamp = 0;
 const startLyricsTick = () => {
   stopLyricsTick();
 
+  let player = document.getElementById("movie_player");
   tickLyricsInterval = setInterval(function () {
-    const player = document.getElementById("movie_player");
-    if (player) {
+    if (!player || !player.isConnected) {
+      player = document.getElementById("movie_player");
+    } else {
       try {
         const now = Date.now();
 
@@ -50,9 +55,22 @@ const startLyricsTick = () => {
         const contentRect = player.getVideoContentRect();
 
         const currentTime = player.getCurrentTime();
+        const playing = isPlaying && !isBuffering;
+
+        // Throttle events when paused: only send every ~500ms instead of every 20ms
+        if (!playing) {
+          pausedTickCounter++;
+          const stateChanged = lastSentPlaying !== playing;
+          const timeChanged = currentTime !== lastPlayerTime;
+          if (!stateChanged && !timeChanged && pausedTickCounter < 25) {
+            return;
+          }
+          pausedTickCounter = 0;
+        }
+        lastSentPlaying = playing;
 
         // Extrapolate the current time
-        if (currentTime !== lastPlayerTime || !isPlaying) {
+        if (currentTime !== lastPlayerTime || !playing) {
           lastPlayerTime = currentTime;
           lastPlayerTimestamp = now;
         }
@@ -71,7 +89,7 @@ const startLyricsTick = () => {
               duration: duration,
               audioTrackData: audioTrackData,
               browserTime: now,
-              playing: isPlaying && !isBuffering,
+              playing: playing,
               contentRect,
             },
           })

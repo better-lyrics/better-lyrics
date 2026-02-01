@@ -44,7 +44,7 @@
     "description": "Show logs setting label"
   },
   "options_general_autoSwitch": {
-    "message": "自动切换到歌词标签",
+    "message": "自动切换到歌词选项卡",
     "description": "Auto switch to lyrics tab setting label"
   },
   "options_general_cache": {
@@ -684,7 +684,7 @@
     "description": "Powered by label"
   },
   "editor_playground": {
-    "message": "Playground",
+    "message": "练习场",
     "description": "Playground link text"
   },
   "editor_docs": {
@@ -724,39 +724,39 @@
     "description": "Message when no lyrics are available"
   },
   "options_language_exclusions": {
-    "message": "Language exclusions",
+    "message": "语言排除",
     "description": "Label for language exclusions setting"
   },
   "options_manage": {
-    "message": "Manage",
+    "message": "管理",
     "description": "Manage button label"
   },
   "options_language_exclusionsTitle": {
-    "message": "Language Exclusions",
+    "message": "语言排除",
     "description": "Modal title for language exclusions"
   },
   "options_romanization_tab": {
-    "message": "Romanization",
+    "message": "罗马化",
     "description": "Romanization tab label"
   },
   "options_translation_tab": {
-    "message": "Translation",
+    "message": "翻译",
     "description": "Translation tab label"
   },
   "options_searchLanguages": {
-    "message": "Search languages...",
+    "message": "搜索语言…",
     "description": "Search input placeholder"
   },
   "options_romanization_hint": {
-    "message": "Click to toggle. Excluded languages will not be romanized.",
+    "message": "点击即可切换。排除的语言将不会被罗马化。",
     "description": "Hint text for romanization exclusions"
   },
   "options_translation_hint": {
-    "message": "Click to toggle. Excluded source languages will not be translated.",
+    "message": "点击即可切换。排除的源语言将不会被翻译。",
     "description": "Hint text for translation exclusions"
   },
   "options_resetToDefault": {
-    "message": "Reset $TYPE$ to Default",
+    "message": "将$TYPE$重置为默认",
     "description": "Reset to default button label",
     "placeholders": {
       "type": {
@@ -766,7 +766,7 @@
     }
   },
   "options_romanization_resetTitle": {
-    "message": "Reset $TYPE$ Exclusions",
+    "message": "重置$TYPE$排除项",
     "description": "Modal title for resetting exclusions",
     "placeholders": {
       "type": {
@@ -776,19 +776,19 @@
     }
   },
   "options_romanization_resetMessage": {
-    "message": "This will clear all excluded languages. Continue?",
+    "message": "这将清除所有已排除的语言。继续吗？",
     "description": "Confirmation message for resetting exclusions"
   },
   "options_reset": {
-    "message": "Reset",
+    "message": "重置",
     "description": "Reset button label"
   },
   "options_cancel": {
-    "message": "Cancel",
+    "message": "取消",
     "description": "Cancel button label"
   },
   "options_romanization_resetSuccess": {
-    "message": "$TYPE$ exclusions reset to default",
+    "message": "$TYPE$排除项已重置为默认值",
     "description": "Success message after resetting exclusions",
     "placeholders": {
       "type": {

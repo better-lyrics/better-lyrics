@@ -71,10 +71,20 @@ If you're new to CSS, don't worry! This guide will walk you through the main com
 
 ## 2. Understanding the CSS Structure
 
-The Better Lyrics styling system consists of three main CSS files, each serving a specific purpose:
+The Better Lyrics styling system consists of several modular CSS files, organized into directories:
 
-1. **blyrics.css** - Core lyrics styling, animations, and visual effects
-2. **ytmusic.css** - YouTube Music interface modifications and layout adjustments
+1. **blyrics/** - Core lyrics styling, animations, and visual effects
+    - `variables.css`: Global custom properties
+    - `lyrics.css`: Main lyrics container and line styles, translations, romanization
+    - `components.css`: UI components like the loader, footer, and buttons
+    - `instrumental.css`: Instrumental break styles
+    - `misc.css`: Utility classes
+    - `responsive.css`: Media queries for responsive design
+2. **ytmusic/** - YouTube Music interface modifications and layout adjustments
+    - `variables.css`: YouTube Music specific variables
+    - `general.css`: General interface overrides
+    - `fullscreen.css`: Fullscreen mode styles
+    - `mobile.css`: Mobile-specific adjustments
 3. **themesong.css** - Compatibility styles for the ThemeSong browser extension
 
 Each file is organized into logical sections:
@@ -91,7 +101,7 @@ Each section uses CSS selectors to target specific HTML elements and apply style
 
 ## 3. Custom Properties (CSS Variables)
 
-At the beginning of `blyrics.css`, you'll see a `:root` selector with custom properties that define the visual theme and behavior of Better Lyrics:
+In `blyrics/variables.css`, you'll see a `:root` selector with custom properties that define the visual theme and behavior of Better Lyrics:
 
 ```css
 :root {
@@ -594,7 +604,7 @@ These animations create:
 
 ## 7. Modifying YouTube Music's Layout
 
-The `ytmusic.css` file contains extensive modifications to YouTube Music™'s interface to create a more immersive lyrics experience.
+The `ytmusic/` directory contains extensive modifications to YouTube Music™'s interface to create a more immersive lyrics experience.
 
 ### Background and Transparency Effects
 

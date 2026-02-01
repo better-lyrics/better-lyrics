@@ -68,6 +68,7 @@ jobs:
 
       - name: Run Knip fix
         if: steps.app-token.outputs.token != ''
+        continue-on-error: true
         run: npm run knip:fix
 
       - name: Commit and push changes
