@@ -440,7 +440,7 @@
     "description": "Submit a theme link"
   },
   "marketplace_loading": {
-    "message": "Loading themes...",
+    "message": "...",
     "description": "Loading message"
   },
   "marketplace_retry": {
