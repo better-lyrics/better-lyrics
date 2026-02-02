@@ -41,7 +41,7 @@
         "@codemirror/lint": "^6.9.2",
         "@codemirror/search": "^6.6.0",
         "@codemirror/state": "^6.5.4",
-        "@codemirror/view": "^6.39.11",
+        "@codemirror/view": "^6.39.12",
         "@formkit/auto-animate": "^0.9.0",
         "@fsegurai/codemirror-theme-material-dark": "^6.2.2",
         "codemirror-lang-rics": "^0.3.20",
