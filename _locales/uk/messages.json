@@ -734,7 +734,7 @@
     "description": "Message when no lyrics are available"
   },
   "options_language_exclusions": {
-    "message": "Language exclusions",
+    "message": "Винятки мов",
     "description": "Label for language exclusions setting"
   },
   "options_manage": {
@@ -742,7 +742,7 @@
     "description": "Manage button label"
   },
   "options_language_exclusionsTitle": {
-    "message": "Language Exclusions",
+    "message": "Винятки мов",
     "description": "Modal title for language exclusions"
   },
   "options_romanization_tab": {
@@ -758,15 +758,15 @@
     "description": "Search input placeholder"
   },
   "options_romanization_hint": {
-    "message": "Click to toggle. Excluded languages will not be romanized.",
+    "message": "Клацніть, щоб увімкнути або вимкнути. Транслітерація не буде застосовуватись.",
     "description": "Hint text for romanization exclusions"
   },
   "options_translation_hint": {
-    "message": "Click to toggle. Excluded source languages will not be translated.",
+    "message": "Клацніть, щоб увімкнути або вимкнути. Тексти цими мовами не будуть перекладені.",
     "description": "Hint text for translation exclusions"
   },
   "options_resetToDefault": {
-    "message": "Відновити $TYPE$ за замовчуванням",
+    "message": "Скинути до налаштувань за замовчуванням",
     "description": "Reset to default button label",
     "placeholders": {
       "type": {
@@ -776,7 +776,7 @@
     }
   },
   "options_romanization_resetTitle": {
-    "message": "Reset $TYPE$ Exclusions",
+    "message": "Скинути винятки",
     "description": "Modal title for resetting exclusions",
     "placeholders": {
       "type": {
@@ -786,7 +786,7 @@
     }
   },
   "options_romanization_resetMessage": {
-    "message": "This will clear all excluded languages. Continue?",
+    "message": "Усі винятки буде видалено. Продовжити?",
     "description": "Confirmation message for resetting exclusions"
   },
   "options_reset": {
@@ -798,7 +798,7 @@
     "description": "Cancel button label"
   },
   "options_romanization_resetSuccess": {
-    "message": "$TYPE$ exclusions reset to default",
+    "message": "Скинуто до стандартних значень",
     "description": "Success message after resetting exclusions",
     "placeholders": {
       "type": {
