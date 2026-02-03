@@ -221,13 +221,16 @@
 				<h3>Drag or select an audio file here</h3>
 			</label>
 			<div class="audio-controls">
-				<button id="playback-btn" class="icon-btn playback-btn">
+				<button id="playback-btn" class="icon-btn no-tooltip playback-btn">
 					<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-						<path fill="currentColor" d="M8 19h2V5H8v14m6-14v14h2V5h-2z"/>
+						<path fill="currentColor" d="M8 19h2V5H8v14m6-14v14h2V5h-2z" stroke="currentColor" stroke-width="1"/>
 					</svg>
 				</button>
 				<span id="current-time" class="code time-display">0:00.000</span>
-				<input id="seek-bar" type="range" class="seek-bar" min="0" max="100" value="0" step="0.01"/>
+				<div id="seek-bar" class="seek-bar">
+					<div class="filler"></div>
+					<div class="head"></div>
+				</div>
 				<span id="total-duration" class="code time-display">0:00.000</span>
 			</div>
 		</div>
@@ -245,7 +248,7 @@
 					</button>
 				</div>
 				<div class="modal-body">
-					<!-- <span id="modal-message" class="modal-message">By confirming, you acknowledge that the following lyrics you're about to publish abides the rules for the following provider and are not against their terms.</span> -->
+					<!-- <span id="modal-message" class="modal-message">By confirming, you acknowledge that the following lyrics you are about to publish abides the rules for the following provider</span> -->
 					<!-- <input type="text" id="modal-input" class="modal-input" placeholder=""> -->
 				</div>
 				<div class="modal-footer">

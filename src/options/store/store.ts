@@ -1,5 +1,3 @@
-import { LOG_PREFIX_STORE } from "@constants";
-import { getLocalStorage, getSyncStorage } from "@core/storage";
 import autoAnimate, { type AnimationController } from "@formkit/auto-animate";
 import DOMPurify from "dompurify";
 import { marked } from "marked";

@@ -1,7 +1,7 @@
 import type { Lyric, LyricPart } from "@/modules/lyrics/providers/shared";
 import { clyricsModalList, clyricsNewLyrics } from ".";
 import { openCLyricsModal } from "./clyrics";
-import { actionMenus, addNewLine, type ContextData, contextMenus, domDefaults } from "./editorDom";
+import { actionMenus, addNewLine, type ContextData, contextMenus } from "./editorDom";
 import { getLocalStorage } from "@/core/storage";
 
 let loaded = false;
@@ -166,7 +166,8 @@ export const startTimeInput = document.getElementById("start-time-input");
 export const durationInput = document.getElementById("duration-input");
 //// Playbar
 export const playbar = document.getElementById("playbar");
-export const audioFile = document.getElementById("audio-file-playbar");
+export const dragAudio = document.getElementById("drag-audio"); 
+export const audioFile = document.getElementById("audio-file-playbar") as HTMLInputElement; // child of `dragAudio`
 //// Lyric Lines Editor
 export const lyricLines = document.getElementById("lyric-lines");
 export const noLyrics = document.getElementById("no-lyrics");
@@ -493,6 +494,7 @@ function handleActionsMenu() {
       if (typeof act.func == "function") act.func(button);
     });
   });
+  console.log("[onload] Actions Menu loaded");
 }
 
 /// Tab Buttons
@@ -544,12 +546,13 @@ function handleTools() {
       chrome.storage.sync.set({ [checker.parent]: read });
     });
   });
+  console.log("[onload] Tools loaded");
 }
 
 /// Lyric Line
 function handleLyricLine() {
   if (!lyricLines) {
-    console.warn("No lyric lines loaded. Refresh to reload handler");
+    console.warn("No lyric lines frame. Refresh to reload handler");
     return;
   }
   lyricLines.addEventListener("mouseenter", () => {
@@ -558,22 +561,51 @@ function handleLyricLine() {
   lyricLines.addEventListener("mouseleave", () => {
     contextMenuB = [];
   });
+  console.log("[onload] Lyric Lines loaded");
 }
 
+/// Playbar
 function handlePlaybar() {
   if (!audioFile) {
     console.warn("No audio file loader. Refresh to reload handler");
     return;
   }
-  audioFile.addEventListener("drop", e => {
 
+  function load(files?: FileList | null) {
+    if (!files) { return; }
+    if (files.length > 0) {
+      const file = files[0]
+      if (file.type.split("/")[0] != "audio") { return; }
+      const audioSrc = URL.createObjectURL(file);
+      console.log(`loaded ${file.name}, ${file.size}, ${file.type}. ${audioSrc}`);
+      const audio = new Audio(audioSrc);
+      audio.play();
+      
+      audioFile.parentElement!.style.display = "none"
+    }
+  }
+
+  audioFile.parentElement!.addEventListener("dragover", e => {
+    e.preventDefault();
+    e.stopPropagation();
   })
+  audioFile.parentElement!.addEventListener("drop", e => {
+    e.preventDefault();
+    e.stopPropagation();
+    load(e.dataTransfer?.files);
+  });
+
+  audioFile.addEventListener("change", e => {
+    load(audioFile.files);
+  })
+
+  console.log("[onload] Playbar loaded");
 }
 
 /// Context Menu
 function handleContextMenu() {
   if (!contextMenu) {
-    console.warn("No context menu loaded. Refresh to reload handler");
+    console.warn("No context menu frame. Refresh to reload handler");
     return;
   }
 
@@ -627,6 +659,7 @@ function handleContextMenu() {
       });
     }
   });
+  console.log("[onload] Context Menu loaded");
 }
 
 /// Keybind
@@ -647,6 +680,7 @@ function handleKeybind() {
     if (e.shiftKey) pressed.push("Shift");
     pressed.push(e.key);
   });
+  console.log("[onload] Keybinds loaded");
 }
 
 // Set up the handlers on load

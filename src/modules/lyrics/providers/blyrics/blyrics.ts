@@ -149,7 +149,7 @@ export async function fillTtml(responseString: string) {
 
   const rawObj = (await parser.parse(responseString)) as TtmlRoot;
 
-  const lyrics = new Map() as Map<string, Lyric>;
+  const lyrics = new Map() as Map<any, Lyric>;
 
   const tt = rawObj[0].tt;
   const ttHead = tt.find(e => e.head)!.head!;
@@ -162,7 +162,6 @@ export async function fillTtml(responseString: string) {
   const lines = ttBody.flatMap(e => e.div);
 
   const hasTimingData = lines.length > 0 && lines[0][":@"] !== undefined;
-  console.log(hasTimingData);
   if (!hasTimingData) {
     return null;
   }
@@ -182,7 +181,7 @@ export async function fillTtml(responseString: string) {
     const rawAgent = meta?.["@_agent"];
     const normalizedAgent = rawAgent ? (agentMapping.get(rawAgent) ?? rawAgent) : undefined;
 
-    lyrics.set(meta?.["@_key"] || lyrics.size.toString(), {
+    lyrics.set(meta?.["@_key"] || lyrics.size, {
       agent: normalizedAgent,
       durationMs: endTimeMs - beginTimeMs,
       parts: partParse.parts,
@@ -211,7 +210,6 @@ export async function fillTtml(responseString: string) {
     return null;
   };
 
-  console.log('transliterations and translations');
   const translationsData = findInMetadata<TranslationContainer[]>("translations");
   const transliterationsData = findInMetadata<TransliterationContainer[]>("transliterations");
 
@@ -244,7 +242,6 @@ export async function fillTtml(responseString: string) {
     });
   }
 
-  console.log("final")
   let lyricArray = Array.from(lyrics.values());
   const songDurationMs = parseTime(ttMeta["@_dur"]);
   lyricArray = insertInstrumentalBreaks(lyricArray, songDurationMs);
@@ -257,8 +254,6 @@ export async function fillTtml(responseString: string) {
     source: "boidu.dev",
     sourceHref: "https://boidu.dev/",
   };
-
-  console.log("results")
 
   return {
     isWordSynced,

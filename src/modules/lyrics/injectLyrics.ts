@@ -155,6 +155,19 @@ export interface LyricsData {
   lyricsContainer: HTMLElement;
 }
 
+export interface InjectionParameters {
+  /** Disable rendering instrumental break lyric line */
+  disableInstrumentalElement?: boolean;
+  /** Disable rendering lyric translations */
+  disableTranslations?: boolean;
+  /** Disable rendering lyric romanizations */
+  disableRomanization?: boolean;
+  /** Disable automatic translations when none provided */
+  disableAutoTranslate?: boolean;
+  /** Disable automatic romanization when none provided */
+  disableAutoRoman?: boolean; 
+}
+
 /**
  * Processes lyrics data and prepares it for rendering.
  * Sets language settings, validates data, and initiates DOM injection.
@@ -185,7 +198,7 @@ export function processLyrics(data: LyricSourceResultWithMeta, keepLoaderVisible
     log(LYRICS_TAB_NOT_DISABLED_LOG);
   }
 
-  injectLyrics(data, keepLoaderVisible, signal);
+  injectLyrics(data, keepLoaderVisible, {}, signal);
 }
 
 function createLyricsLine(parts: LyricPart[], line: LineData, lyricElement: HTMLDivElement) {
@@ -275,12 +288,13 @@ function createBreakElem(lyricElement: HTMLDivElement, order: number) {
  *
  * @param data - Complete lyrics data object
  * @param keepLoaderVisible
+ * @param parameters - Parameters for advanced setup
  * @param signal - AbortSignal to cancel async operations
  * @param data.lyrics - Array of lyric lines with timing
  * @param [data.source] - Source attribution for lyrics
  * @param [data.sourceHref] - URL for source link
  */
-function injectLyrics(data: LyricSourceResultWithMeta, keepLoaderVisible = false, signal?: AbortSignal): void {
+export function injectLyrics(data: LyricSourceResultWithMeta, keepLoaderVisible = false, parameters?: InjectionParameters, signal?: AbortSignal): void {
   const injectionId = AppState.currentInjectionId;
   const isStale = () => AppState.currentInjectionId !== injectionId;
 
@@ -314,10 +328,15 @@ function injectLyrics(data: LyricSourceResultWithMeta, keepLoaderVisible = false
       return;
     }
 
+    if (!parameters?.disableTranslations) { resolve("en"); }
+    
     const abortHandler = () => reject(new Error("Aborted"));
     signal?.addEventListener("abort", abortHandler, { once: true });
 
-    if (!data.language) {
+    if (data.language) {
+      signal?.removeEventListener("abort", abortHandler);
+      resolve(data.language);
+    } else if (!parameters?.disableAutoTranslate) {
       let text = "";
       let lineCount = 0;
       for (let lyricLine of lyrics) {
@@ -333,9 +352,6 @@ function injectLyrics(data: LyricSourceResultWithMeta, keepLoaderVisible = false
         log(LOG_PREFIX, "Lang was missing. Determined it is: " + lang);
         resolve(lang);
       });
-    } else {
-      signal?.removeEventListener("abort", abortHandler);
-      resolve(data.language);
     }
   });
 
@@ -343,7 +359,7 @@ function injectLyrics(data: LyricSourceResultWithMeta, keepLoaderVisible = false
   let syncType: SyncType = allZero ? "none" : "synced";
 
   lyrics.forEach((lyricItem, lineIndex) => {
-    if (lyricItem.isInstrumental) {
+    if (lyricItem.isInstrumental && !parameters?.disableInstrumentalElement) {
       const instrumentalElement = createInstrumentalElement(lyricItem.durationMs, lineIndex);
       instrumentalElement.classList.add("blyrics--line");
       instrumentalElement.dataset.time = String(lyricItem.startTimeMs / 1000);

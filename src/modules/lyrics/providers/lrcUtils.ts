@@ -14,7 +14,6 @@ export function parseTime(timeStr: string | number | undefined): number {
 
   const parts = timeStr.split(":").map(val => val.replace(/[^0-9.]/g, "")); // removes any non-numerical character except dots
   let totalMs = 0;
-  console.log(parts);
 
   try {
     if (parts.length === 1) {

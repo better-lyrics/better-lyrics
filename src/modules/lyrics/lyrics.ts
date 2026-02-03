@@ -85,6 +85,7 @@ export async function createLyrics(detail: PlayerDetails, signal: AbortSignal): 
     // We should get recalled if we were executed without a valid song/artist and aren't able to get lyrics
 
     let matchingSong = await getSongMetadata(videoId, 1, signal);
+    // console.log(matchingSong, { song, artist, videoId, duration });
     let swappedVideoId = false;
     let isAVSwitch =
       (matchingSong &&
@@ -111,10 +112,16 @@ export async function createLyrics(detail: PlayerDetails, signal: AbortSignal): 
       AppState.suppressZeroTime = 0;
     }
 
-    if (isMusicVideo && matchingSong && matchingSong.counterpartVideoId && matchingSong.segmentMap) {
-      log("Switching VideoId to Audio Id");
-      swappedVideoId = true;
-      videoId = matchingSong.counterpartVideoId;
+    if (matchingSong) {
+      // accurate metadata passed parameters (song with (feat.) and artists with no localized "and")
+      song = matchingSong.title;
+      artist = matchingSong.artist;
+
+      if (isMusicVideo && matchingSong.counterpartVideoId && matchingSong.segmentMap) {
+        log("Switching VideoId to Audio Id");
+        swappedVideoId = true;
+        videoId = matchingSong.counterpartVideoId;
+      }
     }
 
     const tabSelector = document.getElementsByClassName(TAB_HEADER_CLASS)[1];
