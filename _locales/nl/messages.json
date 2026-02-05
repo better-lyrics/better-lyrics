@@ -440,7 +440,7 @@
     "description": "Submit a theme link"
   },
   "marketplace_loading": {
-    "message": "Loading themes...",
+    "message": "...",
     "description": "Loading message"
   },
   "marketplace_retry": {
@@ -654,6 +654,16 @@
   "marketplace_noThemesInstalled": {
     "message": "No themes installed yet",
     "description": "Empty installed themes message"
+  },
+  "marketplace_lastUpdatedOn": {
+    "message": "Last updated on $date$",
+    "description": "Tooltip showing full date when a theme was last updated",
+    "placeholders": {
+      "date": {
+        "content": "$1",
+        "example": "January 15, 2025, 3:42 PM"
+      }
+    }
   },
   "editor_pageTitle": {
     "message": "Better Lyrics CSS Editor",

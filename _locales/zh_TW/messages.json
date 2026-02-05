@@ -655,6 +655,16 @@
     "message": "尚未安裝任何主題",
     "description": "Empty installed themes message"
   },
+  "marketplace_lastUpdatedOn": {
+    "message": "Last updated on $date$",
+    "description": "Tooltip showing full date when a theme was last updated",
+    "placeholders": {
+      "date": {
+        "content": "$1",
+        "example": "January 15, 2025, 3:42 PM"
+      }
+    }
+  },
   "editor_pageTitle": {
     "message": "Better Lyrics CSS 編輯器",
     "description": "Standalone editor page title"
