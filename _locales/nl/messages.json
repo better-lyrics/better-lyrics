@@ -96,7 +96,7 @@
     "description": "Language settings section description"
   },
   "options_language_romanization": {
-    "message": "Romanisatie",
+    "message": "Somatisatie",
     "description": "Romanization setting label"
   },
   "options_language_translate": {
@@ -364,43 +364,43 @@
     "description": "Header subtitle"
   },
   "marketplace_searchPlaceholder": {
-    "message": "Search themes...",
+    "message": "Zoek thema's...",
     "description": "Search input placeholder"
   },
   "marketplace_refresh": {
-    "message": "Refresh",
+    "message": "Ververs",
     "description": "Refresh button label"
   },
   "marketplace_keyboardShortcuts": {
-    "message": "Keyboard shortcuts",
+    "message": "Toetsenbord snelkoppelingen",
     "description": "Keyboard shortcuts button label"
   },
   "marketplace_sortBy": {
-    "message": "Sort by",
+    "message": "Sorteer op",
     "description": "Sort filter group label"
   },
   "marketplace_sortRatingDesc": {
-    "message": "Highest rated",
+    "message": "Best beoordeeld",
     "description": "Sort by highest rating"
   },
   "marketplace_sortRatingAsc": {
-    "message": "Lowest rated",
+    "message": "Laagst beoordeeld",
     "description": "Sort by lowest rating"
   },
   "marketplace_sortDownloadsDesc": {
-    "message": "Most downloaded",
+    "message": "Meest gedownload",
     "description": "Sort by most downloads"
   },
   "marketplace_sortDownloadsAsc": {
-    "message": "Least downloaded",
+    "message": "Minst gedownload",
     "description": "Sort by least downloads"
   },
   "marketplace_sortNewest": {
-    "message": "Newest",
+    "message": "Nieuwst",
     "description": "Sort by newest"
   },
   "marketplace_sortOldest": {
-    "message": "Oldest",
+    "message": "Oudste",
     "description": "Sort by oldest"
   },
   "marketplace_show": {
@@ -408,23 +408,23 @@
     "description": "Show filter group label"
   },
   "marketplace_showAll": {
-    "message": "All",
+    "message": "Alle",
     "description": "Show all themes"
   },
   "marketplace_showInstalled": {
-    "message": "Installed",
+    "message": "Geïnstalleerd",
     "description": "Show installed themes"
   },
   "marketplace_showNotInstalled": {
-    "message": "Not installed",
+    "message": "Niet geïnstalleerd",
     "description": "Show not installed themes"
   },
   "marketplace_options": {
-    "message": "Options",
+    "message": "Opties",
     "description": "Options filter group label"
   },
   "marketplace_hasShaders": {
-    "message": "Has shaders",
+    "message": "Heeft shaders",
     "description": "Filter for themes with shaders"
   },
   "marketplace_compatibleOnly": {
