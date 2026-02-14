@@ -47,7 +47,7 @@
         "codemirror-lang-rics": "^0.3.20",
         "dompurify": "^3.3.0",
         "extension": "2.1.3",
-        "fast-xml-parser": "^5.3.4",
+        "fast-xml-parser": "^5.3.5",
         "fflate": "^0.8.2",
         "marked": "^17.0.1",
         "rics": "^0.3.20",
