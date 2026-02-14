@@ -1,8 +1,9 @@
 import type { Lyric, LyricPart } from "@/modules/lyrics/providers/shared";
 import { clyricsModalList, clyricsNewLyrics } from ".";
 import { openCLyricsModal } from "./clyrics";
-import { actionMenus, addNewLine, type ContextData, contextMenus } from "./editorDom";
+import { actionMenus, addNewLine, type ContextData, contextMenus, domDefaults } from "./editorDom";
 import { getLocalStorage } from "@/core/storage";
+import { formatTime } from "@/modules/lyrics/providers/lrcUtils";
 
 let loaded = false;
 
@@ -11,10 +12,12 @@ let selectedFile = -1;
 let historyStack = [];
 let historyVer = -1;
 
-let lyrics: Lyric[] = [];
-
 let _selectedLine: any = -1;
 let _selectedWord: any = -1;
+
+let loadedAudio: HTMLAudioElement | null = null; // loaded audio from playbar
+
+let lyrics: Lyric[] = [];
 
 // Storing context menu button and their functions when clicked
 let contextMenuB: ContextData[] = [];
@@ -571,33 +574,90 @@ function handlePlaybar() {
     return;
   }
 
+  const playbackBtn = document.getElementById("playback-btn");
+  const curTime = document.getElementById("playbar-time");
+  const duration = document.getElementById("playbar-duration");
+  
+  const seekBar = document.getElementById("playbar-seek");
+  const seekerBar = document.getElementById("playbar-seek-bar");
+  const seekerHead = document.getElementById("playbar-seek-head");
+
   function load(files?: FileList | null) {
     if (!files) { return; }
     if (files.length > 0) {
       const file = files[0]
       if (file.type.split("/")[0] != "audio") { return; }
       const audioSrc = URL.createObjectURL(file);
-      console.log(`loaded ${file.name}, ${file.size}, ${file.type}. ${audioSrc}`);
-      const audio = new Audio(audioSrc);
-      audio.play();
+      console.log(`Loaded ${file.name}, ${file.size}, ${file.type}. ${audioSrc}`);
+      loadedAudio = new Audio(audioSrc);
+      loadedAudio.addTextTrack("descriptions", file.name);
       
-      audioFile.parentElement!.style.display = "none"
+      if (dragAudio) { dragAudio.style.display = "none"; }
+
+      loadedAudio.onplay = () => {
+        if (playbackBtn) {
+          const path = playbackBtn.firstElementChild?.firstElementChild!;
+          path.setAttribute("d", domDefaults.svg.pausePATH);
+        }
+      }
+
+      loadedAudio.onpause = () => {
+        if (playbackBtn) {
+          const path = playbackBtn.firstElementChild?.firstElementChild!;
+          path.setAttribute("d", domDefaults.svg.playPATH);
+        }
+      }
+
+      loadedAudio.onloadeddata = () => {
+        if (playbackBtn) {
+          playbackBtn.onclick = () => {
+            loadedAudio!.paused ? loadedAudio!.play() : loadedAudio!.pause();
+          }
+        }
+        
+        if (seekBar) {
+          const rect = seekBar.getBoundingClientRect();
+          seekBar.onclick = e => {
+            loadedAudio!.currentTime = (e.clientX - rect.x) / rect.width * loadedAudio!.duration;
+          }
+        }
+        
+        if (duration) {
+          duration.textContent = formatTime(loadedAudio!.duration * 1000, false, true);
+        }
+      }
+
+      loadedAudio.ontimeupdate = () => {
+        if (curTime) {
+          curTime.textContent = formatTime(loadedAudio!.currentTime * 1000, false, true);
+        }
+
+        if (seekBar) {
+          if (seekerBar) {
+            seekerBar.style.width = `${loadedAudio!.currentTime / loadedAudio!.duration * 100}%`;
+          }
+          if (seekerHead) {
+            seekerHead.style.left = `calc(${loadedAudio!.currentTime / loadedAudio!.duration * 100}% - .375rem)`;
+          }
+        }
+      }
     }
   }
 
-  audioFile.parentElement!.addEventListener("dragover", e => {
-    e.preventDefault();
-    e.stopPropagation();
-  })
-  audioFile.parentElement!.addEventListener("drop", e => {
-    e.preventDefault();
-    e.stopPropagation();
-    load(e.dataTransfer?.files);
-  });
+  if (dragAudio) {
+    dragAudio.addEventListener("dragover", e => {
+      e.preventDefault();
+      e.stopPropagation();
+    });
 
-  audioFile.addEventListener("change", e => {
-    load(audioFile.files);
-  })
+    dragAudio.addEventListener("drop", e => {
+      e.preventDefault();
+      e.stopPropagation();
+      load(e.dataTransfer?.files);
+    });
+  }
+
+  audioFile.addEventListener("change", () => load(audioFile.files));
 
   console.log("[onload] Playbar loaded");
 }

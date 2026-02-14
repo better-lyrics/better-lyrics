@@ -45,6 +45,7 @@ export function parseTime(timeStr: string | number | undefined): number {
  */
 export function formatTime(timeNum: number, useMs?: boolean, whole?: boolean): string {
   if (typeof timeNum != "number") return whole ? (useMs ? "00:00.000" : "00:00") : useMs ? "0.000" : "0";
+  timeNum = Math.round(timeNum);
 
   const totalSec = Math.floor(timeNum / 1000);
   const minutes = Math.floor(totalSec / 60);

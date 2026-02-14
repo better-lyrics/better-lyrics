@@ -216,22 +216,22 @@
 		
 		<!-- PLAYBAR -->
 		<div class="playbar">
-			<label class="drag-audio" for="audio-file-playbar">
+			<label id="drag-audio" class="drag-audio" for="audio-file-playbar">
 				<input id="audio-file-playbar" accept="audio/*" type="file"/>
 				<h3>Drag or select an audio file here</h3>
 			</label>
 			<div class="audio-controls">
 				<button id="playback-btn" class="icon-btn no-tooltip playback-btn">
 					<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-						<path fill="currentColor" d="M8 19h2V5H8v14m6-14v14h2V5h-2z" stroke="currentColor" stroke-width="1"/>
+						<path fill="currentColor" d="M8 19V5l11 7z" stroke="currentColor" stroke-width="1"/>
 					</svg>
 				</button>
-				<span id="current-time" class="code time-display">0:00.000</span>
-				<div id="seek-bar" class="seek-bar">
-					<div class="filler"></div>
-					<div class="head"></div>
+				<span id="playbar-time" class="code time-display">00:00</span>
+				<div id="playbar-seek" class="seek-bar">
+					<div id="playbar-seek-bar" class="sb-bar"></div>
+					<div id="playbar-seek-head" class="sb-head"></div>
 				</div>
-				<span id="total-duration" class="code time-display">0:00.000</span>
+				<span id="playbar-duration" class="code time-display">00:00</span>
 			</div>
 		</div>
 

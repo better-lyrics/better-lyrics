@@ -43,5 +43,6 @@ export interface CLyricsOverview {
 export interface CLyricsData extends CLyricsOverview {
   videoId?: string | null;
   lyrics: Lyric[];
+  language?: string | null;
   editor?: CLyricsEditor;
 }

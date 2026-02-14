@@ -59,8 +59,9 @@ export interface IdentityExport {
 const STORAGE_KEY = "userIdentity";
 const REGISTERED_KEY = "identityRegistered";
 const CERTIFICATE_KEY = "keyCertificate";
-const ECDSA_PARAMS: EcKeyGenParams = { name: "ECDSA", namedCurve: "P-256" };
-const HASH_ALGORITHM = "SHA-256";
+
+export const ECDSA_PARAMS: EcKeyGenParams = { name: "ECDSA", namedCurve: "P-256" };
+export const HASH_ALGORITHM = "SHA-256";
 
 let cachedIdentity: KeyIdentity | null = null;
 
@@ -238,11 +239,34 @@ export async function hasCertificate(): Promise<boolean> {
   return cert !== null;
 }
 
-async function clearCertificate(): Promise<void> {
-  await chrome.storage.local.remove(CERTIFICATE_KEY);
+export function canonicalJson(obj: unknown): string {
+  if (obj === null || typeof obj !== "object") {
+    return JSON.stringify(obj);
+  }
+  if (Array.isArray(obj)) {
+    return `[${obj.map(canonicalJson).join(",")}]`;
+  }
+  const record = obj as Record<string, unknown>;
+  const sorted = Object.keys(record)
+  .filter(k => record[k] !== undefined)
+  .sort();
+  return `{${sorted.map(k => `${JSON.stringify(k)}:${canonicalJson(record[k])}`).join(",")}}`;
+}
+
+export function bufferToBase64(buffer: ArrayBuffer): string {
+  const bytes = new Uint8Array(buffer);
+  let binary = "";
+  for (let i = 0; i < bytes.length; i++) {
+    binary += String.fromCharCode(bytes[i]);
+  }
+  return btoa(binary);
 }
 
 // -- Private Helpers --------------------------
+
+async function clearCertificate(): Promise<void> {
+  await chrome.storage.local.remove(CERTIFICATE_KEY);
+}
 
 async function generateKeyIdentity(): Promise<KeyIdentity> {
   const keyPair = await crypto.subtle.generateKey(ECDSA_PARAMS, true, ["sign", "verify"]);
@@ -342,28 +366,6 @@ function isValidIdentityExport(obj: unknown): obj is IdentityExport {
   );
 }
 
-function canonicalJson(obj: unknown): string {
-  if (obj === null || typeof obj !== "object") {
-    return JSON.stringify(obj);
-  }
-  if (Array.isArray(obj)) {
-    return `[${obj.map(canonicalJson).join(",")}]`;
-  }
-  const record = obj as Record<string, unknown>;
-  const sorted = Object.keys(record)
-    .filter(k => record[k] !== undefined)
-    .sort();
-  return `{${sorted.map(k => `${JSON.stringify(k)}:${canonicalJson(record[k])}`).join(",")}}`;
-}
-
-function bufferToBase64(buffer: ArrayBuffer): string {
-  const bytes = new Uint8Array(buffer);
-  let binary = "";
-  for (let i = 0; i < bytes.length; i++) {
-    binary += String.fromCharCode(bytes[i]);
-  }
-  return btoa(binary);
-}
 
 function bufferToHex(buffer: ArrayBuffer): string {
   const bytes = new Uint8Array(buffer);

@@ -1,6 +1,6 @@
 import { formatTime } from "@/modules/lyrics/providers/lrcUtils";
 import type { Lyric } from "@/modules/lyrics/providers/shared";
-import { defaults, lyricLines } from "./editor";
+import { defaults } from "./editor";
 
 export interface ContextData {
   id?: string;
@@ -62,7 +62,7 @@ export const domDefaults = {
     close: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path d="M6.28 5.22a.75.75 0 0 0-1.06 1.06L8.94 10l-3.72 3.72a.75.75 0 1 0 1.06 1.06L10 11.06l3.72 3.72a.75.75 0 1 0 1.06-1.06L11.06 10l3.72-3.72a.75.75 0 0 0-1.06-1.06L10 8.94z"/></svg>`,
 
     // line suggestive
-    warning: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="currentColor" d="M2.725 21q-.275 0-.5-.137t-.35-.363-.137-.488.137-.512l9.25-16q.15-.25.388-.375T12 3t.488.125.387.375l9.25 16q.15.25.138.513t-.138.487-.35.363-.5.137zM12 18q.425 0 .713-.288T13 17t-.288-.712T12 16t-.712.288T11 17t.288.713T12 18m0-3q.425 0 .713-.288T13 14v-3q0-.425-.288-.712T12 10t-.712.288T11 11v3q0 .425.288.713T12 15"/></svg>`,
+    warning: `<svg xmlns="http://wzww.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="currentColor" d="M2.725 21q-.275 0-.5-.137t-.35-.363-.137-.488.137-.512l9.25-16q.15-.25.388-.375T12 3t.488.125.387.375l9.25 16q.15.25.138.513t-.138.487-.35.363-.5.137zM12 18q.425 0 .713-.288T13 17t-.288-.712T12 16t-.712.288T11 17t.288.713T12 18m0-3q.425 0 .713-.288T13 14v-3q0-.425-.288-.712T12 10t-.712.288T11 11v3q0 .425.288.713T12 15"/></svg>`,
 
     info: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="currentColor" d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20m1 15h-2v-6h2zm0-8h-2V7h2z"/></svg>`,
 
@@ -80,6 +80,10 @@ export const domDefaults = {
 
     // for background liens
     paragraph: `<svg xmlns="http://www.w3.org/2000/svg" class="line-svg" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 6h4m4 0h-4m0 0v12M4 11h3m3 0H7m0 0v7"/></svg>`,
+
+    // for playback button
+    playPATH: "M8 19V5l11 7z",
+    pausePATH: "M8 19h2V5H8v14m6-14v14h2V5h-2z"
   },
   lineLint: {
     // Level 0 - Info suggestion to give much better experience
@@ -104,6 +108,9 @@ export const domDefaults = {
   },
 };
 
+/**
+ * Creates a new `lyric-line` element built for `Powerhouse` layout
+ */
 export function addNewLine(data: Lyric) {
   function separator(cls: string) {
     const separator = document.createElement("div");

@@ -204,12 +204,12 @@ button {
     width: .75rem;
 }
 
-.editor-layout-select {
+#editor-layout-select {
     background: rgba(0, 0, 0, .25);
     border-radius: .3rem;
     padding: .4rem;
-    text-align: right;
-    border: .05rem solid hsl(0, 0%, 100%, .5);
+    text-align: center;
+    border: .05rem solid hsl(0, 0%, 100%, .3);
 }
 
 /* TOOLS */
@@ -832,17 +832,18 @@ button {
     position: relative;
 }
 
-.seek-bar > .filler {
+.seek-bar > .sb-bar {
+    transition: .2s;
     background: hsl(195, 100%, 50%, .2);
     border-radius: inherit;
     height: stretch;
 }
 
-.seek-bar:hover > .head {
+.seek-bar:hover > .sb-head {
     opacity: 1;
 }
 
-.seek-bar > .head {
+.seek-bar > .sb-head {
     opacity: 0;
     transition: .2s;
     left: -.375rem;

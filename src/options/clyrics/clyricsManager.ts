@@ -1,5 +1,6 @@
 import type { TrackInfoProvider } from "@/modules/lyrics/providers/shared";
 import type { CLyricsData } from "./types";
+import type { LyricFormatType } from "./publishing";
 
 /**
  * Returns a list of all created custom lyrics
@@ -18,6 +19,9 @@ export async function getCustomLyrics(index: number): Promise<CLyricsData> {
   return clyrics[index];
 }
 
+/**
+ * Creates a new custom lyrics data
+ */
 export async function createCustomLyrics(parameters: TrackInfoProvider, videoId: string | null): Promise<CLyricsData | null> {
   if (!parameters.song || parameters.song.length < 1 || !parameters.artist || parameters.artist.length < 1) {
     return null;
@@ -37,4 +41,11 @@ export async function createCustomLyrics(parameters: TrackInfoProvider, videoId:
   clyrics.push(data);
   await chrome.storage.local.set({ customLyrics: clyrics });
   return data;
+}
+
+/**
+ * Converts a Custom Lyrics data to choosen format
+ */
+export async function convertFormat(clyrics: CLyricsData, format: LyricFormatType) {
+  
 }
