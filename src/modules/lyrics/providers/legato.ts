@@ -35,7 +35,7 @@ export default async function legato(providerParameters: ProviderParameters): Pr
     }
 
     providerParameters.sourceMap["legato-synced"].lyricSourceResult = {
-      lyrics: parseLRC(data.lyrics, providerParameters.duration * 1000),
+      lyrics: parseLRC(data.lyrics, providerParameters.duration * 1000).result,
       source: "Better Lyrics Legato",
       sourceHref: "https://boidu.dev/",
       musicVideoSynced: false,

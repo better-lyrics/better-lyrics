@@ -478,7 +478,7 @@ function handleSliders() {
         const head = slider.querySelector(".head") as HTMLElement;
         const bar = slider.querySelector(".bar") as HTMLElement;
         const value = parseFloat(slider.getAttribute("value") || "0") || 0;
-        if (sliderOnUpdate[slider.id]) {
+        if (slider.getAttribute("on-sliding") == "true" && sliderOnUpdate[slider.id]) {
           sliderOnUpdate[slider.id](value);
         }
         if (head) {
@@ -499,6 +499,7 @@ function handleSliders() {
     slider.addEventListener("mousedown", e => {
       e.preventDefault();
       timeout = setTimeout(() => {
+        slider.setAttribute("on-sliding", "true");
         const moveHandler = (e: MouseEvent) => {
           const rect = slider.getBoundingClientRect();
           slider.setAttribute("value", `${(e.clientX - rect.x) / rect.width}`);
@@ -506,6 +507,7 @@ function handleSliders() {
         document.addEventListener("mousemove", moveHandler);
         document.addEventListener("mouseup", () => {
           clearTimeout(timeout);
+          slider.setAttribute("on-sliding", "false");
           document.removeEventListener("mousemove", moveHandler);
         });
       }, 200);

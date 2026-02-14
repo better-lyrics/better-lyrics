@@ -35,7 +35,7 @@ export default async function lyricLib(providerParameters: ProviderParameters): 
 
     if (data.syncedLyrics) {
       providerParameters.sourceMap["lrclib-synced"].lyricSourceResult = {
-        lyrics: parseLRC(data.syncedLyrics, data.duration),
+        lyrics: parseLRC(data.syncedLyrics, data.duration).result,
         source: "LRCLIB",
         sourceHref: "https://lrclib.net",
         musicVideoSynced: false,
