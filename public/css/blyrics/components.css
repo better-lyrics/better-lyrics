@@ -53,7 +53,7 @@
 	height: 3rem;
 	min-width: 3rem;
 	min-height: 3rem;
-	margin-top: 0rem;
+	margin-top: 3rem;
 	flex-shrink: 0;
 	background: url(https://better-lyrics.boidu.dev/icon-512.png);
 	background-position: 50%;
@@ -105,7 +105,7 @@
     height: 2.7rem;
 	min-width: 2.7rem;
 	min-height: 2.7rem; 
-	margin-top: 0rem;
+	margin-top: 2.7rem;
 }
 
 #blyrics-loader[small-loader]:after {
@@ -177,6 +177,7 @@
 	display: block;
 	height: 3rem;
 	width: 3rem;
+	margin-top: 3rem;
 }
 
 #blyrics-ad-overlay:after {
