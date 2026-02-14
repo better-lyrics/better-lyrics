@@ -85,7 +85,6 @@ export async function createLyrics(detail: PlayerDetails, signal: AbortSignal): 
     // We should get recalled if we were executed without a valid song/artist and aren't able to get lyrics
 
     let matchingSong = await getSongMetadata(videoId, 1, signal);
-    // console.log(matchingSong, { song, artist, videoId, duration });
     let swappedVideoId = false;
     let isAVSwitch =
       (matchingSong &&

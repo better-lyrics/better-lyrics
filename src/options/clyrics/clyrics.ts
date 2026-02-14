@@ -1,7 +1,7 @@
 import { formatTime } from "@/modules/lyrics/providers/lrcUtils";
 import { createCustomLyrics, listCustomLyrics } from "./clyricsManager";
 import { clyricsModalList, clyricsModalOverlay, clyricsNewLyrics } from "./index";
-import type { CLyricsOverview } from "./types";
+import type { CLyricsOverview } from "./clyrics-types";
 
 let initializedForm = false;
 

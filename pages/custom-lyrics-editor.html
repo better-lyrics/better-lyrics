@@ -227,11 +227,17 @@
 					</svg>
 				</button>
 				<span id="playbar-time" class="code time-display">00:00</span>
-				<div id="playbar-seek" class="seek-bar">
-					<div id="playbar-seek-bar" class="sb-bar"></div>
-					<div id="playbar-seek-head" class="sb-head"></div>
+				<div id="playbar-seek" class="slider">
+					<div id="playbar-seek-bar" class="bar"></div>
+					<div id="playbar-seek-head" class="head"></div>
 				</div>
 				<span id="playbar-duration" class="code time-display">00:00</span>
+				<button id="playbar-rate">
+					<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+						<path fill="currentColor" d="M14 20.725v-2.05q2.25-.65 3.625-2.5t1.375-4.2-1.375-4.2T14 5.275v-2.05q3.1.7 5.05 3.138T21 11.975t-1.95 5.613T14 20.725M3 15V9h4l5-5v16l-5-5zm11 1V7.95q1.175.55 1.838 1.65T16.5 12q0 1.275-.663 2.363T14 16"/>
+					</svg>
+					<span class="code">1x</span>
+				</button>
 			</div>
 		</div>
 
@@ -296,9 +302,36 @@
 			</div>
 		</div>
 
-		<div id="action-file-menu" class="list-buttons hidden" style="opacity: 0;"></div>
+		<!-- Actions Menu -->
+		<div id="action-file-menu" class="list-buttons hidden" style="opacity: 0"></div>
 
-		<div id="context-menu" class="list-buttons hidden" style="opacity: 0;"></div>
+		<div id="context-menu" class="list-buttons hidden" style="opacity: 0"></div>
+
+		<div id="playbar-rate-menu" class="list-buttons" style="opacity: 0; position: absolute;">
+			<div id="playbar-playrates" class="rows">
+				<button value=".25" class="code">0.25x</button>
+				<button value=".5" class="code">0.5x</button>
+				<button value="1" class="code">1x</button>
+				<button value="1.25" class="code">1.25x</button>
+				<button value="1.5" class="code">1.5x</button>
+				<button value="2" class="code">2x</button>
+			</div>
+			<div id="playbar-playrate">
+				<span id="playbar-min-rate" class="code time-display">0.25x</span>
+				<div id="playbar-playrate-bar" class="slider" min=".25" max="2" step=".05">
+					<div id="playbar-playrate-bar" class="bar"></div>
+					<div id="playbar-playrate-head" class="head"></div>
+				</div>
+				<span id="playbar-max-rate" class="code time-display">2x</span>
+			</div>
+			<div id="playbar-volume">
+				<span id="playbar-volume-rate" class="code time-display">50%</span>
+				<div id="playbar-volume-bar" class="slider" min=".25" max="1" step=".01">
+					<div id="playbar-volume-bar" class="bar"></div>
+					<div id="playbar-volume-head" class="head"></div>
+				</div>
+			</div>
+		</div>
 	</body>
 	<script type="module" defer src="../src/options/clyrics/editor.ts"></script>
 	<script type="module" defer src="../src/options/clyrics.ts"></script>

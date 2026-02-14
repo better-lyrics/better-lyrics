@@ -1,4 +1,4 @@
-import type { Lyric } from "@/modules/lyrics/providers/shared";
+import type { LyricsArray } from "@/modules/lyrics/providers/shared";
 
 export interface CLyricsEditorVoices {
   color: string;
@@ -42,7 +42,7 @@ export interface CLyricsOverview {
 
 export interface CLyricsData extends CLyricsOverview {
   videoId?: string | null;
-  lyrics: Lyric[];
+  lyrics: LyricsArray;
   language?: string | null;
   editor?: CLyricsEditor;
 }

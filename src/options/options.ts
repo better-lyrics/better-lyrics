@@ -384,7 +384,10 @@ function createProviderElem(providerId: string, checked = true): HTMLLIElement |
 document.addEventListener("DOMContentLoaded", () => {
   initI18n();
   restoreOptions();
+
+  document.getElementById("reload-lyrics")?.addEventListener("click", saveOptions);
 });
+
 document.querySelectorAll("#options input, #options select").forEach(element => {
   element.addEventListener("change", saveOptions);
 });

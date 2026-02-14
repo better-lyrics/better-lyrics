@@ -170,7 +170,7 @@ button {
     align-items: stretch;
     justify-content: flex-start;
     align-self: stretch;
-    gap: .25rem;
+    gap: .3rem;
     height: 100%;
     overflow: auto;
 }
@@ -198,6 +198,10 @@ button {
     justify-content: flex-start;
     align-self: stretch;
     position: relative;
+}
+
+#agents-presets {
+    margin-right: auto;
 }
 
 .agent-col {
@@ -498,7 +502,7 @@ button {
 
 /* LYRIC LIENS */
 .lyric-lines {
-    margin: .3125rem 0;
+    margin-bottom: .3rem;
     display: flex;
     flex-direction: column;
     gap: .5rem;
@@ -606,13 +610,9 @@ button {
     gap: .25rem;
 }
 
-.line-svg {
-    flex-shrink: 0;
-    width: 1.75rem;
-    height: 1.75rem;
-    position: relative;
-    overflow: visible;
-    aspect-ratio: 1;
+.line-index {
+    margin: 0 .4rem;
+    font-size: 1.1rem;
 }
 
 #new-word-line {
@@ -807,13 +807,13 @@ button {
 }
 
 .audio-controls {
-    padding: 0 .375rem;
+    padding: 0 .5rem;
     display: flex;
     height: 100%;
     justify-content: flex-start;
     align-items: center;
     flex-direction: row;
-    gap: .75rem;
+    gap: .6rem;
 }
 
 .playback-btn {
@@ -821,7 +821,7 @@ button {
     padding: .5rem;
 }
 
-.seek-bar {
+.slider {
     display: flex;
     align-items: center;
     width: stretch;
@@ -832,18 +832,18 @@ button {
     position: relative;
 }
 
-.seek-bar > .sb-bar {
+.slider > .bar {
     transition: .2s;
     background: hsl(195, 100%, 50%, .2);
     border-radius: inherit;
     height: stretch;
 }
 
-.seek-bar:hover > .sb-head {
+.slider:hover > .head {
     opacity: 1;
 }
 
-.seek-bar > .sb-head {
+.slider > .head {
     opacity: 0;
     transition: .2s;
     left: -.375rem;
@@ -852,6 +852,61 @@ button {
     width: .75rem;
     height: .75rem;
     background: hsl(195, 100%, 50%);
+}
+
+#playbar-playback {
+    transition: .2s;
+    width: 3.5rem;
+    height: 1.75rem;
+    padding: 0;
+    border-radius: .2rem;
+    background: transparent;
+    color: hsl(0, 0%, 100%, .5);
+}
+
+#playbar-playback:hover {
+    background: hsl(0, 0%, 100%, .05);
+}
+
+#playbar-playback > span {
+    font-size: .75rem;
+}
+
+#playbar-rate {
+    display: flex;
+    gap: .3rem;
+    padding: .4rem .5rem;
+    border-radius: .3rem;
+    background: transparent;
+}
+
+#playbar-rate:hover {
+    background: hsl(0, 0%, 100%, .05);
+}
+
+#playbar-rate > span {
+    font-size: .8rem;
+}
+
+#playbar-rate-menu {
+    gap: .5rem;
+}
+
+#playbar-playrates > button {
+    border-radius: .3rem;
+    padding: .4rem .6rem;
+    font-size: .8rem;
+}
+
+#playbar-playrate, #playbar-volume {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: .75rem;
+}
+
+#playbar-volume {
+    padding-right: .25rem;
 }
 
 /* MODIFICATION BUTTON */
@@ -911,7 +966,6 @@ button {
     display: flex;
     justify-content: space-between;
     gap: 1.5rem;
-    /* font-size: 1rem; */
     padding: .375rem;
     border-radius: .25rem;
     background-color: transparent;

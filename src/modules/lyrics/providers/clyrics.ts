@@ -1,4 +1,4 @@
-import type { CLyricsData } from "@/options/clyrics/types";
+import type { CLyricsData } from "@/options/clyrics/clyrics-types";
 import type { ProviderParameters } from "./shared";
 
 export default async function customLyrics(providerParameters: ProviderParameters): Promise<void> {

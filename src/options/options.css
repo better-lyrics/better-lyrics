@@ -260,6 +260,10 @@ select option {
     margin-top: 0.5rem;
 }
 
+#clyrics {
+	display: none;
+}
+
 #css {
     display: none;
 }

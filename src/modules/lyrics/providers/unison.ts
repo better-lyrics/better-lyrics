@@ -16,7 +16,7 @@ interface UnisonResponse {
 export default async function unison(providerParameters: ProviderParameters): Promise<void> {
   const url = new URL(UNISON_API_URL);
 
-  // which is better - videoId or song metadata?
+  // which is better? videoId or song metadata?
   // url.searchParams.append("v", providerParameters.videoId);
 
   url.searchParams.append("song", providerParameters.song);
@@ -31,39 +31,56 @@ export default async function unison(providerParameters: ProviderParameters): Pr
   });
 
   providerParameters.sourceMap["unison-richsynced"].filled = true;
+  providerParameters.sourceMap["unison-synced"].filled = true;
+  providerParameters.sourceMap["unison-plain"].filled = true;
 
   if (!response.ok) {
     providerParameters.sourceMap["unison-richsynced"].lyricSourceResult = null;
+    providerParameters.sourceMap["unison-synced"].lyricSourceResult = null;
+    providerParameters.sourceMap["unison-plain"].lyricSourceResult = null;
     return;
   }
 
   const responseString: UnisonResponse = await response.json().then(json => json.data);
+  const result = {
+    cacheAllowed: false,
+    source: "boidu.dev",
+    sourceHref: "https://boidu.dev/"
+  }
+  
   switch (responseString.format) {
     case "ttml":
       const filled = await fillTtml(responseString.lyrics);
-      if (!filled) return;
-      
-      providerParameters.sourceMap["unison-richsynced"].lyricSourceResult = filled ? filled.result : null;
+      providerParameters.sourceMap["unison-richsynced"].lyricSourceResult = filled && filled.isWordSynced ? filled.result : null;
+      providerParameters.sourceMap["unison-synced"].lyricSourceResult = filled && !filled.isWordSynced ? filled.result : null;
+      providerParameters.sourceMap["unison-plain"].lyricSourceResult = null;
       break;
     case "lrc":
       const lrc = parseLRC(responseString.lyrics, responseString.duration);
-      providerParameters.sourceMap["unison-richsynced"].lyricSourceResult = lrc ? {
-        cacheAllowed: true,
-        lyrics: lrc,
-        musicVideoSynced: false,
-        source: "boidu.dev",
-        sourceHref: "https://boidu.dev/",
-      } : null
+      const res = {
+        ...result,
+        lyrics: lrc.result
+      }
+
+      const resPlain = {
+        ...result,
+        cacheAllowed: false,
+        lyrics: lrc.plain
+      }
+
+      providerParameters.sourceMap["unison-richsynced"].lyricSourceResult = lrc && lrc.isWordSynced ? res : null;
+      providerParameters.sourceMap["unison-synced"].lyricSourceResult = lrc && !lrc.isWordSynced ? res : null;
+      providerParameters.sourceMap["unison-plain"].lyricSourceResult = lrc ? resPlain : null;
       break;
     case "plain":
       const plain = parsePlainLyrics(responseString.lyrics);
-      providerParameters.sourceMap["unison-richsynced"].lyricSourceResult = plain ? {
-        cacheAllowed: true,
-        lyrics: plain,
-        musicVideoSynced: false,
-        source: "boidu.dev",
-        sourceHref: "https://boidu.dev/",
-      } : null
+      providerParameters.sourceMap["unison-richsynced"].lyricSourceResult = null;
+      providerParameters.sourceMap["unison-synced"].lyricSourceResult = null;
+      providerParameters.sourceMap["unison-plain"].lyricSourceResult = plain ? {
+        ...result,
+        cacheAllowed: false,
+        lyrics: plain
+      } : null;
       break;
   }
 }

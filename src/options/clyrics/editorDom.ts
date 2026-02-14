@@ -15,13 +15,24 @@ export const actionMenus: { [key: string]: ContextData[] } = {
   file: [
     { id: "new-lyrics-btn", type: "button", content: "New Lyrics", rightCont: "(Ctrl+N)" },
     { id: "open-lyrics-btn", type: "button", content: "Open Lyrics", rightCont: "(Ctrl+O)" },
-    { id: "save-lyrics-btn", type: "button", content: "Save as another lyrics" },
+    { id: "save-as-lyrics-btn", type: "button", content: "Save as another lyrics" },
     { type: "separator" },
     { id: "import-lyrics-btn", type: "button", content: "Import Lyrics", rightCont: ">" },
     { id: "export-lyrics-btn", type: "button", content: "Export Lyrics", rightCont: ">" },
     { type: "separator" },
     { id: "publish-lyrics-btn", type: "button", content: "Publish Lyrics" },
     { id: "search-lyrics-btn", type: "button", content: "Search Lyrics" },
+    { id: "edit-lyrics-btn", type: "button", content: "Edit Lyrics", rightCont: "(Ctrl+E)" },
+  ],
+  fileImport: [
+    { id: "import-from-provider-btn", type: "button", content: "Import from provider" },
+    { id: "import-from-file-btn", type: "button", content: "Import from file" },
+  ],
+  fileExport: [
+    { id: "export-to-ttml-btn", type: "button", content: "Export to .TTML" },
+    { id: "export-to-lrc-btn", type: "button", content: "Export to .LRC" },
+    { id: "export-to-srt-btn", type: "button", content: "Export to .SRT" },
+    { id: "export-plain-btn", type: "button", content: "Export as plain lyrics" },
   ]
 };
 
@@ -66,21 +77,6 @@ export const domDefaults = {
 
     info: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="currentColor" d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20m1 15h-2v-6h2zm0-8h-2V7h2z"/></svg>`,
 
-    // for voice 1
-    leftAlign: `<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" class="line-svg" viewBox="0 0 24 24"><path fill="currentColor" d="M14 18a1 1 0 0 1 0 2H4a1 1 0 0 1 0-2zm6-5a1 1 0 1 1 0 2H4a1 1 0 1 1 0-2zm-6-5a1 1 0 0 1 0 2H4a1 1 0 0 1 0-2zm6-5a1 1 0 0 1 0 2H4a1 1 0 0 1 0-2z"/></svg>`,
-
-    // for voice 1000
-    middleAlign: `<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" class="line-svg" viewBox="0 0 24 24"><path fill="currentColor" d="M17 18a1 1 0 0 1 0 2H7a1 1 0 0 1 0-2zm3-5a1 1 0 1 1 0 2H4a1 1 0 1 1 0-2zm-3-5a1 1 0 0 1 0 2H7a1 1 0 0 1 0-2zm3-5a1 1 0 0 1 0 2H4a1 1 0 0 1 0-2z"/></svg>`,
-
-    // for voice 2 and voice 3
-    rightAlign: `<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" class="line-svg" viewBox="0 0 24 24"><path fill="currentColor" d="M20 18a1 1 0 0 1 0 2H10a1 1 0 0 1 0-2zm0-5a1 1 0 1 1 0 2H4a1 1 0 1 1 0-2zm0-5a1 1 0 0 1 0 2H10a1 1 0 0 1 0-2zm0-5a1 1 0 0 1 0 2H4a1 1 0 0 1 0-2z"/></svg>`,
-
-    // for voice more than 3 (acts as a unidentified alignment)
-    justify: `<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" class="line-svg" viewBox="0 0 24 24"><path fill="currentColor" d="M4 3a1 1 0 0 0 0 2h16a1 1 0 1 0 0-2zm0 5a1 1 0 0 0 0 2h16a1 1 0 1 0 0-2zm-1 6a1 1 0 0 1 1-1h16a1 1 0 1 1 0 2H4a1 1 0 0 1-1-1m1 4a1 1 0 1 0 0 2h16a1 1 0 1 0 0-2z"/></svg>`,
-
-    // for background liens
-    paragraph: `<svg xmlns="http://www.w3.org/2000/svg" class="line-svg" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 6h4m4 0h-4m0 0v12M4 11h3m3 0H7m0 0v7"/></svg>`,
-
     // for playback button
     playPATH: "M8 19V5l11 7z",
     pausePATH: "M8 19h2V5H8v14m6-14v14h2V5h-2z"
@@ -111,7 +107,7 @@ export const domDefaults = {
 /**
  * Creates a new `lyric-line` element built for `Powerhouse` layout
  */
-export function addNewLine(data: Lyric) {
+export function addNewLine(data: Lyric, index: number = 1) {
   function separator(cls: string) {
     const separator = document.createElement("div");
     separator.className = String(cls);
@@ -208,25 +204,7 @@ export function addNewLine(data: Lyric) {
   normalLine.id = "normal-line";
   normalLine.className = "line";
   normalLine.style.display = instrumenone;
-
-  //// SVG
-  switch (data.agent) {
-    case "v1":
-      normalLine.innerHTML = domDefaults.svg.leftAlign;
-      break;
-    case "v2":
-      normalLine.innerHTML = domDefaults.svg.rightAlign;
-      break;
-    case "v3":
-      normalLine.innerHTML = domDefaults.svg.rightAlign;
-      break;
-    case "v1000":
-      normalLine.innerHTML = domDefaults.svg.middleAlign;
-      break;
-    default:
-      normalLine.innerHTML = domDefaults.svg.justify;
-      break;
-  }
+  normalLine.innerHTML = `<span class="line-index">#${index}</span>`;
 
   //// Normal Words Wrapper
   const normalWordsWrapper = document.createElement("div");
@@ -287,9 +265,6 @@ export function addNewLine(data: Lyric) {
   bgLine.className = "line";
   bgLine.id = "background-line";
   bgLine.style.display = hasBgWords ? instrumenone : "none";
-
-  //// SVG
-  bgLine.innerHTML = domDefaults.svg.paragraph;
 
   //// Background Words Wrapper
   const bgWordsWrapper = document.createElement("div");

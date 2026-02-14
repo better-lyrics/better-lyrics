@@ -1,6 +1,7 @@
 import type { TrackInfoProvider } from "@/modules/lyrics/providers/shared";
-import type { CLyricsData } from "./types";
-import type { LyricFormatType } from "./publishing";
+import type { CLyricsData } from "./clyrics-types";
+import { LyricFormatType, LyricSyncType } from "./publishing";
+import { formatTime } from "@/modules/lyrics/providers/lrcUtils";
 
 /**
  * Returns a list of all created custom lyrics
@@ -10,11 +11,11 @@ export async function listCustomLyrics(): Promise<CLyricsData[]> {
   return clyrics.customLyrics || [];
 }
 
-/**
+/** 
  * Fetches the custom lyrics data
  * @param index Zero-based location index of array
  */
-export async function getCustomLyrics(index: number): Promise<CLyricsData> {
+export async function getCustomLyrics(index: number): Promise<CLyricsData | null> {
   const clyrics = await listCustomLyrics();
   return clyrics[index];
 }
@@ -23,7 +24,7 @@ export async function getCustomLyrics(index: number): Promise<CLyricsData> {
  * Creates a new custom lyrics data
  */
 export async function createCustomLyrics(parameters: TrackInfoProvider, videoId: string | null): Promise<CLyricsData | null> {
-  if (!parameters.song || parameters.song.length < 1 || !parameters.artist || parameters.artist.length < 1) {
+  if (typeof parameters.song != "string" || parameters.song.length < 1 || typeof parameters.song != "string" || parameters.artist.length < 1) {
     return null;
   }
 
@@ -44,8 +45,59 @@ export async function createCustomLyrics(parameters: TrackInfoProvider, videoId:
 }
 
 /**
- * Converts a Custom Lyrics data to choosen format
+ * Converts a Custom Lyrics data to a choosen format and level of synchronization
  */
-export async function convertFormat(clyrics: CLyricsData, format: LyricFormatType) {
-  
+export function convertFormat(clyrics: CLyricsData, format: LyricFormatType, syncType: LyricSyncType = LyricSyncType.RICH): string | null {
+  if (!Object.values(LyricFormatType).find(f => f == format) || !Object.values(LyricSyncType).find(s => s == syncType) || !clyrics || !clyrics.lyrics) {
+    return null;
+  }
+
+  if (format == LyricFormatType.PLAIN) {
+    let built = "";
+    for (const lyric of clyrics.lyrics) {
+      let words = lyric.words;
+      if (!words && lyric.parts) {
+        for (const part of lyric.parts) { words += part.words; }
+      }
+      built += words + "\n"
+    }
+    return built;
+  } else if (format == LyricFormatType.LRC) {
+    let built = "";
+    for (const lyric of clyrics.lyrics) {
+      if (syncType == LyricSyncType.PLAIN) {
+        let words = lyric.words;
+        if (!words && lyric.parts) {
+          for (const part of lyric.parts) { words += part.words; }
+        }
+        built += words + "\n";
+      } else if (syncType == LyricSyncType.LINE) {
+        let words = lyric.words;
+        if (!words && lyric.parts) {
+          for (const part of lyric.parts) { words += part.words; }
+        }
+        built += `[${formatTime(lyric.startTimeMs * 1000, true, true)}] ` + words;
+      } else if (syncType == LyricSyncType.RICH) {
+        let lastStartMs = -1;
+        let richBuilt = "";
+
+        if (lyric.parts) {
+          for (const part of lyric.parts) {
+            lastStartMs = part.startTimeMs + part.durationMs;
+            richBuilt +=
+              lastStartMs != part.startTimeMs ? `<${formatTime(part.startTimeMs * 1000, true, true)}> ` : "" +
+              part.words +
+              ` <${formatTime((part.startTimeMs + part.durationMs) * 1000, true, true)}>`;
+          }
+        } else {
+          richBuilt = lyric.words || "";
+        }
+
+        built += `[${formatTime(lyric.startTimeMs * 1000, true, true)}] ` + richBuilt;
+      }
+    }
+    return built;
+  }
+
+  return null;
 }

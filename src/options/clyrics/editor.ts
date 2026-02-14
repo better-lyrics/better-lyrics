@@ -1,9 +1,12 @@
 import type { Lyric, LyricPart } from "@/modules/lyrics/providers/shared";
-import { clyricsModalList, clyricsNewLyrics } from ".";
+import { clyricsModalList, clyricsNewLyrics } from "./index";
 import { openCLyricsModal } from "./clyrics";
 import { actionMenus, addNewLine, type ContextData, contextMenus, domDefaults } from "./editorDom";
 import { getLocalStorage } from "@/core/storage";
 import { formatTime } from "@/modules/lyrics/providers/lrcUtils";
+import { buildTTML } from "./ttmlBuilder";
+import { getCustomLyrics } from "./clyricsManager";
+import type { CLyricsData } from "./clyrics-types";
 
 let loaded = false;
 
@@ -22,6 +25,9 @@ let lyrics: Lyric[] = [];
 // Storing context menu button and their functions when clicked
 let contextMenuB: ContextData[] = [];
 let loadedActionMenu: { [key: string]: boolean } = {};
+
+// Storing sliders functions
+let sliderOnUpdate: { [key: string]: (value: number) => void } = {}; // acts as an onUpdate thing
 
 // Global variables
 export const defaults: {
@@ -264,6 +270,9 @@ function createNewInteractable(content: string) {
   return interactableWord;
 }
 
+/**
+ * Creates a new lyric line and appends it to the editor in Powerhouse layout
+ */
 function createNewLine(parameters?: { isInstrumental?: boolean; voice?: number }, data?: Lyric, selIndex?: number) {
   const prevLine = lyrics[lyrics.length - 1];
 
@@ -456,6 +465,55 @@ function createNewLine(parameters?: { isInstrumental?: boolean; voice?: number }
 }
 
 // Handlers
+/// Sliders
+function handleSliders() {
+  const sliders = document.querySelectorAll(".slider") as NodeListOf<HTMLElement>;
+  sliders.forEach(slider => {
+    let timeout: string | number | any = null;
+    const attrObserver = new MutationObserver(mutations => {
+      mutations.forEach(mutation => {
+        if (mutation.type != "attributes") {
+          return;
+        }
+        const head = slider.querySelector(".head") as HTMLElement;
+        const bar = slider.querySelector(".bar") as HTMLElement;
+        const value = parseFloat(slider.getAttribute("value") || "0") || 0;
+        if (sliderOnUpdate[slider.id]) {
+          sliderOnUpdate[slider.id](value);
+        }
+        if (head) {
+          head.style.left = `calc(${value * 100}% - .375rem)`;
+        }
+        if (bar) {
+          bar.style.width = `${value * 100}%`;
+        }
+      });
+    });
+    attrObserver.observe(slider, { attributes: true, attributeFilter: ["value"] });
+
+    slider.addEventListener("click", e => {
+      const rect = slider.getBoundingClientRect();
+      slider.setAttribute("value", `${(e.clientX - rect.x) / rect.width}`);
+    });
+
+    slider.addEventListener("mousedown", e => {
+      e.preventDefault();
+      timeout = setTimeout(() => {
+        const moveHandler = (e: MouseEvent) => {
+          const rect = slider.getBoundingClientRect();
+          slider.setAttribute("value", `${(e.clientX - rect.x) / rect.width}`);
+        };
+        document.addEventListener("mousemove", moveHandler);
+        document.addEventListener("mouseup", () => {
+          clearTimeout(timeout);
+          document.removeEventListener("mousemove", moveHandler);
+        });
+      }, 200);
+    });
+  });
+  console.log("[onload] Sliders loaded");
+}
+
 /// Actions
 function handleActionsMenu() {
   let actionMenuOpen: HTMLElement | null = null;
@@ -579,8 +637,9 @@ function handlePlaybar() {
   const duration = document.getElementById("playbar-duration");
   
   const seekBar = document.getElementById("playbar-seek");
-  const seekerBar = document.getElementById("playbar-seek-bar");
-  const seekerHead = document.getElementById("playbar-seek-head");
+
+  const playrate = document.getElementById("playbar-rate");
+  const playrateMenu = document.getElementById("playbar-rate-menu");
 
   function load(files?: FileList | null) {
     if (!files) { return; }
@@ -594,21 +653,21 @@ function handlePlaybar() {
       
       if (dragAudio) { dragAudio.style.display = "none"; }
 
-      loadedAudio.onplay = () => {
+      loadedAudio.addEventListener("play", () => {
         if (playbackBtn) {
           const path = playbackBtn.firstElementChild?.firstElementChild!;
           path.setAttribute("d", domDefaults.svg.pausePATH);
         }
-      }
+      });
 
-      loadedAudio.onpause = () => {
+      loadedAudio.addEventListener("pause", () => {
         if (playbackBtn) {
           const path = playbackBtn.firstElementChild?.firstElementChild!;
           path.setAttribute("d", domDefaults.svg.playPATH);
         }
-      }
+      });
 
-      loadedAudio.onloadeddata = () => {
+      loadedAudio.addEventListener("loadeddata", () => {
         if (playbackBtn) {
           playbackBtn.onclick = () => {
             loadedAudio!.paused ? loadedAudio!.play() : loadedAudio!.pause();
@@ -616,31 +675,26 @@ function handlePlaybar() {
         }
         
         if (seekBar) {
-          const rect = seekBar.getBoundingClientRect();
-          seekBar.onclick = e => {
-            loadedAudio!.currentTime = (e.clientX - rect.x) / rect.width * loadedAudio!.duration;
+          sliderOnUpdate[seekBar.id] = (val) => {
+            loadedAudio!.currentTime = val * loadedAudio!.duration;
           }
         }
         
         if (duration) {
           duration.textContent = formatTime(loadedAudio!.duration * 1000, false, true);
         }
-      }
+      });
 
-      loadedAudio.ontimeupdate = () => {
+      loadedAudio.addEventListener("timeupdate", () => {
         if (curTime) {
           curTime.textContent = formatTime(loadedAudio!.currentTime * 1000, false, true);
         }
 
         if (seekBar) {
-          if (seekerBar) {
-            seekerBar.style.width = `${loadedAudio!.currentTime / loadedAudio!.duration * 100}%`;
-          }
-          if (seekerHead) {
-            seekerHead.style.left = `calc(${loadedAudio!.currentTime / loadedAudio!.duration * 100}% - .375rem)`;
-          }
+          const value = loadedAudio!.currentTime / loadedAudio!.duration;
+          seekBar.setAttribute("value", `${value}`);
         }
-      }
+      });
     }
   }
 
@@ -747,6 +801,7 @@ function handleKeybind() {
 function load() {
   if (loaded) return;
   loaded = true;
+  handleSliders();
   handleActionsMenu();
   handleTabs();
   handleTools();
@@ -771,4 +826,6 @@ document.addEventListener("DOMContentLoaded", async () => {
   }
 
   load();
+
+  console.log(buildTTML(await getCustomLyrics(0) as CLyricsData));
 });
