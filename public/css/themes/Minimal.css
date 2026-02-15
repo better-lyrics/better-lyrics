@@ -1,5 +1,5 @@
 
-/* 2026-02-14T18-29-48 v1.6.7                       */
+/* 2026-02-15T17-07-59 v1.6.8                       */
 
 /* This theme explicitly changes/disables lyrics    */
 /* swipe animation. To bring back default lyric     */ 
@@ -631,7 +631,7 @@ ytmusic-app-layout[player-ui-state="PLAYER_BAR_ONLY"]
   z-index: 0;
 }
 
-ytmusic-app-layout:not[player-ui-state="PLAYER_BAR_ONLY"]
+ytmusic-app-layout:not([player-ui-state="PLAYER_BAR_ONLY"])
   #player-bar-background::before {
   background: transparent !important;
   background-color: transparent !important;
@@ -1218,6 +1218,7 @@ ytmusic-player-page[is-mweb-modernization-enabled]
 {
 transition: transform 0.2s ease-out !important;
 }
+
 
 
 
