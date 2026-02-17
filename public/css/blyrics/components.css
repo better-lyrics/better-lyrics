@@ -363,6 +363,7 @@
 	display: none;
 	z-index: 2;
 	max-width: 40rem;
+	font-family: var(--blyrics-font-family);
 }
 
 #blyrics-song-info > p#blyrics-title {
