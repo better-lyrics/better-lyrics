@@ -294,7 +294,7 @@ export async function broadcastRICSToTabs(ricsSource: string, strategy: "local" 
   }
 }
 
-export interface ApplyStoreThemeOptions {
+interface ApplyStoreThemeOptions {
   themeId: string;
   css: string;
   title: string;

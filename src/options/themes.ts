@@ -134,4 +134,4 @@ export async function renameCustomTheme(oldName: string, newName: string): Promi
 }
 
 export default themes;
-export type { CustomTheme };
+;
