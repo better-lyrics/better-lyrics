@@ -34,7 +34,7 @@ window.fetch = async function (request, init) {
       // Only read the request body if it's a POST request
       let requestBodyPromise;
       if (method.toUpperCase() === "POST") {
-        const contentEncoding = originalRequestForJson.headers.get("content-encoding");
+        const contentEncoding = originalRequestForJson.headers.get("content-encoding")?.toLowerCase();
         if (
           (contentEncoding === "gzip" || contentEncoding === "deflate") &&
           typeof DecompressionStream !== "undefined"
