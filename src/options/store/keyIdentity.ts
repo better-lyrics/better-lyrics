@@ -11,7 +11,7 @@ export interface KeyIdentity {
   createdAt: number;
 }
 
-export interface SignedRatingPayload {
+interface SignedRatingPayload {
   themeId: string;
   rating: number;
   timestamp: number;
@@ -19,32 +19,32 @@ export interface SignedRatingPayload {
   keyId: string;
 }
 
-export interface SignedRating {
+interface SignedRating {
   payload: SignedRatingPayload;
   signature: string;
   publicKey: JsonWebKey;
 }
 
-export interface SignedInstallPayload {
+interface SignedInstallPayload {
   themeId: string;
   timestamp: number;
   nonce: string;
   keyId: string;
 }
 
-export interface SignedInstall {
+interface SignedInstall {
   payload: SignedInstallPayload;
   signature: string;
   publicKey: JsonWebKey;
 }
 
-export interface SignedPayload<T = Record<string, unknown>> {
+interface SignedPayload<T = Record<string, unknown>> {
   payload: T & { timestamp: number; nonce: string; keyId: string };
   signature: string;
   publicKey: JsonWebKey;
 }
 
-export interface IdentityExport {
+interface IdentityExport {
   version: 1;
   keyId: string;
   publicKey: JsonWebKey;

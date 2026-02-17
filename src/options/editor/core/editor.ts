@@ -42,7 +42,7 @@ const commentKeymap: readonly KeyBinding[] = [
   { key: "Mod-Shift-a", run: toggleBlockComment },
 ];
 
-export interface EditorOptions {
+interface EditorOptions {
   enableSearch?: boolean;
 }
 

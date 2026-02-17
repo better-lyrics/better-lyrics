@@ -24,7 +24,7 @@ import { broadcastRICSToTabs, saveToStorageWithFallback, showSyncError, showSync
 
 const STORE_THEME_PREFIX = "store:";
 
-export type EditorThemeSource = "marketplace" | "github" | "custom" | "builtin" | null;
+type EditorThemeSource = "marketplace" | "github" | "custom" | "builtin" | null;
 
 function createMarketplaceIcon(): SVGSVGElement {
   const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
