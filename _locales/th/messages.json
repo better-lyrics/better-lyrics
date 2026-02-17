@@ -1,274 +1,274 @@
 {
   "extensionName": {
-    "message": "Better Lyrics (YouTube Music 歌词)",
+    "message": "Better Lyrics (เนื้อเพลงสำหรับ Youtube Music)",
     "description": "The name of the extension"
   },
   "extensionDescription": {
-    "message": "使用精美的同步歌词、多语言支持、实时翻译等功能增强 YouTube Music",
+    "message": "เพิ่มความเท่ให้กับ Youtube Music ด้วยเนื้อเพลงที่ซิงก์กับเวลา การแปลเนื้อเพลงแบบสด อินเตอร์เฟซหลากหลายภาษา และอื่น ๆ อีกมาก",
     "description": "The description of the extension"
   },
   "options_tab_general": {
-    "message": "常规",
+    "message": "ทั่วไป",
     "description": "General settings tab label"
   },
   "options_tab_display": {
-    "message": "显示",
+    "message": "การแสดงผล",
     "description": "Display settings tab label"
   },
   "options_tab_language": {
-    "message": "语言",
+    "message": "ภาษา",
     "description": "Language settings tab label"
   },
   "options_tab_sources": {
-    "message": "来源",
+    "message": "ต้นทาง",
     "description": "Sources settings tab label"
   },
   "options_tab_identity": {
-    "message": "身份",
+    "message": "การระบุตัวตน",
     "description": "Identity settings tab label"
   },
   "options_tab_themes": {
-    "message": "主题",
+    "message": "ธีม",
     "description": "Themes settings tab label"
   },
   "options_general_title": {
-    "message": "常规设置",
+    "message": "การตั้งค่าทั่วไป",
     "description": "General settings section title"
   },
   "options_general_description": {
-    "message": "影响 Better Lyrics 整体行为的设置。",
+    "message": "การตั้งค่าที่มีผลต่อการทำงานโดยรวมของ Better Lyrics",
     "description": "General settings section description"
   },
   "options_general_showLogs": {
-    "message": "显示日志",
+    "message": "แสดง log",
     "description": "Show logs setting label"
   },
   "options_general_autoSwitch": {
-    "message": "自动切换到歌词选项卡",
+    "message": "สลับไปแท็บเนื้อเพลงอัตโนมัติ",
     "description": "Auto switch to lyrics tab setting label"
   },
   "options_general_cache": {
-    "message": "缓存",
+    "message": "แคช",
     "description": "Cache section label"
   },
   "options_general_clearCache": {
-    "message": "清除缓存",
+    "message": "ล้างแคชทั้งหมด",
     "description": "Clear cache button label"
   },
   "options_general_totalLyrics": {
-    "message": "缓存中的歌词总数",
+    "message": "เนื้อเพลงในแคชทั้งหมด",
     "description": "Total lyrics in cache label"
   },
   "options_general_cacheSize": {
-    "message": "缓存大小",
+    "message": "ขนาดแคช",
     "description": "Cache size label"
   },
   "options_display_title": {
-    "message": "显示设置",
+    "message": "การตั้งค่าการแสดงผล",
     "description": "Display settings section title"
   },
   "options_display_description": {
-    "message": "调整 Better Lyrics 的外观。",
+    "message": "ปรับแต่งหน้าตาของ Better Lyrics",
     "description": "Display settings section description"
   },
   "options_display_disableFullscreen": {
-    "message": "禁用全屏模式",
+    "message": "ปิดใช้งานโหมดเต็มหน้าจอ",
     "description": "Disable fullscreen mode setting label"
   },
   "options_display_autoHideCursor": {
-    "message": "全屏时自动隐藏光标",
+    "message": "ซ่อนเคอร์เซอร์โดยอัตโนมัติเมื่อเปิดเต็มหน้าจอ",
     "description": "Auto-hide cursor setting label"
   },
   "options_display_albumArt": {
-    "message": "显示模糊的专辑封面背景",
+    "message": "Show blurred album art background",
     "description": "Show album art background setting label"
   },
   "options_display_stylizedAnimations": {
-    "message": "显示风格化动画",
+    "message": "Show stylized animations",
     "description": "Show stylized animations setting label"
   },
   "options_language_title": {
-    "message": "语言设置",
+    "message": "Language Settings",
     "description": "Language settings section title"
   },
   "options_language_description": {
-    "message": "Better Lyrics 的语言和翻译设置。",
+    "message": "Language and translation settings for Better Lyrics.",
     "description": "Language settings section description"
   },
   "options_language_romanization": {
-    "message": "罗马化",
+    "message": "Romanization",
     "description": "Romanization setting label"
   },
   "options_language_translate": {
-    "message": "翻译歌词",
+    "message": "Translate song lyrics",
     "description": "Translate song lyrics setting label"
   },
   "options_language_translationLanguage": {
-    "message": "翻译语言",
+    "message": "Translation language",
     "description": "Translation language setting label"
   },
   "options_sources_title": {
-    "message": "歌词来源优先级",
+    "message": "Lyric Source Preference",
     "description": "Sources settings section title"
   },
   "options_sources_description": {
-    "message": "拖动以重新排序优先级。排在前面的来源会先尝试。取消勾选可禁用。",
+    "message": "Drag to reorder priority. Higher sources are tried first. Uncheck to disable.",
     "description": "Sources settings section description"
   },
   "options_themes_title": {
-    "message": "主题设置",
+    "message": "Theme Settings",
     "description": "Theme settings section title"
   },
   "options_themes_description": {
-    "message": "自定义 Better Lyrics 的外观。",
+    "message": "Customize the appearance of Better Lyrics.",
     "description": "Theme settings section description"
   },
   "options_themes_theme": {
-    "message": "主题",
+    "message": "Theme",
     "description": "Theme label"
   },
   "options_themes_chooseTheme": {
-    "message": "选择主题",
+    "message": "Choose a theme",
     "description": "Choose a theme button label"
   },
   "options_themes_customStyles": {
-    "message": "自定义样式",
+    "message": "Custom Styles",
     "description": "Custom styles label"
   },
   "options_themes_create": {
-    "message": "创建",
+    "message": "Create",
     "description": "Create button label"
   },
   "options_themes_marketplace": {
-    "message": "主题市场",
+    "message": "Theme Marketplace",
     "description": "Theme marketplace button label"
   },
   "options_themes_installedThemes": {
-    "message": "已安装主题",
+    "message": "Installed Themes",
     "description": "Installed themes button label"
   },
   "options_identity_title": {
-    "message": "身份",
+    "message": "Identity",
     "description": "Identity settings section title"
   },
   "options_identity_description": {
-    "message": "您在 Better Lyrics 的唯一匿名身份。",
+    "message": "Your unique anonymous identity for Better Lyrics.",
     "description": "Identity settings section description"
   },
   "options_identity_yourIdentity": {
-    "message": "您的身份",
+    "message": "Your identity",
     "description": "Your identity label"
   },
   "options_identity_loading": {
-    "message": "加载中...",
+    "message": "Loading...",
     "description": "Loading identity placeholder"
   },
   "options_identity_exportImport": {
-    "message": "导出/导入",
+    "message": "Export/Import",
     "description": "Export/Import section label"
   },
   "options_identity_exportKey": {
-    "message": "导出密钥",
+    "message": "Export Key",
     "description": "Export key button label"
   },
   "options_identity_importKey": {
-    "message": "导入密钥",
+    "message": "Import Key",
     "description": "Import key button label"
   },
   "options_modal_selectTheme": {
-    "message": "选择主题",
+    "message": "Select a Theme",
     "description": "Theme modal title"
   },
   "options_modal_cancel": {
-    "message": "取消",
+    "message": "Cancel",
     "description": "Cancel button label"
   },
   "options_modal_confirm": {
-    "message": "确认",
+    "message": "Confirm",
     "description": "Confirm button label"
   },
   "options_alert_cacheCleared": {
-    "message": "缓存已成功清除！",
+    "message": "Cache cleared successfully!",
     "description": "Cache cleared success message"
   },
   "options_alert_cacheClearFailed": {
-    "message": "清除缓存失败！",
+    "message": "Failed to clear cache!",
     "description": "Cache clear failed message"
   },
   "options_alert_nothingToClear": {
-    "message": "没有可清除的内容！",
+    "message": "Nothing to clear!",
     "description": "Nothing to clear message"
   },
   "options_alert_exportFailed": {
-    "message": "导出身份失败",
+    "message": "Failed to export identity",
     "description": "Export identity failed message"
   },
   "options_alert_fileSaveDialogOpened": {
-    "message": "文件保存对话框已打开。",
+    "message": "Identity file save dialog opened.",
     "description": "File save dialog opened message"
   },
   "options_alert_fileSaveFailed": {
-    "message": "保存文件时出错。请重试。",
+    "message": "Error saving file. Please try again.",
     "description": "File save failed message"
   },
   "options_alert_downloadInitiated": {
-    "message": "身份文件下载已开始。",
+    "message": "Identity file download initiated.",
     "description": "Download initiated message"
   },
   "options_alert_importSuccess": {
-    "message": "身份导入成功！",
+    "message": "Identity imported successfully!",
     "description": "Import success message"
   },
   "options_alert_identityLoadError": {
-    "message": "加载身份时出错",
+    "message": "Error loading identity",
     "description": "Identity load error message"
   },
   "options_editor_saving": {
-    "message": "保存中...",
+    "message": "Saving...",
     "description": "Saving indicator text"
   },
   "options_editor_importFile": {
-    "message": "从文件导入",
+    "message": "Import from file",
     "description": "Import from file tooltip"
   },
   "options_editor_exportFile": {
-    "message": "导出到文件",
+    "message": "Export to file",
     "description": "Export to file tooltip"
   },
   "options_editor_saveAsTheme": {
-    "message": "另存为主题",
+    "message": "Save as theme",
     "description": "Save as theme tooltip"
   },
   "options_editor_openInNewTab": {
-    "message": "在新标签页中打开",
+    "message": "Open in new tab",
     "description": "Open in new tab tooltip"
   },
   "options_editor_backToSettings": {
-    "message": "返回设置",
+    "message": "Back to Settings",
     "description": "Back to settings button label"
   },
   "options_editor_fullExperienceNote": {
-    "message": "要获得完整的编辑器体验，",
+    "message": "For the full editor experience, ",
     "description": "Full editor experience note prefix"
   },
   "options_editor_openInNewTabLink": {
-    "message": "在新标签页中打开此编辑器",
+    "message": "open this editor in a new tab",
     "description": "Open in new tab link text"
   },
   "options_editor_stylingGuide": {
-    "message": "样式指南",
+    "message": "Styling Guide",
     "description": "Styling guide link text"
   },
   "options_editor_renameTheme": {
-    "message": "重命名自定义主题",
+    "message": "Rename custom theme",
     "description": "Rename theme button title"
   },
   "options_editor_deleteTheme": {
-    "message": "删除自定义主题",
+    "message": "Delete custom theme",
     "description": "Delete theme button title"
   },
   "options_editor_doubleClickRename": {
-    "message": "双击重命名",
+    "message": "Double-click to rename",
     "description": "Double-click to rename tooltip"
   },
   "options_provider_betterLyrics": {
@@ -288,199 +288,199 @@
     "description": "LRClib provider name"
   },
   "options_provider_youtube": {
-    "message": "YouTube",
+    "message": "Youtube",
     "description": "Youtube provider name"
   },
   "options_provider_youtubeCaptions": {
-    "message": "YouTube 字幕",
+    "message": "Youtube Captions",
     "description": "Youtube Captions provider name"
   },
   "options_syncType_syllable": {
-    "message": "音节",
+    "message": "Syllable",
     "description": "Syllable sync type label"
   },
   "options_syncType_syllable_tooltip": {
-    "message": "随着演唱逐个高亮显示音节。音节同步提供最佳体验。",
+    "message": "Highlights individual syllables as they're sung. Syllable syncing provides the best experience.",
     "description": "Syllable sync type tooltip"
   },
   "options_syncType_word": {
-    "message": "单词",
+    "message": "Word",
     "description": "Word sync type label"
   },
   "options_syncType_word_tooltip": {
-    "message": "随着演唱逐个高亮显示单词。单词同步提供良好体验。",
+    "message": "Highlights individual words as they're sung. Word syncing provides a good experience.",
     "description": "Word sync type tooltip"
   },
   "options_syncType_line": {
-    "message": "行",
+    "message": "Line",
     "description": "Line sync type label"
   },
   "options_syncType_line_tooltip": {
-    "message": "随着演唱高亮显示整行。行同步提供基本体验。",
+    "message": "Highlights entire lines as they're sung. Line syncing provides a basic experience.",
     "description": "Line sync type tooltip"
   },
   "options_syncType_unsynced": {
-    "message": "未同步",
+    "message": "Unsynced",
     "description": "Unsynced sync type label"
   },
   "options_syncType_unsynced_tooltip": {
-    "message": "没有时间信息的歌词。未同步歌词提供最小体验。",
+    "message": "Lyrics without timing information. Unsynced lyrics provide a minimal experience.",
     "description": "Unsynced sync type tooltip"
   },
   "options_detail_rateTheme": {
-    "message": "评价此主题",
+    "message": "Rate this theme",
     "description": "Rate theme label"
   },
   "options_detail_install": {
-    "message": "安装",
+    "message": "Install",
     "description": "Install button label"
   },
   "options_detail_viewOnGitHub": {
-    "message": "在 GitHub 上查看",
+    "message": "View on GitHub",
     "description": "View on GitHub link text"
   },
   "options_detail_shaderInfo": {
-    "message": "此主题包含着色器配置。",
+    "message": "This theme includes a shader config.",
     "description": "Shader info text prefix"
   },
   "options_detail_downloadShader": {
-    "message": "下载 shader.json",
+    "message": "Download shader.json",
     "description": "Download shader link text"
   },
   "options_detail_shaderImportSuffix": {
-    "message": "并导入到",
+    "message": "and import it in",
     "description": "Shader import suffix text before Better Lyrics Shaders link"
   },
   "marketplace_pageTitle": {
-    "message": "Better Lyrics 主题市场",
+    "message": "Better Lyrics Theme Marketplace",
     "description": "Page title"
   },
   "marketplace_title": {
-    "message": "主题市场",
+    "message": "Theme Marketplace",
     "description": "Header title"
   },
   "marketplace_subtitle": {
-    "message": "发现并安装社区主题",
+    "message": "Discover and install community themes",
     "description": "Header subtitle"
   },
   "marketplace_searchPlaceholder": {
-    "message": "搜索主题...",
+    "message": "Search themes...",
     "description": "Search input placeholder"
   },
   "marketplace_refresh": {
-    "message": "刷新",
+    "message": "Refresh",
     "description": "Refresh button label"
   },
   "marketplace_keyboardShortcuts": {
-    "message": "键盘快捷键",
+    "message": "Keyboard shortcuts",
     "description": "Keyboard shortcuts button label"
   },
   "marketplace_sortBy": {
-    "message": "排序方式",
+    "message": "Sort by",
     "description": "Sort filter group label"
   },
   "marketplace_sortRatingDesc": {
-    "message": "评分最高",
+    "message": "Highest rated",
     "description": "Sort by highest rating"
   },
   "marketplace_sortRatingAsc": {
-    "message": "评分最低",
+    "message": "Lowest rated",
     "description": "Sort by lowest rating"
   },
   "marketplace_sortDownloadsDesc": {
-    "message": "下载最多",
+    "message": "Most downloaded",
     "description": "Sort by most downloads"
   },
   "marketplace_sortDownloadsAsc": {
-    "message": "下载最少",
+    "message": "Least downloaded",
     "description": "Sort by least downloads"
   },
   "marketplace_sortNewest": {
-    "message": "最新",
+    "message": "Newest",
     "description": "Sort by newest"
   },
   "marketplace_sortOldest": {
-    "message": "最旧",
+    "message": "Oldest",
     "description": "Sort by oldest"
   },
   "marketplace_show": {
-    "message": "显示",
+    "message": "Show",
     "description": "Show filter group label"
   },
   "marketplace_showAll": {
-    "message": "全部",
+    "message": "All",
     "description": "Show all themes"
   },
   "marketplace_showInstalled": {
-    "message": "已安装",
+    "message": "Installed",
     "description": "Show installed themes"
   },
   "marketplace_showNotInstalled": {
-    "message": "未安装",
+    "message": "Not installed",
     "description": "Show not installed themes"
   },
   "marketplace_options": {
-    "message": "选项",
+    "message": "Options",
     "description": "Options filter group label"
   },
   "marketplace_hasShaders": {
-    "message": "包含着色器",
+    "message": "Has shaders",
     "description": "Filter for themes with shaders"
   },
   "marketplace_compatibleOnly": {
-    "message": "仅兼容",
+    "message": "Compatible only",
     "description": "Filter for compatible themes"
   },
   "marketplace_installFromUrl": {
-    "message": "从 URL 安装",
+    "message": "Install from URL",
     "description": "Install from URL button"
   },
   "marketplace_submitTheme": {
-    "message": "提交主题",
+    "message": "Submit a theme",
     "description": "Submit a theme link"
   },
   "marketplace_loading": {
-    "message": "加载主题中...",
+    "message": "Loading themes...",
     "description": "Loading message"
   },
   "marketplace_retry": {
-    "message": "重试",
+    "message": "Retry",
     "description": "Retry button"
   },
   "marketplace_noThemesMatch": {
-    "message": "没有匹配您筛选条件的主题",
+    "message": "No themes match your filters",
     "description": "Empty state message"
   },
   "marketplace_permissionTitle": {
-    "message": "需要权限",
+    "message": "Permission Required",
     "description": "Permission required title"
   },
   "marketplace_permissionMessage": {
-    "message": "要浏览和安装主题，Better Lyrics 需要访问托管主题的 GitHub 和市场 API 的权限。",
+    "message": "To browse and install themes, Better Lyrics needs permission to access GitHub where themes are hosted & the marketplace api.",
     "description": "Permission required message"
   },
   "marketplace_grantPermission": {
-    "message": "授予权限",
+    "message": "Grant Permission",
     "description": "Grant permission button"
   },
   "marketplace_install": {
-    "message": "安装",
+    "message": "Install",
     "description": "Install button"
   },
   "marketplace_remove": {
-    "message": "移除",
+    "message": "Remove",
     "description": "Remove button"
   },
   "marketplace_apply": {
-    "message": "应用",
+    "message": "Apply",
     "description": "Apply button"
   },
   "marketplace_active": {
-    "message": "已启用",
+    "message": "Active",
     "description": "Active theme indicator"
   },
   "marketplace_shadersBadge": {
-    "message": "着色器",
+    "message": "Shaders",
     "description": "Shaders badge text"
   },
   "marketplace_githubBadge": {
@@ -488,175 +488,175 @@
     "description": "GitHub badge text"
   },
   "marketplace_urlModalTitle": {
-    "message": "从 URL 安装",
+    "message": "Install from URL",
     "description": "URL install modal title"
   },
   "marketplace_urlModalMessage": {
-    "message": "输入 GitHub 仓库 URL 以直接安装主题：",
+    "message": "Enter a GitHub repository URL to install a theme directly:",
     "description": "URL install modal message"
   },
   "marketplace_urlModalPlaceholder": {
-    "message": "github.com/用户/仓库 或 github.com/用户/仓库/tree/分支",
+    "message": "github.com/user/repo or github.com/user/repo/tree/branch",
     "description": "URL input placeholder"
   },
   "marketplace_urlModalError": {
-    "message": "请输入 GitHub 仓库 URL",
+    "message": "Please enter a GitHub repository URL",
     "description": "URL validation error"
   },
   "marketplace_cancel": {
-    "message": "取消",
+    "message": "Cancel",
     "description": "Cancel button"
   },
   "marketplace_urlPermissionTitle": {
-    "message": "需要额外权限",
+    "message": "Additional Permission Required",
     "description": "URL permission modal title"
   },
   "marketplace_urlPermissionWhy": {
-    "message": "为什么需要这个？",
+    "message": "Why is this needed?",
     "description": "URL permission explanation title"
   },
   "marketplace_urlPermissionDesc": {
-    "message": "从自定义 GitHub URL 安装主题需要比市场更广泛的访问权限。这使 Better Lyrics 能够：",
+    "message": "Installing themes from custom GitHub URLs requires broader access than the marketplace. This allows Better Lyrics to:",
     "description": "URL permission description"
   },
   "marketplace_urlPermissionItem1": {
-    "message": "从任何 GitHub 仓库获取主题文件",
+    "message": "Fetch theme files from any GitHub repository",
     "description": "URL permission list item 1"
   },
   "marketplace_urlPermissionItem2": {
-    "message": "检测仓库的默认分支",
+    "message": "Detect the default branch of the repository",
     "description": "URL permission list item 2"
   },
   "marketplace_urlPermissionItem3": {
-    "message": "在安装前验证主题结构",
+    "message": "Validate the theme structure before installation",
     "description": "URL permission list item 3"
   },
   "marketplace_urlPermissionNote": {
-    "message": "此权限仅在通过 URL 安装主题时使用。市场主题不需要此权限。",
+    "message": "This permission is only used when you install themes via URL. Marketplace themes don't require this.",
     "description": "URL permission note"
   },
   "marketplace_shortcutsTitle": {
-    "message": "键盘快捷键",
+    "message": "Keyboard Shortcuts",
     "description": "Shortcuts modal title"
   },
   "marketplace_shortcutsNavigation": {
-    "message": "导航",
+    "message": "Navigation",
     "description": "Navigation shortcuts group"
   },
   "marketplace_shortcutsSearch": {
-    "message": "搜索主题",
+    "message": "Search themes",
     "description": "Search shortcut label"
   },
   "marketplace_shortcutsRefresh": {
-    "message": "刷新市场",
+    "message": "Refresh marketplace",
     "description": "Refresh shortcut label"
   },
   "marketplace_shortcutsInstallUrl": {
-    "message": "从 URL 安装",
+    "message": "Install from URL",
     "description": "Install from URL shortcut label"
   },
   "marketplace_shortcutsPrevPage": {
-    "message": "上一页",
+    "message": "Previous page",
     "description": "Previous page shortcut label"
   },
   "marketplace_shortcutsNextPage": {
-    "message": "下一页",
+    "message": "Next page",
     "description": "Next page shortcut label"
   },
   "marketplace_shortcutsSort": {
-    "message": "排序",
+    "message": "Sort",
     "description": "Sort shortcuts group"
   },
   "marketplace_shortcutsSortHint": {
-    "message": "再次按下以切换方向",
+    "message": "press again to toggle direction",
     "description": "Sort toggle hint"
   },
   "marketplace_shortcutsByRating": {
-    "message": "按评分",
+    "message": "By rating",
     "description": "Sort by rating shortcut"
   },
   "marketplace_shortcutsByDownloads": {
-    "message": "按下载量",
+    "message": "By downloads",
     "description": "Sort by downloads shortcut"
   },
   "marketplace_shortcutsByDate": {
-    "message": "按日期",
+    "message": "By date",
     "description": "Sort by date shortcut"
   },
   "marketplace_shortcutsFilters": {
-    "message": "筛选",
+    "message": "Filters",
     "description": "Filters shortcuts group"
   },
   "marketplace_shortcutsShowAll": {
-    "message": "显示全部",
+    "message": "Show all",
     "description": "Show all shortcut"
   },
   "marketplace_shortcutsShowInstalled": {
-    "message": "显示已安装",
+    "message": "Show installed",
     "description": "Show installed shortcut"
   },
   "marketplace_shortcutsShowNotInstalled": {
-    "message": "显示未安装",
+    "message": "Show not installed",
     "description": "Show not installed shortcut"
   },
   "marketplace_shortcutsToggleShaders": {
-    "message": "切换着色器",
+    "message": "Toggle shaders",
     "description": "Toggle shaders shortcut"
   },
   "marketplace_shortcutsToggleCompatible": {
-    "message": "切换兼容性",
+    "message": "Toggle compatible",
     "description": "Toggle compatible shortcut"
   },
   "marketplace_shortcutsDetails": {
-    "message": "主题详情",
+    "message": "Theme Details",
     "description": "Theme details shortcuts group"
   },
   "marketplace_shortcutsInstallRemove": {
-    "message": "安装 / 移除",
+    "message": "Install / Remove",
     "description": "Install/remove shortcut"
   },
   "marketplace_shortcutsPrevImage": {
-    "message": "上一张图片",
+    "message": "Previous image",
     "description": "Previous image shortcut"
   },
   "marketplace_shortcutsNextImage": {
-    "message": "下一张图片",
+    "message": "Next image",
     "description": "Next image shortcut"
   },
   "marketplace_shortcutsGeneral": {
-    "message": "常规",
+    "message": "General",
     "description": "General shortcuts group"
   },
   "marketplace_shortcutsCloseModal": {
-    "message": "关闭弹窗",
+    "message": "Close modal",
     "description": "Close modal shortcut"
   },
   "marketplace_shortcutsShowShortcuts": {
-    "message": "显示快捷键",
+    "message": "Show shortcuts",
     "description": "Show shortcuts shortcut"
   },
   "marketplace_shortcutsApplyTheme": {
-    "message": "应用主题（安装后）",
+    "message": "Apply theme (after install)",
     "description": "Apply theme shortcut"
   },
   "marketplace_ratingFailed": {
-    "message": "提交评分失败",
+    "message": "Failed to submit rating",
     "description": "Rating submission error"
   },
   "marketplace_shaderFetchFailed": {
-    "message": "获取着色器配置失败",
+    "message": "Failed to fetch shader config",
     "description": "Shader fetch error"
   },
   "marketplace_applyFailed": {
-    "message": "应用主题失败",
+    "message": "Failed to apply theme",
     "description": "Theme apply error"
   },
   "marketplace_noThemesInstalled": {
-    "message": "尚未安装任何主题",
+    "message": "No themes installed yet",
     "description": "Empty installed themes message"
   },
   "marketplace_lastUpdatedOn": {
-    "message": "最后更新于 $date$",
+    "message": "Last updated on $date$",
     "description": "Tooltip showing full date when a theme was last updated",
     "placeholders": {
       "date": {
@@ -666,107 +666,107 @@
     }
   },
   "editor_pageTitle": {
-    "message": "Better Lyrics CSS 编辑器",
+    "message": "Better Lyrics Styles Editor",
     "description": "Standalone editor page title"
   },
   "editor_importFromFile": {
-    "message": "从文件导入",
+    "message": "Import from file",
     "description": "Import from file button"
   },
   "editor_exportToFile": {
-    "message": "导出到文件",
+    "message": "Export to file",
     "description": "Export to file button"
   },
   "editor_saveAsTheme": {
-    "message": "另存为主题",
+    "message": "Save as theme",
     "description": "Save as theme button"
   },
   "editor_stylingGuide": {
-    "message": "样式指南",
+    "message": "Styling guide",
     "description": "Styling guide button"
   },
   "editor_tip": {
-    "message": "提示：此独立标签页可移动到单独窗口或与 YouTube Music 分屏使用，实时查看更改。更多信息请访问",
+    "message": "Tip: This is a standalone tab, you can move this editor to a separate window or use split-screen view alongside YouTube Music to see your changes in real-time. For more info, visit the",
     "description": "Editor tip text"
   },
   "editor_poweredBy": {
-    "message": "技术支持",
+    "message": "Powered by",
     "description": "Powered by label"
   },
   "editor_playground": {
-    "message": "练习场",
+    "message": "Playground",
     "description": "Playground link text"
   },
   "editor_docs": {
-    "message": "文档",
+    "message": "Docs",
     "description": "Docs link text"
   },
   "lyrics_source": {
-    "message": "来源：",
+    "message": "Source: ",
     "description": "Lyrics source label"
   },
   "lyrics_addToLrclib": {
-    "message": "添加歌词到 LRCLib",
+    "message": "Add Lyrics to LRCLib",
     "description": "Add lyrics button text"
   },
   "lyrics_searchOnGenius": {
-    "message": "在 Genius 上搜索",
+    "message": "Search on Genius",
     "description": "Search on Genius button text"
   },
   "lyrics_searching": {
-    "message": "Better Lyrics 正在搜索歌词...",
+    "message": "Better Lyrics is searching for lyrics...",
     "description": "Loading message while searching for lyrics"
   },
   "lyrics_stillSearching": {
-    "message": "仍在搜索同步歌词...",
+    "message": "Still searching for synced lyrics...",
     "description": "Loading message while still searching"
   },
   "lyrics_noSyncedLyrics": {
-    "message": "Better Lyrics 未能找到同步歌词",
+    "message": "Better Lyrics could not find synced lyrics",
     "description": "Message when no synced lyrics found"
   },
   "lyrics_adPlaying": {
-    "message": "[电梯音乐]",
+    "message": "[elevator music]",
     "description": "Message shown during ad playback"
   },
   "lyrics_notFound": {
-    "message": "未找到此歌曲的歌词",
+    "message": "No lyrics found for this song",
     "description": "Message when no lyrics are available"
   },
   "options_language_exclusions": {
-    "message": "语言排除",
+    "message": "Language exclusions",
     "description": "Label for language exclusions setting"
   },
   "options_manage": {
-    "message": "管理",
+    "message": "Manage",
     "description": "Manage button label"
   },
   "options_language_exclusionsTitle": {
-    "message": "语言排除",
+    "message": "Language Exclusions",
     "description": "Modal title for language exclusions"
   },
   "options_romanization_tab": {
-    "message": "罗马化",
+    "message": "Romanization",
     "description": "Romanization tab label"
   },
   "options_translation_tab": {
-    "message": "翻译",
+    "message": "Translation",
     "description": "Translation tab label"
   },
   "options_searchLanguages": {
-    "message": "搜索语言…",
+    "message": "Search languages...",
     "description": "Search input placeholder"
   },
   "options_romanization_hint": {
-    "message": "点击即可切换。排除的语言将不会被罗马化。",
+    "message": "Click to toggle. Excluded languages will not be romanized.",
     "description": "Hint text for romanization exclusions"
   },
   "options_translation_hint": {
-    "message": "点击即可切换。排除的源语言将不会被翻译。",
+    "message": "Click to toggle. Excluded source languages will not be translated.",
     "description": "Hint text for translation exclusions"
   },
   "options_resetToDefault": {
-    "message": "将$TYPE$重置为默认",
+    "message": "Reset $TYPE$ to Default",
     "description": "Reset to default button label",
     "placeholders": {
       "type": {
@@ -776,7 +776,7 @@
     }
   },
   "options_romanization_resetTitle": {
-    "message": "重置$TYPE$排除项",
+    "message": "Reset $TYPE$ Exclusions",
     "description": "Modal title for resetting exclusions",
     "placeholders": {
       "type": {
@@ -786,19 +786,19 @@
     }
   },
   "options_romanization_resetMessage": {
-    "message": "这将清除所有已排除的语言。继续吗？",
+    "message": "This will clear all excluded languages. Continue?",
     "description": "Confirmation message for resetting exclusions"
   },
   "options_reset": {
-    "message": "重置",
+    "message": "Reset",
     "description": "Reset button label"
   },
   "options_cancel": {
-    "message": "取消",
+    "message": "Cancel",
     "description": "Cancel button label"
   },
   "options_romanization_resetSuccess": {
-    "message": "$TYPE$排除项已重置为默认值",
+    "message": "$TYPE$ exclusions reset to default",
     "description": "Success message after resetting exclusions",
     "placeholders": {
       "type": {

@@ -655,6 +655,16 @@
     "message": "Noch keine Designs installiert",
     "description": "Empty installed themes message"
   },
+  "marketplace_lastUpdatedOn": {
+    "message": "Zuletzt aktualisiert am $date$",
+    "description": "Tooltip showing full date when a theme was last updated",
+    "placeholders": {
+      "date": {
+        "content": "$1",
+        "example": "January 15, 2025, 3:42 PM"
+      }
+    }
+  },
   "editor_pageTitle": {
     "message": "Better Lyrics CSS-Editor",
     "description": "Standalone editor page title"
@@ -724,39 +734,39 @@
     "description": "Message when no lyrics are available"
   },
   "options_language_exclusions": {
-    "message": "Language exclusions",
+    "message": "Sprachausschlüsse",
     "description": "Label for language exclusions setting"
   },
   "options_manage": {
-    "message": "Manage",
+    "message": "Verwalten",
     "description": "Manage button label"
   },
   "options_language_exclusionsTitle": {
-    "message": "Language Exclusions",
+    "message": "Sprachausschlüsse",
     "description": "Modal title for language exclusions"
   },
   "options_romanization_tab": {
-    "message": "Romanization",
+    "message": "Romanisierung",
     "description": "Romanization tab label"
   },
   "options_translation_tab": {
-    "message": "Translation",
+    "message": "Übersetzung",
     "description": "Translation tab label"
   },
   "options_searchLanguages": {
-    "message": "Search languages...",
+    "message": "Sprachen durchsuchen...",
     "description": "Search input placeholder"
   },
   "options_romanization_hint": {
-    "message": "Click to toggle. Excluded languages will not be romanized.",
+    "message": "Zum Umschalten klicken. Ausgeschlossene Sprachen werden nicht romanisiert.",
     "description": "Hint text for romanization exclusions"
   },
   "options_translation_hint": {
-    "message": "Click to toggle. Excluded source languages will not be translated.",
+    "message": "Zum Umschalten klicken. Ausgeschlossene Quellsprachen werden nicht übersetzt.",
     "description": "Hint text for translation exclusions"
   },
   "options_resetToDefault": {
-    "message": "Reset $TYPE$ to Default",
+    "message": "$TYPE$ auf Standard zurücksetzen",
     "description": "Reset to default button label",
     "placeholders": {
       "type": {
@@ -766,7 +776,7 @@
     }
   },
   "options_romanization_resetTitle": {
-    "message": "Reset $TYPE$ Exclusions",
+    "message": "$TYPE$ Ausschlüsse zurücksetzen",
     "description": "Modal title for resetting exclusions",
     "placeholders": {
       "type": {
@@ -776,19 +786,19 @@
     }
   },
   "options_romanization_resetMessage": {
-    "message": "This will clear all excluded languages. Continue?",
+    "message": "Dadurch werden alle ausgeschlossenen Sprachen gelöscht. Fortfahren?",
     "description": "Confirmation message for resetting exclusions"
   },
   "options_reset": {
-    "message": "Reset",
+    "message": "Zurücksetzen",
     "description": "Reset button label"
   },
   "options_cancel": {
-    "message": "Cancel",
+    "message": "Abbrechen",
     "description": "Cancel button label"
   },
   "options_romanization_resetSuccess": {
-    "message": "$TYPE$ exclusions reset to default",
+    "message": "$TYPE$ Ausschlüsse auf Standard zurücksetzen",
     "description": "Success message after resetting exclusions",
     "placeholders": {
       "type": {
