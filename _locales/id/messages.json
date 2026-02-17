@@ -656,7 +656,7 @@
     "description": "Empty installed themes message"
   },
   "marketplace_lastUpdatedOn": {
-    "message": "Last updated on $date$",
+    "message": "Terakhir diperbarui pada $date$",
     "description": "Tooltip showing full date when a theme was last updated",
     "placeholders": {
       "date": {

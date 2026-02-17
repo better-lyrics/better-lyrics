@@ -62,6 +62,8 @@
 	--blyrics-footer-font-weight: 400;
 
 	/* Animations */
+	--blyrics-loader-transition-duration: 0.6s;
+	--blyrics-loader-transition-easing: cubic-bezier(0.22, 1, 0.36, 1);
 	--blyrics-scale-transition-duration: var(
 		--blyrics-transition-duration,
 		0.166s

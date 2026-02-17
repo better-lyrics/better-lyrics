@@ -161,21 +161,24 @@ export async function createLyrics(detail: PlayerDetails, signal: AbortSignal): 
       alwaysFetchMetadata: swappedVideoId,
       signal,
     };
+    let ytLyricsEarlyInjectAbortController = new AbortController();
 
     let ytLyricsPromise = getLyrics(providerParameters, "yt-lyrics").then(lyrics => {
       if (!AppState.areLyricsLoaded && lyrics && !signal.aborted) {
-        log(LOG_PREFIX, "Temporarily Using YT Music Lyrics while we wait for synced lyrics to load");
+        if (!ytLyricsEarlyInjectAbortController.signal.aborted) {
+          log(LOG_PREFIX, "Temporarily Using YT Music Lyrics while we wait for synced lyrics to load");
+          let lyricsWithMeta = {
+            ...lyrics,
+            song: providerParameters.song,
+            artist: providerParameters.artist,
+            duration: providerParameters.duration,
+            videoId: providerParameters.videoId,
+            album: providerParameters.album || "",
+            segmentMap: null,
+          };
 
-        let lyricsWithMeta = {
-          ...lyrics,
-          song: providerParameters.song,
-          artist: providerParameters.artist,
-          duration: providerParameters.duration,
-          videoId: providerParameters.videoId,
-          album: providerParameters.album || "",
-          segmentMap: null,
-        };
-        processLyrics(lyricsWithMeta, true, signal);
+          processLyrics(lyricsWithMeta, true, signal);
+        }
       }
       return lyrics;
     });
@@ -214,6 +217,7 @@ export async function createLyrics(detail: PlayerDetails, signal: AbortSignal): 
         let sourceLyrics = await getLyrics(providerParameters, provider);
 
         if (sourceLyrics && sourceLyrics.lyrics && sourceLyrics.lyrics.length > 0) {
+          ytLyricsEarlyInjectAbortController.abort("Lyrics are ready"); // May not be ideal when the stringSimilarity fails, but this should be rare anyways
           let ytLyrics = (await ytLyricsPromise) as YTLyricSourceResult;
 
           if (ytLyrics !== null) {
