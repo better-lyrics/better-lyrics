@@ -454,7 +454,7 @@ export async function validateThemeRepo(repo: string, branchOverride?: string): 
   };
 }
 
-export interface ParsedGitHubUrl {
+interface ParsedGitHubUrl {
   repo: string;
   branch?: string;
 }

@@ -1,49 +1,140 @@
-/* Loader styles */
-#blyrics-loader {
-	align-items: center;
-	display: flex !important;
-	gap: 1rem;
-	height: 100%;
-	justify-content: center;
-	opacity: 1;
-	position: relative;
-	max-height: 100%;
-	transition:
-        height 0.2s,
-        opacity 0.2s,
-        padding-top 0.2s,
-        display 0s allow-discrete; 
+/* Loader & Wrapper State Machine styles */
+#tab-renderer {
+    position: relative;
+    container-type: size;
 }
 
-#blyrics-loader:not([no-sync-available]):before {
-	animation: blyrics-spin 1s linear infinite;
+#blyrics-loader {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 50%;
+    z-index: 100;
+    display: flex !important;
+    align-items: center;
+    justify-content: center;
+    gap: 1.5rem;
+    pointer-events: none;
+    visibility: hidden;
+    opacity: 0;
+    transform: translateY(-50%);
+    transition:
+        opacity var(--blyrics-loader-transition-duration, 0.6s) var(--blyrics-loader-transition-easing, cubic-bezier(0.22, 1, 0.36, 1)),
+        transform var(--blyrics-loader-transition-duration, 0.6s) var(--blyrics-loader-transition-easing, cubic-bezier(0.22, 1, 0.36, 1)),
+        visibility var(--blyrics-loader-transition-duration, 0.6s);
+    will-change: opacity, transform;
+}
+
+#blyrics-wrapper {
+    transition: transform var(--blyrics-loader-transition-duration, 0.6s) var(--blyrics-loader-transition-easing, cubic-bezier(0.22, 1, 0.36, 1));
+    will-change: transform;
+    transform: translateY(0);
+}
+
+/* State: hidden */
+#blyrics-loader[state="hidden"] {
+    display: none !important;
+}
+
+#blyrics-loader[state="hidden"] ~ #blyrics-wrapper {
+    transform: translateY(0);
+}
+
+#blyrics-loader[state="hidden"]:before,
+#blyrics-loader[state="hidden"]:after {
+    animation-play-state: paused !important;
+}
+
+/* State: full-loader */
+#blyrics-loader[state="full-loader"] {
+    visibility: visible;
+    opacity: 1;
+    transform: translateY(-50%);
+    transition: none;
+}
+
+#blyrics-loader[state="full-loader"] ~ #blyrics-wrapper {
+    transform: translateY(100cqh);
+    transition: none;
+}
+
+/* State: small-loader */
+#blyrics-loader[state="small-loader"] {
+    visibility: visible;
+    opacity: 1;
+    transform: translateY(calc(-50cqh + 5rem));
+}
+
+#blyrics-loader[state="small-loader"] ~ #blyrics-wrapper {
+    transform: translateY(12rem);
+}
+
+/* State: showing-message */
+#blyrics-loader[state="showing-message"] {
+    visibility: visible;
+    opacity: 1;
+    transform: translateY(calc(-50cqh + 5rem));
+}
+
+#blyrics-loader[state="showing-message"]:before {
+    display: none;
+}
+
+#blyrics-loader[state="showing-message"]:after {
+    animation-play-state: paused !important;
+    background: none !important;
+    -webkit-text-fill-color: var(--blyrics-ui-text-color) !important;
+    color: var(--blyrics-ui-text-color) !important;
+    opacity: 0.8;
+}
+
+#blyrics-loader[state="showing-message"] ~ #blyrics-wrapper {
+    transform: translateY(12rem);
+}
+
+/* State: exiting */
+#blyrics-loader[state="exiting"],
+#blyrics-loader[state="exiting-message"] {
+    visibility: visible;
+    opacity: 0;
+    transform: translateY(calc(-50cqh - 2rem));
+}
+
+#blyrics-loader[state="exiting-message"]:before {
+    display: none;
+}
+
+#blyrics-loader[state="exiting"] ~ #blyrics-wrapper,
+#blyrics-loader[state="exiting-message"] ~ #blyrics-wrapper {
+    transform: translateY(0);
+}
+
+/* Loader Visual Elements */
+#blyrics-loader:before {
+	animation: blyrics-spin 1.5s linear infinite;
 	background: url(https://better-lyrics.boidu.dev/icon-512.png);
 	background-position: 50%;
 	background-size: cover;
 	content: "";
 	display: block;
-	height: 3rem;
-	min-height: 3rem;
-	margin-top: 3rem;
-	width: 3rem;
-	min-width: 3rem;
+	height: 3.5rem;
+	width: 3.5rem;
 	flex-shrink: 0;
 }
 
 #blyrics-loader:after {
-	color: color-mix(in srgb, var(--blyrics-ui-text-color) 50%, transparent);
-	content: var(--blyrics-text-searching, "Better Lyrics is searching for lyrics...");
+	color: color-mix(in srgb, var(--blyrics-ui-text-color) 70%, transparent);
+	content: var(--blyrics-loader-text, "");
 	font-family: var(--blyrics-font-family);
-	font-size: 2rem;
+	font-size: 2.2rem;
 	font-weight: 700;
 	isolation: isolate;
 	line-height: 1.5;
 	white-space: pre;
 	z-index: 1;
-	transition: color 0.5s ease-in-out;
 }
 
-#blyrics-loader:not([no-sync-available]):after {
+#blyrics-loader:not([state="showing-message"]):not([state="exiting-message"]):after {
 	background: var(--blyrics-shimmer-gradient) 0 0 / 200% 100%;
 	-webkit-background-clip: text;
 	background-clip: text;
@@ -52,61 +143,29 @@
 	will-change: background-position;
 }
 
-#blyrics-loader[small-loader][active] {
-	padding-top: 5rem;
-	height: 5rem;
-}
 
-#blyrics-loader:not([active]) {
-	height: 0;
-	opacity: 0;
-	display: none !important;
-	transition:
-        height 0.2s 3s,
-        opacity 0.2s 3s,
-        padding-top 0.2s 3s,
-        display 0.2s allow-discrete 3.2s;
-}
 
-@starting-style {
-    #blyrics-loader {
-        opacity: 0;
-        height: 0;
-    }
-}
-
-#blyrics-loader[small-loader]:after {
-	content: var(--blyrics-text-still-searching, "Still searching for synced lyrics...");
-}
-
-#blyrics-loader[no-sync-available] {
-	max-height: 5rem;
-	transition:
-		height 0.2s linear 5s,
-		opacity 0.2s linear 5s,
-		padding-top 0.2s linear 5s,
-		max-height 0.2s linear 0s;
-}
-
-#blyrics-loader[no-sync-available]:after {
-	content: var(--blyrics-text-no-synced, "Better Lyrics could not find synced lyrics");
-}
 
 /* Ad overlay styles */
 #blyrics-ad-overlay {
 	align-items: center;
 	display: flex !important;
 	gap: 1rem;
-	height: 100%;
 	justify-content: center;
-	opacity: 1;
-	position: relative;
-	max-height: 100%;
-	transition:
-		height 0.2s,
-		opacity 0.2s,
-		padding-top 0.2s,
-		display 0s allow-discrete;
+	opacity: 0;
+	position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 101;
+    visibility: hidden;
+    pointer-events: none;
+	transition: opacity 0.4s ease, transform 0.4s ease;
+}
+
+#blyrics-ad-overlay[active] {
+    opacity: 1;
+    visibility: visible;
 }
 
 #blyrics-ad-overlay:before {
@@ -117,8 +176,8 @@
 	content: "";
 	display: block;
 	height: 3rem;
-	margin-top: 3rem;
 	width: 3rem;
+    flex-shrink: 0;
 }
 
 #blyrics-ad-overlay:after {
@@ -138,42 +197,19 @@
 	will-change: background-position;
 }
 
-#blyrics-ad-overlay:not([active]) {
-	height: 0;
-	opacity: 0;
-	overflow: hidden;
-	display: none !important;
-	transition:
-        height 0.2s,
-        opacity 0.2s,
-        padding-top 0.2s,
-        display 0.2s allow-discrete 0.2s;
-}
-
-@starting-style {
-    #blyrics-ad-overlay {
-		height: 0;
-		opacity: 0;
-		overflow: hidden;
-	}
-}
-
 #blyrics-ad-overlay[active] ~ #blyrics-wrapper,
-#blyrics-ad-overlay[active] ~ .blyrics-container,
 #blyrics-ad-overlay[active] ~ #blyrics-loader {
 	display: none !important;
 }
 
 :has(ytmusic-player-bar[is-advertisement]) #blyrics-wrapper,
-:has(ytmusic-player-bar[is-advertisement]) .blyrics-container,
 :has(ytmusic-player-bar[is-advertisement]) #blyrics-loader {
 	display: none !important;
 }
 
 :has(ytmusic-player-bar[is-advertisement]) #blyrics-ad-overlay {
-	height: 100%;
-	opacity: 1;
-	overflow: visible;
+    opacity: 1;
+    visibility: visible;
 }
 
 #tab-renderer[page-type="MUSIC_PAGE_TYPE_TRACK_LYRICS"]
@@ -363,6 +399,7 @@
 	display: none;
 	z-index: 2;
 	max-width: 40rem;
+	font-family: var(--blyrics-font-family);
 }
 
 #blyrics-song-info > p#blyrics-title {
@@ -380,10 +417,10 @@
 
 @keyframes blyrics-spin {
 	0% {
-		transform: translateY(-50%) rotate(0deg);
+		transform: rotate(0deg);
 	}
 	to {
-		transform: translateY(-50%) rotate(1turn);
+		transform: rotate(1turn);
 	}
 }
 

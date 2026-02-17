@@ -13,7 +13,7 @@ export interface SegmentMap {
   reversed?: boolean;
 }
 
-export interface LyricsInfo {
+interface LyricsInfo {
   hasLyrics: boolean;
   lyrics: string | null;
   sourceText: string | null;
