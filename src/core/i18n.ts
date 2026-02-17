@@ -23,9 +23,6 @@ export function getLanguageDisplayName(langCode: string): string {
 
 export function injectI18nCssVars(): void {
   const vars: Record<string, string> = {
-    "--blyrics-text-searching": t("lyrics_searching"),
-    "--blyrics-text-still-searching": t("lyrics_stillSearching"),
-    "--blyrics-text-no-synced": t("lyrics_noSyncedLyrics"),
     "--blyrics-text-ad-playing": t("lyrics_adPlaying"),
   };
 
