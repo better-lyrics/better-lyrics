@@ -62,7 +62,7 @@
         "@typescript/lib-dom": "npm:@types/web@^0.0.280",
         "axios": "^1.13.5",
         "jsdom": "^27.4.0",
-        "knip": "^5.82.1",
+        "knip": "^5.83.1",
         "tsx": "^4.21.0",
         "typescript": "^5.9.3"
     }
