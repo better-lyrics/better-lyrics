@@ -362,6 +362,7 @@ function createProviderElem(providerId: string, checked = true): HTMLLIElement |
 // Event listeners
 document.addEventListener("DOMContentLoaded", () => {
   initI18n();
+  initTabScrollIndicators();
   restoreOptions();
 });
 document.querySelectorAll("#options input, #options select").forEach(element => {
@@ -381,6 +382,44 @@ tabButtons.forEach(button => {
     document.querySelector(button.getAttribute("data-target")!)!.classList.add("active");
   });
 });
+
+// -- Tab scroll fade indicators --------------------------
+
+function initTabScrollIndicators(): void {
+  const container = document.querySelector(".tab-container") as HTMLElement;
+  if (!container) return;
+
+  const wrapper = document.createElement("div");
+  wrapper.className = "tab-scroll-wrapper";
+  container.parentNode!.insertBefore(wrapper, container);
+  wrapper.appendChild(container);
+
+  function update(): void {
+    const { scrollLeft, scrollWidth, clientWidth } = container;
+    const overflow = scrollWidth - clientWidth;
+
+    if (overflow <= 2) {
+      delete container.dataset.scrollLeft;
+      delete container.dataset.scrollRight;
+      return;
+    }
+
+    if (scrollLeft > 2) {
+      container.dataset.scrollLeft = "";
+    } else {
+      delete container.dataset.scrollLeft;
+    }
+
+    if (scrollLeft < overflow - 2) {
+      container.dataset.scrollRight = "";
+    } else {
+      delete container.dataset.scrollRight;
+    }
+  }
+
+  container.addEventListener("scroll", update);
+  update();
+}
 
 document.addEventListener("DOMContentLoaded", () => {
   new Sortable(document.getElementById("providers-list")!, {
