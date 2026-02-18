@@ -1,6 +1,6 @@
 {
   "extensionName": {
-    "message": "Better Lyrics (Lyrics for Youtube Music)",
+    "message": "Better Lyrics (Songteksten Voor Youtube Music)",
     "description": "The name of the extension"
   },
   "extensionDescription": {
@@ -76,11 +76,11 @@
     "description": "Disable fullscreen mode setting label"
   },
   "options_display_autoHideCursor": {
-    "message": "Auto-hide cursor in fullscreen mode",
+    "message": "Automatisch verbergen van de cursor in volledig scherm",
     "description": "Auto-hide cursor setting label"
   },
   "options_display_albumArt": {
-    "message": "Show blurred album art background",
+    "message": "Toon vervaagde albumhoes achtergrond",
     "description": "Show album art background setting label"
   },
   "options_display_stylizedAnimations": {
@@ -104,7 +104,7 @@
     "description": "Translate song lyrics setting label"
   },
   "options_language_translationLanguage": {
-    "message": "Translation language",
+    "message": "Taal van vertaling",
     "description": "Translation language setting label"
   },
   "options_sources_title": {
@@ -196,7 +196,7 @@
     "description": "Cache clear failed message"
   },
   "options_alert_nothingToClear": {
-    "message": "Nothing to clear!",
+    "message": "Niets te wissen!",
     "description": "Nothing to clear message"
   },
   "options_alert_exportFailed": {
@@ -228,11 +228,11 @@
     "description": "Saving indicator text"
   },
   "options_editor_importFile": {
-    "message": "Import from file",
+    "message": "Importeer vanuit bestand",
     "description": "Import from file tooltip"
   },
   "options_editor_exportFile": {
-    "message": "Export to file",
+    "message": "Exporteren naar bestand",
     "description": "Export to file tooltip"
   },
   "options_editor_saveAsTheme": {
@@ -248,19 +248,19 @@
     "description": "Back to settings button label"
   },
   "options_editor_fullExperienceNote": {
-    "message": "For the full editor experience, ",
+    "message": "Voor de volledige editor ervaring, ",
     "description": "Full editor experience note prefix"
   },
   "options_editor_openInNewTabLink": {
-    "message": "open this editor in a new tab",
+    "message": "open deze editor in een nieuw tabblad",
     "description": "Open in new tab link text"
   },
   "options_editor_stylingGuide": {
-    "message": "Styling Guide",
+    "message": "Opmaak handleiding",
     "description": "Styling guide link text"
   },
   "options_editor_renameTheme": {
-    "message": "Rename custom theme",
+    "message": "Hernoem aangepast thema",
     "description": "Rename theme button title"
   },
   "options_editor_deleteTheme": {
@@ -268,7 +268,7 @@
     "description": "Delete theme button title"
   },
   "options_editor_doubleClickRename": {
-    "message": "Double-click to rename",
+    "message": "Dubbelklikken om te hernoemen",
     "description": "Double-click to rename tooltip"
   },
   "options_provider_betterLyrics": {
@@ -444,7 +444,7 @@
     "description": "Loading message"
   },
   "marketplace_retry": {
-    "message": "Retry",
+    "message": "Opnieuw",
     "description": "Retry button"
   },
   "marketplace_noThemesMatch": {
@@ -476,7 +476,7 @@
     "description": "Apply button"
   },
   "marketplace_active": {
-    "message": "Active",
+    "message": "Actief",
     "description": "Active theme indicator"
   },
   "marketplace_shadersBadge": {
@@ -512,7 +512,7 @@
     "description": "URL permission modal title"
   },
   "marketplace_urlPermissionWhy": {
-    "message": "Why is this needed?",
+    "message": "Waarom is dit nodig?",
     "description": "URL permission explanation title"
   },
   "marketplace_urlPermissionDesc": {
@@ -540,19 +540,19 @@
     "description": "Shortcuts modal title"
   },
   "marketplace_shortcutsNavigation": {
-    "message": "Navigation",
+    "message": "Navigatie",
     "description": "Navigation shortcuts group"
   },
   "marketplace_shortcutsSearch": {
-    "message": "Search themes",
+    "message": "Zoek thema's",
     "description": "Search shortcut label"
   },
   "marketplace_shortcutsRefresh": {
-    "message": "Refresh marketplace",
+    "message": "Marketplace vernieuwen",
     "description": "Refresh shortcut label"
   },
   "marketplace_shortcutsInstallUrl": {
-    "message": "Install from URL",
+    "message": "Installeren vanaf URL",
     "description": "Install from URL shortcut label"
   },
   "marketplace_shortcutsPrevPage": {
@@ -592,7 +592,7 @@
     "description": "Show all shortcut"
   },
   "marketplace_shortcutsShowInstalled": {
-    "message": "Show installed",
+    "message": "Toon geïnstalleerd",
     "description": "Show installed shortcut"
   },
   "marketplace_shortcutsShowNotInstalled": {
@@ -608,7 +608,7 @@
     "description": "Toggle compatible shortcut"
   },
   "marketplace_shortcutsDetails": {
-    "message": "Theme Details",
+    "message": "Thema details",
     "description": "Theme details shortcuts group"
   },
   "marketplace_shortcutsInstallRemove": {
@@ -726,7 +726,7 @@
     "description": "Message when no synced lyrics found"
   },
   "lyrics_adPlaying": {
-    "message": "[elevator music]",
+    "message": "[wacht muziek]",
     "description": "Message shown during ad playback"
   },
   "lyrics_notFound": {
@@ -738,7 +738,7 @@
     "description": "Label for language exclusions setting"
   },
   "options_manage": {
-    "message": "Manage",
+    "message": "Beheer",
     "description": "Manage button label"
   },
   "options_language_exclusionsTitle": {
@@ -794,7 +794,7 @@
     "description": "Reset button label"
   },
   "options_cancel": {
-    "message": "Cancel",
+    "message": "Annuleer",
     "description": "Cancel button label"
   },
   "options_romanization_resetSuccess": {
