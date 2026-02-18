@@ -492,7 +492,7 @@
     "description": "URL install modal title"
   },
   "marketplace_urlModalMessage": {
-    "message": "Masukkan URL repositori GitHub untuk menginstal tema secara langsung:",
+    "message": "Masukkan URL repositori GitHub untuk memasang tema secara langsung:",
     "description": "URL install modal message"
   },
   "marketplace_urlModalPlaceholder": {
