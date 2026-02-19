@@ -36,7 +36,7 @@
     "description": "General settings section title"
   },
   "options_general_description": {
-    "message": "Settings that affect the general behavior of Better Lyrics.",
+    "message": " ",
     "description": "General settings section description"
   },
   "options_general_showLogs": {
@@ -84,7 +84,7 @@
     "description": "Show album art background setting label"
   },
   "options_display_stylizedAnimations": {
-    "message": "Show stylized animations",
+    "message": "Toon gestylized animaties",
     "description": "Show stylized animations setting label"
   },
   "options_language_title": {
@@ -92,7 +92,7 @@
     "description": "Language settings section title"
   },
   "options_language_description": {
-    "message": "Language and translation settings for Better Lyrics.",
+    "message": "Taal- en vertaalinstellingen voor Better Lyrics.",
     "description": "Language settings section description"
   },
   "options_language_romanization": {
@@ -152,7 +152,7 @@
     "description": "Identity settings section title"
   },
   "options_identity_description": {
-    "message": "Your unique anonymous identity for Better Lyrics.",
+    "message": "Je unieke anonieme identiteit voor Better Lyrics.",
     "description": "Identity settings section description"
   },
   "options_identity_yourIdentity": {
@@ -188,11 +188,11 @@
     "description": "Confirm button label"
   },
   "options_alert_cacheCleared": {
-    "message": "Cache cleared successfully!",
+    "message": "Cache succesvol geleegd!",
     "description": "Cache cleared success message"
   },
   "options_alert_cacheClearFailed": {
-    "message": "Failed to clear cache!",
+    "message": "Kon cache niet wissen!",
     "description": "Cache clear failed message"
   },
   "options_alert_nothingToClear": {
@@ -200,7 +200,7 @@
     "description": "Nothing to clear message"
   },
   "options_alert_exportFailed": {
-    "message": "Failed to export identity",
+    "message": "Identiteit exporteren mislukt",
     "description": "Export identity failed message"
   },
   "options_alert_fileSaveDialogOpened": {
@@ -216,11 +216,11 @@
     "description": "Download initiated message"
   },
   "options_alert_importSuccess": {
-    "message": "Identity imported successfully!",
+    "message": "Identiteit succesvol geïmporteerd!",
     "description": "Import success message"
   },
   "options_alert_identityLoadError": {
-    "message": "Error loading identity",
+    "message": "Fout bij laden identiteit",
     "description": "Identity load error message"
   },
   "options_editor_saving": {
@@ -340,7 +340,7 @@
     "description": "View on GitHub link text"
   },
   "options_detail_shaderInfo": {
-    "message": "This theme includes a shader config.",
+    "message": "Dit thema bevat een shader configuratie.",
     "description": "Shader info text prefix"
   },
   "options_detail_downloadShader": {
@@ -348,7 +348,7 @@
     "description": "Download shader link text"
   },
   "options_detail_shaderImportSuffix": {
-    "message": "and import it in",
+    "message": "en importeer het in",
     "description": "Shader import suffix text before Better Lyrics Shaders link"
   },
   "marketplace_pageTitle": {
@@ -360,7 +360,7 @@
     "description": "Header title"
   },
   "marketplace_subtitle": {
-    "message": "Discover and install community themes",
+    "message": "Ontdek en installeer communitythema's",
     "description": "Header subtitle"
   },
   "marketplace_searchPlaceholder": {
@@ -404,7 +404,7 @@
     "description": "Sort by oldest"
   },
   "marketplace_show": {
-    "message": "Show",
+    "message": "Toon",
     "description": "Show filter group label"
   },
   "marketplace_showAll": {
@@ -428,7 +428,7 @@
     "description": "Filter for themes with shaders"
   },
   "marketplace_compatibleOnly": {
-    "message": "Compatible only",
+    "message": "Alleen geschikt",
     "description": "Filter for compatible themes"
   },
   "marketplace_installFromUrl": {
@@ -440,7 +440,7 @@
     "description": "Submit a theme link"
   },
   "marketplace_loading": {
-    "message": "...",
+    "message": "Thema’s laden...",
     "description": "Loading message"
   },
   "marketplace_retry": {
@@ -448,11 +448,11 @@
     "description": "Retry button"
   },
   "marketplace_noThemesMatch": {
-    "message": "No themes match your filters",
+    "message": "Geen thema's komen overeen met uw filters",
     "description": "Empty state message"
   },
   "marketplace_permissionTitle": {
-    "message": "Permission Required",
+    "message": "Toestemming vereist",
     "description": "Permission required title"
   },
   "marketplace_permissionMessage": {
@@ -460,7 +460,7 @@
     "description": "Permission required message"
   },
   "marketplace_grantPermission": {
-    "message": "Grant Permission",
+    "message": "Geef Toestemming",
     "description": "Grant permission button"
   },
   "marketplace_install": {
@@ -488,11 +488,11 @@
     "description": "GitHub badge text"
   },
   "marketplace_urlModalTitle": {
-    "message": "Install from URL",
+    "message": "Installeren vanaf URL",
     "description": "URL install modal title"
   },
   "marketplace_urlModalMessage": {
-    "message": "Enter a GitHub repository URL to install a theme directly:",
+    "message": "Voer een GitHub repository URL in om een thema direct te installeren:",
     "description": "URL install modal message"
   },
   "marketplace_urlModalPlaceholder": {
@@ -500,7 +500,7 @@
     "description": "URL input placeholder"
   },
   "marketplace_urlModalError": {
-    "message": "Please enter a GitHub repository URL",
+    "message": "Voer een GitHub repository URL in",
     "description": "URL validation error"
   },
   "marketplace_cancel": {
@@ -508,7 +508,7 @@
     "description": "Cancel button"
   },
   "marketplace_urlPermissionTitle": {
-    "message": "Additional Permission Required",
+    "message": "Aanvullende toestemming vereist",
     "description": "URL permission modal title"
   },
   "marketplace_urlPermissionWhy": {
@@ -516,7 +516,7 @@
     "description": "URL permission explanation title"
   },
   "marketplace_urlPermissionDesc": {
-    "message": "Installing themes from custom GitHub URLs requires broader access than the marketplace. This allows Better Lyrics to:",
+    "message": "Het installeren van thema’s via aangepaste GitHub-URL’s vereist bredere toegang dan via de marketplace. Hierdoor kan Better Lyrics:",
     "description": "URL permission description"
   },
   "marketplace_urlPermissionItem1": {
@@ -632,7 +632,7 @@
     "description": "Close modal shortcut"
   },
   "marketplace_shortcutsShowShortcuts": {
-    "message": "Show shortcuts",
+    "message": "Sneltoetsen tonen",
     "description": "Show shortcuts shortcut"
   },
   "marketplace_shortcutsApplyTheme": {
@@ -640,7 +640,7 @@
     "description": "Apply theme shortcut"
   },
   "marketplace_ratingFailed": {
-    "message": "Failed to submit rating",
+    "message": "Beoordeling indienen mislukt",
     "description": "Rating submission error"
   },
   "marketplace_shaderFetchFailed": {
@@ -648,11 +648,11 @@
     "description": "Shader fetch error"
   },
   "marketplace_applyFailed": {
-    "message": "Failed to apply theme",
+    "message": "Thema toepassen mislukt",
     "description": "Theme apply error"
   },
   "marketplace_noThemesInstalled": {
-    "message": "No themes installed yet",
+    "message": "Nog geen thema's geïnstalleerd",
     "description": "Empty installed themes message"
   },
   "marketplace_lastUpdatedOn": {
@@ -670,11 +670,11 @@
     "description": "Standalone editor page title"
   },
   "editor_importFromFile": {
-    "message": "Import from file",
+    "message": "Importeer vanuit bestand",
     "description": "Import from file button"
   },
   "editor_exportToFile": {
-    "message": "Export to file",
+    "message": "Exporteer naar bestand",
     "description": "Export to file button"
   },
   "editor_saveAsTheme": {
@@ -682,7 +682,7 @@
     "description": "Save as theme button"
   },
   "editor_stylingGuide": {
-    "message": "Styling guide",
+    "message": "Opmaak handleiding",
     "description": "Styling guide button"
   },
   "editor_tip": {
@@ -706,7 +706,7 @@
     "description": "Lyrics source label"
   },
   "lyrics_addToLrclib": {
-    "message": "Add Lyrics to LRCLib",
+    "message": "Songteksten toevoegen aan LRCLib",
     "description": "Add lyrics button text"
   },
   "lyrics_searchOnGenius": {
@@ -730,11 +730,11 @@
     "description": "Message shown during ad playback"
   },
   "lyrics_notFound": {
-    "message": "No lyrics found for this song",
+    "message": "Geen songtekst gevonden voor dit nummer",
     "description": "Message when no lyrics are available"
   },
   "options_language_exclusions": {
-    "message": "Language exclusions",
+    "message": "Taal uitsluitingen",
     "description": "Label for language exclusions setting"
   },
   "options_manage": {
@@ -742,7 +742,7 @@
     "description": "Manage button label"
   },
   "options_language_exclusionsTitle": {
-    "message": "Language Exclusions",
+    "message": "Taal Uitsluitingen",
     "description": "Modal title for language exclusions"
   },
   "options_romanization_tab": {
@@ -786,7 +786,7 @@
     }
   },
   "options_romanization_resetMessage": {
-    "message": "This will clear all excluded languages. Continue?",
+    "message": "Dit zal alle uitgesloten talen wissen. Doorgaan?",
     "description": "Confirmation message for resetting exclusions"
   },
   "options_reset": {
