@@ -184,7 +184,7 @@ export function processLyrics(data: LyricSourceResultWithMeta, keepLoaderVisible
   injectLyrics(data, keepLoaderVisible, signal);
 }
 
-function createLyricsLine(parts: LyricPart[], line: LineData, lyricElement: HTMLElement) {
+function createLyricsLine(parts: LyricPart[], line: LineData, lyricElement: HTMLDivElement) {
   // To add rtl elements in reverse to the dom
   let rtlBuffer: HTMLSpanElement[] = [];
   let isAllRtl = true;
@@ -255,7 +255,7 @@ function createLyricsLine(parts: LyricPart[], line: LineData, lyricElement: HTML
     });
   }
 
-  groupByWordAndInsert(lyricElement as HTMLDivElement, lyricElementsBuffer);
+  groupByWordAndInsert(lyricElement, lyricElementsBuffer);
 }
 
 function createBreakElem(lyricElement: HTMLElement, order: number) {
@@ -506,11 +506,10 @@ function injectLyrics(data: LyricSourceResultWithMeta, keepLoaderVisible = false
 
   AppState.lyricData = lyricsData;
 
-  if (!allZero) {
-    AppState.areLyricsTicking = true;
-    calculateLyricPositions();
-    getResizeObserver().observe(lyricsWrapper);
-  } else {
+  AppState.areLyricsTicking = true;
+  calculateLyricPositions();
+  getResizeObserver().observe(lyricsWrapper);
+  if (allZero) {
     log(SYNC_DISABLED_LOG);
   }
 

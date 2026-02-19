@@ -250,6 +250,10 @@ The following options are avalible:
 | `blyrics-target-scroll-pos-ratio`     | `0.37`        | Position on the screen lyrics should be at. 0.5 means the selected lyric will be in the middle of the screen, 0 means top, 1 means bottom. |
 | `blyrics-long-word-threshold`         | `1500`        | Duration threshold (in ms) above which words get `data-long-word="true"`. Useful for glow effects on held notes.                           |
 | `blyrics-hide-instrumental-only`      | `false`       | Treat "[Instrumental Only]" as no lyrics (enables fullscreen effect).                                                                      |
+| `blyrics-passive-scroll-seconds-per-line` | `3.5`     | For unsynced lyrics auto-scroll: seconds spent scrolling per lyric line. Controls overall scroll speed.                                    |
+| `blyrics-passive-scroll-bottom-pause-s`   | `1.5`     | For unsynced lyrics auto-scroll: seconds to pause at the bottom before scrolling back to top.                                              |
+| `blyrics-passive-scroll-reset-duration-s` | `0.6`     | For unsynced lyrics auto-scroll: seconds for the scroll-back-to-top animation.                                                             |
+| `blyrics-passive-scroll-top-pause-s`      | `0.8`     | For unsynced lyrics auto-scroll: seconds to pause at the top before scrolling down again.                                                  |
 
 ⁴Make sure that the following equation is met
 

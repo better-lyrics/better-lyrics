@@ -8,6 +8,7 @@ import {
   handleSettings,
   hideCursorOnIdle,
   listenForPopupMessages,
+  loadPassiveScrollSetting,
   loadTranslationSettings,
   onAlbumArtEnabled,
 } from "@modules/settings/settings";
@@ -43,6 +44,7 @@ async function modify(): Promise<void> {
   handleSettings();
   setupWakeLockForFullscreen();
   loadTranslationSettings();
+  loadPassiveScrollSetting();
   subscribeToCustomStyles();
   await purgeExpiredKeys();
   await saveCacheInfo();

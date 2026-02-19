@@ -192,6 +192,7 @@ export function listenForPopupMessages(): void {
       hideCursorOnIdle();
       handleSettings();
       loadTranslationSettings();
+      loadPassiveScrollSetting();
       AppState.shouldInjectAlbumArt = "Unknown";
       onAlbumArtEnabled(
         () => {
@@ -214,6 +215,12 @@ export function listenForPopupMessages(): void {
         sendResponse({ success: false });
       }
     }
+  });
+}
+
+export function loadPassiveScrollSetting(): void {
+  getStorage({ isPassiveScrollEnabled: true }, items => {
+    AppState.isPassiveScrollEnabled = items.isPassiveScrollEnabled;
   });
 }
 

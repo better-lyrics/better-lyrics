@@ -13,6 +13,7 @@ interface Options {
   isAlbumArtEnabled: boolean;
   isFullScreenDisabled: boolean;
   isStylizedAnimationsEnabled: boolean;
+  isPassiveScrollEnabled: boolean;
   isTranslateEnabled: boolean;
   translationLanguage: string;
   isCursorAutoHideEnabled: boolean;
@@ -46,6 +47,7 @@ const getOptionsFromForm = (): Options => {
     isAlbumArtEnabled: (document.getElementById("albumArt") as HTMLInputElement).checked,
     isFullScreenDisabled: (document.getElementById("isFullScreenDisabled") as HTMLInputElement).checked,
     isStylizedAnimationsEnabled: (document.getElementById("isStylizedAnimationsEnabled") as HTMLInputElement).checked,
+    isPassiveScrollEnabled: (document.getElementById("isPassiveScrollEnabled") as HTMLInputElement).checked,
     isTranslateEnabled: (document.getElementById("translate") as HTMLInputElement).checked,
     translationLanguage: (document.getElementById("translationLanguage") as HTMLInputElement).value,
     isCursorAutoHideEnabled: (document.getElementById("cursorAutoHide") as HTMLInputElement).checked,
@@ -186,6 +188,7 @@ const restoreOptions = (): void => {
     isCursorAutoHideEnabled: true,
     isFullScreenDisabled: false,
     isStylizedAnimationsEnabled: true,
+    isPassiveScrollEnabled: true,
     isTranslateEnabled: false,
     translationLanguage: "en",
     isRomanizationEnabled: false,
@@ -221,6 +224,7 @@ const setOptionsInForm = (items: Options): void => {
   (document.getElementById("isFullScreenDisabled") as HTMLInputElement).checked = items.isFullScreenDisabled;
   (document.getElementById("isStylizedAnimationsEnabled") as HTMLInputElement).checked =
     items.isStylizedAnimationsEnabled;
+  (document.getElementById("isPassiveScrollEnabled") as HTMLInputElement).checked = items.isPassiveScrollEnabled;
   (document.getElementById("translate") as HTMLInputElement).checked = items.isTranslateEnabled;
   (document.getElementById("translationLanguage") as HTMLInputElement).value = items.translationLanguage;
   (document.getElementById("isRomanizationEnabled") as HTMLInputElement).checked = items.isRomanizationEnabled;

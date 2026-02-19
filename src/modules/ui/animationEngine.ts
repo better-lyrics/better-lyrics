@@ -12,7 +12,7 @@ import {
 } from "@constants";
 import { AppState } from "@core/appState";
 import { calculateLyricPositions, type LineData } from "@modules/lyrics/injectLyrics";
-import { hideAdOverlay, isAdPlaying, showAdOverlay } from "@modules/ui/dom";
+import { hideAdOverlay, isAdPlaying, isLoaderActive, showAdOverlay } from "@modules/ui/dom";
 import { log } from "@utils";
 import { ctx, resetDebugRender } from "./animationEngineDebug";
 import { registerThemeSetting } from "@modules/settings/themeOptions";
@@ -30,6 +30,13 @@ let observedTabRenderer: HTMLElement | null = null;
 
 // 0.5 means the selected lyric will be in the middle of the screen, 0 means top, 1 means bottom
 export const SCROLL_POS_OFFSET_RATIO = registerThemeSetting("blyrics-target-scroll-pos-ratio", 0.37);
+
+export const ADD_EXTRA_PADDING_TOP = registerThemeSetting("blyrics-add-extra-top-padding", false);
+
+const PASSIVE_SECONDS_PER_LINE = registerThemeSetting("blyrics-passive-scroll-seconds-per-line", 3.5);
+const PASSIVE_BOTTOM_PAUSE_S = registerThemeSetting("blyrics-passive-scroll-bottom-pause-s", 1.5);
+const PASSIVE_RESET_DURATION_S = registerThemeSetting("blyrics-passive-scroll-reset-duration-s", 0.6);
+const PASSIVE_TOP_PAUSE_S = registerThemeSetting("blyrics-passive-scroll-top-pause-s", 0.8);
 
 interface AnimEngineState {
   skipScrolls: number;
@@ -53,6 +60,8 @@ interface AnimEngineState {
     centers: number[];
     lyricScrollTime: number;
   };
+  passiveScrollAccumulatedTime: number;
+  passiveLastWallTime: number;
 }
 
 export let animEngineState: AnimEngineState = {
@@ -74,6 +83,8 @@ export let animEngineState: AnimEngineState = {
     centers: [],
     lyricScrollTime: 0,
   },
+  passiveScrollAccumulatedTime: 0,
+  passiveLastWallTime: 0,
 };
 
 export function resetActiveAnimations(): void {
@@ -96,6 +107,8 @@ export function resetAnimEngineState(): void {
   animEngineState.lastScrollDebugContext.centers = [];
   animEngineState.doneFirstInstantScroll = false;
   animEngineState.queuedScroll = false;
+  animEngineState.passiveScrollAccumulatedTime = 0;
+  animEngineState.passiveLastWallTime = 0;
   cachedDurations.clear();
 }
 
@@ -118,6 +131,101 @@ function getCSSDurationInMs(lyricsElement: HTMLElement, property: string): numbe
   }
 
   return duration;
+}
+
+// -- Skip Scrolls Decay --------------------------
+
+function decaySkipScrolls(now: number): void {
+  let j = 0;
+  for (; j < animEngineState.skipScrollsDecayTimes.length; j++) {
+    if (animEngineState.skipScrollsDecayTimes[j] > now) {
+      break;
+    }
+  }
+  animEngineState.skipScrollsDecayTimes = animEngineState.skipScrollsDecayTimes.slice(j);
+  animEngineState.skipScrolls -= j;
+  if (animEngineState.skipScrolls < 1) {
+    animEngineState.skipScrolls = 1;
+  }
+}
+
+// -- Passive Scroll Engine --------------------------
+
+function passiveScrollEngine(isPlaying: boolean): void {
+  const lyricData = AppState.lyricData;
+  if (!lyricData) return;
+
+  if (isLoaderActive()) return;
+
+  const tabRenderer = document.querySelector(TAB_RENDERER_SELECTOR) as HTMLElement;
+  if (!tabRenderer) return;
+
+  const now = Date.now();
+
+  // -- Accumulate play time --------------------------
+  if (animEngineState.passiveLastWallTime > 0 && isPlaying) {
+    const wallDelta = (now - animEngineState.passiveLastWallTime) / 1000;
+    animEngineState.passiveScrollAccumulatedTime += Math.min(wallDelta, 0.5);
+  }
+  animEngineState.passiveLastWallTime = now;
+
+  // -- User scroll interruption --------------------------
+  if (animEngineState.scrollResumeTime > now) {
+    return;
+  }
+
+  if (animEngineState.wasUserScrolling) {
+    getResumeScrollElement().setAttribute("autoscroll-hidden", "true");
+    lyricData.lyricsContainer.classList.remove(USER_SCROLLING_CLASS);
+    animEngineState.wasUserScrolling = false;
+
+    // Re-sync accumulated time to current scroll position so scroll continues from where user left off
+    const maxScroll = tabRenderer.scrollHeight - tabRenderer.clientHeight;
+    if (maxScroll > 0) {
+      const ratio = tabRenderer.scrollTop / maxScroll;
+      const numLines = lyricData.lines.length;
+      const scrollDuration = numLines * PASSIVE_SECONDS_PER_LINE.getNumberValue();
+      animEngineState.passiveScrollAccumulatedTime = ratio * scrollDuration;
+    }
+  }
+
+  // -- Cycle calculation --------------------------
+  const numLines = lyricData.lines.length;
+  if (numLines === 0) return;
+
+  const scrollDuration = numLines * PASSIVE_SECONDS_PER_LINE.getNumberValue();
+  const bottomPause = PASSIVE_BOTTOM_PAUSE_S.getNumberValue();
+  const resetDuration = PASSIVE_RESET_DURATION_S.getNumberValue();
+  const topPause = PASSIVE_TOP_PAUSE_S.getNumberValue();
+  const cycleLength = scrollDuration + bottomPause + resetDuration + topPause;
+
+  const maxScroll = tabRenderer.scrollHeight - tabRenderer.clientHeight;
+  if (maxScroll <= 0) return;
+
+  const cycleTime = animEngineState.passiveScrollAccumulatedTime % cycleLength;
+
+  let targetScroll: number;
+  if (cycleTime < scrollDuration) {
+    // Phase 1: linear scroll down
+    targetScroll = (cycleTime / scrollDuration) * maxScroll;
+  } else if (cycleTime < scrollDuration + bottomPause) {
+    // Phase 2: hold at bottom
+    targetScroll = maxScroll;
+  } else if (cycleTime < scrollDuration + bottomPause + resetDuration) {
+    // Phase 3: ease-out scroll back to top
+    const resetProgress = (cycleTime - scrollDuration - bottomPause) / resetDuration;
+    const eased = 1 - (1 - resetProgress) * (1 - resetProgress);
+    targetScroll = maxScroll * (1 - eased);
+  } else {
+    // Phase 4: hold at top
+    targetScroll = 0;
+  }
+
+  tabRenderer.scrollTop = targetScroll;
+  animEngineState.skipScrolls += 1;
+  animEngineState.skipScrollsDecayTimes.push(now + 2000);
+
+  decaySkipScrolls(now);
 }
 
 /**
@@ -152,6 +260,16 @@ export function animationEngine(currentTime: number, eventCreationTime: number, 
   const now = Date.now();
   // const frameStart = performance.now();
   if (!AppState.areLyricsTicking || (currentTime === 0 && !isPlaying)) {
+    return;
+  }
+
+  if (AppState.lyricData?.syncType === "none") {
+    if (!animEngineState.lastPlayState && isPlaying) {
+      animEngineState.scrollResumeTime = 0;
+    }
+    animEngineState.lastPlayState = isPlaying;
+    if (!AppState.isPassiveScrollEnabled) return;
+    passiveScrollEngine(isPlaying);
     return;
   }
 
@@ -568,17 +686,7 @@ export function animationEngine(currentTime: number, eventCreationTime: number, 
       animEngineState.wasUserScrolling = false;
     }
 
-    let j = 0;
-    for (; j < animEngineState.skipScrollsDecayTimes.length; j++) {
-      if (animEngineState.skipScrollsDecayTimes[j] > now) {
-        break;
-      }
-    }
-    animEngineState.skipScrollsDecayTimes = animEngineState.skipScrollsDecayTimes.slice(j);
-    animEngineState.skipScrolls -= j;
-    if (animEngineState.skipScrolls < 1) {
-      animEngineState.skipScrolls = 1; // Always leave at least one for when the window is refocused.
-    }
+    decaySkipScrolls(now);
     // const frameTime = performance.now() - frameStart;
     // if (frameTime > 5) {
     //   console.warn("[BLyrics-diag] SLOW FRAME", { ms: frameTime.toFixed(1) });
