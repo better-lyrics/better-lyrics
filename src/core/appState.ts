@@ -75,7 +75,7 @@ export function reloadLyrics(): void {
 export function handleModifications(detail: PlayerDetails): void {
   if (AppState.lyricInjectionPromise) {
     AppState.lyricAbortController?.abort("New song is being loaded");
-    flushLoader(); // Flush loader immediately when aborting
+    // flushLoader(); // Flush loader immediately when aborting
     // Don't wait for old promise - start new song immediately
     // Old promise will complete eventually and its finally block will handle cleanup
   }

@@ -34,6 +34,8 @@ Essential reference for creating custom themes. For deep dives, see [STYLING.md]
 
 ```css
 :root {
+  --blyrics-loader-transition-duration: 0.6s;
+  --blyrics-loader-transition-easing: cubic-bezier(0.22, 1, 0.36, 1);
   --blyrics-scale-transition-duration: 0.166s;
   --blyrics-lyric-highlight-fade-in-duration: 0.33s;
   --blyrics-lyric-highlight-fade-out-duration: 0.5s;

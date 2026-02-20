@@ -200,7 +200,7 @@
     "description": "Nothing to clear message"
   },
   "options_alert_exportFailed": {
-    "message": "Failed to export identity",
+    "message": "Không xuất được danh tính",
     "description": "Export identity failed message"
   },
   "options_alert_fileSaveDialogOpened": {
@@ -404,7 +404,7 @@
     "description": "Sort by oldest"
   },
   "marketplace_show": {
-    "message": "Show",
+    "message": "Hiển thị",
     "description": "Show filter group label"
   },
   "marketplace_showAll": {
@@ -656,7 +656,7 @@
     "description": "Empty installed themes message"
   },
   "marketplace_lastUpdatedOn": {
-    "message": "Last updated on $date$",
+    "message": "Cập nhật lần cuối vào $date$",
     "description": "Tooltip showing full date when a theme was last updated",
     "placeholders": {
       "date": {

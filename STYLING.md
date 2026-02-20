@@ -152,9 +152,11 @@ These custom properties allow for easy customization of colors, sizes, and other
 
 ### Animations
 
-| Variable                                      | Default Value | Description                                                                                     |
-| --------------------------------------------- | ------------- | ----------------------------------------------------------------------------------------------- |
-| `--blyrics-scale-transition-duration`         | `0.166s`      | Transition duration of scale effect                                                             |
+| Variable                                      | Default Value                        | Description                                                                                     |
+| --------------------------------------------- | ------------------------------------ | ----------------------------------------------------------------------------------------------- |
+| `--blyrics-loader-transition-duration`        | `0.6s`                               | Duration of loader enter/exit transitions                                                       |
+| `--blyrics-loader-transition-easing`          | `cubic-bezier(0.22, 1, 0.36, 1)`    | Easing curve for loader enter/exit transitions                                                  |
+| `--blyrics-scale-transition-duration`         | `0.166s`                             | Transition duration of scale effect                                                             |
 | `--blyrics-lyric-highlight-fade-in-duration`  | `0.33s`       | Controls duration of fade in transition                                                         |
 | `--blyrics-lyric-highlight-fade-out-duration` | `0.5s`        | Controls duration of fade out transition                                                        |
 | `--blyrics-wobble-duration`                   | `1s`          | Controls duration of wobble animation                                                           |
