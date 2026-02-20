@@ -1,10 +1,10 @@
 {
   "extensionName": {
-    "message": "Better Lyrics (Lời bài hát cho Youtube Music)",
+    "message": "Better Lyrics (Lời bài hát dành cho Youtube Music)",
     "description": "The name of the extension"
   },
   "extensionDescription": {
-    "message": "Nâng cấp Youtube Music với lời bài hát đẹp mắt được đồng bộ hóa, hỗ trợ nhiều ngôn ngữ, dịch theo thời gian thực và hơn thế nữa",
+    "message": "Cải thiện Youtube Music với những lời bài hát đẹp mắt được đồng bộ hóa, hỗ trợ nhiều ngôn ngữ, dịch theo thời gian thực và hơn thế nữa",
     "description": "The description of the extension"
   },
   "options_tab_general": {
@@ -44,7 +44,7 @@
     "description": "Show logs setting label"
   },
   "options_general_autoSwitch": {
-    "message": "Tự động chuyển sang phần Lời bài hát",
+    "message": "Tự động chuyển sang phần \"Lời nhạc\"",
     "description": "Auto switch to lyrics tab setting label"
   },
   "options_general_cache": {
@@ -56,7 +56,7 @@
     "description": "Clear cache button label"
   },
   "options_general_totalLyrics": {
-    "message": "Số lời bài hát trong bộ nhớ đệm",
+    "message": "Tổng các lời bài hát trong bộ nhớ đệm",
     "description": "Total lyrics in cache label"
   },
   "options_general_cacheSize": {
@@ -68,7 +68,7 @@
     "description": "Display settings section title"
   },
   "options_display_description": {
-    "message": "Tùy chỉnh hợp mắt hiển thị của Better Lyrics.",
+    "message": "Tinh chỉnh cách hiển thị của Better Lyrics.",
     "description": "Display settings section description"
   },
   "options_display_disableFullscreen": {
@@ -80,7 +80,7 @@
     "description": "Auto-hide cursor setting label"
   },
   "options_display_albumArt": {
-    "message": "Hiển thị nền như ảnh bìa của bài hát được làm mờ",
+    "message": "Hiển thị nền ảnh bìa của bài hát được làm mờ",
     "description": "Show album art background setting label"
   },
   "options_display_stylizedAnimations": {
@@ -112,7 +112,7 @@
     "description": "Sources settings section title"
   },
   "options_sources_description": {
-    "message": "Kéo để sắp xếp độ ưu tiên. Nguồn cao hơn sẽ được tìm lời bài hát của nguồn đó trước. Gạt để không tìm của một nguồn.",
+    "message": "Kéo để sắp xếp độ ưu tiên. Nguồn cao hơn sẽ được thử tìm lời bài hát trước. Bỏ chọn để tắt tìm kiếm một nguồn cụ thể.",
     "description": "Sources settings section description"
   },
   "options_themes_title": {
@@ -152,7 +152,7 @@
     "description": "Identity settings section title"
   },
   "options_identity_description": {
-    "message": "Danh tính ẩn danh riêng của bạn trên Better Lyrics.",
+    "message": "Danh tính ẩn danh độc nhất vô nhị của bạn trên Better Lyrics.",
     "description": "Identity settings section description"
   },
   "options_identity_yourIdentity": {
@@ -200,7 +200,7 @@
     "description": "Nothing to clear message"
   },
   "options_alert_exportFailed": {
-    "message": "Không xuất được danh tính",
+    "message": "Đã xảy ra lỗi khi xuất danh tính",
     "description": "Export identity failed message"
   },
   "options_alert_fileSaveDialogOpened": {
@@ -212,7 +212,7 @@
     "description": "File save failed message"
   },
   "options_alert_downloadInitiated": {
-    "message": "Quá trình tải tệp danh tính đã được khởi tạo.",
+    "message": "Quá trình tải tệp danh tính đã được bắt đầu.",
     "description": "Download initiated message"
   },
   "options_alert_importSuccess": {
@@ -220,7 +220,7 @@
     "description": "Import success message"
   },
   "options_alert_identityLoadError": {
-    "message": "Lỗi tải danh tính",
+    "message": "Đã xảy ra lỗi khi tải danh tính",
     "description": "Identity load error message"
   },
   "options_editor_saving": {
@@ -228,7 +228,7 @@
     "description": "Saving indicator text"
   },
   "options_editor_importFile": {
-    "message": "Nhập tệp",
+    "message": "Nhập từ tệp",
     "description": "Import from file tooltip"
   },
   "options_editor_exportFile": {
@@ -236,7 +236,7 @@
     "description": "Export to file tooltip"
   },
   "options_editor_saveAsTheme": {
-    "message": "Lưu thành một chủ đề",
+    "message": "Lưu dưới dạng chủ đề",
     "description": "Save as theme tooltip"
   },
   "options_editor_openInNewTab": {
@@ -248,7 +248,7 @@
     "description": "Back to settings button label"
   },
   "options_editor_fullExperienceNote": {
-    "message": "Nếu muốn một trải nghiệm một trình chỉnh sửa thực thụ,",
+    "message": "Để có trải nghiệm của một trình chỉnh sửa thực thụ, ",
     "description": "Full editor experience note prefix"
   },
   "options_editor_openInNewTabLink": {
@@ -260,11 +260,11 @@
     "description": "Styling guide link text"
   },
   "options_editor_renameTheme": {
-    "message": "Đổi tên chủ đề riêng",
+    "message": "Đổi tên chủ đề tuỳ chỉnh",
     "description": "Rename theme button title"
   },
   "options_editor_deleteTheme": {
-    "message": "Xóa chủ đề riêng",
+    "message": "Xóa chủ đề tuỳ chỉnh",
     "description": "Delete theme button title"
   },
   "options_editor_doubleClickRename": {
@@ -300,7 +300,7 @@
     "description": "Syllable sync type label"
   },
   "options_syncType_syllable_tooltip": {
-    "message": "Lướt qua từng âm tiết theo người hát. Đồng bộ âm tiết đưa ra trải nghiệm tuyệt vời nhất.",
+    "message": "Lướt qua từng âm tiết theo người hát. Đồng bộ theo âm tiết cho ra những trải nghiệm tốt nhất.",
     "description": "Syllable sync type tooltip"
   },
   "options_syncType_word": {
@@ -308,7 +308,7 @@
     "description": "Word sync type label"
   },
   "options_syncType_word_tooltip": {
-    "message": "Lướt qua từng từ theo người hát. Đồng bộ theo từ đưa ra một trải nghiệm tốt.",
+    "message": "Lướt qua từng từ theo người hát. Đồng bộ theo từ cho ra những trải nghiệm tốt.",
     "description": "Word sync type tooltip"
   },
   "options_syncType_line": {
@@ -316,7 +316,7 @@
     "description": "Line sync type label"
   },
   "options_syncType_line_tooltip": {
-    "message": "Làm nổi cả một dòng lời bài hát theo người hát. Đồng bộ theo dòng đưa ra một trải nghiệm cơ bản.",
+    "message": "Làm nổi cả một dòng lời bài hát theo người hát. Đồng bộ theo dòng cho ra những trải nghiệm bình thường.",
     "description": "Line sync type tooltip"
   },
   "options_syncType_unsynced": {
@@ -324,7 +324,7 @@
     "description": "Unsynced sync type label"
   },
   "options_syncType_unsynced_tooltip": {
-    "message": "Lời bài hát để nguyên. Không đồng bộ đưa ra một trải nghiệm tối giản nhất.",
+    "message": "Lời bài hát để nguyên. Không đồng bộ cho ra trải nghiệm tối giản nhất.",
     "description": "Unsynced sync type tooltip"
   },
   "options_detail_rateTheme": {
@@ -360,7 +360,7 @@
     "description": "Header title"
   },
   "marketplace_subtitle": {
-    "message": "Khám phá và tải xuống chủ đề từ chính tay cộng đồng chúng tôi",
+    "message": "Khám phá và tải xuống chủ đề từ chính tay cộng đồng tạo ra",
     "description": "Header subtitle"
   },
   "marketplace_searchPlaceholder": {
@@ -372,7 +372,7 @@
     "description": "Refresh button label"
   },
   "marketplace_keyboardShortcuts": {
-    "message": "Phím tắt",
+    "message": "Phím tắt bàn phím",
     "description": "Keyboard shortcuts button label"
   },
   "marketplace_sortBy": {
@@ -484,7 +484,7 @@
     "description": "Shaders badge text"
   },
   "marketplace_githubBadge": {
-    "message": "Github",
+    "message": "GitHub",
     "description": "GitHub badge text"
   },
   "marketplace_urlModalTitle": {
@@ -512,7 +512,7 @@
     "description": "URL permission modal title"
   },
   "marketplace_urlPermissionWhy": {
-    "message": "Sao cái này lại cần thiết vậy?",
+    "message": "Tại sao cái này lại cần thiết vậy?",
     "description": "URL permission explanation title"
   },
   "marketplace_urlPermissionDesc": {
@@ -524,7 +524,7 @@
     "description": "URL permission list item 1"
   },
   "marketplace_urlPermissionItem2": {
-    "message": "Phát hiện nhánh mặc định của repository",
+    "message": "Phát hiện nhánh mặc định của kho lưu trữ đó",
     "description": "URL permission list item 2"
   },
   "marketplace_urlPermissionItem3": {
@@ -532,11 +532,11 @@
     "description": "URL permission list item 3"
   },
   "marketplace_urlPermissionNote": {
-    "message": "Chỉ cần cấp quyền khi bạn tải chủ đề qua URL. Tải qua cửa hàng thì không cần.",
+    "message": "Quyền này chỉ được sử dụng khi bạn tải chủ đề qua URL. Tải qua cửa hàng thì không cần.",
     "description": "URL permission note"
   },
   "marketplace_shortcutsTitle": {
-    "message": "Phím tắt",
+    "message": "Phím tắt bàn phím",
     "description": "Shortcuts modal title"
   },
   "marketplace_shortcutsNavigation": {
@@ -568,7 +568,7 @@
     "description": "Sort shortcuts group"
   },
   "marketplace_shortcutsSortHint": {
-    "message": "Nhấn lần nữa để đổi hướng",
+    "message": "nhấn lần nữa để đổi hướng",
     "description": "Sort toggle hint"
   },
   "marketplace_shortcutsByRating": {
@@ -670,15 +670,15 @@
     "description": "Standalone editor page title"
   },
   "editor_importFromFile": {
-    "message": "Nhập file",
+    "message": "Nhập từ tệp",
     "description": "Import from file button"
   },
   "editor_exportToFile": {
-    "message": "Xuất ra file",
+    "message": "Xuất ra tệp",
     "description": "Export to file button"
   },
   "editor_saveAsTheme": {
-    "message": "Lưu thành chủ đề",
+    "message": "Lưu dưới dạng chủ đề",
     "description": "Save as theme button"
   },
   "editor_stylingGuide": {
@@ -686,7 +686,7 @@
     "description": "Styling guide button"
   },
   "editor_tip": {
-    "message": "Mẹo: Đây là một tab độc lập. Bạn có thể kéo trình chỉnh sửa này ra cửa sổ riêng hoặc dùng chế độ chia màn hình cùng YouTube Music để xem thay đổi theo thời gian thực. Để biết thêm thông tin, hãy truy cập",
+    "message": "Mẹo: Đây là một tab riêng, bạn có thể kéo trình chỉnh sửa này ra cửa sổ riêng biệt hoặc dùng chế độ chia màn hình cùng YouTube Music để xem các thay đổi của bạn theo thời gian thực. Để biết thêm thông tin, hãy truy cập",
     "description": "Editor tip text"
   },
   "editor_poweredBy": {
@@ -694,7 +694,7 @@
     "description": "Powered by label"
   },
   "editor_playground": {
-    "message": "Sân chơi",
+    "message": "Sân chơi lập trình",
     "description": "Playground link text"
   },
   "editor_docs": {
@@ -702,7 +702,7 @@
     "description": "Docs link text"
   },
   "lyrics_source": {
-    "message": "Nguồn:",
+    "message": "Nguồn: ",
     "description": "Lyrics source label"
   },
   "lyrics_addToLrclib": {
@@ -726,7 +726,7 @@
     "description": "Message when no synced lyrics found"
   },
   "lyrics_adPlaying": {
-    "message": "tu tu tu",
+    "message": "[Quảng cáo, bruh.🙏]",
     "description": "Message shown during ad playback"
   },
   "lyrics_notFound": {
@@ -762,7 +762,7 @@
     "description": "Hint text for romanization exclusions"
   },
   "options_translation_hint": {
-    "message": "Nhấn để bật/tắt. Các ngôn ngữ bị loại trừ sẽ không được dịch.",
+    "message": "Nhấn để bật/tắt. Các ngôn ngữ gốc bị loại trừ sẽ không được dịch.",
     "description": "Hint text for translation exclusions"
   },
   "options_resetToDefault": {
