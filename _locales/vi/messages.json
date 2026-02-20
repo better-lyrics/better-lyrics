@@ -726,7 +726,7 @@
     "description": "Message when no synced lyrics found"
   },
   "lyrics_adPlaying": {
-    "message": "[Quảng cáo, bruh.🙏]",
+    "message": "[tu tu tu]",
     "description": "Message shown during ad playback"
   },
   "lyrics_notFound": {
