@@ -202,3 +202,18 @@ ytmusic-player-bar[player-fullscreened]:not([blyrics-dfs]) #play-pause-button>.y
     width: 32px;
     height: 32px;
 }
+
+/* Fix YTM A/B test: player bar not auto-hiding */
+
+ytmusic-app-layout[player-fullscreened]:not([blyrics-dfs]) > [slot="player-bar"] {
+  animation: none !important;
+  opacity: 0 !important;
+  transition: opacity .3s cubic-bezier(.2, 0, .6, 1);
+  will-change: opacity;
+  width: 100%;
+}
+
+ytmusic-app-layout[player-fullscreened][show-fullscreen-controls]:not([blyrics-dfs]) > [slot="player-bar"],
+ytmusic-app-layout[player-fullscreened]:not([blyrics-dfs]) > [slot="player-bar"]:hover {
+  opacity: 1 !important;
+}
