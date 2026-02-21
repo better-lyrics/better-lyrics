@@ -202,3 +202,10 @@ ytmusic-player-bar[player-fullscreened]:not([blyrics-dfs]) #play-pause-button>.y
     width: 32px;
     height: 32px;
 }
+
+/* Fix YTM A/B test: player bar not auto-hiding */
+
+ytmusic-app-layout[player-fullscreened]:not([blyrics-dfs]) > [slot="player-bar"] {
+  animation: none !important;
+  width: 100%;
+}

@@ -1,274 +1,274 @@
 {
   "extensionName": {
-    "message": "Better Lyrics (Lời bài hát dành cho Youtube Music)",
+    "message": "Lepší texty písní (Texty písní pro YouTube hudbu)",
     "description": "The name of the extension"
   },
   "extensionDescription": {
-    "message": "Cải thiện Youtube Music với những lời bài hát đẹp mắt được đồng bộ hóa, hỗ trợ nhiều ngôn ngữ, dịch theo thời gian thực và hơn thế nữa",
+    "message": "Enhance YouTube Music with beautiful time-synced lyrics, multilingual support, real-time translations and more",
     "description": "The description of the extension"
   },
   "options_tab_general": {
-    "message": "Chung",
+    "message": "General",
     "description": "General settings tab label"
   },
   "options_tab_display": {
-    "message": "Hiển thị",
+    "message": "Display",
     "description": "Display settings tab label"
   },
   "options_tab_language": {
-    "message": "Ngôn ngữ",
+    "message": "Language",
     "description": "Language settings tab label"
   },
   "options_tab_sources": {
-    "message": "Nguồn",
+    "message": "Sources",
     "description": "Sources settings tab label"
   },
   "options_tab_identity": {
-    "message": "Danh tính",
+    "message": "Identity",
     "description": "Identity settings tab label"
   },
   "options_tab_themes": {
-    "message": "Chủ đề",
+    "message": "Themes",
     "description": "Themes settings tab label"
   },
   "options_general_title": {
-    "message": "Cài đặt chung",
+    "message": "General Settings",
     "description": "General settings section title"
   },
   "options_general_description": {
-    "message": "Cài đặt liên quan tới cách hoạt động chung của Better Lyrics.",
+    "message": "Settings that affect the general behavior of Better Lyrics.",
     "description": "General settings section description"
   },
   "options_general_showLogs": {
-    "message": "Hiện các bản ghi",
+    "message": "Show logs",
     "description": "Show logs setting label"
   },
   "options_general_autoSwitch": {
-    "message": "Tự động chuyển sang phần \"Lời nhạc\"",
+    "message": "Auto switch to lyrics tab",
     "description": "Auto switch to lyrics tab setting label"
   },
   "options_general_cache": {
-    "message": "Bộ nhớ đệm",
+    "message": "Cache",
     "description": "Cache section label"
   },
   "options_general_clearCache": {
-    "message": "Xóa bộ nhớ đệm",
+    "message": "Clear Cache",
     "description": "Clear cache button label"
   },
   "options_general_totalLyrics": {
-    "message": "Tổng các lời bài hát trong bộ nhớ đệm",
+    "message": "Total lyrics in cache",
     "description": "Total lyrics in cache label"
   },
   "options_general_cacheSize": {
-    "message": "Dung lượng bộ nhớ đệm",
+    "message": "Cache size",
     "description": "Cache size label"
   },
   "options_display_title": {
-    "message": "Cài đặt hiển thị",
+    "message": "Display Settings",
     "description": "Display settings section title"
   },
   "options_display_description": {
-    "message": "Tinh chỉnh cách hiển thị của Better Lyrics.",
+    "message": "Fine-tune the appearance of Better Lyrics.",
     "description": "Display settings section description"
   },
   "options_display_disableFullscreen": {
-    "message": "Tắt chế độ toàn màn hình",
+    "message": "Disable fullscreen mode",
     "description": "Disable fullscreen mode setting label"
   },
   "options_display_autoHideCursor": {
-    "message": "Tự động ẩn con trỏ chuột trong chế độ toàn màn hình",
+    "message": "Auto-hide cursor in fullscreen mode",
     "description": "Auto-hide cursor setting label"
   },
   "options_display_albumArt": {
-    "message": "Hiển thị nền ảnh bìa của bài hát được làm mờ",
+    "message": "Show blurred album art background",
     "description": "Show album art background setting label"
   },
   "options_display_stylizedAnimations": {
-    "message": "Hiển thị hiệu ứng đẹp mắt",
+    "message": "Show stylized animations",
     "description": "Show stylized animations setting label"
   },
   "options_language_title": {
-    "message": "Cài đặt ngôn ngữ",
+    "message": "Language Settings",
     "description": "Language settings section title"
   },
   "options_language_description": {
-    "message": "Cài đặt ngôn ngữ cùng dịch thuật của Better Lyrics.",
+    "message": "Language and translation settings for Better Lyrics.",
     "description": "Language settings section description"
   },
   "options_language_romanization": {
-    "message": "Phiên âm",
+    "message": "Romanization",
     "description": "Romanization setting label"
   },
   "options_language_translate": {
-    "message": "Dịch lời bài hát",
+    "message": "Translate song lyrics",
     "description": "Translate song lyrics setting label"
   },
   "options_language_translationLanguage": {
-    "message": "Ngôn ngữ dịch",
+    "message": "Translation language",
     "description": "Translation language setting label"
   },
   "options_sources_title": {
-    "message": "Tùy chọn nguồn lời bài hát được ưu tiên",
+    "message": "Lyric Source Preference",
     "description": "Sources settings section title"
   },
   "options_sources_description": {
-    "message": "Kéo để sắp xếp độ ưu tiên. Nguồn cao hơn sẽ được thử tìm lời bài hát trước. Bỏ chọn để tắt tìm kiếm một nguồn cụ thể.",
+    "message": "Drag to reorder priority. Higher sources are tried first. Uncheck to disable.",
     "description": "Sources settings section description"
   },
   "options_themes_title": {
-    "message": "Cài đặt chủ đề",
+    "message": "Theme Settings",
     "description": "Theme settings section title"
   },
   "options_themes_description": {
-    "message": "Tùy chỉnh hiển thị của Better Lyrics.",
+    "message": "Customize the appearance of Better Lyrics.",
     "description": "Theme settings section description"
   },
   "options_themes_theme": {
-    "message": "Chủ đề",
+    "message": "Theme",
     "description": "Theme label"
   },
   "options_themes_chooseTheme": {
-    "message": "Chọn một chủ đề",
+    "message": "Choose a theme",
     "description": "Choose a theme button label"
   },
   "options_themes_customStyles": {
-    "message": "Chủ đề riêng",
+    "message": "Custom Styles",
     "description": "Custom styles label"
   },
   "options_themes_create": {
-    "message": "Tạo mới",
+    "message": "Create",
     "description": "Create button label"
   },
   "options_themes_marketplace": {
-    "message": "Cửa hàng chủ đề",
+    "message": "Theme Marketplace",
     "description": "Theme marketplace button label"
   },
   "options_themes_installedThemes": {
-    "message": "Chủ đề đã tải",
+    "message": "Installed Themes",
     "description": "Installed themes button label"
   },
   "options_identity_title": {
-    "message": "Danh tính",
+    "message": "Identity",
     "description": "Identity settings section title"
   },
   "options_identity_description": {
-    "message": "Danh tính ẩn danh độc nhất vô nhị của bạn trên Better Lyrics.",
+    "message": "Your unique anonymous identity for Better Lyrics.",
     "description": "Identity settings section description"
   },
   "options_identity_yourIdentity": {
-    "message": "Danh tính của bạn",
+    "message": "Your identity",
     "description": "Your identity label"
   },
   "options_identity_loading": {
-    "message": "Đang tải...",
+    "message": "Loading...",
     "description": "Loading identity placeholder"
   },
   "options_identity_exportImport": {
-    "message": "Nhập/Xuất",
+    "message": "Export/Import",
     "description": "Export/Import section label"
   },
   "options_identity_exportKey": {
-    "message": "Xuất khóa",
+    "message": "Export Key",
     "description": "Export key button label"
   },
   "options_identity_importKey": {
-    "message": "Nhập khóa",
+    "message": "Import Key",
     "description": "Import key button label"
   },
   "options_modal_selectTheme": {
-    "message": "Chọn một chủ đề",
+    "message": "Select a Theme",
     "description": "Theme modal title"
   },
   "options_modal_cancel": {
-    "message": "Hủy",
+    "message": "Cancel",
     "description": "Cancel button label"
   },
   "options_modal_confirm": {
-    "message": "Xác nhận",
+    "message": "Confirm",
     "description": "Confirm button label"
   },
   "options_alert_cacheCleared": {
-    "message": "Bộ nhớ đệm đã được xóa sạch!",
+    "message": "Cache cleared successfully!",
     "description": "Cache cleared success message"
   },
   "options_alert_cacheClearFailed": {
-    "message": "Xóa bộ nhớ đệm không thành công!",
+    "message": "Failed to clear cache!",
     "description": "Cache clear failed message"
   },
   "options_alert_nothingToClear": {
-    "message": "Không có gì để xóa!",
+    "message": "Nothing to clear!",
     "description": "Nothing to clear message"
   },
   "options_alert_exportFailed": {
-    "message": "Đã xảy ra lỗi khi xuất danh tính",
+    "message": "Export identity selhal",
     "description": "Export identity failed message"
   },
   "options_alert_fileSaveDialogOpened": {
-    "message": "Đã mở hộp thoại lưu tệp danh tính.",
+    "message": "Identity file save dialog opened.",
     "description": "File save dialog opened message"
   },
   "options_alert_fileSaveFailed": {
-    "message": "Không lưu được tệp. Vui lòng thử lại.",
+    "message": "Chyba při ukládání souboru. Zkuste to prosím znovu.",
     "description": "File save failed message"
   },
   "options_alert_downloadInitiated": {
-    "message": "Quá trình tải tệp danh tính đã được bắt đầu.",
+    "message": "Identity file download initiated.",
     "description": "Download initiated message"
   },
   "options_alert_importSuccess": {
-    "message": "Tệp danh tính đã nhập thành công!",
+    "message": "Identity imported successfully!",
     "description": "Import success message"
   },
   "options_alert_identityLoadError": {
-    "message": "Đã xảy ra lỗi khi tải danh tính",
+    "message": "Error loading identity",
     "description": "Identity load error message"
   },
   "options_editor_saving": {
-    "message": "Đang lưu...",
+    "message": "Saving...",
     "description": "Saving indicator text"
   },
   "options_editor_importFile": {
-    "message": "Nhập từ tệp",
+    "message": "Import from file",
     "description": "Import from file tooltip"
   },
   "options_editor_exportFile": {
-    "message": "Xuất ra tệp",
+    "message": "Export to file",
     "description": "Export to file tooltip"
   },
   "options_editor_saveAsTheme": {
-    "message": "Lưu dưới dạng chủ đề",
+    "message": "Save as theme",
     "description": "Save as theme tooltip"
   },
   "options_editor_openInNewTab": {
-    "message": "Mở trong thẻ mới",
+    "message": "Open in new tab",
     "description": "Open in new tab tooltip"
   },
   "options_editor_backToSettings": {
-    "message": "Quay về Cài đặt",
+    "message": "Back to Settings",
     "description": "Back to settings button label"
   },
   "options_editor_fullExperienceNote": {
-    "message": "Để có trải nghiệm của một trình chỉnh sửa thực thụ, ",
+    "message": "For the full editor experience, ",
     "description": "Full editor experience note prefix"
   },
   "options_editor_openInNewTabLink": {
-    "message": "hãy mở trang này trong thẻ mới",
+    "message": "open this editor in a new tab",
     "description": "Open in new tab link text"
   },
   "options_editor_stylingGuide": {
-    "message": "Hướng dẫn tạo chủ đề",
+    "message": "Styling Guide",
     "description": "Styling guide link text"
   },
   "options_editor_renameTheme": {
-    "message": "Đổi tên chủ đề tuỳ chỉnh",
+    "message": "Rename custom theme",
     "description": "Rename theme button title"
   },
   "options_editor_deleteTheme": {
-    "message": "Xóa chủ đề tuỳ chỉnh",
+    "message": "Delete custom theme",
     "description": "Delete theme button title"
   },
   "options_editor_doubleClickRename": {
-    "message": "Nháy đúp chuột để đổi tên",
+    "message": "Double-click to rename",
     "description": "Double-click to rename tooltip"
   },
   "options_provider_betterLyrics": {
@@ -292,191 +292,191 @@
     "description": "Youtube provider name"
   },
   "options_provider_youtubeCaptions": {
-    "message": "Phụ đề Youtube",
+    "message": "Youtube Captions",
     "description": "Youtube Captions provider name"
   },
   "options_syncType_syllable": {
-    "message": "Âm tiết",
+    "message": "Syllable",
     "description": "Syllable sync type label"
   },
   "options_syncType_syllable_tooltip": {
-    "message": "Lướt qua từng âm tiết theo người hát. Đồng bộ theo âm tiết cho ra những trải nghiệm tốt nhất.",
+    "message": "Highlights individual syllables as they're sung. Syllable syncing provides the best experience.",
     "description": "Syllable sync type tooltip"
   },
   "options_syncType_word": {
-    "message": "Từ",
+    "message": "Word",
     "description": "Word sync type label"
   },
   "options_syncType_word_tooltip": {
-    "message": "Lướt qua từng từ theo người hát. Đồng bộ theo từ cho ra những trải nghiệm tốt.",
+    "message": "Highlights individual words as they're sung. Word syncing provides a good experience.",
     "description": "Word sync type tooltip"
   },
   "options_syncType_line": {
-    "message": "Dòng",
+    "message": "Line",
     "description": "Line sync type label"
   },
   "options_syncType_line_tooltip": {
-    "message": "Làm nổi cả một dòng lời bài hát theo người hát. Đồng bộ theo dòng cho ra những trải nghiệm bình thường.",
+    "message": "Highlights entire lines as they're sung. Line syncing provides a basic experience.",
     "description": "Line sync type tooltip"
   },
   "options_syncType_unsynced": {
-    "message": "Không đồng bộ",
+    "message": "Unsynced",
     "description": "Unsynced sync type label"
   },
   "options_syncType_unsynced_tooltip": {
-    "message": "Lời bài hát để nguyên. Không đồng bộ cho ra trải nghiệm tối giản nhất.",
+    "message": "Lyrics without timing information. Unsynced lyrics provide a minimal experience.",
     "description": "Unsynced sync type tooltip"
   },
   "options_detail_rateTheme": {
-    "message": "Đánh giá chủ đề này",
+    "message": "Rate this theme",
     "description": "Rate theme label"
   },
   "options_detail_install": {
-    "message": "Tải xuống",
+    "message": "Install",
     "description": "Install button label"
   },
   "options_detail_viewOnGitHub": {
-    "message": "Xem trên GitHub",
+    "message": "View on GitHub",
     "description": "View on GitHub link text"
   },
   "options_detail_shaderInfo": {
-    "message": "Chủ đề này bao gồm một cấu hình shader.",
+    "message": "This theme includes a shader config.",
     "description": "Shader info text prefix"
   },
   "options_detail_downloadShader": {
-    "message": "Tải shader.json xuống",
+    "message": "Download shader.json",
     "description": "Download shader link text"
   },
   "options_detail_shaderImportSuffix": {
-    "message": "rồi hãy nhập nó vào",
+    "message": "and import it in",
     "description": "Shader import suffix text before Better Lyrics Shaders link"
   },
   "marketplace_pageTitle": {
-    "message": "Cửa hàng Chủ đề Better Lyrics",
+    "message": "Better Lyrics Theme Marketplace",
     "description": "Page title"
   },
   "marketplace_title": {
-    "message": "Cửa hàng chủ đề",
+    "message": "Theme Marketplace",
     "description": "Header title"
   },
   "marketplace_subtitle": {
-    "message": "Khám phá và tải xuống chủ đề từ chính tay cộng đồng tạo ra",
+    "message": "Discover and install community themes",
     "description": "Header subtitle"
   },
   "marketplace_searchPlaceholder": {
-    "message": "Tìm chủ đề...",
+    "message": "Search themes...",
     "description": "Search input placeholder"
   },
   "marketplace_refresh": {
-    "message": "Tải lại",
+    "message": "Refresh",
     "description": "Refresh button label"
   },
   "marketplace_keyboardShortcuts": {
-    "message": "Phím tắt bàn phím",
+    "message": "Keyboard shortcuts",
     "description": "Keyboard shortcuts button label"
   },
   "marketplace_sortBy": {
-    "message": "Sắp xếp theo",
+    "message": "Sort by",
     "description": "Sort filter group label"
   },
   "marketplace_sortRatingDesc": {
-    "message": "Được đánh giá cao nhất",
+    "message": "Highest rated",
     "description": "Sort by highest rating"
   },
   "marketplace_sortRatingAsc": {
-    "message": "Được đánh giá thấp nhất",
+    "message": "Lowest rated",
     "description": "Sort by lowest rating"
   },
   "marketplace_sortDownloadsDesc": {
-    "message": "Được tải về nhiều nhất",
+    "message": "Most downloaded",
     "description": "Sort by most downloads"
   },
   "marketplace_sortDownloadsAsc": {
-    "message": "Được tải về ít nhất",
+    "message": "Least downloaded",
     "description": "Sort by least downloads"
   },
   "marketplace_sortNewest": {
-    "message": "Mới nhất",
+    "message": "Newest",
     "description": "Sort by newest"
   },
   "marketplace_sortOldest": {
-    "message": "Cũ nhất",
+    "message": "Oldest",
     "description": "Sort by oldest"
   },
   "marketplace_show": {
-    "message": "Hiển thị",
+    "message": "Show",
     "description": "Show filter group label"
   },
   "marketplace_showAll": {
-    "message": "Tất cả",
+    "message": "All",
     "description": "Show all themes"
   },
   "marketplace_showInstalled": {
-    "message": "Đã tải về",
+    "message": "Installed",
     "description": "Show installed themes"
   },
   "marketplace_showNotInstalled": {
-    "message": "Chưa tải về",
+    "message": "Not installed",
     "description": "Show not installed themes"
   },
   "marketplace_options": {
-    "message": "Tùy chọn",
+    "message": "Options",
     "description": "Options filter group label"
   },
   "marketplace_hasShaders": {
-    "message": "Có cấu hình shader",
+    "message": "Has shaders",
     "description": "Filter for themes with shaders"
   },
   "marketplace_compatibleOnly": {
-    "message": "Chỉ tương thích",
+    "message": "Compatible only",
     "description": "Filter for compatible themes"
   },
   "marketplace_installFromUrl": {
-    "message": "Tải xuống từ URL",
+    "message": "Install from URL",
     "description": "Install from URL button"
   },
   "marketplace_submitTheme": {
-    "message": "Tải lên một chủ đề",
+    "message": "Submit a theme",
     "description": "Submit a theme link"
   },
   "marketplace_loading": {
-    "message": "Đang tải chủ đề...",
+    "message": "Loading themes...",
     "description": "Loading message"
   },
   "marketplace_retry": {
-    "message": "Thử lại",
+    "message": "Retry",
     "description": "Retry button"
   },
   "marketplace_noThemesMatch": {
-    "message": "Không chủ đề nào tương thích với bộ lọc của bạn",
+    "message": "No themes match your filters",
     "description": "Empty state message"
   },
   "marketplace_permissionTitle": {
-    "message": "Yêu cầu cấp quyền",
+    "message": "Permission Required",
     "description": "Permission required title"
   },
   "marketplace_permissionMessage": {
-    "message": "Để khám phá và cài đặt chủ đề, Better Lyrics cần quyền truy cập GitHub, nơi lưu trữ các giao diện, cùng với API của marketplace.",
+    "message": "To browse and install themes, Better Lyrics needs permission to access GitHub where themes are hosted & the marketplace api.",
     "description": "Permission required message"
   },
   "marketplace_grantPermission": {
-    "message": "Cấp quyền",
+    "message": "Grant Permission",
     "description": "Grant permission button"
   },
   "marketplace_install": {
-    "message": "Tải về",
+    "message": "Install",
     "description": "Install button"
   },
   "marketplace_remove": {
-    "message": "Xóa",
+    "message": "Remove",
     "description": "Remove button"
   },
   "marketplace_apply": {
-    "message": "Áp dụng",
+    "message": "Apply",
     "description": "Apply button"
   },
   "marketplace_active": {
-    "message": "Đang hoạt động",
+    "message": "Active",
     "description": "Active theme indicator"
   },
   "marketplace_shadersBadge": {
@@ -488,175 +488,175 @@
     "description": "GitHub badge text"
   },
   "marketplace_urlModalTitle": {
-    "message": "Tải về từ URL",
+    "message": "Install from URL",
     "description": "URL install modal title"
   },
   "marketplace_urlModalMessage": {
-    "message": "Nhập URL repository GitHub để cài đặt giao diện trực tiếp:",
+    "message": "Enter a GitHub repository URL to install a theme directly:",
     "description": "URL install modal message"
   },
   "marketplace_urlModalPlaceholder": {
-    "message": "github.com/user/repo hoặc github.com/user/repo/tree/branch",
+    "message": "github.com/user/repo or github.com/user/repo/tree/branch",
     "description": "URL input placeholder"
   },
   "marketplace_urlModalError": {
-    "message": "Vui lòng nhập một URL repository GitHub",
+    "message": "Please enter a GitHub repository URL",
     "description": "URL validation error"
   },
   "marketplace_cancel": {
-    "message": "Hủy",
+    "message": "Cancel",
     "description": "Cancel button"
   },
   "marketplace_urlPermissionTitle": {
-    "message": "Cần cấp quyền thêm",
+    "message": "Additional Permission Required",
     "description": "URL permission modal title"
   },
   "marketplace_urlPermissionWhy": {
-    "message": "Tại sao cái này lại cần thiết vậy?",
+    "message": "Why is this needed?",
     "description": "URL permission explanation title"
   },
   "marketplace_urlPermissionDesc": {
-    "message": "Việc cài chủ đề từ URL của GitHub tùy chỉnh yêu cầu quyền truy cập cao hơn cửa hàng. Nhờ đó, Better Lyrics có thể:",
+    "message": "Installing themes from custom GitHub URLs requires broader access than the marketplace. This allows Better Lyrics to:",
     "description": "URL permission description"
   },
   "marketplace_urlPermissionItem1": {
-    "message": "Tải các chủ đề từ bất kì kho lưu trữ GitHub nào",
+    "message": "Fetch theme files from any GitHub repository",
     "description": "URL permission list item 1"
   },
   "marketplace_urlPermissionItem2": {
-    "message": "Phát hiện nhánh mặc định của kho lưu trữ đó",
+    "message": "Detect the default branch of the repository",
     "description": "URL permission list item 2"
   },
   "marketplace_urlPermissionItem3": {
-    "message": "Kiểm tra cấu trúc giao diện trước khi cài đặt",
+    "message": "Validate the theme structure before installation",
     "description": "URL permission list item 3"
   },
   "marketplace_urlPermissionNote": {
-    "message": "Quyền này chỉ được sử dụng khi bạn tải chủ đề qua URL. Tải qua cửa hàng thì không cần.",
+    "message": "This permission is only used when you install themes via URL. Marketplace themes don't require this.",
     "description": "URL permission note"
   },
   "marketplace_shortcutsTitle": {
-    "message": "Phím tắt bàn phím",
+    "message": "Keyboard Shortcuts",
     "description": "Shortcuts modal title"
   },
   "marketplace_shortcutsNavigation": {
-    "message": "Điều hướng",
+    "message": "Navigation",
     "description": "Navigation shortcuts group"
   },
   "marketplace_shortcutsSearch": {
-    "message": "Tìm kiếm chủ đề",
+    "message": "Search themes",
     "description": "Search shortcut label"
   },
   "marketplace_shortcutsRefresh": {
-    "message": "Tải lại cửa hàng",
+    "message": "Refresh marketplace",
     "description": "Refresh shortcut label"
   },
   "marketplace_shortcutsInstallUrl": {
-    "message": "Tải qua URL",
+    "message": "Install from URL",
     "description": "Install from URL shortcut label"
   },
   "marketplace_shortcutsPrevPage": {
-    "message": "Trang trước",
+    "message": "Previous page",
     "description": "Previous page shortcut label"
   },
   "marketplace_shortcutsNextPage": {
-    "message": "Trang sau",
+    "message": "Next page",
     "description": "Next page shortcut label"
   },
   "marketplace_shortcutsSort": {
-    "message": "Lọc",
+    "message": "Sort",
     "description": "Sort shortcuts group"
   },
   "marketplace_shortcutsSortHint": {
-    "message": "nhấn lần nữa để đổi hướng",
+    "message": "press again to toggle direction",
     "description": "Sort toggle hint"
   },
   "marketplace_shortcutsByRating": {
-    "message": "Theo đánh giá",
+    "message": "By rating",
     "description": "Sort by rating shortcut"
   },
   "marketplace_shortcutsByDownloads": {
-    "message": "Theo lượt tải xuống",
+    "message": "By downloads",
     "description": "Sort by downloads shortcut"
   },
   "marketplace_shortcutsByDate": {
-    "message": "Theo ngày",
+    "message": "By date",
     "description": "Sort by date shortcut"
   },
   "marketplace_shortcutsFilters": {
-    "message": "Bộ lọc",
+    "message": "Filters",
     "description": "Filters shortcuts group"
   },
   "marketplace_shortcutsShowAll": {
-    "message": "Hiển thị tất cả",
+    "message": "Show all",
     "description": "Show all shortcut"
   },
   "marketplace_shortcutsShowInstalled": {
-    "message": "Hiển thị đã tải",
+    "message": "Show installed",
     "description": "Show installed shortcut"
   },
   "marketplace_shortcutsShowNotInstalled": {
-    "message": "Hiển thị chưa tải",
+    "message": "Show not installed",
     "description": "Show not installed shortcut"
   },
   "marketplace_shortcutsToggleShaders": {
-    "message": "Bật/Tắt shaders",
+    "message": "Toggle shaders",
     "description": "Toggle shaders shortcut"
   },
   "marketplace_shortcutsToggleCompatible": {
-    "message": "Bật/Tắt tương thích",
+    "message": "Toggle compatible",
     "description": "Toggle compatible shortcut"
   },
   "marketplace_shortcutsDetails": {
-    "message": "Thông tin về chủ đề này",
+    "message": "Theme Details",
     "description": "Theme details shortcuts group"
   },
   "marketplace_shortcutsInstallRemove": {
-    "message": "Tải xuống / Xóa",
+    "message": "Install / Remove",
     "description": "Install/remove shortcut"
   },
   "marketplace_shortcutsPrevImage": {
-    "message": "Ảnh trước đó",
+    "message": "Previous image",
     "description": "Previous image shortcut"
   },
   "marketplace_shortcutsNextImage": {
-    "message": "Ảnh tiếp theo",
+    "message": "Next image",
     "description": "Next image shortcut"
   },
   "marketplace_shortcutsGeneral": {
-    "message": "Chung",
+    "message": "General",
     "description": "General shortcuts group"
   },
   "marketplace_shortcutsCloseModal": {
-    "message": "Đóng cửa sổ",
+    "message": "Close modal",
     "description": "Close modal shortcut"
   },
   "marketplace_shortcutsShowShortcuts": {
-    "message": "Hiển thị phím tắt",
+    "message": "Show shortcuts",
     "description": "Show shortcuts shortcut"
   },
   "marketplace_shortcutsApplyTheme": {
-    "message": "Áp dụng chủ đề (Sau khi tải)",
+    "message": "Apply theme (after install)",
     "description": "Apply theme shortcut"
   },
   "marketplace_ratingFailed": {
-    "message": "Không thể đăng bài đánh giá",
+    "message": "Failed to submit rating",
     "description": "Rating submission error"
   },
   "marketplace_shaderFetchFailed": {
-    "message": "Không thể tải cấu hình shader",
+    "message": "Failed to fetch shader config",
     "description": "Shader fetch error"
   },
   "marketplace_applyFailed": {
-    "message": "Không thể áp dụng chủ đề",
+    "message": "Failed to apply theme",
     "description": "Theme apply error"
   },
   "marketplace_noThemesInstalled": {
-    "message": "Chưa cài đặt chủ đề nào",
+    "message": "No themes installed yet",
     "description": "Empty installed themes message"
   },
   "marketplace_lastUpdatedOn": {
-    "message": "Cập nhật lần cuối vào $date$",
+    "message": "Last updated on $date$",
     "description": "Tooltip showing full date when a theme was last updated",
     "placeholders": {
       "date": {
@@ -670,103 +670,103 @@
     "description": "Standalone editor page title"
   },
   "editor_importFromFile": {
-    "message": "Nhập từ tệp",
+    "message": "Import from file",
     "description": "Import from file button"
   },
   "editor_exportToFile": {
-    "message": "Xuất ra tệp",
+    "message": "Export to file",
     "description": "Export to file button"
   },
   "editor_saveAsTheme": {
-    "message": "Lưu dưới dạng chủ đề",
+    "message": "Save as theme",
     "description": "Save as theme button"
   },
   "editor_stylingGuide": {
-    "message": "Hướng dẫn tùy chỉnh",
+    "message": "Styling guide",
     "description": "Styling guide button"
   },
   "editor_tip": {
-    "message": "Mẹo: Đây là một tab riêng, bạn có thể kéo trình chỉnh sửa này ra cửa sổ riêng biệt hoặc dùng chế độ chia màn hình cùng YouTube Music để xem các thay đổi của bạn theo thời gian thực. Để biết thêm thông tin, hãy truy cập",
+    "message": "Tip: This is a standalone tab, you can move this editor to a separate window or use split-screen view alongside YouTube Music to see your changes in real-time. For more info, visit the",
     "description": "Editor tip text"
   },
   "editor_poweredBy": {
-    "message": "Được cung cấp bởi",
+    "message": "Powered by",
     "description": "Powered by label"
   },
   "editor_playground": {
-    "message": "Sân chơi lập trình",
+    "message": "Playground",
     "description": "Playground link text"
   },
   "editor_docs": {
-    "message": "Tài liệu",
+    "message": "Docs",
     "description": "Docs link text"
   },
   "lyrics_source": {
-    "message": "Nguồn: ",
+    "message": "Source: ",
     "description": "Lyrics source label"
   },
   "lyrics_addToLrclib": {
-    "message": "Thêm lời bài hát vào LRCLib",
+    "message": "Add Lyrics to LRCLib",
     "description": "Add lyrics button text"
   },
   "lyrics_searchOnGenius": {
-    "message": "Tìm trên Genius",
+    "message": "Search on Genius",
     "description": "Search on Genius button text"
   },
   "lyrics_searching": {
-    "message": "Better Lyrics đang tìm lời bài hát...",
+    "message": "Better Lyrics is searching for lyrics...",
     "description": "Loading message while searching for lyrics"
   },
   "lyrics_stillSearching": {
-    "message": "Vẫn đang tìm lời bài hát được đồng bộ...",
+    "message": "Still searching for synced lyrics...",
     "description": "Loading message while still searching"
   },
   "lyrics_noSyncedLyrics": {
-    "message": "Better Lyrics không thể tìm lời bài hát được đồng bộ",
+    "message": "Better Lyrics could not find synced lyrics",
     "description": "Message when no synced lyrics found"
   },
   "lyrics_adPlaying": {
-    "message": "[tu tu tu]",
+    "message": "[elevator music]",
     "description": "Message shown during ad playback"
   },
   "lyrics_notFound": {
-    "message": "Không có lời bài hát được tìm thấy cho bài này",
+    "message": "No lyrics found for this song",
     "description": "Message when no lyrics are available"
   },
   "options_language_exclusions": {
-    "message": "Danh sách ngôn ngữ bị loại trừ",
+    "message": "Language exclusions",
     "description": "Label for language exclusions setting"
   },
   "options_manage": {
-    "message": "Quản lý",
+    "message": "Manage",
     "description": "Manage button label"
   },
   "options_language_exclusionsTitle": {
-    "message": "Danh sách ngôn ngữ bị loại trừ",
+    "message": "Language Exclusions",
     "description": "Modal title for language exclusions"
   },
   "options_romanization_tab": {
-    "message": "Phiên âm",
+    "message": "Romanization",
     "description": "Romanization tab label"
   },
   "options_translation_tab": {
-    "message": "Dịch thuật",
+    "message": "Translation",
     "description": "Translation tab label"
   },
   "options_searchLanguages": {
-    "message": "Tìm ngôn ngữ...",
+    "message": "Search languages...",
     "description": "Search input placeholder"
   },
   "options_romanization_hint": {
-    "message": "Nhấn để bật/tắt. Các ngôn ngữ bị loại trừ sẽ không được phiên âm.",
+    "message": "Click to toggle. Excluded languages will not be romanized.",
     "description": "Hint text for romanization exclusions"
   },
   "options_translation_hint": {
-    "message": "Nhấn để bật/tắt. Các ngôn ngữ gốc bị loại trừ sẽ không được dịch.",
+    "message": "Click to toggle. Excluded source languages will not be translated.",
     "description": "Hint text for translation exclusions"
   },
   "options_resetToDefault": {
-    "message": "Đặt lại $TYPE$ về ban đầu",
+    "message": "Reset $TYPE$ to Default",
     "description": "Reset to default button label",
     "placeholders": {
       "type": {
@@ -776,7 +776,7 @@
     }
   },
   "options_romanization_resetTitle": {
-    "message": "Đặt lại loại trừ $TYPE$",
+    "message": "Reset $TYPE$ Exclusions",
     "description": "Modal title for resetting exclusions",
     "placeholders": {
       "type": {
@@ -786,19 +786,19 @@
     }
   },
   "options_romanization_resetMessage": {
-    "message": "Thao tác này sẽ xóa tất cả các ngôn ngữ đã bị loại trừ. Chắc chắn chứ?",
+    "message": "This will clear all excluded languages. Continue?",
     "description": "Confirmation message for resetting exclusions"
   },
   "options_reset": {
-    "message": "Đặt lại",
+    "message": "Reset",
     "description": "Reset button label"
   },
   "options_cancel": {
-    "message": "Hủy",
+    "message": "Cancel",
     "description": "Cancel button label"
   },
   "options_romanization_resetSuccess": {
-    "message": "Danh sách loại trừ $TYPE$ đã được đặt lại về mặc định",
+    "message": "$TYPE$ exclusions reset to default",
     "description": "Success message after resetting exclusions",
     "placeholders": {
       "type": {
