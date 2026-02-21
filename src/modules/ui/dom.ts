@@ -297,7 +297,7 @@ function createFooter(song: string, artist: string, album: string, duration: num
       href: "#",
     });
     
-    pip.addEventListener("click", e => {
+    pip.addEventListener("click", async e => {
       e.preventDefault();
       
       // this is an experimental feature, so we'll just try it and catch any errors if it doesn't work
@@ -305,16 +305,12 @@ function createFooter(song: string, artist: string, album: string, duration: num
       const wrapper = document.getElementById(LYRICS_WRAPPER_ID);
       const container = document.getElementsByClassName(LYRICS_CLASS)[0] as HTMLElement;
       if (container && docPiP && typeof docPiP.requestWindow === "function") {
-        const pipWindow = docPiP.requestWindow({
-          width: 800,
-          height: 600
-        }) as Window;
-
-        pipWindow.addEventListener("pagehide", _ => {
-          wrapper!.append(container);
+        const pipWindow: Window = await docPiP.requestWindow({
+          width: 600,
+          height: 500
         });
       
-        [...document.styleSheets].forEach(styleSheet => {
+        Array.from(document.styleSheets).forEach(styleSheet => {
           try {
             const cssRules = [...styleSheet.cssRules]
               .map((rule) => rule.cssText)
@@ -334,8 +330,11 @@ function createFooter(song: string, artist: string, album: string, duration: num
           }
         });
       
-        // Move the player to the Picture-in-Picture window.
         pipWindow.document.body.append(container);
+        
+        pipWindow.addEventListener("pagehide", _ => {
+          wrapper!.append(container);
+        });
       } else {
         alert("Document Picture-in-Picture API is not supported in this browser.");
       }
