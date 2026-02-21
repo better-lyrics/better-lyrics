@@ -1,5 +1,4 @@
 import { TRANSLATE_IN_ROMAJI, TRANSLATE_LYRICS_URL, TRANSLATION_ERROR_LOG } from "@constants";
-import { getStorage } from "@core/storage";
 import { log } from "@utils";
 
 export interface TranslationResult {
@@ -71,10 +70,7 @@ export async function translateTextIntoRomaji(
   })
     .then(response => response.json())
     .then(data => {
-      let romanizedText = data[0][1][3];
-      if (romanizedText === undefined) {
-        romanizedText = data[0][1][2];
-      }
+      let romanizedText = data[0][1][3] || data[0][1][2] || data[0][2][3];
       if (text.trim().toLowerCase() === romanizedText.trim().toLowerCase() && text.trim() !== "") {
         return null;
       } else {

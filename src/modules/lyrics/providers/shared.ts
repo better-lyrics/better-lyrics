@@ -73,10 +73,10 @@ export interface Lyric {
   parts?: LyricPart[];
   agent?: string;
   isInstrumental?: boolean;
-  translations?: LyricLang;
-  /** Not storing multiple romanization, just stores `romanization` and `timedRomanization` in one property, plus language code */
-  romanizations?: { text: string; lang?: string; parts?: LyricPart[] };
-  // old property, only for backwards-compatibility
+  translations?: LyricLang;  
+  romanizations?: { text: string; lang?: string; parts?: LyricPart[] }; // Not storing multiple romanization, just stores `romanization` and `timedRomanization` in one property, plus language code
+
+  // old property, for backwards-compatibility
   translation?: { text: string; lang: string };
   romanization?: string;
   timedRomanization?: LyricPart[];
