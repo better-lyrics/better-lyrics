@@ -292,10 +292,60 @@ function createFooter(song: string, artist: string, album: string, duration: num
       logoAlt: "Genius",
     });
 
+    const pip = createActionButton({
+      text: "Picture-in-Picture",
+      href: "#",
+    });
+    
+    pip.addEventListener("click", e => {
+      e.preventDefault();
+      
+      // this is an experimental feature, so we'll just try it and catch any errors if it doesn't work
+      const docPiP = (window as any).documentPictureInPicture;
+      const wrapper = document.getElementById(LYRICS_WRAPPER_ID);
+      const container = document.getElementsByClassName(LYRICS_CLASS)[0] as HTMLElement;
+      if (container && docPiP && typeof docPiP.requestWindow === "function") {
+        const pipWindow = docPiP.requestWindow({
+          width: 800,
+          height: 600
+        }) as Window;
+
+        pipWindow.addEventListener("pagehide", _ => {
+          wrapper!.append(container);
+        });
+      
+        [...document.styleSheets].forEach(styleSheet => {
+          try {
+            const cssRules = [...styleSheet.cssRules]
+              .map((rule) => rule.cssText)
+              .join("");
+            const style = document.createElement("style");
+      
+            style.textContent = cssRules;
+            pipWindow.document.head.appendChild(style);
+          } catch (e) {
+            const link = document.createElement("link");
+      
+            link.rel = "stylesheet";
+            link.type = styleSheet.type;
+            link.media = styleSheet.media.mediaText;
+            link.href = styleSheet.href || "";
+            pipWindow.document.head.appendChild(link);
+          }
+        });
+      
+        // Move the player to the Picture-in-Picture window.
+        pipWindow.document.body.append(container);
+      } else {
+        alert("Document Picture-in-Picture API is not supported in this browser.");
+      }
+    });
+
     footer.appendChild(footerContainer);
     footer.appendChild(geniusContainer);
     footer.appendChild(addLyricsContainer);
     footer.appendChild(discordLink);
+    footer.appendChild(pip);
 
     footer.removeAttribute("is-empty");
   } catch (_err) {

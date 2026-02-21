@@ -36,6 +36,7 @@
 				</a>
 			</div>
 		</nav>
+
 		<div id="options">
 			<div class="tab-container">
 				<button class="tab active" id="general-tab" data-target="#general-content">
@@ -519,6 +520,23 @@
 			</div>
 		</div>
 
+		<div id="clyrics-modal-overlay" class="modal-overlay">
+			<div class="medium-modal modal clyrics-modal">
+				<div class="modal-header">
+					<h3 class="modal-title">Custom Lyrics</h3>
+					<button id="clyrics-modal-close" class="modal-close-btn" aria-label="Close">
+						<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+							<path d="M6.28 5.22a.75.75 0 0 0-1.06 1.06L8.94 10l-3.72 3.72a.75.75 0 1 0 1.06 1.06L10 11.06l3.72 3.72a.75.75 0 1 0 1.06-1.06L11.06 10l3.72-3.72a.75.75 0 0 0-1.06-1.06L10 8.94 6.28 5.22Z"/>
+						</svg>
+					</button>
+				</div>
+
+				<div class="modal-body-wrapped modal-body">
+					<div id="clyrics-new-lyrics" class="modal-section"></div>
+				</div>
+			</div>
+		</div>
+		
 		<div id="theme-modal-overlay" class="modal-overlay">
 			<div class="modal theme-modal">
 				<div class="modal-header">
@@ -537,7 +555,20 @@
 		</div>
 
 		<div id="clyrics">
-			
+			<div class="clyrics-header">
+				<button id="clyrics-return" class="icon-btn" data-tooltip="Return">
+					<svg viewBox="0 0 24 24">
+						<path fill="currentColor" d="m7.825 13l4.9 4.9q.3.3.288.7t-.313.7q-.3.275-.7.288t-.7-.288l-6.6-6.6q-.15-.15-.213-.325T4.426 12t.063-.375t.212-.325l6.6-6.6q.275-.275.688-.275t.712.275q.3.3.3.713t-.3.712L7.825 11H19q.425 0 .713.288T20 12t-.288.713T19 13z"></path>
+					</svg>
+				</button>
+
+				<button id="clyrics-add" class="icon-btn" data-tooltip="Add">
+					<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+						<path fill="currentColor" d="M11 13H5v-2h6V5h2v6h6v2h-6v6h-2z"></path>
+					</svg>
+				</button>
+			</div>
+			<div id="clyrics-list" class="columns"></div>
 		</div>
 
 		<div id="css">

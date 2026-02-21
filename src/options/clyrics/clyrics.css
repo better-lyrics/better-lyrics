@@ -1,11 +1,4 @@
 /* Custom Lyrics Modal */
-.clyrics-modal-items {
-	display: flex;
-	flex-direction: column;
-	align-items: stretch;
-	gap: .625rem;
-}
-
 .clyrics-card {
 	background: rgba(255, 255, 255, 0.05);
 	border: 1px solid rgba(255, 255, 255, 0.1);
@@ -17,7 +10,10 @@
 	display: flex;
 	flex-direction: row;
 	justify-content: space-between;
-	/* flex: 0 0 auto; */
+}
+
+.clyrics-card:hover {
+	box-shadow: 0 0px 8px rgba(0, 0, 0, .35)
 }
 
 .clyrics-card-info {
@@ -51,6 +47,14 @@
 .clyrics-input-span {
 	opacity: 0.5;
 	font-size: .625rem;
+}
+
+.clyrics-metadata {
+	display: flex;
+	gap: .25rem;
+	flex-direction: row;
+	align-items: center;
+	font-size: larger;
 }
 
 .clyrics-input-info {

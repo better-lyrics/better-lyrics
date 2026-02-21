@@ -22,34 +22,138 @@ export function buildTTML(clyrics: CLyricsData, syncType: LyricSyncType = LyricS
     syncType == LyricSyncType.RICH ? "Word" :
     syncType == LyricSyncType.LINE ? "Line" : "None"
 
-  let lastEnd = 0;
+  let firstStart = -1;
+  let translations = {
+    lang: "",
+    ttml: [
 
-  for (const lyric of clyrics.lyrics) {
-    
+    ] as any[]
   }
-  
-  // An accurate representation of how a TTML object would look
-  const data = {
-    tt: [{
-      head: [{
-        metadata: [{
 
-        }]
-      }],
-      body: [{
-        div: [{
+  let romanizations = {
+    lang: "",
+    ttml: [
+
+    ] as any[]
+  }
+
+  let linesTTML = [
+
+  ] as any[];
+
+  clyrics.lyrics.forEach((lyric, index) => {
+    if (lyric.isInstrumental) {
+      clyrics.lyrics.splice(index, 1);
+      return;
+    }
+
+    if (firstStart < 0) { firstStart = lyric.startTimeMs; }
+
+    let struct = {
+      "@": {
+        "ttm:agent": lyric.agent,
+        "itunes:key": "L" + index,
+      }
+    } as any;
+    
+    // Plain Metadata Application
+    if (lyric.translation) {
+      translations.lang = lyric.translation.lang;
+      translations.ttml.push({
+        for: "L" + index,
+        "#text": lyric.translation.text
+      });
+    }
+    if (lyric.romanization) {
+      romanizations.ttml.push({
+        for: "L" + index,
+        "#text": lyric.romanization
+      });
+    }
+
+    // Timed Metadata Application
+    if (lyric.timedRomanization && ttmlTiming == "Word") {
+      let span = [] as any[];
+      lyric.timedRomanization.forEach(part => {
+        if (part.words.trim().length < 1) { return; }
+        span.push({
+          "@": {
+            xmlns: "http://www.w3.org/ns/ttml",
+            begin: formatTime(part.startTimeMs, true),
+            end: formatTime(part.startTimeMs + part.durationMs, true),
+          },
+          "#text": part.words || "",
+        });
+      });
+      romanizations.ttml[romanizations.ttml.length - 1] = {
+        for: "L" + index,
+        "#text": undefined,
+        span
+      }
+    }
+
+    // Timed Lyric Lines
+    if (lyric.parts && ttmlTiming == "Word") {
+      struct.span = [];
+      lyric.parts.forEach(part => {
+        if (part.words.trim().length < 1) { return; }
+        struct.span.push({
+          "@": {
+            begin: formatTime(part.startTimeMs, true),
+            end: formatTime(part.startTimeMs + part.durationMs, true),
+          },
+          "#text": part.words || "",
+        });
+      });
+    } else {
+      struct["#text"] = lyric.words || "";
+    }
+
+    // Timing Application
+    if (ttmlTiming != "None") {
+      struct["@"]["begin"] = formatTime(lyric.startTimeMs, true);
+      struct["@"]["end"] = formatTime(lyric.startTimeMs + lyric.durationMs, true);
+    }
+
+    linesTTML.push(struct);
+  });
+  
+  // An accurate representation of how a TTML object would look from the TTML parser algorithm perspective
+  const data = {
+    tt: {
+      head: {
+        metadata: {
+          iTunesMetadata: {
             "@": {
-              begin: "0.000",
-              end: formatTime(clyrics.duration * 1000, true)
+              "xmlns": "http://music.apple.com/lyric-ttml-internal"
             },
-            p: [{
-              
-            }]
+            songwriters: [],
+            // for now there's only support for one translation and one transliteration, could possibly change in the future
+            translations: {
+              translation: [{
+                "@": {
+                  "xml:lang": translations.lang
+                },
+                text: translations.ttml
+              }]
+            },
+            transliterations: {
+              transliteration: [{
+                text: romanizations.ttml
+              }]
+            }
+          }
+        }
+      },
+      body: {
+        div: [{
+          "@": {},
+          p: linesTTML
         }],
         "@": {
           "dur": formatTime(clyrics.duration * 1000, true)
         }
-      }],
+      },
       "@": {
         "xmlns": "http://www.w3.org/ns/ttml",
         "xmlns:itunes": "http://music.apple.com/lyric-ttml-internal", 
@@ -57,7 +161,14 @@ export function buildTTML(clyrics: CLyricsData, syncType: LyricSyncType = LyricS
         "xml:lang": clyrics.language || "",
         "itunes:timing": ttmlTiming,
       }
-    }],
+    },
+  }
+
+  if (ttmlTiming != "None") {
+    data.tt.body.div[0]["@"] = {
+      begin: formatTime(firstStart, true),
+      end: formatTime(clyrics.duration * 1000, true)
+    }
   }
 
   console.log(data);

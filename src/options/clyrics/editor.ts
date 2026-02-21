@@ -1,5 +1,5 @@
 import type { Lyric, LyricPart } from "@/modules/lyrics/providers/shared";
-import { clyricsModalList, clyricsNewLyrics } from "./index";
+import { clyricsList, clyricsNewLyrics } from "./index";
 import { openCLyricsModal } from "./clyrics";
 import { actionMenus, addNewLine, type ContextData, contextMenus, domDefaults } from "./editorDom";
 import { getLocalStorage } from "@/core/storage";
@@ -30,6 +30,12 @@ let loadedActionMenu: { [key: string]: boolean } = {};
 let sliderOnUpdate: { [key: string]: (value: number) => void } = {}; // acts as an onUpdate thing
 
 // Global variables
+function elementDisplay(nodeList: NodeListOf<HTMLElement>, x: boolean) {
+  nodeList.forEach(node => {
+    node.style.display = x ? "" : "none";
+  });
+}
+
 export const defaults: {
   parentData: any;
   checkboxFunc: any;
@@ -48,34 +54,19 @@ export const defaults: {
     "show-timeline-btn": {
       parent: "clyricsEditorDisplay",
       id: "timeline",
-      func: function (x: boolean) {
-        const timelines: NodeListOf<HTMLElement> = document.querySelectorAll(".line-timeline");
-        timelines.forEach(timeline => {
-          timeline.style.display = x ? "" : "none";
-        });
-      },
+      func: function (x: boolean) { elementDisplay(document.querySelectorAll(".line-timeline"), x); },
     },
 
     "show-roman-btn": {
       parent: "clyricsEditorDisplay",
       id: "roman",
-      func: function (x: boolean) {
-        const romans: NodeListOf<HTMLElement> = document.querySelectorAll(".line-romanization");
-        romans.forEach(roman => {
-          roman.style.display = x ? "" : "none";
-        });
-      },
+      func: function (x: boolean) { elementDisplay(document.querySelectorAll(".line-romanization"), x); },
     },
 
     "show-translate-btn": {
       parent: "clyricsEditorDisplay",
       id: "translate",
-      func: function (x: boolean) {
-        const translates: NodeListOf<HTMLElement> = document.querySelectorAll(".line-translate");
-        translates.forEach(translate => {
-          translate.style.display = x ? "" : "none";
-        });
-      },
+      func: function (x: boolean) { elementDisplay(document.querySelectorAll(".line-translate"), x); },
     },
   },
 
@@ -85,15 +76,15 @@ export const defaults: {
       if (clyricsNewLyrics) {
         clyricsNewLyrics.style.display = "";
       }
-      if (clyricsModalList) {
-        clyricsModalList.style.display = "none";
+      if (clyricsList) {
+        clyricsList.style.display = "none";
       }
     },
 
     "open-lyrics-btn": () => {
       openCLyricsModal();
-      if (clyricsModalList) {
-        clyricsModalList.style.display = "";
+      if (clyricsList) {
+        clyricsList.style.display = "";
       }
       if (clyricsNewLyrics) {
         clyricsNewLyrics.style.display = "none";
@@ -158,6 +149,7 @@ export function logAction(type: any, value: any, args: { [key: string]: any } = 
 //// General interactables
 export const actionButtons = document.querySelectorAll(".action-btn");
 export const checkboxes = document.querySelectorAll(".checkbox");
+export const sliders = document.querySelectorAll(".slider");
 export const tabButtons = document.querySelectorAll(".tab-btn");
 /// Identifiers
 //// Input fields on lyric lines
@@ -447,7 +439,7 @@ function createNewLine(parameters?: { isInstrumental?: boolean; voice?: number }
   if (!lyricLines) return;
   lyricLines.appendChild(lyricLine);
 
-  // set up MutationObservers for line removal to remove all remaining event listeners
+  // set up MutationObservers for line removal to remove all remaining observers
   // lmk if this is actually necessary or not
   const OBSERVE = new MutationObserver(mutations => {
     mutations.forEach(mutation => {
@@ -465,22 +457,56 @@ function createNewLine(parameters?: { isInstrumental?: boolean; voice?: number }
 }
 
 // Handlers
-/// Sliders
+/// General Checkboxes
+function handleCheckboxes() {
+  const parentData: { [key: string]: any } = {};
+
+  checkboxes.forEach(async checkbox => {
+    const checker = defaults.checkboxFunc[checkbox.id];
+    if (checker && checker.parent) {
+      const loaded =
+        (await chrome.storage.sync.get(checker.parent))[checker.parent] || defaults.parentData[checker.parent] || {};
+      parentData[checker.parent] = loaded;
+
+      checker.func(loaded[checker.id]);
+      if (loaded[checker.id]) checkbox.classList.add("checked");
+      else checkbox.classList.remove("checked");
+    }
+
+    checkbox.addEventListener("click", async () => {
+      const checked = checkbox.classList.contains("checked");
+
+      if (checked) checkbox.classList.remove("checked");
+      else checkbox.classList.add("checked");
+
+      if (!checker) return;
+      checker.func(!checked);
+
+      if (!checker.parent) return;
+      const read =
+        (await chrome.storage.sync.get(checker.parent))[checker.parent] || defaults.parentData[checker.parent] || {};
+      read[checker.id] = !checked;
+
+      chrome.storage.sync.set({ [checker.parent]: read });
+    });
+  });
+
+  console.log("[onload] Checkboxes loaded");
+}
+
+/// General Sliders
 function handleSliders() {
-  const sliders = document.querySelectorAll(".slider") as NodeListOf<HTMLElement>;
-  sliders.forEach(slider => {
+  sliders.forEach(slider_ => {
+    const slider = slider_ as HTMLElement;
     let timeout: string | number | any = null;
     const attrObserver = new MutationObserver(mutations => {
       mutations.forEach(mutation => {
-        if (mutation.type != "attributes") {
+        if (mutation.type != "attributes" || slider.getAttribute("on-sliding") == "true") {
           return;
         }
         const head = slider.querySelector(".head") as HTMLElement;
         const bar = slider.querySelector(".bar") as HTMLElement;
         const value = parseFloat(slider.getAttribute("value") || "0") || 0;
-        if (slider.getAttribute("on-sliding") == "true" && sliderOnUpdate[slider.id]) {
-          sliderOnUpdate[slider.id](value);
-        }
         if (head) {
           head.style.left = `calc(${value * 100}% - .375rem)`;
         }
@@ -489,11 +515,14 @@ function handleSliders() {
         }
       });
     });
+
     attrObserver.observe(slider, { attributes: true, attributeFilter: ["value"] });
 
     slider.addEventListener("click", e => {
       const rect = slider.getBoundingClientRect();
-      slider.setAttribute("value", `${(e.clientX - rect.x) / rect.width}`);
+      const value = (e.clientX - rect.x) / rect.width ;
+      slider.setAttribute("value", `${value}`);
+      sliderOnUpdate[slider.id](value);
     });
 
     slider.addEventListener("mousedown", e => {
@@ -504,12 +533,15 @@ function handleSliders() {
           const rect = slider.getBoundingClientRect();
           slider.setAttribute("value", `${(e.clientX - rect.x) / rect.width}`);
         };
+
         document.addEventListener("mousemove", moveHandler);
         document.addEventListener("mouseup", () => {
+          slider.removeAttribute("on-sliding");
           clearTimeout(timeout);
-          slider.setAttribute("on-sliding", "false");
           document.removeEventListener("mousemove", moveHandler);
         });
+
+        moveHandler(e);
       }, 200);
     });
   });
@@ -572,43 +604,11 @@ function handleTabs() {
 
 /// Tools
 function handleTools() {
-  const parentData: { [key: string]: any } = {};
-
   /// New Line
   if (addLine) addLine.addEventListener("click", () => createNewLine());
   if (addLineInstrumental) addLineInstrumental.addEventListener("click", () => createNewLine({ isInstrumental: true }));
   if (addLineTogether) addLineTogether.addEventListener("click", () => createNewLine({ voice: 1000 }));
 
-  /// Checkboxes
-  checkboxes.forEach(async checkbox => {
-    const checker = defaults.checkboxFunc[checkbox.id];
-    if (checker && checker.parent) {
-      const loaded =
-        (await chrome.storage.sync.get(checker.parent))[checker.parent] || defaults.parentData[checker.parent] || {};
-      parentData[checker.parent] = loaded;
-
-      checker.func(loaded[checker.id]);
-      if (loaded[checker.id]) checkbox.classList.add("checked");
-      else checkbox.classList.remove("checked");
-    }
-
-    checkbox.addEventListener("click", async () => {
-      const checked = checkbox.classList.contains("checked");
-
-      if (checked) checkbox.classList.remove("checked");
-      else checkbox.classList.add("checked");
-
-      if (!checker) return;
-      checker.func(!checked);
-
-      if (!checker.parent) return;
-      const read =
-        (await chrome.storage.sync.get(checker.parent))[checker.parent] || defaults.parentData[checker.parent] || {};
-      read[checker.id] = !checked;
-
-      chrome.storage.sync.set({ [checker.parent]: read });
-    });
-  });
   console.log("[onload] Tools loaded");
 }
 
@@ -618,12 +618,32 @@ function handleLyricLine() {
     console.warn("No lyric lines frame. Refresh to reload handler");
     return;
   }
+
+  function inlineConditional() {
+    if (!lyricLines) { return; }
+    lyricLines.style.paddingRight = lyricLines.scrollHeight > lyricLines.clientHeight ? "" : "0";
+  }
+
+  const resizeObserver = new MutationObserver(() => inlineConditional());
+  resizeObserver.observe(lyricLines, { characterData: true });
+
+  const ABORT = new MutationObserver(record => {
+    const mutation = record[0];
+    if (mutation.type == "childList" && Array.from(mutation.removedNodes).includes(lyricLines)) {
+      console.warn("Lyric lines frame removed. Refresh to reload handler");
+      resizeObserver.disconnect();
+      return ABORT.disconnect();
+    }
+  })
+  ABORT.observe(lyricLines.parentElement!, { childList: true });
+
   lyricLines.addEventListener("mouseenter", () => {
     setupContextMenu("default");
   });
   lyricLines.addEventListener("mouseleave", () => {
     contextMenuB = [];
   });
+
   console.log("[onload] Lyric Lines loaded");
 }
 
@@ -670,6 +690,13 @@ function handlePlaybar() {
       });
 
       loadedAudio.addEventListener("loadeddata", () => {
+        navigator.mediaSession.metadata = new MediaMetadata({
+          title: file.name,
+          artist: "Playing from file",
+          album: "Better Lyrics: Custom Lyrics Editor",
+          artwork: [],
+        });
+
         if (playbackBtn) {
           playbackBtn.onclick = () => {
             loadedAudio!.paused ? loadedAudio!.play() : loadedAudio!.pause();
@@ -803,6 +830,7 @@ function handleKeybind() {
 function load() {
   if (loaded) return;
   loaded = true;
+  handleCheckboxes();
   handleSliders();
   handleActionsMenu();
   handleTabs();
@@ -819,8 +847,8 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   if (selectedFile < 0) {
     openCLyricsModal();
-    if (clyricsModalList) {
-      clyricsModalList.style.display = "";
+    if (clyricsList) {
+      clyricsList.style.display = "";
     }
     if (clyricsNewLyrics) {
       clyricsNewLyrics.style.display = "none";

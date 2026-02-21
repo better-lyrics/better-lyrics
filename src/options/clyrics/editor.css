@@ -190,16 +190,6 @@ button {
     padding: .5rem;
 }
 
-.rows {
-    display: flex;
-    flex-direction: row;
-    gap: .25rem;
-    align-items: center;
-    justify-content: flex-start;
-    align-self: stretch;
-    position: relative;
-}
-
 #agents-presets {
     margin-right: auto;
 }
@@ -698,10 +688,6 @@ button {
     border-radius: .25rem;
 }
 
-.code {
-    font-family: "Jetbrains Mono", sans-serif;
-}
-
 .words {
     display: flex;
     flex-direction: row;
@@ -927,10 +913,6 @@ button {
 .topright-tooltip-icon-btn::after {
     transform: translate(-100%) translateY(4px);
     left: 100%;
-}
-
-.icon-btn.no-tooltip::after {
-    display: none;
 }
 
 /* CONTEXT MENU */

@@ -1,5 +1,5 @@
 import { bufferToBase64, canonicalJson, ECDSA_PARAMS, getIdentity, HASH_ALGORITHM } from "../store/keyIdentity";
-import { UNISON_API_URL } from "@/core/constants";
+import { LRCLIB_API_BASEURL, LRCLIB_API_URL, UNISON_API_URL } from "@/core/constants";
 import type { CLyricsData } from "./clyrics-types";
 import { convertFormat } from "./clyricsManager";
 
@@ -35,6 +35,18 @@ export interface UnisonLyricsSubmission {
 	syncType?: LyricSyncType
 }
 
+function hexToBytes(hex: string) {
+    if (hex.length % 2 !== 0) {
+        throw new Error("Invalid hex string");
+    }
+
+    const bytes = new Uint8Array(hex.length / 2);
+    for (let i = 0; i < bytes.length; i++) {
+        bytes[i] = parseInt(hex.substring(i * 2, i * 2 + 2), 16);
+    }
+    return bytes;
+}
+
 function verifyNonce(result: Uint8Array, target: Uint8Array) {
     if (result.length !== target.length) {
         return false;
@@ -49,18 +61,6 @@ function verifyNonce(result: Uint8Array, target: Uint8Array) {
     }
 
     return true;
-}
-
-function hexToBytes(hex: string) {
-    if (hex.length % 2 !== 0) {
-        throw new Error("Invalid hex string");
-    }
-
-    const bytes = new Uint8Array(hex.length / 2);
-    for (let i = 0; i < bytes.length; i++) {
-        bytes[i] = parseInt(hex.substring(i * 2, i * 2 + 2), 16);
-    }
-    return bytes;
 }
 
 async function solveLRCLIBchallenge(prefix: string, targetHex: string) {
@@ -88,6 +88,7 @@ export async function publishLyrics(clyrics: CLyricsData, type: LyricFormatType,
         return false;
     }
 
+    // who the heck would even publish TTML to an obvious LRC only provider lol
     if (type == LyricFormatType.TTML && provider == ProviderPublisher.LRCLIB) {
         return false;
     }
@@ -133,7 +134,41 @@ export async function publishLyrics(clyrics: CLyricsData, type: LyricFormatType,
             statusText: response.statusText,
         };
     } else if (provider == ProviderPublisher.LRCLIB) {
+        const challenge = await fetch(LRCLIB_API_BASEURL + "/request-challenge");
+        if (!challenge.ok) {
+            return {
+                success: false,
+                status: challenge.status,
+                statusText: challenge.statusText,
+            };
+        }
 
+        const challengeData = await challenge.json();
+
+        const lyricStr = convertFormat(clyrics, type, syncType);
+        const plainStr = convertFormat(clyrics, LyricFormatType.PLAIN, LyricSyncType.PLAIN);
+
+        const publish = await fetch(LRCLIB_API_URL + "/api/publish", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "X-Publish-Token": `${challengeData.prefix}:${await solveLRCLIBchallenge(challengeData.prefix, challengeData.target)}`
+            },
+            body: JSON.stringify({
+                trackName: clyrics.song,
+                artistName: clyrics.artist,
+                albumName: clyrics.album,
+                duration: clyrics.duration,
+                syncedLyrics: lyricStr,
+                plainLyrics: plainStr
+            })
+        });
+
+        return {
+            success: publish.ok,
+            status: publish.status,
+            statusText: publish.statusText
+        };
     }
 
     return false;

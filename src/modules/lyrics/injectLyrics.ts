@@ -578,26 +578,34 @@ export function injectLyrics(data: LyricSourceResultWithMeta, keepLoaderVisible 
       return translatedLine;
     };
 
-    let translationResult: TranslationResult | null;
+    let translationResult: TranslationResult | null = null;
 
     let targetTranslationLang = AppState.translationLanguage;
+    let translatedText = "";
 
-    if (item.translation && langCodesMatch(targetTranslationLang, item.translation.lang)) {
+    if (item.translations) { // new translations implementation
+      const entry = Object.entries(item.translations).filter(([lang]) => langCodesMatch(targetTranslationLang, lang));
+      translatedText = entry[0]?.[1] || "";
+    } else if (item.translation && langCodesMatch(targetTranslationLang, item.translation.lang)) { // backwards-compatibility
+      translatedText = item.translation.text;
+    } else {
+      translationResult = getTranslationFromCache(item.words, targetTranslationLang);
+    }
+
+    if (!translationResult) {
       if (!data.language) {
         console.warn(`${LOG_PREFIX} Found translations, but no original language`);
       }
 
       translationResult = {
         originalLanguage: data.language || "", // Should never be empty!
-        translatedText: item.translation.text,
+        translatedText
       };
-    } else {
-      translationResult = getTranslationFromCache(item.words, targetTranslationLang);
     }
 
     let translationOriginalLang = translationResult?.originalLanguage || data.language;
 
-    const isSourceLangDisabled = !!translationOriginalLang && isTranslationDisabledForLang(translationOriginalLang);
+    const isSourceLangDisabled = translationOriginalLang && isTranslationDisabledForLang(translationOriginalLang);
     if (translationResult && AppState.isTranslateEnabled && !isSourceLangDisabled) {
       if (!isSameText(translationResult.translatedText, item.words)) {
         createTranslationElem().textContent = "\n" + translationResult.translatedText;
@@ -614,7 +622,7 @@ export function injectLyrics(data: LyricSourceResultWithMeta, keepLoaderVisible 
             const trimmed = item.words.trim();
             if (trimmed === "♪" || trimmed === "") return;
 
-            const result = await translateText(item.words, target_language, signal);
+            const result = await translateText(item.words || "", target_language, signal);
 
             if (isStale() || signal?.aborted) return;
             if (result && !isSameText(result.translatedText, item.words)) {

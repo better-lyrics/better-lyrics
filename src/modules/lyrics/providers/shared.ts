@@ -62,16 +62,24 @@ export interface LyricSourceResult {
 
 export type LyricsArray = Lyric[];
 
+export interface LyricLang {
+  [lang: string]: string;
+}
+
 export interface Lyric {
   startTimeMs: number;
   words: string;
   durationMs: number;
   parts?: LyricPart[];
   agent?: string;
+  isInstrumental?: boolean;
+  translations?: LyricLang;
+  /** Not storing multiple romanization, just stores `romanization` and `timedRomanization` in one property, plus language code */
+  romanizations?: { text: string; lang?: string; parts?: LyricPart[] };
+  // old property, only for backwards-compatibility
   translation?: { text: string; lang: string };
   romanization?: string;
   timedRomanization?: LyricPart[];
-  isInstrumental?: boolean;
 }
 
 export interface LyricPart {

@@ -1,15 +1,100 @@
 import { formatTime } from "@/modules/lyrics/providers/lrcUtils";
 import { createCustomLyrics, listCustomLyrics } from "./clyricsManager";
-import { clyricsModalList, clyricsModalOverlay, clyricsNewLyrics } from "./index";
-import type { CLyricsOverview } from "./clyrics-types";
+import { clyricsList, clyricsModalItems, clyricsModalOverlay, clyricsNewLyrics } from "./index";
+import type { CLyricsData, CLyricsOverview } from "./clyrics-types";
 
 let initializedForm = false;
 
-async function populateCLyrics(): Promise<void> {
-  if (!clyricsModalList) return;
+function createCLyricsCard(options: CLyricsOverview): HTMLElement | null {
+  if (!options.song || options.song.length < 1 || !options.artist || options.artist.length < 1) {
+    return null;
+  }
 
-  clyricsModalList.innerHTML = "";
-  clyricsModalList.className = "modal-section";
+  // Card
+  const card = document.createElement("div");
+  card.className = "clyrics-card";
+
+  /// Card Info
+  const info = document.createElement("div");
+  info.className = "clyrics-card-info";
+
+  //// Metadata
+  const metadata = document.createElement("div");
+  metadata.className = "clyrics-input-span span-wseparator";
+  
+  ///// Duration
+  const mdDuration = document.createElement("div");
+  mdDuration.className = "clyrics-metadata"
+
+  const mdDurSVG = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+  mdDurSVG.setAttribute("viewBox", "0 0 24 24");
+
+  const mdDurSVGPath = document.createElementNS("http://www.w3.org/2000/svg", "path");
+  mdDurSVGPath.setAttribute("fill", "currentColor");
+  mdDurSVGPath.setAttribute("d", "m13 12.175 2.25 2.25q.275.275.275.688t-.275.712q-.3.3-.712.3t-.713-.3L11.3 13.3q-.15-.15-.225-.337T11 12.575V9q0-.425.288-.712T12 8t.713.288T13 9zm-1.713-6.462Q11 5.425 11 5V4h2v1q0 .425-.288.713T12 6t-.712-.288m7 5.576Q18.575 11 19 11h1v2h-1q-.425 0-.712-.288T18 12t.288-.712m-5.575 7Q13 18.575 13 19v1h-2v-1q0-.425.288-.712T12 18t.713.288m-7-5.575Q5.425 13 5 13H4v-2h1q.425 0 .713.288T6 12t-.288.713M12 22q-2.075 0-3.9-.788t-3.175-2.137T2.788 15.9 2 12t.788-3.9 2.137-3.175T8.1 2.788 12 2t3.9.788 3.175 2.137T21.213 8.1 22 12t-.788 3.9-2.137 3.175-3.175 2.138T12 22m8-10q0-3.35-2.325-5.675T12 4 6.325 6.325 4 12t2.325 5.675T12 20t5.675-2.325T20 12m-8 0");
+  mdDurSVG.appendChild(mdDurSVGPath);
+  mdDuration.appendChild(mdDurSVG);
+
+  const mdDurValue = document.createElement("span");
+  mdDurValue.className = "code";
+  mdDurValue.textContent = formatTime(options.duration * 1000);
+  mdDuration.appendChild(mdDurValue);
+  
+  metadata.appendChild(mdDuration);
+
+  ///// Separator
+  const separator = document.createElement("div");
+  separator.className = "span-separator";
+  metadata.appendChild(separator);
+
+  ///// Modified
+  const mdModified = document.createElement("div");
+  mdModified.className = "clyrics-metadata"
+
+  // <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="currentColor" d="M12 21q-.425 0-.712-.288T11 20v-5.6l-3.95 3.975q-.3.3-.712.3t-.713-.3-.3-.712.3-.713L9.6 13H4q-.425 0-.712-.288T3 12t.288-.712T4 11h5.6L5.625 7.05q-.3-.3-.3-.712t.3-.713.713-.3.712.3L11 9.6V4q0-.425.288-.712T12 3t.713.288T13 4v5.6l3.95-3.975q.3-.3.713-.3t.712.3.3.713-.3.712L14.4 11H20q.425 0 .713.288T21 12t-.288.713T20 13h-5.6l3.975 3.95q.3.3.3.713t-.3.712-.712.3-.713-.3L13 14.4V20q0 .425-.288.713T12 21"/></svg>
+  const mdModSVG = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+  mdModSVG.setAttribute("viewBox", "0 0 24 24");
+
+  const mdModSVGPath = document.createElementNS("http://www.w3.org/2000/svg", "path");
+  mdModSVGPath.setAttribute("fill", "currentColor");
+  mdModSVGPath.setAttribute("d", "M12 21q-.425 0-.712-.288T11 20v-5.6l-3.95 3.975q-.3.3-.712.3t-.713-.3-.3-.712.3-.713L9.6 13H4q-.425 0-.712-.288T3 12t.288-.712T4 11h5.6L5.625 7.05q-.3-.3-.3-.712t.3-.713.713-.3.712.3L11 9.6V4q0-.425.288-.712T12 3t.713.288T13 4v5.6l3.95-3.975q.3-.3.713-.3t.712.3.3.713-.3.712L14.4 11H20q.425 0 .713.288T21 12t-.288.713T20 13h-5.6l3.975 3.95q.3.3.3.713t-.3.712-.712.3-.713-.3L13 14.4V20q0 .425-.288.713T12 21");
+  mdModSVG.appendChild(mdModSVGPath);
+  mdModified.appendChild(mdModSVG);
+  
+  const mdModValue = document.createElement("span");
+  mdModValue.className = "code";
+  mdModValue.textContent = new Date(options.modified).toLocaleString();
+  mdModified.appendChild(mdModValue);
+
+  metadata.appendChild(mdModified);
+
+  //// Name
+  const name = document.createElement("strong");
+  name.className = "clyrics-input-title";
+  name.textContent = options.song;
+
+  //// Artist - Album
+  const artistAlbum = document.createElement("div");
+  artistAlbum.className = "clyrics-input-description span-wseparator";
+  artistAlbum.textContent = options.artist;
+
+  if (options.album) {
+    artistAlbum.innerHTML += `<div class="span-separator"></div>${options.album}`
+  }
+
+  info.appendChild(metadata);
+  info.appendChild(name);
+  info.appendChild(artistAlbum);
+
+  card.appendChild(info);
+  return card;
+}
+
+async function populateCLyrics(): Promise<void> {
+  if (!clyricsModalItems) return;
+
+  clyricsModalItems.innerHTML = "";
+  clyricsModalItems.className = "modal-section";
 
   const customLyrics = await listCustomLyrics();
 
@@ -28,46 +113,55 @@ async function populateCLyrics(): Promise<void> {
 
   const newLyricSvg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
   newLyricSvg.setAttribute("viewBox", "0 0 24 24");
-  newLyricSvg.setAttribute("fill", "currentColor");
-
+  
   const newLyricSvgPath = document.createElementNS("http://www.w3.org/2000/svg", "path");
   newLyricSvgPath.setAttribute("d", "M11 13H5v-2h6V5h2v6h6v2h-6v6h-2z");
+  newLyricSvgPath.setAttribute("fill", "currentColor");
 
   newLyricSvg.appendChild(newLyricSvgPath);
   newLyric.appendChild(newLyricSvg);
 
   newLyric.addEventListener("click", () => {
-    if (clyricsModalList) clyricsModalList.style.display = "none";
+    if (clyricsModalItems) clyricsModalItems.style.display = "none";
     if (clyricsNewLyrics) clyricsNewLyrics.style.display = "";
   });
 
   yourLyricsHeader.appendChild(newLyric);
 
-  clyricsModalList.appendChild(yourLyricsHeader);
+  clyricsModalItems.appendChild(yourLyricsHeader);
 
   const yourLyricsItems = document.createElement("div");
-  yourLyricsItems.className = "clyrics-modal-items";
+  yourLyricsItems.id = "clyrics-list";
+  yourLyricsItems.className = "columns";
 
+  fillCLyrics(yourLyricsItems);
+
+  clyricsModalItems.appendChild(yourLyricsItems);
+}
+
+export async function fillCLyrics(element: HTMLElement) {
+  const customLyrics = await listCustomLyrics() as CLyricsData[];
   if (customLyrics.length < 1) {
     const card = document.createElement("div");
     card.className = "clyrics-card";
+    card.id = "clyrics-nothing-so-you-need-to-create-a-new-one-okay";
 
     const info = document.createElement("div");
     info.className = "clyrics-card-info";
 
-    const nothing = document.createElement("div");
+    const nothing = document.createElement("strong");
     nothing.className = "clyrics-input-title";
-    nothing.innerHTML = `<strong>You don't have any applied custom lyrics</strong>`;
+    nothing.textContent = "You don't have any applied custom lyrics!";
 
     const note = document.createElement("div");
     note.className = "clyrics-span";
-    note.textContent = `Create a new one or import one from your computer!`;
+    note.textContent = "Create a new one or import one from your computer";
 
     info.appendChild(nothing);
     info.appendChild(note);
 
     card.appendChild(info);
-    yourLyricsItems.appendChild(card);
+    element.appendChild(card);
   }
 
   customLyrics.forEach(clyrics => {
@@ -78,13 +172,11 @@ async function populateCLyrics(): Promise<void> {
       duration: clyrics.duration,
       modified: clyrics.modified,
     });
-    if (card) yourLyricsItems.appendChild(card);
+    if (card) element.appendChild(card);
   });
-
-  clyricsModalList.appendChild(yourLyricsItems);
 }
 
-async function formNewLyrics(): Promise<void> {
+export async function formNewLyrics(): Promise<void> {
   if (!clyricsNewLyrics || initializedForm) return;
   initializedForm = true;
   let registeredInputs = {} as Record<string, HTMLInputElement>;
@@ -110,25 +202,27 @@ async function formNewLyrics(): Promise<void> {
   modalTopButtons.className = "clyrics-top-buttons";
 
   /// Return button
-  const returnButton = document.createElement("button");
-  returnButton.className = "icon-btn";
-  returnButton.setAttribute("data-tooltip", "Return");
-
-  const returnButtonSvg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
-  returnButtonSvg.setAttribute("viewBox", "0 0 24 24");
-
-  const returnButtonSvgPath = document.createElementNS("http://www.w3.org/2000/svg", "path");
-  returnButtonSvgPath.setAttribute("fill", "currentColor");
-  returnButtonSvgPath.setAttribute("d", "m7.825 13l4.9 4.9q.3.3.288.7t-.313.7q-.3.275-.7.288t-.7-.288l-6.6-6.6q-.15-.15-.213-.325T4.426 12t.063-.375t.212-.325l6.6-6.6q.275-.275.688-.275t.712.275q.3.3.3.713t-.3.712L7.825 11H19q.425 0 .713.288T20 12t-.288.713T19 13z");
-  returnButtonSvg.appendChild(returnButtonSvgPath);
-  returnButton.appendChild(returnButtonSvg);
-
-  returnButton.addEventListener("click", () => {
-    if (clyricsModalList) clyricsModalList.style.display = "";
-    if (clyricsNewLyrics) clyricsNewLyrics.style.display = "none";
-  });
-
-  modalTopButtons.appendChild(returnButton);
+  if (clyricsModalItems) {
+    const returnButton = document.createElement("button");
+    returnButton.className = "icon-btn";
+    returnButton.setAttribute("data-tooltip", "Return");
+  
+    const returnButtonSvg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+    returnButtonSvg.setAttribute("viewBox", "0 0 24 24");
+  
+    const returnButtonSvgPath = document.createElementNS("http://www.w3.org/2000/svg", "path");
+    returnButtonSvgPath.setAttribute("fill", "currentColor");
+    returnButtonSvgPath.setAttribute("d", "m7.825 13l4.9 4.9q.3.3.288.7t-.313.7q-.3.275-.7.288t-.7-.288l-6.6-6.6q-.15-.15-.213-.325T4.426 12t.063-.375t.212-.325l6.6-6.6q.275-.275.688-.275t.712.275q.3.3.3.713t-.3.712L7.825 11H19q.425 0 .713.288T20 12t-.288.713T19 13z");
+    returnButtonSvg.appendChild(returnButtonSvgPath);
+    returnButton.appendChild(returnButtonSvg);
+  
+    returnButton.addEventListener("click", () => {
+      if (clyricsList) clyricsList.style.display = "";
+      if (clyricsNewLyrics) clyricsNewLyrics.style.display = "none";
+    });
+  
+    modalTopButtons.appendChild(returnButton);
+  }
 
   /// Import from last played button
   const importLastButton = document.createElement("button");
@@ -335,7 +429,7 @@ async function formNewLyrics(): Promise<void> {
 
     if (data) { 
       populateCLyrics();
-      if (clyricsModalList) clyricsModalList.style.display = "";
+      if (clyricsList) clyricsList.style.display = "";
       if (clyricsNewLyrics) clyricsNewLyrics.style.display = "none";
       for (const input in registeredInputs) {
         registeredInputs[input].value = "";
@@ -351,45 +445,9 @@ async function formNewLyrics(): Promise<void> {
   clyricsNewLyrics.appendChild(createBtn);
 }
 
-function createCLyricsCard(options: CLyricsOverview): HTMLElement | null {
-  if (!options.song || options.song.length < 1 || !options.artist || options.artist.length < 1) {
-    return null;
-  }
-
-  const card = document.createElement("div");
-  card.className = "clyrics-card";
-
-  const info = document.createElement("div");
-  info.className = "clyrics-card-info";
-
-  const metadata = document.createElement("div");
-  metadata.className = "clyrics-input-span span-wseparator";
-  metadata.innerHTML = `Duration: ${formatTime(options.duration * 1000)}<div class="span-separator"></div>Modified: ${new Date(options.modified).toLocaleString()}`;
-
-  const name = document.createElement("div");
-  name.className = "clyrics-input-title";
-  name.innerHTML = `<strong>${options.song}</strong>`;
-
-  const artistAlbum = document.createElement("div");
-  artistAlbum.className = "clyrics-input-description span-wseparator";
-  artistAlbum.textContent = options.artist;
-
-  if (options.album) {
-    artistAlbum.innerHTML += `<div class="span-separator"></div>${options.album}`
-  }
-
-  info.appendChild(metadata);
-  info.appendChild(name);
-  info.appendChild(artistAlbum);
-
-  card.appendChild(info);
-
-  return card;
-}
-
 export async function openCLyricsModal() {
   if (clyricsModalOverlay) {
-    formNewLyrics();
+    if (!initializedForm) formNewLyrics();
     populateCLyrics();
     clyricsModalOverlay.style.display = "flex";
     requestAnimationFrame(() => {

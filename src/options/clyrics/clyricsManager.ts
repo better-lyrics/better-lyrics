@@ -2,13 +2,32 @@ import type { TrackInfoProvider } from "@/modules/lyrics/providers/shared";
 import type { CLyricsData } from "./clyrics-types";
 import { LyricFormatType, LyricSyncType } from "./publishing";
 import { formatTime } from "@/modules/lyrics/providers/lrcUtils";
+import { buildTTML } from "./ttmlBuilder";
+import { compressString, decompressString } from "@/core/compression";
 
 /**
  * Returns a list of all created custom lyrics
+ * @param raw Whether to return Array of compressed CLyrics data instead of decompressed parsed CLyrics data
  */
-export async function listCustomLyrics(): Promise<CLyricsData[]> {
-  const clyrics = await chrome.storage.local.get<{ customLyrics: CLyricsData[] }>("customLyrics");
-  return clyrics.customLyrics || [];
+export async function listCustomLyrics(raw: boolean = false): Promise<(string | CLyricsData)[]> {
+  const clyrics = await chrome.storage.local.get<{ customLyrics: string[] }>("customLyrics");
+  if (raw) {
+    return clyrics.customLyrics || [];
+  }
+
+  const decompressed: CLyricsData[] = [];
+  clyrics.customLyrics.forEach((compressed, index) => {
+    if (typeof compressed == "string") {
+      try {
+        const decompress = decompressString(compressed);
+        decompressed[index] = JSON.parse(decompress);
+      } catch (e) {
+        console.error(`Failed to decompress CLyrics ${index}`, e);
+      }
+    }
+
+  })
+  return decompressed;
 }
 
 /** 
@@ -16,7 +35,7 @@ export async function listCustomLyrics(): Promise<CLyricsData[]> {
  * @param index Zero-based location index of array
  */
 export async function getCustomLyrics(index: number): Promise<CLyricsData | null> {
-  const clyrics = await listCustomLyrics();
+  const clyrics = await listCustomLyrics() as CLyricsData[];
   return clyrics[index];
 }
 
@@ -28,7 +47,7 @@ export async function createCustomLyrics(parameters: TrackInfoProvider, videoId:
     return null;
   }
 
-  const clyrics = await listCustomLyrics();
+  const clyrics = await listCustomLyrics(true);
   const data = {
     videoId,
     song: parameters.song,
@@ -39,13 +58,15 @@ export async function createCustomLyrics(parameters: TrackInfoProvider, videoId:
     lyrics: [],
   };
 
-  clyrics.push(data);
+  const compressed = compressString(JSON.stringify(data));
+
+  clyrics.push(compressed);
   await chrome.storage.local.set({ customLyrics: clyrics });
   return data;
 }
 
 /**
- * Converts a Custom Lyrics data to a choosen format and level of synchronization
+ * Converts a custom lyrics data to a choosen file format and level of synchronization
  */
 export function convertFormat(clyrics: CLyricsData, format: LyricFormatType, syncType: LyricSyncType = LyricSyncType.RICH): string | null {
   if (!Object.values(LyricFormatType).find(f => f == format) || !Object.values(LyricSyncType).find(s => s == syncType) || !clyrics || !clyrics.lyrics) {
@@ -97,6 +118,8 @@ export function convertFormat(clyrics: CLyricsData, format: LyricFormatType, syn
       }
     }
     return built;
+  } else if (format == LyricFormatType.TTML) {
+    return buildTTML(clyrics, syncType);
   }
 
   return null;
