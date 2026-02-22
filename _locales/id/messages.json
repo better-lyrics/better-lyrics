@@ -352,7 +352,7 @@
     "description": "Shader import suffix text before Better Lyrics Shaders link"
   },
   "marketplace_pageTitle": {
-    "message": "Better Lyrics Toko Tema",
+    "message": "Toko Tema Better Lyrics",
     "description": "Page title"
   },
   "marketplace_title": {
@@ -666,7 +666,7 @@
     }
   },
   "editor_pageTitle": {
-    "message": "Better Lyrics Editor CSS",
+    "message": "Editor Penataan Gaya Better Lyrics",
     "description": "Standalone editor page title"
   },
   "editor_importFromFile": {
