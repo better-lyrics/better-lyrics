@@ -1,12 +1,13 @@
 import { LYRIC_SOURCE_KEYS, PROVIDER_CONFIGS, PROVIDER_SWITCHED_LOG } from "@constants";
+import { getTransientStorage, setTransientStorage } from "@core/storage";
 import { log } from "@utils";
 import bLyrics from "./blyrics/blyrics";
 import cubey, { type CubeyLyricSourceResult } from "./cubey";
+import legato from "./legato";
 import lyricLib from "./lrclib";
+import unison from "./unison";
 import ytLyrics, { type YTLyricSourceResult } from "./yt";
 import { ytCaptions } from "./ytCaptions";
-import legato from "./legato";
-import { getTransientStorage, setTransientStorage } from "@core/storage";
 
 /** Current version of the lyrics cache format */
 const LYRIC_CACHE_VERSION = "2.0.0";
@@ -60,17 +61,21 @@ export interface LyricSourceResult {
 
 export type LyricsArray = Lyric[];
 
+export interface LyricLang {
+  [lang: string]: string;
+}
+
 export interface Lyric {
   startTimeMs: number;
   words: string;
   durationMs: number;
-  key?: string;
   parts?: LyricPart[];
   agent?: string;
-  translation?: { text: string; lang: string };
+  isInstrumental?: boolean;
+  translations?: LyricLang;
+  translation?: { text: string; lang: string }; // old property
   romanization?: string;
   timedRomanization?: LyricPart[];
-  isInstrumental?: boolean;
 }
 
 export interface LyricPart {
@@ -80,10 +85,14 @@ export interface LyricPart {
   isBackground?: boolean;
 }
 
-export interface ProviderParameters {
+export interface TrackInfoProvider {
   song: string;
   artist: string;
   duration: number;
+  album: string | null;
+}
+
+export interface ProviderParameters extends TrackInfoProvider {
   videoId: string;
   audioTrackData: AudioTrackData | null;
   album: string | null;
@@ -146,6 +155,9 @@ export function initProviders(): void {
 const sourceKeyToFillFn = {
   "bLyrics-richsynced": bLyrics,
   "bLyrics-synced": bLyrics,
+  "unison-richsynced": unison,
+  "unison-synced": unison,
+  "unison-plain": unison,
   "musixmatch-richsync": cubey,
   "musixmatch-synced": cubey,
   "lrclib-synced": lyricLib,
@@ -181,6 +193,7 @@ export async function getLyrics(
   sourceName: LyricSourceKey
 ): Promise<LyricSourceResult | null> {
   let lyricSource = providerParameters.sourceMap[sourceName];
+  console.log(sourceName, lyricSource);
   if (!lyricSource.filled) {
     // Check cache first
     const cacheKey = `blyrics_${providerParameters.videoId}_${sourceName}`;

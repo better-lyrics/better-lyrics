@@ -180,13 +180,16 @@ const restoreOptions = (): void => {
     isRomanizationEnabled: false,
     preferredProviderList: [
       "bLyrics-richsynced",
+      "unison-richsynced",
       "musixmatch-richsync",
       "yt-captions",
       "bLyrics-synced",
+      "unison-synced",
       "lrclib-synced",
       "legato-synced",
       "musixmatch-synced",
       "yt-lyrics",
+      "unison-plain",
       "lrclib-plain",
     ],
     romanizationDisabledLanguages: [],
@@ -222,13 +225,16 @@ const setOptionsInForm = (items: Options): void => {
   // Always recreate in the default order to make sure no items go missing
   let unseenProviders = [
     "bLyrics-richsynced",
+    "unison-richsynced",
     "musixmatch-richsync",
     "yt-captions",
     "bLyrics-synced",
+    "unison-synced",
     "lrclib-synced",
     "legato-synced",
     "musixmatch-synced",
     "yt-lyrics",
+    "unison-plain",
     "lrclib-plain",
   ];
 
@@ -262,6 +268,9 @@ const getProviderIdToInfoMap = (): { [key: string]: ProviderInfo } => ({
   "musixmatch-synced": { name: t("options_provider_musixmatch"), syncType: "line" },
   "yt-captions": { name: t("options_provider_youtubeCaptions"), syncType: "line" },
   "lrclib-synced": { name: t("options_provider_lrclib"), syncType: "line" },
+  "unison-richsynced": { name: t("options_provider_betterLyricsUnison"), syncType: "syllable" },
+  "unison-synced": { name: t("options_provider_betterLyricsUnison"), syncType: "line" },
+  "unison-plain": { name: t("options_provider_betterLyricsUnison"), syncType: "unsynced" },
   "bLyrics-richsynced": { name: t("options_provider_betterLyrics"), syncType: "syllable" },
   "bLyrics-synced": { name: t("options_provider_betterLyrics"), syncType: "line" },
   "legato-synced": { name: t("options_provider_betterLyricsLegato"), syncType: "line" },
@@ -364,7 +373,10 @@ document.addEventListener("DOMContentLoaded", () => {
   initI18n();
   initTabScrollIndicators();
   restoreOptions();
+
+  document.getElementById("reload-lyrics")?.addEventListener("click", saveOptions);
 });
+
 document.querySelectorAll("#options input, #options select").forEach(element => {
   element.addEventListener("change", saveOptions);
 });

@@ -131,7 +131,7 @@ function insertInstrumentalBreaks(lyrics: Lyric[], songDurationMs: number): Lyri
   return result;
 }
 
-export async function fillTtml(responseString: string, providerParameters: ProviderParameters) {
+export async function fillTtml(responseString: string) {
   const options: X2jOptions = {
     ignoreAttributes: false,
     attributeNamePrefix: "@_",
@@ -149,7 +149,7 @@ export async function fillTtml(responseString: string, providerParameters: Provi
 
   const rawObj = (await parser.parse(responseString)) as TtmlRoot;
 
-  const lyrics = new Map() as Map<string, Lyric>;
+  const lyrics = new Map() as Map<any, Lyric>;
 
   const tt = rawObj[0].tt;
   const ttHead = tt.find(e => e.head)!.head!;
@@ -163,11 +163,7 @@ export async function fillTtml(responseString: string, providerParameters: Provi
 
   const hasTimingData = lines.length > 0 && lines[0][":@"] !== undefined;
   if (!hasTimingData) {
-    providerParameters.sourceMap["bLyrics-richsynced"].lyricSourceResult = null;
-    providerParameters.sourceMap["bLyrics-richsynced"].filled = true;
-    providerParameters.sourceMap["bLyrics-synced"].lyricSourceResult = null;
-    providerParameters.sourceMap["bLyrics-synced"].filled = true;
-    return;
+    return null;
   }
 
   let isWordSynced = false;
@@ -185,15 +181,15 @@ export async function fillTtml(responseString: string, providerParameters: Provi
     const rawAgent = meta?.["@_agent"];
     const normalizedAgent = rawAgent ? (agentMapping.get(rawAgent) ?? rawAgent) : undefined;
 
-    lyrics.set(meta?.["@_key"] || lyrics.size.toString(), {
+    lyrics.set(meta?.["@_key"] || lyrics.size, {
       agent: normalizedAgent,
       durationMs: endTimeMs - beginTimeMs,
       parts: partParse.parts,
       startTimeMs: beginTimeMs,
       words: partParse.text,
+      translations: undefined,
       romanization: undefined,
-      timedRomanization: undefined,
-      translation: undefined,
+      timedRomanization: undefined
     });
   });
 
@@ -218,17 +214,22 @@ export async function fillTtml(responseString: string, providerParameters: Provi
   const transliterationsData = findInMetadata<TransliterationContainer[]>("transliterations");
 
   if (translationsData && translationsData.length > 0) {
-    const lang = translationsData[0][":@"]["@_lang"];
-    translationsData[0].translation.forEach(translation => {
-      const text = translation.text[0]["#text"];
-      const line = translation[":@"]["@_for"];
-
-      if (lang && text && line) {
-        const lyricLine = lyrics.get(line);
-        if (lyricLine) {
-          lyricLine.translation = { text, lang };
+    translationsData.forEach(container => {
+      const lang = container[":@"]["@_lang"];
+      container.translation.forEach(translation => {
+        const text = translation.text[0]["#text"];
+        const line = translation[":@"]["@_for"];
+        if (lang && text && line) {
+          const lyricLine = lyrics.get(line);
+          if (lyricLine) {
+            if (lyricLine.translations) {
+              lyricLine.translations[lang] = text;
+            } else {
+              lyricLine.translations = { [lang]: text };
+            }
+          }
         }
-      }
+      });
     });
   }
 
@@ -236,12 +237,14 @@ export async function fillTtml(responseString: string, providerParameters: Provi
     transliterationsData[0].transliteration.forEach((transliteration: TransliterationItem) => {
       const line = transliteration[":@"]["@_for"];
       if (line) {
-        const lyricLine = lyrics.get(line)!;
-        const beginTime = lyricLine.startTimeMs;
-        const parseResult = parseLyricPart(transliteration.text, beginTime, false);
-
-        lyricLine.romanization = parseResult.text;
-        lyricLine.timedRomanization = parseResult.parts;
+        const lyricLine = lyrics.get(line);
+        if (lyricLine) {
+          const beginTime = lyricLine.startTimeMs;
+          const parseResult = parseLyricPart(transliteration.text, beginTime, false);
+  
+          lyricLine.romanization = parseResult.text;
+          lyricLine.timedRomanization = parseResult.parts;
+        }
       }
     });
   }
@@ -259,16 +262,10 @@ export async function fillTtml(responseString: string, providerParameters: Provi
     sourceHref: "https://boidu.dev/",
   };
 
-  if (isWordSynced) {
-    providerParameters.sourceMap["bLyrics-richsynced"].lyricSourceResult = result;
-    providerParameters.sourceMap["bLyrics-synced"].lyricSourceResult = null;
-  } else {
-    providerParameters.sourceMap["bLyrics-richsynced"].lyricSourceResult = null;
-    providerParameters.sourceMap["bLyrics-synced"].lyricSourceResult = result;
-  }
-
-  providerParameters.sourceMap["bLyrics-synced"].filled = true;
-  providerParameters.sourceMap["bLyrics-richsynced"].filled = true;
+  return {
+    isWordSynced,
+    result,
+  };
 }
 
 export default async function bLyrics(providerParameters: ProviderParameters): Promise<void> {
@@ -288,13 +285,27 @@ export default async function bLyrics(providerParameters: ProviderParameters): P
   if (!response.ok) {
     providerParameters.sourceMap["bLyrics-richsynced"].filled = true;
     providerParameters.sourceMap["bLyrics-richsynced"].lyricSourceResult = null;
-
     providerParameters.sourceMap["bLyrics-synced"].filled = true;
     providerParameters.sourceMap["bLyrics-synced"].lyricSourceResult = null;
-
     return;
   }
 
   let responseString: string = await response.json().then(json => json.ttml);
-  await fillTtml(responseString, providerParameters);
+  const filled = await fillTtml(responseString);
+  providerParameters.sourceMap["bLyrics-richsynced"].filled = true;
+  providerParameters.sourceMap["bLyrics-synced"].filled = true;
+
+  if (!filled) {
+    providerParameters.sourceMap["bLyrics-richsynced"].lyricSourceResult = null;
+    providerParameters.sourceMap["bLyrics-synced"].lyricSourceResult = null;
+    return;
+  }
+
+  if (filled.isWordSynced) {
+    providerParameters.sourceMap["bLyrics-richsynced"].lyricSourceResult = filled.result;
+    providerParameters.sourceMap["bLyrics-synced"].lyricSourceResult = null;
+  } else {
+    providerParameters.sourceMap["bLyrics-richsynced"].lyricSourceResult = null;
+    providerParameters.sourceMap["bLyrics-synced"].lyricSourceResult = filled.result;
+  }
 }

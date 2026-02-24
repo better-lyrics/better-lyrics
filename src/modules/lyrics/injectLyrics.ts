@@ -317,7 +317,10 @@ function injectLyrics(data: LyricSourceResultWithMeta, keepLoaderVisible = false
     const abortHandler = () => reject(new Error("Aborted"));
     signal?.addEventListener("abort", abortHandler, { once: true });
 
-    if (!data.language) {
+    if (data.language) {
+      signal?.removeEventListener("abort", abortHandler);
+      resolve(data.language);
+    } else {
       let text = "";
       let lineCount = 0;
       for (let lyricLine of lyrics) {
@@ -333,9 +336,6 @@ function injectLyrics(data: LyricSourceResultWithMeta, keepLoaderVisible = false
         log(LOG_PREFIX, "Lang was missing. Determined it is: " + lang);
         resolve(lang);
       });
-    } else {
-      signal?.removeEventListener("abort", abortHandler);
-      resolve(data.language);
     }
   });
 
@@ -562,21 +562,31 @@ function injectLyrics(data: LyricSourceResultWithMeta, keepLoaderVisible = false
       return translatedLine;
     };
 
-    let translationResult: TranslationResult | null;
+    let translationResult: TranslationResult | null = null;
 
     let targetTranslationLang = AppState.translationLanguage;
+    let translatedText: any = null;
 
-    if (item.translation && langCodesMatch(targetTranslationLang, item.translation.lang)) {
-      if (!data.language) {
-        console.warn(`${LOG_PREFIX} Found translations, but no original language`);
+    if (item.translations) { // new translations implementation
+      const entry = Object.entries(item.translations).filter(([lang]) => langCodesMatch(targetTranslationLang, lang));
+      translatedText = entry[0]?.[1];
+    } else if (item.translation && langCodesMatch(targetTranslationLang, item.translation.lang)) { // backwards-compatibility
+      translatedText = item.translation.text;
+    }
+
+    if (!translationResult) {
+      if (translatedText) {
+        if (!data.language) {
+          console.warn(`${LOG_PREFIX} Found translations, but no original language`);
+        }
+
+        translationResult = {
+          originalLanguage: data.language || "", // Should never be empty!
+          translatedText
+        };
+      } else {
+        translationResult = getTranslationFromCache(item.words, targetTranslationLang);
       }
-
-      translationResult = {
-        originalLanguage: data.language || "", // Should never be empty!
-        translatedText: item.translation.text,
-      };
-    } else {
-      translationResult = getTranslationFromCache(item.words, targetTranslationLang);
     }
 
     let translationOriginalLang = translationResult?.originalLanguage || data.language;

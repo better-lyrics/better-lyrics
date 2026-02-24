@@ -12,7 +12,7 @@ export function parseTime(timeStr: string | number | undefined): number {
 
   if (typeof timeStr === "number") return timeStr;
 
-  const parts = timeStr.split(":");
+  const parts = timeStr.split(":").map(val => val.replace(/[^0-9.]/g, "")); // removes any non-numerical character except dots
   let totalMs = 0;
 
   try {
@@ -31,7 +31,7 @@ export function parseTime(timeStr: string | number | undefined): number {
       const seconds = parseFloat(parts[2]);
       totalMs = hours * 3600 * 1000 + minutes * 60 * 1000 + seconds * 1000;
     }
-
+    
     // Return a rounded integer
     return Math.round(totalMs);
   } catch (e) {
@@ -41,15 +41,40 @@ export function parseTime(timeStr: string | number | undefined): number {
 }
 
 /**
- *
+ * Formats a time number in milliseconds to `mm:ss` or `mm:ss.xxx` with `useMs` on `true`
+ */
+export function formatTime(timeNum: number, useMs?: boolean, whole?: boolean): string {
+  if (typeof timeNum != "number") return whole ? (useMs ? "00:00.000" : "00:00") : useMs ? "0.000" : "0";
+  timeNum = Math.round(timeNum);
+
+  const totalSec = Math.floor(timeNum / 1000);
+  const minutes = Math.floor(totalSec / 60);
+  const seconds = totalSec % 60;
+  const millisec = timeNum % 1000;
+
+  const padZero = (num: number, length: number = 2): string => {
+    return num.toString().padStart(length, "0");
+  };
+
+  if (whole) return `${padZero(minutes)}:${padZero(seconds)}${useMs ? `.${padZero(millisec, 3)}` : ""}`;
+  else
+    return (
+      (minutes > 0 ? `${padZero(minutes)}:` : "") + `${padZero(seconds)}${useMs ? `.${padZero(millisec, 3)}` : ""}`
+    );
+}
+
+/**
  * @param lrcText
  * @param songDuration
  * @return
  */
-export function parseLRC(lrcText: string, songDuration: number): LyricsArray {
+export function parseLRC(lrcText: string, songDuration: number) {
   const lines = lrcText.split("\n");
   const result: LyricsArray = [];
+  const plain: LyricsArray = [];
   const idTags = {} as any;
+
+  let isWordSynced = false;
 
   // Process each line
   lines.forEach(line => {
@@ -114,6 +139,12 @@ export function parseLRC(lrcText: string, songDuration: number): LyricsArray {
     const endTime = Math.max(...timeTags);
     const duration = endTime - startTime;
 
+    if (parts.length > 0) isWordSynced = true;
+    plain.push({
+      startTimeMs: 0,
+      words: plainText.trim(),
+      durationMs: 0
+    });
     result.push({
       startTimeMs: startTime,
       words: plainText.trim(),
@@ -163,7 +194,11 @@ export function parseLRC(lrcText: string, songDuration: number): LyricsArray {
     });
   }
 
-  return result;
+  return {
+    isWordSynced,
+    result,
+    plain
+  };
 }
 
 /**
@@ -197,7 +232,7 @@ export function lrcFixers(lyrics: LyricsArray): void {
   let durationCount = 0;
   for (let lyric of lyrics) {
     // skipping the last two parts is on purpose
-    // (weather they have a valid duration seems uncorrelated with the rest of them being correct)
+    // (whether they have a valid duration seems uncorrelated with the rest of them being correct)
     if (!lyric.parts || lyric.parts.length === 0) {
       continue;
     }
