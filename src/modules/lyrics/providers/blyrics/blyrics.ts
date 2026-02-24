@@ -181,7 +181,7 @@ export async function fillTtml(responseString: string) {
     const rawAgent = meta?.["@_agent"];
     const normalizedAgent = rawAgent ? (agentMapping.get(rawAgent) ?? rawAgent) : undefined;
 
-    lyrics.set(meta?.["@_key"] || lyrics.size, {
+    lyrics.set(meta?.["@_key"] || lyrics.size.toString(), {
       agent: normalizedAgent,
       durationMs: endTimeMs - beginTimeMs,
       parts: partParse.parts,
