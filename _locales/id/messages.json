@@ -4,7 +4,7 @@
     "description": "The name of the extension"
   },
   "extensionDescription": {
-    "message": "Meningkatkan YouTube Music dengan lirik indah tersinkronisasi waktu, mendukung multibahasa, terjemahan cepat dan lainnya",
+    "message": "Meningkatkan YouTube Music dengan lirik indah real-time, mendukung multibahasa, terjemahan cepat dan lainnya",
     "description": "The description of the extension"
   },
   "options_tab_general": {
@@ -188,7 +188,7 @@
     "description": "Confirm button label"
   },
   "options_alert_cacheCleared": {
-    "message": "Cache berhasil dikosongkan!",
+    "message": "Cache berhasil dibersihkan!",
     "description": "Cache cleared success message"
   },
   "options_alert_cacheClearFailed": {
@@ -196,7 +196,7 @@
     "description": "Cache clear failed message"
   },
   "options_alert_nothingToClear": {
-    "message": "Tidak ada yang dibersihkan!",
+    "message": "Tidak ada yang perlu dibersihkan!",
     "description": "Nothing to clear message"
   },
   "options_alert_exportFailed": {
@@ -208,7 +208,7 @@
     "description": "File save dialog opened message"
   },
   "options_alert_fileSaveFailed": {
-    "message": "Gagal menyimpan file. Coba lagi.",
+    "message": "Gagal menyimpan file. Silahkan coba lagi.",
     "description": "File save failed message"
   },
   "options_alert_downloadInitiated": {
@@ -248,7 +248,7 @@
     "description": "Back to settings button label"
   },
   "options_editor_fullExperienceNote": {
-    "message": "Untuk pengalaman editor penuh, ",
+    "message": "Untuk pengalaman editor yang maksimal, ",
     "description": "Full editor experience note prefix"
   },
   "options_editor_openInNewTabLink": {
