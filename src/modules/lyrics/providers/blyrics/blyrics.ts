@@ -150,6 +150,7 @@ export async function fillTtml(responseString: string, providerParameters: Provi
   const rawObj = (await parser.parse(responseString)) as TtmlRoot;
 
   const lyrics = new Map() as Map<string, Lyric>;
+  const lyricIds = {} as Record<string, string[]>;
 
   const tt = rawObj[0].tt;
   const ttHead = tt.find(e => e.head)!.head!;
@@ -185,7 +186,18 @@ export async function fillTtml(responseString: string, providerParameters: Provi
     const rawAgent = meta?.["@_agent"];
     const normalizedAgent = rawAgent ? (agentMapping.get(rawAgent) ?? rawAgent) : undefined;
 
-    lyrics.set(meta?.["@_key"] || lyrics.size.toString(), {
+    let lyric = lyricIds[meta?.["@_key"] || ""];
+    if (meta?.["@_key"]) {
+      if (lyric) {
+        lyricIds[meta["@_key"]].push(meta["@_key"] + `_${lyric.length + 1}`);
+      } else {
+        lyricIds[meta["@_key"]] = [ meta["@_key"] + "_1" ];
+      }
+      
+      lyric = lyricIds[meta["@_key"]];
+    }
+
+    lyrics.set(lyric ? meta["@_key"] + `_${lyric.length}` : lyrics.size.toString(), {
       agent: normalizedAgent,
       durationMs: endTimeMs - beginTimeMs,
       parts: partParse.parts,
@@ -224,10 +236,15 @@ export async function fillTtml(responseString: string, providerParameters: Provi
       const line = translation[":@"]["@_for"];
 
       if (lang && text && line) {
-        const lyricLine = lyrics.get(line);
-        if (lyricLine) {
+        const lyricLines = lyricIds[line];
+        if (!lyricLines) { return; }
+
+        lyricLines.forEach(id => {
+          const lyricLine = lyrics.get(id);
+          if (!lyricLine) { return; }
+
           lyricLine.translation = { text, lang };
-        }
+        });
       }
     });
   }
@@ -235,14 +252,21 @@ export async function fillTtml(responseString: string, providerParameters: Provi
   if (transliterationsData && transliterationsData.length > 0) {
     transliterationsData[0].transliteration.forEach((transliteration: TransliterationItem) => {
       const line = transliteration[":@"]["@_for"];
-      if (line) {
-        const lyricLine = lyrics.get(line)!;
+      if (!line) { return; }
+
+      const lyricLines = lyricIds[line];
+      if (!lyricLines) { return; }
+
+      lyricLines.forEach(id => {
+        const lyricLine = lyrics.get(id);
+        if (!lyricLine) { return; }
+
         const beginTime = lyricLine.startTimeMs;
         const parseResult = parseLyricPart(transliteration.text, beginTime, false);
 
         lyricLine.romanization = parseResult.text;
         lyricLine.timedRomanization = parseResult.parts;
-      }
+      });
     });
   }
 
