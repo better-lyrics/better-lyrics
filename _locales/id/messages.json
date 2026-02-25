@@ -204,7 +204,7 @@
     "description": "Export identity failed message"
   },
   "options_alert_fileSaveDialogOpened": {
-    "message": "Simpan file identitas dialog terbuka.",
+    "message": "Dialog penyimpanan file identitas dibuka.",
     "description": "File save dialog opened message"
   },
   "options_alert_fileSaveFailed": {
@@ -212,7 +212,7 @@
     "description": "File save failed message"
   },
   "options_alert_downloadInitiated": {
-    "message": "Unduh file identitas dimulai.",
+    "message": "Pengunduhan file identitas dimulai.",
     "description": "Download initiated message"
   },
   "options_alert_importSuccess": {
@@ -252,7 +252,7 @@
     "description": "Full editor experience note prefix"
   },
   "options_editor_openInNewTabLink": {
-    "message": "buka editor ini di tab baru",
+    "message": "buka editor di tab baru",
     "description": "Open in new tab link text"
   },
   "options_editor_stylingGuide": {
@@ -260,7 +260,7 @@
     "description": "Styling guide link text"
   },
   "options_editor_renameTheme": {
-    "message": "Namai ulang tema kustom",
+    "message": "Ubah nama tema kustom",
     "description": "Rename theme button title"
   },
   "options_editor_deleteTheme": {
@@ -284,7 +284,7 @@
     "description": "Musixmatch provider name"
   },
   "options_provider_lrclib": {
-    "message": "LRCLIB",
+    "message": "LRClib",
     "description": "LRClib provider name"
   },
   "options_provider_youtube": {
@@ -292,7 +292,7 @@
     "description": "Youtube provider name"
   },
   "options_provider_youtubeCaptions": {
-    "message": "YouTube Captions",
+    "message": "Subtitel YouTube",
     "description": "Youtube Captions provider name"
   },
   "options_syncType_syllable": {
@@ -300,7 +300,7 @@
     "description": "Syllable sync type label"
   },
   "options_syncType_syllable_tooltip": {
-    "message": "Menyoroti individual suku kata secara langsung. Sinkron sukukata memberikan pengalaman terbaik.",
+    "message": "Menyorot tiap suku kata saat dinyanyikan. Sinkronisasi suku kata memberikan pengalaman terbaik.",
     "description": "Syllable sync type tooltip"
   },
   "options_syncType_word": {
@@ -308,7 +308,7 @@
     "description": "Word sync type label"
   },
   "options_syncType_word_tooltip": {
-    "message": "Menyoroti individual kata secara langsung. Sinkron kata memberikan pengalaman baik.",
+    "message": "Menyorot setiap kata saat dinyanyikan. Sinkronisasi kata memberikan pengalaman yang baik.",
     "description": "Word sync type tooltip"
   },
   "options_syncType_line": {
@@ -324,7 +324,7 @@
     "description": "Unsynced sync type label"
   },
   "options_syncType_unsynced_tooltip": {
-    "message": "Lirik tanpa informasi waktu. Lirik tak disinkron memberikan pengalaman minimal.",
+    "message": "Lirik tanpa informasi waktu. Lirik non-sinkron memberikan pengalaman minimal.",
     "description": "Unsynced sync type tooltip"
   },
   "options_detail_rateTheme": {
@@ -348,7 +348,7 @@
     "description": "Download shader link text"
   },
   "options_detail_shaderImportSuffix": {
-    "message": "dan impor filenya",
+    "message": "lalu impor ke",
     "description": "Shader import suffix text before Better Lyrics Shaders link"
   },
   "marketplace_pageTitle": {
@@ -376,7 +376,7 @@
     "description": "Keyboard shortcuts button label"
   },
   "marketplace_sortBy": {
-    "message": "Urutkan dari",
+    "message": "Urut berdasarkan",
     "description": "Sort filter group label"
   },
   "marketplace_sortRatingDesc": {
