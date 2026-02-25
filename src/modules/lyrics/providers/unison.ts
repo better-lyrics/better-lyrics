@@ -42,6 +42,14 @@ export default async function unison(providerParameters: ProviderParameters): Pr
   }
 
   const responseString: UnisonResponse = await response.json().then(json => json.data);
+
+  if (!responseString.format || !responseString.lyrics) {
+    providerParameters.sourceMap["unison-richsynced"].lyricSourceResult = null;
+    providerParameters.sourceMap["unison-synced"].lyricSourceResult = null;
+    providerParameters.sourceMap["unison-plain"].lyricSourceResult = null;
+    return;
+  }
+  
   const result = {
     cacheAllowed: false,
     source: "boidu.dev",
