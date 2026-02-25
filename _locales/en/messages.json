@@ -57,6 +57,14 @@
     "message": "Clear Cache",
     "description": "Clear cache button label"
   },
+  "options_general_reloadLyrics": {
+    "message": "Reload lyrics",
+    "description": "Reload lyrics section label"
+  },
+  "options_general_reload": {
+    "message": "Reload",
+    "description": "Reload button label"
+  },
   "options_general_totalLyrics": {
     "message": "Total lyrics in cache",
     "description": "Total lyrics in cache label"
