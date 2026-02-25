@@ -290,6 +290,10 @@
     "message": "Better Lyrics Legato",
     "description": "Better Lyrics Legato provider name"
   },
+  "options_provider_betterLyricsUnison": {
+    "message": "Better Lyrics Unison",
+    "description": "Better Lyrics Unison provider name"
+  },
   "options_provider_musixmatch": {
     "message": "Musixmatch",
     "description": "Musixmatch provider name"

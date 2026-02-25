@@ -3,6 +3,7 @@ import { log } from "@utils";
 import bLyrics from "./blyrics/blyrics";
 import cubey, { type CubeyLyricSourceResult } from "./cubey";
 import lyricLib from "./lrclib";
+import unison from "./unison";
 import ytLyrics, { type YTLyricSourceResult } from "./yt";
 import { ytCaptions } from "./ytCaptions";
 import legato from "./legato";
@@ -146,6 +147,9 @@ export function initProviders(): void {
 const sourceKeyToFillFn = {
   "bLyrics-richsynced": bLyrics,
   "bLyrics-synced": bLyrics,
+  "unison-richsynced": unison,
+  "unison-synced": unison,
+  "unison-plain": unison,
   "musixmatch-richsync": cubey,
   "musixmatch-synced": cubey,
   "lrclib-synced": lyricLib,
