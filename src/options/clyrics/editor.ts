@@ -6,7 +6,7 @@ import { getLocalStorage } from "@/core/storage";
 import { formatTime } from "@/modules/lyrics/providers/lrcUtils";
 import { buildTTML } from "./ttmlBuilder";
 import { getCustomLyrics } from "./clyricsManager";
-import type { CLyricsData } from "./clyrics-types";
+import type { CLyricsData, CLyricsEditor } from "./clyrics-types";
 
 let loaded = false;
 
@@ -20,7 +20,12 @@ let _selectedWord: any = -1;
 
 let loadedAudio: HTMLAudioElement | null = null; // loaded audio from playbar
 
+// DATA
 let lyrics: Lyric[] = [];
+let editor: CLyricsEditor = {
+  voices: {},
+  lines: {}
+};
 
 // Storing context menu button and their functions when clicked
 let contextMenuB: ContextData[] = [];
@@ -177,34 +182,34 @@ export const noLyrics = document.getElementById("no-lyrics");
 function _save() {}
 
 function loadContextMenu(element: HTMLElement, menus: ContextData[]) {
-    if (!element) return;
-    const buttons = [...menus];
-    buttons.forEach(btn => {
-      if (typeof btn != "object" || !btn.type) return;
-      if (btn.type == "button") {
-        const button = document.createElement("button");
-        button.className = "list-btn";
-        button.innerHTML = btn.content + (btn.rightCont ? `<strong>${btn.rightCont}</strong>` : "");
-        button.disabled = btn.disabled || false;
-        if (typeof btn.func == "function")
-          button.addEventListener("click", () => {
-            btn.func!();
-          });
-        element.appendChild(button);
-      } else if (btn.type == "separator") {
-        const separator = document.createElement("div");
-        separator.className = "separator-column";
-        element.appendChild(separator);
-      } else if (btn.type == "span") {
-        const span = document.createElement("span");
-        span.className = "code";
-        span.style.opacity = ".5";
-        span.innerHTML = btn.content || "";
-        element.appendChild(span);
-      }
-    });
-  }
-
+  if (!element) return;
+  const buttons = [...menus];
+  buttons.forEach(btn => {
+    if (typeof btn != "object" || !btn.type) return;
+    if (btn.type == "button") {
+      const button = document.createElement("button");
+      button.className = "list-btn";
+      button.innerHTML = btn.content + (btn.rightCont ? `<strong>${btn.rightCont}</strong>` : "");
+      button.disabled = btn.disabled || false;
+      if (typeof btn.func == "function")
+        button.addEventListener("click", () => {
+          btn.func!();
+        });
+      element.appendChild(button);
+    } else if (btn.type == "separator") {
+      const separator = document.createElement("div");
+      separator.className = "separator-column";
+      element.appendChild(separator);
+    } else if (btn.type == "span") {
+      const span = document.createElement("span");
+      span.className = "code";
+      span.style.opacity = ".5";
+      span.innerHTML = btn.content || "";
+      element.appendChild(span);
+    }
+  });
+}
+  
 function setupActionMenu(id: string) {
   const selActionMenu = actionMenus[id];
   if (loadedActionMenu[id] || !selActionMenu) {
@@ -496,53 +501,69 @@ function handleCheckboxes() {
 
 /// General Sliders
 function handleSliders() {
-  sliders.forEach(slider_ => {
-    const slider = slider_ as HTMLElement;
-    let timeout: string | number | any = null;
+  function updateSlider(slider: HTMLElement, relativeVal: number, valAttr: string = "value") {
+    const clamped = Math.min(1, Math.max(0, relativeVal));
+    const absolute = parseFloat(slider.getAttribute("min") || "0") + clamped * (parseFloat(slider.getAttribute("max") || "1") - parseFloat(slider.getAttribute("min") || "0"));
+    console.log(absolute);
+    let final = absolute;
+
+    if (slider.getAttribute("step")) {
+      const step = parseFloat(slider.getAttribute("step")!);
+      const mod = absolute % step;
+
+      final = mod > (step / 2) ? final - mod + step : final - mod; 
+    }
+
+    slider.setAttribute(valAttr, `${final}`);
+    if (valAttr == "value" && sliderOnUpdate[slider.id]) sliderOnUpdate[slider.id](final);
+  }
+
+  sliders.forEach(eslider => {
+    const slider = eslider as HTMLElement;
     const attrObserver = new MutationObserver(mutations => {
       mutations.forEach(mutation => {
-        if (mutation.type != "attributes" || slider.getAttribute("on-sliding") == "true") {
-          return;
-        }
+        if (mutation.type !== "attributes") { return; }
+
         const head = slider.querySelector(".head") as HTMLElement;
         const bar = slider.querySelector(".bar") as HTMLElement;
-        const value = parseFloat(slider.getAttribute("value") || "0") || 0;
+        const value = parseFloat(slider.getAttribute("ref-val") || slider.getAttribute("value") || "0") || 0;
+        const relative = (value - parseFloat(slider.getAttribute("min") || "0")) / (parseFloat(slider.getAttribute("max") || "1") - parseFloat(slider.getAttribute("min") || "0")) * 100;
+
         if (head) {
-          head.style.left = `calc(${value * 100}% - .375rem)`;
+          head.style.left = `calc(${relative}% - .375rem)`;
         }
         if (bar) {
-          bar.style.width = `${value * 100}%`;
+          bar.style.width = `${relative}%`;
         }
       });
     });
 
-    attrObserver.observe(slider, { attributes: true, attributeFilter: ["value"] });
+    attrObserver.observe(slider, { attributes: true, attributeFilter: ["ref-val", "value"] });
 
     slider.addEventListener("click", e => {
       const rect = slider.getBoundingClientRect();
-      const value = (e.clientX - rect.x) / rect.width ;
-      slider.setAttribute("value", `${value}`);
-      sliderOnUpdate[slider.id](value);
+      const value = (e.clientX - rect.x) / rect.width;
+      updateSlider(slider, value);
     });
 
     slider.addEventListener("mousedown", e => {
       e.preventDefault();
-      timeout = setTimeout(() => {
-        slider.setAttribute("on-sliding", "true");
-        const moveHandler = (e: MouseEvent) => {
-          const rect = slider.getBoundingClientRect();
-          slider.setAttribute("value", `${(e.clientX - rect.x) / rect.width}`);
-        };
+      const moveHandler = (e: MouseEvent) => {
+        const rect = slider.getBoundingClientRect();
+        updateSlider(slider, (e.clientX - rect.x) / rect.width, "ref-val");
+      };
 
-        document.addEventListener("mousemove", moveHandler);
-        document.addEventListener("mouseup", () => {
-          slider.removeAttribute("on-sliding");
-          clearTimeout(timeout);
-          document.removeEventListener("mousemove", moveHandler);
-        });
+      document.addEventListener("mousemove", moveHandler);
+      document.addEventListener("mouseup", () => {
+        if (slider.matches(`${slider.id}:hover`)) {
+          updateSlider(slider, parseFloat(slider.getAttribute("ref-val") || slider.getAttribute("value") || "0"));
+        }
 
-        moveHandler(e);
-      }, 200);
+        slider.removeAttribute("ref-val");
+        document.removeEventListener("mousemove", moveHandler);
+      });
+
+      moveHandler(e);
     });
   });
   console.log("[onload] Sliders loaded");
@@ -577,7 +598,7 @@ function handleActionsMenu() {
 
   actionButtons.forEach(button => {
     if (!(button instanceof HTMLElement)) return;
-    button.addEventListener("click", _e => {
+    button.addEventListener("click", () => {
       const act = actionFunc[button.id];
       if (!act || !act.menu) return;
       if (actionMenuOpen == act.menu) {
@@ -634,7 +655,7 @@ function handleLyricLine() {
       resizeObserver.disconnect();
       return ABORT.disconnect();
     }
-  })
+  });
   ABORT.observe(lyricLines.parentElement!, { childList: true });
 
   lyricLines.addEventListener("mouseenter", () => {

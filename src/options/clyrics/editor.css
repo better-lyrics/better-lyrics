@@ -876,6 +876,8 @@ button {
 
 #playbar-rate-menu {
     gap: .5rem;
+    right: 1rem;
+    bottom: 3rem;
 }
 
 #playbar-playrates > button {

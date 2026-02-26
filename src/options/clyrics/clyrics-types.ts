@@ -9,6 +9,7 @@ export interface CLyricsLine {
   words: string;
   durationMs: number;
 }
+
 /**
  * Editor-mode preferences
  */
@@ -27,7 +28,7 @@ export interface CLyricsEditor {
   lines?: {
     [line: string | number]: {
       words: string | CLyricsLine[];
-      bgLine: string | CLyricsLine[];
+      bgWords: string | CLyricsLine[];
     };
   };
 }
