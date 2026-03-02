@@ -540,6 +540,42 @@ async function populateThemeModal(): Promise<void> {
 
   themeModalGrid.replaceChildren();
 
+  // -- Deprecation Banner --------------------------
+  const banner = document.createElement("div");
+  banner.className = "theme-deprecation-banner";
+
+  const content = document.createElement("div");
+  content.className = "theme-deprecation-content";
+
+  const titleRow = document.createElement("div");
+  titleRow.className = "theme-deprecation-title";
+
+  const iconSpan = document.createElement("span");
+  iconSpan.className = "theme-deprecation-icon";
+  iconSpan.textContent = "\u26A0";
+  titleRow.appendChild(iconSpan);
+  titleRow.appendChild(document.createTextNode(t("deprecation_builtin_title")));
+  content.appendChild(titleRow);
+
+  const body = document.createElement("span");
+  body.className = "theme-deprecation-body";
+  body.textContent = t("deprecation_builtin_body");
+  content.appendChild(body);
+
+  banner.appendChild(content);
+
+  const cta = document.createElement("button");
+  cta.className = "theme-deprecation-cta";
+  cta.appendChild(createMarketplaceIcon());
+  cta.appendChild(document.createTextNode(t("deprecation_builtin_cta")));
+  cta.addEventListener("click", () => {
+    chrome.tabs.create({ url: chrome.runtime.getURL("pages/marketplace.html") });
+  });
+  banner.appendChild(cta);
+
+  themeModalGrid.appendChild(banner);
+
+  // -- Theme Grid --------------------------
   const customThemes = await getCustomThemes();
   const syncData = await getSyncStorage<{ themeName?: string }>(["themeName"]);
   const storedThemeName = syncData.themeName;
@@ -548,7 +584,7 @@ async function populateThemeModal(): Promise<void> {
   builtInSection.className = "theme-modal-section";
   const builtInTitle = document.createElement("h3");
   builtInTitle.className = "theme-modal-section-title";
-  builtInTitle.textContent = "Built-in Themes";
+  builtInTitle.textContent = t("theme_modal_section_builtin");
   builtInSection.appendChild(builtInTitle);
 
   const builtInGrid = document.createElement("div");
@@ -576,7 +612,7 @@ async function populateThemeModal(): Promise<void> {
     customSection.className = "theme-modal-section";
     const customTitle = document.createElement("h3");
     customTitle.className = "theme-modal-section-title";
-    customTitle.textContent = "Custom Themes";
+    customTitle.textContent = t("theme_modal_section_custom");
     customSection.appendChild(customTitle);
 
     const customGrid = document.createElement("div");
@@ -645,6 +681,8 @@ function createThemeCard(options: ThemeCardOptions, storedThemeName?: string): H
   }
 
   card.appendChild(info);
+
+  card.setAttribute("data-type", options.storeId ? "store" : options.isCustom ? "custom" : "builtin");
 
   card.addEventListener("click", () => {
     selectTheme(options.isCustom, options.index, options.name);

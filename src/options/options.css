@@ -1270,6 +1270,85 @@ input.cm-textfield:focus-visible {
 	background: rgba(255, 255, 255, 0.3);
 }
 
+/* -- Deprecation Banner -------------------------- */
+
+.theme-deprecation-banner {
+	display: flex;
+	align-items: center;
+	gap: 0.5rem;
+	padding: 0.75rem;
+	margin-bottom: 0.75rem;
+	background: rgba(251, 191, 36, 0.08);
+	border: 1px solid rgba(251, 191, 36, 0.2);
+	border-radius: 0.5rem;
+	margin-top: -0.5rem;
+}
+
+.theme-deprecation-content {
+	flex: 1;
+	min-width: 0;
+}
+
+.theme-deprecation-title {
+	display: flex;
+	align-items: center;
+	gap: 0.375rem;
+	font-size: 0.8125rem;
+	font-weight: 600;
+	color: rgba(251, 191, 36, 0.9);
+	margin-bottom: 0.25rem;
+}
+
+.theme-deprecation-icon {
+	flex-shrink: 0;
+	font-size: 0.8125rem;
+}
+
+.theme-deprecation-body {
+	display: block;
+	font-size: 0.75rem;
+	color: rgb(189 177 148);
+	line-height: 1.5;
+}
+
+.theme-deprecation-cta {
+	display: flex;
+	align-items: center;
+	gap: 0.375rem;
+	flex-shrink: 0;
+	padding: 0.375rem 0.75rem;
+	margin: 0;
+	border: none;
+	border-radius: 0.375rem;
+	background: rgba(251, 191, 36, 0.15);
+	color: rgba(251, 191, 36, 0.9);
+	font-size: 0.75rem;
+	font-weight: 500;
+	font-family: inherit;
+	cursor: pointer;
+	transition: background 0.15s ease;
+	white-space: nowrap;
+}
+
+.theme-deprecation-cta:hover {
+	background: rgba(251, 191, 36, 0.25);
+}
+
+.theme-deprecation-cta svg {
+	width: 14px;
+	height: 14px;
+}
+
+@media (max-width: 600px) {
+	.theme-deprecation-banner {
+		flex-direction: column;
+		align-items: stretch;
+	}
+	.theme-deprecation-cta {
+		align-self: flex-start;
+	}
+}
+
 .theme-name-display {
   color: rgba(255, 255, 255, .75);
   align-items: center;
