@@ -1,10 +1,10 @@
 {
   "extensionName": {
-    "message": "Better Lyrics (YouTube Music 가사)",
+    "message": "Better Lyrics (YouTube Music용 가사)",
     "description": "The name of the extension"
   },
   "extensionDescription": {
-    "message": "아름다운 싱크 가사, 다국어 지원, 실시간 번역 등으로 YouTube Music을 향상시킵니다",
+    "message": "YouTube Music을 아름다운 싱크 가사, 다국어 지원, 실시간 번역 등으로 향상시킵니다",
     "description": "The description of the extension"
   },
   "options_tab_general": {
@@ -76,7 +76,7 @@
     "description": "Disable fullscreen mode setting label"
   },
   "options_display_autoHideCursor": {
-    "message": "전체 화면에서 커서 자동 숨기기",
+    "message": "전체 화면에서 커서 자동으로 숨김",
     "description": "Auto-hide cursor setting label"
   },
   "options_display_albumArt": {
@@ -120,7 +120,7 @@
     "description": "Theme settings section title"
   },
   "options_themes_description": {
-    "message": "Better Lyrics의 외관을 사용자 정의합니다.",
+    "message": "Better Lyrics의 외관을 커스텀합니다.",
     "description": "Theme settings section description"
   },
   "options_themes_theme": {
@@ -148,15 +148,15 @@
     "description": "Installed themes button label"
   },
   "options_identity_title": {
-    "message": "신원",
+    "message": "계정",
     "description": "Identity settings section title"
   },
   "options_identity_description": {
-    "message": "Better Lyrics를 위한 고유한 익명 신원입니다.",
+    "message": "Better Lyrics용 당신만의 익명 계정.",
     "description": "Identity settings section description"
   },
   "options_identity_yourIdentity": {
-    "message": "내 신원",
+    "message": "나의 계정",
     "description": "Your identity label"
   },
   "options_identity_loading": {
@@ -188,19 +188,19 @@
     "description": "Confirm button label"
   },
   "options_alert_cacheCleared": {
-    "message": "캐시가 성공적으로 지워졌습니다!",
+    "message": "캐시를 성공적으로 지웠습니다!",
     "description": "Cache cleared success message"
   },
   "options_alert_cacheClearFailed": {
-    "message": "캐시 지우기 실패!",
+    "message": "캐시를 지우는데 실패했습니다!",
     "description": "Cache clear failed message"
   },
   "options_alert_nothingToClear": {
-    "message": "지울 것이 없습니다!",
+    "message": "삭제할 것이 없습니다!",
     "description": "Nothing to clear message"
   },
   "options_alert_exportFailed": {
-    "message": "신원 내보내기 실패",
+    "message": "계정 내보내기에 실패했습니다",
     "description": "Export identity failed message"
   },
   "options_alert_fileSaveDialogOpened": {
@@ -208,19 +208,19 @@
     "description": "File save dialog opened message"
   },
   "options_alert_fileSaveFailed": {
-    "message": "파일 저장 중 오류가 발생했습니다. 다시 시도해 주세요.",
+    "message": "파일을 저장하는 중에 오류가 발생했습니다. 다시 시도해 주세요.",
     "description": "File save failed message"
   },
   "options_alert_downloadInitiated": {
-    "message": "신원 파일 다운로드가 시작되었습니다.",
+    "message": "계정 파일 다운로드를 시작했습니다.",
     "description": "Download initiated message"
   },
   "options_alert_importSuccess": {
-    "message": "신원을 성공적으로 가져왔습니다!",
+    "message": "계정을 성공적으로 가져왔습니다!",
     "description": "Import success message"
   },
   "options_alert_identityLoadError": {
-    "message": "신원 로딩 중 오류 발생",
+    "message": "계정 로딩 중에 오류가 발생하였습니다",
     "description": "Identity load error message"
   },
   "options_editor_saving": {
@@ -228,11 +228,11 @@
     "description": "Saving indicator text"
   },
   "options_editor_importFile": {
-    "message": "파일에서 가져오기",
+    "message": "파일 불러오기",
     "description": "Import from file tooltip"
   },
   "options_editor_exportFile": {
-    "message": "파일로 내보내기",
+    "message": "파일 내보내기",
     "description": "Export to file tooltip"
   },
   "options_editor_saveAsTheme": {
@@ -248,11 +248,11 @@
     "description": "Back to settings button label"
   },
   "options_editor_fullExperienceNote": {
-    "message": "전체 편집기 경험을 위해, ",
+    "message": "편집기의 모든 기능을 이용하려면, ",
     "description": "Full editor experience note prefix"
   },
   "options_editor_openInNewTabLink": {
-    "message": "이 편집기를 새 탭에서 여세요",
+    "message": "이 편집기를 새 탭에서 여세요.",
     "description": "Open in new tab link text"
   },
   "options_editor_stylingGuide": {
@@ -260,11 +260,11 @@
     "description": "Styling guide link text"
   },
   "options_editor_renameTheme": {
-    "message": "사용자 정의 테마 이름 변경",
+    "message": "커스텀 테마 이름 변경",
     "description": "Rename theme button title"
   },
   "options_editor_deleteTheme": {
-    "message": "사용자 정의 테마 삭제",
+    "message": "커스텀 테마 삭제",
     "description": "Delete theme button title"
   },
   "options_editor_doubleClickRename": {
@@ -300,7 +300,7 @@
     "description": "Syllable sync type label"
   },
   "options_syncType_syllable_tooltip": {
-    "message": "노래에 맞춰 개별 음절을 하이라이트합니다. 음절 싱크가 최고의 경험을 제공합니다.",
+    "message": "노래에 맞춰 개별 음절을 강조합니다. 음절 싱크는 최고의 경험을 제공합니다.",
     "description": "Syllable sync type tooltip"
   },
   "options_syncType_word": {
@@ -308,7 +308,7 @@
     "description": "Word sync type label"
   },
   "options_syncType_word_tooltip": {
-    "message": "노래에 맞춰 개별 단어를 하이라이트합니다. 단어 싱크가 좋은 경험을 제공합니다.",
+    "message": "노래에 맞춰 각각의 단어를 강조합니다. 단어 싱크는 좋은 경험을 제공합니다.",
     "description": "Word sync type tooltip"
   },
   "options_syncType_line": {
@@ -316,7 +316,7 @@
     "description": "Line sync type label"
   },
   "options_syncType_line_tooltip": {
-    "message": "노래에 맞춰 전체 줄을 하이라이트합니다. 줄 싱크가 기본적인 경험을 제공합니다.",
+    "message": "노래에 맞춰 전체 줄을 강조합니다. 줄 싱크는 기본적인 경험을 제공합니다.",
     "description": "Line sync type tooltip"
   },
   "options_syncType_unsynced": {
@@ -328,7 +328,7 @@
     "description": "Unsynced sync type tooltip"
   },
   "options_detail_rateTheme": {
-    "message": "이 테마 평가",
+    "message": "이 테마 평가하기",
     "description": "Rate theme label"
   },
   "options_detail_install": {
@@ -360,7 +360,7 @@
     "description": "Header title"
   },
   "marketplace_subtitle": {
-    "message": "커뮤니티 테마를 발견하고 설치하세요",
+    "message": "커뮤니티 테마를 찾고 설치해보세요",
     "description": "Header subtitle"
   },
   "marketplace_searchPlaceholder": {
@@ -400,7 +400,7 @@
     "description": "Sort by newest"
   },
   "marketplace_sortOldest": {
-    "message": "오래된순",
+    "message": "오래된 순",
     "description": "Sort by oldest"
   },
   "marketplace_show": {
@@ -428,7 +428,7 @@
     "description": "Filter for themes with shaders"
   },
   "marketplace_compatibleOnly": {
-    "message": "호환되는 것만",
+    "message": "호환 가능만 사용",
     "description": "Filter for compatible themes"
   },
   "marketplace_installFromUrl": {
@@ -436,7 +436,7 @@
     "description": "Install from URL button"
   },
   "marketplace_submitTheme": {
-    "message": "테마 제출",
+    "message": "테마 올리기",
     "description": "Submit a theme link"
   },
   "marketplace_loading": {
@@ -456,11 +456,11 @@
     "description": "Permission required title"
   },
   "marketplace_permissionMessage": {
-    "message": "테마를 탐색하고 설치하려면 Better Lyrics가 테마가 호스팅된 GitHub와 마켓플레이스 API에 액세스할 권한이 필요합니다.",
+    "message": "테마를 탐색하거나 설치하려면 Better Lyrics가 테마를 호스팅하고 있는 GitHub와 마켓플레이스 API에 대한 접근 권한이 필요합니다.",
     "description": "Permission required message"
   },
   "marketplace_grantPermission": {
-    "message": "권한 부여",
+    "message": "권한 허용",
     "description": "Grant permission button"
   },
   "marketplace_install": {
@@ -488,11 +488,11 @@
     "description": "GitHub badge text"
   },
   "marketplace_urlModalTitle": {
-    "message": "URL에서 설치",
+    "message": "URL로 설치",
     "description": "URL install modal title"
   },
   "marketplace_urlModalMessage": {
-    "message": "GitHub 저장소 URL을 입력하여 테마를 직접 설치하세요:",
+    "message": "GitHub 저장소 URL을 입력하여 테마를 직접 설치:",
     "description": "URL install modal message"
   },
   "marketplace_urlModalPlaceholder": {
@@ -508,7 +508,7 @@
     "description": "Cancel button"
   },
   "marketplace_urlPermissionTitle": {
-    "message": "추가 권한 필요",
+    "message": "추가 권한이 필요합니다",
     "description": "URL permission modal title"
   },
   "marketplace_urlPermissionWhy": {
@@ -516,11 +516,11 @@
     "description": "URL permission explanation title"
   },
   "marketplace_urlPermissionDesc": {
-    "message": "사용자 정의 GitHub URL에서 테마를 설치하려면 마켓플레이스보다 더 넓은 액세스가 필요합니다. 이를 통해 Better Lyrics는:",
+    "message": "커스텀 GitHub URL을 통해 테마를 설치하려면 마켓플레이스보다 넓은 접근권한이 필요합니다. 이를 통해 Better Lyrics는 다음과 같은 작업을 할 수 있습니다:",
     "description": "URL permission description"
   },
   "marketplace_urlPermissionItem1": {
-    "message": "모든 GitHub 저장소에서 테마 파일 가져오기",
+    "message": "원하는 GitHub 저장소에서 테마 파일을 가져오기",
     "description": "URL permission list item 1"
   },
   "marketplace_urlPermissionItem2": {
@@ -532,7 +532,7 @@
     "description": "URL permission list item 3"
   },
   "marketplace_urlPermissionNote": {
-    "message": "이 권한은 URL을 통해 테마를 설치할 때만 사용됩니다. 마켓플레이스 테마는 필요하지 않습니다.",
+    "message": "이 권한은 URL을 통해 테마를 설치할 때만 사용됩니다. 마켓플레이스 테마에는 필요하지 않습니다.",
     "description": "URL permission note"
   },
   "marketplace_shortcutsTitle": {
@@ -568,7 +568,7 @@
     "description": "Sort shortcuts group"
   },
   "marketplace_shortcutsSortHint": {
-    "message": "다시 누르면 역순",
+    "message": "한 번 더 누르면 역순으로",
     "description": "Sort toggle hint"
   },
   "marketplace_shortcutsByRating": {
@@ -640,11 +640,11 @@
     "description": "Apply theme shortcut"
   },
   "marketplace_ratingFailed": {
-    "message": "평가 제출 실패",
+    "message": "평가을 전송하는데 실패했습니다",
     "description": "Rating submission error"
   },
   "marketplace_shaderFetchFailed": {
-    "message": "셰이더 구성 가져오기 실패",
+    "message": "셰이더 설정을 가져오지 못했습니다",
     "description": "Shader fetch error"
   },
   "marketplace_applyFailed": {
@@ -656,7 +656,7 @@
     "description": "Empty installed themes message"
   },
   "marketplace_lastUpdatedOn": {
-    "message": "Last updated on $date$",
+    "message": "$date$ 에 마지막으로 업데이트",
     "description": "Tooltip showing full date when a theme was last updated",
     "placeholders": {
       "date": {
@@ -666,7 +666,7 @@
     }
   },
   "editor_pageTitle": {
-    "message": "Better Lyrics CSS 편집기",
+    "message": "Better Lyrics CSS 에디터",
     "description": "Standalone editor page title"
   },
   "editor_importFromFile": {
@@ -686,7 +686,7 @@
     "description": "Styling guide button"
   },
   "editor_tip": {
-    "message": "팁: 이 독립형 탭은 별도 창으로 이동하거나 YouTube Music과 분할 화면으로 사용하여 실시간으로 변경 사항을 확인할 수 있습니다. 자세한 정보는",
+    "message": "팁: 이 독립형 탭은 별도 창으로 이동하거나 YouTube Music과 분할 화면으로 사용하여 실시간으로 변경 사항을 확인할 수 있습니다. 자세한 내용은",
     "description": "Editor tip text"
   },
   "editor_poweredBy": {
@@ -694,11 +694,11 @@
     "description": "Powered by label"
   },
   "editor_playground": {
-    "message": "Playground",
+    "message": "플레이그라운드",
     "description": "Playground link text"
   },
   "editor_docs": {
-    "message": "Docs",
+    "message": "문서",
     "description": "Docs link text"
   },
   "lyrics_source": {
@@ -718,11 +718,11 @@
     "description": "Loading message while searching for lyrics"
   },
   "lyrics_stillSearching": {
-    "message": "싱크 가사를 계속 검색 중...",
+    "message": "싱크 가사를 검색 중...",
     "description": "Loading message while still searching"
   },
   "lyrics_noSyncedLyrics": {
-    "message": "Better Lyrics가 싱크 가사를 찾을 수 없습니다",
+    "message": "Better Lyrics에서 싱크 가사를 찾지 못했습니다",
     "description": "Message when no synced lyrics found"
   },
   "lyrics_adPlaying": {
@@ -734,39 +734,39 @@
     "description": "Message when no lyrics are available"
   },
   "options_language_exclusions": {
-    "message": "Language exclusions",
+    "message": "언어 제외 옵션",
     "description": "Label for language exclusions setting"
   },
   "options_manage": {
-    "message": "Manage",
+    "message": "관리",
     "description": "Manage button label"
   },
   "options_language_exclusionsTitle": {
-    "message": "Language Exclusions",
+    "message": "언어 제외 옵션",
     "description": "Modal title for language exclusions"
   },
   "options_romanization_tab": {
-    "message": "Romanization",
+    "message": "로마자 표기",
     "description": "Romanization tab label"
   },
   "options_translation_tab": {
-    "message": "Translation",
+    "message": "번역",
     "description": "Translation tab label"
   },
   "options_searchLanguages": {
-    "message": "Search languages...",
+    "message": "언어 검색...",
     "description": "Search input placeholder"
   },
   "options_romanization_hint": {
-    "message": "Click to toggle. Excluded languages will not be romanized.",
+    "message": "토글하려면 클릭하세요. 제외된 언어는 로마자 표기가 되지 않습니다.",
     "description": "Hint text for romanization exclusions"
   },
   "options_translation_hint": {
-    "message": "Click to toggle. Excluded source languages will not be translated.",
+    "message": "토글하려면 클릭하세요. 제외된 언어는 번역되지 않습니다.",
     "description": "Hint text for translation exclusions"
   },
   "options_resetToDefault": {
-    "message": "Reset $TYPE$ to Default",
+    "message": "$TYPE$을 기본값으로 재설정",
     "description": "Reset to default button label",
     "placeholders": {
       "type": {
@@ -776,7 +776,7 @@
     }
   },
   "options_romanization_resetTitle": {
-    "message": "Reset $TYPE$ Exclusions",
+    "message": "$TYPE$을 제외하고 재설정",
     "description": "Modal title for resetting exclusions",
     "placeholders": {
       "type": {
@@ -786,19 +786,19 @@
     }
   },
   "options_romanization_resetMessage": {
-    "message": "This will clear all excluded languages. Continue?",
+    "message": "이렇게 하면 제외된 모든 언어가 지워집니다. 계속하시겠어요?",
     "description": "Confirmation message for resetting exclusions"
   },
   "options_reset": {
-    "message": "Reset",
+    "message": "초기화",
     "description": "Reset button label"
   },
   "options_cancel": {
-    "message": "Cancel",
+    "message": "취소",
     "description": "Cancel button label"
   },
   "options_romanization_resetSuccess": {
-    "message": "$TYPE$ exclusions reset to default",
+    "message": "$TYPE$를 제외한 항목이 기본값으로 재설정되었습니다",
     "description": "Success message after resetting exclusions",
     "placeholders": {
       "type": {
