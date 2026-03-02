@@ -41,7 +41,7 @@
         "@codemirror/lint": "^6.9.4",
         "@codemirror/search": "^6.6.0",
         "@codemirror/state": "^6.5.4",
-        "@codemirror/view": "^6.39.12",
+        "@codemirror/view": "^6.39.15",
         "@formkit/auto-animate": "^0.9.0",
         "@fsegurai/codemirror-theme-material-dark": "^6.2.2",
         "codemirror-lang-rics": "^0.3.20",
@@ -49,7 +49,7 @@
         "extension": "2.1.3",
         "fast-xml-parser": "^5.3.7",
         "fflate": "^0.8.2",
-        "marked": "^17.0.1",
+        "marked": "^17.0.3",
         "rics": "^0.3.20",
         "sortablejs": "^1.15.7"
     },
