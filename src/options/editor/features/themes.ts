@@ -1,11 +1,14 @@
 import { LOG_PREFIX_EDITOR } from "@constants";
+import { t } from "@core/i18n";
 import { getSyncStorage } from "@core/storage";
 
 import type { ThemeSource } from "../../store/types";
 import type { ThemeCardOptions } from "../types";
 
-import { getInstalledTheme } from "../../store/themeStoreManager";
+import { getInstalledTheme, installSymlinkedThemeFromMarketplace } from "../../store/themeStoreManager";
+import { checkStorePermissions, requestStorePermissions } from "../../store/themeStoreService";
 import THEMES, { deleteCustomTheme, getCustomThemes, renameCustomTheme, saveCustomTheme } from "../../themes";
+import type { Theme } from "../../themes";
 import { SAVE_CUSTOM_THEME_DEBOUNCE, SAVE_DEBOUNCE_DELAY } from "../core/editor";
 import { editorStateManager } from "../core/state";
 import {
@@ -20,7 +23,13 @@ import {
   themeSelectorBtn,
 } from "../ui/dom";
 import { showAlert, showConfirm, showPrompt } from "../ui/feedback";
-import { broadcastRICSToTabs, saveToStorageWithFallback, showSyncError, showSyncSuccess } from "./storage";
+import {
+  applyStoreThemeComplete,
+  broadcastRICSToTabs,
+  saveToStorageWithFallback,
+  showSyncError,
+  showSyncSuccess,
+} from "./storage";
 
 const STORE_THEME_PREFIX = "store:";
 
@@ -44,6 +53,19 @@ function createMarketplaceIcon(): SVGSVGElement {
   );
   pathFill.setAttribute("clip-rule", "evenodd");
   svg.appendChild(pathFill);
+  return svg;
+}
+
+function createBundledIcon(): SVGSVGElement {
+  const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+  svg.setAttribute("viewBox", "0 0 24 24");
+  svg.setAttribute("fill", "currentColor");
+  const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+  path.setAttribute(
+    "d",
+    "M11.15 12.335v9.18a.6.6 0 0 1-.15-.08l-6.51-3.91a1.9 1.9 0 0 1-.7-.7a1.9 1.9 0 0 1-.25-1v-8.07zm9.31-4.58v8.1a2.1 2.1 0 0 1-.27.95a1.74 1.74 0 0 1-.69.71l-6.51 3.91l-.14.07v-9.17l3.26-2v2.77a.85.85 0 1 0 1.7 0v-3.74zm-5.18 1.15l-3.28 2l-7.66-4.6l.11-.07l3.06-1.63zm4.37-2.62l-2.71 1.62l-7.64-4.28l1.66-.87a2 2 0 0 1 1-.27a2.1 2.1 0 0 1 1 .28l6.47 3.46a.5.5 0 0 1 .22.06"
+  );
+  svg.appendChild(path);
   return svg;
 }
 
@@ -135,6 +157,90 @@ class ThemeManager {
       throw new Error(`Built-in theme at index ${index} not found`);
     }
 
+    if (selectedTheme.storeId) {
+      return this.applySymlinkedTheme(selectedTheme as Theme & { storeId: string });
+    }
+
+    await this.applyBundledFallback(selectedTheme);
+  }
+
+  private async applySymlinkedTheme(theme: Theme & { storeId: string }): Promise<void> {
+    console.log(LOG_PREFIX_EDITOR, `Applying symlinked theme: ${theme.name} → ${theme.storeId}`);
+
+    const permission = await checkStorePermissions();
+
+    if (permission.granted) {
+      console.log(LOG_PREFIX_EDITOR, "Store permissions granted, installing from marketplace");
+      const installed = await installSymlinkedThemeFromMarketplace(theme.storeId);
+
+      if (installed) {
+        const success = await applyStoreThemeComplete({
+          themeId: installed.id,
+          css: installed.css,
+          title: installed.title || theme.name,
+          creators: installed.creators || [],
+          source: "marketplace",
+        });
+
+        if (success) {
+          showAlert(t("symlink_applied", theme.name));
+          return;
+        }
+      }
+
+      console.warn(LOG_PREFIX_EDITOR, `Marketplace install failed for ${theme.storeId}, falling back to bundled`);
+      showAlert(t("symlink_installFailed"));
+      await this.applyBundledFallback(theme);
+      return;
+    }
+
+    console.log(LOG_PREFIX_EDITOR, "Store permissions not granted, showing permission modal");
+
+    const messageNode = document.createTextNode(t("symlink_modal_message"));
+    const confirmed = await showConfirm(
+      t("symlink_modal_title"),
+      messageNode,
+      false,
+      t("symlink_modal_enable"),
+      t("symlink_modal_useBundled")
+    );
+
+    if (confirmed) {
+      const granted = await requestStorePermissions();
+      if (granted) {
+        console.log(LOG_PREFIX_EDITOR, "Permissions granted after prompt, installing from marketplace");
+        const installed = await installSymlinkedThemeFromMarketplace(theme.storeId);
+
+        if (installed) {
+          const success = await applyStoreThemeComplete({
+            themeId: installed.id,
+            css: installed.css,
+            title: installed.title || theme.name,
+            creators: installed.creators || [],
+            source: "marketplace",
+          });
+
+          if (success) {
+            showAlert(t("symlink_applied", theme.name));
+            return;
+          }
+        }
+
+        console.warn(LOG_PREFIX_EDITOR, `Marketplace install failed after permission grant for ${theme.storeId}`);
+        showAlert(t("symlink_installFailed"));
+      } else {
+        console.log(LOG_PREFIX_EDITOR, "Permissions denied by user");
+      }
+    } else {
+      console.log(LOG_PREFIX_EDITOR, "User chose bundled fallback");
+    }
+
+    await this.applyBundledFallback(theme);
+  }
+
+  private async applyBundledFallback(selectedTheme: Theme): Promise<void> {
+    console.log(LOG_PREFIX_EDITOR, `Using bundled fallback for: ${selectedTheme.name}`);
+
     const response = await fetch(chrome.runtime.getURL(`css/themes/${selectedTheme.path}`));
     const css = await response.text();
 
@@ -154,7 +260,7 @@ class ThemeManager {
 
       await this.saveTheme(themeContent);
 
-      showAlert(`Applied theme: ${selectedTheme.name}`);
+      showAlert(t("symlink_bundledFallback", selectedTheme.name));
     });
   }
 
@@ -435,6 +541,8 @@ async function populateThemeModal(): Promise<void> {
   themeModalGrid.replaceChildren();
 
   const customThemes = await getCustomThemes();
+  const syncData = await getSyncStorage<{ themeName?: string }>(["themeName"]);
+  const storedThemeName = syncData.themeName;
 
   const builtInSection = document.createElement("div");
   builtInSection.className = "theme-modal-section";
@@ -447,12 +555,16 @@ async function populateThemeModal(): Promise<void> {
   builtInGrid.className = "theme-modal-items";
 
   THEMES.forEach((theme, index) => {
-    const card = createThemeCard({
-      name: theme.name,
-      author: theme.author,
-      isCustom: false,
-      index,
-    });
+    const card = createThemeCard(
+      {
+        name: theme.name,
+        author: theme.author,
+        isCustom: false,
+        index,
+        storeId: theme.storeId,
+      },
+      storedThemeName
+    );
     builtInGrid.appendChild(card);
   });
 
@@ -485,12 +597,16 @@ async function populateThemeModal(): Promise<void> {
   }
 }
 
-function createThemeCard(options: ThemeCardOptions): HTMLElement {
+function createThemeCard(options: ThemeCardOptions, storedThemeName?: string): HTMLElement {
   const card = document.createElement("div");
   card.className = "theme-card";
 
   const isStoreThemeActive = editorStateManager.getIsStoreTheme();
-  if (!isStoreThemeActive && editorStateManager.getCurrentThemeName() === options.name) {
+  const isSymlinkedActive = options.storeId && storedThemeName === `${STORE_THEME_PREFIX}${options.storeId}`;
+
+  if (isSymlinkedActive) {
+    card.classList.add("selected");
+  } else if (!isStoreThemeActive && editorStateManager.getCurrentThemeName() === options.name) {
     card.classList.add("selected");
   }
 
@@ -509,6 +625,25 @@ function createThemeCard(options: ThemeCardOptions): HTMLElement {
 
   info.appendChild(name);
   info.appendChild(author);
+
+  if (options.storeId) {
+    const badge = document.createElement("div");
+    badge.className = "theme-card-badge";
+    const icon = createMarketplaceIcon();
+    icon.classList.add("theme-card-badge-icon");
+    badge.appendChild(icon);
+    badge.appendChild(document.createTextNode(t("symlink_badge_marketplace")));
+    info.appendChild(badge);
+  } else if (!options.isCustom) {
+    const badge = document.createElement("div");
+    badge.className = "theme-card-badge";
+    const icon = createBundledIcon();
+    icon.classList.add("theme-card-badge-icon", "theme-card-badge-icon--bundled");
+    badge.appendChild(icon);
+    badge.appendChild(document.createTextNode(t("symlink_badge_bundled")));
+    info.appendChild(badge);
+  }
+
   card.appendChild(info);
 
   card.addEventListener("click", () => {

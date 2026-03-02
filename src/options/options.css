@@ -1230,6 +1230,28 @@ input.cm-textfield:focus-visible {
 	text-overflow: ellipsis;
 }
 
+.theme-card-badge {
+	display: flex;
+	align-items: center;
+	gap: 4px;
+	font-size: 0.625rem;
+	color: rgba(255, 255, 255, 0.4);
+	margin-top: 2px;
+}
+
+.theme-card-badge-icon {
+	width: 10px;
+	height: 10px;
+	margin-top: -1.5px;
+	opacity: 0.5;
+}
+
+.theme-card-badge-icon.theme-card-badge-icon--bundled {
+	width: 12px;
+	height: 12px;
+	margin-top: 0px;
+}
+
 .theme-modal-body::-webkit-scrollbar {
 	width: 8px;
 }
