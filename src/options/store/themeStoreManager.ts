@@ -3,6 +3,7 @@ import { getLocalStorage, getSyncStorage } from "@core/storage";
 import {
   fetchFullTheme,
   fetchRegistryShaderConfig,
+  fetchSingleStoreTheme,
   fetchThemeCSS,
   fetchThemeMetadata,
   fetchThemeShaderConfig,
@@ -219,6 +220,63 @@ export async function applyStoreTheme(themeId: string): Promise<string> {
   await setActiveStoreTheme(themeId);
 
   return theme.css;
+}
+
+// -- Symlinked Theme Installs --------------------------
+
+export async function installSymlinkedThemeFromMarketplace(storeId: string): Promise<InstalledStoreTheme | null> {
+  console.log(LOG_PREFIX_STORE, `Installing symlinked theme from marketplace: ${storeId}`);
+
+  const existing = await getInstalledTheme(storeId);
+  if (existing && existing.version !== "0.0.0-bundled") {
+    console.log(LOG_PREFIX_STORE, `Symlinked theme already installed: ${storeId} v${existing.version}`);
+    return existing;
+  }
+
+  try {
+    const storeTheme = await fetchSingleStoreTheme(storeId);
+    if (!storeTheme) {
+      console.warn(LOG_PREFIX_STORE, `Symlinked theme not found in marketplace: ${storeId}`);
+      return null;
+    }
+
+    const installed = await installTheme(storeTheme, { source: "marketplace" });
+    console.log(LOG_PREFIX_STORE, `Installed symlinked theme: ${storeId} v${installed.version}`);
+    return installed;
+  } catch (err) {
+    console.warn(LOG_PREFIX_STORE, `Failed to install symlinked theme from marketplace: ${storeId}`, err);
+    return null;
+  }
+}
+
+export async function installSymlinkedThemeFromBundle(
+  storeId: string,
+  bundledCss: string,
+  themeName: string
+): Promise<InstalledStoreTheme> {
+  console.log(LOG_PREFIX_STORE, `Installing symlinked theme from bundle: ${storeId}`);
+
+  const installedTheme: InstalledStoreTheme = {
+    id: storeId,
+    repo: "",
+    title: themeName,
+    creators: [],
+    css: bundledCss,
+    installedAt: Date.now(),
+    version: "0.0.0-bundled",
+    source: "marketplace",
+  };
+
+  await chrome.storage.local.set({ [getThemeStorageKey(storeId)]: installedTheme });
+
+  const index = await getThemeIndex();
+  if (!index.themeIds.includes(storeId)) {
+    index.themeIds.push(storeId);
+    await setThemeIndex(index);
+  }
+
+  console.log(LOG_PREFIX_STORE, `Installed symlinked theme from bundle: ${storeId}`);
+  return installedTheme;
 }
 
 function parseVersion(version: string): number[] {

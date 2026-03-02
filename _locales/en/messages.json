@@ -839,5 +839,54 @@
         "example": "Romanization"
       }
     }
+  },
+
+  "symlink_modal_title": {
+    "message": "Marketplace Theme",
+    "description": "Title for the symlinked theme permission modal"
+  },
+  "symlink_modal_message": {
+    "message": "This theme is maintained on the Marketplace and receives automatic updates. Enable marketplace updates?",
+    "description": "Explanation text in the symlinked theme permission modal"
+  },
+  "symlink_modal_enable": {
+    "message": "Enable Updates",
+    "description": "Confirm button in the symlinked theme permission modal"
+  },
+  "symlink_modal_useBundled": {
+    "message": "Use Bundled",
+    "description": "Cancel button in the symlinked theme permission modal"
+  },
+  "symlink_applied": {
+    "message": "Applied theme: $NAME$ (Marketplace)",
+    "description": "Alert after successfully applying a symlinked theme from marketplace",
+    "placeholders": {
+      "name": {
+        "content": "$1",
+        "example": "Minimal"
+      }
+    }
+  },
+  "symlink_bundledFallback": {
+    "message": "Applied theme: $NAME$",
+    "description": "Alert when using bundled version of a symlinked theme",
+    "placeholders": {
+      "name": {
+        "content": "$1",
+        "example": "Minimal"
+      }
+    }
+  },
+  "symlink_installFailed": {
+    "message": "Couldn't reach marketplace, using bundled version",
+    "description": "Alert when marketplace fetch fails for a symlinked theme"
+  },
+  "symlink_badge_marketplace": {
+    "message": "Marketplace",
+    "description": "Badge text on symlinked theme cards"
+  },
+  "symlink_badge_bundled": {
+    "message": "Bundled",
+    "description": "Badge text on non-symlinked built-in theme cards"
   }
 }

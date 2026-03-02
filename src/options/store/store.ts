@@ -290,6 +290,14 @@ const renderer = new marked.Renderer();
 renderer.link = ({ href, text }) => {
   return `<a href="${href}" target="_blank" rel="noopener noreferrer">${text}</a>`;
 };
+renderer.image = ({ href, title, text }) => {
+  const src = href.replace(
+    /^https?:\/\/github\.com\/([^/]+\/[^/]+)\/blob\/(.+)/,
+    "https://raw.githubusercontent.com/$1/$2"
+  );
+  const titleAttr = title ? ` title="${title}"` : "";
+  return `<img src="${src}" alt="${text}"${titleAttr} />`;
+};
 marked.use({ renderer });
 
 function parseMarkdown(text: string): DocumentFragment {
