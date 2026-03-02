@@ -4,7 +4,7 @@
     "description": "The name of the extension"
   },
   "extensionDescription": {
-    "message": "Meningkatkan YouTube Music dengan lirik indah tersinkronisasi waktu, mendukung multibahasa, terjemahan cepat dan lainnya",
+    "message": "Meningkatkan YouTube Music dengan lirik indah real-time, mendukung multibahasa, terjemahan cepat dan lainnya",
     "description": "The description of the extension"
   },
   "options_tab_general": {
@@ -188,7 +188,7 @@
     "description": "Confirm button label"
   },
   "options_alert_cacheCleared": {
-    "message": "Cache berhasil dikosongkan!",
+    "message": "Cache berhasil dibersihkan!",
     "description": "Cache cleared success message"
   },
   "options_alert_cacheClearFailed": {
@@ -196,7 +196,7 @@
     "description": "Cache clear failed message"
   },
   "options_alert_nothingToClear": {
-    "message": "Tidak ada yang dibersihkan!",
+    "message": "Tidak ada yang perlu dibersihkan!",
     "description": "Nothing to clear message"
   },
   "options_alert_exportFailed": {
@@ -204,15 +204,15 @@
     "description": "Export identity failed message"
   },
   "options_alert_fileSaveDialogOpened": {
-    "message": "Simpan file identitas dialog terbuka.",
+    "message": "Dialog penyimpanan file identitas dibuka.",
     "description": "File save dialog opened message"
   },
   "options_alert_fileSaveFailed": {
-    "message": "Gagal menyimpan file. Coba lagi.",
+    "message": "Gagal menyimpan file. Silahkan coba lagi.",
     "description": "File save failed message"
   },
   "options_alert_downloadInitiated": {
-    "message": "Unduh file identitas dimulai.",
+    "message": "Pengunduhan file identitas dimulai.",
     "description": "Download initiated message"
   },
   "options_alert_importSuccess": {
@@ -248,11 +248,11 @@
     "description": "Back to settings button label"
   },
   "options_editor_fullExperienceNote": {
-    "message": "Untuk pengalaman editor penuh, ",
+    "message": "Untuk pengalaman editor yang maksimal, ",
     "description": "Full editor experience note prefix"
   },
   "options_editor_openInNewTabLink": {
-    "message": "buka editor ini di tab baru",
+    "message": "buka editor di tab baru",
     "description": "Open in new tab link text"
   },
   "options_editor_stylingGuide": {
@@ -260,7 +260,7 @@
     "description": "Styling guide link text"
   },
   "options_editor_renameTheme": {
-    "message": "Namai ulang tema kustom",
+    "message": "Ubah nama tema kustom",
     "description": "Rename theme button title"
   },
   "options_editor_deleteTheme": {
@@ -284,7 +284,7 @@
     "description": "Musixmatch provider name"
   },
   "options_provider_lrclib": {
-    "message": "LRCLIB",
+    "message": "LRClib",
     "description": "LRClib provider name"
   },
   "options_provider_youtube": {
@@ -292,7 +292,7 @@
     "description": "Youtube provider name"
   },
   "options_provider_youtubeCaptions": {
-    "message": "YouTube Captions",
+    "message": "Subtitel YouTube",
     "description": "Youtube Captions provider name"
   },
   "options_syncType_syllable": {
@@ -300,7 +300,7 @@
     "description": "Syllable sync type label"
   },
   "options_syncType_syllable_tooltip": {
-    "message": "Menyoroti individual suku kata secara langsung. Sinkron sukukata memberikan pengalaman terbaik.",
+    "message": "Menyorot tiap suku kata saat dinyanyikan. Sinkronisasi suku kata memberikan pengalaman terbaik.",
     "description": "Syllable sync type tooltip"
   },
   "options_syncType_word": {
@@ -308,7 +308,7 @@
     "description": "Word sync type label"
   },
   "options_syncType_word_tooltip": {
-    "message": "Menyoroti individual kata secara langsung. Sinkron kata memberikan pengalaman baik.",
+    "message": "Menyorot setiap kata saat dinyanyikan. Sinkronisasi kata memberikan pengalaman yang baik.",
     "description": "Word sync type tooltip"
   },
   "options_syncType_line": {
@@ -324,7 +324,7 @@
     "description": "Unsynced sync type label"
   },
   "options_syncType_unsynced_tooltip": {
-    "message": "Lirik tanpa informasi waktu. Lirik tak disinkron memberikan pengalaman minimal.",
+    "message": "Lirik tanpa informasi waktu. Lirik non-sinkron memberikan pengalaman minimal.",
     "description": "Unsynced sync type tooltip"
   },
   "options_detail_rateTheme": {
@@ -348,11 +348,11 @@
     "description": "Download shader link text"
   },
   "options_detail_shaderImportSuffix": {
-    "message": "dan impor filenya",
+    "message": "lalu impor ke",
     "description": "Shader import suffix text before Better Lyrics Shaders link"
   },
   "marketplace_pageTitle": {
-    "message": "Better Lyrics Toko Tema",
+    "message": "Toko Tema Better Lyrics",
     "description": "Page title"
   },
   "marketplace_title": {
@@ -376,7 +376,7 @@
     "description": "Keyboard shortcuts button label"
   },
   "marketplace_sortBy": {
-    "message": "Urutkan dari",
+    "message": "Urut berdasarkan",
     "description": "Sort filter group label"
   },
   "marketplace_sortRatingDesc": {
@@ -420,7 +420,7 @@
     "description": "Show not installed themes"
   },
   "marketplace_options": {
-    "message": "Pilihan",
+    "message": "Opsi",
     "description": "Options filter group label"
   },
   "marketplace_hasShaders": {
@@ -436,7 +436,7 @@
     "description": "Install from URL button"
   },
   "marketplace_submitTheme": {
-    "message": "Kirim tema",
+    "message": "Unggah tema",
     "description": "Submit a theme link"
   },
   "marketplace_loading": {
@@ -448,7 +448,7 @@
     "description": "Retry button"
   },
   "marketplace_noThemesMatch": {
-    "message": "Tidak ada tema yang cocok dengan filter",
+    "message": "Tidak ada tema yang cocok dengan filtermu",
     "description": "Empty state message"
   },
   "marketplace_permissionTitle": {
@@ -456,7 +456,7 @@
     "description": "Permission required title"
   },
   "marketplace_permissionMessage": {
-    "message": "Untuk menelusuri dan memasang tema, Better Lyrics memerlukan izin untuk mengakses GitHub dimana tema di simpan & API marketplace.",
+    "message": "Untuk menelusuri dan memasang tema, Better Lyrics memerlukan izin untuk mengakses GitHub tempat tema dihosting & api marketplace.",
     "description": "Permission required message"
   },
   "marketplace_grantPermission": {
@@ -516,11 +516,11 @@
     "description": "URL permission explanation title"
   },
   "marketplace_urlPermissionDesc": {
-    "message": "Memasang tema dari GitHub membutuhkan akses lebih luas daripada toko. Ini mengizinkan Better Lyrics untuk:",
+    "message": "Memasang tema dari URL GitHub kustom memerlukan akses yang lebih luas dibandingkan marketplace. Hal ini memungkinkan Better Lyrics untuk:",
     "description": "URL permission description"
   },
   "marketplace_urlPermissionItem1": {
-    "message": "Ambil file tema dari repositori GitHub",
+    "message": "Mengambil file tema dari repositori GitHub",
     "description": "URL permission list item 1"
   },
   "marketplace_urlPermissionItem2": {
@@ -568,7 +568,7 @@
     "description": "Sort shortcuts group"
   },
   "marketplace_shortcutsSortHint": {
-    "message": "tekan lagi untuk alihkan arah",
+    "message": "tekan lagi untuk alihkan arah urutan",
     "description": "Sort toggle hint"
   },
   "marketplace_shortcutsByRating": {
@@ -576,11 +576,11 @@
     "description": "Sort by rating shortcut"
   },
   "marketplace_shortcutsByDownloads": {
-    "message": "Berdasar unduhan",
+    "message": "Berdasarkan unduhan",
     "description": "Sort by downloads shortcut"
   },
   "marketplace_shortcutsByDate": {
-    "message": "Berdasar tanggal",
+    "message": "Berdasarkan tanggal",
     "description": "Sort by date shortcut"
   },
   "marketplace_shortcutsFilters": {
@@ -666,7 +666,7 @@
     }
   },
   "editor_pageTitle": {
-    "message": "Better Lyrics Editor CSS",
+    "message": "Editor Gaya Better Lyrics",
     "description": "Standalone editor page title"
   },
   "editor_importFromFile": {
@@ -682,15 +682,15 @@
     "description": "Save as theme button"
   },
   "editor_stylingGuide": {
-    "message": "Panduan penataan gaya",
+    "message": "Panduan gaya",
     "description": "Styling guide button"
   },
   "editor_tip": {
-    "message": "Tip: Ini adalah tab tersendiri, kamu bisa memindahkan editor ini ke jendela terpisah atau menggunakan layar terpisah di samping YouTube Music untuk melihat perubahanmu secara langsung. Untuk info lebih lanjut, kunjungi",
+    "message": "Tips: Ini adalah tab mandiri. Anda dapat memindahkan editor ini ke jendela terpisah atau menggunakan tampilan layar terbagi bersama YouTube Music untuk melihat perubahan secara real-time. Untuk info lebih lanjut, kunjungi",
     "description": "Editor tip text"
   },
   "editor_poweredBy": {
-    "message": "Diberdayakan oleh",
+    "message": "Diberdaya oleh",
     "description": "Powered by label"
   },
   "editor_playground": {
@@ -722,15 +722,15 @@
     "description": "Loading message while still searching"
   },
   "lyrics_noSyncedLyrics": {
-    "message": "Better Lyrics tidak bisa mencari lirik tersinkron",
+    "message": "Better Lyrics tidak menemukan lirik tersinkron",
     "description": "Message when no synced lyrics found"
   },
   "lyrics_adPlaying": {
-    "message": "[tutututu tutututu]",
+    "message": "[lalalalala.....]",
     "description": "Message shown during ad playback"
   },
   "lyrics_notFound": {
-    "message": "Tidak ketemu lirik untuk lagu ini",
+    "message": "Lirik lagu ini nggak ketemu",
     "description": "Message when no lyrics are available"
   },
   "options_language_exclusions": {
@@ -758,7 +758,7 @@
     "description": "Search input placeholder"
   },
   "options_romanization_hint": {
-    "message": "Klik untuk dialihkan. Bahasa yang dikecualikan tidak akan diromanisasi.",
+    "message": "Klik untuk alihkan. Bahasa yang dikecualikan tidak akan diromanisasi.",
     "description": "Hint text for romanization exclusions"
   },
   "options_translation_hint": {
@@ -766,7 +766,7 @@
     "description": "Hint text for translation exclusions"
   },
   "options_resetToDefault": {
-    "message": "Atur ulang $TYPE$ ke Bawaan",
+    "message": "Atur ulang $TYPE$ ke default",
     "description": "Reset to default button label",
     "placeholders": {
       "type": {
