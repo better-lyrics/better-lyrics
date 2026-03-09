@@ -180,6 +180,10 @@ export function disableInertWhenFullscreen(): void {
             const tabSelector = document.getElementsByClassName(TAB_HEADER_CLASS)[1] as HTMLElement;
             if (tabSelector && tabSelector.getAttribute("aria-selected") !== "true") {
               tabSelector.click();
+              currentTab = 1;
+              if (AppState.areLyricsLoaded && AppState.lyricData?.syncType !== "none") {
+                AppState.areLyricsTicking = true;
+              }
             }
           }
         })

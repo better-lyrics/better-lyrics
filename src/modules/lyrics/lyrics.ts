@@ -112,7 +112,6 @@ export async function createLyrics(detail: PlayerDetails, signal: AbortSignal): 
     }
 
     if (matchingSong) {
-      // accurate metadata passed parameters (song with (feat.) and artists with no localized "and")
       song = matchingSong.title;
       artist = matchingSong.artist;
 
@@ -332,9 +331,14 @@ export async function preFetchLyrics(
   let matchingSong = await getSongMetadata(videoId, 250, signal);
   let swappedVideoId = false;
 
-  if (isMusicVideo && matchingSong && matchingSong.counterpartVideoId && matchingSong.segmentMap) {
-    swappedVideoId = true;
-    videoId = matchingSong.counterpartVideoId;
+  if (matchingSong) {
+    song = matchingSong.title;
+    artist = matchingSong.artist;
+
+    if (isMusicVideo && matchingSong.counterpartVideoId && matchingSong.segmentMap) {
+      swappedVideoId = true;
+      videoId = matchingSong.counterpartVideoId;
+    }
   }
 
   song = song.trim();
