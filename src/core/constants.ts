@@ -48,7 +48,7 @@ export const LRCLIB_UPLOAD_URL = "https://lrclibup.boidu.dev/" as const;
 export const LRCLIB_CLIENT_HEADER = "BetterLyrics Extension (https://github.com/better-lyrics/better-lyrics)" as const;
 export const THEME_STORE_API_URL = "https://better-lyrics-themes-api.boidu.dev" as const;
 export const THEME_STORE_TURNSTILE_URL = `${THEME_STORE_API_URL}/turnstile` as const;
-export const THEME_REGISTRY_BASE = "https://raw.githubusercontent.com/better-lyrics/themes" as const;
+const THEME_REGISTRY_BASE = "https://raw.githubusercontent.com/better-lyrics/themes" as const;
 export const THEME_REGISTRY_URL = `${THEME_REGISTRY_BASE}/master` as const;
 export const TRANSLATE_LYRICS_URL = function (lang: string, text: string): string {
   return `https://translate.googleapis.com/translate_a/single?client=gtx&sl=auto&tl=${lang}&dt=t&q=${encodeURIComponent(text)}`;

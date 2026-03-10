@@ -111,10 +111,15 @@ export async function createLyrics(detail: PlayerDetails, signal: AbortSignal): 
       AppState.suppressZeroTime = 0;
     }
 
-    if (isMusicVideo && matchingSong && matchingSong.counterpartVideoId && matchingSong.segmentMap) {
-      log("Switching VideoId to Audio Id");
-      swappedVideoId = true;
-      videoId = matchingSong.counterpartVideoId;
+    if (matchingSong) {
+      song = matchingSong.title;
+      artist = matchingSong.artist;
+
+      if (isMusicVideo && matchingSong.counterpartVideoId && matchingSong.segmentMap) {
+        log("Switching VideoId to Audio Id");
+        swappedVideoId = true;
+        videoId = matchingSong.counterpartVideoId;
+      }
     }
 
     const tabSelector = document.getElementsByClassName(TAB_HEADER_CLASS)[1];
@@ -149,6 +154,7 @@ export async function createLyrics(detail: PlayerDetails, signal: AbortSignal): 
 
     let lyrics: LyricSourceResult | null = null;
     let sourceMap = newSourceMap();
+
     // We depend on the cubey lyrics to fetch certain metadata, so we always call it even if it isn't the top priority
     let providerParameters: ProviderParameters = {
       song,
@@ -229,7 +235,7 @@ export async function createLyrics(detail: PlayerDetails, signal: AbortSignal): 
             let matchAmount = stringSimilarity(lyricText.toLowerCase(), ytLyrics.text.toLowerCase());
             if (matchAmount < 0.5) {
               log(
-                `Got lyrics from ${sourceLyrics.source}, but they don't match yt lyrics. Rejecting: Match: ${matchAmount}%`
+                `Got lyrics from ${sourceLyrics.source}, but they don't match YT lyrics. Rejecting: Match: ${matchAmount}%`
               );
               continue;
             }
@@ -315,9 +321,14 @@ export async function preFetchLyrics(
   let matchingSong = await getSongMetadata(videoId, 250, signal);
   let swappedVideoId = false;
 
-  if (isMusicVideo && matchingSong && matchingSong.counterpartVideoId && matchingSong.segmentMap) {
-    swappedVideoId = true;
-    videoId = matchingSong.counterpartVideoId;
+  if (matchingSong) {
+    song = matchingSong.title;
+    artist = matchingSong.artist;
+
+    if (isMusicVideo && matchingSong.counterpartVideoId && matchingSong.segmentMap) {
+      swappedVideoId = true;
+      videoId = matchingSong.counterpartVideoId;
+    }
   }
 
   song = song.trim();
