@@ -1,6 +1,6 @@
 {
   "extensionName": {
-    "message": "Lepší texty písní (Texty písní pro YouTube hudbu)",
+    "message": "Better Lyrics (Lyrics for Youtube Music)",
     "description": "The name of the extension"
   },
   "extensionDescription": {
@@ -12,7 +12,7 @@
     "description": "General settings tab label"
   },
   "options_tab_display": {
-    "message": "Zobrazení",
+    "message": "Display",
     "description": "Display settings tab label"
   },
   "options_tab_language": {
@@ -200,7 +200,7 @@
     "description": "Nothing to clear message"
   },
   "options_alert_exportFailed": {
-    "message": "Export identity selhal",
+    "message": "Failed to export identity",
     "description": "Export identity failed message"
   },
   "options_alert_fileSaveDialogOpened": {
@@ -208,7 +208,7 @@
     "description": "File save dialog opened message"
   },
   "options_alert_fileSaveFailed": {
-    "message": "Chyba při ukládání souboru. Zkuste to prosím znovu.",
+    "message": "Error saving file. Please try again.",
     "description": "File save failed message"
   },
   "options_alert_downloadInitiated": {

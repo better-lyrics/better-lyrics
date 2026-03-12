@@ -3,7 +3,6 @@ import {
   LOG_PREFIX,
   LYRICS_CLASS,
   LYRICS_FOUND_LOG,
-  LYRICS_SPACING_ELEMENT_ID,
   LYRICS_TAB_NOT_DISABLED_LOG,
   LYRICS_WRAPPER_ID,
   LYRICS_WRAPPER_NOT_VISIBLE_LOG,
@@ -32,12 +31,7 @@ import {
   translateText,
   translateTextIntoRomaji,
 } from "@modules/lyrics/translation";
-import {
-  ADD_EXTRA_PADDING_TOP,
-  animEngineState,
-  lyricsElementAdded,
-  SCROLL_POS_OFFSET_RATIO,
-} from "@modules/ui/animationEngine";
+import { animEngineState, lyricsElementAdded } from "@modules/ui/animationEngine";
 import {
   addFooter,
   addNoLyricsButton,
@@ -103,6 +97,8 @@ function getResizeObserver(): ResizeObserver {
             (entry.target.clientWidth !== AppState.lyricData.lyricWidth ||
               entry.target.clientHeight !== AppState.lyricData.lyricHeight)
           ) {
+            animEngineState.doneFirstInstantScroll = false;
+            animEngineState.nextScrollAllowedTime = 0;
             calculateLyricPositions();
           }
         }
@@ -634,14 +630,6 @@ function injectLyrics(data: LyricSourceResultWithMeta, keepLoaderVisible = false
     addNoLyricsButton(data.song, data.artist, data.album, data.duration);
   }
 
-  let spacingElement = document.createElement("div");
-  spacingElement.id = LYRICS_SPACING_ELEMENT_ID;
-  spacingElement.style.height = "100px"; // Temp Value; actual is calculated in the tick function
-  spacingElement.textContent = "";
-  spacingElement.style.padding = "0";
-  spacingElement.style.margin = "0";
-  lyricsContainer.appendChild(spacingElement);
-
   lyricsContainer.dataset.sync = syncType;
   lyricsContainer.dataset.loaderVisible = String(keepLoaderVisible);
   if (lyrics[0].words === t("lyrics_notFound")) {
@@ -681,16 +669,6 @@ export function calculateLyricPositions() {
   setExtraHeight();
   if (AppState.lyricData && AppState.areLyricsTicking) {
     const lyricsElement = document.getElementsByClassName(LYRICS_CLASS)[0] as HTMLElement;
-
-    if (ADD_EXTRA_PADDING_TOP.getBooleanValue()) {
-      const tabRendererHeight = document.getElementById("tab-renderer")?.clientHeight;
-      if (tabRendererHeight) {
-        lyricsElement.style.paddingTop = `${tabRendererHeight * SCROLL_POS_OFFSET_RATIO.getNumberValue()}px`;
-      } else {
-        lyricsElement.style.paddingTop = "";
-        log("Could not find tab renderer height, not adding extra padding top.");
-      }
-    }
 
     const data = AppState.lyricData;
     data.lyricWidth = lyricsElement.clientWidth;

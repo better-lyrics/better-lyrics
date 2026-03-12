@@ -26,7 +26,6 @@ export const FULLSCREEN_BUTTON_SELECTOR = ".fullscreen-button" as const;
 // DOM IDs and Attributes
 export const LYRICS_LOADER_ID = "blyrics-loader" as const;
 export const LYRICS_WRAPPER_ID = "blyrics-wrapper" as const;
-export const LYRICS_SPACING_ELEMENT_ID = "blyrics-spacing-element" as const;
 export const LYRICS_DISABLED_ATTR = "blyrics-dfs" as const;
 export const HIDDEN_CLASS = "blyrics-hidden" as const;
 
