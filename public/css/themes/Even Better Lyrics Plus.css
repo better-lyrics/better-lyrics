@@ -180,3 +180,15 @@ ytmusic-player-bar {
   0%{ transform: translateX(0); }
   100% { transform: translateX(calc(-50% - 12px)); }
 }
+
+.av-toggle.ytmusic-av-toggle{
+  background: rgba(255,255,255,0.1);
+}
+
+.ytmusic-av-toggle[aria-pressed=false]{
+  background: transparent;
+}
+
+.ytmusic-av-toggle[aria-pressed=true] {
+  background: rgba(255,255,255,0.1);
+}
