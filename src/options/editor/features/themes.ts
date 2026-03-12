@@ -6,7 +6,6 @@ import type { ThemeSource } from "../../store/types";
 import type { ThemeCardOptions } from "../types";
 
 import { getInstalledTheme, installSymlinkedThemeFromMarketplace } from "../../store/themeStoreManager";
-import { checkStorePermissions, requestStorePermissions } from "../../store/themeStoreService";
 import THEMES, { deleteCustomTheme, getCustomThemes, renameCustomTheme, saveCustomTheme } from "../../themes";
 import type { Theme } from "../../themes";
 import { SAVE_CUSTOM_THEME_DEBOUNCE, SAVE_DEBOUNCE_DELAY } from "../core/editor";
@@ -167,75 +166,25 @@ class ThemeManager {
   private async applySymlinkedTheme(theme: Theme & { storeId: string }): Promise<void> {
     console.log(LOG_PREFIX_EDITOR, `Applying symlinked theme: ${theme.name} → ${theme.storeId}`);
 
-    const permission = await checkStorePermissions();
+    const installed = await installSymlinkedThemeFromMarketplace(theme.storeId);
 
-    if (permission.granted) {
-      console.log(LOG_PREFIX_EDITOR, "Store permissions granted, installing from marketplace");
-      const installed = await installSymlinkedThemeFromMarketplace(theme.storeId);
+    if (installed) {
+      const success = await applyStoreThemeComplete({
+        themeId: installed.id,
+        css: installed.css,
+        title: installed.title || theme.name,
+        creators: installed.creators || [],
+        source: "marketplace",
+      });
 
-      if (installed) {
-        const success = await applyStoreThemeComplete({
-          themeId: installed.id,
-          css: installed.css,
-          title: installed.title || theme.name,
-          creators: installed.creators || [],
-          source: "marketplace",
-        });
-
-        if (success) {
-          showAlert(t("symlink_applied", theme.name));
-          return;
-        }
+      if (success) {
+        showAlert(t("symlink_applied", theme.name));
+        return;
       }
-
-      console.warn(LOG_PREFIX_EDITOR, `Marketplace install failed for ${theme.storeId}, falling back to bundled`);
-      showAlert(t("symlink_installFailed"));
-      await this.applyBundledFallback(theme);
-      return;
     }
 
-    console.log(LOG_PREFIX_EDITOR, "Store permissions not granted, showing permission modal");
-
-    const messageNode = document.createTextNode(t("symlink_modal_message"));
-    const confirmed = await showConfirm(
-      t("symlink_modal_title"),
-      messageNode,
-      false,
-      t("symlink_modal_enable"),
-      t("symlink_modal_useBundled")
-    );
-
-    if (confirmed) {
-      const granted = await requestStorePermissions();
-      if (granted) {
-        console.log(LOG_PREFIX_EDITOR, "Permissions granted after prompt, installing from marketplace");
-        const installed = await installSymlinkedThemeFromMarketplace(theme.storeId);
-
-        if (installed) {
-          const success = await applyStoreThemeComplete({
-            themeId: installed.id,
-            css: installed.css,
-            title: installed.title || theme.name,
-            creators: installed.creators || [],
-            source: "marketplace",
-          });
-
-          if (success) {
-            showAlert(t("symlink_applied", theme.name));
-            return;
-          }
-        }
-
-        console.warn(LOG_PREFIX_EDITOR, `Marketplace install failed after permission grant for ${theme.storeId}`);
-        showAlert(t("symlink_installFailed"));
-      } else {
-        console.log(LOG_PREFIX_EDITOR, "Permissions denied by user");
-      }
-    } else {
-      console.log(LOG_PREFIX_EDITOR, "User chose bundled fallback");
-    }
-
-    await this.applyBundledFallback(theme);
+    console.warn(LOG_PREFIX_EDITOR, `Marketplace install failed for ${theme.storeId}`);
+    showAlert(t("symlink_installFailed"));
   }
 
   private async applyBundledFallback(selectedTheme: Theme): Promise<void> {
@@ -260,7 +209,7 @@ class ThemeManager {
 
       await this.saveTheme(themeContent);
 
-      showAlert(t("symlink_bundledFallback", selectedTheme.name));
+      showAlert(t("symlink_applied", selectedTheme.name));
     });
   }
 

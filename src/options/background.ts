@@ -12,59 +12,49 @@ import { LOG_PREFIX_BACKGROUND } from "@constants";
 import { getLocalStorage, getSyncStorage } from "@core/storage";
 import {
   getInstalledStoreThemes,
-  getInstalledTheme,
-  installSymlinkedThemeFromBundle,
+  installSymlinkedThemeFromMarketplace,
   performSilentUpdates,
   performUrlThemeUpdates,
   setActiveStoreTheme,
 } from "./store/themeStoreManager";
-import { checkStorePermissions, fetchAllStoreThemes } from "./store/themeStoreService";
-import { getSymlinkedStoreId, SYMLINKED_THEMES } from "./themes";
+import { fetchAllStoreThemes } from "./store/themeStoreService";
 
 const THEME_UPDATE_ALARM = "theme-update-check";
 const UPDATE_INTERVAL_MINUTES = 360; // 6 hours
-const SYMLINKED_MIGRATION_VERSION = 1;
+
+// -- Symlinked Theme Migration --------------------------
+
 const SYMLINKED_MIGRATION_KEY = "symlinkedMigrationVersion";
+const SYMLINKED_MIGRATION_VERSION = 1;
+
+const SYMLINKED_THEME_MAP: Record<string, string> = {
+  Minimal: "minimal",
+  "Dynamic Background": "dynamic-background",
+  "Apple Music": "apple-music",
+};
 
 async function migrateSymlinkedThemes(): Promise<void> {
   try {
     const result = await getLocalStorage<{ [SYMLINKED_MIGRATION_KEY]?: number }>([SYMLINKED_MIGRATION_KEY]);
-    const currentVersion = result[SYMLINKED_MIGRATION_KEY] ?? 0;
-
-    if (currentVersion >= SYMLINKED_MIGRATION_VERSION) {
-      console.log(LOG_PREFIX_BACKGROUND, `Symlinked migration already at v${SYMLINKED_MIGRATION_VERSION}, skipping`);
-      return;
-    }
-
-    console.log(LOG_PREFIX_BACKGROUND, "Starting symlinked themes migration");
-
-    for (const theme of SYMLINKED_THEMES) {
-      const existing = await getInstalledTheme(theme.storeId);
-      if (existing) {
-        console.log(LOG_PREFIX_BACKGROUND, `Symlinked theme already installed: ${theme.storeId}, skipping`);
-        continue;
-      }
-
-      const response = await fetch(chrome.runtime.getURL(`css/themes/${theme.path}`));
-      const css = await response.text();
-      await installSymlinkedThemeFromBundle(theme.storeId, css, theme.name);
-      console.log(LOG_PREFIX_BACKGROUND, `Migrated symlinked theme: ${theme.name} → ${theme.storeId}`);
-    }
+    if ((result[SYMLINKED_MIGRATION_KEY] ?? 0) >= SYMLINKED_MIGRATION_VERSION) return;
 
     const syncData = await getSyncStorage<{ themeName?: string }>(["themeName"]);
     const themeName = syncData.themeName;
 
     if (themeName && !themeName.startsWith("store:")) {
-      const storeId = getSymlinkedStoreId(themeName);
+      const storeId = SYMLINKED_THEME_MAP[themeName];
       if (storeId) {
-        await chrome.storage.sync.set({ themeName: `store:${storeId}` });
-        await setActiveStoreTheme(storeId);
-        console.log(LOG_PREFIX_BACKGROUND, `Migrated active theme: ${themeName} → store:${storeId}`);
+        console.log(LOG_PREFIX_BACKGROUND, `Migrating symlinked theme: ${themeName} → store:${storeId}`);
+        const installed = await installSymlinkedThemeFromMarketplace(storeId);
+        if (installed) {
+          await chrome.storage.sync.set({ themeName: `store:${storeId}` });
+          await setActiveStoreTheme(storeId);
+          console.log(LOG_PREFIX_BACKGROUND, `Migrated active theme: ${themeName} → store:${storeId}`);
+        }
       }
     }
 
     await chrome.storage.local.set({ [SYMLINKED_MIGRATION_KEY]: SYMLINKED_MIGRATION_VERSION });
-    console.log(LOG_PREFIX_BACKGROUND, "Symlinked themes migration complete");
   } catch (err) {
     console.warn(LOG_PREFIX_BACKGROUND, "Symlinked themes migration failed:", err);
   }
@@ -72,9 +62,6 @@ async function migrateSymlinkedThemes(): Promise<void> {
 
 async function checkAndApplyThemeUpdates(): Promise<void> {
   try {
-    const permission = await checkStorePermissions();
-    if (!permission.granted) return;
-
     const installed = await getInstalledStoreThemes();
     if (installed.length === 0) return;
 

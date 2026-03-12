@@ -451,14 +451,6 @@
     "message": "Không chủ đề nào tương thích với bộ lọc của bạn",
     "description": "Empty state message"
   },
-  "marketplace_permissionTitle": {
-    "message": "Yêu cầu cấp quyền",
-    "description": "Permission required title"
-  },
-  "marketplace_permissionMessage": {
-    "message": "Để khám phá và cài đặt chủ đề, Better Lyrics cần quyền truy cập GitHub, nơi lưu trữ các giao diện, cùng với API của marketplace.",
-    "description": "Permission required message"
-  },
   "marketplace_grantPermission": {
     "message": "Cấp quyền",
     "description": "Grant permission button"

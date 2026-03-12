@@ -7,7 +7,7 @@ export interface Theme {
   /**
    * Path relative to public/css/themes/
    */
-  path: string;
+  path?: string;
   storeId?: string;
 }
 
@@ -63,7 +63,6 @@ const themes: Theme[] = [
     name: "Minimal",
     author: "Semicolonhope",
     link: "",
-    path: "Minimal.css",
     storeId: "minimal",
   },
   {
@@ -76,23 +75,15 @@ const themes: Theme[] = [
     name: "Dynamic Background",
     author: "chengg",
     link: "https://github.com/chengggit/Youtube-Music-Dynamic-Theme",
-    path: "Dynamic Background.css",
     storeId: "dynamic-background",
   },
   {
     name: "Apple Music",
     author: "tposejank",
     link: "https://x.com/tposejank",
-    path: "Apple Music.css",
     storeId: "apple-music",
   },
 ];
-
-export const SYMLINKED_THEMES = themes.filter((t): t is Theme & { storeId: string } => !!t.storeId);
-
-export function getSymlinkedStoreId(themeName: string): string | undefined {
-  return themes.find(t => t.name === themeName)?.storeId;
-}
 
 export async function getCustomThemes(): Promise<CustomTheme[]> {
   const result = await getLocalStorage<{ customThemes?: CustomTheme[] }>(["customThemes"]);

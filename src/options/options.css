@@ -1328,6 +1328,7 @@ input.cm-textfield:focus-visible {
 	cursor: pointer;
 	transition: background 0.15s ease;
 	white-space: nowrap;
+	width: fit-content;
 }
 
 .theme-deprecation-cta:hover {

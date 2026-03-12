@@ -94,28 +94,12 @@ async function getDefaultBranch(repo: string, testFile = "metadata.json"): Promi
   return "main";
 }
 
-async function checkRegistryPermissions(): Promise<PermissionStatus> {
-  return { granted: true, canRequest: true };
-}
-
-async function requestRegistryPermissions(): Promise<boolean> {
-  return true;
-}
-
 export async function checkUrlInstallPermissions(): Promise<PermissionStatus> {
   return { granted: true, canRequest: true };
 }
 
 export async function requestUrlInstallPermissions(): Promise<boolean> {
   return true;
-}
-
-export async function checkStorePermissions(): Promise<PermissionStatus> {
-  return checkRegistryPermissions();
-}
-
-export async function requestStorePermissions(): Promise<boolean> {
-  return requestRegistryPermissions();
 }
 
 function getRegistryFileUrl(themeId: string, file: string): string {

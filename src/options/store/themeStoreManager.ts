@@ -228,7 +228,7 @@ export async function installSymlinkedThemeFromMarketplace(storeId: string): Pro
   console.log(LOG_PREFIX_STORE, `Installing symlinked theme from marketplace: ${storeId}`);
 
   const existing = await getInstalledTheme(storeId);
-  if (existing && existing.version !== "0.0.0-bundled") {
+  if (existing) {
     console.log(LOG_PREFIX_STORE, `Symlinked theme already installed: ${storeId} v${existing.version}`);
     return existing;
   }
@@ -247,36 +247,6 @@ export async function installSymlinkedThemeFromMarketplace(storeId: string): Pro
     console.warn(LOG_PREFIX_STORE, `Failed to install symlinked theme from marketplace: ${storeId}`, err);
     return null;
   }
-}
-
-export async function installSymlinkedThemeFromBundle(
-  storeId: string,
-  bundledCss: string,
-  themeName: string
-): Promise<InstalledStoreTheme> {
-  console.log(LOG_PREFIX_STORE, `Installing symlinked theme from bundle: ${storeId}`);
-
-  const installedTheme: InstalledStoreTheme = {
-    id: storeId,
-    repo: "",
-    title: themeName,
-    creators: [],
-    css: bundledCss,
-    installedAt: Date.now(),
-    version: "0.0.0-bundled",
-    source: "marketplace",
-  };
-
-  await chrome.storage.local.set({ [getThemeStorageKey(storeId)]: installedTheme });
-
-  const index = await getThemeIndex();
-  if (!index.themeIds.includes(storeId)) {
-    index.themeIds.push(storeId);
-    await setThemeIndex(index);
-  }
-
-  console.log(LOG_PREFIX_STORE, `Installed symlinked theme from bundle: ${storeId}`);
-  return installedTheme;
 }
 
 function parseVersion(version: string): number[] {

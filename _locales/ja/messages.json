@@ -451,14 +451,6 @@
     "message": "フィルターに一致するテーマがありません",
     "description": "Empty state message"
   },
-  "marketplace_permissionTitle": {
-    "message": "権限が必要です",
-    "description": "Permission required title"
-  },
-  "marketplace_permissionMessage": {
-    "message": "テーマを閲覧・インストールするには、Better LyricsがテーマがホストされているGitHubとマーケットプレイスAPIへのアクセス権限が必要です。",
-    "description": "Permission required message"
-  },
   "marketplace_grantPermission": {
     "message": "権限を許可",
     "description": "Grant permission button"
