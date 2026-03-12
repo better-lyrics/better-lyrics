@@ -1,15 +1,15 @@
 import { LOG_PREFIX_STORE, THEME_STORE_API_URL } from "@constants";
-import type { AllThemeStats, ApiResult, RatingResult } from "./types";
-import { fetchWithTimeout } from "./themeStoreService";
 import {
-  signRating,
-  signInstall,
-  signPayload,
+  getCertificate,
   isKeyRegistered,
   markKeyRegistered,
-  getCertificate,
   setCertificate,
+  signInstall,
+  signPayload,
+  signRating,
 } from "./keyIdentity";
+import { fetchWithTimeout } from "./themeStoreService";
+import type { AllThemeStats, ApiResult, RatingResult } from "./types";
 
 const THEME_ID_MAX_LENGTH = 128;
 const THEME_ID_PATTERN = /^[a-zA-Z0-9_-]+$/;

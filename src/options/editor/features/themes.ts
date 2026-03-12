@@ -1,15 +1,17 @@
 import { LOG_PREFIX_EDITOR } from "@constants";
 import { t } from "@core/i18n";
 import { getSyncStorage } from "@core/storage";
-
+import {
+  getInstalledStoreThemes,
+  getInstalledTheme,
+  installSymlinkedThemeFromMarketplace,
+} from "../../store/themeStoreManager";
 import type { ThemeSource } from "../../store/types";
-import type { ThemeCardOptions } from "../types";
-
-import { getInstalledTheme, installSymlinkedThemeFromMarketplace } from "../../store/themeStoreManager";
-import THEMES, { deleteCustomTheme, getCustomThemes, renameCustomTheme, saveCustomTheme } from "../../themes";
 import type { Theme } from "../../themes";
+import THEMES, { deleteCustomTheme, getCustomThemes, renameCustomTheme, saveCustomTheme } from "../../themes";
 import { SAVE_CUSTOM_THEME_DEBOUNCE, SAVE_DEBOUNCE_DELAY } from "../core/editor";
 import { editorStateManager } from "../core/state";
+import type { ThemeCardOptions } from "../types";
 import {
   deleteThemeBtn,
   editThemeBtn,
@@ -18,8 +20,12 @@ import {
   themeModalOverlay,
   themeNameDisplay,
   themeNameText,
-  themeSourceBadge,
+  themePreviewAuthor,
+  themePreviewBadge,
+  themePreviewCard,
+  themePreviewName,
   themeSelectorBtn,
+  themeSourceBadge,
 } from "../ui/dom";
 import { showAlert, showConfirm, showPrompt } from "../ui/feedback";
 import {
@@ -31,6 +37,26 @@ import {
 } from "./storage";
 
 const STORE_THEME_PREFIX = "store:";
+const preloadedImages = new Set<string>();
+
+function preloadImage(url: string): Promise<void> {
+  if (!url || preloadedImages.has(url)) return Promise.resolve();
+  preloadedImages.add(url);
+  return new Promise(resolve => {
+    const img = new Image();
+    img.onload = () => resolve();
+    img.onerror = () => resolve();
+    img.src = url;
+  });
+}
+
+export async function preloadInstalledThemeImages(): Promise<void> {
+  const themes = await getInstalledStoreThemes();
+  for (const theme of themes) {
+    const url = theme.imageUrls?.[0] ?? theme.coverUrl;
+    if (url) preloadImage(url);
+  }
+}
 
 type EditorThemeSource = "marketplace" | "github" | "custom" | "builtin" | null;
 
@@ -166,7 +192,11 @@ class ThemeManager {
   private async applySymlinkedTheme(theme: Theme & { storeId: string }): Promise<void> {
     console.log(LOG_PREFIX_EDITOR, `Applying symlinked theme: ${theme.name} → ${theme.storeId}`);
 
-    const installed = await installSymlinkedThemeFromMarketplace(theme.storeId);
+    let installed = await installSymlinkedThemeFromMarketplace(theme.storeId);
+
+    if (!installed) {
+      installed = await getInstalledTheme(theme.storeId);
+    }
 
     if (installed) {
       const success = await applyStoreThemeComplete({
@@ -209,7 +239,7 @@ class ThemeManager {
 
       await this.saveTheme(themeContent);
 
-      showAlert(t("symlink_applied", selectedTheme.name));
+      showAlert(t("builtin_applied", selectedTheme.name));
     });
   }
 
@@ -457,11 +487,23 @@ export async function updateThemeSelectorButton(): Promise<void> {
   updateCreateEditButton();
 
   const themeName = editorStateManager.getCurrentThemeName();
-  themeSelectorBtn.replaceChildren();
+
+  // -- Gather preview data before touching DOM --------------------------
+  let displayName = themeName || t("options_themes_chooseTheme");
+  let authorText = "";
+  let badgeLabel = "";
+  let badgeIcon: SVGSVGElement | null = null;
+  let bgUrl = "";
+
+  if (!themeName) {
+    const { customCSS } = (await chrome.storage.sync.get("customCSS")) as { customCSS?: string };
+    if (customCSS && customCSS.trim().length > 0) {
+      displayName = t("options_themes_customTheme");
+      authorText = t("theme_author_you");
+    }
+  }
 
   if (themeName) {
-    themeSelectorBtn.appendChild(document.createTextNode(themeName));
-
     const syncData = await getSyncStorage<{ themeName?: string }>(["themeName"]);
     const storedThemeName = syncData.themeName;
 
@@ -469,18 +511,35 @@ export async function updateThemeSelectorButton(): Promise<void> {
       const storeThemeId = storedThemeName.slice(STORE_THEME_PREFIX.length);
       const installedTheme = await getInstalledTheme(storeThemeId);
       if (installedTheme) {
-        const icon = installedTheme.source === "url" ? createGitHubIcon() : createMarketplaceIcon();
-        icon.classList.add("theme-selector-badge-icon");
-        const iconContainer = document.createElement("span");
-        iconContainer.className = "theme-selector-badge";
-        iconContainer.appendChild(icon);
-        iconContainer.append(installedTheme.source === "url" ? "GitHub" : "Marketplace");
-        themeSelectorBtn.dataset.source = installedTheme.source;
-        themeSelectorBtn.prepend(iconContainer);
+        const author = installedTheme.creators?.join(", ");
+        if (author) authorText = t("theme_author_prefix", author);
+        badgeIcon = installedTheme.source === "url" ? createGitHubIcon() : createMarketplaceIcon();
+        badgeLabel = installedTheme.source === "url" ? "GitHub" : "Marketplace";
+        bgUrl = installedTheme.imageUrls?.[0] ?? installedTheme.coverUrl ?? "";
       }
+    } else {
+      const builtIn = THEMES.find(theme => theme.name === storedThemeName);
+      authorText = builtIn ? t("theme_author_prefix", builtIn.author) : t("theme_author_you");
     }
-  } else {
-    themeSelectorBtn.appendChild(document.createTextNode("Choose a theme"));
+  }
+
+  if (bgUrl) await preloadImage(bgUrl);
+
+  // -- Apply all at once (no async gap) --------------------------
+  if (themePreviewName) themePreviewName.textContent = displayName;
+  if (themePreviewAuthor) themePreviewAuthor.textContent = authorText;
+  if (themePreviewCard)
+    themePreviewCard.style.setProperty("--theme-img-url", bgUrl ? `url("${bgUrl}")` : "transparent");
+
+  if (themePreviewBadge) {
+    themePreviewBadge.replaceChildren();
+    if (badgeIcon) {
+      themePreviewBadge.appendChild(badgeIcon);
+      themePreviewBadge.append(badgeLabel);
+      themePreviewBadge.classList.add("active");
+    } else {
+      themePreviewBadge.classList.remove("active");
+    }
   }
 }
 

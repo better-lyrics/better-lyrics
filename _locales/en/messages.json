@@ -137,6 +137,14 @@
     "message": "Choose a theme",
     "description": "Choose a theme button label"
   },
+  "options_themes_change": {
+    "message": "Change",
+    "description": "Change theme button label"
+  },
+  "options_themes_customTheme": {
+    "message": "Custom Theme",
+    "description": "Display name for unnamed custom themes"
+  },
   "options_themes_customStyles": {
     "message": "Custom Styles",
     "description": "Custom styles label"
@@ -843,9 +851,33 @@
       }
     }
   },
+  "builtin_applied": {
+    "message": "Applied theme: $NAME$",
+    "description": "Alert after successfully applying a bundled built-in theme",
+    "placeholders": {
+      "name": {
+        "content": "$1",
+        "example": "Spotlight"
+      }
+    }
+  },
+  "theme_author_prefix": {
+    "message": "by $AUTHOR$",
+    "description": "Author prefix shown on theme selector button",
+    "placeholders": {
+      "author": {
+        "content": "$1",
+        "example": "boidu"
+      }
+    }
+  },
+  "theme_author_you": {
+    "message": "by You",
+    "description": "Author label for custom user themes on theme selector button"
+  },
   "symlink_installFailed": {
-    "message": "Couldn't reach marketplace, using bundled version",
-    "description": "Alert when marketplace fetch fails for a symlinked theme"
+    "message": "Couldn't install theme. Check your connection and try again.",
+    "description": "Alert when a symlinked theme fails to install from marketplace"
   },
   "symlink_badge_marketplace": {
     "message": "Marketplace",

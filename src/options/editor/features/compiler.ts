@@ -1,6 +1,6 @@
-import { compileWithDetails, type CompileError as RicsError, type CompileWarning as RicsWarning } from "rics";
 import { LOG_PREFIX_EDITOR } from "@constants";
 import { truncateSource } from "@utils";
+import { compileWithDetails, type CompileError as RicsError, type CompileWarning as RicsWarning } from "rics";
 
 const COMPILE_TIMEOUT = 3000;
 const MAX_ITERATIONS = 10000;

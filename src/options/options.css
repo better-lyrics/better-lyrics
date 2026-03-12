@@ -113,6 +113,128 @@ body {
     margin-top: 1.5rem;
 }
 
+/* -- Theme Preview Card -------------------------- */
+
+.theme-preview-card {
+    --theme-img-url: none;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-top: 1rem;
+    margin-bottom: 1.25rem;
+    padding: 1rem 1.25rem;
+    border-radius: 0.75rem;
+    background: linear-gradient(45deg, rgb(51 52 55 / 100%), rgb(51 52 55 / 75%), rgb(51 52 55 / 0%)), var(--theme-img-url), rgb(51 52 55 / 100%);
+    background-color: rgba(255, 255, 255, 0.05);
+    background-size: cover;
+    background-position: right;
+    box-sizing: border-box;
+    overflow: hidden;
+    min-height: 3.5rem;
+    outline: 1px solid #48494b;
+}
+
+.theme-preview-card::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    backdrop-filter: blur(8px);
+    pointer-events: none;
+    z-index: 0;
+}
+
+.theme-preview-info {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    min-width: 0;
+}
+
+.theme-preview-header {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.theme-preview-name {
+    font-size: 1.125rem;
+    font-weight: 500;
+    color: #fff;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.theme-preview-author {
+    font-size: 0.8rem;
+    color: rgba(255, 255, 255, 0.5);
+}
+
+.theme-preview-author:empty {
+    display: none;
+}
+
+.theme-preview-badge {
+    display: none;
+    align-items: center;
+    gap: 0.25rem;
+    font-size: 0.625rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    padding: 0.15rem 0.4rem;
+    border-radius: 0.25rem;
+    border: 0.5px solid rgba(255, 255, 255, 0.1);
+		background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(2px);
+    color: rgba(255, 255, 255, 0.625);
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+.theme-preview-badge.active {
+    display: inline-flex;
+}
+
+.theme-preview-badge svg {
+    width: 0.75rem;
+    height: 0.75rem;
+}
+
+.theme-preview-change-btn {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    background-color: hsla(0, 0%, 100%, 0.1);
+    color: #fff;
+    padding: 8px 12px;
+    padding-right: 16px;
+    border: none;
+    border-radius: 0.5rem;
+    cursor: pointer;
+    font-size: 0.875rem;
+    width: fit-content;
+    margin: 0;
+    backdrop-filter: blur(4px);
+    transition: background-color 0.15s ease;
+}
+
+.theme-preview-change-btn:hover {
+    background-color: hsla(0, 0%, 100%, 0.2);
+}
+
+.theme-preview-change-btn svg {
+    width: 0.875rem;
+    height: 0.875rem;
+}
+
 button {
     background-color: hsla(0, 0%, 100%, 0.1);
     color: #fff;
