@@ -10,7 +10,7 @@
 	transition: transform var(--blyrics-lyric-scroll-duration)
 		var(--blyrics-lyric-scroll-timing-function) 0s;
 	padding-top: 2rem;
-	padding-bottom: 0;
+	padding-bottom: calc(var(--blyrics-padding-bottom));
 }
 
 .blyrics-container > div {

@@ -55,6 +55,8 @@ Essential reference for creating custom themes. For deep dives, see [STYLING.md]
   --blyrics-padding: 2rem;
   --blyrics-margin: 2rem;
   --blyrics-border-radius: 1000rem;
+  --blyrics-padding-top: 0px;                    /* calculated automatically */
+  --blyrics-padding-bottom: 0px;                 /* calculated automatically */
   --blyrics-panel-size: 50%;                     /* lyrics container width (audio mode) */
   --blyrics-video-panel-size: 30%;               /* lyrics container width (video mode) */
   --blyrics-fullscreen-panel-size: 66%;          /* lyrics container width (fullscreen audio) */
@@ -108,7 +110,6 @@ blyrics-target-scroll-pos-ratio = 0.37;
 | `blyrics-queue-scroll-ms` | `150` | Max queued scroll delay (ms) |
 | `blyrics-debug-renderer` | `false` | Enable debug overlay |
 | `blyrics-target-scroll-pos-ratio` | `0.37` | Lyric position (0=top, 0.5=center, 1=bottom) |
-| `blyrics-add-extra-top-padding` | `false` | Extra top padding for always-scrollable lyrics |
 | `blyrics-long-word-threshold` | `1500` | Duration (ms) above which `data-long-word` is set |
 
 **Scroll equation**: `--blyrics-lyric-scroll-duration` + 0.02s = `blyrics-early-scroll-consider-s` + `blyrics-queue-scroll-ms`

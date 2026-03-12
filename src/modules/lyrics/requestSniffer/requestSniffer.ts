@@ -1,6 +1,6 @@
 import { log } from "@utils";
 import type { LongBylineText, NextResponse, ThumbnailElement } from "@modules/lyrics/requestSniffer/NextResponse";
-import { parseTime } from "@modules/lyrics/providers/lrcUtils";
+import { parseTime } from "./utils";
 
 interface Segment {
   primaryVideoStartTimeMilliseconds: number;

@@ -1,4 +1,4 @@
-import { LOG_PREFIX_STORE, THEME_REGISTRY_BASE, THEME_REGISTRY_URL, THEME_STORE_API_URL } from "@constants";
+import { LOG_PREFIX_STORE, THEME_REGISTRY_URL } from "@constants";
 import type {
   LockfileEntry,
   PermissionStatus,
@@ -27,10 +27,6 @@ export async function fetchWithTimeout(
     clearTimeout(timeoutId);
   }
 }
-
-const REGISTRY_ORIGINS = [`${THEME_REGISTRY_BASE}/*`, `${THEME_STORE_API_URL}/*`];
-
-const URL_INSTALL_ORIGINS = ["https://raw.githubusercontent.com/*", "https://api.github.com/*"];
 
 interface BranchCacheEntry {
   branch: string;
@@ -99,21 +95,19 @@ async function getDefaultBranch(repo: string, testFile = "metadata.json"): Promi
 }
 
 async function checkRegistryPermissions(): Promise<PermissionStatus> {
-  const _granted = await chrome.permissions.contains({ origins: REGISTRY_ORIGINS });
   return { granted: true, canRequest: true };
 }
 
 async function requestRegistryPermissions(): Promise<boolean> {
-  return chrome.permissions.request({ origins: REGISTRY_ORIGINS });
+  return true;
 }
 
 export async function checkUrlInstallPermissions(): Promise<PermissionStatus> {
-  const granted = await chrome.permissions.contains({ origins: URL_INSTALL_ORIGINS });
-  return { granted, canRequest: true };
+  return { granted: true, canRequest: true };
 }
 
 export async function requestUrlInstallPermissions(): Promise<boolean> {
-  return chrome.permissions.request({ origins: URL_INSTALL_ORIGINS });
+  return true;
 }
 
 export async function checkStorePermissions(): Promise<PermissionStatus> {

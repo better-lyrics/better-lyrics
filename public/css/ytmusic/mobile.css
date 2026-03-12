@@ -4,6 +4,18 @@
     max-width: unset;
   }
 
+  ytmusic-player-page:not([is-mweb-modernization-enabled])[player-fullscreened]:not([blyrics-dfs]) 
+  #side-panel {
+    height: 100vh;
+    transform: translateY(calc(0px - var(--ytmusic-nav-bar-height) - var(--ytmusic-player-page-vertical-padding))) 
+  }
+
+
+  ytmusic-player-page:not([is-mweb-modernization-enabled])[player-fullscreened]:not([blyrics-dfs]) 
+  .blyrics-container {
+    padding-top: var(--blyrics-padding-top);
+  }
+
   /* Normal panel sizes */
   ytmusic-player-page:not([is-mweb-modernization-enabled])[blyrics-video-mode]
   #side-panel {
