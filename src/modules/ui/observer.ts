@@ -15,7 +15,12 @@ import {
 } from "@constants";
 import { AppState, handleModifications, reloadLyrics, type PlayerDetails } from "@core/appState";
 import { onAutoSwitchEnabled, onFullScreenDisabled } from "@modules/settings/settings";
-import { animationEngine, animEngineState, getResumeScrollElement } from "@modules/ui/animationEngine";
+import {
+  animationEngine,
+  animEngineState,
+  getResumeScrollElement,
+  resetActiveAnimations,
+} from "@modules/ui/animationEngine";
 import {
   closePlayerPageIfOpenedForFullscreen,
   isNavigating,
@@ -180,6 +185,10 @@ export function disableInertWhenFullscreen(): void {
             const tabSelector = document.getElementsByClassName(TAB_HEADER_CLASS)[1] as HTMLElement;
             if (tabSelector && tabSelector.getAttribute("aria-selected") !== "true") {
               tabSelector.click();
+              currentTab = 1;
+              if (AppState.areLyricsLoaded && AppState.lyricData?.syncType !== "none") {
+                AppState.areLyricsTicking = true;
+              }
             }
           }
         })
@@ -257,6 +266,12 @@ export function initializeLyrics(): void {
     return;
   }
   hasInitializedLyrics = true;
+
+  document.addEventListener("visibilitychange", () => {
+    if (document.visibilityState === "visible") {
+      resetActiveAnimations();
+    }
+  });
 
   // @ts-ignore
   document.addEventListener("blyrics-send-player-time", (event: CustomEvent<PlayerDetails>) => {

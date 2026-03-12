@@ -15,7 +15,8 @@
 }
 
 ytmusic-player[is-mweb-player-page-modernization-enabled]:not([video-mode]) {
-  border-radius: 1.5rem;
+  border-radius: 2rem;
+  outline: 1px solid rgb(175 175 175 / 15%);
 }
 
 @media (min-width: 1400px) {

@@ -8,7 +8,7 @@ import type {
   TransliterationItem,
   TtmlRoot,
 } from "@modules/lyrics/providers/blyrics/blyrics-types";
-import { parseTime } from "@modules/lyrics/providers/lrcUtils";
+import { parseTime } from "@modules/lyrics/providers/ttmlUtils";
 import type { Lyric, LyricPart, LyricSourceResult, ProviderParameters } from "@modules/lyrics/providers/shared";
 import { type X2jOptions, XMLParser } from "fast-xml-parser";
 

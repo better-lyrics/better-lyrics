@@ -96,7 +96,7 @@
     "description": "Language settings section description"
   },
   "options_language_romanization": {
-    "message": "Somatisatie",
+    "message": "Romanisatie",
     "description": "Romanization setting label"
   },
   "options_language_translate": {
@@ -496,7 +496,7 @@
     "description": "URL install modal message"
   },
   "marketplace_urlModalPlaceholder": {
-    "message": "github.com/user/repo or github.com/user/repo/tree/branch",
+    "message": "github.com/user/repo of github.com/user/repo/tree/branch",
     "description": "URL input placeholder"
   },
   "marketplace_urlModalError": {

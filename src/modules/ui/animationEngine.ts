@@ -75,6 +75,15 @@ export let animEngineState: AnimEngineState = {
   },
 };
 
+export function resetActiveAnimations(): void {
+  if (!AppState.lyricData || !animEngineState.lastPlayState) return;
+  for (const line of AppState.lyricData.lines) {
+    if (line.isSelected) {
+      line.isAnimating = false;
+    }
+  }
+}
+
 /**
  * Resets anim engine states
  * Called when song is switched or cleaned up
@@ -333,6 +342,7 @@ export function animationEngine(currentTime: number, eventCreationTime: number, 
           part.animationStartTimeMs = now - timeDelta * 1000;
         }
         lineData.isAnimating = true;
+        lineData.lastAnimSetupAt = now;
         lineData.isAnimationPlayStatePlaying = true;
         lineData.accumulatedOffsetMs = 0;
       }

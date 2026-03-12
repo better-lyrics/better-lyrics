@@ -138,6 +138,7 @@ export type LineData = {
   isAnimationPlayStatePlaying: boolean;
   accumulatedOffsetMs: number;
   isAnimating: boolean;
+  lastAnimSetupAt: number;
   isSelected: boolean;
   height: number;
   position: number;
@@ -379,6 +380,7 @@ function injectLyrics(data: LyricSourceResultWithMeta, keepLoaderVisible = false
         isAnimationPlayStatePlaying: false,
         accumulatedOffsetMs: 0,
         isAnimating: false,
+        lastAnimSetupAt: 0,
         isSelected: false,
         height: -1,
         position: -1,
@@ -430,6 +432,7 @@ function injectLyrics(data: LyricSourceResultWithMeta, keepLoaderVisible = false
       isAnimationPlayStatePlaying: false,
       accumulatedOffsetMs: 0,
       isAnimating: false,
+      lastAnimSetupAt: 0,
       isSelected: false,
       height: -1, // Temp value; set later
       position: -1, // Temp value; set later
