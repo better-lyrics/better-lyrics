@@ -33,6 +33,7 @@ export const SCROLL_POS_OFFSET_RATIO = registerThemeSetting("blyrics-target-scro
 
 export const ADD_EXTRA_PADDING_TOP = registerThemeSetting("blyrics-add-extra-top-padding", false);
 
+const PASSIVE_SCROLL_ENABLED = registerThemeSetting("blyrics-passive-scroll-enabled", true);
 const PASSIVE_SECONDS_PER_LINE = registerThemeSetting("blyrics-passive-scroll-seconds-per-line", 3.5);
 const PASSIVE_BOTTOM_PAUSE_S = registerThemeSetting("blyrics-passive-scroll-bottom-pause-s", 1.5);
 const PASSIVE_RESET_DURATION_S = registerThemeSetting("blyrics-passive-scroll-reset-duration-s", 0.6);
@@ -109,6 +110,7 @@ export function resetAnimEngineState(): void {
   animEngineState.queuedScroll = false;
   animEngineState.passiveScrollAccumulatedTime = 0;
   animEngineState.passiveLastWallTime = 0;
+  stopPassiveScrollLoop();
   cachedDurations.clear();
 }
 
@@ -151,9 +153,39 @@ function decaySkipScrolls(now: number): void {
 
 // -- Passive Scroll Engine --------------------------
 
+let passiveRAFId: number | null = null;
+
+function stopPassiveScrollLoop(): void {
+  if (passiveRAFId !== null) {
+    cancelAnimationFrame(passiveRAFId);
+    passiveRAFId = null;
+  }
+}
+
+function startPassiveScrollLoop(): void {
+  if (passiveRAFId !== null) return;
+  passiveRAFId = requestAnimationFrame(passiveScrollRAFLoop);
+}
+
+function passiveScrollRAFLoop(): void {
+  passiveRAFId = null;
+  if (
+    !AppState.isPassiveScrollEnabled ||
+    !PASSIVE_SCROLL_ENABLED.getBooleanValue() ||
+    AppState.lyricData?.syncType !== "none"
+  )
+    return;
+
+  passiveScrollEngine(animEngineState.lastPlayState);
+  passiveRAFId = requestAnimationFrame(passiveScrollRAFLoop);
+}
+
 function passiveScrollEngine(isPlaying: boolean): void {
   const lyricData = AppState.lyricData;
   if (!lyricData) return;
+
+  const tabSelector = lyricData.tabSelector;
+  if (!tabSelector || tabSelector.getAttribute("aria-selected") !== "true") return;
 
   if (isLoaderActive()) return;
 
@@ -221,11 +253,14 @@ function passiveScrollEngine(isPlaying: boolean): void {
     targetScroll = 0;
   }
 
+  const prevScrollTop = tabRenderer.scrollTop;
   tabRenderer.scrollTop = targetScroll;
-  animEngineState.skipScrolls += 1;
-  animEngineState.skipScrollsDecayTimes.push(now + 2000);
-
-  decaySkipScrolls(now);
+  // Only skip the next scroll event if scrollTop actually changed.
+  // When it doesn't change (pause phases, sub-pixel rounding), no programmatic
+  // scroll event fires — setting skipScrolls would eat user scroll events instead.
+  if (tabRenderer.scrollTop !== prevScrollTop) {
+    animEngineState.skipScrolls = 1;
+  }
 }
 
 /**
@@ -269,7 +304,7 @@ export function animationEngine(currentTime: number, eventCreationTime: number, 
     }
     animEngineState.lastPlayState = isPlaying;
     if (!AppState.isPassiveScrollEnabled) return;
-    passiveScrollEngine(isPlaying);
+    startPassiveScrollLoop();
     return;
   }
 

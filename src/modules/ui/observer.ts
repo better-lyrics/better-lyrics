@@ -187,7 +187,7 @@ export function disableInertWhenFullscreen(): void {
             if (tabSelector && tabSelector.getAttribute("aria-selected") !== "true") {
               tabSelector.click();
               currentTab = 1;
-              if (AppState.areLyricsLoaded && AppState.lyricData?.syncType !== "none") {
+              if (AppState.areLyricsLoaded) {
                 AppState.areLyricsTicking = true;
               }
             }
@@ -403,11 +403,9 @@ export function scrollEventHandler(): void {
     animEngineState.scrollResumeTime = Date.now() + (isPassive ? 5000 : 25000);
     animEngineState.wasUserScrolling = true;
 
-    if (!isPassive) {
-      getResumeScrollElement().removeAttribute("autoscroll-hidden");
-      const lyricsElement = document.getElementsByClassName(LYRICS_CLASS)[0] as HTMLElement;
-      lyricsElement.classList.add(USER_SCROLLING_CLASS);
-    }
+    getResumeScrollElement().removeAttribute("autoscroll-hidden");
+    const lyricsElement = document.getElementsByClassName(LYRICS_CLASS)[0] as HTMLElement;
+    lyricsElement.classList.add(USER_SCROLLING_CLASS);
   }
 }
 

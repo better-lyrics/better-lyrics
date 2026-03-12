@@ -112,6 +112,7 @@ blyrics-target-scroll-pos-ratio = 0.37;
 | `blyrics-target-scroll-pos-ratio` | `0.37` | Lyric position (0=top, 0.5=center, 1=bottom) |
 | `blyrics-long-word-threshold` | `1500` | Duration (ms) above which `data-long-word` is set |
 | `blyrics-hide-instrumental-only` | `false` | Treat "[Instrumental Only]" as no lyrics (enables fullscreen effect) |
+| `blyrics-passive-scroll-enabled` | `true` | Unsynced auto-scroll: enable/disable entirely (overrides user setting) |
 | `blyrics-passive-scroll-seconds-per-line` | `3.5` | Unsynced auto-scroll: seconds per line (scroll speed) |
 | `blyrics-passive-scroll-bottom-pause-s` | `1.5` | Unsynced auto-scroll: pause at bottom (s) |
 | `blyrics-passive-scroll-reset-duration-s` | `0.6` | Unsynced auto-scroll: scroll-back-to-top duration (s) |
