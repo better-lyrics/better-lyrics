@@ -10,7 +10,8 @@ interface UnisonResponse {
   duration: number
   lyrics: string
   format: "ttml" | "lrc" | "plain"
-  syncType: "richsync" | "linesync" | "plain"
+  syncType: "richsync" | "linesync" | "plain",
+  voteCount: number
 }
 
 export default async function unison(providerParameters: ProviderParameters): Promise<void> {
@@ -50,8 +51,9 @@ export default async function unison(providerParameters: ProviderParameters): Pr
   
   const result = {
     cacheAllowed: false,
-    source: "boidu.dev",
-    sourceHref: "https://boidu.dev/"
+    source: "Unison",
+    sourceHref: "https://boidu.dev/",
+    unisonVotes: responseString.voteCount
   }
   
   switch (responseString.format) {
