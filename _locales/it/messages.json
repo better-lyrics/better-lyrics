@@ -132,11 +132,11 @@
     "description": "Choose a theme button label"
   },
   "options_themes_change": {
-    "message": "Change",
+    "message": "Cambia",
     "description": "Change theme button label"
   },
   "options_themes_customTheme": {
-    "message": "Custom Theme",
+    "message": "Tema Personalizzato",
     "description": "Display name for unnamed custom themes"
   },
   "options_themes_customStyles": {
@@ -808,7 +808,7 @@
     }
   },
   "symlink_applied": {
-    "message": "Applied theme: $NAME$ (Marketplace)",
+    "message": "Tema applicato: $NAME$ (Marketplace)",
     "description": "Alert after successfully applying a symlinked theme from marketplace",
     "placeholders": {
       "name": {
@@ -818,7 +818,7 @@
     }
   },
   "builtin_applied": {
-    "message": "Applied theme: $NAME$",
+    "message": "Tema applicato: $NAME$",
     "description": "Alert after successfully applying a bundled built-in theme",
     "placeholders": {
       "name": {
@@ -828,7 +828,7 @@
     }
   },
   "theme_author_prefix": {
-    "message": "by $AUTHOR$",
+    "message": "di $AUTHOR$",
     "description": "Author prefix shown on theme selector button",
     "placeholders": {
       "author": {
@@ -838,11 +838,11 @@
     }
   },
   "theme_author_you": {
-    "message": "by You",
+    "message": "da Tu",
     "description": "Author label for custom user themes on theme selector button"
   },
   "symlink_installFailed": {
-    "message": "Couldn't install theme. Check your connection and try again.",
+    "message": "Impossibile installare il tema. Controlla la tua connessione e riprova.",
     "description": "Alert when a symlinked theme fails to install from marketplace"
   },
   "symlink_badge_marketplace": {
@@ -850,27 +850,27 @@
     "description": "Badge text on symlinked theme cards"
   },
   "symlink_badge_bundled": {
-    "message": "Bundled",
+    "message": "Impacchettato",
     "description": "Badge text on non-symlinked built-in theme cards"
   },
   "deprecation_builtin_title": {
-    "message": "Heads up, these themes are moving!",
+    "message": "Attento, questi temi se ne andranno!",
     "description": "Title for the built-in themes deprecation banner in theme modal"
   },
   "deprecation_builtin_body": {
-    "message": "We're migrating built-in themes to the Theme Marketplace. Some already have, look for the Marketplace badge. The rest will follow in a future update, with CSS backups on GitHub and Discord.",
+    "message": "Stiamo migrando i temi integrati al Marketplace dei Temi. Alcuni son stati già migrati, cerca il badge Marketplace. Il resto li seguiranno in un aggiornamento futuro, con backup CSS su GitHub e Discord.",
     "description": "Body text for the built-in themes deprecation banner"
   },
   "deprecation_builtin_cta": {
-    "message": "Browse Marketplace",
+    "message": "Sfoglia Marketplace",
     "description": "CTA button text in the deprecation banner to open the marketplace"
   },
   "theme_modal_section_builtin": {
-    "message": "Built-in Themes",
+    "message": "Temi Integrati",
     "description": "Section title for built-in themes in the theme chooser modal"
   },
   "theme_modal_section_custom": {
-    "message": "Custom Themes",
+    "message": "Temi Personalizzati",
     "description": "Section title for custom themes in the theme chooser modal"
   }
 }
