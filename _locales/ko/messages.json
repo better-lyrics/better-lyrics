@@ -451,14 +451,6 @@
     "message": "필터와 일치하는 테마가 없습니다",
     "description": "Empty state message"
   },
-  "marketplace_permissionTitle": {
-    "message": "권한 필요",
-    "description": "Permission required title"
-  },
-  "marketplace_permissionMessage": {
-    "message": "테마를 탐색하거나 설치하려면 Better Lyrics가 테마를 호스팅하고 있는 GitHub와 마켓플레이스 API에 대한 접근 권한이 필요합니다.",
-    "description": "Permission required message"
-  },
   "marketplace_grantPermission": {
     "message": "권한 허용",
     "description": "Grant permission button"

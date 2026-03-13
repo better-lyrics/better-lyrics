@@ -7,7 +7,7 @@ const possibleIdTags = ["ti", "ar", "al", "au", "lr", "length", "by", "offset", 
 /**
  * Parse time in [mm:ss.xx] or <mm:ss.xx> format to milliseconds
  */
-export function parseTime(timeStr: string | number | undefined): number {
+function parseTime(timeStr: string | number | undefined): number {
   if (!timeStr) return 0;
 
   if (typeof timeStr === "number") return timeStr;

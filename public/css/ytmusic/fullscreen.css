@@ -36,13 +36,7 @@ ytmusic-app-layout:not([is-mweb-modernization-enabled])[player-fullscreened]:not
 > [slot="player-page"]
 .tab-header-container {
   display: none !important;
-}
-
-ytmusic-app-layout:not([is-mweb-modernization-enabled])[player-fullscreened]:not([blyrics-dfs])
-> [slot="player-page"]
-#side-panel {
-  transform: translateY(-7.5rem);
-}
+} 
 
 ytmusic-player-page:not([is-mweb-modernization-enabled])[player-fullscreened]:not([blyrics-dfs])[blyrics-video-mode] .content.ytmusic-player-page {
   padding: 0 var(--ytmusic-player-page-horizontal-padding) 0;

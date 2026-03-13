@@ -451,14 +451,6 @@
     "message": "Geen thema's komen overeen met uw filters",
     "description": "Empty state message"
   },
-  "marketplace_permissionTitle": {
-    "message": "Toestemming vereist",
-    "description": "Permission required title"
-  },
-  "marketplace_permissionMessage": {
-    "message": "Om door de thema's te bladeren en te installeren, heeft Better Lyrics toestemming nodig om toegang te krijgen tot GitHub waar thema's worden gehost & de Marketplace api.",
-    "description": "Permission required message"
-  },
   "marketplace_grantPermission": {
     "message": "Geef Toestemming",
     "description": "Grant permission button"
