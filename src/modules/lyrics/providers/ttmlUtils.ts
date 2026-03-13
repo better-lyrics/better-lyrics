@@ -1,4 +1,4 @@
-import { BLYRICS_INSTRUMENTAL_GAP_MS } from "@constants";
+import { BLYRICS_INSTRUMENTAL_GAP_MS, LYRICS_API_URL } from "@constants";
 import type {
   MetadataElement,
   ParagraphElementOrBackground,
@@ -8,9 +8,58 @@ import type {
   TransliterationItem,
   TtmlRoot,
 } from "@modules/lyrics/providers/blyrics/blyrics-types";
-import { parseTime } from "@modules/lyrics/providers/lrcUtils";
 import type { Lyric, LyricPart, LyricSourceResult, ProviderParameters } from "@modules/lyrics/providers/shared";
 import { type X2jOptions, XMLParser } from "fast-xml-parser";
+
+/**
+ * Parse time in hh:mm:ss.xx or offset-time with unit indicators "h", "m", "s", "ms" (e.g 432.25s)
+ */
+function parseTime(timeStr: string | number | undefined): number {
+  if (!timeStr) return 0;
+  if (typeof timeStr === "number") return timeStr;
+
+  const offsetTimeMatch = timeStr.match(/^([\d.]+)(h|m|s|ms)$/);
+  if (offsetTimeMatch) {
+    const value = parseFloat(offsetTimeMatch[1]);
+    const unit = offsetTimeMatch[2];
+    if (unit === "h") {
+      return Math.round(value * 60 * 60 * 1000);
+    } else if (unit === "m") {
+      return Math.round(value * 60 * 1000);
+    } else if (unit === "s") {
+      return Math.round(value * 1000);
+    } else if (unit === "ms") {
+      return Math.round(value);
+    }
+  }
+
+  const parts = timeStr.split(":").map(val => val.replace(/[^0-9.]/g, "")); // removes any non-numerical character except dots
+  let totalMs = 0;
+
+  try {
+    if (parts.length === 1) {
+      // Format: ss.mmm
+      totalMs = parseFloat(parts[0]) * 1000;
+    } else if (parts.length === 2) {
+      // Format: mm:ss.mmm
+      const minutes = parseInt(parts[0], 10);
+      const seconds = parseFloat(parts[1]);
+      totalMs = minutes * 60 * 1000 + seconds * 1000;
+    } else if (parts.length === 3) {
+      // Format: hh:mm:ss.mmm
+      const hours = parseInt(parts[0], 10);
+      const minutes = parseInt(parts[1], 10);
+      const seconds = parseFloat(parts[2]);
+      totalMs = hours * 3600 * 1000 + minutes * 60 * 1000 + seconds * 1000;
+    }
+
+    // Return a rounded integer
+    return Math.round(totalMs);
+  } catch (e) {
+    console.error(`Error parsing time string: ${timeStr}`, e);
+    return 0;
+  }
+}
 
 function extractAgentMapping(metadataElements: MetadataElement[]): Map<string, string> {
   const mapping = new Map<string, string>();
@@ -150,6 +199,7 @@ export async function fillTtml(responseString: string) {
   const rawObj = (await parser.parse(responseString)) as TtmlRoot;
 
   const lyrics = new Map() as Map<string, Lyric>;
+  const lyricIds = {} as Record<string, string[]>;
 
   const tt = rawObj[0].tt;
   const ttHead = tt.find(e => e.head)!.head!;
@@ -181,7 +231,18 @@ export async function fillTtml(responseString: string) {
     const rawAgent = meta?.["@_agent"];
     const normalizedAgent = rawAgent ? (agentMapping.get(rawAgent) ?? rawAgent) : undefined;
 
-    lyrics.set(meta?.["@_key"] || lyrics.size.toString(), {
+    let lyric = lyricIds[meta?.["@_key"] || ""];
+    if (meta?.["@_key"]) {
+      if (lyric) {
+        lyricIds[meta["@_key"]].push(meta["@_key"] + `_${lyric.length + 1}`);
+      } else {
+        lyricIds[meta["@_key"]] = [meta["@_key"] + "_1"];
+      }
+
+      lyric = lyricIds[meta["@_key"]];
+    }
+
+    lyrics.set(lyric ? meta["@_key"] + `_${lyric.length}` : lyrics.size.toString(), {
       agent: normalizedAgent,
       durationMs: endTimeMs - beginTimeMs,
       parts: partParse.parts,
@@ -220,10 +281,19 @@ export async function fillTtml(responseString: string) {
       const line = translation[":@"]["@_for"];
 
       if (lang && text && line) {
-        const lyricLine = lyrics.get(line);
-        if (lyricLine) {
-          lyricLine.translation = { text, lang };
+        const lyricLines = lyricIds[line];
+        if (!lyricLines) {
+          return;
         }
+
+        lyricLines.forEach(id => {
+          const lyricLine = lyrics.get(id);
+          if (!lyricLine) {
+            return;
+          }
+
+          lyricLine.translation = { text, lang };
+        });
       }
     });
   }
@@ -231,14 +301,27 @@ export async function fillTtml(responseString: string) {
   if (transliterationsData && transliterationsData.length > 0) {
     transliterationsData[0].transliteration.forEach((transliteration: TransliterationItem) => {
       const line = transliteration[":@"]["@_for"];
-      if (line) {
-        const lyricLine = lyrics.get(line)!;
+      if (!line) {
+        return;
+      }
+
+      const lyricLines = lyricIds[line];
+      if (!lyricLines) {
+        return;
+      }
+
+      lyricLines.forEach(id => {
+        const lyricLine = lyrics.get(id);
+        if (!lyricLine) {
+          return;
+        }
+
         const beginTime = lyricLine.startTimeMs;
         const parseResult = parseLyricPart(transliteration.text, beginTime, false);
 
         lyricLine.romanization = parseResult.text;
         lyricLine.timedRomanization = parseResult.parts;
-      }
+      });
     });
   }
 

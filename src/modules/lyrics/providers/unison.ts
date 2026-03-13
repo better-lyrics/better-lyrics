@@ -16,9 +16,7 @@ interface UnisonResponse {
 export default async function unison(providerParameters: ProviderParameters): Promise<void> {
   const url = new URL(UNISON_API_URL);
 
-  // which is better? videoId or song metadata?
-  // url.searchParams.append("v", providerParameters.videoId);
-
+  url.searchParams.append("v", providerParameters.videoId);
   url.searchParams.append("song", providerParameters.song);
   url.searchParams.append("artist", providerParameters.artist);
   url.searchParams.append("duration", String(providerParameters.duration));
