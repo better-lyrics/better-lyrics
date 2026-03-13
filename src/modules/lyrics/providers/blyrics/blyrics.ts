@@ -203,9 +203,9 @@ export async function fillTtml(responseString: string, providerParameters: Provi
       parts: partParse.parts,
       startTimeMs: beginTimeMs,
       words: partParse.text,
+      translations: undefined,
       romanization: undefined,
       timedRomanization: undefined,
-      translation: undefined,
     });
   });
 
@@ -230,26 +230,29 @@ export async function fillTtml(responseString: string, providerParameters: Provi
   const transliterationsData = findInMetadata<TransliterationContainer[]>("transliterations");
 
   if (translationsData && translationsData.length > 0) {
-    const lang = translationsData[0][":@"]["@_lang"];
-    translationsData[0].translation.forEach(translation => {
-      const text = translation.text[0]["#text"];
-      const line = translation[":@"]["@_for"];
+    translationsData.forEach(translateContainer => {
+      translateContainer.translation.forEach(translation => {
+        const lang = translateContainer[":@"]["@_lang"]
+        const text = translation.text[0]["#text"];
+        const line = translation[":@"]["@_for"];
 
-      if (lang && text && line) {
-        const lyricLines = lyricIds[line];
-        if (!lyricLines) {
-          return;
-        }
-
-        lyricLines.forEach(id => {
-          const lyricLine = lyrics.get(id);
-          if (!lyricLine) {
+        if (lang && text && line) {
+          const lyricLines = lyricIds[line];
+          if (!lyricLines) {
             return;
           }
 
-          lyricLine.translation = { text, lang };
-        });
-      }
+          lyricLines.forEach(id => {
+            const lyricLine = lyrics.get(id);
+            if (!lyricLine) {
+              return;
+            }
+
+            if (!lyricLine.translations) lyricLine.translations = {};
+            lyricLine.translations[lang] = text;
+          });
+        }
+      })
     });
   }
 

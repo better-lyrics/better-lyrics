@@ -561,21 +561,28 @@ function injectLyrics(data: LyricSourceResultWithMeta, keepLoaderVisible = false
       return translatedLine;
     };
 
-    let translationResult: TranslationResult | null;
+    let translationResult: TranslationResult | null = null;
+    let translatedText: string | null = null;
 
     let targetTranslationLang = AppState.translationLanguage;
 
-    if (item.translation && langCodesMatch(targetTranslationLang, item.translation.lang)) {
+    if (item.translations && Object.keys(item.translations).find(lang => langCodesMatch(targetTranslationLang, lang))) {
+      translatedText = Object.keys(item.translations).find(lang => langCodesMatch(targetTranslationLang, lang)) || "";
+    } else if (item.translation && langCodesMatch(targetTranslationLang, item.translation.lang)) {
+      translatedText = item.translation.text;
+    } else {
+      translationResult = getTranslationFromCache(item.words, targetTranslationLang);
+    }
+
+    if (!translationResult && translatedText) {
       if (!data.language) {
         console.warn(`${LOG_PREFIX} Found translations, but no original language`);
       }
-
+      
       translationResult = {
         originalLanguage: data.language || "", // Should never be empty!
-        translatedText: item.translation.text,
+        translatedText,
       };
-    } else {
-      translationResult = getTranslationFromCache(item.words, targetTranslationLang);
     }
 
     let translationOriginalLang = translationResult?.originalLanguage || data.language;
