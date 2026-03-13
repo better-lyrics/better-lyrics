@@ -59,8 +59,14 @@ export default async function unison(providerParameters: ProviderParameters): Pr
   switch (responseString.format) {
     case "ttml":
       const filled = await fillTtml(responseString.lyrics);
-      providerParameters.sourceMap["unison-richsynced"].lyricSourceResult = filled && filled.isWordSynced ? filled.result : null;
-      providerParameters.sourceMap["unison-synced"].lyricSourceResult = filled && !filled.isWordSynced ? filled.result : null;
+      if (filled) {
+        const unisonResult = { ...filled.result, source: "Unison", unisonVotes: responseString.voteCount };
+        providerParameters.sourceMap["unison-richsynced"].lyricSourceResult = filled.isWordSynced ? unisonResult : null;
+        providerParameters.sourceMap["unison-synced"].lyricSourceResult = !filled.isWordSynced ? unisonResult : null;
+      } else {
+        providerParameters.sourceMap["unison-richsynced"].lyricSourceResult = null;
+        providerParameters.sourceMap["unison-synced"].lyricSourceResult = null;
+      }
       providerParameters.sourceMap["unison-plain"].lyricSourceResult = null;
       break;
     case "lrc":
