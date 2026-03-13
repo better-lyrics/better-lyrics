@@ -537,6 +537,17 @@ function getContainerSize(): number {
   return Math.round(Math.max(document.getElementById("thumbnail")?.getBoundingClientRect().width || 0, 544));
 }
 
+function getHighResImageUrl(smallThumbnail: ThumbnailElement) {
+  const containerSize = getContainerSize();
+  let url = smallThumbnail.url;
+  if (url && /w\d+-h\d+/.test(url)) {
+    url = url.replace(/w\d+-h\d+/, `w${containerSize}-h${containerSize}`);
+  } else {
+    url = url.replace(/\/(sd|hq|mq)?default\.jpg/, "/maxresdefault.jpg");
+  }
+  return url;
+}
+
 export function addThumbnail(smallThumbnail: ThumbnailElement): void {
   thumbnailResizeObserver?.disconnect();
 
@@ -551,30 +562,17 @@ export function addThumbnail(smallThumbnail: ThumbnailElement): void {
     document.getElementById("thumbnail")?.appendChild(imgElm);
   }
 
-  if (lastLoadedThumbnail !== smallThumbnail) {
-    imgElm.src = smallThumbnail.url;
-    imgElm.classList.remove(HIDDEN_CLASS);
-    setBackgroundImage(smallThumbnail.url);
-  }
-  lastLoadedThumbnail = smallThumbnail;
-
   const containerSize = getContainerSize();
-
-  let url = smallThumbnail.url;
-  if (url && /w\d+-h\d+/.test(url)) {
-    url = url.replace(/w\d+-h\d+/, `w${containerSize}-h${containerSize}`);
-  } else {
-    url = url.replace(/\/(sd|hq|mq)?default\.jpg/, "/maxresdefault.jpg");
-  }
-
-  const proxy = new Image();
-  proxy.src = url;
+  const url = getHighResImageUrl(smallThumbnail);
 
   albumArtLoadController?.abort();
   const loadController = new AbortController();
   albumArtLoadController = loadController;
 
-  proxy.onload = () => {
+  const proxy = new Image();
+  proxy.src = url;
+
+  const setHighResImage = () => {
     if (loadController.signal.aborted) return;
 
     imgElm.src = proxy.src;
@@ -594,9 +592,31 @@ export function addThumbnail(smallThumbnail: ThumbnailElement): void {
     });
     thumbnailResizeObserver.observe(thumbnailElm);
   };
+
+  if (proxy.complete) {
+    lastLoadedThumbnail = smallThumbnail;
+    setHighResImage();
+  } else {
+    if (lastLoadedThumbnail !== smallThumbnail) {
+      imgElm.src = smallThumbnail.url;
+      imgElm.classList.remove(HIDDEN_CLASS);
+      setBackgroundImage(smallThumbnail.url);
+    }
+
+    lastLoadedThumbnail = smallThumbnail;
+
+    proxy.onload = setHighResImage;
+  }
+}
+
+export function preloadHighResThumbnail(smallThumbnail: ThumbnailElement) {
+  const proxy = new Image();
+  proxy.src = getHighResImageUrl(smallThumbnail);
 }
 
 export function showYtThumbnail(): void {
+  console.log("Showing YT ThumbnailElement");
+
   const blyricsImg = document.getElementById("blyrics-img") as HTMLImageElement | null;
   if (blyricsImg) {
     blyricsImg.src = "";
