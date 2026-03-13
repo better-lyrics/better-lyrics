@@ -1,9 +1,9 @@
-import autoAnimate, { type AnimationController } from "@formkit/auto-animate";
-import DOMPurify from "dompurify";
-import { marked } from "marked";
 import { LOG_PREFIX_STORE } from "@constants";
 import { t } from "@core/i18n";
 import { getLocalStorage, getSyncStorage } from "@core/storage";
+import autoAnimate, { type AnimationController } from "@formkit/auto-animate";
+import DOMPurify from "dompurify";
+import { marked } from "marked";
 import { applyStoreThemeComplete } from "../editor/features/storage";
 import type { AllThemeStats, InstalledStoreTheme, StoreTheme, ThemeStats } from "./types";
 
@@ -26,14 +26,12 @@ import {
   removeTheme,
 } from "./themeStoreManager";
 import {
-  checkStorePermissions,
   checkUrlInstallPermissions,
   fetchAllStoreThemes,
   fetchFullTheme,
   fetchRegistryShaderConfig,
   fetchThemeShaderConfig,
   parseGitHubRepoUrl,
-  requestStorePermissions,
   requestUrlInstallPermissions,
   validateThemeRepo,
 } from "./themeStoreService";
@@ -290,6 +288,14 @@ const renderer = new marked.Renderer();
 renderer.link = ({ href, text }) => {
   return `<a href="${href}" target="_blank" rel="noopener noreferrer">${text}</a>`;
 };
+renderer.image = ({ href, title, text }) => {
+  const src = href.replace(
+    /^https?:\/\/github\.com\/([^/]+\/[^/]+)\/blob\/(.+)/,
+    "https://raw.githubusercontent.com/$1/$2"
+  );
+  const titleAttr = title ? ` title="${title}"` : "";
+  return `<img src="${src}" alt="${text}"${titleAttr} />`;
+};
 marked.use({ renderer });
 
 function parseMarkdown(text: string): DocumentFragment {
@@ -460,14 +466,6 @@ function setupMarketplaceListeners(): void {
 
   const urlInstallBtn = document.getElementById("url-install-btn");
   urlInstallBtn?.addEventListener("click", () => openUrlModal());
-
-  const permissionBtn = document.getElementById("store-permission-btn");
-  permissionBtn?.addEventListener("click", async () => {
-    const granted = await requestStorePermissions();
-    if (granted) {
-      loadMarketplace();
-    }
-  });
 
   setupMarketplaceFilters();
 }
@@ -855,23 +853,14 @@ async function loadMarketplace(): Promise<void> {
   const grid = document.getElementById("store-modal-grid");
   const loading = document.getElementById("store-loading");
   const error = document.getElementById("store-error");
-  const permissionSection = document.getElementById("store-permission");
 
   if (!grid) return;
 
   grid.replaceChildren();
   if (loading) loading.style.display = "flex";
   if (error) error.style.display = "none";
-  if (permissionSection) permissionSection.style.display = "none";
 
   try {
-    const permission = await checkStorePermissions();
-    if (!permission.granted) {
-      if (loading) loading.style.display = "none";
-      if (permissionSection) permissionSection.style.display = "flex";
-      return;
-    }
-
     const [themes, installedThemes, statsResult] = await Promise.all([
       fetchAllStoreThemes(),
       getInstalledStoreThemes(),
@@ -944,9 +933,6 @@ async function refreshMarketplace(): Promise<void> {
 
 async function checkForThemeUpdates(): Promise<void> {
   try {
-    const permission = await checkStorePermissions();
-    if (!permission.granted) return;
-
     const installed = await getInstalledStoreThemes();
     if (installed.length === 0) return;
 

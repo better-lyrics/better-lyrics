@@ -3,7 +3,6 @@ import {
   CURRENT_LYRICS_CLASS,
   LYRICS_CHECK_INTERVAL_ERROR,
   LYRICS_CLASS,
-  LYRICS_SPACING_ELEMENT_ID,
   NO_LYRICS_ELEMENT_LOG,
   PAUSED_CLASS,
   PRE_ANIMATING_CLASS,
@@ -27,8 +26,6 @@ const ENABLE_DEBUG_RENDER = registerThemeSetting("blyrics-debug-renderer", false
 
 // 0.5 means the selected lyric will be in the middle of the screen, 0 means top, 1 means bottom
 export const SCROLL_POS_OFFSET_RATIO = registerThemeSetting("blyrics-target-scroll-pos-ratio", 0.37);
-
-export const ADD_EXTRA_PADDING_TOP = registerThemeSetting("blyrics-add-extra-top-padding", false);
 
 interface AnimEngineState {
   skipScrolls: number;
@@ -74,6 +71,15 @@ export let animEngineState: AnimEngineState = {
     lyricScrollTime: 0,
   },
 };
+
+export function resetActiveAnimations(): void {
+  if (!AppState.lyricData || !animEngineState.lastPlayState) return;
+  for (const line of AppState.lyricData.lines) {
+    if (line.isSelected) {
+      line.isAnimating = false;
+    }
+  }
+}
 
 /**
  * Resets anim engine states
@@ -333,6 +339,7 @@ export function animationEngine(currentTime: number, eventCreationTime: number, 
           part.animationStartTimeMs = now - timeDelta * 1000;
         }
         lineData.isAnimating = true;
+        lineData.lastAnimSetupAt = now;
         lineData.isAnimationPlayStatePlaying = true;
         lineData.accumulatedOffsetMs = 0;
       }

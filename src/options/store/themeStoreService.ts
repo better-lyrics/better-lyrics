@@ -95,28 +95,12 @@ async function getDefaultBranch(repo: string, testFile = "metadata.json"): Promi
   return "main";
 }
 
-async function checkRegistryPermissions(): Promise<PermissionStatus> {
-  return { granted: true, canRequest: true };
-}
-
-async function requestRegistryPermissions(): Promise<boolean> {
-  return true;
-}
-
 export async function checkUrlInstallPermissions(): Promise<PermissionStatus> {
   return { granted: true, canRequest: true };
 }
 
 export async function requestUrlInstallPermissions(): Promise<boolean> {
   return true;
-}
-
-export async function checkStorePermissions(): Promise<PermissionStatus> {
-  return checkRegistryPermissions();
-}
-
-export async function requestStorePermissions(): Promise<boolean> {
-  return requestRegistryPermissions();
 }
 
 function getRegistryFileUrl(themeId: string, file: string): string {
@@ -354,6 +338,18 @@ export async function fetchFullTheme(repo: string, branchOverride?: string): Pro
     cssUrl,
     shaderUrl,
   };
+}
+
+export async function fetchSingleStoreTheme(themeId: string): Promise<StoreTheme | null> {
+  try {
+    const lockfile = await fetchThemeLockfile();
+    const entry = lockfile.themes.find(e => e.id === themeId);
+    if (!entry) return null;
+    return await fetchFullThemeFromRegistry(entry);
+  } catch (err) {
+    console.warn(LOG_PREFIX_STORE, `Failed to fetch single store theme ${themeId}:`, err);
+    return null;
+  }
 }
 
 export async function fetchAllStoreThemes(): Promise<StoreTheme[]> {

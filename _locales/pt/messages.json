@@ -451,14 +451,6 @@
     "message": "Nenhum tema corresponde aos seus filtros",
     "description": "Empty state message"
   },
-  "marketplace_permissionTitle": {
-    "message": "Permissão necessária",
-    "description": "Permission required title"
-  },
-  "marketplace_permissionMessage": {
-    "message": "Para navegar e instalar temas, Better Lyrics precisa de permissão para acessar o GitHub onde os temas estão hospedados e a API da loja.",
-    "description": "Permission required message"
-  },
   "marketplace_grantPermission": {
     "message": "Conceder permissão",
     "description": "Grant permission button"

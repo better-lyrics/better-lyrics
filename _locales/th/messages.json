@@ -451,14 +451,6 @@
     "message": "ไม่พบธีมที่ตรงตามตัวกรองของคุณ",
     "description": "Empty state message"
   },
-  "marketplace_permissionTitle": {
-    "message": "จำเป็ตต้องมีสิทธิ์เข้าถึง",
-    "description": "Permission required title"
-  },
-  "marketplace_permissionMessage": {
-    "message": "ในการสำรวจและติดตั้งธีม Better Lyrics จำเป็นต้องมีสิทธิ์ในการเข้าถึง GitHub เพื่อเข้าถึงข้อมูลธีมและ API ของ Marketplace",
-    "description": "Permission required message"
-  },
   "marketplace_grantPermission": {
     "message": "อนุญาตสิทธิ์",
     "description": "Grant permission button"

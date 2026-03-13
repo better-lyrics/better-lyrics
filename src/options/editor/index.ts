@@ -12,6 +12,7 @@ import {
   handleSaveTheme,
   initStoreThemeListener,
   openThemeModal,
+  preloadInstalledThemeImages,
   saveToStorage,
   setThemeName,
 } from "./features/themes";
@@ -182,6 +183,8 @@ async function initializeEditor() {
   const loadCustomCssPromise = storageManager.loadInitialCSS();
 
   await Promise.allSettled([setSelectedThemePromise, loadCustomCssPromise]);
+
+  preloadInstalledThemeImages();
 
   console.log(LOG_PREFIX_EDITOR, "Editor initialization complete");
 }

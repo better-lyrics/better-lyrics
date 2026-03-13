@@ -15,7 +15,8 @@
 }
 
 ytmusic-player[is-mweb-player-page-modernization-enabled]:not([video-mode]) {
-  border-radius: 1.5rem;
+  border-radius: 2rem;
+  outline: 1px solid rgb(175 175 175 / 15%);
 }
 
 @media (min-width: 1400px) {
@@ -178,4 +179,16 @@ ytmusic-player-bar {
 @keyframes marquee-scroll {
   0%{ transform: translateX(0); }
   100% { transform: translateX(calc(-50% - 12px)); }
+}
+
+.av-toggle.ytmusic-av-toggle{
+  background: rgba(255,255,255,0.1);
+}
+
+.ytmusic-av-toggle[aria-pressed=false]{
+  background: transparent;
+}
+
+.ytmusic-av-toggle[aria-pressed=true] {
+  background: rgba(255,255,255,0.1);
 }

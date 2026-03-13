@@ -3,6 +3,7 @@ import { getLocalStorage, getSyncStorage } from "@core/storage";
 import {
   fetchFullTheme,
   fetchRegistryShaderConfig,
+  fetchSingleStoreTheme,
   fetchThemeCSS,
   fetchThemeMetadata,
   fetchThemeShaderConfig,
@@ -219,6 +220,33 @@ export async function applyStoreTheme(themeId: string): Promise<string> {
   await setActiveStoreTheme(themeId);
 
   return theme.css;
+}
+
+// -- Symlinked Theme Installs --------------------------
+
+export async function installSymlinkedThemeFromMarketplace(storeId: string): Promise<InstalledStoreTheme | null> {
+  console.log(LOG_PREFIX_STORE, `Installing symlinked theme from marketplace: ${storeId}`);
+
+  const existing = await getInstalledTheme(storeId);
+  if (existing) {
+    console.log(LOG_PREFIX_STORE, `Symlinked theme already installed: ${storeId} v${existing.version}`);
+    return existing;
+  }
+
+  try {
+    const storeTheme = await fetchSingleStoreTheme(storeId);
+    if (!storeTheme) {
+      console.warn(LOG_PREFIX_STORE, `Symlinked theme not found in marketplace: ${storeId}`);
+      return null;
+    }
+
+    const installed = await installTheme(storeTheme, { source: "marketplace" });
+    console.log(LOG_PREFIX_STORE, `Installed symlinked theme: ${storeId} v${installed.version}`);
+    return installed;
+  } catch (err) {
+    console.warn(LOG_PREFIX_STORE, `Failed to install symlinked theme from marketplace: ${storeId}`, err);
+    return null;
+  }
 }
 
 function parseVersion(version: string): number[] {

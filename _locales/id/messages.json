@@ -451,14 +451,6 @@
     "message": "Tidak ada tema yang cocok dengan filtermu",
     "description": "Empty state message"
   },
-  "marketplace_permissionTitle": {
-    "message": "Izin Diperlukan",
-    "description": "Permission required title"
-  },
-  "marketplace_permissionMessage": {
-    "message": "Untuk menelusuri dan memasang tema, Better Lyrics memerlukan izin untuk mengakses GitHub tempat tema dihosting & api marketplace.",
-    "description": "Permission required message"
-  },
   "marketplace_grantPermission": {
     "message": "Berikan Izin",
     "description": "Grant permission button"

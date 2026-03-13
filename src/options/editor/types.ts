@@ -26,4 +26,5 @@ export interface ThemeCardOptions {
   author: string;
   isCustom: boolean;
   index: number;
+  storeId?: string;
 }
