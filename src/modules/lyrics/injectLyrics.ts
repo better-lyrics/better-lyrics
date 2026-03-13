@@ -566,8 +566,10 @@ function injectLyrics(data: LyricSourceResultWithMeta, keepLoaderVisible = false
 
     let targetTranslationLang = AppState.translationLanguage;
 
-    if (item.translations && Object.keys(item.translations).find(lang => langCodesMatch(targetTranslationLang, lang))) {
-      translatedText = Object.keys(item.translations).find(lang => langCodesMatch(targetTranslationLang, lang)) || "";
+    if (item.translations && Object.keys(item.translations).length > 0) {
+      const matchedLang = Object.keys(item.translations).find(lang => langCodesMatch(targetTranslationLang, lang));
+      if (matchedLang) {
+        translatedText = item.translations[matchedLang];
     } else if (item.translation && langCodesMatch(targetTranslationLang, item.translation.lang)) {
       translatedText = item.translation.text;
     } else {
