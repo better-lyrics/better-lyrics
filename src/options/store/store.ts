@@ -1389,17 +1389,14 @@ function createStoreThemeCard(
     applyBtn.disabled = true;
     try {
       const installedTheme = await getInstalledTheme(theme.id);
-      if (installedTheme) {
-        await handleApplyTheme(installedTheme);
-        applyBtn.textContent = t("marketplace_active");
-        document.querySelectorAll(".store-card-btn-apply").forEach(btn => {
-          if (btn !== applyBtn && !(btn as HTMLButtonElement).style.display) {
-            (btn as HTMLButtonElement).disabled = false;
-            btn.textContent = t("marketplace_apply");
-          }
-        });
+      if (!installedTheme) {
+        applyBtn.disabled = false;
+        return;
       }
-    } catch {
+      const applied = await handleApplyTheme(installedTheme);
+      if (!applied) applyBtn.disabled = false;
+    } catch (err) {
+      console.error(LOG_PREFIX_STORE, "Failed to apply theme:", err);
       applyBtn.disabled = false;
     }
   });
@@ -1793,12 +1790,14 @@ async function openDetailModal(theme: StoreTheme, urlThemeInfo?: UrlThemeInfo): 
       detailApplyBtn.disabled = true;
       try {
         const installedTheme = await getInstalledTheme(theme.id);
-        if (installedTheme) {
-          await handleApplyTheme(installedTheme);
-          setActionButtonContent(detailApplyBtn, t("marketplace_active"), "A");
-          await refreshStoreCards();
+        if (!installedTheme) {
+          detailApplyBtn.disabled = false;
+          return;
         }
+        const applied = await handleApplyTheme(installedTheme);
+        if (!applied) detailApplyBtn.disabled = false;
       } catch (err) {
+        console.error(LOG_PREFIX_STORE, "Failed to apply theme:", err);
         detailApplyBtn.disabled = false;
         showAlert(`${t("marketplace_applyFailed")}: ${err}`);
       }
@@ -2206,7 +2205,7 @@ async function updateYourThemesDropdown(): Promise<void> {
   }
 }
 
-async function handleApplyTheme(theme: InstalledStoreTheme): Promise<void> {
+async function handleApplyTheme(theme: InstalledStoreTheme): Promise<boolean> {
   try {
     const css = await applyStoreTheme(theme.id);
 
@@ -2237,9 +2236,12 @@ async function handleApplyTheme(theme: InstalledStoreTheme): Promise<void> {
         detailApplyBtn.disabled = false;
       }
     }
+
+    return true;
   } catch (err) {
     console.error(LOG_PREFIX_STORE, "Failed to apply theme:", err);
     showAlert(`${t("marketplace_applyFailed")}: ${err}`);
+    return false;
   }
 }
 
