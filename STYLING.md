@@ -166,15 +166,17 @@ These custom properties allow for easy customization of colors, sizes, and other
 
 ### Layout
 
-| Variable                                | Default Value | Description                                       |
-| --------------------------------------- | ------------- | ------------------------------------------------- |
-| `--blyrics-padding`                     | `2rem`        | Standard padding                                  |
-| `--blyrics-margin`                      | `2rem`        | Standard margin                                   |
-| `--blyrics-border-radius`               | `1000rem`     | Standard border radius                            |
-| `--blyrics-panel-size `                 | `50%`         | Size of lyrics panel (not fullscreen, audio only) |
-| `--blyrics-video-panel-size`            | `30%`         | Size of lyrics panel (not fullscreen, video mode) |
-| `--blyrics-fullscreen-panel-size`       | `66%`         | Size of lyrics panel (fullscreen, audio only)     |
-| `--blyrics-fullscreen-video-panel-size` | `25%`         | Size of lyrics panel (fullscreen, video mode)     |
+| Variable                                | Default Value | Description                                                                                    |
+| --------------------------------------- | ------------- | ---------------------------------------------------------------------------------------------- |
+| `--blyrics-padding`                     | `2rem`        | Standard padding                                                                               |
+| `--blyrics-margin`                      | `2rem`        | Standard margin                                                                                |
+| `--blyrics-border-radius`               | `1000rem`     | Standard border radius                                                                         |
+| `--blyrics-padding-top`                 | (dynamic)     | Extra top padding for always-scrollable lyrics (calculated automatically)                      |
+| `--blyrics-padding-bottom`              | (dynamic)     | Extra bottom padding for always-scrollable lyrics (calculated automatically)                   |
+| `--blyrics-panel-size `                 | `50%`         | Size of lyrics panel (not fullscreen, audio only)                                              |
+| `--blyrics-video-panel-size`            | `30%`         | Size of lyrics panel (not fullscreen, video mode)                                              |
+| `--blyrics-fullscreen-panel-size`       | `66%`         | Size of lyrics panel (fullscreen, audio only)                                                  |
+| `--blyrics-fullscreen-video-panel-size` | `25%`         | Size of lyrics panel (fullscreen, video mode)                                                  |
 
 ### Effects
 
@@ -246,7 +248,6 @@ The following options are avalible:
 | `blyrics-queue-scroll-ms`⁴            | `150`         | If we're unable to scroll due to having scrolled recently, what is the maximum amount of time that a scroll can be "queued" for.           |
 | `blyrics-debug-renderer`              | `false`       | Set to `true` to enable the debug renderer.                                                                                                |
 | `blyrics-target-scroll-pos-ratio`     | `0.37`        | Position on the screen lyrics should be at. 0.5 means the selected lyric will be in the middle of the screen, 0 means top, 1 means bottom. |
-| `blyrics-add-extra-top-padding`       | `false`       | Should extra spacing be added to the top of the lyrics container to allow the lyrics to always scroll.                                     |
 | `blyrics-long-word-threshold`         | `1500`        | Duration threshold (in ms) above which words get `data-long-word="true"`. Useful for glow effects on held notes.                           |
 
 ⁴Make sure that the following equation is met
@@ -279,7 +280,7 @@ The main container for the lyrics is styled using the `.blyrics-container` class
   z-index: 1;
   transition: transform var(--blyrics-lyric-scroll-duration) var(--blyrics-lyric-scroll-timing-function) 0s;
   padding-top: 2rem;
-  padding-bottom: 0;
+  padding-bottom: calc(var(--blyrics-padding-bottom));
 }
 ```
 

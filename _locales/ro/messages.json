@@ -451,14 +451,6 @@
     "message": "Nicio temă se potrivește cu filtrele dvs.",
     "description": "Empty state message"
   },
-  "marketplace_permissionTitle": {
-    "message": "Necesită permisiune",
-    "description": "Permission required title"
-  },
-  "marketplace_permissionMessage": {
-    "message": "Pentru a răsfoi și a instala teme, Better Lyrics are nevoie de permisiunea de a accesa GitHub, unde temele sunt găzduite, și API-ul bazarului.",
-    "description": "Permission required message"
-  },
   "marketplace_grantPermission": {
     "message": "Acordați Permisiunea",
     "description": "Grant permission button"

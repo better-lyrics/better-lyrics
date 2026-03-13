@@ -1,13 +1,14 @@
 import { getLocalStorage } from "@core/storage";
 
-interface Theme {
+export interface Theme {
   name: string;
   author: string;
   link?: string;
   /**
    * Path relative to public/css/themes/
    */
-  path: string;
+  path?: string;
+  storeId?: string;
 }
 
 interface CustomTheme {
@@ -62,7 +63,7 @@ const themes: Theme[] = [
     name: "Minimal",
     author: "Semicolonhope",
     link: "",
-    path: "Minimal.css",
+    storeId: "minimal",
   },
   {
     name: "Luxurious Glass",
@@ -74,13 +75,13 @@ const themes: Theme[] = [
     name: "Dynamic Background",
     author: "chengg",
     link: "https://github.com/chengggit/Youtube-Music-Dynamic-Theme",
-    path: "Dynamic Background.css",
+    storeId: "dynamic-background",
   },
   {
     name: "Apple Music",
     author: "tposejank",
     link: "https://x.com/tposejank",
-    path: "Apple Music.css",
+    storeId: "apple-music",
   },
 ];
 

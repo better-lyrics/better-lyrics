@@ -451,14 +451,6 @@
     "message": "Немає тем, що відповідають вашим фільтрам",
     "description": "Empty state message"
   },
-  "marketplace_permissionTitle": {
-    "message": "Необхідні дозволи",
-    "description": "Permission required title"
-  },
-  "marketplace_permissionMessage": {
-    "message": "Для перегляду й встановлення тем Better Lyrics потрібен доступ до GitHub (де зберігаються теми) та api магазину тем.",
-    "description": "Permission required message"
-  },
   "marketplace_grantPermission": {
     "message": "Надати дозвіл",
     "description": "Grant permission button"

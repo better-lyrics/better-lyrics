@@ -236,13 +236,15 @@ export async function showConfirm(
   title: string,
   message: string | Node | Node[],
   danger = false,
-  confirmText?: string
+  confirmText?: string,
+  cancelText?: string
 ): Promise<boolean> {
   const result = await showModal({
     title,
     message,
     showInput: false,
     confirmText: confirmText || (danger ? "Delete" : "OK"),
+    cancelText,
     confirmDanger: danger,
   });
   return result !== null;

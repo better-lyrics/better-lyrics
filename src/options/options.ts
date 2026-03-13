@@ -1,10 +1,11 @@
 // Function to save user options
-import Sortable from "sortablejs";
+
 import { LOG_PREFIX, ROMANIZATION_LANGUAGES } from "@constants";
-import { t, initI18n, getLanguageDisplayName } from "@core/i18n";
-import { initStoreUI, setupYourThemesButton } from "./store/store";
-import { getIdentity, exportIdentity, importIdentity, type KeyIdentity } from "./store/keyIdentity";
+import { getLanguageDisplayName, initI18n, t } from "@core/i18n";
+import Sortable from "sortablejs";
 import { showModal } from "./editor/ui/feedback";
+import { exportIdentity, getIdentity, importIdentity, type KeyIdentity } from "./store/keyIdentity";
+import { initStoreUI, setupYourThemesButton } from "./store/store";
 
 interface Options {
   isLogsEnabled: boolean;

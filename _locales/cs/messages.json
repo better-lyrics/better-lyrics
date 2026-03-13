@@ -12,7 +12,7 @@
     "description": "General settings tab label"
   },
   "options_tab_display": {
-    "message": "Display",
+    "message": "Zobrazení",
     "description": "Display settings tab label"
   },
   "options_tab_language": {
@@ -450,14 +450,6 @@
   "marketplace_noThemesMatch": {
     "message": "No themes match your filters",
     "description": "Empty state message"
-  },
-  "marketplace_permissionTitle": {
-    "message": "Permission Required",
-    "description": "Permission required title"
-  },
-  "marketplace_permissionMessage": {
-    "message": "To browse and install themes, Better Lyrics needs permission to access GitHub where themes are hosted & the marketplace api.",
-    "description": "Permission required message"
   },
   "marketplace_grantPermission": {
     "message": "Grant Permission",

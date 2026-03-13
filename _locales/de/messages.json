@@ -451,14 +451,6 @@
     "message": "Keine Designs entsprechen deinen Filtern",
     "description": "Empty state message"
   },
-  "marketplace_permissionTitle": {
-    "message": "Berechtigung erforderlich",
-    "description": "Permission required title"
-  },
-  "marketplace_permissionMessage": {
-    "message": "Um Designs zu durchsuchen und zu installieren, benötigt Better Lyrics Zugriff auf GitHub, wo die Designs gehostet werden, sowie die Marktplatz-api.",
-    "description": "Permission required message"
-  },
   "marketplace_grantPermission": {
     "message": "Berechtigung erteilen",
     "description": "Grant permission button"

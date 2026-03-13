@@ -451,14 +451,6 @@
     "message": "沒有符合您篩選條件的主題",
     "description": "Empty state message"
   },
-  "marketplace_permissionTitle": {
-    "message": "需要權限",
-    "description": "Permission required title"
-  },
-  "marketplace_permissionMessage": {
-    "message": "要瀏覽和安裝主題，Better Lyrics 需要存取託管主題的 GitHub 和市集 API 的權限。",
-    "description": "Permission required message"
-  },
   "marketplace_grantPermission": {
     "message": "授予權限",
     "description": "Grant permission button"
