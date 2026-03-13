@@ -801,6 +801,7 @@
 	gap: 0.75rem;
   transition: all 0.2s;
   width: 100%;
+  user-select: none;
 }
 
 .store-card-btn-install {
@@ -823,9 +824,48 @@
   background: rgba(239, 68, 68, 0.3);
 }
 
+.store-card-btn-apply {
+  background: rgba(59, 130, 246, 0.2);
+  color: rgb(147, 197, 253);
+  border: 1px solid rgba(59, 130, 246, 0.3);
+}
+
+.store-card-btn-apply:hover:not(:disabled) {
+  background: rgba(59, 130, 246, 0.3);
+}
+
+.store-card-btn-apply kbd {
+  background: rgba(59, 130, 246, 0.15);
+  border-color: rgba(59, 130, 246, 0.25);
+  color: rgba(147, 197, 253, 0.8);
+}
+
+.store-card-btn-group {
+  display: flex;
+  gap: 0.375rem;
+  margin-top: 0.375rem;
+}
+
+.store-card-btn-group .store-card-btn {
+  flex: 1;
+  margin-top: 0;
+}
+
 .store-card-btn:disabled {
   opacity: 0.5;
   cursor: not-allowed;
+}
+
+.store-card-btn-install:disabled:hover {
+  background: rgba(34, 197, 94, 0.2);
+}
+
+.store-card-btn-remove:disabled:hover {
+  background: rgba(239, 68, 68, 0.2);
+}
+
+.store-card-btn-apply:disabled:hover {
+  background: rgba(59, 130, 246, 0.2);
 }
 
 .store-card-btn kbd {
@@ -992,7 +1032,7 @@
   flex-shrink: 0;
 }
 
-.detail-header-actions #detail-action-btn {
+.detail-header-actions .store-card-btn {
   height: 32px;
 	padding: 0 1rem;
   width: auto;
