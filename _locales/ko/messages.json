@@ -80,7 +80,7 @@
     "description": "Auto-hide cursor setting label"
   },
   "options_display_albumArt": {
-    "message": "흐린 앨범 아트 배경 표시",
+    "message": "흐릿하게 처리한 앨범 아트를 배경으로 표시",
     "description": "Show album art background setting label"
   },
   "options_display_stylizedAnimations": {
@@ -112,7 +112,7 @@
     "description": "Sources settings section title"
   },
   "options_sources_description": {
-    "message": "드래그하여 우선순위 변경. 상위 소스가 먼저 시도됩니다. 체크 해제하면 비활성화.",
+    "message": "드래그하여 우선순위를 변경합니다. 상위에 위치한 소스를 먼저 불러옵니다. 체크를 해제하면 비활성화됩니다.",
     "description": "Sources settings section description"
   },
   "options_themes_title": {
@@ -678,7 +678,7 @@
     "description": "Export to file button"
   },
   "editor_saveAsTheme": {
-    "message": "테마로 저장",
+    "message": "테마 저장하기",
     "description": "Save as theme button"
   },
   "editor_stylingGuide": {
