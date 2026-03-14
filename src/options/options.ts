@@ -181,13 +181,16 @@ const restoreOptions = (): void => {
     isRomanizationEnabled: false,
     preferredProviderList: [
       "bLyrics-richsynced",
+      "unison-richsynced",
       "musixmatch-richsync",
       "yt-captions",
       "bLyrics-synced",
+      "unison-synced",
       "lrclib-synced",
       "legato-synced",
       "musixmatch-synced",
       "yt-lyrics",
+      "unison-plain",
       "lrclib-plain",
     ],
     romanizationDisabledLanguages: [],
@@ -223,13 +226,16 @@ const setOptionsInForm = (items: Options): void => {
   // Always recreate in the default order to make sure no items go missing
   let unseenProviders = [
     "bLyrics-richsynced",
+    "unison-richsynced",
     "musixmatch-richsync",
     "yt-captions",
     "bLyrics-synced",
+    "unison-synced",
     "lrclib-synced",
     "legato-synced",
     "musixmatch-synced",
     "yt-lyrics",
+    "unison-plain",
     "lrclib-plain",
   ];
 
@@ -261,6 +267,9 @@ interface ProviderInfo {
 const getProviderIdToInfoMap = (): { [key: string]: ProviderInfo } => ({
   "musixmatch-richsync": { name: t("options_provider_musixmatch"), syncType: "word" },
   "musixmatch-synced": { name: t("options_provider_musixmatch"), syncType: "line" },
+  "unison-richsynced": { name: t("options_provider_betterLyricsUnison"), syncType: "syllable" },
+  "unison-synced": { name: t("options_provider_betterLyricsUnison"), syncType: "line" },
+  "unison-plain": { name: t("options_provider_betterLyricsUnison"), syncType: "unsynced" },
   "yt-captions": { name: t("options_provider_youtubeCaptions"), syncType: "line" },
   "lrclib-synced": { name: t("options_provider_lrclib"), syncType: "line" },
   "bLyrics-richsynced": { name: t("options_provider_betterLyrics"), syncType: "syllable" },
