@@ -12,6 +12,7 @@ interface UnisonResponse {
   lyrics: string;
   format: "ttml" | "lrc" | "plain";
   syncType: "richsync" | "linesync" | "plain";
+  effectiveScore: number;
   voteCount: number;
 }
 
@@ -21,6 +22,7 @@ export type UnisonLyricSourceResult = LyricSourceResult & {
 
 export interface UnisonData {
   votes: number;
+  effectiveScore: number;
   lyricsId: number;
 }
 
@@ -62,7 +64,7 @@ export default async function unison(providerParameters: ProviderParameters): Pr
   const result = {
     source: "Unison",
     sourceHref: "https://boidu.dev/",
-    unisonData: { votes: responseData.voteCount, lyricsId: responseData.id }
+    unisonData: { votes: responseData.voteCount, effectiveScore: responseData.effectiveScore, lyricsId: responseData.id }
   }
   
   switch (responseData.format) {

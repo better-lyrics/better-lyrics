@@ -254,8 +254,7 @@ export function addFooter(
     // Vote count and score
     const unisonScore = document.createElement("div");
     unisonScore.className = `${FOOTER_CLASS}__container`;
-
-    //....
+    unisonScore.textContent = `${unisonData.votes} votes`;
     unisonContainer.appendChild(unisonScore);
 
     // Downvote lyrics
@@ -275,6 +274,24 @@ export function addFooter(
     unisonDownvote.appendChild(unisonDownvoteSVG);
 
     unisonContainer.appendChild(unisonDownvote);
+
+    // Report lyrics
+    const unisonReport = document.createElement("button");
+    unisonReport.className = `${FOOTER_CLASS}__vote`;
+
+    const unisonReportSVG = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+    unisonReportSVG.setAttribute("viewBox", "0 0 18 18");
+    unisonReportSVG.setAttribute("fill", "white");
+    unisonReportSVG.setAttribute("width", "20");
+    unisonReportSVG.setAttribute("height", "20");
+
+    const unisonReportSVGPath = document.createElementNS("http://www.w3.org/2000/svg", "path");
+    unisonReportSVGPath.setAttribute("d", "m3 2.25-.11.055c-.392.196-.64.597-.64 1.036v12.41a.75.75 0 101.5 0v-4.87a5.451 5.451 0 014.687.087L9 11.25l.357.166A6.701 6.701 0 0015 11.25l.11-.055c.343-.171.575-.5.628-.873l.012-.163V3.344a.908.908 0 00-1.313-.812 5.45 5.45 0 01-4.874 0L9 2.25a6.7 6.7 0 00-6 0Zm5.33 1.342.564.282a6.95 6.95 0 005.356.356v5.715a5.2 5.2 0 01-4.58-.037l-.564-.282A6.95 6.95 0 003.75 9.27V3.555a5.2 5.2 0 014.58.037Z");
+
+    unisonReportSVG.appendChild(unisonReportSVGPath);
+    unisonReport.appendChild(unisonReportSVG);
+
+    unisonContainer.appendChild(unisonReport);
 
     // Append container
     footer.appendChild(unisonContainer);
