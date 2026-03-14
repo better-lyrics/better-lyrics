@@ -1,6 +1,6 @@
 import { openSearchPanel } from "@codemirror/search";
 import { LOG_PREFIX_EDITOR } from "@constants";
-import { initI18n } from "@core/i18n";
+import { initI18n, loadLocaleOverride } from "@core/i18n";
 import { createEditorState, createEditorView } from "./core/editor";
 import { editorStateManager } from "./core/state";
 import { generateDefaultFilename, importManager, saveCSSToFile } from "./features/import";
@@ -191,6 +191,7 @@ async function initializeEditor() {
 
 export function initialize() {
   document.addEventListener("DOMContentLoaded", async () => {
+    await loadLocaleOverride();
     initI18n();
     await initializeEditor();
     initializeNavigation();
