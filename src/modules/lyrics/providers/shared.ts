@@ -1,9 +1,9 @@
 import { LYRIC_SOURCE_KEYS, PROVIDER_CONFIGS, PROVIDER_SWITCHED_LOG } from "@constants";
 import { log } from "@utils";
-import bLyrics from "./blyrics/blyrics";
+import bLyrics from "./blyrics";
 import cubey, { type CubeyLyricSourceResult } from "./cubey";
 import lyricLib from "./lrclib";
-import unison from "./unison";
+import unison, { type UnisonLyricSourceResult } from "./unison";
 import ytLyrics, { type YTLyricSourceResult } from "./yt";
 import { ytCaptions } from "./ytCaptions";
 import legato from "./legato";
@@ -46,7 +46,7 @@ interface AudioTrackData {
 interface LyricSource {
   filled: boolean;
   resultCached: boolean;
-  lyricSourceResult: LyricSourceResult | CubeyLyricSourceResult | YTLyricSourceResult | null;
+  lyricSourceResult: LyricSourceResult | CubeyLyricSourceResult | UnisonLyricSourceResult | YTLyricSourceResult | null;
   lyricSourceFiller: (providerParameters: ProviderParameters) => Promise<void>;
 }
 

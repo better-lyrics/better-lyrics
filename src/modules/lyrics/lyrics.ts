@@ -265,6 +265,7 @@ export async function createLyrics(detail: PlayerDetails, signal: AbortSignal): 
       };
     }
 
+    console.log(selectedProvider, lyrics)
     if (!lyrics.lyrics) {
       throw new Error("Lyrics.lyrics is null or undefined. Report this bug");
     }

@@ -1,6 +1,6 @@
 import { LYRICS_API_URL } from "@/core/constants";
-import type { ProviderParameters } from "../shared";
-import { fillTtml } from "../ttmlUtils";
+import type { ProviderParameters } from "./shared";
+import { fillTtml } from "./ttmlUtils";
 
 export default async function bLyrics(providerParameters: ProviderParameters): Promise<void> {
   // Fetch from the primary API if cache is empty or invalid

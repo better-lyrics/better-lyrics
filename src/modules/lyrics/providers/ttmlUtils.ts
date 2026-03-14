@@ -1,4 +1,4 @@
-import { BLYRICS_INSTRUMENTAL_GAP_MS, LYRICS_API_URL } from "@constants";
+import { BLYRICS_INSTRUMENTAL_GAP_MS } from "@constants";
 import type {
   MetadataElement,
   ParagraphElementOrBackground,
@@ -7,8 +7,8 @@ import type {
   TransliterationContainer,
   TransliterationItem,
   TtmlRoot,
-} from "@modules/lyrics/providers/blyrics/blyrics-types";
-import type { Lyric, LyricPart, LyricSourceResult, ProviderParameters } from "@modules/lyrics/providers/shared";
+} from "@/modules/lyrics/providers/ttmlTypes";
+import type { Lyric, LyricPart, LyricSourceResult } from "@modules/lyrics/providers/shared";
 import { type X2jOptions, XMLParser } from "fast-xml-parser";
 
 /**

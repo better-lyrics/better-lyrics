@@ -269,10 +269,14 @@
 	background-color: var(--blyrics-footer-bg-color);
 	border: 1px solid var(--blyrics-footer-border-color);
 	padding: 0.5rem 0.75rem;
-	border-radius: var(--blyrics--small-border-radius);
+	border-radius: var(--blyrics-small-border-radius);
 	display: grid;
 	place-items: center;
 	transition: background-color 0.2s;
+}
+
+.blyrics-footer__vote:hover {
+	background-color: var(--blyrics-vote-hover-color);
 }
 
 .blyrics-footer__container {
