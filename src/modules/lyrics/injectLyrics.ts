@@ -570,6 +570,7 @@ function injectLyrics(data: LyricSourceResultWithMeta, keepLoaderVisible = false
       const matchedLang = Object.keys(item.translations).find(lang => langCodesMatch(targetTranslationLang, lang));
       if (matchedLang) {
         translatedText = item.translations[matchedLang];
+      }
     } else if (item.translation && langCodesMatch(targetTranslationLang, item.translation.lang)) {
       translatedText = item.translation.text;
     } else {
