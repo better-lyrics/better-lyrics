@@ -69,6 +69,7 @@
   gap: 0.75rem;
   text-decoration: none;
   color: inherit;
+	font-weight: 600;
   transition: opacity 0.15s;
 }
 

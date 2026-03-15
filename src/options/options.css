@@ -61,22 +61,22 @@ h1 img {
     color: rgba(255, 255, 255, 0.5);
 }
 
-button,
-label,
-label input {
+body:not(.unison-standalone) button,
+body:not(.unison-standalone) label,
+body:not(.unison-standalone) label input {
     cursor: pointer;
 }
 
 #status,
 #status-css,
-label input {
+body:not(.unison-standalone) label input {
     position: absolute;
     opacity: 0;
 }
 
 #status,
 #status-css,
-button {
+body:not(.unison-standalone) button {
     font-size: 1.125rem;
 }
 
@@ -235,7 +235,7 @@ body {
     height: 0.875rem;
 }
 
-button {
+body:not(.unison-standalone) button {
     background-color: hsla(0, 0%, 100%, 0.1);
     color: #fff;
     padding: 14px 20px;
@@ -247,7 +247,7 @@ button {
     cursor: pointer;
 }
 
-button:hover {
+body:not(.unison-standalone) button:hover {
     background-color: hsla(0, 0%, 100%, 0.2);
 }
 
@@ -275,7 +275,7 @@ button:hover {
     opacity: 1;
 }
 
-select {
+body:not(.unison-standalone) select {
     appearance: none;
     background-color: transparent;
     border: none;
@@ -290,7 +290,7 @@ select {
     color: white;
 }
 
-select option {
+body:not(.unison-standalone) select option {
     color: black;
 }
 
@@ -754,14 +754,14 @@ select option {
     display: block;
 }
 
-label {
+body:not(.unison-standalone) label {
     position: relative;
     display: inline-block;
     width: 36px;
     height: 20px;
 }
 
-label input {
+body:not(.unison-standalone) label input {
     opacity: 0;
     width: 0;
     height: 0;

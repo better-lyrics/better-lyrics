@@ -1,3 +1,4 @@
+import { XMLParser } from "fast-xml-parser";
 import { LOG_PREFIX_UNISON } from "@constants";
 import { t } from "@core/i18n";
 import type {
@@ -830,71 +831,78 @@ function stripLrcTimestamps(line: string): string {
   return line.replace(/^\[[\d:.]+\]\s*/g, "");
 }
 
+interface TtmlNode {
+  "#text"?: string;
+  ":@"?: Record<string, string>;
+  span?: TtmlNode[];
+  p?: TtmlNode[];
+  [key: string]: unknown;
+}
+
 interface PreviewLine {
   text: string;
   isBackground: boolean;
 }
 
-function extractBgSpans(html: string): { cleaned: string; bgTexts: string[] } {
-  const bgTexts: string[] = [];
-  let cleaned = html;
-  let depth = 0;
-  let bgStart = -1;
-
-  const openPattern = /<span[^>]*role\s*=\s*["']x-bg["'][^>]*>/i;
-  let searchFrom = 0;
-
-  while (searchFrom < cleaned.length) {
-    const slice = cleaned.slice(searchFrom);
-    const openMatch = openPattern.exec(slice);
-    if (!openMatch) break;
-
-    bgStart = searchFrom + openMatch.index;
-    depth = 1;
-    let cursor = bgStart + openMatch[0].length;
-
-    while (cursor < cleaned.length && depth > 0) {
-      if (cleaned.startsWith("<span", cursor)) {
-        depth++;
-        const close = cleaned.indexOf(">", cursor);
-        cursor = close === -1 ? cleaned.length : close + 1;
-      } else if (cleaned.startsWith("</span>", cursor)) {
-        depth--;
-        if (depth === 0) {
-          const bgHtml = cleaned.slice(bgStart, cursor + 7);
-          const bgText = bgHtml.replace(/<[^>]+>/g, "").trim();
-          if (bgText) bgTexts.push(bgText);
-          cleaned = cleaned.slice(0, bgStart) + cleaned.slice(cursor + 7);
-          searchFrom = bgStart;
-          break;
-        }
-        cursor += 7;
-      } else {
-        cursor++;
-      }
-    }
-
-    if (depth > 0) break;
+function collectText(nodes: TtmlNode[]): string {
+  let text = "";
+  for (const node of nodes) {
+    if (node["#text"] != null) text += node["#text"];
+    if (node.span) text += collectText(node.span);
   }
-
-  return { cleaned, bgTexts };
+  return text;
 }
 
 function parseTtmlLines(text: string): PreviewLine[] {
+  const parser = new XMLParser({
+    ignoreAttributes: false,
+    attributeNamePrefix: "@_",
+    textNodeName: "#text",
+    trimValues: false,
+    removeNSPrefix: true,
+    preserveOrder: true,
+    allowBooleanAttributes: true,
+    parseAttributeValue: false,
+    parseTagValue: false,
+  });
+
+  let parsed: TtmlNode[];
+  try {
+    parsed = parser.parse(text) as TtmlNode[];
+  } catch {
+    return text.split("\n").map(t => ({ text: t, isBackground: false }));
+  }
+
   const lines: PreviewLine[] = [];
-  const pMatches = text.match(/<p[^>]*>[\s\S]*?<\/p>/gi);
-  if (!pMatches) return text.split("\n").map(t => ({ text: t, isBackground: false }));
 
-  for (const match of pMatches) {
-    const { cleaned, bgTexts } = extractBgSpans(match);
-    const mainText = cleaned.replace(/<[^>]+>/g, "").trim();
-
-    if (mainText) lines.push({ text: mainText, isBackground: false });
-    for (const bg of bgTexts) {
-      lines.push({ text: bg, isBackground: true });
+  function walkNodes(nodes: TtmlNode[]) {
+    for (const node of nodes) {
+      if (node.p) {
+        let mainText = "";
+        const bgTexts: string[] = [];
+        for (const child of node.p) {
+          if (child[":@"]?.["@_role"] === "x-bg") {
+            const bg = collectText(child.span ?? []).trim();
+            if (bg) bgTexts.push(bg);
+          } else {
+            mainText += child["#text"] ?? "";
+            if (child.span) mainText += collectText(child.span);
+          }
+        }
+        mainText = mainText.trim();
+        if (mainText) lines.push({ text: mainText, isBackground: false });
+        for (const bg of bgTexts) lines.push({ text: bg, isBackground: true });
+      }
+      for (const key of Object.keys(node)) {
+        if (key === ":@" || key === "#text") continue;
+        const val = node[key as keyof TtmlNode];
+        if (Array.isArray(val)) walkNodes(val as TtmlNode[]);
+      }
     }
   }
-  return lines;
+
+  walkNodes(parsed);
+  return lines.length > 0 ? lines : text.split("\n").map(t => ({ text: t, isBackground: false }));
 }
 
 function renderPreviewEmpty(container: HTMLElement): void {
