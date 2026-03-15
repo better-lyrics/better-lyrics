@@ -625,9 +625,18 @@ function injectLyrics(data: LyricSourceResultWithMeta, keepLoaderVisible = false
   animEngineState.scrollResumeTime = 0;
 
   if (lyrics[0].words !== t("lyrics_notFound")) {
-    addFooter(data.source, data.sourceHref, data.song, data.artist, data.album, data.duration, data.providerKey);
+    addFooter(
+      data.source,
+      data.sourceHref,
+      data.song,
+      data.artist,
+      data.album,
+      data.duration,
+      data.providerKey,
+      data.unisonId
+    );
   } else {
-    addNoLyricsButton(data.song, data.artist, data.album, data.duration);
+    addNoLyricsButton(data.song, data.artist, data.album, data.duration, data.videoId);
   }
 
   lyricsContainer.dataset.sync = syncType;

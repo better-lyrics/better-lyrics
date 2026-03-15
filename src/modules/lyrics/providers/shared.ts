@@ -56,6 +56,7 @@ export interface LyricSourceResult {
   sourceHref: string;
   musicVideoSynced?: boolean | null;
   cacheAllowed?: boolean;
+  unisonId?: number;
 }
 
 export type LyricsArray = Lyric[];

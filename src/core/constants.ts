@@ -46,6 +46,7 @@ export const LEGATO_API_URL = "https://lyrics-api.boidu.dev/kugou/getLyrics" as 
 export const LRCLIB_UPLOAD_URL = "https://lrclibup.boidu.dev/" as const;
 export const LRCLIB_CLIENT_HEADER = "BetterLyrics Extension (https://github.com/better-lyrics/better-lyrics)" as const;
 export const THEME_STORE_API_URL = "https://better-lyrics-themes-api.boidu.dev" as const;
+export const UNISON_API_BASE_URL = "https://unison.boidu.dev" as const;
 export const THEME_STORE_TURNSTILE_URL = `${THEME_STORE_API_URL}/turnstile` as const;
 const THEME_REGISTRY_BASE = "https://raw.githubusercontent.com/better-lyrics/themes" as const;
 export const THEME_REGISTRY_URL = `${THEME_REGISTRY_BASE}/master` as const;
@@ -98,6 +99,7 @@ export const LOG_PREFIX_CONTENT = "[BetterLyrics:Content]" as const;
 export const LOG_PREFIX_BACKGROUND = "[BetterLyrics:Background]" as const;
 export const LOG_PREFIX_EDITOR = "[BetterLyrics:Editor]" as const;
 export const LOG_PREFIX_STORE = "[BetterLyrics:Store]" as const;
+export const LOG_PREFIX_UNISON = "[BetterLyrics:Unison]" as const;
 
 // Initialization and General Logs
 export const INITIALIZE_LOG =
