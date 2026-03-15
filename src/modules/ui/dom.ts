@@ -615,7 +615,6 @@ export function preloadHighResThumbnail(smallThumbnail: ThumbnailElement) {
 }
 
 export function showYtThumbnail(): void {
-
   const blyricsImg = document.getElementById("blyrics-img") as HTMLImageElement | null;
   if (blyricsImg) {
     blyricsImg.src = "";
