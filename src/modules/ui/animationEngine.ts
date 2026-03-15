@@ -31,8 +31,6 @@ let observedTabRenderer: HTMLElement | null = null;
 // 0.5 means the selected lyric will be in the middle of the screen, 0 means top, 1 means bottom
 export const SCROLL_POS_OFFSET_RATIO = registerThemeSetting("blyrics-target-scroll-pos-ratio", 0.37);
 
-const ADD_EXTRA_PADDING_TOP = registerThemeSetting("blyrics-add-extra-top-padding", false);
-
 const PASSIVE_SCROLL_ENABLED = registerThemeSetting("blyrics-passive-scroll-enabled", true);
 const PASSIVE_SECONDS_PER_LINE = registerThemeSetting("blyrics-passive-scroll-seconds-per-line", 3.5);
 const PASSIVE_BOTTOM_PAUSE_S = registerThemeSetting("blyrics-passive-scroll-bottom-pause-s", 1.5);
