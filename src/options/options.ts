@@ -1,7 +1,7 @@
 // Function to save user options
 
 import { LOG_PREFIX, ROMANIZATION_LANGUAGES } from "@constants";
-import { getLanguageDisplayName, initI18n, t } from "@core/i18n";
+import { getLanguageDisplayName, initI18n, loadLocaleOverride, SUPPORTED_LOCALES, t } from "@core/i18n";
 import Sortable from "sortablejs";
 import { showModal } from "./editor/ui/feedback";
 import { exportIdentity, getIdentity, importIdentity, type KeyIdentity } from "./store/keyIdentity";
@@ -20,6 +20,7 @@ interface Options {
   preferredProviderList: string[];
   romanizationDisabledLanguages: string[];
   translationDisabledLanguages: string[];
+  uiLanguage: string;
 }
 
 const saveOptions = (): void => {
@@ -52,6 +53,7 @@ const getOptionsFromForm = (): Options => {
     preferredProviderList: preferredProviderList,
     romanizationDisabledLanguages: romanizationDisabledLanguages,
     translationDisabledLanguages: translationDisabledLanguages,
+    uiLanguage: (document.getElementById("uiLanguage") as HTMLSelectElement).value,
   };
 };
 
@@ -192,6 +194,7 @@ const restoreOptions = (): void => {
     ],
     romanizationDisabledLanguages: [],
     translationDisabledLanguages: [],
+    uiLanguage: "auto",
   };
 
   chrome.storage.sync.get(defaultOptions, setOptionsInForm);
@@ -211,6 +214,7 @@ const setOptionsInForm = (items: Options): void => {
   (document.getElementById("translate") as HTMLInputElement).checked = items.isTranslateEnabled;
   (document.getElementById("translationLanguage") as HTMLInputElement).value = items.translationLanguage;
   (document.getElementById("isRomanizationEnabled") as HTMLInputElement).checked = items.isRomanizationEnabled;
+  (document.getElementById("uiLanguage") as HTMLSelectElement).value = items.uiLanguage;
   romanizationDisabledLanguages = items.romanizationDisabledLanguages || [];
   translationDisabledLanguages = items.translationDisabledLanguages || [];
   updateExclusionsConfigVisibility();
@@ -360,11 +364,54 @@ function createProviderElem(providerId: string, checked = true): HTMLLIElement |
   return liElem;
 }
 
+// -- Display Language Dropdown --------------------------
+
+function populateLanguageDropdown(): void {
+  const select = document.getElementById("uiLanguage") as HTMLSelectElement | undefined;
+  if (!select) return;
+
+  const browserLang = chrome.i18n.getUILanguage();
+  const autoOption = document.createElement("option");
+  autoOption.value = "auto";
+  autoOption.textContent = `${t("options_language_displayLanguageAuto")} (${browserLang})`;
+  select.appendChild(autoOption);
+
+  for (const locale of SUPPORTED_LOCALES) {
+    const option = document.createElement("option");
+    option.value = locale.code;
+    option.textContent = locale.nativeName;
+    select.appendChild(option);
+  }
+
+  select.addEventListener("change", () => {
+    saveOptions();
+    location.hash = "language-content";
+    location.reload();
+  });
+}
+
+function restoreActiveTab(): void {
+  if (!location.hash) return;
+
+  const target = `#${location.hash.slice(1)}`;
+  const targetBtn = document.querySelector(`.tab[data-target="${target}"]`);
+  const targetContent = document.querySelector(target);
+  if (!targetBtn || !targetContent) return;
+
+  document.querySelectorAll(".tab").forEach(btn => btn.classList.remove("active"));
+  document.querySelectorAll(".tab-content").forEach(content => content.classList.remove("active"));
+  targetBtn.classList.add("active");
+  targetContent.classList.add("active");
+}
+
 // Event listeners
-document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener("DOMContentLoaded", async () => {
+  await loadLocaleOverride();
   initI18n();
+  populateLanguageDropdown();
   initTabScrollIndicators();
   restoreOptions();
+  restoreActiveTab();
 });
 document.querySelectorAll("#options input, #options select").forEach(element => {
   element.addEventListener("change", saveOptions);
@@ -380,7 +427,9 @@ tabButtons.forEach(button => {
     tabContents.forEach(content => content.classList.remove("active"));
 
     button.classList.add("active");
-    document.querySelector(button.getAttribute("data-target")!)!.classList.add("active");
+    const target = button.getAttribute("data-target")!;
+    document.querySelector(target)!.classList.add("active");
+    history.replaceState(null, "", target);
   });
 });
 

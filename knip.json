@@ -7,7 +7,8 @@
     "src/options/editor.ts",
     "src/options/marketplace.ts",
     "public/earlyInject.js",
-    "public/script.js"
+    "public/script.js",
+    "src/core/generated/locales.ts"
   ],
   "project": ["src/**/*.ts", "public/**/*.js"],
   "ignore": ["src/types/**"],
@@ -17,7 +18,8 @@
     "@typescript/lib-dom"
   ],
   "ignoreIssues": {
-    "src/modules/lyrics/providers/blyrics/blyrics-types.ts": ["exports", "types"]
+    "src/modules/lyrics/providers/blyrics/blyrics-types.ts": ["exports", "types"],
+    "src/core/generated/locales.ts": ["types"]
   },
   "includeEntryExports": true
 }
