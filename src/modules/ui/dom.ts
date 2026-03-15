@@ -269,6 +269,7 @@ export function addFooter(
         unisonUpvote.innerHTML = votedIcons.upvote;
         return;
       }
+      unisonDownvote.innerHTML = votedIcons.downvote;
 
       let data = (await byId(unisonData.lyricsId));
       if (!data) { return; }
@@ -316,6 +317,7 @@ export function addFooter(
         unisonDownvote.innerHTML = votedIcons.downvote;
         return;
       }
+      unisonUpvote.innerHTML = votedIcons.upvote;
 
       let data = (await byId(unisonData.lyricsId));
       if (!data) { return; }
