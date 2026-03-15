@@ -281,7 +281,7 @@ export async function fillTtml(responseString: string, providerParameters: Provi
   }
 
   let lyricArray = Array.from(lyrics.values());
-  const songDurationMs = ttMeta ? parseTime(ttMeta["@_dur"]) : providerParameters.duration;
+  const songDurationMs = ttMeta && ttMeta["@_dur"] ? parseTime(ttMeta["@_dur"]) : providerParameters.duration;
   lyricArray = insertInstrumentalBreaks(lyricArray, songDurationMs);
 
   let result: LyricSourceResult = {
