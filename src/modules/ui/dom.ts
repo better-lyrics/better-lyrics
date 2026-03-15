@@ -253,13 +253,14 @@ export function addFooter(
         await deleteVote(unisonData.lyricsId);
         
         let data = (await byId(unisonData.lyricsId));
-        if (!data) { return; }
-        
-        unisonData.effectiveScore = data.effectiveScore;
-        unisonData.votes = data.voteCount;
-        unisonData.vote = data.userVote;
-        
-        unisonScore.textContent = `${data.effectiveScore} score (${data.voteCount})`;
+        if (data) {
+          unisonData.effectiveScore = data.effectiveScore;
+          unisonData.votes = data.voteCount;
+          unisonData.vote = data.userVote;
+          
+          unisonScore.textContent = `${data.effectiveScore} score (${data.voteCount})`;
+        }
+        return;
       }
 
       unisonUpvote.innerHTML = votedIcons.upvoted;
@@ -299,13 +300,14 @@ export function addFooter(
         await deleteVote(unisonData.lyricsId);
         
         let data = (await byId(unisonData.lyricsId));
-        if (!data) { return; }
-        
-        unisonData.effectiveScore = data.effectiveScore;
-        unisonData.votes = data.voteCount;
-        unisonData.vote = data.userVote;
-        
-        unisonScore.textContent = `${data.effectiveScore} score (${data.voteCount})`;
+        if (data) {
+          unisonData.effectiveScore = data.effectiveScore;
+          unisonData.votes = data.voteCount;
+          unisonData.vote = data.userVote;
+          
+          unisonScore.textContent = `${data.effectiveScore} score (${data.voteCount})`;
+        }
+        return;
       }
       
       unisonDownvote.innerHTML = votedIcons.downvoted;
