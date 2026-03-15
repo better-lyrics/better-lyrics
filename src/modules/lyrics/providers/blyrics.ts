@@ -27,7 +27,7 @@ export default async function bLyrics(providerParameters: ProviderParameters): P
   }
 
   let responseString: string = await response.json().then(json => json.ttml);
-  const ttml = await fillTtml(responseString);
+  const ttml = await fillTtml(responseString, providerParameters.duration);
 
   if (ttml) {
     if (ttml.isWordSynced) {

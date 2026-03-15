@@ -129,7 +129,7 @@ export default async function unison(providerParameters: ProviderParameters): Pr
   
   switch (responseData.format) {
     case "ttml":
-      const filled = await fillTtml(responseData.lyrics);
+      const filled = await fillTtml(responseData.lyrics, providerParameters.duration);
       if (filled) {
         const unisonResult = { ...filled.result, ...result };
         providerParameters.sourceMap["unison-richsynced"].lyricSourceResult = filled.isWordSynced ? unisonResult : null;

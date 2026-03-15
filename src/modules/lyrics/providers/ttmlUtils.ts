@@ -180,7 +180,7 @@ function insertInstrumentalBreaks(lyrics: Lyric[], songDurationMs: number): Lyri
   return result;
 }
 
-export async function fillTtml(responseString: string) {
+export async function fillTtml(responseString: string, duration: number) {
   const options: X2jOptions = {
     ignoreAttributes: false,
     attributeNamePrefix: "@_",
@@ -326,7 +326,7 @@ export async function fillTtml(responseString: string) {
   }
 
   let lyricArray = Array.from(lyrics.values());
-  const songDurationMs = parseTime(ttMeta["@_dur"]);
+  const songDurationMs = ttMeta && ttMeta["@_dur"] ? parseTime(ttMeta["@_dur"]) : duration * 1000;
   lyricArray = insertInstrumentalBreaks(lyricArray, songDurationMs);
 
   let result: LyricSourceResult = {
