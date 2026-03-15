@@ -61,22 +61,22 @@ h1 img {
     color: rgba(255, 255, 255, 0.5);
 }
 
-body:not(.unison-standalone) button,
-body:not(.unison-standalone) label,
-body:not(.unison-standalone) label input {
+.options-page :where(button),
+.options-page :where(label),
+.options-page :where(label input) {
     cursor: pointer;
 }
 
 #status,
 #status-css,
-body:not(.unison-standalone) label input {
+.options-page :where(label input) {
     position: absolute;
     opacity: 0;
 }
 
 #status,
 #status-css,
-body:not(.unison-standalone) button {
+.options-page :where(button) {
     font-size: 1.125rem;
 }
 
@@ -205,6 +205,22 @@ body {
     height: 0.75rem;
 }
 
+.options-page :where(button) {
+    background-color: hsla(0, 0%, 100%, 0.1);
+    color: #fff;
+    padding: 14px 20px;
+    margin: 8px 0;
+    border: none;
+    width: 100%;
+    border-radius: 1000rem;
+    text-align: center;
+    cursor: pointer;
+}
+
+.options-page :where(button:hover) {
+    background-color: hsla(0, 0%, 100%, 0.2);
+}
+
 .theme-preview-change-btn {
     position: relative;
     z-index: 1;
@@ -235,22 +251,6 @@ body {
     height: 0.875rem;
 }
 
-body:not(.unison-standalone) button {
-    background-color: hsla(0, 0%, 100%, 0.1);
-    color: #fff;
-    padding: 14px 20px;
-    margin: 8px 0;
-    border: none;
-    width: 100%;
-    border-radius: 1000rem;
-    text-align: center;
-    cursor: pointer;
-}
-
-body:not(.unison-standalone) button:hover {
-    background-color: hsla(0, 0%, 100%, 0.2);
-}
-
 #status,
 #status-css {
     top: 0;
@@ -275,7 +275,7 @@ body:not(.unison-standalone) button:hover {
     opacity: 1;
 }
 
-body:not(.unison-standalone) select {
+.options-page :where(select) {
     appearance: none;
     background-color: transparent;
     border: none;
@@ -290,7 +290,7 @@ body:not(.unison-standalone) select {
     color: white;
 }
 
-body:not(.unison-standalone) select option {
+.options-page :where(select option) {
     color: black;
 }
 
@@ -754,14 +754,14 @@ body:not(.unison-standalone) select option {
     display: block;
 }
 
-body:not(.unison-standalone) label {
+.options-page :where(label) {
     position: relative;
     display: inline-block;
     width: 36px;
     height: 20px;
 }
 
-body:not(.unison-standalone) label input {
+.options-page :where(label input) {
     opacity: 0;
     width: 0;
     height: 0;
