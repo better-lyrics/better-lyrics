@@ -32,7 +32,7 @@ export type UnisonLyricSourceResult = LyricSourceResult & {
 };
 
 export interface UnisonData {
-  vote: 1 | -1;
+  vote: 1 | -1 | null;
   votes: number;
   effectiveScore: number;
   lyricsId: number;
@@ -76,7 +76,9 @@ export async function report(lyricsId: number, reason: UnisonReportReason, detai
 
 export async function byId(lyricsId: number): Promise<UnisonResponse | null> {
   const url = new URL(UNISON_API_URL + "/" + lyricsId);
-  const response = await fetch(url.toString())
+  const response = await fetch(url.toString(), {
+    headers: { "x-key-id": (await getIdentity()).keyId }
+  });
 
   if (!response.ok) { return null; }
   return response.json().then(json => json.data);

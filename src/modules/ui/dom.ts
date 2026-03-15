@@ -262,6 +262,11 @@ export function addFooter(
 
       let data = (await byId(unisonData.lyricsId));
       if (!data) { return; }
+      
+      unisonData.effectiveScore = data.effectiveScore;
+      unisonData.votes = data.voteCount;
+      unisonData.vote = data.userVote;
+
       unisonScore.textContent = `${data.effectiveScore} score (${data.voteCount})`;
     });
 
@@ -294,6 +299,11 @@ export function addFooter(
 
       let data = (await byId(unisonData.lyricsId));
       if (!data) { return; }
+      
+      unisonData.effectiveScore = data.effectiveScore;
+      unisonData.votes = data.voteCount;
+      unisonData.vote = data.userVote;
+      
       unisonScore.textContent = `${data.effectiveScore} score (${data.voteCount})`;
     });
 
