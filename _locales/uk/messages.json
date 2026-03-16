@@ -623,6 +623,10 @@
     "message": "Встановити / Видалити",
     "description": "Install/remove shortcut"
   },
+  "marketplace_shortcutsApply": {
+    "message": "Apply theme",
+    "description": "Apply theme shortcut label"
+  },
   "marketplace_shortcutsPrevImage": {
     "message": "Попереднє зображення",
     "description": "Previous image shortcut"
