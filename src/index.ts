@@ -11,8 +11,9 @@ import {
   loadTranslationSettings,
   onAlbumArtEnabled,
 } from "@modules/settings/settings";
-import { injectHeadTags, reloadAlbumArt, setupAdObserver } from "@modules/ui/dom";
+import { cleanup, cleanupHeadTags, injectHeadTags, reloadAlbumArt, setupAdObserver } from "@modules/ui/dom";
 import {
+  cleanupObservers,
   disableInertWhenFullscreen,
   enableLyricsTab,
   initializeLyrics,
@@ -27,8 +28,6 @@ import { log, setUpLog } from "@utils";
 
 /**
  * Initializes the BetterLyrics extension by setting up all required components.
- * This method orchestrates the setup of logging, DOM injection, observers, settings,
- * storage, and lyric providers.
  */
 async function modify(): Promise<void> {
   setUpLog();
@@ -71,14 +70,27 @@ async function modify(): Promise<void> {
 }
 
 /**
- * Initializes the application by setting up the DOM content loaded event listener.
- * Entry point for the BetterLyrics extension.
+ * Extension.js entry point for content scripts.
+ * Supports HMR by providing a cleanup function.
  */
-function init(): void {
-  document.addEventListener("DOMContentLoaded", modify);
+/** @public */
+export default function init() {
+  if (document.readyState === "complete" || document.readyState === "interactive") {
+    modify();
+  } else {
+    document.addEventListener("DOMContentLoaded", modify);
+  }
+
+  setupRequestSniffer();
+
+  return () => {
+    // Cleanup logic for HMR
+    document.removeEventListener("DOMContentLoaded", modify);
+    cleanupHeadTags();
+    cleanupObservers();
+    cleanup();
+    // Reset AppState if necessary
+    AppState.areLyricsLoaded = false;
+    AppState.areLyricsTicking = false;
+  };
 }
-
-// Initialize the application
-init();
-
-setupRequestSniffer();

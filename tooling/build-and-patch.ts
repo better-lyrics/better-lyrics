@@ -7,7 +7,7 @@ try {
 
   for (const browser of browsers) {
     console.log(`Building for ${browser}...`);
-    execSync(`extension build --browser ${browser} --polyfill`, { stdio: "inherit" });
+    execSync(`extension build --browser ${browser}`, { stdio: "inherit" });
 
     console.log(`Copying sourcemaps for ${browser}...`);
     execSync(`mkdir -p sourcemaps_for_upload/${browser}`, { stdio: "inherit" });

@@ -703,9 +703,29 @@ export async function injectHeadTags(): Promise<void> {
     const link = document.createElement("link");
     link.rel = "stylesheet";
     link.href = chrome.runtime.getURL(file);
-    link.id = `blyrics-style-${file.replace(/(\/index)?\.css$/, "")}`;
+    link.id = `blyrics-style-${file.replace(/(\/index)?\.css$/, "").replace(/\//g, "-")}`;
     document.head.appendChild(link);
   }
+}
+
+/**
+ * Removes injected head tags.
+ */
+export function cleanupHeadTags(): void {
+  const ids = [
+    "blyrics-style-css-ytmusic",
+    "blyrics-style-css-blyrics",
+    "blyrics-style-css-themesong",
+    "blyrics-disable-effects",
+    "blyrics-custom-style",
+  ];
+  ids.forEach(id => document.getElementById(id)?.remove());
+
+  // Remove font links and preloads
+  const links = document.head.querySelectorAll(
+    'link[href*="fontshare"], link[href*="googleapis"], link[rel="preload"][href*="icon-512"]'
+  );
+  links.forEach(link => link.remove());
 }
 
 /**

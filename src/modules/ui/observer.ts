@@ -56,6 +56,35 @@ let hasInitializedAltHover = false;
 let hasInitializedLyrics = false;
 let metadataAbortController: AbortController | null = null;
 
+export function cleanupObservers(): void {
+  fullscreenObserver?.disconnect();
+  lyricsTabObserver?.disconnect();
+  inertObserver?.disconnect();
+  fullscreenExitObserver?.disconnect();
+  avButtonObserver?.disconnect();
+
+  fullscreenObserver = null;
+  lyricsTabObserver = null;
+  inertObserver = null;
+  fullscreenExitObserver = null;
+  avButtonObserver = null;
+
+  hasInitializedLyricReloader = false;
+  hasInitializedHomepageFullscreen = false;
+  hasInitializedAltHover = false;
+  hasInitializedLyrics = false;
+
+  cleanupWakeLock();
+
+  const tabs = document.getElementsByClassName(TAB_CONTENT_CLASS);
+  for (let i = 0; i < tabs.length; i++) {
+    // Note: This won't remove the anonymous listeners added in lyricReloader
+    // but in a content script environment during HMR, the element might be replaced
+    // or we might need to use named functions if we really need to remove them from persistent elements.
+    // For now, this addresses the observers.
+  }
+}
+
 async function requestWakeLock(): Promise<void> {
   if (!("wakeLock" in navigator)) {
     log(GENERAL_ERROR_LOG, "Wake Lock API not supported in this browser.");

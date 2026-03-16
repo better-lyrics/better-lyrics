@@ -49,6 +49,21 @@ const setupResizeObserver = player => {
 // ------------------------------------------
 
 /**
+ * Stops the lyrics tick interval and clears the timer.
+ * Called when the page is unloaded or when an error occurs.
+ */
+const stopLyricsTick = () => {
+    if (tickLyricsInterval) {
+        clearInterval(tickLyricsInterval);
+        tickLyricsInterval = null;
+    }
+
+    if (playerResizeObserver) {
+        playerResizeObserver.disconnect();
+        playerResizeObserver = null;
+    }
+};
+/**
  * Starts the lyrics tick interval to monitor YouTube Music player state.
  * Dispatches custom events with player information every 20ms for real-time sync.
  * Automatically stops the previous interval if one exists.
@@ -139,31 +154,29 @@ const startLyricsTick = () => {
   }, 20);
 };
 
-/**
- * Stops the lyrics tick interval, clears the timer, and cleans up observers.
- * Called when the page is unloaded or when an error occurs.
- */
-const stopLyricsTick = () => {
-  if (tickLyricsInterval) {
-    clearInterval(tickLyricsInterval);
-    tickLyricsInterval = null;
-  }
-
-  if (playerResizeObserver) {
-    playerResizeObserver.disconnect();
-    playerResizeObserver = null;
-  }
-};
-
-window.addEventListener("unload", stopLyricsTick);
-
-document.addEventListener("blyrics-seek-to", event => {
+const handleSeekTo = event => {
   const player = document.getElementById("movie_player");
   const seekTime = event.detail ?? 0;
   if (player && seekTime >= 0) {
     player.seekTo(seekTime, true);
     player.playVideo();
   }
-});
+};
 
-startLyricsTick();
+/**
+ * Extension.js entry point for main world scripts.
+ * Supports HMR by providing a cleanup function.
+ */
+/** @public */
+export default function init() {
+  window.addEventListener("unload", stopLyricsTick);
+  document.addEventListener("blyrics-seek-to", handleSeekTo);
+
+  startLyricsTick();
+
+  return () => {
+    stopLyricsTick();
+    window.removeEventListener("unload", stopLyricsTick);
+    document.removeEventListener("blyrics-seek-to", handleSeekTo);
+  };
+}
