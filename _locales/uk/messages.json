@@ -624,7 +624,7 @@
     "description": "Install/remove shortcut"
   },
   "marketplace_shortcutsApply": {
-    "message": "Apply theme",
+    "message": "Застосувати",
     "description": "Apply theme shortcut label"
   },
   "marketplace_shortcutsPrevImage": {
