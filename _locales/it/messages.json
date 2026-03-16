@@ -88,11 +88,11 @@
     "description": "Show stylized animations setting label"
   },
   "options_language_displayLanguage": {
-    "message": "Display Language",
+    "message": "Lingua su Schermo",
     "description": "Label for the UI language selector dropdown"
   },
   "options_language_displayLanguageAuto": {
-    "message": "Auto",
+    "message": "Automatico",
     "description": "Option label for automatic language detection based on browser settings"
   },
   "options_language_title": {
@@ -622,6 +622,10 @@
   "marketplace_shortcutsInstallRemove": {
     "message": "Installa / Rimuovi",
     "description": "Install/remove shortcut"
+  },
+  "marketplace_shortcutsApply": {
+    "message": "Applica tema",
+    "description": "Apply theme shortcut label"
   },
   "marketplace_shortcutsPrevImage": {
     "message": "Immagine precedente",
