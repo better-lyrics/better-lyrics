@@ -623,6 +623,10 @@
     "message": "Pasang / Hapus",
     "description": "Install/remove shortcut"
   },
+  "marketplace_shortcutsApply": {
+    "message": "Terapkan tema",
+    "description": "Apply theme shortcut label"
+  },
   "marketplace_shortcutsPrevImage": {
     "message": "Gambar sebelumnya",
     "description": "Previous image shortcut"
@@ -644,7 +648,7 @@
     "description": "Show shortcuts shortcut"
   },
   "marketplace_shortcutsApplyTheme": {
-    "message": "Terapkan tema (setelah pemasangan)",
+    "message": "Terapkan tema (setelah dipasang)",
     "description": "Apply theme shortcut"
   },
   "marketplace_ratingFailed": {
