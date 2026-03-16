@@ -623,6 +623,10 @@
     "message": "설치 / 제거",
     "description": "Install/remove shortcut"
   },
+  "marketplace_shortcutsApply": {
+    "message": "Apply theme",
+    "description": "Apply theme shortcut label"
+  },
   "marketplace_shortcutsPrevImage": {
     "message": "이전 이미지",
     "description": "Previous image shortcut"
