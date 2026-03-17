@@ -52,7 +52,8 @@ export function showReportModal(lyricsId: number) {
     header.className = `${MODAL_CLASS}--header`;
     
     const title = document.createElement("h1");
-    title.textContent = "__MSG_report_lyrics_title__";
+
+    title.textContent = t("report_lyrics_title");
     title.className = `${MODAL_CLASS}--title`;
     header.appendChild(title);
     
@@ -66,16 +67,17 @@ export function showReportModal(lyricsId: number) {
 
     const info = document.createElement("span");
     info.className = `${MODAL_CLASS}--info`;
-    info.textContent = "__MSG_report_lyrics_info__";
+    info.textContent = t("report_lyrics_info");
     modal.appendChild(info);
 
 
-    Object.values(UnisonReportReason).forEach(reason => addRadioCheckbox(modal, reason, `__MSG_report_lyrics_${reason}__`));
+    Object.values(UnisonReportReason).forEach(reason => addRadioCheckbox(modal, reason, t(`report_lyrics_${reason}`)));
     
     const detailInput = document.createElement("input");
     detailInput.type = "text";
     detailInput.className = `${MODAL_CLASS}--details`;
-    detailInput.placeholder = "__MSG_report_lyrics_details_placeholder__";
+    detailInput.placeholder = t("report_lyrics_details_placeholder");
+
     modal.appendChild(detailInput);
 
     const footer = document.createElement("div");
