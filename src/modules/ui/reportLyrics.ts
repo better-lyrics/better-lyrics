@@ -85,7 +85,7 @@ export function showReportModal(lyricsId: number) {
 
     submitReport.addEventListener("click", () => {
         if (!selected) { return; }
-        report(lyricsId, selected);
+        report(lyricsId, selected, detailInput.value);
         closeReportModal();
     });
 
@@ -101,7 +101,6 @@ export function showReportModal(lyricsId: number) {
     });
 
     footer.appendChild(cancelReport);
-
 
     modal.appendChild(footer);
     overlay.appendChild(modal);
