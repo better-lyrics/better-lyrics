@@ -175,6 +175,7 @@ export async function fillTtml(responseString: string, providerParameters: Provi
 
   lines.forEach(line => {
     let meta = line[":@"];
+    if (!meta?.["@_begin"]) return;
     let beginTimeMs = parseTime(meta?.["@_begin"]);
     let endTimeMs = parseTime(meta?.["@_end"]);
 
