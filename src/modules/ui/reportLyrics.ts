@@ -110,9 +110,11 @@ export function showReportModal(lyricsId: number) {
     app.appendChild(overlay);
 }
 
+
 export function closeReportModal() {
     modalInitiated = false;
-    const modal = document.getElementsByClassName(MODAL_CLASS)[0];
-    if (!modal) { return; }
-    modal.remove();
+    const overlay = document.getElementsByClassName(MODAL_OVERLAY_CLASS)[0];
+    if (!overlay) { return; }
+    overlay.remove();
+
 }
