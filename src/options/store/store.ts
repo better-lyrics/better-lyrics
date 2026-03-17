@@ -17,6 +17,7 @@ import {
   clearActiveStoreTheme,
   getActiveStoreTheme,
   getInstalledStoreThemes,
+  getInstalledTheme,
   type InstallOptions,
   installTheme,
   isThemeInstalled,
@@ -770,6 +771,12 @@ function setupMarketplaceKeyboardListeners(): void {
         e.preventDefault();
         const actionBtn = document.getElementById("detail-action-btn") as HTMLButtonElement;
         actionBtn?.click();
+      } else if (e.key.toLowerCase() === "a") {
+        e.preventDefault();
+        const applyBtn = document.getElementById("detail-apply-btn") as HTMLButtonElement;
+        if (applyBtn && !applyBtn.disabled && applyBtn.style.display !== "none") {
+          applyBtn.click();
+        }
       }
       return;
     }
@@ -861,10 +868,11 @@ async function loadMarketplace(): Promise<void> {
   if (error) error.style.display = "none";
 
   try {
-    const [themes, installedThemes, statsResult] = await Promise.all([
+    const [themes, installedThemes, statsResult, activeThemeId] = await Promise.all([
       fetchAllStoreThemes(),
       getInstalledStoreThemes(),
       fetchAllStats(),
+      getActiveStoreTheme(),
     ]);
 
     storeThemesCache = [...themes, ...getTestThemes()];
@@ -883,7 +891,7 @@ async function loadMarketplace(): Promise<void> {
 
     storeThemesCache.forEach((theme, index) => {
       const themeStats = storeStatsCache[theme.id];
-      const card = createStoreThemeCard(theme, installedIds.has(theme.id), themeStats);
+      const card = createStoreThemeCard(theme, installedIds.has(theme.id), themeStats, undefined, activeThemeId);
       card.style.animationDelay = `${index * 25}ms`;
       card.classList.add("card-initial");
       card.addEventListener(
@@ -1310,7 +1318,8 @@ function createStoreThemeCard(
   theme: StoreTheme,
   isInstalled: boolean,
   stats?: ThemeStats,
-  urlThemeInfo?: UrlThemeInfo
+  urlThemeInfo?: UrlThemeInfo,
+  activeThemeId?: string | null
 ): HTMLElement {
   const card = document.createElement("div");
   card.className = "store-card";
@@ -1364,11 +1373,45 @@ function createStoreThemeCard(
     }
   });
 
+  const applyBtn = document.createElement("button");
+  applyBtn.className = "store-card-btn store-card-btn-apply";
+  const isActive = activeThemeId === theme.id;
+  if (isActive) {
+    applyBtn.textContent = t("marketplace_active");
+    applyBtn.disabled = true;
+  } else {
+    applyBtn.textContent = t("marketplace_apply");
+  }
+  if (!isInstalled) applyBtn.style.display = "none";
+
+  applyBtn.addEventListener("click", async e => {
+    e.stopPropagation();
+    applyBtn.disabled = true;
+    try {
+      const installedTheme = await getInstalledTheme(theme.id);
+      if (!installedTheme) {
+        applyBtn.disabled = false;
+        return;
+      }
+      const applied = await handleApplyTheme(installedTheme);
+      if (!applied) applyBtn.disabled = false;
+    } catch (err) {
+      console.error(LOG_PREFIX_STORE, "Failed to apply theme:", err);
+      applyBtn.disabled = false;
+    }
+  });
+
+  const btnGroup = document.createElement("div");
+  btnGroup.className = "store-card-btn-group";
+
   info.appendChild(title);
   info.appendChild(author);
 
+  btnGroup.appendChild(applyBtn);
+  btnGroup.appendChild(actionBtn);
+
   content.appendChild(info);
-  content.appendChild(actionBtn);
+  content.appendChild(btnGroup);
 
   card.appendChild(coverImg);
   card.appendChild(content);
@@ -1452,12 +1495,21 @@ async function handleThemeAction(theme: StoreTheme, button: HTMLButtonElement): 
       } else {
         button.className = "store-card-btn store-card-btn-install";
         button.textContent = t("marketplace_install");
+        const cardApplyBtn = card?.querySelector(".store-card-btn-apply") as HTMLButtonElement | null;
+        if (cardApplyBtn) cardApplyBtn.style.display = "none";
       }
       showAlert(`Removed ${theme.title}`);
     } else {
       const installedTheme = await installTheme(theme, { source: "marketplace" });
       button.className = "store-card-btn store-card-btn-remove";
       button.textContent = t("marketplace_remove");
+
+      const cardApplyBtn = card?.querySelector(".store-card-btn-apply") as HTMLButtonElement | null;
+      if (cardApplyBtn) {
+        cardApplyBtn.style.display = "";
+        cardApplyBtn.disabled = false;
+        cardApplyBtn.textContent = t("marketplace_apply");
+      }
 
       const applyAction: AlertAction = {
         label: t("marketplace_apply"),
@@ -1716,6 +1768,42 @@ async function openDetailModal(theme: StoreTheme, urlThemeInfo?: UrlThemeInfo): 
     updateRatingEnabled(initialInstalled);
   }
 
+  const detailApplyBtn = document.getElementById("detail-apply-btn") as HTMLButtonElement | null;
+
+  const updateDetailApplyBtn = (installed: boolean, isActive: boolean) => {
+    if (!detailApplyBtn) return;
+    detailApplyBtn.style.display = installed ? "" : "none";
+    if (isActive) {
+      setActionButtonContent(detailApplyBtn, t("marketplace_active"), "A");
+      detailApplyBtn.disabled = true;
+    } else {
+      setActionButtonContent(detailApplyBtn, t("marketplace_apply"), "A");
+      detailApplyBtn.disabled = false;
+    }
+  };
+
+  if (detailApplyBtn) {
+    const activeThemeId = await getActiveStoreTheme();
+    updateDetailApplyBtn(initialInstalled, activeThemeId === theme.id);
+
+    detailApplyBtn.onclick = async () => {
+      detailApplyBtn.disabled = true;
+      try {
+        const installedTheme = await getInstalledTheme(theme.id);
+        if (!installedTheme) {
+          detailApplyBtn.disabled = false;
+          return;
+        }
+        const applied = await handleApplyTheme(installedTheme);
+        if (!applied) detailApplyBtn.disabled = false;
+      } catch (err) {
+        console.error(LOG_PREFIX_STORE, "Failed to apply theme:", err);
+        detailApplyBtn.disabled = false;
+        showAlert(`${t("marketplace_applyFailed")}: ${err}`);
+      }
+    };
+  }
+
   if (actionBtn) {
     actionBtn.className = `store-card-btn ${initialInstalled ? "store-card-btn-remove" : "store-card-btn-install"}`;
     setActionButtonContent(actionBtn, initialInstalled ? t("marketplace_remove") : t("marketplace_install"), "I");
@@ -1731,10 +1819,12 @@ async function openDetailModal(theme: StoreTheme, urlThemeInfo?: UrlThemeInfo): 
           setActionButtonContent(actionBtn, t("marketplace_install"), "I");
           showAlert(`Removed ${theme.title}`);
           updateRatingEnabled?.(false);
+          updateDetailApplyBtn(false, false);
         } else {
           const installedTheme = await installTheme(theme, { source: "marketplace" });
           actionBtn.className = "store-card-btn store-card-btn-remove";
           setActionButtonContent(actionBtn, t("marketplace_remove"), "I");
+          updateDetailApplyBtn(true, false);
 
           const applyAction: AlertAction = {
             label: t("marketplace_apply"),
@@ -2115,7 +2205,7 @@ async function updateYourThemesDropdown(): Promise<void> {
   }
 }
 
-async function handleApplyTheme(theme: InstalledStoreTheme): Promise<void> {
+async function handleApplyTheme(theme: InstalledStoreTheme): Promise<boolean> {
   try {
     const css = await applyStoreTheme(theme.id);
 
@@ -2134,9 +2224,24 @@ async function handleApplyTheme(theme: InstalledStoreTheme): Promise<void> {
     showAlert(`Applied ${theme.title}`);
     updateYourThemesDropdown();
     toggleYourThemesDropdown(false);
+    await refreshStoreCards();
+
+    const detailApplyBtn = document.getElementById("detail-apply-btn") as HTMLButtonElement | null;
+    if (detailApplyBtn && detailApplyBtn.style.display !== "none") {
+      if (currentDetailTheme?.id === theme.id) {
+        setActionButtonContent(detailApplyBtn, t("marketplace_active"), "A");
+        detailApplyBtn.disabled = true;
+      } else {
+        setActionButtonContent(detailApplyBtn, t("marketplace_apply"), "A");
+        detailApplyBtn.disabled = false;
+      }
+    }
+
+    return true;
   } catch (err) {
     console.error(LOG_PREFIX_STORE, "Failed to apply theme:", err);
     showAlert(`${t("marketplace_applyFailed")}: ${err}`);
+    return false;
   }
 }
 
@@ -2188,7 +2293,7 @@ function resetFilters(): void {
 }
 
 async function refreshStoreCards(): Promise<void> {
-  const installedThemes = await getInstalledStoreThemes();
+  const [installedThemes, activeThemeId] = await Promise.all([getInstalledStoreThemes(), getActiveStoreTheme()]);
   const installedIds = new Set(installedThemes.map(t => t.id));
 
   const cards = document.querySelectorAll(".store-card");
@@ -2196,12 +2301,25 @@ async function refreshStoreCards(): Promise<void> {
     const themeId = (card as HTMLElement).dataset.themeId;
     if (!themeId) return;
 
-    const btn = card.querySelector(".store-card-btn") as HTMLButtonElement;
-    if (!btn) return;
+    const btn = card.querySelector(".store-card-btn:not(.store-card-btn-apply)") as HTMLButtonElement;
+    if (btn) {
+      const isInstalled = installedIds.has(themeId);
+      btn.className = `store-card-btn ${isInstalled ? "store-card-btn-remove" : "store-card-btn-install"}`;
+      btn.textContent = isInstalled ? t("marketplace_remove") : t("marketplace_install");
+    }
 
-    const isInstalled = installedIds.has(themeId);
-    btn.className = `store-card-btn ${isInstalled ? "store-card-btn-remove" : "store-card-btn-install"}`;
-    btn.textContent = isInstalled ? t("marketplace_remove") : t("marketplace_install");
+    const applyBtn = card.querySelector(".store-card-btn-apply") as HTMLButtonElement;
+    if (applyBtn) {
+      const isInstalled = installedIds.has(themeId);
+      applyBtn.style.display = isInstalled ? "" : "none";
+      if (themeId === activeThemeId) {
+        applyBtn.textContent = t("marketplace_active");
+        applyBtn.disabled = true;
+      } else {
+        applyBtn.textContent = t("marketplace_apply");
+        applyBtn.disabled = false;
+      }
+    }
   });
 }
 
