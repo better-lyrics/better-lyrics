@@ -63,9 +63,12 @@ export function showReportModal(lyricsId: number) {
 
     modal.appendChild(header);
 
+
     const info = document.createElement("span");
     info.className = `${MODAL_CLASS}--info`;
+    info.textContent = "__MSG_report_lyrics_info__";
     modal.appendChild(info);
+
 
     Object.values(UnisonReportReason).forEach(reason => addRadioCheckbox(modal, reason, `__MSG_report_lyrics_${reason}__`));
     
