@@ -78,7 +78,7 @@ async function signedRequest<T>(
 
 // -- Public API --------------------------
 
-async function searchLyrics(query: string): Promise<ApiResult<UnisonSearchEntry[]>> {
+export async function searchLyrics(query: string): Promise<ApiResult<UnisonSearchEntry[]>> {
   try {
     const params = new URLSearchParams({ q: query });
 
@@ -101,7 +101,7 @@ interface FeedResponse {
   nextCursor?: number;
 }
 
-async function getFeed(
+export async function getFeed(
   cursor?: number
 ): Promise<ApiResult<{ entries: UnisonFeedEntry[]; nextCursor?: number }>> {
   try {
@@ -131,7 +131,7 @@ async function getFeed(
   }
 }
 
-async function getMySubmissions(
+export async function getMySubmissions(
   cursor?: number
 ): Promise<ApiResult<{ entries: UnisonFeedEntry[]; nextCursor?: number }>> {
   try {
@@ -161,7 +161,7 @@ async function getMySubmissions(
   }
 }
 
-async function getLyricsById(id: number): Promise<ApiResult<UnisonLyricsEntry | null>> {
+export async function getLyricsById(id: number): Promise<ApiResult<UnisonLyricsEntry | null>> {
   try {
     const headers: Record<string, string> = {};
     try {
@@ -184,7 +184,7 @@ async function getLyricsById(id: number): Promise<ApiResult<UnisonLyricsEntry | 
   }
 }
 
-async function getLyricsByVideoId(videoId: string): Promise<ApiResult<UnisonLyricsEntry | null>> {
+export async function getLyricsByVideoId(videoId: string): Promise<ApiResult<UnisonLyricsEntry | null>> {
   try {
     const headers: Record<string, string> = {};
     try {
@@ -209,7 +209,7 @@ async function getLyricsByVideoId(videoId: string): Promise<ApiResult<UnisonLyri
   }
 }
 
-async function submitLyrics(
+export async function submitLyrics(
   submission: UnisonSubmission
 ): Promise<ApiResult<{ id: number; created: boolean } | null>> {
   return signedRequest<{ id: number; created: boolean } | null>(
