@@ -1,5 +1,6 @@
 import { MODAL_CLASS, MODAL_OVERLAY_CLASS, REPORT_MODAL } from "@/core/constants";
 import { report, UnisonReportReason } from "../lyrics/providers/unison";
+import { t } from "@/core/i18n";
 
 let modalInitiated: boolean = false;
 let selected: string | null = null;
@@ -64,12 +65,10 @@ export function showReportModal(lyricsId: number) {
 
     modal.appendChild(header);
 
-
     const info = document.createElement("span");
     info.className = `${MODAL_CLASS}--info`;
     info.textContent = t("report_lyrics_info");
     modal.appendChild(info);
-
 
     Object.values(UnisonReportReason).forEach(reason => addRadioCheckbox(modal, reason, t(`report_lyrics_${reason}`)));
     
