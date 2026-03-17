@@ -285,7 +285,7 @@ export default async function cubey(providerParameters: ProviderParameters): Pro
 
   if (responseData.goLyricsApiTtml) {
     let ttmlData = JSON.parse(responseData.goLyricsApiTtml);
-    const ttml = await fillTtml(ttmlData.ttml);
+    const ttml = await fillTtml(ttmlData.ttml, providerParameters.duration);
 
     if (ttml) {
       if (ttml.isWordSynced) {
