@@ -19,7 +19,7 @@ interface UnisonResponse {
   userVote: 1 | -1 | null;
 }
 
-enum UnisonReportReason {
+export enum UnisonReportReason {
   WRONG_SONG = "wrong_song",
   BAD_SYNC = "bad_sync",
   OFFENSIVE = "offensive",
@@ -62,7 +62,7 @@ export async function deleteVote(lyricsId: number) {
   return response.status;
 }
 
-export async function report(lyricsId: number, reason: UnisonReportReason, details?: string) {
+export async function report(lyricsId: number, reason: UnisonReportReason | string, details?: string) {
   const url = new URL(UNISON_API_URL + "/" + lyricsId + "/report");
   
   const response = await fetch(url.toString(), {

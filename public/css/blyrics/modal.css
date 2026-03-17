@@ -1,0 +1,42 @@
+.blyrics-modal-overlay {
+    background-color: rgba(0, 0, 0, .25);
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: fixed;
+    transition: .2s;
+    top: 0;
+    bottom: 0;
+    right: 0;
+    left: 0;
+}
+
+.blyrics-modal {
+    display: flex;
+    flex-direction: column;
+    width: 500px;
+    border-radius: var(--blyrics-small-border-radius);
+    background: rgb(35, 35, 35);
+    padding: 1.5rem;
+    gap: 1rem;
+}
+
+.blyrics-modal--header {
+    display: flex;
+    flex-direction: row;
+    gap: 1rem;
+    justify-content: space-between;
+}
+
+.blyrics-modal--title {
+    font-size: 2.5rem;
+}
+
+.blyrics-modal--info {
+    font-size: 1.5rem;
+}
+
+.blyrics-modal--radio {
+    font-size: 1.25rem;
+}

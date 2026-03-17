@@ -16,11 +16,13 @@ export const USER_SCROLLING_CLASS = "blyrics-user-scrolling" as const;
 export const TRANSLATED_LYRICS_CLASS = "blyrics--translated" as const;
 export const ROMANIZED_LYRICS_CLASS = "blyrics--romanized" as const;
 export const FOOTER_CLASS = "blyrics-footer" as const;
+export const MODAL_OVERLAY_CLASS = "blyrics-modal-overlay" as const;
+export const MODAL_CLASS = "blyrics-modal" as const;
 
 // DOM Selectors
 export const TAB_RENDERER_SELECTOR = "#tab-renderer" as const;
 export const NO_LYRICS_TEXT_SELECTOR =
-  "#tab-renderer > ytmusic-message-renderer > yt-formatted-string.text.style-scope.ytmusic-message-renderer" as const;
+"#tab-renderer > ytmusic-message-renderer > yt-formatted-string.text.style-scope.ytmusic-message-renderer" as const;
 export const FULLSCREEN_BUTTON_SELECTOR = ".fullscreen-button" as const;
 
 // DOM IDs and Attributes
@@ -28,6 +30,7 @@ export const LYRICS_LOADER_ID = "blyrics-loader" as const;
 export const LYRICS_WRAPPER_ID = "blyrics-wrapper" as const;
 export const LYRICS_DISABLED_ATTR = "blyrics-dfs" as const;
 export const HIDDEN_CLASS = "blyrics-hidden" as const;
+export const REPORT_MODAL = "blyrics-report-lyrics" as const;
 
 // Assets and Resources
 export const DISCORD_LOGO_SRC =
