@@ -57,7 +57,7 @@ const themes: Theme[] = [
     name: "Even Better Lyrics Plus",
     author: "Noah & BetterLyrics",
     link: "",
-    path: "Even Better Lyrics Plus.css",
+    storeId: "eblp",
   },
   {
     name: "Minimal",
