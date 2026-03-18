@@ -820,7 +820,7 @@ function setupMarketplaceKeyboardListeners(): void {
           scrollToTop();
         }
         break;
-      case "a":
+      case "l":
         e.preventDefault();
         setShowFilter("all");
         break;
@@ -909,6 +909,8 @@ async function loadMarketplace(): Promise<void> {
 
     gridAnimationController = autoAnimate(grid, { duration: 200, easing: "cubic-bezier(0.2, 0, 0, 1)" });
     gridAnimationController.enable();
+
+    openThemeFromUrlParam();
   } catch (err) {
     console.error(LOG_PREFIX_STORE, "Failed to load themes:", err);
     if (loading) loading.style.display = "none";
@@ -918,6 +920,16 @@ async function loadMarketplace(): Promise<void> {
       if (errorMsg) errorMsg.textContent = `Failed to load themes: ${err}`;
     }
   }
+}
+
+function openThemeFromUrlParam(): void {
+  const themeId = new URLSearchParams(window.location.search).get("theme");
+  if (!themeId) return;
+
+  const theme = storeThemesCache.find(t => t.id === themeId);
+  if (theme) openDetailModal(theme);
+
+  history.replaceState(null, "", window.location.pathname);
 }
 
 async function refreshMarketplace(): Promise<void> {
