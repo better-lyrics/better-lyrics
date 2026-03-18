@@ -568,11 +568,9 @@ async function processBatchTranslationsAndRomanizations(
     if (isTranslateEnabled && !isSourceLangDisabled) {
       let translationResult: string | null = null;
 
-      if (item.translations && Object.keys(item.translations).length > 0) {
-        const matchedLang = Object.keys(item.translations).find(lang => langCodesMatch(targetTranslationLang, lang));
-        if (matchedLang) {
-          translationResult = item.translations[matchedLang];
-        }
+      const matchedLang = item.translations && Object.keys(item.translations).find(lang => langCodesMatch(targetTranslationLang, lang));
+      if (item.translations && matchedLang) {
+        translationResult = item.translations[matchedLang];
       } else if (item.translation && langCodesMatch(targetTranslationLang, item.translation.lang)) {
         translationResult = item.translation.text;
       } else {
