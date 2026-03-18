@@ -1,6 +1,5 @@
 import { INITIALIZE_LOG } from "@constants";
-import { AppState } from "@core/appState";
-import { injectI18nCssVars } from "@core/i18n";
+import { injectI18nCssVars, loadLocaleOverride, subscribeToLocaleChanges } from "@core/i18n";
 import { purgeExpiredKeys, saveCacheInfo } from "@core/storage";
 import { initProviders } from "@modules/lyrics/providers/shared";
 import { setupRequestSniffer } from "@modules/lyrics/requestSniffer/requestSniffer";
@@ -33,7 +32,9 @@ import { log, setUpLog } from "@utils";
 async function modify(): Promise<void> {
   setUpLog();
   await injectHeadTags();
+  await loadLocaleOverride();
   injectI18nCssVars();
+  subscribeToLocaleChanges();
   setupAdObserver();
   enableLyricsTab();
   setupHomepageFullscreenHandler();

@@ -6,6 +6,7 @@
 		<link rel="stylesheet" href="options.css">
 		<link rel="stylesheet" href="store/store.css">
 		<link rel="stylesheet" href="clyrics/clyrics.css">
+		<style>body:not(.i18n-ready){opacity:0}</style>
 	</head>
 	<body>
 		<nav id="navbar">
@@ -155,6 +156,12 @@
 						__MSG_options_language_title__
 					</h2>
 					<p>__MSG_options_language_description__</p>
+					<div class="container">
+						<span>__MSG_options_language_displayLanguage__</span>
+						<div class="select">
+							<select id="uiLanguage"></select>
+						</div>
+					</div>
 					<div class="container">
 						<span>__MSG_options_language_romanization__</span>
 						<label>
