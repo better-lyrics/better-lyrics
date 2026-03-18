@@ -265,8 +265,8 @@ export function addFooter(
       }
 
       unisonUpvote.innerHTML = votedIcons.upvoted;
-      const status = await vote(unisonData.lyricsId, true);
-      if (status !== 200 && status !== 409) {
+      const res = await vote(unisonData.lyricsId, true);
+      if (!res.ok && res.status !== 409) {
         unisonUpvote.innerHTML = votedIcons.upvote;
         return;
       }
@@ -313,8 +313,8 @@ export function addFooter(
       }
       
       unisonDownvote.innerHTML = votedIcons.downvoted;
-      const status = await vote(unisonData.lyricsId, false);
-      if (status !== 200 && status !== 409) {
+      const res = await vote(unisonData.lyricsId, false);
+      if (!res.ok && res.status !== 409) {
         unisonDownvote.innerHTML = votedIcons.downvote;
         return;
       }

@@ -47,7 +47,7 @@ export async function vote(lyricsId: number, upvote: boolean) {
     body: JSON.stringify(await signPayload({ vote: upvote ? 1 : -1 }))
   });
 
-  return response.status;
+  return { ok: response.ok, status: response.status };
 }
 
 export async function deleteVote(lyricsId: number) {
@@ -59,7 +59,7 @@ export async function deleteVote(lyricsId: number) {
     body: JSON.stringify(await signPayload({}))
   });
 
-  return response.status;
+  return { ok: response.ok, status: response.status };
 }
 
 export async function report(lyricsId: number, reason: UnisonReportReason | string, details?: string) {
@@ -71,7 +71,7 @@ export async function report(lyricsId: number, reason: UnisonReportReason | stri
     body: JSON.stringify(await signPayload({ reason, details }))
   });
 
-  return response.status;
+  return { ok: response.ok, status: response.status };
 }
 
 export async function byId(lyricsId: number): Promise<UnisonResponse | null> {

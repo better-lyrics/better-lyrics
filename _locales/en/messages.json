@@ -964,5 +964,21 @@
   "report_lyrics_cancel": {
     "message": "Cancel",
     "description": "Cancel button for reporting lyrics"
+  },
+  "report_lyrics_reporting": {
+    "message": "Reporting lyrics...",
+    "description": "Report lyrics on a reporting process"
+  },
+  "report_lyrics_success": {
+    "message": "Thank you for reporting the lyrics! Unison will review the reports as soon as possible",
+    "description": "Succesfully reported the lyrics for a song"
+  },
+  "report_lyrics_already": {
+    "message": "You've already reported the lyrics for this song!",
+    "description": "Multiple attempts of already reporting the same lyrics"
+  },
+  "report_lyrics_error": {
+    "message": "Uh-oh, it seems like we can't pass this report to the provider. If you can, please try again",
+    "description": "Report lyrics errors"
   }
 }
