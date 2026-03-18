@@ -820,7 +820,7 @@ function setupMarketplaceKeyboardListeners(): void {
           scrollToTop();
         }
         break;
-      case "a":
+      case "l":
         e.preventDefault();
         setShowFilter("all");
         break;
