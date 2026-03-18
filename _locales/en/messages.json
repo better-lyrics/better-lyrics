@@ -652,6 +652,10 @@
     "message": "Install / Remove",
     "description": "Install/remove shortcut"
   },
+  "marketplace_shortcutsApply": {
+    "message": "Apply theme",
+    "description": "Apply theme shortcut label"
+  },
   "marketplace_shortcutsPrevImage": {
     "message": "Previous image",
     "description": "Previous image shortcut"
