@@ -1,5 +1,5 @@
 import { IDENTITY_ACTIONS, IDENTITY_ADJECTIVES, IDENTITY_NOUNS } from "@constants";
-import { getLocalStorage } from "@core/storage";
+import { getLocalStorage } from "./storage";
 
 // -- Types ------------------------------------
 

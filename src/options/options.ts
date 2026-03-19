@@ -5,7 +5,7 @@ import { initializeCLyricsModal } from "./clyrics/index";
 import { getLanguageDisplayName, initI18n, loadLocaleOverride, SUPPORTED_LOCALES, t } from "@core/i18n";
 import Sortable from "sortablejs";
 import { showModal } from "./editor/ui/feedback";
-import { exportIdentity, getIdentity, importIdentity, type KeyIdentity } from "./store/keyIdentity";
+import { exportIdentity, getIdentity, importIdentity, type KeyIdentity } from "@core/keyIdentity";
 import { initStoreUI, setupYourThemesButton } from "./store/store";
 
 interface Options {
@@ -277,6 +277,9 @@ interface ProviderInfo {
 const getProviderIdToInfoMap = (): { [key: string]: ProviderInfo } => ({
   "musixmatch-richsync": { name: t("options_provider_musixmatch"), syncType: "word" },
   "musixmatch-synced": { name: t("options_provider_musixmatch"), syncType: "line" },
+  "unison-richsynced": { name: t("options_provider_betterLyricsUnison"), syncType: "syllable" },
+  "unison-synced": { name: t("options_provider_betterLyricsUnison"), syncType: "line" },
+  "unison-plain": { name: t("options_provider_betterLyricsUnison"), syncType: "unsynced" },
   "yt-captions": { name: t("options_provider_youtubeCaptions"), syncType: "line" },
   "lrclib-synced": { name: t("options_provider_lrclib"), syncType: "line" },
   "unison-richsynced": { name: t("options_provider_betterLyricsUnison"), syncType: "syllable" },

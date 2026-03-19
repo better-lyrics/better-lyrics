@@ -16,6 +16,8 @@ export const USER_SCROLLING_CLASS = "blyrics-user-scrolling" as const;
 export const TRANSLATED_LYRICS_CLASS = "blyrics--translated" as const;
 export const ROMANIZED_LYRICS_CLASS = "blyrics--romanized" as const;
 export const FOOTER_CLASS = "blyrics-footer" as const;
+export const MODAL_OVERLAY_CLASS = "blyrics-modal-overlay" as const;
+export const MODAL_CLASS = "blyrics-modal" as const;
 
 // DOM Selectors
 export const TAB_RENDERER_SELECTOR = "#tab-renderer" as const;
@@ -28,6 +30,7 @@ export const LYRICS_LOADER_ID = "blyrics-loader" as const;
 export const LYRICS_WRAPPER_ID = "blyrics-wrapper" as const;
 export const LYRICS_DISABLED_ATTR = "blyrics-dfs" as const;
 export const HIDDEN_CLASS = "blyrics-hidden" as const;
+export const REPORT_MODAL = "blyrics-report-lyrics" as const;
 
 // Assets and Resources
 export const DISCORD_LOGO_SRC =
@@ -365,16 +368,15 @@ export const PROVIDER_CONFIGS: ProviderConfig[] = [
   { key: "bLyrics-richsynced", displayName: "Better Lyrics", syncType: "syllable", priority: 0 },
   { key: "unison-richsynced", displayName: "Unison", syncType: "syllable", priority: 1 },
   { key: "musixmatch-richsync", displayName: "Musixmatch", syncType: "word", priority: 2 },
-  { key: "yt-captions", displayName: "YouTube Captions", syncType: "line", priority: 3 },
+  { key: "yt-captions", displayName: "Youtube Captions", syncType: "line", priority: 3 },
   { key: "bLyrics-synced", displayName: "Better Lyrics", syncType: "line", priority: 4 },
   { key: "unison-synced", displayName: "Unison", syncType: "line", priority: 5 },
-  { key: "lrclib-synced", displayName: "LRCLIB", syncType: "line", priority: 6 },
+  { key: "lrclib-synced", displayName: "LRCLib", syncType: "line", priority: 6 },
   { key: "legato-synced", displayName: "Legato", syncType: "line", priority: 7 },
   { key: "musixmatch-synced", displayName: "Musixmatch", syncType: "line", priority: 8 },
-  { key: "yt-lyrics", displayName: "YouTube", syncType: "unsynced", priority: 9 },
+  { key: "yt-lyrics", displayName: "Youtube", syncType: "unsynced", priority: 9 },
   { key: "unison-plain", displayName: "Unison", syncType: "unsynced", priority: 10 },
-  { key: "lrclib-plain", displayName: "LRCLIB", syncType: "unsynced", priority: 11 },
-  { key: "custom-lyrics", displayName: "Custom Lyrics (Local)", syncType: "vary", priority: 12 },
+  { key: "lrclib-plain", displayName: "LRCLib", syncType: "unsynced", priority: 11 },
 ] as const;
 
 export const LYRIC_SOURCE_KEYS = PROVIDER_CONFIGS.map(p => p.key);

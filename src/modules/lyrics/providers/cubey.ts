@@ -73,9 +73,9 @@ export type CubeyLyricSourceResult = LyricSourceResult & {
 };
 
 import { log } from "@core/utils";
-import { fillTtml } from "@modules/lyrics/providers/blyrics/blyrics";
-import { CUBEY_LYRICS_API_URL, CUBEY_LYRICS_API_URL_TURNSTILE } from "@/core/constants";
 import { lrcFixers, parseLRC, parsePlainLyrics } from "./lrcUtils";
+import { CUBEY_LYRICS_API_URL, CUBEY_LYRICS_API_URL_TURNSTILE } from "@/core/constants";
+import { fillTtml } from "./ttmlUtils";
 
 /**
  *
@@ -287,26 +287,38 @@ export default async function cubey(providerParameters: ProviderParameters): Pro
 
   if (responseData.goLyricsApiTtml) {
     let ttmlData = JSON.parse(responseData.goLyricsApiTtml);
-    const filled = await fillTtml(ttmlData.ttml, providerParameters.duration);
-    providerParameters.sourceMap["bLyrics-richsynced"].filled = true;
-    providerParameters.sourceMap["bLyrics-synced"].filled = true;
+    const ttml = await fillTtml(ttmlData.ttml, providerParameters.duration);
 
-    if (!filled) {
-      providerParameters.sourceMap["bLyrics-richsynced"].lyricSourceResult = null;
-      providerParameters.sourceMap["bLyrics-synced"].lyricSourceResult = null;
-      return;
-    }
+    if (ttml) {
+      if (ttml.isWordSynced) {
+        providerParameters.sourceMap["bLyrics-richsynced"].lyricSourceResult = ttml.result;
+        providerParameters.sourceMap["bLyrics-synced"].lyricSourceResult = null;
+      } else {
+        providerParameters.sourceMap["bLyrics-richsynced"].lyricSourceResult = null;
+        providerParameters.sourceMap["bLyrics-synced"].lyricSourceResult = ttml.result;
+      }
 
-    if (filled.isWordSynced) {
-      providerParameters.sourceMap["bLyrics-richsynced"].lyricSourceResult = filled.result;
-      providerParameters.sourceMap["bLyrics-synced"].lyricSourceResult = null;
+      providerParameters.sourceMap["bLyrics-synced"].filled = true;
+      providerParameters.sourceMap["bLyrics-richsynced"].filled = true;
     } else {
       providerParameters.sourceMap["bLyrics-richsynced"].lyricSourceResult = null;
-      providerParameters.sourceMap["bLyrics-synced"].lyricSourceResult = filled.result;
+      providerParameters.sourceMap["bLyrics-richsynced"].filled = true;
+
+      providerParameters.sourceMap["bLyrics-synced"].lyricSourceResult = null;
+      providerParameters.sourceMap["bLyrics-synced"].filled = true;
     }
   }
 
-  (["musixmatch-synced", "musixmatch-richsync"] as const).forEach(source => {
+  (
+    [
+      "musixmatch-synced",
+      "musixmatch-richsync",
+      "lrclib-synced",
+      "lrclib-plain",
+      "bLyrics-richsynced",
+      "bLyrics-synced",
+    ] as const
+  ).forEach(source => {
     providerParameters.sourceMap[source].filled = true;
   });
 }
