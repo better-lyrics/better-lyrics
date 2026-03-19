@@ -7,7 +7,7 @@ export interface ContextData {
   type: "button" | "separator" | "span";
   content?: string;
   rightCont?: string;
-  func?: () => void;
+  func?: (...args: any) => void;
   disabled?: boolean;
 }
 
@@ -33,7 +33,7 @@ export const actionMenus: { [key: string]: ContextData[] } = {
     { id: "export-to-lrc-btn", type: "button", content: "Export to .LRC" },
     { id: "export-to-srt-btn", type: "button", content: "Export to .SRT" },
     { id: "export-plain-btn", type: "button", content: "Export as plain lyrics" },
-  ]
+  ],
 };
 
 export const contextMenus: { [key: string]: ContextData[] } = {
@@ -79,7 +79,7 @@ export const domDefaults = {
 
     // for playback button
     playPATH: "M8 19V5l11 7z",
-    pausePATH: "M8 19h2V5H8v14m6-14v14h2V5h-2z"
+    pausePATH: "M8 19h2V5H8v14m6-14v14h2V5h-2z",
   },
   lineLint: {
     // Level 0 - Info suggestion to give much better experience
@@ -116,7 +116,6 @@ export function addNewLine(data: Lyric, index: number = 1) {
 
   // Create element
   let hasBgWords = false;
-  const instrumenone = data.isInstrumental ? "none" : "";
   const wordParts =
     data.parts && data.parts.length > 0
       ? data.parts
@@ -139,7 +138,7 @@ export function addNewLine(data: Lyric, index: number = 1) {
     [];
 
   const lyricLine = document.createElement("div");
-  if (data.isInstrumental) lyricLine.classList.add("lyric-line-instrumental");
+  if (data.isInstrumental) lyricLine.classList.add("instrumental--line");
   lyricLine.classList.add("lyric-line");
 
   /// Suggestions
@@ -166,12 +165,11 @@ export function addNewLine(data: Lyric, index: number = 1) {
   timeLine.className = "line-timeline";
   timeLine.style.display = defaults.parentData.clyricsEditorDisplay.timeline ? "" : "none";
 
-  if (data.isInstrumental) {
-    const instrumental = document.createElement("span");
-    instrumental.id = "line-instrumental";
-    instrumental.innerHTML = `<strong class="code">[INSTRUMENTAL]</strong>`;
-    timeLine.appendChild(instrumental);
-  }
+  // Only visible when the line is instrumental
+  const instrumental = document.createElement("span");
+  instrumental.id = "line-instrumental";
+  instrumental.innerHTML = `<strong class="code">[INSTRUMENTAL]</strong>`;
+  timeLine.appendChild(instrumental);
 
   const startTimeLine = document.createElement("span");
   startTimeLine.id = "line-start-time";
@@ -187,14 +185,13 @@ export function addNewLine(data: Lyric, index: number = 1) {
   timeLine.appendChild(endTimeLine);
 
   const belowSep = separator("span-separator");
-  belowSep.style.display = instrumenone;
+  belowSep.classList.add("not-for-instrumental");
   timeLine.appendChild(belowSep);
 
   const voiceLine = document.createElement("span");
   voiceLine.id = "line-voice";
-  voiceLine.className = "code";
+  voiceLine.className = "code not-for-instrumental";
   voiceLine.textContent = data.agent || null;
-  voiceLine.style.display = instrumenone;
   timeLine.appendChild(voiceLine);
 
   lyricLine.appendChild(timeLine);
@@ -202,8 +199,7 @@ export function addNewLine(data: Lyric, index: number = 1) {
   /// Normal Line
   const normalLine = document.createElement("div");
   normalLine.id = "normal-line";
-  normalLine.className = "line";
-  normalLine.style.display = instrumenone;
+  normalLine.className = "line not-for-instrumental";
   normalLine.innerHTML = `<span class="line-index">#${index}</span>`;
 
   //// Normal Words Wrapper
@@ -257,14 +253,15 @@ export function addNewLine(data: Lyric, index: number = 1) {
 
   /// Background separator
   const bgSeparator = separator("separator-column");
-  bgSeparator.style.display = hasBgWords ? instrumenone : "none";
+  bgSeparator.id = "background-line";
+  bgSeparator.classList.add("not-for-instrumental");
   lyricLine.appendChild(bgSeparator);
 
   /// Background Line
   const bgLine = document.createElement("div");
-  bgLine.className = "line";
   bgLine.id = "background-line";
-  bgLine.style.display = hasBgWords ? instrumenone : "none";
+  bgLine.className = "line not-for-instrumental";
+  bgLine.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><path fill="currentColor" d="M13 15.5H3a1 1 0 0 1 0-2h10a1 1 0 0 1 0 2m8-5H3a1 1 0 0 1 0-2h18a1 1 0 0 1 0 2"/></svg>`;
 
   //// Background Words Wrapper
   const bgWordsWrapper = document.createElement("div");
@@ -305,8 +302,8 @@ export function addNewLine(data: Lyric, index: number = 1) {
 
   /// Romanizations
   const romanization = document.createElement("div");
-  romanization.className = "line-romanization";
-  romanization.style.display = defaults.parentData.clyricsEditorDisplay.roman ? instrumenone : "none";
+  romanization.className = "line-romanization not-for-instrumental";
+  romanization.style.display = defaults.parentData.clyricsEditorDisplay.roman ? "" : "none";
 
   const romans = document.createElement("div");
   romans.className = "line-romans";
@@ -338,8 +335,8 @@ export function addNewLine(data: Lyric, index: number = 1) {
 
   /// Translation
   const translate = document.createElement("div");
-  translate.className = "line-translate";
-  translate.style.display = defaults.parentData.clyricsEditorDisplay.translate ? instrumenone : "none";
+  translate.className = "line-translate not-for-instrumental";
+  translate.style.display = defaults.parentData.clyricsEditorDisplay.translate ? "" : "none";
 
   const translateInput = document.createElement("input");
   translateInput.id = "line-translate-input";
@@ -354,5 +351,6 @@ export function addNewLine(data: Lyric, index: number = 1) {
     normalWordInput: newNormalWord,
     bgWordInput: newBgWord,
     romanWordInput: newRoman,
+    hasBgWords,
   };
 }

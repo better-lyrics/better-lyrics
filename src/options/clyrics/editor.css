@@ -38,6 +38,11 @@ button {
     width: auto;
 }
 
+.svg1-5 {
+    width: 1.5rem;
+    height: 1.5rem;
+}
+
 /* TOPBAR */
 .topbar {
     padding: 0 .5rem;
@@ -533,11 +538,6 @@ button {
     overflow: hidden;
 }
 
-.lyric-line-instrumental {
-    background: hsl(0, 0%, 100%, .375);
-    border-color: rgba(0, 0, 0, .25);
-}
-
 .lyric-line:hover {
     border-color: hsl(0, 0%, 100%, .5);
 }
@@ -548,6 +548,26 @@ button {
 
 .lyric-line:has(.line-warning) {
     border-color: hsl(50, 100%, 50%, .5);
+}
+
+.lyric-line.instrumental--line {
+    background: hsl(0, 0%, 100%, .375);
+    border-color: rgba(0, 0, 0, .25);
+}
+
+.lyric-line.instrumental--line > .line-timeline {
+    font-size: 1.25rem;
+    color: rgba(0, 0, 0, .75);
+}
+
+.lyric-line.instrumental--line > .line-timeline > div {
+    background: rgba(0, 0, 0, .75);
+}
+
+.lyric-line.instrumental--line .not-for-instrumental,
+.lyric-line:not(.instrumental--line) > .line-timeline > #line-instrumental,
+.lyric-line:not(.bg--enabled) > #background-line {
+    display: none;
 }
 
 .line > .words-wrapper > .words > #new-word-line:not(:focus) {
@@ -601,8 +621,9 @@ button {
 }
 
 .line-index {
-    margin: 0 .4rem;
-    font-size: 1.1rem;
+    min-width: 1.5rem;
+    font-size: 1.25rem;
+    text-align: center;
 }
 
 #new-word-line {
@@ -629,15 +650,6 @@ button {
     display: flex;
     align-items: center;
     justify-content: center;
-}
-
-.lyric-line-instrumental > .line-timeline {
-    font-size: 1.25rem;
-    color: rgba(0, 0, 0, .75);
-}
-
-.lyric-line-instrumental > .line-timeline > div {
-    background: rgba(0, 0, 0, .75);
 }
 
 .line-romanization {

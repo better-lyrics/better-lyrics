@@ -131,7 +131,7 @@ function insertInstrumentalBreaks(lyrics: Lyric[], songDurationMs: number): Lyri
   return result;
 }
 
-export async function fillTtml(responseString: string) {
+export async function fillTtml(responseString: string, duration: number) {
   const options: X2jOptions = {
     ignoreAttributes: false,
     attributeNamePrefix: "@_",
@@ -275,15 +275,14 @@ export async function fillTtml(responseString: string) {
         const beginTime = lyricLine.startTimeMs;
         const parseResult = parseLyricPart(transliteration.text, beginTime, false);
 
-        lyricLine.romanizations = { text: parseResult.text, lang, parts: parseResult.parts };
-        // lyricLine.romanization = parseResult.text;
-        // lyricLine.timedRomanization = parseResult.parts;
+        lyricLine.romanization = parseResult.text;
+        lyricLine.timedRomanization = parseResult.parts;
       });
     });
   }
 
   let lyricArray = Array.from(lyrics.values());
-  const songDurationMs = ttMeta && ttMeta["@_dur"] ? parseTime(ttMeta["@_dur"]) : providerParameters.duration * 1000;
+  const songDurationMs = ttMeta && ttMeta["@_dur"] ? parseTime(ttMeta["@_dur"]) : duration * 1000;
   lyricArray = insertInstrumentalBreaks(lyricArray, songDurationMs);
 
   let result: LyricSourceResult = {
@@ -324,7 +323,7 @@ export default async function bLyrics(providerParameters: ProviderParameters): P
   }
 
   let responseString: string = await response.json().then(json => json.ttml);
-  const filled = await fillTtml(responseString);
+  const filled = await fillTtml(responseString, providerParameters.duration);
   providerParameters.sourceMap["bLyrics-richsynced"].filled = true;
   providerParameters.sourceMap["bLyrics-synced"].filled = true;
 

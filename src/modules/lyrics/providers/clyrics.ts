@@ -1,5 +1,6 @@
 import type { CLyricsData } from "@/options/clyrics/clyrics-types";
-import type { ProviderParameters } from "./shared";
+import type { LyricsArray, ProviderParameters } from "./shared";
+import { decompressString } from "@/core/compression";
 
 export default async function customLyrics(providerParameters: ProviderParameters): Promise<void> {
   const result = await chrome.storage.local.get(["customLyrics"]);
@@ -37,11 +38,21 @@ export default async function customLyrics(providerParameters: ProviderParameter
   }
 
   if (clyric) {
+    let lyrics = clyric.lyrics as LyricsArray;
+    if (typeof lyrics === "string") {
+      try {
+        lyrics = JSON.parse(decompressString(lyrics));
+      } catch (err) {
+        providerParameters.sourceMap["custom-lyrics"].lyricSourceResult = null;
+        return;
+      }
+    }
+
     providerParameters.sourceMap["custom-lyrics"].lyricSourceResult = {
-      lyrics: clyric.lyrics,
+      lyrics,
       source: "Custom Lyrics",
-      sourceHref: "",
-      musicVideoSynced: false,
+      sourceHref: "#",
+      musicVideoSynced: true,
       cacheAllowed: false,
     };
   } else {

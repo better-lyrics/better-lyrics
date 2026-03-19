@@ -227,7 +227,7 @@
 					</svg>
 				</button>
 				<span id="playbar-time" class="code time-display">00:00</span>
-				<div id="playbar-seek" class="slider">
+				<div id="playbar-seek" class="slider slider--nonimmediate">
 					<div id="playbar-seek-bar" class="bar"></div>
 					<div id="playbar-seek-head" class="head"></div>
 				</div>
@@ -236,7 +236,7 @@
 					<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
 						<path fill="currentColor" d="M14 20.725v-2.05q2.25-.65 3.625-2.5t1.375-4.2-1.375-4.2T14 5.275v-2.05q3.1.7 5.05 3.138T21 11.975t-1.95 5.613T14 20.725M3 15V9h4l5-5v16l-5-5zm11 1V7.95q1.175.55 1.838 1.65T16.5 12q0 1.275-.663 2.363T14 16"/>
 					</svg>
-					<span class="code">1x</span>
+					<span id="playbar-current-rate" class="code">1x</span>
 				</button>
 			</div>
 		</div>
@@ -317,16 +317,16 @@
 				<button value="2" class="code">2x</button>
 			</div>
 			<div id="playbar-playrate">
-				<span id="playbar-min-rate" class="code time-display">0.25x</span>
-				<div id="playbar-playrate-bar" class="slider" min=".25" max="2" step=".05">
+				<span id="playbar-play-rate" class="code time-display">1.00x</span>
+				<div id="playbar-playrate-bar" class="slider" min=".25" max="2" step=".05" value="1">
 					<div id="playbar-playrate-bar" class="bar"></div>
 					<div id="playbar-playrate-head" class="head"></div>
 				</div>
-				<span id="playbar-max-rate" class="code time-display">2x</span>
+				<span id="playbar-max-rate" class="code time-display">2.00x</span>
 			</div>
 			<div id="playbar-volume">
 				<span id="playbar-volume-rate" class="code time-display">50%</span>
-				<div id="playbar-volume-bar" class="slider" min=".25" max="1" step=".01">
+				<div id="playbar-volume-bar" class="slider" min="0" max="1" step=".01" value=".5">
 					<div id="playbar-volume-bar" class="bar"></div>
 					<div id="playbar-volume-head" class="head"></div>
 				</div>

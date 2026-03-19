@@ -1,40 +1,48 @@
-import type { Lyric, LyricPart } from "@/modules/lyrics/providers/shared";
+import type { Lyric, LyricPart, LyricsArray } from "@/modules/lyrics/providers/shared";
 import { clyricsList, clyricsNewLyrics } from "./index";
 import { openCLyricsModal } from "./clyrics";
 import { actionMenus, addNewLine, type ContextData, contextMenus, domDefaults } from "./editorDom";
 import { getLocalStorage } from "@/core/storage";
-import { formatTime } from "@/modules/lyrics/providers/lrcUtils";
 import { buildTTML } from "./ttmlBuilder";
 import { getCustomLyrics } from "./clyricsManager";
-import type { CLyricsData, CLyricsEditor } from "./clyrics-types";
+import type { CLyricsData, CLyricsEditor, CLyricsLyric, CLyricsLyricPart } from "./clyrics-types";
+import * as checkbox from "./editor/checkbox";
+import * as slider from "./editor/slider";
+import * as playbar from "./editor/playbar";
+import * as keybind from "./editor/keybind";
 
 let loaded = false;
 
 // Variables
+let reservedUUID = new Map();
+
 let selectedFile = -1;
 let historyStack = [];
 let historyVer = -1;
 
-let _selectedLine: any = -1;
+let selectedLine: any = -1;
 let _selectedWord: any = -1;
 
-let loadedAudio: HTMLAudioElement | null = null; // loaded audio from playbar
-
 // DATA
-let lyrics: Lyric[] = [];
-let editor: CLyricsEditor = {
-  voices: {},
-  lines: {}
-};
+let clyrics: CLyricsData | null = null;
+let lyrics: CLyricsLyric[] = [];
+let editor: CLyricsEditor = {};
 
 // Storing context menu button and their functions when clicked
 let contextMenuB: ContextData[] = [];
 let loadedActionMenu: { [key: string]: boolean } = {};
 
-// Storing sliders functions
-let sliderOnUpdate: { [key: string]: (value: number) => void } = {}; // acts as an onUpdate thing
-
 // Global variables
+const clamp = (x: number, min: number, max: number) => Math.min(Math.max(x, min), max);
+function generateUUID() {
+  const uuid = crypto.randomUUID();
+  if (reservedUUID.has(uuid)) {
+    return generateUUID();
+  }
+  reservedUUID.set(uuid, null);
+  return uuid;
+}
+
 function elementDisplay(nodeList: NodeListOf<HTMLElement>, x: boolean) {
   nodeList.forEach(node => {
     node.style.display = x ? "" : "none";
@@ -59,19 +67,25 @@ export const defaults: {
     "show-timeline-btn": {
       parent: "clyricsEditorDisplay",
       id: "timeline",
-      func: function (x: boolean) { elementDisplay(document.querySelectorAll(".line-timeline"), x); },
+      func: function (x: boolean) {
+        elementDisplay(document.querySelectorAll(".line-timeline"), x);
+      },
     },
 
     "show-roman-btn": {
       parent: "clyricsEditorDisplay",
       id: "roman",
-      func: function (x: boolean) { elementDisplay(document.querySelectorAll(".line-romanization"), x); },
+      func: function (x: boolean) {
+        elementDisplay(document.querySelectorAll(".line-romanization"), x);
+      },
     },
 
     "show-translate-btn": {
       parent: "clyricsEditorDisplay",
       id: "translate",
-      func: function (x: boolean) { elementDisplay(document.querySelectorAll(".line-translate"), x); },
+      func: function (x: boolean) {
+        elementDisplay(document.querySelectorAll(".line-translate"), x);
+      },
     },
   },
 
@@ -94,7 +108,7 @@ export const defaults: {
       if (clyricsNewLyrics) {
         clyricsNewLyrics.style.display = "none";
       }
-    }
+    },
   },
 
   contextMenu: {
@@ -106,10 +120,27 @@ export const defaults: {
 
     "toggle-instrumental-line": line => {
       if (line < 0 || line >= lyrics.length) return;
-      const lyric = lyrics[line];
+      const lyric = lyrics.find(eline => eline.key === line);
       if (!lyric) return;
       lyric.isInstrumental = !lyric.isInstrumental;
+      lyric.elmData.element.classList[lyric.isInstrumental ? "add" : "remove"]("instrumental--line");
       logAction("toggle-instrumental-line", lyric.isInstrumental, { line });
+    },
+
+    "toggle-background-line": line => {
+      if (line < 0 || line >= lyrics.length) return;
+      const lyric = lyrics.find(eline => eline.key === line);
+      if (!lyric) return;
+      if (!editor.lines) {
+        editor.lines = {};
+      }
+      if (!editor.lines[line]) {
+        editor.lines[line] = {};
+      }
+      let editorline = editor.lines[line];
+      editorline.bgEnabled = !editorline.bgEnabled;
+      lyric.elmData.element.classList[editorline.bgEnabled ? "add" : "remove"]("bg--enabled");
+      logAction("toggle-background-line", editorline.bgEnabled, { line });
     },
   },
 };
@@ -170,16 +201,17 @@ export const addLineInstrumental = document.getElementById("add-line-instrumenta
 export const addLineTogether = document.getElementById("add-line-together");
 export const startTimeInput = document.getElementById("start-time-input");
 export const durationInput = document.getElementById("duration-input");
-//// Playbar
-export const playbar = document.getElementById("playbar");
-export const dragAudio = document.getElementById("drag-audio"); 
-export const audioFile = document.getElementById("audio-file-playbar") as HTMLInputElement; // child of `dragAudio`
 //// Lyric Lines Editor
 export const lyricLines = document.getElementById("lyric-lines");
 export const noLyrics = document.getElementById("no-lyrics");
 
 // Data functions
-function _save() {}
+/**
+ * Saves the custom lyrics by collecting everything, filter out
+ * only the necessary data, compressing the lyrics data, and
+ * save it to storage
+ */
+// function saveCustomLyrics() {}
 
 function loadContextMenu(element: HTMLElement, menus: ContextData[]) {
   if (!element) return;
@@ -209,7 +241,7 @@ function loadContextMenu(element: HTMLElement, menus: ContextData[]) {
     }
   });
 }
-  
+
 function setupActionMenu(id: string) {
   const selActionMenu = actionMenus[id];
   if (loadedActionMenu[id] || !selActionMenu) {
@@ -229,10 +261,10 @@ function setupActionMenu(id: string) {
 /**
  * Sets up the context menu functionality
  */
-function setupContextMenu(id: string, line?: number, word?: number) {
+function setupContextMenu(id: string, line?: any, word?: any) {
   const selContextMenu = contextMenus[id];
   if (!selContextMenu) {
-    return;
+    return [];
   }
 
   selContextMenu.forEach(btn => {
@@ -242,7 +274,7 @@ function setupContextMenu(id: string, line?: number, word?: number) {
     }
   });
 
-  contextMenuB = selContextMenu;
+  return selContextMenu;
 }
 
 /**
@@ -271,32 +303,51 @@ function createNewInteractable(content: string) {
  * Creates a new lyric line and appends it to the editor in Powerhouse layout
  */
 function createNewLine(parameters?: { isInstrumental?: boolean; voice?: number }, data?: Lyric, selIndex?: number) {
+  if (typeof selIndex === "number") {
+    selIndex = clamp(selIndex, 0, lyrics.length - 1);
+  }
+
   const prevLine = lyrics[lyrics.length - 1];
 
-  const struct = {
-    order: Math.min(lyrics.length, selIndex || 0),
+  const struct: CLyricsLyric = {
+    key: generateUUID(),
     startTimeMs: data?.startTimeMs || prevLine ? prevLine.startTimeMs + prevLine.durationMs : 0,
     words: data?.words || "",
     durationMs: data?.durationMs || 2000,
     parts: data?.parts || [],
     agent: data?.agent
       ? `v${parseInt(data?.agent.match(/\d+/) ? data?.agent.match(/\d+/)![0] : "1")}`
-      : parameters?.isInstrumental
-        ? undefined
-        : `v${parameters?.voice || 1}`,
+      : `v${parameters?.voice || 1}`,
     isInstrumental: data?.isInstrumental || parameters?.isInstrumental,
     translation: data?.translation,
     romanization: data?.romanization,
     timedRomanization: data?.timedRomanization,
+    elmData: undefined,
   };
 
-  const _partWord = [];
-  const _partBgWord = [];
+  if (!struct.key) {
+    return;
+  }
 
-  // i figured out if the index is moved or not, it still references to the same data!!!!!!! (took me a while to figure out how the array system work)
+  const partWord = [];
+  const partBgWord = [];
+
+  const lineData = addNewLine(struct);
+  struct.elmData = lineData;
+
   const index = typeof selIndex === "number" ? lyrics.splice(selIndex, 0, struct) && selIndex : lyrics.push(struct);
   const lineStruct = lyrics[index - 1];
-  const lineData = addNewLine(struct);
+
+  if (lineData.hasBgWords) {
+    if (!editor.lines) {
+      editor.lines = {};
+    }
+    if (!editor.lines[struct.key]) {
+      editor.lines[struct.key] = {};
+    }
+    editor.lines[struct.key].bgEnabled = true;
+    lineData.element.classList.add("bg--enabled");
+  }
 
   if (noLyrics) noLyrics.style.display = lyrics.length < 1 ? "" : "none";
 
@@ -311,10 +362,11 @@ function createNewLine(parameters?: { isInstrumental?: boolean; voice?: number }
     lyricLine.addEventListener(
       "mouseenter",
       () => {
-        contextMenuB = contextMenus.line;
+        contextMenuB = setupContextMenu("line", struct.key);
       },
       { signal }
     );
+
     lyricLine.addEventListener(
       "mouseleave",
       () => {
@@ -323,11 +375,10 @@ function createNewLine(parameters?: { isInstrumental?: boolean; voice?: number }
       { signal }
     );
 
-    // we need to make sure its still referencing the same line after moving the index of the line
     lyricLine.addEventListener(
       "click",
       () => {
-        _selectedLine = lyricLine;
+        selectedLine = lyricLine;
       },
       { signal }
     );
@@ -345,23 +396,32 @@ function createNewLine(parameters?: { isInstrumental?: boolean; voice?: number }
         return;
       }
 
-      const prevWord = struct.parts[struct.parts.length - 1];
-      const _wordIndex = struct.parts.push({
-        startTimeMs: prevWord ? prevWord.startTimeMs + prevWord.durationMs : struct.startTimeMs,
+      lineStruct.parts = lineStruct.parts || [];
+
+      const prevWord = lineStruct.parts[lineStruct.parts.length - 1];
+      const partStruct: CLyricsLyricPart = {
+        key: generateUUID(),
+        startTimeMs: prevWord ? prevWord.startTimeMs + prevWord.durationMs : lineStruct.startTimeMs,
         words: input.value,
         durationMs: 2000,
-      });
+      };
+
+      partWord.push(partStruct);
 
       const word = createNewInteractable(input.value)!;
       word.addEventListener("mouseenter", () => {
-        contextMenuB = [...contextMenus.word, { type: "separator" }, ...contextMenus.line];
+        contextMenuB = [
+          ...setupContextMenu("word", struct.key, partStruct.key),
+          { type: "separator" },
+          ...setupContextMenu("line", struct.key),
+        ];
       });
 
       word.addEventListener("mouseleave", () => {
         contextMenuB = lyricLine.matches("div:hover")
-          ? contextMenus.line
+          ? setupContextMenu("line", struct.key)
           : lyricLines!.matches("div:hover")
-            ? contextMenus.default
+            ? setupContextMenu("default")
             : [];
       });
 
@@ -386,25 +446,34 @@ function createNewLine(parameters?: { isInstrumental?: boolean; voice?: number }
       if (e.key != "Enter" || input.value.length < 1) {
         return;
       }
+
       lineStruct.parts = lineStruct.parts || [];
+
       const prevWord = lineStruct.parts[lineStruct.parts.length - 1];
-      const _wordIndex = lineStruct.parts.push({
+      const partStruct: CLyricsLyricPart = {
+        key: generateUUID(),
         startTimeMs: prevWord ? prevWord.startTimeMs + prevWord.durationMs : lineStruct.startTimeMs,
         words: input.value,
         durationMs: 2000,
         isBackground: true,
-      });
+      };
+
+      partBgWord.push(partStruct);
 
       const word = createNewInteractable(input.value)!;
       word.addEventListener("mouseenter", () => {
-        contextMenuB = [...contextMenus.word, { type: "separator" }, ...contextMenus.line];
+        contextMenuB = [
+          ...setupContextMenu("word", struct.key, partStruct.key),
+          { type: "separator" },
+          ...setupContextMenu("line", struct.key),
+        ];
       });
 
       word.addEventListener("mouseleave", () => {
         contextMenuB = lyricLine.matches("div:hover")
-          ? contextMenus.line
+          ? setupContextMenu("line", struct.key)
           : lyricLines!.matches("div:hover")
-            ? contextMenus.default
+            ? setupContextMenu("default")
             : [];
       });
 
@@ -462,113 +531,6 @@ function createNewLine(parameters?: { isInstrumental?: boolean; voice?: number }
 }
 
 // Handlers
-/// General Checkboxes
-function handleCheckboxes() {
-  const parentData: { [key: string]: any } = {};
-
-  checkboxes.forEach(async checkbox => {
-    const checker = defaults.checkboxFunc[checkbox.id];
-    if (checker && checker.parent) {
-      const loaded =
-        (await chrome.storage.sync.get(checker.parent))[checker.parent] || defaults.parentData[checker.parent] || {};
-      parentData[checker.parent] = loaded;
-
-      checker.func(loaded[checker.id]);
-      if (loaded[checker.id]) checkbox.classList.add("checked");
-      else checkbox.classList.remove("checked");
-    }
-
-    checkbox.addEventListener("click", async () => {
-      const checked = checkbox.classList.contains("checked");
-
-      if (checked) checkbox.classList.remove("checked");
-      else checkbox.classList.add("checked");
-
-      if (!checker) return;
-      checker.func(!checked);
-
-      if (!checker.parent) return;
-      const read =
-        (await chrome.storage.sync.get(checker.parent))[checker.parent] || defaults.parentData[checker.parent] || {};
-      read[checker.id] = !checked;
-
-      chrome.storage.sync.set({ [checker.parent]: read });
-    });
-  });
-
-  console.log("[onload] Checkboxes loaded");
-}
-
-/// General Sliders
-function handleSliders() {
-  function updateSlider(slider: HTMLElement, relativeVal: number, valAttr: string = "value") {
-    const clamped = Math.min(1, Math.max(0, relativeVal));
-    const absolute = parseFloat(slider.getAttribute("min") || "0") + clamped * (parseFloat(slider.getAttribute("max") || "1") - parseFloat(slider.getAttribute("min") || "0"));
-    console.log(absolute);
-    let final = absolute;
-
-    if (slider.getAttribute("step")) {
-      const step = parseFloat(slider.getAttribute("step")!);
-      const mod = absolute % step;
-
-      final = mod > (step / 2) ? final - mod + step : final - mod; 
-    }
-
-    slider.setAttribute(valAttr, `${final}`);
-    if (valAttr == "value" && sliderOnUpdate[slider.id]) sliderOnUpdate[slider.id](final);
-  }
-
-  sliders.forEach(eslider => {
-    const slider = eslider as HTMLElement;
-    const attrObserver = new MutationObserver(mutations => {
-      mutations.forEach(mutation => {
-        if (mutation.type !== "attributes") { return; }
-
-        const head = slider.querySelector(".head") as HTMLElement;
-        const bar = slider.querySelector(".bar") as HTMLElement;
-        const value = parseFloat(slider.getAttribute("ref-val") || slider.getAttribute("value") || "0") || 0;
-        const relative = (value - parseFloat(slider.getAttribute("min") || "0")) / (parseFloat(slider.getAttribute("max") || "1") - parseFloat(slider.getAttribute("min") || "0")) * 100;
-
-        if (head) {
-          head.style.left = `calc(${relative}% - .375rem)`;
-        }
-        if (bar) {
-          bar.style.width = `${relative}%`;
-        }
-      });
-    });
-
-    attrObserver.observe(slider, { attributes: true, attributeFilter: ["ref-val", "value"] });
-
-    slider.addEventListener("click", e => {
-      const rect = slider.getBoundingClientRect();
-      const value = (e.clientX - rect.x) / rect.width;
-      updateSlider(slider, value);
-    });
-
-    slider.addEventListener("mousedown", e => {
-      e.preventDefault();
-      const moveHandler = (e: MouseEvent) => {
-        const rect = slider.getBoundingClientRect();
-        updateSlider(slider, (e.clientX - rect.x) / rect.width, "ref-val");
-      };
-
-      document.addEventListener("mousemove", moveHandler);
-      document.addEventListener("mouseup", () => {
-        if (slider.matches(`${slider.id}:hover`)) {
-          updateSlider(slider, parseFloat(slider.getAttribute("ref-val") || slider.getAttribute("value") || "0"));
-        }
-
-        slider.removeAttribute("ref-val");
-        document.removeEventListener("mousemove", moveHandler);
-      });
-
-      moveHandler(e);
-    });
-  });
-  console.log("[onload] Sliders loaded");
-}
-
 /// Actions
 function handleActionsMenu() {
   let actionMenuOpen: HTMLElement | null = null;
@@ -579,7 +541,7 @@ function handleActionsMenu() {
     actionMenuOpen = null;
   }
 
-  const actionFunc: { [key: string]: { id: string, menu: HTMLElement | null; func: (btn: HTMLElement) => void } } = {
+  const actionFunc: { [key: string]: { id: string; menu: HTMLElement | null; func: (btn: HTMLElement) => void } } = {
     "action-file-btn": {
       id: "file",
       menu: actionFile,
@@ -610,7 +572,7 @@ function handleActionsMenu() {
       if (typeof act.func == "function") act.func(button);
     });
   });
-  console.log("[onload] Actions Menu loaded");
+  console.log("Actions Menu loaded");
 }
 
 /// Tab Buttons
@@ -630,7 +592,7 @@ function handleTools() {
   if (addLineInstrumental) addLineInstrumental.addEventListener("click", () => createNewLine({ isInstrumental: true }));
   if (addLineTogether) addLineTogether.addEventListener("click", () => createNewLine({ voice: 1000 }));
 
-  console.log("[onload] Tools loaded");
+  console.log("Tools loaded");
 }
 
 /// Lyric Line
@@ -641,7 +603,9 @@ function handleLyricLine() {
   }
 
   function inlineConditional() {
-    if (!lyricLines) { return; }
+    if (!lyricLines) {
+      return;
+    }
     lyricLines.style.paddingRight = lyricLines.scrollHeight > lyricLines.clientHeight ? "" : "0";
   }
 
@@ -659,111 +623,13 @@ function handleLyricLine() {
   ABORT.observe(lyricLines.parentElement!, { childList: true });
 
   lyricLines.addEventListener("mouseenter", () => {
-    setupContextMenu("default");
+    contextMenuB = setupContextMenu("default");
   });
   lyricLines.addEventListener("mouseleave", () => {
     contextMenuB = [];
   });
 
-  console.log("[onload] Lyric Lines loaded");
-}
-
-/// Playbar
-function handlePlaybar() {
-  if (!audioFile) {
-    console.warn("No audio file loader. Refresh to reload handler");
-    return;
-  }
-
-  const playbackBtn = document.getElementById("playback-btn");
-  const curTime = document.getElementById("playbar-time");
-  const duration = document.getElementById("playbar-duration");
-  
-  const seekBar = document.getElementById("playbar-seek");
-
-  const playrate = document.getElementById("playbar-rate");
-  const playrateMenu = document.getElementById("playbar-rate-menu");
-
-  function load(files?: FileList | null) {
-    if (!files) { return; }
-    if (files.length > 0) {
-      const file = files[0]
-      if (file.type.split("/")[0] != "audio") { return; }
-      const audioSrc = URL.createObjectURL(file);
-      console.log(`Loaded ${file.name}, ${file.size}, ${file.type}. ${audioSrc}`);
-      loadedAudio = new Audio(audioSrc);
-      loadedAudio.addTextTrack("descriptions", file.name);
-      
-      if (dragAudio) { dragAudio.style.display = "none"; }
-
-      loadedAudio.addEventListener("play", () => {
-        if (playbackBtn) {
-          const path = playbackBtn.firstElementChild?.firstElementChild!;
-          path.setAttribute("d", domDefaults.svg.pausePATH);
-        }
-      });
-
-      loadedAudio.addEventListener("pause", () => {
-        if (playbackBtn) {
-          const path = playbackBtn.firstElementChild?.firstElementChild!;
-          path.setAttribute("d", domDefaults.svg.playPATH);
-        }
-      });
-
-      loadedAudio.addEventListener("loadeddata", () => {
-        navigator.mediaSession.metadata = new MediaMetadata({
-          title: file.name,
-          artist: "Playing from file",
-          album: "Better Lyrics: Custom Lyrics Editor",
-          artwork: [],
-        });
-
-        if (playbackBtn) {
-          playbackBtn.onclick = () => {
-            loadedAudio!.paused ? loadedAudio!.play() : loadedAudio!.pause();
-          }
-        }
-        
-        if (seekBar) {
-          sliderOnUpdate[seekBar.id] = (val) => {
-            loadedAudio!.currentTime = val * loadedAudio!.duration;
-          }
-        }
-        
-        if (duration) {
-          duration.textContent = formatTime(loadedAudio!.duration * 1000, false, true);
-        }
-      });
-
-      loadedAudio.addEventListener("timeupdate", () => {
-        if (curTime) {
-          curTime.textContent = formatTime(loadedAudio!.currentTime * 1000, false, true);
-        }
-
-        if (seekBar) {
-          const value = loadedAudio!.currentTime / loadedAudio!.duration;
-          seekBar.setAttribute("value", `${value}`);
-        }
-      });
-    }
-  }
-
-  if (dragAudio) {
-    dragAudio.addEventListener("dragover", e => {
-      e.preventDefault();
-      e.stopPropagation();
-    });
-
-    dragAudio.addEventListener("drop", e => {
-      e.preventDefault();
-      e.stopPropagation();
-      load(e.dataTransfer?.files);
-    });
-  }
-
-  audioFile.addEventListener("change", () => load(audioFile.files));
-
-  console.log("[onload] Playbar loaded");
+  console.log("Lyric Lines loaded");
 }
 
 /// Context Menu
@@ -801,6 +667,7 @@ function handleContextMenu() {
       if (contextMenuB.length < 1) {
         return;
       }
+
       closeContextMenu();
       loadContextMenu(contextMenu, contextMenuB);
 
@@ -823,43 +690,23 @@ function handleContextMenu() {
       });
     }
   });
-  console.log("[onload] Context Menu loaded");
-}
-
-/// Keybind
-function handleKeybind() {
-  const _keybinds = {
-    // Undo (Ctrl+Z)
-    undo: {
-      keys: ["Ctrl", "z"],
-      func: function () {},
-    },
-  };
-
-  document.addEventListener("keydown", e => {
-    let pressed = [];
-    if (e.ctrlKey) pressed.push("Ctrl");
-    if (e.altKey) pressed.push("Alt");
-    if (e.metaKey) pressed.push("Meta");
-    if (e.shiftKey) pressed.push("Shift");
-    pressed.push(e.key);
-  });
-  console.log("[onload] Keybinds loaded");
+  console.log("Context Menu loaded");
 }
 
 // Set up the handlers on load
 function load() {
   if (loaded) return;
   loaded = true;
-  handleCheckboxes();
-  handleSliders();
+
+  checkbox.handle();
+  slider.handle();
   handleActionsMenu();
   handleTabs();
   handleTools();
   handleLyricLine();
-  handlePlaybar();
+  playbar.handle();
   handleContextMenu();
-  handleKeybind();
+  keybind.handle();
 }
 
 document.addEventListener("DOMContentLoaded", async () => {
@@ -878,5 +725,8 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   load();
 
-  console.log(buildTTML(await getCustomLyrics(0) as CLyricsData));
+  const data = await getCustomLyrics(lastFile);
+  clyrics = data;
+
+  console.log(buildTTML((await getCustomLyrics(0)) as CLyricsData));
 });

@@ -21,17 +21,20 @@ function createCLyricsCard(options: CLyricsOverview): HTMLElement | null {
   //// Metadata
   const metadata = document.createElement("div");
   metadata.className = "clyrics-input-span span-wseparator";
-  
+
   ///// Duration
   const mdDuration = document.createElement("div");
-  mdDuration.className = "clyrics-metadata"
+  mdDuration.className = "clyrics-metadata";
 
   const mdDurSVG = document.createElementNS("http://www.w3.org/2000/svg", "svg");
   mdDurSVG.setAttribute("viewBox", "0 0 24 24");
 
   const mdDurSVGPath = document.createElementNS("http://www.w3.org/2000/svg", "path");
   mdDurSVGPath.setAttribute("fill", "currentColor");
-  mdDurSVGPath.setAttribute("d", "m13 12.175 2.25 2.25q.275.275.275.688t-.275.712q-.3.3-.712.3t-.713-.3L11.3 13.3q-.15-.15-.225-.337T11 12.575V9q0-.425.288-.712T12 8t.713.288T13 9zm-1.713-6.462Q11 5.425 11 5V4h2v1q0 .425-.288.713T12 6t-.712-.288m7 5.576Q18.575 11 19 11h1v2h-1q-.425 0-.712-.288T18 12t.288-.712m-5.575 7Q13 18.575 13 19v1h-2v-1q0-.425.288-.712T12 18t.713.288m-7-5.575Q5.425 13 5 13H4v-2h1q.425 0 .713.288T6 12t-.288.713M12 22q-2.075 0-3.9-.788t-3.175-2.137T2.788 15.9 2 12t.788-3.9 2.137-3.175T8.1 2.788 12 2t3.9.788 3.175 2.137T21.213 8.1 22 12t-.788 3.9-2.137 3.175-3.175 2.138T12 22m8-10q0-3.35-2.325-5.675T12 4 6.325 6.325 4 12t2.325 5.675T12 20t5.675-2.325T20 12m-8 0");
+  mdDurSVGPath.setAttribute(
+    "d",
+    "m13 12.175 2.25 2.25q.275.275.275.688t-.275.712q-.3.3-.712.3t-.713-.3L11.3 13.3q-.15-.15-.225-.337T11 12.575V9q0-.425.288-.712T12 8t.713.288T13 9zm-1.713-6.462Q11 5.425 11 5V4h2v1q0 .425-.288.713T12 6t-.712-.288m7 5.576Q18.575 11 19 11h1v2h-1q-.425 0-.712-.288T18 12t.288-.712m-5.575 7Q13 18.575 13 19v1h-2v-1q0-.425.288-.712T12 18t.713.288m-7-5.575Q5.425 13 5 13H4v-2h1q.425 0 .713.288T6 12t-.288.713M12 22q-2.075 0-3.9-.788t-3.175-2.137T2.788 15.9 2 12t.788-3.9 2.137-3.175T8.1 2.788 12 2t3.9.788 3.175 2.137T21.213 8.1 22 12t-.788 3.9-2.137 3.175-3.175 2.138T12 22m8-10q0-3.35-2.325-5.675T12 4 6.325 6.325 4 12t2.325 5.675T12 20t5.675-2.325T20 12m-8 0"
+  );
   mdDurSVG.appendChild(mdDurSVGPath);
   mdDuration.appendChild(mdDurSVG);
 
@@ -39,7 +42,7 @@ function createCLyricsCard(options: CLyricsOverview): HTMLElement | null {
   mdDurValue.className = "code";
   mdDurValue.textContent = formatTime(options.duration * 1000);
   mdDuration.appendChild(mdDurValue);
-  
+
   metadata.appendChild(mdDuration);
 
   ///// Separator
@@ -49,7 +52,7 @@ function createCLyricsCard(options: CLyricsOverview): HTMLElement | null {
 
   ///// Modified
   const mdModified = document.createElement("div");
-  mdModified.className = "clyrics-metadata"
+  mdModified.className = "clyrics-metadata";
 
   // <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="currentColor" d="M12 21q-.425 0-.712-.288T11 20v-5.6l-3.95 3.975q-.3.3-.712.3t-.713-.3-.3-.712.3-.713L9.6 13H4q-.425 0-.712-.288T3 12t.288-.712T4 11h5.6L5.625 7.05q-.3-.3-.3-.712t.3-.713.713-.3.712.3L11 9.6V4q0-.425.288-.712T12 3t.713.288T13 4v5.6l3.95-3.975q.3-.3.713-.3t.712.3.3.713-.3.712L14.4 11H20q.425 0 .713.288T21 12t-.288.713T20 13h-5.6l3.975 3.95q.3.3.3.713t-.3.712-.712.3-.713-.3L13 14.4V20q0 .425-.288.713T12 21"/></svg>
   const mdModSVG = document.createElementNS("http://www.w3.org/2000/svg", "svg");
@@ -57,10 +60,13 @@ function createCLyricsCard(options: CLyricsOverview): HTMLElement | null {
 
   const mdModSVGPath = document.createElementNS("http://www.w3.org/2000/svg", "path");
   mdModSVGPath.setAttribute("fill", "currentColor");
-  mdModSVGPath.setAttribute("d", "M12 21q-.425 0-.712-.288T11 20v-5.6l-3.95 3.975q-.3.3-.712.3t-.713-.3-.3-.712.3-.713L9.6 13H4q-.425 0-.712-.288T3 12t.288-.712T4 11h5.6L5.625 7.05q-.3-.3-.3-.712t.3-.713.713-.3.712.3L11 9.6V4q0-.425.288-.712T12 3t.713.288T13 4v5.6l3.95-3.975q.3-.3.713-.3t.712.3.3.713-.3.712L14.4 11H20q.425 0 .713.288T21 12t-.288.713T20 13h-5.6l3.975 3.95q.3.3.3.713t-.3.712-.712.3-.713-.3L13 14.4V20q0 .425-.288.713T12 21");
+  mdModSVGPath.setAttribute(
+    "d",
+    "M12 21q-.425 0-.712-.288T11 20v-5.6l-3.95 3.975q-.3.3-.712.3t-.713-.3-.3-.712.3-.713L9.6 13H4q-.425 0-.712-.288T3 12t.288-.712T4 11h5.6L5.625 7.05q-.3-.3-.3-.712t.3-.713.713-.3.712.3L11 9.6V4q0-.425.288-.712T12 3t.713.288T13 4v5.6l3.95-3.975q.3-.3.713-.3t.712.3.3.713-.3.712L14.4 11H20q.425 0 .713.288T21 12t-.288.713T20 13h-5.6l3.975 3.95q.3.3.3.713t-.3.712-.712.3-.713-.3L13 14.4V20q0 .425-.288.713T12 21"
+  );
   mdModSVG.appendChild(mdModSVGPath);
   mdModified.appendChild(mdModSVG);
-  
+
   const mdModValue = document.createElement("span");
   mdModValue.className = "code";
   mdModValue.textContent = new Date(options.modified).toLocaleString();
@@ -79,7 +85,7 @@ function createCLyricsCard(options: CLyricsOverview): HTMLElement | null {
   artistAlbum.textContent = options.artist;
 
   if (options.album) {
-    artistAlbum.innerHTML += `<div class="span-separator"></div>${options.album}`
+    artistAlbum.innerHTML += `<div class="span-separator"></div>${options.album}`;
   }
 
   info.appendChild(metadata);
@@ -113,7 +119,7 @@ async function populateCLyrics(): Promise<void> {
 
   const newLyricSvg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
   newLyricSvg.setAttribute("viewBox", "0 0 24 24");
-  
+
   const newLyricSvgPath = document.createElementNS("http://www.w3.org/2000/svg", "path");
   newLyricSvgPath.setAttribute("d", "M11 13H5v-2h6V5h2v6h6v2h-6v6h-2z");
   newLyricSvgPath.setAttribute("fill", "currentColor");
@@ -140,7 +146,7 @@ async function populateCLyrics(): Promise<void> {
 }
 
 export async function fillCLyrics(element: HTMLElement) {
-  const customLyrics = await listCustomLyrics() as CLyricsData[];
+  const customLyrics = (await listCustomLyrics()) as CLyricsData[];
   if (customLyrics.length < 1) {
     const card = document.createElement("div");
     card.className = "clyrics-card";
@@ -206,21 +212,24 @@ export async function formNewLyrics(): Promise<void> {
     const returnButton = document.createElement("button");
     returnButton.className = "icon-btn";
     returnButton.setAttribute("data-tooltip", "Return");
-  
+
     const returnButtonSvg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
     returnButtonSvg.setAttribute("viewBox", "0 0 24 24");
-  
+
     const returnButtonSvgPath = document.createElementNS("http://www.w3.org/2000/svg", "path");
     returnButtonSvgPath.setAttribute("fill", "currentColor");
-    returnButtonSvgPath.setAttribute("d", "m7.825 13l4.9 4.9q.3.3.288.7t-.313.7q-.3.275-.7.288t-.7-.288l-6.6-6.6q-.15-.15-.213-.325T4.426 12t.063-.375t.212-.325l6.6-6.6q.275-.275.688-.275t.712.275q.3.3.3.713t-.3.712L7.825 11H19q.425 0 .713.288T20 12t-.288.713T19 13z");
+    returnButtonSvgPath.setAttribute(
+      "d",
+      "m7.825 13l4.9 4.9q.3.3.288.7t-.313.7q-.3.275-.7.288t-.7-.288l-6.6-6.6q-.15-.15-.213-.325T4.426 12t.063-.375t.212-.325l6.6-6.6q.275-.275.688-.275t.712.275q.3.3.3.713t-.3.712L7.825 11H19q.425 0 .713.288T20 12t-.288.713T19 13z"
+    );
     returnButtonSvg.appendChild(returnButtonSvgPath);
     returnButton.appendChild(returnButtonSvg);
-  
+
     returnButton.addEventListener("click", () => {
       if (clyricsList) clyricsList.style.display = "";
       if (clyricsNewLyrics) clyricsNewLyrics.style.display = "none";
     });
-  
+
     modalTopButtons.appendChild(returnButton);
   }
 
@@ -249,8 +258,9 @@ export async function formNewLyrics(): Promise<void> {
   // Span info
   const clyricsSpan = document.createElement("span");
   clyricsSpan.className = "clyrics-span";
-  clyricsSpan.innerHTML = "Your lyrics will be saved on your computer.<br/>Any changes you made with your lyrics will be immediately saved to prevent losing all of your progress";
-  
+  clyricsSpan.innerHTML =
+    "Your lyrics will be saved on your computer.<br/>Any changes you made with your lyrics will be immediately saved to prevent losing all of your progress";
+
   clyricsNewLyrics.appendChild(clyricsSpan);
 
   // Inputs
@@ -295,7 +305,7 @@ export async function formNewLyrics(): Promise<void> {
       placeholder: "Album that the track is included with",
     },
 
-    "duration": {
+    duration: {
       id: "duration",
       required: false,
       type: "number",
@@ -427,7 +437,7 @@ export async function formNewLyrics(): Promise<void> {
       registeredInputs.videoId.value
     );
 
-    if (data) { 
+    if (data) {
       populateCLyrics();
       if (clyricsList) clyricsList.style.display = "";
       if (clyricsNewLyrics) clyricsNewLyrics.style.display = "none";
@@ -437,7 +447,7 @@ export async function formNewLyrics(): Promise<void> {
       errMsg.style.display = "none";
       registeredInputs = {};
     } else {
-      errMsg.textContent = "Please include atleast the Track Name and the Artist Name!"
+      errMsg.textContent = "Please include atleast the Track Name and the Artist Name!";
       errMsg.style.display = "";
     }
   });

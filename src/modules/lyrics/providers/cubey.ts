@@ -287,7 +287,7 @@ export default async function cubey(providerParameters: ProviderParameters): Pro
 
   if (responseData.goLyricsApiTtml) {
     let ttmlData = JSON.parse(responseData.goLyricsApiTtml);
-    const filled = await fillTtml(ttmlData.ttml);
+    const filled = await fillTtml(ttmlData.ttml, providerParameters.duration);
     providerParameters.sourceMap["bLyrics-richsynced"].filled = true;
     providerParameters.sourceMap["bLyrics-synced"].filled = true;
 
@@ -306,12 +306,7 @@ export default async function cubey(providerParameters: ProviderParameters): Pro
     }
   }
 
-  (
-    [
-      "musixmatch-synced",
-      "musixmatch-richsync",
-    ] as const
-  ).forEach(source => {
+  (["musixmatch-synced", "musixmatch-richsync"] as const).forEach(source => {
     providerParameters.sourceMap[source].filled = true;
   });
 }

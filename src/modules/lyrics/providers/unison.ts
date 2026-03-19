@@ -4,21 +4,19 @@ import type { ProviderParameters } from "./shared";
 import { parseLRC, parsePlainLyrics } from "./lrcUtils";
 
 interface UnisonResponse {
-  videoId: string
-  song: string
-  artist: string
-  duration: number
-  lyrics: string
-  format: "ttml" | "lrc" | "plain"
-  syncType: "richsync" | "linesync" | "plain"
+  videoId: string;
+  song: string;
+  artist: string;
+  duration: number;
+  lyrics: string;
+  format: "ttml" | "lrc" | "plain";
+  syncType: "richsync" | "linesync" | "plain";
 }
 
 export default async function unison(providerParameters: ProviderParameters): Promise<void> {
   const url = new URL(UNISON_API_URL);
 
-  // which is better? videoId or song metadata?
-  // url.searchParams.append("v", providerParameters.videoId);
-
+  url.searchParams.append("v", providerParameters.videoId);
   url.searchParams.append("song", providerParameters.song);
   url.searchParams.append("artist", providerParameters.artist);
   url.searchParams.append("duration", String(providerParameters.duration));
@@ -45,28 +43,30 @@ export default async function unison(providerParameters: ProviderParameters): Pr
   const result = {
     cacheAllowed: false,
     source: "boidu.dev",
-    sourceHref: "https://boidu.dev/"
-  }
-  
+    sourceHref: "https://boidu.dev/",
+  };
+
   switch (responseString.format) {
     case "ttml":
-      const filled = await fillTtml(responseString.lyrics);
-      providerParameters.sourceMap["unison-richsynced"].lyricSourceResult = filled && filled.isWordSynced ? filled.result : null;
-      providerParameters.sourceMap["unison-synced"].lyricSourceResult = filled && !filled.isWordSynced ? filled.result : null;
+      const filled = await fillTtml(responseString.lyrics, providerParameters.duration);
+      providerParameters.sourceMap["unison-richsynced"].lyricSourceResult =
+        filled && filled.isWordSynced ? filled.result : null;
+      providerParameters.sourceMap["unison-synced"].lyricSourceResult =
+        filled && !filled.isWordSynced ? filled.result : null;
       providerParameters.sourceMap["unison-plain"].lyricSourceResult = null;
       break;
     case "lrc":
       const lrc = parseLRC(responseString.lyrics, responseString.duration);
       const res = {
         ...result,
-        lyrics: lrc.result
-      }
+        lyrics: lrc.result,
+      };
 
       const resPlain = {
         ...result,
         cacheAllowed: false,
-        lyrics: lrc.plain
-      }
+        lyrics: lrc.plain,
+      };
 
       providerParameters.sourceMap["unison-richsynced"].lyricSourceResult = lrc && lrc.isWordSynced ? res : null;
       providerParameters.sourceMap["unison-synced"].lyricSourceResult = lrc && !lrc.isWordSynced ? res : null;
@@ -76,11 +76,13 @@ export default async function unison(providerParameters: ProviderParameters): Pr
       const plain = parsePlainLyrics(responseString.lyrics);
       providerParameters.sourceMap["unison-richsynced"].lyricSourceResult = null;
       providerParameters.sourceMap["unison-synced"].lyricSourceResult = null;
-      providerParameters.sourceMap["unison-plain"].lyricSourceResult = plain ? {
-        ...result,
-        cacheAllowed: false,
-        lyrics: plain
-      } : null;
+      providerParameters.sourceMap["unison-plain"].lyricSourceResult = plain
+        ? {
+            ...result,
+            cacheAllowed: false,
+            lyrics: plain,
+          }
+        : null;
       break;
   }
 }

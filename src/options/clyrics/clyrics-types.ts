@@ -1,13 +1,23 @@
-import type { LyricsArray } from "@/modules/lyrics/providers/shared";
+import type { Lyric, LyricsArray } from "@/modules/lyrics/providers/shared";
 
 export interface CLyricsEditorVoices {
   color: string;
 }
 
-export interface CLyricsLine {
+export interface CLyricsPart {
   startTimeMs: number;
   words: string;
   durationMs: number;
+}
+
+export interface CLyricsLyricPart extends CLyricsPart {
+  key?: string;
+  isBackground?: boolean;
+}
+
+export interface CLyricsLyric extends Lyric {
+  parts?: CLyricsLyricPart[];
+  elmData: any;
 }
 
 /**
@@ -27,8 +37,9 @@ export interface CLyricsEditor {
    */
   lines?: {
     [line: string | number]: {
-      words: string | CLyricsLine[];
-      bgWords: string | CLyricsLine[];
+      words?: string | CLyricsPart[];
+      bgEnabled?: boolean;
+      bgWords?: string | CLyricsPart[];
     };
   };
 }
@@ -43,7 +54,7 @@ export interface CLyricsOverview {
 
 export interface CLyricsData extends CLyricsOverview {
   videoId?: string | null;
-  lyrics: LyricsArray;
+  lyrics: LyricsArray | string; // string as in like a compressed LyricsArray
   language?: string | null;
   editor?: CLyricsEditor;
 }

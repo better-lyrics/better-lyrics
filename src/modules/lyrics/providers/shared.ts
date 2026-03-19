@@ -62,20 +62,18 @@ export interface LyricSourceResult {
 
 export type LyricsArray = Lyric[];
 
-export interface LyricLang {
-  [lang: string]: string;
-}
-
 export interface Lyric {
   startTimeMs: number;
   words: string;
   durationMs: number;
+  key?: string;
   parts?: LyricPart[];
   agent?: string;
   translations?: { [lang: string]: string };
   translation?: { text: string; lang: string }; // old property
   romanization?: string;
   timedRomanization?: LyricPart[];
+  isInstrumental?: boolean;
 }
 
 export interface LyricPart {

@@ -2,72 +2,77 @@ import { XMLBuilder, type XmlBuilderOptions } from "fast-xml-parser";
 import { LyricSyncType } from "./publishing";
 import type { CLyricsData } from "./clyrics-types";
 import { formatTime } from "@/modules/lyrics/providers/lrcUtils";
+import type { LyricsArray } from "@/modules/lyrics/providers/shared";
+import { decompressString } from "@/core/compression";
 
 /**
  * Builds a TTML string with the given data
  */
 export function buildTTML(clyrics: CLyricsData, syncType: LyricSyncType = LyricSyncType.RICH): string | null {
-  if (!clyrics || !Object.values(LyricSyncType).find(s => s == syncType)) { 
+  if (!clyrics || !Object.values(LyricSyncType).find(s => s == syncType)) {
     return null;
+  }
+
+  let lyrics = clyrics.lyrics as LyricsArray;
+  if (typeof lyrics === "string") {
+    try {
+      lyrics = JSON.parse(decompressString(lyrics));
+    } catch (err) {
+      return null;
+    }
   }
 
   const options: XmlBuilderOptions = {
     ignoreAttributes: false,
-    attributesGroupName: "@"
+    attributesGroupName: "@",
   };
 
   const builder = new XMLBuilder(options);
 
-  let ttmlTiming = 
-    syncType == LyricSyncType.RICH ? "Word" :
-    syncType == LyricSyncType.LINE ? "Line" : "None"
+  let ttmlTiming = syncType == LyricSyncType.RICH ? "Word" : syncType == LyricSyncType.LINE ? "Line" : "None";
 
   let firstStart = -1;
   let translations = {
     lang: "",
-    ttml: [
-
-    ] as any[]
-  }
+    ttml: [] as any[],
+  };
 
   let romanizations = {
     lang: "",
-    ttml: [
+    ttml: [] as any[],
+  };
 
-    ] as any[]
-  }
+  let linesTTML = [] as any[];
 
-  let linesTTML = [
-
-  ] as any[];
-
-  clyrics.lyrics.forEach((lyric, index) => {
+  lyrics.forEach((lyric, index) => {
     if (lyric.isInstrumental) {
-      clyrics.lyrics.splice(index, 1);
+      lyrics.splice(index, 1);
       return;
     }
 
-    if (firstStart < 0) { firstStart = lyric.startTimeMs; }
+    if (firstStart < 0) {
+      firstStart = lyric.startTimeMs;
+    }
 
     let struct = {
       "@": {
         "ttm:agent": lyric.agent,
         "itunes:key": "L" + index,
-      }
+      },
     } as any;
-    
+
     // Plain Metadata Application
     if (lyric.translation) {
       translations.lang = lyric.translation.lang;
       translations.ttml.push({
         for: "L" + index,
-        "#text": lyric.translation.text
+        "#text": lyric.translation.text,
       });
     }
     if (lyric.romanization) {
       romanizations.ttml.push({
         for: "L" + index,
-        "#text": lyric.romanization
+        "#text": lyric.romanization,
       });
     }
 
@@ -75,7 +80,9 @@ export function buildTTML(clyrics: CLyricsData, syncType: LyricSyncType = LyricS
     if (lyric.timedRomanization && ttmlTiming == "Word") {
       let span = [] as any[];
       lyric.timedRomanization.forEach(part => {
-        if (part.words.trim().length < 1) { return; }
+        if (part.words.trim().length < 1) {
+          return;
+        }
         span.push({
           "@": {
             xmlns: "http://www.w3.org/ns/ttml",
@@ -88,15 +95,17 @@ export function buildTTML(clyrics: CLyricsData, syncType: LyricSyncType = LyricS
       romanizations.ttml[romanizations.ttml.length - 1] = {
         for: "L" + index,
         "#text": undefined,
-        span
-      }
+        span,
+      };
     }
 
     // Timed Lyric Lines
     if (lyric.parts && ttmlTiming == "Word") {
       struct.span = [];
       lyric.parts.forEach(part => {
-        if (part.words.trim().length < 1) { return; }
+        if (part.words.trim().length < 1) {
+          return;
+        }
         struct.span.push({
           "@": {
             begin: formatTime(part.startTimeMs, true),
@@ -117,7 +126,7 @@ export function buildTTML(clyrics: CLyricsData, syncType: LyricSyncType = LyricS
 
     linesTTML.push(struct);
   });
-  
+
   // An accurate representation of how a TTML object would look from the TTML parser algorithm perspective
   const data = {
     tt: {
@@ -125,50 +134,56 @@ export function buildTTML(clyrics: CLyricsData, syncType: LyricSyncType = LyricS
         metadata: {
           iTunesMetadata: {
             "@": {
-              "xmlns": "http://music.apple.com/lyric-ttml-internal"
+              xmlns: "http://music.apple.com/lyric-ttml-internal",
             },
             songwriters: [],
             // for now there's only support for one translation and one transliteration, could possibly change in the future
             translations: {
-              translation: [{
-                "@": {
-                  "xml:lang": translations.lang
+              translation: [
+                {
+                  "@": {
+                    "xml:lang": translations.lang,
+                  },
+                  text: translations.ttml,
                 },
-                text: translations.ttml
-              }]
+              ],
             },
             transliterations: {
-              transliteration: [{
-                text: romanizations.ttml
-              }]
-            }
-          }
-        }
+              transliteration: [
+                {
+                  text: romanizations.ttml,
+                },
+              ],
+            },
+          },
+        },
       },
       body: {
-        div: [{
-          "@": {},
-          p: linesTTML
-        }],
+        div: [
+          {
+            "@": {},
+            p: linesTTML,
+          },
+        ],
         "@": {
-          "dur": formatTime(clyrics.duration * 1000, true)
-        }
+          dur: formatTime(clyrics.duration * 1000, true),
+        },
       },
       "@": {
-        "xmlns": "http://www.w3.org/ns/ttml",
-        "xmlns:itunes": "http://music.apple.com/lyric-ttml-internal", 
+        xmlns: "http://www.w3.org/ns/ttml",
+        "xmlns:itunes": "http://music.apple.com/lyric-ttml-internal",
         "xmlns:ttm": "http://www.w3.org/ns/ttml#metadata",
         "xml:lang": clyrics.language || "",
         "itunes:timing": ttmlTiming,
-      }
+      },
     },
-  }
+  };
 
   if (ttmlTiming != "None") {
     data.tt.body.div[0]["@"] = {
       begin: formatTime(firstStart, true),
-      end: formatTime(clyrics.duration * 1000, true)
-    }
+      end: formatTime(clyrics.duration * 1000, true),
+    };
   }
 
   console.log(data);
