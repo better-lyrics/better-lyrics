@@ -945,8 +945,8 @@
 
 /* Detail Modal */
 .detail-modal {
-  max-width: 550px;
-  width: 95%;
+  max-width: 600px;
+  width: 100%;
   max-height: 85vh;
   display: flex;
   flex-direction: column;
@@ -1383,8 +1383,7 @@
 
 .detail-rating-row {
   display: flex;
-  align-items: center;
-	justify-content: space-between;
+  align-items: flex-end;
   gap: 0.75rem;
 }
 

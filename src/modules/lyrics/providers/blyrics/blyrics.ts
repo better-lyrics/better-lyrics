@@ -202,7 +202,7 @@ export async function fillTtml(responseString: string) {
       words: partParse.text,
       translations: undefined,
       romanization: undefined,
-      timedRomanization: undefined
+      timedRomanization: undefined,
     });
   });
 
@@ -227,30 +227,29 @@ export async function fillTtml(responseString: string) {
   const transliterationsData = findInMetadata<TransliterationContainer[]>("transliterations");
 
   if (translationsData && translationsData.length > 0) {
-    const lang = translationsData[0][":@"]["@_lang"];
-    translationsData[0].translation.forEach(translation => {
-      const text = translation.text[0]["#text"];
-      const line = translation[":@"]["@_for"];
+    translationsData.forEach(translateContainer => {
+      translateContainer.translation.forEach(translation => {
+        const lang = translateContainer[":@"]["@_lang"];
+        const text = translation.text[0]["#text"];
+        const line = translation[":@"]["@_for"];
 
-      if (lang && text && line) {
-        const lyricLines = lyricIds[line];
-        if (!lyricLines) {
-          return;
-        }
-
-        lyricLines.forEach(id => {
-          const lyricLine = lyrics.get(id);
-          if (!lyricLine) {
+        if (lang && text && line) {
+          const lyricLines = lyricIds[line];
+          if (!lyricLines) {
             return;
           }
-          
-          if (lyricLine.translations) {
+
+          lyricLines.forEach(id => {
+            const lyricLine = lyrics.get(id);
+            if (!lyricLine) {
+              return;
+            }
+
+            if (!lyricLine.translations) lyricLine.translations = {};
             lyricLine.translations[lang] = text;
-          } else {
-            lyricLine.translations = { [lang]: text };
-          }
-        });
-      }
+          });
+        }
+      });
     });
   }
 
@@ -284,7 +283,7 @@ export async function fillTtml(responseString: string) {
   }
 
   let lyricArray = Array.from(lyrics.values());
-  const songDurationMs = parseTime(ttMeta["@_dur"]);
+  const songDurationMs = ttMeta && ttMeta["@_dur"] ? parseTime(ttMeta["@_dur"]) : providerParameters.duration * 1000;
   lyricArray = insertInstrumentalBreaks(lyricArray, songDurationMs);
 
   let result: LyricSourceResult = {
