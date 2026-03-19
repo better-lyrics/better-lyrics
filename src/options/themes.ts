@@ -75,7 +75,7 @@ const themes: Theme[] = [
     name: "Spotlight",
     author: "BetterLyrics",
     link: "https://twitter.com/boidushya",
-    path: "Spotlight.css",
+    storeId: "spotlight",
   },
   {
     name: "Pastel",
@@ -105,7 +105,7 @@ const themes: Theme[] = [
     name: "Even Better Lyrics Plus",
     author: "Noah & BetterLyrics",
     link: "",
-    path: "Even Better Lyrics Plus.css",
+    storeId: "eblp",
   },
   {
     name: "Minimal",

@@ -67,7 +67,8 @@ export interface Lyric {
   key?: string;
   parts?: LyricPart[];
   agent?: string;
-  translation?: { text: string; lang: string };
+  translations?: { [lang: string]: string };
+  translation?: { text: string; lang: string }; // old property
   romanization?: string;
   timedRomanization?: LyricPart[];
   isInstrumental?: boolean;
