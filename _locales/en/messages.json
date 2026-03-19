@@ -316,16 +316,16 @@
     "description": "Musixmatch provider name"
   },
   "options_provider_lrclib": {
-    "message": "LRCLIB",
-    "description": "LRCLIB provider name"
+    "message": "LRClib",
+    "description": "LRClib provider name"
   },
   "options_provider_youtube": {
-    "message": "YouTube",
-    "description": "YouTube provider name"
+    "message": "Youtube",
+    "description": "Youtube provider name"
   },
   "options_provider_youtubeCaptions": {
-    "message": "YouTube Captions",
-    "description": "YouTube Captions provider name"
+    "message": "Youtube Captions",
+    "description": "Youtube Captions provider name"
   },
   "options_provider_clyrics": {
     "message": "Custom Lyrics",
