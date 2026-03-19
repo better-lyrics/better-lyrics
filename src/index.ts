@@ -1,3 +1,4 @@
+import { AppState } from "./core/appState";
 import { INITIALIZE_LOG } from "@constants";
 import { injectI18nCssVars, loadLocaleOverride, subscribeToLocaleChanges } from "@core/i18n";
 import { purgeExpiredKeys, saveCacheInfo } from "@core/storage";
