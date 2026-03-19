@@ -24,6 +24,10 @@ const TIME_JUMP_THRESHOLD = 0.5;
 
 const ENABLE_DEBUG_RENDER = registerThemeSetting("blyrics-debug-renderer", false);
 
+let cachedTabRendererHeight: number | null = null;
+let tabRendererResizeObserver: ResizeObserver | null = null;
+let observedTabRenderer: HTMLElement | null = null;
+
 // 0.5 means the selected lyric will be in the middle of the screen, 0 means top, 1 means bottom
 export const SCROLL_POS_OFFSET_RATIO = registerThemeSetting("blyrics-target-scroll-pos-ratio", 0.37);
 
@@ -117,6 +121,26 @@ function getCSSDurationInMs(lyricsElement: HTMLElement, property: string): numbe
 }
 
 /**
+ * Sets up a ResizeObserver on the tab renderer to cache its height.
+ * Avoids calling getBoundingClientRect() every tick which causes layout thrashing.
+ */
+function setupTabRendererObserver(element: HTMLElement) {
+  if (tabRendererResizeObserver) {
+    tabRendererResizeObserver.disconnect();
+  }
+
+  tabRendererResizeObserver = new ResizeObserver(() => {
+    if (element && element.isConnected) {
+      cachedTabRendererHeight = element.getBoundingClientRect().height;
+    }
+  });
+
+  tabRendererResizeObserver.observe(element);
+  observedTabRenderer = element;
+  cachedTabRendererHeight = element.getBoundingClientRect().height;
+}
+
+/**
  * Main lyrics synchronization function that handles timing, highlighting, and scrolling.
  *
  * @param currentTime - Current playback time in seconds
@@ -196,8 +220,12 @@ export function animationEngine(currentTime: number, eventCreationTime: number, 
     const lyricScrollTime = currentTime + getCSSDurationInMs(lyricsElement, "--blyrics-scroll-timing-offset") / 1000;
 
     // Read layout values before the loop writes class changes, to avoid forced reflow
-    const tabRenderer = document.querySelector(TAB_RENDERER_SELECTOR) as HTMLElement;
-    const tabRendererHeight = tabRenderer.getBoundingClientRect().height;
+    const tabRenderer = document.querySelector(TAB_RENDERER_SELECTOR) as HTMLElement | null;
+    if (!tabRenderer) return;
+    if (tabRenderer !== observedTabRenderer) {
+      setupTabRendererObserver(tabRenderer);
+    }
+    const tabRendererHeight = cachedTabRendererHeight ?? tabRenderer.getBoundingClientRect().height;
     let scrollTop = tabRenderer.scrollTop;
 
     let activeElems = [] as LineData[];
