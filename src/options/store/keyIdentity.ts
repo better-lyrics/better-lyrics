@@ -248,8 +248,8 @@ export function canonicalJson(obj: unknown): string {
   }
   const record = obj as Record<string, unknown>;
   const sorted = Object.keys(record)
-  .filter(k => record[k] !== undefined)
-  .sort();
+    .filter(k => record[k] !== undefined)
+    .sort();
   return `{${sorted.map(k => `${JSON.stringify(k)}:${canonicalJson(record[k])}`).join(",")}}`;
 }
 
@@ -365,7 +365,6 @@ function isValidIdentityExport(obj: unknown): obj is IdentityExport {
     isValidPrivateJwk(candidate.privateKey)
   );
 }
-
 
 function bufferToHex(buffer: ArrayBuffer): string {
   const bytes = new Uint8Array(buffer);

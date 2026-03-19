@@ -287,7 +287,9 @@ export function setupRequestSniffer(): void {
                   artist: counterpartArtist,
                   album: counterpartAlbum,
                   isVideo: counterpartIsVideo,
-                  durationMs: parseTime(counterPartRenderer.playlistPanelVideoRenderer.lengthText.runs[0].text.replaceAll(".", ":")),
+                  durationMs: parseTime(
+                    counterPartRenderer.playlistPanelVideoRenderer.lengthText.runs[0].text.replaceAll(".", ":")
+                  ),
                   segmentMap: content.playlistPanelVideoWrapperRenderer!.counterpart[0].segmentMap,
                   thumbnail: counterpartThumbnail,
                   smallThumbnail: counterpartSmallThumbnail,

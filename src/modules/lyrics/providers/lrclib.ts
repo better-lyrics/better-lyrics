@@ -11,7 +11,7 @@ export default async function lyricLib(providerParameters: ProviderParameters): 
     url.searchParams.append("album_name", providerParameters.album);
   }
   url.searchParams.append("duration", String(providerParameters.duration));
-  
+
   const response = await fetch(url.toString(), {
     headers: {
       "Lrclib-Client": LRCLIB_CLIENT_HEADER,

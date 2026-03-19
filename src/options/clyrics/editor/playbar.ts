@@ -6,6 +6,8 @@ let loadedAudio: HTMLAudioElement | null = null;
 let playbackRate: number = 1;
 let volume: number = 0.5;
 
+let playrateMenuOpen = false;
+
 export const playbar = document.getElementById("playbar");
 export const dragAudio = document.getElementById("drag-audio");
 export const audioFile = document.getElementById("audio-file-playbar") as HTMLInputElement; // child of `dragAudio`
@@ -24,6 +26,7 @@ export function handle() {
 
   const playrate = document.getElementById("playbar-rate");
   const playrateMenu = document.getElementById("playbar-rate-menu");
+
   const curPlayrate = document.getElementById("playbar-play-rate");
   const playrateBar = document.getElementById("playbar-playrate-bar");
   const curVolume = document.getElementById("playbar-volume-rate");
@@ -112,6 +115,13 @@ export function handle() {
       e.preventDefault();
       e.stopPropagation();
       load(e.dataTransfer?.files);
+    });
+  }
+
+  if (playrate && playrateMenu) {
+    playrate.addEventListener("click", () => {
+      playrateMenuOpen = !playrateMenuOpen;
+      playrateMenu.style.display = playrateMenuOpen ? "" : "none";
     });
   }
 

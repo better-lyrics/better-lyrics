@@ -91,7 +91,7 @@ export function convertFormat(
   if (typeof lyrics === "string") {
     try {
       lyrics = JSON.parse(decompressString(lyrics));
-    } catch (err) {
+    } catch (_) {
       return null;
     }
   }

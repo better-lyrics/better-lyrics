@@ -1,7 +1,7 @@
 import { sliders } from "../editor";
 
 // Storing sliders functions
-let sliderOnUpdate: { [key: string]: (value: number) => void } = {}; // acts as an onUpdate thing
+export let sliderOnUpdate: { [key: string]: (value: number) => void } = {};
 
 /**
  * Register slider functionality. Overwrites if element already registered.
@@ -49,6 +49,7 @@ export function handle() {
   }
 
   sliders.forEach(eslider => {
+    let interval: any = null;
     const slider = eslider as HTMLElement;
     visualUpdate(slider);
 
@@ -73,12 +74,14 @@ export function handle() {
     slider.addEventListener("mousedown", e => {
       e.preventDefault();
       const moveHandler = (e: MouseEvent) => {
-        const rect = slider.getBoundingClientRect();
-        updateSlider(
-          slider,
-          (e.clientX - rect.x) / rect.width,
-          slider.classList.contains("slider--nonimmediate") ? "ref-val" : "value"
-        );
+        interval = setInterval(() => {
+          const rect = slider.getBoundingClientRect();
+          updateSlider(
+            slider,
+            (e.clientX - rect.x) / rect.width,
+            slider.classList.contains("slider--nonimmediate") ? "ref-val" : "value"
+          );
+        }, 50);
       };
 
       document.addEventListener("mousemove", moveHandler);
@@ -88,6 +91,7 @@ export function handle() {
         }
 
         slider.removeAttribute("ref-val");
+        if (interval) clearInterval(interval);
         document.removeEventListener("mousemove", moveHandler);
       });
 

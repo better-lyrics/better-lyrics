@@ -254,7 +254,6 @@ export async function fillTtml(responseString: string, duration: number) {
   }
 
   if (transliterationsData && transliterationsData.length > 0) {
-    const lang = transliterationsData[0][":@"]["@_lang"];
     transliterationsData[0].transliteration.forEach((transliteration: TransliterationItem) => {
       const line = transliteration[":@"]["@_for"];
       if (!line) {

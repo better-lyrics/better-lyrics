@@ -10,40 +10,28 @@ import * as checkbox from "./editor/checkbox";
 import * as slider from "./editor/slider";
 import * as playbar from "./editor/playbar";
 import * as keybind from "./editor/keybind";
+import * as contextMenu from "./editor/contextMenu";
+import * as actionMenu from "./editor/actionMenu";
 
 let loaded = false;
 
 // Variables
-let reservedUUID = new Map();
+let reservedUUID: Map<string, null> = new Map();
 
-let selectedFile = -1;
-let historyStack = [];
-let historyVer = -1;
+let selectedFile: number = -1;
+let historyStack: { type: any; value: any }[] = [];
+let historyVer: number = -1;
 
-let selectedLine: any = -1;
-let _selectedWord: any = -1;
+let selectedLine: number[] = [];
+let selectedWord: number[] = [];
 
-// DATA
+// Custom Lyrics data
 let clyrics: CLyricsData | null = null;
 let lyrics: CLyricsLyric[] = [];
 let editor: CLyricsEditor = {};
 
-// Storing context menu button and their functions when clicked
-let contextMenuB: ContextData[] = [];
-let loadedActionMenu: { [key: string]: boolean } = {};
-
 // Global variables
-const clamp = (x: number, min: number, max: number) => Math.min(Math.max(x, min), max);
-function generateUUID() {
-  const uuid = crypto.randomUUID();
-  if (reservedUUID.has(uuid)) {
-    return generateUUID();
-  }
-  reservedUUID.set(uuid, null);
-  return uuid;
-}
-
-function elementDisplay(nodeList: NodeListOf<HTMLElement>, x: boolean) {
+function toggleDisplay(nodeList: NodeListOf<HTMLElement>, x: boolean) {
   nodeList.forEach(node => {
     node.style.display = x ? "" : "none";
   });
@@ -68,7 +56,7 @@ export const defaults: {
       parent: "clyricsEditorDisplay",
       id: "timeline",
       func: function (x: boolean) {
-        elementDisplay(document.querySelectorAll(".line-timeline"), x);
+        toggleDisplay(document.querySelectorAll(".line-timeline"), x);
       },
     },
 
@@ -76,7 +64,7 @@ export const defaults: {
       parent: "clyricsEditorDisplay",
       id: "roman",
       func: function (x: boolean) {
-        elementDisplay(document.querySelectorAll(".line-romanization"), x);
+        toggleDisplay(document.querySelectorAll(".line-romanization"), x);
       },
     },
 
@@ -84,7 +72,7 @@ export const defaults: {
       parent: "clyricsEditorDisplay",
       id: "translate",
       func: function (x: boolean) {
-        elementDisplay(document.querySelectorAll(".line-translate"), x);
+        toggleDisplay(document.querySelectorAll(".line-translate"), x);
       },
     },
   },
@@ -146,6 +134,8 @@ export const defaults: {
 };
 
 // Global functions
+export const clamp = (x: number, min: number, max: number) => Math.min(Math.max(x, min), max);
+
 export function logAction(type: any, value: any, args: { [key: string]: any } = {}) {
   // contains valid actions and an extra required arguments listed on the array
   const validActions: { [key: string]: string[] } = {
@@ -154,7 +144,7 @@ export function logAction(type: any, value: any, args: { [key: string]: any } = 
     "new-roman-line": ["line", "word"],
 
     "toggle-instrumental-line": ["line"],
-    "toggle-bg-line": ["line"],
+    "toggle-background-line": ["line"],
 
     "moved-line": ["line", "from", "to"],
     "moved-word-line": ["line", "word", "from", "to"],
@@ -180,6 +170,36 @@ export function logAction(type: any, value: any, args: { [key: string]: any } = 
   historyVer += 1;
 }
 
+/**
+ * Undo the last action
+ */
+export function undo() {
+  if (historyVer - 1 < 0) {
+    return;
+  }
+
+  // ...action before undoing
+
+  historyVer -= 1;
+
+  // ...action after undoing
+}
+
+/**
+ * Redo the last undo action
+ */
+export function redo() {
+  if (historyVer + 1 >= historyStack.length - 1) {
+    return;
+  }
+
+  // ...action before redoing
+
+  historyVer += 1;
+
+  // ...action after redoing
+}
+
 // Initiate elements
 /// Class
 //// General interactables
@@ -194,7 +214,6 @@ export const newRomanWords = document.querySelectorAll("#new-roman-word");
 /// Identifier
 //// Action and context menus
 export const actionFile = document.getElementById("action-file-menu");
-export const contextMenu = document.getElementById("context-menu");
 //// Tools
 export const addLine = document.getElementById("add-line");
 export const addLineInstrumental = document.getElementById("add-line-instrumental");
@@ -206,76 +225,21 @@ export const lyricLines = document.getElementById("lyric-lines");
 export const noLyrics = document.getElementById("no-lyrics");
 
 // Data functions
+function generateUUID() {
+  const uuid = crypto.randomUUID();
+  if (reservedUUID.has(uuid)) {
+    return generateUUID();
+  }
+  reservedUUID.set(uuid, null);
+  return uuid;
+}
+
 /**
  * Saves the custom lyrics by collecting everything, filter out
  * only the necessary data, compressing the lyrics data, and
  * save it to storage
  */
 // function saveCustomLyrics() {}
-
-function loadContextMenu(element: HTMLElement, menus: ContextData[]) {
-  if (!element) return;
-  const buttons = [...menus];
-  buttons.forEach(btn => {
-    if (typeof btn != "object" || !btn.type) return;
-    if (btn.type == "button") {
-      const button = document.createElement("button");
-      button.className = "list-btn";
-      button.innerHTML = btn.content + (btn.rightCont ? `<strong>${btn.rightCont}</strong>` : "");
-      button.disabled = btn.disabled || false;
-      if (typeof btn.func == "function")
-        button.addEventListener("click", () => {
-          btn.func!();
-        });
-      element.appendChild(button);
-    } else if (btn.type == "separator") {
-      const separator = document.createElement("div");
-      separator.className = "separator-column";
-      element.appendChild(separator);
-    } else if (btn.type == "span") {
-      const span = document.createElement("span");
-      span.className = "code";
-      span.style.opacity = ".5";
-      span.innerHTML = btn.content || "";
-      element.appendChild(span);
-    }
-  });
-}
-
-function setupActionMenu(id: string) {
-  const selActionMenu = actionMenus[id];
-  if (loadedActionMenu[id] || !selActionMenu) {
-    return selActionMenu;
-  }
-
-  selActionMenu.forEach(btn => {
-    if (typeof btn != "object" || !btn.type || btn.type != "button" || !btn.id) return;
-    if (defaults.actionMenu[btn.id]) {
-      btn.func = () => btn.id && defaults.actionMenu[btn.id]();
-    }
-  });
-
-  return selActionMenu;
-}
-
-/**
- * Sets up the context menu functionality
- */
-function setupContextMenu(id: string, line?: any, word?: any) {
-  const selContextMenu = contextMenus[id];
-  if (!selContextMenu) {
-    return [];
-  }
-
-  selContextMenu.forEach(btn => {
-    if (typeof btn != "object" || !btn.type || btn.type != "button" || !btn.id) return;
-    if (defaults.contextMenu[btn.id]) {
-      btn.func = () => btn.id && defaults.contextMenu[btn.id](line, word);
-    }
-  });
-
-  return selContextMenu;
-}
 
 /**
  * Creates an interactable "word" button element
@@ -335,7 +299,7 @@ function createNewLine(parameters?: { isInstrumental?: boolean; voice?: number }
   const lineData = addNewLine(struct);
   struct.elmData = lineData;
 
-  const index = typeof selIndex === "number" ? lyrics.splice(selIndex, 0, struct) && selIndex : lyrics.push(struct);
+  let index = typeof selIndex === "number" ? lyrics.splice(selIndex, 0, struct) && selIndex : lyrics.push(struct);
   const lineStruct = lyrics[index - 1];
 
   if (lineData.hasBgWords) {
@@ -362,7 +326,7 @@ function createNewLine(parameters?: { isInstrumental?: boolean; voice?: number }
     lyricLine.addEventListener(
       "mouseenter",
       () => {
-        contextMenuB = setupContextMenu("line", struct.key);
+        contextMenu.setContextMenu(contextMenu.setupContextMenu("line", struct.key));
       },
       { signal }
     );
@@ -370,15 +334,19 @@ function createNewLine(parameters?: { isInstrumental?: boolean; voice?: number }
     lyricLine.addEventListener(
       "mouseleave",
       () => {
-        contextMenuB = lyricLines.matches("div:hover") ? contextMenus.default : [];
+        contextMenu.setContextMenu(lyricLines.matches("div:hover") ? contextMenus.default : []);
       },
       { signal }
     );
 
     lyricLine.addEventListener(
       "click",
-      () => {
-        selectedLine = lyricLine;
+      key => {
+        if (key.shiftKey) {
+          selectedLine.push(index);
+        } else {
+          selectedLine = [index];
+        }
       },
       { signal }
     );
@@ -410,19 +378,29 @@ function createNewLine(parameters?: { isInstrumental?: boolean; voice?: number }
 
       const word = createNewInteractable(input.value)!;
       word.addEventListener("mouseenter", () => {
-        contextMenuB = [
-          ...setupContextMenu("word", struct.key, partStruct.key),
+        contextMenu.setContextMenu([
+          ...contextMenu.setupContextMenu("word", struct.key, partStruct.key),
           { type: "separator" },
-          ...setupContextMenu("line", struct.key),
-        ];
+          ...contextMenu.setupContextMenu("line", struct.key),
+        ]);
       });
 
       word.addEventListener("mouseleave", () => {
-        contextMenuB = lyricLine.matches("div:hover")
-          ? setupContextMenu("line", struct.key)
-          : lyricLines!.matches("div:hover")
-            ? setupContextMenu("default")
-            : [];
+        contextMenu.setContextMenu(
+          lyricLine.matches("div:hover")
+            ? contextMenu.setupContextMenu("line", struct.key)
+            : lyricLines!.matches("div:hover")
+              ? contextMenu.setupContextMenu("default")
+              : []
+        );
+      });
+
+      word.addEventListener("click", key => {
+        if (key.shiftKey) {
+          selectedWord.push(index);
+        } else {
+          selectedWord = [index];
+        }
       });
 
       logAction("new-word-line", input.value, { type: "normal" });
@@ -462,19 +440,29 @@ function createNewLine(parameters?: { isInstrumental?: boolean; voice?: number }
 
       const word = createNewInteractable(input.value)!;
       word.addEventListener("mouseenter", () => {
-        contextMenuB = [
-          ...setupContextMenu("word", struct.key, partStruct.key),
+        contextMenu.setContextMenu([
+          ...contextMenu.setupContextMenu("word", struct.key, partStruct.key),
           { type: "separator" },
-          ...setupContextMenu("line", struct.key),
-        ];
+          ...contextMenu.setupContextMenu("line", struct.key),
+        ]);
       });
 
       word.addEventListener("mouseleave", () => {
-        contextMenuB = lyricLine.matches("div:hover")
-          ? setupContextMenu("line", struct.key)
-          : lyricLines!.matches("div:hover")
-            ? setupContextMenu("default")
-            : [];
+        contextMenu.setContextMenu(
+          lyricLine.matches("div:hover")
+            ? contextMenu.setupContextMenu("line", struct.key)
+            : lyricLines!.matches("div:hover")
+              ? contextMenu.setupContextMenu("default")
+              : []
+        );
+      });
+
+      word.addEventListener("click", key => {
+        if (key.shiftKey) {
+          selectedWord.push(index);
+        } else {
+          selectedWord = [index];
+        }
       });
 
       logAction("new-word-line", input.value, { type: "bg" });
@@ -531,50 +519,6 @@ function createNewLine(parameters?: { isInstrumental?: boolean; voice?: number }
 }
 
 // Handlers
-/// Actions
-function handleActionsMenu() {
-  let actionMenuOpen: HTMLElement | null = null;
-  function closeActionMenu() {
-    if (!actionMenuOpen) return;
-    actionMenuOpen.style.display = "none";
-    actionMenuOpen.style.opacity = "0";
-    actionMenuOpen = null;
-  }
-
-  const actionFunc: { [key: string]: { id: string; menu: HTMLElement | null; func: (btn: HTMLElement) => void } } = {
-    "action-file-btn": {
-      id: "file",
-      menu: actionFile,
-      func: function (btn) {
-        if (!actionFile) return;
-        actionMenuOpen = actionFile;
-        actionFile.style.top = `${Math.round(btn.getBoundingClientRect().bottom + 4)}`;
-        actionFile.style.left = `${Math.round(btn.getBoundingClientRect().left)}`;
-        actionFile.style.display = "flex";
-        requestAnimationFrame(() => {
-          actionFile.style.opacity = "1";
-        });
-      },
-    },
-  };
-
-  actionButtons.forEach(button => {
-    if (!(button instanceof HTMLElement)) return;
-    button.addEventListener("click", () => {
-      const act = actionFunc[button.id];
-      if (!act || !act.menu) return;
-      if (actionMenuOpen == act.menu) {
-        return closeActionMenu();
-      }
-      closeActionMenu();
-      act.menu.innerHTML = "";
-      loadContextMenu(act.menu, setupActionMenu(act.id));
-      if (typeof act.func == "function") act.func(button);
-    });
-  });
-  console.log("Actions Menu loaded");
-}
-
 /// Tab Buttons
 function handleTabs() {
   tabButtons.forEach(button => {
@@ -623,74 +567,13 @@ function handleLyricLine() {
   ABORT.observe(lyricLines.parentElement!, { childList: true });
 
   lyricLines.addEventListener("mouseenter", () => {
-    contextMenuB = setupContextMenu("default");
+    contextMenu.setContextMenu(contextMenu.setupContextMenu("default"));
   });
   lyricLines.addEventListener("mouseleave", () => {
-    contextMenuB = [];
+    contextMenu.setContextMenu([]);
   });
 
   console.log("Lyric Lines loaded");
-}
-
-/// Context Menu
-function handleContextMenu() {
-  if (!contextMenu) {
-    console.warn("No context menu frame. Refresh to reload handler");
-    return;
-  }
-
-  let contextMenuOpen = false;
-
-  function closeContextMenu() {
-    contextMenuOpen = false;
-
-    if (!contextMenu) return;
-    contextMenu.style.opacity = "0";
-    contextMenu.style.top = "";
-    contextMenu.style.bottom = "";
-    contextMenu.style.left = "";
-    contextMenu.style.right = "";
-    contextMenu.classList.add("hidden");
-    contextMenu.innerHTML = "";
-  }
-
-  document.addEventListener("mousedown", _e => {
-    if (contextMenuOpen && !contextMenu.matches(`div:hover`)) {
-      closeContextMenu();
-    }
-  });
-
-  document.addEventListener("contextmenu", e => {
-    if (contextMenuOpen && lyricLines && !lyricLines.matches("div:hover")) {
-      closeContextMenu();
-    } else {
-      if (contextMenuB.length < 1) {
-        return;
-      }
-
-      closeContextMenu();
-      loadContextMenu(contextMenu, contextMenuB);
-
-      const docRect = document.documentElement.getBoundingClientRect();
-      contextMenuOpen = true;
-      e.preventDefault();
-
-      contextMenu.classList.remove("hidden");
-      const conRect = contextMenu.getBoundingClientRect();
-
-      // chose to keep it anchored to the top just so when rescaled it doesnt go off
-      if (conRect.height + e.clientY > docRect.height) contextMenu.style.top = `${e.clientY - conRect.height}px`;
-      else contextMenu.style.top = `${e.clientY}px`;
-
-      if (conRect.width + e.clientX > docRect.width) contextMenu.style.right = `${docRect.width - e.clientX}px`;
-      else contextMenu.style.left = `${e.clientX}px`;
-
-      requestAnimationFrame(() => {
-        contextMenu.style.opacity = "1";
-      });
-    }
-  });
-  console.log("Context Menu loaded");
 }
 
 // Set up the handlers on load
@@ -700,12 +583,12 @@ function load() {
 
   checkbox.handle();
   slider.handle();
-  handleActionsMenu();
+  actionMenu.handle();
   handleTabs();
   handleTools();
   handleLyricLine();
   playbar.handle();
-  handleContextMenu();
+  contextMenu.handle();
   keybind.handle();
 }
 
@@ -728,5 +611,5 @@ document.addEventListener("DOMContentLoaded", async () => {
   const data = await getCustomLyrics(lastFile);
   clyrics = data;
 
-  console.log(buildTTML((await getCustomLyrics(0)) as CLyricsData));
+  console.log(buildTTML(clyrics!));
 });

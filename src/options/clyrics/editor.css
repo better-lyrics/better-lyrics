@@ -740,7 +740,8 @@ button {
 }
 
 .word-space {
-    color: rgba(255, 255, 255, .375);
+    color: hsla(0, 0%, 100%, .4);
+    font-style: italic;
 }
 
 .text2 {

@@ -295,10 +295,10 @@ function createFooter(song: string, artist: string, album: string, duration: num
       text: "Picture-in-Picture",
       href: "#",
     });
-    
+
     pip.addEventListener("click", async e => {
       e.preventDefault();
-      
+
       // this is an experimental feature, so we'll just try it and catch any errors if it doesn't work
       const docPiP = (window as any).documentPictureInPicture;
       const wrapper = document.getElementById(LYRICS_WRAPPER_ID);
@@ -306,21 +306,19 @@ function createFooter(song: string, artist: string, album: string, duration: num
       if (container && docPiP && typeof docPiP.requestWindow === "function") {
         const pipWindow: Window = await docPiP.requestWindow({
           width: 600,
-          height: 500
+          height: 500,
         });
-      
+
         Array.from(document.styleSheets).forEach(styleSheet => {
           try {
-            const cssRules = [...styleSheet.cssRules]
-              .map((rule) => rule.cssText)
-              .join("");
+            const cssRules = [...styleSheet.cssRules].map(rule => rule.cssText).join("");
             const style = document.createElement("style");
-      
+
             style.textContent = cssRules;
             pipWindow.document.head.appendChild(style);
-          } catch (e) {
+          } catch (_) {
             const link = document.createElement("link");
-      
+
             link.rel = "stylesheet";
             link.type = styleSheet.type;
             link.media = styleSheet.media.mediaText;
@@ -328,9 +326,9 @@ function createFooter(song: string, artist: string, album: string, duration: num
             pipWindow.document.head.appendChild(link);
           }
         });
-      
+
         pipWindow.document.body.append(container);
-        
+
         pipWindow.addEventListener("pagehide", _ => {
           wrapper!.append(container);
         });

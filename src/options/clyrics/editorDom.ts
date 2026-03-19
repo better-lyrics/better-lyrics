@@ -15,7 +15,7 @@ export const actionMenus: { [key: string]: ContextData[] } = {
   file: [
     { id: "new-lyrics-btn", type: "button", content: "New Lyrics", rightCont: "(Ctrl+N)" },
     { id: "open-lyrics-btn", type: "button", content: "Open Lyrics", rightCont: "(Ctrl+O)" },
-    { id: "save-as-lyrics-btn", type: "button", content: "Save as another lyrics" },
+    { id: "save-lyrics-btn", type: "button", content: "Save Lyrics", rightCont: "(Ctrl+S)" },
     { type: "separator" },
     { id: "import-lyrics-btn", type: "button", content: "Import Lyrics", rightCont: ">" },
     { id: "export-lyrics-btn", type: "button", content: "Export Lyrics", rightCont: ">" },
@@ -85,7 +85,7 @@ export const domDefaults = {
     // Level 0 - Info suggestion to give much better experience
     INSTRUMENTAL_GAP: {
       level: 0,
-      msg: "Make the instrumental line only if there's a 5 seconds or more start time gap between the previous line and the next line",
+      msg: "Make the instrumental line only if there's a 5 seconds or more time gap between end time previous line and start time next line",
     },
     DUPLICATE_INSTRUMENTAL: {
       level: 0,

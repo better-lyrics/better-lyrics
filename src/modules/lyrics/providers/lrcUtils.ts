@@ -31,7 +31,7 @@ function parseTime(timeStr: string | number | undefined): number {
       const seconds = parseFloat(parts[2]);
       totalMs = hours * 3600 * 1000 + minutes * 60 * 1000 + seconds * 1000;
     }
-    
+
     // Return a rounded integer
     return Math.round(totalMs);
   } catch (e) {
@@ -143,7 +143,7 @@ export function parseLRC(lrcText: string, songDuration: number) {
     plain.push({
       startTimeMs: 0,
       words: plainText.trim(),
-      durationMs: 0
+      durationMs: 0,
     });
     result.push({
       startTimeMs: startTime,
@@ -197,7 +197,7 @@ export function parseLRC(lrcText: string, songDuration: number) {
   return {
     isWordSynced,
     result,
-    plain
+    plain,
   };
 }
 

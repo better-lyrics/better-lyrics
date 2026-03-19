@@ -42,7 +42,7 @@ export default async function customLyrics(providerParameters: ProviderParameter
     if (typeof lyrics === "string") {
       try {
         lyrics = JSON.parse(decompressString(lyrics));
-      } catch (err) {
+      } catch (_) {
         providerParameters.sourceMap["custom-lyrics"].lyricSourceResult = null;
         return;
       }

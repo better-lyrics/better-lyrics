@@ -161,7 +161,7 @@ export interface InjectionParameters {
   /** Disable automatic translations when none provided */
   disableAutoTranslate?: boolean;
   /** Disable automatic romanization when none provided */
-  disableAutoRoman?: boolean; 
+  disableAutoRoman?: boolean;
 }
 
 /**
@@ -290,7 +290,12 @@ function createBreakElem(lyricElement: HTMLElement, order: number) {
  * @param [data.source] - Source attribution for lyrics
  * @param [data.sourceHref] - URL for source link
  */
-export function injectLyrics(data: LyricSourceResultWithMeta, keepLoaderVisible = false, parameters?: InjectionParameters, signal?: AbortSignal): void {
+export function injectLyrics(
+  data: LyricSourceResultWithMeta,
+  keepLoaderVisible = false,
+  parameters?: InjectionParameters,
+  signal?: AbortSignal
+): void {
   const injectionId = AppState.currentInjectionId;
   const isStale = () => AppState.currentInjectionId !== injectionId;
 

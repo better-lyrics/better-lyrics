@@ -1,13 +1,11 @@
-/// Keybind
-const funcbind = {
-  // Undo (Ctrl+Z)
-  undo: () => {},
-};
+import { redo, undo } from "../editor";
 
 const keybind: { [keybind: string]: any } = {
-  "CTRL+Z": funcbind.undo,
+  "CTRL+Z": undo,
+  "CTRL+Y": redo,
 };
 
+/// Keybind
 export function handle() {
   document.addEventListener("keydown", e => {
     let pressed: string[] = [];
