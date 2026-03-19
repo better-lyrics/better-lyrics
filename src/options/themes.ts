@@ -14,7 +14,55 @@ export interface Theme {
 interface CustomTheme {
   name: string;
   css: string;
+  settings?: { [field: string]: CTSettingFieldToggle | CTSettingFieldRange | CTSettingFieldDropdown | CTSettingFieldColor | CTSettingField };
+  /** Modified through user actions */
+  savedSettings?: { [field: string]: any };
   timestamp: number;
+}
+
+enum CTSettingFieldAttrType {
+  CSS = "css",
+  RICS = "rics"
+}
+
+enum CTSettingFieldType {
+  TOGGLE = "toggle",
+  RANGE = "range",
+  DROPDOWN = "dropdown"
+  ,COLOR = "color",
+}
+
+interface CTSettingField {
+  label: string;
+  type: CTSettingFieldType | string;
+  /** CSS starts with `--` prefix while RICS starts with `$` prefix */
+  attribute: string;
+  attrType: CTSettingFieldAttrType | string;
+  /** `%v` for accessing setting value on the `attrValue` */
+  attrValue: string;
+}
+
+interface CTSettingFieldToggle extends CTSettingField {
+  onValue?: any;
+  offValue?: any;
+  default: boolean;
+}
+
+interface CTSettingFieldRange extends CTSettingField {
+  min: number;
+  max: number;
+  step: number;
+  default: number;
+}
+
+interface CTSettingFieldDropdown extends CTSettingField {
+  options: { [label: string]: any };
+  /** Default index from zero to `n - 1` */
+  default: number;
+}
+
+interface CTSettingFieldColor extends CTSettingField {
+  default: string;
 }
 
 const themes: Theme[] = [
@@ -90,13 +138,14 @@ export async function getCustomThemes(): Promise<CustomTheme[]> {
   return result.customThemes || [];
 }
 
-export async function saveCustomTheme(name: string, css: string): Promise<void> {
+export async function saveCustomTheme(name: string, css: string, settings?: { [field: string]: CTSettingField }): Promise<void> {
   const customThemes = await getCustomThemes();
   const existingIndex = customThemes.findIndex(theme => theme.name === name);
 
   const newTheme: CustomTheme = {
     name,
     css,
+    settings,
     timestamp: Date.now(),
   };
 
@@ -132,6 +181,27 @@ export async function renameCustomTheme(oldName: string, newName: string): Promi
   theme.timestamp = Date.now();
 
   await chrome.storage.local.set({ customThemes });
+}
+
+export async function addSettingFieldCT(name: string, type: CTSettingFieldType | string, id: string, data: CTSettingField): Promise<void> {
+  if (!Object.values(CTSettingFieldType).find(ftype => ftype === type)) {
+    throw new Error(`Invalid setting field type "${type}"`)
+  }
+
+  const customThemes = await getCustomThemes();
+  const themeIndex = customThemes.findIndex(theme => theme.name === name);
+
+  if (!themeIndex) {
+    throw new Error(`Theme "${name}" not found`);
+  }
+
+  const theme = customThemes[themeIndex];
+  if (!theme.settings) { theme.settings = {}; }
+  if (theme.settings[id]) {
+    throw new Error(`Field with Id "${id}" already exists!`);
+  }
+
+  theme.settings[id] = data;
 }
 
 export default themes;

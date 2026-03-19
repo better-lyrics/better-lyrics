@@ -1583,6 +1583,7 @@ input.cm-textfield:focus-visible {
 }
 
 .edit-theme-btn,
+.modify-theme-settings-btn,
 .delete-theme-btn {
 	border: none;
 	cursor: pointer;
@@ -1600,17 +1601,28 @@ input.cm-textfield:focus-visible {
 	box-shadow: inset 0 .75px rgba(255, 255, 255, .1);
 }
 
+.edit-theme-btn.active,
+.modify-theme-settings-btn.active,
+.delete-theme-btn.active {
+	display: grid;
+}
+
 .edit-theme-btn {
 	border-radius: 0.5rem 0.25rem 0.25rem 0.5rem;
 	color: rgba(255, 255, 255, 0.6);
 }
 
-.edit-theme-btn.active {
-	display: grid;
-}
-
 .edit-theme-btn:hover {
 	color: rgba(255, 255, 255, 1);
+}
+
+.modify-theme-settings-btn {
+	border-radius: 0.25rem;
+	color: hsla(0, 0%, 100%, 0.6);
+}
+
+.modify-theme-settings-btn:hover {
+	color: hsla(0, 0%, 100%, 1);
 }
 
 .delete-theme-btn {
@@ -1618,15 +1630,12 @@ input.cm-textfield:focus-visible {
 	color: rgba(255, 100, 100, 0.8);
 }
 
-.delete-theme-btn.active {
-	display: grid;
-}
-
 .delete-theme-btn:hover {
 	color: rgba(255, 100, 100, 1);
 }
 
 .edit-theme-btn svg,
+.modify-theme-settings-btn svg,
 .delete-theme-btn svg {
 	width: 0.875rem;
 	height: 0.875rem;

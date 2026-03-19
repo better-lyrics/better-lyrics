@@ -290,6 +290,10 @@
     "message": "Rename custom theme",
     "description": "Rename theme button title"
   },
+  "options_editor_modifyThemeSettings": {
+    "message": "Modify custom theme's settings",
+    "description": "Modify theme settings button title"
+  },
   "options_editor_deleteTheme": {
     "message": "Delete custom theme",
     "description": "Delete theme button title"
