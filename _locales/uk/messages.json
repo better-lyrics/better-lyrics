@@ -87,6 +87,14 @@
     "message": "Стилізовані анімації",
     "description": "Show stylized animations setting label"
   },
+  "options_language_displayLanguage": {
+    "message": "Відображувана мова",
+    "description": "Label for the UI language selector dropdown"
+  },
+  "options_language_displayLanguageAuto": {
+    "message": "Автоматично",
+    "description": "Option label for automatic language detection based on browser settings"
+  },
   "options_language_title": {
     "message": "Налаштування мови",
     "description": "Language settings section title"
@@ -130,6 +138,14 @@
   "options_themes_chooseTheme": {
     "message": "Виберіть тему",
     "description": "Choose a theme button label"
+  },
+  "options_themes_change": {
+    "message": "Зміна",
+    "description": "Change theme button label"
+  },
+  "options_themes_customTheme": {
+    "message": "Користувацька тема",
+    "description": "Display name for unnamed custom themes"
   },
   "options_themes_customStyles": {
     "message": "Користувацькі стилі",
@@ -607,6 +623,10 @@
     "message": "Встановити / Видалити",
     "description": "Install/remove shortcut"
   },
+  "marketplace_shortcutsApply": {
+    "message": "Застосувати",
+    "description": "Apply theme shortcut label"
+  },
   "marketplace_shortcutsPrevImage": {
     "message": "Попереднє зображення",
     "description": "Previous image shortcut"
@@ -798,5 +818,71 @@
         "example": "Romanization"
       }
     }
+  },
+  "symlink_applied": {
+    "message": "Застосовано тему: $NAME$ (з магазину)",
+    "description": "Alert after successfully applying a symlinked theme from marketplace",
+    "placeholders": {
+      "name": {
+        "content": "$1",
+        "example": "Minimal"
+      }
+    }
+  },
+  "builtin_applied": {
+    "message": "Застосовано тему: $NAME$",
+    "description": "Alert after successfully applying a bundled built-in theme",
+    "placeholders": {
+      "name": {
+        "content": "$1",
+        "example": "Spotlight"
+      }
+    }
+  },
+  "theme_author_prefix": {
+    "message": "від $AUTHOR$",
+    "description": "Author prefix shown on theme selector button",
+    "placeholders": {
+      "author": {
+        "content": "$1",
+        "example": "boidu"
+      }
+    }
+  },
+  "theme_author_you": {
+    "message": "від вас",
+    "description": "Author label for custom user themes on theme selector button"
+  },
+  "symlink_installFailed": {
+    "message": "Не вдалося встановити тему. Перевірте з’єднання та повторіть спробу.",
+    "description": "Alert when a symlinked theme fails to install from marketplace"
+  },
+  "symlink_badge_marketplace": {
+    "message": "Магазин тем",
+    "description": "Badge text on symlinked theme cards"
+  },
+  "symlink_badge_bundled": {
+    "message": "Вбудовані",
+    "description": "Badge text on non-symlinked built-in theme cards"
+  },
+  "deprecation_builtin_title": {
+    "message": "Увага: ці теми переміщуються!",
+    "description": "Title for the built-in themes deprecation banner in theme modal"
+  },
+  "deprecation_builtin_body": {
+    "message": "Ми переносимо вбудовані теми до Магазину тем. Деякі вже там — шукайте позначку Marketplace. Інші з’являться в наступному оновленні, а резервні копії CSS будуть доступні на GitHub і в Discord.",
+    "description": "Body text for the built-in themes deprecation banner"
+  },
+  "deprecation_builtin_cta": {
+    "message": "Огляд магазину",
+    "description": "CTA button text in the deprecation banner to open the marketplace"
+  },
+  "theme_modal_section_builtin": {
+    "message": "Вбудовані теми",
+    "description": "Section title for built-in themes in the theme chooser modal"
+  },
+  "theme_modal_section_custom": {
+    "message": "Користувальницькі теми",
+    "description": "Section title for custom themes in the theme chooser modal"
   }
 }

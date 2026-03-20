@@ -87,6 +87,14 @@
     "message": "Tampilkan animasi bergaya",
     "description": "Show stylized animations setting label"
   },
+  "options_language_displayLanguage": {
+    "message": "Bahasa Tampilan",
+    "description": "Label for the UI language selector dropdown"
+  },
+  "options_language_displayLanguageAuto": {
+    "message": "Otomatis",
+    "description": "Option label for automatic language detection based on browser settings"
+  },
   "options_language_title": {
     "message": "Pengaturan Bahasa",
     "description": "Language settings section title"
@@ -130,6 +138,14 @@
   "options_themes_chooseTheme": {
     "message": "Pilih tema",
     "description": "Choose a theme button label"
+  },
+  "options_themes_change": {
+    "message": "Ubah",
+    "description": "Change theme button label"
+  },
+  "options_themes_customTheme": {
+    "message": "Tema Kustom",
+    "description": "Display name for unnamed custom themes"
   },
   "options_themes_customStyles": {
     "message": "Gaya Kustom",
@@ -607,6 +623,10 @@
     "message": "Pasang / Hapus",
     "description": "Install/remove shortcut"
   },
+  "marketplace_shortcutsApply": {
+    "message": "Terapkan tema",
+    "description": "Apply theme shortcut label"
+  },
   "marketplace_shortcutsPrevImage": {
     "message": "Gambar sebelumnya",
     "description": "Previous image shortcut"
@@ -628,7 +648,7 @@
     "description": "Show shortcuts shortcut"
   },
   "marketplace_shortcutsApplyTheme": {
-    "message": "Terapkan tema (setelah pemasangan)",
+    "message": "Terapkan tema (setelah dipasang)",
     "description": "Apply theme shortcut"
   },
   "marketplace_ratingFailed": {
@@ -798,5 +818,71 @@
         "example": "Romanization"
       }
     }
+  },
+  "symlink_applied": {
+    "message": "Tema yang dipakai: $NAME$ (Toko)",
+    "description": "Alert after successfully applying a symlinked theme from marketplace",
+    "placeholders": {
+      "name": {
+        "content": "$1",
+        "example": "Minimal"
+      }
+    }
+  },
+  "builtin_applied": {
+    "message": "Tema yang dipakai: $NAME$",
+    "description": "Alert after successfully applying a bundled built-in theme",
+    "placeholders": {
+      "name": {
+        "content": "$1",
+        "example": "Spotlight"
+      }
+    }
+  },
+  "theme_author_prefix": {
+    "message": "oleh $AUTHOR$",
+    "description": "Author prefix shown on theme selector button",
+    "placeholders": {
+      "author": {
+        "content": "$1",
+        "example": "boidu"
+      }
+    }
+  },
+  "theme_author_you": {
+    "message": "oleh Kamu",
+    "description": "Author label for custom user themes on theme selector button"
+  },
+  "symlink_installFailed": {
+    "message": "Tidak dapat mengunduh tema. Coba cek koneksimu dan coba lagi.",
+    "description": "Alert when a symlinked theme fails to install from marketplace"
+  },
+  "symlink_badge_marketplace": {
+    "message": "Toko",
+    "description": "Badge text on symlinked theme cards"
+  },
+  "symlink_badge_bundled": {
+    "message": "Sepaket",
+    "description": "Badge text on non-symlinked built-in theme cards"
+  },
+  "deprecation_builtin_title": {
+    "message": "Siap siap, tema tema ini bakalan pindah!",
+    "description": "Title for the built-in themes deprecation banner in theme modal"
+  },
+  "deprecation_builtin_body": {
+    "message": "Kami akan memindahkan tema-tema bawaan ini ke Toko Tema. Sudah ada beberapa, lihat yang ada lencana Toko. Sisanya bakalan ikutan di pembaruan selanjutnya, dengan cadangan CSS di GitHub dan Discord.",
+    "description": "Body text for the built-in themes deprecation banner"
+  },
+  "deprecation_builtin_cta": {
+    "message": "Jelajahi Toko",
+    "description": "CTA button text in the deprecation banner to open the marketplace"
+  },
+  "theme_modal_section_builtin": {
+    "message": "Tema Bawaan",
+    "description": "Section title for built-in themes in the theme chooser modal"
+  },
+  "theme_modal_section_custom": {
+    "message": "Tema Kustom",
+    "description": "Section title for custom themes in the theme chooser modal"
   }
 }
