@@ -488,7 +488,16 @@ export function injectLyrics(
 
   if (lyrics[0].words !== t("lyrics_notFound")) {
     if (data.source === "Unison" && "unisonData" in data) {
-      addFooter(data.source, data.sourceHref, data.song, data.artist, data.album, data.duration, data.providerKey, data.unisonData);
+      addFooter(
+        data.source,
+        data.sourceHref,
+        data.song,
+        data.artist,
+        data.album,
+        data.duration,
+        data.providerKey,
+        data.unisonData
+      );
     } else {
       addFooter(data.source, data.sourceHref, data.song, data.artist, data.album, data.duration, data.providerKey);
     }

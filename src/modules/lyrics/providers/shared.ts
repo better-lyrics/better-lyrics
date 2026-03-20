@@ -1,6 +1,7 @@
 import { LYRIC_SOURCE_KEYS, PROVIDER_CONFIGS, PROVIDER_SWITCHED_LOG } from "@constants";
 import { getTransientStorage, setTransientStorage } from "@core/storage";
 import { log } from "@utils";
+import customLyrics from "./clyrics";
 import bLyrics from "./blyrics";
 import cubey, { type CubeyLyricSourceResult } from "./cubey";
 import legato from "./legato";

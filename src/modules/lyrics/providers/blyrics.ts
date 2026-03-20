@@ -40,7 +40,7 @@ export default async function bLyrics(providerParameters: ProviderParameters): P
 
     providerParameters.sourceMap["bLyrics-synced"].filled = true;
     providerParameters.sourceMap["bLyrics-richsynced"].filled = true;
-  } else { 
+  } else {
     providerParameters.sourceMap["bLyrics-richsynced"].lyricSourceResult = null;
     providerParameters.sourceMap["bLyrics-richsynced"].filled = true;
 
