@@ -496,13 +496,14 @@ export function injectLyrics(
         data.album,
         data.duration,
         data.providerKey,
+        data.videoId,
         data.unisonData
       );
     } else {
       addFooter(data.source, data.sourceHref, data.song, data.artist, data.album, data.duration, data.providerKey);
     }
   } else {
-    addNoLyricsButton(data.song, data.artist, data.album, data.duration);
+    addNoLyricsButton(data.song, data.artist, data.album, data.duration, data.videoId);
   }
 
   lyricsContainer.dataset.sync = syncType;

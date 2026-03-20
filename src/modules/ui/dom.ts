@@ -202,6 +202,7 @@ export function addFooter(
   album: string,
   duration: number,
   providerKey?: string,
+  videoId?: string,
   ...args: any[]
 ): void {
   if (document.getElementsByClassName(FOOTER_CLASS).length !== 0) {
@@ -212,7 +213,7 @@ export function addFooter(
   const footer = document.createElement("div");
   footer.classList.add(FOOTER_CLASS);
   lyricsElement.appendChild(footer);
-  createFooter(song, artist, album, duration);
+  createFooter(song, artist, album, duration, videoId);
 
   const footerLink = document.getElementById("betterLyricsFooterLink") as HTMLAnchorElement;
   sourceHref = sourceHref || "https://better-lyrics.boidu.dev/";
@@ -374,7 +375,7 @@ export function addFooter(
  * @param album - Album name
  * @param duration - Song duration in seconds
  */
-function createFooter(song: string, artist: string, album: string, duration: number): void {
+function createFooter(song: string, artist: string, album: string, duration: number, videoId?: string): void {
   try {
     const footer = document.getElementsByClassName(FOOTER_CLASS)[0] as HTMLElement;
     footer.replaceChildren();
@@ -415,6 +416,7 @@ function createFooter(song: string, artist: string, album: string, duration: num
     if (artist) lrclibUrl.searchParams.append("artist", artist);
     if (album) lrclibUrl.searchParams.append("album", album);
     if (duration) lrclibUrl.searchParams.append("duration", duration.toString());
+    if (videoId) lrclibUrl.searchParams.append("videoId", videoId);
     footerLink.target = "_blank";
 
     const addLyricsContainer = createActionButton({
@@ -822,7 +824,13 @@ export function showYtThumbnail(): void {
  * @param album - Album name
  * @param duration - Song duration in seconds
  */
-export function addNoLyricsButton(song: string, artist: string, album: string, duration: number): void {
+export function addNoLyricsButton(
+  song: string,
+  artist: string,
+  album: string,
+  duration: number,
+  videoId?: string
+): void {
   const lyricsWrapper = document.getElementById(LYRICS_WRAPPER_ID);
   if (!lyricsWrapper) return;
 
@@ -834,6 +842,7 @@ export function addNoLyricsButton(song: string, artist: string, album: string, d
   if (artist) lrclibUrl.searchParams.append("artist", artist);
   if (album) lrclibUrl.searchParams.append("album", album);
   if (duration) lrclibUrl.searchParams.append("duration", duration.toString());
+  if (videoId) lrclibUrl.searchParams.append("videoId", videoId);
 
   const addLyricsButton = createActionButton({
     text: t("lyrics_addToLrclib"),
