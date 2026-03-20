@@ -277,9 +277,6 @@ interface ProviderInfo {
 const getProviderIdToInfoMap = (): { [key: string]: ProviderInfo } => ({
   "musixmatch-richsync": { name: t("options_provider_musixmatch"), syncType: "word" },
   "musixmatch-synced": { name: t("options_provider_musixmatch"), syncType: "line" },
-  "unison-richsynced": { name: t("options_provider_betterLyricsUnison"), syncType: "syllable" },
-  "unison-synced": { name: t("options_provider_betterLyricsUnison"), syncType: "line" },
-  "unison-plain": { name: t("options_provider_betterLyricsUnison"), syncType: "unsynced" },
   "yt-captions": { name: t("options_provider_youtubeCaptions"), syncType: "line" },
   "lrclib-synced": { name: t("options_provider_lrclib"), syncType: "line" },
   "unison-richsynced": { name: t("options_provider_betterLyricsUnison"), syncType: "syllable" },

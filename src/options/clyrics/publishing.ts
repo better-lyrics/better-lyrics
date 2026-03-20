@@ -1,4 +1,4 @@
-import { bufferToBase64, canonicalJson, ECDSA_PARAMS, getIdentity, HASH_ALGORITHM } from "../store/keyIdentity";
+import { bufferToBase64, canonicalJson, ECDSA_PARAMS, getIdentity, HASH_ALGORITHM } from "@/core/keyIdentity";
 import { LRCLIB_API_BASEURL, LRCLIB_API_URL, UNISON_API_URL } from "@/core/constants";
 import type { CLyricsData } from "./clyrics-types";
 import { convertFormat } from "./clyricsManager";
