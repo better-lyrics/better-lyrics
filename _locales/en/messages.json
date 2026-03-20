@@ -91,6 +91,15 @@
     "description": "Show stylized animations setting label"
   },
 
+  "options_language_displayLanguage": {
+    "message": "Display Language",
+    "description": "Label for the UI language selector dropdown"
+  },
+  "options_language_displayLanguageAuto": {
+    "message": "Auto",
+    "description": "Option label for automatic language detection based on browser settings"
+  },
+
   "options_language_title": {
     "message": "Language Settings",
     "description": "Language settings section title"
@@ -642,6 +651,10 @@
   "marketplace_shortcutsInstallRemove": {
     "message": "Install / Remove",
     "description": "Install/remove shortcut"
+  },
+  "marketplace_shortcutsApply": {
+    "message": "Apply theme",
+    "description": "Apply theme shortcut label"
   },
   "marketplace_shortcutsPrevImage": {
     "message": "Previous image",

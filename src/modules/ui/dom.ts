@@ -188,7 +188,8 @@ export function addFooter(
   artist: string,
   album: string,
   duration: number,
-  providerKey?: string
+  providerKey?: string,
+  videoId?: string
 ): void {
   if (document.getElementsByClassName(FOOTER_CLASS).length !== 0) {
     document.getElementsByClassName(FOOTER_CLASS)[0].remove();
@@ -198,7 +199,7 @@ export function addFooter(
   const footer = document.createElement("div");
   footer.classList.add(FOOTER_CLASS);
   lyricsElement.appendChild(footer);
-  createFooter(song, artist, album, duration);
+  createFooter(song, artist, album, duration, videoId);
 
   const footerLink = document.getElementById("betterLyricsFooterLink") as HTMLAnchorElement;
   sourceHref = sourceHref || "https://better-lyrics.boidu.dev/";
@@ -234,7 +235,7 @@ export function addFooter(
  * @param album - Album name
  * @param duration - Song duration in seconds
  */
-function createFooter(song: string, artist: string, album: string, duration: number): void {
+function createFooter(song: string, artist: string, album: string, duration: number, videoId?: string): void {
   try {
     const footer = document.getElementsByClassName(FOOTER_CLASS)[0] as HTMLElement;
     footer.replaceChildren();
@@ -275,6 +276,7 @@ function createFooter(song: string, artist: string, album: string, duration: num
     if (artist) lrclibUrl.searchParams.append("artist", artist);
     if (album) lrclibUrl.searchParams.append("album", album);
     if (duration) lrclibUrl.searchParams.append("duration", duration.toString());
+    if (videoId) lrclibUrl.searchParams.append("videoId", videoId);
     footerLink.target = "_blank";
 
     const addLyricsContainer = createActionButton({
@@ -537,6 +539,17 @@ function getContainerSize(): number {
   return Math.round(Math.max(document.getElementById("thumbnail")?.getBoundingClientRect().width || 0, 544));
 }
 
+function getHighResImageUrl(smallThumbnail: ThumbnailElement) {
+  const containerSize = getContainerSize();
+  let url = smallThumbnail.url;
+  if (url && /w\d+-h\d+/.test(url)) {
+    url = url.replace(/w\d+-h\d+/, `w${containerSize}-h${containerSize}`);
+  } else {
+    url = url.replace(/\/(sd|hq|mq)?default\.jpg/, "/maxresdefault.jpg");
+  }
+  return url;
+}
+
 export function addThumbnail(smallThumbnail: ThumbnailElement): void {
   thumbnailResizeObserver?.disconnect();
 
@@ -551,30 +564,17 @@ export function addThumbnail(smallThumbnail: ThumbnailElement): void {
     document.getElementById("thumbnail")?.appendChild(imgElm);
   }
 
-  if (lastLoadedThumbnail !== smallThumbnail) {
-    imgElm.src = smallThumbnail.url;
-    imgElm.classList.remove(HIDDEN_CLASS);
-    setBackgroundImage(smallThumbnail.url);
-  }
-  lastLoadedThumbnail = smallThumbnail;
-
   const containerSize = getContainerSize();
-
-  let url = smallThumbnail.url;
-  if (url && /w\d+-h\d+/.test(url)) {
-    url = url.replace(/w\d+-h\d+/, `w${containerSize}-h${containerSize}`);
-  } else {
-    url = url.replace(/\/(sd|hq|mq)?default\.jpg/, "/maxresdefault.jpg");
-  }
-
-  const proxy = new Image();
-  proxy.src = url;
+  const url = getHighResImageUrl(smallThumbnail);
 
   albumArtLoadController?.abort();
   const loadController = new AbortController();
   albumArtLoadController = loadController;
 
-  proxy.onload = () => {
+  const proxy = new Image();
+  proxy.src = url;
+
+  const setHighResImage = () => {
     if (loadController.signal.aborted) return;
 
     imgElm.src = proxy.src;
@@ -594,6 +594,26 @@ export function addThumbnail(smallThumbnail: ThumbnailElement): void {
     });
     thumbnailResizeObserver.observe(thumbnailElm);
   };
+
+  if (proxy.complete) {
+    lastLoadedThumbnail = smallThumbnail;
+    setHighResImage();
+  } else {
+    if (lastLoadedThumbnail !== smallThumbnail) {
+      imgElm.src = smallThumbnail.url;
+      imgElm.classList.remove(HIDDEN_CLASS);
+      setBackgroundImage(smallThumbnail.url);
+    }
+
+    lastLoadedThumbnail = smallThumbnail;
+
+    proxy.onload = setHighResImage;
+  }
+}
+
+export function preloadHighResThumbnail(smallThumbnail: ThumbnailElement) {
+  const proxy = new Image();
+  proxy.src = getHighResImageUrl(smallThumbnail);
 }
 
 export function showYtThumbnail(): void {
@@ -617,7 +637,13 @@ export function showYtThumbnail(): void {
  * @param album - Album name
  * @param duration - Song duration in seconds
  */
-export function addNoLyricsButton(song: string, artist: string, album: string, duration: number): void {
+export function addNoLyricsButton(
+  song: string,
+  artist: string,
+  album: string,
+  duration: number,
+  videoId?: string
+): void {
   const lyricsWrapper = document.getElementById(LYRICS_WRAPPER_ID);
   if (!lyricsWrapper) return;
 
@@ -629,6 +655,7 @@ export function addNoLyricsButton(song: string, artist: string, album: string, d
   if (artist) lrclibUrl.searchParams.append("artist", artist);
   if (album) lrclibUrl.searchParams.append("album", album);
   if (duration) lrclibUrl.searchParams.append("duration", duration.toString());
+  if (videoId) lrclibUrl.searchParams.append("videoId", videoId);
 
   const addLyricsButton = createActionButton({
     text: t("lyrics_addToLrclib"),

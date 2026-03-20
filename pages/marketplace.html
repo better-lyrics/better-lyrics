@@ -17,6 +17,7 @@
 		/>
 		<link rel="stylesheet" href="../src/options/options.css" />
 		<link rel="stylesheet" href="../src/options/store/store.css" />
+		<style>body:not(.i18n-ready){opacity:0}</style>
 	</head>
 	<body class="marketplace-standalone">
 		<div class="marketplace-page">
@@ -85,7 +86,7 @@
 						<label class="marketplace-filter-chip">
 							<input type="radio" name="store-filter-show" value="all" checked>
 							<span>__MSG_marketplace_showAll__</span>
-							<kbd>A</kbd>
+							<kbd>L</kbd>
 						</label>
 						<label class="marketplace-filter-chip">
 							<input type="radio" name="store-filter-show" value="installed">
@@ -169,6 +170,7 @@
 						<p id="detail-author"></p>
 					</div>
 					<div class="detail-header-actions">
+						<button id="detail-apply-btn" class="store-card-btn store-card-btn-apply" style="display: none;">__MSG_marketplace_apply__</button>
 						<button id="detail-action-btn" class="store-card-btn store-card-btn-install">__MSG_marketplace_install__</button>
 						<button id="detail-modal-close" class="modal-close-btn" aria-label="Close">
 							<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
@@ -377,7 +379,7 @@
 							<div class="shortcut-item">
 								<span class="shortcut-label">__MSG_marketplace_shortcutsShowAll__</span>
 								<div class="shortcut-keys">
-									<kbd>A</kbd>
+									<kbd>L</kbd>
 								</div>
 							</div>
 							<div class="shortcut-item">
@@ -411,6 +413,12 @@
 								<span class="shortcut-label">__MSG_marketplace_shortcutsInstallRemove__</span>
 								<div class="shortcut-keys">
 									<kbd>I</kbd>
+								</div>
+							</div>
+							<div class="shortcut-item">
+								<span class="shortcut-label">__MSG_marketplace_shortcutsApply__</span>
+								<div class="shortcut-keys">
+									<kbd>A</kbd>
 								</div>
 							</div>
 							<div class="shortcut-item">
