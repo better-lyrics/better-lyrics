@@ -637,7 +637,13 @@ export function showYtThumbnail(): void {
  * @param album - Album name
  * @param duration - Song duration in seconds
  */
-export function addNoLyricsButton(song: string, artist: string, album: string, duration: number, videoId?: string): void {
+export function addNoLyricsButton(
+  song: string,
+  artist: string,
+  album: string,
+  duration: number,
+  videoId?: string
+): void {
   const lyricsWrapper = document.getElementById(LYRICS_WRAPPER_ID);
   if (!lyricsWrapper) return;
 

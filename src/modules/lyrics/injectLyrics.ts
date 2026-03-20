@@ -468,7 +468,16 @@ function injectLyrics(data: LyricSourceResultWithMeta, keepLoaderVisible = false
   animEngineState.scrollResumeTime = 0;
 
   if (lyrics[0].words !== t("lyrics_notFound")) {
-    addFooter(data.source, data.sourceHref, data.song, data.artist, data.album, data.duration, data.providerKey, data.videoId);
+    addFooter(
+      data.source,
+      data.sourceHref,
+      data.song,
+      data.artist,
+      data.album,
+      data.duration,
+      data.providerKey,
+      data.videoId
+    );
   } else {
     addNoLyricsButton(data.song, data.artist, data.album, data.duration, data.videoId);
   }
