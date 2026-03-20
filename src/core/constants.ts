@@ -46,12 +46,7 @@ export const NOTO_SANS_UNIVERSAL_LINK =
 // API URLs and Functions
 export const UNISON_API_URL = "https://unison.boidu.dev/lyrics" as const;
 export const LYRICS_API_URL = "https://lyrics-api.boidu.dev/getLyrics" as const;
-export const BINIMUM_LYRICS_API_URL = "https://lyrics-api.binimum.org/" as const;
 export const DISCORD_INVITE_URL = "https://discord.gg/UsHE3d5fWF" as const;
-export const LRCLIB_API_URL = "https://lrclib.net/api/get" as const;
-export const LEGATO_API_URL = "https://lyrics-api.boidu.dev/kugou/getLyrics" as const;
-export const PORTATO_API_URL = "https://lyrics-api.boidu.dev/qq/getLyrics" as const;
-export const LRCLIB_CLIENT_HEADER = "BetterLyrics Extension (https://github.com/better-lyrics/better-lyrics)" as const;
 export const THEME_STORE_API_URL = "https://better-lyrics-themes-api.boidu.dev" as const;
 export const UNISON_API_BASE_URL = "https://unison.boidu.dev" as const;
 export const THEME_STORE_TURNSTILE_URL = `${THEME_STORE_API_URL}/turnstile` as const;
@@ -117,7 +112,6 @@ export const GENERAL_ERROR_LOG = "[BetterLyrics] Error:" as const;
 export const FETCH_LYRICS_LOG = "[BetterLyrics] Fetching lyrics for:" as const;
 export const LYRICS_FOUND_LOG = "[BetterLyrics] Lyrics found, injecting into the page" as const;
 export const NO_LYRICS_FOUND_LOG = "[BetterLyrics] No lyrics found for the current song" as const;
-export const LRCLIB_LYRICS_FOUND_LOG = "[BetterLyrics] Lyrics found from LRCLIB" as const;
 export const PROVIDER_SWITCHED_LOG = "[BetterLyrics] Switching to provider = " as const;
 
 // UI State Logs
@@ -374,80 +368,30 @@ export const PROVIDER_CONFIGS: ProviderConfig[] = [
     key: "unison-richsynced",
     displayName: "Unison",
     syncType: "syllable",
-    priority: 1,
-  },
-  {
-    key: "binimum-richsynced",
-    displayName: "BiniLyrics",
-    syncType: "syllable",
     priority: 2,
   },
-  {
-    key: "musixmatch-richsync",
-    displayName: "Musixmatch",
-    syncType: "word",
-    priority: 3,
-  },
-  {
-    key: "yt-captions",
-    displayName: "Youtube Captions",
-    syncType: "line",
-    priority: 4,
-  },
-  {
-    key: "bLyrics-synced",
-    displayName: "Better Lyrics",
-    syncType: "line",
-    priority: 5,
-  },
+  { key: "binimum-richsynced", displayName: "BiniLyrics", syncType: "syllable", priority: 3 },
+  { key: "musixmatch-richsync", displayName: "Musixmatch", syncType: "word", priority: 4 },
+  { key: "bLyrics-synced", displayName: "Better Lyrics", syncType: "line", priority: 5 },
   {
     key: "unison-synced",
     displayName: "Unison",
     syncType: "line",
     priority: 6,
   },
-  {
-    key: "binimum-synced",
-    displayName: "BiniLyrics",
-    syncType: "line",
-    priority: 7,
-  },
-  {
-    key: "lrclib-synced",
-    displayName: "LRCLib",
-    syncType: "line",
-    priority: 8,
-  },
-  {
-    key: "legato-synced",
-    displayName: "Legato",
-    syncType: "line",
-    priority: 9,
-  },
-  {
-    key: "musixmatch-synced",
-    displayName: "Musixmatch",
-    syncType: "line",
-    priority: 10,
-  },
-  {
-    key: "yt-lyrics",
-    displayName: "Youtube",
-    syncType: "unsynced",
-    priority: 11,
-  },
+  { key: "yt-captions", displayName: "Youtube Captions", syncType: "line", priority: 7 },
+  { key: "binimum-synced", displayName: "BiniLyrics", syncType: "line", priority: 8 },
+  { key: "lrclib-synced", displayName: "LRCLib", syncType: "line", priority: 9 },
+  { key: "legato-synced", displayName: "Better Lyrics Legato", syncType: "line", priority: 10 },
+  { key: "musixmatch-synced", displayName: "Musixmatch", syncType: "line", priority: 11 },
+  { key: "yt-lyrics", displayName: "Youtube", syncType: "unsynced", priority: 12 },
   {
     key: "unison-plain",
     displayName: "Unison",
     syncType: "unsynced",
-    priority: 12,
-  },
-  {
-    key: "lrclib-plain",
-    displayName: "LRCLib",
-    syncType: "unsynced",
     priority: 13,
   },
+  { key: "lrclib-plain", displayName: "LRCLib", syncType: "unsynced", priority: 14 },
 ] as const;
 
 export const LYRIC_SOURCE_KEYS = PROVIDER_CONFIGS.map(p => p.key);
