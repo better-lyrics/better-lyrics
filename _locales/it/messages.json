@@ -87,6 +87,14 @@
     "message": "Mostra animazioni stilizzate",
     "description": "Show stylized animations setting label"
   },
+  "options_language_displayLanguage": {
+    "message": "Lingua su Schermo",
+    "description": "Label for the UI language selector dropdown"
+  },
+  "options_language_displayLanguageAuto": {
+    "message": "Automatico",
+    "description": "Option label for automatic language detection based on browser settings"
+  },
   "options_language_title": {
     "message": "Impostazioni lingua",
     "description": "Language settings section title"
@@ -130,6 +138,14 @@
   "options_themes_chooseTheme": {
     "message": "Scegli un tema",
     "description": "Choose a theme button label"
+  },
+  "options_themes_change": {
+    "message": "Cambia",
+    "description": "Change theme button label"
+  },
+  "options_themes_customTheme": {
+    "message": "Tema Personalizzato",
+    "description": "Display name for unnamed custom themes"
   },
   "options_themes_customStyles": {
     "message": "Stili personalizzati",
@@ -607,6 +623,10 @@
     "message": "Installa / Rimuovi",
     "description": "Install/remove shortcut"
   },
+  "marketplace_shortcutsApply": {
+    "message": "Applica tema",
+    "description": "Apply theme shortcut label"
+  },
   "marketplace_shortcutsPrevImage": {
     "message": "Immagine precedente",
     "description": "Previous image shortcut"
@@ -798,5 +818,71 @@
         "example": "Romanization"
       }
     }
+  },
+  "symlink_applied": {
+    "message": "Tema applicato: $NAME$ (Marketplace)",
+    "description": "Alert after successfully applying a symlinked theme from marketplace",
+    "placeholders": {
+      "name": {
+        "content": "$1",
+        "example": "Minimal"
+      }
+    }
+  },
+  "builtin_applied": {
+    "message": "Tema applicato: $NAME$",
+    "description": "Alert after successfully applying a bundled built-in theme",
+    "placeholders": {
+      "name": {
+        "content": "$1",
+        "example": "Spotlight"
+      }
+    }
+  },
+  "theme_author_prefix": {
+    "message": "di $AUTHOR$",
+    "description": "Author prefix shown on theme selector button",
+    "placeholders": {
+      "author": {
+        "content": "$1",
+        "example": "boidu"
+      }
+    }
+  },
+  "theme_author_you": {
+    "message": "da Tu",
+    "description": "Author label for custom user themes on theme selector button"
+  },
+  "symlink_installFailed": {
+    "message": "Impossibile installare il tema. Controlla la tua connessione e riprova.",
+    "description": "Alert when a symlinked theme fails to install from marketplace"
+  },
+  "symlink_badge_marketplace": {
+    "message": "Marketplace",
+    "description": "Badge text on symlinked theme cards"
+  },
+  "symlink_badge_bundled": {
+    "message": "Impacchettato",
+    "description": "Badge text on non-symlinked built-in theme cards"
+  },
+  "deprecation_builtin_title": {
+    "message": "Attento, questi temi se ne andranno!",
+    "description": "Title for the built-in themes deprecation banner in theme modal"
+  },
+  "deprecation_builtin_body": {
+    "message": "Stiamo migrando i temi integrati al Marketplace dei Temi. Alcuni son stati già migrati, cerca il badge Marketplace. Il resto li seguiranno in un aggiornamento futuro, con backup CSS su GitHub e Discord.",
+    "description": "Body text for the built-in themes deprecation banner"
+  },
+  "deprecation_builtin_cta": {
+    "message": "Sfoglia Marketplace",
+    "description": "CTA button text in the deprecation banner to open the marketplace"
+  },
+  "theme_modal_section_builtin": {
+    "message": "Temi Integrati",
+    "description": "Section title for built-in themes in the theme chooser modal"
+  },
+  "theme_modal_section_custom": {
+    "message": "Temi Personalizzati",
+    "description": "Section title for custom themes in the theme chooser modal"
   }
 }

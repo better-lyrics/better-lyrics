@@ -80,12 +80,20 @@
     "description": "Auto-hide cursor setting label"
   },
   "options_display_albumArt": {
-    "message": "흐린 앨범 아트 배경 표시",
+    "message": "흐릿하게 처리한 앨범 아트를 배경으로 표시",
     "description": "Show album art background setting label"
   },
   "options_display_stylizedAnimations": {
     "message": "스타일리시한 애니메이션 표시",
     "description": "Show stylized animations setting label"
+  },
+  "options_language_displayLanguage": {
+    "message": "Display Language",
+    "description": "Label for the UI language selector dropdown"
+  },
+  "options_language_displayLanguageAuto": {
+    "message": "Auto",
+    "description": "Option label for automatic language detection based on browser settings"
   },
   "options_language_title": {
     "message": "언어 설정",
@@ -112,7 +120,7 @@
     "description": "Sources settings section title"
   },
   "options_sources_description": {
-    "message": "드래그하여 우선순위 변경. 상위 소스가 먼저 시도됩니다. 체크 해제하면 비활성화.",
+    "message": "드래그하여 우선순위를 변경합니다. 상위에 위치한 소스를 먼저 불러옵니다. 체크를 해제하면 비활성화됩니다.",
     "description": "Sources settings section description"
   },
   "options_themes_title": {
@@ -130,6 +138,14 @@
   "options_themes_chooseTheme": {
     "message": "테마 선택",
     "description": "Choose a theme button label"
+  },
+  "options_themes_change": {
+    "message": "Change",
+    "description": "Change theme button label"
+  },
+  "options_themes_customTheme": {
+    "message": "Custom Theme",
+    "description": "Display name for unnamed custom themes"
   },
   "options_themes_customStyles": {
     "message": "사용자 정의 스타일",
@@ -607,6 +623,10 @@
     "message": "설치 / 제거",
     "description": "Install/remove shortcut"
   },
+  "marketplace_shortcutsApply": {
+    "message": "Apply theme",
+    "description": "Apply theme shortcut label"
+  },
   "marketplace_shortcutsPrevImage": {
     "message": "이전 이미지",
     "description": "Previous image shortcut"
@@ -670,7 +690,7 @@
     "description": "Export to file button"
   },
   "editor_saveAsTheme": {
-    "message": "테마로 저장",
+    "message": "테마 저장하기",
     "description": "Save as theme button"
   },
   "editor_stylingGuide": {
@@ -798,5 +818,71 @@
         "example": "Romanization"
       }
     }
+  },
+  "symlink_applied": {
+    "message": "Applied theme: $NAME$ (Marketplace)",
+    "description": "Alert after successfully applying a symlinked theme from marketplace",
+    "placeholders": {
+      "name": {
+        "content": "$1",
+        "example": "Minimal"
+      }
+    }
+  },
+  "builtin_applied": {
+    "message": "Applied theme: $NAME$",
+    "description": "Alert after successfully applying a bundled built-in theme",
+    "placeholders": {
+      "name": {
+        "content": "$1",
+        "example": "Spotlight"
+      }
+    }
+  },
+  "theme_author_prefix": {
+    "message": "by $AUTHOR$",
+    "description": "Author prefix shown on theme selector button",
+    "placeholders": {
+      "author": {
+        "content": "$1",
+        "example": "boidu"
+      }
+    }
+  },
+  "theme_author_you": {
+    "message": "by You",
+    "description": "Author label for custom user themes on theme selector button"
+  },
+  "symlink_installFailed": {
+    "message": "Couldn't install theme. Check your connection and try again.",
+    "description": "Alert when a symlinked theme fails to install from marketplace"
+  },
+  "symlink_badge_marketplace": {
+    "message": "Marketplace",
+    "description": "Badge text on symlinked theme cards"
+  },
+  "symlink_badge_bundled": {
+    "message": "Bundled",
+    "description": "Badge text on non-symlinked built-in theme cards"
+  },
+  "deprecation_builtin_title": {
+    "message": "Heads up, these themes are moving!",
+    "description": "Title for the built-in themes deprecation banner in theme modal"
+  },
+  "deprecation_builtin_body": {
+    "message": "We're migrating built-in themes to the Theme Marketplace. Some already have, look for the Marketplace badge. The rest will follow in a future update, with CSS backups on GitHub and Discord.",
+    "description": "Body text for the built-in themes deprecation banner"
+  },
+  "deprecation_builtin_cta": {
+    "message": "Browse Marketplace",
+    "description": "CTA button text in the deprecation banner to open the marketplace"
+  },
+  "theme_modal_section_builtin": {
+    "message": "Built-in Themes",
+    "description": "Section title for built-in themes in the theme chooser modal"
+  },
+  "theme_modal_section_custom": {
+    "message": "Custom Themes",
+    "description": "Section title for custom themes in the theme chooser modal"
   }
 }
