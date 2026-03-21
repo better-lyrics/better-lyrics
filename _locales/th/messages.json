@@ -87,6 +87,14 @@
     "message": "แสดงแอนิเมชันสวยงาม",
     "description": "Show stylized animations setting label"
   },
+  "options_language_displayLanguage": {
+    "message": "ภาษาที่แสดงผล",
+    "description": "Label for the UI language selector dropdown"
+  },
+  "options_language_displayLanguageAuto": {
+    "message": "อัตโนมัติ",
+    "description": "Option label for automatic language detection based on browser settings"
+  },
   "options_language_title": {
     "message": "การตั้งค่าภาษา",
     "description": "Language settings section title"
@@ -130,6 +138,14 @@
   "options_themes_chooseTheme": {
     "message": "เลือกธีม",
     "description": "Choose a theme button label"
+  },
+  "options_themes_change": {
+    "message": "เปลี่ยน",
+    "description": "Change theme button label"
+  },
+  "options_themes_customTheme": {
+    "message": "ธีมที่กำหนดเอง",
+    "description": "Display name for unnamed custom themes"
   },
   "options_themes_customStyles": {
     "message": "สไลต์กำหนดเอง",
@@ -607,6 +623,10 @@
     "message": "ติดตั้ง/ลบออก",
     "description": "Install/remove shortcut"
   },
+  "marketplace_shortcutsApply": {
+    "message": "Apply theme",
+    "description": "Apply theme shortcut label"
+  },
   "marketplace_shortcutsPrevImage": {
     "message": "ภาพก่อนหน้า",
     "description": "Previous image shortcut"
@@ -798,5 +818,71 @@
         "example": "Romanization"
       }
     }
+  },
+  "symlink_applied": {
+    "message": "ธีมที่กำลังใช้: $NAME$ (จาก Marketplace)",
+    "description": "Alert after successfully applying a symlinked theme from marketplace",
+    "placeholders": {
+      "name": {
+        "content": "$1",
+        "example": "Minimal"
+      }
+    }
+  },
+  "builtin_applied": {
+    "message": "ธีมที่กำลังใช้: $NAME$",
+    "description": "Alert after successfully applying a bundled built-in theme",
+    "placeholders": {
+      "name": {
+        "content": "$1",
+        "example": "Spotlight"
+      }
+    }
+  },
+  "theme_author_prefix": {
+    "message": "โดย $AUTHOR$",
+    "description": "Author prefix shown on theme selector button",
+    "placeholders": {
+      "author": {
+        "content": "$1",
+        "example": "boidu"
+      }
+    }
+  },
+  "theme_author_you": {
+    "message": "โดยคุณ",
+    "description": "Author label for custom user themes on theme selector button"
+  },
+  "symlink_installFailed": {
+    "message": "ไม่สามารถติดตั้งธีมได้ ตรวจสอบการเชื่อมต่อแล้วลองอีกครั้ง",
+    "description": "Alert when a symlinked theme fails to install from marketplace"
+  },
+  "symlink_badge_marketplace": {
+    "message": "Marketplace",
+    "description": "Badge text on symlinked theme cards"
+  },
+  "symlink_badge_bundled": {
+    "message": "มีรวมมาให้",
+    "description": "Badge text on non-symlinked built-in theme cards"
+  },
+  "deprecation_builtin_title": {
+    "message": "โปรดทราบ! ธีมเหล่านี้กำลังจะย้ายไปที่ใหม่",
+    "description": "Title for the built-in themes deprecation banner in theme modal"
+  },
+  "deprecation_builtin_body": {
+    "message": "เรากำลังเปลี่ยนจากธีมที่มีให้ไปเป็น Theme Marketplace บางรายการมีอยู่ใน Marketplace อยู่แล้วโดยมีเครื่องหมาย Marketplace กำกับ สำหรับส่วนที่เหลือที่ยังไม่มีจะตามมาทีหลัง และ CSS ของธีมจะมีสำรองให้ใน GitHub และ ดิสคอร์ด",
+    "description": "Body text for the built-in themes deprecation banner"
+  },
+  "deprecation_builtin_cta": {
+    "message": "ค้นดู Marketplace",
+    "description": "CTA button text in the deprecation banner to open the marketplace"
+  },
+  "theme_modal_section_builtin": {
+    "message": "ธีมที่มีให้อยู่แล้ว",
+    "description": "Section title for built-in themes in the theme chooser modal"
+  },
+  "theme_modal_section_custom": {
+    "message": "ธีมกำหนดเอง",
+    "description": "Section title for custom themes in the theme chooser modal"
   }
 }
