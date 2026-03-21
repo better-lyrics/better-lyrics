@@ -226,7 +226,7 @@ export async function formNewLyrics(): Promise<void> {
     returnButton.appendChild(returnButtonSvg);
 
     returnButton.addEventListener("click", () => {
-      if (clyricsList) clyricsList.style.display = "";
+      if (clyricsModalItems) clyricsModalItems.style.display = "";
       if (clyricsNewLyrics) clyricsNewLyrics.style.display = "none";
     });
 
@@ -364,13 +364,12 @@ export async function formNewLyrics(): Promise<void> {
       label.htmlFor = "clyrics-lyric-file-input";
       label.className = "small-btn";
 
-      const svg = "http://www.w3.org/2000/svg";
-      const importIcon = document.createElementNS(svg, "svg");
+      const importIcon = document.createElementNS("http://www.w3.org/2000/svg", "svg");
       importIcon.setAttribute("width", "32");
       importIcon.setAttribute("height", "32");
       importIcon.setAttribute("viewBox", "0 0 24 24");
 
-      const pathImportIcon = document.createElementNS(svg, "path");
+      const pathImportIcon = document.createElementNS("http://www.w3.org/2000/svg", "path");
       pathImportIcon.setAttribute("fill", "currentColor");
       pathImportIcon.setAttribute(
         "d",

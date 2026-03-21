@@ -1,19 +1,43 @@
-import type { Lyric, LyricPart, LyricsArray } from "@/modules/lyrics/providers/shared";
-import { clyricsList, clyricsNewLyrics } from "./index";
-import { openCLyricsModal } from "./clyrics";
-import { actionMenus, addNewLine, type ContextData, contextMenus, domDefaults } from "./editorDom";
-import { getLocalStorage } from "@/core/storage";
+import * as actionMenu from "./editor/actionMenu";
+import * as checkbox from "./editor/checkbox";
+import * as contextMenu from "./editor/contextMenu";
+import * as keybind from "./editor/keybind";
+import * as playbar from "./editor/playbar";
+import * as slider from "./editor/slider";
 import { buildTTML } from "./ttmlBuilder";
+import { clyricsList, clyricsModalItems, clyricsNewLyrics } from "./index";
+import { openCLyricsModal } from "./clyrics";
+import { addNewLine, contextMenus } from "./editorDom";
+import { getLocalStorage } from "@/core/storage";
 import { getCustomLyrics } from "./clyricsManager";
 import type { CLyricsData, CLyricsEditor, CLyricsLyric, CLyricsLyricPart } from "./clyrics-types";
-import * as checkbox from "./editor/checkbox";
-import * as slider from "./editor/slider";
-import * as playbar from "./editor/playbar";
-import * as keybind from "./editor/keybind";
-import * as contextMenu from "./editor/contextMenu";
-import * as actionMenu from "./editor/actionMenu";
+import type { Lyric } from "@/modules/lyrics/providers/shared";
 
 let loaded = false;
+
+// Initiate elements
+/// Class
+//// General interactables
+export const actionButtons = document.querySelectorAll(".action-btn");
+export const checkboxes = document.querySelectorAll(".checkbox");
+export const sliders = document.querySelectorAll(".slider");
+export const tabButtons = document.querySelectorAll(".tab-btn");
+/// Identifiers
+//// Input fields on lyric lines
+export const newWords = document.querySelectorAll("#new-word-line");
+export const newRomanWords = document.querySelectorAll("#new-roman-word");
+/// Identifier
+//// Action and context menus
+export const actionFile = document.getElementById("action-file-menu");
+//// Tools
+export const addLine = document.getElementById("add-line");
+export const addLineInstrumental = document.getElementById("add-line-instrumental");
+export const addLineTogether = document.getElementById("add-line-together");
+export const startTimeInput = document.getElementById("start-time-input");
+export const durationInput = document.getElementById("duration-input");
+//// Lyric Lines Editor
+export const lyricLines = document.getElementById("lyric-lines");
+export const noLyrics = document.getElementById("no-lyrics");
 
 // Variables
 let reservedUUID: Map<string, null> = new Map();
@@ -25,10 +49,10 @@ let historyVer: number = -1;
 let selectedLine: number[] = [];
 let selectedWord: number[] = [];
 
-// Custom Lyrics data
-let clyrics: CLyricsData | null = null;
-let lyrics: CLyricsLyric[] = [];
-let editor: CLyricsEditor = {};
+// Loaded Custom Lyrics data
+export let clyrics: CLyricsData | null = null;
+export let lyrics: CLyricsLyric[] = [];
+export let editor: CLyricsEditor = {};
 
 // Global variables
 function toggleDisplay(nodeList: NodeListOf<HTMLElement>, x: boolean) {
@@ -40,6 +64,7 @@ function toggleDisplay(nodeList: NodeListOf<HTMLElement>, x: boolean) {
 export const defaults: {
   parentData: any;
   checkboxFunc: any;
+  actionTabs: { [key: string]: { id: string; menu: HTMLElement | null; func?: (btn: HTMLElement) => void } };
   actionMenu: { [key: string]: (...args: any[]) => any };
   contextMenu: { [key: string]: (...args: any[]) => any };
 } = {
@@ -77,21 +102,28 @@ export const defaults: {
     },
   },
 
+  actionTabs: {
+    "action-file-btn": {
+      id: "file",
+      menu: actionFile,
+    },
+  },
+
   actionMenu: {
     "new-lyrics-btn": () => {
       openCLyricsModal();
       if (clyricsNewLyrics) {
         clyricsNewLyrics.style.display = "";
       }
-      if (clyricsList) {
-        clyricsList.style.display = "none";
+      if (clyricsModalItems) {
+        clyricsModalItems.style.display = "none";
       }
     },
 
     "open-lyrics-btn": () => {
       openCLyricsModal();
-      if (clyricsList) {
-        clyricsList.style.display = "";
+      if (clyricsModalItems) {
+        clyricsModalItems.style.display = "";
       }
       if (clyricsNewLyrics) {
         clyricsNewLyrics.style.display = "none";
@@ -199,30 +231,6 @@ export function redo() {
 
   // ...action after redoing
 }
-
-// Initiate elements
-/// Class
-//// General interactables
-export const actionButtons = document.querySelectorAll(".action-btn");
-export const checkboxes = document.querySelectorAll(".checkbox");
-export const sliders = document.querySelectorAll(".slider");
-export const tabButtons = document.querySelectorAll(".tab-btn");
-/// Identifiers
-//// Input fields on lyric lines
-export const newWords = document.querySelectorAll("#new-word-line");
-export const newRomanWords = document.querySelectorAll("#new-roman-word");
-/// Identifier
-//// Action and context menus
-export const actionFile = document.getElementById("action-file-menu");
-//// Tools
-export const addLine = document.getElementById("add-line");
-export const addLineInstrumental = document.getElementById("add-line-instrumental");
-export const addLineTogether = document.getElementById("add-line-together");
-export const startTimeInput = document.getElementById("start-time-input");
-export const durationInput = document.getElementById("duration-input");
-//// Lyric Lines Editor
-export const lyricLines = document.getElementById("lyric-lines");
-export const noLyrics = document.getElementById("no-lyrics");
 
 // Data functions
 function generateUUID() {

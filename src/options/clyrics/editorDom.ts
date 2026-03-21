@@ -8,6 +8,9 @@ export interface ContextData {
   content?: string;
   rightCont?: string;
   func?: (...args: any) => void;
+  /** Shows up a checkmark besides the content */
+  enabled?: boolean;
+  /** Disables the functionality */
   disabled?: boolean;
 }
 
@@ -20,9 +23,9 @@ export const actionMenus: { [key: string]: ContextData[] } = {
     { id: "import-lyrics-btn", type: "button", content: "Import Lyrics", rightCont: ">" },
     { id: "export-lyrics-btn", type: "button", content: "Export Lyrics", rightCont: ">" },
     { type: "separator" },
+    { id: "edit-lyrics-btn", type: "button", content: "Edit Lyrics", rightCont: "(Ctrl+E)" },
     { id: "publish-lyrics-btn", type: "button", content: "Publish Lyrics" },
     { id: "search-lyrics-btn", type: "button", content: "Search Lyrics" },
-    { id: "edit-lyrics-btn", type: "button", content: "Edit Lyrics", rightCont: "(Ctrl+E)" },
   ],
   fileImport: [
     { id: "import-from-provider-btn", type: "button", content: "Import from provider" },
@@ -52,7 +55,7 @@ export const contextMenus: { [key: string]: ContextData[] } = {
     { id: "combine-words", type: "button", content: "Combine Words", rightCont: "(Ctrl+Shift+B)" },
   ],
   line: [
-    { id: "toggle-instrumental-line", type: "button", content: "Instrumental Line" }, // rightCont: "✓"
+    { id: "toggle-instrumental-line", type: "button", content: "Instrumental Line" },
     { id: "toggle-background-line", type: "button", content: "Background Line", rightCont: "(B)" },
     { type: "separator" },
     { id: "duplicate-line", type: "button", content: "Duplicate Line", rightCont: "(Ctrl+D)" },

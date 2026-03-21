@@ -6,12 +6,26 @@ export const contextMenu = document.getElementById("context-menu");
 
 // Variable
 export let loadedContextMenu: ContextData[] = [];
+let contextMenuOpen = false;
 
 // Functions
+function closeContextMenu() {
+  contextMenuOpen = false;
+
+  if (!contextMenu) return;
+  contextMenu.style.opacity = "0";
+  contextMenu.style.top = "";
+  contextMenu.style.bottom = "";
+  contextMenu.style.left = "";
+  contextMenu.style.right = "";
+  contextMenu.classList.add("hidden");
+  contextMenu.innerHTML = "";
+}
+
 /**
- * Loads up the context menu visually
+ * Loads up menu with list buttons visually
  */
-export function loadContextMenu(element: HTMLElement, menus: ContextData[]) {
+export function loadButtonsMenu(element: HTMLElement, menus: ContextData[]) {
   if (!element) return;
   const buttons = [...menus];
   buttons.forEach(btn => {
@@ -21,10 +35,10 @@ export function loadContextMenu(element: HTMLElement, menus: ContextData[]) {
       button.className = "list-btn";
       button.innerHTML = btn.content + (btn.rightCont ? `<strong>${btn.rightCont}</strong>` : "");
       button.disabled = btn.disabled || false;
-      if (typeof btn.func == "function")
-        button.addEventListener("click", () => {
-          btn.func!();
-        });
+      button.addEventListener("click", () => {
+        closeContextMenu();
+        if (typeof btn.func === "function") btn.func!();
+      });
       element.appendChild(button);
     } else if (btn.type == "separator") {
       const separator = document.createElement("div");
@@ -76,29 +90,8 @@ export function handle() {
     return;
   }
 
-  let contextMenuOpen = false;
-
-  function closeContextMenu() {
-    contextMenuOpen = false;
-
-    if (!contextMenu) return;
-    contextMenu.style.opacity = "0";
-    contextMenu.style.top = "";
-    contextMenu.style.bottom = "";
-    contextMenu.style.left = "";
-    contextMenu.style.right = "";
-    contextMenu.classList.add("hidden");
-    contextMenu.innerHTML = "";
-  }
-
   document.addEventListener("mousedown", _ => {
     if (contextMenuOpen && !contextMenu!.matches(`div:hover`)) {
-      closeContextMenu();
-    }
-  });
-
-  document.addEventListener("mouseup", _ => {
-    if (contextMenuOpen) {
       closeContextMenu();
     }
   });
@@ -112,7 +105,7 @@ export function handle() {
       }
 
       closeContextMenu();
-      loadContextMenu(contextMenu, loadedContextMenu);
+      loadButtonsMenu(contextMenu, loadedContextMenu);
 
       const docRect = document.documentElement.getBoundingClientRect();
       contextMenuOpen = true;

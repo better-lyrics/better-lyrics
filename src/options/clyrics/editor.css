@@ -939,15 +939,14 @@ button {
     background-color: hsl(0, 0%, 12.5%);
     padding: .5rem;
     border-radius: .5rem;
-    border-color: hsl(0, 0%, 100%, .25);
-    border-width: .0625rem;
-    border-style: solid;
+    border: .0625rem solid hsla(0, 0%, 100%, .25);
     align-items: stretch;
     flex-direction: column;
     overflow-y: auto;
     max-height: 55%;
     box-shadow: 0 .25rem 2rem .25rem rgba(0, 0, 0, 0.15);
     gap: .2rem;
+    z-index: 1000;
 }
 
 .list-buttons.hidden {
