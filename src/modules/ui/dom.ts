@@ -254,7 +254,11 @@ export function addFooter(
     unisonUpvote.addEventListener("click", async () => {
       if (unisonData.vote === 1) {
         unisonUpvote.innerHTML = votedIcons.upvote;
-        await deleteVote(unisonData.lyricsId);
+        const res = await deleteVote(unisonData.lyricsId);
+        if (!res.ok && res.status !== 404) {
+          unisonUpvote.innerHTML = votedIcons.upvoted;
+          return;
+        }
 
         let data = await byId(unisonData.lyricsId);
         if (data) {
@@ -264,27 +268,26 @@ export function addFooter(
 
           unisonScore.textContent = `${data.effectiveScore} score (${data.voteCount})`;
         }
-        return;
+      } else {
+        unisonUpvote.innerHTML = votedIcons.upvoted;
+        const res = await vote(unisonData.lyricsId, true);
+        if (!res.ok && res.status !== 409) {
+          unisonUpvote.innerHTML = votedIcons.upvote;
+          return;
+        }
+        unisonDownvote.innerHTML = votedIcons.downvote;
+
+        let data = await byId(unisonData.lyricsId);
+        if (!data) {
+          return;
+        }
+
+        unisonData.effectiveScore = data.effectiveScore;
+        unisonData.votes = data.voteCount;
+        unisonData.vote = data.userVote;
+
+        unisonScore.textContent = `${data.effectiveScore} score (${data.voteCount})`;
       }
-
-      unisonUpvote.innerHTML = votedIcons.upvoted;
-      const res = await vote(unisonData.lyricsId, true);
-      if (!res.ok && res.status !== 409) {
-        unisonUpvote.innerHTML = votedIcons.upvote;
-        return;
-      }
-      unisonDownvote.innerHTML = votedIcons.downvote;
-
-      let data = await byId(unisonData.lyricsId);
-      if (!data) {
-        return;
-      }
-
-      unisonData.effectiveScore = data.effectiveScore;
-      unisonData.votes = data.voteCount;
-      unisonData.vote = data.userVote;
-
-      unisonScore.textContent = `${data.effectiveScore} score (${data.voteCount})`;
     });
 
     unisonContainer.appendChild(unisonUpvote);
@@ -304,7 +307,11 @@ export function addFooter(
     unisonDownvote.addEventListener("click", async () => {
       if (unisonData.vote === -1) {
         unisonDownvote.innerHTML = votedIcons.downvote;
-        await deleteVote(unisonData.lyricsId);
+        const res = await deleteVote(unisonData.lyricsId);
+        if (!res.ok && res.status !== 404) {
+          unisonDownvote.innerHTML = votedIcons.downvoted;
+          return;
+        }
 
         let data = await byId(unisonData.lyricsId);
         if (data) {
@@ -314,27 +321,26 @@ export function addFooter(
 
           unisonScore.textContent = `${data.effectiveScore} score (${data.voteCount})`;
         }
-        return;
+      } else {
+        unisonDownvote.innerHTML = votedIcons.downvoted;
+        const res = await vote(unisonData.lyricsId, false);
+        if (!res.ok && res.status !== 409) {
+          unisonDownvote.innerHTML = votedIcons.downvote;
+          return;
+        }
+        unisonUpvote.innerHTML = votedIcons.upvote;
+
+        let data = await byId(unisonData.lyricsId);
+        if (!data) {
+          return;
+        }
+
+        unisonData.effectiveScore = data.effectiveScore;
+        unisonData.votes = data.voteCount;
+        unisonData.vote = data.userVote;
+
+        unisonScore.textContent = `${data.effectiveScore} score (${data.voteCount})`;
       }
-
-      unisonDownvote.innerHTML = votedIcons.downvoted;
-      const res = await vote(unisonData.lyricsId, false);
-      if (!res.ok && res.status !== 409) {
-        unisonDownvote.innerHTML = votedIcons.downvote;
-        return;
-      }
-      unisonUpvote.innerHTML = votedIcons.upvote;
-
-      let data = await byId(unisonData.lyricsId);
-      if (!data) {
-        return;
-      }
-
-      unisonData.effectiveScore = data.effectiveScore;
-      unisonData.votes = data.voteCount;
-      unisonData.vote = data.userVote;
-
-      unisonScore.textContent = `${data.effectiveScore} score (${data.voteCount})`;
     });
 
     unisonContainer.appendChild(unisonDownvote);
