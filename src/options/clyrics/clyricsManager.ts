@@ -1,9 +1,9 @@
-import type { LyricsArray, TrackInfoProvider } from "@/modules/lyrics/providers/shared";
-import type { CLyricsData } from "./clyrics-types";
 import { LyricFormatType, LyricSyncType } from "./publishing";
 import { formatTime } from "@/modules/lyrics/providers/lrcUtils";
 import { buildTTML } from "./ttmlBuilder";
 import { compressString, decompressString } from "@/core/compression";
+import type { LyricsArray, TrackInfoProvider } from "@/modules/lyrics/providers/shared";
+import type { CLyricsData } from "./clyrics-types";
 
 /**
  * Returns a list of all created custom lyrics
@@ -16,14 +16,16 @@ export async function listCustomLyrics(raw: boolean = false): Promise<(string | 
   }
 
   const decompressed: CLyricsData[] = [];
-  clyrics.customLyrics.forEach((compressed, index) => {
-    if (typeof compressed == "string") {
+  clyrics.customLyrics.forEach((data, index) => {
+    if (typeof data == "string") {
       try {
-        const decompress = decompressString(compressed);
+        const decompress = decompressString(data);
         decompressed[index] = JSON.parse(decompress);
       } catch (e) {
         console.error(`Failed to decompress CLyrics ${index}`, e);
       }
+    } else {
+      decompressed[index] = data;
     }
   });
   return decompressed;

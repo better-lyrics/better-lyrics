@@ -289,6 +289,7 @@ export function initializeLyrics(): void {
           duration: detail.duration,
           song: detail.song,
           artist: detail.artist,
+          album: "",
         },
       });
       AppState.areLyricsTicking = false;

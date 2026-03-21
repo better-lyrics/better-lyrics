@@ -438,7 +438,7 @@ export async function formNewLyrics(): Promise<void> {
 
     if (data) {
       populateCLyrics();
-      if (clyricsList) clyricsList.style.display = "";
+      if (clyricsModalItems) clyricsModalItems.style.display = "";
       if (clyricsNewLyrics) clyricsNewLyrics.style.display = "none";
       for (const input in registeredInputs) {
         registeredInputs[input].value = "";
