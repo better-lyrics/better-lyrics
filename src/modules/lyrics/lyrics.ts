@@ -21,7 +21,7 @@ import { clearCache as clearTranslationCache } from "./translation";
 const hideInstrumentalOnly = registerThemeSetting("blyrics-hide-instrumental-only", false, true);
 
 function isInstrumentalOnly(lyrics: Lyric[]): boolean {
-  if (lyrics.length > 1) return false;
+  if (lyrics.length !== 1) return false;
   return /^\[?instrumental\s*only\]?$/i.test(lyrics[0].words.trim());
 }
 
