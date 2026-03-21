@@ -24,14 +24,30 @@ let lastPlayerTimestamp = 0;
 let lastSentPlaying = null;
 let pausedTickCounter = 0;
 
-// Get all player methods (paste in broswer console)
-// for(i in document.getElementById("movie_player")) {
-//     if (typeof document.getElementById("movie_player")[i] === 'function' && i.includes("get")) {
-//             console.log(i + ": " + JSON.stringify(document.getElementById("movie_player")[i](), null, 2));
-//     } else {
-//         console.log(i);
-//     }
-// }
+let cachedContentRect = null;
+let playerResizeObserver = null;
+let lastVideoId = null;
+
+/**
+ * Sets up a ResizeObserver on the player element to cache the content rect.
+ * This avoids querying the DOM layout every 20ms which causes performance drops.
+ * @param {HTMLElement} player
+ */
+const setupResizeObserver = player => {
+  if (playerResizeObserver) {
+    playerResizeObserver.disconnect();
+  }
+
+  playerResizeObserver = new ResizeObserver(() => {
+    if (player && typeof player.getVideoContentRect === "function") {
+      cachedContentRect = player.getVideoContentRect();
+    }
+  });
+
+  playerResizeObserver.observe(player);
+};
+// ------------------------------------------
+
 /**
  * Starts the lyrics tick interval to monitor YouTube Music player state.
  * Dispatches custom events with player information every 20ms for real-time sync.
@@ -41,18 +57,40 @@ const startLyricsTick = () => {
   stopLyricsTick();
 
   let player = document.getElementById("movie_player");
+  if (player) {
+    setupResizeObserver(player);
+  }
+
   tickLyricsInterval = setInterval(function () {
     if (!player || !player.isConnected) {
       player = document.getElementById("movie_player");
+      if (player) {
+        setupResizeObserver(player);
+      }
     } else {
       try {
         const now = Date.now();
 
         const { video_id, title, author } = player.getVideoData();
+
+        // Update the cached rect when the video changes, as aspect ratios might shift
+        if (video_id !== lastVideoId) {
+          lastVideoId = video_id;
+          if (typeof player.getVideoContentRect === "function") {
+            cachedContentRect = player.getVideoContentRect();
+          }
+        }
+
         const audioTrackData = player.getAudioTrack();
         const duration = player.getDuration();
         const { isPlaying, isBuffering } = player.getPlayerStateObject();
-        const contentRect = player.getVideoContentRect();
+
+        // Use the cached contentRect. Fallback if it hasn't been cached yet.
+        let contentRect = cachedContentRect;
+        if (!contentRect && typeof player.getVideoContentRect === "function") {
+          contentRect = player.getVideoContentRect();
+          cachedContentRect = contentRect;
+        }
 
         const currentTime = player.getCurrentTime();
         const playing = isPlaying && !isBuffering;
@@ -76,7 +114,6 @@ const startLyricsTick = () => {
         }
 
         const timeDiff = (now - lastPlayerTimestamp) / 1000;
-
         const time = currentTime + timeDiff;
 
         document.dispatchEvent(
@@ -103,13 +140,18 @@ const startLyricsTick = () => {
 };
 
 /**
- * Stops the lyrics tick interval and clears the timer.
+ * Stops the lyrics tick interval, clears the timer, and cleans up observers.
  * Called when the page is unloaded or when an error occurs.
  */
 const stopLyricsTick = () => {
   if (tickLyricsInterval) {
     clearInterval(tickLyricsInterval);
     tickLyricsInterval = null;
+  }
+
+  if (playerResizeObserver) {
+    playerResizeObserver.disconnect();
+    playerResizeObserver = null;
   }
 };
 
