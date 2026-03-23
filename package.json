@@ -39,7 +39,7 @@
     "dependencies": {
         "@codemirror/autocomplete": "^6.20.1",
         "@codemirror/commands": "^6.10.3",
-        "@codemirror/lint": "^6.9.4",
+        "@codemirror/lint": "^6.9.5",
         "@codemirror/search": "^6.6.0",
         "@codemirror/state": "^6.6.0",
         "@codemirror/view": "^6.40.0",
