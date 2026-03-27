@@ -318,6 +318,7 @@ export default async function bLyrics(providerParameters: ProviderParameters): P
   if (providerParameters.album != null) {
     url.searchParams.append("al", providerParameters.album);
   }
+  url.searchParams.append("v", providerParameters.videoId);
 
   const response = await fetch(url.toString(), {
     signal: AbortSignal.any([providerParameters.signal, AbortSignal.timeout(10000)]),
