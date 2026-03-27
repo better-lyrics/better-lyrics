@@ -53,15 +53,15 @@ const setupResizeObserver = player => {
  * Called when the page is unloaded or when an error occurs.
  */
 const stopLyricsTick = () => {
-    if (tickLyricsInterval) {
-        clearInterval(tickLyricsInterval);
-        tickLyricsInterval = null;
-    }
+  if (tickLyricsInterval) {
+    clearInterval(tickLyricsInterval);
+    tickLyricsInterval = null;
+  }
 
-    if (playerResizeObserver) {
-        playerResizeObserver.disconnect();
-        playerResizeObserver = null;
-    }
+  if (playerResizeObserver) {
+    playerResizeObserver.disconnect();
+    playerResizeObserver = null;
+  }
 };
 /**
  * Starts the lyrics tick interval to monitor YouTube Music player state.

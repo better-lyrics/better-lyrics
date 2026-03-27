@@ -7,25 +7,25 @@ export default {
     chrome: {
       profile: profile("chrome"),
       excludeBrowserFlags: [
-        '--hide-scrollbars', // Allow scrollbars to be visible
-        '--mute-audio', // Allow audio to play
-      ]
+        "--hide-scrollbars", // Allow scrollbars to be visible
+        "--mute-audio", // Allow audio to play
+      ],
     },
     chromium: {
       profile: profile("chromium"),
       excludeBrowserFlags: [
-        '--hide-scrollbars', // Allow scrollbars to be visible
-        '--mute-audio', // Allow audio to play
-      ]
+        "--hide-scrollbars", // Allow scrollbars to be visible
+        "--mute-audio", // Allow audio to play
+      ],
     },
     edge: { profile: profile("edge") },
     firefox: { profile: profile("firefox") },
     "chromium-based": {
       profile: profile("chromium-based"),
       excludeBrowserFlags: [
-        '--hide-scrollbars', // Allow scrollbars to be visible
-        '--mute-audio', // Allow audio to play
-      ]
+        "--hide-scrollbars", // Allow scrollbars to be visible
+        "--mute-audio", // Allow audio to play
+      ],
     },
     "gecko-based": { profile: profile("gecko-based") },
   },
