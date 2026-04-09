@@ -40,6 +40,7 @@ export const NOTO_SANS_UNIVERSAL_LINK =
 
 // API URLs and Functions
 export const LYRICS_API_URL = "https://lyrics-api.boidu.dev/getLyrics" as const;
+export const BINIMUM_LYRICS_API_URL = "https://lyrics-api.binimum.org/" as const;
 export const DISCORD_INVITE_URL = "https://discord.gg/UsHE3d5fWF" as const;
 export const LRCLIB_API_URL = "https://lrclib.net/api/get" as const;
 export const LEGATO_API_URL = "https://lyrics-api.boidu.dev/kugou/getLyrics" as const;
@@ -360,15 +361,72 @@ interface ProviderConfig {
 }
 
 export const PROVIDER_CONFIGS: ProviderConfig[] = [
-  { key: "bLyrics-richsynced", displayName: "Better Lyrics", syncType: "syllable", priority: 0 },
-  { key: "musixmatch-richsync", displayName: "Musixmatch", syncType: "word", priority: 1 },
-  { key: "yt-captions", displayName: "Youtube Captions", syncType: "line", priority: 2 },
-  { key: "bLyrics-synced", displayName: "Better Lyrics", syncType: "line", priority: 3 },
-  { key: "lrclib-synced", displayName: "LRCLib", syncType: "line", priority: 4 },
-  { key: "legato-synced", displayName: "Legato", syncType: "line", priority: 5 },
-  { key: "musixmatch-synced", displayName: "Musixmatch", syncType: "line", priority: 6 },
-  { key: "yt-lyrics", displayName: "Youtube", syncType: "unsynced", priority: 7 },
-  { key: "lrclib-plain", displayName: "LRCLib", syncType: "unsynced", priority: 8 },
+  {
+    key: "bLyrics-richsynced",
+    displayName: "Better Lyrics",
+    syncType: "syllable",
+    priority: 0,
+  },
+  {
+    key: "binimum-richsynced",
+    displayName: "BiniLyrics",
+    syncType: "syllable",
+    priority: 1,
+  },
+  {
+    key: "musixmatch-richsync",
+    displayName: "Musixmatch",
+    syncType: "word",
+    priority: 2,
+  },
+  {
+    key: "yt-captions",
+    displayName: "Youtube Captions",
+    syncType: "line",
+    priority: 3,
+  },
+  {
+    key: "bLyrics-synced",
+    displayName: "Better Lyrics",
+    syncType: "line",
+    priority: 4,
+  },
+  {
+    key: "binimum-synced",
+    displayName: "BiniLyrics",
+    syncType: "line",
+    priority: 5,
+  },
+  {
+    key: "lrclib-synced",
+    displayName: "LRCLib",
+    syncType: "line",
+    priority: 6,
+  },
+  {
+    key: "legato-synced",
+    displayName: "Legato",
+    syncType: "line",
+    priority: 7,
+  },
+  {
+    key: "musixmatch-synced",
+    displayName: "Musixmatch",
+    syncType: "line",
+    priority: 8,
+  },
+  {
+    key: "yt-lyrics",
+    displayName: "Youtube",
+    syncType: "unsynced",
+    priority: 9,
+  },
+  {
+    key: "lrclib-plain",
+    displayName: "LRCLib",
+    syncType: "unsynced",
+    priority: 10,
+  },
 ] as const;
 
 export const LYRIC_SOURCE_KEYS = PROVIDER_CONFIGS.map(p => p.key);
