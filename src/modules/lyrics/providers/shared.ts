@@ -1,12 +1,13 @@
 import { LYRIC_SOURCE_KEYS, PROVIDER_CONFIGS, PROVIDER_SWITCHED_LOG } from "@constants";
+import { getTransientStorage, setTransientStorage } from "@core/storage";
 import { log } from "@utils";
+import binimum from "./binimum";
 import bLyrics from "./blyrics/blyrics";
 import cubey, { type CubeyLyricSourceResult } from "./cubey";
+import legato from "./legato";
 import lyricLib from "./lrclib";
 import ytLyrics, { type YTLyricSourceResult } from "./yt";
 import { ytCaptions } from "./ytCaptions";
-import legato from "./legato";
-import { getTransientStorage, setTransientStorage } from "@core/storage";
 
 /** Current version of the lyrics cache format */
 const LYRIC_CACHE_VERSION = "2.0.0";
@@ -145,6 +146,8 @@ export function initProviders(): void {
 }
 
 const sourceKeyToFillFn = {
+  "binimum-richsynced": binimum,
+  "binimum-synced": binimum,
   "bLyrics-richsynced": bLyrics,
   "bLyrics-synced": bLyrics,
   "musixmatch-richsync": cubey,
