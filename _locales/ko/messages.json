@@ -88,11 +88,11 @@
     "description": "Show stylized animations setting label"
   },
   "options_language_displayLanguage": {
-    "message": "Display Language",
+    "message": "표시된 언어",
     "description": "Label for the UI language selector dropdown"
   },
   "options_language_displayLanguageAuto": {
-    "message": "Auto",
+    "message": "자동",
     "description": "Option label for automatic language detection based on browser settings"
   },
   "options_language_title": {
@@ -140,11 +140,11 @@
     "description": "Choose a theme button label"
   },
   "options_themes_change": {
-    "message": "Change",
+    "message": "변경",
     "description": "Change theme button label"
   },
   "options_themes_customTheme": {
-    "message": "Custom Theme",
+    "message": "커스텀 테마",
     "description": "Display name for unnamed custom themes"
   },
   "options_themes_customStyles": {
@@ -432,7 +432,7 @@
     "description": "Show installed themes"
   },
   "marketplace_showNotInstalled": {
-    "message": "미설치",
+    "message": "설치되지 않음",
     "description": "Show not installed themes"
   },
   "marketplace_options": {
@@ -460,7 +460,7 @@
     "description": "Loading message"
   },
   "marketplace_retry": {
-    "message": "재시도",
+    "message": "다시 시도",
     "description": "Retry button"
   },
   "marketplace_noThemesMatch": {
@@ -624,7 +624,7 @@
     "description": "Install/remove shortcut"
   },
   "marketplace_shortcutsApply": {
-    "message": "Apply theme",
+    "message": "테마 적용",
     "description": "Apply theme shortcut label"
   },
   "marketplace_shortcutsPrevImage": {
@@ -820,7 +820,7 @@
     }
   },
   "symlink_applied": {
-    "message": "Applied theme: $NAME$ (Marketplace)",
+    "message": "적용된 테마: $NAME$ (마켓플레이스)",
     "description": "Alert after successfully applying a symlinked theme from marketplace",
     "placeholders": {
       "name": {
@@ -830,7 +830,7 @@
     }
   },
   "builtin_applied": {
-    "message": "Applied theme: $NAME$",
+    "message": "적용된 테마: $NAME$",
     "description": "Alert after successfully applying a bundled built-in theme",
     "placeholders": {
       "name": {
@@ -854,35 +854,35 @@
     "description": "Author label for custom user themes on theme selector button"
   },
   "symlink_installFailed": {
-    "message": "Couldn't install theme. Check your connection and try again.",
+    "message": "테마를 설치할 수 없습니다. 연결을 확인한 후 다시 시도하세요.",
     "description": "Alert when a symlinked theme fails to install from marketplace"
   },
   "symlink_badge_marketplace": {
-    "message": "Marketplace",
+    "message": "마켓플레이스",
     "description": "Badge text on symlinked theme cards"
   },
   "symlink_badge_bundled": {
-    "message": "Bundled",
+    "message": "내장됨",
     "description": "Badge text on non-symlinked built-in theme cards"
   },
   "deprecation_builtin_title": {
-    "message": "Heads up, these themes are moving!",
+    "message": "주의, 이 테마는 움직입니다!",
     "description": "Title for the built-in themes deprecation banner in theme modal"
   },
   "deprecation_builtin_body": {
-    "message": "We're migrating built-in themes to the Theme Marketplace. Some already have, look for the Marketplace badge. The rest will follow in a future update, with CSS backups on GitHub and Discord.",
+    "message": "내장된 테마를 테마 마켓플레이스로 마이그레이션하고 있습니다. 이미 일부는 마켓플레이스 배지를 찾고 있습니다. 나머지는 향후 업데이트에서 GitHub와 Discord에서 CSS 백업을 통해 제공될 예정입니다.",
     "description": "Body text for the built-in themes deprecation banner"
   },
   "deprecation_builtin_cta": {
-    "message": "Browse Marketplace",
+    "message": "마켓플레이스 탐색",
     "description": "CTA button text in the deprecation banner to open the marketplace"
   },
   "theme_modal_section_builtin": {
-    "message": "Built-in Themes",
+    "message": "내장 테마",
     "description": "Section title for built-in themes in the theme chooser modal"
   },
   "theme_modal_section_custom": {
-    "message": "Custom Themes",
+    "message": "커스텀 테마",
     "description": "Section title for custom themes in the theme chooser modal"
   }
 }
