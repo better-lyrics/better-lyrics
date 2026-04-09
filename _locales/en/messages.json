@@ -323,6 +323,10 @@
     "message": "Youtube Captions",
     "description": "Youtube Captions provider name"
   },
+  "options_provider_binilyrics": {
+    "message": "BiniLyrics",
+    "description": "BiniLyrics provider name"
+  },
 
   "options_syncType_syllable": {
     "message": "Syllable",
