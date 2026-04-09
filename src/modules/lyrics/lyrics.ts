@@ -8,14 +8,22 @@ import { t } from "@core/i18n";
 import { AppState, type PlayerDetails } from "@core/appState";
 import { type LyricsData, processLyrics } from "@modules/lyrics/injectLyrics";
 import { stringSimilarity } from "@modules/lyrics/lyricParseUtils";
+import { registerThemeSetting } from "@modules/settings/themeOptions";
 import { flushLoader, renderLoader } from "@modules/ui/dom";
 import { log } from "@utils";
 import type { CubeyLyricSourceResult } from "./providers/cubey";
-import type { LyricSourceResult, ProviderParameters } from "./providers/shared";
+import type { Lyric, LyricSourceResult, ProviderParameters } from "./providers/shared";
 import { getLyrics, newSourceMap, providerPriority } from "./providers/shared";
 import type { YTLyricSourceResult } from "./providers/yt";
 import { getSongMetadata, getSongAlbum, type SegmentMap } from "./requestSniffer/requestSniffer";
 import { clearCache as clearTranslationCache } from "./translation";
+
+const hideInstrumentalOnly = registerThemeSetting("blyrics-hide-instrumental-only", false, true);
+
+function isInstrumentalOnly(lyrics: Lyric[]): boolean {
+  if (lyrics.length !== 1) return false;
+  return /^\[?instrumental\s*only\]?$/i.test(lyrics[0].words.trim());
+}
 
 export type LyricSourceResultWithMeta = LyricSourceResult & {
   song: string;
@@ -223,6 +231,9 @@ export async function createLyrics(detail: PlayerDetails, signal: AbortSignal): 
         let sourceLyrics = await getLyrics(providerParameters, provider);
 
         if (sourceLyrics && sourceLyrics.lyrics && sourceLyrics.lyrics.length > 0) {
+          if (hideInstrumentalOnly.getBooleanValue() && isInstrumentalOnly(sourceLyrics.lyrics)) {
+            continue;
+          }
           ytLyricsEarlyInjectAbortController.abort("Lyrics are ready"); // May not be ideal when the stringSimilarity fails, but this should be rare anyways
           let ytLyrics = (await ytLyricsPromise) as YTLyricSourceResult;
 
