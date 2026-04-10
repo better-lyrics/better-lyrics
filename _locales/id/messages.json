@@ -311,6 +311,10 @@
     "message": "Subtitel YouTube",
     "description": "Youtube Captions provider name"
   },
+  "options_provider_binilyrics": {
+    "message": "BiniLyrics",
+    "description": "BiniLyrics provider name"
+  },
   "options_syncType_syllable": {
     "message": "Sukukata",
     "description": "Syllable sync type label"
