@@ -311,6 +311,10 @@
     "message": "YouTube字幕",
     "description": "Youtube Captions provider name"
   },
+  "options_provider_binilyrics": {
+    "message": "BiniLyrics",
+    "description": "BiniLyrics provider name"
+  },
   "options_syncType_syllable": {
     "message": "音節",
     "description": "Syllable sync type label"
