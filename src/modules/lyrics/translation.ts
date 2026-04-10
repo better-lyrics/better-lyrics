@@ -22,6 +22,8 @@ interface BatchRequest {
   targetLanguage?: string; // For translations
   sourceLanguage?: string; // For romanizations
   signal?: AbortSignal;
+  /** Called when a single line translation is available (streaming AI mode only) */
+  onLineTranslated?: (batchIndex: number, result: TranslationResult) => void;
 }
 
 interface BatchTranslationResponse {
@@ -49,7 +51,7 @@ export async function translateBatch(request: BatchRequest): Promise<BatchTransl
 }
 
 /**
- * Translates using Google Translate API (original implementation).
+ * Google Translate implementation.
  */
 async function translateBatchWithGoogle(request: BatchRequest): Promise<BatchTranslationResponse> {
   const { lines, targetLanguage, signal } = request;
@@ -60,7 +62,6 @@ async function translateBatchWithGoogle(request: BatchRequest): Promise<BatchTra
   const results: (TranslationResult | null)[] = new Array(lines.length).fill(null);
   const toTranslate: { index: number; text: string }[] = [];
 
-  // Check cache first
   lines.forEach((line, index) => {
     const trimmed = line.trim();
     if (!trimmed || trimmed === "♪") return;
@@ -79,72 +80,48 @@ async function translateBatchWithGoogle(request: BatchRequest): Promise<BatchTra
 
   let detectedLanguage = "";
 
-  // Chunk toTranslate based on URL length limits
-  const chunks: { index: number; text: string }[][] = [];
+  // Build URL-length-limited chunks
+  let chunks: { index: number; text: string }[][] = [];
   let currentChunk: { index: number; text: string }[] = [];
-  let currentEncodedLength = 0;
-
-  const baseUrl = TRANSLATE_LYRICS_URL(targetLanguage, "");
-  const separatorEncoded = encodeURIComponent(BATCH_SEPARATOR);
+  let currentLength = 0;
 
   for (const item of toTranslate) {
-    const itemEncoded = encodeURIComponent(item.text);
-    const addedLength = (currentChunk.length > 0 ? separatorEncoded.length : 0) + itemEncoded.length;
-
-    if (currentChunk.length > 0 && baseUrl.length + currentEncodedLength + addedLength > MAX_URL_LENGTH) {
+    const addedLength = encodeURIComponent(item.text + BATCH_SEPARATOR).length;
+    if (currentLength + addedLength > MAX_URL_LENGTH && currentChunk.length > 0) {
       chunks.push(currentChunk);
       currentChunk = [];
-      currentEncodedLength = 0;
+      currentLength = 0;
     }
-
     currentChunk.push(item);
-    currentEncodedLength += (currentChunk.length > 1 ? separatorEncoded.length : 0) + itemEncoded.length;
+    currentLength += addedLength;
   }
-  if (currentChunk.length > 0) {
-    chunks.push(currentChunk);
-  }
+  if (currentChunk.length > 0) chunks.push(currentChunk);
 
   for (const chunk of chunks) {
     try {
-      const combinedText = chunk.map(item => item.text).join(BATCH_SEPARATOR);
-      const url = TRANSLATE_LYRICS_URL(targetLanguage, combinedText);
+      const query = chunk.map(item => item.text).join(BATCH_SEPARATOR);
+      const url = TRANSLATE_LYRICS_URL(targetLanguage, query);
 
-      const response = await fetch(url, { cache: "force-cache", signal });
+      const response = await fetch(url, { signal });
+      if (!response.ok) continue;
+
       const data = await response.json();
 
-      if (!detectedLanguage) {
-        detectedLanguage = data[2] || "";
+      if (!detectedLanguage && data[2]) {
+        detectedLanguage = data[2];
       }
 
-      let fullTranslatedText = "";
-      data[0].forEach((part: string[]) => {
-        fullTranslatedText += part[0];
-      });
-
-      let translatedLines = fullTranslatedText.split(BATCH_SEPARATOR);
-
-      // Fallback: If Google merged the translations into fewer blocks than expected
-      if (translatedLines.length < chunk.length) {
-        const semicolonSplit = fullTranslatedText.split(";").filter(l => l.trim().length > 0);
-        if (semicolonSplit.length === chunk.length) {
-          translatedLines = semicolonSplit;
-        } else {
-          const singleNewlineSplit = fullTranslatedText.split(/\r?\n/).filter(l => l.trim().length > 0);
-          if (singleNewlineSplit.length === chunk.length) {
-            translatedLines = singleNewlineSplit;
-          } else if (translatedLines.length === 1 && chunk.length > 1) {
-            log(TRANSLATION_ERROR_LOG, `Batch translation failed to split: expected ${chunk.length} lines, got 1.`);
-            translatedLines = [];
-          }
-        }
-      }
+      const translatedParts: string[] = (data[0] || []).map((part: any) => part?.[0] || "").filter(Boolean);
+      const translatedTexts = translatedParts.join("").split(BATCH_SEPARATOR);
 
       chunk.forEach((item, i) => {
-        const translatedText = translatedLines[i]?.trim();
-        if (translatedText && translatedText.toLowerCase() !== item.text.toLowerCase()) {
-          const result = { originalLanguage: detectedLanguage, translatedText };
-          cache.translation.set(`${targetLanguage}_${item.text}`, result);
-          results[item.index] = result;
+        if (translatedTexts[i] !== undefined) {
+          const translatedText = translatedTexts[i].trim();
+          if (translatedText && translatedText.toLowerCase() !== item.text.toLowerCase()) {
+            const result = { originalLanguage: detectedLanguage, translatedText };
+            cache.translation.set(`${targetLanguage}_${item.text}`, result);
+            results[item.index] = result;
+          }
         }
       });
     } catch (error) {
@@ -158,10 +135,11 @@ async function translateBatchWithGoogle(request: BatchRequest): Promise<BatchTra
 }
 
 /**
- * Translates using a local OpenAI-compatible API.
+ * Translates using a local OpenAI-compatible API with streaming.
+ * Uses chrome.runtime.Port for real-time SSE streaming through the background worker.
  */
 async function translateBatchWithAI(request: BatchRequest): Promise<BatchTranslationResponse> {
-  const { lines, targetLanguage, signal } = request;
+  const { lines, targetLanguage, signal, onLineTranslated } = request;
   if (!targetLanguage || lines.length === 0) {
     return { results: lines.map(() => null), detectedLanguage: "" };
   }
@@ -182,7 +160,10 @@ async function translateBatchWithAI(request: BatchRequest): Promise<BatchTransla
 
     const cacheKey = `${targetLanguage}_${trimmed}`;
     if (cache.translation.has(cacheKey)) {
-      results[index] = cache.translation.get(cacheKey)!;
+      const cached = cache.translation.get(cacheKey)!;
+      results[index] = cached;
+      // Fire callback for cached results too
+      if (onLineTranslated) onLineTranslated(index, cached);
     } else {
       toTranslate.push({ index, text: trimmed });
     }
@@ -232,54 +213,67 @@ async function translateBatchWithAI(request: BatchRequest): Promise<BatchTransla
         temperature: 0.3,
       };
 
-      // Route through background service worker to avoid mixed content blocking
-      const response: { data?: any; error?: string } = await chrome.runtime.sendMessage({
-        action: "aiTranslate",
-        url,
-        headers,
-        body,
-      });
+      // Stream via Port through background service worker
+      await new Promise<void>((resolve) => {
+        const port = chrome.runtime.connect({ name: "aiTranslateStream" });
+        let accumulatedText = "";
 
-      if (signal?.aborted) break;
+        const processCompleteLine = (lineText: string) => {
+          const match = lineText.match(/^(\d+)\.\s*(.+)$/);
+          if (!match) return;
 
-      if (response.error) {
-        log(TRANSLATION_ERROR_LOG, `OpenAI API error: ${response.error}`);
-        continue;
-      }
-
-      const data = response.data;
-      const content: string = data?.choices?.[0]?.message?.content?.trim() || "";
-
-      if (!content) {
-        log(TRANSLATION_ERROR_LOG, "OpenAI API returned empty content");
-        continue;
-      }
-
-      // Parse the numbered response
-      const translatedLines = content.split("\n");
-      const parsedResults = new Map<number, string>();
-
-      for (const line of translatedLines) {
-        const match = line.match(/^(\d+)\.\s*(.+)$/);
-        if (match) {
           const lineNum = parseInt(match[1], 10);
           const translatedText = match[2].trim();
-          parsedResults.set(lineNum, translatedText);
-        }
-      }
+          const chunkItem = chunk[lineNum - 1];
+          if (!chunkItem) return;
 
-      // Detect language from first response if not already set
-      if (!detectedLanguage && data?.choices?.[0]?.message?.content) {
-        detectedLanguage = "auto";
-      }
+          if (!detectedLanguage) detectedLanguage = "auto";
 
-      chunk.forEach((item, i) => {
-        const translatedText = parsedResults.get(i + 1);
-        if (translatedText && translatedText.toLowerCase() !== item.text.toLowerCase()) {
-          const result = { originalLanguage: detectedLanguage, translatedText };
-          cache.translation.set(`${targetLanguage}_${item.text}`, result);
-          results[item.index] = result;
-        }
+          if (translatedText && translatedText.toLowerCase() !== chunkItem.text.toLowerCase()) {
+            const result: TranslationResult = { originalLanguage: detectedLanguage, translatedText };
+            cache.translation.set(`${targetLanguage}_${chunkItem.text}`, result);
+            results[chunkItem.index] = result;
+            if (onLineTranslated) onLineTranslated(chunkItem.index, result);
+          }
+        };
+
+        port.onMessage.addListener((msg: { type: string; content?: string; error?: string }) => {
+          if (signal?.aborted) {
+            port.disconnect();
+            resolve();
+            return;
+          }
+
+          if (msg.type === "chunk" && msg.content) {
+            accumulatedText += msg.content;
+
+            // Check for complete lines (ended by newline)
+            const completedLines = accumulatedText.split("\n");
+            // Keep the last potentially incomplete line
+            accumulatedText = completedLines.pop() || "";
+
+            for (const line of completedLines) {
+              const trimmed = line.trim();
+              if (trimmed) processCompleteLine(trimmed);
+            }
+          } else if (msg.type === "error") {
+            log(TRANSLATION_ERROR_LOG, `OpenAI API stream error: ${msg.error}`);
+          } else if (msg.type === "done") {
+            // Process any remaining text
+            if (accumulatedText.trim()) {
+              processCompleteLine(accumulatedText.trim());
+            }
+            port.disconnect();
+            resolve();
+          }
+        });
+
+        port.onDisconnect.addListener(() => {
+          resolve();
+        });
+
+        // Send the request to start streaming
+        port.postMessage({ url, headers, body });
       });
     } catch (error) {
       if ((error as Error).name !== "AbortError") {

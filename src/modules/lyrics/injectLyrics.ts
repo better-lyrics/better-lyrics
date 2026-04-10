@@ -636,6 +636,12 @@ async function processBatchTranslationsAndRomanizations(
           lines: translationBatch.map(b => b.text),
           targetLanguage: targetTranslationLang,
           signal,
+          onLineTranslated: (batchIndex, result) => {
+            if (isStale()) return;
+            const originalIndex = translationBatch[batchIndex].index;
+            injectTranslation(linesData[originalIndex].lyricElement, result.translatedText);
+            lyricsElementAdded();
+          },
         });
         if (isStale()) return;
 
@@ -646,6 +652,7 @@ async function processBatchTranslationsAndRomanizations(
 
         if (isTranslationDisabledForLang(sourceLanguage || "")) return;
 
+        // For non-streaming (Google Translate), inject remaining results
         response.results.forEach((result, i) => {
           if (result) {
             const originalIndex = translationBatch[i].index;

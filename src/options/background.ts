@@ -140,8 +140,7 @@ chrome.runtime.onMessage.addListener((request, _sender, sendResponse) => {
       });
     });
   } else if (request.action === "aiTranslate") {
-    // Proxy AI translation requests through the background worker
-    // to avoid mixed content (HTTPS page → HTTP API) browser blocking.
+    // Non-streaming fallback (kept for compatibility)
     const { url, headers, body } = request;
     fetch(url, {
       method: "POST",
@@ -160,7 +159,83 @@ chrome.runtime.onMessage.addListener((request, _sender, sendResponse) => {
       .catch(err => {
         sendResponse({ error: String(err) });
       });
-    return true; // Keep the message channel open for async sendResponse
+    return true;
   }
   return true;
+});
+
+// Streaming AI translation via Port connection
+chrome.runtime.onConnect.addListener(port => {
+  if (port.name !== "aiTranslateStream") return;
+
+  port.onMessage.addListener(async (msg: { url: string; headers: Record<string, string>; body: any }) => {
+    const { url, headers, body } = msg;
+    // Enable streaming in the request body
+    body.stream = true;
+
+    try {
+      const res = await fetch(url, {
+        method: "POST",
+        headers,
+        body: JSON.stringify(body),
+      });
+
+      if (!res.ok) {
+        const text = await res.text();
+        port.postMessage({ type: "error", error: `API returned ${res.status}: ${text}` });
+        port.postMessage({ type: "done" });
+        return;
+      }
+
+      const reader = res.body!.getReader();
+      const decoder = new TextDecoder();
+      let buffer = "";
+
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+
+        buffer += decoder.decode(value, { stream: true });
+
+        // Parse SSE lines from the buffer
+        const lines = buffer.split("\n");
+        // Keep the last potentially incomplete line in the buffer
+        buffer = lines.pop() || "";
+
+        for (const line of lines) {
+          const trimmed = line.trim();
+          if (!trimmed || trimmed === "data: [DONE]") continue;
+          if (trimmed.startsWith("data: ")) {
+            try {
+              const json = JSON.parse(trimmed.slice(6));
+              const content = json.choices?.[0]?.delta?.content;
+              if (content) {
+                port.postMessage({ type: "chunk", content });
+              }
+            } catch {
+              // Ignore malformed JSON chunks
+            }
+          }
+        }
+      }
+
+      // Process any remaining buffer
+      if (buffer.trim() && buffer.trim() !== "data: [DONE]" && buffer.trim().startsWith("data: ")) {
+        try {
+          const json = JSON.parse(buffer.trim().slice(6));
+          const content = json.choices?.[0]?.delta?.content;
+          if (content) {
+            port.postMessage({ type: "chunk", content });
+          }
+        } catch {
+          // Ignore
+        }
+      }
+
+      port.postMessage({ type: "done" });
+    } catch (err) {
+      port.postMessage({ type: "error", error: String(err) });
+      port.postMessage({ type: "done" });
+    }
+  });
 });
