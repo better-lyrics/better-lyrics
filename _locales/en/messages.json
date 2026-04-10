@@ -120,6 +120,22 @@
     "message": "Translation language",
     "description": "Translation language setting label"
   },
+  "options_language_aiTranslate": {
+    "message": "Use AI Translation (OpenAI Compatible API)",
+    "description": "Toggle label for enabling AI-based translation via OpenAI compatible API"
+  },
+  "options_language_aiEndpoint": {
+    "message": "API Endpoint",
+    "description": "Label for the OpenAI compatible API endpoint input"
+  },
+  "options_language_aiApiKey": {
+    "message": "API Key",
+    "description": "Label for the OpenAI compatible API key input"
+  },
+  "options_language_aiModel": {
+    "message": "Model",
+    "description": "Label for the OpenAI compatible model name input"
+  },
 
   "options_sources_title": {
     "message": "Lyric Source Preference",

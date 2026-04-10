@@ -128,7 +128,7 @@ chrome.alarms.onAlarm.addListener(alarm => {
   }
 });
 
-chrome.runtime.onMessage.addListener(request => {
+chrome.runtime.onMessage.addListener((request, _sender, sendResponse) => {
   if (request.action === "applyStyles") {
     chrome.tabs.query({ url: "*://music.youtube.com/*" }, tabs => {
       tabs.forEach(tab => {
@@ -139,6 +139,28 @@ chrome.runtime.onMessage.addListener(request => {
         }
       });
     });
+  } else if (request.action === "aiTranslate") {
+    // Proxy AI translation requests through the background worker
+    // to avoid mixed content (HTTPS page → HTTP API) browser blocking.
+    const { url, headers, body } = request;
+    fetch(url, {
+      method: "POST",
+      headers,
+      body: JSON.stringify(body),
+    })
+      .then(async res => {
+        if (!res.ok) {
+          const text = await res.text();
+          sendResponse({ error: `API returned ${res.status}: ${text}` });
+        } else {
+          const data = await res.json();
+          sendResponse({ data });
+        }
+      })
+      .catch(err => {
+        sendResponse({ error: String(err) });
+      });
+    return true; // Keep the message channel open for async sendResponse
   }
   return true;
 });

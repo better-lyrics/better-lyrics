@@ -228,6 +228,10 @@ export function loadTranslationSettings(): void {
       translationLanguage: "en",
       romanizationDisabledLanguages: [],
       translationDisabledLanguages: [],
+      isAITranslateEnabled: false,
+      openaiApiEndpoint: "",
+      openaiApiKey: "",
+      openaiModel: "gpt-4o-mini",
     },
     items => {
       AppState.isTranslateEnabled = items.isTranslateEnabled;
@@ -235,6 +239,10 @@ export function loadTranslationSettings(): void {
       AppState.translationLanguage = items.translationLanguage || "en";
       AppState.romanizationDisabledLanguages = items.romanizationDisabledLanguages || [];
       AppState.translationDisabledLanguages = items.translationDisabledLanguages || [];
+      AppState.isAITranslateEnabled = items.isAITranslateEnabled || false;
+      AppState.openaiApiEndpoint = items.openaiApiEndpoint || "";
+      AppState.openaiApiKey = items.openaiApiKey || "";
+      AppState.openaiModel = items.openaiModel || "gpt-4o-mini";
     }
   );
 }

@@ -39,6 +39,10 @@ interface AppStateType {
   romanizationDisabledLanguages: string[];
   translationDisabledLanguages: string[];
   translationLanguage: string;
+  isAITranslateEnabled: boolean;
+  openaiApiEndpoint: string;
+  openaiApiKey: string;
+  openaiModel: string;
   hasPreloadedNextSong: boolean;
   currentInjectionId: number;
 }
@@ -63,6 +67,10 @@ export const AppState: AppStateType = {
   romanizationDisabledLanguages: [],
   translationDisabledLanguages: [],
   translationLanguage: "en",
+  isAITranslateEnabled: false,
+  openaiApiEndpoint: "",
+  openaiApiKey: "",
+  openaiModel: "gpt-4o-mini",
   hasPreloadedNextSong: false,
   currentInjectionId: 0,
 };

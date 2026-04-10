@@ -316,6 +316,27 @@
 							</select>
 						</div>
 					</div>
+					<div class="container">
+						<span>__MSG_options_language_aiTranslate__</span>
+						<label>
+							<input type="checkbox" id="isAITranslateEnabled">
+							<span class="checkmark"></span>
+						</label>
+					</div>
+					<div id="ai-translate-config" class="container" style="flex-direction: column; align-items: flex-start; gap: 0.75rem; padding: 0.75rem 1rem; display: none;">
+						<div style="display: flex; align-items: center; justify-content: space-between; width: 100%; gap: 0.5rem;">
+							<span style="white-space: nowrap; min-width: 80px;">__MSG_options_language_aiEndpoint__</span>
+							<input type="text" id="openaiApiEndpoint" placeholder="http://localhost:11434" style="flex: 1; padding: 0.4rem 0.6rem; border-radius: 6px; border: 1px solid rgba(255,255,255,0.15); background: rgba(255,255,255,0.05); color: inherit; font-size: 0.85rem; font-family: inherit;">
+						</div>
+						<div style="display: flex; align-items: center; justify-content: space-between; width: 100%; gap: 0.5rem;">
+							<span style="white-space: nowrap; min-width: 80px;">__MSG_options_language_aiApiKey__</span>
+							<input type="password" id="openaiApiKey" style="flex: 1; padding: 0.4rem 0.6rem; border-radius: 6px; border: 1px solid rgba(255,255,255,0.15); background: rgba(255,255,255,0.05); color: inherit; font-size: 0.85rem; font-family: inherit;">
+						</div>
+						<div style="display: flex; align-items: center; justify-content: space-between; width: 100%; gap: 0.5rem;">
+							<span style="white-space: nowrap; min-width: 80px;">__MSG_options_language_aiModel__</span>
+							<input type="text" id="openaiModel" placeholder="gpt-4o-mini" style="flex: 1; padding: 0.4rem 0.6rem; border-radius: 6px; border: 1px solid rgba(255,255,255,0.15); background: rgba(255,255,255,0.05); color: inherit; font-size: 0.85rem; font-family: inherit;">
+						</div>
+					</div>
 					<div class="container" id="romanization-config-container" style="display: none;">
 						<span>__MSG_options_language_exclusions__</span>
 						<button class="small-btn" id="romanization-config-btn">

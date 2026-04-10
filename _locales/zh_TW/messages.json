@@ -115,6 +115,22 @@
     "message": "翻譯語言",
     "description": "Translation language setting label"
   },
+  "options_language_aiTranslate": {
+    "message": "使用 AI 翻譯（OpenAI 相容 API）",
+    "description": "Toggle label for enabling AI-based translation via OpenAI compatible API"
+  },
+  "options_language_aiEndpoint": {
+    "message": "API 端點",
+    "description": "Label for the OpenAI compatible API endpoint input"
+  },
+  "options_language_aiApiKey": {
+    "message": "API 金鑰",
+    "description": "Label for the OpenAI compatible API key input"
+  },
+  "options_language_aiModel": {
+    "message": "模型",
+    "description": "Label for the OpenAI compatible model name input"
+  },
   "options_sources_title": {
     "message": "歌詞來源優先順序",
     "description": "Sources settings section title"

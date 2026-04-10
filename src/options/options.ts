@@ -21,6 +21,10 @@ interface Options {
   romanizationDisabledLanguages: string[];
   translationDisabledLanguages: string[];
   uiLanguage: string;
+  isAITranslateEnabled: boolean;
+  openaiApiEndpoint: string;
+  openaiApiKey: string;
+  openaiModel: string;
 }
 
 const saveOptions = (): void => {
@@ -54,6 +58,10 @@ const getOptionsFromForm = (): Options => {
     romanizationDisabledLanguages: romanizationDisabledLanguages,
     translationDisabledLanguages: translationDisabledLanguages,
     uiLanguage: (document.getElementById("uiLanguage") as HTMLSelectElement).value,
+    isAITranslateEnabled: (document.getElementById("isAITranslateEnabled") as HTMLInputElement).checked,
+    openaiApiEndpoint: (document.getElementById("openaiApiEndpoint") as HTMLInputElement).value,
+    openaiApiKey: (document.getElementById("openaiApiKey") as HTMLInputElement).value,
+    openaiModel: (document.getElementById("openaiModel") as HTMLInputElement).value,
   };
 };
 
@@ -205,6 +213,10 @@ const restoreOptions = (): void => {
     romanizationDisabledLanguages: [],
     translationDisabledLanguages: [],
     uiLanguage: "auto",
+    isAITranslateEnabled: false,
+    openaiApiEndpoint: "",
+    openaiApiKey: "",
+    openaiModel: "gpt-4o-mini",
   };
 
   chrome.storage.sync.get(defaultOptions, setOptionsInForm);
@@ -225,9 +237,14 @@ const setOptionsInForm = (items: Options): void => {
   (document.getElementById("translationLanguage") as HTMLInputElement).value = items.translationLanguage;
   (document.getElementById("isRomanizationEnabled") as HTMLInputElement).checked = items.isRomanizationEnabled;
   (document.getElementById("uiLanguage") as HTMLSelectElement).value = items.uiLanguage;
+  (document.getElementById("isAITranslateEnabled") as HTMLInputElement).checked = items.isAITranslateEnabled || false;
+  (document.getElementById("openaiApiEndpoint") as HTMLInputElement).value = items.openaiApiEndpoint || "";
+  (document.getElementById("openaiApiKey") as HTMLInputElement).value = items.openaiApiKey || "";
+  (document.getElementById("openaiModel") as HTMLInputElement).value = items.openaiModel || "gpt-4o-mini";
   romanizationDisabledLanguages = items.romanizationDisabledLanguages || [];
   translationDisabledLanguages = items.translationDisabledLanguages || [];
   updateExclusionsConfigVisibility();
+  updateAITranslateConfigVisibility();
   renderRomanizationLanguagePills();
   renderTranslationLanguagePills();
 
@@ -446,6 +463,22 @@ document.addEventListener("DOMContentLoaded", async () => {
   initTabScrollIndicators();
   restoreOptions();
   restoreActiveTab();
+
+  // Debounced save for text inputs (OpenAI API fields)
+  let openaiSaveTimeout: ReturnType<typeof setTimeout> | null = null;
+  const debouncedSave = () => {
+    if (openaiSaveTimeout) clearTimeout(openaiSaveTimeout);
+    openaiSaveTimeout = setTimeout(saveOptions, 500);
+  };
+  ["openaiApiEndpoint", "openaiApiKey", "openaiModel"].forEach(id => {
+    document.getElementById(id)?.addEventListener("input", debouncedSave);
+  });
+
+  // Show/hide AI translate config when toggle changes
+  const aiToggle = document.getElementById("isAITranslateEnabled") as HTMLInputElement;
+  aiToggle?.addEventListener("change", () => {
+    updateAITranslateConfigVisibility();
+  });
 });
 document.querySelectorAll("#options input, #options select").forEach(element => {
   element.addEventListener("change", saveOptions);
@@ -652,6 +685,14 @@ function updateExclusionsConfigVisibility(): void {
 
   const shouldShow = romanizationToggle?.checked || translateToggle?.checked;
   configContainer.style.display = shouldShow ? "flex" : "none";
+}
+
+function updateAITranslateConfigVisibility(): void {
+  const aiToggle = document.getElementById("isAITranslateEnabled") as HTMLInputElement;
+  const configContainer = document.getElementById("ai-translate-config");
+  if (!configContainer) return;
+
+  configContainer.style.display = aiToggle?.checked ? "flex" : "none";
 }
 
 function initLangExclusionsModal(): void {

@@ -1,4 +1,5 @@
 import { TRANSLATE_IN_ROMAJI, TRANSLATE_LYRICS_URL, TRANSLATION_ERROR_LOG } from "@constants";
+import { AppState } from "@core/appState";
 import { log } from "@utils";
 
 interface TranslationResult {
@@ -38,8 +39,19 @@ const MAX_URL_LENGTH = 15000;
 
 /**
  * Translates a batch of lyric lines in a single request, chunked if necessary.
+ * Dispatches to either Google Translate or OpenAI-compatible API based on settings.
  */
 export async function translateBatch(request: BatchRequest): Promise<BatchTranslationResponse> {
+  if (AppState.isAITranslateEnabled) {
+    return translateBatchWithAI(request);
+  }
+  return translateBatchWithGoogle(request);
+}
+
+/**
+ * Translates using Google Translate API (original implementation).
+ */
+async function translateBatchWithGoogle(request: BatchRequest): Promise<BatchTranslationResponse> {
   const { lines, targetLanguage, signal } = request;
   if (!targetLanguage || lines.length === 0) {
     return { results: lines.map(() => null), detectedLanguage: "" };
@@ -129,6 +141,140 @@ export async function translateBatch(request: BatchRequest): Promise<BatchTransl
 
       chunk.forEach((item, i) => {
         const translatedText = translatedLines[i]?.trim();
+        if (translatedText && translatedText.toLowerCase() !== item.text.toLowerCase()) {
+          const result = { originalLanguage: detectedLanguage, translatedText };
+          cache.translation.set(`${targetLanguage}_${item.text}`, result);
+          results[item.index] = result;
+        }
+      });
+    } catch (error) {
+      if ((error as Error).name !== "AbortError") {
+        log(TRANSLATION_ERROR_LOG, error);
+      }
+    }
+  }
+
+  return { results, detectedLanguage };
+}
+
+/**
+ * Translates using a local OpenAI-compatible API.
+ */
+async function translateBatchWithAI(request: BatchRequest): Promise<BatchTranslationResponse> {
+  const { lines, targetLanguage, signal } = request;
+  if (!targetLanguage || lines.length === 0) {
+    return { results: lines.map(() => null), detectedLanguage: "" };
+  }
+
+  const systemPrompt =
+    `You are a lyrics translator. Translate the following song lyrics to ${targetLanguage}. ` +
+    `Each line is numbered. Return ONLY the translated lines, one per line, with the same numbering format "N. translated text". ` +
+    `Preserve the original meaning and tone. Do NOT add any explanation or extra text. ` +
+    `If a line is already in the target language, return it as-is.`;
+
+  const results: (TranslationResult | null)[] = new Array(lines.length).fill(null);
+  const toTranslate: { index: number; text: string }[] = [];
+
+  // Check cache first
+  lines.forEach((line, index) => {
+    const trimmed = line.trim();
+    if (!trimmed || trimmed === "♪") return;
+
+    const cacheKey = `${targetLanguage}_${trimmed}`;
+    if (cache.translation.has(cacheKey)) {
+      results[index] = cache.translation.get(cacheKey)!;
+    } else {
+      toTranslate.push({ index, text: trimmed });
+    }
+  });
+
+  if (toTranslate.length === 0) {
+    return { results, detectedLanguage: results.find(r => r !== null)?.originalLanguage || "" };
+  }
+
+  let detectedLanguage = "";
+
+  // Chunk into groups to avoid overly large API requests
+  const MAX_LINES_PER_CHUNK = 500;
+  const chunks: { index: number; text: string }[][] = [];
+  for (let i = 0; i < toTranslate.length; i += MAX_LINES_PER_CHUNK) {
+    chunks.push(toTranslate.slice(i, i + MAX_LINES_PER_CHUNK));
+  }
+
+  const apiEndpoint = AppState.openaiApiEndpoint;
+  const apiKey = AppState.openaiApiKey;
+  const model = AppState.openaiModel;
+
+  if (!apiEndpoint) {
+    log(TRANSLATION_ERROR_LOG, "OpenAI API endpoint is not configured. Set it in extension options.");
+    return { results, detectedLanguage };
+  }
+
+  const url = apiEndpoint.replace(/\/+$/, "") + "/v1/chat/completions";
+  const headers: Record<string, string> = {
+    "Content-Type": "application/json",
+  };
+  if (apiKey) {
+    headers["Authorization"] = `Bearer ${apiKey}`;
+  }
+
+  for (const chunk of chunks) {
+    if (signal?.aborted) break;
+    try {
+      const numberedLines = chunk.map((item, i) => `${i + 1}. ${item.text}`).join("\n");
+
+      const body = {
+        model: model || "gpt-4o-mini",
+        messages: [
+          { role: "system", content: systemPrompt },
+          { role: "user", content: numberedLines },
+        ],
+        temperature: 0.3,
+      };
+
+      // Route through background service worker to avoid mixed content blocking
+      const response: { data?: any; error?: string } = await chrome.runtime.sendMessage({
+        action: "aiTranslate",
+        url,
+        headers,
+        body,
+      });
+
+      if (signal?.aborted) break;
+
+      if (response.error) {
+        log(TRANSLATION_ERROR_LOG, `OpenAI API error: ${response.error}`);
+        continue;
+      }
+
+      const data = response.data;
+      const content: string = data?.choices?.[0]?.message?.content?.trim() || "";
+
+      if (!content) {
+        log(TRANSLATION_ERROR_LOG, "OpenAI API returned empty content");
+        continue;
+      }
+
+      // Parse the numbered response
+      const translatedLines = content.split("\n");
+      const parsedResults = new Map<number, string>();
+
+      for (const line of translatedLines) {
+        const match = line.match(/^(\d+)\.\s*(.+)$/);
+        if (match) {
+          const lineNum = parseInt(match[1], 10);
+          const translatedText = match[2].trim();
+          parsedResults.set(lineNum, translatedText);
+        }
+      }
+
+      // Detect language from first response if not already set
+      if (!detectedLanguage && data?.choices?.[0]?.message?.content) {
+        detectedLanguage = "auto";
+      }
+
+      chunk.forEach((item, i) => {
+        const translatedText = parsedResults.get(i + 1);
         if (translatedText && translatedText.toLowerCase() !== item.text.toLowerCase()) {
           const result = { originalLanguage: detectedLanguage, translatedText };
           cache.translation.set(`${targetLanguage}_${item.text}`, result);
