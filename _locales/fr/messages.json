@@ -311,6 +311,10 @@
     "message": "Sous-titres YouTube",
     "description": "Youtube Captions provider name"
   },
+  "options_provider_binilyrics": {
+    "message": "BiniLyrics",
+    "description": "BiniLyrics provider name"
+  },
   "options_syncType_syllable": {
     "message": "Syllabe",
     "description": "Syllable sync type label"
