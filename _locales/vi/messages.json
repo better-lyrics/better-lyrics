@@ -311,6 +311,10 @@
     "message": "Phụ đề Youtube",
     "description": "Youtube Captions provider name"
   },
+  "options_provider_binilyrics": {
+    "message": "BiniLyrics",
+    "description": "BiniLyrics provider name"
+  },
   "options_syncType_syllable": {
     "message": "Âm tiết",
     "description": "Syllable sync type label"
