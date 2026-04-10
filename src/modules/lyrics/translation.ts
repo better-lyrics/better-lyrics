@@ -80,48 +80,72 @@ async function translateBatchWithGoogle(request: BatchRequest): Promise<BatchTra
 
   let detectedLanguage = "";
 
-  // Build URL-length-limited chunks
-  let chunks: { index: number; text: string }[][] = [];
+  // Chunk toTranslate based on URL length limits
+  const chunks: { index: number; text: string }[][] = [];
   let currentChunk: { index: number; text: string }[] = [];
-  let currentLength = 0;
+  let currentEncodedLength = 0;
+
+  const baseUrl = TRANSLATE_LYRICS_URL(targetLanguage, "");
+  const separatorEncoded = encodeURIComponent(BATCH_SEPARATOR);
 
   for (const item of toTranslate) {
-    const addedLength = encodeURIComponent(item.text + BATCH_SEPARATOR).length;
-    if (currentLength + addedLength > MAX_URL_LENGTH && currentChunk.length > 0) {
+    const itemEncoded = encodeURIComponent(item.text);
+    const addedLength = (currentChunk.length > 0 ? separatorEncoded.length : 0) + itemEncoded.length;
+
+    if (currentChunk.length > 0 && baseUrl.length + currentEncodedLength + addedLength > MAX_URL_LENGTH) {
       chunks.push(currentChunk);
       currentChunk = [];
-      currentLength = 0;
+      currentEncodedLength = 0;
     }
+
     currentChunk.push(item);
-    currentLength += addedLength;
+    currentEncodedLength += (currentChunk.length > 1 ? separatorEncoded.length : 0) + itemEncoded.length;
   }
-  if (currentChunk.length > 0) chunks.push(currentChunk);
+  if (currentChunk.length > 0) {
+    chunks.push(currentChunk);
+  }
 
   for (const chunk of chunks) {
     try {
-      const query = chunk.map(item => item.text).join(BATCH_SEPARATOR);
-      const url = TRANSLATE_LYRICS_URL(targetLanguage, query);
+      const combinedText = chunk.map(item => item.text).join(BATCH_SEPARATOR);
+      const url = TRANSLATE_LYRICS_URL(targetLanguage, combinedText);
 
-      const response = await fetch(url, { signal });
-      if (!response.ok) continue;
-
+      const response = await fetch(url, { cache: "force-cache", signal });
       const data = await response.json();
 
-      if (!detectedLanguage && data[2]) {
-        detectedLanguage = data[2];
+      if (!detectedLanguage) {
+        detectedLanguage = data[2] || "";
       }
 
-      const translatedParts: string[] = (data[0] || []).map((part: any) => part?.[0] || "").filter(Boolean);
-      const translatedTexts = translatedParts.join("").split(BATCH_SEPARATOR);
+      let fullTranslatedText = "";
+      data[0].forEach((part: string[]) => {
+        fullTranslatedText += part[0];
+      });
+
+      let translatedLines = fullTranslatedText.split(BATCH_SEPARATOR);
+
+      // Fallback: If Google merged the translations into fewer blocks than expected
+      if (translatedLines.length < chunk.length) {
+        const semicolonSplit = fullTranslatedText.split(";").filter(l => l.trim().length > 0);
+        if (semicolonSplit.length === chunk.length) {
+          translatedLines = semicolonSplit;
+        } else {
+          const singleNewlineSplit = fullTranslatedText.split(/\r?\n/).filter(l => l.trim().length > 0);
+          if (singleNewlineSplit.length === chunk.length) {
+            translatedLines = singleNewlineSplit;
+          } else if (translatedLines.length === 1 && chunk.length > 1) {
+            log(TRANSLATION_ERROR_LOG, `Batch translation failed to split: expected ${chunk.length} lines, got 1.`);
+            translatedLines = [];
+          }
+        }
+      }
 
       chunk.forEach((item, i) => {
-        if (translatedTexts[i] !== undefined) {
-          const translatedText = translatedTexts[i].trim();
-          if (translatedText && translatedText.toLowerCase() !== item.text.toLowerCase()) {
-            const result = { originalLanguage: detectedLanguage, translatedText };
-            cache.translation.set(`${targetLanguage}_${item.text}`, result);
-            results[item.index] = result;
-          }
+        const translatedText = translatedLines[i]?.trim();
+        if (translatedText && translatedText.toLowerCase() !== item.text.toLowerCase()) {
+          const result = { originalLanguage: detectedLanguage, translatedText };
+          cache.translation.set(`${targetLanguage}_${item.text}`, result);
+          results[item.index] = result;
         }
       });
     } catch (error) {
