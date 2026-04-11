@@ -6,7 +6,6 @@ import {
   FOOTER_CLASS,
   FOOTER_NOT_VISIBLE_LOG,
   GENIUS_LOGO_SRC,
-  LOADER_ANIMATION_END_FAILED,
   LOADER_TRANSITION_ENDED,
   LRCLIB_UPLOAD_URL,
   LYRICS_AD_OVERLAY_ID,
@@ -40,7 +39,6 @@ import { scrollEventHandler } from "./observer";
 import type { ThumbnailElement } from "@modules/lyrics/requestSniffer/NextResponse";
 import { disconnectResizeObserver } from "@modules/lyrics/injectLyrics";
 import { byId, deleteVote, vote, type UnisonData } from "../lyrics/providers/unison";
-import { signPayload } from "@/core/keyIdentity";
 import { showReportModal } from "./reportLyrics";
 
 const votedIcons = {

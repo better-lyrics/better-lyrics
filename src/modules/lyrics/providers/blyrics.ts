@@ -11,6 +11,7 @@ export default async function bLyrics(providerParameters: ProviderParameters): P
   if (providerParameters.album != null) {
     url.searchParams.append("al", providerParameters.album);
   }
+  url.searchParams.append("v", providerParameters.videoId);
 
   const response = await fetch(url.toString(), {
     signal: AbortSignal.any([providerParameters.signal, AbortSignal.timeout(10000)]),
@@ -27,24 +28,5 @@ export default async function bLyrics(providerParameters: ProviderParameters): P
   }
 
   let responseString: string = await response.json().then(json => json.ttml);
-  const ttml = await fillTtml(responseString, providerParameters.duration);
-
-  if (ttml) {
-    if (ttml.isWordSynced) {
-      providerParameters.sourceMap["bLyrics-richsynced"].lyricSourceResult = ttml.result;
-      providerParameters.sourceMap["bLyrics-synced"].lyricSourceResult = null;
-    } else {
-      providerParameters.sourceMap["bLyrics-richsynced"].lyricSourceResult = null;
-      providerParameters.sourceMap["bLyrics-synced"].lyricSourceResult = ttml.result;
-    }
-
-    providerParameters.sourceMap["bLyrics-synced"].filled = true;
-    providerParameters.sourceMap["bLyrics-richsynced"].filled = true;
-  } else {
-    providerParameters.sourceMap["bLyrics-richsynced"].lyricSourceResult = null;
-    providerParameters.sourceMap["bLyrics-richsynced"].filled = true;
-
-    providerParameters.sourceMap["bLyrics-synced"].lyricSourceResult = null;
-    providerParameters.sourceMap["bLyrics-synced"].filled = true;
-  }
+  await fillTtml(responseString, providerParameters);
 }

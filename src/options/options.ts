@@ -297,6 +297,9 @@ const getProviderIdToInfoMap = (): { [key: string]: ProviderInfo } => ({
     name: t("options_provider_musixmatch"),
     syncType: "line",
   },
+  "unison-richsynced": { name: t("options_provider_betterLyricsUnison"), syncType: "syllable" },
+  "unison-synced": { name: t("options_provider_betterLyricsUnison"), syncType: "line" },
+  "unison-plain": { name: t("options_provider_betterLyricsUnison"), syncType: "unsynced" },
   "yt-captions": {
     name: t("options_provider_youtubeCaptions"),
     syncType: "line",

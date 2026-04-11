@@ -372,10 +372,11 @@ export const PROVIDER_CONFIGS: ProviderConfig[] = [
     syncType: "syllable",
     priority: 0,
   },
-  { key: "unison-richsynced",
+  {
+    key: "unison-richsynced",
     displayName: "Unison",
     syncType: "syllable",
-    priority: 1
+    priority: 1,
   },
   {
     key: "binimum-richsynced",
@@ -402,15 +403,16 @@ export const PROVIDER_CONFIGS: ProviderConfig[] = [
     priority: 5,
   },
   {
-    key: "binimum-synced",
-    displayName: "BiniLyrics",
+    key: "unison-synced",
+    displayName: "Unison",
     syncType: "line",
     priority: 6,
   },
-  { key: "unison-synced",
-    displayName: "Unison",
+  {
+    key: "binimum-synced",
+    displayName: "BiniLyrics",
     syncType: "line",
-    priority: 7
+    priority: 7,
   },
   {
     key: "lrclib-synced",
@@ -440,7 +442,7 @@ export const PROVIDER_CONFIGS: ProviderConfig[] = [
     key: "unison-plain",
     displayName: "Unison",
     syncType: "unsynced",
-    priority: 12
+    priority: 12,
   },
   {
     key: "lrclib-plain",
