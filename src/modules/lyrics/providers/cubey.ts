@@ -285,26 +285,7 @@ export default async function cubey(providerParameters: ProviderParameters): Pro
 
   if (responseData.goLyricsApiTtml) {
     let ttmlData = JSON.parse(responseData.goLyricsApiTtml);
-    const ttml = await fillTtml(ttmlData.ttml, providerParameters.duration);
-
-    if (ttml) {
-      if (ttml.isWordSynced) {
-        providerParameters.sourceMap["bLyrics-richsynced"].lyricSourceResult = ttml.result;
-        providerParameters.sourceMap["bLyrics-synced"].lyricSourceResult = null;
-      } else {
-        providerParameters.sourceMap["bLyrics-richsynced"].lyricSourceResult = null;
-        providerParameters.sourceMap["bLyrics-synced"].lyricSourceResult = ttml.result;
-      }
-  
-      providerParameters.sourceMap["bLyrics-synced"].filled = true;
-      providerParameters.sourceMap["bLyrics-richsynced"].filled = true;
-    } else {
-      providerParameters.sourceMap["bLyrics-richsynced"].lyricSourceResult = null;
-      providerParameters.sourceMap["bLyrics-richsynced"].filled = true;
-
-      providerParameters.sourceMap["bLyrics-synced"].lyricSourceResult = null;
-      providerParameters.sourceMap["bLyrics-synced"].filled = true;
-    }
+    fillTtml(ttmlData.ttml, providerParameters);
   }
 
   (
