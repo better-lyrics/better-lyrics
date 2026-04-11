@@ -124,26 +124,29 @@ export default async function unison(providerParameters: ProviderParameters): Pr
     cacheAllowed: false,
     source: "Unison",
     sourceHref: "https://boidu.dev/",
-    unisonData: { vote: responseData.userVote, votes: responseData.voteCount, effectiveScore: responseData.effectiveScore, lyricsId: responseData.id }
   }
   
+  const unisonData = {
+    vote: responseData.userVote,
+    votes: responseData.voteCount,
+    effectiveScore: responseData.effectiveScore,
+    lyricsId: responseData.id
+  }
+
   switch (responseData.format) {
     case "ttml":
-      const filled = await fillTtml(responseData.lyrics, providerParameters.duration);
-      if (filled) {
-        const unisonResult = { ...filled.result, ...result };
-        providerParameters.sourceMap["unison-richsynced"].lyricSourceResult = filled.isWordSynced ? unisonResult : null;
-        providerParameters.sourceMap["unison-synced"].lyricSourceResult = !filled.isWordSynced ? unisonResult : null;
-      } else {
-        providerParameters.sourceMap["unison-richsynced"].lyricSourceResult = null;
-        providerParameters.sourceMap["unison-synced"].lyricSourceResult = null;
-      }
+      await fillTtml(responseData.lyrics, providerParameters, {
+        richsyncKey: "unison-richsynced",
+        syncedKey: "unison-synced",
+        ...result,
+      }, unisonData);
       providerParameters.sourceMap["unison-plain"].lyricSourceResult = null;
       break;
     case "lrc":
       const lrc = parseLRC(responseData.lyrics, responseData.duration);
       const res = {
         ...result,
+        unisonData,
         lyrics: lrc
       }
 
@@ -157,6 +160,7 @@ export default async function unison(providerParameters: ProviderParameters): Pr
       providerParameters.sourceMap["unison-synced"].lyricSourceResult = null;
       providerParameters.sourceMap["unison-plain"].lyricSourceResult = plain ? {
         ...result,
+        unisonData,
         lyrics: plain
       } : null;
       break;

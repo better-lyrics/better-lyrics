@@ -8,7 +8,13 @@ import type {
   TransliterationItem,
   TtmlRoot,
 } from "@/modules/lyrics/providers/ttmlTypes";
-import type { Lyric, LyricPart, LyricSourceResult } from "@modules/lyrics/providers/shared";
+import type {
+  Lyric,
+  LyricPart,
+  LyricSourceKey,
+  LyricSourceResult,
+  ProviderParameters,
+} from "@modules/lyrics/providers/shared";
 import { type X2jOptions, XMLParser } from "fast-xml-parser";
 
 /**
@@ -180,8 +186,28 @@ function insertInstrumentalBreaks(lyrics: Lyric[], songDurationMs: number): Lyri
   return result;
 }
 
-export async function fillTtml(responseString: string, duration: number) {
-  const options: X2jOptions = {
+interface FillTtmlOptions {
+  richsyncKey: LyricSourceKey;
+  syncedKey: LyricSourceKey;
+  source: string;
+  sourceHref: string;
+  cacheAllowed?: boolean;
+}
+
+export async function fillTtml(
+  responseString: string,
+  providerParameters: ProviderParameters,
+  options: FillTtmlOptions = {
+    richsyncKey: "bLyrics-richsynced",
+    syncedKey: "bLyrics-synced",
+    source: "boidu.dev",
+    sourceHref: "https://boidu.dev/",
+    cacheAllowed: true,
+  },
+  ...args: unknown[]
+) {
+  const { richsyncKey, syncedKey, source, sourceHref, cacheAllowed } = options;
+  const parserOptions: X2jOptions = {
     ignoreAttributes: false,
     attributeNamePrefix: "@_",
     attributesGroupName: false,
@@ -194,7 +220,7 @@ export async function fillTtml(responseString: string, duration: number) {
     parseTagValue: false,
   };
 
-  const parser = new XMLParser(options);
+  const parser = new XMLParser(parserOptions);
 
   const rawObj = (await parser.parse(responseString)) as TtmlRoot;
 
@@ -213,7 +239,11 @@ export async function fillTtml(responseString: string, duration: number) {
 
   const hasTimingData = lines.length > 0 && lines[0][":@"] !== undefined;
   if (!hasTimingData) {
-    return null;
+    providerParameters.sourceMap[richsyncKey].lyricSourceResult = null;
+    providerParameters.sourceMap[richsyncKey].filled = true;
+    providerParameters.sourceMap[syncedKey].lyricSourceResult = null;
+    providerParameters.sourceMap[syncedKey].filled = true;
+    return;
   }
 
   let isWordSynced = false;
@@ -330,20 +360,27 @@ export async function fillTtml(responseString: string, duration: number) {
   }
 
   let lyricArray = Array.from(lyrics.values());
-  const songDurationMs = ttMeta && ttMeta["@_dur"] ? parseTime(ttMeta["@_dur"]) : duration * 1000;
+  const songDurationMs = ttMeta && ttMeta["@_dur"] ? parseTime(ttMeta["@_dur"]) : providerParameters.duration * 1000;
   lyricArray = insertInstrumentalBreaks(lyricArray, songDurationMs);
 
   let result: LyricSourceResult = {
-    cacheAllowed: true,
+    cacheAllowed: cacheAllowed ?? true,
     language: rawObj[0][":@"]["@_lang"] || ttMeta["@_lang"],
     lyrics: lyricArray,
     musicVideoSynced: false,
-    source: "boidu.dev",
-    sourceHref: "https://boidu.dev/",
+    source,
+    sourceHref,
+    ...args,
   };
 
-  return {
-    isWordSynced,
-    result,
-  };
+  if (isWordSynced) {
+    providerParameters.sourceMap[richsyncKey].lyricSourceResult = result;
+    providerParameters.sourceMap[syncedKey].lyricSourceResult = null;
+  } else {
+    providerParameters.sourceMap[richsyncKey].lyricSourceResult = null;
+    providerParameters.sourceMap[syncedKey].lyricSourceResult = result;
+  }
+
+  providerParameters.sourceMap[syncedKey].filled = true;
+  providerParameters.sourceMap[richsyncKey].filled = true;
 }

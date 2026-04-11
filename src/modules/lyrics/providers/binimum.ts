@@ -1,5 +1,5 @@
 import { BINIMUM_LYRICS_API_URL } from "@constants";
-import { fillTtml } from "./blyrics/blyrics";
+import { fillTtml } from "./ttmlUtils";
 import type { ProviderParameters } from "./shared";
 
 type BinimumTimingType = "syllable" | "line";
