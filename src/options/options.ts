@@ -65,7 +65,10 @@ const saveOptionsToStorage = (options: Options): void => {
   chrome.storage.sync.set(options, () => {
     chrome.tabs.query({ url: "https://music.youtube.com/*" }, tabs => {
       tabs.forEach(tab => {
-        chrome.tabs.sendMessage(tab.id!, { action: "updateSettings", settings: options });
+        chrome.tabs.sendMessage(tab.id!, {
+          action: "updateSettings",
+          settings: options,
+        });
       });
     });
   });
@@ -151,7 +154,12 @@ const subscribeToCacheInfo = (): void => {
 
   chrome.storage.onChanged.addListener((changes, area) => {
     if (area === "sync" && changes.cacheInfo) {
-      updateCacheInfo({ cacheInfo: changes.cacheInfo.newValue as { count: number; size: number } });
+      updateCacheInfo({
+        cacheInfo: changes.cacheInfo.newValue as {
+          count: number;
+          size: number;
+        },
+      });
     }
   });
 };
@@ -187,11 +195,13 @@ const restoreOptions = (): void => {
     preferredProviderList: [
       "bLyrics-richsynced",
       "unison-richsynced",
+      "binimum-richsynced",
       "musixmatch-richsync",
       "custom-lyrics",
       "yt-captions",
       "bLyrics-synced",
       "unison-synced",
+      "binimum-synced",
       "lrclib-synced",
       "legato-synced",
       "musixmatch-synced",
@@ -235,11 +245,13 @@ const setOptionsInForm = (items: Options): void => {
   let unseenProviders = [
     "bLyrics-richsynced",
     "unison-richsynced",
+    "binimum-richsynced",
     "musixmatch-richsync",
     "custom-lyrics",
     "yt-captions",
     "bLyrics-synced",
     "unison-synced",
+    "binimum-synced",
     "lrclib-synced",
     "legato-synced",
     "musixmatch-synced",
@@ -275,22 +287,44 @@ interface ProviderInfo {
 }
 
 const getProviderIdToInfoMap = (): { [key: string]: ProviderInfo } => ({
-  "musixmatch-richsync": { name: t("options_provider_musixmatch"), syncType: "word" },
-  "musixmatch-synced": { name: t("options_provider_musixmatch"), syncType: "line" },
-  "yt-captions": { name: t("options_provider_youtubeCaptions"), syncType: "line" },
+  "binimum-richsynced": { name: t("options_provider_binilyrics"), syncType: "syllable" },
+  "binimum-synced": { name: t("options_provider_binilyrics"), syncType: "line" },
+  "musixmatch-richsync": {
+    name: t("options_provider_musixmatch"),
+    syncType: "word",
+  },
+  "musixmatch-synced": {
+    name: t("options_provider_musixmatch"),
+    syncType: "line",
+  },
+  "yt-captions": {
+    name: t("options_provider_youtubeCaptions"),
+    syncType: "line",
+  },
   "lrclib-synced": { name: t("options_provider_lrclib"), syncType: "line" },
   "unison-richsynced": { name: t("options_provider_betterLyricsUnison"), syncType: "syllable" },
   "unison-synced": { name: t("options_provider_betterLyricsUnison"), syncType: "line" },
   "unison-plain": { name: t("options_provider_betterLyricsUnison"), syncType: "unsynced" },
-  "bLyrics-richsynced": { name: t("options_provider_betterLyrics"), syncType: "syllable" },
-  "bLyrics-synced": { name: t("options_provider_betterLyrics"), syncType: "line" },
-  "legato-synced": { name: t("options_provider_betterLyricsLegato"), syncType: "line" },
+  "bLyrics-richsynced": {
+    name: t("options_provider_betterLyrics"),
+    syncType: "syllable",
+  },
+  "bLyrics-synced": {
+    name: t("options_provider_betterLyrics"),
+    syncType: "line",
+  },
+  "legato-synced": {
+    name: t("options_provider_betterLyricsLegato"),
+    syncType: "line",
+  },
   "yt-lyrics": { name: t("options_provider_youtube"), syncType: "unsynced" },
   "lrclib-plain": { name: t("options_provider_lrclib"), syncType: "unsynced" },
   "custom-lyrics": { name: t("options_provider_clyrics"), syncType: "vary" },
 });
 
-const getSyncTypeConfig = (): { [key in SyncType]: { label: string; icon: string; tooltip: string } } => ({
+const getSyncTypeConfig = (): {
+  [key in SyncType]: { label: string; icon: string; tooltip: string };
+} => ({
   vary: {
     label: t("options_syncType_vary"),
     tooltip: t("options_syncType_vary_tooltip"),
@@ -508,7 +542,9 @@ document.addEventListener("DOMContentLoaded", () => {
   initializeCLyricsModal();
 
   document.getElementById("browse-themes-btn")?.addEventListener("click", () => {
-    chrome.tabs.create({ url: chrome.runtime.getURL("pages/marketplace.html") });
+    chrome.tabs.create({
+      url: chrome.runtime.getURL("pages/marketplace.html"),
+    });
   });
 
   initIdentityUI();

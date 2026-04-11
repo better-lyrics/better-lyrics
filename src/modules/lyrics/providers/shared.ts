@@ -1,6 +1,7 @@
 import { LYRIC_SOURCE_KEYS, PROVIDER_CONFIGS, PROVIDER_SWITCHED_LOG } from "@constants";
 import { getTransientStorage, setTransientStorage } from "@core/storage";
 import { log } from "@utils";
+import binimum from "./binimum";
 import customLyrics from "./clyrics";
 import bLyrics from "./blyrics";
 import cubey, { type CubeyLyricSourceResult } from "./cubey";
@@ -152,6 +153,8 @@ export function initProviders(): void {
 
 const sourceKeyToFillFn = {
   "custom-lyrics": customLyrics,
+  "binimum-richsynced": binimum,
+  "binimum-synced": binimum,
   "bLyrics-richsynced": bLyrics,
   "bLyrics-synced": bLyrics,
   "unison-richsynced": unison,
