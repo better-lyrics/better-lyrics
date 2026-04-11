@@ -370,7 +370,7 @@ export async function fillTtml(
     musicVideoSynced: false,
     source,
     sourceHref,
-    ...args,
+    ...(args[0] || {}),
   };
 
   if (isWordSynced) {
