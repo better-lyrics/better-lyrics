@@ -225,10 +225,10 @@ export default async function cubey(providerParameters: ProviderParameters): Pro
       Number(providerParameters.duration)
     );
 
-    lrcFixers(musixmatchWordByWordLyrics.result);
+    lrcFixers(musixmatchWordByWordLyrics);
 
     providerParameters.sourceMap["musixmatch-richsync"].lyricSourceResult = {
-      lyrics: musixmatchWordByWordLyrics.result,
+      lyrics: musixmatchWordByWordLyrics,
       source: "Musixmatch",
       sourceHref: "https://www.musixmatch.com",
       musicVideoSynced: false,
@@ -255,7 +255,7 @@ export default async function cubey(providerParameters: ProviderParameters): Pro
   if (responseData.musixmatchSyncedLyrics) {
     let musixmatchSyncedLyrics = parseLRC(responseData.musixmatchSyncedLyrics, Number(providerParameters.duration));
     providerParameters.sourceMap["musixmatch-synced"].lyricSourceResult = {
-      lyrics: musixmatchSyncedLyrics.result,
+      lyrics: musixmatchSyncedLyrics,
       source: "Musixmatch",
       sourceHref: "https://www.musixmatch.com",
       musicVideoSynced: false,
@@ -266,7 +266,7 @@ export default async function cubey(providerParameters: ProviderParameters): Pro
     let lrclibSyncedLyrics = parseLRC(responseData.lrclibSyncedLyrics, Number(providerParameters.duration));
     if (lrclibSyncedLyrics) providerParameters.sourceMap["lrclib-synced"].filled = true;
     providerParameters.sourceMap["lrclib-synced"].lyricSourceResult = {
-      lyrics: lrclibSyncedLyrics.result,
+      lyrics: lrclibSyncedLyrics,
       source: "LRCLIB",
       sourceHref: "https://lrclib.net",
       musicVideoSynced: false,
