@@ -149,7 +149,7 @@ export default async function unison(providerParameters: ProviderParameters): Pr
       const res = {
         ...result,
         unisonData,
-        lyrics: lrc
+        lyrics: lrc.result
       }
 
       providerParameters.sourceMap["unison-richsynced"].lyricSourceResult = null;

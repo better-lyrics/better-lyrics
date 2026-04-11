@@ -305,9 +305,6 @@ const getProviderIdToInfoMap = (): { [key: string]: ProviderInfo } => ({
     syncType: "line",
   },
   "lrclib-synced": { name: t("options_provider_lrclib"), syncType: "line" },
-  "unison-richsynced": { name: t("options_provider_betterLyricsUnison"), syncType: "syllable" },
-  "unison-synced": { name: t("options_provider_betterLyricsUnison"), syncType: "line" },
-  "unison-plain": { name: t("options_provider_betterLyricsUnison"), syncType: "unsynced" },
   "bLyrics-richsynced": {
     name: t("options_provider_betterLyrics"),
     syncType: "syllable",

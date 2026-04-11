@@ -71,10 +71,7 @@ export function formatTime(timeNum: number, useMs?: boolean, whole?: boolean): s
 export function parseLRC(lrcText: string, songDuration: number) {
   const lines = lrcText.split("\n");
   const result: LyricsArray = [];
-  const plain: LyricsArray = [];
   const idTags = {} as any;
-
-  let isWordSynced = false;
 
   // Process each line
   lines.forEach(line => {
@@ -139,12 +136,6 @@ export function parseLRC(lrcText: string, songDuration: number) {
     const endTime = Math.max(...timeTags);
     const duration = endTime - startTime;
 
-    if (parts.length > 0) isWordSynced = true;
-    plain.push({
-      startTimeMs: 0,
-      words: plainText.trim(),
-      durationMs: 0,
-    });
     result.push({
       startTimeMs: startTime,
       words: plainText.trim(),
@@ -193,12 +184,8 @@ export function parseLRC(lrcText: string, songDuration: number) {
       });
     });
   }
-
-  return {
-    isWordSynced,
-    result,
-    plain,
-  };
+  
+  return result;
 }
 
 /**
