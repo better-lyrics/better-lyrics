@@ -139,7 +139,7 @@ export default async function unison(providerParameters: ProviderParameters): Pr
         richsyncKey: "unison-richsynced",
         syncedKey: "unison-synced",
         ...result,
-      }, unisonData);
+      }, { unisonData });
       providerParameters.sourceMap["unison-plain"].lyricSourceResult = null;
       break;
     case "lrc":
