@@ -111,6 +111,7 @@ blyrics-target-scroll-pos-ratio = 0.37;
 | `blyrics-debug-renderer` | `false` | Enable debug overlay |
 | `blyrics-target-scroll-pos-ratio` | `0.37` | Lyric position (0=top, 0.5=center, 1=bottom) |
 | `blyrics-long-word-threshold` | `1500` | Duration (ms) above which `data-long-word` is set |
+| `blyrics-hide-instrumental-only` | `false` | Treat "[Instrumental Only]" as no lyrics (enables fullscreen effect) |
 
 **Scroll equation**: `--blyrics-lyric-scroll-duration` + 0.02s = `blyrics-early-scroll-consider-s` + `blyrics-queue-scroll-ms`
 
