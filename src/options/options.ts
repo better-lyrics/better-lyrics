@@ -479,6 +479,25 @@ document.addEventListener("DOMContentLoaded", async () => {
   aiToggle?.addEventListener("change", () => {
     updateAITranslateConfigVisibility();
   });
+
+  const endpointInput = document.getElementById("openaiApiEndpoint") as HTMLInputElement;
+  endpointInput?.addEventListener("input", checkEndpointPermission);
+
+  const authBtn = document.getElementById("authorizeEndpointBtn");
+  authBtn?.addEventListener("click", () => {
+    const endpoint = endpointInput.value.trim();
+    if (!endpoint) return;
+    try {
+      const url = new URL(endpoint);
+      const origin = `${url.protocol}//${url.hostname}/*`;
+      chrome.permissions.request({ origins: [origin] }, (granted) => {
+        if (granted) {
+          checkEndpointPermission();
+          showAlert(t("options_alert_permissionGranted") || "Permission granted!");
+        }
+      });
+    } catch(e) {}
+  });
 });
 document.querySelectorAll("#options input, #options select").forEach(element => {
   element.addEventListener("change", saveOptions);
@@ -693,6 +712,47 @@ function updateAITranslateConfigVisibility(): void {
   if (!configContainer) return;
 
   configContainer.style.display = aiToggle?.checked ? "flex" : "none";
+  if (aiToggle?.checked) {
+    checkEndpointPermission();
+  }
+}
+
+function checkEndpointPermission(): void {
+  const endpoint = (document.getElementById("openaiApiEndpoint") as HTMLInputElement)?.value.trim();
+  const authBtn = document.getElementById("authorizeEndpointBtn");
+  const firefoxHttpWarning = document.getElementById("firefoxHttpWarning");
+  if (!authBtn) return;
+  
+  const isFirefox = navigator.userAgent.toLowerCase().includes('firefox');
+  
+  if (firefoxHttpWarning) {
+    if (isFirefox && endpoint && endpoint.startsWith("http://") && !endpoint.includes("localhost") && !endpoint.includes("127.0.0.1")) {
+      firefoxHttpWarning.style.display = "block";
+    } else {
+      firefoxHttpWarning.style.display = "none";
+    }
+  }
+
+  // Workaround for Firefox MV3: Firefox enforces strict CSP (upgrade-insecure-requests) 
+  // and CORS restrictions on background scripts. Explicit host_permissions are required
+  // to bypass these limits. Chrome MV3 allows this natively, so we hide the button there.
+  if (!isFirefox || !endpoint) {
+    authBtn.style.display = "none";
+    return;
+  }
+  
+  let origin = endpoint;
+  try {
+    const url = new URL(endpoint);
+    origin = `${url.protocol}//${url.hostname}/*`;
+  } catch(e) {
+    authBtn.style.display = "none";
+    return;
+  }
+
+  chrome.permissions.contains({ origins: [origin] }, (hasPermission) => {
+    authBtn.style.display = hasPermission ? "none" : "block";
+  });
 }
 
 function initLangExclusionsModal(): void {

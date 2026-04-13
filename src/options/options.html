@@ -324,9 +324,13 @@
 						</label>
 					</div>
 					<div id="ai-translate-config" class="container" style="flex-direction: column; align-items: flex-start; gap: 0.75rem; padding: 0.75rem 1rem; display: none;">
-						<div style="display: flex; align-items: center; justify-content: space-between; width: 100%; gap: 0.5rem;">
+						<div style="display: flex; align-items: center; justify-content: space-between; width: 100%; gap: 0.5rem; position: relative;">
 							<span style="white-space: nowrap; min-width: 80px;">__MSG_options_language_aiEndpoint__</span>
 							<input type="text" id="openaiApiEndpoint" placeholder="http://localhost:11434" style="flex: 1; padding: 0.4rem 0.6rem; border-radius: 6px; border: 1px solid rgba(255,255,255,0.15); background: rgba(255,255,255,0.05); color: inherit; font-size: 0.85rem; font-family: inherit;">
+							<button id="authorizeEndpointBtn" class="small-btn btn-primary" style="display: none; padding: 0.3rem 0.6rem; font-size: 0.8rem; white-space: nowrap;">__MSG_options_language_aiAuthorize__</button>
+						</div>
+						<div id="firefoxHttpWarning" style="display: none; color: #ff6b6b; font-size: 0.8rem; margin-top: -0.25rem;">
+							__MSG_options_language_aiHttpWarning__
 						</div>
 						<div style="display: flex; align-items: center; justify-content: space-between; width: 100%; gap: 0.5rem;">
 							<span style="white-space: nowrap; min-width: 80px;">__MSG_options_language_aiApiKey__</span>

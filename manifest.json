@@ -12,7 +12,8 @@
   },
   "chromium:key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA4RTGjLjI1KqxGLgE7d3tD4O+mTA6pKDPZ29V4/uP9nBicHRst7R7n5wdFW1qvLiILyUqRm1fURMBeShb0mcPEMC6iW3cr4i8NG+52VxFcPIYbsegPHJsQFVWe6lgorVw20yn2mWshGKIppgN14FJCSFc7mS/CX4JL88E82AIaFJiVBgmpBu5RMcglUfSwMH5ePlRV68dOhMjX8bdoHH6FoAARh7igtyKBKEzA811PWRIBiKZBGAZc2ew6+5O2mERuFq0PRvfEcD4KsBRiWHltyUcYzVjIMF4soC8i6lNOJx8it0kAn5PN6G7TdiD3HbU5eLqk+iCr+cK/pS1ybiACQIDAQAB",
   "host_permissions": [
-    "*://music.youtube.com/*"
+    "*://music.youtube.com/*",
+    "*://localhost/*"
   ],
   "permissions": [
     "storage",
@@ -21,7 +22,9 @@
   "optional_permissions": [
     "downloads"
   ],
-  "optional_host_permissions": [],
+  "optional_host_permissions": [
+    "<all_urls>"
+  ],
   "options_ui": {
     "page": "src/options/options.html",
     "open_in_tab": false
@@ -47,10 +50,11 @@
     "service_worker": "src/options/background.ts",
     "type": "module"
   },
-  "gecko:background": {
+  "background": {
     "scripts": [
       "src/options/background.ts"
-    ]
+    ],
+    "type": "module"
   },
   "browser_specific_settings": {
     "gecko": {

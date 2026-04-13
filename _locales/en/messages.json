@@ -128,6 +128,14 @@
     "message": "API Endpoint",
     "description": "Label for the OpenAI compatible API endpoint input"
   },
+  "options_language_aiAuthorize": {
+    "message": "Authorize CORS",
+    "description": "Button label for authorizing CORS requests"
+  },
+  "options_language_aiHttpWarning": {
+    "message": "Warning: Firefox forces non-localhost HTTP requests to HTTPS. Please use 127.0.0.1 or an HTTPS endpoint.",
+    "description": "Warning message displayed in Firefox when user enters a non-localhost HTTP endpoint"
+  },
   "options_language_aiApiKey": {
     "message": "API Key",
     "description": "Label for the OpenAI compatible API key input"
@@ -264,6 +272,10 @@
   "options_alert_identityLoadError": {
     "message": "Error loading identity",
     "description": "Identity load error message"
+  },
+  "options_alert_permissionGranted": {
+    "message": "Permission granted successfully!",
+    "description": "Permission granted success message"
   },
 
   "options_editor_saving": {
