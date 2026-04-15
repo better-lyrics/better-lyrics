@@ -1,0 +1,927 @@
+{
+  "extensionName": {
+    "message": "Better Lyrics (Lyrics for Youtube Music)",
+    "description": "The name of the extension"
+  },
+  "extensionDescription": {
+    "message": "Tingkatkan YouTube Music dengan lirik tersegerak masa yang indah, sokongan pelbagai bahasa, terjemahan masa nyata dan banyak lagi",
+    "description": "The description of the extension"
+  },
+
+  "options_tab_general": {
+    "message": "Umum",
+    "description": "General settings tab label"
+  },
+  "options_tab_display": {
+    "message": "Paparan",
+    "description": "Display settings tab label"
+  },
+  "options_tab_language": {
+    "message": "Bahasa",
+    "description": "Language settings tab label"
+  },
+  "options_tab_sources": {
+    "message": "Sumber",
+    "description": "Sources settings tab label"
+  },
+  "options_tab_identity": {
+    "message": "Identiti",
+    "description": "Identity settings tab label"
+  },
+  "options_tab_themes": {
+    "message": "Tema",
+    "description": "Themes settings tab label"
+  },
+
+  "options_general_title": {
+    "message": "Tetapan Umum",
+    "description": "General settings section title"
+  },
+  "options_general_description": {
+    "message": "Tetapan yang mempengaruhi tingkah laku umum Better Lyrics.",
+    "description": "General settings section description"
+  },
+  "options_general_showLogs": {
+    "message": "Tunjuk log",
+    "description": "Show logs setting label"
+  },
+  "options_general_autoSwitch": {
+    "message": "Tukar automatik ke tab lirik",
+    "description": "Auto switch to lyrics tab setting label"
+  },
+  "options_general_cache": {
+    "message": "Cache",
+    "description": "Cache section label"
+  },
+  "options_general_clearCache": {
+    "message": "Kosongkan Cache",
+    "description": "Clear cache button label"
+  },
+  "options_general_totalLyrics": {
+    "message": "Jumlah lirik dalam cache",
+    "description": "Total lyrics in cache label"
+  },
+  "options_general_cacheSize": {
+    "message": "Saiz cache",
+    "description": "Cache size label"
+  },
+
+  "options_display_title": {
+    "message": "Tetapan Paparan",
+    "description": "Display settings section title"
+  },
+  "options_display_description": {
+    "message": "Laraskan penampilan Better Lyrics.",
+    "description": "Display settings section description"
+  },
+  "options_display_disableFullscreen": {
+    "message": "Lumpuhkan mod skrin penuh",
+    "description": "Disable fullscreen mode setting label"
+  },
+  "options_display_autoHideCursor": {
+    "message": "Sembunyikan kursor secara automatik dalam mod skrin penuh",
+    "description": "Auto-hide cursor setting label"
+  },
+  "options_display_albumArt": {
+    "message": "Tunjuk latar belakang seni album kabur",
+    "description": "Show album art background setting label"
+  },
+  "options_display_stylizedAnimations": {
+    "message": "Tunjuk animasi bergaya",
+    "description": "Show stylized animations setting label"
+  },
+
+  "options_language_displayLanguage": {
+    "message": "Bahasa Paparan",
+    "description": "Label for the UI language selector dropdown"
+  },
+  "options_language_displayLanguageAuto": {
+    "message": "Auto",
+    "description": "Option label for automatic language detection based on browser settings"
+  },
+
+  "options_language_title": {
+    "message": "Tetapan Bahasa",
+    "description": "Language settings section title"
+  },
+  "options_language_description": {
+    "message": "Tetapan bahasa dan terjemahan untuk Better Lyrics.",
+    "description": "Language settings section description"
+  },
+  "options_language_romanization": {
+    "message": "Romanisasi",
+    "description": "Romanization setting label"
+  },
+  "options_language_translate": {
+    "message": "Terjemah lirik lagu",
+    "description": "Translate song lyrics setting label"
+  },
+  "options_language_translationLanguage": {
+    "message": "Bahasa terjemahan",
+    "description": "Translation language setting label"
+  },
+
+  "options_sources_title": {
+    "message": "Keutamaan Sumber Lirik",
+    "description": "Sources settings section title"
+  },
+  "options_sources_description": {
+    "message": "Seret untuk susun semula keutamaan. Sumber lebih tinggi dicuba dahulu. Nyahtanda untuk melumpuhkan.",
+    "description": "Sources settings section description"
+  },
+
+  "options_themes_title": {
+    "message": "Tetapan Tema",
+    "description": "Theme settings section title"
+  },
+  "options_themes_description": {
+    "message": "Sesuaikan penampilan Better Lyrics.",
+    "description": "Theme settings section description"
+  },
+  "options_themes_theme": {
+    "message": "Tema",
+    "description": "Theme label"
+  },
+  "options_themes_chooseTheme": {
+    "message": "Pilih tema",
+    "description": "Choose a theme button label"
+  },
+  "options_themes_change": {
+    "message": "Ubah",
+    "description": "Change theme button label"
+  },
+  "options_themes_customTheme": {
+    "message": "Tema Tersuai",
+    "description": "Display name for unnamed custom themes"
+  },
+  "options_themes_customStyles": {
+    "message": "Gaya Tersuai",
+    "description": "Custom styles label"
+  },
+  "options_themes_create": {
+    "message": "Cipta",
+    "description": "Create button label"
+  },
+  "options_themes_marketplace": {
+    "message": "Pasaran Tema",
+    "description": "Theme marketplace button label"
+  },
+  "options_themes_installedThemes": {
+    "message": "Tema Dipasang",
+    "description": "Installed themes button label"
+  },
+
+  "options_identity_title": {
+    "message": "Identiti",
+    "description": "Identity settings section title"
+  },
+  "options_identity_description": {
+    "message": "Identiti tanpa nama unik anda untuk Better Lyrics.",
+    "description": "Identity settings section description"
+  },
+  "options_identity_yourIdentity": {
+    "message": "Identiti anda",
+    "description": "Your identity label"
+  },
+  "options_identity_loading": {
+    "message": "Memuatkan...",
+    "description": "Loading identity placeholder"
+  },
+  "options_identity_exportImport": {
+    "message": "Eksport/Import",
+    "description": "Export/Import section label"
+  },
+  "options_identity_exportKey": {
+    "message": "Eksport Kunci",
+    "description": "Export key button label"
+  },
+  "options_identity_importKey": {
+    "message": "Import Kunci",
+    "description": "Import key button label"
+  },
+
+  "options_modal_selectTheme": {
+    "message": "Pilih Tema",
+    "description": "Theme modal title"
+  },
+  "options_modal_cancel": {
+    "message": "Batal",
+    "description": "Cancel button label"
+  },
+  "options_modal_confirm": {
+    "message": "Sahkan",
+    "description": "Confirm button label"
+  },
+
+  "options_alert_cacheCleared": {
+    "message": "Cache berjaya dikosongkan!",
+    "description": "Cache cleared success message"
+  },
+  "options_alert_cacheClearFailed": {
+    "message": "Gagal mengosongkan cache!",
+    "description": "Cache clear failed message"
+  },
+  "options_alert_nothingToClear": {
+    "message": "Tiada yang perlu dikosongkan!",
+    "description": "Nothing to clear message"
+  },
+  "options_alert_exportFailed": {
+    "message": "Gagal mengeksport identiti",
+    "description": "Export identity failed message"
+  },
+  "options_alert_fileSaveDialogOpened": {
+    "message": "Dialog simpan fail identiti dibuka.",
+    "description": "File save dialog opened message"
+  },
+  "options_alert_fileSaveFailed": {
+    "message": "Ralat menyimpan fail. Sila cuba lagi.",
+    "description": "File save failed message"
+  },
+  "options_alert_downloadInitiated": {
+    "message": "Muat turun fail identiti dimulakan.",
+    "description": "Download initiated message"
+  },
+  "options_alert_importSuccess": {
+    "message": "Identiti berjaya diimport!",
+    "description": "Import success message"
+  },
+  "options_alert_identityLoadError": {
+    "message": "Ralat memuatkan identiti",
+    "description": "Identity load error message"
+  },
+
+  "options_editor_saving": {
+    "message": "Menyimpan...",
+    "description": "Saving indicator text"
+  },
+  "options_editor_importFile": {
+    "message": "Import dari fail",
+    "description": "Import from file tooltip"
+  },
+  "options_editor_exportFile": {
+    "message": "Eksport ke fail",
+    "description": "Export to file tooltip"
+  },
+  "options_editor_saveAsTheme": {
+    "message": "Simpan sebagai tema",
+    "description": "Save as theme tooltip"
+  },
+  "options_editor_openInNewTab": {
+    "message": "Buka dalam tab baharu",
+    "description": "Open in new tab tooltip"
+  },
+  "options_editor_backToSettings": {
+    "message": "Kembali ke Tetapan",
+    "description": "Back to settings button label"
+  },
+  "options_editor_fullExperienceNote": {
+    "message": "Untuk pengalaman editor penuh, ",
+    "description": "Full editor experience note prefix"
+  },
+  "options_editor_openInNewTabLink": {
+    "message": "buka editor ini dalam tab baharu",
+    "description": "Open in new tab link text"
+  },
+  "options_editor_stylingGuide": {
+    "message": "Panduan Gaya",
+    "description": "Styling guide link text"
+  },
+  "options_editor_renameTheme": {
+    "message": "Namakan semula tema tersuai",
+    "description": "Rename theme button title"
+  },
+  "options_editor_deleteTheme": {
+    "message": "Padam tema tersuai",
+    "description": "Delete theme button title"
+  },
+  "options_editor_doubleClickRename": {
+    "message": "Klik dua kali untuk menamakan semula",
+    "description": "Double-click to rename tooltip"
+  },
+
+  "options_provider_betterLyrics": {
+    "message": "Better Lyrics",
+    "description": "Better Lyrics provider name"
+  },
+  "options_provider_betterLyricsLegato": {
+    "message": "Better Lyrics Legato",
+    "description": "Better Lyrics Legato provider name"
+  },
+  "options_provider_musixmatch": {
+    "message": "Musixmatch",
+    "description": "Musixmatch provider name"
+  },
+  "options_provider_lrclib": {
+    "message": "LRClib",
+    "description": "LRClib provider name"
+  },
+  "options_provider_youtube": {
+    "message": "Youtube",
+    "description": "Youtube provider name"
+  },
+  "options_provider_youtubeCaptions": {
+    "message": "Kapsyen Youtube",
+    "description": "Youtube Captions provider name"
+  },
+  "options_provider_binilyrics": {
+    "message": "BiniLyrics",
+    "description": "BiniLyrics provider name"
+  },
+
+  "options_syncType_syllable": {
+    "message": "Suku Kata",
+    "description": "Syllable sync type label"
+  },
+  "options_syncType_syllable_tooltip": {
+    "message": "Menyerlahkan suku kata secara individu semasa dinyanyikan. Penyegerakan suku kata memberikan pengalaman terbaik.",
+    "description": "Syllable sync type tooltip"
+  },
+  "options_syncType_word": {
+    "message": "Perkataan",
+    "description": "Word sync type label"
+  },
+  "options_syncType_word_tooltip": {
+    "message": "Menyerlahkan perkataan secara individu semasa dinyanyikan. Penyegerakan perkataan memberikan pengalaman yang baik.",
+    "description": "Word sync type tooltip"
+  },
+  "options_syncType_line": {
+    "message": "Baris",
+    "description": "Line sync type label"
+  },
+  "options_syncType_line_tooltip": {
+    "message": "Menyerlahkan keseluruhan baris semasa dinyanyikan. Penyegerakan baris memberikan pengalaman asas.",
+    "description": "Line sync type tooltip"
+  },
+  "options_syncType_unsynced": {
+    "message": "Tidak Tersegerak",
+    "description": "Unsynced sync type label"
+  },
+  "options_syncType_unsynced_tooltip": {
+    "message": "Lirik tanpa maklumat masa. Lirik tidak tersegerak memberikan pengalaman yang minima.",
+    "description": "Unsynced sync type tooltip"
+  },
+
+  "options_detail_rateTheme": {
+    "message": "Nilai tema ini",
+    "description": "Rate theme label"
+  },
+  "options_detail_install": {
+    "message": "Pasang",
+    "description": "Install button label"
+  },
+  "options_detail_viewOnGitHub": {
+    "message": "Lihat di GitHub",
+    "description": "View on GitHub link text"
+  },
+  "options_detail_shaderInfo": {
+    "message": "Tema ini menyertakan konfigurasi shader.",
+    "description": "Shader info text prefix"
+  },
+  "options_detail_downloadShader": {
+    "message": "Muat turun shader.json",
+    "description": "Download shader link text"
+  },
+  "options_detail_shaderImportSuffix": {
+    "message": "dan import ke dalam",
+    "description": "Shader import suffix text before Better Lyrics Shaders link"
+  },
+
+  "marketplace_pageTitle": {
+    "message": "Pasaran Tema Better Lyrics",
+    "description": "Page title"
+  },
+  "marketplace_title": {
+    "message": "Pasaran Tema",
+    "description": "Header title"
+  },
+  "marketplace_subtitle": {
+    "message": "Temui dan pasang tema komuniti",
+    "description": "Header subtitle"
+  },
+  "marketplace_searchPlaceholder": {
+    "message": "Cari tema...",
+    "description": "Search input placeholder"
+  },
+  "marketplace_refresh": {
+    "message": "Muat semula",
+    "description": "Refresh button label"
+  },
+  "marketplace_keyboardShortcuts": {
+    "message": "Pintasan papan kekunci",
+    "description": "Keyboard shortcuts button label"
+  },
+
+  "marketplace_sortBy": {
+    "message": "Isih mengikut",
+    "description": "Sort filter group label"
+  },
+  "marketplace_sortRatingDesc": {
+    "message": "Penilaian tertinggi",
+    "description": "Sort by highest rating"
+  },
+  "marketplace_sortRatingAsc": {
+    "message": "Penilaian terendah",
+    "description": "Sort by lowest rating"
+  },
+  "marketplace_sortDownloadsDesc": {
+    "message": "Paling banyak dimuat turun",
+    "description": "Sort by most downloads"
+  },
+  "marketplace_sortDownloadsAsc": {
+    "message": "Paling sedikit dimuat turun",
+    "description": "Sort by least downloads"
+  },
+  "marketplace_sortNewest": {
+    "message": "Terbaru",
+    "description": "Sort by newest"
+  },
+  "marketplace_sortOldest": {
+    "message": "Terlama",
+    "description": "Sort by oldest"
+  },
+
+  "marketplace_show": {
+    "message": "Tunjuk",
+    "description": "Show filter group label"
+  },
+  "marketplace_showAll": {
+    "message": "Semua",
+    "description": "Show all themes"
+  },
+  "marketplace_showInstalled": {
+    "message": "Dipasang",
+    "description": "Show installed themes"
+  },
+  "marketplace_showNotInstalled": {
+    "message": "Belum dipasang",
+    "description": "Show not installed themes"
+  },
+
+  "marketplace_options": {
+    "message": "Pilihan",
+    "description": "Options filter group label"
+  },
+  "marketplace_hasShaders": {
+    "message": "Ada shader",
+    "description": "Filter for themes with shaders"
+  },
+  "marketplace_compatibleOnly": {
+    "message": "Yang serasi sahaja",
+    "description": "Filter for compatible themes"
+  },
+
+  "marketplace_installFromUrl": {
+    "message": "Pasang dari URL",
+    "description": "Install from URL button"
+  },
+  "marketplace_submitTheme": {
+    "message": "Hantar tema",
+    "description": "Submit a theme link"
+  },
+
+  "marketplace_loading": {
+    "message": "Memuatkan tema...",
+    "description": "Loading message"
+  },
+  "marketplace_retry": {
+    "message": "Cuba semula",
+    "description": "Retry button"
+  },
+  "marketplace_noThemesMatch": {
+    "message": "Tiada tema yang sepadan dengan penapis anda",
+    "description": "Empty state message"
+  },
+
+  "marketplace_grantPermission": {
+    "message": "Berikan Kebenaran",
+    "description": "Grant permission button"
+  },
+
+  "marketplace_install": {
+    "message": "Pasang",
+    "description": "Install button"
+  },
+  "marketplace_remove": {
+    "message": "Buang",
+    "description": "Remove button"
+  },
+  "marketplace_apply": {
+    "message": "Guna",
+    "description": "Apply button"
+  },
+  "marketplace_active": {
+    "message": "Aktif",
+    "description": "Active theme indicator"
+  },
+
+  "marketplace_shadersBadge": {
+    "message": "Shader",
+    "description": "Shaders badge text"
+  },
+  "marketplace_githubBadge": {
+    "message": "GitHub",
+    "description": "GitHub badge text"
+  },
+
+  "marketplace_urlModalTitle": {
+    "message": "Pasang dari URL",
+    "description": "URL install modal title"
+  },
+  "marketplace_urlModalMessage": {
+    "message": "Masukkan URL repositori GitHub untuk memasang tema secara terus:",
+    "description": "URL install modal message"
+  },
+  "marketplace_urlModalPlaceholder": {
+    "message": "github.com/user/repo atau github.com/user/repo/tree/branch",
+    "description": "URL input placeholder"
+  },
+  "marketplace_urlModalError": {
+    "message": "Sila masukkan URL repositori GitHub",
+    "description": "URL validation error"
+  },
+  "marketplace_cancel": {
+    "message": "Batal",
+    "description": "Cancel button"
+  },
+
+  "marketplace_urlPermissionTitle": {
+    "message": "Kebenaran Tambahan Diperlukan",
+    "description": "URL permission modal title"
+  },
+  "marketplace_urlPermissionWhy": {
+    "message": "Mengapa ini diperlukan?",
+    "description": "URL permission explanation title"
+  },
+  "marketplace_urlPermissionDesc": {
+    "message": "Memasang tema dari URL GitHub tersuai memerlukan akses yang lebih luas berbanding pasaran. Ini membolehkan Better Lyrics untuk:",
+    "description": "URL permission description"
+  },
+  "marketplace_urlPermissionItem1": {
+    "message": "Ambil fail tema dari mana-mana repositori GitHub",
+    "description": "URL permission list item 1"
+  },
+  "marketplace_urlPermissionItem2": {
+    "message": "Kesan cawangan lalai repositori",
+    "description": "URL permission list item 2"
+  },
+  "marketplace_urlPermissionItem3": {
+    "message": "Sahkan struktur tema sebelum pemasangan",
+    "description": "URL permission list item 3"
+  },
+  "marketplace_urlPermissionNote": {
+    "message": "Kebenaran ini hanya digunakan apabila anda memasang tema melalui URL. Tema pasaran tidak memerlukannya.",
+    "description": "URL permission note"
+  },
+
+  "marketplace_shortcutsTitle": {
+    "message": "Pintasan Papan Kekunci",
+    "description": "Shortcuts modal title"
+  },
+  "marketplace_shortcutsNavigation": {
+    "message": "Navigasi",
+    "description": "Navigation shortcuts group"
+  },
+  "marketplace_shortcutsSearch": {
+    "message": "Cari tema",
+    "description": "Search shortcut label"
+  },
+  "marketplace_shortcutsRefresh": {
+    "message": "Muat semula pasaran",
+    "description": "Refresh shortcut label"
+  },
+  "marketplace_shortcutsInstallUrl": {
+    "message": "Pasang dari URL",
+    "description": "Install from URL shortcut label"
+  },
+  "marketplace_shortcutsPrevPage": {
+    "message": "Halaman sebelumnya",
+    "description": "Previous page shortcut label"
+  },
+  "marketplace_shortcutsNextPage": {
+    "message": "Halaman seterusnya",
+    "description": "Next page shortcut label"
+  },
+
+  "marketplace_shortcutsSort": {
+    "message": "Isih",
+    "description": "Sort shortcuts group"
+  },
+  "marketplace_shortcutsSortHint": {
+    "message": "tekan lagi untuk tukar arah",
+    "description": "Sort toggle hint"
+  },
+  "marketplace_shortcutsByRating": {
+    "message": "Mengikut penilaian",
+    "description": "Sort by rating shortcut"
+  },
+  "marketplace_shortcutsByDownloads": {
+    "message": "Mengikut muat turun",
+    "description": "Sort by downloads shortcut"
+  },
+  "marketplace_shortcutsByDate": {
+    "message": "Mengikut tarikh",
+    "description": "Sort by date shortcut"
+  },
+
+  "marketplace_shortcutsFilters": {
+    "message": "Penapis",
+    "description": "Filters shortcuts group"
+  },
+  "marketplace_shortcutsShowAll": {
+    "message": "Tunjuk semua",
+    "description": "Show all shortcut"
+  },
+  "marketplace_shortcutsShowInstalled": {
+    "message": "Tunjuk yang dipasang",
+    "description": "Show installed shortcut"
+  },
+  "marketplace_shortcutsShowNotInstalled": {
+    "message": "Tunjuk yang belum dipasang",
+    "description": "Show not installed shortcut"
+  },
+  "marketplace_shortcutsToggleShaders": {
+    "message": "Togol shader",
+    "description": "Toggle shaders shortcut"
+  },
+  "marketplace_shortcutsToggleCompatible": {
+    "message": "Togol serasi",
+    "description": "Toggle compatible shortcut"
+  },
+
+  "marketplace_shortcutsDetails": {
+    "message": "Butiran Tema",
+    "description": "Theme details shortcuts group"
+  },
+  "marketplace_shortcutsInstallRemove": {
+    "message": "Pasang / Buang",
+    "description": "Install/remove shortcut"
+  },
+  "marketplace_shortcutsApply": {
+    "message": "Guna tema",
+    "description": "Apply theme shortcut label"
+  },
+  "marketplace_shortcutsPrevImage": {
+    "message": "Imej sebelumnya",
+    "description": "Previous image shortcut"
+  },
+  "marketplace_shortcutsNextImage": {
+    "message": "Imej seterusnya",
+    "description": "Next image shortcut"
+  },
+
+  "marketplace_shortcutsGeneral": {
+    "message": "Umum",
+    "description": "General shortcuts group"
+  },
+  "marketplace_shortcutsCloseModal": {
+    "message": "Tutup modal",
+    "description": "Close modal shortcut"
+  },
+  "marketplace_shortcutsShowShortcuts": {
+    "message": "Tunjuk pintasan",
+    "description": "Show shortcuts shortcut"
+  },
+  "marketplace_shortcutsApplyTheme": {
+    "message": "Guna tema (selepas pasang)",
+    "description": "Apply theme shortcut"
+  },
+
+  "marketplace_ratingFailed": {
+    "message": "Gagal menghantar penilaian",
+    "description": "Rating submission error"
+  },
+  "marketplace_shaderFetchFailed": {
+    "message": "Gagal mendapatkan konfigurasi shader",
+    "description": "Shader fetch error"
+  },
+  "marketplace_applyFailed": {
+    "message": "Gagal menggunakan tema",
+    "description": "Theme apply error"
+  },
+  "marketplace_noThemesInstalled": {
+    "message": "Tiada tema dipasang lagi",
+    "description": "Empty installed themes message"
+  },
+  "marketplace_lastUpdatedOn": {
+    "message": "Terakhir dikemaskini pada $date$",
+    "description": "Tooltip showing full date when a theme was last updated",
+    "placeholders": {
+      "date": {
+        "content": "$1",
+        "example": "January 15, 2025, 3:42 PM"
+      }
+    }
+  },
+
+  "editor_pageTitle": {
+    "message": "Editor Gaya Better Lyrics",
+    "description": "Standalone editor page title"
+  },
+  "editor_importFromFile": {
+    "message": "Import dari fail",
+    "description": "Import from file button"
+  },
+  "editor_exportToFile": {
+    "message": "Eksport ke fail",
+    "description": "Export to file button"
+  },
+  "editor_saveAsTheme": {
+    "message": "Simpan sebagai tema",
+    "description": "Save as theme button"
+  },
+  "editor_stylingGuide": {
+    "message": "Panduan gaya",
+    "description": "Styling guide button"
+  },
+  "editor_tip": {
+    "message": "Petua: Ini adalah tab bebas, anda boleh memindahkan editor ini ke tetingkap berasingan atau menggunakan paparan skrin pisah bersama YouTube Music untuk melihat perubahan anda secara langsung. Untuk maklumat lanjut, lawati",
+    "description": "Editor tip text"
+  },
+  "editor_poweredBy": {
+    "message": "Dikuasakan oleh",
+    "description": "Powered by label"
+  },
+  "editor_playground": {
+    "message": "Taman Permainan",
+    "description": "Playground link text"
+  },
+  "editor_docs": {
+    "message": "Dokumentasi",
+    "description": "Docs link text"
+  },
+
+  "lyrics_source": {
+    "message": "Sumber: ",
+    "description": "Lyrics source label"
+  },
+  "lyrics_addToLrclib": {
+    "message": "Tambah Lirik ke LRCLib",
+    "description": "Add lyrics button text"
+  },
+  "lyrics_searchOnGenius": {
+    "message": "Cari di Genius",
+    "description": "Search on Genius button text"
+  },
+
+  "lyrics_searching": {
+    "message": "Better Lyrics sedang mencari lirik...",
+    "description": "Loading message while searching for lyrics"
+  },
+  "lyrics_stillSearching": {
+    "message": "Masih mencari lirik tersegerak...",
+    "description": "Loading message while still searching"
+  },
+  "lyrics_noSyncedLyrics": {
+    "message": "Better Lyrics tidak dapat menemui lirik tersegerak",
+    "description": "Message when no synced lyrics found"
+  },
+  "lyrics_adPlaying": {
+    "message": "[muzik latar]",
+    "description": "Message shown during ad playback"
+  },
+  "lyrics_notFound": {
+    "message": "Tiada lirik dijumpai untuk lagu ini",
+    "description": "Message when no lyrics are available"
+  },
+  "options_language_exclusions": {
+    "message": "Pengecualian bahasa",
+    "description": "Label for language exclusions setting"
+  },
+  "options_manage": {
+    "message": "Urus",
+    "description": "Manage button label"
+  },
+  "options_language_exclusionsTitle": {
+    "message": "Pengecualian Bahasa",
+    "description": "Modal title for language exclusions"
+  },
+  "options_romanization_tab": {
+    "message": "Romanisasi",
+    "description": "Romanization tab label"
+  },
+  "options_translation_tab": {
+    "message": "Terjemahan",
+    "description": "Translation tab label"
+  },
+  "options_searchLanguages": {
+    "message": "Cari bahasa...",
+    "description": "Search input placeholder"
+  },
+  "options_romanization_hint": {
+    "message": "Klik untuk togol. Bahasa yang dikecualikan tidak akan diromanisasikan.",
+    "description": "Hint text for romanization exclusions"
+  },
+  "options_translation_hint": {
+    "message": "Klik untuk togol. Bahasa sumber yang dikecualikan tidak akan diterjemahkan.",
+    "description": "Hint text for translation exclusions"
+  },
+  "options_resetToDefault": {
+    "message": "Set Semula $TYPE$ ke Lalai",
+    "description": "Reset to default button label",
+    "placeholders": {
+      "type": {
+        "content": "$1",
+        "example": "Romanization"
+      }
+    }
+  },
+  "options_romanization_resetTitle": {
+    "message": "Set Semula Pengecualian $TYPE$",
+    "description": "Modal title for resetting exclusions",
+    "placeholders": {
+      "type": {
+        "content": "$1",
+        "example": "Romanization"
+      }
+    }
+  },
+  "options_romanization_resetMessage": {
+    "message": "Ini akan mengosongkan semua bahasa yang dikecualikan. Teruskan?",
+    "description": "Confirmation message for resetting exclusions"
+  },
+  "options_reset": {
+    "message": "Set Semula",
+    "description": "Reset button label"
+  },
+  "options_cancel": {
+    "message": "Batal",
+    "description": "Cancel button label"
+  },
+  "options_romanization_resetSuccess": {
+    "message": "Pengecualian $TYPE$ ditetapkan semula ke lalai",
+    "description": "Success message after resetting exclusions",
+    "placeholders": {
+      "type": {
+        "content": "$1",
+        "example": "Romanization"
+      }
+    }
+  },
+
+  "symlink_applied": {
+    "message": "Tema digunakan: $NAME$ (Pasaran)",
+    "description": "Alert after successfully applying a symlinked theme from marketplace",
+    "placeholders": {
+      "name": {
+        "content": "$1",
+        "example": "Minimal"
+      }
+    }
+  },
+  "builtin_applied": {
+    "message": "Tema digunakan: $NAME$",
+    "description": "Alert after successfully applying a bundled built-in theme",
+    "placeholders": {
+      "name": {
+        "content": "$1",
+        "example": "Spotlight"
+      }
+    }
+  },
+  "theme_author_prefix": {
+    "message": "oleh $AUTHOR$",
+    "description": "Author prefix shown on theme selector button",
+    "placeholders": {
+      "author": {
+        "content": "$1",
+        "example": "boidu"
+      }
+    }
+  },
+  "theme_author_you": {
+    "message": "oleh Anda",
+    "description": "Author label for custom user themes on theme selector button"
+  },
+  "symlink_installFailed": {
+    "message": "Tidak dapat memasang tema. Semak sambungan anda dan cuba lagi.",
+    "description": "Alert when a symlinked theme fails to install from marketplace"
+  },
+  "symlink_badge_marketplace": {
+    "message": "Pasaran",
+    "description": "Badge text on symlinked theme cards"
+  },
+  "symlink_badge_bundled": {
+    "message": "Terbundel",
+    "description": "Badge text on non-symlinked built-in theme cards"
+  },
+  "deprecation_builtin_title": {
+    "message": "Perhatian, tema-tema ini akan dipindahkan!",
+    "description": "Title for the built-in themes deprecation banner in theme modal"
+  },
+  "deprecation_builtin_body": {
+    "message": "Kami sedang memindahkan tema terbina ke Pasaran Tema. Sesetengah sudah dipindahkan, cari lencana Pasaran. Lain-lain akan menyusul dalam kemaskini akan datang, dengan sandaran CSS di GitHub dan Discord.",
+    "description": "Body text for the built-in themes deprecation banner"
+  },
+  "deprecation_builtin_cta": {
+    "message": "Layari Pasaran",
+    "description": "CTA button text in the deprecation banner to open the marketplace"
+  },
+  "theme_modal_section_builtin": {
+    "message": "Tema Terbina",
+    "description": "Section title for built-in themes in the theme chooser modal"
+  },
+  "theme_modal_section_custom": {
+    "message": "Tema Tersuai",
+    "description": "Section title for custom themes in the theme chooser modal"
+  }
+}
