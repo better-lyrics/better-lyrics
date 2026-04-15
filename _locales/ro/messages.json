@@ -88,11 +88,11 @@
     "description": "Show stylized animations setting label"
   },
   "options_language_displayLanguage": {
-    "message": "Display Language",
+    "message": "Limbă de Afișare",
     "description": "Label for the UI language selector dropdown"
   },
   "options_language_displayLanguageAuto": {
-    "message": "Auto",
+    "message": "Automat",
     "description": "Option label for automatic language detection based on browser settings"
   },
   "options_language_title": {
@@ -140,11 +140,11 @@
     "description": "Choose a theme button label"
   },
   "options_themes_change": {
-    "message": "Change",
+    "message": "Schimbă",
     "description": "Change theme button label"
   },
   "options_themes_customTheme": {
-    "message": "Custom Theme",
+    "message": "Temă personalizată",
     "description": "Display name for unnamed custom themes"
   },
   "options_themes_customStyles": {
@@ -628,7 +628,7 @@
     "description": "Install/remove shortcut"
   },
   "marketplace_shortcutsApply": {
-    "message": "Apply theme",
+    "message": "Aplică tema",
     "description": "Apply theme shortcut label"
   },
   "marketplace_shortcutsPrevImage": {
@@ -824,7 +824,7 @@
     }
   },
   "symlink_applied": {
-    "message": "Applied theme: $NAME$ (Marketplace)",
+    "message": "Temă aplicată: $NAME$ (Piață)",
     "description": "Alert after successfully applying a symlinked theme from marketplace",
     "placeholders": {
       "name": {
@@ -834,7 +834,7 @@
     }
   },
   "builtin_applied": {
-    "message": "Applied theme: $NAME$",
+    "message": "Temă aplicată: $NAME$",
     "description": "Alert after successfully applying a bundled built-in theme",
     "placeholders": {
       "name": {
@@ -844,7 +844,7 @@
     }
   },
   "theme_author_prefix": {
-    "message": "by $AUTHOR$",
+    "message": "de $AUTHOR$",
     "description": "Author prefix shown on theme selector button",
     "placeholders": {
       "author": {
@@ -854,39 +854,39 @@
     }
   },
   "theme_author_you": {
-    "message": "by You",
+    "message": "de dvs.",
     "description": "Author label for custom user themes on theme selector button"
   },
   "symlink_installFailed": {
-    "message": "Couldn't install theme. Check your connection and try again.",
+    "message": "Nu s-a putut instala tema. Verificați conexiunea și încercați din nou.",
     "description": "Alert when a symlinked theme fails to install from marketplace"
   },
   "symlink_badge_marketplace": {
-    "message": "Marketplace",
+    "message": "Piață",
     "description": "Badge text on symlinked theme cards"
   },
   "symlink_badge_bundled": {
-    "message": "Bundled",
+    "message": "Combinat",
     "description": "Badge text on non-symlinked built-in theme cards"
   },
   "deprecation_builtin_title": {
-    "message": "Heads up, these themes are moving!",
+    "message": "Atenție, migrăm aceste teme!",
     "description": "Title for the built-in themes deprecation banner in theme modal"
   },
   "deprecation_builtin_body": {
-    "message": "We're migrating built-in themes to the Theme Marketplace. Some already have, look for the Marketplace badge. The rest will follow in a future update, with CSS backups on GitHub and Discord.",
+    "message": "Migrăm teme incluse în Piața Temelor. Unele deja există, caută insigna de piață. Restul va urma într-o actualizare viitoare, cu rezerve de CSS pe GitHub și Discord.",
     "description": "Body text for the built-in themes deprecation banner"
   },
   "deprecation_builtin_cta": {
-    "message": "Browse Marketplace",
+    "message": "Răsfoiește piața",
     "description": "CTA button text in the deprecation banner to open the marketplace"
   },
   "theme_modal_section_builtin": {
-    "message": "Built-in Themes",
+    "message": "Teme incluse",
     "description": "Section title for built-in themes in the theme chooser modal"
   },
   "theme_modal_section_custom": {
-    "message": "Custom Themes",
+    "message": "Temă personalizată",
     "description": "Section title for custom themes in the theme chooser modal"
   }
 }
