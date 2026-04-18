@@ -87,6 +87,10 @@
     "message": "Mostrar animaciones estilizadas",
     "description": "Show stylized animations setting label"
   },
+  "options_display_passiveScroll": {
+    "message": "Auto-scroll unsynced lyrics",
+    "description": "Auto-scroll unsynced lyrics setting label"
+  },
   "options_language_displayLanguage": {
     "message": "Display Language",
     "description": "Label for the UI language selector dropdown"
