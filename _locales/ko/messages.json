@@ -87,6 +87,10 @@
     "message": "스타일리시한 애니메이션 표시",
     "description": "Show stylized animations setting label"
   },
+  "options_display_passiveScroll": {
+    "message": "Auto-scroll unsynced lyrics",
+    "description": "Auto-scroll unsynced lyrics setting label"
+  },
   "options_language_displayLanguage": {
     "message": "표시된 언어",
     "description": "Label for the UI language selector dropdown"
@@ -310,6 +314,10 @@
   "options_provider_youtubeCaptions": {
     "message": "YouTube 자막",
     "description": "Youtube Captions provider name"
+  },
+  "options_provider_binilyrics": {
+    "message": "BiniLyrics",
+    "description": "BiniLyrics provider name"
   },
   "options_syncType_syllable": {
     "message": "음절",
