@@ -88,7 +88,7 @@
     "description": "Show stylized animations setting label"
   },
   "options_display_passiveScroll": {
-    "message": "Auto-scroll unsynced lyrics",
+    "message": "Gulir otomatis lirik taksinkron",
     "description": "Auto-scroll unsynced lyrics setting label"
   },
   "options_language_displayLanguage": {
@@ -228,7 +228,7 @@
     "description": "File save dialog opened message"
   },
   "options_alert_fileSaveFailed": {
-    "message": "Gagal menyimpan file. Silahkan coba lagi.",
+    "message": "Gagal menyimpan file. Silakan coba lagi.",
     "description": "File save failed message"
   },
   "options_alert_downloadInitiated": {
@@ -348,7 +348,7 @@
     "description": "Unsynced sync type label"
   },
   "options_syncType_unsynced_tooltip": {
-    "message": "Lirik tanpa informasi waktu. Lirik non-sinkron memberikan pengalaman minimal.",
+    "message": "Lirik tanpa informasi waktu. Lirik taksinkron memberikan pengalaman minimal.",
     "description": "Unsynced sync type tooltip"
   },
   "options_detail_rateTheme": {
