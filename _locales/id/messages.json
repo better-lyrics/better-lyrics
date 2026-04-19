@@ -176,7 +176,7 @@
     "description": "Identity settings section description"
   },
   "options_identity_yourIdentity": {
-    "message": "Identitas Anda",
+    "message": "Identitas Kamu",
     "description": "Your identity label"
   },
   "options_identity_loading": {
