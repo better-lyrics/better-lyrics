@@ -4,199 +4,199 @@
     "description": "The name of the extension"
   },
   "extensionDescription": {
-    "message": "Enhance YouTube Music with beautiful time-synced lyrics, multilingual support, real-time translations and more",
+    "message": "Прокачайте свой YouTube Music красивым, синхронизированным текстом песен, поддержкой разных языков, переводом в реальном времени и многим другим",
     "description": "The description of the extension"
   },
   "options_tab_general": {
-    "message": "General",
+    "message": "Главная",
     "description": "General settings tab label"
   },
   "options_tab_display": {
-    "message": "Display",
+    "message": "Отображение",
     "description": "Display settings tab label"
   },
   "options_tab_language": {
-    "message": "Language",
+    "message": "Язык",
     "description": "Language settings tab label"
   },
   "options_tab_sources": {
-    "message": "Sources",
+    "message": "Источники",
     "description": "Sources settings tab label"
   },
   "options_tab_identity": {
-    "message": "Identity",
+    "message": "Профиль",
     "description": "Identity settings tab label"
   },
   "options_tab_themes": {
-    "message": "Themes",
+    "message": "Темы",
     "description": "Themes settings tab label"
   },
   "options_general_title": {
-    "message": "General Settings",
+    "message": "Общие настройки",
     "description": "General settings section title"
   },
   "options_general_description": {
-    "message": "Settings that affect the general behavior of Better Lyrics.",
+    "message": "Настройки, которые влияют на общее поведение Better Lyrics.",
     "description": "General settings section description"
   },
   "options_general_showLogs": {
-    "message": "Show logs",
+    "message": "Показать логи",
     "description": "Show logs setting label"
   },
   "options_general_autoSwitch": {
-    "message": "Auto switch to lyrics tab",
+    "message": "Автопереключение на вкладку \"Текст\"",
     "description": "Auto switch to lyrics tab setting label"
   },
   "options_general_cache": {
-    "message": "Cache",
+    "message": "Кэш",
     "description": "Cache section label"
   },
   "options_general_clearCache": {
-    "message": "Clear Cache",
+    "message": "Очистить кэш",
     "description": "Clear cache button label"
   },
   "options_general_totalLyrics": {
-    "message": "Total lyrics in cache",
+    "message": "Всего текстов в кэше",
     "description": "Total lyrics in cache label"
   },
   "options_general_cacheSize": {
-    "message": "Cache size",
+    "message": "Размер кэша",
     "description": "Cache size label"
   },
   "options_display_title": {
-    "message": "Display Settings",
+    "message": "Настройки отображения",
     "description": "Display settings section title"
   },
   "options_display_description": {
-    "message": "Fine-tune the appearance of Better Lyrics.",
+    "message": "Настройте внешний вид Better Lyrics.",
     "description": "Display settings section description"
   },
   "options_display_disableFullscreen": {
-    "message": "Disable fullscreen mode",
+    "message": "Выключить полноэкранный режим",
     "description": "Disable fullscreen mode setting label"
   },
   "options_display_autoHideCursor": {
-    "message": "Auto-hide cursor in fullscreen mode",
+    "message": "Спрятать курсор в полноэкранном режиме",
     "description": "Auto-hide cursor setting label"
   },
   "options_display_albumArt": {
-    "message": "Show blurred album art background",
+    "message": "Размытая обложка альбома как фон",
     "description": "Show album art background setting label"
   },
   "options_display_stylizedAnimations": {
-    "message": "Show stylized animations",
+    "message": "Показать стилизованные анимации",
     "description": "Show stylized animations setting label"
   },
   "options_display_passiveScroll": {
-    "message": "Auto-scroll unsynced lyrics",
+    "message": "Автопрокрутка несинхронизированных текстов",
     "description": "Auto-scroll unsynced lyrics setting label"
   },
   "options_language_displayLanguage": {
-    "message": "Display Language",
+    "message": "Язык интерфейса",
     "description": "Label for the UI language selector dropdown"
   },
   "options_language_displayLanguageAuto": {
-    "message": "Auto",
+    "message": "Авто",
     "description": "Option label for automatic language detection based on browser settings"
   },
   "options_language_title": {
-    "message": "Language Settings",
+    "message": "Настройки языка",
     "description": "Language settings section title"
   },
   "options_language_description": {
-    "message": "Language and translation settings for Better Lyrics.",
+    "message": "Настройки языка и переводов для Better Lyrics.",
     "description": "Language settings section description"
   },
   "options_language_romanization": {
-    "message": "Romanization",
+    "message": "Романизация",
     "description": "Romanization setting label"
   },
   "options_language_translate": {
-    "message": "Translate song lyrics",
+    "message": "Переводить тексты песен",
     "description": "Translate song lyrics setting label"
   },
   "options_language_translationLanguage": {
-    "message": "Translation language",
+    "message": "Язык перевода",
     "description": "Translation language setting label"
   },
   "options_sources_title": {
-    "message": "Lyric Source Preference",
+    "message": "Настройки источников текстов",
     "description": "Sources settings section title"
   },
   "options_sources_description": {
-    "message": "Drag to reorder priority. Higher sources are tried first. Uncheck to disable.",
+    "message": "Перетащите для изменения приоритета. Сначала попробуйте источники, что повыше. Снимите флажок, чтобы отключить.",
     "description": "Sources settings section description"
   },
   "options_themes_title": {
-    "message": "Theme Settings",
+    "message": "Настройки темы",
     "description": "Theme settings section title"
   },
   "options_themes_description": {
-    "message": "Customize the appearance of Better Lyrics.",
+    "message": "Настройте внешний вид Better Lyrics.",
     "description": "Theme settings section description"
   },
   "options_themes_theme": {
-    "message": "Theme",
+    "message": "Тема",
     "description": "Theme label"
   },
   "options_themes_chooseTheme": {
-    "message": "Choose a theme",
+    "message": "Выберите тему",
     "description": "Choose a theme button label"
   },
   "options_themes_change": {
-    "message": "Change",
+    "message": "Изменить",
     "description": "Change theme button label"
   },
   "options_themes_customTheme": {
-    "message": "Custom Theme",
+    "message": "Своя тема",
     "description": "Display name for unnamed custom themes"
   },
   "options_themes_customStyles": {
-    "message": "Custom Styles",
+    "message": "Свои стили",
     "description": "Custom styles label"
   },
   "options_themes_create": {
-    "message": "Create",
+    "message": "Создать",
     "description": "Create button label"
   },
   "options_themes_marketplace": {
-    "message": "Theme Marketplace",
+    "message": "Магазин тем",
     "description": "Theme marketplace button label"
   },
   "options_themes_installedThemes": {
-    "message": "Installed Themes",
+    "message": "Установленные темы",
     "description": "Installed themes button label"
   },
   "options_identity_title": {
-    "message": "Identity",
+    "message": "Профиль",
     "description": "Identity settings section title"
   },
   "options_identity_description": {
-    "message": "Your unique anonymous identity for Better Lyrics.",
+    "message": "Ваш уникальный анонимный ID для Better Lyrics.",
     "description": "Identity settings section description"
   },
   "options_identity_yourIdentity": {
-    "message": "Your identity",
+    "message": "Ваш ID",
     "description": "Your identity label"
   },
   "options_identity_loading": {
-    "message": "Loading...",
+    "message": "Загрузка...",
     "description": "Loading identity placeholder"
   },
   "options_identity_exportImport": {
-    "message": "Export/Import",
+    "message": "Экспорт/импорт",
     "description": "Export/Import section label"
   },
   "options_identity_exportKey": {
-    "message": "Export Key",
+    "message": "Экспортировать ключ",
     "description": "Export key button label"
   },
   "options_identity_importKey": {
-    "message": "Import Key",
+    "message": "Импортировать ключ",
     "description": "Import key button label"
   },
   "options_modal_selectTheme": {
-    "message": "Select a Theme",
+    "message": "Выберите тему",
     "description": "Theme modal title"
   },
   "options_modal_cancel": {
@@ -400,103 +400,103 @@
     "description": "Keyboard shortcuts button label"
   },
   "marketplace_sortBy": {
-    "message": "Sort by",
+    "message": "Сортировать по",
     "description": "Sort filter group label"
   },
   "marketplace_sortRatingDesc": {
-    "message": "Highest rated",
+    "message": "С наивысшим рейтингом",
     "description": "Sort by highest rating"
   },
   "marketplace_sortRatingAsc": {
-    "message": "Lowest rated",
+    "message": "С наинизшим рейтингом",
     "description": "Sort by lowest rating"
   },
   "marketplace_sortDownloadsDesc": {
-    "message": "Most downloaded",
+    "message": "Самые скачиваемые",
     "description": "Sort by most downloads"
   },
   "marketplace_sortDownloadsAsc": {
-    "message": "Least downloaded",
+    "message": "Наименее скачиваемые",
     "description": "Sort by least downloads"
   },
   "marketplace_sortNewest": {
-    "message": "Newest",
+    "message": "Новые",
     "description": "Sort by newest"
   },
   "marketplace_sortOldest": {
-    "message": "Oldest",
+    "message": "Старые",
     "description": "Sort by oldest"
   },
   "marketplace_show": {
-    "message": "Show",
+    "message": "Показать",
     "description": "Show filter group label"
   },
   "marketplace_showAll": {
-    "message": "All",
+    "message": "Все",
     "description": "Show all themes"
   },
   "marketplace_showInstalled": {
-    "message": "Installed",
+    "message": "Установленные",
     "description": "Show installed themes"
   },
   "marketplace_showNotInstalled": {
-    "message": "Not installed",
+    "message": "Не установленные",
     "description": "Show not installed themes"
   },
   "marketplace_options": {
-    "message": "Options",
+    "message": "Опции",
     "description": "Options filter group label"
   },
   "marketplace_hasShaders": {
-    "message": "Has shaders",
+    "message": "Имеет шейдеры",
     "description": "Filter for themes with shaders"
   },
   "marketplace_compatibleOnly": {
-    "message": "Compatible only",
+    "message": "Только совместимые",
     "description": "Filter for compatible themes"
   },
   "marketplace_installFromUrl": {
-    "message": "Install from URL",
+    "message": "Установить из URL",
     "description": "Install from URL button"
   },
   "marketplace_submitTheme": {
-    "message": "Submit a theme",
+    "message": "Отправить тему",
     "description": "Submit a theme link"
   },
   "marketplace_loading": {
-    "message": "Loading themes...",
+    "message": "Загрузка тем...",
     "description": "Loading message"
   },
   "marketplace_retry": {
-    "message": "Retry",
+    "message": "Повторить",
     "description": "Retry button"
   },
   "marketplace_noThemesMatch": {
-    "message": "No themes match your filters",
+    "message": "Нет подходящих тем",
     "description": "Empty state message"
   },
   "marketplace_grantPermission": {
-    "message": "Grant Permission",
+    "message": "Предоставить разрешение",
     "description": "Grant permission button"
   },
   "marketplace_install": {
-    "message": "Install",
+    "message": "Установить",
     "description": "Install button"
   },
   "marketplace_remove": {
-    "message": "Remove",
+    "message": "Удалить",
     "description": "Remove button"
   },
   "marketplace_apply": {
-    "message": "Apply",
+    "message": "Применить",
     "description": "Apply button"
   },
   "marketplace_active": {
-    "message": "Active",
+    "message": "Активно",
     "description": "Active theme indicator"
   },
   "marketplace_shadersBadge": {
-    "message": "Shaders",
+    "message": "Шейдеры",
     "description": "Shaders badge text"
   },
   "marketplace_githubBadge": {
@@ -504,47 +504,47 @@
     "description": "GitHub badge text"
   },
   "marketplace_urlModalTitle": {
-    "message": "Install from URL",
+    "message": "Установить из URL",
     "description": "URL install modal title"
   },
   "marketplace_urlModalMessage": {
-    "message": "Enter a GitHub repository URL to install a theme directly:",
+    "message": "Введите URL-адрес репозитория GitHub, чтобы установить тему напрямую:",
     "description": "URL install modal message"
   },
   "marketplace_urlModalPlaceholder": {
-    "message": "github.com/user/repo or github.com/user/repo/tree/branch",
+    "message": "github.com/user/repo или github.com/user/repo/tree/branch",
     "description": "URL input placeholder"
   },
   "marketplace_urlModalError": {
-    "message": "Please enter a GitHub repository URL",
+    "message": "Пожалуйста, введите URL-адрес GitHub репозитория",
     "description": "URL validation error"
   },
   "marketplace_cancel": {
-    "message": "Cancel",
+    "message": "Отмена",
     "description": "Cancel button"
   },
   "marketplace_urlPermissionTitle": {
-    "message": "Additional Permission Required",
+    "message": "Необходимо дополнительное разрешение",
     "description": "URL permission modal title"
   },
   "marketplace_urlPermissionWhy": {
-    "message": "Why is this needed?",
+    "message": "Зачем это нужно?",
     "description": "URL permission explanation title"
   },
   "marketplace_urlPermissionDesc": {
-    "message": "Installing themes from custom GitHub URLs requires broader access than the marketplace. This allows Better Lyrics to:",
+    "message": "Установка тем из пользовательских URL-адресов на GitHub требует более широкого доступа, чем установка из магазина. Это позволяет Better Lyrics:",
     "description": "URL permission description"
   },
   "marketplace_urlPermissionItem1": {
-    "message": "Fetch theme files from any GitHub repository",
+    "message": "Получить файлы тем из любого GitHub репозитория",
     "description": "URL permission list item 1"
   },
   "marketplace_urlPermissionItem2": {
-    "message": "Detect the default branch of the repository",
+    "message": "Обнаружить ветку по умолчанию для репозитория",
     "description": "URL permission list item 2"
   },
   "marketplace_urlPermissionItem3": {
-    "message": "Validate the theme structure before installation",
+    "message": "Проверить структуру темы перед установкой",
     "description": "URL permission list item 3"
   },
   "marketplace_urlPermissionNote": {
