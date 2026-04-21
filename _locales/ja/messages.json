@@ -563,14 +563,6 @@
     "message": "URLからインストール",
     "description": "Install from URL shortcut label"
   },
-  "marketplace_shortcutsPrevPage": {
-    "message": "前のページ",
-    "description": "Previous page shortcut label"
-  },
-  "marketplace_shortcutsNextPage": {
-    "message": "次のページ",
-    "description": "Next page shortcut label"
-  },
   "marketplace_shortcutsSort": {
     "message": "並び替え",
     "description": "Sort shortcuts group"

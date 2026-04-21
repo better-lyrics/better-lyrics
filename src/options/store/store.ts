@@ -131,12 +131,62 @@ let currentFilters: FilterState = {
 };
 
 const EXTENSION_VERSION = chrome.runtime.getManifest().version;
-const ITEMS_PER_PAGE = 12;
-let currentPage = 1;
-let isMarketplacePage = false;
+const INITIAL_BATCH_SIZE = 30;
+const LOAD_MORE_BATCH_SIZE = 20;
+let currentVisibleCards: HTMLElement[] = [];
+let renderedCount = 0;
+let infiniteScrollObserver: IntersectionObserver | null = null;
+
+const TEST_GENERATED_COUNT = 200;
+
+const TEST_THEMES_ENABLED = (() => {
+  try {
+    return process.env.EXTENSION_PUBLIC_ENABLE_TEST_THEMES === "true";
+  } catch {
+    return false;
+  }
+})();
+
+function pseudoRandom(seed: number): () => number {
+  let state = seed;
+  return () => {
+    state = (state * 1664525 + 1013904223) >>> 0;
+    return state / 0xffffffff;
+  };
+}
+
+function generateSyntheticTestThemes(): StoreTheme[] {
+  const palettes = ["1a1a2e", "2d3748", "4a5568", "744210", "742a2a", "276749", "2c5282", "44337a", "702459"];
+  const adjectives = ["Neon", "Pastel", "Midnight", "Sunset", "Aurora", "Velvet", "Glacier", "Ember", "Cosmic", "Lush"];
+  const nouns = ["Wave", "Glow", "Mist", "Pulse", "Drift", "Bloom", "Shade", "Veil", "Spark", "Dawn"];
+  const authors = ["Ada", "Linus", "Grace", "Dennis", "Margaret", "Tim", "Donald", "Barbara", "Anita", "Brian"];
+  const rand = pseudoRandom(0xb1c7);
+
+  return Array.from({ length: TEST_GENERATED_COUNT }, (_, i) => {
+    const palette = palettes[Math.floor(rand() * palettes.length)];
+    const adj = adjectives[Math.floor(rand() * adjectives.length)];
+    const noun = nouns[Math.floor(rand() * nouns.length)];
+    const creatorCount = 1 + Math.floor(rand() * 3);
+    const creators = Array.from({ length: creatorCount }, () => authors[Math.floor(rand() * authors.length)]);
+    const cover = `https://placehold.co/400x240/${palette}/ffffff?text=${encodeURIComponent(`${adj}+${noun}`)}`;
+    return {
+      id: `test-generated-${i}`,
+      title: `${adj} ${noun} ${i + 1}`,
+      description: `Auto-generated theme #${i + 1} — ${adj.toLowerCase()} ${noun.toLowerCase()} aesthetic for stress-testing the marketplace.`,
+      creators,
+      version: "1.0.0",
+      minVersion: i % 17 === 0 ? "99.0.0" : "2.0.0",
+      hasShaders: i % 4 === 0,
+      repo: `test/generated-${i}`,
+      coverUrl: cover,
+      imageUrls: [cover],
+      cssUrl: "",
+    };
+  });
+}
 
 function getTestThemes(): StoreTheme[] {
-  if (typeof process === "undefined" || process.env?.EXTENSION_PUBLIC_ENABLE_TEST_THEMES !== "true") {
+  if (!TEST_THEMES_ENABLED) {
     return [];
   }
 
@@ -149,7 +199,7 @@ function getTestThemes(): StoreTheme[] {
     "https://placehold.co/400x240/cc44cc/ffffff?text=Image+4",
   ];
 
-  return [
+  const curated: StoreTheme[] = [
     {
       id: "test-basic",
       title: "Basic Theme",
@@ -261,14 +311,16 @@ function getTestThemes(): StoreTheme[] {
       cssUrl: "",
     },
   ];
+
+  return [...curated, ...generateSyntheticTestThemes()];
 }
 
 function getTestStats(): AllThemeStats {
-  if (typeof process === "undefined" || process.env?.EXTENSION_PUBLIC_ENABLE_TEST_THEMES !== "true") {
+  if (!TEST_THEMES_ENABLED) {
     return {};
   }
 
-  return {
+  const stats: AllThemeStats = {
     "test-basic": { installs: 150, rating: 4.0, ratingCount: 80 },
     "test-markdown": { installs: 500, rating: 4.5, ratingCount: 200 },
     "test-markdown-images": { installs: 1200, rating: 4.8, ratingCount: 450 },
@@ -278,6 +330,16 @@ function getTestStats(): AllThemeStats {
     "test-multi-author": { installs: 3000, rating: 4.0, ratingCount: 3500 },
     "test-long-description": { installs: 600, rating: 4.3, ratingCount: 180 },
   };
+
+  const rand = pseudoRandom(0x5ed5);
+  for (let i = 0; i < TEST_GENERATED_COUNT; i++) {
+    stats[`test-generated-${i}`] = {
+      installs: Math.floor(rand() * 5000),
+      rating: 3 + rand() * 2,
+      ratingCount: Math.floor(rand() * 800),
+    };
+  }
+  return stats;
 }
 
 marked.setOptions({
@@ -437,7 +499,6 @@ export async function initMarketplaceUI(): Promise<void> {
   urlModalOverlay = document.getElementById("url-modal-overlay");
   urlPermissionModalOverlay = document.getElementById("url-permission-modal-overlay");
   shortcutsModalOverlay = document.getElementById("shortcuts-modal-overlay");
-  isMarketplacePage = true;
 
   setupMarketplaceListeners();
   setupDetailModalListeners();
@@ -445,7 +506,6 @@ export async function initMarketplaceUI(): Promise<void> {
   setupUrlPermissionModalListeners();
   setupShortcutsModalListeners();
   setupMarketplaceKeyboardListeners();
-  setupPaginationListeners();
 
   await loadUserRatings();
   await loadUserInstalls();
@@ -453,6 +513,7 @@ export async function initMarketplaceUI(): Promise<void> {
   refreshUrlThemesMetadata();
 
   await loadMarketplace();
+  setupInfiniteScroll();
 }
 
 function setupMarketplaceListeners(): void {
@@ -544,7 +605,6 @@ function setupMarketplaceFilters(): void {
 
   searchInput?.addEventListener("input", () => {
     currentFilters.searchQuery = searchInput.value.trim().toLowerCase();
-    currentPage = 1;
     applyFiltersToGrid();
   });
 
@@ -564,7 +624,6 @@ function setupMarketplaceFilters(): void {
         currentFilters.sortDirection = "desc";
       }
 
-      currentPage = 1;
       updateSortChipsUI();
       applyFiltersToGrid();
     });
@@ -579,7 +638,6 @@ function setupMarketplaceFilters(): void {
           currentFilters.sortBy = input.value as FilterState["sortBy"];
           currentFilters.sortDirection = "desc";
         }
-        currentPage = 1;
         updateSortChipsUI();
         applyFiltersToGrid();
       }
@@ -589,48 +647,46 @@ function setupMarketplaceFilters(): void {
   showRadios.forEach(radio => {
     radio.addEventListener("change", () => {
       currentFilters.showFilter = (radio as HTMLInputElement).value as FilterState["showFilter"];
-      currentPage = 1;
       applyFiltersToGrid();
     });
   });
 
   shaderCheckbox?.addEventListener("change", () => {
     currentFilters.hasShaders = shaderCheckbox.checked;
-    currentPage = 1;
     applyFiltersToGrid();
   });
 
   compatibleCheckbox?.addEventListener("change", () => {
     currentFilters.versionCompatible = compatibleCheckbox.checked;
-    currentPage = 1;
     applyFiltersToGrid();
   });
 
   updateSortChipsUI(false);
 }
 
-function setupPaginationListeners(): void {
-  const prevBtn = document.getElementById("pagination-prev");
-  const nextBtn = document.getElementById("pagination-next");
+function setupInfiniteScroll(): void {
+  const sentinel = document.getElementById("marketplace-scroll-sentinel");
+  if (!sentinel) return;
 
-  prevBtn?.addEventListener("click", () => {
-    if (currentPage > 1) {
-      currentPage--;
-      applyFiltersToGrid();
-      scrollToTop();
-    }
-  });
-
-  nextBtn?.addEventListener("click", () => {
-    currentPage++;
-    applyFiltersToGrid();
-    scrollToTop();
-  });
+  if (infiniteScrollObserver) infiniteScrollObserver.disconnect();
+  infiniteScrollObserver = new IntersectionObserver(
+    entries => {
+      for (const entry of entries) {
+        if (entry.isIntersecting) {
+          renderNextBatch(LOAD_MORE_BATCH_SIZE);
+          break;
+        }
+      }
+    },
+    { rootMargin: "400px 0px" }
+  );
+  infiniteScrollObserver.observe(sentinel);
 }
 
-function scrollToTop(): void {
-  const content = document.querySelector(".marketplace-content");
-  content?.scrollIntoView({ behavior: "smooth", block: "start" });
+function setSentinelVisible(visible: boolean): void {
+  const sentinel = document.getElementById("marketplace-scroll-sentinel");
+  if (!sentinel) return;
+  sentinel.style.display = visible ? "" : "none";
 }
 
 function setupShortcutsModalListeners(): void {
@@ -696,7 +752,6 @@ function setSortFilter(value: "rating" | "downloads" | "newest", toggleDirection
   if (currentFilters.sortBy === value) {
     if (toggleDirection) {
       currentFilters.sortDirection = currentFilters.sortDirection === "desc" ? "asc" : "desc";
-      currentPage = 1;
       updateSortChipsUI();
       applyFiltersToGrid();
     }
@@ -704,7 +759,6 @@ function setSortFilter(value: "rating" | "downloads" | "newest", toggleDirection
     radio.checked = true;
     currentFilters.sortBy = value;
     currentFilters.sortDirection = "desc";
-    currentPage = 1;
     updateSortChipsUI();
     applyFiltersToGrid();
   }
@@ -715,7 +769,6 @@ function setShowFilter(value: "all" | "installed" | "not-installed"): void {
   if (radio && !radio.checked) {
     radio.checked = true;
     currentFilters.showFilter = value;
-    currentPage = 1;
     applyFiltersToGrid();
   }
 }
@@ -725,7 +778,6 @@ function toggleCheckboxFilter(id: string, filterKey: "hasShaders" | "versionComp
   if (checkbox) {
     checkbox.checked = !checkbox.checked;
     currentFilters[filterKey] = checkbox.checked;
-    currentPage = 1;
     applyFiltersToGrid();
   }
 }
@@ -796,30 +848,6 @@ function setupMarketplaceKeyboardListeners(): void {
         e.preventDefault();
         openShortcutsModal();
         break;
-      case "[":
-        e.preventDefault();
-        if (currentPage > 1) {
-          currentPage--;
-          applyFiltersToGrid();
-          scrollToTop();
-        }
-        break;
-      case "]":
-        e.preventDefault();
-        const totalVisible = storeThemesCache.filter(theme => {
-          const installedIds = new Set<string>();
-          return (
-            matchesSearchQuery(theme, currentFilters.searchQuery) &&
-            matchesInstallFilter(theme.id, installedIds, currentFilters.showFilter)
-          );
-        }).length;
-        const totalPages = Math.ceil(totalVisible / ITEMS_PER_PAGE);
-        if (currentPage < totalPages) {
-          currentPage++;
-          applyFiltersToGrid();
-          scrollToTop();
-        }
-        break;
       case "l":
         e.preventDefault();
         setShowFilter("all");
@@ -889,20 +917,10 @@ async function loadMarketplace(): Promise<void> {
       return;
     }
 
-    storeThemesCache.forEach((theme, index) => {
+    storeThemesCache.forEach(theme => {
       const themeStats = storeStatsCache[theme.id];
       const card = createStoreThemeCard(theme, installedIds.has(theme.id), themeStats, undefined, activeThemeId);
-      card.style.animationDelay = `${index * 25}ms`;
-      card.classList.add("card-initial");
-      card.addEventListener(
-        "animationend",
-        () => {
-          card.classList.remove("card-initial");
-          card.style.animationDelay = "";
-        },
-        { once: true }
-      );
-      grid.appendChild(card);
+      hiddenCards.set(theme.id, card);
     });
 
     await applyFiltersToGrid();
@@ -947,6 +965,9 @@ async function refreshMarketplace(): Promise<void> {
   storeThemesCache = [];
   storeStatsCache = {};
   hiddenCards.clear();
+  currentVisibleCards = [];
+  renderedCount = 0;
+  setSentinelVisible(false);
   resetFilters();
   await loadMarketplace();
 }
@@ -1037,25 +1058,16 @@ async function applyFiltersToGrid(): Promise<void> {
 
     const matchesFilters = matchesSearch && matchesShowFilter && matchesShaderFilter && matchesVersionFilter;
 
-    let card = grid.querySelector(`.store-card[data-theme-id="${theme.id}"]`) as HTMLElement | null;
-    if (!card) {
-      card = hiddenCards.get(theme.id) || null;
-    }
-
+    const card =
+      (grid.querySelector(`.store-card[data-theme-id="${theme.id}"]`) as HTMLElement | null) ||
+      hiddenCards.get(theme.id) ||
+      null;
     if (!card) return;
 
-    if (matchesFilters) {
-      if (!card.parentElement) {
-        grid.appendChild(card);
-        hiddenCards.delete(theme.id);
-      }
-      visibleCards.push(card);
-    } else {
-      if (card.parentElement) {
-        card.remove();
-        hiddenCards.set(theme.id, card);
-      }
-    }
+    if (card.parentElement) card.remove();
+    hiddenCards.set(theme.id, card);
+
+    if (matchesFilters) visibleCards.push(card);
   });
 
   const showUrlThemes = currentFilters.showFilter === "installed" || currentFilters.showFilter === "all";
@@ -1067,31 +1079,24 @@ async function applyFiltersToGrid(): Promise<void> {
       const matchesVersionFilter =
         !currentFilters.versionCompatible || isVersionCompatible(storeTheme.minVersion, EXTENSION_VERSION);
 
+      let card = urlOnlyThemeCards.get(installed.id);
       if (!matchesSearch || !matchesShaderFilter || !matchesVersionFilter) {
-        const existingCard = urlOnlyThemeCards.get(installed.id);
-        if (existingCard?.parentElement) {
-          existingCard.remove();
-        }
+        if (card?.parentElement) card.remove();
         return;
       }
 
-      let card = urlOnlyThemeCards.get(installed.id);
       if (!card) {
         const urlInfo: UrlThemeInfo = { sourceUrl: installed.sourceUrl, repo: installed.repo };
         card = createStoreThemeCard(storeTheme, true, undefined, urlInfo);
         urlOnlyThemeCards.set(installed.id, card);
       }
 
-      if (!card.parentElement) {
-        grid.appendChild(card);
-      }
+      if (card.parentElement) card.remove();
       visibleCards.push(card);
     });
   } else {
     urlOnlyThemeCards.forEach(card => {
-      if (card.parentElement) {
-        card.remove();
-      }
+      if (card.parentElement) card.remove();
     });
   }
 
@@ -1117,27 +1122,8 @@ async function applyFiltersToGrid(): Promise<void> {
     return 0;
   });
 
-  visibleCards.forEach(card => grid.appendChild(card));
-
-  if (isMarketplacePage && visibleCards.length > ITEMS_PER_PAGE) {
-    const totalPages = Math.ceil(visibleCards.length / ITEMS_PER_PAGE);
-    if (currentPage > totalPages) currentPage = totalPages;
-
-    const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
-    const endIndex = startIndex + ITEMS_PER_PAGE;
-
-    visibleCards.forEach((card, index) => {
-      if (index >= startIndex && index < endIndex) {
-        if (!card.parentElement) grid.appendChild(card);
-      } else {
-        if (card.parentElement) card.remove();
-      }
-    });
-
-    updatePaginationUI(visibleCards.length, totalPages);
-  } else {
-    hidePagination();
-  }
+  currentVisibleCards = visibleCards;
+  renderedCount = 0;
 
   const existingEmpty = grid.querySelector(".store-empty");
   if (existingEmpty) existingEmpty.remove();
@@ -1147,73 +1133,50 @@ async function applyFiltersToGrid(): Promise<void> {
     emptyMsg.className = "store-empty";
     emptyMsg.textContent = t("marketplace_noThemesMatch");
     grid.appendChild(emptyMsg);
-    hidePagination();
+    setSentinelVisible(false);
+    return;
   }
+
+  renderNextBatch(INITIAL_BATCH_SIZE);
 }
 
-function updatePaginationUI(_totalItems: number, totalPages: number): void {
-  const paginationContainer = document.getElementById("marketplace-pagination");
-  const numbersContainer = document.getElementById("pagination-numbers");
-  const prevBtn = document.getElementById("pagination-prev") as HTMLButtonElement;
-  const nextBtn = document.getElementById("pagination-next") as HTMLButtonElement;
+function renderNextBatch(batchSize: number): void {
+  const grid = document.getElementById("store-modal-grid");
+  if (!grid) return;
 
-  if (!paginationContainer || !numbersContainer) return;
-
-  paginationContainer.style.display = "flex";
-
-  if (prevBtn) prevBtn.disabled = currentPage <= 1;
-  if (nextBtn) nextBtn.disabled = currentPage >= totalPages;
-
-  numbersContainer.replaceChildren();
-
-  const maxVisiblePages = 5;
-  let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
-  let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
-
-  if (endPage - startPage + 1 < maxVisiblePages) {
-    startPage = Math.max(1, endPage - maxVisiblePages + 1);
+  if (renderedCount >= currentVisibleCards.length) {
+    setSentinelVisible(false);
+    return;
   }
 
-  if (startPage > 1) {
-    numbersContainer.appendChild(createPageButton(1));
-    if (startPage > 2) {
-      const ellipsis = document.createElement("span");
-      ellipsis.className = "marketplace-pagination-info";
-      ellipsis.textContent = "...";
-      numbersContainer.appendChild(ellipsis);
+  const useStaggerAnimation = !gridAnimationController;
+  const start = renderedCount;
+  const end = Math.min(start + batchSize, currentVisibleCards.length);
+
+  for (let i = start; i < end; i++) {
+    const card = currentVisibleCards[i];
+    const themeId = card.dataset.themeId;
+    if (themeId) hiddenCards.delete(themeId);
+
+    if (useStaggerAnimation) {
+      const localIndex = i - start;
+      card.style.animationDelay = `${localIndex * 25}ms`;
+      card.classList.add("card-initial");
+      card.addEventListener(
+        "animationend",
+        () => {
+          card.classList.remove("card-initial");
+          card.style.animationDelay = "";
+        },
+        { once: true }
+      );
     }
+
+    grid.appendChild(card);
   }
 
-  for (let i = startPage; i <= endPage; i++) {
-    numbersContainer.appendChild(createPageButton(i));
-  }
-
-  if (endPage < totalPages) {
-    if (endPage < totalPages - 1) {
-      const ellipsis = document.createElement("span");
-      ellipsis.className = "marketplace-pagination-info";
-      ellipsis.textContent = "...";
-      numbersContainer.appendChild(ellipsis);
-    }
-    numbersContainer.appendChild(createPageButton(totalPages));
-  }
-}
-
-function createPageButton(pageNum: number): HTMLButtonElement {
-  const btn = document.createElement("button");
-  btn.className = `marketplace-pagination-btn ${pageNum === currentPage ? "active" : ""}`;
-  btn.textContent = String(pageNum);
-  btn.addEventListener("click", () => {
-    currentPage = pageNum;
-    applyFiltersToGrid();
-    scrollToTop();
-  });
-  return btn;
-}
-
-function hidePagination(): void {
-  const paginationContainer = document.getElementById("marketplace-pagination");
-  if (paginationContainer) paginationContainer.style.display = "none";
+  renderedCount = end;
+  setSentinelVisible(renderedCount < currentVisibleCards.length);
 }
 
 function matchesSearchQuery(theme: StoreTheme, query: string): boolean {

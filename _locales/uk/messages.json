@@ -563,14 +563,6 @@
     "message": "Встановити з URL-адреси",
     "description": "Install from URL shortcut label"
   },
-  "marketplace_shortcutsPrevPage": {
-    "message": "Попередня сторінка",
-    "description": "Previous page shortcut label"
-  },
-  "marketplace_shortcutsNextPage": {
-    "message": "Наступна сторінка",
-    "description": "Next page shortcut label"
-  },
   "marketplace_shortcutsSort": {
     "message": "Сортувати",
     "description": "Sort shortcuts group"
