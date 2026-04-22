@@ -1,10 +1,10 @@
 import { CUBEY_LYRICS_API_URL, CUBEY_LYRICS_API_URL_TURNSTILE, LOG_PREFIX } from "@constants";
 import { getLocalStorage } from "@core/storage";
 import { log } from "@core/utils";
-import { fillTtml } from "./blyrics/blyrics";
 import { lrcFixers, parseLRC, parsePlainLyrics } from "./lrcUtils";
 import { parseQRC } from "./qrcUtils";
 import { type LyricSourceKey, type LyricSourceResult, type ProviderParameters } from "./shared";
+import { fillTtml } from "@modules/lyrics/providers/ttmlUtils";
 
 /**
  * Handles the Turnstile challenge by creating an iframe and returning a Promise.

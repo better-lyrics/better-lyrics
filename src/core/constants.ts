@@ -45,7 +45,6 @@ export const NOTO_SANS_UNIVERSAL_LINK =
 
 // API URLs and Functions
 export const UNISON_API_URL = "https://unison.boidu.dev/lyrics" as const;
-export const LYRICS_API_URL = "https://lyrics-api.boidu.dev/getLyrics" as const;
 export const DISCORD_INVITE_URL = "https://discord.gg/UsHE3d5fWF" as const;
 export const THEME_STORE_API_URL = "https://better-lyrics-themes-api.boidu.dev" as const;
 export const UNISON_API_BASE_URL = "https://unison.boidu.dev" as const;
