@@ -1,5 +1,6 @@
 import {
   BACKGROUND_LYRIC_CLASS,
+  HAS_TRAILING_SPACE_CLASS,
   LOG_PREFIX,
   LYRICS_CLASS,
   LYRICS_FOUND_LOG,
@@ -48,6 +49,7 @@ import { getRelativeBounds, languageMatchesAny, log } from "@utils";
 let disableRichsync = registerThemeSetting("blyrics-disable-richsync", false, true);
 let lineSyncedAnimationDelay = registerThemeSetting("blyrics-line-synced-animation-delay", 50, true);
 let longWordThreshold = registerThemeSetting("blyrics-long-word-threshold", 1500, true);
+let longWordWrapThreshold = registerThemeSetting("blyrics-long-word-wrap-threshold", 5, true);
 
 function isRomanizationDisabledForLang(lang: string): boolean {
   return languageMatchesAny(lang, AppState.romanizationDisabledLanguages);
@@ -185,63 +187,147 @@ export function processLyrics(data: LyricSourceResultWithMeta, keepLoaderVisible
   injectLyrics(data, keepLoaderVisible, signal);
 }
 
+/**
+ * Fallback for issue #307: split a part whose core text exceeds the wrap threshold into smaller
+ * sub-parts at natural word boundaries (via Intl.Segmenter). This creates wrap opportunities for
+ * unbroken runs such as SEA-language lyrics. Duration is distributed linearly across sub-parts.
+ */
+function splitLongPart(part: LyricPart, threshold: number): LyricPart[] {
+  if (threshold <= 0 || part.words.length <= threshold) return [part];
+
+  let segments: string[];
+  try {
+    const segmenter = new Intl.Segmenter(undefined, { granularity: "word" });
+    segments = Array.from(segmenter.segment(part.words), s => s.segment);
+  } catch {
+    segments = Array.from(part.words);
+  }
+
+  const chunks: string[] = [];
+  let current = "";
+  for (const seg of segments) {
+    if (current.length > 0 && current.length + seg.length > threshold) {
+      chunks.push(current);
+      current = seg;
+    } else {
+      current += seg;
+    }
+  }
+  if (current.length > 0) chunks.push(current);
+
+  if (chunks.length <= 1) return [part];
+
+  const totalChars = part.words.length;
+  const subParts: LyricPart[] = [];
+  let charsBefore = 0;
+  for (let i = 0; i < chunks.length; i++) {
+    const chunk = chunks[i];
+    const subStart = part.startTimeMs + Math.round((part.durationMs * charsBefore) / totalChars);
+    const subEnd =
+      i === chunks.length - 1
+        ? part.startTimeMs + part.durationMs
+        : part.startTimeMs + Math.round((part.durationMs * (charsBefore + chunk.length)) / totalChars);
+    subParts.push({
+      startTimeMs: subStart,
+      durationMs: subEnd - subStart,
+      words: chunk,
+      isBackground: part.isBackground,
+    });
+    charsBefore += chunk.length;
+  }
+  return subParts;
+}
+
 function createLyricsLine(parts: LyricPart[], line: LineData, lyricElement: HTMLDivElement) {
   // To add rtl elements in reverse to the dom
   let rtlBuffer: HTMLSpanElement[] = [];
   let isAllRtl = true;
 
   let lyricElementsBuffer = [] as HTMLSpanElement[];
+  let lastEmittedSpan: HTMLSpanElement | null = null;
+  const wrapThreshold = longWordWrapThreshold.getNumberValue();
 
-  parts.forEach(part => {
-    let isRtl = testRtl(part.words);
-    if (!isRtl && part.words.trim().length > 0) {
-      isAllRtl = false;
-      rtlBuffer.reverse().forEach(part => {
-        lyricElementsBuffer.push(part);
-      });
-      rtlBuffer = [];
+  parts.forEach(originalPart => {
+    // Separate leading / trailing whitespace from the part's core text. Whitespace is not emitted
+    // as DOM content; it becomes a class on the preceding span so CSS can re-add spacing in a way
+    // that disappears cleanly at line / row ends.
+    const match = originalPart.words.match(/^(\s*)([\s\S]*?)(\s*)$/u);
+    const leadingWs = match?.[1] ?? "";
+    const core = match?.[2] ?? originalPart.words;
+    if (core.length === 0) {
+      if (lastEmittedSpan) {
+        lastEmittedSpan.classList.add(HAS_TRAILING_SPACE_CLASS);
+      }
+      return;
     }
 
-    let span = document.createElement("span");
-    span.classList.add(WORD_CLASS);
-    if (part.durationMs === 0) {
-      span.classList.add(ZERO_DURATION_ANIMATION_CLASS);
-    }
-    if (isRtl) {
-      span.classList.add(RTL_CLASS);
+    if (leadingWs.length > 0 && lastEmittedSpan) {
+      lastEmittedSpan.classList.add(HAS_TRAILING_SPACE_CLASS);
     }
 
-    let partData: PartData = {
-      time: part.startTimeMs / 1000,
-      duration: part.durationMs / 1000,
-      lyricElement: span,
-      animationStartTimeMs: Infinity,
+    const cleanedPart: LyricPart = {
+      startTimeMs: originalPart.startTimeMs,
+      durationMs: originalPart.durationMs,
+      words: core,
+      isBackground: originalPart.isBackground,
     };
+    const subParts = splitLongPart(cleanedPart, wrapThreshold);
 
-    span.textContent = part.words;
-    span.dataset.time = String(partData.time);
-    span.dataset.duration = String(partData.duration);
-    span.dataset.content = part.words;
-    span.style.setProperty("--blyrics-duration", part.durationMs + "ms");
-    if (part.durationMs > longWordThreshold.getNumberValue()) {
-      span.dataset.longWord = "true";
-    }
-    if (part.isBackground) {
-      span.classList.add(BACKGROUND_LYRIC_CLASS);
-    }
-    if (part.words.trim().length === 0) {
-      span.style.display = "inline";
-    }
+    subParts.forEach((part, subIdx) => {
+      const isLastSub = subIdx === subParts.length - 1;
+      let isRtl = testRtl(part.words);
+      if (!isRtl && part.words.trim().length > 0) {
+        isAllRtl = false;
+        rtlBuffer.reverse().forEach(p => {
+          lyricElementsBuffer.push(p);
+        });
+        rtlBuffer = [];
+      }
 
-    if (part.words.trim().length !== 0) {
+      let span = document.createElement("span");
+      span.classList.add(WORD_CLASS);
+      if (part.durationMs === 0) {
+        span.classList.add(ZERO_DURATION_ANIMATION_CLASS);
+      }
+      if (isRtl) {
+        span.classList.add(RTL_CLASS);
+      }
+
+      let partData: PartData = {
+        time: part.startTimeMs / 1000,
+        duration: part.durationMs / 1000,
+        lyricElement: span,
+        animationStartTimeMs: Infinity,
+      };
+
+      span.textContent = part.words;
+      span.dataset.time = String(partData.time);
+      span.dataset.duration = String(partData.duration);
+      span.dataset.content = part.words;
+      span.style.setProperty("--blyrics-duration", part.durationMs + "ms");
+      if (part.durationMs > longWordThreshold.getNumberValue()) {
+        span.dataset.longWord = "true";
+      }
+      if (part.isBackground) {
+        span.classList.add(BACKGROUND_LYRIC_CLASS);
+      }
+
+      // Non-final sub-parts signal a group-flush (wrap opportunity) without a trailing-space
+      // visual gap — the original text was contiguous.
+      if (!isLastSub) {
+        span.dataset.wrapAfter = "true";
+      }
+
       line.parts.push(partData);
-    }
 
-    if (isRtl) {
-      rtlBuffer.push(span);
-    } else {
-      lyricElementsBuffer.push(span);
-    }
+      if (isRtl) {
+        rtlBuffer.push(span);
+      } else {
+        lyricElementsBuffer.push(span);
+      }
+
+      lastEmittedSpan = span;
+    });
   });
 
   //Add remaining rtl elements
@@ -257,6 +343,10 @@ function createLyricsLine(parts: LyricPart[], line: LineData, lyricElement: HTML
   }
 
   groupByWordAndInsert(lyricElement, lyricElementsBuffer);
+  if (lyricElement.children.length > 0) {
+    lyricElement.children[lyricElement.children.length - 1].classList.add(HAS_TRAILING_SPACE_CLASS);
+  }
+
 }
 
 function createBreakElem(lyricElement: HTMLElement, order: number) {
@@ -368,10 +458,15 @@ function injectLyrics(data: LyricSourceResultWithMeta, keepLoaderVisible = false
       const words = item.words.split(" ");
 
       words.forEach((word, index) => {
-        word = word.trim().length < 1 ? word : word + " ";
+        word = word.trim().length < 1 ? word : word;
         item.parts.push({
           startTimeMs: item.startTimeMs + index * lineSyncedAnimationDelay.getNumberValue(),
           words: word,
+          durationMs: 0,
+        });
+        item.parts.push({
+          startTimeMs: item.startTimeMs + index * lineSyncedAnimationDelay.getNumberValue(),
+          words: " ",
           durationMs: 0,
         });
       });
@@ -719,7 +814,6 @@ export function calculateLyricPositions() {
  * @param lyricElementsBuffer elements to add
  */
 function groupByWordAndInsert(lyricElement: HTMLDivElement, lyricElementsBuffer: HTMLSpanElement[]) {
-  const breakChar = /([\s\u200B\u00AD\p{Dash_Punctuation}])/gu;
   let wordGroupBuffer = [] as HTMLSpanElement[];
   let isCurrentBufferBg = false;
 
@@ -740,31 +834,22 @@ function groupByWordAndInsert(lyricElement: HTMLDivElement, lyricElementsBuffer:
   };
 
   lyricElementsBuffer.forEach(part => {
-    const isNonMatchingType = isCurrentBufferBg !== part.classList.contains(BACKGROUND_LYRIC_CLASS);
+    const partIsBg = part.classList.contains(BACKGROUND_LYRIC_CLASS);
+    const isNonMatchingType = isCurrentBufferBg !== partIsBg;
+    const hasTrailingSpace = part.classList.contains(HAS_TRAILING_SPACE_CLASS);
+    const wrapAfter = part.dataset.wrapAfter === "true";
 
-    const isElmJustSpace = !(part.textContent.length === 1 && part.textContent[0] === " ");
-    if (!isNonMatchingType) {
-      wordGroupBuffer.push(part);
-    }
-    if (
-      (part.textContent.length > 0 && breakChar.test(part.textContent[part.textContent.length - 1])) ||
-      isNonMatchingType
-    ) {
+    if (isNonMatchingType) {
       pushWordGroupBuffer();
+      isCurrentBufferBg = partIsBg;
     }
+    wordGroupBuffer.push(part);
 
-    // Switch to the correct type unless the current char we're at is just a space.
-    //
-    // We do this to prevent phantom spaces
-    // from appearing at the beginning of the word when the bg lyrics are at the start of a line
-
-    if (isNonMatchingType && isElmJustSpace) {
-      wordGroupBuffer.push(part);
-      isCurrentBufferBg = part.classList.contains(BACKGROUND_LYRIC_CLASS);
+    if (hasTrailingSpace || wrapAfter) {
+      pushWordGroupBuffer();
     }
   });
 
-  //add remaining
   pushWordGroupBuffer();
 }
 

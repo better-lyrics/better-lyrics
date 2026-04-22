@@ -8,6 +8,7 @@ export const CURRENT_LYRICS_CLASS = "blyrics--active" as const;
 export const ZERO_DURATION_ANIMATION_CLASS = "blyrics-zero-dur-animate" as const;
 export const RTL_CLASS = "blyrics-rtl" as const;
 export const WORD_CLASS = "blyrics--word" as const;
+export const HAS_TRAILING_SPACE_CLASS = "blyrics--has-trailing-space" as const;
 export const BACKGROUND_LYRIC_CLASS = "blyrics-background-lyric" as const;
 export const ANIMATING_CLASS = "blyrics--animating" as const;
 export const PAUSED_CLASS = "blyrics--paused" as const;
