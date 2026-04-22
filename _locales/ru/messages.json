@@ -858,7 +858,7 @@
     }
   },
   "theme_author_you": {
-    "message": "by You",
+    "message": "от Вас",
     "description": "Author label for custom user themes on theme selector button"
   },
   "symlink_installFailed": {
