@@ -346,7 +346,6 @@ function createLyricsLine(parts: LyricPart[], line: LineData, lyricElement: HTML
   if (lyricElement.children.length > 0) {
     lyricElement.children[lyricElement.children.length - 1].classList.add(HAS_TRAILING_SPACE_CLASS);
   }
-
 }
 
 function createBreakElem(lyricElement: HTMLElement, order: number) {
