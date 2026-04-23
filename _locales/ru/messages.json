@@ -616,67 +616,67 @@
     "description": "Show not installed shortcut"
   },
   "marketplace_shortcutsToggleShaders": {
-    "message": "Toggle shaders",
+    "message": "Переключить шейдеры",
     "description": "Toggle shaders shortcut"
   },
   "marketplace_shortcutsToggleCompatible": {
-    "message": "Toggle compatible",
+    "message": "Переключить совместимость",
     "description": "Toggle compatible shortcut"
   },
   "marketplace_shortcutsDetails": {
-    "message": "Theme Details",
+    "message": "О теме",
     "description": "Theme details shortcuts group"
   },
   "marketplace_shortcutsInstallRemove": {
-    "message": "Install / Remove",
+    "message": "Установить / удалить",
     "description": "Install/remove shortcut"
   },
   "marketplace_shortcutsApply": {
-    "message": "Apply theme",
+    "message": "Применить тему",
     "description": "Apply theme shortcut label"
   },
   "marketplace_shortcutsPrevImage": {
-    "message": "Previous image",
+    "message": "Предыдущая картинка",
     "description": "Previous image shortcut"
   },
   "marketplace_shortcutsNextImage": {
-    "message": "Next image",
+    "message": "Следующая картинка",
     "description": "Next image shortcut"
   },
   "marketplace_shortcutsGeneral": {
-    "message": "General",
+    "message": "Главная",
     "description": "General shortcuts group"
   },
   "marketplace_shortcutsCloseModal": {
-    "message": "Close modal",
+    "message": "Закрыть модальное окно",
     "description": "Close modal shortcut"
   },
   "marketplace_shortcutsShowShortcuts": {
-    "message": "Show shortcuts",
+    "message": "Показать горячие клавиши",
     "description": "Show shortcuts shortcut"
   },
   "marketplace_shortcutsApplyTheme": {
-    "message": "Apply theme (after install)",
+    "message": "Применить тему (после установки)",
     "description": "Apply theme shortcut"
   },
   "marketplace_ratingFailed": {
-    "message": "Failed to submit rating",
+    "message": "Не удалось отправить оценку",
     "description": "Rating submission error"
   },
   "marketplace_shaderFetchFailed": {
-    "message": "Failed to fetch shader config",
+    "message": "Не удалось получить конфигурацию шейдера",
     "description": "Shader fetch error"
   },
   "marketplace_applyFailed": {
-    "message": "Failed to apply theme",
+    "message": "Не удалось применить тему",
     "description": "Theme apply error"
   },
   "marketplace_noThemesInstalled": {
-    "message": "No themes installed yet",
+    "message": "Нет установленных тем",
     "description": "Empty installed themes message"
   },
   "marketplace_lastUpdatedOn": {
-    "message": "Last updated on $date$",
+    "message": "Последнее обновление: $date$",
     "description": "Tooltip showing full date when a theme was last updated",
     "placeholders": {
       "date": {
@@ -686,71 +686,71 @@
     }
   },
   "editor_pageTitle": {
-    "message": "Better Lyrics Styles Editor",
+    "message": "Редактор стилей Better Lyrics",
     "description": "Standalone editor page title"
   },
   "editor_importFromFile": {
-    "message": "Import from file",
+    "message": "Импортировать из файла",
     "description": "Import from file button"
   },
   "editor_exportToFile": {
-    "message": "Export to file",
+    "message": "Экспортировать в файл",
     "description": "Export to file button"
   },
   "editor_saveAsTheme": {
-    "message": "Save as theme",
+    "message": "Сохранить как тему",
     "description": "Save as theme button"
   },
   "editor_stylingGuide": {
-    "message": "Styling guide",
+    "message": "Гид по стилям",
     "description": "Styling guide button"
   },
   "editor_tip": {
-    "message": "Tip: This is a standalone tab, you can move this editor to a separate window or use split-screen view alongside YouTube Music to see your changes in real-time. For more info, visit the",
+    "message": "Совет: Это отдельная вкладка, Вы можете переместить этот редактор в отдельное окно или использовать разделенный экран вместе с YouTube Music, чтобы увидеть изменения в реальном времени. Для получения дополнительной информации, посетите",
     "description": "Editor tip text"
   },
   "editor_poweredBy": {
-    "message": "Powered by",
+    "message": "Сделано на",
     "description": "Powered by label"
   },
   "editor_playground": {
-    "message": "Playground",
+    "message": "Песочница",
     "description": "Playground link text"
   },
   "editor_docs": {
-    "message": "Docs",
+    "message": "Доки",
     "description": "Docs link text"
   },
   "lyrics_source": {
-    "message": "Source: ",
+    "message": "Источник: ",
     "description": "Lyrics source label"
   },
   "lyrics_addToLrclib": {
-    "message": "Add Lyrics to LRCLib",
+    "message": "Добавить текст в LRCLib",
     "description": "Add lyrics button text"
   },
   "lyrics_searchOnGenius": {
-    "message": "Search on Genius",
+    "message": "Искать на Genius",
     "description": "Search on Genius button text"
   },
   "lyrics_searching": {
-    "message": "Better Lyrics is searching for lyrics...",
+    "message": "Better Lyrics ищет текст песни...",
     "description": "Loading message while searching for lyrics"
   },
   "lyrics_stillSearching": {
-    "message": "Still searching for synced lyrics...",
+    "message": "Всё ещё ищет текст...",
     "description": "Loading message while still searching"
   },
   "lyrics_noSyncedLyrics": {
-    "message": "Better Lyrics could not find synced lyrics",
+    "message": "Better Lyrics не удалось найти синхронизированный текст",
     "description": "Message when no synced lyrics found"
   },
   "lyrics_adPlaying": {
-    "message": "[elevator music]",
+    "message": "[пум-пум-пум]",
     "description": "Message shown during ad playback"
   },
   "lyrics_notFound": {
-    "message": "No lyrics found for this song",
+    "message": "Не удалось найти текст песни",
     "description": "Message when no lyrics are available"
   },
   "options_language_exclusions": {
@@ -866,31 +866,31 @@
     "description": "Alert when a symlinked theme fails to install from marketplace"
   },
   "symlink_badge_marketplace": {
-    "message": "Marketplace",
+    "message": "Магазин",
     "description": "Badge text on symlinked theme cards"
   },
   "symlink_badge_bundled": {
-    "message": "Bundled",
+    "message": "Связанные",
     "description": "Badge text on non-symlinked built-in theme cards"
   },
   "deprecation_builtin_title": {
-    "message": "Heads up, these themes are moving!",
+    "message": "Обрати внимание, темы переезжают!",
     "description": "Title for the built-in themes deprecation banner in theme modal"
   },
   "deprecation_builtin_body": {
-    "message": "We're migrating built-in themes to the Theme Marketplace. Some already have, look for the Marketplace badge. The rest will follow in a future update, with CSS backups on GitHub and Discord.",
+    "message": "Мы переводим встроенные темы в Магазин тем. Некоторые из них уже переведены, ищите значок магазина. Остальные догонят в будущем обновлении, с CSS бэкапами на GitHub и Discord.",
     "description": "Body text for the built-in themes deprecation banner"
   },
   "deprecation_builtin_cta": {
-    "message": "Browse Marketplace",
+    "message": "Открыть магазин",
     "description": "CTA button text in the deprecation banner to open the marketplace"
   },
   "theme_modal_section_builtin": {
-    "message": "Built-in Themes",
+    "message": "Встроенные темы",
     "description": "Section title for built-in themes in the theme chooser modal"
   },
   "theme_modal_section_custom": {
-    "message": "Custom Themes",
+    "message": "Свои темы",
     "description": "Section title for custom themes in the theme chooser modal"
   }
 }
