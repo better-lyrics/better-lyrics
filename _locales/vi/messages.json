@@ -91,6 +91,58 @@
     "message": "Auto-scroll unsynced lyrics",
     "description": "Auto-scroll unsynced lyrics setting label"
   },
+  "options_display_unisonActions": {
+    "message": "Unison Actions",
+    "description": "Display-section row label for the Unison Actions modal trigger"
+  },
+  "options_unisonModal_title": {
+    "message": "Unison Actions",
+    "description": "Title of the Unison Actions modal"
+  },
+  "options_unisonModal_showPinned": {
+    "message": "Show pinned actions",
+    "description": "Toggle label inside the Unison Actions modal for the floating dock"
+  },
+  "options_unisonModal_showPinned_hint": {
+    "message": "A floating control to upvote, downvote, or report Unison lyrics",
+    "description": "Hint text under the Show pinned actions toggle"
+  },
+  "options_unisonModal_autoHide": {
+    "message": "Auto-hide in fullscreen",
+    "description": "Toggle label inside the Unison Actions modal for auto-hiding the dock when idle in fullscreen"
+  },
+  "options_unisonModal_autoHide_hint": {
+    "message": "Hide the floating control when you are idle in fullscreen mode",
+    "description": "Hint text under the Auto-hide in fullscreen toggle"
+  },
+  "options_unisonModal_position": {
+    "message": "Position",
+    "description": "Label above the visual position picker in the Unison Actions modal"
+  },
+  "options_unisonModal_position_topLeft": {
+    "message": "Top left",
+    "description": "Tooltip for the top-left cell in the Unison position picker"
+  },
+  "options_unisonModal_position_topCenter": {
+    "message": "Top center",
+    "description": "Tooltip for the top-center cell in the Unison position picker"
+  },
+  "options_unisonModal_position_topRight": {
+    "message": "Top right",
+    "description": "Tooltip for the top-right cell in the Unison position picker"
+  },
+  "options_unisonModal_position_bottomLeft": {
+    "message": "Bottom left",
+    "description": "Tooltip for the bottom-left cell in the Unison position picker"
+  },
+  "options_unisonModal_position_bottomCenter": {
+    "message": "Bottom center",
+    "description": "Tooltip for the bottom-center cell in the Unison position picker"
+  },
+  "options_unisonModal_position_bottomRight": {
+    "message": "Bottom right",
+    "description": "Tooltip for the bottom-right cell in the Unison position picker"
+  },
   "options_language_displayLanguage": {
     "message": "Ngôn ngữ hiển thị",
     "description": "Label for the UI language selector dropdown"
