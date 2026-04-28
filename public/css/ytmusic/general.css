@@ -105,6 +105,10 @@ ytmusic-message-renderer.ytmusic-tab-renderer {
   display: none !important;
 }
 
+#side-panel:has(#tab-renderer:not([page-type="MUSIC_PAGE_TYPE_TRACK_LYRICS"])) .blyrics-unison-dock {
+  display: none !important;
+}
+
 ytmusic-player-page:not([is-mweb-modernization-enabled])[blyrics-video-mode]
 .side-panel.ytmusic-player-page {
   margin: 0 0 0 calc(var(--ytmusic-player-page-content-gap) / 2);
