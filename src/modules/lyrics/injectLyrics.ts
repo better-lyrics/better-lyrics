@@ -24,6 +24,7 @@ import { createInstrumentalElement } from "@modules/lyrics/createInstrumentalEle
 import { containsNonLatin, detectNonLatinLanguage, testRtl } from "@modules/lyrics/lyricParseUtils";
 import { applySegmentMapToLyrics, type LyricSourceResultWithMeta } from "@modules/lyrics/lyrics";
 import type { Lyric, LyricPart } from "@modules/lyrics/providers/shared";
+import type { UnisonData } from "@modules/lyrics/providers/unison";
 import {
   getRomanizationFromCache,
   getTranslationFromCache,
@@ -468,30 +469,19 @@ function injectLyrics(data: LyricSourceResultWithMeta, keepLoaderVisible = false
   animEngineState.scrollResumeTime = 0;
 
   if (lyrics[0].words !== t("lyrics_notFound")) {
-    if (data.source === "Unison" && "unisonData" in data) {
-      addFooter(
-        data.source,
-        data.sourceHref,
-        data.song,
-        data.artist,
-        data.album,
-        data.duration,
-        data.providerKey,
-        data.videoId,
-        data.unisonData
-      );
-    } else {
-      addFooter(
-        data.source,
-        data.sourceHref,
-        data.song,
-        data.artist,
-        data.album,
-        data.duration,
-        data.providerKey,
-        data.videoId
-      );
-    }
+    const unisonData =
+      data.source === "Unison" && "unisonData" in data ? (data as { unisonData: UnisonData }).unisonData : undefined;
+    addFooter(
+      data.source,
+      data.sourceHref,
+      data.song,
+      data.artist,
+      data.album,
+      data.duration,
+      data.providerKey,
+      data.videoId,
+      unisonData
+    );
   } else {
     addNoLyricsButton(data.song, data.artist, data.album, data.duration, data.videoId);
   }

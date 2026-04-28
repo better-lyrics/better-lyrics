@@ -8,7 +8,6 @@ import {
   GENIUS_LOGO_SRC,
   HIDDEN_CLASS,
   LOADER_TRANSITION_ENDED,
-  LRCLIB_UPLOAD_URL,
   LYRICS_AD_OVERLAY_ID,
   LYRICS_CLASS,
   LYRICS_LOADER_ID,
@@ -205,7 +204,7 @@ export function addFooter(
   duration: number,
   providerKey?: string,
   videoId?: string,
-  ...args: any[]
+  unisonData?: UnisonData
 ): void {
   if (document.getElementsByClassName(FOOTER_CLASS).length !== 0) {
     document.getElementsByClassName(FOOTER_CLASS)[0].remove();
@@ -242,190 +241,209 @@ export function addFooter(
     footerLink.textContent = source || "boidu.dev";
   }
 
-  if (source === "Unison" && args[0]) {
-    const unisonData: UnisonData = args[0];
-
-    const unisonContainer = document.createElement("div");
-    unisonContainer.className = `${FOOTER_CLASS}__unison`;
-
-    const unisonCard = document.createElement("div");
-    unisonCard.className = `${FOOTER_CLASS}__container ${FOOTER_CLASS}__unison-card`;
-
-    if (unisonData.submitter) {
-      const authorBlock = document.createElement("div");
-      authorBlock.className = `${FOOTER_CLASS}__unison-author`;
-
-      const authorRow = document.createElement("div");
-      authorRow.className = `${FOOTER_CLASS}__unison-author-row`;
-
-      const handleEl = document.createElement("strong");
-      handleEl.className = `${FOOTER_CLASS}__author-name`;
-      handleEl.textContent = generatePetName(unisonData.submitter.keyId);
-
-      const tier = getTrustTier(unisonData.submitter.reputation);
-      const tierEl = document.createElement("span");
-      tierEl.className = `${FOOTER_CLASS}__trust-tier`;
-      tierEl.dataset.tier = tier;
-      tierEl.textContent = t(`unison_tier_${tier}`);
-
-      authorRow.appendChild(handleEl);
-      authorRow.appendChild(tierEl);
-
-      const subLabel = document.createElement("div");
-      subLabel.className = `${FOOTER_CLASS}__unison-author-label`;
-      subLabel.textContent = t("unison_submitted_this");
-
-      authorBlock.appendChild(authorRow);
-      authorBlock.appendChild(subLabel);
-      unisonCard.appendChild(authorBlock);
-
-      const divider = document.createElement("div");
-      divider.className = `${FOOTER_CLASS}__unison-divider`;
-      unisonCard.appendChild(divider);
-    }
-
-    const actionsBlock = document.createElement("div");
-    actionsBlock.className = `${FOOTER_CLASS}__unison-actions-block`;
-
-    const actionRow = document.createElement("div");
-    actionRow.className = `${FOOTER_CLASS}__unison-actions`;
-
-    const unisonUpvote = document.createElement("button");
-    unisonUpvote.className = `${FOOTER_CLASS}__vote`;
-    setVoteIcon(unisonUpvote, unisonData.vote === 1 ? votedIcons.upvoted : votedIcons.upvote);
-
-    const unisonDownvote = document.createElement("button");
-    unisonDownvote.className = `${FOOTER_CLASS}__vote`;
-    setVoteIcon(unisonDownvote, unisonData.vote === -1 ? votedIcons.downvoted : votedIcons.downvote);
-
-    const scoreLine = document.createElement("div");
-    scoreLine.className = `${FOOTER_CLASS}__unison-score-line`;
-    const scoreNum = document.createElement("strong");
-    const scoreLabel = document.createElement("span");
-    const scoreSeparator = document.createElement("span");
-    scoreSeparator.textContent = " · ";
-    const voteNum = document.createElement("strong");
-    const voteLabel = document.createElement("span");
-    scoreLine.appendChild(scoreNum);
-    scoreLine.appendChild(scoreLabel);
-    scoreLine.appendChild(scoreSeparator);
-    scoreLine.appendChild(voteNum);
-    scoreLine.appendChild(voteLabel);
-    const scoreLineRefs = { scoreNum, scoreLabel, voteNum, voteLabel };
-    setScoreLine(scoreLineRefs, unisonData.effectiveScore, unisonData.votes);
-
-    unisonUpvote.addEventListener("click", async () => {
-      if (unisonData.vote === 1) {
-        setVoteIcon(unisonUpvote, votedIcons.upvote);
-        const res = await deleteVote(unisonData.lyricsId);
-        if (!res.ok && res.status !== 404) {
-          setVoteIcon(unisonUpvote, votedIcons.upvoted);
-          return;
-        }
-
-        let data = await byId(unisonData.lyricsId);
-        if (data) {
-          unisonData.effectiveScore = data.effectiveScore;
-          unisonData.votes = data.voteCount;
-          unisonData.vote = data.userVote;
-          setScoreLine(scoreLineRefs, data.effectiveScore, data.voteCount);
-        }
-      } else {
-        setVoteIcon(unisonUpvote, votedIcons.upvoted);
-        const res = await vote(unisonData.lyricsId, true);
-        if (!res.ok && res.status !== 409) {
-          setVoteIcon(unisonUpvote, votedIcons.upvote);
-          return;
-        }
-        setVoteIcon(unisonDownvote, votedIcons.downvote);
-
-        let data = await byId(unisonData.lyricsId);
-        if (!data) {
-          return;
-        }
-
-        unisonData.effectiveScore = data.effectiveScore;
-        unisonData.votes = data.voteCount;
-        unisonData.vote = data.userVote;
-        setScoreLine(scoreLineRefs, data.effectiveScore, data.voteCount);
-      }
-    });
-
-    unisonDownvote.addEventListener("click", async () => {
-      if (unisonData.vote === -1) {
-        setVoteIcon(unisonDownvote, votedIcons.downvote);
-        const res = await deleteVote(unisonData.lyricsId);
-        if (!res.ok && res.status !== 404) {
-          setVoteIcon(unisonDownvote, votedIcons.downvoted);
-          return;
-        }
-
-        let data = await byId(unisonData.lyricsId);
-        if (data) {
-          unisonData.effectiveScore = data.effectiveScore;
-          unisonData.votes = data.voteCount;
-          unisonData.vote = data.userVote;
-          setScoreLine(scoreLineRefs, data.effectiveScore, data.voteCount);
-        }
-      } else {
-        setVoteIcon(unisonDownvote, votedIcons.downvoted);
-        const res = await vote(unisonData.lyricsId, false);
-        if (!res.ok && res.status !== 409) {
-          setVoteIcon(unisonDownvote, votedIcons.downvote);
-          return;
-        }
-        setVoteIcon(unisonUpvote, votedIcons.upvote);
-
-        let data = await byId(unisonData.lyricsId);
-        if (!data) {
-          return;
-        }
-
-        unisonData.effectiveScore = data.effectiveScore;
-        unisonData.votes = data.voteCount;
-        unisonData.vote = data.userVote;
-        setScoreLine(scoreLineRefs, data.effectiveScore, data.voteCount);
-      }
-    });
-
-    const unisonReport = document.createElement("button");
-    unisonReport.className = `${FOOTER_CLASS}__vote`;
-    unisonReport.addEventListener("click", () => showReportModal(unisonData.lyricsId));
-
-    const unisonReportSVG = document.createElementNS("http://www.w3.org/2000/svg", "svg");
-    unisonReportSVG.setAttribute("viewBox", "0 0 18 18");
-    unisonReportSVG.setAttribute("fill", "currentColor");
-    unisonReportSVG.setAttribute("width", "20");
-    unisonReportSVG.setAttribute("height", "20");
-
-    const unisonReportSVGPath = document.createElementNS("http://www.w3.org/2000/svg", "path");
-    unisonReportSVGPath.setAttribute(
-      "d",
-      "m3 2.25-.11.055c-.392.196-.64.597-.64 1.036v12.41a.75.75 0 101.5 0v-4.87a5.451 5.451 0 014.687.087L9 11.25l.357.166A6.701 6.701 0 0015 11.25l.11-.055c.343-.171.575-.5.628-.873l.012-.163V3.344a.908.908 0 00-1.313-.812 5.45 5.45 0 01-4.874 0L9 2.25a6.7 6.7 0 00-6 0Zm5.33 1.342.564.282a6.95 6.95 0 005.356.356v5.715a5.2 5.2 0 01-4.58-.037l-.564-.282A6.95 6.95 0 003.75 9.27V3.555a5.2 5.2 0 014.58.037Z"
-    );
-
-    unisonReportSVG.appendChild(unisonReportSVGPath);
-    unisonReport.appendChild(unisonReportSVG);
-
-    actionRow.appendChild(unisonUpvote);
-    actionRow.appendChild(unisonDownvote);
-    actionRow.appendChild(unisonReport);
-
-    actionsBlock.appendChild(actionRow);
-    actionsBlock.appendChild(scoreLine);
-
-    unisonCard.appendChild(actionsBlock);
-    unisonContainer.appendChild(unisonCard);
-
-    unisonContainer.addEventListener("click", e => {
-      if ((e.target as HTMLElement).closest("button")) return;
-      const url = new URL(chrome.runtime.getURL("pages/unison.html"));
-      url.searchParams.set("id", String(unisonData.lyricsId));
-      window.open(url.toString(), "_blank", "noopener,noreferrer");
-    });
-
-    footer.appendChild(unisonContainer);
+  if (source === "Unison" && unisonData) {
+    footer.appendChild(createUnisonFooterCard(unisonData));
   }
+}
+
+function createUnisonFooterCard(unisonData: UnisonData): HTMLElement {
+  const unisonContainer = document.createElement("div");
+  unisonContainer.className = `${FOOTER_CLASS}__unison`;
+
+  const unisonCard = document.createElement("div");
+  unisonCard.className = `${FOOTER_CLASS}__container ${FOOTER_CLASS}__unison-card`;
+
+  if (unisonData.submitter) {
+    unisonCard.appendChild(createSubmitterBlock(unisonData.submitter));
+    const divider = document.createElement("div");
+    divider.className = `${FOOTER_CLASS}__unison-divider`;
+    unisonCard.appendChild(divider);
+  }
+
+  const actionsBlock = document.createElement("div");
+  actionsBlock.className = `${FOOTER_CLASS}__unison-actions-block`;
+
+  const actionRow = document.createElement("div");
+  actionRow.className = `${FOOTER_CLASS}__unison-actions`;
+
+  const unisonUpvote = document.createElement("button");
+  unisonUpvote.className = `${FOOTER_CLASS}__vote`;
+  setVoteIcon(unisonUpvote, unisonData.vote === 1 ? votedIcons.upvoted : votedIcons.upvote);
+
+  const unisonDownvote = document.createElement("button");
+  unisonDownvote.className = `${FOOTER_CLASS}__vote`;
+  setVoteIcon(unisonDownvote, unisonData.vote === -1 ? votedIcons.downvoted : votedIcons.downvote);
+
+  const { scoreLine, scoreLineRefs } = createScoreLine();
+  setScoreLine(scoreLineRefs, unisonData.effectiveScore, unisonData.votes);
+
+  unisonUpvote.addEventListener("click", async e => {
+    e.stopPropagation();
+    if (unisonData.vote === 1) {
+      setVoteIcon(unisonUpvote, votedIcons.upvote);
+      const res = await deleteVote(unisonData.lyricsId);
+      if (!res.ok && res.status !== 404) {
+        setVoteIcon(unisonUpvote, votedIcons.upvoted);
+        return;
+      }
+
+      let data = await byId(unisonData.lyricsId);
+      if (data) {
+        unisonData.effectiveScore = data.effectiveScore;
+        unisonData.votes = data.voteCount;
+        unisonData.vote = data.userVote;
+        setScoreLine(scoreLineRefs, data.effectiveScore, data.voteCount);
+      }
+    } else {
+      setVoteIcon(unisonUpvote, votedIcons.upvoted);
+      const res = await vote(unisonData.lyricsId, true);
+      if (!res.ok && res.status !== 409) {
+        setVoteIcon(unisonUpvote, votedIcons.upvote);
+        return;
+      }
+      setVoteIcon(unisonDownvote, votedIcons.downvote);
+
+      let data = await byId(unisonData.lyricsId);
+      if (!data) {
+        return;
+      }
+
+      unisonData.effectiveScore = data.effectiveScore;
+      unisonData.votes = data.voteCount;
+      unisonData.vote = data.userVote;
+      setScoreLine(scoreLineRefs, data.effectiveScore, data.voteCount);
+    }
+  });
+
+  unisonDownvote.addEventListener("click", async e => {
+    e.stopPropagation();
+    if (unisonData.vote === -1) {
+      setVoteIcon(unisonDownvote, votedIcons.downvote);
+      const res = await deleteVote(unisonData.lyricsId);
+      if (!res.ok && res.status !== 404) {
+        setVoteIcon(unisonDownvote, votedIcons.downvoted);
+        return;
+      }
+
+      let data = await byId(unisonData.lyricsId);
+      if (data) {
+        unisonData.effectiveScore = data.effectiveScore;
+        unisonData.votes = data.voteCount;
+        unisonData.vote = data.userVote;
+        setScoreLine(scoreLineRefs, data.effectiveScore, data.voteCount);
+      }
+    } else {
+      setVoteIcon(unisonDownvote, votedIcons.downvoted);
+      const res = await vote(unisonData.lyricsId, false);
+      if (!res.ok && res.status !== 409) {
+        setVoteIcon(unisonDownvote, votedIcons.downvote);
+        return;
+      }
+      setVoteIcon(unisonUpvote, votedIcons.upvote);
+
+      let data = await byId(unisonData.lyricsId);
+      if (!data) {
+        return;
+      }
+
+      unisonData.effectiveScore = data.effectiveScore;
+      unisonData.votes = data.voteCount;
+      unisonData.vote = data.userVote;
+      setScoreLine(scoreLineRefs, data.effectiveScore, data.voteCount);
+    }
+  });
+
+  const unisonReport = createReportButton(unisonData.lyricsId);
+
+  actionRow.appendChild(unisonUpvote);
+  actionRow.appendChild(unisonDownvote);
+  actionRow.appendChild(unisonReport);
+
+  actionsBlock.appendChild(actionRow);
+  actionsBlock.appendChild(scoreLine);
+
+  unisonCard.appendChild(actionsBlock);
+  unisonContainer.appendChild(unisonCard);
+
+  unisonContainer.addEventListener("click", e => {
+    if ((e.target as HTMLElement).closest("button")) return;
+    const url = new URL(chrome.runtime.getURL("pages/unison.html"));
+    url.searchParams.set("id", String(unisonData.lyricsId));
+    window.open(url.toString(), "_blank", "noopener,noreferrer");
+  });
+
+  return unisonContainer;
+}
+
+function createSubmitterBlock(submitter: NonNullable<UnisonData["submitter"]>): HTMLElement {
+  const authorBlock = document.createElement("div");
+  authorBlock.className = `${FOOTER_CLASS}__unison-author`;
+
+  const authorRow = document.createElement("div");
+  authorRow.className = `${FOOTER_CLASS}__unison-author-row`;
+
+  const handleEl = document.createElement("strong");
+  handleEl.className = `${FOOTER_CLASS}__author-name`;
+  handleEl.textContent = generatePetName(submitter.keyId);
+
+  const tier = getTrustTier(submitter.reputation);
+  const tierEl = document.createElement("span");
+  tierEl.className = `${FOOTER_CLASS}__trust-tier`;
+  tierEl.dataset.tier = tier;
+  tierEl.textContent = t(`unison_tier_${tier}`);
+
+  authorRow.appendChild(handleEl);
+  authorRow.appendChild(tierEl);
+
+  const subLabel = document.createElement("div");
+  subLabel.className = `${FOOTER_CLASS}__unison-author-label`;
+  subLabel.textContent = t("unison_submitted_this");
+
+  authorBlock.appendChild(authorRow);
+  authorBlock.appendChild(subLabel);
+  return authorBlock;
+}
+
+function createScoreLine(): { scoreLine: HTMLElement; scoreLineRefs: ScoreLineRefs } {
+  const scoreLine = document.createElement("div");
+  scoreLine.className = `${FOOTER_CLASS}__unison-score-line`;
+  const scoreNum = document.createElement("strong");
+  const scoreLabel = document.createElement("span");
+  const scoreSeparator = document.createElement("span");
+  scoreSeparator.textContent = " · ";
+  const voteNum = document.createElement("strong");
+  const voteLabel = document.createElement("span");
+  scoreLine.appendChild(scoreNum);
+  scoreLine.appendChild(scoreLabel);
+  scoreLine.appendChild(scoreSeparator);
+  scoreLine.appendChild(voteNum);
+  scoreLine.appendChild(voteLabel);
+  return { scoreLine, scoreLineRefs: { scoreNum, scoreLabel, voteNum, voteLabel } };
+}
+
+function createReportButton(lyricsId: number): HTMLButtonElement {
+  const button = document.createElement("button");
+  button.className = `${FOOTER_CLASS}__vote`;
+  button.addEventListener("click", e => {
+    e.stopPropagation();
+    showReportModal(lyricsId);
+  });
+
+  const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+  svg.setAttribute("viewBox", "0 0 18 18");
+  svg.setAttribute("fill", "currentColor");
+  svg.setAttribute("width", "20");
+  svg.setAttribute("height", "20");
+
+  const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+  path.setAttribute(
+    "d",
+    "m3 2.25-.11.055c-.392.196-.64.597-.64 1.036v12.41a.75.75 0 101.5 0v-4.87a5.451 5.451 0 014.687.087L9 11.25l.357.166A6.701 6.701 0 0015 11.25l.11-.055c.343-.171.575-.5.628-.873l.012-.163V3.344a.908.908 0 00-1.313-.812 5.45 5.45 0 01-4.874 0L9 2.25a6.7 6.7 0 00-6 0Zm5.33 1.342.564.282a6.95 6.95 0 005.356.356v5.715a5.2 5.2 0 01-4.58-.037l-.564-.282A6.95 6.95 0 003.75 9.27V3.555a5.2 5.2 0 014.58.037Z"
+  );
+
+  svg.appendChild(path);
+  button.appendChild(svg);
+  return button;
 }
 
 interface ScoreLineRefs {
@@ -497,18 +515,7 @@ function createFooter(song: string, artist: string, album: string, duration: num
 
     discordLink.appendChild(discordImage);
 
-    const lrclibUrl = new URL(LRCLIB_UPLOAD_URL);
-    if (song) lrclibUrl.searchParams.append("title", song);
-    if (artist) lrclibUrl.searchParams.append("artist", artist);
-    if (album) lrclibUrl.searchParams.append("album", album);
-    if (duration) lrclibUrl.searchParams.append("duration", duration.toString());
-    if (videoId) lrclibUrl.searchParams.append("videoId", videoId);
     footerLink.target = "_blank";
-
-    const addLyricsContainer = createActionButton({
-      text: t("lyrics_addToLrclib"),
-      href: lrclibUrl.toString(),
-    });
 
     const geniusContainer = createActionButton({
       text: t("lyrics_searchOnGenius"),
@@ -519,7 +526,14 @@ function createFooter(song: string, artist: string, album: string, duration: num
 
     footer.appendChild(footerContainer);
     footer.appendChild(geniusContainer);
-    footer.appendChild(addLyricsContainer);
+    if (videoId) {
+      footer.appendChild(
+        createActionButton({
+          text: t("lyrics_submitToUnison"),
+          href: buildUnisonSubmitUrl(song, artist, album, duration, videoId).toString(),
+        })
+      );
+    }
     footer.appendChild(discordLink);
 
     footer.removeAttribute("is-empty");
@@ -876,18 +890,6 @@ export function addNoLyricsButton(
   const buttonContainer = document.createElement("div");
   buttonContainer.className = "blyrics-no-lyrics-button-container";
 
-  const lrclibUrl = new URL(LRCLIB_UPLOAD_URL);
-  if (song) lrclibUrl.searchParams.append("title", song);
-  if (artist) lrclibUrl.searchParams.append("artist", artist);
-  if (album) lrclibUrl.searchParams.append("album", album);
-  if (duration) lrclibUrl.searchParams.append("duration", duration.toString());
-  if (videoId) lrclibUrl.searchParams.append("videoId", videoId);
-
-  const addLyricsButton = createActionButton({
-    text: t("lyrics_addToLrclib"),
-    href: lrclibUrl.toString(),
-  });
-
   const geniusSearch = createActionButton({
     text: t("lyrics_searchOnGenius"),
     href: getGeniusLink(song, artist),
@@ -895,26 +897,29 @@ export function addNoLyricsButton(
     logoAlt: "Genius",
   });
 
-  buttonContainer.appendChild(addLyricsButton);
   buttonContainer.appendChild(geniusSearch);
 
   if (videoId) {
-    const unisonUrl = new URL(chrome.runtime.getURL("pages/unison.html"));
-    unisonUrl.searchParams.set("submit", "true");
-    if (song) unisonUrl.searchParams.set("song", song);
-    if (artist) unisonUrl.searchParams.set("artist", artist);
-    if (album) unisonUrl.searchParams.set("album", album);
-    if (duration) unisonUrl.searchParams.set("duration", duration.toString());
-    unisonUrl.searchParams.set("videoId", videoId);
-
-    const unisonButton = createActionButton({
-      text: t("lyrics_submitToUnison"),
-      href: unisonUrl.toString(),
-    });
-    buttonContainer.appendChild(unisonButton);
+    buttonContainer.appendChild(
+      createActionButton({
+        text: t("lyrics_submitToUnison"),
+        href: buildUnisonSubmitUrl(song, artist, album, duration, videoId).toString(),
+      })
+    );
   }
 
   lyricsWrapper.appendChild(buttonContainer);
+}
+
+function buildUnisonSubmitUrl(song: string, artist: string, album: string, duration: number, videoId: string): URL {
+  const url = new URL(chrome.runtime.getURL("pages/unison.html"));
+  url.searchParams.set("submit", "true");
+  if (song) url.searchParams.set("song", song);
+  if (artist) url.searchParams.set("artist", artist);
+  if (album) url.searchParams.set("album", album);
+  if (duration) url.searchParams.set("duration", duration.toString());
+  url.searchParams.set("videoId", videoId);
+  return url;
 }
 
 /**

@@ -1242,16 +1242,16 @@
     "description": "Report lyrics on a reporting process"
   },
   "report_lyrics_success": {
-    "message": "Thank you for reporting the lyrics! Unison will review the reports as soon as possible",
-    "description": "Succesfully reported the lyrics for a song"
+    "message": "Thanks for the heads up! We'll take a look soon.",
+    "description": "Shown after a lyrics report is successfully submitted"
   },
   "report_lyrics_already": {
-    "message": "You've already reported the lyrics for this song!",
-    "description": "Multiple attempts of already reporting the same lyrics"
+    "message": "We've got this one already. Thanks though!",
+    "description": "Shown when the user tries to report the same lyrics twice"
   },
   "report_lyrics_error": {
-    "message": "Uh-oh, it seems like we can't pass this report to the provider. If you can, please try again",
-    "description": "Report lyrics errors"
+    "message": "That didn't go through. Mind trying again?",
+    "description": "Shown when a lyrics report fails to submit"
   },
 
   "unison_tier_new": {

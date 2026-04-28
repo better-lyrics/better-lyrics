@@ -708,6 +708,12 @@ function showReportMenu(unisonId: number, anchor: HTMLButtonElement): void {
 function setupSubmitForm(): void {
   submitBtn.addEventListener("click", handleSubmit);
 
+  const durationField = document.getElementById("unison-field-duration") as HTMLInputElement | null;
+  durationField?.addEventListener("blur", () => {
+    if (!durationField.value.trim()) return;
+    durationField.value = String(parseDurationInput(durationField.value));
+  });
+
   const composerHint = document.getElementById("unison-composer-hint");
   if (composerHint) {
     const link = document.createElement("a");
@@ -787,7 +793,7 @@ function prefillSubmitForm(params: URLSearchParams): void {
   for (const [param, elementId] of Object.entries(fields)) {
     const value = params.get(param);
     const el = document.getElementById(elementId) as HTMLInputElement | null;
-    if (value && el) el.value = value;
+    if (value && el) el.value = param === "duration" ? String(parseDurationInput(value)) : value;
   }
 
   updateComposerLink();
@@ -810,6 +816,12 @@ function updateComposerLink(): void {
   if (isrc) url.searchParams.set("isrc", isrc);
 
   composerLink.href = url.toString();
+}
+
+function parseDurationInput(value: string): number {
+  const normalized = value.replace(",", ".").trim();
+  const num = Number(normalized);
+  return Number.isFinite(num) ? Math.round(num) : 0;
 }
 
 function detectFormat(text: string): UnisonFormat {
@@ -976,7 +988,7 @@ async function handleSubmit(): Promise<void> {
   const song = (document.getElementById("unison-field-song") as HTMLInputElement).value.trim();
   const artist = (document.getElementById("unison-field-artist") as HTMLInputElement).value.trim();
   const album = (document.getElementById("unison-field-album") as HTMLInputElement).value.trim();
-  const duration = Number((document.getElementById("unison-field-duration") as HTMLInputElement).value);
+  const duration = parseDurationInput((document.getElementById("unison-field-duration") as HTMLInputElement).value);
   const videoId = (document.getElementById("unison-field-videoId") as HTMLInputElement).value.trim();
   const isrc = (document.getElementById("unison-field-isrc") as HTMLInputElement).value.trim();
   const lyrics = lyricsTextarea.value.trim();
