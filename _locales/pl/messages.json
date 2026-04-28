@@ -571,14 +571,6 @@
     "message": "Zainstaluj z URL’a",
     "description": "Install from URL shortcut label"
   },
-  "marketplace_shortcutsPrevPage": {
-    "message": "Poprzednia strona",
-    "description": "Previous page shortcut label"
-  },
-  "marketplace_shortcutsNextPage": {
-    "message": "Następna strona",
-    "description": "Next page shortcut label"
-  },
   "marketplace_shortcutsSort": {
     "message": "Sortuj",
     "description": "Sort shortcuts group"
