@@ -91,6 +91,58 @@
     "message": "Автопрокрутка текстів пісень",
     "description": "Auto-scroll unsynced lyrics setting label"
   },
+  "options_display_unisonActions": {
+    "message": "Unison Actions",
+    "description": "Display-section row label for the Unison Actions modal trigger"
+  },
+  "options_unisonModal_title": {
+    "message": "Unison Actions",
+    "description": "Title of the Unison Actions modal"
+  },
+  "options_unisonModal_showPinned": {
+    "message": "Show pinned actions",
+    "description": "Toggle label inside the Unison Actions modal for the floating dock"
+  },
+  "options_unisonModal_showPinned_hint": {
+    "message": "A floating control to upvote, downvote, or report Unison lyrics",
+    "description": "Hint text under the Show pinned actions toggle"
+  },
+  "options_unisonModal_autoHide": {
+    "message": "Auto-hide in fullscreen",
+    "description": "Toggle label inside the Unison Actions modal for auto-hiding the dock when idle in fullscreen"
+  },
+  "options_unisonModal_autoHide_hint": {
+    "message": "Hide the floating control when you are idle in fullscreen mode",
+    "description": "Hint text under the Auto-hide in fullscreen toggle"
+  },
+  "options_unisonModal_position": {
+    "message": "Position",
+    "description": "Label above the visual position picker in the Unison Actions modal"
+  },
+  "options_unisonModal_position_topLeft": {
+    "message": "Top left",
+    "description": "Tooltip for the top-left cell in the Unison position picker"
+  },
+  "options_unisonModal_position_topCenter": {
+    "message": "Top center",
+    "description": "Tooltip for the top-center cell in the Unison position picker"
+  },
+  "options_unisonModal_position_topRight": {
+    "message": "Top right",
+    "description": "Tooltip for the top-right cell in the Unison position picker"
+  },
+  "options_unisonModal_position_bottomLeft": {
+    "message": "Bottom left",
+    "description": "Tooltip for the bottom-left cell in the Unison position picker"
+  },
+  "options_unisonModal_position_bottomCenter": {
+    "message": "Bottom center",
+    "description": "Tooltip for the bottom-center cell in the Unison position picker"
+  },
+  "options_unisonModal_position_bottomRight": {
+    "message": "Bottom right",
+    "description": "Tooltip for the bottom-right cell in the Unison position picker"
+  },
   "options_language_displayLanguage": {
     "message": "Відображувана мова",
     "description": "Label for the UI language selector dropdown"
@@ -1010,55 +1062,55 @@
     "description": "Vote count label"
   },
   "unison_createInComposer": {
-    "message": "Create synced lyrics",
+    "message": "Створити синхронізований текст",
     "description": "Create in Composer link text in dashboard"
   },
   "unison_song": {
-    "message": "Song",
+    "message": "Назва пісні",
     "description": "Song field label"
   },
   "unison_artist": {
-    "message": "Artist",
+    "message": "Виконавець",
     "description": "Artist field label"
   },
   "unison_album": {
-    "message": "Album",
+    "message": "Альбом",
     "description": "Album field label"
   },
   "unison_duration": {
-    "message": "Duration",
+    "message": "Тривалість",
     "description": "Duration field label"
   },
   "unison_videoId": {
-    "message": "Video ID",
+    "message": "Ідентифікатор відео",
     "description": "Video ID field label"
   },
   "unison_lyrics": {
-    "message": "Lyrics",
+    "message": "Текст",
     "description": "Lyrics textarea label"
   },
   "unison_format": {
-    "message": "Format",
+    "message": "Формат",
     "description": "Format selector label"
   },
   "unison_openInYTMusic": {
-    "message": "Open in YouTube Music",
+    "message": "Відкрити в YouTube Music",
     "description": "Link text to open song in YouTube Music"
   },
   "unison_back": {
-    "message": "Back",
+    "message": "Назад",
     "description": "Back button text in detail view"
   },
   "unison_noPreview": {
-    "message": "Paste or drop lyrics to see a preview",
+    "message": "Вставте або перенесіть сюди текст, щоб побачити попередній перегляд",
     "description": "Empty state text shown in submit preview before lyrics are entered"
   },
   "unison_preview": {
-    "message": "Preview",
+    "message": "Попередній перегляд",
     "description": "Column title for parsed lyrics preview in detail view"
   },
   "unison_rawLyrics": {
-    "message": "Raw Lyrics",
+    "message": "Сирий текст",
     "description": "Column title for raw lyrics source in detail view"
   },
   "unison_isrc": {
@@ -1066,167 +1118,167 @@
     "description": "ISRC field label"
   },
   "unison_placeholder_song": {
-    "message": "e.g. Bohemian Rhapsody",
+    "message": "напр., Bohemian Rhapsody",
     "description": "Placeholder for song input"
   },
   "unison_placeholder_artist": {
-    "message": "e.g. Queen",
+    "message": "напр., Queen",
     "description": "Placeholder for artist input"
   },
   "unison_placeholder_album": {
-    "message": "e.g. A Night at the Opera",
+    "message": "напр., A Night at the Opera",
     "description": "Placeholder for album input"
   },
   "unison_placeholder_duration": {
-    "message": "e.g. 354",
+    "message": "напр., 354",
     "description": "Placeholder for duration input"
   },
   "unison_placeholder_videoId": {
-    "message": "e.g. dQw4w9WgXcQ",
+    "message": "напр., dQw4w9WgXcQ",
     "description": "Placeholder for video ID input"
   },
   "unison_placeholder_isrc": {
-    "message": "e.g. GBAYE0601498",
+    "message": "напр., GBAYE0601498",
     "description": "Placeholder for ISRC input"
   },
   "unison_placeholder_lyrics": {
-    "message": "Paste LRC, TTML, or plain text lyrics here. You can also drag & drop a file.",
+    "message": "Вставте сюди LRC, TTML чи простий текст. Також можна перетягнути файли сюди.",
     "description": "Placeholder for lyrics textarea"
   },
   "unison_durationHint": {
-    "message": "Song length in seconds",
+    "message": "Тривалість пісні в секундах",
     "description": "Hint text below duration field label"
   },
   "unison_videoIdHint": {
-    "message": "11-character ID from the YouTube Music URL",
+    "message": "11-значний ідентифікатор з URL-адреси YouTube Music",
     "description": "Hint text below video ID field label"
   },
   "unison_formatHint": {
-    "message": "Auto-detected from lyrics content",
+    "message": "Автоматичне визначення із наданого вмісту",
     "description": "Hint text below format field label"
   },
   "unison_isrcHintPrefix": {
-    "message": "Find it using an",
+    "message": "Визначте його за допомогою",
     "description": "Text before ISRC finder link"
   },
   "unison_isrcHintLinkText": {
-    "message": "ISRC lookup tool",
+    "message": "інструменту пошуку ISRC",
     "description": "Link text for ISRC finder"
   },
   "unison_tabFeed": {
-    "message": "Feed",
+    "message": "Стрічка",
     "description": "Feed tab label for recent submissions"
   },
   "unison_tabMySubmissions": {
-    "message": "My Submissions",
+    "message": "Мій внесок",
     "description": "Feed tab label for user's own submissions"
   },
   "unison_noSubmissions": {
-    "message": "You haven't submitted any lyrics yet.",
+    "message": "Ви ще не подали жодних текстів пісень.",
     "description": "Empty state for my submissions tab"
   },
   "unison_sync": {
-    "message": "Sync",
+    "message": "Синхронізація",
     "description": "Sync type label in detail view"
   },
   "unison_language": {
-    "message": "Language",
+    "message": "Мова",
     "description": "Language label in detail view"
   },
   "unison_validationRequired": {
-    "message": "Please fill in song, artist, video ID, and lyrics.",
+    "message": "Будь ласка, вкажіть назву пісні, виконавця, ідентифікатор відео і текст.",
     "description": "Validation error when required fields are missing"
   },
   "unison_submitFailed": {
-    "message": "Submission failed",
+    "message": "Помилка подання",
     "description": "Fallback error message when submission fails"
   },
   "report_lyrics_title": {
-    "message": "Report Lyrics",
+    "message": "Скарга на текст",
     "description": "Title for the report lyrics modal"
   },
   "report_lyrics_info": {
-    "message": "Specify the reason why the lyrics for this song are not compatible",
+    "message": "Укажіть причину, чому текст цієї пісні є неприйнятним",
     "description": "Information about using the report lyrics modal"
   },
   "report_lyrics_wrong_song": {
-    "message": "Wrong song or version",
+    "message": "Неправильна пісня чи версія",
     "description": "Reason for the report that the lyrics are for the wrong song or version"
   },
   "report_lyrics_bad_sync": {
-    "message": "Bad synchronization",
+    "message": "Погана синхронізація",
     "description": "Reason for the report that the lyrics are too off on the part synchronization"
   },
   "report_lyrics_offensive": {
-    "message": "Offensive",
+    "message": "Образливий вміст",
     "description": "Reason for the report that the lyrics are offensive or too offensive"
   },
   "report_lyrics_spam": {
-    "message": "Spam or lyrics are irrelevant to the song",
+    "message": "Спам або текст не стосується пісні",
     "description": "Reason for the report that the lyrics are a spam attempt and/or irrelevant with the sung parts"
   },
   "report_lyrics_other": {
-    "message": "Other reason",
+    "message": "Інша причина",
     "description": "Reason for the report that the lyrics is bad in other reasons"
   },
   "report_lyrics_details_placeholder": {
-    "message": "Additional details about this report",
+    "message": "Додаткова інформація про цю скаргу",
     "description": "Placeholder for report lyrics details input"
   },
   "report_lyrics_submit": {
-    "message": "Submit",
+    "message": "Надіслати",
     "description": "Submit button for reporting lyrics"
   },
   "report_lyrics_cancel": {
-    "message": "Cancel",
+    "message": "Скасувати",
     "description": "Cancel button for reporting lyrics"
   },
   "report_lyrics_reporting": {
-    "message": "Reporting lyrics...",
+    "message": "Надсилання скарги...",
     "description": "Report lyrics on a reporting process"
   },
   "report_lyrics_success": {
-    "message": "Thanks for the heads up! We'll take a look soon.",
+    "message": "Дякуємо за вказівку! Незабаром ми переглянемо вашу скаргу.",
     "description": "Shown after a lyrics report is successfully submitted"
   },
   "report_lyrics_already": {
-    "message": "We've got this one already. Thanks though!",
+    "message": "Ми вже отримали цю скаргу. Але все одно дякуємо!",
     "description": "Shown when the user tries to report the same lyrics twice"
   },
   "report_lyrics_error": {
-    "message": "That didn't go through. Mind trying again?",
+    "message": "Щось пішло не так. Можливо, спробуйте ще раз?",
     "description": "Shown when a lyrics report fails to submit"
   },
   "unison_tier_new": {
-    "message": "new",
+    "message": "новачок",
     "description": "Trust tier badge for low-reputation Unison submitters"
   },
   "unison_tier_trusted": {
-    "message": "trusted",
+    "message": "надійний",
     "description": "Trust tier badge for mid-reputation Unison submitters"
   },
   "unison_tier_veteran": {
-    "message": "veteran",
+    "message": "ветеран",
     "description": "Trust tier badge for high-reputation Unison submitters"
   },
   "unison_tier_expert": {
-    "message": "expert",
+    "message": "експерт",
     "description": "Trust tier badge for top-reputation Unison submitters"
   },
   "unison_submitted_this": {
-    "message": "submitted this lyric",
+    "message": "подав цей текст",
     "description": "Sub-label under the submitter name in the Unison footer card"
   },
   "unison_score_label": {
-    "message": "score",
+    "message": "оцінка",
     "description": "Noun shown after the numeric score in the Unison footer (e.g. the 'score' in '4.85 score · 12 votes')"
   },
   "unison_vote_singular": {
-    "message": "vote",
+    "message": "голос",
     "description": "Singular noun used after the number 1 in the Unison vote count (e.g. '1 vote')"
   },
   "unison_vote_plural": {
-    "message": "votes",
+    "message": "голоси(ів)",
     "description": "Plural noun used after numbers other than 1 in the Unison vote count (e.g. '5 votes')"
   }
 }
