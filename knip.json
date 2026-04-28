@@ -6,6 +6,7 @@
     "src/options/options.ts",
     "src/options/editor.ts",
     "src/options/marketplace.ts",
+    "src/options/unison/unison.ts",
     "public/earlyInject.js",
     "public/script.js",
     "src/core/generated/locales.ts"

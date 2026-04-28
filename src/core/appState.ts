@@ -1,6 +1,7 @@
-import { GENERAL_ERROR_LOG } from "@constants";
+import { GENERAL_ERROR_LOG, UNISON_DOCK_DEFAULT_POSITION } from "@constants";
 import type { LyricsData } from "@modules/lyrics/injectLyrics";
 import { createLyrics } from "@modules/lyrics/lyrics";
+import type { UnisonData } from "@modules/lyrics/providers/unison";
 import { flushLoader } from "@modules/ui/dom";
 import { log } from "@utils";
 
@@ -39,8 +40,13 @@ interface AppStateType {
   romanizationDisabledLanguages: string[];
   translationDisabledLanguages: string[];
   translationLanguage: string;
+  isPassiveScrollEnabled: boolean;
   hasPreloadedNextSong: boolean;
   currentInjectionId: number;
+  isUnisonPinnedDockEnabled: boolean;
+  unisonPinnedDockPosition: string;
+  isUnisonAutoHideInFullscreenEnabled: boolean;
+  currentUnisonData: UnisonData | null;
 }
 
 export const AppState: AppStateType = {
@@ -63,8 +69,13 @@ export const AppState: AppStateType = {
   romanizationDisabledLanguages: [],
   translationDisabledLanguages: [],
   translationLanguage: "en",
+  isPassiveScrollEnabled: true,
   hasPreloadedNextSong: false,
   currentInjectionId: 0,
+  isUnisonPinnedDockEnabled: true,
+  unisonPinnedDockPosition: UNISON_DOCK_DEFAULT_POSITION,
+  isUnisonAutoHideInFullscreenEnabled: true,
+  currentUnisonData: null,
 };
 
 export function reloadLyrics(): void {
