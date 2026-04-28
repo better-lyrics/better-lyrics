@@ -1,9 +1,9 @@
 import { GENERAL_ERROR_LOG, LOG_PREFIX } from "@constants";
 import { decompressString, isCompressed } from "@core/compression";
 import { compileRicsToStyles, getLocalStorage, getSyncStorage, loadChunkedStyles } from "@core/storage";
+import { setThemeSettings } from "@modules/settings/themeOptions";
 import { log } from "@utils";
 import { cachedDurations } from "./animationEngine";
-import { setThemeSettings } from "@modules/settings/themeOptions";
 
 let hasSubscribedToStyles = false;
 

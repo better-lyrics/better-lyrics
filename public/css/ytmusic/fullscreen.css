@@ -203,3 +203,18 @@ ytmusic-app-layout[player-fullscreened]:not([blyrics-dfs]) > [slot="player-bar"]
   animation: none !important;
   width: 100%;
 }
+
+/* Top-anchored Unison dock: tab header is hidden in fullscreen, so no 48px buffer needed */
+#layout[player-fullscreened]:not([blyrics-dfs]) .blyrics-unison-dock[data-position^="top-"] {
+  top: 16px;
+}
+
+/* Shift bottom-anchored Unison dock above the player bar when it shows in fullscreen */
+#layout[player-fullscreened]:not([blyrics-dfs])[show-fullscreen-controls] .blyrics-unison-dock[data-position^="bottom-"] {
+  --dock-y-shift: -88px;
+}
+
+/* Top-center autoscroll-button shift is smaller in fullscreen (no tab header) */
+#layout[player-fullscreened]:not([blyrics-dfs]) #side-panel:has(.autoscroll-resume-button:not([autoscroll-hidden="true"])) .blyrics-unison-dock[data-position="top-center"] {
+  --dock-y-shift: 52px;
+}
