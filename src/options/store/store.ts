@@ -9,8 +9,8 @@ import type { AllThemeStats, InstalledStoreTheme, StoreTheme, ThemeStats } from 
 
 let gridAnimationController: AnimationController | null = null;
 
-import { type AlertAction, showAlert } from "../editor/ui/feedback";
 import { getDisplayName, hasCertificate } from "@core/keyIdentity";
+import { type AlertAction, showAlert } from "../editor/ui/feedback";
 import { fetchAllStats, fetchUserRatings, submitRating, trackInstall } from "./themeStoreApi";
 import {
   applyStoreTheme,

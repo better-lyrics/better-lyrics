@@ -18,19 +18,21 @@ import {
   WORD_CLASS,
   ZERO_DURATION_ANIMATION_CLASS,
 } from "@constants";
-import { t } from "@core/i18n";
 import { AppState } from "@core/appState";
-import { containsNonLatin, detectNonLatinLanguage, testRtl } from "@modules/lyrics/lyricParseUtils";
+import { t } from "@core/i18n";
 import { createInstrumentalElement } from "@modules/lyrics/createInstrumentalElement";
+import { containsNonLatin, detectNonLatinLanguage, testRtl } from "@modules/lyrics/lyricParseUtils";
 import { applySegmentMapToLyrics, type LyricSourceResultWithMeta } from "@modules/lyrics/lyrics";
 import type { Lyric, LyricPart } from "@modules/lyrics/providers/shared";
 import {
-  translateBatch,
-  romanizeBatch,
-  getTranslationFromCache,
   getRomanizationFromCache,
+  getTranslationFromCache,
+  romanizeBatch,
+  translateBatch,
 } from "@modules/lyrics/translation";
+import { registerThemeSetting } from "@modules/settings/themeOptions";
 import { animEngineState, lyricsElementAdded } from "@modules/ui/animationEngine";
+import { resizeCanvas } from "@modules/ui/animationEngineDebug";
 import {
   addFooter,
   addNoLyricsButton,
@@ -41,8 +43,6 @@ import {
   setExtraHeight,
 } from "@modules/ui/dom";
 import { getRelativeBounds, languageMatchesAny, log } from "@utils";
-import { resizeCanvas } from "@modules/ui/animationEngineDebug";
-import { registerThemeSetting } from "@modules/settings/themeOptions";
 
 let disableRichsync = registerThemeSetting("blyrics-disable-richsync", false, true);
 let lineSyncedAnimationDelay = registerThemeSetting("blyrics-line-synced-animation-delay", 50, true);
@@ -469,9 +469,28 @@ function injectLyrics(data: LyricSourceResultWithMeta, keepLoaderVisible = false
 
   if (lyrics[0].words !== t("lyrics_notFound")) {
     if (data.source === "Unison" && "unisonData" in data) {
-      addFooter(data.source, data.sourceHref, data.song, data.artist, data.album, data.duration, data.providerKey, data.videoId, data.unisonData);
+      addFooter(
+        data.source,
+        data.sourceHref,
+        data.song,
+        data.artist,
+        data.album,
+        data.duration,
+        data.providerKey,
+        data.videoId,
+        data.unisonData
+      );
     } else {
-      addFooter(data.source, data.sourceHref, data.song, data.artist, data.album, data.duration, data.providerKey, data.videoId);
+      addFooter(
+        data.source,
+        data.sourceHref,
+        data.song,
+        data.artist,
+        data.album,
+        data.duration,
+        data.providerKey,
+        data.videoId
+      );
     }
   } else {
     addNoLyricsButton(data.song, data.artist, data.album, data.duration, data.videoId);

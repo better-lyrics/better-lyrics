@@ -1,5 +1,5 @@
-import { AppState } from "@core/appState";
 import { INITIALIZE_LOG } from "@constants";
+import { AppState } from "@core/appState";
 import { injectI18nCssVars, loadLocaleOverride, subscribeToLocaleChanges } from "@core/i18n";
 import { purgeExpiredKeys, saveCacheInfo } from "@core/storage";
 import { initProviders } from "@modules/lyrics/providers/shared";
@@ -18,8 +18,8 @@ import {
   enableLyricsTab,
   initializeLyrics,
   lyricReloader,
-  setupAltHoverHandler,
   setUpAvButtonListener,
+  setupAltHoverHandler,
   setupHomepageFullscreenHandler,
   setupWakeLockForFullscreen,
 } from "@modules/ui/observer";

@@ -1,5 +1,13 @@
 import { BLYRICS_INSTRUMENTAL_GAP_MS } from "@constants";
 import type {
+  Lyric,
+  LyricPart,
+  LyricSourceKey,
+  LyricSourceResult,
+  ProviderParameters,
+} from "@modules/lyrics/providers/shared";
+import { type X2jOptions, XMLParser } from "fast-xml-parser";
+import type {
   MetadataElement,
   ParagraphElementOrBackground,
   SpanElement,
@@ -8,14 +16,6 @@ import type {
   TransliterationItem,
   TtmlRoot,
 } from "@/modules/lyrics/providers/ttmlTypes";
-import type {
-  Lyric,
-  LyricPart,
-  LyricSourceKey,
-  LyricSourceResult,
-  ProviderParameters,
-} from "@modules/lyrics/providers/shared";
-import { type X2jOptions, XMLParser } from "fast-xml-parser";
 
 /**
  * Parse time in hh:mm:ss.xx or offset-time with unit indicators "h", "m", "s", "ms" (e.g 432.25s)
@@ -186,6 +186,40 @@ function insertInstrumentalBreaks(lyrics: Lyric[], songDurationMs: number): Lyri
   return result;
 }
 
+// -- AMLL TTML Namespace Recovery --------------------------------------------
+// Some exporters (AMLL, etc.) use prefixes without declaring them; inject synthetic xmlns to keep parsers happy.
+
+const ELEMENT_PREFIX_REGEX = /<\/?([A-Za-z][\w.-]*):/g;
+const ATTRIBUTE_PREFIX_REGEX = /\s([A-Za-z][\w.-]*):[\w.-]+\s*=/g;
+const DECLARED_PREFIX_REGEX = /xmlns:([A-Za-z][\w.-]*)\s*=/g;
+const ROOT_TT_TAG_REGEX = /<tt\b[^>]*>/;
+
+function declareMissingNamespaces(content: string): string {
+  const rootMatch = content.match(ROOT_TT_TAG_REGEX);
+  if (!rootMatch) return content;
+
+  const rootTag = rootMatch[0];
+  const declared = new Set<string>(["xml", "xmlns"]);
+  for (const match of rootTag.matchAll(DECLARED_PREFIX_REGEX)) {
+    declared.add(match[1]);
+  }
+
+  const used = new Set<string>();
+  for (const match of content.matchAll(ELEMENT_PREFIX_REGEX)) {
+    used.add(match[1]);
+  }
+  for (const match of content.matchAll(ATTRIBUTE_PREFIX_REGEX)) {
+    used.add(match[1]);
+  }
+
+  const missing = [...used].filter(prefix => !declared.has(prefix));
+  if (missing.length === 0) return content;
+
+  const additions = missing.map(prefix => ` xmlns:${prefix}="urn:better-lyrics:unbound:${prefix}"`).join("");
+  const patchedRootTag = rootTag.replace(/>$/, `${additions}>`);
+  return content.replace(rootTag, patchedRootTag);
+}
+
 interface FillTtmlOptions {
   richsyncKey: LyricSourceKey;
   syncedKey: LyricSourceKey;
@@ -222,20 +256,24 @@ export async function fillTtml(
 
   const parser = new XMLParser(parserOptions);
 
-  const rawObj = (await parser.parse(responseString)) as TtmlRoot;
+  const sanitizedResponse = declareMissingNamespaces(responseString);
+  const rawObj = (await parser.parse(sanitizedResponse)) as TtmlRoot;
 
   const lyrics = new Map() as Map<string, Lyric>;
   const lyricIds = {} as Record<string, string[]>;
 
-  const tt = rawObj[0].tt;
+  const ttContainer = rawObj.find(e => "tt" in e)!;
+  const tt = ttContainer.tt;
   const ttHead = tt.find(e => e.head)!.head!;
   const ttBodyContainer = tt.find(e => e.body)!;
   const ttBody = ttBodyContainer.body!;
   const ttMeta = ttBodyContainer[":@"];
 
-  const agentMapping = extractAgentMapping(ttHead[0].metadata);
+  const metadataElements = ttHead.find(e => "metadata" in e)?.metadata ?? [];
 
-  const lines = ttBody.flatMap(e => e.div);
+  const agentMapping = extractAgentMapping(metadataElements);
+
+  const lines = ttBody.flatMap(e => e.div ?? []).filter(e => e != null && "p" in e);
 
   const hasTimingData = lines.length > 0 && lines[0][":@"] !== undefined;
   if (!hasTimingData) {
@@ -285,7 +323,7 @@ export async function fillTtml(
     });
   });
 
-  const metadataArray = ttHead[0].metadata;
+  const metadataArray = metadataElements;
 
   const findInMetadata = <T>(key: "translations" | "transliterations"): T | null => {
     const direct = metadataArray.find(e => key in e);
@@ -365,7 +403,7 @@ export async function fillTtml(
 
   let result: LyricSourceResult = {
     cacheAllowed: cacheAllowed ?? true,
-    language: rawObj[0][":@"]["@_lang"] || ttMeta["@_lang"],
+    language: ttContainer[":@"]?.["@_lang"] || ttMeta?.["@_lang"],
     lyrics: lyricArray,
     musicVideoSynced: false,
     source,

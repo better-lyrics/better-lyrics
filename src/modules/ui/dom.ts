@@ -6,6 +6,7 @@ import {
   FOOTER_CLASS,
   FOOTER_NOT_VISIBLE_LOG,
   GENIUS_LOGO_SRC,
+  HIDDEN_CLASS,
   LOADER_TRANSITION_ENDED,
   LRCLIB_UPLOAD_URL,
   LYRICS_AD_OVERLAY_ID,
@@ -18,14 +19,14 @@ import {
   PLAYER_BAR_SELECTOR,
   PROVIDER_CONFIGS,
   ROMANIZED_LYRICS_CLASS,
+  type SyncType,
   TAB_RENDERER_SELECTOR,
   TRANSLATED_LYRICS_CLASS,
-  type SyncType,
-  HIDDEN_CLASS,
-  UNISON_API_URL,
 } from "@constants";
-import { t } from "@core/i18n";
 import { AppState } from "@core/appState";
+import { t } from "@core/i18n";
+import { disconnectResizeObserver } from "@modules/lyrics/injectLyrics";
+import type { ThumbnailElement } from "@modules/lyrics/requestSniffer/NextResponse";
 import {
   animEngineState,
   getResumeScrollElement,
@@ -35,17 +36,16 @@ import {
   toMs,
 } from "@modules/ui/animationEngine";
 import { log } from "@utils";
+import { generatePetName } from "@/core/keyIdentity";
+import { byId, deleteVote, type UnisonData, vote } from "../lyrics/providers/unison";
 import { scrollEventHandler } from "./observer";
-import type { ThumbnailElement } from "@modules/lyrics/requestSniffer/NextResponse";
-import { disconnectResizeObserver } from "@modules/lyrics/injectLyrics";
-import { byId, deleteVote, vote, type UnisonData } from "../lyrics/providers/unison";
 import { showReportModal } from "./reportLyrics";
 
 const votedIcons = {
-  upvote: `<svg xmlns="http://www.w3.org/2000/svg" height="20" viewBox="0 0 24 24" width="20" fill="white"><path d="M9.221 1.795a1 1 0 011.109-.656l1.04.173a4 4 0 013.252 4.784L14 9h4.061a3.664 3.664 0 013.576 2.868A3.68 3.68 0 0121 14.85l.02.087A3.815 3.815 0 0120 18.5v.043l-.01.227a2.82 2.82 0 01-.135.663l-.106.282A3.754 3.754 0 0116.295 22h-3.606l-.392-.007a12.002 12.002 0 01-5.223-1.388l-.343-.189-.27-.154a2.005 2.005 0 00-.863-.26l-.13-.004H3.5a1.5 1.5 0 01-1.5-1.5V12.5A1.5 1.5 0 013.5 11h1.79l.157-.013a1 1 0 00.724-.512l.063-.145 2.987-8.535Zm-1.1 9.196A3 3 0 015.29 13H4v4.998h1.468a4 4 0 011.986.528l.27.155.285.157A10 10 0 0012.69 20h3.606c.754 0 1.424-.483 1.663-1.2l.03-.126a.819.819 0 00.012-.131v-.872l.587-.586c.388-.388.577-.927.523-1.465l-.038-.23-.02-.087-.21-.9.55-.744A1.663 1.663 0 0018.061 11H14a2.002 2.002 0 01-1.956-2.418l.623-2.904a2 2 0 00-1.626-2.392l-.21-.035-2.71 7.741Z"></path></svg>`,
-  upvoted: `<svg xmlns="http://www.w3.org/2000/svg" height="20" viewBox="0 0 24 24" width="20" fill="white"><path d="M10.72 2.18a3.263 3.263 0 012.352 4.063l-.708 2.476a1 1 0 00.962 1.275h5.29c.848 0 1.624.48 2.003 1.238l.179.359a1.785 1.785 0 01-.6 2.279.446.446 0 00-.198.37v.07c0 .124.041.246.116.346a2.375 2.375 0 01-.41 3.278l-.5.399a.38.38 0 00-.123.416l.07.206c.217.653.1 1.372-.313 1.923a2.8 2.8 0 01-2.24 1.12l-3.914-.002a12 12 0 01-5.952-1.584l-.272-.155a2.002 2.002 0 00-.993-.265H3a1 1 0 01-1-1v-5.996a1 1 0 011.002-1L5.789 12a1 1 0 00.945-.67l3.02-8.628a.816.816 0 01.967-.523Z"></path></svg>`,
-  downvote: `<svg xmlns="http://www.w3.org/2000/svg" height="20" viewBox="0 0 24 24" width="20" fill="white"><path d="m11.31 2 .392.007c1.824.06 3.61.534 5.223 1.388l.343.189.27.154c.264.152.56.24.863.26l.13.004H20.5a1.5 1.5 0 011.5 1.5V11.5a1.5 1.5 0 01-1.5 1.5h-1.79l-.158.013a1 1 0 00-.723.512l-.064.145-2.987 8.535a1 1 0 01-1.109.656l-1.04-.174a4 4 0 01-3.251-4.783L10 15H5.938a3.664 3.664 0 01-3.576-2.868A3.682 3.682 0 013 9.15l-.02-.088A3.816 3.816 0 014 5.5v-.043l.008-.227a2.86 2.86 0 01.136-.664l.107-.28A3.754 3.754 0 017.705 2h3.605ZM7.705 4c-.755 0-1.425.483-1.663 1.2l-.032.126a.818.818 0 00-.01.131v.872l-.587.586a1.816 1.816 0 00-.524 1.465l.038.23.02.087.21.9-.55.744a1.686 1.686 0 00-.321 1.18l.029.177c.17.76.844 1.302 1.623 1.302H10a2.002 2.002 0 011.956 2.419l-.623 2.904-.034.208a2.002 2.002 0 001.454 2.139l.206.045.21.035 2.708-7.741A3.001 3.001 0 0118.71 11H20V6.002h-1.47c-.696 0-1.38-.183-1.985-.528l-.27-.155-.285-.157A10.002 10.002 0 0011.31 4H7.705Z"></path></svg>`,
-  downvoted: `<svg xmlns="http://www.w3.org/2000/svg" height="20" viewBox="0 0 24 24" width="20" fill="white"><path d="M11.313 2.002c2.088 0 4.14.546 5.953 1.583l.273.156a2 2 0 00.993.264H21a1 1 0 011 1V11a1 1 0 01-1.002 1l-2.787-.005a1 1 0 00-.946.67l-3.02 8.628a.815.815 0 01-.966.522 3.262 3.262 0 01-2.35-4.062l.707-2.477a1 1 0 00-.961-1.274h-5.29a2.24 2.24 0 01-2.004-1.238l-.18-.359a1.784 1.784 0 01.601-2.278.446.446 0 00.198-.37v-.07a.578.578 0 00-.116-.347 2.374 2.374 0 01.412-3.278l.498-.399a.379.379 0 00.123-.415l-.07-.207a2.1 2.1 0 01.313-1.923A2.798 2.798 0 017.4 2l3.913.002Z"></path></svg>`,
+  upvote: `<svg xmlns="http://www.w3.org/2000/svg" height="20" viewBox="0 0 24 24" width="20" fill="currentColor"><path d="M9.221 1.795a1 1 0 011.109-.656l1.04.173a4 4 0 013.252 4.784L14 9h4.061a3.664 3.664 0 013.576 2.868A3.68 3.68 0 0121 14.85l.02.087A3.815 3.815 0 0120 18.5v.043l-.01.227a2.82 2.82 0 01-.135.663l-.106.282A3.754 3.754 0 0116.295 22h-3.606l-.392-.007a12.002 12.002 0 01-5.223-1.388l-.343-.189-.27-.154a2.005 2.005 0 00-.863-.26l-.13-.004H3.5a1.5 1.5 0 01-1.5-1.5V12.5A1.5 1.5 0 013.5 11h1.79l.157-.013a1 1 0 00.724-.512l.063-.145 2.987-8.535Zm-1.1 9.196A3 3 0 015.29 13H4v4.998h1.468a4 4 0 011.986.528l.27.155.285.157A10 10 0 0012.69 20h3.606c.754 0 1.424-.483 1.663-1.2l.03-.126a.819.819 0 00.012-.131v-.872l.587-.586c.388-.388.577-.927.523-1.465l-.038-.23-.02-.087-.21-.9.55-.744A1.663 1.663 0 0018.061 11H14a2.002 2.002 0 01-1.956-2.418l.623-2.904a2 2 0 00-1.626-2.392l-.21-.035-2.71 7.741Z"></path></svg>`,
+  upvoted: `<svg xmlns="http://www.w3.org/2000/svg" height="20" viewBox="0 0 24 24" width="20" fill="currentColor"><path d="M10.72 2.18a3.263 3.263 0 012.352 4.063l-.708 2.476a1 1 0 00.962 1.275h5.29c.848 0 1.624.48 2.003 1.238l.179.359a1.785 1.785 0 01-.6 2.279.446.446 0 00-.198.37v.07c0 .124.041.246.116.346a2.375 2.375 0 01-.41 3.278l-.5.399a.38.38 0 00-.123.416l.07.206c.217.653.1 1.372-.313 1.923a2.8 2.8 0 01-2.24 1.12l-3.914-.002a12 12 0 01-5.952-1.584l-.272-.155a2.002 2.002 0 00-.993-.265H3a1 1 0 01-1-1v-5.996a1 1 0 011.002-1L5.789 12a1 1 0 00.945-.67l3.02-8.628a.816.816 0 01.967-.523Z"></path></svg>`,
+  downvote: `<svg xmlns="http://www.w3.org/2000/svg" height="20" viewBox="0 0 24 24" width="20" fill="currentColor"><path d="m11.31 2 .392.007c1.824.06 3.61.534 5.223 1.388l.343.189.27.154c.264.152.56.24.863.26l.13.004H20.5a1.5 1.5 0 011.5 1.5V11.5a1.5 1.5 0 01-1.5 1.5h-1.79l-.158.013a1 1 0 00-.723.512l-.064.145-2.987 8.535a1 1 0 01-1.109.656l-1.04-.174a4 4 0 01-3.251-4.783L10 15H5.938a3.664 3.664 0 01-3.576-2.868A3.682 3.682 0 013 9.15l-.02-.088A3.816 3.816 0 014 5.5v-.043l.008-.227a2.86 2.86 0 01.136-.664l.107-.28A3.754 3.754 0 017.705 2h3.605ZM7.705 4c-.755 0-1.425.483-1.663 1.2l-.032.126a.818.818 0 00-.01.131v.872l-.587.586a1.816 1.816 0 00-.524 1.465l.038.23.02.087.21.9-.55.744a1.686 1.686 0 00-.321 1.18l.029.177c.17.76.844 1.302 1.623 1.302H10a2.002 2.002 0 011.956 2.419l-.623 2.904-.034.208a2.002 2.002 0 001.454 2.139l.206.045.21.035 2.708-7.741A3.001 3.001 0 0118.71 11H20V6.002h-1.47c-.696 0-1.38-.183-1.985-.528l-.27-.155-.285-.157A10.002 10.002 0 0011.31 4H7.705Z"></path></svg>`,
+  downvoted: `<svg xmlns="http://www.w3.org/2000/svg" height="20" viewBox="0 0 24 24" width="20" fill="currentColor"><path d="M11.313 2.002c2.088 0 4.14.546 5.953 1.583l.273.156a2 2 0 00.993.264H21a1 1 0 011 1V11a1 1 0 01-1.002 1l-2.787-.005a1 1 0 00-.946.67l-3.02 8.628a.815.815 0 01-.966.522 3.262 3.262 0 01-2.35-4.062l.707-2.477a1 1 0 00-.961-1.274h-5.29a2.24 2.24 0 01-2.004-1.238l-.18-.359a1.784 1.784 0 01.601-2.278.446.446 0 00.198-.37v-.07a.578.578 0 00-.116-.347 2.374 2.374 0 01.412-3.278l.498-.399a.379.379 0 00.123-.415l-.07-.207a2.1 2.1 0 01.313-1.923A2.798 2.798 0 017.4 2l3.913.002Z"></path></svg>`,
 };
 
 const syncTypeIcons: Record<SyncType, string> = {
@@ -70,6 +70,12 @@ function parseSvgString(svgString: string): SVGElement | null {
     return svg;
   }
   return null;
+}
+
+function setVoteIcon(button: HTMLElement, svgString: string): void {
+  const svg = parseSvgString(svgString);
+  button.replaceChildren();
+  if (svg) button.appendChild(svg);
 }
 
 const providerDisplayInfo: Record<string, { name: string; syncType: SyncType }> = Object.fromEntries(
@@ -240,19 +246,80 @@ export function addFooter(
     const unisonData: UnisonData = args[0];
 
     const unisonContainer = document.createElement("div");
-    unisonContainer.className = `${FOOTER_CLASS}__container transparent`;
+    unisonContainer.className = `${FOOTER_CLASS}__unison`;
 
-    // Upvote lyrics
+    const unisonCard = document.createElement("div");
+    unisonCard.className = `${FOOTER_CLASS}__container ${FOOTER_CLASS}__unison-card`;
+
+    if (unisonData.submitter) {
+      const authorBlock = document.createElement("div");
+      authorBlock.className = `${FOOTER_CLASS}__unison-author`;
+
+      const authorRow = document.createElement("div");
+      authorRow.className = `${FOOTER_CLASS}__unison-author-row`;
+
+      const handleEl = document.createElement("strong");
+      handleEl.className = `${FOOTER_CLASS}__author-name`;
+      handleEl.textContent = generatePetName(unisonData.submitter.keyId);
+
+      const tier = getTrustTier(unisonData.submitter.reputation);
+      const tierEl = document.createElement("span");
+      tierEl.className = `${FOOTER_CLASS}__trust-tier`;
+      tierEl.dataset.tier = tier;
+      tierEl.textContent = t(`unison_tier_${tier}`);
+
+      authorRow.appendChild(handleEl);
+      authorRow.appendChild(tierEl);
+
+      const subLabel = document.createElement("div");
+      subLabel.className = `${FOOTER_CLASS}__unison-author-label`;
+      subLabel.textContent = t("unison_submitted_this");
+
+      authorBlock.appendChild(authorRow);
+      authorBlock.appendChild(subLabel);
+      unisonCard.appendChild(authorBlock);
+
+      const divider = document.createElement("div");
+      divider.className = `${FOOTER_CLASS}__unison-divider`;
+      unisonCard.appendChild(divider);
+    }
+
+    const actionsBlock = document.createElement("div");
+    actionsBlock.className = `${FOOTER_CLASS}__unison-actions-block`;
+
+    const actionRow = document.createElement("div");
+    actionRow.className = `${FOOTER_CLASS}__unison-actions`;
+
     const unisonUpvote = document.createElement("button");
     unisonUpvote.className = `${FOOTER_CLASS}__vote`;
-    unisonUpvote.innerHTML = unisonData.vote === 1 ? votedIcons.upvoted : votedIcons.upvote;
+    setVoteIcon(unisonUpvote, unisonData.vote === 1 ? votedIcons.upvoted : votedIcons.upvote);
+
+    const unisonDownvote = document.createElement("button");
+    unisonDownvote.className = `${FOOTER_CLASS}__vote`;
+    setVoteIcon(unisonDownvote, unisonData.vote === -1 ? votedIcons.downvoted : votedIcons.downvote);
+
+    const scoreLine = document.createElement("div");
+    scoreLine.className = `${FOOTER_CLASS}__unison-score-line`;
+    const scoreNum = document.createElement("strong");
+    const scoreLabel = document.createElement("span");
+    const scoreSeparator = document.createElement("span");
+    scoreSeparator.textContent = " · ";
+    const voteNum = document.createElement("strong");
+    const voteLabel = document.createElement("span");
+    scoreLine.appendChild(scoreNum);
+    scoreLine.appendChild(scoreLabel);
+    scoreLine.appendChild(scoreSeparator);
+    scoreLine.appendChild(voteNum);
+    scoreLine.appendChild(voteLabel);
+    const scoreLineRefs = { scoreNum, scoreLabel, voteNum, voteLabel };
+    setScoreLine(scoreLineRefs, unisonData.effectiveScore, unisonData.votes);
 
     unisonUpvote.addEventListener("click", async () => {
       if (unisonData.vote === 1) {
-        unisonUpvote.innerHTML = votedIcons.upvote;
+        setVoteIcon(unisonUpvote, votedIcons.upvote);
         const res = await deleteVote(unisonData.lyricsId);
         if (!res.ok && res.status !== 404) {
-          unisonUpvote.innerHTML = votedIcons.upvoted;
+          setVoteIcon(unisonUpvote, votedIcons.upvoted);
           return;
         }
 
@@ -261,17 +328,16 @@ export function addFooter(
           unisonData.effectiveScore = data.effectiveScore;
           unisonData.votes = data.voteCount;
           unisonData.vote = data.userVote;
-
-          unisonScore.textContent = `${data.effectiveScore} score (${data.voteCount})`;
+          setScoreLine(scoreLineRefs, data.effectiveScore, data.voteCount);
         }
       } else {
-        unisonUpvote.innerHTML = votedIcons.upvoted;
+        setVoteIcon(unisonUpvote, votedIcons.upvoted);
         const res = await vote(unisonData.lyricsId, true);
         if (!res.ok && res.status !== 409) {
-          unisonUpvote.innerHTML = votedIcons.upvote;
+          setVoteIcon(unisonUpvote, votedIcons.upvote);
           return;
         }
-        unisonDownvote.innerHTML = votedIcons.downvote;
+        setVoteIcon(unisonDownvote, votedIcons.downvote);
 
         let data = await byId(unisonData.lyricsId);
         if (!data) {
@@ -281,31 +347,16 @@ export function addFooter(
         unisonData.effectiveScore = data.effectiveScore;
         unisonData.votes = data.voteCount;
         unisonData.vote = data.userVote;
-
-        unisonScore.textContent = `${data.effectiveScore} score (${data.voteCount})`;
+        setScoreLine(scoreLineRefs, data.effectiveScore, data.voteCount);
       }
     });
-
-    unisonContainer.appendChild(unisonUpvote);
-
-    // Vote count and score
-    const unisonScore = document.createElement("div");
-    unisonScore.className = `${FOOTER_CLASS}__container`;
-    unisonScore.textContent = `${unisonData.effectiveScore} score (${unisonData.votes})`;
-
-    unisonContainer.appendChild(unisonScore);
-
-    // Downvote lyrics
-    const unisonDownvote = document.createElement("button");
-    unisonDownvote.className = `${FOOTER_CLASS}__vote`;
-    unisonDownvote.innerHTML = unisonData.vote === -1 ? votedIcons.downvoted : votedIcons.downvote;
 
     unisonDownvote.addEventListener("click", async () => {
       if (unisonData.vote === -1) {
-        unisonDownvote.innerHTML = votedIcons.downvote;
+        setVoteIcon(unisonDownvote, votedIcons.downvote);
         const res = await deleteVote(unisonData.lyricsId);
         if (!res.ok && res.status !== 404) {
-          unisonDownvote.innerHTML = votedIcons.downvoted;
+          setVoteIcon(unisonDownvote, votedIcons.downvoted);
           return;
         }
 
@@ -314,17 +365,16 @@ export function addFooter(
           unisonData.effectiveScore = data.effectiveScore;
           unisonData.votes = data.voteCount;
           unisonData.vote = data.userVote;
-
-          unisonScore.textContent = `${data.effectiveScore} score (${data.voteCount})`;
+          setScoreLine(scoreLineRefs, data.effectiveScore, data.voteCount);
         }
       } else {
-        unisonDownvote.innerHTML = votedIcons.downvoted;
+        setVoteIcon(unisonDownvote, votedIcons.downvoted);
         const res = await vote(unisonData.lyricsId, false);
         if (!res.ok && res.status !== 409) {
-          unisonDownvote.innerHTML = votedIcons.downvote;
+          setVoteIcon(unisonDownvote, votedIcons.downvote);
           return;
         }
-        unisonUpvote.innerHTML = votedIcons.upvote;
+        setVoteIcon(unisonUpvote, votedIcons.upvote);
 
         let data = await byId(unisonData.lyricsId);
         if (!data) {
@@ -334,22 +384,17 @@ export function addFooter(
         unisonData.effectiveScore = data.effectiveScore;
         unisonData.votes = data.voteCount;
         unisonData.vote = data.userVote;
-
-        unisonScore.textContent = `${data.effectiveScore} score (${data.voteCount})`;
+        setScoreLine(scoreLineRefs, data.effectiveScore, data.voteCount);
       }
     });
 
-    unisonContainer.appendChild(unisonDownvote);
-
-    // Report lyrics
     const unisonReport = document.createElement("button");
     unisonReport.className = `${FOOTER_CLASS}__vote`;
-
     unisonReport.addEventListener("click", () => showReportModal(unisonData.lyricsId));
 
     const unisonReportSVG = document.createElementNS("http://www.w3.org/2000/svg", "svg");
     unisonReportSVG.setAttribute("viewBox", "0 0 18 18");
-    unisonReportSVG.setAttribute("fill", "white");
+    unisonReportSVG.setAttribute("fill", "currentColor");
     unisonReportSVG.setAttribute("width", "20");
     unisonReportSVG.setAttribute("height", "20");
 
@@ -362,11 +407,42 @@ export function addFooter(
     unisonReportSVG.appendChild(unisonReportSVGPath);
     unisonReport.appendChild(unisonReportSVG);
 
-    unisonContainer.appendChild(unisonReport);
+    actionRow.appendChild(unisonUpvote);
+    actionRow.appendChild(unisonDownvote);
+    actionRow.appendChild(unisonReport);
 
-    // Append container
-    footer.appendChild(unisonContainer);
+    actionsBlock.appendChild(actionRow);
+    actionsBlock.appendChild(scoreLine);
+
+    unisonCard.appendChild(actionsBlock);
+    unisonContainer.appendChild(unisonCard);
+    footer.prepend(unisonContainer);
   }
+}
+
+interface ScoreLineRefs {
+  scoreNum: HTMLElement;
+  scoreLabel: HTMLElement;
+  voteNum: HTMLElement;
+  voteLabel: HTMLElement;
+}
+
+function formatScoreNumber(score: number): string {
+  return Number.isInteger(score) ? score.toString() : score.toFixed(2);
+}
+
+function setScoreLine(refs: ScoreLineRefs, score: number, votes: number): void {
+  refs.scoreNum.textContent = formatScoreNumber(score);
+  refs.scoreLabel.textContent = ` ${t("unison_score_label")}`;
+  refs.voteNum.textContent = String(votes);
+  refs.voteLabel.textContent = ` ${votes === 1 ? t("unison_vote_singular") : t("unison_vote_plural")}`;
+}
+
+function getTrustTier(reputation: number): "new" | "trusted" | "veteran" | "expert" {
+  if (reputation < 0.5) return "new";
+  if (reputation < 1.5) return "trusted";
+  if (reputation < 1.85) return "veteran";
+  return "expert";
 }
 
 /**

@@ -4,8 +4,8 @@ import { clearCache, compileRicsToStyles, getStorage } from "@core/storage";
 import { log, setUpLog } from "@core/utils";
 import { calculateLyricPositions } from "@modules/lyrics/injectLyrics";
 import { clearCache as clearTranslationCache } from "@modules/lyrics/translation";
-import { applyCustomStyles, getAndApplyCustomStyles } from "@modules/ui/styleInjector";
 import { reloadAlbumArt } from "@modules/ui/dom";
+import { applyCustomStyles, getAndApplyCustomStyles } from "@modules/ui/styleInjector";
 
 let hasInitializedMessageListener = false;
 

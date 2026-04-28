@@ -277,7 +277,7 @@ async function hashPublicKey(jwk: JsonWebKey): Promise<string> {
   return bufferToHex(hashBuffer);
 }
 
-function generatePetName(keyId: string): string {
+export function generatePetName(keyId: string): string {
   const adjIndex = parseInt(keyId.slice(0, 2), 16) % IDENTITY_ADJECTIVES.length;
   const nounIndex = parseInt(keyId.slice(2, 4), 16) % IDENTITY_NOUNS.length;
   const actionIndex = parseInt(keyId.slice(4, 6), 16) % IDENTITY_ACTIONS.length;

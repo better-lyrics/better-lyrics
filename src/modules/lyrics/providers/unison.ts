@@ -1,8 +1,13 @@
 import { UNISON_API_URL } from "@/core/constants";
-import { fillTtml } from "./ttmlUtils";
-import type { LyricSourceResult, ProviderParameters } from "./shared";
-import { parseLRC, parsePlainLyrics } from "./lrcUtils";
 import { getIdentity, signPayload } from "@/core/keyIdentity";
+import { parseLRC, parsePlainLyrics } from "./lrcUtils";
+import type { LyricSourceResult, ProviderParameters } from "./shared";
+import { fillTtml } from "./ttmlUtils";
+
+interface SubmitterInfo {
+  keyId: string;
+  reputation: number;
+}
 
 interface UnisonResponse {
   id: number;
@@ -15,6 +20,7 @@ interface UnisonResponse {
   syncType: "richsync" | "linesync" | "plain";
   effectiveScore: number;
   voteCount: number;
+  submitter?: SubmitterInfo;
   /** A property only passed if `x-api-key` header is also passed */
   userVote: 1 | -1 | null;
 }
@@ -24,11 +30,11 @@ export enum UnisonReportReason {
   BAD_SYNC = "bad_sync",
   OFFENSIVE = "offensive",
   SPAM = "spam",
-  OTHER = "other"
+  OTHER = "other",
 }
 
 export type UnisonLyricSourceResult = LyricSourceResult & {
-  unisonData: UnisonData
+  unisonData: UnisonData;
 };
 
 export interface UnisonData {
@@ -36,15 +42,16 @@ export interface UnisonData {
   votes: number;
   effectiveScore: number;
   lyricsId: number;
+  submitter?: SubmitterInfo;
 }
 
 export async function vote(lyricsId: number, upvote: boolean) {
   const url = new URL(UNISON_API_URL + "/" + lyricsId + "/vote");
-  
+
   const response = await fetch(url.toString(), {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(await signPayload({ vote: upvote ? 1 : -1 }))
+    body: JSON.stringify(await signPayload({ vote: upvote ? 1 : -1 })),
   });
 
   return { ok: response.ok, status: response.status };
@@ -52,11 +59,11 @@ export async function vote(lyricsId: number, upvote: boolean) {
 
 export async function deleteVote(lyricsId: number) {
   const url = new URL(UNISON_API_URL + "/" + lyricsId + "/vote");
-  
+
   const response = await fetch(url.toString(), {
     method: "DELETE",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(await signPayload({}))
+    body: JSON.stringify(await signPayload({})),
   });
 
   return { ok: response.ok, status: response.status };
@@ -64,11 +71,11 @@ export async function deleteVote(lyricsId: number) {
 
 export async function report(lyricsId: number, reason: UnisonReportReason | string, details?: string) {
   const url = new URL(UNISON_API_URL + "/" + lyricsId + "/report");
-  
+
   const response = await fetch(url.toString(), {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(await signPayload({ reason, details }))
+    body: JSON.stringify(await signPayload({ reason, details })),
   });
 
   return { ok: response.ok, status: response.status };
@@ -77,10 +84,12 @@ export async function report(lyricsId: number, reason: UnisonReportReason | stri
 export async function byId(lyricsId: number): Promise<UnisonResponse | null> {
   const url = new URL(UNISON_API_URL + "/" + lyricsId);
   const response = await fetch(url.toString(), {
-    headers: { "x-key-id": (await getIdentity()).keyId }
+    headers: { "x-key-id": (await getIdentity()).keyId },
   });
 
-  if (!response.ok) { return null; }
+  if (!response.ok) {
+    return null;
+  }
   return response.json().then(json => json.data);
 }
 
@@ -97,7 +106,7 @@ export default async function unison(providerParameters: ProviderParameters): Pr
 
   const response = await fetch(url.toString(), {
     signal: AbortSignal.any([providerParameters.signal, AbortSignal.timeout(10000)]),
-    headers: { "x-key-id": (await getIdentity()).keyId }
+    headers: { "x-key-id": (await getIdentity()).keyId },
   });
 
   providerParameters.sourceMap["unison-richsynced"].filled = true;
@@ -119,27 +128,33 @@ export default async function unison(providerParameters: ProviderParameters): Pr
     providerParameters.sourceMap["unison-plain"].lyricSourceResult = null;
     return;
   }
-  
+
   const result = {
     cacheAllowed: false,
     source: "Unison",
     sourceHref: "https://boidu.dev/",
-  }
-  
-  const unisonData = {
+  };
+
+  const unisonData: UnisonData = {
     vote: responseData.userVote,
     votes: responseData.voteCount,
     effectiveScore: responseData.effectiveScore,
-    lyricsId: responseData.id
-  }
+    lyricsId: responseData.id,
+    submitter: responseData.submitter,
+  };
 
   switch (responseData.format) {
     case "ttml":
-      await fillTtml(responseData.lyrics, providerParameters, {
-        richsyncKey: "unison-richsynced",
-        syncedKey: "unison-synced",
-        ...result,
-      }, { unisonData });
+      await fillTtml(
+        responseData.lyrics,
+        providerParameters,
+        {
+          richsyncKey: "unison-richsynced",
+          syncedKey: "unison-synced",
+          ...result,
+        },
+        { unisonData }
+      );
       providerParameters.sourceMap["unison-plain"].lyricSourceResult = null;
       break;
     case "lrc":
@@ -147,8 +162,8 @@ export default async function unison(providerParameters: ProviderParameters): Pr
       const res = {
         ...result,
         unisonData,
-        lyrics: lrc
-      }
+        lyrics: lrc,
+      };
 
       providerParameters.sourceMap["unison-richsynced"].lyricSourceResult = null;
       providerParameters.sourceMap["unison-synced"].lyricSourceResult = lrc ? res : null;
@@ -158,11 +173,13 @@ export default async function unison(providerParameters: ProviderParameters): Pr
       const plain = parsePlainLyrics(responseData.lyrics);
       providerParameters.sourceMap["unison-richsynced"].lyricSourceResult = null;
       providerParameters.sourceMap["unison-synced"].lyricSourceResult = null;
-      providerParameters.sourceMap["unison-plain"].lyricSourceResult = plain ? {
-        ...result,
-        unisonData,
-        lyrics: plain
-      } : null;
+      providerParameters.sourceMap["unison-plain"].lyricSourceResult = plain
+        ? {
+            ...result,
+            unisonData,
+            lyrics: plain,
+          }
+        : null;
       break;
   }
 }

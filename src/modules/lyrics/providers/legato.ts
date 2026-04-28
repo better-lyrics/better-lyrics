@@ -1,7 +1,7 @@
-import { type ProviderParameters } from "./shared";
 import { GENERAL_ERROR_LOG, LEGATO_API_URL } from "@constants";
 import { log } from "@utils";
 import { parseLRC } from "./lrcUtils";
+import { type ProviderParameters } from "./shared";
 
 export default async function legato(providerParameters: ProviderParameters): Promise<void> {
   const markFailed = () => {

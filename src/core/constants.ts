@@ -21,7 +21,8 @@ export const MODAL_CLASS = "blyrics-modal" as const;
 
 // DOM Selectors
 export const TAB_RENDERER_SELECTOR = "#tab-renderer" as const;
-export const NO_LYRICS_TEXT_SELECTOR = "#tab-renderer > ytmusic-message-renderer > yt-formatted-string.text.style-scope.ytmusic-message-renderer" as const;
+export const NO_LYRICS_TEXT_SELECTOR =
+  "#tab-renderer > ytmusic-message-renderer > yt-formatted-string.text.style-scope.ytmusic-message-renderer" as const;
 export const FULLSCREEN_BUTTON_SELECTOR = ".fullscreen-button" as const;
 
 // DOM IDs and Attributes

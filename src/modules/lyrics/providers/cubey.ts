@@ -73,8 +73,8 @@ export type CubeyLyricSourceResult = LyricSourceResult & {
 };
 
 import { log } from "@core/utils";
-import { lrcFixers, parseLRC, parsePlainLyrics } from "./lrcUtils";
 import { CUBEY_LYRICS_API_URL, CUBEY_LYRICS_API_URL_TURNSTILE } from "@/core/constants";
+import { lrcFixers, parseLRC, parsePlainLyrics } from "./lrcUtils";
 import { fillTtml } from "./ttmlUtils";
 
 /**
@@ -285,7 +285,7 @@ export default async function cubey(providerParameters: ProviderParameters): Pro
 
   if (responseData.goLyricsApiTtml) {
     let ttmlData = JSON.parse(responseData.goLyricsApiTtml);
-    fillTtml(ttmlData.ttml, providerParameters);
+    await fillTtml(ttmlData.ttml, providerParameters);
   }
 
   (

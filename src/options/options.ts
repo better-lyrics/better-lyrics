@@ -2,9 +2,9 @@
 
 import { LOG_PREFIX, ROMANIZATION_LANGUAGES } from "@constants";
 import { getLanguageDisplayName, initI18n, loadLocaleOverride, SUPPORTED_LOCALES, t } from "@core/i18n";
+import { exportIdentity, getIdentity, importIdentity, type KeyIdentity } from "@core/keyIdentity";
 import Sortable from "sortablejs";
 import { showModal } from "./editor/ui/feedback";
-import { exportIdentity, getIdentity, importIdentity, type KeyIdentity } from "@core/keyIdentity";
 import { initStoreUI, setupYourThemesButton } from "./store/store";
 
 interface Options {
