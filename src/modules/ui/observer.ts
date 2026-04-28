@@ -2,8 +2,8 @@ import {
   AUTO_SWITCH_ENABLED_LOG,
   FULLSCREEN_BUTTON_SELECTOR,
   GENERAL_ERROR_LOG,
-  LYRICS_CLASS,
   LOG_PREFIX,
+  LYRICS_CLASS,
   LYRICS_TAB_CLICKED_LOG,
   LYRICS_WRAPPER_ID,
   PAUSING_LYRICS_SCROLL_LOG,
@@ -13,7 +13,9 @@ import {
   TAB_RENDERER_SELECTOR,
   USER_SCROLLING_CLASS,
 } from "@constants";
-import { AppState, handleModifications, reloadLyrics, type PlayerDetails } from "@core/appState";
+import { AppState, handleModifications, type PlayerDetails, reloadLyrics } from "@core/appState";
+import { preFetchLyrics } from "@modules/lyrics/lyrics";
+import { getSongMetadata } from "@modules/lyrics/requestSniffer/requestSniffer";
 import { onAutoSwitchEnabled, onFullScreenDisabled } from "@modules/settings/settings";
 import {
   animationEngine,
@@ -27,8 +29,6 @@ import {
   isPlayerPageOpen,
   openPlayerPageForFullscreen,
 } from "@modules/ui/navigation";
-import { getSongMetadata } from "@modules/lyrics/requestSniffer/requestSniffer";
-import { preFetchLyrics } from "@modules/lyrics/lyrics";
 import { log } from "@utils";
 import {
   addThumbnail,

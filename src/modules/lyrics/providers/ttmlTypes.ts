@@ -211,7 +211,7 @@ interface TtmlElement {
   };
 }
 
-export interface RootAttributes {
+interface RootAttributes {
   "@_lang"?: string;
   "@_timing"?: string;
 }

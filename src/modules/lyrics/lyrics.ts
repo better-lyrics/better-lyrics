@@ -4,8 +4,8 @@
  */
 
 import { FETCH_LYRICS_LOG, LOG_PREFIX, LYRICS_TAB_HIDDEN_LOG, SERVER_ERROR_LOG, TAB_HEADER_CLASS } from "@constants";
-import { t } from "@core/i18n";
 import { AppState, type PlayerDetails } from "@core/appState";
+import { t } from "@core/i18n";
 import { type LyricsData, processLyrics } from "@modules/lyrics/injectLyrics";
 import { stringSimilarity } from "@modules/lyrics/lyricParseUtils";
 import { registerThemeSetting } from "@modules/settings/themeOptions";
@@ -15,7 +15,7 @@ import type { CubeyLyricSourceResult } from "./providers/cubey";
 import type { Lyric, LyricSourceResult, ProviderParameters } from "./providers/shared";
 import { getLyrics, newSourceMap, providerPriority } from "./providers/shared";
 import type { YTLyricSourceResult } from "./providers/yt";
-import { getSongMetadata, getSongAlbum, type SegmentMap } from "./requestSniffer/requestSniffer";
+import { getSongAlbum, getSongMetadata, type SegmentMap } from "./requestSniffer/requestSniffer";
 import { clearCache as clearTranslationCache } from "./translation";
 
 const hideInstrumentalOnly = registerThemeSetting("blyrics-hide-instrumental-only", false, true);

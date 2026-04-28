@@ -1,94 +1,94 @@
 {
   "extensionName": {
-    "message": "Better Lyrics (YouTube Music용 가사)",
+    "message": "Better Lyrics (Текст для Youtube Music)",
     "description": "The name of the extension"
   },
   "extensionDescription": {
-    "message": "YouTube Music을 아름다운 싱크 가사, 다국어 지원, 실시간 번역 등으로 향상시킵니다",
+    "message": "Прокачайте свой YouTube Music красивым, синхронизированным текстом песен, поддержкой разных языков, переводом в реальном времени и многим другим",
     "description": "The description of the extension"
   },
   "options_tab_general": {
-    "message": "일반",
+    "message": "Главная",
     "description": "General settings tab label"
   },
   "options_tab_display": {
-    "message": "디스플레이",
+    "message": "Отображение",
     "description": "Display settings tab label"
   },
   "options_tab_language": {
-    "message": "언어",
+    "message": "Язык",
     "description": "Language settings tab label"
   },
   "options_tab_sources": {
-    "message": "소스",
+    "message": "Источники",
     "description": "Sources settings tab label"
   },
   "options_tab_identity": {
-    "message": "신원",
+    "message": "Профиль",
     "description": "Identity settings tab label"
   },
   "options_tab_themes": {
-    "message": "테마",
+    "message": "Темы",
     "description": "Themes settings tab label"
   },
   "options_general_title": {
-    "message": "일반 설정",
+    "message": "Общие настройки",
     "description": "General settings section title"
   },
   "options_general_description": {
-    "message": "Better Lyrics의 전반적인 동작에 영향을 주는 설정입니다.",
+    "message": "Настройки, которые влияют на общее поведение Better Lyrics.",
     "description": "General settings section description"
   },
   "options_general_showLogs": {
-    "message": "로그 표시",
+    "message": "Показать логи",
     "description": "Show logs setting label"
   },
   "options_general_autoSwitch": {
-    "message": "가사 탭으로 자동 전환",
+    "message": "Автопереключение на вкладку \"Текст\"",
     "description": "Auto switch to lyrics tab setting label"
   },
   "options_general_cache": {
-    "message": "캐시",
+    "message": "Кэш",
     "description": "Cache section label"
   },
   "options_general_clearCache": {
-    "message": "캐시 지우기",
+    "message": "Очистить кэш",
     "description": "Clear cache button label"
   },
   "options_general_totalLyrics": {
-    "message": "캐시된 가사 수",
+    "message": "Всего текстов в кэше",
     "description": "Total lyrics in cache label"
   },
   "options_general_cacheSize": {
-    "message": "캐시 크기",
+    "message": "Размер кэша",
     "description": "Cache size label"
   },
   "options_display_title": {
-    "message": "디스플레이 설정",
+    "message": "Настройки отображения",
     "description": "Display settings section title"
   },
   "options_display_description": {
-    "message": "Better Lyrics의 외관을 조정합니다.",
+    "message": "Настройте внешний вид Better Lyrics.",
     "description": "Display settings section description"
   },
   "options_display_disableFullscreen": {
-    "message": "전체 화면 모드 비활성화",
+    "message": "Выключить полноэкранный режим",
     "description": "Disable fullscreen mode setting label"
   },
   "options_display_autoHideCursor": {
-    "message": "전체 화면에서 커서 자동으로 숨김",
+    "message": "Спрятать курсор в полноэкранном режиме",
     "description": "Auto-hide cursor setting label"
   },
   "options_display_albumArt": {
-    "message": "흐릿하게 처리한 앨범 아트를 배경으로 표시",
+    "message": "Размытая обложка альбома как фон",
     "description": "Show album art background setting label"
   },
   "options_display_stylizedAnimations": {
-    "message": "스타일리시한 애니메이션 표시",
+    "message": "Показать стилизованные анимации",
     "description": "Show stylized animations setting label"
   },
   "options_display_passiveScroll": {
-    "message": "Auto-scroll unsynced lyrics",
+    "message": "Автопрокрутка несинхронизированных текстов",
     "description": "Auto-scroll unsynced lyrics setting label"
   },
   "options_display_unisonActions": {
@@ -144,203 +144,203 @@
     "description": "Tooltip for the bottom-right cell in the Unison position picker"
   },
   "options_language_displayLanguage": {
-    "message": "표시된 언어",
+    "message": "Язык интерфейса",
     "description": "Label for the UI language selector dropdown"
   },
   "options_language_displayLanguageAuto": {
-    "message": "자동",
+    "message": "Авто",
     "description": "Option label for automatic language detection based on browser settings"
   },
   "options_language_title": {
-    "message": "언어 설정",
+    "message": "Настройки языка",
     "description": "Language settings section title"
   },
   "options_language_description": {
-    "message": "Better Lyrics의 언어 및 번역 설정입니다.",
+    "message": "Настройки языка и переводов для Better Lyrics.",
     "description": "Language settings section description"
   },
   "options_language_romanization": {
-    "message": "로마자 표기",
+    "message": "Романизация",
     "description": "Romanization setting label"
   },
   "options_language_translate": {
-    "message": "가사 번역",
+    "message": "Переводить тексты песен",
     "description": "Translate song lyrics setting label"
   },
   "options_language_translationLanguage": {
-    "message": "번역 언어",
+    "message": "Язык перевода",
     "description": "Translation language setting label"
   },
   "options_sources_title": {
-    "message": "가사 소스 우선순위",
+    "message": "Настройки источников текстов",
     "description": "Sources settings section title"
   },
   "options_sources_description": {
-    "message": "드래그하여 우선순위를 변경합니다. 상위에 위치한 소스를 먼저 불러옵니다. 체크를 해제하면 비활성화됩니다.",
+    "message": "Перетащите для изменения приоритета. Сначала попробуйте источники, что повыше. Снимите флажок, чтобы отключить.",
     "description": "Sources settings section description"
   },
   "options_themes_title": {
-    "message": "테마 설정",
+    "message": "Настройки темы",
     "description": "Theme settings section title"
   },
   "options_themes_description": {
-    "message": "Better Lyrics의 외관을 커스텀합니다.",
+    "message": "Настройте внешний вид Better Lyrics.",
     "description": "Theme settings section description"
   },
   "options_themes_theme": {
-    "message": "테마",
+    "message": "Тема",
     "description": "Theme label"
   },
   "options_themes_chooseTheme": {
-    "message": "테마 선택",
+    "message": "Выберите тему",
     "description": "Choose a theme button label"
   },
   "options_themes_change": {
-    "message": "변경",
+    "message": "Изменить",
     "description": "Change theme button label"
   },
   "options_themes_customTheme": {
-    "message": "커스텀 테마",
+    "message": "Своя тема",
     "description": "Display name for unnamed custom themes"
   },
   "options_themes_customStyles": {
-    "message": "사용자 정의 스타일",
+    "message": "Свои стили",
     "description": "Custom styles label"
   },
   "options_themes_create": {
-    "message": "만들기",
+    "message": "Создать",
     "description": "Create button label"
   },
   "options_themes_marketplace": {
-    "message": "테마 마켓플레이스",
+    "message": "Магазин тем",
     "description": "Theme marketplace button label"
   },
   "options_themes_installedThemes": {
-    "message": "설치된 테마",
+    "message": "Установленные темы",
     "description": "Installed themes button label"
   },
   "options_identity_title": {
-    "message": "계정",
+    "message": "Профиль",
     "description": "Identity settings section title"
   },
   "options_identity_description": {
-    "message": "Better Lyrics용 당신만의 익명 계정.",
+    "message": "Ваш уникальный анонимный ID для Better Lyrics.",
     "description": "Identity settings section description"
   },
   "options_identity_yourIdentity": {
-    "message": "나의 계정",
+    "message": "Ваш ID",
     "description": "Your identity label"
   },
   "options_identity_loading": {
-    "message": "로딩 중...",
+    "message": "Загрузка...",
     "description": "Loading identity placeholder"
   },
   "options_identity_exportImport": {
-    "message": "내보내기/가져오기",
+    "message": "Экспорт/импорт",
     "description": "Export/Import section label"
   },
   "options_identity_exportKey": {
-    "message": "키 내보내기",
+    "message": "Экспортировать ключ",
     "description": "Export key button label"
   },
   "options_identity_importKey": {
-    "message": "키 가져오기",
+    "message": "Импортировать ключ",
     "description": "Import key button label"
   },
   "options_modal_selectTheme": {
-    "message": "테마 선택",
+    "message": "Выберите тему",
     "description": "Theme modal title"
   },
   "options_modal_cancel": {
-    "message": "취소",
+    "message": "Отмена",
     "description": "Cancel button label"
   },
   "options_modal_confirm": {
-    "message": "확인",
+    "message": "Подтвердить",
     "description": "Confirm button label"
   },
   "options_alert_cacheCleared": {
-    "message": "캐시를 성공적으로 지웠습니다!",
+    "message": "Кэш успешно очищен!",
     "description": "Cache cleared success message"
   },
   "options_alert_cacheClearFailed": {
-    "message": "캐시를 지우는데 실패했습니다!",
+    "message": "Не удалось очистить кэш!",
     "description": "Cache clear failed message"
   },
   "options_alert_nothingToClear": {
-    "message": "삭제할 것이 없습니다!",
+    "message": "Нечего очищать!",
     "description": "Nothing to clear message"
   },
   "options_alert_exportFailed": {
-    "message": "계정 내보내기에 실패했습니다",
+    "message": "Не удалось экспортировать ID",
     "description": "Export identity failed message"
   },
   "options_alert_fileSaveDialogOpened": {
-    "message": "파일 저장 대화 상자가 열렸습니다.",
+    "message": "Открыт диалог сохранения файла ID.",
     "description": "File save dialog opened message"
   },
   "options_alert_fileSaveFailed": {
-    "message": "파일을 저장하는 중에 오류가 발생했습니다. 다시 시도해 주세요.",
+    "message": "Ошибка сохранения файла. Попробуйте ещё раз.",
     "description": "File save failed message"
   },
   "options_alert_downloadInitiated": {
-    "message": "계정 파일 다운로드를 시작했습니다.",
+    "message": "Начата загрузка ID файла.",
     "description": "Download initiated message"
   },
   "options_alert_importSuccess": {
-    "message": "계정을 성공적으로 가져왔습니다!",
+    "message": "ID импортирован успешно!",
     "description": "Import success message"
   },
   "options_alert_identityLoadError": {
-    "message": "계정 로딩 중에 오류가 발생하였습니다",
+    "message": "Ошибка загрузка ID",
     "description": "Identity load error message"
   },
   "options_editor_saving": {
-    "message": "저장 중...",
+    "message": "Сохранение...",
     "description": "Saving indicator text"
   },
   "options_editor_importFile": {
-    "message": "파일 불러오기",
+    "message": "Импорт из файла",
     "description": "Import from file tooltip"
   },
   "options_editor_exportFile": {
-    "message": "파일 내보내기",
+    "message": "Экспорт в файл",
     "description": "Export to file tooltip"
   },
   "options_editor_saveAsTheme": {
-    "message": "테마로 저장",
+    "message": "Сохранить как тему",
     "description": "Save as theme tooltip"
   },
   "options_editor_openInNewTab": {
-    "message": "새 탭에서 열기",
+    "message": "Открыть в новой вкладке",
     "description": "Open in new tab tooltip"
   },
   "options_editor_backToSettings": {
-    "message": "설정으로 돌아가기",
+    "message": "Назад к настройкам",
     "description": "Back to settings button label"
   },
   "options_editor_fullExperienceNote": {
-    "message": "편집기의 모든 기능을 이용하려면, ",
+    "message": "Для полного доступа к редактору,",
     "description": "Full editor experience note prefix"
   },
   "options_editor_openInNewTabLink": {
-    "message": "이 편집기를 새 탭에서 여세요.",
+    "message": "откройте его в новой вкладке",
     "description": "Open in new tab link text"
   },
   "options_editor_stylingGuide": {
-    "message": "스타일링 가이드",
+    "message": "Гид по стилям",
     "description": "Styling guide link text"
   },
   "options_editor_renameTheme": {
-    "message": "커스텀 테마 이름 변경",
+    "message": "Переименовать свою тему",
     "description": "Rename theme button title"
   },
   "options_editor_deleteTheme": {
-    "message": "커스텀 테마 삭제",
+    "message": "Удалить свою тему",
     "description": "Delete theme button title"
   },
   "options_editor_doubleClickRename": {
-    "message": "더블 클릭하여 이름 변경",
+    "message": "Двойной клик, чтобы переименовать",
     "description": "Double-click to rename tooltip"
   },
   "options_provider_betterLyrics": {
@@ -352,7 +352,7 @@
     "description": "Better Lyrics Legato provider name"
   },
   "options_provider_betterLyricsUnison": {
-    "message": "Better Lyrics Unison",
+    "message": "Better Lyrics Унисон",
     "description": "Better Lyrics Unison provider name"
   },
   "options_provider_musixmatch": {
@@ -364,11 +364,11 @@
     "description": "LRClib provider name"
   },
   "options_provider_youtube": {
-    "message": "YouTube",
+    "message": "Youtube",
     "description": "Youtube provider name"
   },
   "options_provider_youtubeCaptions": {
-    "message": "YouTube 자막",
+    "message": "Youtube Субтитры",
     "description": "Youtube Captions provider name"
   },
   "options_provider_binilyrics": {
@@ -376,183 +376,183 @@
     "description": "BiniLyrics provider name"
   },
   "options_syncType_syllable": {
-    "message": "음절",
+    "message": "Слог",
     "description": "Syllable sync type label"
   },
   "options_syncType_syllable_tooltip": {
-    "message": "노래에 맞춰 개별 음절을 강조합니다. 음절 싱크는 최고의 경험을 제공합니다.",
+    "message": "Подсвечивает отдельные слоги по мере их пропевания. Послоговая синхронизация - лучший вариант.",
     "description": "Syllable sync type tooltip"
   },
   "options_syncType_word": {
-    "message": "단어",
+    "message": "Слово",
     "description": "Word sync type label"
   },
   "options_syncType_word_tooltip": {
-    "message": "노래에 맞춰 각각의 단어를 강조합니다. 단어 싱크는 좋은 경험을 제공합니다.",
+    "message": "Подсвечивает отдельные слова по мере их пропевания. Пословная синхронизация - хороший вариант.",
     "description": "Word sync type tooltip"
   },
   "options_syncType_line": {
-    "message": "줄",
+    "message": "Строка",
     "description": "Line sync type label"
   },
   "options_syncType_line_tooltip": {
-    "message": "노래에 맞춰 전체 줄을 강조합니다. 줄 싱크는 기본적인 경험을 제공합니다.",
+    "message": "Подсвечивает отдельные строчки по мере их пропевания. Построчная синхронизация - обычный вариант.",
     "description": "Line sync type tooltip"
   },
   "options_syncType_unsynced": {
-    "message": "동기화 없음",
+    "message": "Без синхрон.",
     "description": "Unsynced sync type label"
   },
   "options_syncType_unsynced_tooltip": {
-    "message": "타이밍 정보가 없는 가사입니다. 동기화되지 않은 가사는 최소한의 경험을 제공합니다.",
+    "message": "Текст без информации о таймингах. Несинхронизированный текст - худший вариант.",
     "description": "Unsynced sync type tooltip"
   },
   "options_detail_rateTheme": {
-    "message": "이 테마 평가하기",
+    "message": "Оценить тему",
     "description": "Rate theme label"
   },
   "options_detail_install": {
-    "message": "설치",
+    "message": "Установить",
     "description": "Install button label"
   },
   "options_detail_viewOnGitHub": {
-    "message": "GitHub에서 보기",
+    "message": "Открыть на GitHub",
     "description": "View on GitHub link text"
   },
   "options_detail_shaderInfo": {
-    "message": "이 테마에는 셰이더 구성이 포함되어 있습니다.",
+    "message": "Эта тема включает в себя конфигурацию шейдера.",
     "description": "Shader info text prefix"
   },
   "options_detail_downloadShader": {
-    "message": "shader.json 다운로드",
+    "message": "Скачать shader.json",
     "description": "Download shader link text"
   },
   "options_detail_shaderImportSuffix": {
-    "message": "후 가져오기:",
+    "message": "и импортировать в",
     "description": "Shader import suffix text before Better Lyrics Shaders link"
   },
   "marketplace_pageTitle": {
-    "message": "Better Lyrics 테마 마켓플레이스",
+    "message": "Магазин тем Better Lyrics",
     "description": "Page title"
   },
   "marketplace_title": {
-    "message": "테마 마켓플레이스",
+    "message": "Магазин тем",
     "description": "Header title"
   },
   "marketplace_subtitle": {
-    "message": "커뮤니티 테마를 찾고 설치해보세요",
+    "message": "Находите и скачивайте темы сообщества",
     "description": "Header subtitle"
   },
   "marketplace_searchPlaceholder": {
-    "message": "테마 검색...",
+    "message": "Поиск тем...",
     "description": "Search input placeholder"
   },
   "marketplace_refresh": {
-    "message": "새로고침",
+    "message": "Обновить",
     "description": "Refresh button label"
   },
   "marketplace_keyboardShortcuts": {
-    "message": "키보드 단축키",
+    "message": "Горячие клавиши",
     "description": "Keyboard shortcuts button label"
   },
   "marketplace_sortBy": {
-    "message": "정렬",
+    "message": "Сортировать по",
     "description": "Sort filter group label"
   },
   "marketplace_sortRatingDesc": {
-    "message": "높은 평점순",
+    "message": "С наивысшим рейтингом",
     "description": "Sort by highest rating"
   },
   "marketplace_sortRatingAsc": {
-    "message": "낮은 평점순",
+    "message": "С наинизшим рейтингом",
     "description": "Sort by lowest rating"
   },
   "marketplace_sortDownloadsDesc": {
-    "message": "다운로드 많은순",
+    "message": "Самые скачиваемые",
     "description": "Sort by most downloads"
   },
   "marketplace_sortDownloadsAsc": {
-    "message": "다운로드 적은순",
+    "message": "Наименее скачиваемые",
     "description": "Sort by least downloads"
   },
   "marketplace_sortNewest": {
-    "message": "최신순",
+    "message": "Новые",
     "description": "Sort by newest"
   },
   "marketplace_sortOldest": {
-    "message": "오래된 순",
+    "message": "Старые",
     "description": "Sort by oldest"
   },
   "marketplace_show": {
-    "message": "표시",
+    "message": "Показать",
     "description": "Show filter group label"
   },
   "marketplace_showAll": {
-    "message": "전체",
+    "message": "Все",
     "description": "Show all themes"
   },
   "marketplace_showInstalled": {
-    "message": "설치됨",
+    "message": "Установленные",
     "description": "Show installed themes"
   },
   "marketplace_showNotInstalled": {
-    "message": "설치되지 않음",
+    "message": "Не установленные",
     "description": "Show not installed themes"
   },
   "marketplace_options": {
-    "message": "옵션",
+    "message": "Опции",
     "description": "Options filter group label"
   },
   "marketplace_hasShaders": {
-    "message": "셰이더 포함",
+    "message": "Имеет шейдеры",
     "description": "Filter for themes with shaders"
   },
   "marketplace_compatibleOnly": {
-    "message": "호환 가능만 사용",
+    "message": "Только совместимые",
     "description": "Filter for compatible themes"
   },
   "marketplace_installFromUrl": {
-    "message": "URL에서 설치",
+    "message": "Установить из URL",
     "description": "Install from URL button"
   },
   "marketplace_submitTheme": {
-    "message": "테마 올리기",
+    "message": "Отправить тему",
     "description": "Submit a theme link"
   },
   "marketplace_loading": {
-    "message": "테마 로딩 중...",
+    "message": "Загрузка тем...",
     "description": "Loading message"
   },
   "marketplace_retry": {
-    "message": "다시 시도",
+    "message": "Повторить",
     "description": "Retry button"
   },
   "marketplace_noThemesMatch": {
-    "message": "필터와 일치하는 테마가 없습니다",
+    "message": "Нет подходящих тем",
     "description": "Empty state message"
   },
   "marketplace_grantPermission": {
-    "message": "권한 허용",
+    "message": "Предоставить разрешение",
     "description": "Grant permission button"
   },
   "marketplace_install": {
-    "message": "설치",
+    "message": "Установить",
     "description": "Install button"
   },
   "marketplace_remove": {
-    "message": "제거",
+    "message": "Удалить",
     "description": "Remove button"
   },
   "marketplace_apply": {
-    "message": "적용",
+    "message": "Применить",
     "description": "Apply button"
   },
   "marketplace_active": {
-    "message": "활성",
+    "message": "Активно",
     "description": "Active theme indicator"
   },
   "marketplace_shadersBadge": {
-    "message": "셰이더",
+    "message": "Шейдеры",
     "description": "Shaders badge text"
   },
   "marketplace_githubBadge": {
@@ -560,171 +560,171 @@
     "description": "GitHub badge text"
   },
   "marketplace_urlModalTitle": {
-    "message": "URL로 설치",
+    "message": "Установить из URL",
     "description": "URL install modal title"
   },
   "marketplace_urlModalMessage": {
-    "message": "GitHub 저장소 URL을 입력하여 테마를 직접 설치:",
+    "message": "Введите URL-адрес репозитория GitHub, чтобы установить тему напрямую:",
     "description": "URL install modal message"
   },
   "marketplace_urlModalPlaceholder": {
-    "message": "github.com/user/repo 또는 github.com/user/repo/tree/branch",
+    "message": "github.com/user/repo или github.com/user/repo/tree/branch",
     "description": "URL input placeholder"
   },
   "marketplace_urlModalError": {
-    "message": "GitHub 저장소 URL을 입력하세요",
+    "message": "Пожалуйста, введите URL-адрес GitHub репозитория",
     "description": "URL validation error"
   },
   "marketplace_cancel": {
-    "message": "취소",
+    "message": "Отмена",
     "description": "Cancel button"
   },
   "marketplace_urlPermissionTitle": {
-    "message": "추가 권한이 필요합니다",
+    "message": "Необходимо дополнительное разрешение",
     "description": "URL permission modal title"
   },
   "marketplace_urlPermissionWhy": {
-    "message": "왜 필요한가요?",
+    "message": "Зачем это нужно?",
     "description": "URL permission explanation title"
   },
   "marketplace_urlPermissionDesc": {
-    "message": "커스텀 GitHub URL을 통해 테마를 설치하려면 마켓플레이스보다 넓은 접근권한이 필요합니다. 이를 통해 Better Lyrics는 다음과 같은 작업을 할 수 있습니다:",
+    "message": "Установка тем из пользовательских URL-адресов на GitHub требует более широкого доступа, чем установка из магазина. Это позволяет Better Lyrics:",
     "description": "URL permission description"
   },
   "marketplace_urlPermissionItem1": {
-    "message": "원하는 GitHub 저장소에서 테마 파일을 가져오기",
+    "message": "Получить файлы тем из любого GitHub репозитория",
     "description": "URL permission list item 1"
   },
   "marketplace_urlPermissionItem2": {
-    "message": "저장소의 기본 브랜치 감지",
+    "message": "Обнаружить ветку по умолчанию для репозитория",
     "description": "URL permission list item 2"
   },
   "marketplace_urlPermissionItem3": {
-    "message": "설치 전 테마 구조 검증",
+    "message": "Проверить структуру темы перед установкой",
     "description": "URL permission list item 3"
   },
   "marketplace_urlPermissionNote": {
-    "message": "이 권한은 URL을 통해 테마를 설치할 때만 사용됩니다. 마켓플레이스 테마에는 필요하지 않습니다.",
+    "message": "Это разрешение используется только при установке тем по URL. Темы из магазина не требуют этого.",
     "description": "URL permission note"
   },
   "marketplace_shortcutsTitle": {
-    "message": "키보드 단축키",
+    "message": "Горячие клавиши",
     "description": "Shortcuts modal title"
   },
   "marketplace_shortcutsNavigation": {
-    "message": "탐색",
+    "message": "Навигация",
     "description": "Navigation shortcuts group"
   },
   "marketplace_shortcutsSearch": {
-    "message": "테마 검색",
+    "message": "Поиск тем",
     "description": "Search shortcut label"
   },
   "marketplace_shortcutsRefresh": {
-    "message": "마켓플레이스 새로고침",
+    "message": "Обновить магазин",
     "description": "Refresh shortcut label"
   },
   "marketplace_shortcutsInstallUrl": {
-    "message": "URL에서 설치",
+    "message": "Установить из URL",
     "description": "Install from URL shortcut label"
   },
   "marketplace_shortcutsSort": {
-    "message": "정렬",
+    "message": "Сортировка",
     "description": "Sort shortcuts group"
   },
   "marketplace_shortcutsSortHint": {
-    "message": "한 번 더 누르면 역순으로",
+    "message": "нажмите ещё раз, чтобы переключить направление",
     "description": "Sort toggle hint"
   },
   "marketplace_shortcutsByRating": {
-    "message": "평점순",
+    "message": "По оценкам",
     "description": "Sort by rating shortcut"
   },
   "marketplace_shortcutsByDownloads": {
-    "message": "다운로드순",
+    "message": "По скачиваниям",
     "description": "Sort by downloads shortcut"
   },
   "marketplace_shortcutsByDate": {
-    "message": "날짜순",
+    "message": "По дате",
     "description": "Sort by date shortcut"
   },
   "marketplace_shortcutsFilters": {
-    "message": "필터",
+    "message": "Фильтры",
     "description": "Filters shortcuts group"
   },
   "marketplace_shortcutsShowAll": {
-    "message": "전체 표시",
+    "message": "Показать все",
     "description": "Show all shortcut"
   },
   "marketplace_shortcutsShowInstalled": {
-    "message": "설치됨 표시",
+    "message": "Показать установленные",
     "description": "Show installed shortcut"
   },
   "marketplace_shortcutsShowNotInstalled": {
-    "message": "미설치 표시",
+    "message": "Показать неустановленные",
     "description": "Show not installed shortcut"
   },
   "marketplace_shortcutsToggleShaders": {
-    "message": "셰이더 전환",
+    "message": "Переключить шейдеры",
     "description": "Toggle shaders shortcut"
   },
   "marketplace_shortcutsToggleCompatible": {
-    "message": "호환성 전환",
+    "message": "Переключить совместимость",
     "description": "Toggle compatible shortcut"
   },
   "marketplace_shortcutsDetails": {
-    "message": "테마 상세",
+    "message": "О теме",
     "description": "Theme details shortcuts group"
   },
   "marketplace_shortcutsInstallRemove": {
-    "message": "설치 / 제거",
+    "message": "Установить / удалить",
     "description": "Install/remove shortcut"
   },
   "marketplace_shortcutsApply": {
-    "message": "테마 적용",
+    "message": "Применить тему",
     "description": "Apply theme shortcut label"
   },
   "marketplace_shortcutsPrevImage": {
-    "message": "이전 이미지",
+    "message": "Предыдущая картинка",
     "description": "Previous image shortcut"
   },
   "marketplace_shortcutsNextImage": {
-    "message": "다음 이미지",
+    "message": "Следующая картинка",
     "description": "Next image shortcut"
   },
   "marketplace_shortcutsGeneral": {
-    "message": "일반",
+    "message": "Главная",
     "description": "General shortcuts group"
   },
   "marketplace_shortcutsCloseModal": {
-    "message": "모달 닫기",
+    "message": "Закрыть модальное окно",
     "description": "Close modal shortcut"
   },
   "marketplace_shortcutsShowShortcuts": {
-    "message": "단축키 표시",
+    "message": "Показать горячие клавиши",
     "description": "Show shortcuts shortcut"
   },
   "marketplace_shortcutsApplyTheme": {
-    "message": "테마 적용 (설치 후)",
+    "message": "Применить тему (после установки)",
     "description": "Apply theme shortcut"
   },
   "marketplace_ratingFailed": {
-    "message": "평가을 전송하는데 실패했습니다",
+    "message": "Не удалось отправить оценку",
     "description": "Rating submission error"
   },
   "marketplace_shaderFetchFailed": {
-    "message": "셰이더 설정을 가져오지 못했습니다",
+    "message": "Не удалось получить конфигурацию шейдера",
     "description": "Shader fetch error"
   },
   "marketplace_applyFailed": {
-    "message": "테마 적용 실패",
+    "message": "Не удалось применить тему",
     "description": "Theme apply error"
   },
   "marketplace_noThemesInstalled": {
-    "message": "설치된 테마 없음",
+    "message": "Нет установленных тем",
     "description": "Empty installed themes message"
   },
   "marketplace_lastUpdatedOn": {
-    "message": "$date$ 에 마지막으로 업데이트",
+    "message": "Последнее обновление: $date$",
     "description": "Tooltip showing full date when a theme was last updated",
     "placeholders": {
       "date": {
@@ -734,103 +734,103 @@
     }
   },
   "editor_pageTitle": {
-    "message": "Better Lyrics CSS 에디터",
+    "message": "Редактор стилей Better Lyrics",
     "description": "Standalone editor page title"
   },
   "editor_importFromFile": {
-    "message": "파일에서 가져오기",
+    "message": "Импортировать из файла",
     "description": "Import from file button"
   },
   "editor_exportToFile": {
-    "message": "파일로 내보내기",
+    "message": "Экспортировать в файл",
     "description": "Export to file button"
   },
   "editor_saveAsTheme": {
-    "message": "테마 저장하기",
+    "message": "Сохранить как тему",
     "description": "Save as theme button"
   },
   "editor_stylingGuide": {
-    "message": "스타일링 가이드",
+    "message": "Гид по стилям",
     "description": "Styling guide button"
   },
   "editor_tip": {
-    "message": "팁: 이 독립형 탭은 별도 창으로 이동하거나 YouTube Music과 분할 화면으로 사용하여 실시간으로 변경 사항을 확인할 수 있습니다. 자세한 내용은",
+    "message": "Совет: Это отдельная вкладка, Вы можете переместить этот редактор в отдельное окно или использовать разделенный экран вместе с YouTube Music, чтобы увидеть изменения в реальном времени. Для получения дополнительной информации, посетите",
     "description": "Editor tip text"
   },
   "editor_poweredBy": {
-    "message": "Powered by",
+    "message": "Сделано на",
     "description": "Powered by label"
   },
   "editor_playground": {
-    "message": "플레이그라운드",
+    "message": "Песочница",
     "description": "Playground link text"
   },
   "editor_docs": {
-    "message": "문서",
+    "message": "Доки",
     "description": "Docs link text"
   },
   "lyrics_source": {
-    "message": "소스: ",
+    "message": "Источник: ",
     "description": "Lyrics source label"
   },
   "lyrics_searchOnGenius": {
-    "message": "Genius에서 검색",
+    "message": "Искать на Genius",
     "description": "Search on Genius button text"
   },
   "lyrics_searching": {
-    "message": "Better Lyrics가 가사를 검색 중...",
+    "message": "Better Lyrics ищет текст песни...",
     "description": "Loading message while searching for lyrics"
   },
   "lyrics_stillSearching": {
-    "message": "싱크 가사를 검색 중...",
+    "message": "Всё ещё ищет текст...",
     "description": "Loading message while still searching"
   },
   "lyrics_noSyncedLyrics": {
-    "message": "Better Lyrics에서 싱크 가사를 찾지 못했습니다",
+    "message": "Better Lyrics не удалось найти синхронизированный текст",
     "description": "Message when no synced lyrics found"
   },
   "lyrics_adPlaying": {
-    "message": "[엘리베이터 음악]",
+    "message": "[пум-пум-пум]",
     "description": "Message shown during ad playback"
   },
   "lyrics_notFound": {
-    "message": "이 노래의 가사를 찾을 수 없습니다",
+    "message": "Не удалось найти текст песни",
     "description": "Message when no lyrics are available"
   },
   "options_language_exclusions": {
-    "message": "언어 제외 옵션",
+    "message": "Языковые исключения",
     "description": "Label for language exclusions setting"
   },
   "options_manage": {
-    "message": "관리",
+    "message": "Настроить",
     "description": "Manage button label"
   },
   "options_language_exclusionsTitle": {
-    "message": "언어 제외 옵션",
+    "message": "Языковые исключения",
     "description": "Modal title for language exclusions"
   },
   "options_romanization_tab": {
-    "message": "로마자 표기",
+    "message": "Романизация",
     "description": "Romanization tab label"
   },
   "options_translation_tab": {
-    "message": "번역",
+    "message": "Перевод",
     "description": "Translation tab label"
   },
   "options_searchLanguages": {
-    "message": "언어 검색...",
+    "message": "Поиск языков...",
     "description": "Search input placeholder"
   },
   "options_romanization_hint": {
-    "message": "토글하려면 클릭하세요. 제외된 언어는 로마자 표기가 되지 않습니다.",
+    "message": "Нажмите, чтобы переключить. Исключенные языки не будут романизированы.",
     "description": "Hint text for romanization exclusions"
   },
   "options_translation_hint": {
-    "message": "토글하려면 클릭하세요. 제외된 언어는 번역되지 않습니다.",
+    "message": "Нажмите, чтобы переключить. Исключенные исходные языки не будут переведены.",
     "description": "Hint text for translation exclusions"
   },
   "options_resetToDefault": {
-    "message": "$TYPE$을 기본값으로 재설정",
+    "message": "Сбросить $TYPE$",
     "description": "Reset to default button label",
     "placeholders": {
       "type": {
@@ -840,7 +840,7 @@
     }
   },
   "options_romanization_resetTitle": {
-    "message": "$TYPE$을 제외하고 재설정",
+    "message": "Сбросить исключения $TYPE$",
     "description": "Modal title for resetting exclusions",
     "placeholders": {
       "type": {
@@ -850,19 +850,19 @@
     }
   },
   "options_romanization_resetMessage": {
-    "message": "이렇게 하면 제외된 모든 언어가 지워집니다. 계속하시겠어요?",
+    "message": "Все исключенные языки будут удалены. Продолжить?",
     "description": "Confirmation message for resetting exclusions"
   },
   "options_reset": {
-    "message": "초기화",
+    "message": "Сброс",
     "description": "Reset button label"
   },
   "options_cancel": {
-    "message": "취소",
+    "message": "Отмена",
     "description": "Cancel button label"
   },
   "options_romanization_resetSuccess": {
-    "message": "$TYPE$를 제외한 항목이 기본값으로 재설정되었습니다",
+    "message": "$TYPE$ исключения сброшены",
     "description": "Success message after resetting exclusions",
     "placeholders": {
       "type": {
@@ -872,7 +872,7 @@
     }
   },
   "symlink_applied": {
-    "message": "적용된 테마: $NAME$ (마켓플레이스)",
+    "message": "Текущая тема: $NAME$ (Магазин)",
     "description": "Alert after successfully applying a symlinked theme from marketplace",
     "placeholders": {
       "name": {
@@ -882,7 +882,7 @@
     }
   },
   "builtin_applied": {
-    "message": "적용된 테마: $NAME$",
+    "message": "Текущая тема: $NAME$",
     "description": "Alert after successfully applying a bundled built-in theme",
     "placeholders": {
       "name": {
@@ -892,7 +892,7 @@
     }
   },
   "theme_author_prefix": {
-    "message": "by $AUTHOR$",
+    "message": "от $AUTHOR$",
     "description": "Author prefix shown on theme selector button",
     "placeholders": {
       "author": {
@@ -902,115 +902,115 @@
     }
   },
   "theme_author_you": {
-    "message": "by You",
+    "message": "от Вас",
     "description": "Author label for custom user themes on theme selector button"
   },
   "symlink_installFailed": {
-    "message": "테마를 설치할 수 없습니다. 연결을 확인한 후 다시 시도하세요.",
+    "message": "Не удалось установить тему. Проверьте подключение и повторите попытку.",
     "description": "Alert when a symlinked theme fails to install from marketplace"
   },
   "symlink_badge_marketplace": {
-    "message": "마켓플레이스",
+    "message": "Магазин",
     "description": "Badge text on symlinked theme cards"
   },
   "symlink_badge_bundled": {
-    "message": "내장됨",
+    "message": "Связанные",
     "description": "Badge text on non-symlinked built-in theme cards"
   },
   "deprecation_builtin_title": {
-    "message": "주의, 이 테마는 움직입니다!",
+    "message": "Обрати внимание, темы переезжают!",
     "description": "Title for the built-in themes deprecation banner in theme modal"
   },
   "deprecation_builtin_body": {
-    "message": "내장된 테마를 테마 마켓플레이스로 마이그레이션하고 있습니다. 이미 일부는 마켓플레이스 배지를 찾고 있습니다. 나머지는 향후 업데이트에서 GitHub와 Discord에서 CSS 백업을 통해 제공될 예정입니다.",
+    "message": "Мы переводим встроенные темы в Магазин тем. Некоторые из них уже переведены, ищите значок магазина. Остальные догонят в будущем обновлении, с CSS бэкапами на GitHub и Discord.",
     "description": "Body text for the built-in themes deprecation banner"
   },
   "deprecation_builtin_cta": {
-    "message": "마켓플레이스 탐색",
+    "message": "Открыть магазин",
     "description": "CTA button text in the deprecation banner to open the marketplace"
   },
   "theme_modal_section_builtin": {
-    "message": "내장 테마",
+    "message": "Встроенные темы",
     "description": "Section title for built-in themes in the theme chooser modal"
   },
   "theme_modal_section_custom": {
-    "message": "커스텀 테마",
+    "message": "Свои темы",
     "description": "Section title for custom themes in the theme chooser modal"
   },
   "lyrics_submitToUnison": {
-    "message": "Submit lyrics with Unison",
+    "message": "Отправить текст песни с Унисон",
     "description": "Button text for submitting lyrics to Unison"
   },
   "unison_pageTitle": {
-    "message": "Unison - Better Lyrics",
+    "message": "Унисон - Better Lyrics",
     "description": "Page title for the Unison dashboard"
   },
   "unison_title": {
-    "message": "Unison",
+    "message": "Унисон",
     "description": "Unison branding title"
   },
   "unison_subtitle": {
-    "message": "Community Lyrics",
+    "message": "Тексты сообщества",
     "description": "Unison subtitle text"
   },
   "unison_search": {
-    "message": "Search lyrics",
+    "message": "Искать текст",
     "description": "Search button label"
   },
   "unison_searchPlaceholder": {
-    "message": "Search songs, artists, or lyrics...",
+    "message": "Искать песню, артиста, или текст...",
     "description": "Search input placeholder"
   },
   "unison_submit": {
-    "message": "Submit Lyrics",
+    "message": "Отправить текст",
     "description": "Submit lyrics button text"
   },
   "unison_submitSuccess": {
-    "message": "Lyrics submitted!",
+    "message": "Текст отправлен!",
     "description": "Success message after submitting lyrics"
   },
   "unison_submitDescription": {
-    "message": "Submit community lyrics for any YouTube Music track. Paste LRC (timestamped), TTML (XML), or plain text. Synced formats are prioritized.",
+    "message": "Отправьте тексты сообщества для любого трека YouTube. Вставьте LRC (с таймингами), TTML (XML) или обычный текст. Синхронизированные форматы являются приоритетными.",
     "description": "Description text for the submission form"
   },
   "unison_composerHintPrefix": {
-    "message": "Use",
+    "message": "Использовать",
     "description": "Text before Composer link in submit hint"
   },
   "unison_composerHintSuffix": {
-    "message": "to create word-synced lyrics from scratch.",
+    "message": ", чтобы создать текст с нуля.",
     "description": "Text after Composer link in submit hint"
   },
   "unison_upvote": {
-    "message": "Upvote",
+    "message": "Апвоут",
     "description": "Upvote button tooltip"
   },
   "unison_downvote": {
-    "message": "Downvote",
+    "message": "Даунвоут",
     "description": "Downvote button tooltip"
   },
   "unison_report": {
-    "message": "Report",
+    "message": "Пожаловаться",
     "description": "Report button tooltip"
   },
   "unison_reportSuccess": {
-    "message": "Reported",
+    "message": "Жалоба отправлена",
     "description": "Report success tooltip text"
   },
   "unison_report_wrong_song": {
-    "message": "Wrong song",
+    "message": "Неверная песня",
     "description": "Report reason: wrong song"
   },
   "unison_report_bad_sync": {
-    "message": "Bad sync",
+    "message": "Плохая синхронизация",
     "description": "Report reason: bad synchronization"
   },
   "unison_report_offensive": {
-    "message": "Offensive",
+    "message": "Оскорбления",
     "description": "Report reason: offensive content"
   },
   "unison_report_spam": {
-    "message": "Spam",
+    "message": "Спам",
     "description": "Report reason: spam"
   },
   "unison_report_other": {
@@ -1194,47 +1194,47 @@
     "description": "Fallback error message when submission fails"
   },
   "report_lyrics_title": {
-    "message": "Report Lyrics",
+    "message": "Пожаловаться на текст",
     "description": "Title for the report lyrics modal"
   },
   "report_lyrics_info": {
-    "message": "Specify the reason why the lyrics for this song are not compatible",
+    "message": "Обозначьте причину, по которой текст неуместен",
     "description": "Information about using the report lyrics modal"
   },
   "report_lyrics_wrong_song": {
-    "message": "Wrong song or version",
+    "message": "Неверная песня или версия",
     "description": "Reason for the report that the lyrics are for the wrong song or version"
   },
   "report_lyrics_bad_sync": {
-    "message": "Bad synchronization",
+    "message": "Плохая синхронизация",
     "description": "Reason for the report that the lyrics are too off on the part synchronization"
   },
   "report_lyrics_offensive": {
-    "message": "Offensive",
+    "message": "Оскорбления",
     "description": "Reason for the report that the lyrics are offensive or too offensive"
   },
   "report_lyrics_spam": {
-    "message": "Spam or lyrics are irrelevant to the song",
+    "message": "Спам или текст не относится к песне",
     "description": "Reason for the report that the lyrics are a spam attempt and/or irrelevant with the sung parts"
   },
   "report_lyrics_other": {
-    "message": "Other reason",
+    "message": "Другое",
     "description": "Reason for the report that the lyrics is bad in other reasons"
   },
   "report_lyrics_details_placeholder": {
-    "message": "Additional details about this report",
+    "message": "Дополнительные детали о жалобе",
     "description": "Placeholder for report lyrics details input"
   },
   "report_lyrics_submit": {
-    "message": "Submit",
+    "message": "Отправить",
     "description": "Submit button for reporting lyrics"
   },
   "report_lyrics_cancel": {
-    "message": "Cancel",
+    "message": "Отменить",
     "description": "Cancel button for reporting lyrics"
   },
   "report_lyrics_reporting": {
-    "message": "Reporting lyrics...",
+    "message": "Жалоба отправляется...",
     "description": "Report lyrics on a reporting process"
   },
   "report_lyrics_success": {
@@ -1250,35 +1250,35 @@
     "description": "Shown when a lyrics report fails to submit"
   },
   "unison_tier_new": {
-    "message": "new",
+    "message": "новый",
     "description": "Trust tier badge for low-reputation Unison submitters"
   },
   "unison_tier_trusted": {
-    "message": "trusted",
+    "message": "доверенный",
     "description": "Trust tier badge for mid-reputation Unison submitters"
   },
   "unison_tier_veteran": {
-    "message": "veteran",
+    "message": "ветеран",
     "description": "Trust tier badge for high-reputation Unison submitters"
   },
   "unison_tier_expert": {
-    "message": "expert",
+    "message": "эксперт",
     "description": "Trust tier badge for top-reputation Unison submitters"
   },
   "unison_submitted_this": {
-    "message": "submitted this lyric",
+    "message": "отправил(-а) этот текст",
     "description": "Sub-label under the submitter name in the Unison footer card"
   },
   "unison_score_label": {
-    "message": "score",
+    "message": "счёт",
     "description": "Noun shown after the numeric score in the Unison footer (e.g. the 'score' in '4.85 score · 12 votes')"
   },
   "unison_vote_singular": {
-    "message": "vote",
+    "message": "голос",
     "description": "Singular noun used after the number 1 in the Unison vote count (e.g. '1 vote')"
   },
   "unison_vote_plural": {
-    "message": "votes",
+    "message": "голосов",
     "description": "Plural noun used after numbers other than 1 in the Unison vote count (e.g. '5 votes')"
   }
 }
