@@ -1,4 +1,4 @@
-import { LOG_PREFIX_CONTENT, LYRICS_DISABLED_ATTR } from "@constants";
+import { LOG_PREFIX_CONTENT, LYRICS_DISABLED_ATTR, UNISON_DOCK_CLASS, UNISON_DOCK_DEFAULT_POSITION } from "@constants";
 import { AppState, reloadLyrics } from "@core/appState";
 import { clearCache, compileRicsToStyles, getStorage } from "@core/storage";
 import { log, setUpLog } from "@core/utils";
@@ -193,7 +193,10 @@ export function listenForPopupMessages(): void {
       handleSettings();
       loadTranslationSettings();
       loadPassiveScrollSetting();
-      loadUnisonPinnedDockSettings(syncUnisonDock);
+      loadUnisonPinnedDockSettings(() => {
+        syncUnisonDock();
+        hideDockOnIdleInFullscreen();
+      });
       AppState.shouldInjectAlbumArt = "Unknown";
       onAlbumArtEnabled(
         () => {
@@ -226,11 +229,19 @@ export function loadPassiveScrollSetting(): void {
 }
 
 export function loadUnisonPinnedDockSettings(callback?: () => void): void {
-  getStorage({ isUnisonPinnedDockEnabled: false, unisonPinnedDockPosition: "bottom-right" }, items => {
-    AppState.isUnisonPinnedDockEnabled = items.isUnisonPinnedDockEnabled;
-    AppState.unisonPinnedDockPosition = items.unisonPinnedDockPosition;
-    callback?.();
-  });
+  getStorage(
+    {
+      isUnisonPinnedDockEnabled: true,
+      unisonPinnedDockPosition: UNISON_DOCK_DEFAULT_POSITION,
+      isUnisonAutoHideInFullscreenEnabled: true,
+    },
+    items => {
+      AppState.isUnisonPinnedDockEnabled = items.isUnisonPinnedDockEnabled;
+      AppState.unisonPinnedDockPosition = items.unisonPinnedDockPosition;
+      AppState.isUnisonAutoHideInFullscreenEnabled = items.isUnisonAutoHideInFullscreenEnabled;
+      callback?.();
+    }
+  );
 }
 
 function syncUnisonDock(): void {
@@ -242,6 +253,53 @@ function syncUnisonDock(): void {
     mountUnisonDock(AppState.currentUnisonData, AppState.unisonPinnedDockPosition);
     updateUnisonDockPosition(AppState.unisonPinnedDockPosition);
   }
+}
+
+const DOCK_IDLE_HIDDEN_CLASS = `${UNISON_DOCK_CLASS}--idle-hidden`;
+
+let dockIdleTimer: number | null = null;
+let dockMouseListener: ((this: Document, ev: MouseEvent) => any) | null = null;
+
+function setDockIdleHidden(hidden: boolean): void {
+  for (const dock of Array.from(document.getElementsByClassName(UNISON_DOCK_CLASS))) {
+    dock.classList.toggle(DOCK_IDLE_HIDDEN_CLASS, hidden);
+  }
+}
+
+export function hideDockOnIdleInFullscreen(): void {
+  if (dockMouseListener) {
+    document.removeEventListener("mousemove", dockMouseListener);
+    dockMouseListener = null;
+  }
+  if (dockIdleTimer) {
+    window.clearTimeout(dockIdleTimer);
+    dockIdleTimer = null;
+  }
+  setDockIdleHidden(false);
+
+  if (!AppState.isUnisonAutoHideInFullscreenEnabled) return;
+
+  let dockVisible = true;
+
+  function hideDock() {
+    dockIdleTimer = null;
+    if (!dockVisible) return;
+    if (!document.getElementById("layout")?.hasAttribute("player-fullscreened")) return;
+    setDockIdleHidden(true);
+    dockVisible = false;
+  }
+
+  function handleMouseMove() {
+    if (dockIdleTimer) window.clearTimeout(dockIdleTimer);
+    if (!dockVisible) {
+      setDockIdleHidden(false);
+      dockVisible = true;
+    }
+    dockIdleTimer = window.setTimeout(hideDock, 3000);
+  }
+
+  dockMouseListener = handleMouseMove;
+  document.addEventListener("mousemove", handleMouseMove);
 }
 
 /**

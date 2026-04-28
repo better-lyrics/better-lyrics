@@ -1827,6 +1827,129 @@ input.cm-textfield:focus-visible {
 	background: rgb(220, 38, 38);
 }
 
+/* -- Unison Actions Modal --------------------------*/
+
+.unison-modal-row {
+	align-items: center;
+}
+
+.unison-modal-row__text {
+	display: flex;
+	flex-direction: column;
+	gap: 0.125rem;
+	min-width: 0;
+}
+
+.modal-row-hint {
+	font-size: 0.6875rem;
+	color: rgba(255, 255, 255, 0.4);
+	margin: 0;
+}
+
+.position-section {
+	display: flex;
+	flex-direction: column;
+	gap: 0.5rem;
+}
+
+.position-section__label {
+	font-size: 0.8125rem;
+	font-weight: 500;
+	color: rgba(255, 255, 255, 0.92);
+}
+
+.position-picker {
+	display: flex;
+	justify-content: center;
+	padding: 0.5rem 0;
+}
+
+.position-frame {
+	width: 192px;
+	height: 192px;
+	border-radius: 16px;
+	border: 1px solid rgba(255, 255, 255, 0.14);
+	padding: 4px;
+	display: grid;
+	grid-template-columns: repeat(3, 1fr);
+	grid-template-rows: repeat(3, 1fr);
+	gap: 4px;
+}
+
+.position-cell {
+	border-radius: 4px;
+	background: rgba(255, 255, 255, 0.04);
+	cursor: pointer;
+	display: grid;
+	place-items: center;
+	transition: background 0.15s ease;
+}
+
+.position-cell::before {
+	content: "";
+	width: 8px;
+	height: 8px;
+	border-radius: 50%;
+	background: rgba(255, 255, 255, 0.28);
+	transition: background 0.15s ease, transform 0.15s ease;
+}
+
+.position-cell:hover {
+	background: rgba(255, 255, 255, 0.09);
+}
+
+.position-cell:hover::before {
+	background: rgba(255, 255, 255, 0.55);
+}
+
+.position-cell[data-selected="true"] {
+	background: hsla(232, 84%, 70%, 0.18);
+}
+
+.position-cell[data-selected="true"]::before {
+	background: hsl(232, 84%, 70%);
+	transform: scale(1.3);
+}
+
+.position-cell[data-pos="top-left"] {
+	grid-row: 1;
+	grid-column: 1;
+	border-top-left-radius: 12px;
+}
+
+.position-cell[data-pos="top-center"] {
+	grid-row: 1;
+	grid-column: 2;
+}
+
+.position-cell[data-pos="top-right"] {
+	grid-row: 1;
+	grid-column: 3;
+	border-top-right-radius: 12px;
+}
+
+.position-cell[data-pos="bottom-left"] {
+	grid-row: 3;
+	grid-column: 1;
+	border-bottom-left-radius: 12px;
+}
+
+.position-cell[data-pos="bottom-center"] {
+	grid-row: 3;
+	grid-column: 2;
+}
+
+.position-cell[data-pos="bottom-right"] {
+	grid-row: 3;
+	grid-column: 3;
+	border-bottom-right-radius: 12px;
+}
+
+#unison-actions-modal-body[data-pinned-disabled="true"] .unison-modal-row--dependent {
+	opacity: 0.45;
+	pointer-events: none;
+}
+
 /* -- Language Exclusions Modal (shared search + pills) --------------------------*/
 
 .lang-search-container {

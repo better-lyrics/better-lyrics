@@ -3,6 +3,31 @@ import { t } from "@/core/i18n";
 import { report, UnisonReportReason } from "../lyrics/providers/unison";
 
 let selected: string | null = null;
+let isClosing = false;
+let escapeHandler: ((e: KeyboardEvent) => void) | null = null;
+
+const ANIM_DURATION = 200;
+const ANIM_EASING = "cubic-bezier(0.22, 1, 0.36, 1)";
+
+const OVERLAY_KEYFRAMES: Keyframe[] = [{ opacity: 0 }, { opacity: 1 }];
+const MODAL_KEYFRAMES: Keyframe[] = [
+  { opacity: 0, transform: "scale(0.95) translateY(16px)" },
+  { opacity: 1, transform: "scale(1) translateY(0)" },
+];
+
+function animateModal(overlay: HTMLElement, modal: HTMLElement | null, direction: PlaybackDirection) {
+  const opts: KeyframeAnimationOptions = {
+    duration: ANIM_DURATION,
+    easing: ANIM_EASING,
+    fill: direction === "reverse" ? "forwards" : "backwards",
+    direction,
+  };
+  const pending: Promise<unknown>[] = [overlay.animate(OVERLAY_KEYFRAMES, opts).finished];
+  if (modal) {
+    pending.push(modal.animate(MODAL_KEYFRAMES, opts).finished);
+  }
+  return Promise.all(pending);
+}
 
 function addRadioCheckbox(modal: HTMLElement, id: string, text: string) {
   if (!modal) {
@@ -144,13 +169,40 @@ export function showReportModal(lyricsId: number) {
   modal.appendChild(footer);
   overlay.appendChild(modal);
   app.appendChild(overlay);
+
+  escapeHandler = (e: KeyboardEvent) => {
+    if (e.key === "Escape") {
+      e.stopPropagation();
+      e.preventDefault();
+      closeReportModal();
+    }
+  };
+  document.addEventListener("keydown", escapeHandler, { capture: true });
+
+  animateModal(overlay, modal, "normal");
 }
 
-function closeReportModal() {
-  selected = null;
-  const overlay = document.getElementsByClassName(MODAL_OVERLAY_CLASS)[0];
+async function closeReportModal() {
+  if (isClosing) {
+    return;
+  }
+  const overlay = document.getElementsByClassName(MODAL_OVERLAY_CLASS)[0] as HTMLElement | undefined;
   if (!overlay) {
     return;
   }
+
+  isClosing = true;
+  selected = null;
+  overlay.style.pointerEvents = "none";
+
+  if (escapeHandler) {
+    document.removeEventListener("keydown", escapeHandler, { capture: true });
+    escapeHandler = null;
+  }
+
+  const modal = overlay.querySelector(`.${MODAL_CLASS}`) as HTMLElement | null;
+  await animateModal(overlay, modal, "reverse");
+
   overlay.remove();
+  isClosing = false;
 }

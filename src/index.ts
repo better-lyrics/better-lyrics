@@ -7,6 +7,7 @@ import { setupRequestSniffer } from "@modules/lyrics/requestSniffer/requestSniff
 import {
   handleSettings,
   hideCursorOnIdle,
+  hideDockOnIdleInFullscreen,
   listenForPopupMessages,
   loadPassiveScrollSetting,
   loadTranslationSettings,
@@ -46,7 +47,7 @@ async function modify(): Promise<void> {
   setupWakeLockForFullscreen();
   loadTranslationSettings();
   loadPassiveScrollSetting();
-  loadUnisonPinnedDockSettings();
+  loadUnisonPinnedDockSettings(hideDockOnIdleInFullscreen);
   subscribeToCustomStyles();
   await purgeExpiredKeys();
   await saveCacheInfo();

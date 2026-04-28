@@ -17,6 +17,7 @@ export const TRANSLATED_LYRICS_CLASS = "blyrics--translated" as const;
 export const ROMANIZED_LYRICS_CLASS = "blyrics--romanized" as const;
 export const FOOTER_CLASS = "blyrics-footer" as const;
 export const UNISON_DOCK_CLASS = "blyrics-unison-dock" as const;
+export const UNISON_DOCK_DEFAULT_POSITION = "bottom-right" as const;
 export const MODAL_OVERLAY_CLASS = "blyrics-modal-overlay" as const;
 export const MODAL_CLASS = "blyrics-modal" as const;
 
