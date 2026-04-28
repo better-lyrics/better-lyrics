@@ -7,7 +7,7 @@
     "isolatedModules": true,
     "jsx": "react-jsx",
     "lib": ["dom", "dom.iterable", "esnext"],
-    "moduleResolution": "node",
+    "moduleResolution": "bundler",
     "module": "esnext",
     "noEmit": true,
     "resolveJsonModule": true,
@@ -16,6 +16,7 @@
     "verbatimModuleSyntax": true,
     "useDefineForClassFields": true,
     "skipLibCheck": true,
+    "types": ["chrome", "node"],
     "paths": {
       "@/*": ["./src/*"],
       "@core/*" : ["./src/core/*"],

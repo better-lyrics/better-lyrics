@@ -1,10 +1,10 @@
 // Function to save user options
 
-import { LOG_PREFIX, ROMANIZATION_LANGUAGES } from "@constants";
+import { LOG_PREFIX, ROMANIZATION_LANGUAGES, UNISON_DOCK_DEFAULT_POSITION } from "@constants";
 import { getLanguageDisplayName, initI18n, loadLocaleOverride, SUPPORTED_LOCALES, t } from "@core/i18n";
+import { exportIdentity, getIdentity, importIdentity, type KeyIdentity } from "@core/keyIdentity";
 import Sortable from "sortablejs";
 import { showModal } from "./editor/ui/feedback";
-import { exportIdentity, getIdentity, importIdentity, type KeyIdentity } from "./store/keyIdentity";
 import { initStoreUI, setupYourThemesButton } from "./store/store";
 
 interface Options {
@@ -13,6 +13,7 @@ interface Options {
   isAlbumArtEnabled: boolean;
   isFullScreenDisabled: boolean;
   isStylizedAnimationsEnabled: boolean;
+  isPassiveScrollEnabled: boolean;
   isTranslateEnabled: boolean;
   translationLanguage: string;
   isCursorAutoHideEnabled: boolean;
@@ -21,6 +22,9 @@ interface Options {
   romanizationDisabledLanguages: string[];
   translationDisabledLanguages: string[];
   uiLanguage: string;
+  isUnisonPinnedDockEnabled: boolean;
+  unisonPinnedDockPosition: string;
+  isUnisonAutoHideInFullscreenEnabled: boolean;
 }
 
 const saveOptions = (): void => {
@@ -46,6 +50,7 @@ const getOptionsFromForm = (): Options => {
     isAlbumArtEnabled: (document.getElementById("albumArt") as HTMLInputElement).checked,
     isFullScreenDisabled: (document.getElementById("isFullScreenDisabled") as HTMLInputElement).checked,
     isStylizedAnimationsEnabled: (document.getElementById("isStylizedAnimationsEnabled") as HTMLInputElement).checked,
+    isPassiveScrollEnabled: (document.getElementById("isPassiveScrollEnabled") as HTMLInputElement).checked,
     isTranslateEnabled: (document.getElementById("translate") as HTMLInputElement).checked,
     translationLanguage: (document.getElementById("translationLanguage") as HTMLInputElement).value,
     isCursorAutoHideEnabled: (document.getElementById("cursorAutoHide") as HTMLInputElement).checked,
@@ -54,8 +59,18 @@ const getOptionsFromForm = (): Options => {
     romanizationDisabledLanguages: romanizationDisabledLanguages,
     translationDisabledLanguages: translationDisabledLanguages,
     uiLanguage: (document.getElementById("uiLanguage") as HTMLSelectElement).value,
+    isUnisonPinnedDockEnabled: (document.getElementById("isUnisonPinnedDockEnabled") as HTMLInputElement).checked,
+    unisonPinnedDockPosition: getSelectedUnisonPosition(),
+    isUnisonAutoHideInFullscreenEnabled: (
+      document.getElementById("isUnisonAutoHideInFullscreenEnabled") as HTMLInputElement
+    ).checked,
   };
 };
+
+function getSelectedUnisonPosition(): string {
+  const selected = document.querySelector<HTMLElement>("#unison-position-frame .position-cell[data-selected='true']");
+  return selected?.dataset.pos ?? UNISON_DOCK_DEFAULT_POSITION;
+}
 
 // Function to save options to Chrome storage
 const saveOptionsToStorage = (options: Options): void => {
@@ -186,30 +201,38 @@ const restoreOptions = (): void => {
     isCursorAutoHideEnabled: true,
     isFullScreenDisabled: false,
     isStylizedAnimationsEnabled: true,
+    isPassiveScrollEnabled: true,
     isTranslateEnabled: false,
     translationLanguage: "en",
     isRomanizationEnabled: false,
     preferredProviderList: [
       "bLyrics-richsynced",
+      "unison-richsynced",
       "binimum-richsynced",
       "musixmatch-richsync",
       "yt-captions",
       "bLyrics-synced",
+      "unison-synced",
       "binimum-synced",
       "lrclib-synced",
       "legato-synced",
       "musixmatch-synced",
       "yt-lyrics",
+      "unison-plain",
       "lrclib-plain",
     ],
     romanizationDisabledLanguages: [],
     translationDisabledLanguages: [],
     uiLanguage: "auto",
+    isUnisonPinnedDockEnabled: true,
+    unisonPinnedDockPosition: UNISON_DOCK_DEFAULT_POSITION,
+    isUnisonAutoHideInFullscreenEnabled: true,
   };
 
   chrome.storage.sync.get(defaultOptions, setOptionsInForm);
 
   document.getElementById("clear-cache")!.addEventListener("click", () => clearTransientLyrics());
+  setupUnisonActionsModal();
 };
 
 // Function to set options in form elements
@@ -221,10 +244,16 @@ const setOptionsInForm = (items: Options): void => {
   (document.getElementById("isFullScreenDisabled") as HTMLInputElement).checked = items.isFullScreenDisabled;
   (document.getElementById("isStylizedAnimationsEnabled") as HTMLInputElement).checked =
     items.isStylizedAnimationsEnabled;
+  (document.getElementById("isPassiveScrollEnabled") as HTMLInputElement).checked = items.isPassiveScrollEnabled;
   (document.getElementById("translate") as HTMLInputElement).checked = items.isTranslateEnabled;
   (document.getElementById("translationLanguage") as HTMLInputElement).value = items.translationLanguage;
   (document.getElementById("isRomanizationEnabled") as HTMLInputElement).checked = items.isRomanizationEnabled;
   (document.getElementById("uiLanguage") as HTMLSelectElement).value = items.uiLanguage;
+  (document.getElementById("isUnisonPinnedDockEnabled") as HTMLInputElement).checked = items.isUnisonPinnedDockEnabled;
+  (document.getElementById("isUnisonAutoHideInFullscreenEnabled") as HTMLInputElement).checked =
+    items.isUnisonAutoHideInFullscreenEnabled;
+  setUnisonPositionInForm(items.unisonPinnedDockPosition);
+  syncUnisonModalDependentState(items.isUnisonPinnedDockEnabled);
   romanizationDisabledLanguages = items.romanizationDisabledLanguages || [];
   translationDisabledLanguages = items.translationDisabledLanguages || [];
   updateExclusionsConfigVisibility();
@@ -237,15 +266,18 @@ const setOptionsInForm = (items: Options): void => {
   // Always recreate in the default order to make sure no items go missing
   let unseenProviders = [
     "bLyrics-richsynced",
+    "unison-richsynced",
     "binimum-richsynced",
     "musixmatch-richsync",
     "yt-captions",
     "bLyrics-synced",
+    "unison-synced",
     "binimum-synced",
     "lrclib-synced",
     "legato-synced",
     "musixmatch-synced",
     "yt-lyrics",
+    "unison-plain",
     "lrclib-plain",
   ];
 
@@ -285,6 +317,9 @@ const getProviderIdToInfoMap = (): { [key: string]: ProviderInfo } => ({
     name: t("options_provider_musixmatch"),
     syncType: "line",
   },
+  "unison-richsynced": { name: t("options_provider_betterLyricsUnison"), syncType: "syllable" },
+  "unison-synced": { name: t("options_provider_betterLyricsUnison"), syncType: "line" },
+  "unison-plain": { name: t("options_provider_betterLyricsUnison"), syncType: "unsynced" },
   "yt-captions": {
     name: t("options_provider_youtubeCaptions"),
     syncType: "line",
@@ -886,4 +921,60 @@ function filterLanguagePills(containerId: string, query: string): void {
     const matches = langName.includes(normalizedQuery) || langCode.includes(normalizedQuery);
     pill.classList.toggle("lang-pill-hidden", !matches);
   });
+}
+
+function setUnisonPositionInForm(position: string): void {
+  const frame = document.getElementById("unison-position-frame");
+  if (!frame) return;
+  frame.querySelectorAll<HTMLElement>(".position-cell").forEach(cell => {
+    if (cell.dataset.pos === position) {
+      cell.dataset.selected = "true";
+    } else {
+      delete cell.dataset.selected;
+    }
+  });
+}
+
+function syncUnisonModalDependentState(enabled: boolean): void {
+  const body = document.getElementById("unison-actions-modal-body");
+  if (!body) return;
+  body.dataset.pinnedDisabled = enabled ? "false" : "true";
+}
+
+function setupUnisonActionsModal(): void {
+  const openBtn = document.getElementById("unison-actions-btn");
+  const overlay = document.getElementById("unison-actions-modal-overlay");
+  const closeBtn = document.getElementById("unison-actions-modal-close");
+  const frame = document.getElementById("unison-position-frame");
+  const pinnedToggle = document.getElementById("isUnisonPinnedDockEnabled") as HTMLInputElement | null;
+  const autoHideToggle = document.getElementById("isUnisonAutoHideInFullscreenEnabled") as HTMLInputElement | null;
+
+  if (!openBtn || !overlay || !closeBtn || !frame || !pinnedToggle || !autoHideToggle) return;
+
+  const closeModal = (): void => overlay.classList.remove("active");
+
+  openBtn.addEventListener("click", () => overlay.classList.add("active"));
+  closeBtn.addEventListener("click", closeModal);
+
+  overlay.addEventListener("click", e => {
+    if (e.target === overlay) closeModal();
+  });
+
+  document.addEventListener("keydown", e => {
+    if (e.key === "Escape" && overlay.classList.contains("active")) closeModal();
+  });
+
+  frame.addEventListener("click", e => {
+    const cell = (e.target as HTMLElement).closest<HTMLElement>(".position-cell");
+    if (!cell?.dataset.pos) return;
+    setUnisonPositionInForm(cell.dataset.pos);
+    saveOptions();
+  });
+
+  pinnedToggle.addEventListener("change", () => {
+    syncUnisonModalDependentState(pinnedToggle.checked);
+    saveOptions();
+  });
+
+  autoHideToggle.addEventListener("change", saveOptions);
 }

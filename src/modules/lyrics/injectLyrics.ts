@@ -18,19 +18,22 @@ import {
   WORD_CLASS,
   ZERO_DURATION_ANIMATION_CLASS,
 } from "@constants";
-import { t } from "@core/i18n";
 import { AppState } from "@core/appState";
-import { containsNonLatin, detectNonLatinLanguage, testRtl } from "@modules/lyrics/lyricParseUtils";
+import { t } from "@core/i18n";
 import { createInstrumentalElement } from "@modules/lyrics/createInstrumentalElement";
+import { containsNonLatin, detectNonLatinLanguage, testRtl } from "@modules/lyrics/lyricParseUtils";
 import { applySegmentMapToLyrics, type LyricSourceResultWithMeta } from "@modules/lyrics/lyrics";
 import type { Lyric, LyricPart } from "@modules/lyrics/providers/shared";
+import type { UnisonData } from "@modules/lyrics/providers/unison";
 import {
-  translateBatch,
-  romanizeBatch,
-  getTranslationFromCache,
   getRomanizationFromCache,
+  getTranslationFromCache,
+  romanizeBatch,
+  translateBatch,
 } from "@modules/lyrics/translation";
+import { registerThemeSetting } from "@modules/settings/themeOptions";
 import { animEngineState, lyricsElementAdded } from "@modules/ui/animationEngine";
+import { resizeCanvas } from "@modules/ui/animationEngineDebug";
 import {
   addFooter,
   addNoLyricsButton,
@@ -41,8 +44,6 @@ import {
   setExtraHeight,
 } from "@modules/ui/dom";
 import { getRelativeBounds, languageMatchesAny, log } from "@utils";
-import { resizeCanvas } from "@modules/ui/animationEngineDebug";
-import { registerThemeSetting } from "@modules/settings/themeOptions";
 
 let disableRichsync = registerThemeSetting("blyrics-disable-richsync", false, true);
 let lineSyncedAnimationDelay = registerThemeSetting("blyrics-line-synced-animation-delay", 50, true);
@@ -184,7 +185,7 @@ export function processLyrics(data: LyricSourceResultWithMeta, keepLoaderVisible
   injectLyrics(data, keepLoaderVisible, signal);
 }
 
-function createLyricsLine(parts: LyricPart[], line: LineData, lyricElement: HTMLElement) {
+function createLyricsLine(parts: LyricPart[], line: LineData, lyricElement: HTMLDivElement) {
   // To add rtl elements in reverse to the dom
   let rtlBuffer: HTMLSpanElement[] = [];
   let isAllRtl = true;
@@ -255,7 +256,7 @@ function createLyricsLine(parts: LyricPart[], line: LineData, lyricElement: HTML
     });
   }
 
-  groupByWordAndInsert(lyricElement as HTMLDivElement, lyricElementsBuffer);
+  groupByWordAndInsert(lyricElement, lyricElementsBuffer);
 }
 
 function createBreakElem(lyricElement: HTMLElement, order: number) {
@@ -468,6 +469,8 @@ function injectLyrics(data: LyricSourceResultWithMeta, keepLoaderVisible = false
   animEngineState.scrollResumeTime = 0;
 
   if (lyrics[0].words !== t("lyrics_notFound")) {
+    const unisonData =
+      data.source === "Unison" && "unisonData" in data ? (data as { unisonData: UnisonData }).unisonData : undefined;
     addFooter(
       data.source,
       data.sourceHref,
@@ -476,7 +479,8 @@ function injectLyrics(data: LyricSourceResultWithMeta, keepLoaderVisible = false
       data.album,
       data.duration,
       data.providerKey,
-      data.videoId
+      data.videoId,
+      unisonData
     );
   } else {
     addNoLyricsButton(data.song, data.artist, data.album, data.duration, data.videoId);
@@ -506,11 +510,10 @@ function injectLyrics(data: LyricSourceResultWithMeta, keepLoaderVisible = false
 
   AppState.lyricData = lyricsData;
 
-  if (!allZero) {
-    AppState.areLyricsTicking = true;
-    calculateLyricPositions();
-    getResizeObserver().observe(lyricsWrapper);
-  } else {
+  AppState.areLyricsTicking = true;
+  calculateLyricPositions();
+  getResizeObserver().observe(lyricsWrapper);
+  if (allZero) {
     log(SYNC_DISABLED_LOG);
   }
 
