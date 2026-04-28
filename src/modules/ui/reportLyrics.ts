@@ -148,7 +148,7 @@ export function showReportModal(lyricsId: number) {
   app.appendChild(overlay);
 }
 
-export function closeReportModal() {
+function closeReportModal() {
   modalInitiated = false;
   selected = null;
   const overlay = document.getElementsByClassName(MODAL_OVERLAY_CLASS)[0];
