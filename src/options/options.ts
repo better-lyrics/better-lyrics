@@ -2,9 +2,9 @@
 
 import { LOG_PREFIX, ROMANIZATION_LANGUAGES } from "@constants";
 import { getLanguageDisplayName, initI18n, loadLocaleOverride, SUPPORTED_LOCALES, t } from "@core/i18n";
+import { exportIdentity, getIdentity, importIdentity, type KeyIdentity } from "@core/keyIdentity";
 import Sortable from "sortablejs";
 import { showModal } from "./editor/ui/feedback";
-import { exportIdentity, getIdentity, importIdentity, type KeyIdentity } from "./store/keyIdentity";
 import { initStoreUI, setupYourThemesButton } from "./store/store";
 
 interface Options {
@@ -13,6 +13,7 @@ interface Options {
   isAlbumArtEnabled: boolean;
   isFullScreenDisabled: boolean;
   isStylizedAnimationsEnabled: boolean;
+  isPassiveScrollEnabled: boolean;
   isTranslateEnabled: boolean;
   translationLanguage: string;
   isCursorAutoHideEnabled: boolean;
@@ -46,6 +47,7 @@ const getOptionsFromForm = (): Options => {
     isAlbumArtEnabled: (document.getElementById("albumArt") as HTMLInputElement).checked,
     isFullScreenDisabled: (document.getElementById("isFullScreenDisabled") as HTMLInputElement).checked,
     isStylizedAnimationsEnabled: (document.getElementById("isStylizedAnimationsEnabled") as HTMLInputElement).checked,
+    isPassiveScrollEnabled: (document.getElementById("isPassiveScrollEnabled") as HTMLInputElement).checked,
     isTranslateEnabled: (document.getElementById("translate") as HTMLInputElement).checked,
     translationLanguage: (document.getElementById("translationLanguage") as HTMLInputElement).value,
     isCursorAutoHideEnabled: (document.getElementById("cursorAutoHide") as HTMLInputElement).checked,
@@ -62,7 +64,10 @@ const saveOptionsToStorage = (options: Options): void => {
   chrome.storage.sync.set(options, () => {
     chrome.tabs.query({ url: "https://music.youtube.com/*" }, tabs => {
       tabs.forEach(tab => {
-        chrome.tabs.sendMessage(tab.id!, { action: "updateSettings", settings: options });
+        chrome.tabs.sendMessage(tab.id!, {
+          action: "updateSettings",
+          settings: options,
+        });
       });
     });
   });
@@ -148,7 +153,12 @@ const subscribeToCacheInfo = (): void => {
 
   chrome.storage.onChanged.addListener((changes, area) => {
     if (area === "sync" && changes.cacheInfo) {
-      updateCacheInfo({ cacheInfo: changes.cacheInfo.newValue as { count: number; size: number } });
+      updateCacheInfo({
+        cacheInfo: changes.cacheInfo.newValue as {
+          count: number;
+          size: number;
+        },
+      });
     }
   });
 };
@@ -178,18 +188,24 @@ const restoreOptions = (): void => {
     isCursorAutoHideEnabled: true,
     isFullScreenDisabled: false,
     isStylizedAnimationsEnabled: true,
+    isPassiveScrollEnabled: true,
     isTranslateEnabled: false,
     translationLanguage: "en",
     isRomanizationEnabled: false,
     preferredProviderList: [
       "bLyrics-richsynced",
+      "unison-richsynced",
+      "binimum-richsynced",
       "musixmatch-richsync",
       "yt-captions",
       "bLyrics-synced",
+      "unison-synced",
+      "binimum-synced",
       "lrclib-synced",
       "legato-synced",
       "musixmatch-synced",
       "yt-lyrics",
+      "unison-plain",
       "lrclib-plain",
     ],
     romanizationDisabledLanguages: [],
@@ -211,6 +227,7 @@ const setOptionsInForm = (items: Options): void => {
   (document.getElementById("isFullScreenDisabled") as HTMLInputElement).checked = items.isFullScreenDisabled;
   (document.getElementById("isStylizedAnimationsEnabled") as HTMLInputElement).checked =
     items.isStylizedAnimationsEnabled;
+  (document.getElementById("isPassiveScrollEnabled") as HTMLInputElement).checked = items.isPassiveScrollEnabled;
   (document.getElementById("translate") as HTMLInputElement).checked = items.isTranslateEnabled;
   (document.getElementById("translationLanguage") as HTMLInputElement).value = items.translationLanguage;
   (document.getElementById("isRomanizationEnabled") as HTMLInputElement).checked = items.isRomanizationEnabled;
@@ -227,13 +244,18 @@ const setOptionsInForm = (items: Options): void => {
   // Always recreate in the default order to make sure no items go missing
   let unseenProviders = [
     "bLyrics-richsynced",
+    "unison-richsynced",
+    "binimum-richsynced",
     "musixmatch-richsync",
     "yt-captions",
     "bLyrics-synced",
+    "unison-synced",
+    "binimum-synced",
     "lrclib-synced",
     "legato-synced",
     "musixmatch-synced",
     "yt-lyrics",
+    "unison-plain",
     "lrclib-plain",
   ];
 
@@ -263,18 +285,43 @@ interface ProviderInfo {
 }
 
 const getProviderIdToInfoMap = (): { [key: string]: ProviderInfo } => ({
-  "musixmatch-richsync": { name: t("options_provider_musixmatch"), syncType: "word" },
-  "musixmatch-synced": { name: t("options_provider_musixmatch"), syncType: "line" },
-  "yt-captions": { name: t("options_provider_youtubeCaptions"), syncType: "line" },
+  "binimum-richsynced": { name: t("options_provider_binilyrics"), syncType: "syllable" },
+  "binimum-synced": { name: t("options_provider_binilyrics"), syncType: "line" },
+  "musixmatch-richsync": {
+    name: t("options_provider_musixmatch"),
+    syncType: "word",
+  },
+  "musixmatch-synced": {
+    name: t("options_provider_musixmatch"),
+    syncType: "line",
+  },
+  "unison-richsynced": { name: t("options_provider_betterLyricsUnison"), syncType: "syllable" },
+  "unison-synced": { name: t("options_provider_betterLyricsUnison"), syncType: "line" },
+  "unison-plain": { name: t("options_provider_betterLyricsUnison"), syncType: "unsynced" },
+  "yt-captions": {
+    name: t("options_provider_youtubeCaptions"),
+    syncType: "line",
+  },
   "lrclib-synced": { name: t("options_provider_lrclib"), syncType: "line" },
-  "bLyrics-richsynced": { name: t("options_provider_betterLyrics"), syncType: "syllable" },
-  "bLyrics-synced": { name: t("options_provider_betterLyrics"), syncType: "line" },
-  "legato-synced": { name: t("options_provider_betterLyricsLegato"), syncType: "line" },
+  "bLyrics-richsynced": {
+    name: t("options_provider_betterLyrics"),
+    syncType: "syllable",
+  },
+  "bLyrics-synced": {
+    name: t("options_provider_betterLyrics"),
+    syncType: "line",
+  },
+  "legato-synced": {
+    name: t("options_provider_betterLyricsLegato"),
+    syncType: "line",
+  },
   "yt-lyrics": { name: t("options_provider_youtube"), syncType: "unsynced" },
   "lrclib-plain": { name: t("options_provider_lrclib"), syncType: "unsynced" },
 });
 
-const getSyncTypeConfig = (): { [key in SyncType]: { label: string; icon: string; tooltip: string } } => ({
+const getSyncTypeConfig = (): {
+  [key in SyncType]: { label: string; icon: string; tooltip: string };
+} => ({
   syllable: {
     label: t("options_syncType_syllable"),
     tooltip: t("options_syncType_syllable_tooltip"),
@@ -484,7 +531,9 @@ document.addEventListener("DOMContentLoaded", () => {
   initLangExclusionsModal();
 
   document.getElementById("browse-themes-btn")?.addEventListener("click", () => {
-    chrome.tabs.create({ url: chrome.runtime.getURL("pages/marketplace.html") });
+    chrome.tabs.create({
+      url: chrome.runtime.getURL("pages/marketplace.html"),
+    });
   });
 
   initIdentityUI();

@@ -20,7 +20,7 @@ import {
   searchLyrics,
   submitLyrics,
 } from "@modules/unison/unisonApi";
-import { getDisplayName } from "@/options/store/keyIdentity";
+import { getDisplayName } from "@/core/keyIdentity";
 
 // -- SVG Icons --------------------------
 

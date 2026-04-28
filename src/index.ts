@@ -1,5 +1,5 @@
-import { AppState } from "@core/appState";
 import { INITIALIZE_LOG } from "@constants";
+import { AppState } from "@core/appState";
 import { injectI18nCssVars, loadLocaleOverride, subscribeToLocaleChanges } from "@core/i18n";
 import { purgeExpiredKeys, saveCacheInfo } from "@core/storage";
 import { initProviders } from "@modules/lyrics/providers/shared";
@@ -8,6 +8,7 @@ import {
   handleSettings,
   hideCursorOnIdle,
   listenForPopupMessages,
+  loadPassiveScrollSetting,
   loadTranslationSettings,
   onAlbumArtEnabled,
 } from "@modules/settings/settings";
@@ -17,8 +18,8 @@ import {
   enableLyricsTab,
   initializeLyrics,
   lyricReloader,
-  setupAltHoverHandler,
   setUpAvButtonListener,
+  setupAltHoverHandler,
   setupHomepageFullscreenHandler,
   setupWakeLockForFullscreen,
 } from "@modules/ui/observer";
@@ -43,6 +44,7 @@ async function modify(): Promise<void> {
   handleSettings();
   setupWakeLockForFullscreen();
   loadTranslationSettings();
+  loadPassiveScrollSetting();
   subscribeToCustomStyles();
   await purgeExpiredKeys();
   await saveCacheInfo();

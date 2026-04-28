@@ -2,8 +2,8 @@ import {
   AUTO_SWITCH_ENABLED_LOG,
   FULLSCREEN_BUTTON_SELECTOR,
   GENERAL_ERROR_LOG,
-  LYRICS_CLASS,
   LOG_PREFIX,
+  LYRICS_CLASS,
   LYRICS_TAB_CLICKED_LOG,
   LYRICS_WRAPPER_ID,
   PAUSING_LYRICS_SCROLL_LOG,
@@ -13,7 +13,9 @@ import {
   TAB_RENDERER_SELECTOR,
   USER_SCROLLING_CLASS,
 } from "@constants";
-import { AppState, handleModifications, reloadLyrics, type PlayerDetails } from "@core/appState";
+import { AppState, handleModifications, type PlayerDetails, reloadLyrics } from "@core/appState";
+import { preFetchLyrics } from "@modules/lyrics/lyrics";
+import { getSongMetadata } from "@modules/lyrics/requestSniffer/requestSniffer";
 import { onAutoSwitchEnabled, onFullScreenDisabled } from "@modules/settings/settings";
 import {
   animationEngine,
@@ -27,14 +29,13 @@ import {
   isPlayerPageOpen,
   openPlayerPageForFullscreen,
 } from "@modules/ui/navigation";
-import { getSongMetadata } from "@modules/lyrics/requestSniffer/requestSniffer";
-import { preFetchLyrics } from "@modules/lyrics/lyrics";
 import { log } from "@utils";
 import {
   addThumbnail,
   cleanup,
   injectSongAttributes,
   isLoaderActive,
+  preloadHighResThumbnail,
   renderLoader,
   resetThumbnailState,
   showYtThumbnail,
@@ -186,7 +187,7 @@ export function disableInertWhenFullscreen(): void {
             if (tabSelector && tabSelector.getAttribute("aria-selected") !== "true") {
               tabSelector.click();
               currentTab = 1;
-              if (AppState.areLyricsLoaded && AppState.lyricData?.syncType !== "none") {
+              if (AppState.areLyricsLoaded) {
                 AppState.areLyricsTicking = true;
               }
             }
@@ -225,7 +226,7 @@ export function lyricReloader(): void {
         setTimeout(() => {
           tabRenderer.scrollTop = scrollPositions[i];
           // Don't start ticking until we set the height
-          AppState.areLyricsTicking = AppState.areLyricsLoaded && AppState.lyricData?.syncType !== "none" && i === 1;
+          AppState.areLyricsTicking = AppState.areLyricsLoaded && i === 1;
         }, 0);
         currentTab = i;
 
@@ -285,7 +286,6 @@ export function initializeLyrics(): void {
       AppState.lastVideoId = currentVideoId;
       AppState.lastVideoDetails = currentVideoDetails;
       resetThumbnailState();
-      showYtThumbnail();
       if (!detail.song || !detail.artist) {
         log("Lyrics switched: Still waiting for metadata ", detail.videoId);
         return;
@@ -305,12 +305,14 @@ export function initializeLyrics(): void {
         if (AppState.lastVideoId !== videoIdAtStart) return;
 
         if (songMetadata?.isVideo && songMetadata.counterpartVideoId) {
-          songMetadata = await getSongMetadata(songMetadata.counterpartVideoId, 250, abortController.signal);
+          songMetadata = await getSongMetadata(songMetadata.counterpartVideoId, 10, abortController.signal);
           if (AppState.lastVideoId !== videoIdAtStart) return;
         }
 
         if (songMetadata) {
           addThumbnail(songMetadata.smallThumbnail);
+        } else {
+          showYtThumbnail();
         }
       });
     }
@@ -329,6 +331,7 @@ export function initializeLyrics(): void {
           }
 
           if (next) {
+            preloadHighResThumbnail(next.smallThumbnail);
             await preFetchLyrics(
               {
                 song: next.title,
@@ -396,13 +399,13 @@ export function scrollEventHandler(): void {
     if (animEngineState.scrollResumeTime < Date.now()) {
       log(PAUSING_LYRICS_SCROLL_LOG);
     }
-    animEngineState.scrollResumeTime = Date.now() + 25000;
-    if (!animEngineState.wasUserScrolling) {
-      getResumeScrollElement().removeAttribute("autoscroll-hidden");
-      const lyricsElement = document.getElementsByClassName(LYRICS_CLASS)[0] as HTMLElement;
-      lyricsElement.classList.add(USER_SCROLLING_CLASS);
-      animEngineState.wasUserScrolling = true;
-    }
+    const isPassive = AppState.lyricData?.syncType === "none";
+    animEngineState.scrollResumeTime = Date.now() + (isPassive ? 5000 : 25000);
+    animEngineState.wasUserScrolling = true;
+
+    getResumeScrollElement().removeAttribute("autoscroll-hidden");
+    const lyricsElement = document.getElementsByClassName(LYRICS_CLASS)[0] as HTMLElement;
+    lyricsElement.classList.add(USER_SCROLLING_CLASS);
   }
 }
 

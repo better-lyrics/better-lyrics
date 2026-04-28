@@ -71,11 +71,26 @@ jobs:
         continue-on-error: true
         run: npm run knip:fix
 
-      - name: Commit and push changes
+      - name: Check for changes and last author
+        id: check-changes
         if: steps.app-token.outputs.token != ''
+        run: |
+          if [ -n "$(git status --porcelain)" ]; then
+            echo "changes_detected=true" >> $GITHUB_OUTPUT
+            LAST_AUTHOR=$(git log -1 --pretty=format:'%an')
+            if [ "$LAST_AUTHOR" == "better-lyrics-harmonizer[bot]" ]; then
+              echo "::error::Infinite loop detected: Bot found more changes after its own auto-fix. Manual intervention required."
+              exit 1
+            fi
+          else
+            echo "changes_detected=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Commit and push changes
+        if: steps.app-token.outputs.token != '' && steps.check-changes.outputs.changes_detected == 'true'
         uses: planetscale/ghcommit-action@v0.2.19
         with:
-          commit_message: "Auto-fix: Apply Biome and Knip fixes [skip ci]"
+          commit_message: "Auto-fix: Apply Biome and Knip fixes"
           repo: ${{ github.repository }}
           branch: ${{ github.head_ref || github.ref_name }}
         env:

@@ -1,5 +1,5 @@
 import { LOG_PREFIX_UNISON, UNISON_API_BASE_URL } from "@constants";
-import { getIdentity, isKeyRegistered, markKeyRegistered, signPayload } from "@/options/store/keyIdentity";
+import { getIdentity, isKeyRegistered, markKeyRegistered, signPayload } from "@/core/keyIdentity";
 import { fetchWithTimeout } from "@/options/store/themeStoreService";
 import type {
   ReportReason,

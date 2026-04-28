@@ -39,6 +39,7 @@ interface AppStateType {
   romanizationDisabledLanguages: string[];
   translationDisabledLanguages: string[];
   translationLanguage: string;
+  isPassiveScrollEnabled: boolean;
   hasPreloadedNextSong: boolean;
   currentInjectionId: number;
 }
@@ -63,6 +64,7 @@ export const AppState: AppStateType = {
   romanizationDisabledLanguages: [],
   translationDisabledLanguages: [],
   translationLanguage: "en",
+  isPassiveScrollEnabled: true,
   hasPreloadedNextSong: false,
   currentInjectionId: 0,
 };

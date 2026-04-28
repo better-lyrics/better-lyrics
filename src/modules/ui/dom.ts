@@ -6,7 +6,7 @@ import {
   FOOTER_CLASS,
   FOOTER_NOT_VISIBLE_LOG,
   GENIUS_LOGO_SRC,
-  LOADER_ANIMATION_END_FAILED,
+  HIDDEN_CLASS,
   LOADER_TRANSITION_ENDED,
   LRCLIB_UPLOAD_URL,
   LYRICS_AD_OVERLAY_ID,
@@ -19,13 +19,14 @@ import {
   PLAYER_BAR_SELECTOR,
   PROVIDER_CONFIGS,
   ROMANIZED_LYRICS_CLASS,
+  type SyncType,
   TAB_RENDERER_SELECTOR,
   TRANSLATED_LYRICS_CLASS,
-  type SyncType,
-  HIDDEN_CLASS,
 } from "@constants";
-import { t } from "@core/i18n";
 import { AppState } from "@core/appState";
+import { t } from "@core/i18n";
+import { disconnectResizeObserver } from "@modules/lyrics/injectLyrics";
+import type { ThumbnailElement } from "@modules/lyrics/requestSniffer/NextResponse";
 import {
   animEngineState,
   getResumeScrollElement,
@@ -35,10 +36,17 @@ import {
   toMs,
 } from "@modules/ui/animationEngine";
 import { log } from "@utils";
+import { generatePetName } from "@/core/keyIdentity";
+import { byId, deleteVote, type UnisonData, vote } from "../lyrics/providers/unison";
 import { scrollEventHandler } from "./observer";
-import type { ThumbnailElement } from "@modules/lyrics/requestSniffer/NextResponse";
-import { disconnectResizeObserver } from "@modules/lyrics/injectLyrics";
-import { createVotingControls } from "@modules/unison/footerVoting";
+import { showReportModal } from "./reportLyrics";
+
+const votedIcons = {
+  upvote: `<svg xmlns="http://www.w3.org/2000/svg" height="20" viewBox="0 0 24 24" width="20" fill="currentColor"><path d="M9.221 1.795a1 1 0 011.109-.656l1.04.173a4 4 0 013.252 4.784L14 9h4.061a3.664 3.664 0 013.576 2.868A3.68 3.68 0 0121 14.85l.02.087A3.815 3.815 0 0120 18.5v.043l-.01.227a2.82 2.82 0 01-.135.663l-.106.282A3.754 3.754 0 0116.295 22h-3.606l-.392-.007a12.002 12.002 0 01-5.223-1.388l-.343-.189-.27-.154a2.005 2.005 0 00-.863-.26l-.13-.004H3.5a1.5 1.5 0 01-1.5-1.5V12.5A1.5 1.5 0 013.5 11h1.79l.157-.013a1 1 0 00.724-.512l.063-.145 2.987-8.535Zm-1.1 9.196A3 3 0 015.29 13H4v4.998h1.468a4 4 0 011.986.528l.27.155.285.157A10 10 0 0012.69 20h3.606c.754 0 1.424-.483 1.663-1.2l.03-.126a.819.819 0 00.012-.131v-.872l.587-.586c.388-.388.577-.927.523-1.465l-.038-.23-.02-.087-.21-.9.55-.744A1.663 1.663 0 0018.061 11H14a2.002 2.002 0 01-1.956-2.418l.623-2.904a2 2 0 00-1.626-2.392l-.21-.035-2.71 7.741Z"></path></svg>`,
+  upvoted: `<svg xmlns="http://www.w3.org/2000/svg" height="20" viewBox="0 0 24 24" width="20" fill="currentColor"><path d="M10.72 2.18a3.263 3.263 0 012.352 4.063l-.708 2.476a1 1 0 00.962 1.275h5.29c.848 0 1.624.48 2.003 1.238l.179.359a1.785 1.785 0 01-.6 2.279.446.446 0 00-.198.37v.07c0 .124.041.246.116.346a2.375 2.375 0 01-.41 3.278l-.5.399a.38.38 0 00-.123.416l.07.206c.217.653.1 1.372-.313 1.923a2.8 2.8 0 01-2.24 1.12l-3.914-.002a12 12 0 01-5.952-1.584l-.272-.155a2.002 2.002 0 00-.993-.265H3a1 1 0 01-1-1v-5.996a1 1 0 011.002-1L5.789 12a1 1 0 00.945-.67l3.02-8.628a.816.816 0 01.967-.523Z"></path></svg>`,
+  downvote: `<svg xmlns="http://www.w3.org/2000/svg" height="20" viewBox="0 0 24 24" width="20" fill="currentColor"><path d="m11.31 2 .392.007c1.824.06 3.61.534 5.223 1.388l.343.189.27.154c.264.152.56.24.863.26l.13.004H20.5a1.5 1.5 0 011.5 1.5V11.5a1.5 1.5 0 01-1.5 1.5h-1.79l-.158.013a1 1 0 00-.723.512l-.064.145-2.987 8.535a1 1 0 01-1.109.656l-1.04-.174a4 4 0 01-3.251-4.783L10 15H5.938a3.664 3.664 0 01-3.576-2.868A3.682 3.682 0 013 9.15l-.02-.088A3.816 3.816 0 014 5.5v-.043l.008-.227a2.86 2.86 0 01.136-.664l.107-.28A3.754 3.754 0 017.705 2h3.605ZM7.705 4c-.755 0-1.425.483-1.663 1.2l-.032.126a.818.818 0 00-.01.131v.872l-.587.586a1.816 1.816 0 00-.524 1.465l.038.23.02.087.21.9-.55.744a1.686 1.686 0 00-.321 1.18l.029.177c.17.76.844 1.302 1.623 1.302H10a2.002 2.002 0 011.956 2.419l-.623 2.904-.034.208a2.002 2.002 0 001.454 2.139l.206.045.21.035 2.708-7.741A3.001 3.001 0 0118.71 11H20V6.002h-1.47c-.696 0-1.38-.183-1.985-.528l-.27-.155-.285-.157A10.002 10.002 0 0011.31 4H7.705Z"></path></svg>`,
+  downvoted: `<svg xmlns="http://www.w3.org/2000/svg" height="20" viewBox="0 0 24 24" width="20" fill="currentColor"><path d="M11.313 2.002c2.088 0 4.14.546 5.953 1.583l.273.156a2 2 0 00.993.264H21a1 1 0 011 1V11a1 1 0 01-1.002 1l-2.787-.005a1 1 0 00-.946.67l-3.02 8.628a.815.815 0 01-.966.522 3.262 3.262 0 01-2.35-4.062l.707-2.477a1 1 0 00-.961-1.274h-5.29a2.24 2.24 0 01-2.004-1.238l-.18-.359a1.784 1.784 0 01.601-2.278.446.446 0 00.198-.37v-.07a.578.578 0 00-.116-.347 2.374 2.374 0 01.412-3.278l.498-.399a.379.379 0 00.123-.415l-.07-.207a2.1 2.1 0 01.313-1.923A2.798 2.798 0 017.4 2l3.913.002Z"></path></svg>`,
+};
 
 const syncTypeIcons: Record<SyncType, string> = {
   syllable: `<svg width="14" height="14" viewBox="0 0 1024 1024" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><rect x="636" y="239" width="389.981" height="233.271" rx="48" fill-opacity="0.5"/><path d="M0 335C0 289.745 0 267.118 14.0589 253.059C28.1177 239 50.7452 239 96 239H213C243.17 239 258.255 239 267.627 248.373C277 257.745 277 272.83 277 303V408C277 438.17 277 453.255 267.627 462.627C258.255 472 243.17 472 213 472H96C50.7452 472 28.1177 472 14.0589 457.941C0 443.882 0 421.255 0 376V335Z"/><path d="M337 304C337 273.83 337 258.745 346.373 249.373C355.745 240 370.83 240 401 240H460C505.255 240 527.882 240 541.941 254.059C556 268.118 556 290.745 556 336V377C556 422.255 556 444.882 541.941 458.941C527.882 473 505.255 473 460 473H401C370.83 473 355.745 473 346.373 463.627C337 454.255 337 439.17 337 409V304Z" fill-opacity="0.5"/><rect y="552.271" width="1024" height="233" rx="48" fill-opacity="0.5"/></svg>`,
@@ -62,6 +70,12 @@ function parseSvgString(svgString: string): SVGElement | null {
     return svg;
   }
   return null;
+}
+
+function setVoteIcon(button: HTMLElement, svgString: string): void {
+  const svg = parseSvgString(svgString);
+  button.replaceChildren();
+  if (svg) button.appendChild(svg);
 }
 
 const providerDisplayInfo: Record<string, { name: string; syncType: SyncType }> = Object.fromEntries(
@@ -190,7 +204,8 @@ export function addFooter(
   album: string,
   duration: number,
   providerKey?: string,
-  unisonId?: number
+  videoId?: string,
+  ...args: any[]
 ): void {
   if (document.getElementsByClassName(FOOTER_CLASS).length !== 0) {
     document.getElementsByClassName(FOOTER_CLASS)[0].remove();
@@ -200,7 +215,7 @@ export function addFooter(
   const footer = document.createElement("div");
   footer.classList.add(FOOTER_CLASS);
   lyricsElement.appendChild(footer);
-  createFooter(song, artist, album, duration);
+  createFooter(song, artist, album, duration, videoId);
 
   const footerLink = document.getElementById("betterLyricsFooterLink") as HTMLAnchorElement;
   sourceHref = sourceHref || "https://better-lyrics.boidu.dev/";
@@ -227,10 +242,207 @@ export function addFooter(
     footerLink.textContent = source || "boidu.dev";
   }
 
-  if (unisonId !== undefined) {
-    const votingControls = createVotingControls(unisonId);
-    footer.appendChild(votingControls);
+  if (source === "Unison" && args[0]) {
+    const unisonData: UnisonData = args[0];
+
+    const unisonContainer = document.createElement("div");
+    unisonContainer.className = `${FOOTER_CLASS}__unison`;
+
+    const unisonCard = document.createElement("div");
+    unisonCard.className = `${FOOTER_CLASS}__container ${FOOTER_CLASS}__unison-card`;
+
+    if (unisonData.submitter) {
+      const authorBlock = document.createElement("div");
+      authorBlock.className = `${FOOTER_CLASS}__unison-author`;
+
+      const authorRow = document.createElement("div");
+      authorRow.className = `${FOOTER_CLASS}__unison-author-row`;
+
+      const handleEl = document.createElement("strong");
+      handleEl.className = `${FOOTER_CLASS}__author-name`;
+      handleEl.textContent = generatePetName(unisonData.submitter.keyId);
+
+      const tier = getTrustTier(unisonData.submitter.reputation);
+      const tierEl = document.createElement("span");
+      tierEl.className = `${FOOTER_CLASS}__trust-tier`;
+      tierEl.dataset.tier = tier;
+      tierEl.textContent = t(`unison_tier_${tier}`);
+
+      authorRow.appendChild(handleEl);
+      authorRow.appendChild(tierEl);
+
+      const subLabel = document.createElement("div");
+      subLabel.className = `${FOOTER_CLASS}__unison-author-label`;
+      subLabel.textContent = t("unison_submitted_this");
+
+      authorBlock.appendChild(authorRow);
+      authorBlock.appendChild(subLabel);
+      unisonCard.appendChild(authorBlock);
+
+      const divider = document.createElement("div");
+      divider.className = `${FOOTER_CLASS}__unison-divider`;
+      unisonCard.appendChild(divider);
+    }
+
+    const actionsBlock = document.createElement("div");
+    actionsBlock.className = `${FOOTER_CLASS}__unison-actions-block`;
+
+    const actionRow = document.createElement("div");
+    actionRow.className = `${FOOTER_CLASS}__unison-actions`;
+
+    const unisonUpvote = document.createElement("button");
+    unisonUpvote.className = `${FOOTER_CLASS}__vote`;
+    setVoteIcon(unisonUpvote, unisonData.vote === 1 ? votedIcons.upvoted : votedIcons.upvote);
+
+    const unisonDownvote = document.createElement("button");
+    unisonDownvote.className = `${FOOTER_CLASS}__vote`;
+    setVoteIcon(unisonDownvote, unisonData.vote === -1 ? votedIcons.downvoted : votedIcons.downvote);
+
+    const scoreLine = document.createElement("div");
+    scoreLine.className = `${FOOTER_CLASS}__unison-score-line`;
+    const scoreNum = document.createElement("strong");
+    const scoreLabel = document.createElement("span");
+    const scoreSeparator = document.createElement("span");
+    scoreSeparator.textContent = " · ";
+    const voteNum = document.createElement("strong");
+    const voteLabel = document.createElement("span");
+    scoreLine.appendChild(scoreNum);
+    scoreLine.appendChild(scoreLabel);
+    scoreLine.appendChild(scoreSeparator);
+    scoreLine.appendChild(voteNum);
+    scoreLine.appendChild(voteLabel);
+    const scoreLineRefs = { scoreNum, scoreLabel, voteNum, voteLabel };
+    setScoreLine(scoreLineRefs, unisonData.effectiveScore, unisonData.votes);
+
+    unisonUpvote.addEventListener("click", async () => {
+      if (unisonData.vote === 1) {
+        setVoteIcon(unisonUpvote, votedIcons.upvote);
+        const res = await deleteVote(unisonData.lyricsId);
+        if (!res.ok && res.status !== 404) {
+          setVoteIcon(unisonUpvote, votedIcons.upvoted);
+          return;
+        }
+
+        let data = await byId(unisonData.lyricsId);
+        if (data) {
+          unisonData.effectiveScore = data.effectiveScore;
+          unisonData.votes = data.voteCount;
+          unisonData.vote = data.userVote;
+          setScoreLine(scoreLineRefs, data.effectiveScore, data.voteCount);
+        }
+      } else {
+        setVoteIcon(unisonUpvote, votedIcons.upvoted);
+        const res = await vote(unisonData.lyricsId, true);
+        if (!res.ok && res.status !== 409) {
+          setVoteIcon(unisonUpvote, votedIcons.upvote);
+          return;
+        }
+        setVoteIcon(unisonDownvote, votedIcons.downvote);
+
+        let data = await byId(unisonData.lyricsId);
+        if (!data) {
+          return;
+        }
+
+        unisonData.effectiveScore = data.effectiveScore;
+        unisonData.votes = data.voteCount;
+        unisonData.vote = data.userVote;
+        setScoreLine(scoreLineRefs, data.effectiveScore, data.voteCount);
+      }
+    });
+
+    unisonDownvote.addEventListener("click", async () => {
+      if (unisonData.vote === -1) {
+        setVoteIcon(unisonDownvote, votedIcons.downvote);
+        const res = await deleteVote(unisonData.lyricsId);
+        if (!res.ok && res.status !== 404) {
+          setVoteIcon(unisonDownvote, votedIcons.downvoted);
+          return;
+        }
+
+        let data = await byId(unisonData.lyricsId);
+        if (data) {
+          unisonData.effectiveScore = data.effectiveScore;
+          unisonData.votes = data.voteCount;
+          unisonData.vote = data.userVote;
+          setScoreLine(scoreLineRefs, data.effectiveScore, data.voteCount);
+        }
+      } else {
+        setVoteIcon(unisonDownvote, votedIcons.downvoted);
+        const res = await vote(unisonData.lyricsId, false);
+        if (!res.ok && res.status !== 409) {
+          setVoteIcon(unisonDownvote, votedIcons.downvote);
+          return;
+        }
+        setVoteIcon(unisonUpvote, votedIcons.upvote);
+
+        let data = await byId(unisonData.lyricsId);
+        if (!data) {
+          return;
+        }
+
+        unisonData.effectiveScore = data.effectiveScore;
+        unisonData.votes = data.voteCount;
+        unisonData.vote = data.userVote;
+        setScoreLine(scoreLineRefs, data.effectiveScore, data.voteCount);
+      }
+    });
+
+    const unisonReport = document.createElement("button");
+    unisonReport.className = `${FOOTER_CLASS}__vote`;
+    unisonReport.addEventListener("click", () => showReportModal(unisonData.lyricsId));
+
+    const unisonReportSVG = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+    unisonReportSVG.setAttribute("viewBox", "0 0 18 18");
+    unisonReportSVG.setAttribute("fill", "currentColor");
+    unisonReportSVG.setAttribute("width", "20");
+    unisonReportSVG.setAttribute("height", "20");
+
+    const unisonReportSVGPath = document.createElementNS("http://www.w3.org/2000/svg", "path");
+    unisonReportSVGPath.setAttribute(
+      "d",
+      "m3 2.25-.11.055c-.392.196-.64.597-.64 1.036v12.41a.75.75 0 101.5 0v-4.87a5.451 5.451 0 014.687.087L9 11.25l.357.166A6.701 6.701 0 0015 11.25l.11-.055c.343-.171.575-.5.628-.873l.012-.163V3.344a.908.908 0 00-1.313-.812 5.45 5.45 0 01-4.874 0L9 2.25a6.7 6.7 0 00-6 0Zm5.33 1.342.564.282a6.95 6.95 0 005.356.356v5.715a5.2 5.2 0 01-4.58-.037l-.564-.282A6.95 6.95 0 003.75 9.27V3.555a5.2 5.2 0 014.58.037Z"
+    );
+
+    unisonReportSVG.appendChild(unisonReportSVGPath);
+    unisonReport.appendChild(unisonReportSVG);
+
+    actionRow.appendChild(unisonUpvote);
+    actionRow.appendChild(unisonDownvote);
+    actionRow.appendChild(unisonReport);
+
+    actionsBlock.appendChild(actionRow);
+    actionsBlock.appendChild(scoreLine);
+
+    unisonCard.appendChild(actionsBlock);
+    unisonContainer.appendChild(unisonCard);
+    footer.prepend(unisonContainer);
   }
+}
+
+interface ScoreLineRefs {
+  scoreNum: HTMLElement;
+  scoreLabel: HTMLElement;
+  voteNum: HTMLElement;
+  voteLabel: HTMLElement;
+}
+
+function formatScoreNumber(score: number): string {
+  return Number.isInteger(score) ? score.toString() : score.toFixed(2);
+}
+
+function setScoreLine(refs: ScoreLineRefs, score: number, votes: number): void {
+  refs.scoreNum.textContent = formatScoreNumber(score);
+  refs.scoreLabel.textContent = ` ${t("unison_score_label")}`;
+  refs.voteNum.textContent = String(votes);
+  refs.voteLabel.textContent = ` ${votes === 1 ? t("unison_vote_singular") : t("unison_vote_plural")}`;
+}
+
+function getTrustTier(reputation: number): "new" | "trusted" | "veteran" | "expert" {
+  if (reputation < 0.5) return "new";
+  if (reputation < 1.5) return "trusted";
+  if (reputation < 1.85) return "veteran";
+  return "expert";
 }
 
 /**
@@ -241,7 +453,7 @@ export function addFooter(
  * @param album - Album name
  * @param duration - Song duration in seconds
  */
-function createFooter(song: string, artist: string, album: string, duration: number): void {
+function createFooter(song: string, artist: string, album: string, duration: number, videoId?: string): void {
   try {
     const footer = document.getElementsByClassName(FOOTER_CLASS)[0] as HTMLElement;
     footer.replaceChildren();
@@ -282,6 +494,7 @@ function createFooter(song: string, artist: string, album: string, duration: num
     if (artist) lrclibUrl.searchParams.append("artist", artist);
     if (album) lrclibUrl.searchParams.append("album", album);
     if (duration) lrclibUrl.searchParams.append("duration", duration.toString());
+    if (videoId) lrclibUrl.searchParams.append("videoId", videoId);
     footerLink.target = "_blank";
 
     const addLyricsContainer = createActionButton({
@@ -544,6 +757,17 @@ function getContainerSize(): number {
   return Math.round(Math.max(document.getElementById("thumbnail")?.getBoundingClientRect().width || 0, 544));
 }
 
+function getHighResImageUrl(smallThumbnail: ThumbnailElement) {
+  const containerSize = getContainerSize();
+  let url = smallThumbnail.url;
+  if (url && /w\d+-h\d+/.test(url)) {
+    url = url.replace(/w\d+-h\d+/, `w${containerSize}-h${containerSize}`);
+  } else {
+    url = url.replace(/\/(sd|hq|mq)?default\.jpg/, "/maxresdefault.jpg");
+  }
+  return url;
+}
+
 export function addThumbnail(smallThumbnail: ThumbnailElement): void {
   thumbnailResizeObserver?.disconnect();
 
@@ -558,30 +782,17 @@ export function addThumbnail(smallThumbnail: ThumbnailElement): void {
     document.getElementById("thumbnail")?.appendChild(imgElm);
   }
 
-  if (lastLoadedThumbnail !== smallThumbnail) {
-    imgElm.src = smallThumbnail.url;
-    imgElm.classList.remove(HIDDEN_CLASS);
-    setBackgroundImage(smallThumbnail.url);
-  }
-  lastLoadedThumbnail = smallThumbnail;
-
   const containerSize = getContainerSize();
-
-  let url = smallThumbnail.url;
-  if (url && /w\d+-h\d+/.test(url)) {
-    url = url.replace(/w\d+-h\d+/, `w${containerSize}-h${containerSize}`);
-  } else {
-    url = url.replace(/\/(sd|hq|mq)?default\.jpg/, "/maxresdefault.jpg");
-  }
-
-  const proxy = new Image();
-  proxy.src = url;
+  const url = getHighResImageUrl(smallThumbnail);
 
   albumArtLoadController?.abort();
   const loadController = new AbortController();
   albumArtLoadController = loadController;
 
-  proxy.onload = () => {
+  const proxy = new Image();
+  proxy.src = url;
+
+  const setHighResImage = () => {
     if (loadController.signal.aborted) return;
 
     imgElm.src = proxy.src;
@@ -601,6 +812,26 @@ export function addThumbnail(smallThumbnail: ThumbnailElement): void {
     });
     thumbnailResizeObserver.observe(thumbnailElm);
   };
+
+  if (proxy.complete) {
+    lastLoadedThumbnail = smallThumbnail;
+    setHighResImage();
+  } else {
+    if (lastLoadedThumbnail !== smallThumbnail) {
+      imgElm.src = smallThumbnail.url;
+      imgElm.classList.remove(HIDDEN_CLASS);
+      setBackgroundImage(smallThumbnail.url);
+    }
+
+    lastLoadedThumbnail = smallThumbnail;
+
+    proxy.onload = setHighResImage;
+  }
+}
+
+export function preloadHighResThumbnail(smallThumbnail: ThumbnailElement) {
+  const proxy = new Image();
+  proxy.src = getHighResImageUrl(smallThumbnail);
 }
 
 export function showYtThumbnail(): void {
@@ -642,6 +873,7 @@ export function addNoLyricsButton(
   if (artist) lrclibUrl.searchParams.append("artist", artist);
   if (album) lrclibUrl.searchParams.append("album", album);
   if (duration) lrclibUrl.searchParams.append("duration", duration.toString());
+  if (videoId) lrclibUrl.searchParams.append("videoId", videoId);
 
   const addLyricsButton = createActionButton({
     text: t("lyrics_addToLrclib"),

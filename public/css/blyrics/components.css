@@ -232,7 +232,7 @@
 .blyrics-footer {
 	height: 0;
 	display: flex;
-	align-items: center;
+	align-items: flex-start;
 	gap: 1rem;
 	direction: ltr;
 	position: relative;
@@ -265,6 +265,146 @@
 	filter: brightness(10);
 }
 
+.blyrics-footer__vote {
+	background-color: var(--blyrics-footer-bg-color);
+	border: none;
+	box-shadow: rgba(0, 0, 0, 0.05) 0px 10px 15px -3px, rgba(0, 0, 0, 0.025) 0px 4px 6px -2px, inset rgba(255, 255, 255, 0.1) 0px 1px 0px 0px;
+	color: var(--blyrics-footer-link-color);
+	width: 30px;
+	height: 30px;
+	padding: 0.5rem;
+	box-sizing: border-box;
+	border-radius: var(--blyrics-small-border-radius);
+	display: grid;
+	place-items: center;
+	transition: background-color 0.2s;
+}
+
+.blyrics-footer__vote svg {
+	width: 16px;
+	height: 16px;
+}
+
+.blyrics-footer__vote:hover {
+	background-color: var(--blyrics-vote-hover-color);
+}
+
+/* The "Even Better Lyrics" theme scales every direct div child of
+   .blyrics-user-scrolling on hover; we don't want that on the footer. */
+.blyrics-container > .blyrics-footer:hover,
+.blyrics-user-scrolling > .blyrics-footer:hover {
+	transform: none;
+}
+
+.blyrics-footer__unison {
+	flex-basis: 100%;
+	width: 100%;
+	display: flex;
+	margin-bottom: 2rem;
+}
+
+.blyrics-footer__container.blyrics-footer__unison-card {
+	background-color: hsla(0, 0%, 100%, 0.04);
+	border: none;
+	box-shadow:
+		rgba(0, 0, 0, 0.05) 0px 10px 15px -3px,
+		rgba(0, 0, 0, 0.025) 0px 4px 6px -2px,
+		inset rgba(255, 255, 255, 0.1) 0px 1px 0px 0px;
+	border-radius: 14px;
+	padding: 1rem 1rem 1rem 1.5rem;
+	width: fit-content;
+	max-width: 100%;
+	flex-direction: row;
+	align-items: stretch;
+	gap: 1.25rem;
+	white-space: normal;
+}
+
+.blyrics-footer__unison-author {
+	display: flex;
+	flex-direction: column;
+	gap: 0.25rem;
+	justify-content: center;
+	min-width: 0;
+}
+
+.blyrics-footer__unison-author-row {
+	display: flex;
+	align-items: center;
+	gap: 0.5rem;
+	font-size: 14px;
+}
+
+.blyrics-footer__author-name {
+	font-weight: 600;
+	color: var(--blyrics-footer-link-color);
+}
+
+.blyrics-footer__unison-author-label {
+	font-size: 11px;
+	color: var(--blyrics-footer-text-color);
+}
+
+.blyrics-footer__unison-divider {
+	width: 1px;
+	align-self: stretch;
+	background-color: hsla(0, 0%, 100%, 0.04);
+}
+
+.blyrics-footer__unison-actions-block {
+	display: flex;
+	flex-direction: column;
+	gap: 0.5rem;
+	align-items: flex-end;
+}
+
+.blyrics-footer__unison-actions {
+	display: flex;
+	align-items: center;
+	gap: 0.5rem;
+}
+
+.blyrics-footer__unison-score-line {
+	font-size: 11px;
+	font-variant-numeric: tabular-nums;
+	color: var(--blyrics-footer-text-color);
+}
+
+.blyrics-footer__unison-score-line > strong {
+	color: var(--blyrics-footer-link-color);
+	font-weight: 500;
+}
+
+.blyrics-footer__trust-tier {
+	text-transform: uppercase;
+	letter-spacing: 0.04em;
+	font-size: 10px;
+	font-weight: 600;
+	padding: 0.2rem 0.6rem;
+	border-radius: 0.5rem;
+	background-color: hsla(0, 0%, 100%, 0.08);
+}
+
+.blyrics-footer__trust-tier[data-tier="new"] {
+	color: hsl(220, 70%, 75%);
+	background-color: hsla(220, 70%, 60%, 0.15);
+}
+
+.blyrics-footer__trust-tier[data-tier="trusted"] {
+	color: hsl(140, 55%, 70%);
+	background-color: hsla(140, 55%, 50%, 0.15);
+}
+
+.blyrics-footer__trust-tier[data-tier="veteran"] {
+	color: hsl(280, 60%, 78%);
+	background-color: hsla(280, 60%, 60%, 0.18);
+}
+
+.blyrics-footer__trust-tier[data-tier="expert"] {
+	color: hsl(45, 80%, 70%);
+	background-color: hsla(45, 80%, 55%, 0.2);
+}
+
 .blyrics-footer__container {
 	align-items: center;
 	background-color: var(--blyrics-footer-bg-color);
@@ -282,6 +422,14 @@
 	white-space: pre;
 	width: fit-content;
 	z-index: 2;
+}
+
+.blyrics-footer__container[class*="transparent"] {
+	background-color: transparent;
+	border: none;
+	padding: 0;
+	display: flex;
+	gap: .75rem;
 }
 
 .blyrics-footer__container > a {

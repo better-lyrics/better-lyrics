@@ -1,12 +1,14 @@
 import { LYRIC_SOURCE_KEYS, PROVIDER_CONFIGS, PROVIDER_SWITCHED_LOG } from "@constants";
+import { getTransientStorage, setTransientStorage } from "@core/storage";
 import { log } from "@utils";
-import bLyrics from "./blyrics/blyrics";
+import binimum from "./binimum";
+import bLyrics from "./blyrics";
 import cubey, { type CubeyLyricSourceResult } from "./cubey";
+import legato from "./legato";
 import lyricLib from "./lrclib";
+import unison, { type UnisonLyricSourceResult } from "./unison";
 import ytLyrics, { type YTLyricSourceResult } from "./yt";
 import { ytCaptions } from "./ytCaptions";
-import legato from "./legato";
-import { getTransientStorage, setTransientStorage } from "@core/storage";
 
 /** Current version of the lyrics cache format */
 const LYRIC_CACHE_VERSION = "2.0.0";
@@ -45,7 +47,7 @@ interface AudioTrackData {
 interface LyricSource {
   filled: boolean;
   resultCached: boolean;
-  lyricSourceResult: LyricSourceResult | CubeyLyricSourceResult | YTLyricSourceResult | null;
+  lyricSourceResult: LyricSourceResult | CubeyLyricSourceResult | UnisonLyricSourceResult | YTLyricSourceResult | null;
   lyricSourceFiller: (providerParameters: ProviderParameters) => Promise<void>;
 }
 
@@ -68,7 +70,8 @@ export interface Lyric {
   key?: string;
   parts?: LyricPart[];
   agent?: string;
-  translation?: { text: string; lang: string };
+  translations?: { [lang: string]: string };
+  translation?: { text: string; lang: string }; // old property
   romanization?: string;
   timedRomanization?: LyricPart[];
   isInstrumental?: boolean;
@@ -145,8 +148,13 @@ export function initProviders(): void {
 }
 
 const sourceKeyToFillFn = {
+  "binimum-richsynced": binimum,
+  "binimum-synced": binimum,
   "bLyrics-richsynced": bLyrics,
   "bLyrics-synced": bLyrics,
+  "unison-richsynced": unison,
+  "unison-synced": unison,
+  "unison-plain": unison,
   "musixmatch-richsync": cubey,
   "musixmatch-synced": cubey,
   "lrclib-synced": lyricLib,
