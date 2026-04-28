@@ -754,10 +754,6 @@
     "message": "Source: ",
     "description": "Lyrics source label"
   },
-  "lyrics_addToLrclib": {
-    "message": "Add Lyrics to LRCLib",
-    "description": "Add lyrics button text"
-  },
   "lyrics_searchOnGenius": {
     "message": "Search on Genius",
     "description": "Search on Genius button text"
@@ -928,10 +924,6 @@
     "message": "Submit lyrics with Unison",
     "description": "Button text for submitting lyrics to Unison"
   },
-  "lyrics_createInComposer": {
-    "message": "Create in Composer",
-    "description": "Button text for creating synced lyrics in Composer"
-  },
   "unison_pageTitle": {
     "message": "Unison - Better Lyrics",
     "description": "Page title for the Unison dashboard"
@@ -1048,14 +1040,6 @@
     "message": "Load more",
     "description": "Load more button for feed pagination"
   },
-  "unison_recentlyAdded": {
-    "message": "Recently added",
-    "description": "Feed section label"
-  },
-  "unison_lyricsBy": {
-    "message": "Submitted by",
-    "description": "Attribution prefix for lyrics submitter"
-  },
   "unison_votes": {
     "message": "votes",
     "description": "Vote count label"
@@ -1063,10 +1047,6 @@
   "unison_createInComposer": {
     "message": "Create synced lyrics",
     "description": "Create in Composer link text in dashboard"
-  },
-  "unison_composerDescription": {
-    "message": "Use Composer to create word-synced TTML or LRC lyrics",
-    "description": "Description for the Composer link"
   },
   "unison_song": {
     "message": "Song",

@@ -709,10 +709,6 @@
     "message": "Sumber: ",
     "description": "Lyrics source label"
   },
-  "lyrics_addToLrclib": {
-    "message": "Tambahkan Lirik ke LRCLIB",
-    "description": "Add lyrics button text"
-  },
   "lyrics_searchOnGenius": {
     "message": "Cari di Genius",
     "description": "Search on Genius button text"

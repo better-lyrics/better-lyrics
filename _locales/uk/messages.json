@@ -709,10 +709,6 @@
     "message": "Джерело: ",
     "description": "Lyrics source label"
   },
-  "lyrics_addToLrclib": {
-    "message": "Додати тексти пісень до LRCLib",
-    "description": "Add lyrics button text"
-  },
   "lyrics_searchOnGenius": {
     "message": "Пошук на Genius",
     "description": "Search on Genius button text"

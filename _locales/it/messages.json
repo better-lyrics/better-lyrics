@@ -709,10 +709,6 @@
     "message": "Fonte: ",
     "description": "Lyrics source label"
   },
-  "lyrics_addToLrclib": {
-    "message": "Aggiungi testi a LRCLib",
-    "description": "Add lyrics button text"
-  },
   "lyrics_searchOnGenius": {
     "message": "Cerca su Genius",
     "description": "Search on Genius button text"

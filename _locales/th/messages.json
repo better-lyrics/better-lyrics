@@ -709,10 +709,6 @@
     "message": "ที่มา: ",
     "description": "Lyrics source label"
   },
-  "lyrics_addToLrclib": {
-    "message": "เพิ่มเนื้อเพลงที่ LRCLib",
-    "description": "Add lyrics button text"
-  },
   "lyrics_searchOnGenius": {
     "message": "ค้นหาบน Genius",
     "description": "Search on Genius button text"

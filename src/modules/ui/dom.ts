@@ -305,6 +305,7 @@ function createUnisonFooterCard(unisonData: UnisonData): HTMLElement {
 
       let data = await byId(unisonData.lyricsId);
       if (!data) {
+        setVoteIcon(unisonUpvote, votedIcons.upvote);
         return;
       }
 
@@ -343,6 +344,7 @@ function createUnisonFooterCard(unisonData: UnisonData): HTMLElement {
 
       let data = await byId(unisonData.lyricsId);
       if (!data) {
+        setVoteIcon(unisonDownvote, votedIcons.downvote);
         return;
       }
 

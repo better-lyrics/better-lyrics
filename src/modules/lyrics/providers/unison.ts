@@ -1,4 +1,4 @@
-import { UNISON_API_URL } from "@/core/constants";
+import { LOG_PREFIX_UNISON, UNISON_API_URL } from "@/core/constants";
 import { getIdentity, signPayload } from "@/core/keyIdentity";
 import { parseLRC, parsePlainLyrics } from "./lrcUtils";
 import type { LyricSourceResult, ProviderParameters } from "./shared";
@@ -46,51 +46,65 @@ export interface UnisonData {
 }
 
 export async function vote(lyricsId: number, upvote: boolean) {
-  const url = new URL(UNISON_API_URL + "/" + lyricsId + "/vote");
-
-  const response = await fetch(url.toString(), {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(await signPayload({ vote: upvote ? 1 : -1 })),
-  });
-
-  return { ok: response.ok, status: response.status };
+  try {
+    const url = new URL(UNISON_API_URL + "/" + lyricsId + "/vote");
+    const response = await fetch(url.toString(), {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(await signPayload({ vote: upvote ? 1 : -1 })),
+    });
+    return { ok: response.ok, status: response.status };
+  } catch (err) {
+    console.warn(`${LOG_PREFIX_UNISON} vote failed`, err);
+    return { ok: false, status: 0 };
+  }
 }
 
 export async function deleteVote(lyricsId: number) {
-  const url = new URL(UNISON_API_URL + "/" + lyricsId + "/vote");
-
-  const response = await fetch(url.toString(), {
-    method: "DELETE",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(await signPayload({})),
-  });
-
-  return { ok: response.ok, status: response.status };
+  try {
+    const url = new URL(UNISON_API_URL + "/" + lyricsId + "/vote");
+    const response = await fetch(url.toString(), {
+      method: "DELETE",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(await signPayload({})),
+    });
+    return { ok: response.ok, status: response.status };
+  } catch (err) {
+    console.warn(`${LOG_PREFIX_UNISON} deleteVote failed`, err);
+    return { ok: false, status: 0 };
+  }
 }
 
 export async function report(lyricsId: number, reason: UnisonReportReason | string, details?: string) {
-  const url = new URL(UNISON_API_URL + "/" + lyricsId + "/report");
-
-  const response = await fetch(url.toString(), {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(await signPayload({ reason, details })),
-  });
-
-  return { ok: response.ok, status: response.status };
+  try {
+    const url = new URL(UNISON_API_URL + "/" + lyricsId + "/report");
+    const response = await fetch(url.toString(), {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(await signPayload({ reason, details })),
+    });
+    return { ok: response.ok, status: response.status };
+  } catch (err) {
+    console.warn(`${LOG_PREFIX_UNISON} report failed`, err);
+    return { ok: false, status: 0 };
+  }
 }
 
 export async function byId(lyricsId: number): Promise<UnisonResponse | null> {
-  const url = new URL(UNISON_API_URL + "/" + lyricsId);
-  const response = await fetch(url.toString(), {
-    headers: { "x-key-id": (await getIdentity()).keyId },
-  });
+  try {
+    const url = new URL(UNISON_API_URL + "/" + lyricsId);
+    const response = await fetch(url.toString(), {
+      headers: { "x-key-id": (await getIdentity()).keyId },
+    });
 
-  if (!response.ok) {
+    if (!response.ok) {
+      return null;
+    }
+    return response.json().then(json => json.data);
+  } catch (err) {
+    console.warn(`${LOG_PREFIX_UNISON} byId failed`, err);
     return null;
   }
-  return response.json().then(json => json.data);
 }
 
 export default async function unison(providerParameters: ProviderParameters): Promise<void> {

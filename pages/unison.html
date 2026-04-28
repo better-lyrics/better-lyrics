@@ -40,7 +40,7 @@
 						<svg class="unison-search-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
 							<path fill-rule="evenodd" d="M9 3.5a5.5 5.5 0 1 0 0 11 5.5 5.5 0 0 0 0-11ZM2 9a7 7 0 1 1 12.452 4.391l3.328 3.329a.75.75 0 1 1-1.06 1.06l-3.329-3.328A7 7 0 0 1 2 9Z" clip-rule="evenodd" />
 						</svg>
-						<input type="text" id="unison-search" class="unison-search-input" placeholder="__MSG_unison_searchPlaceholder__" />
+						<input type="text" id="unison-search" class="unison-search-input" aria-label="__MSG_unison_search__" placeholder="__MSG_unison_searchPlaceholder__" />
 						<div class="unison-search-hint"><kbd>/</kbd></div>
 					</div>
 					<button id="unison-submit-nav-btn" class="unison-nav-btn">
@@ -153,9 +153,6 @@
 					</div>
 				</div>
 			</section>
-
-			<!-- Toast -->
-			<div id="unison-toast" class="unison-toast"></div>
 		</div>
 
 		<script type="module" defer src="../src/options/unison/unison.ts"></script>

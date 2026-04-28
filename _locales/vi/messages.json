@@ -709,10 +709,6 @@
     "message": "Nguồn: ",
     "description": "Lyrics source label"
   },
-  "lyrics_addToLrclib": {
-    "message": "Thêm lời bài hát vào LRCLib",
-    "description": "Add lyrics button text"
-  },
   "lyrics_searchOnGenius": {
     "message": "Tìm trên Genius",
     "description": "Search on Genius button text"

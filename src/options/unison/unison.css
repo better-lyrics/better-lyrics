@@ -1050,31 +1050,6 @@ select.unison-input {
   margin-top: 0.5rem;
 }
 
-/* -- Toast --------------------------  */
-
-.unison-toast {
-  position: fixed;
-  bottom: 1.5rem;
-  left: 50%;
-  transform: translateX(-50%) translateY(120%);
-  background: #3e3e41;
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  border-radius: 0.5rem;
-  padding: 0.5rem 1rem;
-  font-size: 0.8125rem;
-  color: rgba(255, 255, 255, 0.9);
-  pointer-events: none;
-  opacity: 0;
-  transition: transform 0.2s ease, opacity 0.2s ease;
-  z-index: 200;
-  box-shadow: rgba(0, 0, 0, 0.3) 0px 10px 30px -5px;
-}
-
-.unison-toast--visible {
-  transform: translateX(-50%) translateY(0);
-  opacity: 1;
-}
-
 /* -- Responsive --------------------------  */
 
 @media (max-width: 768px) {

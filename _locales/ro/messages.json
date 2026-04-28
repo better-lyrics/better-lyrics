@@ -709,10 +709,6 @@
     "message": "Sursă: ",
     "description": "Lyrics source label"
   },
-  "lyrics_addToLrclib": {
-    "message": "Adaugă versuri la LRCLib",
-    "description": "Add lyrics button text"
-  },
   "lyrics_searchOnGenius": {
     "message": "Caută pe Genius",
     "description": "Search on Genius button text"

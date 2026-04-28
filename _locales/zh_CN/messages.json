@@ -709,10 +709,6 @@
     "message": "来源：",
     "description": "Lyrics source label"
   },
-  "lyrics_addToLrclib": {
-    "message": "添加歌词到 LRCLib",
-    "description": "Add lyrics button text"
-  },
   "lyrics_searchOnGenius": {
     "message": "在 Genius 上搜索",
     "description": "Search on Genius button text"

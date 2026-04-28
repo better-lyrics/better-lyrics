@@ -709,10 +709,6 @@
     "message": "Bron: ",
     "description": "Lyrics source label"
   },
-  "lyrics_addToLrclib": {
-    "message": "Songteksten toevoegen aan LRCLib",
-    "description": "Add lyrics button text"
-  },
   "lyrics_searchOnGenius": {
     "message": "Zoek op Genius",
     "description": "Search on Genius button text"

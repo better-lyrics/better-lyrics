@@ -709,10 +709,6 @@
     "message": "소스: ",
     "description": "Lyrics source label"
   },
-  "lyrics_addToLrclib": {
-    "message": "LRCLib에 가사 추가",
-    "description": "Add lyrics button text"
-  },
   "lyrics_searchOnGenius": {
     "message": "Genius에서 검색",
     "description": "Search on Genius button text"

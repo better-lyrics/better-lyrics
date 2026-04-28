@@ -709,10 +709,6 @@
     "message": "ソース：",
     "description": "Lyrics source label"
   },
-  "lyrics_addToLrclib": {
-    "message": "LRCLibに歌詞を追加",
-    "description": "Add lyrics button text"
-  },
   "lyrics_searchOnGenius": {
     "message": "Geniusで検索",
     "description": "Search on Genius button text"

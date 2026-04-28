@@ -709,10 +709,6 @@
     "message": "來源：",
     "description": "Lyrics source label"
   },
-  "lyrics_addToLrclib": {
-    "message": "新增歌詞到 LRCLib",
-    "description": "Add lyrics button text"
-  },
   "lyrics_searchOnGenius": {
     "message": "在 Genius 上搜尋",
     "description": "Search on Genius button text"
