@@ -416,7 +416,15 @@ export function addFooter(
 
     unisonCard.appendChild(actionsBlock);
     unisonContainer.appendChild(unisonCard);
-    footer.prepend(unisonContainer);
+
+    unisonContainer.addEventListener("click", e => {
+      if ((e.target as HTMLElement).closest("button")) return;
+      const url = new URL(chrome.runtime.getURL("pages/unison.html"));
+      url.searchParams.set("id", String(unisonData.lyricsId));
+      window.open(url.toString(), "_blank", "noopener,noreferrer");
+    });
+
+    footer.appendChild(unisonContainer);
   }
 }
 

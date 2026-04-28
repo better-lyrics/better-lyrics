@@ -16,15 +16,13 @@ function addRadioCheckbox(modal: HTMLElement, id: string, text: string) {
   const button = document.createElement("button");
   button.className = `${MODAL_CLASS}--radio-button`;
 
-  button.addEventListener("click", () => {
+  radioCheckbox.addEventListener("click", () => {
     if (selected === id) {
       return;
     }
     const radios = Array.from(document.getElementsByClassName(`${MODAL_CLASS}--radio`));
-    document.startViewTransition(() => {
-      radios.forEach(el => el.classList.remove("blyrics-radio-selected"));
-      radioCheckbox.classList.add("blyrics-radio-selected");
-    });
+    radios.forEach(el => el.classList.remove("blyrics-radio-selected"));
+    radioCheckbox.classList.add("blyrics-radio-selected");
     selected = id;
   });
 

@@ -300,7 +300,7 @@
 	flex-basis: 100%;
 	width: 100%;
 	display: flex;
-	margin-bottom: 2rem;
+	margin-top: 2rem;
 }
 
 .blyrics-footer__container.blyrics-footer__unison-card {
@@ -318,6 +318,12 @@
 	align-items: stretch;
 	gap: 1.25rem;
 	white-space: normal;
+	cursor: pointer;
+	transition: background-color 0.15s ease;
+}
+
+.blyrics-footer__container.blyrics-footer__unison-card:hover {
+	background-color: hsla(0, 0%, 100%, 0.08);
 }
 
 .blyrics-footer__unison-author {
