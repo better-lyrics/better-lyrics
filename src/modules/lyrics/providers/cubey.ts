@@ -73,9 +73,9 @@ export type CubeyLyricSourceResult = LyricSourceResult & {
 };
 
 import { log } from "@core/utils";
-import { lrcFixers, parseLRC, parsePlainLyrics } from "./lrcUtils";
-import { fillTtml } from "@modules/lyrics/providers/blyrics/blyrics";
 import { CUBEY_LYRICS_API_URL, CUBEY_LYRICS_API_URL_TURNSTILE } from "@/core/constants";
+import { lrcFixers, parseLRC, parsePlainLyrics } from "./lrcUtils";
+import { fillTtml } from "./ttmlUtils";
 
 /**
  *

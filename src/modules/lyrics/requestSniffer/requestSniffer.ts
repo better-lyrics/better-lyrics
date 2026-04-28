@@ -1,5 +1,5 @@
-import { log } from "@utils";
 import type { LongBylineText, NextResponse, ThumbnailElement } from "@modules/lyrics/requestSniffer/NextResponse";
+import { log } from "@utils";
 import { parseTime } from "./utils";
 
 interface Segment {

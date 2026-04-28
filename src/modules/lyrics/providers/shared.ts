@@ -2,10 +2,11 @@ import { LYRIC_SOURCE_KEYS, PROVIDER_CONFIGS, PROVIDER_SWITCHED_LOG } from "@con
 import { getTransientStorage, setTransientStorage } from "@core/storage";
 import { log } from "@utils";
 import binimum from "./binimum";
-import bLyrics from "./blyrics/blyrics";
+import bLyrics from "./blyrics";
 import cubey, { type CubeyLyricSourceResult } from "./cubey";
 import legato from "./legato";
 import lyricLib from "./lrclib";
+import unison, { type UnisonLyricSourceResult } from "./unison";
 import ytLyrics, { type YTLyricSourceResult } from "./yt";
 import { ytCaptions } from "./ytCaptions";
 
@@ -46,7 +47,7 @@ interface AudioTrackData {
 interface LyricSource {
   filled: boolean;
   resultCached: boolean;
-  lyricSourceResult: LyricSourceResult | CubeyLyricSourceResult | YTLyricSourceResult | null;
+  lyricSourceResult: LyricSourceResult | CubeyLyricSourceResult | UnisonLyricSourceResult | YTLyricSourceResult | null;
   lyricSourceFiller: (providerParameters: ProviderParameters) => Promise<void>;
 }
 
@@ -57,6 +58,7 @@ export interface LyricSourceResult {
   sourceHref: string;
   musicVideoSynced?: boolean | null;
   cacheAllowed?: boolean;
+  unisonId?: number;
 }
 
 export type LyricsArray = Lyric[];
@@ -150,6 +152,9 @@ const sourceKeyToFillFn = {
   "binimum-synced": binimum,
   "bLyrics-richsynced": bLyrics,
   "bLyrics-synced": bLyrics,
+  "unison-richsynced": unison,
+  "unison-synced": unison,
+  "unison-plain": unison,
   "musixmatch-richsync": cubey,
   "musixmatch-synced": cubey,
   "lrclib-synced": lyricLib,
