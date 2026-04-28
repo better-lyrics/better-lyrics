@@ -91,6 +91,58 @@
     "message": "Автопрокрутка несинхронизированных текстов",
     "description": "Auto-scroll unsynced lyrics setting label"
   },
+  "options_display_unisonActions": {
+    "message": "Unison Actions",
+    "description": "Display-section row label for the Unison Actions modal trigger"
+  },
+  "options_unisonModal_title": {
+    "message": "Unison Actions",
+    "description": "Title of the Unison Actions modal"
+  },
+  "options_unisonModal_showPinned": {
+    "message": "Show pinned actions",
+    "description": "Toggle label inside the Unison Actions modal for the floating dock"
+  },
+  "options_unisonModal_showPinned_hint": {
+    "message": "A floating control to upvote, downvote, or report Unison lyrics",
+    "description": "Hint text under the Show pinned actions toggle"
+  },
+  "options_unisonModal_autoHide": {
+    "message": "Auto-hide in fullscreen",
+    "description": "Toggle label inside the Unison Actions modal for auto-hiding the dock when idle in fullscreen"
+  },
+  "options_unisonModal_autoHide_hint": {
+    "message": "Hide the floating control when you are idle in fullscreen mode",
+    "description": "Hint text under the Auto-hide in fullscreen toggle"
+  },
+  "options_unisonModal_position": {
+    "message": "Position",
+    "description": "Label above the visual position picker in the Unison Actions modal"
+  },
+  "options_unisonModal_position_topLeft": {
+    "message": "Top left",
+    "description": "Tooltip for the top-left cell in the Unison position picker"
+  },
+  "options_unisonModal_position_topCenter": {
+    "message": "Top center",
+    "description": "Tooltip for the top-center cell in the Unison position picker"
+  },
+  "options_unisonModal_position_topRight": {
+    "message": "Top right",
+    "description": "Tooltip for the top-right cell in the Unison position picker"
+  },
+  "options_unisonModal_position_bottomLeft": {
+    "message": "Bottom left",
+    "description": "Tooltip for the bottom-left cell in the Unison position picker"
+  },
+  "options_unisonModal_position_bottomCenter": {
+    "message": "Bottom center",
+    "description": "Tooltip for the bottom-center cell in the Unison position picker"
+  },
+  "options_unisonModal_position_bottomRight": {
+    "message": "Bottom right",
+    "description": "Tooltip for the bottom-right cell in the Unison position picker"
+  },
   "options_language_displayLanguage": {
     "message": "Язык интерфейса",
     "description": "Label for the UI language selector dropdown"
@@ -886,79 +938,79 @@
     "description": "Section title for custom themes in the theme chooser modal"
   },
   "lyrics_submitToUnison": {
-    "message": "Submit lyrics with Unison",
+    "message": "Отправить текст песни с Унисон",
     "description": "Button text for submitting lyrics to Unison"
   },
   "unison_pageTitle": {
-    "message": "Unison - Better Lyrics",
+    "message": "Унисон - Better Lyrics",
     "description": "Page title for the Unison dashboard"
   },
   "unison_title": {
-    "message": "Unison",
+    "message": "Унисон",
     "description": "Unison branding title"
   },
   "unison_subtitle": {
-    "message": "Community Lyrics",
+    "message": "Тексты сообщества",
     "description": "Unison subtitle text"
   },
   "unison_search": {
-    "message": "Search lyrics",
+    "message": "Искать текст",
     "description": "Search button label"
   },
   "unison_searchPlaceholder": {
-    "message": "Search songs, artists, or lyrics...",
+    "message": "Искать песню, артиста, или текст...",
     "description": "Search input placeholder"
   },
   "unison_submit": {
-    "message": "Submit Lyrics",
+    "message": "Отправить текст",
     "description": "Submit lyrics button text"
   },
   "unison_submitSuccess": {
-    "message": "Lyrics submitted!",
+    "message": "Текст отправлен!",
     "description": "Success message after submitting lyrics"
   },
   "unison_submitDescription": {
-    "message": "Submit community lyrics for any YouTube Music track. Paste LRC (timestamped), TTML (XML), or plain text. Synced formats are prioritized.",
+    "message": "Отправьте тексты сообщества для любого трека YouTube. Вставьте LRC (с таймингами), TTML (XML) или обычный текст. Синхронизированные форматы являются приоритетными.",
     "description": "Description text for the submission form"
   },
   "unison_composerHintPrefix": {
-    "message": "Use",
+    "message": "Использовать",
     "description": "Text before Composer link in submit hint"
   },
   "unison_composerHintSuffix": {
-    "message": "to create word-synced lyrics from scratch.",
+    "message": ", чтобы создать текст с нуля.",
     "description": "Text after Composer link in submit hint"
   },
   "unison_upvote": {
-    "message": "Upvote",
+    "message": "Апвоут",
     "description": "Upvote button tooltip"
   },
   "unison_downvote": {
-    "message": "Downvote",
+    "message": "Даунвоут",
     "description": "Downvote button tooltip"
   },
   "unison_report": {
-    "message": "Report",
+    "message": "Пожаловаться",
     "description": "Report button tooltip"
   },
   "unison_reportSuccess": {
-    "message": "Reported",
+    "message": "Жалоба отправлена",
     "description": "Report success tooltip text"
   },
   "unison_report_wrong_song": {
-    "message": "Wrong song",
+    "message": "Неверная песня",
     "description": "Report reason: wrong song"
   },
   "unison_report_bad_sync": {
-    "message": "Bad sync",
+    "message": "Плохая синхронизация",
     "description": "Report reason: bad synchronization"
   },
   "unison_report_offensive": {
-    "message": "Offensive",
+    "message": "Оскорбления",
     "description": "Report reason: offensive content"
   },
   "unison_report_spam": {
-    "message": "Spam",
+    "message": "Спам",
     "description": "Report reason: spam"
   },
   "unison_report_other": {
