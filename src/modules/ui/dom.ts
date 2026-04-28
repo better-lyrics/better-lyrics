@@ -21,6 +21,7 @@ import {
   type SyncType,
   TAB_RENDERER_SELECTOR,
   TRANSLATED_LYRICS_CLASS,
+  UNISON_DOCK_CLASS,
 } from "@constants";
 import { AppState } from "@core/appState";
 import { t } from "@core/i18n";
@@ -242,8 +243,100 @@ export function addFooter(
   }
 
   if (source === "Unison" && unisonData) {
+    AppState.currentUnisonData = unisonData;
     footer.appendChild(createUnisonFooterCard(unisonData));
+    if (AppState.isUnisonPinnedDockEnabled) {
+      mountUnisonDock(unisonData, AppState.unisonPinnedDockPosition);
+    }
+  } else {
+    AppState.currentUnisonData = null;
+    unmountUnisonDock();
   }
+}
+
+const unisonControlsRegistry = {
+  upvotes: [] as HTMLButtonElement[],
+  downvotes: [] as HTMLButtonElement[],
+  scoreLineRefs: [] as ScoreLineRefs[],
+};
+
+let unisonDockObserver: IntersectionObserver | null = null;
+
+function refreshUnisonControls(unisonData: UnisonData): void {
+  for (const btn of unisonControlsRegistry.upvotes) {
+    setVoteIcon(btn, unisonData.vote === 1 ? votedIcons.upvoted : votedIcons.upvote);
+  }
+  for (const btn of unisonControlsRegistry.downvotes) {
+    setVoteIcon(btn, unisonData.vote === -1 ? votedIcons.downvoted : votedIcons.downvote);
+  }
+  for (const refs of unisonControlsRegistry.scoreLineRefs) {
+    setScoreLine(refs, unisonData.effectiveScore, unisonData.votes);
+  }
+}
+
+function clearUnisonControlsRegistry(): void {
+  unisonControlsRegistry.upvotes.length = 0;
+  unisonControlsRegistry.downvotes.length = 0;
+  unisonControlsRegistry.scoreLineRefs.length = 0;
+}
+
+type VoteUpdateData = NonNullable<Awaited<ReturnType<typeof byId>>>;
+
+function applyServerVoteData(unisonData: UnisonData, data: VoteUpdateData): void {
+  unisonData.effectiveScore = data.effectiveScore;
+  unisonData.votes = data.voteCount;
+  unisonData.vote = data.userVote;
+  refreshUnisonControls(unisonData);
+}
+
+function setOptimisticVote(unisonData: UnisonData, value: 1 | -1 | null): void {
+  unisonData.vote = value;
+  refreshUnisonControls(unisonData);
+}
+
+function buildUnisonVoteButton(unisonData: UnisonData, voteValue: 1 | -1): HTMLButtonElement {
+  const btn = document.createElement("button");
+  btn.className = `${FOOTER_CLASS}__vote`;
+
+  const activeIcon = voteValue === 1 ? votedIcons.upvoted : votedIcons.downvoted;
+  const inactiveIcon = voteValue === 1 ? votedIcons.upvote : votedIcons.downvote;
+  setVoteIcon(btn, unisonData.vote === voteValue ? activeIcon : inactiveIcon);
+
+  const registry = voteValue === 1 ? unisonControlsRegistry.upvotes : unisonControlsRegistry.downvotes;
+  registry.push(btn);
+
+  btn.addEventListener("click", async e => {
+    e.stopPropagation();
+    const wasActive = unisonData.vote === voteValue;
+
+    if (wasActive) {
+      setOptimisticVote(unisonData, null);
+      const res = await deleteVote(unisonData.lyricsId);
+      if (!res.ok && res.status !== 404) {
+        setOptimisticVote(unisonData, voteValue);
+        return;
+      }
+      const data = await byId(unisonData.lyricsId);
+      if (data) applyServerVoteData(unisonData, data);
+      return;
+    }
+
+    const prevVote = unisonData.vote;
+    setOptimisticVote(unisonData, voteValue);
+    const res = await vote(unisonData.lyricsId, voteValue === 1);
+    if (!res.ok && res.status !== 409) {
+      setOptimisticVote(unisonData, prevVote);
+      return;
+    }
+    const data = await byId(unisonData.lyricsId);
+    if (!data) {
+      setOptimisticVote(unisonData, prevVote);
+      return;
+    }
+    applyServerVoteData(unisonData, data);
+  });
+
+  return btn;
 }
 
 function createUnisonFooterCard(unisonData: UnisonData): HTMLElement {
@@ -266,94 +359,12 @@ function createUnisonFooterCard(unisonData: UnisonData): HTMLElement {
   const actionRow = document.createElement("div");
   actionRow.className = `${FOOTER_CLASS}__unison-actions`;
 
-  const unisonUpvote = document.createElement("button");
-  unisonUpvote.className = `${FOOTER_CLASS}__vote`;
-  setVoteIcon(unisonUpvote, unisonData.vote === 1 ? votedIcons.upvoted : votedIcons.upvote);
-
-  const unisonDownvote = document.createElement("button");
-  unisonDownvote.className = `${FOOTER_CLASS}__vote`;
-  setVoteIcon(unisonDownvote, unisonData.vote === -1 ? votedIcons.downvoted : votedIcons.downvote);
+  const unisonUpvote = buildUnisonVoteButton(unisonData, 1);
+  const unisonDownvote = buildUnisonVoteButton(unisonData, -1);
 
   const { scoreLine, scoreLineRefs } = createScoreLine();
+  unisonControlsRegistry.scoreLineRefs.push(scoreLineRefs);
   setScoreLine(scoreLineRefs, unisonData.effectiveScore, unisonData.votes);
-
-  unisonUpvote.addEventListener("click", async e => {
-    e.stopPropagation();
-    if (unisonData.vote === 1) {
-      setVoteIcon(unisonUpvote, votedIcons.upvote);
-      const res = await deleteVote(unisonData.lyricsId);
-      if (!res.ok && res.status !== 404) {
-        setVoteIcon(unisonUpvote, votedIcons.upvoted);
-        return;
-      }
-
-      let data = await byId(unisonData.lyricsId);
-      if (data) {
-        unisonData.effectiveScore = data.effectiveScore;
-        unisonData.votes = data.voteCount;
-        unisonData.vote = data.userVote;
-        setScoreLine(scoreLineRefs, data.effectiveScore, data.voteCount);
-      }
-    } else {
-      setVoteIcon(unisonUpvote, votedIcons.upvoted);
-      const res = await vote(unisonData.lyricsId, true);
-      if (!res.ok && res.status !== 409) {
-        setVoteIcon(unisonUpvote, votedIcons.upvote);
-        return;
-      }
-      setVoteIcon(unisonDownvote, votedIcons.downvote);
-
-      let data = await byId(unisonData.lyricsId);
-      if (!data) {
-        setVoteIcon(unisonUpvote, votedIcons.upvote);
-        return;
-      }
-
-      unisonData.effectiveScore = data.effectiveScore;
-      unisonData.votes = data.voteCount;
-      unisonData.vote = data.userVote;
-      setScoreLine(scoreLineRefs, data.effectiveScore, data.voteCount);
-    }
-  });
-
-  unisonDownvote.addEventListener("click", async e => {
-    e.stopPropagation();
-    if (unisonData.vote === -1) {
-      setVoteIcon(unisonDownvote, votedIcons.downvote);
-      const res = await deleteVote(unisonData.lyricsId);
-      if (!res.ok && res.status !== 404) {
-        setVoteIcon(unisonDownvote, votedIcons.downvoted);
-        return;
-      }
-
-      let data = await byId(unisonData.lyricsId);
-      if (data) {
-        unisonData.effectiveScore = data.effectiveScore;
-        unisonData.votes = data.voteCount;
-        unisonData.vote = data.userVote;
-        setScoreLine(scoreLineRefs, data.effectiveScore, data.voteCount);
-      }
-    } else {
-      setVoteIcon(unisonDownvote, votedIcons.downvoted);
-      const res = await vote(unisonData.lyricsId, false);
-      if (!res.ok && res.status !== 409) {
-        setVoteIcon(unisonDownvote, votedIcons.downvote);
-        return;
-      }
-      setVoteIcon(unisonUpvote, votedIcons.upvote);
-
-      let data = await byId(unisonData.lyricsId);
-      if (!data) {
-        setVoteIcon(unisonDownvote, votedIcons.downvote);
-        return;
-      }
-
-      unisonData.effectiveScore = data.effectiveScore;
-      unisonData.votes = data.voteCount;
-      unisonData.vote = data.userVote;
-      setScoreLine(scoreLineRefs, data.effectiveScore, data.voteCount);
-    }
-  });
 
   const unisonReport = createReportButton(unisonData.lyricsId);
 
@@ -375,6 +386,55 @@ function createUnisonFooterCard(unisonData: UnisonData): HTMLElement {
   });
 
   return unisonContainer;
+}
+
+export function mountUnisonDock(unisonData: UnisonData, position: string): void {
+  if (document.getElementsByClassName(UNISON_DOCK_CLASS).length > 0) {
+    return;
+  }
+  const sidePanel = document.querySelector("#side-panel");
+  if (!sidePanel) return;
+
+  const dock = document.createElement("div");
+  dock.className = UNISON_DOCK_CLASS;
+  dock.dataset.position = position;
+
+  const inner = document.createElement("div");
+  inner.className = `${UNISON_DOCK_CLASS}__inner`;
+
+  inner.appendChild(buildUnisonVoteButton(unisonData, 1));
+  inner.appendChild(buildUnisonVoteButton(unisonData, -1));
+  inner.appendChild(createReportButton(unisonData.lyricsId));
+
+  dock.appendChild(inner);
+  sidePanel.appendChild(dock);
+
+  const card = document.querySelector<HTMLElement>(`.${FOOTER_CLASS}__unison-card`);
+  if (card) {
+    unisonDockObserver = new IntersectionObserver(
+      entries => {
+        for (const entry of entries) {
+          dock.classList.toggle(`${UNISON_DOCK_CLASS}--hidden`, entry.isIntersecting);
+        }
+      },
+      { threshold: 0.4 }
+    );
+    unisonDockObserver.observe(card);
+  }
+}
+
+export function unmountUnisonDock(): void {
+  if (unisonDockObserver) {
+    unisonDockObserver.disconnect();
+    unisonDockObserver = null;
+  }
+  const dock = document.getElementsByClassName(UNISON_DOCK_CLASS)[0];
+  if (dock) dock.remove();
+}
+
+export function updateUnisonDockPosition(position: string): void {
+  const dock = document.getElementsByClassName(UNISON_DOCK_CLASS)[0] as HTMLElement | undefined;
+  if (dock) dock.dataset.position = position;
 }
 
 function createSubmitterBlock(submitter: NonNullable<UnisonData["submitter"]>): HTMLElement {
@@ -988,6 +1048,10 @@ export function cleanup(): void {
   if (blyricsFooter) {
     blyricsFooter.remove();
   }
+
+  unmountUnisonDock();
+  clearUnisonControlsRegistry();
+  AppState.currentUnisonData = null;
 
   getResumeScrollElement().setAttribute("autoscroll-hidden", "true");
 

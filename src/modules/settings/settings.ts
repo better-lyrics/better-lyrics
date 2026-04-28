@@ -4,7 +4,7 @@ import { clearCache, compileRicsToStyles, getStorage } from "@core/storage";
 import { log, setUpLog } from "@core/utils";
 import { calculateLyricPositions } from "@modules/lyrics/injectLyrics";
 import { clearCache as clearTranslationCache } from "@modules/lyrics/translation";
-import { reloadAlbumArt } from "@modules/ui/dom";
+import { mountUnisonDock, reloadAlbumArt, unmountUnisonDock, updateUnisonDockPosition } from "@modules/ui/dom";
 import { applyCustomStyles, getAndApplyCustomStyles } from "@modules/ui/styleInjector";
 
 let hasInitializedMessageListener = false;
@@ -193,6 +193,7 @@ export function listenForPopupMessages(): void {
       handleSettings();
       loadTranslationSettings();
       loadPassiveScrollSetting();
+      loadUnisonPinnedDockSettings(syncUnisonDock);
       AppState.shouldInjectAlbumArt = "Unknown";
       onAlbumArtEnabled(
         () => {
@@ -222,6 +223,25 @@ export function loadPassiveScrollSetting(): void {
   getStorage({ isPassiveScrollEnabled: true }, items => {
     AppState.isPassiveScrollEnabled = items.isPassiveScrollEnabled;
   });
+}
+
+export function loadUnisonPinnedDockSettings(callback?: () => void): void {
+  getStorage({ isUnisonPinnedDockEnabled: false, unisonPinnedDockPosition: "bottom-right" }, items => {
+    AppState.isUnisonPinnedDockEnabled = items.isUnisonPinnedDockEnabled;
+    AppState.unisonPinnedDockPosition = items.unisonPinnedDockPosition;
+    callback?.();
+  });
+}
+
+function syncUnisonDock(): void {
+  if (!AppState.isUnisonPinnedDockEnabled) {
+    unmountUnisonDock();
+    return;
+  }
+  if (AppState.currentUnisonData) {
+    mountUnisonDock(AppState.currentUnisonData, AppState.unisonPinnedDockPosition);
+    updateUnisonDockPosition(AppState.unisonPinnedDockPosition);
+  }
 }
 
 /**

@@ -22,6 +22,8 @@ interface Options {
   romanizationDisabledLanguages: string[];
   translationDisabledLanguages: string[];
   uiLanguage: string;
+  isUnisonPinnedDockEnabled: boolean;
+  unisonPinnedDockPosition: string;
 }
 
 const saveOptions = (): void => {
@@ -56,6 +58,8 @@ const getOptionsFromForm = (): Options => {
     romanizationDisabledLanguages: romanizationDisabledLanguages,
     translationDisabledLanguages: translationDisabledLanguages,
     uiLanguage: (document.getElementById("uiLanguage") as HTMLSelectElement).value,
+    isUnisonPinnedDockEnabled: (document.getElementById("isUnisonPinnedDockEnabled") as HTMLInputElement).checked,
+    unisonPinnedDockPosition: (document.getElementById("unisonPinnedDockPosition") as HTMLSelectElement).value,
   };
 };
 
@@ -211,6 +215,8 @@ const restoreOptions = (): void => {
     romanizationDisabledLanguages: [],
     translationDisabledLanguages: [],
     uiLanguage: "auto",
+    isUnisonPinnedDockEnabled: false,
+    unisonPinnedDockPosition: "bottom-right",
   };
 
   chrome.storage.sync.get(defaultOptions, setOptionsInForm);
@@ -232,6 +238,8 @@ const setOptionsInForm = (items: Options): void => {
   (document.getElementById("translationLanguage") as HTMLInputElement).value = items.translationLanguage;
   (document.getElementById("isRomanizationEnabled") as HTMLInputElement).checked = items.isRomanizationEnabled;
   (document.getElementById("uiLanguage") as HTMLSelectElement).value = items.uiLanguage;
+  (document.getElementById("isUnisonPinnedDockEnabled") as HTMLInputElement).checked = items.isUnisonPinnedDockEnabled;
+  (document.getElementById("unisonPinnedDockPosition") as HTMLSelectElement).value = items.unisonPinnedDockPosition;
   romanizationDisabledLanguages = items.romanizationDisabledLanguages || [];
   translationDisabledLanguages = items.translationDisabledLanguages || [];
   updateExclusionsConfigVisibility();

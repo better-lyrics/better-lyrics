@@ -94,6 +94,38 @@
     "message": "Auto-scroll unsynced lyrics",
     "description": "Auto-scroll unsynced lyrics setting label"
   },
+  "options_display_pinUnisonActions": {
+    "message": "Pin Unison actions",
+    "description": "Toggle label for the floating Unison upvote/downvote/report dock"
+  },
+  "options_display_pinUnisonActionsPosition": {
+    "message": "Pin position",
+    "description": "Label for the position selector of the Unison pinned dock"
+  },
+  "options_display_pinUnisonActionsPosition_topLeft": {
+    "message": "Top left",
+    "description": "Top-left option for Unison pinned dock position"
+  },
+  "options_display_pinUnisonActionsPosition_topCenter": {
+    "message": "Top center",
+    "description": "Top-center option for Unison pinned dock position"
+  },
+  "options_display_pinUnisonActionsPosition_topRight": {
+    "message": "Top right",
+    "description": "Top-right option for Unison pinned dock position"
+  },
+  "options_display_pinUnisonActionsPosition_bottomLeft": {
+    "message": "Bottom left",
+    "description": "Bottom-left option for Unison pinned dock position"
+  },
+  "options_display_pinUnisonActionsPosition_bottomCenter": {
+    "message": "Bottom center",
+    "description": "Bottom-center option for Unison pinned dock position"
+  },
+  "options_display_pinUnisonActionsPosition_bottomRight": {
+    "message": "Bottom right",
+    "description": "Bottom-right option for Unison pinned dock position"
+  },
 
   "options_language_displayLanguage": {
     "message": "Display Language",

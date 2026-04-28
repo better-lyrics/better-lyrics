@@ -395,6 +395,87 @@
 	background-color: hsla(0, 0%, 100%, 0.08);
 }
 
+#side-panel:has(.blyrics-unison-dock) {
+	position: relative;
+}
+
+.blyrics-unison-dock {
+	position: absolute;
+	z-index: 50;
+	pointer-events: none;
+	transform: translateY(var(--dock-y-shift, 0));
+	transition: transform 125ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+#side-panel:has(.autoscroll-resume-button:not([autoscroll-hidden="true"])) .blyrics-unison-dock[data-position="top-center"] {
+	--dock-y-shift: 72px;
+}
+
+.blyrics-unison-dock[data-position="top-left"] {
+	top: 64px;
+	left: 0;
+}
+
+.blyrics-unison-dock[data-position="top-center"] {
+	top: 64px;
+	left: 50%;
+	--dock-tx: -50%;
+}
+
+.blyrics-unison-dock[data-position="top-right"] {
+	top: 64px;
+	right: 0;
+}
+
+.blyrics-unison-dock[data-position="bottom-left"] {
+	bottom: 16px;
+	left: 0;
+}
+
+.blyrics-unison-dock[data-position="bottom-center"] {
+	bottom: 16px;
+	left: 50%;
+	--dock-tx: -50%;
+}
+
+.blyrics-unison-dock[data-position="bottom-right"] {
+	bottom: 16px;
+	right: 0;
+}
+
+.blyrics-unison-dock__inner {
+	pointer-events: auto;
+	background-color: hsla(0, 0%, 100%, 0.04);
+	box-shadow:
+		rgba(0, 0, 0, 0.3) 0 10px 24px -6px,
+		inset rgba(255, 255, 255, 0.1) 0 1px 0 0;
+	backdrop-filter: blur(12px);
+	border-radius: 14px;
+	padding: 8px;
+	display: flex;
+	align-items: center;
+	gap: 6px;
+	transform: translateX(var(--dock-tx, 0)) scale(1);
+	opacity: 1;
+	filter: blur(0);
+	transition:
+		transform 320ms cubic-bezier(0.4, 0, 0.2, 1),
+		opacity 320ms cubic-bezier(0.4, 0, 0.2, 1),
+		filter 320ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.blyrics-unison-dock__inner .blyrics-footer__vote {
+	width: 32px;
+	height: 32px;
+}
+
+.blyrics-unison-dock--hidden .blyrics-unison-dock__inner {
+	transform: translateX(var(--dock-tx, 0)) scale(0.85);
+	opacity: 0;
+	filter: blur(8px);
+	pointer-events: none;
+}
+
 .blyrics-footer__trust-tier[data-tier="new"] {
 	color: hsl(220, 70%, 75%);
 	background-color: hsla(220, 70%, 60%, 0.15);

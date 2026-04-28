@@ -10,6 +10,7 @@ import {
   listenForPopupMessages,
   loadPassiveScrollSetting,
   loadTranslationSettings,
+  loadUnisonPinnedDockSettings,
   onAlbumArtEnabled,
 } from "@modules/settings/settings";
 import { injectHeadTags, reloadAlbumArt, setupAdObserver } from "@modules/ui/dom";
@@ -45,6 +46,7 @@ async function modify(): Promise<void> {
   setupWakeLockForFullscreen();
   loadTranslationSettings();
   loadPassiveScrollSetting();
+  loadUnisonPinnedDockSettings();
   subscribeToCustomStyles();
   await purgeExpiredKeys();
   await saveCacheInfo();
