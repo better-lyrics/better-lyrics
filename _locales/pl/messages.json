@@ -299,6 +299,10 @@
     "message": "Better Lyrics Legato",
     "description": "Better Lyrics Legato provider name"
   },
+  "options_provider_betterLyricsUnison": {
+    "message": "Better Lyrics Unison",
+    "description": "Better Lyrics Unison provider name"
+  },
   "options_provider_musixmatch": {
     "message": "Musixmatch",
     "description": "Musixmatch provider name"
@@ -884,5 +888,93 @@
   "theme_modal_section_custom": {
     "message": "Własne motywy",
     "description": "Section title for custom themes in the theme chooser modal"
+  },
+  "report_lyrics_title": {
+    "message": "Report Lyrics",
+    "description": "Title for the report lyrics modal"
+  },
+  "report_lyrics_info": {
+    "message": "Specify the reason why the lyrics for this song are not compatible",
+    "description": "Information about using the report lyrics modal"
+  },
+  "report_lyrics_wrong_song": {
+    "message": "Wrong song or version",
+    "description": "Reason for the report that the lyrics are for the wrong song or version"
+  },
+  "report_lyrics_bad_sync": {
+    "message": "Bad synchronization",
+    "description": "Reason for the report that the lyrics are too off on the part synchronization"
+  },
+  "report_lyrics_offensive": {
+    "message": "Offensive",
+    "description": "Reason for the report that the lyrics are offensive or too offensive"
+  },
+  "report_lyrics_spam": {
+    "message": "Spam or lyrics are irrelevant to the song",
+    "description": "Reason for the report that the lyrics are a spam attempt and/or irrelevant with the sung parts"
+  },
+  "report_lyrics_other": {
+    "message": "Other reason",
+    "description": "Reason for the report that the lyrics is bad in other reasons"
+  },
+  "report_lyrics_details_placeholder": {
+    "message": "Additional details about this report",
+    "description": "Placeholder for report lyrics details input"
+  },
+  "report_lyrics_submit": {
+    "message": "Submit",
+    "description": "Submit button for reporting lyrics"
+  },
+  "report_lyrics_cancel": {
+    "message": "Cancel",
+    "description": "Cancel button for reporting lyrics"
+  },
+  "report_lyrics_reporting": {
+    "message": "Reporting lyrics...",
+    "description": "Report lyrics on a reporting process"
+  },
+  "report_lyrics_success": {
+    "message": "Thank you for reporting the lyrics! Unison will review the reports as soon as possible",
+    "description": "Succesfully reported the lyrics for a song"
+  },
+  "report_lyrics_already": {
+    "message": "You've already reported the lyrics for this song!",
+    "description": "Multiple attempts of already reporting the same lyrics"
+  },
+  "report_lyrics_error": {
+    "message": "Uh-oh, it seems like we can't pass this report to the provider. If you can, please try again",
+    "description": "Report lyrics errors"
+  },
+  "unison_tier_new": {
+    "message": "new",
+    "description": "Trust tier badge for low-reputation Unison submitters"
+  },
+  "unison_tier_trusted": {
+    "message": "trusted",
+    "description": "Trust tier badge for mid-reputation Unison submitters"
+  },
+  "unison_tier_veteran": {
+    "message": "veteran",
+    "description": "Trust tier badge for high-reputation Unison submitters"
+  },
+  "unison_tier_expert": {
+    "message": "expert",
+    "description": "Trust tier badge for top-reputation Unison submitters"
+  },
+  "unison_submitted_this": {
+    "message": "submitted this lyric",
+    "description": "Sub-label under the submitter name in the Unison footer card"
+  },
+  "unison_score_label": {
+    "message": "score",
+    "description": "Noun shown after the numeric score in the Unison footer (e.g. the 'score' in '4.85 score · 12 votes')"
+  },
+  "unison_vote_singular": {
+    "message": "vote",
+    "description": "Singular noun used after the number 1 in the Unison vote count (e.g. '1 vote')"
+  },
+  "unison_vote_plural": {
+    "message": "votes",
+    "description": "Plural noun used after numbers other than 1 in the Unison vote count (e.g. '5 votes')"
   }
 }
