@@ -1,10 +1,10 @@
 {
   "extensionName": {
-    "message": "Better Lyrics (Lyrics для Youtube Music)",
+    "message": "Better Lyrics (Тексти пісень для Youtube Music)",
     "description": "The name of the extension"
   },
   "extensionDescription": {
-    "message": "Розширте можливості YouTube Music — красиві тексти пісень із синхронізацією, багатомовність, переклад у реальному часі та ще більше функцій",
+    "message": "Розширте можливості YouTube Music за допомогою красивих синхронізованих текстів пісень, підтримкою багатомовності, перекладом у реальному часі й інших функцій",
     "description": "The description of the extension"
   },
   "options_tab_general": {
@@ -132,7 +132,7 @@
     "description": "Theme settings section title"
   },
   "options_themes_description": {
-    "message": "Кастомізуйте зовнішній вигляд від Better Lyrics.",
+    "message": "Персоналізуйте зовнішній вигляд від Better Lyrics.",
     "description": "Theme settings section description"
   },
   "options_themes_theme": {
@@ -172,11 +172,11 @@
     "description": "Identity settings section title"
   },
   "options_identity_description": {
-    "message": "Ваші унікальні попередні налаштування в Better Lyrics.",
+    "message": "Ваш унікальний анонімний профіль в Better Lyrics.",
     "description": "Identity settings section description"
   },
   "options_identity_yourIdentity": {
-    "message": "Ваша особистість",
+    "message": "Ваш ідентифікатор",
     "description": "Your identity label"
   },
   "options_identity_loading": {
@@ -196,7 +196,7 @@
     "description": "Import key button label"
   },
   "options_modal_selectTheme": {
-    "message": "Обрати тему",
+    "message": "Вибрати тему",
     "description": "Theme modal title"
   },
   "options_modal_cancel": {
@@ -220,11 +220,11 @@
     "description": "Nothing to clear message"
   },
   "options_alert_exportFailed": {
-    "message": "Не вдалось імпортувати дані",
+    "message": "Не вдалось імпортувати профіль",
     "description": "Export identity failed message"
   },
   "options_alert_fileSaveDialogOpened": {
-    "message": "Діалогове вікно збереження файлу особистих даних.",
+    "message": "Відкрито вікно збереження файлу профілю.",
     "description": "File save dialog opened message"
   },
   "options_alert_fileSaveFailed": {
@@ -232,11 +232,11 @@
     "description": "File save failed message"
   },
   "options_alert_downloadInitiated": {
-    "message": "Завантаження файлу особистих даних розпочато.",
+    "message": "Завантаження файлу профілю розпочато.",
     "description": "Download initiated message"
   },
   "options_alert_importSuccess": {
-    "message": "Особисті дані успішно імпортовано!",
+    "message": "Профіль успішно імпортовано!",
     "description": "Import success message"
   },
   "options_alert_identityLoadError": {
@@ -268,11 +268,11 @@
     "description": "Back to settings button label"
   },
   "options_editor_fullExperienceNote": {
-    "message": "Для повноцінної роботи редактора ",
+    "message": "Щоб скористатися повним функціоналом, ",
     "description": "Full editor experience note prefix"
   },
   "options_editor_openInNewTabLink": {
-    "message": "відкрити редактор у новій вкладці",
+    "message": "відкрийте редактор у новій вкладці",
     "description": "Open in new tab link text"
   },
   "options_editor_stylingGuide": {
@@ -316,7 +316,7 @@
     "description": "Youtube provider name"
   },
   "options_provider_youtubeCaptions": {
-    "message": "Youtube Captions",
+    "message": "Субтитри Youtube",
     "description": "Youtube Captions provider name"
   },
   "options_provider_binilyrics": {
@@ -324,11 +324,11 @@
     "description": "BiniLyrics provider name"
   },
   "options_syncType_syllable": {
-    "message": "Склади",
+    "message": "Склад",
     "description": "Syllable sync type label"
   },
   "options_syncType_syllable_tooltip": {
-    "message": "Виділяє склади в міру виконання. Найвищий рівень синхронізації.",
+    "message": "Виділяє склади під час виконання. Найкращий можливий рівень синхронізації.",
     "description": "Syllable sync type tooltip"
   },
   "options_syncType_word": {
@@ -336,7 +336,7 @@
     "description": "Word sync type label"
   },
   "options_syncType_word_tooltip": {
-    "message": "Виділяє кожне слово, коли воно звучить. Кращий рівень синхронізації.",
+    "message": "Виділяє слова під час виконання. Хороший рівень синхронізації.",
     "description": "Word sync type tooltip"
   },
   "options_syncType_line": {
@@ -344,15 +344,15 @@
     "description": "Line sync type label"
   },
   "options_syncType_line_tooltip": {
-    "message": "Виділяє весь рядок, коли він звучить. Базовий рівень синхронізації.",
+    "message": "Виділяє весь рядок під час виконання. Базовий рівень синхронізації.",
     "description": "Line sync type tooltip"
   },
   "options_syncType_unsynced": {
-    "message": "Несинхронізоване",
+    "message": "Несинхронізовано",
     "description": "Unsynced sync type label"
   },
   "options_syncType_unsynced_tooltip": {
-    "message": "Тексти без прив'язки до таймінгу. Несинхронізовані тексти мають обмежений функціонал.",
+    "message": "Тексти без прив'язки до часу. Ці тексти мають обмежений функціонал.",
     "description": "Unsynced sync type tooltip"
   },
   "options_detail_rateTheme": {
@@ -360,7 +360,7 @@
     "description": "Rate theme label"
   },
   "options_detail_install": {
-    "message": "Встановити",
+    "message": "Установити",
     "description": "Install button label"
   },
   "options_detail_viewOnGitHub": {
@@ -368,15 +368,15 @@
     "description": "View on GitHub link text"
   },
   "options_detail_shaderInfo": {
-    "message": "У цій темі використовується конфігурація шейдера.",
+    "message": "Ця тема містить конфігурацію шейдера.",
     "description": "Shader info text prefix"
   },
   "options_detail_downloadShader": {
-    "message": "Завантажити shader.json",
+    "message": "Завантажте shader.json",
     "description": "Download shader link text"
   },
   "options_detail_shaderImportSuffix": {
-    "message": "та імпортувати його в",
+    "message": "та імпортуйте його в",
     "description": "Shader import suffix text before Better Lyrics Shaders link"
   },
   "marketplace_pageTitle": {
@@ -432,7 +432,7 @@
     "description": "Sort by oldest"
   },
   "marketplace_show": {
-    "message": "Показати",
+    "message": "Показувати",
     "description": "Show filter group label"
   },
   "marketplace_showAll": {
@@ -440,7 +440,7 @@
     "description": "Show all themes"
   },
   "marketplace_showInstalled": {
-    "message": "Встановлені",
+    "message": "Установлені",
     "description": "Show installed themes"
   },
   "marketplace_showNotInstalled": {
@@ -460,11 +460,11 @@
     "description": "Filter for compatible themes"
   },
   "marketplace_installFromUrl": {
-    "message": "Встановити з URL-адреси",
+    "message": "Установити з URL-адреси",
     "description": "Install from URL button"
   },
   "marketplace_submitTheme": {
-    "message": "Подати тему",
+    "message": "Запропонувати тему",
     "description": "Submit a theme link"
   },
   "marketplace_loading": {
@@ -484,7 +484,7 @@
     "description": "Grant permission button"
   },
   "marketplace_install": {
-    "message": "Встановити",
+    "message": "Установити",
     "description": "Install button"
   },
   "marketplace_remove": {
@@ -496,7 +496,7 @@
     "description": "Apply button"
   },
   "marketplace_active": {
-    "message": "Активний",
+    "message": "Активно",
     "description": "Active theme indicator"
   },
   "marketplace_shadersBadge": {
@@ -532,7 +532,7 @@
     "description": "URL permission modal title"
   },
   "marketplace_urlPermissionWhy": {
-    "message": "Чому це необхідно?",
+    "message": "Для чого це?",
     "description": "URL permission explanation title"
   },
   "marketplace_urlPermissionDesc": {
@@ -568,7 +568,7 @@
     "description": "Search shortcut label"
   },
   "marketplace_shortcutsRefresh": {
-    "message": "Оновити асортимент",
+    "message": "Оновити магазин",
     "description": "Refresh shortcut label"
   },
   "marketplace_shortcutsInstallUrl": {
@@ -624,7 +624,7 @@
     "description": "Theme details shortcuts group"
   },
   "marketplace_shortcutsInstallRemove": {
-    "message": "Встановити / Видалити",
+    "message": "Установити / Видалити",
     "description": "Install/remove shortcut"
   },
   "marketplace_shortcutsApply": {
@@ -682,7 +682,7 @@
     }
   },
   "editor_pageTitle": {
-    "message": "Better Lyrics Редактор CSS",
+    "message": "Редактор стилів Better Lyrics",
     "description": "Standalone editor page title"
   },
   "editor_importFromFile": {
@@ -690,7 +690,7 @@
     "description": "Import from file button"
   },
   "editor_exportToFile": {
-    "message": "Експорт до файлу",
+    "message": "Експортувати у файл",
     "description": "Export to file button"
   },
   "editor_saveAsTheme": {
@@ -698,7 +698,7 @@
     "description": "Save as theme button"
   },
   "editor_stylingGuide": {
-    "message": "Посібнику зі стилізації",
+    "message": "Посібник зі стилізації",
     "description": "Styling guide button"
   },
   "editor_tip": {
@@ -710,7 +710,7 @@
     "description": "Powered by label"
   },
   "editor_playground": {
-    "message": "Майданчик",
+    "message": "Чернетка",
     "description": "Playground link text"
   },
   "editor_docs": {
@@ -720,10 +720,6 @@
   "lyrics_source": {
     "message": "Джерело: ",
     "description": "Lyrics source label"
-  },
-  "lyrics_addToLrclib": {
-    "message": "Додати тексти пісень до LRCLib",
-    "description": "Add lyrics button text"
   },
   "lyrics_searchOnGenius": {
     "message": "Пошук на Genius",
@@ -746,7 +742,7 @@
     "description": "Message shown during ad playback"
   },
   "lyrics_notFound": {
-    "message": "Не знайдено текстів для цієї пісні",
+    "message": "Не вдалося знайти текст цієї пісні",
     "description": "Message when no lyrics are available"
   },
   "options_language_exclusions": {
@@ -874,7 +870,7 @@
     "description": "Title for the built-in themes deprecation banner in theme modal"
   },
   "deprecation_builtin_body": {
-    "message": "Ми переносимо вбудовані теми до Магазину тем. Деякі вже там — шукайте позначку Marketplace. Інші з’являться в наступному оновленні, а резервні копії CSS будуть доступні на GitHub і в Discord.",
+    "message": "Ми переносимо вбудовані теми до магазину тем. Деякі — вже там (шукайте позначку «Магазин тем»). Інші ж, з’являться в наступному оновленні, а резервні копії CSS будуть доступні на GitHub і в Discord.",
     "description": "Body text for the built-in themes deprecation banner"
   },
   "deprecation_builtin_cta": {
@@ -886,8 +882,264 @@
     "description": "Section title for built-in themes in the theme chooser modal"
   },
   "theme_modal_section_custom": {
-    "message": "Користувальницькі теми",
+    "message": "Користувацькі теми",
     "description": "Section title for custom themes in the theme chooser modal"
+  },
+  "lyrics_submitToUnison": {
+    "message": "Подати текст через Unison",
+    "description": "Button text for submitting lyrics to Unison"
+  },
+  "unison_pageTitle": {
+    "message": "Unison - Better Lyrics",
+    "description": "Page title for the Unison dashboard"
+  },
+  "unison_title": {
+    "message": "Unison",
+    "description": "Unison branding title"
+  },
+  "unison_subtitle": {
+    "message": "Тексти від спільноти",
+    "description": "Unison subtitle text"
+  },
+  "unison_search": {
+    "message": "Шукати тексти",
+    "description": "Search button label"
+  },
+  "unison_searchPlaceholder": {
+    "message": "Шукати пісні, виконавців чи тексти...",
+    "description": "Search input placeholder"
+  },
+  "unison_submit": {
+    "message": "Подати текст",
+    "description": "Submit lyrics button text"
+  },
+  "unison_submitSuccess": {
+    "message": "Текст подано!",
+    "description": "Success message after submitting lyrics"
+  },
+  "unison_submitDescription": {
+    "message": "Подайте користувацькі тексти пісень для будь-якої пісні на YouTube Music. Вставте файл у форматі LRC (з часовими мітками), TTML (XML) або простий текст. Перевага надається синхронізованим форматам.",
+    "description": "Description text for the submission form"
+  },
+  "unison_composerHintPrefix": {
+    "message": "Використовуйте",
+    "description": "Text before Composer link in submit hint"
+  },
+  "unison_composerHintSuffix": {
+    "message": "для створення тексту із синхронізацією за словами.",
+    "description": "Text after Composer link in submit hint"
+  },
+  "unison_upvote": {
+    "message": "За",
+    "description": "Upvote button tooltip"
+  },
+  "unison_downvote": {
+    "message": "Проти",
+    "description": "Downvote button tooltip"
+  },
+  "unison_report": {
+    "message": "Поскаржитися",
+    "description": "Report button tooltip"
+  },
+  "unison_reportSuccess": {
+    "message": "Скаргу надіслано",
+    "description": "Report success tooltip text"
+  },
+  "unison_report_wrong_song": {
+    "message": "Неправильна пісня",
+    "description": "Report reason: wrong song"
+  },
+  "unison_report_bad_sync": {
+    "message": "Погана синхронізація",
+    "description": "Report reason: bad synchronization"
+  },
+  "unison_report_offensive": {
+    "message": "Образливе",
+    "description": "Report reason: offensive content"
+  },
+  "unison_report_spam": {
+    "message": "Спам",
+    "description": "Report reason: spam"
+  },
+  "unison_report_other": {
+    "message": "Інше",
+    "description": "Report reason: other"
+  },
+  "unison_confidence_low": {
+    "message": "Низька впевненість",
+    "description": "Low confidence indicator"
+  },
+  "unison_confidence_medium": {
+    "message": "Середня впевненість",
+    "description": "Medium confidence indicator"
+  },
+  "unison_confidence_high": {
+    "message": "Висока впевненість",
+    "description": "High confidence indicator"
+  },
+  "unison_format_lrc": {
+    "message": "LRC",
+    "description": "LRC format badge"
+  },
+  "unison_format_ttml": {
+    "message": "TTML",
+    "description": "TTML format badge"
+  },
+  "unison_format_plain": {
+    "message": "Простий текст",
+    "description": "Plain text format badge"
+  },
+  "unison_autoDetect": {
+    "message": "Автоматичне визначення",
+    "description": "Auto-detect format option"
+  },
+  "unison_noResults": {
+    "message": "Текстів не знайдено. Спробуйте інший запит.",
+    "description": "No search results message"
+  },
+  "unison_interactingAs": {
+    "message": "Взаємодія під ім'ям",
+    "description": "Identity label prefix"
+  },
+  "unison_loadMore": {
+    "message": "Завантажити більше",
+    "description": "Load more button for feed pagination"
+  },
+  "unison_votes": {
+    "message": "голос(и)",
+    "description": "Vote count label"
+  },
+  "unison_createInComposer": {
+    "message": "Create synced lyrics",
+    "description": "Create in Composer link text in dashboard"
+  },
+  "unison_song": {
+    "message": "Song",
+    "description": "Song field label"
+  },
+  "unison_artist": {
+    "message": "Artist",
+    "description": "Artist field label"
+  },
+  "unison_album": {
+    "message": "Album",
+    "description": "Album field label"
+  },
+  "unison_duration": {
+    "message": "Duration",
+    "description": "Duration field label"
+  },
+  "unison_videoId": {
+    "message": "Video ID",
+    "description": "Video ID field label"
+  },
+  "unison_lyrics": {
+    "message": "Lyrics",
+    "description": "Lyrics textarea label"
+  },
+  "unison_format": {
+    "message": "Format",
+    "description": "Format selector label"
+  },
+  "unison_openInYTMusic": {
+    "message": "Open in YouTube Music",
+    "description": "Link text to open song in YouTube Music"
+  },
+  "unison_back": {
+    "message": "Back",
+    "description": "Back button text in detail view"
+  },
+  "unison_noPreview": {
+    "message": "Paste or drop lyrics to see a preview",
+    "description": "Empty state text shown in submit preview before lyrics are entered"
+  },
+  "unison_preview": {
+    "message": "Preview",
+    "description": "Column title for parsed lyrics preview in detail view"
+  },
+  "unison_rawLyrics": {
+    "message": "Raw Lyrics",
+    "description": "Column title for raw lyrics source in detail view"
+  },
+  "unison_isrc": {
+    "message": "ISRC",
+    "description": "ISRC field label"
+  },
+  "unison_placeholder_song": {
+    "message": "e.g. Bohemian Rhapsody",
+    "description": "Placeholder for song input"
+  },
+  "unison_placeholder_artist": {
+    "message": "e.g. Queen",
+    "description": "Placeholder for artist input"
+  },
+  "unison_placeholder_album": {
+    "message": "e.g. A Night at the Opera",
+    "description": "Placeholder for album input"
+  },
+  "unison_placeholder_duration": {
+    "message": "e.g. 354",
+    "description": "Placeholder for duration input"
+  },
+  "unison_placeholder_videoId": {
+    "message": "e.g. dQw4w9WgXcQ",
+    "description": "Placeholder for video ID input"
+  },
+  "unison_placeholder_isrc": {
+    "message": "e.g. GBAYE0601498",
+    "description": "Placeholder for ISRC input"
+  },
+  "unison_placeholder_lyrics": {
+    "message": "Paste LRC, TTML, or plain text lyrics here. You can also drag & drop a file.",
+    "description": "Placeholder for lyrics textarea"
+  },
+  "unison_durationHint": {
+    "message": "Song length in seconds",
+    "description": "Hint text below duration field label"
+  },
+  "unison_videoIdHint": {
+    "message": "11-character ID from the YouTube Music URL",
+    "description": "Hint text below video ID field label"
+  },
+  "unison_formatHint": {
+    "message": "Auto-detected from lyrics content",
+    "description": "Hint text below format field label"
+  },
+  "unison_isrcHintPrefix": {
+    "message": "Find it using an",
+    "description": "Text before ISRC finder link"
+  },
+  "unison_isrcHintLinkText": {
+    "message": "ISRC lookup tool",
+    "description": "Link text for ISRC finder"
+  },
+  "unison_tabFeed": {
+    "message": "Feed",
+    "description": "Feed tab label for recent submissions"
+  },
+  "unison_tabMySubmissions": {
+    "message": "My Submissions",
+    "description": "Feed tab label for user's own submissions"
+  },
+  "unison_noSubmissions": {
+    "message": "You haven't submitted any lyrics yet.",
+    "description": "Empty state for my submissions tab"
+  },
+  "unison_sync": {
+    "message": "Sync",
+    "description": "Sync type label in detail view"
+  },
+  "unison_language": {
+    "message": "Language",
+    "description": "Language label in detail view"
+  },
+  "unison_validationRequired": {
+    "message": "Please fill in song, artist, video ID, and lyrics.",
+    "description": "Validation error when required fields are missing"
+  },
+  "unison_submitFailed": {
+    "message": "Submission failed",
+    "description": "Fallback error message when submission fails"
   },
   "report_lyrics_title": {
     "message": "Report Lyrics",
@@ -934,16 +1186,16 @@
     "description": "Report lyrics on a reporting process"
   },
   "report_lyrics_success": {
-    "message": "Thank you for reporting the lyrics! Unison will review the reports as soon as possible",
-    "description": "Succesfully reported the lyrics for a song"
+    "message": "Thanks for the heads up! We'll take a look soon.",
+    "description": "Shown after a lyrics report is successfully submitted"
   },
   "report_lyrics_already": {
-    "message": "You've already reported the lyrics for this song!",
-    "description": "Multiple attempts of already reporting the same lyrics"
+    "message": "We've got this one already. Thanks though!",
+    "description": "Shown when the user tries to report the same lyrics twice"
   },
   "report_lyrics_error": {
-    "message": "Uh-oh, it seems like we can't pass this report to the provider. If you can, please try again",
-    "description": "Report lyrics errors"
+    "message": "That didn't go through. Mind trying again?",
+    "description": "Shown when a lyrics report fails to submit"
   },
   "unison_tier_new": {
     "message": "new",
