@@ -311,7 +311,7 @@
 		rgba(0, 0, 0, 0.025) 0px 4px 6px -2px,
 		inset rgba(255, 255, 255, 0.1) 0px 1px 0px 0px;
 	border-radius: 14px;
-	padding: 1rem 1rem 1rem 1.5rem;
+	padding: 1rem;
 	width: fit-content;
 	max-width: 100%;
 	flex-direction: row;
@@ -320,6 +320,10 @@
 	white-space: normal;
 	cursor: pointer;
 	transition: background-color 0.15s ease;
+}
+
+.blyrics-footer__container.blyrics-footer__unison-card:has(.blyrics-footer__unison-author) {
+	padding: 1rem 1rem 1rem 1.5rem;
 }
 
 .blyrics-footer__container.blyrics-footer__unison-card:hover {
