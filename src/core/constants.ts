@@ -130,7 +130,6 @@ export const LYRICS_TAB_NOT_DISABLED_LOG =
   "[BetterLyrics] (Safe to ignore) Lyrics tab is not disabled, unable to enable it" as const;
 export const SONG_SWITCHED_LOG = "[BetterLyrics] Song has been switched" as const;
 export const LOADER_TRANSITION_ENDED = "[BetterLyrics] Loader Transition Ended" as const;
-export const LOADER_ANIMATION_END_FAILED = "[BetterLyrics] Loader Animation Didn't End" as const;
 export const PAUSING_LYRICS_SCROLL_LOG = "[BetterLyrics] Pausing Lyrics Autoscroll Due to User Scroll" as const;
 
 // Feature State Logs

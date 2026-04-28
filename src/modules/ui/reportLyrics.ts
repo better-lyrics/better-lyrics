@@ -146,7 +146,7 @@ export function showReportModal(lyricsId: number) {
   app.appendChild(overlay);
 }
 
-export function closeReportModal() {
+function closeReportModal() {
   selected = null;
   const overlay = document.getElementsByClassName(MODAL_OVERLAY_CLASS)[0];
   if (!overlay) {
