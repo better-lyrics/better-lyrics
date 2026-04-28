@@ -187,7 +187,7 @@ export function disableInertWhenFullscreen(): void {
             if (tabSelector && tabSelector.getAttribute("aria-selected") !== "true") {
               tabSelector.click();
               currentTab = 1;
-              if (AppState.areLyricsLoaded && AppState.lyricData?.syncType !== "none") {
+              if (AppState.areLyricsLoaded) {
                 AppState.areLyricsTicking = true;
               }
             }
@@ -226,7 +226,7 @@ export function lyricReloader(): void {
         setTimeout(() => {
           tabRenderer.scrollTop = scrollPositions[i];
           // Don't start ticking until we set the height
-          AppState.areLyricsTicking = AppState.areLyricsLoaded && AppState.lyricData?.syncType !== "none" && i === 1;
+          AppState.areLyricsTicking = AppState.areLyricsLoaded && i === 1;
         }, 0);
         currentTab = i;
 
@@ -399,13 +399,13 @@ export function scrollEventHandler(): void {
     if (animEngineState.scrollResumeTime < Date.now()) {
       log(PAUSING_LYRICS_SCROLL_LOG);
     }
-    animEngineState.scrollResumeTime = Date.now() + 25000;
-    if (!animEngineState.wasUserScrolling) {
-      getResumeScrollElement().removeAttribute("autoscroll-hidden");
-      const lyricsElement = document.getElementsByClassName(LYRICS_CLASS)[0] as HTMLElement;
-      lyricsElement.classList.add(USER_SCROLLING_CLASS);
-      animEngineState.wasUserScrolling = true;
-    }
+    const isPassive = AppState.lyricData?.syncType === "none";
+    animEngineState.scrollResumeTime = Date.now() + (isPassive ? 5000 : 25000);
+    animEngineState.wasUserScrolling = true;
+
+    getResumeScrollElement().removeAttribute("autoscroll-hidden");
+    const lyricsElement = document.getElementsByClassName(LYRICS_CLASS)[0] as HTMLElement;
+    lyricsElement.classList.add(USER_SCROLLING_CLASS);
   }
 }
 

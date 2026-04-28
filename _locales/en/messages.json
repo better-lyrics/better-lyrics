@@ -90,6 +90,10 @@
     "message": "Show stylized animations",
     "description": "Show stylized animations setting label"
   },
+  "options_display_passiveScroll": {
+    "message": "Auto-scroll unsynced lyrics",
+    "description": "Auto-scroll unsynced lyrics setting label"
+  },
 
   "options_language_displayLanguage": {
     "message": "Display Language",
@@ -596,14 +600,6 @@
   "marketplace_shortcutsInstallUrl": {
     "message": "Install from URL",
     "description": "Install from URL shortcut label"
-  },
-  "marketplace_shortcutsPrevPage": {
-    "message": "Previous page",
-    "description": "Previous page shortcut label"
-  },
-  "marketplace_shortcutsNextPage": {
-    "message": "Next page",
-    "description": "Next page shortcut label"
   },
 
   "marketplace_shortcutsSort": {
