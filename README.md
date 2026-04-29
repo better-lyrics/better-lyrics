@@ -68,11 +68,12 @@ Better Lyrics upgrades your YouTube Music™ experience by providing beautiful t
 🎵 Displays beautiful time-synced lyrics on YouTube Music™\
 📦 Requires no external dependencies or configurations\
 ⏩ Lets you seek by clicking on any line\
-🌏 Supports multiple languages\
+🌏 Translations and romanization for foreign-language tracks\
+🌐 UI available in multiple languages\
 🪶 Runs lightweight and fast\
 🖥️ Includes full-screen mode\
 🎨 Theme Marketplace with community themes\
-🔧 Customizable lyrics providers\
+🔧 Customizable lyrics providers from multiple sources\
 ✨ And much more!
 
 ## Download
@@ -110,14 +111,17 @@ Settings are organized into tabs in the extension popup:
 | Full screen mode                             | Enabled |
 | Auto-hide cursor in full screen mode         | Enabled |
 | Stylized animations (Background/Wobble/Glow) | Enabled |
+| Passive scroll for unsynced lyrics           | Enabled |
+| Unison Actions (pinned dock position, etc.)  | Manage  |
 
 ### Language
 
-| Option               | Default  |
-| -------------------- | -------- |
-| Translations         | Disabled |
-| Translation Language | English  |
-| Romanization         | Disabled |
+| Option               | Default     |
+| -------------------- | ----------- |
+| Display Language     | Auto-detect |
+| Romanization         | Disabled    |
+| Translations         | Disabled    |
+| Translation Language | English     |
 
 ### Sources
 
@@ -132,6 +136,13 @@ Settings are organized into tabs in the extension popup:
 | Theme selector | Choose from installed themes        |
 | CSS Editor     | Customize styling with live preview |
 | Marketplace    | Browse and install community themes |
+
+### Identity
+
+| Option           | Description                                            |
+| ---------------- | ------------------------------------------------------ |
+| Display name     | The handle attached to themes you publish              |
+| Export / Import  | Back up or transfer your identity key between devices  |
 
 > [!TIP]
 >
@@ -149,29 +160,37 @@ Browse and install community-created themes directly from the extension. Access 
 
 ## Extension Permissions
 
-| Permission                                                            | Reason                                                                                                                                                                                           | Data Usage                                         |
-| --------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | -------------------------------------------------- |
-| **Download files and read and modify the browser's download history** | [Firefox specific - Required to download styles and themes as CSS file](https://github.com/better-lyrics/better-lyrics/blob/b9d5f888703f1b786e48a4fe66bfec08a1553739/src/options/editor.js#L159) | Does not read or modify browser's download history |
+| Permission                          | Reason                                                                                                                                                          | Data Usage                                                                       |
+| ----------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------- |
+| **Access to `music.youtube.com`**   | Required to inject the lyrics UI into YouTube Music™ pages.                                                                                                     | No data is read or sent from any other site.                                     |
+| **Storage**                         | Saves your settings, installed themes, identity key, and the local lyrics cache.                                                                                | All stored locally in your browser; settings are synced across devices via your browser's built-in sync. |
+| **Alarms**                          | Schedules background tasks such as periodic theme update checks and cache cleanup.                                                                              | Does not collect or transmit any data.                                           |
+| **Downloads** (optional)            | [Required when exporting themes or your identity key as a file.](https://github.com/better-lyrics/better-lyrics/blob/HEAD/src/options/editor/features/import.ts) | Only used at the moment you click an export button. Browser download history is not read or modified. |
 
 Better Lyrics **does not** collect any personal data or track your browsing activity. The extension is open-source and thoroughly reviewed by the community to ensure that your privacy is protected.
 
 ## Manual Installation
 
+The simplest path is to grab a pre-built ZIP from the [releases page](https://github.com/better-lyrics/better-lyrics/releases) — it contains both Chrome and Firefox builds, ready to load. If you'd rather build from source, clone the repo and run `npm install && npm run build`. The build outputs are written to `dist/chrome/` and `dist/firefox/`.
+
 ### Chrome
 
-1. Clone this repository or download the ZIP file from [releases](https://github.com/better-lyrics/better-lyrics/releases) page.
+1. Download a release ZIP and unzip it (or build from source — see above).
 2. Open Google Chrome™ and go to `chrome://extensions`.
-3. Enable "Developer mode" by toggling the switch in top right corner.
-4. Click on "Load unpacked" and select the folder where you cloned/downloaded this repository.
+3. Enable "Developer mode" with the toggle in the top-right corner.
+4. Click "Load unpacked" and select the unzipped folder (or `dist/chrome/` if building from source).
 5. Better Lyrics should now be installed and ready to use!
 
 ### Firefox
 
-1. Clone this repository or download the ZIP file from [releases](https://github.com/better-lyrics/better-lyrics/releases) page.
+1. Download a release ZIP and unzip it (or build from source — see above).
 2. Open Firefox and go to `about:debugging#/runtime/this-firefox`.
-3. Copy the contents of `manifest.firefox.json` and paste it in `manifest.json`.
-4. Click on "Load Temporary Add-on" and select the `manifest.json` file in the cloned/downloaded folder.
-5. Better Lyrics should now be installed and ready to use!
+3. Click "Load Temporary Add-on" and select the `manifest.json` inside the unzipped folder (or `dist/firefox/manifest.json` if building from source).
+4. Better Lyrics should now be installed and ready to use!
+
+> [!NOTE]
+>
+> Firefox unloads temporary add-ons when the browser is closed. For a permanent install, use the [signed Firefox Add-on listing](https://addons.mozilla.org/en-US/firefox/addon/better-lyrics/).
 
 ## FAQ
 
@@ -205,12 +224,14 @@ Yes you can! Please follow the contributing guidelines below.
 
 ### Some lyrics are out of sync, missing, or incorrect. What can I do?
 
-If you find any issues with lyrics, you now have two options:
+Better Lyrics fetches from many providers, each with its own catalog and contribution process. Things to try:
 
-1. Toggle or reorder providers in extension settings
-2. Contribute your own lyrics using [LRCLIBup](https://lrclibup.boidu.dev)
+1. **Toggle or reorder providers** in extension settings — a different provider may already have a better version.
+2. **Contribute corrections** to a community-editable provider:
+   - [LRCLIBup](https://lrclibup.boidu.dev) lets you submit time-synced lyrics that flow back to all LRCLib users — the easiest path for the average user.
+   - Other providers (Musixmatch, QQ Music, KuGou, BiniLyrics, Unison) have their own catalogs and contribution channels; corrections submitted there will be picked up automatically once their data updates.
 
-LRCLIBup allows you to submit correct, properly synchronized lyrics that will be available to all users who use the LRCLib provider. This is a community-driven approach to improving and adding lyrics, so please be mindful of quality.
+Please be mindful of quality when contributing — these databases are shared by everyone using the extension.
 
 ### How do I report a bug?
 
