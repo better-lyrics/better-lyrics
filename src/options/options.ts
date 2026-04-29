@@ -209,6 +209,7 @@ const restoreOptions = (): void => {
       "bLyrics-richsynced",
       "unison-richsynced",
       "binimum-richsynced",
+      "portato-richsynced",
       "musixmatch-richsync",
       "yt-captions",
       "bLyrics-synced",
@@ -268,6 +269,7 @@ const setOptionsInForm = (items: Options): void => {
     "bLyrics-richsynced",
     "unison-richsynced",
     "binimum-richsynced",
+    "portato-richsynced",
     "musixmatch-richsync",
     "yt-captions",
     "bLyrics-synced",
@@ -324,6 +326,7 @@ const getProviderIdToInfoMap = (): { [key: string]: ProviderInfo } => ({
     name: t("options_provider_youtubeCaptions"),
     syncType: "line",
   },
+  "portato-richsynced": { name: t("options_provider_betterLyricsPortato"), syncType: "word" },
   "lrclib-synced": { name: t("options_provider_lrclib"), syncType: "line" },
   "bLyrics-richsynced": {
     name: t("options_provider_betterLyrics"),
