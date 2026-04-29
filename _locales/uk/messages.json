@@ -92,55 +92,55 @@
     "description": "Auto-scroll unsynced lyrics setting label"
   },
   "options_display_unisonActions": {
-    "message": "Unison Actions",
+    "message": "Дії з Unison",
     "description": "Display-section row label for the Unison Actions modal trigger"
   },
   "options_unisonModal_title": {
-    "message": "Unison Actions",
+    "message": "Дії з Unison",
     "description": "Title of the Unison Actions modal"
   },
   "options_unisonModal_showPinned": {
-    "message": "Show pinned actions",
+    "message": "Закріпити дії на екрані",
     "description": "Toggle label inside the Unison Actions modal for the floating dock"
   },
   "options_unisonModal_showPinned_hint": {
-    "message": "A floating control to upvote, downvote, or report Unison lyrics",
+    "message": "Плаваючі кнопки для голосування або скарги щодо тексту з Unison",
     "description": "Hint text under the Show pinned actions toggle"
   },
   "options_unisonModal_autoHide": {
-    "message": "Auto-hide in fullscreen",
+    "message": "Приховувати в повноекранному режимі",
     "description": "Toggle label inside the Unison Actions modal for auto-hiding the dock when idle in fullscreen"
   },
   "options_unisonModal_autoHide_hint": {
-    "message": "Hide the floating control when you are idle in fullscreen mode",
+    "message": "Приховувати плаваючі кнопки під час простою в повноекранному режимі",
     "description": "Hint text under the Auto-hide in fullscreen toggle"
   },
   "options_unisonModal_position": {
-    "message": "Position",
+    "message": "Положення",
     "description": "Label above the visual position picker in the Unison Actions modal"
   },
   "options_unisonModal_position_topLeft": {
-    "message": "Top left",
+    "message": "Угорі ліворуч",
     "description": "Tooltip for the top-left cell in the Unison position picker"
   },
   "options_unisonModal_position_topCenter": {
-    "message": "Top center",
+    "message": "Угорі по центру",
     "description": "Tooltip for the top-center cell in the Unison position picker"
   },
   "options_unisonModal_position_topRight": {
-    "message": "Top right",
+    "message": "Угорі праворуч",
     "description": "Tooltip for the top-right cell in the Unison position picker"
   },
   "options_unisonModal_position_bottomLeft": {
-    "message": "Bottom left",
+    "message": "Унизу ліворуч",
     "description": "Tooltip for the bottom-left cell in the Unison position picker"
   },
   "options_unisonModal_position_bottomCenter": {
-    "message": "Bottom center",
+    "message": "Унизу по центру",
     "description": "Tooltip for the bottom-center cell in the Unison position picker"
   },
   "options_unisonModal_position_bottomRight": {
-    "message": "Bottom right",
+    "message": "Унизу праворуч",
     "description": "Tooltip for the bottom-right cell in the Unison position picker"
   },
   "options_language_displayLanguage": {
@@ -300,11 +300,11 @@
     "description": "Saving indicator text"
   },
   "options_editor_importFile": {
-    "message": "Імпортувати з файлу",
+    "message": "Імпорт з файлу",
     "description": "Import from file tooltip"
   },
   "options_editor_exportFile": {
-    "message": "Експорт до файлу",
+    "message": "Експорт у файл",
     "description": "Export to file tooltip"
   },
   "options_editor_saveAsTheme": {
@@ -738,11 +738,11 @@
     "description": "Standalone editor page title"
   },
   "editor_importFromFile": {
-    "message": "Імпортувати з файлу",
+    "message": "Імпорт з файлу",
     "description": "Import from file button"
   },
   "editor_exportToFile": {
-    "message": "Експортувати у файл",
+    "message": "Експорт у файл",
     "description": "Export to file button"
   },
   "editor_saveAsTheme": {
@@ -914,7 +914,7 @@
     "description": "Badge text on symlinked theme cards"
   },
   "symlink_badge_bundled": {
-    "message": "Вбудовані",
+    "message": "Вбудована",
     "description": "Badge text on non-symlinked built-in theme cards"
   },
   "deprecation_builtin_title": {
