@@ -17,3 +17,115 @@
 	padding-top: var(--blyrics-padding) !important;
 	word-break: break-word;
 }
+
+.blyrics-hidden {
+	display: none !important;
+}
+
+/* Miscellaneous styles */
+.blyrics--error {
+	align-self: flex-start !important;
+	color: var(--blyrics-error-color);
+	cursor: default;
+	font-family: var(--blyrics-font-family);
+	font-size: var(--blyrics-font-size);
+	font-weight: var(--blyrics-font-weight);
+	line-height: 1;
+	margin-block: var(--blyrics-margin) !important;
+	opacity: var(--blyrics-error-opacity);
+	padding-bottom: var(--blyrics-padding) !important;
+	padding-top: var(--blyrics-padding) !important;
+	word-break: break-word;
+}
+
+
+:root {
+	--animation-style: cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+/* view-transition-class assignments — safe to set permanently;
+   the property has no effect unless a transition is active. */
+.blyrics--line {
+	view-transition-class: blyrics-line;
+}
+
+.blyrics--romanized {
+	view-transition-class: blyrics-roman;
+}
+
+.blyrics--translated {
+	view-transition-class: blyrics-translation;
+}
+
+/* All ::view-transition-* rules require Chrome 125+. Wrap them so that
+   Chrome 111–124 falls back gracefully with no transition. */
+@supports (view-transition-class: test) {
+
+	/* Suppress the root crossfade so the YouTube Music UI does not flash. */
+	::view-transition-group(root) {
+		animation: none;
+	}
+
+	::view-transition-old(root) {
+		animation: none;
+		display: none;
+	}
+
+	::view-transition-new(root) {
+		animation: none;
+	}
+
+	/* All named groups slide smoothly to their new position.
+	   Brand-new elements have no old geometry, so there is no
+	   size-morph to worry about — the group just starts at its
+	   final size immediately. */
+	::view-transition-group(*.blyrics-line),
+	::view-transition-group(*.blyrics-translation),
+	::view-transition-group(*.blyrics-roman) {
+		animation-duration: 0.35s;
+		animation-timing-function: var(--animation-style);
+	}
+
+	/* During a slide (element exists in both old and new state),
+	   hide the old snapshot and freeze the new snapshot so only
+	   the group position animates — no ghost, no crossfade. */
+	::view-transition-old(*.blyrics-line),
+	::view-transition-old(*.blyrics-translation):not(:only-child),
+	::view-transition-old(*.blyrics-roman):not(:only-child) {
+		display: none;
+	}
+
+	::view-transition-new(*.blyrics-line),
+	::view-transition-new(*.blyrics-translation):not(:only-child),
+	::view-transition-new(*.blyrics-roman):not(:only-child) {
+		animation: none;
+	}
+
+	/* Entry — :only-child means there is NO old snapshot, so this
+	   element is appearing for the first time. */
+	::view-transition-new(*.blyrics-translation):only-child,
+	::view-transition-new(*.blyrics-roman):only-child {
+		animation: blyrics-floatIn 0.3s var(--animation-style) 0.35s both;
+	}
+
+	/* Exit — :only-child means there is NO new snapshot, so this
+	   element is being removed (song change). */
+	::view-transition-old(*.blyrics-translation):only-child,
+	::view-transition-old(*.blyrics-roman):only-child {
+		animation: blyrics-floatOut 0.25s var(--animation-style) both;
+	}
+
+	@keyframes blyrics-floatIn {
+		from {
+			opacity: 0;
+			transform: translateY(-10%);
+		}
+	}
+
+	@keyframes blyrics-floatOut {
+		to {
+			opacity: 0;
+			transform: translateY(-10%);
+		}
+	}
+}
