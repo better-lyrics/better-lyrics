@@ -363,14 +363,14 @@ interface ProviderConfig {
 
 export const PROVIDER_CONFIGS: ProviderConfig[] = [
   { key: "bLyrics-richsynced", displayName: "Better Lyrics", syncType: "syllable", priority: 0 },
-  { key: "portato-richsynced", displayName: "Better Lyrics Portato", syncType: "word", priority: 1 },
   {
     key: "unison-richsynced",
     displayName: "Unison",
     syncType: "syllable",
-    priority: 2,
+    priority: 1,
   },
-  { key: "binimum-richsynced", displayName: "BiniLyrics", syncType: "syllable", priority: 3 },
+  { key: "binimum-richsynced", displayName: "BiniLyrics", syncType: "syllable", priority: 2 },
+  { key: "portato-richsynced", displayName: "Better Lyrics Portato", syncType: "word", priority: 3 },
   { key: "musixmatch-richsync", displayName: "Musixmatch", syncType: "word", priority: 4 },
   { key: "bLyrics-synced", displayName: "Better Lyrics", syncType: "line", priority: 5 },
   {

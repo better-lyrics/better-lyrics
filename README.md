@@ -248,17 +248,23 @@ Yes! Better Lyrics supports switching between different providers. You can reord
 
 Available providers (default priority order):
 
-| #   | Provider             | Sync Level |
-| --- | -------------------- | ---------- |
-| 1   | Better Lyrics        | Syllable   |
-| 2   | Musixmatch           | Word       |
-| 3   | YouTube Captions     | Line       |
-| 4   | Better Lyrics        | Line       |
-| 5   | LRCLib               | Line       |
-| 6   | Better Lyrics Legato | Line       |
-| 7   | Musixmatch           | Line       |
-| 8   | YouTube Lyrics       | Unsynced   |
-| 9   | LRCLib               | Unsynced   |
+| #   | Provider              | Sync Level |
+| --- | --------------------- | ---------- |
+| 1   | Better Lyrics         | Syllable   |
+| 2   | Unison                | Syllable   |
+| 3   | BiniLyrics            | Syllable   |
+| 4   | Better Lyrics Portato | Word       |
+| 5   | Musixmatch            | Word       |
+| 6   | Better Lyrics         | Line       |
+| 7   | Unison                | Line       |
+| 8   | YouTube Captions      | Line       |
+| 9   | BiniLyrics            | Line       |
+| 10  | LRCLib                | Line       |
+| 11  | Better Lyrics Legato  | Line       |
+| 12  | Musixmatch            | Line       |
+| 13  | YouTube               | Unsynced   |
+| 14  | Unison                | Unsynced   |
+| 15  | LRCLib                | Unsynced   |
 
 Adding custom providers isn't currently supported.
 
