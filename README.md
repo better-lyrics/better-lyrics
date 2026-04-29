@@ -171,11 +171,11 @@ Better Lyrics **does not** collect any personal data or track your browsing acti
 
 ## Manual Installation
 
-The simplest path is to grab a pre-built ZIP from the [releases page](https://github.com/better-lyrics/better-lyrics/releases) — it contains both Chrome and Firefox builds, ready to load. If you'd rather build from source, clone the repo and run `npm install && npm run build`. The build outputs are written to `dist/chrome/` and `dist/firefox/`.
+The simplest path is to grab a pre-built ZIP from the [releases page](https://github.com/better-lyrics/better-lyrics/releases). It contains both Chrome and Firefox builds, ready to load. If you'd rather build from source, clone the repo and run `npm install && npm run build`. The build outputs are written to `dist/chrome/` and `dist/firefox/`.
 
 ### Chrome
 
-1. Download a release ZIP and unzip it (or build from source — see above).
+1. Download a release ZIP and unzip it (or build from source, see above).
 2. Open Google Chrome™ and go to `chrome://extensions`.
 3. Enable "Developer mode" with the toggle in the top-right corner.
 4. Click "Load unpacked" and select the unzipped folder (or `dist/chrome/` if building from source).
@@ -183,7 +183,7 @@ The simplest path is to grab a pre-built ZIP from the [releases page](https://gi
 
 ### Firefox
 
-1. Download a release ZIP and unzip it (or build from source — see above).
+1. Download a release ZIP and unzip it (or build from source, see above).
 2. Open Firefox and go to `about:debugging#/runtime/this-firefox`.
 3. Click "Load Temporary Add-on" and select the `manifest.json` inside the unzipped folder (or `dist/firefox/manifest.json` if building from source).
 4. Better Lyrics should now be installed and ready to use!
@@ -224,14 +224,17 @@ Yes you can! Please follow the contributing guidelines below.
 
 ### Some lyrics are out of sync, missing, or incorrect. What can I do?
 
-Better Lyrics fetches from many providers, each with its own catalog and contribution process. Things to try:
+Better Lyrics fetches from many providers, so the first thing to try is switching to a different one in extension settings (Sources tab); a better version may already exist elsewhere.
 
-1. **Toggle or reorder providers** in extension settings — a different provider may already have a better version.
-2. **Contribute corrections** to a community-editable provider:
-   - [LRCLIBup](https://lrclibup.boidu.dev) lets you submit time-synced lyrics that flow back to all LRCLib users — the easiest path for the average user.
-   - Other providers (Musixmatch, QQ Music, KuGou, BiniLyrics, Unison) have their own catalogs and contribution channels; corrections submitted there will be picked up automatically once their data updates.
+If you want to fix the lyrics for everyone, use **Unison**, our built-in community lyrics platform. Unison is the recommended contribution path going forward (it replaces LRCLIBup, which we no longer use). You can:
 
-Please be mindful of quality when contributing — these databases are shared by everyone using the extension.
+1. **Vote or report** directly from the lyrics panel. When Unison is the active provider, an Unison card appears below the lyrics with upvote, downvote, and report buttons. Reports include reasons (wrong lyrics, bad timing, offensive content, etc.) so curators know how to act.
+2. **Submit corrected lyrics.** Click the "Submit to Unison" button at the bottom of any song's lyrics view, or open Unison directly from the Unison card. The submit form is pre-filled with the current song's metadata; just paste your corrected lyrics in your preferred format (LRC, plain text, or rich-sync).
+3. **Browse, search, and manage your submissions.** The Unison page has a feed of recent contributions, a search view, and a "My submissions" tab so you can track and edit your own entries.
+
+Please be mindful of quality when contributing, since these lyrics are served to everyone using the extension.
+
+Other providers (Musixmatch, BiniLyrics, etc.) have their own external catalogs and contribution channels; corrections submitted there will flow back into Better Lyrics automatically once those upstream databases update.
 
 ### How do I report a bug?
 
