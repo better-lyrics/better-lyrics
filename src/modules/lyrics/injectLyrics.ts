@@ -1,5 +1,6 @@
 import {
   BACKGROUND_LYRIC_CLASS,
+  GENERAL_ERROR_LOG,
   LOG_PREFIX,
   LYRICS_CLASS,
   LYRICS_FOUND_LOG,
@@ -47,6 +48,77 @@ import { registerThemeSetting } from "@modules/settings/themeOptions";
 let disableRichsync = registerThemeSetting("blyrics-disable-richsync", false, true);
 let lineSyncedAnimationDelay = registerThemeSetting("blyrics-line-synced-animation-delay", 50, true);
 let longWordThreshold = registerThemeSetting("blyrics-long-word-threshold", 1500, true);
+
+let vtPromise = Promise.resolve();
+
+function animateDOMUpdate(updateFn: () => void, postUpdateFn?: () => void, shouldSkipFn?: () => boolean, excludeLines?: HTMLElement[]) {
+  if (!document.startViewTransition || !CSS.supports("view-transition-class", "test")) {
+    if (shouldSkipFn?.()) return;
+    updateFn();
+    postUpdateFn?.();
+    return;
+  }
+
+  vtPromise = vtPromise.finally(
+    () =>
+      new Promise<void>(resolve => {
+        if (shouldSkipFn?.()) {
+          resolve();
+          return;
+        }
+
+        const container = document.querySelector(`.${LYRICS_CLASS}`) as HTMLElement | null;
+        const videoId = container?.dataset.videoId ?? "unknown";
+
+        // Assign temporary names to line elements so the browser can track
+        // their positional change during the transition.
+        const excludeSet = new Set(excludeLines ?? []);
+        const lineElements = Array.from(container?.querySelectorAll<HTMLElement>(".blyrics--line") ?? []);
+        lineElements.forEach(el => {
+          if (!excludeSet.has(el)) {
+            el.style.setProperty("view-transition-name", `line-${videoId}-${el.dataset.lineNumber ?? "unknown"}`);
+          }
+        });
+
+        try {
+          const transition = document.startViewTransition(() => {
+            updateFn();
+          });
+
+          transition.finished.catch(() => { }).finally(() => {
+            // Remove ONLY the temporary line names.
+            // Roman/translation names stay permanently on their elements.
+            lineElements.forEach(el => el.style.removeProperty("view-transition-name"));
+            // postUpdateFn runs here — AFTER the animation has finished —
+            // so the layout reads inside lyricsElementAdded() never interrupt
+            // a live compositor animation.
+            try {
+              postUpdateFn?.();
+            } catch (e) {
+              console.error("[BetterLyrics] Error in postUpdateFn:", e);
+            }
+            resolve();
+          });
+        } catch {
+          lineElements.forEach(el => el.style.removeProperty("view-transition-name"));
+
+          // updateFn may have already executed synchronously inside
+          // startViewTransition before it threw. injectRomanization /
+          // injectTranslation are idempotent so a double-call is safe,
+          // but redundant.
+
+          try {
+            if (!shouldSkipFn?.()) {
+              updateFn();
+            }
+            postUpdateFn?.();
+          } finally {
+            resolve();
+          }
+        }
+      })
+  );
+}
 
 function isRomanizationDisabledForLang(lang: string): boolean {
   return languageMatchesAny(lang, AppState.romanizationDisabledLanguages);
@@ -181,7 +253,7 @@ export function processLyrics(data: LyricSourceResultWithMeta, keepLoaderVisible
     log(LYRICS_TAB_NOT_DISABLED_LOG);
   }
 
-  injectLyrics(data, keepLoaderVisible, signal);
+  injectLyrics(data, keepLoaderVisible, signal).catch(err => log(GENERAL_ERROR_LOG, err));
 }
 
 function createLyricsLine(parts: LyricPart[], line: LineData, lyricElement: HTMLDivElement) {
@@ -276,9 +348,62 @@ function createBreakElem(lyricElement: HTMLElement, order: number) {
  * @param [data.source] - Source attribution for lyrics
  * @param [data.sourceHref] - URL for source link
  */
-function injectLyrics(data: LyricSourceResultWithMeta, keepLoaderVisible = false, signal?: AbortSignal): void {
+
+export async function performExitTransition(): Promise<void> {
+  if (!document.startViewTransition || !CSS.supports("view-transition-class", "test")) return;
+
+  const container = document.querySelector(`.${LYRICS_CLASS}`) as HTMLElement | null;
+  if (!container) return;
+
+  const videoId = container.dataset.videoId ?? "unknown";
+
+  const romanElems = Array.from(container.querySelectorAll<HTMLElement>(`.${ROMANIZED_LYRICS_CLASS}`));
+  const transElems = Array.from(container.querySelectorAll<HTMLElement>(`.${TRANSLATED_LYRICS_CLASS}`));
+
+  if (romanElems.length === 0 && transElems.length === 0) return;
+
+  // Name line elements so their layout change (collapsing to fill the gap)
+  // is animated by the transition group, not an instant snap.
+  const lineElements = Array.from(container.querySelectorAll<HTMLElement>(".blyrics--line"));
+  lineElements.forEach(el => {
+    el.style.setProperty("view-transition-name", `line-${videoId}-${el.dataset.lineNumber ?? "unknown"}`);
+  });
+
+  const allExiting = [...romanElems, ...transElems];
+
+  try {
+    const transition = document.startViewTransition(() => {
+      allExiting.forEach(el => el.remove());
+    });
+
+    await transition.finished.catch(() => { });
+
+    lineElements.forEach(el => el.style.removeProperty("view-transition-name"));
+  } catch {
+    lineElements.forEach(el => el.style.removeProperty("view-transition-name"));
+  }
+}
+
+async function injectLyrics(data: LyricSourceResultWithMeta, keepLoaderVisible = false, signal?: AbortSignal): Promise<void> {
   const injectionId = AppState.currentInjectionId;
   const isStale = () => AppState.currentInjectionId !== injectionId;
+
+  // Register this call's exit transition *on* the vtPromise chain so that
+  // concurrent injectLyrics calls are fully serialized.  The .finally()
+  // means we wait for all in-flight entry animations to finish first, then
+  // run our exit animation before allowing the next queued item to proceed.
+  await new Promise<void>(resolve => {
+    vtPromise = vtPromise.finally(async () => {
+      // Only animate the exit if this injection is still the intended one.
+      // A newer song change may have already superseded us.
+      if (!isStale()) {
+        await performExitTransition().catch(() => { });
+      }
+      resolve();
+    });
+  });
+
+  if (isStale()) return;
 
   const lyrics = data.lyrics!;
   cleanup();
@@ -288,6 +413,7 @@ function injectLyrics(data: LyricSourceResultWithMeta, keepLoaderVisible = false
   lyricsWrapper.replaceChildren();
   const lyricsContainer = document.createElement("div");
   lyricsContainer.className = LYRICS_CLASS;
+  lyricsContainer.dataset.videoId = data.videoId ?? "unknown";
   lyricsWrapper.appendChild(lyricsContainer);
 
   lyricsWrapper.removeAttribute("is-empty");
@@ -312,10 +438,14 @@ function injectLyrics(data: LyricSourceResultWithMeta, keepLoaderVisible = false
     if (lyricItem.isInstrumental) {
       const instrumentalElement = createInstrumentalElement(lyricItem.durationMs, lineIndex);
       instrumentalElement.classList.add("blyrics--line");
+
+
+
       instrumentalElement.dataset.time = String(lyricItem.startTimeMs / 1000);
       instrumentalElement.dataset.duration = String(lyricItem.durationMs / 1000);
       instrumentalElement.dataset.lineNumber = String(lineIndex);
       instrumentalElement.dataset.instrumental = "true";
+
 
       const agent = findNearestAgent(lyrics, lineIndex);
       if (agent) {
@@ -383,6 +513,8 @@ function injectLyrics(data: LyricSourceResultWithMeta, keepLoaderVisible = false
     let lyricElement = document.createElement("div");
     lyricElement.classList.add("blyrics--line");
 
+
+
     let line: LineData = {
       lyricElement: lyricElement,
       time: item.startTimeMs / 1000,
@@ -405,6 +537,7 @@ function injectLyrics(data: LyricSourceResultWithMeta, keepLoaderVisible = false
     lyricElement.dataset.time = String(line.time);
     lyricElement.dataset.duration = String(line.duration);
     lyricElement.dataset.lineNumber = String(lineIndex);
+
     lyricElement.style.setProperty("--blyrics-duration", item.durationMs + "ms");
     if (item.agent) {
       lyricElement.dataset.agent = item.agent;
@@ -458,7 +591,7 @@ function injectLyrics(data: LyricSourceResultWithMeta, keepLoaderVisible = false
   });
 
   // Handle Translations and Romanizations in Batch
-  processBatchTranslationsAndRomanizations(data, lines, isStale, signal);
+  processBatchTranslationsAndRomanizations(data, lines, isStale, signal).catch(err => log(GENERAL_ERROR_LOG, err));
 
   animEngineState.skipScrolls = 2;
   animEngineState.skipScrollsDecayTimes = [];
@@ -514,6 +647,7 @@ function injectLyrics(data: LyricSourceResultWithMeta, keepLoaderVisible = false
   }
 
   AppState.areLyricsLoaded = true;
+
 }
 
 /**
@@ -534,6 +668,9 @@ async function processBatchTranslationsAndRomanizations(
   const translationBatch: { index: number; text: string }[] = [];
 
   let sourceLanguage = data.language;
+
+  const cachedRomanizations: Array<{ lyricElement: HTMLElement; lineData: LineData; result: string; timedRomanization: LyricPart[] | null }> = [];
+  const cachedTranslations: Array<{ lyricElement: HTMLElement; result: string }> = [];
 
   // 1. Identify what needs to be translated/romanized
   lyrics.forEach((item, index) => {
@@ -556,7 +693,7 @@ async function processBatchTranslationsAndRomanizations(
       }
 
       if (romanizedResult && !isSameText(romanizedResult, item.words)) {
-        injectRomanization(lyricElement, lineData, romanizedResult, timedRomanization);
+        cachedRomanizations.push({ lyricElement, lineData, result: romanizedResult, timedRomanization });
       } else {
         const shouldRomanize =
           (sourceLanguage && languageMatchesAny(sourceLanguage, ROMANIZATION_LANGUAGES)) ||
@@ -588,12 +725,37 @@ async function processBatchTranslationsAndRomanizations(
       }
 
       if (translationResult && !isSameText(translationResult, item.words)) {
-        injectTranslation(lyricElement, translationResult);
+        cachedTranslations.push({ lyricElement, result: translationResult });
       } else if (sourceLanguage !== targetTranslationLang || containsNonLatin(item.words) || !sourceLanguage) {
         translationBatch.push({ index, text: item.words });
       }
     }
   });
+
+  if (cachedRomanizations.length > 0 || cachedTranslations.length > 0) {
+    let didInjectCached = false;
+    // Pre-check which elements will actually grow so we can exclude them from
+    // view-transition-name assignment. Lines that already have the child
+    // element won't grow and must NOT be excluded (they still need to slide).
+    const cachedExclude = [
+      ...cachedRomanizations
+        .filter(r => !r.lyricElement.querySelector(`.${ROMANIZED_LYRICS_CLASS}`))
+        .map(r => r.lyricElement),
+      ...cachedTranslations
+        .filter(t => !t.lyricElement.querySelector(`.${TRANSLATED_LYRICS_CLASS}`))
+        .map(t => t.lyricElement),
+    ];
+    animateDOMUpdate(() => {
+      if (isStale()) return;
+      cachedRomanizations.forEach(({ lyricElement, lineData, result, timedRomanization }) => {
+        if (injectRomanization(lyricElement, lineData, result, timedRomanization)) didInjectCached = true;
+      });
+
+      cachedTranslations.forEach(({ lyricElement, result }) => {
+        if (injectTranslation(lyricElement, result)) didInjectCached = true;
+      });
+    }, () => { if (didInjectCached) lyricsElementAdded(); }, isStale, cachedExclude);
+  }
 
   if (isStale()) return;
 
@@ -617,13 +779,22 @@ async function processBatchTranslationsAndRomanizations(
 
         if (isRomanizationDisabledForLang(sourceLanguage || "")) return;
 
-        response.results.forEach((result, i) => {
-          if (result) {
-            const originalIndex = romanizationBatch[i].index;
-            injectRomanization(linesData[originalIndex].lyricElement, linesData[originalIndex], result);
-          }
-        });
-        lyricsElementAdded();
+        let didInjectRoman = false;
+        const romanExclude = romanizationBatch
+          .filter((b, i) =>
+            !!response.results[i] &&
+            !linesData[b.index].lyricElement.querySelector(`.${ROMANIZED_LYRICS_CLASS}`)
+          )
+          .map(b => linesData[b.index].lyricElement);
+        animateDOMUpdate(() => {
+          if (isStale()) return;
+          response.results.forEach((result, i) => {
+            if (result) {
+              const originalIndex = romanizationBatch[i].index;
+              if (injectRomanization(linesData[originalIndex].lyricElement, linesData[originalIndex], result)) didInjectRoman = true;
+            }
+          });
+        }, () => { if (didInjectRoman) lyricsElementAdded(); }, isStale, romanExclude);
       })()
     );
   }
@@ -645,13 +816,22 @@ async function processBatchTranslationsAndRomanizations(
 
         if (isTranslationDisabledForLang(sourceLanguage || "")) return;
 
-        response.results.forEach((result, i) => {
-          if (result) {
-            const originalIndex = translationBatch[i].index;
-            injectTranslation(linesData[originalIndex].lyricElement, result.translatedText);
-          }
-        });
-        lyricsElementAdded();
+        let didInjectTranslation = false;
+        const translationExclude = translationBatch
+          .filter((b, i) =>
+            !!response.results[i] &&
+            !linesData[b.index].lyricElement.querySelector(`.${TRANSLATED_LYRICS_CLASS}`)
+          )
+          .map(b => linesData[b.index].lyricElement);
+        animateDOMUpdate(() => {
+          if (isStale()) return;
+          response.results.forEach((result, i) => {
+            if (result) {
+              const originalIndex = translationBatch[i].index;
+              if (injectTranslation(linesData[originalIndex].lyricElement, result.translatedText)) didInjectTranslation = true;
+            }
+          });
+        }, () => { if (didInjectTranslation) lyricsElementAdded(); }, isStale, translationExclude);
       })()
     );
   }
@@ -664,13 +844,19 @@ function injectRomanization(
   lineData: LineData,
   text: string,
   timedRomanization: LyricPart[] | null = null
-) {
-  if (lyricElement.querySelector(`.${ROMANIZED_LYRICS_CLASS}`)) return;
+): boolean {
+  if (lyricElement.querySelector(`.${ROMANIZED_LYRICS_CLASS}`)) return false;
 
   createBreakElem(lyricElement, 4);
   const romanizedLine = document.createElement("div");
   romanizedLine.classList.add(ROMANIZED_LYRICS_CLASS);
   romanizedLine.style.order = "5";
+
+  // Assign permanent view-transition-name at creation
+  const container = lyricElement.closest(`.${LYRICS_CLASS}`) as HTMLElement | null;
+  const videoId = container?.dataset.videoId ?? "unknown";
+  const lineId = lyricElement.dataset.lineNumber ?? "unknown";
+  romanizedLine.style.setProperty("view-transition-name", `roman-${videoId}-${lineId}`);
 
   if (timedRomanization && timedRomanization.length > 0 && !disableRichsync.getBooleanValue()) {
     createLyricsLine(timedRomanization, lineData, romanizedLine);
@@ -678,17 +864,26 @@ function injectRomanization(
     romanizedLine.textContent = text;
   }
   lyricElement.appendChild(romanizedLine);
+  return true;
 }
 
-function injectTranslation(lyricElement: HTMLElement, text: string) {
-  if (lyricElement.querySelector(`.${TRANSLATED_LYRICS_CLASS}`)) return;
+function injectTranslation(lyricElement: HTMLElement, text: string): boolean {
+  if (lyricElement.querySelector(`.${TRANSLATED_LYRICS_CLASS}`)) return false;
 
   createBreakElem(lyricElement, 6);
   const translatedLine = document.createElement("div");
   translatedLine.classList.add(TRANSLATED_LYRICS_CLASS);
   translatedLine.style.order = "7";
+
+  // Assign permanent view-transition-name at creation
+  const container = lyricElement.closest(`.${LYRICS_CLASS}`) as HTMLElement | null;
+  const videoId = container?.dataset.videoId ?? "unknown";
+  const lineId = lyricElement.dataset.lineNumber ?? "unknown";
+  translatedLine.style.setProperty("view-transition-name", `translation-${videoId}-${lineId}`);
+
   translatedLine.textContent = text;
   lyricElement.appendChild(translatedLine);
+  return true;
 }
 
 export function calculateLyricPositions() {
