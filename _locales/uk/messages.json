@@ -351,6 +351,10 @@
     "message": "Better Lyrics Legato",
     "description": "Better Lyrics Legato provider name"
   },
+  "options_provider_betterLyricsPortato": {
+    "message": "Better Lyrics Portato",
+    "description": "Better Lyrics Portato provider name"
+  },
   "options_provider_betterLyricsUnison": {
     "message": "Better Lyrics Unison",
     "description": "Better Lyrics Unison provider name"
@@ -1222,7 +1226,7 @@
     "description": "Reason for the report that the lyrics is bad in other reasons"
   },
   "report_lyrics_details_placeholder": {
-    "message": "Додаткова інформація про цю скаргу",
+    "message": "Додаткова інформація щодо скарги",
     "description": "Placeholder for report lyrics details input"
   },
   "report_lyrics_submit": {
