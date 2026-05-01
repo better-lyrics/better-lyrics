@@ -1,14 +1,10 @@
 import { LYRIC_SOURCE_KEYS, PROVIDER_CONFIGS, PROVIDER_SWITCHED_LOG } from "@constants";
 import { getTransientStorage, setTransientStorage } from "@core/storage";
 import { log } from "@utils";
-import binimum from "./binimum";
-import bLyrics from "./blyrics/blyrics";
-import cubey, { type CubeyLyricSourceResult } from "./cubey";
-import legato from "./legato";
-import lyricLib from "./lrclib";
+import unified from "./unified";
 import ytLyrics, { type YTLyricSourceResult } from "./yt";
 import { ytCaptions } from "./ytCaptions";
-
+import unison, { type UnisonLyricSourceResult } from "@modules/lyrics/providers/unison";
 /** Current version of the lyrics cache format */
 const LYRIC_CACHE_VERSION = "2.0.0";
 
@@ -46,7 +42,7 @@ interface AudioTrackData {
 interface LyricSource {
   filled: boolean;
   resultCached: boolean;
-  lyricSourceResult: LyricSourceResult | CubeyLyricSourceResult | YTLyricSourceResult | null;
+  lyricSourceResult: LyricSourceResult | UnisonLyricSourceResult | YTLyricSourceResult | null;
   lyricSourceFiller: (providerParameters: ProviderParameters) => Promise<void>;
 }
 
@@ -57,6 +53,11 @@ export interface LyricSourceResult {
   sourceHref: string;
   musicVideoSynced?: boolean | null;
   cacheAllowed?: boolean;
+  album?: string;
+  artist?: string;
+  song?: string;
+  duration?: number;
+  unisonId?: number;
 }
 
 export type LyricsArray = Lyric[];
@@ -146,17 +147,22 @@ export function initProviders(): void {
 }
 
 const sourceKeyToFillFn = {
-  "binimum-richsynced": binimum,
-  "binimum-synced": binimum,
-  "bLyrics-richsynced": bLyrics,
-  "bLyrics-synced": bLyrics,
-  "musixmatch-richsync": cubey,
-  "musixmatch-synced": cubey,
-  "lrclib-synced": lyricLib,
-  "lrclib-plain": lyricLib,
+  "binimum-richsynced": (p: ProviderParameters) => unified(p, "binimum-richsynced"),
+  "binimum-synced": (p: ProviderParameters) => unified(p, "binimum-synced"),
+  "bLyrics-richsynced": (p: ProviderParameters) => unified(p, "bLyrics-richsynced"),
+  "bLyrics-synced": (p: ProviderParameters) => unified(p, "bLyrics-synced"),
+  "unison-richsynced": unison,
+  "unison-synced": unison,
+  "unison-plain": unison,
+  "musixmatch-richsync": (p: ProviderParameters) => unified(p, "musixmatch-richsync"),
+  "musixmatch-synced": (p: ProviderParameters) => unified(p, "musixmatch-synced"),
+  "lrclib-synced": (p: ProviderParameters) => unified(p, "lrclib-synced"),
+  "lrclib-plain": (p: ProviderParameters) => unified(p, "lrclib-plain"),
   "yt-captions": ytCaptions,
   "yt-lyrics": ytLyrics,
-  "legato-synced": legato,
+  "legato-synced": (p: ProviderParameters) => unified(p, "legato-synced"),
+  "portato-richsynced": (p: ProviderParameters) => unified(p, "portato-richsynced"),
+  metadata: (p: ProviderParameters) => unified(p, "metadata" as LyricSourceKey),
 } as const;
 
 export type LyricSourceKey = Readonly<keyof typeof sourceKeyToFillFn>;

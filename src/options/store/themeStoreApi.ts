@@ -7,7 +7,7 @@ import {
   signInstall,
   signPayload,
   signRating,
-} from "./keyIdentity";
+} from "@core/keyIdentity";
 import { fetchWithTimeout } from "./themeStoreService";
 import type { AllThemeStats, ApiResult, RatingResult } from "./types";
 

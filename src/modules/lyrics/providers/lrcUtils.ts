@@ -4,6 +4,10 @@ import type { LyricPart, LyricsArray } from "./shared";
 
 const possibleIdTags = ["ti", "ar", "al", "au", "lr", "length", "by", "offset", "re", "tool", "ve", "#"];
 
+const TIME_TAG_REGEX = /[\[](\d+:\d+\.\d+)[\]]/g;
+const ENHANCED_WORD_REGEX = /<(\d+:\d+\.\d+)>/g;
+const ID_TAG_REGEX = /^[\[](\w+):(.*)[\]]$/;
+
 /**
  * Parse time in [mm:ss.xx] or <mm:ss.xx> format to milliseconds
  */
@@ -49,54 +53,50 @@ function parseTime(timeStr: string | number | undefined): number {
 export function parseLRC(lrcText: string, songDuration: number): LyricsArray {
   const lines = lrcText.split("\n");
   const result: LyricsArray = [];
-  const idTags = {} as any;
+  const idTags: Record<string, string> = {};
 
-  // Process each line
   lines.forEach(line => {
     line = line.trim();
 
-    // Match ID tags [type:value]
-    const idTagMatch = line.match(/^[\[](\w+):(.*)[\]]$/);
+    const idTagMatch = line.match(ID_TAG_REGEX);
     if (idTagMatch && possibleIdTags.includes(idTagMatch[1])) {
       idTags[idTagMatch[1]] = idTagMatch[2];
       return;
     }
 
-    // Match time tags with lyrics
-    const timeTagRegex = /[\[](\d+:\d+\.\d+)[\]]/g;
-    const enhancedWordRegex = /<(\d+:\d+\.\d+)>/g;
-
     const timeTags: number[] = [];
     let match;
-    while ((match = timeTagRegex.exec(line)) !== null) {
-      timeTags.push(<number>parseTime(match[1]));
+    while ((match = TIME_TAG_REGEX.exec(line)) !== null) {
+      timeTags.push(parseTime(match[1]));
     }
 
-    if (timeTags.length === 0) return; // Skip lines without time tags
+    if (timeTags.length === 0) return;
 
-    const lyricPart = line.replace(timeTagRegex, "").trim();
+    const lyricPart = line.replace(TIME_TAG_REGEX, "").trim();
 
-    // Extract enhanced lyrics (if available)
     const parts: LyricPart[] = [];
     let lastTime: number | null = null;
     let plainText = "";
 
-    lyricPart.split(enhancedWordRegex).forEach((fragment, index) => {
+    const fragments = lyricPart.split(ENHANCED_WORD_REGEX);
+
+    // Musixmatch wraps each word with paired <ts>, separated by whitespace-only "gap" fragments; canonical LRC has none.
+    const isMusixmatchStyle = fragments.some(
+      (f, i) => i % 2 === 0 && i > 0 && i < fragments.length - 1 && f.length > 0 && f.trim() === ""
+    );
+
+    fragments.forEach((fragment, index) => {
       if (index % 2 === 0) {
-        // This is a word or plain text segment
-        if (fragment.length > 0 && fragment[0] === " ") {
-          fragment = fragment.substring(1);
-        }
-        if (fragment.length > 0 && fragment[fragment.length - 1] === " ") {
-          fragment = fragment.substring(0, fragment.length - 1);
+        if (isMusixmatchStyle) {
+          const trimmed = fragment.trim();
+          fragment = trimmed === "" && fragment.length > 0 ? " " : trimmed;
         }
         plainText += fragment;
         if (parts.length > 0 && parts[parts.length - 1].startTimeMs) {
           parts[parts.length - 1].words += fragment;
         }
       } else {
-        // This is a timestamp
-        const startTime = <number>parseTime(fragment);
+        const startTime = parseTime(fragment);
         if (lastTime !== null && parts.length > 0) {
           parts[parts.length - 1].durationMs = startTime - lastTime;
         }
@@ -109,7 +109,6 @@ export function parseLRC(lrcText: string, songDuration: number): LyricsArray {
       }
     });
 
-    // Calculate fallback duration and add entry
     const startTime = Math.min(...timeTags);
     const endTime = Math.max(...timeTags);
     const duration = endTime - startTime;
