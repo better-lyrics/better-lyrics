@@ -68,7 +68,7 @@
 	/* During a slide (element exists in both old and new state),
 	   hide the old snapshot and freeze the new snapshot so only
 	   the group position animates — no ghost, no crossfade. */
-	::view-transition-old(*.blyrics-line),
+	::view-transition-old(*.blyrics-line):not(:only-child),
 	::view-transition-old(*.blyrics-translation):not(:only-child),
 	::view-transition-old(*.blyrics-roman):not(:only-child) {
 		display: none;
