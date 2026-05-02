@@ -88,7 +88,7 @@ function animateDOMUpdate(updateFn: () => void, postUpdateFn?: () => void, shoul
             updateFn();
           });
 
-          transition.finished.catch(() => { }).finally(() => {
+          transition.finished.catch(e => { log(GENERAL_ERROR_LOG, e); }).finally(() => {
             // Remove ONLY the temporary line names.
             // Roman/translation names stay permanently on their elements.
             lineElements.forEach(el => el.style.removeProperty("view-transition-name"));
@@ -98,11 +98,12 @@ function animateDOMUpdate(updateFn: () => void, postUpdateFn?: () => void, shoul
             try {
               postUpdateFn?.();
             } catch (e) {
-              console.error("[BetterLyrics] Error in postUpdateFn:", e);
+              log(GENERAL_ERROR_LOG, e);
             }
             resolve();
           });
-        } catch {
+        } catch (e) {
+          log(GENERAL_ERROR_LOG, e);
           lineElements.forEach(el => el.style.removeProperty("view-transition-name"));
 
           // updateFn may have already executed synchronously inside
@@ -247,13 +248,6 @@ export function processLyrics(data: LyricSourceResultWithMeta, keepLoaderVisible
   const ytMusicLyrics = document.querySelector(NO_LYRICS_TEXT_SELECTOR)?.parentElement;
   if (ytMusicLyrics) {
     ytMusicLyrics.classList.add("blyrics-hidden");
-  }
-
-  try {
-    const lyricsElement = document.getElementsByClassName(LYRICS_CLASS)[0] as HTMLElement;
-    lyricsElement.replaceChildren();
-  } catch (_err) {
-    log(LYRICS_TAB_NOT_DISABLED_LOG);
   }
 
   injectLyrics(data, keepLoaderVisible, signal).catch(err => log(GENERAL_ERROR_LOG, err));
@@ -439,7 +433,7 @@ function createBreakElem(lyricElement: HTMLElement, order: number) {
  * @param [data.sourceHref] - URL for source link
  */
 
-export async function performExitTransition(): Promise<void> {
+async function performExitTransition(): Promise<void> {
   if (!document.startViewTransition || !CSS.supports("view-transition-class", "test")) return;
 
   const container = document.querySelector(`.${LYRICS_CLASS}`) as HTMLElement | null;
@@ -466,10 +460,11 @@ export async function performExitTransition(): Promise<void> {
       allExiting.forEach(el => el.remove());
     });
 
-    await transition.finished.catch(() => { });
+    await transition.finished.catch(e => { log(GENERAL_ERROR_LOG, e); });
 
     lineElements.forEach(el => el.style.removeProperty("view-transition-name"));
-  } catch {
+  } catch (e) {
+    log(GENERAL_ERROR_LOG, e);
     lineElements.forEach(el => el.style.removeProperty("view-transition-name"));
   }
 }
@@ -487,7 +482,7 @@ async function injectLyrics(data: LyricSourceResultWithMeta, keepLoaderVisible =
       // Only animate the exit if this injection is still the intended one.
       // A newer song change may have already superseded us.
       if (!isStale()) {
-        await performExitTransition().catch(() => { });
+        await performExitTransition().catch(e => { log(GENERAL_ERROR_LOG, e); });
       }
       resolve();
     });
