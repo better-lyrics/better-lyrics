@@ -114,8 +114,8 @@ function animateDOMUpdate(updateFn: () => void, postUpdateFn?: () => void, shoul
           try {
             if (!shouldSkipFn?.()) {
               updateFn();
+              postUpdateFn?.();
             }
-            postUpdateFn?.();
           } finally {
             resolve();
           }
@@ -453,7 +453,13 @@ async function performExitTransition(): Promise<void> {
     el.style.setProperty("view-transition-name", `line-${videoId}-${el.dataset.lineNumber ?? "unknown"}`);
   });
 
-  const allExiting = [...romanElems, ...transElems];
+  const breakOrder4 = Array.from(
+    container.querySelectorAll<HTMLElement>(".blyrics--break")
+  ).filter(el => el.style.order === "4");
+  const breakOrder6 = Array.from(
+    container.querySelectorAll<HTMLElement>(".blyrics--break")
+  ).filter(el => el.style.order === "6");
+  const allExiting = [...romanElems, ...transElems, ...breakOrder4, ...breakOrder6];
 
   try {
     const transition = document.startViewTransition(() => {
