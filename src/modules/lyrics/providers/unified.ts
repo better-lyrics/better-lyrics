@@ -1,4 +1,4 @@
-import { CUBEY_LYRICS_API_URL, CUBEY_LYRICS_API_URL_TURNSTILE, LOG_PREFIX } from "@constants";
+import { CUBEY_LYRICS_API_URL, CUBEY_LYRICS_API_URL_TURNSTILE, HOMEPAGE_URL, LOG_PREFIX } from "@constants";
 import { getLocalStorage } from "@core/storage";
 import { log } from "@core/utils";
 import { lrcFixers, parseLRC, parsePlainLyrics } from "./lrcUtils";
@@ -427,7 +427,7 @@ async function processStreamData(event: string, data: any, params: ProviderParam
         sourceMap["legato-synced"].lyricSourceResult = {
           lyrics,
           source: "Better Lyrics Legato",
-          sourceHref: "https://boidu.dev/",
+          sourceHref: HOMEPAGE_URL,
           musicVideoSynced: false,
         };
         sourceMap["legato-synced"].filled = true;
@@ -446,7 +446,7 @@ async function processStreamData(event: string, data: any, params: ProviderParam
           sourceMap["portato-richsynced"].lyricSourceResult = {
             lyrics,
             source: "Better Lyrics Portato",
-            sourceHref: "https://boidu.dev/",
+            sourceHref: HOMEPAGE_URL,
             musicVideoSynced: false,
             cacheAllowed: true,
           };

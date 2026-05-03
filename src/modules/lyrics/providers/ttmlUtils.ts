@@ -1,4 +1,4 @@
-import { BLYRICS_INSTRUMENTAL_GAP_MS } from "@constants";
+import { BLYRICS_INSTRUMENTAL_GAP_MS, HOMEPAGE_DOMAIN, HOMEPAGE_URL } from "@constants";
 import type {
   Lyric,
   LyricPart,
@@ -234,8 +234,8 @@ export async function fillTtml(
   options: FillTtmlOptions = {
     richsyncKey: "bLyrics-richsynced",
     syncedKey: "bLyrics-synced",
-    source: "boidu.dev",
-    sourceHref: "https://boidu.dev/",
+    source: HOMEPAGE_DOMAIN,
+    sourceHref: HOMEPAGE_URL,
     cacheAllowed: true,
   },
   ...args: unknown[]

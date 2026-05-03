@@ -676,7 +676,7 @@ Ensures the lyrics panel has adequate space for comfortable reading. The `33em` 
 
 #blyrics-loader:before {
   animation: blyrics-spin 1s linear infinite;
-  background: url(https://better-lyrics.boidu.dev/icon-512.png);
+  background: url(https://betterlyrics.org/icon-512.png);
   background-position: 50%;
   background-size: cover;
   content: "";
