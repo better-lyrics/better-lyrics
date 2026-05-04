@@ -49,7 +49,13 @@ export const HOMEPAGE_URL = "https://betterlyrics.org" as const;
 export const HOMEPAGE_DOMAIN = "betterlyrics.org" as const;
 export const HOMEPAGE_ICON_URL = "https://betterlyrics.org/icon-512.png" as const;
 export const UNISON_API_URL = "https://unison.boidu.dev/lyrics" as const;
+export const LYRICS_API_URL = "https://lyrics-api.boidu.dev/getLyrics" as const;
+export const BINIMUM_LYRICS_API_URL = "https://lyrics-api.binimum.org/" as const;
 export const DISCORD_INVITE_URL = "https://discord.gg/UsHE3d5fWF" as const;
+export const LRCLIB_API_URL = "https://lrclib.net/api/get" as const;
+export const LEGATO_API_URL = "https://lyrics-api.boidu.dev/kugou/getLyrics" as const;
+export const PORTATO_API_URL = "https://lyrics-api.boidu.dev/qq/getLyrics" as const;
+export const LRCLIB_CLIENT_HEADER = "BetterLyrics Extension (https://github.com/better-lyrics/better-lyrics)" as const;
 export const THEME_STORE_API_URL = "https://better-lyrics-themes-api.boidu.dev" as const;
 export const UNISON_API_BASE_URL = "https://unison.boidu.dev" as const;
 export const THEME_STORE_TURNSTILE_URL = `${THEME_STORE_API_URL}/turnstile` as const;
@@ -115,6 +121,7 @@ export const GENERAL_ERROR_LOG = "[BetterLyrics] Error:" as const;
 export const FETCH_LYRICS_LOG = "[BetterLyrics] Fetching lyrics for:" as const;
 export const LYRICS_FOUND_LOG = "[BetterLyrics] Lyrics found, injecting into the page" as const;
 export const NO_LYRICS_FOUND_LOG = "[BetterLyrics] No lyrics found for the current song" as const;
+export const LRCLIB_LYRICS_FOUND_LOG = "[BetterLyrics] Lyrics found from LRCLIB" as const;
 export const PROVIDER_SWITCHED_LOG = "[BetterLyrics] Switching to provider = " as const;
 
 // UI State Logs

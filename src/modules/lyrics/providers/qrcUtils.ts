@@ -1,5 +1,4 @@
 import { stringSimilarity } from "@modules/lyrics/lyricParseUtils";
-import { insertInstrumentalBreaks } from "@modules/lyrics/instrumentalBreaks";
 import type { Lyric, LyricPart } from "./shared";
 
 // -- Line/Word Time Parsing --------------------------
@@ -291,5 +290,5 @@ export function parseQRC(qrcXml: string, songDurationMs: number, metadata?: QrcM
     };
   });
 
-  return insertInstrumentalBreaks(lyrics, songDurationMs);
+  return lyrics;
 }
