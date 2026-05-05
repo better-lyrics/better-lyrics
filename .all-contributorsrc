@@ -142,6 +142,15 @@
       "contributions": [
         "code"
       ]
+    },
+    {
+      "login": "ibratabian17",
+      "name": "Ibra Al Tabian",
+      "avatar_url": "https://avatars.githubusercontent.com/u/71920907?v=4",
+      "profile": "http://ibratabian17.github.io",
+      "contributions": [
+        "code"
+      ]
     }
   ],
   "badgeTemplate": "<img src=\"https://img.shields.io/badge/all_contributors-<%= contributors.length %>-orange.svg\" alt=\"\"/>",
