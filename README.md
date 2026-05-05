@@ -397,6 +397,7 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
     <tr>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/ShuiGuiPoppy"><img src="https://avatars.githubusercontent.com/u/219837672?v=4?s=100" width="100px;" alt="ShuiGuiPoppy"/><br /><sub><b>ShuiGuiPoppy</b></sub></a><br /><a href="https://github.com/better-lyrics/better-lyrics/commits?author=ShuiGuiPoppy" title="Code">💻</a></td>
       <td align="center" valign="top" width="14.28%"><a href="http://ibratabian17.github.io"><img src="https://avatars.githubusercontent.com/u/71920907?v=4?s=100" width="100px;" alt="Ibra Al Tabian"/><br /><sub><b>Ibra Al Tabian</b></sub></a><br /><a href="https://github.com/better-lyrics/better-lyrics/commits?author=ibratabian17" title="Code">💻</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://binimum.org"><img src="https://avatars.githubusercontent.com/u/61615730?v=4?s=100" width="100px;" alt="binimum"/><br /><sub><b>binimum</b></sub></a><br /><a href="https://github.com/better-lyrics/better-lyrics/commits?author=binimum" title="Code">💻</a></td>
     </tr>
   </tbody>
 </table>
