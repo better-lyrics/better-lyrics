@@ -14,7 +14,7 @@ Better Lyrics upgrades your YouTube Music™ experience by providing beautiful t
  <a aria-label="Better Stack Badge" href="https://better-lyrics-status.boidu.dev"><img height="20" src="https://uptime.betterstack.com/status-badges/v2/monitor/1dqoz.svg" alt="Better Stack Badge" /></a>
 
  <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
-<img src="https://img.shields.io/badge/all_contributors-15-orange.svg" alt=""/>
+<img src="https://img.shields.io/badge/all_contributors-16-orange.svg" alt=""/>
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
  <a aria-label="Crowdin" href="https://crowdin.com/project/better-lyrics"><img alt="Crowdin" src="https://badges.crowdin.net/better-lyrics/localized.svg"></a>
  <a aria-label="Graphite" href="https://graphite.com/?utm_source=github&utm_medium=readme&utm_campaign=better-lyrics"><img height="20" src="https://img.shields.io/badge/Code_Review-Graphite-black?logo=Graphite&logoColor=white" alt="Graphite" /></a>
@@ -68,11 +68,12 @@ Better Lyrics upgrades your YouTube Music™ experience by providing beautiful t
 🎵 Displays beautiful time-synced lyrics on YouTube Music™\
 📦 Requires no external dependencies or configurations\
 ⏩ Lets you seek by clicking on any line\
-🌏 Supports multiple languages\
+🌏 Translations and romanization for foreign-language tracks\
+🌐 UI available in multiple languages\
 🪶 Runs lightweight and fast\
 🖥️ Includes full-screen mode\
 🎨 Theme Marketplace with community themes\
-🔧 Customizable lyrics providers\
+🔧 Customizable lyrics providers from multiple sources\
 ✨ And much more!
 
 ## Download
@@ -110,14 +111,17 @@ Settings are organized into tabs in the extension popup:
 | Full screen mode                             | Enabled |
 | Auto-hide cursor in full screen mode         | Enabled |
 | Stylized animations (Background/Wobble/Glow) | Enabled |
+| Passive scroll for unsynced lyrics           | Enabled |
+| Unison Actions (pinned dock position, etc.)  | Manage  |
 
 ### Language
 
-| Option               | Default  |
-| -------------------- | -------- |
-| Translations         | Disabled |
-| Translation Language | English  |
-| Romanization         | Disabled |
+| Option               | Default     |
+| -------------------- | ----------- |
+| Display Language     | Auto-detect |
+| Romanization         | Disabled    |
+| Translations         | Disabled    |
+| Translation Language | English     |
 
 ### Sources
 
@@ -132,6 +136,13 @@ Settings are organized into tabs in the extension popup:
 | Theme selector | Choose from installed themes        |
 | CSS Editor     | Customize styling with live preview |
 | Marketplace    | Browse and install community themes |
+
+### Identity
+
+| Option           | Description                                            |
+| ---------------- | ------------------------------------------------------ |
+| Display name     | The handle attached to themes you publish              |
+| Export / Import  | Back up or transfer your identity key between devices  |
 
 > [!TIP]
 >
@@ -149,29 +160,37 @@ Browse and install community-created themes directly from the extension. Access 
 
 ## Extension Permissions
 
-| Permission                                                            | Reason                                                                                                                                                                                           | Data Usage                                         |
-| --------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | -------------------------------------------------- |
-| **Download files and read and modify the browser's download history** | [Firefox specific - Required to download styles and themes as CSS file](https://github.com/better-lyrics/better-lyrics/blob/b9d5f888703f1b786e48a4fe66bfec08a1553739/src/options/editor.js#L159) | Does not read or modify browser's download history |
+| Permission                          | Reason                                                                                                                                                          | Data Usage                                                                       |
+| ----------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------- |
+| **Access to `music.youtube.com`**   | Required to inject the lyrics UI into YouTube Music™ pages.                                                                                                     | No data is read or sent from any other site.                                     |
+| **Storage**                         | Saves your settings, installed themes, identity key, and the local lyrics cache.                                                                                | All stored locally in your browser; settings are synced across devices via your browser's built-in sync. |
+| **Alarms**                          | Schedules background tasks such as periodic theme update checks and cache cleanup.                                                                              | Does not collect or transmit any data.                                           |
+| **Downloads** (optional)            | [Required when exporting themes or your identity key as a file.](https://github.com/better-lyrics/better-lyrics/blob/HEAD/src/options/editor/features/import.ts) | Only used at the moment you click an export button. Browser download history is not read or modified. |
 
 Better Lyrics **does not** collect any personal data or track your browsing activity. The extension is open-source and thoroughly reviewed by the community to ensure that your privacy is protected.
 
 ## Manual Installation
 
+The simplest path is to grab a pre-built ZIP from the [releases page](https://github.com/better-lyrics/better-lyrics/releases). It contains both Chrome and Firefox builds, ready to load. If you'd rather build from source, clone the repo and run `npm install && npm run build`. The build outputs are written to `dist/chrome/` and `dist/firefox/`.
+
 ### Chrome
 
-1. Clone this repository or download the ZIP file from [releases](https://github.com/better-lyrics/better-lyrics/releases) page.
+1. Download a release ZIP and unzip it (or build from source, see above).
 2. Open Google Chrome™ and go to `chrome://extensions`.
-3. Enable "Developer mode" by toggling the switch in top right corner.
-4. Click on "Load unpacked" and select the folder where you cloned/downloaded this repository.
+3. Enable "Developer mode" with the toggle in the top-right corner.
+4. Click "Load unpacked" and select the unzipped folder (or `dist/chrome/` if building from source).
 5. Better Lyrics should now be installed and ready to use!
 
 ### Firefox
 
-1. Clone this repository or download the ZIP file from [releases](https://github.com/better-lyrics/better-lyrics/releases) page.
+1. Download a release ZIP and unzip it (or build from source, see above).
 2. Open Firefox and go to `about:debugging#/runtime/this-firefox`.
-3. Copy the contents of `manifest.firefox.json` and paste it in `manifest.json`.
-4. Click on "Load Temporary Add-on" and select the `manifest.json` file in the cloned/downloaded folder.
-5. Better Lyrics should now be installed and ready to use!
+3. Click "Load Temporary Add-on" and select the `manifest.json` inside the unzipped folder (or `dist/firefox/manifest.json` if building from source).
+4. Better Lyrics should now be installed and ready to use!
+
+> [!NOTE]
+>
+> Firefox unloads temporary add-ons when the browser is closed. For a permanent install, use the [signed Firefox Add-on listing](https://addons.mozilla.org/en-US/firefox/addon/better-lyrics/).
 
 ## FAQ
 
@@ -205,12 +224,22 @@ Yes you can! Please follow the contributing guidelines below.
 
 ### Some lyrics are out of sync, missing, or incorrect. What can I do?
 
-If you find any issues with lyrics, you now have two options:
+Better Lyrics fetches from many providers, so the first thing to try is switching to a different one in extension settings (Sources tab); a better version may already exist elsewhere.
 
-1. Toggle or reorder providers in extension settings
-2. Contribute your own lyrics using [LRCLIBup](https://lrclibup.boidu.dev)
+If you want to fix the lyrics for everyone, use **Unison**, our built-in community lyrics platform. Unison is the recommended contribution path going forward (it replaces LRCLIBup, which we no longer use).
 
-LRCLIBup allows you to submit correct, properly synchronized lyrics that will be available to all users who use the LRCLib provider. This is a community-driven approach to improving and adding lyrics, so please be mindful of quality.
+> [!IMPORTANT]
+> Unison isn't live in the store builds yet. If you're on the Chrome, Firefox, or Edge version, lyrics you submit through Unison won't show up in your extension until the next release. To try it now, install from source.
+
+You can:
+
+1. **Vote or report** directly from the lyrics panel. When Unison is the active provider, an Unison card appears below the lyrics with upvote, downvote, and report buttons. Reports include reasons (wrong lyrics, bad timing, offensive content, etc.) so curators know how to act.
+2. **Submit corrected lyrics.** Click the "Submit to Unison" button at the bottom of any song's lyrics view, or open Unison directly from the Unison card. The submit form is pre-filled with the current song's metadata; just paste your corrected lyrics in your preferred format (LRC, plain text, or rich-sync).
+3. **Browse, search, and manage your submissions.** The Unison page has a feed of recent contributions, a search view, and a "My submissions" tab so you can track and edit your own entries.
+
+Please be mindful of quality when contributing, since these lyrics are served to everyone using the extension.
+
+Other providers (Musixmatch, BiniLyrics, etc.) have their own external catalogs and contribution channels; corrections submitted there will flow back into Better Lyrics automatically once those upstream databases update.
 
 ### How do I report a bug?
 
@@ -248,17 +277,23 @@ Yes! Better Lyrics supports switching between different providers. You can reord
 
 Available providers (default priority order):
 
-| #   | Provider             | Sync Level |
-| --- | -------------------- | ---------- |
-| 1   | Better Lyrics        | Syllable   |
-| 2   | Musixmatch           | Word       |
-| 3   | YouTube Captions     | Line       |
-| 4   | Better Lyrics        | Line       |
-| 5   | LRCLib               | Line       |
-| 6   | Better Lyrics Legato | Line       |
-| 7   | Musixmatch           | Line       |
-| 8   | YouTube Lyrics       | Unsynced   |
-| 9   | LRCLib               | Unsynced   |
+| #   | Provider              | Sync Level |
+| --- | --------------------- | ---------- |
+| 1   | Better Lyrics         | Syllable   |
+| 2   | Unison                | Syllable   |
+| 3   | BiniLyrics            | Syllable   |
+| 4   | Better Lyrics Portato | Word       |
+| 5   | Musixmatch            | Word       |
+| 6   | Better Lyrics         | Line       |
+| 7   | Unison                | Line       |
+| 8   | YouTube Captions      | Line       |
+| 9   | BiniLyrics            | Line       |
+| 10  | LRCLib                | Line       |
+| 11  | Better Lyrics Legato  | Line       |
+| 12  | Musixmatch            | Line       |
+| 13  | YouTube               | Unsynced   |
+| 14  | Unison                | Unsynced   |
+| 15  | LRCLib                | Unsynced   |
 
 Adding custom providers isn't currently supported.
 
@@ -270,7 +305,9 @@ Right now, Better Lyrics is available for Chrome, Firefox, and Edge (and other C
 
 No, Better Lyrics is specifically designed for YouTube Music™. If you want something similar for other streaming services, check out these extensions. If you have suggestions for others, open a PR to add them to this list:
 
+- [Spicy Lyrics](https://github.com/Spikerko/spicy-lyrics) - Spotify
 - [Beautiful Lyrics](https://github.com/surfbryce/beautiful-lyrics) - Spotify
+- [YouLy+](https://github.com/ibratabian17/YouLyPlus) - Apple Music, Tidal
 
 ## Funding
 
@@ -304,7 +341,7 @@ Contributions are welcome! If you have any ideas, suggestions, or bug reports, p
 
 ## License
 
-This project is licensed under the [GNU GPLv3 License](LICENSE). As long as you attribute me or [Better Lyrics](https://better-lyrics.boidu.dev) as the original creator and comply with the rest of the license terms, you can use this project for personal or commercial purposes.
+This project is licensed under the [GNU GPLv3 License](LICENSE). As long as you attribute me or [Better Lyrics](https://betterlyrics.org) as the original creator and comply with the rest of the license terms, you can use this project for personal or commercial purposes.
 
 ## Privacy
 
@@ -359,6 +396,8 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
     </tr>
     <tr>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/ShuiGuiPoppy"><img src="https://avatars.githubusercontent.com/u/219837672?v=4?s=100" width="100px;" alt="ShuiGuiPoppy"/><br /><sub><b>ShuiGuiPoppy</b></sub></a><br /><a href="https://github.com/better-lyrics/better-lyrics/commits?author=ShuiGuiPoppy" title="Code">💻</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="http://ibratabian17.github.io"><img src="https://avatars.githubusercontent.com/u/71920907?v=4?s=100" width="100px;" alt="Ibra Al Tabian"/><br /><sub><b>Ibra Al Tabian</b></sub></a><br /><a href="https://github.com/better-lyrics/better-lyrics/commits?author=ibratabian17" title="Code">💻</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://binimum.org"><img src="https://avatars.githubusercontent.com/u/61615730?v=4?s=100" width="100px;" alt="binimum"/><br /><sub><b>binimum</b></sub></a><br /><a href="https://github.com/better-lyrics/better-lyrics/commits?author=binimum" title="Code">💻</a></td>
     </tr>
   </tbody>
 </table>

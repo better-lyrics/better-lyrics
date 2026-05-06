@@ -1842,6 +1842,10 @@ input.cm-textfield:focus-visible {
 	align-items: center;
 }
 
+.unison-modal-row:first-of-type {
+    margin-top: 0;
+}
+
 .unison-modal-row__text {
 	display: flex;
 	flex-direction: column;

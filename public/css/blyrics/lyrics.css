@@ -54,6 +54,7 @@
 	align-content: flex-start;
 	padding-left: 0.25em;
 	padding-right: 0.25em;
+	margin-right: -0.25em;
 	box-sizing: border-box;
   will-change: transform;
 }
@@ -67,6 +68,10 @@
 	color: var(--blyrics-lyric-inactive-color);
 	display: inline-block;
 	white-space: pre-wrap;
+}
+
+.blyrics--has-trailing-space{
+	margin-right: 0.25em;
 }
 
 .blyrics--word {
