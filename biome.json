@@ -12,6 +12,7 @@
       "!**/node_modules",
       "!www/.next/**/*",
       "!src/options.html",
+      "!src/core/generated/**",
       "!.all-contributorsrc",
       "!STYLING.md"
     ],
