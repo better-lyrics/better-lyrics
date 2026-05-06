@@ -1,10 +1,10 @@
 {
   "manifest_version": 3,
-  "version": "2.2.1.1",
+  "version": "2.3.0.1",
   "default_locale": "en",
   "name": "Better Lyrics (Lyrics for Youtube Music)",
   "description": "__MSG_extensionDescription__",
-  "homepage_url": "https://better-lyrics.boidu.dev",
+  "homepage_url": "https://betterlyrics.org",
   "icons": {
     "16": "images/icons/icon-16.png",
     "48": "images/icons/icon-48.png",
@@ -96,5 +96,5 @@
   "action": {
     "default_popup": "src/options/options.html"
   },
-  "version_name": "2.2.1-canary 1"
+  "version_name": "2.3.0-canary 1"
 }

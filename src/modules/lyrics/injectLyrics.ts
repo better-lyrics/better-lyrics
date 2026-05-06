@@ -253,6 +253,8 @@ export function processLyrics(data: LyricSourceResultWithMeta, keepLoaderVisible
   injectLyrics(data, keepLoaderVisible, signal).catch(err => log(GENERAL_ERROR_LOG, err));
 }
 
+const TRAILING_ATTACHED_PUNCT_REGEX = /^[\p{Pe}\p{Pf}\p{Po}]+$/u;
+
 /**
  * Fallback for issue #307: split a part whose core text exceeds the wrap threshold into smaller
  * sub-parts at natural word boundaries (via Intl.Segmenter). This creates wrap opportunities for
@@ -268,6 +270,16 @@ function splitLongPart(part: LyricPart, threshold: number): LyricPart[] {
   } catch {
     segments = Array.from(part.words);
   }
+
+  // Combine punctuation with previous words
+  segments = segments.reduce((acc, curr) => {
+    if (acc.length > 0 && TRAILING_ATTACHED_PUNCT_REGEX.test(curr)) {
+      acc[acc.length - 1] += curr;
+    } else {
+      acc.push(curr);
+    }
+    return acc;
+  }, [] as string[]);
 
   const chunks: string[] = [];
   let current = "";
@@ -314,10 +326,11 @@ function createLyricsLine(parts: LyricPart[], line: LineData, lyricElement: HTML
   const wrapThreshold = longWordWrapThreshold.getNumberValue();
 
   parts.forEach(originalPart => {
-    // Separate leading / trailing whitespace from the part's core text. Whitespace is not emitted
+    // Separate leading whitespace from the part's core text. Whitespace is not emitted
     // as DOM content; it becomes a class on the preceding span so CSS can re-add spacing in a way
     // that disappears cleanly at line / row ends.
-    const match = originalPart.words.match(/^(\s*)([\s\S]*?)(\s*)$/u);
+    // Trailing whitespace isn't removed at this stage and is used to insert the appropriate classes later
+    const match = originalPart.words.match(/^(\s*)([\s\S]*?)$/u);
     const leadingWs = match?.[1] ?? "";
     const core = match?.[2] ?? originalPart.words;
     if (core.length === 0) {

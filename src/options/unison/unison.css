@@ -443,11 +443,11 @@
 /* -- Card Vote Indicator --------------------------  */
 
 .unison-card--voted-up {
-  border-left: 2px solid rgba(140, 190, 180, 0.4);
+  border: 1px solid rgba(140, 190, 180, 0.4);
 }
 
 .unison-card--voted-down {
-  border-left: 2px solid rgba(200, 140, 160, 0.4);
+  border: 1px solid rgba(200, 140, 160, 0.4);
 }
 
 /* -- Feed --------------------------  */

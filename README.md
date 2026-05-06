@@ -14,7 +14,7 @@ Better Lyrics upgrades your YouTube Music™ experience by providing beautiful t
  <a aria-label="Better Stack Badge" href="https://better-lyrics-status.boidu.dev"><img height="20" src="https://uptime.betterstack.com/status-badges/v2/monitor/1dqoz.svg" alt="Better Stack Badge" /></a>
 
  <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
-<img src="https://img.shields.io/badge/all_contributors-15-orange.svg" alt=""/>
+<img src="https://img.shields.io/badge/all_contributors-16-orange.svg" alt=""/>
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
  <a aria-label="Crowdin" href="https://crowdin.com/project/better-lyrics"><img alt="Crowdin" src="https://badges.crowdin.net/better-lyrics/localized.svg"></a>
  <a aria-label="Graphite" href="https://graphite.com/?utm_source=github&utm_medium=readme&utm_campaign=better-lyrics"><img height="20" src="https://img.shields.io/badge/Code_Review-Graphite-black?logo=Graphite&logoColor=white" alt="Graphite" /></a>
@@ -226,7 +226,12 @@ Yes you can! Please follow the contributing guidelines below.
 
 Better Lyrics fetches from many providers, so the first thing to try is switching to a different one in extension settings (Sources tab); a better version may already exist elsewhere.
 
-If you want to fix the lyrics for everyone, use **Unison**, our built-in community lyrics platform. Unison is the recommended contribution path going forward (it replaces LRCLIBup, which we no longer use). You can:
+If you want to fix the lyrics for everyone, use **Unison**, our built-in community lyrics platform. Unison is the recommended contribution path going forward (it replaces LRCLIBup, which we no longer use).
+
+> [!IMPORTANT]
+> Unison isn't live in the store builds yet. If you're on the Chrome, Firefox, or Edge version, lyrics you submit through Unison won't show up in your extension until the next release. To try it now, install from source.
+
+You can:
 
 1. **Vote or report** directly from the lyrics panel. When Unison is the active provider, an Unison card appears below the lyrics with upvote, downvote, and report buttons. Reports include reasons (wrong lyrics, bad timing, offensive content, etc.) so curators know how to act.
 2. **Submit corrected lyrics.** Click the "Submit to Unison" button at the bottom of any song's lyrics view, or open Unison directly from the Unison card. The submit form is pre-filled with the current song's metadata; just paste your corrected lyrics in your preferred format (LRC, plain text, or rich-sync).
@@ -336,7 +341,7 @@ Contributions are welcome! If you have any ideas, suggestions, or bug reports, p
 
 ## License
 
-This project is licensed under the [GNU GPLv3 License](LICENSE). As long as you attribute me or [Better Lyrics](https://better-lyrics.boidu.dev) as the original creator and comply with the rest of the license terms, you can use this project for personal or commercial purposes.
+This project is licensed under the [GNU GPLv3 License](LICENSE). As long as you attribute me or [Better Lyrics](https://betterlyrics.org) as the original creator and comply with the rest of the license terms, you can use this project for personal or commercial purposes.
 
 ## Privacy
 
@@ -391,6 +396,8 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
     </tr>
     <tr>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/ShuiGuiPoppy"><img src="https://avatars.githubusercontent.com/u/219837672?v=4?s=100" width="100px;" alt="ShuiGuiPoppy"/><br /><sub><b>ShuiGuiPoppy</b></sub></a><br /><a href="https://github.com/better-lyrics/better-lyrics/commits?author=ShuiGuiPoppy" title="Code">💻</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="http://ibratabian17.github.io"><img src="https://avatars.githubusercontent.com/u/71920907?v=4?s=100" width="100px;" alt="Ibra Al Tabian"/><br /><sub><b>Ibra Al Tabian</b></sub></a><br /><a href="https://github.com/better-lyrics/better-lyrics/commits?author=ibratabian17" title="Code">💻</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://binimum.org"><img src="https://avatars.githubusercontent.com/u/61615730?v=4?s=100" width="100px;" alt="binimum"/><br /><sub><b>binimum</b></sub></a><br /><a href="https://github.com/better-lyrics/better-lyrics/commits?author=binimum" title="Code">💻</a></td>
     </tr>
   </tbody>
 </table>

@@ -6,7 +6,7 @@ import ytLyrics, { type YTLyricSourceResult } from "./yt";
 import { ytCaptions } from "./ytCaptions";
 import unison, { type UnisonLyricSourceResult } from "@modules/lyrics/providers/unison";
 /** Current version of the lyrics cache format */
-const LYRIC_CACHE_VERSION = "2.0.0";
+const LYRIC_CACHE_VERSION = "2.1.0";
 
 interface AudioTrackData {
   id: string;
@@ -182,6 +182,25 @@ export function newSourceMap(): SourceMapType {
   }));
 }
 
+export async function saveLyricsToCache(providerParameters: ProviderParameters, provider: LyricSourceKey) {
+  let source = providerParameters.sourceMap[provider];
+  if (
+    source.filled &&
+    !source.resultCached &&
+    source.lyricSourceResult &&
+    source.lyricSourceResult.cacheAllowed !== false
+  ) {
+    source.resultCached = true;
+    const cacheKey = `blyrics_${providerParameters.videoId}_${provider}`;
+    let versionedData = {
+      version: LYRIC_CACHE_VERSION,
+      ...source.lyricSourceResult,
+    };
+    const cacheTime = 7 * 24 * 60 * 60 * 1000;
+    await setTransientStorage(cacheKey, JSON.stringify(versionedData), cacheTime);
+  }
+}
+
 /**
  * @param providerParameters
  * @param sourceName
@@ -209,25 +228,11 @@ export async function getLyrics(
   }
 
   // Save result to cache for each provider
-  defaultPreferredProviderList.forEach(provider => {
-    let source = providerParameters.sourceMap[provider];
-    if (
-      source.filled &&
-      !source.resultCached &&
-      source.lyricSourceResult &&
-      source.lyricSourceResult.cacheAllowed !== false
-    ) {
-      source.resultCached = true;
-
-      const cacheKey = `blyrics_${providerParameters.videoId}_${provider}`;
-      let versionedData = {
-        version: LYRIC_CACHE_VERSION,
-        ...source.lyricSourceResult,
-      };
-      const cacheTime = 7 * 24 * 60 * 60 * 1000;
-      setTransientStorage(cacheKey, JSON.stringify(versionedData), cacheTime);
-    }
-  });
+  await Promise.allSettled(
+    defaultPreferredProviderList.map(async provider => {
+      await saveLyricsToCache(providerParameters, provider);
+    })
+  );
 
   return lyricSource.lyricSourceResult;
 }

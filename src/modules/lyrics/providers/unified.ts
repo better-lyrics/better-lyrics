@@ -1,9 +1,9 @@
-import { CUBEY_LYRICS_API_URL, CUBEY_LYRICS_API_URL_TURNSTILE, LOG_PREFIX } from "@constants";
+import { CUBEY_LYRICS_API_URL, CUBEY_LYRICS_API_URL_TURNSTILE, HOMEPAGE_URL, LOG_PREFIX } from "@constants";
 import { getLocalStorage } from "@core/storage";
 import { log } from "@core/utils";
 import { lrcFixers, parseLRC, parsePlainLyrics } from "./lrcUtils";
 import { parseQRC } from "./qrcUtils";
-import { type LyricSourceKey, type LyricSourceResult, type ProviderParameters } from "./shared";
+import { type LyricSourceKey, type LyricSourceResult, type ProviderParameters, saveLyricsToCache } from "./shared";
 import { fillTtml } from "@modules/lyrics/providers/ttmlUtils";
 
 /**
@@ -132,7 +132,7 @@ async function getAuthenticationToken(forceNew = false): Promise<string | null> 
 }
 
 // Managed keys for this provider
-const MANAGED_KEYS: string[] = [
+const MANAGED_KEYS = [
   "musixmatch-richsync",
   "musixmatch-synced",
   "lrclib-synced",
@@ -144,7 +144,7 @@ const MANAGED_KEYS: string[] = [
   "binimum-richsynced",
   "binimum-synced",
   "metadata",
-];
+] as const;
 
 const ISRC_REGEX = /^[A-Z]{2}[A-Z0-9]{3}\d{7}$/;
 
@@ -189,15 +189,17 @@ const activeStreams = new Map<string, Promise<void>>();
 // Waiters map: videoId -> sourceKey -> resolve function
 const waiters = new Map<string, Map<string, () => void>>();
 
-function resolveWaiter(videoId: string, sourceKey: string) {
-  const videoWaiters = waiters.get(videoId);
-  if (videoWaiters) {
-    const resolve = videoWaiters.get(sourceKey);
-    if (resolve) {
-      resolve();
-      videoWaiters.delete(sourceKey);
+function resolveWaiter(params: ProviderParameters, sourceKey: LyricSourceKey) {
+  saveLyricsToCache(params, sourceKey).then(() => {
+    const videoWaiters = waiters.get(params.videoId);
+    if (videoWaiters) {
+      const resolve = videoWaiters.get(sourceKey);
+      if (resolve) {
+        resolve();
+        videoWaiters.delete(sourceKey);
+      }
     }
-  }
+  });
 }
 
 function resolveAllWaiters(videoId: string) {
@@ -210,8 +212,8 @@ function resolveAllWaiters(videoId: string) {
   }
 }
 
-async function startStream(videoId: string, providerParameters: ProviderParameters, retryCount = 0): Promise<void> {
-  const { song, artist, duration, album, alwaysFetchMetadata, signal, audioTrackData } = providerParameters;
+async function startStream(providerParameters: ProviderParameters, retryCount = 0): Promise<void> {
+  const { song, artist, duration, album, alwaysFetchMetadata, signal, audioTrackData, videoId } = providerParameters;
 
   let jwt = await getAuthenticationToken(retryCount > 0);
   if (!jwt) {
@@ -240,7 +242,7 @@ async function startStream(videoId: string, providerParameters: ProviderParamete
 
     if (response.status === 403 && retryCount < 1) {
       console.warn(LOG_PREFIX, "Request blocked (403), retrying with new token.");
-      await startStream(videoId, providerParameters, retryCount + 1);
+      await startStream(providerParameters, retryCount + 1);
       return;
     }
 
@@ -292,10 +294,10 @@ async function startStream(videoId: string, providerParameters: ProviderParamete
   } finally {
     // Ensure all waiters are resolved (cleared) when stream ends
     MANAGED_KEYS.forEach(key => {
-      if (!providerParameters.sourceMap[key as LyricSourceKey].filled) {
-        providerParameters.sourceMap[key as LyricSourceKey].filled = true;
+      if (!providerParameters.sourceMap[key].filled) {
+        providerParameters.sourceMap[key].filled = true;
       }
-      resolveWaiter(videoId, key);
+      resolveWaiter(providerParameters, key);
     });
     resolveAllWaiters(videoId);
     activeStreams.delete(videoId);
@@ -330,7 +332,7 @@ async function parseSSEMessage(message: string, params: ProviderParameters) {
 }
 
 async function processStreamData(event: string, data: any, params: ProviderParameters) {
-  const { sourceMap, duration, videoId } = params;
+  const { sourceMap, duration } = params;
 
   if (event === "metadata") {
     if (data.album && !params.album) params.album = data.album;
@@ -338,7 +340,7 @@ async function processStreamData(event: string, data: any, params: ProviderParam
     if (data.artist && params.artist !== data.artist) params.artist = data.artist;
     if (data.duration && params.duration !== Number(data.duration)) params.duration = Number(data.duration);
 
-    sourceMap["metadata" as LyricSourceKey].lyricSourceResult = {
+    sourceMap["metadata"].lyricSourceResult = {
       lyrics: null,
       source: "Metadata",
       sourceHref: "",
@@ -349,7 +351,7 @@ async function processStreamData(event: string, data: any, params: ProviderParam
       cacheAllowed: true,
     };
     sourceMap["metadata" as LyricSourceKey].filled = true;
-    resolveWaiter(videoId, "metadata");
+    resolveWaiter(params, "metadata");
     return;
   }
 
@@ -376,7 +378,7 @@ async function processStreamData(event: string, data: any, params: ProviderParam
           cacheAllowed: true,
         };
         sourceMap["musixmatch-richsync"].filled = true;
-        resolveWaiter(videoId, "musixmatch-richsync");
+        resolveWaiter(params, "musixmatch-richsync");
       }
 
       if (results.synced) {
@@ -388,7 +390,7 @@ async function processStreamData(event: string, data: any, params: ProviderParam
           musicVideoSynced: false,
         };
         sourceMap["musixmatch-synced"].filled = true;
-        resolveWaiter(videoId, "musixmatch-synced");
+        resolveWaiter(params, "musixmatch-synced");
       }
     }
 
@@ -403,7 +405,7 @@ async function processStreamData(event: string, data: any, params: ProviderParam
           musicVideoSynced: false,
         };
         sourceMap["lrclib-synced"].filled = true;
-        resolveWaiter(videoId, "lrclib-synced");
+        resolveWaiter(params, "lrclib-synced");
       }
 
       if (results.plain) {
@@ -416,29 +418,31 @@ async function processStreamData(event: string, data: any, params: ProviderParam
           cacheAllowed: false,
         };
         sourceMap["lrclib-plain"].filled = true;
-        resolveWaiter(videoId, "lrclib-plain");
+        resolveWaiter(params, "lrclib-plain");
       }
     }
 
     // Legato (KuGou)
-    if (provider === "kugoulyrics") {
+    if (provider === "kugou") {
       if (results.lyrics) {
-        const lyrics = parseLRC(results.lyrics, duration * 1000);
+        let decodedLyrics = JSON.parse(results.lyrics);
+        const lyrics = parseLRC(decodedLyrics.lyrics, duration * 1000);
         sourceMap["legato-synced"].lyricSourceResult = {
           lyrics,
           source: "Better Lyrics Legato",
-          sourceHref: "https://boidu.dev/",
+          sourceHref: HOMEPAGE_URL,
           musicVideoSynced: false,
         };
         sourceMap["legato-synced"].filled = true;
-        resolveWaiter(videoId, "legato-synced");
+        resolveWaiter(params, "legato-synced");
       }
     }
 
     // Portato (QQ)
-    if (provider === "qqlyrics") {
+    if (provider === "qq") {
       if (results.lyrics) {
-        const lyrics = parseQRC(results.lyrics, duration * 1000, {
+        let decodedLyrics = JSON.parse(results.lyrics);
+        const lyrics = parseQRC(decodedLyrics.lyrics, duration * 1000, {
           title: params.song,
           artist: params.artist,
         });
@@ -446,13 +450,13 @@ async function processStreamData(event: string, data: any, params: ProviderParam
           sourceMap["portato-richsynced"].lyricSourceResult = {
             lyrics,
             source: "Better Lyrics Portato",
-            sourceHref: "https://boidu.dev/",
+            sourceHref: HOMEPAGE_URL,
             musicVideoSynced: false,
             cacheAllowed: true,
           };
         }
         sourceMap["portato-richsynced"].filled = true;
-        resolveWaiter(videoId, "portato-richsynced");
+        resolveWaiter(params, "portato-richsynced");
       }
     }
 
@@ -469,8 +473,8 @@ async function processStreamData(event: string, data: any, params: ProviderParam
         }
         await fillTtml(ttml, params);
         // fillTtml marks filled and updates sourceMap directly
-        resolveWaiter(videoId, "bLyrics-synced");
-        resolveWaiter(videoId, "bLyrics-richsynced");
+        resolveWaiter(params, "bLyrics-synced");
+        resolveWaiter(params, "bLyrics-richsynced");
       }
     }
 
@@ -497,8 +501,8 @@ async function processStreamData(event: string, data: any, params: ProviderParam
           sourceMap["binimum-richsynced"].lyricSourceResult = null;
         }
 
-        resolveWaiter(videoId, "binimum-richsynced");
-        resolveWaiter(videoId, "binimum-synced");
+        resolveWaiter(params, "binimum-richsynced");
+        resolveWaiter(params, "binimum-synced");
       }
     }
   }
@@ -521,7 +525,7 @@ export default async function unified(
 
   // Ensure stream is running
   if (!activeStreams.has(videoId)) {
-    const streamPromise = startStream(videoId, providerParameters);
+    const streamPromise = startStream(providerParameters);
     activeStreams.set(videoId, streamPromise);
     // Note: We don't await the stream promise itself, as it resolves when the stream *ends*
   }

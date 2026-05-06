@@ -16,6 +16,7 @@ import { getLyrics, newSourceMap, providerPriority } from "./providers/shared";
 import type { YTLyricSourceResult } from "./providers/yt";
 import { getSongAlbum, getSongMetadata, type SegmentMap } from "./requestSniffer/requestSniffer";
 import { clearCache as clearTranslationCache } from "./translation";
+import { animEngineState } from "@modules/ui/animationEngine";
 
 const hideInstrumentalOnly = registerThemeSetting("blyrics-hide-instrumental-only", false, true);
 
@@ -116,6 +117,9 @@ export async function createLyrics(detail: PlayerDetails, signal: AbortSignal): 
       AppState.areLyricsLoaded = false;
       AppState.areLyricsTicking = false;
       AppState.suppressZeroTime = 0;
+      animEngineState.lastEventCreationTime = -1;
+      animEngineState.lastPlayState = false;
+      animEngineState.lastTime = 0;
     }
 
     if (matchingSong) {

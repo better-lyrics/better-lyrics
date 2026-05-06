@@ -142,6 +142,24 @@
       "contributions": [
         "code"
       ]
+    },
+    {
+      "login": "ibratabian17",
+      "name": "Ibra Al Tabian",
+      "avatar_url": "https://avatars.githubusercontent.com/u/71920907?v=4",
+      "profile": "http://ibratabian17.github.io",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "binimum",
+      "name": "binimum",
+      "avatar_url": "https://avatars.githubusercontent.com/u/61615730?v=4",
+      "profile": "https://binimum.org",
+      "contributions": [
+        "code"
+      ]
     }
   ],
   "badgeTemplate": "<img src=\"https://img.shields.io/badge/all_contributors-<%= contributors.length %>-orange.svg\" alt=\"\"/>",

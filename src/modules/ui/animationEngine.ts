@@ -47,6 +47,9 @@ interface AnimEngineState {
   wasUserScrolling: boolean;
   lastTime: number;
   lastPlayState: boolean;
+  /**
+   * Take "-1" to mean that we have no sensible last event
+   */
   lastEventCreationTime: number;
   lastActiveElements: LineData[];
   queuedScroll: boolean;
@@ -73,7 +76,7 @@ export let animEngineState: AnimEngineState = {
   wasUserScrolling: false,
   lastTime: 0,
   lastPlayState: false,
-  lastEventCreationTime: 0,
+  lastEventCreationTime: -1,
   doneFirstInstantScroll: true,
   lastActiveElements: [],
   queuedScroll: false,
@@ -316,7 +319,7 @@ export function animationEngine(currentTime: number, eventCreationTime: number, 
   animEngineState.lastEventCreationTime = eventCreationTime;
 
   let timeOffset = now - eventCreationTime;
-  if (!isPlaying) {
+  if (!isPlaying || eventCreationTime === -1) {
     timeOffset = 0;
   }
 
