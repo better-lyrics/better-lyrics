@@ -400,6 +400,7 @@
   color: rgba(255, 255, 255, 0.35);
   padding: 5rem 2rem;
   font-size: 0.875rem;
+  grid-column: 1 / -1;
 }
 
 .unison-empty-state[hidden] {
@@ -644,6 +645,30 @@
 .unison-vote-btn--report:hover {
   color: rgb(239, 68, 68);
   border-color: rgba(239, 68, 68, 0.3);
+}
+
+.unison-vote-btn--delete {
+  align-self: flex-start;
+  color: rgba(239, 68, 68, 0.85);
+  border-color: rgba(239, 68, 68, 0.25);
+}
+
+.unison-vote-btn--delete:hover {
+  background: rgba(239, 68, 68, 0.12);
+  border-color: rgba(239, 68, 68, 0.5);
+  color: rgb(248, 113, 113);
+}
+
+.unison-vote-btn--delete-confirm,
+.unison-vote-btn--delete-confirm:hover {
+  background: rgba(239, 68, 68, 0.2);
+  border-color: rgba(239, 68, 68, 0.6);
+  color: rgb(248, 113, 113);
+}
+
+.unison-vote-btn--delete:disabled {
+  cursor: default;
+  opacity: 0.7;
 }
 
 /* -- Report Dropdown --------------------------  */

@@ -227,6 +227,10 @@ export async function removeVote(lyricsId: number): Promise<ApiResult<{ message:
   return signedRequest<{ message: string } | null>(`/lyrics/${lyricsId}/vote`, "DELETE", {});
 }
 
+export async function deleteLyrics(lyricsId: number): Promise<ApiResult<{ message: string } | null>> {
+  return signedRequest<{ message: string } | null>(`/lyrics/${lyricsId}`, "DELETE", {});
+}
+
 export async function reportLyrics(
   lyricsId: number,
   reason: ReportReason,
