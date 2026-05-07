@@ -222,6 +222,110 @@ Karaoke effect uses `::after` with `background-clip: text`:
 | `blyrics-shimmer` | Loading text shimmer |
 | `blyrics-wave` | Instrumental wave oscillation |
 
+## Unison Submitter Card and Floating Dock
+
+Injected on the YouTube Music page when the Unison provider is active. Themeable through your custom CSS like the rest of this surface.
+
+### New Variables
+
+```css
+:root {
+  --blyrics-vote-hover-color: hsla(0, 0%, 100%, 0.2);
+  --blyrics-small-border-radius: 1rem;
+  --blyrics-fullscreen-bottom-dock-shift: -24px; /* Y-shift for bottom dock in fullscreen */
+}
+```
+
+### Footer Card DOM
+
+```
+.blyrics-footer__unison
+└── .blyrics-footer__container.blyrics-footer__unison-card
+    ├── .blyrics-footer__unison-author (only when there is a submitter)
+    │   ├── .blyrics-footer__unison-author-row
+    │   │   ├── strong.blyrics-footer__author-name
+    │   │   └── span.blyrics-footer__trust-tier [data-tier]
+    │   └── .blyrics-footer__unison-author-label
+    ├── .blyrics-footer__unison-divider (only when submitter is present)
+    └── .blyrics-footer__unison-actions-block
+        ├── .blyrics-footer__unison-actions
+        │   ├── button.blyrics-footer__vote (upvote)
+        │   ├── button.blyrics-footer__vote (downvote)
+        │   └── button.blyrics-footer__vote (report)
+        └── .blyrics-footer__unison-score-line
+```
+
+| Selector | Purpose |
+|----------|---------|
+| `.blyrics-footer__unison` | Outer wrapper, full-width inside footer |
+| `.blyrics-footer__unison-card` | Translucent card, hover lighten, opens unison page on click |
+| `.blyrics-footer__unison-divider` | 1px vertical separator between submitter and actions |
+| `.blyrics-footer__unison-author` | Submitter column |
+| `.blyrics-footer__unison-author-row` | Author name + tier pill row |
+| `.blyrics-footer__author-name` | Submitter handle (deterministic pet name from public key) |
+| `.blyrics-footer__unison-author-label` | "submitted this" subtext |
+| `.blyrics-footer__unison-actions-block` | Right column with buttons + score line |
+| `.blyrics-footer__unison-actions` | Row of three vote/report buttons |
+| `.blyrics-footer__unison-score-line` | "+12 score · 12 votes" line |
+| `.blyrics-footer__vote` | Base button (30px square in card, 32px in dock) |
+| `.blyrics-footer__vote--active` | Active vote (SVG `fill-opacity` becomes 1) |
+| `.blyrics-footer__trust-tier` | Tier pill, color via `[data-tier]` |
+
+### Trust Tier Colors
+
+| Selector | Color family |
+|----------|--------------|
+| `.blyrics-footer__trust-tier[data-tier="new"]` | Blue |
+| `.blyrics-footer__trust-tier[data-tier="trusted"]` | Green |
+| `.blyrics-footer__trust-tier[data-tier="veteran"]` | Purple |
+| `.blyrics-footer__trust-tier[data-tier="expert"]` | Gold |
+
+### Floating Dock
+
+```
+.blyrics-unison-dock [data-position]
+└── .blyrics-unison-dock__inner
+    └── .blyrics-footer__vote (×3)
+```
+
+Mounted inside `#side-panel`. `pointer-events: none` on the wrapper, `auto` on `__inner`.
+
+| Position value | Anchor |
+|----------------|--------|
+| `top-left` | `top: 64px; left: 0` |
+| `top-center` | `top: 64px; left: 50%` (translate -50%) |
+| `top-right` | `top: 64px; left: 100%` (translate -100%) |
+| `bottom-left` | `top: calc(100% - 64px); left: 0` |
+| `bottom-center` | `top: calc(100% - 64px); left: 50%` |
+| `bottom-right` | `top: calc(100% - 64px); left: 100%` |
+
+| Modifier | When applied |
+|----------|--------------|
+| `.blyrics-unison-dock--hidden` | Footer card is in viewport (avoids duplicate controls) |
+| `.blyrics-unison-dock--idle-hidden` | Player is idle in fullscreen |
+
+Animates `transform`, `opacity`, `filter: blur(8px)` over 320ms.
+
+### Layout Adjustments
+
+```css
+/* dock shifts down 72px when autoscroll resume button is visible */
+#side-panel:has(.autoscroll-resume-button:not([autoscroll-hidden="true"])) .blyrics-unison-dock[data-position="top-center"] {
+  --dock-y-shift: 72px;
+}
+
+/* hide dock when side panel shows non-lyrics content */
+#side-panel:has(#tab-renderer:not([page-type="MUSIC_PAGE_TYPE_TRACK_LYRICS"])) .blyrics-unison-dock { ... }
+
+/* in fullscreen: top-anchored dock hidden, bottom-anchored pinned above player bar */
+#layout[player-fullscreened]:not([blyrics-dfs]) .blyrics-unison-dock[data-position^="top-"] { ... }
+#layout[player-fullscreened]:not([blyrics-dfs]) .blyrics-unison-dock[data-position^="bottom-"] {
+  --dock-y-shift: var(--blyrics-fullscreen-bottom-dock-shift, -24px);
+}
+```
+
+Override `--blyrics-fullscreen-bottom-dock-shift` to tune the lift.
+
 ## Theme Patterns
 
 ### 1. Disable Default Animations
