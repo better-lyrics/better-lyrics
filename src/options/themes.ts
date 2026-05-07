@@ -14,7 +14,9 @@ export interface Theme {
 interface CustomTheme {
   name: string;
   css: string;
-  settings?: { [field: string]: CTSettingFieldToggle | CTSettingFieldRange | CTSettingFieldDropdown | CTSettingFieldColor | CTSettingField };
+  settings?: {
+    [field: string]: CTSettingFieldToggle | CTSettingFieldRange | CTSettingFieldDropdown | CTSettingFieldColor | CTSettingFieldTextfield | CTSettingField
+  };
   /** Modified through user actions */
   savedSettings?: { [field: string]: any };
   timestamp: number;
@@ -28,8 +30,9 @@ enum CTSettingFieldAttrType {
 enum CTSettingFieldType {
   TOGGLE = "toggle",
   RANGE = "range",
-  DROPDOWN = "dropdown"
-  ,COLOR = "color",
+  DROPDOWN = "dropdown",
+  COLOR = "color",
+  TEXTFIELD = "textfield"
 }
 
 interface CTSettingField {
@@ -38,8 +41,14 @@ interface CTSettingField {
   /** CSS starts with `--` prefix while RICS starts with `$` prefix */
   attribute: string;
   attrType: CTSettingFieldAttrType | string;
-  /** `%v` for accessing setting value on the `attrValue` */
+  /** 
+   * Use `%VALUE%` for accessing the current setting field value on the `attrValue`.
+   * 
+   * Use `%<SETTING-FIELD-ID>%` for accessing other setting field values on the `attrValue`
+   */
   attrValue: string;
+  /** Make this setting field only available under certain other setting field values */
+  available?: [];
 }
 
 interface CTSettingFieldToggle extends CTSettingField {
@@ -63,6 +72,11 @@ interface CTSettingFieldDropdown extends CTSettingField {
 
 interface CTSettingFieldColor extends CTSettingField {
   default: string;
+}
+
+interface CTSettingFieldTextfield extends CTSettingField {
+  default: string;
+  onlyAllow?: "number" | "alphabetical" | "alphanumeric";
 }
 
 const themes: Theme[] = [
@@ -183,10 +197,12 @@ export async function renameCustomTheme(oldName: string, newName: string): Promi
   await chrome.storage.local.set({ customThemes });
 }
 
-export async function addSettingFieldCT(name: string, type: CTSettingFieldType | string, id: string, data: CTSettingField): Promise<void> {
+export async function addSettingFieldCustomTheme(name: string, type: CTSettingFieldType | string, id: string, data: CTSettingField): Promise<void> {
   if (!Object.values(CTSettingFieldType).find(ftype => ftype === type)) {
     throw new Error(`Invalid setting field type "${type}"`)
   }
+
+  id = id.trim().toLowerCase().replace(/\s+/g, "-");
 
   const customThemes = await getCustomThemes();
   const themeIndex = customThemes.findIndex(theme => theme.name === name);
