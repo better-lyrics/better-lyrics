@@ -226,7 +226,7 @@ async function startStream(providerParameters: ProviderParameters, retryCount = 
   body.append("videoId", videoId);
   if (song) body.append("song", song);
   if (artist) body.append("artist", artist);
-  if (duration) body.append("duration", String(duration));
+  if (duration) body.append("duration", String(Math.round(duration)));
   if (album) body.append("album", album);
   body.append("alwaysFetchMetadata", String(alwaysFetchMetadata));
   const isrc = findIsrc(audioTrackData);
