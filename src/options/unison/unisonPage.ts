@@ -754,21 +754,29 @@ function createDetailDeleteButton(unisonId: number): HTMLButtonElement {
   let confirming = false;
   let revertTimer: ReturnType<typeof setTimeout> | undefined;
 
+  const clearRevertTimer = () => {
+    if (revertTimer) {
+      clearTimeout(revertTimer);
+      revertTimer = undefined;
+    }
+  };
+
   btn.addEventListener("click", async () => {
     if (btn.disabled) return;
 
     if (!confirming) {
       confirming = true;
       setConfirm();
-      if (revertTimer) clearTimeout(revertTimer);
+      clearRevertTimer();
       revertTimer = setTimeout(() => {
         confirming = false;
+        revertTimer = undefined;
         setIdle();
       }, 4000);
       return;
     }
 
-    if (revertTimer) clearTimeout(revertTimer);
+    clearRevertTimer();
     btn.disabled = true;
 
     const result = await deleteLyrics(unisonId);
@@ -782,7 +790,10 @@ function createDetailDeleteButton(unisonId: number): HTMLButtonElement {
     btn.disabled = false;
     const message = result.error === "Not your submission" ? t("unison_deleteForbidden") : t("unison_deleteFailed");
     setError(message);
-    setTimeout(setIdle, 3000);
+    revertTimer = setTimeout(() => {
+      revertTimer = undefined;
+      setIdle();
+    }, 3000);
   });
 
   return btn;
