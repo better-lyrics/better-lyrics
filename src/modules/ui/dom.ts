@@ -968,7 +968,7 @@ function buildUnisonSubmitUrl(song: string, artist: string, album: string, durat
   if (song) url.searchParams.set("song", song);
   if (artist) url.searchParams.set("artist", artist);
   if (album) url.searchParams.set("album", album);
-  if (duration) url.searchParams.set("duration", duration.toString());
+  if (duration) url.searchParams.set("duration", Math.round(duration).toString());
   url.searchParams.set("videoId", videoId);
   return url;
 }
