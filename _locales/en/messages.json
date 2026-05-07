@@ -310,6 +310,14 @@
     "message": "Saving...",
     "description": "Saving indicator text"
   },
+  "options_editor_syncTheme": {
+    "message": "Sync theme from file",
+    "description": "Sync theme from file tooltip"
+  },
+  "options_editor_syncing": {
+    "message": "Currently syncing theme from file",
+    "description": "Syncing theme label"
+  },
   "options_editor_importFile": {
     "message": "Import from file",
     "description": "Import from file tooltip"

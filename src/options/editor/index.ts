@@ -28,6 +28,18 @@ import {
 } from "./ui/dom";
 import { showAlert, showModal } from "./ui/feedback";
 
+// Temporary interfaces for TypeScript - these APIs are still experimental and not baseline widely available
+interface FileSystemObserver {
+  observe(handle: FileSystemFileHandle | FileSystemDirectoryHandle, options?: { recursive: boolean }): Promise<void>;
+  disconnect(): void;
+}
+
+interface FileSystemChangeRecord {
+  changedHandle: FileSystemFileHandle | FileSystemDirectoryHandle
+  root: FileSystemFileHandle;
+  type: "appeared" | "disappeared" | "errored" | "modified" | "moved" | "unknown";
+}
+
 function initializeNavigation() {
   document.getElementById("edit-css-btn")?.addEventListener("click", openEditCSS);
   document.getElementById("back-btn")?.addEventListener("click", openOptions);
@@ -110,6 +122,46 @@ function initializeThemeActions() {
 }
 
 function initializeFileOperations() {
+  document.getElementById("sync-theme-btn")?.addEventListener("click", async () => {
+    try {
+      if ('showOpenFilePicker' in self && 'FileSystemObserver' in self) {
+        const fileHandle: FileSystemFileHandle[] = await (self as any).showOpenFilePicker({
+          id: "sync-theme",
+          types: [
+            {
+              description: "Style files",
+              accept: {
+                "*/*": [".css", ".rics"]
+              }
+            }
+          ],
+        })
+
+        const observer: FileSystemObserver = new (self as any).FileSystemObserver(async (records: FileSystemChangeRecord[]) => {
+          for (const record of records) {
+            if (record.type === "modified") {
+              const file = await record.root.getFile();
+              if (!file) return;
+
+              try {
+                await importManager.importCSSFile(file);
+              } catch (err) {
+                console.error(LOG_PREFIX_EDITOR, "File import error:", err);
+              }
+            } else if (record.type === "disappeared" || record.type === "errored") {
+              observer.disconnect();
+              showAlert("The theme file was deleted or became inaccessible. Syncing has been stopped.");
+            }
+          }
+        });
+
+        await observer.observe(fileHandle[0]);
+      }
+    } catch(_) {
+
+    }
+  })
+
   document.getElementById("file-import-btn")?.addEventListener("click", () => {
     const input = document.createElement("input");
     input.type = "file";

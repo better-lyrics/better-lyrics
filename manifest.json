@@ -16,7 +16,8 @@
   ],
   "permissions": [
     "storage",
-    "alarms"
+    "alarms",
+    "filesystem"
   ],
   "optional_permissions": [
     "downloads"
