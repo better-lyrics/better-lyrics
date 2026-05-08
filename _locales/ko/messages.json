@@ -801,6 +801,10 @@
     "message": "이 노래의 가사를 찾을 수 없습니다",
     "description": "Message when no lyrics are available"
   },
+  "lyrics_resumeAutoscroll": {
+    "message": "Resume Autoscroll",
+    "description": "Resume Autoscroll button label"
+  },
   "options_language_exclusions": {
     "message": "언어 제외 옵션",
     "description": "Label for language exclusions setting"
