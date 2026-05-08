@@ -802,7 +802,7 @@
     "description": "Message when no lyrics are available"
   },
   "lyrics_resumeAutoscroll": {
-    "message": "Resume Autoscroll",
+    "message": "Lanjutkan Gulir Otomatis",
     "description": "Resume Autoscroll button label"
   },
   "options_language_exclusions": {
