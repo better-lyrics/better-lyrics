@@ -801,6 +801,10 @@
     "message": "找不到此歌曲的歌詞",
     "description": "Message when no lyrics are available"
   },
+  "lyrics_resumeAutoscroll": {
+    "message": "Resume Autoscroll",
+    "description": "Resume Autoscroll button label"
+  },
   "options_language_exclusions": {
     "message": "語言排除",
     "description": "Label for language exclusions setting"
