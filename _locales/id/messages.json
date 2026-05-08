@@ -801,6 +801,10 @@
     "message": "Lirik lagu ini nggak ketemu",
     "description": "Message when no lyrics are available"
   },
+  "lyrics_resumeAutoscroll": {
+    "message": "Resume Autoscroll",
+    "description": "Resume Autoscroll button label"
+  },
   "options_language_exclusions": {
     "message": "Pengecualian bahasa",
     "description": "Label for language exclusions setting"
