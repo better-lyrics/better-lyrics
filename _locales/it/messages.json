@@ -801,6 +801,10 @@
     "message": "Nessun testo trovato per questa canzone",
     "description": "Message when no lyrics are available"
   },
+  "lyrics_resumeAutoscroll": {
+    "message": "Resume Autoscroll",
+    "description": "Resume Autoscroll button label"
+  },
   "options_language_exclusions": {
     "message": "Lingue escluse",
     "description": "Label for language exclusions setting"
