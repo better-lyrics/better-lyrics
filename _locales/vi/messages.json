@@ -801,6 +801,10 @@
     "message": "Không tìm thấy lời bài hát cho bài hát này",
     "description": "Message when no lyrics are available"
   },
+  "lyrics_resumeAutoscroll": {
+    "message": "Resume Autoscroll",
+    "description": "Resume Autoscroll button label"
+  },
   "options_language_exclusions": {
     "message": "Danh sách ngôn ngữ bị loại trừ",
     "description": "Label for language exclusions setting"
