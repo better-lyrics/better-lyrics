@@ -801,6 +801,10 @@
     "message": "Nu s-au găsit versuri pentru această melodie",
     "description": "Message when no lyrics are available"
   },
+  "lyrics_resumeAutoscroll": {
+    "message": "Resume Autoscroll",
+    "description": "Resume Autoscroll button label"
+  },
   "options_language_exclusions": {
     "message": "Limbi excluse",
     "description": "Label for language exclusions setting"
