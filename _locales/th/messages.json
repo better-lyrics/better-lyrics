@@ -801,6 +801,10 @@
     "message": "ไม่พบเนื้อเพลงสำหรับเพลงนี้",
     "description": "Message when no lyrics are available"
   },
+  "lyrics_resumeAutoscroll": {
+    "message": "Resume Autoscroll",
+    "description": "Resume Autoscroll button label"
+  },
   "options_language_exclusions": {
     "message": "ภาษาที่ยกเว้น",
     "description": "Label for language exclusions setting"
