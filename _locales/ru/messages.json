@@ -801,6 +801,10 @@
     "message": "Не удалось найти текст песни",
     "description": "Message when no lyrics are available"
   },
+  "lyrics_resumeAutoscroll": {
+    "message": "Resume Autoscroll",
+    "description": "Resume Autoscroll button label"
+  },
   "options_language_exclusions": {
     "message": "Языковые исключения",
     "description": "Label for language exclusions setting"
