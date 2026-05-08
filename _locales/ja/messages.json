@@ -801,6 +801,10 @@
     "message": "この曲の歌詞が見つかりませんでした",
     "description": "Message when no lyrics are available"
   },
+  "lyrics_resumeAutoscroll": {
+    "message": "Resume Autoscroll",
+    "description": "Resume Autoscroll button label"
+  },
   "options_language_exclusions": {
     "message": "Language exclusions",
     "description": "Label for language exclusions setting"
