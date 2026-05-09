@@ -893,7 +893,7 @@ hr {
     user-select: none;
 }
 
-.sortable-item:active {
+.sortable-item:active:not(:has(.checkbox-container:active)) {
     cursor: grabbing;
     transform: scale(0.98);
     background: rgba(255, 255, 255, 0.08);
