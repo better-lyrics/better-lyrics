@@ -835,6 +835,10 @@
     "message": "No lyrics found for this song",
     "description": "Message when no lyrics are available"
   },
+  "lyrics_resumeAutoscroll": {
+    "message": "Resume Autoscroll",
+    "description": "Resume Autoscroll button label"
+  },
   "options_language_exclusions": {
     "message": "Language exclusions",
     "description": "Label for language exclusions setting"
