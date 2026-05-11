@@ -588,6 +588,32 @@
 			</div>
 		</div>
 
+		<div id="sync-theme-modal-overlay" class="modal-overlay">
+			<div class="modal sync-modal">
+				<div class="modal-header">
+					<h3 class="modal-title">__MSG_options_syncTheme_title__</h3>
+					<button id="sync-theme-modal-close" class="modal-close-btn" aria-label="Close">
+						<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+							<path d="M6.28 5.22a.75.75 0 0 0-1.06 1.06L8.94 10l-3.72 3.72a.75.75 0 1 0 1.06 1.06L10 11.06l3.72 3.72a.75.75 0 1 0 1.06-1.06L11.06 10l3.72-3.72a.75.75 0 0 0-1.06-1.06L10 8.94 6.28 5.22Z"></path>
+						</svg>
+					</button>
+				</div>
+				<div class="modal-body">
+					<p class="modal-message">__MSG_options_syncTheme_enter__</p>
+					<input type="text" id="sync-theme-url" class="modal-input" placeholder="ws://localhost:8080">
+					<span>__MSG_options_syncTheme_instructions__</span>
+				</div>
+				<div class="modal-footer">
+					<button id="sync-theme-connect" class="modal-btn modal-btn-primary">
+						__MSG_options_syncTheme_connect__
+					</button>
+					<button id="sync-theme-cancel" class="modal-btn modal-btn-secondary">
+						__MSG_options_modal_cancel__
+					</button>
+				</div>
+			</div>
+		</div>
+
 		<div id="css">
 			<div id="theme-name-display" class="theme-name-display">
 				<div class="theme-name-container">

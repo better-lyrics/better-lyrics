@@ -1,6 +1,6 @@
 import { openSearchPanel } from "@codemirror/search";
 import { LOG_PREFIX_EDITOR } from "@constants";
-import { initI18n, loadLocaleOverride } from "@core/i18n";
+import { initI18n, loadLocaleOverride, t } from "@core/i18n";
 import { createEditorState, createEditorView } from "./core/editor";
 import { editorStateManager } from "./core/state";
 import { generateDefaultFilename, importManager, saveCSSToFile } from "./features/import";
@@ -27,18 +27,6 @@ import {
   themeSelectorBtn,
 } from "./ui/dom";
 import { showAlert, showModal } from "./ui/feedback";
-
-// Temporary interfaces for TypeScript - these APIs are still experimental and not baseline widely available
-interface FileSystemObserver {
-  observe(handle: FileSystemFileHandle | FileSystemDirectoryHandle, options?: { recursive: boolean }): Promise<void>;
-  disconnect(): void;
-}
-
-interface FileSystemChangeRecord {
-  changedHandle: FileSystemFileHandle | FileSystemDirectoryHandle
-  root: FileSystemFileHandle;
-  type: "appeared" | "disappeared" | "errored" | "modified" | "moved" | "unknown";
-}
 
 function initializeNavigation() {
   document.getElementById("edit-css-btn")?.addEventListener("click", openEditCSS);
@@ -121,47 +109,72 @@ function initializeThemeActions() {
   themeNameText?.addEventListener("click", handleRenameTheme);
 }
 
-function initializeFileOperations() {
-  document.getElementById("sync-theme-btn")?.addEventListener("click", async () => {
-    try {
-      if ('showOpenFilePicker' in self && 'FileSystemObserver' in self) {
-        const fileHandle: FileSystemFileHandle[] = await (self as any).showOpenFilePicker({
-          id: "sync-theme",
-          types: [
-            {
-              description: "Style files",
-              accept: {
-                "*/*": [".css", ".rics"]
-              }
-            }
-          ],
-        })
+function initializeSyncTheme() {
+  const openBtn = document.getElementById("sync-theme-btn");
+  const overlay = document.getElementById("sync-theme-modal-overlay");
+  const closeBtn = document.getElementById("sync-theme-modal-close");
+  const cancelBtn = document.getElementById("sync-theme-cancel");
+  const urlInput = document.getElementById("sync-theme-url") as HTMLInputElement;
+  const connect = document.getElementById("sync-theme-connect") as HTMLButtonElement;
 
-        const observer: FileSystemObserver = new (self as any).FileSystemObserver(async (records: FileSystemChangeRecord[]) => {
-          for (const record of records) {
-            if (record.type === "modified") {
-              const file = await record.root.getFile();
-              if (!file) return;
+  if (!openBtn || !overlay || !closeBtn || !urlInput || !connect || !cancelBtn) return;
 
-              try {
-                await importManager.importCSSFile(file);
-              } catch (err) {
-                console.error(LOG_PREFIX_EDITOR, "File import error:", err);
-              }
-            } else if (record.type === "disappeared" || record.type === "errored") {
-              observer.disconnect();
-              showAlert("The theme file was deleted or became inaccessible. Syncing has been stopped.");
-            }
-          }
-        });
+  const closeModal = () => requestAnimationFrame(() => overlay.classList.remove("active"));
 
-        await observer.observe(fileHandle[0]);
-      }
-    } catch(_) {
+  openBtn.addEventListener("click", () => overlay.classList.add("active"));
+  closeBtn.addEventListener("click", closeModal);
+  cancelBtn.addEventListener("click", closeModal);
+  
+  overlay.addEventListener("click", e => {
+    if (e.target === overlay) closeModal();
+  });
 
+  document.addEventListener("keydown", e => {
+    if (e.key === "Escape" && overlay.classList.contains("active")) closeModal();
+  });
+
+  connect.addEventListener("click", () => {
+    connect.innerText = t("options_syncTheme_connecting");
+    connect.disabled = true;
+
+    const url = urlInput.value.trim();
+    const socket = new WebSocket(url);
+
+    socket.onerror = (event) => {
+      console.error(LOG_PREFIX_EDITOR, "WebSocket error:", event);
+      showAlert("WebSocket connection error. Please check the URL and try again");
+
+      connect.innerText = t("options_syncTheme_connect");
+      connect.disabled = false;
     }
-  })
 
+    socket.onopen = () => {
+      closeModal();
+      showAlert("WebSocket connection established. Syncing started");
+      console.log(LOG_PREFIX_EDITOR, "WebSocket connection established. Syncing started");
+
+      connect.innerText = t("options_syncTheme_connect");
+      connect.disabled = false;
+    };
+
+    socket.onmessage = async (event) => {
+      try {
+        await importManager.importCSSFile(new File([event.data], "style.rics", { type: "text/css" }));
+      } catch (err) {
+        console.error(LOG_PREFIX_EDITOR, "File import error:", err);
+      }
+
+      console.log(LOG_PREFIX_EDITOR, "Received updated style file, reimporting");
+    };
+
+    socket.onclose = () => {
+      showAlert("File were either renamed or deleted. Syncing stopped")
+      console.log(LOG_PREFIX_EDITOR, "WebSocket connection closed. Syncing stopped");
+    };
+  })
+}
+
+function initializeFileOperations() {
   document.getElementById("file-import-btn")?.addEventListener("click", () => {
     const input = document.createElement("input");
     input.type = "file";
@@ -250,6 +263,7 @@ export function initialize() {
     initializeEditorKeyboardShortcuts();
     initializeThemeModal();
     initializeThemeActions();
+    initializeSyncTheme();
     initializeFileOperations();
     initializeStorageListeners();
     initStoreThemeListener();

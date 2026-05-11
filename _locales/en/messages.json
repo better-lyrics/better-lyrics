@@ -363,6 +363,27 @@
     "description": "Double-click to rename tooltip"
   },
 
+  "options_syncTheme_title": {
+    "message": "Sync Theme",
+    "description": "Sync theme section title"
+  },
+  "options_syncTheme_enter": {
+    "message": "Enter a WebSocket server URL to connect for syncing theme changes from file in real time",
+    "description": "Sync theme section enter URL message"
+  },
+  "options_syncTheme_instructions": {
+    "message": "For instructions on how to set-up a WebSocket server that syncs a local theme file, visit the documentation linked below.",
+    "description": "Sync theme section instructions"
+  },
+  "options_syncTheme_connect": {
+    "message": "Connect",
+    "description": "Connect button label for syncing theme from file"
+  },
+  "options_syncTheme_connecting": {
+    "message": "Connecting",
+    "description": "Connecting button label for syncing theme from file"
+  },
+
   "options_provider_betterLyrics": {
     "message": "Better Lyrics",
     "description": "Better Lyrics provider name"
@@ -780,6 +801,10 @@
   "editor_pageTitle": {
     "message": "Better Lyrics Styles Editor",
     "description": "Standalone editor page title"
+  },
+  "editor_syncThemeFromFile": {
+    "message": "Sync theme from file",
+    "description": "Sync theme from file button"
   },
   "editor_importFromFile": {
     "message": "Import from file",
