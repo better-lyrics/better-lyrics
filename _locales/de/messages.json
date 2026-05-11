@@ -92,27 +92,27 @@
     "description": "Auto-scroll unsynced lyrics setting label"
   },
   "options_display_unisonActions": {
-    "message": "Unison Actions",
+    "message": "Unison Aktionen",
     "description": "Display-section row label for the Unison Actions modal trigger"
   },
   "options_unisonModal_title": {
-    "message": "Unison Actions",
+    "message": "Unison Aktionen",
     "description": "Title of the Unison Actions modal"
   },
   "options_unisonModal_showPinned": {
-    "message": "Show pinned actions",
+    "message": "Zeige angeheftete Aktionen",
     "description": "Toggle label inside the Unison Actions modal for the floating dock"
   },
   "options_unisonModal_showPinned_hint": {
-    "message": "A floating control to upvote, downvote, or report Unison lyrics",
+    "message": "Eine schwebende Steuerung zum bewerten oder melden von Unison Songtexte",
     "description": "Hint text under the Show pinned actions toggle"
   },
   "options_unisonModal_autoHide": {
-    "message": "Auto-hide in fullscreen",
+    "message": "Auto-Ausblenden im Vollbild",
     "description": "Toggle label inside the Unison Actions modal for auto-hiding the dock when idle in fullscreen"
   },
   "options_unisonModal_autoHide_hint": {
-    "message": "Hide the floating control when you are idle in fullscreen mode",
+    "message": "Verstecke schwebende Steuerung, wenn sie inaktiv im Vollbildmodus sind",
     "description": "Hint text under the Auto-hide in fullscreen toggle"
   },
   "options_unisonModal_position": {
@@ -120,27 +120,27 @@
     "description": "Label above the visual position picker in the Unison Actions modal"
   },
   "options_unisonModal_position_topLeft": {
-    "message": "Top left",
+    "message": "Oben links",
     "description": "Tooltip for the top-left cell in the Unison position picker"
   },
   "options_unisonModal_position_topCenter": {
-    "message": "Top center",
+    "message": "Oben mittig",
     "description": "Tooltip for the top-center cell in the Unison position picker"
   },
   "options_unisonModal_position_topRight": {
-    "message": "Top right",
+    "message": "Oben rechts",
     "description": "Tooltip for the top-right cell in the Unison position picker"
   },
   "options_unisonModal_position_bottomLeft": {
-    "message": "Bottom left",
+    "message": "Unten links",
     "description": "Tooltip for the bottom-left cell in the Unison position picker"
   },
   "options_unisonModal_position_bottomCenter": {
-    "message": "Bottom center",
+    "message": "Unten mittig",
     "description": "Tooltip for the bottom-center cell in the Unison position picker"
   },
   "options_unisonModal_position_bottomRight": {
-    "message": "Bottom right",
+    "message": "Unten rechts",
     "description": "Tooltip for the bottom-right cell in the Unison position picker"
   },
   "options_language_displayLanguage": {
@@ -801,6 +801,10 @@
     "message": "Keine Songtexte für diesen Song gefunden",
     "description": "Message when no lyrics are available"
   },
+  "lyrics_resumeAutoscroll": {
+    "message": "Auto scrollen fortsetzen",
+    "description": "Resume Autoscroll button label"
+  },
   "options_language_exclusions": {
     "message": "Sprachausschlüsse",
     "description": "Label for language exclusions setting"
@@ -942,7 +946,7 @@
     "description": "Section title for custom themes in the theme chooser modal"
   },
   "lyrics_submitToUnison": {
-    "message": "Submit lyrics with Unison",
+    "message": "Songtexte an Unison übermitteln",
     "description": "Button text for submitting lyrics to Unison"
   },
   "unison_pageTitle": {
@@ -954,63 +958,83 @@
     "description": "Unison branding title"
   },
   "unison_subtitle": {
-    "message": "Community Lyrics",
+    "message": "Community-Songtexte",
     "description": "Unison subtitle text"
   },
   "unison_search": {
-    "message": "Search lyrics",
+    "message": "Nach Songtexte suchen",
     "description": "Search button label"
   },
   "unison_searchPlaceholder": {
-    "message": "Search songs, artists, or lyrics...",
+    "message": "Nach Liedern, Künstler oder Songtexte suchen...",
     "description": "Search input placeholder"
   },
   "unison_submit": {
-    "message": "Submit Lyrics",
+    "message": "Songtext einsenden",
     "description": "Submit lyrics button text"
   },
   "unison_submitSuccess": {
-    "message": "Lyrics submitted!",
+    "message": "Songtexte eingesendet!",
     "description": "Success message after submitting lyrics"
   },
   "unison_submitDescription": {
-    "message": "Submit community lyrics for any YouTube Music track. Paste LRC (timestamped), TTML (XML), or plain text. Synced formats are prioritized.",
+    "message": "Community-Songtexte für jeden YouTube Music titel einsenden. Füge LRC (mit Zeitstempel), TTML (XML) oder einfachen Text ein. Synchronisierte Formate werden priorisiert.",
     "description": "Description text for the submission form"
   },
   "unison_composerHintPrefix": {
-    "message": "Use",
+    "message": "Nutzen",
     "description": "Text before Composer link in submit hint"
   },
   "unison_composerHintSuffix": {
-    "message": "to create word-synced lyrics from scratch.",
+    "message": "um wortsynchronisierte Texte von Grund auf zu erstellen.",
     "description": "Text after Composer link in submit hint"
   },
   "unison_upvote": {
-    "message": "Upvote",
+    "message": "Hoch stimmen",
     "description": "Upvote button tooltip"
   },
   "unison_downvote": {
-    "message": "Downvote",
+    "message": "Runter stimmen",
     "description": "Downvote button tooltip"
   },
   "unison_report": {
-    "message": "Report",
+    "message": "Melden",
     "description": "Report button tooltip"
   },
   "unison_reportSuccess": {
-    "message": "Reported",
+    "message": "Gemeldet",
     "description": "Report success tooltip text"
   },
+  "unison_delete": {
+    "message": "Löschen",
+    "description": "Delete button label on a user's own Unison submission card"
+  },
+  "unison_deleteConfirm": {
+    "message": "Löschen bestätigen?",
+    "description": "Delete button label after first click, asking the user to confirm before sending the request"
+  },
+  "unison_deleteSuccess": {
+    "message": "Gelöscht",
+    "description": "Transient label shown on the delete button after a successful delete"
+  },
+  "unison_deleteForbidden": {
+    "message": "Nicht Ihre Einreichung",
+    "description": "Error message shown on the delete button when the server rejects the request because the caller is not the submitter"
+  },
+  "unison_deleteFailed": {
+    "message": "Löschen fehlgeschlagen",
+    "description": "Generic error message shown on the delete button when the request fails for any other reason"
+  },
   "unison_report_wrong_song": {
-    "message": "Wrong song",
+    "message": "Falscher Titel",
     "description": "Report reason: wrong song"
   },
   "unison_report_bad_sync": {
-    "message": "Bad sync",
+    "message": "Schlechte Synchronisation",
     "description": "Report reason: bad synchronization"
   },
   "unison_report_offensive": {
-    "message": "Offensive",
+    "message": "Anstößig",
     "description": "Report reason: offensive content"
   },
   "unison_report_spam": {
@@ -1018,19 +1042,19 @@
     "description": "Report reason: spam"
   },
   "unison_report_other": {
-    "message": "Other",
+    "message": "Sonstiges",
     "description": "Report reason: other"
   },
   "unison_confidence_low": {
-    "message": "Low Confidence",
+    "message": "Tiefes Vertrauen",
     "description": "Low confidence indicator"
   },
   "unison_confidence_medium": {
-    "message": "Medium Confidence",
+    "message": "Mittleres Vertrauen",
     "description": "Medium confidence indicator"
   },
   "unison_confidence_high": {
-    "message": "High Confidence",
+    "message": "Hohes Vertrauen",
     "description": "High confidence indicator"
   },
   "unison_format_lrc": {
@@ -1042,55 +1066,55 @@
     "description": "TTML format badge"
   },
   "unison_format_plain": {
-    "message": "Plain",
+    "message": "Schlicht",
     "description": "Plain text format badge"
   },
   "unison_autoDetect": {
-    "message": "Auto-detect",
+    "message": "Auto-Erkennung",
     "description": "Auto-detect format option"
   },
   "unison_noResults": {
-    "message": "No lyrics found. Try a different search.",
+    "message": "Keine Songtexte gefunden, versuchen sie einen anderen Suchbegriff.",
     "description": "No search results message"
   },
   "unison_interactingAs": {
-    "message": "Interacting as",
+    "message": "Interagieren als",
     "description": "Identity label prefix"
   },
   "unison_loadMore": {
-    "message": "Load more",
+    "message": "Weitere laden",
     "description": "Load more button for feed pagination"
   },
   "unison_votes": {
-    "message": "votes",
+    "message": "Stimmen",
     "description": "Vote count label"
   },
   "unison_createInComposer": {
-    "message": "Create synced lyrics",
+    "message": "Synchronisierte Songtexte erstellen",
     "description": "Create in Composer link text in dashboard"
   },
   "unison_song": {
-    "message": "Song",
+    "message": "Lied",
     "description": "Song field label"
   },
   "unison_artist": {
-    "message": "Artist",
+    "message": "Künstler(in)",
     "description": "Artist field label"
   },
   "unison_album": {
-    "message": "Album",
+    "message": "Alben",
     "description": "Album field label"
   },
   "unison_duration": {
-    "message": "Duration",
+    "message": "Dauer",
     "description": "Duration field label"
   },
   "unison_videoId": {
-    "message": "Video ID",
+    "message": "Video-ID",
     "description": "Video ID field label"
   },
   "unison_lyrics": {
-    "message": "Lyrics",
+    "message": "Songtexte",
     "description": "Lyrics textarea label"
   },
   "unison_format": {
@@ -1098,23 +1122,23 @@
     "description": "Format selector label"
   },
   "unison_openInYTMusic": {
-    "message": "Open in YouTube Music",
+    "message": "Mit YouTube-Musik öffnen",
     "description": "Link text to open song in YouTube Music"
   },
   "unison_back": {
-    "message": "Back",
+    "message": "Zurück",
     "description": "Back button text in detail view"
   },
   "unison_noPreview": {
-    "message": "Paste or drop lyrics to see a preview",
+    "message": "Songtexte einfügen oder ablegen um eine Vorschau zu sehen",
     "description": "Empty state text shown in submit preview before lyrics are entered"
   },
   "unison_preview": {
-    "message": "Preview",
+    "message": "Vorschau",
     "description": "Column title for parsed lyrics preview in detail view"
   },
   "unison_rawLyrics": {
-    "message": "Raw Lyrics",
+    "message": "Rohe Songtexte",
     "description": "Column title for raw lyrics source in detail view"
   },
   "unison_isrc": {
@@ -1122,79 +1146,79 @@
     "description": "ISRC field label"
   },
   "unison_placeholder_song": {
-    "message": "e.g. Bohemian Rhapsody",
+    "message": "z.B. Bohemian Rhapsody",
     "description": "Placeholder for song input"
   },
   "unison_placeholder_artist": {
-    "message": "e.g. Queen",
+    "message": "z.B. Queen",
     "description": "Placeholder for artist input"
   },
   "unison_placeholder_album": {
-    "message": "e.g. A Night at the Opera",
+    "message": "z.B. A Night at the Opera",
     "description": "Placeholder for album input"
   },
   "unison_placeholder_duration": {
-    "message": "e.g. 354",
+    "message": "z.B. 354",
     "description": "Placeholder for duration input"
   },
   "unison_placeholder_videoId": {
-    "message": "e.g. dQw4w9WgXcQ",
+    "message": "z.B. dQw4w9WgXcQ",
     "description": "Placeholder for video ID input"
   },
   "unison_placeholder_isrc": {
-    "message": "e.g. GBAYE0601498",
+    "message": "z.B. GBAYE0601498",
     "description": "Placeholder for ISRC input"
   },
   "unison_placeholder_lyrics": {
-    "message": "Paste LRC, TTML, or plain text lyrics here. You can also drag & drop a file.",
+    "message": "LRC, TTML oder einfache Texte hier einfügen. Sie können auch eine Datei per Drag & Drop einfügen.",
     "description": "Placeholder for lyrics textarea"
   },
   "unison_durationHint": {
-    "message": "Song length in seconds",
+    "message": "Songlänge in Sekunden",
     "description": "Hint text below duration field label"
   },
   "unison_videoIdHint": {
-    "message": "11-character ID from the YouTube Music URL",
+    "message": "11-Zeichen ID von dem YouTube-Musik-URL",
     "description": "Hint text below video ID field label"
   },
   "unison_formatHint": {
-    "message": "Auto-detected from lyrics content",
+    "message": "Auto-erkannt vom Songtext",
     "description": "Hint text below format field label"
   },
   "unison_isrcHintPrefix": {
-    "message": "Find it using an",
+    "message": "Finden Sie es mit einem/er",
     "description": "Text before ISRC finder link"
   },
   "unison_isrcHintLinkText": {
-    "message": "ISRC lookup tool",
+    "message": "ISRC Suchwerkzeug",
     "description": "Link text for ISRC finder"
   },
   "unison_tabFeed": {
-    "message": "Feed",
+    "message": "RSS Konfiguration",
     "description": "Feed tab label for recent submissions"
   },
   "unison_tabMySubmissions": {
-    "message": "My Submissions",
+    "message": "Meine Beiträge",
     "description": "Feed tab label for user's own submissions"
   },
   "unison_noSubmissions": {
-    "message": "You haven't submitted any lyrics yet.",
+    "message": "Sie haben noch keine Songtexte eingereicht.",
     "description": "Empty state for my submissions tab"
   },
   "unison_sync": {
-    "message": "Sync",
+    "message": "Synchronisieren",
     "description": "Sync type label in detail view"
   },
   "unison_language": {
-    "message": "Language",
+    "message": "Sprache",
     "description": "Language label in detail view"
   },
   "unison_validationRequired": {
-    "message": "Please fill in song, artist, video ID, and lyrics.",
+    "message": "Bitte Song, Künstler, Videokennzeichen und Songtexte ausfüllen.",
     "description": "Validation error when required fields are missing"
   },
   "unison_submitFailed": {
-    "message": "Submission failed",
+    "message": "Einreichung fehlgeschlagen",
     "description": "Fallback error message when submission fails"
   },
   "report_lyrics_title": {
@@ -1242,15 +1266,15 @@
     "description": "Report lyrics on a reporting process"
   },
   "report_lyrics_success": {
-    "message": "Thanks for the heads up! We'll take a look soon.",
+    "message": "Vielen Dank für die Meldung! Wir werden bald einen Blick draufwerfen.",
     "description": "Shown after a lyrics report is successfully submitted"
   },
   "report_lyrics_already": {
-    "message": "We've got this one already. Thanks though!",
+    "message": "Wir haben diese Meldung bereits. Vielen Dank!",
     "description": "Shown when the user tries to report the same lyrics twice"
   },
   "report_lyrics_error": {
-    "message": "That didn't go through. Mind trying again?",
+    "message": "Diese Meldung ist fehlgeschlagen, würden sie es erneut versuchen?",
     "description": "Shown when a lyrics report fails to submit"
   },
   "unison_tier_new": {

@@ -55,9 +55,17 @@
 		- [Styling Instrumental Breaks](#styling-instrumental-breaks)
 		- [Data Attributes](#data-attributes)
 	- [18. Autoscroll Resume Button](#18-autoscroll-resume-button)
-	- [19. Best Practices for Modifying CSS](#19-best-practices-for-modifying-css)
-	- [20. Importing/Exporting Styles](#20-importingexporting-styles)
-	- [21. Additional Resources](#21-additional-resources)
+	- [19. Unison Submitter Card and Floating Dock](#19-unison-submitter-card-and-floating-dock)
+		- [New CSS Variables](#new-css-variables)
+		- [Footer Card](#footer-card)
+		- [Submitter Block](#submitter-block)
+		- [Trust Tier Pill](#trust-tier-pill)
+		- [Vote Button](#vote-button)
+		- [Floating Dock](#floating-dock)
+		- [Hide and Idle States](#hide-and-idle-states)
+	- [20. Best Practices for Modifying CSS](#20-best-practices-for-modifying-css)
+	- [21. Importing/Exporting Styles](#21-importingexporting-styles)
+	- [22. Additional Resources](#22-additional-resources)
 
 ## 1. Introduction to CSS and Better Lyrics
 
@@ -343,7 +351,7 @@ Use `data-loader-visible` to adjust styles when the loader is active:
 
 ## 5. Styling Individual Lyric Lines
 
-Animating lyrics is a multi-step process involving various classes and properties that work together to ensure smooth, timed transitions even if the browser stutters. When a div or span has an active or animating class, it doesn't necessarily mean it's currently "active" or animating—these classes are applied early, and the code later inserts specific animation/transition delays to trigger effects at the correct time.
+Animating lyrics is a multi-step process involving various classes and properties that work together to ensure smooth, timed transitions even if the browser stutters. When a div or span has an active or animating class, it doesn't necessarily mean it's currently "active" or animating. These classes are applied early, and the code later inserts specific animation/transition delays to trigger effects at the correct time.
 
 ### Base Structure
 
@@ -1197,7 +1205,148 @@ To customize instrumental breaks:
 
 Creates an elegant button that appears when autoscroll is paused, with smooth show/hide transitions.
 
-## 19. Best Practices for Modifying CSS
+## 19. Unison Submitter Card and Floating Dock
+
+When a song is served by the Unison provider, the extension injects two extra UI blocks into the YouTube Music page: a submitter card inside the lyrics footer, and a floating dock anchored to the side panel. Both are themeable from your custom CSS the same way as everything else on this page. Class names follow the existing `blyrics-footer__*` and `blyrics-unison-*` conventions.
+
+### New CSS Variables
+
+| Variable | Default Value | Description |
+| -------- | ------------- | ----------- |
+| `--blyrics-vote-hover-color` | `hsla(0, 0%, 100%, 0.2)` | Background of vote and report buttons on hover |
+| `--blyrics-small-border-radius` | `1rem` | Border radius for vote buttons |
+| `--blyrics-fullscreen-bottom-dock-shift` | `-24px` | Y-offset applied to bottom-anchored docks in fullscreen. Lifts the dock above the player bar so it stays reachable. Negative values move up |
+
+### Footer Card
+
+When the Unison provider is active, an extra card is appended to the lyrics footer. The card opens the standalone Unison page in a new tab when clicked anywhere outside the buttons.
+
+```html
+<div class="blyrics-footer__unison">
+  <div class="blyrics-footer__container blyrics-footer__unison-card">
+    <div class="blyrics-footer__unison-author">
+      <div class="blyrics-footer__unison-author-row">
+        <strong class="blyrics-footer__author-name">PetName</strong>
+        <span class="blyrics-footer__trust-tier" data-tier="trusted">Trusted</span>
+      </div>
+      <div class="blyrics-footer__unison-author-label">submitted this</div>
+    </div>
+    <div class="blyrics-footer__unison-divider"></div>
+    <div class="blyrics-footer__unison-actions-block">
+      <div class="blyrics-footer__unison-actions">
+        <button class="blyrics-footer__vote">…</button>
+        <button class="blyrics-footer__vote">…</button>
+        <button class="blyrics-footer__vote">…</button>
+      </div>
+      <div class="blyrics-footer__unison-score-line">
+        <strong>+12</strong> <span>score</span> · <strong>12</strong> <span>votes</span>
+      </div>
+    </div>
+  </div>
+</div>
+```
+
+| Class | Purpose |
+| ----- | ------- |
+| `.blyrics-footer__unison` | Outer wrapper for the card. Forces full-width inside the footer |
+| `.blyrics-footer__unison-card` | Combined with `.blyrics-footer__container`. Translucent rounded card with hover lighten |
+| `.blyrics-footer__unison-divider` | 1px vertical line between submitter block and actions block. Only present when there is a submitter |
+| `.blyrics-footer__unison-actions-block` | Right column. Holds the action row plus the score line |
+| `.blyrics-footer__unison-actions` | Row of three buttons: upvote, downvote, report |
+| `.blyrics-footer__unison-score-line` | Score and vote-count line beneath the actions |
+
+### Submitter Block
+
+| Class | Purpose |
+| ----- | ------- |
+| `.blyrics-footer__unison-author` | Column with author row plus subtitle |
+| `.blyrics-footer__unison-author-row` | Row holding the author name and the trust tier pill |
+| `.blyrics-footer__author-name` | The submitter handle. Generated from their public key as a deterministic pet name |
+| `.blyrics-footer__unison-author-label` | Small "submitted this" label below the author row |
+
+### Trust Tier Pill
+
+The tier pill colors itself based on a `data-tier` attribute. Tier is derived from the submitter's reputation in `getTrustTier()`.
+
+| Selector | Color |
+| -------- | ----- |
+| `.blyrics-footer__trust-tier[data-tier="new"]` | Blue |
+| `.blyrics-footer__trust-tier[data-tier="trusted"]` | Green |
+| `.blyrics-footer__trust-tier[data-tier="veteran"]` | Purple |
+| `.blyrics-footer__trust-tier[data-tier="expert"]` | Gold |
+
+To restyle, target `.blyrics-footer__trust-tier[data-tier="<tier>"]` and override `color` and `background-color`.
+
+### Vote Button
+
+The same button class is reused for upvote, downvote, and report buttons in both the footer card and the floating dock.
+
+| Class | Purpose |
+| ----- | ------- |
+| `.blyrics-footer__vote` | Base style. 30px square, rounded, glassy background. Hover uses `--blyrics-vote-hover-color` |
+| `.blyrics-footer__vote--active` | Active state. The SVG path with `fill-opacity` becomes fully opaque |
+
+Inside the floating dock, vote buttons are scaled up to 32px square via the `.blyrics-unison-dock__inner .blyrics-footer__vote` selector.
+
+### Floating Dock
+
+A second copy of the vote buttons floats over the side panel so they remain reachable while the user scrolls past the footer card.
+
+```html
+<div class="blyrics-unison-dock" data-position="top-center">
+  <div class="blyrics-unison-dock__inner">
+    <button class="blyrics-footer__vote">…</button>
+    <button class="blyrics-footer__vote">…</button>
+    <button class="blyrics-footer__vote">…</button>
+  </div>
+</div>
+```
+
+| Class | Purpose |
+| ----- | ------- |
+| `.blyrics-unison-dock` | Absolute-positioned wrapper inside `#side-panel`. `pointer-events: none` so empty space stays click-through |
+| `.blyrics-unison-dock__inner` | The actual button group. Glass background, blur, `pointer-events: auto` |
+
+The dock chooses one of six anchor positions via the `data-position` attribute:
+
+| Value | Anchor |
+| ----- | ------ |
+| `top-left` | `top: 64px; left: 0` |
+| `top-center` | `top: 64px; left: 50%` (translated -50% via `--dock-tx`) |
+| `top-right` | `top: 64px; left: 100%` (translated -100%) |
+| `bottom-left` | `top: calc(100% - 64px); left: 0` |
+| `bottom-center` | `top: calc(100% - 64px); left: 50%` |
+| `bottom-right` | `top: calc(100% - 64px); left: 100%` |
+
+When the autoscroll resume button is visible, the `top-center` dock shifts down by 72px via `--dock-y-shift` so the two controls do not overlap.
+
+### Hide and Idle States
+
+| Class | Purpose |
+| ----- | ------- |
+| `.blyrics-unison-dock--hidden` | Applied while the footer card is in the viewport. The dock fades, blurs, and scales down so the user only sees one set of controls at a time |
+| `.blyrics-unison-dock--idle-hidden` | Applied while the player is idle in fullscreen. Hides the dock with the same animation when controls auto-hide |
+
+Both states animate `transform`, `opacity`, and `filter: blur` over 320ms.
+
+A few related rules ship in the YTM stylesheets and you may want to override them:
+
+```css
+/* Hide the dock when the side panel is showing something other than lyrics */
+#side-panel:has(#tab-renderer:not([page-type="MUSIC_PAGE_TYPE_TRACK_LYRICS"])) .blyrics-unison-dock { … }
+
+/* Hide top-anchored docks in fullscreen */
+#layout[player-fullscreened]:not([blyrics-dfs]) .blyrics-unison-dock[data-position^="top-"] { … }
+
+/* Pin bottom-anchored docks above the player bar in fullscreen */
+#layout[player-fullscreened]:not([blyrics-dfs]) .blyrics-unison-dock[data-position^="bottom-"] {
+  --dock-y-shift: var(--blyrics-fullscreen-bottom-dock-shift, -24px);
+}
+```
+
+Override `--blyrics-fullscreen-bottom-dock-shift` to tune the lift distance.
+
+## 20. Best Practices for Modifying CSS
 
 When modifying this CSS:
 
@@ -1212,7 +1361,7 @@ When modifying this CSS:
 9. **Consider performance** - Avoid overly complex animations that might cause lag
 10. **Have fun** - CSS is about creativity and expression!
 
-## 20. Importing/Exporting Styles
+## 21. Importing/Exporting Styles
 
 The Better Lyrics extension allows you to import and export custom CSS styles for sharing and backup purposes.
 
@@ -1231,7 +1380,7 @@ The Better Lyrics extension allows you to import and export custom CSS styles fo
 
 Share your custom themes with the [Better Lyrics community on Discord](https://discord.gg/UsHE3d5fWF) and get featured in the extension!
 
-## 21. Additional Resources
+## 22. Additional Resources
 
 To learn more about CSS and web development:
 

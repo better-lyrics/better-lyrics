@@ -42,10 +42,11 @@ async function signedRequest<T>(
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(body),
     });
+    let cachedErrorBody: { error?: string } | null = null;
 
     if (response.status === 400 && !needsRegistration) {
-      const errorData = await response.json().catch(() => null);
-      if (errorData?.error === "PUBLIC_KEY_REQUIRED") {
+      cachedErrorBody = await response.json().catch(() => null);
+      if (cachedErrorBody?.error === "PUBLIC_KEY_REQUIRED") {
         body.publicKey = signed.publicKey;
         needsRegistration = true;
         response = await fetchWithTimeout(`${UNISON_API_BASE_URL}${endpoint}`, {
@@ -53,11 +54,12 @@ async function signedRequest<T>(
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(body),
         });
+        cachedErrorBody = null;
       }
     }
 
     if (!response.ok) {
-      const errorData = await response.json().catch(() => null);
+      const errorData = cachedErrorBody ?? (await response.json().catch(() => null));
       const error = errorData?.error ?? `Request failed: ${response.status}`;
       console.warn(LOG_PREFIX_UNISON, error);
       return { success: false, data: null as T, error };
@@ -225,6 +227,10 @@ export async function castVote(lyricsId: number, vote: VoteValue): Promise<ApiRe
 
 export async function removeVote(lyricsId: number): Promise<ApiResult<{ message: string } | null>> {
   return signedRequest<{ message: string } | null>(`/lyrics/${lyricsId}/vote`, "DELETE", {});
+}
+
+export async function deleteLyrics(lyricsId: number): Promise<ApiResult<{ message: string } | null>> {
+  return signedRequest<{ message: string } | null>(`/lyrics/${lyricsId}`, "DELETE", {});
 }
 
 export async function reportLyrics(

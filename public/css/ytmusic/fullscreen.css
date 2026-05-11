@@ -209,9 +209,9 @@ ytmusic-app-layout[player-fullscreened]:not([blyrics-dfs]) > [slot="player-bar"]
   top: 16px;
 }
 
-/* Shift bottom-anchored Unison dock above the player bar when it shows in fullscreen */
-#layout[player-fullscreened]:not([blyrics-dfs])[show-fullscreen-controls] .blyrics-unison-dock[data-position^="bottom-"] {
-  --dock-y-shift: -88px;
+/* Pin bottom-anchored dock above the player bar always, avoids hover/wake-zone chase loop */
+#layout[player-fullscreened]:not([blyrics-dfs]) .blyrics-unison-dock[data-position^="bottom-"] {
+  --dock-y-shift: var(--blyrics-fullscreen-bottom-dock-shift, -24px);
 }
 
 /* Top-center autoscroll-button shift is smaller in fullscreen (no tab header) */

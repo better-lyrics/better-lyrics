@@ -113,7 +113,7 @@ export default async function unison(providerParameters: ProviderParameters): Pr
   url.searchParams.append("v", providerParameters.videoId);
   url.searchParams.append("song", providerParameters.song);
   url.searchParams.append("artist", providerParameters.artist);
-  url.searchParams.append("duration", String(providerParameters.duration));
+  url.searchParams.append("duration", String(Math.round(providerParameters.duration)));
   if (providerParameters.album != null) {
     url.searchParams.append("album", providerParameters.album);
   }

@@ -801,6 +801,10 @@
     "message": "Lirik lagu ini nggak ketemu",
     "description": "Message when no lyrics are available"
   },
+  "lyrics_resumeAutoscroll": {
+    "message": "Lanjutkan Gulir Otomatis",
+    "description": "Resume Autoscroll button label"
+  },
   "options_language_exclusions": {
     "message": "Pengecualian bahasa",
     "description": "Label for language exclusions setting"
@@ -1000,6 +1004,26 @@
   "unison_reportSuccess": {
     "message": "Terlaporkan",
     "description": "Report success tooltip text"
+  },
+  "unison_delete": {
+    "message": "Hapus",
+    "description": "Delete button label on a user's own Unison submission card"
+  },
+  "unison_deleteConfirm": {
+    "message": "Mau dihapus?",
+    "description": "Delete button label after first click, asking the user to confirm before sending the request"
+  },
+  "unison_deleteSuccess": {
+    "message": "Terhapus",
+    "description": "Transient label shown on the delete button after a successful delete"
+  },
+  "unison_deleteForbidden": {
+    "message": "Bukan milikmu",
+    "description": "Error message shown on the delete button when the server rejects the request because the caller is not the submitter"
+  },
+  "unison_deleteFailed": {
+    "message": "Gagal menghapus",
+    "description": "Generic error message shown on the delete button when the request fails for any other reason"
   },
   "unison_report_wrong_song": {
     "message": "Salah lagu",

@@ -11,6 +11,7 @@ import type {
 } from "@modules/unison/types";
 import {
   castVote,
+  deleteLyrics,
   getFeed,
   getLyricsById,
   getLyricsByVideoId,
@@ -30,6 +31,7 @@ const ICONS = {
   report: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48"><defs><mask id="unison-report-mask"><g fill="none" stroke="#fff" stroke-linejoin="round" stroke-width="4"><path fill="#555" d="M36 35H12V21c0-6.627 5.373-12 12-12s12 5.373 12 12z"/><path stroke-linecap="round" d="M8 42h32M4 13l3 1m6-10l1 3m-4 3L7 7"/></g></mask></defs><path fill="currentColor" d="M0 0h48v48H0z" mask="url(#unison-report-mask)"/></svg>`,
   externalLink: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6H6a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-6m-7 1l9-9m-5 0h5v5"/></svg>`,
   back: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="currentColor" d="m9.55 12l7.35 7.35q.375.375.363.875t-.388.875t-.875.375t-.875-.375l-7.7-7.675q-.3-.3-.45-.675t-.15-.75t.15-.75t.45-.675l7.7-7.7q.375-.375.888-.363t.887.388t.375.875t-.375.875z"/></svg>`,
+  trash: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="currentColor" d="M3 6.386c0-.484.345-.877.771-.877h2.665c.529-.016.996-.399 1.176-.965l.03-.1l.115-.391c.07-.24.131-.45.217-.637c.338-.739.964-1.252 1.687-1.383c.184-.033.378-.033.6-.033h3.478c.223 0 .417 0 .6.033c.723.131 1.35.644 1.687 1.383c.086.187.147.396.218.637l.114.391l.03.1c.18.566.74.95 1.27.965h2.57c.427 0 .772.393.772.877s-.345.877-.771.877H3.77c-.425 0-.77-.393-.77-.877"/><path fill="currentColor" fill-rule="evenodd" d="M9.425 11.482c.413-.044.78.273.821.707l.5 5.263c.041.433-.26.82-.671.864c-.412.043-.78-.273-.821-.707l-.5-5.263c-.041-.434.26-.821.671-.864m5.15 0c.412.043.713.43.671.864l-.5 5.263c-.04.434-.408.75-.82.707c-.413-.044-.713-.43-.672-.864l.5-5.264c.041-.433.409-.75.82-.707" clip-rule="evenodd"/><path fill="currentColor" d="M11.596 22h.808c2.783 0 4.174 0 5.08-.886c.904-.886.996-2.339 1.181-5.245l.267-4.188c.1-1.577.15-2.366-.303-2.865c-.454-.5-1.22-.5-2.753-.5H8.124c-1.533 0-2.3 0-2.753.5s-.404 1.288-.303 2.865l.267 4.188c.185 2.906.277 4.36 1.182 5.245c.905.886 2.296.886 5.079.886" opacity=".5"/></svg>`,
 } as const;
 
 const iconParser = new DOMParser();
@@ -65,6 +67,44 @@ let composerLink: HTMLAnchorElement;
 
 let feedNextCursor: number | undefined;
 let activeFeedTab: "recent" | "mine" = "recent";
+
+// -- Dev Stub --------------------------
+
+const IS_DEV = (() => {
+  try {
+    return process.env.NODE_ENV !== "production";
+  } catch {
+    return false;
+  }
+})();
+
+const DEV_STUB_BASE = {
+  id: -1,
+  videoId: "dQw4w9WgXcQ",
+  song: "[DEV] Test Submission",
+  artist: "Stub Artist",
+  album: "Stub Album",
+  format: "lrc" as const,
+  language: "en",
+  syncType: "linesync" as const,
+  score: 5,
+  effectiveScore: 5,
+  voteCount: 12,
+  confidence: "high" as const,
+  userVote: null,
+};
+
+const DEV_STUB_SUBMISSION: UnisonFeedEntry = {
+  ...DEV_STUB_BASE,
+  duration: 240,
+  createdAt: Math.floor(Date.now() / 1000) - 3600,
+};
+
+const DEV_STUB_LYRICS_ENTRY: UnisonLyricsEntry = {
+  ...DEV_STUB_BASE,
+  lyrics:
+    "[00:00.00]This is a dev stub for testing\n[00:05.00]Click the delete button below\n[00:10.00]Confirm to send DELETE /lyrics/-1\n[00:15.00]Server returns 404 (treated as success)\n[00:20.00]You'll be sent back to My Submissions",
+};
 
 // -- Router --------------------------
 
@@ -108,7 +148,7 @@ function routeFromParams(): void {
   const lyricsId = params.get("id");
   if (lyricsId) {
     showView("detail");
-    loadDetailById(Number(lyricsId));
+    loadDetailById(Number(lyricsId), params.get("mine") === "1");
     return;
   }
 
@@ -257,8 +297,11 @@ function updateTabActiveState(): void {
 
 async function loadMySubmissions(cursor?: number): Promise<void> {
   const result = await getMySubmissions(cursor);
+  const realEntries = result.success ? result.data.entries : [];
+  const stubEntries = IS_DEV && cursor === undefined ? [DEV_STUB_SUBMISSION] : [];
+  const entries = [...stubEntries, ...realEntries];
 
-  if (!result.success || result.data.entries.length === 0) {
+  if (entries.length === 0) {
     if (!cursor) {
       feedContainer.replaceChildren();
       const empty = document.createElement("div");
@@ -272,11 +315,11 @@ async function loadMySubmissions(cursor?: number): Promise<void> {
     return;
   }
 
-  for (const entry of result.data.entries) {
-    feedContainer.appendChild(createLyricsCard(entry));
+  for (const entry of entries) {
+    feedContainer.appendChild(createLyricsCard(entry, { fromMine: true }));
   }
 
-  feedNextCursor = result.data.nextCursor;
+  feedNextCursor = result.success ? result.data.nextCursor : undefined;
   feedMoreBtn.hidden = feedNextCursor === undefined;
 }
 
@@ -387,7 +430,11 @@ function formatRelativeTime(timestampSec: number): string {
 
 // -- Lyrics Card --------------------------
 
-function createLyricsCard(entry: UnisonSearchEntry | UnisonFeedEntry): HTMLElement {
+interface LyricsCardOptions {
+  fromMine?: boolean;
+}
+
+function createLyricsCard(entry: UnisonSearchEntry | UnisonFeedEntry, options: LyricsCardOptions = {}): HTMLElement {
   const card = document.createElement("div");
   card.className = "unison-card";
 
@@ -397,7 +444,11 @@ function createLyricsCard(entry: UnisonSearchEntry | UnisonFeedEntry): HTMLEleme
     card.classList.add("unison-card--voted-down");
   }
 
-  card.addEventListener("click", () => navigateTo({ id: String(entry.id) }));
+  card.addEventListener("click", () => {
+    const navParams: Record<string, string> = { id: String(entry.id) };
+    if (options.fromMine) navParams.mine = "1";
+    navigateTo(navParams);
+  });
 
   const header = document.createElement("div");
   header.className = "unison-card-header";
@@ -515,11 +566,15 @@ function renderDetailSkeleton(): void {
   detailLyrics.appendChild(lyricsSkel);
 }
 
-async function loadDetailById(id: number): Promise<void> {
+async function loadDetailById(id: number, isOwn: boolean = false): Promise<void> {
   renderDetailSkeleton();
+  if (IS_DEV && id === DEV_STUB_LYRICS_ENTRY.id) {
+    renderDetail(DEV_STUB_LYRICS_ENTRY, isOwn);
+    return;
+  }
   const result = await getLyricsById(id);
   if (result.success && result.data) {
-    renderDetail(result.data);
+    renderDetail(result.data, isOwn);
   }
 }
 
@@ -531,7 +586,7 @@ async function loadDetailByVideoId(videoId: string): Promise<void> {
   }
 }
 
-function renderDetail(entry: UnisonLyricsEntry): void {
+function renderDetail(entry: UnisonLyricsEntry, isOwn: boolean = false): void {
   detailMeta.replaceChildren();
   detailPreview.replaceChildren();
   detailLyrics.replaceChildren();
@@ -568,7 +623,7 @@ function renderDetail(entry: UnisonLyricsEntry): void {
   scoreRow.appendChild(scoreText);
   scoreRow.appendChild(voteText);
 
-  const votingRow = createDetailVoting(entry.id, entry.userVote);
+  const votingRow = createDetailVoting(entry.id, entry.userVote, isOwn);
 
   const ytLink = document.createElement("a");
   ytLink.className = "unison-yt-link";
@@ -592,6 +647,9 @@ function renderDetail(entry: UnisonLyricsEntry): void {
   detailMeta.appendChild(metaTable);
   detailMeta.appendChild(scoreRow);
   detailMeta.appendChild(votingRow);
+  if (isOwn) {
+    detailMeta.appendChild(createDetailDeleteButton(entry.id));
+  }
   detailMeta.appendChild(ytLink);
 
   // -- Preview column
@@ -615,7 +673,7 @@ function appendMetaRow(table: HTMLTableElement, label: string, value: string): v
   table.appendChild(tr);
 }
 
-function createDetailVoting(unisonId: number, userVote?: 1 | -1 | null): HTMLElement {
+function createDetailVoting(unisonId: number, userVote?: 1 | -1 | null, isOwn: boolean = false): HTMLElement {
   const row = document.createElement("div");
   row.className = "unison-detail-voting";
 
@@ -628,11 +686,6 @@ function createDetailVoting(unisonId: number, userVote?: 1 | -1 | null): HTMLEle
   downBtn.className = "unison-vote-btn";
   downBtn.appendChild(svgIcon("downvote"));
   downBtn.append(t("unison_downvote"));
-
-  const reportBtn = document.createElement("button");
-  reportBtn.className = "unison-vote-btn unison-vote-btn--report";
-  reportBtn.appendChild(svgIcon("report"));
-  reportBtn.append(t("unison_report"));
 
   let currentVote: "up" | "down" | null = userVote === 1 ? "up" : userVote === -1 ? "down" : null;
   upBtn.classList.toggle("unison-vote-btn--active", currentVote === "up");
@@ -660,12 +713,90 @@ function createDetailVoting(unisonId: number, userVote?: 1 | -1 | null): HTMLEle
 
   upBtn.addEventListener("click", () => handleVote("up"));
   downBtn.addEventListener("click", () => handleVote("down"));
-  reportBtn.addEventListener("click", () => showReportMenu(unisonId, reportBtn));
 
   row.appendChild(upBtn);
   row.appendChild(downBtn);
-  row.appendChild(reportBtn);
+
+  if (!isOwn) {
+    const reportBtn = document.createElement("button");
+    reportBtn.className = "unison-vote-btn unison-vote-btn--report";
+    reportBtn.appendChild(svgIcon("report"));
+    reportBtn.append(t("unison_report"));
+    reportBtn.addEventListener("click", () => showReportMenu(unisonId, reportBtn));
+    row.appendChild(reportBtn);
+  }
+
   return row;
+}
+
+function createDetailDeleteButton(unisonId: number): HTMLButtonElement {
+  const btn = document.createElement("button");
+  btn.type = "button";
+  btn.className = "unison-vote-btn unison-vote-btn--delete";
+
+  const setIdle = () => {
+    btn.replaceChildren(svgIcon("trash"), document.createTextNode(t("unison_delete")));
+    btn.classList.remove("unison-vote-btn--delete-confirm");
+  };
+
+  const setConfirm = () => {
+    btn.replaceChildren(svgIcon("trash"), document.createTextNode(t("unison_deleteConfirm")));
+    btn.classList.add("unison-vote-btn--delete-confirm");
+  };
+
+  const setError = (message: string) => {
+    btn.replaceChildren(svgIcon("trash"), document.createTextNode(message));
+    btn.classList.remove("unison-vote-btn--delete-confirm");
+  };
+
+  setIdle();
+
+  let confirming = false;
+  let revertTimer: ReturnType<typeof setTimeout> | undefined;
+
+  const clearRevertTimer = () => {
+    if (revertTimer) {
+      clearTimeout(revertTimer);
+      revertTimer = undefined;
+    }
+  };
+
+  btn.addEventListener("click", async () => {
+    if (btn.disabled) return;
+
+    if (!confirming) {
+      confirming = true;
+      setConfirm();
+      clearRevertTimer();
+      revertTimer = setTimeout(() => {
+        confirming = false;
+        revertTimer = undefined;
+        setIdle();
+      }, 4000);
+      return;
+    }
+
+    clearRevertTimer();
+    btn.disabled = true;
+
+    const result = await deleteLyrics(unisonId);
+
+    if (result.success || result.error === "Lyrics not found") {
+      navigateTo({ tab: "mine" });
+      return;
+    }
+
+    confirming = false;
+    btn.disabled = false;
+    const message = result.error === "Not your submission" ? t("unison_deleteForbidden") : t("unison_deleteFailed");
+    setError(message);
+    revertTimer = setTimeout(() => {
+      revertTimer = undefined;
+      setIdle();
+    }, 3000);
+  });
+
+  return btn;
 }
 
 function showReportMenu(unisonId: number, anchor: HTMLButtonElement): void {
