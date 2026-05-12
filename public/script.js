@@ -27,6 +27,46 @@ let pausedTickCounter = 0;
 let cachedContentRect = null;
 let playerResizeObserver = null;
 let lastVideoId = null;
+let observedVideoElement = null;
+
+/**
+ * Writes the video's intrinsic aspect ratio (from the <video> element's
+ * videoWidth/videoHeight) to a CSS variable so styles can resize the player
+ * to match it (eliminating black bars). Removes the variable when no real
+ * video frame is available so CSS falls back to its default.
+ * @param {HTMLVideoElement | null} video
+ */
+const updateVideoAspectRatioVar = video => {
+  if (video && video.videoWidth > 0 && video.videoHeight > 0) {
+    document.documentElement.style.setProperty(
+      "--blyrics-video-aspect-ratio",
+      `${video.videoWidth} / ${video.videoHeight}`
+    );
+  } else {
+    document.documentElement.style.removeProperty("--blyrics-video-aspect-ratio");
+  }
+};
+
+const handleVideoResize = () => updateVideoAspectRatioVar(observedVideoElement);
+
+/**
+ * Finds the <video> inside the player and (re)attaches a resize listener so
+ * we react to intrinsic-dimension changes (loadedmetadata, quality switches).
+ * @param {HTMLElement} player
+ */
+const attachVideoListener = player => {
+  const video = player && player.querySelector("video");
+  if (video !== observedVideoElement) {
+    if (observedVideoElement) {
+      observedVideoElement.removeEventListener("resize", handleVideoResize);
+    }
+    observedVideoElement = video || null;
+    if (observedVideoElement) {
+      observedVideoElement.addEventListener("resize", handleVideoResize);
+    }
+  }
+  updateVideoAspectRatioVar(observedVideoElement);
+};
 
 /**
  * Sets up a ResizeObserver on the player element to cache the content rect.
@@ -42,9 +82,11 @@ const setupResizeObserver = player => {
     if (player && typeof player.getVideoContentRect === "function") {
       cachedContentRect = player.getVideoContentRect();
     }
+    attachVideoListener(player);
   });
 
   playerResizeObserver.observe(player);
+  attachVideoListener(player);
 };
 // ------------------------------------------
 
@@ -79,6 +121,7 @@ const startLyricsTick = () => {
           if (typeof player.getVideoContentRect === "function") {
             cachedContentRect = player.getVideoContentRect();
           }
+          attachVideoListener(player);
         }
 
         const audioTrackData = player.getAudioTrack();
@@ -152,6 +195,11 @@ const stopLyricsTick = () => {
   if (playerResizeObserver) {
     playerResizeObserver.disconnect();
     playerResizeObserver = null;
+  }
+
+  if (observedVideoElement) {
+    observedVideoElement.removeEventListener("resize", handleVideoResize);
+    observedVideoElement = null;
   }
 };
 
