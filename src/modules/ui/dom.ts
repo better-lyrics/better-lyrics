@@ -265,6 +265,23 @@ const unisonControlsRegistry = {
 
 let unisonDockObserver: IntersectionObserver | null = null;
 
+type DockSuppressionReason = "cardVisible" | "ad" | "loading";
+const dockSuppressionReasons = new Set<DockSuppressionReason>();
+
+function applyDockSuppression(): void {
+  const dock = document.getElementsByClassName(UNISON_DOCK_CLASS)[0] as HTMLElement | undefined;
+  if (!dock) return;
+  dock.classList.toggle(`${UNISON_DOCK_CLASS}--hidden`, dockSuppressionReasons.size > 0);
+}
+
+function setUnisonDockSuppression(reason: DockSuppressionReason, suppressed: boolean): void {
+  const had = dockSuppressionReasons.has(reason);
+  if (suppressed === had) return;
+  if (suppressed) dockSuppressionReasons.add(reason);
+  else dockSuppressionReasons.delete(reason);
+  applyDockSuppression();
+}
+
 function refreshUnisonControls(unisonData: UnisonData): void {
   for (const btn of unisonControlsRegistry.upvotes) {
     btn.classList.toggle(VOTE_ACTIVE_CLASS, unisonData.vote === 1);
@@ -410,13 +427,14 @@ export function mountUnisonDock(unisonData: UnisonData, position: string): void 
 
   dock.appendChild(inner);
   sidePanel.appendChild(dock);
+  applyDockSuppression();
 
   const card = document.querySelector<HTMLElement>(`.${FOOTER_CLASS}__unison-card`);
   if (card) {
     unisonDockObserver = new IntersectionObserver(
       entries => {
         for (const entry of entries) {
-          dock.classList.toggle(`${UNISON_DOCK_CLASS}--hidden`, entry.isIntersecting);
+          setUnisonDockSuppression("cardVisible", entry.isIntersecting);
         }
       },
       { threshold: 0.4 }
@@ -430,6 +448,7 @@ export function unmountUnisonDock(): void {
     unisonDockObserver.disconnect();
     unisonDockObserver = null;
   }
+  dockSuppressionReasons.delete("cardVisible");
   const dock = document.getElementsByClassName(UNISON_DOCK_CLASS)[0];
   if (dock) dock.remove();
 }
@@ -605,6 +624,7 @@ function setLoaderState(state: LoaderState, text?: string): void {
   if (text !== undefined) {
     loader.style.setProperty("--blyrics-loader-text", `"${text}"`);
   }
+  setUnisonDockSuppression("loading", state !== "hidden");
 }
 
 /**
@@ -776,6 +796,7 @@ export function showAdOverlay(): void {
   }
 
   adOverlay.setAttribute("active", "");
+  setUnisonDockSuppression("ad", true);
 }
 
 /**
@@ -786,6 +807,7 @@ export function hideAdOverlay(): void {
   if (adOverlay) {
     adOverlay.removeAttribute("active");
   }
+  setUnisonDockSuppression("ad", false);
 }
 
 /**

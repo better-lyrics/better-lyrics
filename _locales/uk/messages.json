@@ -801,6 +801,10 @@
     "message": "Не вдалося знайти текст цієї пісні",
     "description": "Message when no lyrics are available"
   },
+  "lyrics_resumeAutoscroll": {
+    "message": "Відновити прокручування",
+    "description": "Resume Autoscroll button label"
+  },
   "options_language_exclusions": {
     "message": "Винятки мов",
     "description": "Label for language exclusions setting"
@@ -1000,6 +1004,26 @@
   "unison_reportSuccess": {
     "message": "Скаргу надіслано",
     "description": "Report success tooltip text"
+  },
+  "unison_delete": {
+    "message": "Видалити",
+    "description": "Delete button label on a user's own Unison submission card"
+  },
+  "unison_deleteConfirm": {
+    "message": "Дійсно видалити?",
+    "description": "Delete button label after first click, asking the user to confirm before sending the request"
+  },
+  "unison_deleteSuccess": {
+    "message": "Видалено",
+    "description": "Transient label shown on the delete button after a successful delete"
+  },
+  "unison_deleteForbidden": {
+    "message": "Це не ваше подання",
+    "description": "Error message shown on the delete button when the server rejects the request because the caller is not the submitter"
+  },
+  "unison_deleteFailed": {
+    "message": "Помилка видалення",
+    "description": "Generic error message shown on the delete button when the request fails for any other reason"
   },
   "unison_report_wrong_song": {
     "message": "Неправильна пісня",
