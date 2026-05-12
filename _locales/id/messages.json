@@ -798,7 +798,7 @@
     "description": "Message shown during ad playback"
   },
   "lyrics_notFound": {
-    "message": "Lirik lagu ini nggak ketemu",
+    "message": "Tidak ketemu lirik untuk lagu ini",
     "description": "Message when no lyrics are available"
   },
   "lyrics_resumeAutoscroll": {
