@@ -131,8 +131,8 @@ ytmusic-player-page:not([is-mweb-modernization-enabled]):not([player-ui-state=MI
 /* Keep album art small */
 ytmusic-player-page:not([is-mweb-modernization-enabled]):not([blyrics-video-mode]):not([player-ui-state=MINIPLAYER]) #player.ytmusic-player-page {
   width: 100%;
-  margin-left: auto;
-  margin-right: auto;
+  margin-left: auto !important;
+  margin-right: auto !important;
 }
 
 ytmusic-player-page:not([is-mweb-modernization-enabled]):not([blyrics-video-mode]):not([video-mode])
