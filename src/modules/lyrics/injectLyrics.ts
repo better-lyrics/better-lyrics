@@ -1,5 +1,6 @@
 import {
   BACKGROUND_LYRIC_CLASS,
+  EXPLICIT_WORD_CLASS,
   HAS_TRAILING_SPACE_CLASS,
   LOG_PREFIX,
   LYRICS_CLASS,
@@ -323,6 +324,9 @@ function createLyricsLine(parts: LyricPart[], line: LineData, lyricElement: HTML
       }
       if (part.isBackground) {
         span.classList.add(BACKGROUND_LYRIC_CLASS);
+      }
+      if (part.explicit) {
+        span.classList.add(EXPLICIT_WORD_CLASS);
       }
 
       // Non-final sub-parts signal a group-flush (wrap opportunity) without a trailing-space
