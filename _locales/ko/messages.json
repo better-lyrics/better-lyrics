@@ -1210,7 +1210,7 @@
     "description": "Sync type label in detail view"
   },
   "unison_language": {
-    "message": "Language",
+    "message": "언어",
     "description": "Language label in detail view"
   },
   "unison_validationRequired": {
