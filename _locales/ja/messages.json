@@ -801,6 +801,10 @@
     "message": "この曲の歌詞が見つかりませんでした",
     "description": "Message when no lyrics are available"
   },
+  "lyrics_resumeAutoscroll": {
+    "message": "Resume Autoscroll",
+    "description": "Resume Autoscroll button label"
+  },
   "options_language_exclusions": {
     "message": "Language exclusions",
     "description": "Label for language exclusions setting"
@@ -1000,6 +1004,26 @@
   "unison_reportSuccess": {
     "message": "Reported",
     "description": "Report success tooltip text"
+  },
+  "unison_delete": {
+    "message": "Delete",
+    "description": "Delete button label on a user's own Unison submission card"
+  },
+  "unison_deleteConfirm": {
+    "message": "Confirm delete?",
+    "description": "Delete button label after first click, asking the user to confirm before sending the request"
+  },
+  "unison_deleteSuccess": {
+    "message": "Deleted",
+    "description": "Transient label shown on the delete button after a successful delete"
+  },
+  "unison_deleteForbidden": {
+    "message": "Not your submission",
+    "description": "Error message shown on the delete button when the server rejects the request because the caller is not the submitter"
+  },
+  "unison_deleteFailed": {
+    "message": "Delete failed",
+    "description": "Generic error message shown on the delete button when the request fails for any other reason"
   },
   "unison_report_wrong_song": {
     "message": "Wrong song",

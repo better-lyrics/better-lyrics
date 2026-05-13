@@ -264,12 +264,12 @@ export async function fillTtml(
 
   const ttContainer = rawObj.find(e => "tt" in e)!;
   const tt = ttContainer.tt;
-  const ttHead = tt.find(e => e.head)!.head!;
+  const ttHead = tt.find(e => e.head)?.head;
   const ttBodyContainer = tt.find(e => e.body)!;
   const ttBody = ttBodyContainer.body!;
   const ttMeta = ttBodyContainer[":@"];
 
-  const metadataElements = ttHead.find(e => "metadata" in e)?.metadata ?? [];
+  const metadataElements = ttHead?.find(e => "metadata" in e)?.metadata ?? [];
 
   const agentMapping = extractAgentMapping(metadataElements);
 

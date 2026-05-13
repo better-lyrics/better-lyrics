@@ -5,4 +5,5 @@
   --blyrics-fullscreen-video-panel-size: 25%;
   --blyrics-no-lyrics-slide-delay: 1.8s;
   --blyrics-fullscreen-bottom-dock-shift: -24px;
+  --blyrics-video-aspect-ratio: 16 / 9;
 }
