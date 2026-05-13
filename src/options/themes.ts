@@ -35,6 +35,17 @@ enum CTSettingFieldType {
   TEXTFIELD = "textfield"
 }
 
+enum CTSettingFieldConditionals {
+  EQUAL = "equals",
+  NOTEQUAL = "not-equal",
+  GREATERTHAN = "greater-than",
+  LESSTHAN = "less-than",
+  CONTAINS = "contains",
+  NOTCONTAINS = "not-contains",
+  STARTS = "starts",
+  ENDS = "ends"
+}
+
 interface CTSettingField {
   label: string;
   type: CTSettingFieldType | string;
@@ -42,18 +53,32 @@ interface CTSettingField {
   attribute: string;
   attrType: CTSettingFieldAttrType | string;
   /** 
-   * Use `%VALUE%` for accessing the current setting field value on the `attrValue`.
+   * Use `$VALUE$` for accessing the current setting field value on the `attrValue`.
    * 
-   * Use `%<SETTING-FIELD-ID>%` for accessing other setting field values on the `attrValue`
+   * Use `$<SETTING-FIELD-ID>$` for accessing other setting field values on the `attrValue`
    */
-  attrValue: string;
-  /** Make this setting field only available under certain other setting field values */
-  available?: [];
+  attrValue?: string;
+  /** 
+   * This property allows to make this setting field only effective and available under certain other setting field values 
+   * 
+   * An array of an array of conditional values.
+   * 
+   * The inner array represents a set of conditions (AND), and the outer array represents multiple sets of conditions (OR).
+   * 
+   * For example, it could be built like this:
+   * ```
+   * [
+   *  [{settingField: "field1", condition: "equals", value: true}, {settingField: "field2", condition: "greater-than", value: 5}], // inside this array is a list of conditions that must be met (AND)
+   *  [{settingField: "field3", condition: "contains", value: "abc"}] // this array represents an alternative set of conditions that could be used to meet the conditions instead if the first array did not met the conditions (OR)
+   * ]
+   * ```
+   */
+  available?: [{settingField: string, condition: CTSettingFieldConditionals, value: any}][];
 }
 
 interface CTSettingFieldToggle extends CTSettingField {
-  onValue?: any;
-  offValue?: any;
+  onValue: any;
+  offValue: any;
   default: boolean;
 }
 
@@ -75,8 +100,8 @@ interface CTSettingFieldColor extends CTSettingField {
 }
 
 interface CTSettingFieldTextfield extends CTSettingField {
-  default: string;
   onlyAllow?: "number" | "alphabetical" | "alphanumeric";
+  default: string;
 }
 
 const themes: Theme[] = [
