@@ -73,7 +73,7 @@ interface CTSettingField {
    * ]
    * ```
    */
-  available?: [{settingField: string, condition: CTSettingFieldConditionals, value: any}][];
+  available?: [{settingField: string, condition: string | CTSettingFieldConditionals, value: any}][];
 }
 
 interface CTSettingFieldToggle extends CTSettingField {
@@ -180,11 +180,13 @@ export async function getCustomThemes(): Promise<CustomTheme[]> {
 export async function saveCustomTheme(name: string, css: string, settings?: { [field: string]: CTSettingField }): Promise<void> {
   const customThemes = await getCustomThemes();
   const existingIndex = customThemes.findIndex(theme => theme.name === name);
+  const existingTheme = existingIndex !== -1 ? customThemes[existingIndex] : undefined;
 
   const newTheme: CustomTheme = {
     name,
     css,
-    settings,
+    settings: settings ?? existingTheme?.settings,
+    savedSettings: existingTheme?.savedSettings,
     timestamp: Date.now(),
   };
 
@@ -193,6 +195,26 @@ export async function saveCustomTheme(name: string, css: string, settings?: { [f
   } else {
     customThemes.push(newTheme);
   }
+
+  await chrome.storage.local.set({ customThemes });
+}
+
+export async function updateCustomThemeSavedSettings(name: string, savedSettings: { [field: string]: any }): Promise<void> {
+  const customThemes = await getCustomThemes();
+  const themeIndex = customThemes.findIndex(theme => theme.name === name);
+  if (themeIndex === -1) {
+    throw new Error(`Theme "${name}" not found`);
+  }
+
+  const theme = customThemes[themeIndex];
+  theme.savedSettings = {
+    ...(theme.savedSettings || {}),
+    ...savedSettings,
+  };
+  customThemes[themeIndex] = {
+    ...theme,
+    timestamp: Date.now(),
+  };
 
   await chrome.storage.local.set({ customThemes });
 }
@@ -224,7 +246,7 @@ export async function renameCustomTheme(oldName: string, newName: string): Promi
 
 export async function addSettingFieldCustomTheme(name: string, type: CTSettingFieldType | string, id: string, data: CTSettingField): Promise<void> {
   if (!Object.values(CTSettingFieldType).find(ftype => ftype === type)) {
-    throw new Error(`Invalid setting field type "${type}"`)
+    throw new Error(`Invalid setting field type "${type}"`);
   }
 
   id = id.trim().toLowerCase().replace(/\s+/g, "-");
@@ -232,17 +254,66 @@ export async function addSettingFieldCustomTheme(name: string, type: CTSettingFi
   const customThemes = await getCustomThemes();
   const themeIndex = customThemes.findIndex(theme => theme.name === name);
 
-  if (!themeIndex) {
+  if (themeIndex === -1) {
     throw new Error(`Theme "${name}" not found`);
   }
 
   const theme = customThemes[themeIndex];
   if (!theme.settings) { theme.settings = {}; }
+  if (!theme.savedSettings) { theme.savedSettings = {}; }
   if (theme.settings[id]) {
     throw new Error(`Field with Id "${id}" already exists!`);
   }
 
   theme.settings[id] = data;
+  theme.savedSettings[id] = getDefaultValueForSettingField(data);
+  await chrome.storage.local.set({ customThemes });
+}
+
+function getDefaultValueForSettingField(field: CTSettingField): any {
+  if (field.type === CTSettingFieldType.TOGGLE) {
+    const toggleField = field as CTSettingFieldToggle;
+    return toggleField.default ? toggleField.onValue : toggleField.offValue;
+  }
+  if (field.type === CTSettingFieldType.RANGE) {
+    const rangeField = field as CTSettingFieldRange;
+    return rangeField.default;
+  }
+  if (field.type === CTSettingFieldType.DROPDOWN) {
+    const dropdownField = field as CTSettingFieldDropdown;
+    const values = Object.values(dropdownField.options);
+    return values[dropdownField.default] ?? values[0];
+  }
+  if (field.type === CTSettingFieldType.COLOR) {
+    const colorField = field as CTSettingFieldColor;
+    return colorField.default;
+  }
+  if (field.type === CTSettingFieldType.TEXTFIELD) {
+    const textField = field as CTSettingFieldTextfield;
+    return textField.default;
+  }
+  return undefined;
+}
+
+export async function getCustomThemeByName(name: string): Promise<CustomTheme | undefined> {
+  const customThemes = await getCustomThemes();
+  return customThemes.find(theme => theme.name === name);
+}
+
+export async function updateCustomThemeSettings(name: string, settings?: { [field: string]: CTSettingField }): Promise<void> {
+  const customThemes = await getCustomThemes();
+  const themeIndex = customThemes.findIndex(theme => theme.name === name);
+  if (themeIndex === -1) {
+    throw new Error(`Theme "${name}" not found`);
+  }
+
+  customThemes[themeIndex] = {
+    ...customThemes[themeIndex],
+    settings,
+    timestamp: Date.now(),
+  };
+
+  await chrome.storage.local.set({ customThemes });
 }
 
 export default themes;

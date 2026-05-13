@@ -11,8 +11,10 @@ import {
   handleRenameTheme,
   handleSaveTheme,
   initStoreThemeListener,
+  initializeThemeSettings,
   openThemeModal,
   preloadInstalledThemeImages,
+  refreshThemeSettingsUI,
   saveToStorage,
   setThemeName,
 } from "./features/themes";
@@ -198,6 +200,7 @@ export function initialize() {
     initializeEditorKeyboardShortcuts();
     initializeThemeModal();
     initializeThemeActions();
+    initializeThemeSettings();
     initializeFileOperations();
     initializeStorageListeners();
     initStoreThemeListener();

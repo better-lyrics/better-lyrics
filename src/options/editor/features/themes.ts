@@ -8,13 +8,14 @@ import {
 } from "../../store/themeStoreManager";
 import type { ThemeSource } from "../../store/types";
 import type { Theme } from "../../themes";
-import THEMES, { deleteCustomTheme, getCustomThemes, renameCustomTheme, saveCustomTheme } from "../../themes";
+import THEMES, { addSettingFieldCustomTheme, deleteCustomTheme, getCustomThemes, getCustomThemeByName, renameCustomTheme, saveCustomTheme, updateCustomThemeSavedSettings } from "../../themes";
 import { SAVE_CUSTOM_THEME_DEBOUNCE, SAVE_DEBOUNCE_DELAY } from "../core/editor";
 import { editorStateManager } from "../core/state";
 import type { ThemeCardOptions } from "../types";
 import {
   deleteThemeBtn,
   editThemeBtn,
+  modifyThemeSettingsBtn,
   syncIndicator,
   themeModalGrid,
   themeModalOverlay,
@@ -25,6 +26,7 @@ import {
   themePreviewCard,
   themePreviewName,
   themeSelectorBtn,
+  themeSettingsContainer,
   themeSourceBadge,
 } from "../ui/dom";
 import { showAlert, showConfirm, showPrompt } from "../ui/feedback";
@@ -128,6 +130,397 @@ export function themeSourceToEditorSource(source: ThemeSource | undefined): Edit
   if (source === "marketplace") return "marketplace";
   if (source === "url") return "github";
   return null;
+}
+
+let themeSettingsVisible = false;
+
+async function getCurrentCustomTheme(): Promise<ReturnType<typeof getCustomThemeByName> | undefined> {
+  const themeName = editorStateManager.getCurrentThemeName();
+  if (!themeName || !editorStateManager.getIsCustomTheme()) return undefined;
+  return getCustomThemeByName(themeName);
+}
+
+function getEditorElement(): HTMLElement | null {
+  return document.getElementById("editor");
+}
+
+function setThemeSettingsVisibility(visible: boolean): void {
+  themeSettingsVisible = visible;
+  const editor = getEditorElement();
+  if (editor) {
+    editor.style.display = visible ? "none" : "block";
+  }
+  if (themeSettingsContainer) {
+    themeSettingsContainer.style.display = visible ? "block" : "none";
+  }
+  if (modifyThemeSettingsBtn) {
+    modifyThemeSettingsBtn.classList.toggle("active", visible);
+  }
+}
+
+function createThemeSettingsNotice(message: string): HTMLElement {
+  const wrapper = document.createElement("div");
+  wrapper.style.padding = "1rem";
+  wrapper.style.color = "var(--fg-secondary, #ddd)";
+  wrapper.style.fontSize = "0.95rem";
+  wrapper.textContent = message;
+  return wrapper;
+}
+
+function createFieldLabel(label: string, id: string): HTMLElement {
+  const wrapper = document.createElement("div");
+  wrapper.style.display = "flex";
+  wrapper.style.justifyContent = "space-between";
+  wrapper.style.alignItems = "center";
+
+  const labelElm = document.createElement("span");
+  labelElm.textContent = label;
+  labelElm.style.fontWeight = "600";
+
+  const idElm = document.createElement("span");
+  idElm.textContent = id;
+  idElm.style.opacity = "0.7";
+  idElm.style.fontSize = "0.85rem";
+
+  wrapper.appendChild(labelElm);
+  wrapper.appendChild(idElm);
+  return wrapper;
+}
+
+function parseFieldValue(field: any, rawValue: string): any {
+  switch (field.type) {
+    case "toggle":
+      return rawValue.toLowerCase() === "true";
+    case "range":
+      return Number(rawValue);
+    case "dropdown":
+      return rawValue;
+    case "color":
+      return rawValue;
+    case "textfield":
+      return rawValue;
+    default:
+      return rawValue;
+  }
+}
+
+function getFieldDefaultValue(field: any): any {
+  if (field.default !== undefined) return field.default;
+  if (field.type === "toggle") {
+    return field.onValue ?? field.offValue ?? false;
+  }
+  if (field.type === "range") {
+    return field.min ?? 0;
+  }
+  if (field.type === "dropdown") {
+    const values = Object.values(field.options || {});
+    return values[field.default] ?? values[0] ?? "";
+  }
+  if (field.type === "color") {
+    return field.default ?? "#ffffff";
+  }
+  return "";
+}
+
+function createFieldInput(
+  themeName: string,
+  fieldId: string,
+  field: any,
+  currentValue: any,
+  onChange: (value: any) => void
+): HTMLElement {
+  const container = document.createElement("div");
+  container.style.marginTop = "0.75rem";
+
+  let input: HTMLElement;
+
+  switch (field.type) {
+    case "toggle": {
+      const checkbox = document.createElement("input");
+      checkbox.type = "checkbox";
+      checkbox.checked = currentValue === field.onValue || currentValue === true;
+      checkbox.addEventListener("change", () => {
+        onChange(checkbox.checked ? field.onValue : field.offValue);
+      });
+      input = checkbox;
+      break;
+    }
+    case "range": {
+      const wrapper = document.createElement("div");
+      wrapper.style.display = "flex";
+      wrapper.style.alignItems = "center";
+      wrapper.style.gap = "0.75rem";
+
+      const range = document.createElement("input");
+      range.type = "range";
+      range.min = String(field.min ?? 0);
+      range.max = String(field.max ?? 100);
+      range.step = String(field.step ?? 1);
+      range.value = String(currentValue ?? field.default ?? field.min ?? 0);
+      const valueInput = document.createElement("input");
+      valueInput.type = "number";
+      valueInput.value = range.value;
+      valueInput.min = range.min;
+      valueInput.max = range.max;
+      valueInput.step = range.step;
+      range.addEventListener("input", () => {
+        valueInput.value = range.value;
+      });
+      const commit = () => {
+        const parsed = Number(valueInput.value);
+        if (!Number.isNaN(parsed)) {
+          range.value = String(parsed);
+          onChange(parsed);
+        }
+      };
+      range.addEventListener("change", commit);
+      valueInput.addEventListener("change", commit);
+
+      wrapper.appendChild(range);
+      wrapper.appendChild(valueInput);
+      input = wrapper;
+      break;
+    }
+    case "dropdown": {
+      const select = document.createElement("select");
+      const options = field.options || {};
+      const values = Object.values(options);
+      Object.entries(options).forEach(([label, value]) => {
+        const option = document.createElement("option");
+        option.value = String(value);
+        option.textContent = label;
+        select.appendChild(option);
+      });
+      select.value = String(currentValue ?? values[0] ?? "");
+      select.addEventListener("change", () => {
+        onChange(parseFieldValue(field, select.value));
+      });
+      input = select;
+      break;
+    }
+    case "color": {
+      const color = document.createElement("input");
+      color.type = "color";
+      color.value = String(currentValue ?? field.default ?? "#ffffff");
+      color.addEventListener("change", () => {
+        onChange(color.value);
+      });
+      input = color;
+      break;
+    }
+    default: {
+      const text = document.createElement("input");
+      text.type = "text";
+      text.value = String(currentValue ?? field.default ?? "");
+      text.style.width = "100%";
+      text.addEventListener("change", () => {
+        onChange(text.value);
+      });
+      input = text;
+      break;
+    }
+  }
+
+  container.appendChild(input);
+  return container;
+}
+
+function formatThemeComment(savedSettings?: { [field: string]: any }): string {
+  if (!savedSettings || Object.keys(savedSettings).length === 0) {
+    return "";
+  }
+  const entries = Object.entries(savedSettings)
+    .map(([key, value]) => `blyrics-${key} = ${value};`)
+    .join(" ");
+  return `/* ${entries} */\n\n`;
+}
+
+async function renderThemeSettings(): Promise<void> {
+  if (!themeSettingsContainer) return;
+  themeSettingsContainer.replaceChildren();
+
+  const themeName = editorStateManager.getCurrentThemeName();
+  const isCustom = editorStateManager.getIsCustomTheme();
+  const header = document.createElement("div");
+  header.style.display = "flex";
+  header.style.justifyContent = "space-between";
+  header.style.alignItems = "center";
+  header.style.marginBottom = "1rem";
+
+  const title = document.createElement("h3");
+  title.textContent = "Theme Settings";
+  title.style.margin = "0";
+  header.appendChild(title);
+
+  const addFieldBtn = document.createElement("button");
+  addFieldBtn.textContent = "Add Setting Field";
+  addFieldBtn.className = "small-btn";
+  addFieldBtn.disabled = !isCustom;
+  addFieldBtn.addEventListener("click", async () => {
+    await promptAddThemeSettingField();
+    await renderThemeSettings();
+  });
+  header.appendChild(addFieldBtn);
+  themeSettingsContainer.appendChild(header);
+
+  if (!themeName) {
+    themeSettingsContainer.appendChild(createThemeSettingsNotice("No theme selected. Choose a custom theme to view its settings."));
+    return;
+  }
+
+  if (!isCustom) {
+    themeSettingsContainer.appendChild(createThemeSettingsNotice("Theme settings are only available for saved custom themes."));
+    return;
+  }
+
+  const customTheme = await getCustomThemeByName(themeName);
+  if (!customTheme) {
+    themeSettingsContainer.appendChild(createThemeSettingsNotice("Custom theme metadata not found."));
+    return;
+  }
+
+  const settings = customTheme.settings || {};
+  const savedSettings = customTheme.savedSettings || {};
+
+  if (Object.keys(settings).length === 0) {
+    themeSettingsContainer.appendChild(createThemeSettingsNotice("This custom theme has no settings yet. Use the button above to add a field."));
+    return;
+  }
+
+  const list = document.createElement("div");
+  list.style.display = "grid";
+  list.style.gap = "1rem";
+
+  for (const [fieldId, fieldDef] of Object.entries(settings)) {
+    const value = savedSettings[fieldId] ?? getFieldDefaultValue(fieldDef);
+    const fieldWrapper = document.createElement("div");
+    fieldWrapper.style.padding = "1rem";
+    fieldWrapper.style.border = "1px solid rgba(255,255,255,0.08)";
+    fieldWrapper.style.borderRadius = "0.75rem";
+    fieldWrapper.style.background = "rgba(255,255,255,0.02)";
+
+    fieldWrapper.appendChild(createFieldLabel(fieldDef.label || fieldId, fieldId));
+    fieldWrapper.appendChild(createFieldInput(themeName, fieldId, fieldDef, value, async newValue => {
+      await updateCustomThemeSavedSettings(themeName, { [fieldId]: newValue });
+      if (editorStateManager.getCurrentThemeName() === themeName && editorStateManager.getIsCustomTheme()) {
+        const customThemes = await getCustomThemes();
+        const index = customThemes.findIndex(theme => theme.name === themeName);
+        if (index !== -1) {
+          await themeManager.applyTheme(true, index, themeName);
+        }
+      }
+    }));
+
+    list.appendChild(fieldWrapper);
+  }
+
+  themeSettingsContainer.appendChild(list);
+}
+
+async function promptAddThemeSettingField(): Promise<void> {
+  const themeName = editorStateManager.getCurrentThemeName();
+  if (!themeName) return;
+
+  const label = await showPrompt("Add Theme Setting", "Enter a setting label:", "", "Label");
+  if (!label) return;
+
+  const idValue = label.trim().toLowerCase().replace(/\s+/g, "-");
+  const fieldId = await showPrompt("Theme Setting ID", "Enter a unique setting id:", idValue, "setting-id");
+  if (!fieldId) return;
+
+  const type = await showPrompt(
+    "Setting Type",
+    "Enter a field type: toggle, range, dropdown, color, textfield",
+    "toggle",
+    "toggle"
+  );
+  if (!type) return;
+
+  const attribute = await showPrompt("Setting Key", "Enter the Blyrics setting key (without 'blyrics-' prefix):", "", "example: disable-richsync");
+  if (!attribute) return;
+
+  const attrType = await showPrompt("Attribute Type", "Enter the attribute type: css or rics:", "css", "css");
+  if (!attrType) return;
+
+  const defaultValue = await showPrompt("Default Value", "Enter the default value for this setting:", "", "default value");
+  if (defaultValue === null) return;
+
+  let data: any = {
+    label: label.trim(),
+    type: type.trim(),
+    attribute: `blyrics-${attribute.trim()}`,
+    attrType: attrType.trim(),
+    attrValue: "$VALUE$",
+  };
+
+  if (type === "toggle") {
+    const onValue = await showPrompt("Toggle On Value", "Enter the value when enabled:", "true", "true");
+    if (onValue === null) return;
+    const offValue = await showPrompt("Toggle Off Value", "Enter the value when disabled:", "false", "false");
+    if (offValue === null) return;
+    data.onValue = onValue;
+    data.offValue = offValue;
+    data.default = defaultValue.trim().toLowerCase() === "true";
+  } else if (type === "range") {
+    const min = await showPrompt("Range Minimum", "Enter the minimum value:", "0", "0");
+    if (min === null) return;
+    const max = await showPrompt("Range Maximum", "Enter the maximum value:", "100", "100");
+    if (max === null) return;
+    const step = await showPrompt("Range Step", "Enter the step value:", "1", "1");
+    if (step === null) return;
+    data.min = Number(min);
+    data.max = Number(max);
+    data.step = Number(step);
+    data.default = Number(defaultValue);
+  } else if (type === "dropdown") {
+    const options = await showPrompt(
+      "Dropdown Options",
+      "Enter label=value pairs separated by commas (eg. small=8,medium=16,large=24):",
+      "",
+      "small=8,medium=16"
+    );
+    if (options === null) return;
+    const parsedOptions: Record<string, string> = {};
+    options.split(",").forEach(pair => {
+      const [labelOption, valueOption] = pair.split("=").map(part => part.trim());
+      if (labelOption && valueOption !== undefined) {
+        parsedOptions[labelOption] = valueOption;
+      }
+    });
+    data.options = parsedOptions;
+    const defaultIndex = Number(defaultValue);
+    data.default = Number.isNaN(defaultIndex) ? 0 : defaultIndex;
+  } else if (type === "color") {
+    data.default = defaultValue || "#ffffff";
+  } else {
+    data.default = defaultValue;
+  }
+
+  try {
+    await addSettingFieldCustomTheme(themeName, type.trim(), fieldId.trim(), data);
+    showAlert(`Theme setting field "${fieldId.trim()}" created.`);
+  } catch (error: any) {
+    console.error("Failed to add theme setting field:", error);
+    showAlert(error.message || "Unable to add theme setting field.");
+  }
+}
+
+export function initializeThemeSettings(): void {
+  if (modifyThemeSettingsBtn) {
+    modifyThemeSettingsBtn.addEventListener("click", async () => {
+      themeSettingsVisible = !themeSettingsVisible;
+      setThemeSettingsVisibility(themeSettingsVisible);
+      if (themeSettingsVisible) {
+        await renderThemeSettings();
+      }
+    });
+  }
+}
+
+export async function refreshThemeSettingsUI(): Promise<void> {
+  if (themeSettingsVisible) {
+    await renderThemeSettings();
+  }
 }
 
 class ThemeManager {

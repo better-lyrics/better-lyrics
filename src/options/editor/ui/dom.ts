@@ -11,6 +11,7 @@ export const themeNameText = document.getElementById("theme-name-text");
 export const themeSourceBadge = document.getElementById("theme-source-badge");
 export const editThemeBtn = document.getElementById("edit-theme-btn");
 export const modifyThemeSettingsBtn = document.getElementById("modify-theme-settings-btn");
+export const themeSettingsContainer = document.getElementById("theme-settings") as HTMLElement | null;
 export const deleteThemeBtn = document.getElementById("delete-theme-btn");
 export const themeSelectorBtn = document.getElementById("theme-selector-btn") as HTMLButtonElement | null;
 export const themePreviewCard = document.getElementById("theme-preview-card") as HTMLElement | null;
