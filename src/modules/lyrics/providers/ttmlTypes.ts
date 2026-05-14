@@ -45,6 +45,8 @@ interface ParagraphAttributes {
   "@_key": string;
   "@_agent": string;
   "@_role": string;
+  "@_explicit"?: string;
+  "@_obscene"?: string; // AMLL explicit content flag
 }
 
 export interface SpanElement {
@@ -236,6 +238,7 @@ interface CleanWord {
   end: number;
   text: string;
   isBackground: boolean;
+  explicit?: boolean;
 }
 
 /** A single line of lyrics */
