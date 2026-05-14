@@ -245,6 +245,7 @@ function splitLongPart(part: LyricPart, threshold: number): LyricPart[] {
       durationMs: subEnd - subStart,
       words: chunk,
       isBackground: part.isBackground,
+      explicit: part.explicit,
     });
     charsBefore += chunk.length;
   }
@@ -284,6 +285,7 @@ function createLyricsLine(parts: LyricPart[], line: LineData, lyricElement: HTML
       durationMs: originalPart.durationMs,
       words: core,
       isBackground: originalPart.isBackground,
+      explicit: originalPart.explicit,
     };
     const subParts = splitLongPart(cleanedPart, wrapThreshold);
 
