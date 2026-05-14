@@ -119,7 +119,7 @@ function parseLyricPart(p: ParagraphElementOrBackground[], beginTime: number, ig
         let spanText = subPart.span[0]["#text"]!;
         let startTimeMs = parseTime(subPart[":@"]?.["@_begin"]);
         let endTimeMs = parseTime(subPart[":@"]?.["@_end"]);
-        let explicit = (subPart[":@"]?.["@_explicit"] || subPart[":@"]?.["@_obscene"]) === "true";
+        let explicit = subPart[":@"]?.["@_explicit"] === "true" || subPart[":@"]?.["@_obscene"] === "true";
 
         parts.push({
           startTimeMs,
