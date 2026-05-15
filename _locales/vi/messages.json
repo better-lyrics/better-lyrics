@@ -88,59 +88,59 @@
     "description": "Show stylized animations setting label"
   },
   "options_display_passiveScroll": {
-    "message": "Auto-scroll unsynced lyrics",
+    "message": "Tự động cuộn lời bài hát không được đồng bộ",
     "description": "Auto-scroll unsynced lyrics setting label"
   },
   "options_display_unisonActions": {
-    "message": "Unison Actions",
+    "message": "Hành Động Unison",
     "description": "Display-section row label for the Unison Actions modal trigger"
   },
   "options_unisonModal_title": {
-    "message": "Unison Actions",
+    "message": "Hành Động Unison",
     "description": "Title of the Unison Actions modal"
   },
   "options_unisonModal_showPinned": {
-    "message": "Show pinned actions",
+    "message": "Hiển thị hành động đã được ghim",
     "description": "Toggle label inside the Unison Actions modal for the floating dock"
   },
   "options_unisonModal_showPinned_hint": {
-    "message": "A floating control to upvote, downvote, or report Unison lyrics",
+    "message": "Thanh điều khiển nổi để bình chọn tích cực, tiêu cực hoặc báo cáo lời bài hát cho Unison",
     "description": "Hint text under the Show pinned actions toggle"
   },
   "options_unisonModal_autoHide": {
-    "message": "Auto-hide in fullscreen",
+    "message": "Tự động ẩn khi ở chế độ toàn màn hình",
     "description": "Toggle label inside the Unison Actions modal for auto-hiding the dock when idle in fullscreen"
   },
   "options_unisonModal_autoHide_hint": {
-    "message": "Hide the floating control when you are idle in fullscreen mode",
+    "message": "Ẩn thanh điều khiển nổi khi bạn không ở chế độ toàn màn hình",
     "description": "Hint text under the Auto-hide in fullscreen toggle"
   },
   "options_unisonModal_position": {
-    "message": "Position",
+    "message": "Vị trí",
     "description": "Label above the visual position picker in the Unison Actions modal"
   },
   "options_unisonModal_position_topLeft": {
-    "message": "Top left",
+    "message": "Phía trên cùng bên trái",
     "description": "Tooltip for the top-left cell in the Unison position picker"
   },
   "options_unisonModal_position_topCenter": {
-    "message": "Top center",
+    "message": "Phía trên cùng ở giữa",
     "description": "Tooltip for the top-center cell in the Unison position picker"
   },
   "options_unisonModal_position_topRight": {
-    "message": "Top right",
+    "message": "Phía trên cùng bên phải",
     "description": "Tooltip for the top-right cell in the Unison position picker"
   },
   "options_unisonModal_position_bottomLeft": {
-    "message": "Bottom left",
+    "message": "Phía dưới cùng bên trái",
     "description": "Tooltip for the bottom-left cell in the Unison position picker"
   },
   "options_unisonModal_position_bottomCenter": {
-    "message": "Bottom center",
+    "message": "Phía dưới cùng ở giữa",
     "description": "Tooltip for the bottom-center cell in the Unison position picker"
   },
   "options_unisonModal_position_bottomRight": {
-    "message": "Bottom right",
+    "message": "Phía dưới cùng bên phải",
     "description": "Tooltip for the bottom-right cell in the Unison position picker"
   },
   "options_language_displayLanguage": {
@@ -802,7 +802,7 @@
     "description": "Message when no lyrics are available"
   },
   "lyrics_resumeAutoscroll": {
-    "message": "Resume Autoscroll",
+    "message": "Tiếp tục tự động cuộn",
     "description": "Resume Autoscroll button label"
   },
   "options_language_exclusions": {
@@ -946,7 +946,7 @@
     "description": "Section title for custom themes in the theme chooser modal"
   },
   "lyrics_submitToUnison": {
-    "message": "Submit lyrics with Unison",
+    "message": "Gửi lời bài hát với Unison",
     "description": "Button text for submitting lyrics to Unison"
   },
   "unison_pageTitle": {
@@ -958,103 +958,103 @@
     "description": "Unison branding title"
   },
   "unison_subtitle": {
-    "message": "Community Lyrics",
+    "message": "Lời Bài Hát Đến Từ Cộng Đồng",
     "description": "Unison subtitle text"
   },
   "unison_search": {
-    "message": "Search lyrics",
+    "message": "Tìm kiếm lời bài hát",
     "description": "Search button label"
   },
   "unison_searchPlaceholder": {
-    "message": "Search songs, artists, or lyrics...",
+    "message": "Tìm kiếm bài hát, nghệ sĩ hoặc lời bài hát...",
     "description": "Search input placeholder"
   },
   "unison_submit": {
-    "message": "Submit Lyrics",
+    "message": "Gửi Lời Bài Hát",
     "description": "Submit lyrics button text"
   },
   "unison_submitSuccess": {
-    "message": "Lyrics submitted!",
+    "message": "Đã gửi lời bài hát!",
     "description": "Success message after submitting lyrics"
   },
   "unison_submitDescription": {
-    "message": "Submit community lyrics for any YouTube Music track. Paste LRC (timestamped), TTML (XML), or plain text. Synced formats are prioritized.",
+    "message": "Gửi lời bài hát do cộng đồng đóng góp cho bất kỳ bài hát nào trên YouTube Music. Dán định dạng LRC (có mốc thời gian), TTML (XML) hoặc văn bản thuần túy. Các định dạng được đồng bộ hóa sẽ được ưu tiên.",
     "description": "Description text for the submission form"
   },
   "unison_composerHintPrefix": {
-    "message": "Use",
+    "message": "Sử dụng",
     "description": "Text before Composer link in submit hint"
   },
   "unison_composerHintSuffix": {
-    "message": "to create word-synced lyrics from scratch.",
+    "message": "tạo lời bài hát đồng bộ từ đầu.",
     "description": "Text after Composer link in submit hint"
   },
   "unison_upvote": {
-    "message": "Upvote",
+    "message": "Ủng hộ",
     "description": "Upvote button tooltip"
   },
   "unison_downvote": {
-    "message": "Downvote",
+    "message": "Phản đối",
     "description": "Downvote button tooltip"
   },
   "unison_report": {
-    "message": "Report",
+    "message": "Báo cáo",
     "description": "Report button tooltip"
   },
   "unison_reportSuccess": {
-    "message": "Reported",
+    "message": "Đã báo cáo",
     "description": "Report success tooltip text"
   },
   "unison_delete": {
-    "message": "Delete",
+    "message": "Xóa",
     "description": "Delete button label on a user's own Unison submission card"
   },
   "unison_deleteConfirm": {
-    "message": "Confirm delete?",
+    "message": "Xác nhận xóa?",
     "description": "Delete button label after first click, asking the user to confirm before sending the request"
   },
   "unison_deleteSuccess": {
-    "message": "Deleted",
+    "message": "Đã xóa",
     "description": "Transient label shown on the delete button after a successful delete"
   },
   "unison_deleteForbidden": {
-    "message": "Not your submission",
+    "message": "Không phải bài nộp của bạn",
     "description": "Error message shown on the delete button when the server rejects the request because the caller is not the submitter"
   },
   "unison_deleteFailed": {
-    "message": "Delete failed",
+    "message": "Xóa không thành công",
     "description": "Generic error message shown on the delete button when the request fails for any other reason"
   },
   "unison_report_wrong_song": {
-    "message": "Wrong song",
+    "message": "Sai bài hát",
     "description": "Report reason: wrong song"
   },
   "unison_report_bad_sync": {
-    "message": "Bad sync",
+    "message": "Đồng bộ kém",
     "description": "Report reason: bad synchronization"
   },
   "unison_report_offensive": {
-    "message": "Offensive",
+    "message": "Xúc phạm",
     "description": "Report reason: offensive content"
   },
   "unison_report_spam": {
-    "message": "Spam",
+    "message": "Thư rác",
     "description": "Report reason: spam"
   },
   "unison_report_other": {
-    "message": "Other",
+    "message": "Khác",
     "description": "Report reason: other"
   },
   "unison_confidence_low": {
-    "message": "Low Confidence",
+    "message": "Độ tin cậy thấp",
     "description": "Low confidence indicator"
   },
   "unison_confidence_medium": {
-    "message": "Medium Confidence",
+    "message": "Độ tin cậy trung bình",
     "description": "Medium confidence indicator"
   },
   "unison_confidence_high": {
-    "message": "High Confidence",
+    "message": "Độ tin cậy cao",
     "description": "High confidence indicator"
   },
   "unison_format_lrc": {
@@ -1066,11 +1066,11 @@
     "description": "TTML format badge"
   },
   "unison_format_plain": {
-    "message": "Plain",
+    "message": "Thuần túy",
     "description": "Plain text format badge"
   },
   "unison_autoDetect": {
-    "message": "Auto-detect",
+    "message": "Tự động phát hiện",
     "description": "Auto-detect format option"
   },
   "unison_noResults": {
