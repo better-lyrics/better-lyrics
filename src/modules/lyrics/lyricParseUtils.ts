@@ -1,36 +1,41 @@
 import { ROMANIZATION_LANGUAGES } from "@constants";
 
 /**
- * @author Stephen Brown
- * Source: https://github.com/stephenjjbrown/string-similarity-js/
- * @licence MIT License - https://github.com/stephenjjbrown/string-similarity-js/blob/master/LICENSE.md
+ * Uses a Levenshtein distance algorithm to check whether both strings have a character difference
+ * that doesn't affect the whole line
  * @param str1 First string to match
  * @param str2 Second string to match
- * @param [substringLength=2] Optional. Length of substring to be used in calculating similarity. Default 2.
  * @param [caseSensitive=false] Optional. Whether you want to consider case in string matching. Default false;
  * @returns Number between 0 and 1, with 0 being a low match score.
  */
 export const stringSimilarity = (str1: string, str2: string, substringLength = 2, caseSensitive = false): number => {
   if (!caseSensitive) {
-    str1 = str1.toLowerCase();
-    str2 = str2.toLowerCase();
+    str1 = str1.toLowerCase()
+    str2 = str2.toLowerCase()
   }
-  if (str1.length < substringLength || str2.length < substringLength) return 0;
-  const map = new Map<string, number>();
-  for (let i = 0; i < str1.length - (substringLength - 1); i++) {
-    const substr1 = str1.substring(i, i + substringLength);
-    map.set(substr1, map.has(substr1) ? map.get(substr1)! + 1 : 1);
+  const len1 = str1.length
+  const len2 = str2.length
+  if (len1 === 0 || len2 === 0) {
+    return 1
   }
-  let match = 0;
-  for (let j = 0; j < str2.length - (substringLength - 1); j++) {
-    let substr2 = str2.substring(j, j + substringLength);
-    let count = map.has(substr2) ? map.get(substr2)! : 0;
-    if (count > 0) {
-      map.set(substr2, count - 1);
-      match++;
+  let prevRow = []
+  for (let j = 0; j <= len2; j++) {
+    prevRow[j] = j
+  }
+  for (let i = 1; i <= len1; i++) {
+    let curRow = [i]
+    for (let j = 1; j <= len2; j++) {
+      let cost = str1[i - 1] === str2[j - 1] ? 0 : 1
+      curRow[j] = Math.min(
+        prevRow[j] + 1,
+        curRow[j - 1] + 1,
+        prevRow[j - 1] + cost
+      )
     }
+    prevRow = curRow
   }
-  return (match * 2) / (str1.length + str2.length - (substringLength - 1) * 2);
+  let distance = prevRow[len2]
+  return 1 - distance / Math.max(len1, len2)
 };
 export const testRtl = (text: string): boolean =>
   /[\p{Script=Arabic}\p{Script=Hebrew}\p{Script=Syriac}\p{Script=Thaana}]/u.test(text);
