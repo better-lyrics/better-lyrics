@@ -8,7 +8,7 @@ import { ROMANIZATION_LANGUAGES } from "@constants";
  * @param [caseSensitive=false] Optional. Whether you want to consider case in string matching. Default false;
  * @returns Number between 0 and 1, with 0 being a low match score.
  */
-export const stringSimilarity = (str1: string, str2: string, substringLength = 2, caseSensitive = false): number => {
+export const stringSimilarity = (str1: string, str2: string, caseSensitive = false): number => {
   if (!caseSensitive) {
     str1 = str1.toLowerCase();
     str2 = str2.toLowerCase();
