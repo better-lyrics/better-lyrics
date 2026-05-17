@@ -10,32 +10,32 @@ import { ROMANIZATION_LANGUAGES } from "@constants";
  */
 export const stringSimilarity = (str1: string, str2: string, substringLength = 2, caseSensitive = false): number => {
   if (!caseSensitive) {
-    str1 = str1.toLowerCase()
-    str2 = str2.toLowerCase()
+    str1 = str1.toLowerCase();
+    str2 = str2.toLowerCase();
   }
-  const len1 = str1.length
-  const len2 = str2.length
+  const len1 = str1.length;
+  const len2 = str2.length;
   if (len1 === 0 || len2 === 0) {
-    return 1
+    return 1;
   }
-  let prevRow = []
+  let prevRow = [];
   for (let j = 0; j <= len2; j++) {
-    prevRow[j] = j
+    prevRow[j] = j;
   }
   for (let i = 1; i <= len1; i++) {
-    let curRow = [i]
+    let curRow = [i];
     for (let j = 1; j <= len2; j++) {
-      let cost = str1[i - 1] === str2[j - 1] ? 0 : 1
+      let cost = str1[i - 1] === str2[j - 1] ? 0 : 1;
       curRow[j] = Math.min(
         prevRow[j] + 1,
         curRow[j - 1] + 1,
         prevRow[j - 1] + cost
-      )
+      );
     }
-    prevRow = curRow
+    prevRow = curRow;
   }
-  let distance = prevRow[len2]
-  return 1 - distance / Math.max(len1, len2)
+  let distance = prevRow[len2];
+  return 1 - distance / Math.max(len1, len2);
 };
 export const testRtl = (text: string): boolean =>
   /[\p{Script=Arabic}\p{Script=Hebrew}\p{Script=Syriac}\p{Script=Thaana}]/u.test(text);
