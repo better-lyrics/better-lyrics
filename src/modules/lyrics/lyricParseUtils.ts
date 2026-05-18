@@ -15,7 +15,7 @@ export const stringSimilarity = (str1: string, str2: string, caseSensitive = fal
   }
   const len1 = str1.length;
   const len2 = str2.length;
-  if (len1 === 0 || len2 === 0) {
+  if (len1 === 0 && len2 === 0) {
     return 1;
   }
   let prevRow = [];
