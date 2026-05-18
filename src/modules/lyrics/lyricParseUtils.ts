@@ -9,6 +9,9 @@ import { ROMANIZATION_LANGUAGES } from "@constants";
  * @returns Number between 0 and 1, with 0 being a low match score.
  */
 export const stringSimilarity = (str1: string, str2: string, caseSensitive = false): number => {
+  // trim leading whitespaces, since they dont affect anything
+  str1 = str1.trim();
+  str2 = str2.trim();
   if (str1 === str2) return 1;
   if (!caseSensitive) {
     str1 = str1.toLowerCase();
@@ -35,7 +38,7 @@ export const stringSimilarity = (str1: string, str2: string, caseSensitive = fal
   }
   // early exit if one of the string ended
   if (len1 === 0 || len2 === 0) return 1 - Math.max(len1, len2) / Math.max(str1.length + start, str2.length + start);
-  
+
   const [short, long, sLen, lLen] =
     len1 <= len2
       ? [str1, str2, len1, len2]
