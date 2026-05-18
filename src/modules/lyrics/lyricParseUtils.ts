@@ -9,33 +9,61 @@ import { ROMANIZATION_LANGUAGES } from "@constants";
  * @returns Number between 0 and 1, with 0 being a low match score.
  */
 export const stringSimilarity = (str1: string, str2: string, caseSensitive = false): number => {
+  if (str1 === str2) return 1;
   if (!caseSensitive) {
     str1 = str1.toLowerCase();
     str2 = str2.toLowerCase();
+    if (str1 === str2) return 1;
   }
-  const len1 = str1.length;
-  const len2 = str2.length;
-  if (len1 === 0 && len2 === 0) {
-    return 1;
+  let len1 = str1.length;
+  let len2 = str2.length;
+  if (len1 === 0 || len2 === 0) return 0;
+
+  // strip prefix
+  let start = 0;
+  while (start < len1 && start < len2 && str1[start] === str2[start]) start++;
+  if (start > 0) {
+      str1 = str1.slice(start);
+      str2 = str2.slice(start);
+      len1 -= start;
+      len2 -= start;
   }
-  let prevRow = [];
-  for (let j = 0; j <= len2; j++) {
-    prevRow[j] = j;
+  // strip suffix
+  while (len1 > 0 && len2 > 0 && str1[len1 - 1] === str2[len2 - 1]) {
+    len1--;
+    len2--;
   }
-  for (let i = 1; i <= len1; i++) {
-    let curRow = [i];
-    for (let j = 1; j <= len2; j++) {
-      let cost = str1[i - 1] === str2[j - 1] ? 0 : 1;
-      curRow[j] = Math.min(
-        prevRow[j] + 1,
-        curRow[j - 1] + 1,
-        prevRow[j - 1] + cost
-      );
+  // early exit if one of the string ended
+  if (len1 === 0 || len2 === 0) return 1 - Math.max(len1, len2) / Math.max(str1.length + start, str2.length + start);
+  
+  const [short, long, sLen, lLen] =
+    len1 <= len2
+      ? [str1, str2, len1, len2]
+      : [str2, str1, len2, len1];
+  
+  const maxLen = Math.max(str1.length + start, str2.length + start); // original lengths
+  
+  let prevRow = new Int32Array(sLen + 1);
+  let curRow  = new Int32Array(sLen + 1);
+  
+  for (let j = 0; j <= sLen; j++) prevRow[j] = j;
+  
+  for (let i = 1; i <= lLen; i++) {
+    curRow[0] = i;
+    const longChar = long.charCodeAt(i - 1);
+    for (let j = 1; j <= sLen; j++) {
+      const cost = longChar === short.charCodeAt(j - 1) ? 0 : 1;
+      const ins  = curRow[j - 1] + 1;
+      const del  = prevRow[j] + 1;
+      const sub  = prevRow[j - 1] + cost;
+      curRow[j]  = ins < del ? (ins < sub ? ins : sub) : (del < sub ? del : sub);
     }
+    const temp = prevRow;
     prevRow = curRow;
+    curRow = temp;
   }
-  let distance = prevRow[len2];
-  return 1 - distance / Math.max(len1, len2);
+  
+  return 1 - prevRow[sLen] / maxLen;
 };
 export const testRtl = (text: string): boolean =>
   /[\p{Script=Arabic}\p{Script=Hebrew}\p{Script=Syriac}\p{Script=Thaana}]/u.test(text);
