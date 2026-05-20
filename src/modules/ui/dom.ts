@@ -1110,6 +1110,7 @@ export function addNoLyricsButton(
         href: buildUnisonSubmitUrl(song, artist, album, duration, videoId).toString(),
       })
     );
+    buttonContainer.appendChild(createRequestSyncedButton({ videoId, song, artist }));
   }
 
   lyricsWrapper.appendChild(buttonContainer);
