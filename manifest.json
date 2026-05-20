@@ -21,8 +21,7 @@
   "externally_connectable": {
     "matches": [
       "https://unison.boidu.dev/*",
-      "https://blrcunison.vercel.app/*",
-      "https://*.up.railway.app/*"
+      "https://blrcunison.vercel.app/*"
     ]
   },
   "optional_permissions": [
@@ -53,8 +52,7 @@
     {
       "matches": [
         "https://unison.boidu.dev/*",
-        "https://blrcunison.vercel.app/*",
-        "https://*.up.railway.app/*"
+        "https://blrcunison.vercel.app/*"
       ],
       "resources": ["pages/auth.html"]
     }

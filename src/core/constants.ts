@@ -120,12 +120,9 @@ export const AUTH_MESSAGE_TYPES = {
 
 const AUTH_ALLOWED_ORIGINS: readonly string[] = ["https://unison.boidu.dev", "https://blrcunison.vercel.app"];
 
-const AUTH_ALLOWED_ORIGIN_PATTERNS: readonly RegExp[] = [/^https:\/\/[^/]+\.up\.railway\.app$/];
-
 export function isAllowedAuthOrigin(origin: string | undefined): boolean {
   if (!origin) return false;
-  if (AUTH_ALLOWED_ORIGINS.includes(origin)) return true;
-  return AUTH_ALLOWED_ORIGIN_PATTERNS.some(re => re.test(origin));
+  return AUTH_ALLOWED_ORIGINS.includes(origin);
 }
 
 // Initialization and General Logs
