@@ -147,7 +147,7 @@ function errorLabelFor(status: number | undefined): string {
   return t("lyrics_requestErrorGeneric");
 }
 
-export function createRequestSyncedButton(meta: RequestButtonMeta): HTMLElement {
+function createRequestSyncedButton(meta: RequestButtonMeta): HTMLElement {
   const container = document.createElement("div");
   container.className = `${FOOTER_CLASS}__container`;
 
@@ -339,7 +339,8 @@ export function addFooter(
   duration: number,
   providerKey?: string,
   videoId?: string,
-  unisonData?: UnisonData
+  unisonData?: UnisonData,
+  showRequestButton = false
 ): void {
   if (document.getElementsByClassName(FOOTER_CLASS).length !== 0) {
     document.getElementsByClassName(FOOTER_CLASS)[0].remove();
@@ -349,7 +350,7 @@ export function addFooter(
   const footer = document.createElement("div");
   footer.classList.add(FOOTER_CLASS);
   lyricsElement.appendChild(footer);
-  createFooter(song, artist, album, duration, videoId);
+  createFooter(song, artist, album, duration, videoId, showRequestButton);
 
   const footerLink = document.getElementById("betterLyricsFooterLink") as HTMLAnchorElement;
   sourceHref = sourceHref || HOMEPAGE_URL;
@@ -680,7 +681,14 @@ function getTrustTier(reputation: number): "new" | "trusted" | "veteran" | "expe
  * @param album - Album name
  * @param duration - Song duration in seconds
  */
-function createFooter(song: string, artist: string, album: string, duration: number, videoId?: string): void {
+function createFooter(
+  song: string,
+  artist: string,
+  album: string,
+  duration: number,
+  videoId?: string,
+  showRequestButton = false
+): void {
   try {
     const footer = document.getElementsByClassName(FOOTER_CLASS)[0] as HTMLElement;
     footer.replaceChildren();
@@ -734,6 +742,9 @@ function createFooter(song: string, artist: string, album: string, duration: num
           href: buildUnisonSubmitUrl(song, artist, album, duration, videoId).toString(),
         })
       );
+    }
+    if (videoId && showRequestButton) {
+      footer.appendChild(createRequestSyncedButton({ videoId, song, artist }));
     }
     footer.appendChild(discordLink);
 
