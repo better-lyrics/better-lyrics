@@ -99,7 +99,7 @@ export interface UnisonLyricsRequest {
   thumbnailUrl: string;
 }
 
-export type UnisonRequestStatus = "created" | "already_requested" | "already_available";
+type UnisonRequestStatus = "created" | "already_requested" | "already_available";
 
 export type UnisonRequestSuccess =
   | { status: "created" | "already_requested"; requestCount: number; demand?: number }
