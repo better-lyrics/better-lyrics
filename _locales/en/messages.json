@@ -1016,7 +1016,15 @@
   },
   "lyrics_requestErrorNetwork": {
     "message": "Couldn't reach Unison",
-    "description": "Button label shown briefly when the request fails for a network reason"
+    "description": "Button label shown briefly when the request fails for a transport/network reason (no HTTP response received)"
+  },
+  "lyrics_requestErrorServer": {
+    "message": "Unison is having trouble",
+    "description": "Button label shown briefly when the request fails with a 5xx server error"
+  },
+  "lyrics_requestErrorGeneric": {
+    "message": "Couldn't send the request",
+    "description": "Button label shown briefly when the request fails for any other reason (catch-all)"
   },
   "lyrics_requestSyncedLanded": {
     "message": "Synced version available. Refresh.",

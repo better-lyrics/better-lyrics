@@ -11,6 +11,7 @@ import {
   HOMEPAGE_ICON_URL,
   HOMEPAGE_URL,
   LOADER_TRANSITION_ENDED,
+  LOG_PREFIX_UNISON,
   LYRICS_AD_OVERLAY_ID,
   LYRICS_CLASS,
   LYRICS_LOADER_ID,
@@ -139,6 +140,13 @@ function requestedLabel(requestCount: number): string {
   return t("lyrics_requestedNOthers", String(requestCount - 1));
 }
 
+function errorLabelFor(status: number | undefined): string {
+  if (status === 429) return t("lyrics_requestErrorRateLimit");
+  if (status === undefined) return t("lyrics_requestErrorNetwork");
+  if (status >= 500) return t("lyrics_requestErrorServer");
+  return t("lyrics_requestErrorGeneric");
+}
+
 export function createRequestSyncedButton(meta: RequestButtonMeta): HTMLElement {
   const container = document.createElement("div");
   container.className = `${FOOTER_CLASS}__container`;
@@ -217,8 +225,12 @@ export function createRequestSyncedButton(meta: RequestButtonMeta): HTMLElement 
     const result = await requestLyrics(submission);
 
     if (!result.success || !result.data) {
-      const isRateLimit = (result.error ?? "").toLowerCase().includes("rate") || (result.error ?? "").includes("429");
-      showErrorTemporarily(isRateLimit ? t("lyrics_requestErrorRateLimit") : t("lyrics_requestErrorNetwork"));
+      console.warn(LOG_PREFIX_UNISON, "requestLyrics failed", {
+        videoId: meta.videoId,
+        status: result.status,
+        error: result.error,
+      });
+      showErrorTemporarily(errorLabelFor(result.status));
       return;
     }
 

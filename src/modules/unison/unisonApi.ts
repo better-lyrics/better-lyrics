@@ -19,6 +19,7 @@ interface ApiResult<T> {
   success: boolean;
   data: T;
   error?: string;
+  status?: number;
 }
 
 async function signedRequest<T>(
@@ -67,7 +68,7 @@ async function signedRequest<T>(
       const errorData = cachedErrorBody ?? (await response.json().catch(() => null));
       const error = errorData?.error ?? `Request failed: ${response.status}`;
       console.warn(LOG_PREFIX_UNISON, error);
-      return { success: false, data: null as T, error };
+      return { success: false, data: null as T, error, status: response.status };
     }
 
     if (needsRegistration) {
