@@ -198,10 +198,13 @@ function createRequestSyncedButton(meta: RequestButtonMeta): HTMLElement {
   };
 
   setLabel(t("lyrics_requestSyncedVersion"));
+  setDisabled(true);
 
   getRequest(meta.videoId).then(entry => {
     if (entry && terminalState === "none") {
       showRequested(entry.requestCount);
+    } else if (terminalState === "none") {
+      setDisabled(false);
     }
   });
 
