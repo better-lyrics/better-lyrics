@@ -38,6 +38,9 @@ import {
   SCROLL_POS_OFFSET_RATIO,
   toMs,
 } from "@modules/ui/animationEngine";
+import { getRequest, setRequest } from "@modules/unison/lyricsRequestTracker";
+import type { UnisonLyricsRequest } from "@modules/unison/types";
+import { requestLyrics } from "@modules/unison/unisonApi";
 import { log } from "@utils";
 import { generatePetName } from "@/core/keyIdentity";
 import { byId, deleteVote, type UnisonData, vote } from "../lyrics/providers/unison";
@@ -115,6 +118,122 @@ function createActionButton(options: ActionButtonOptions): HTMLElement {
   link.style.height = "100%";
   container.appendChild(link);
 
+  return container;
+}
+
+// -- Request Synced Version Button --------------------------
+
+interface RequestButtonMeta {
+  videoId: string;
+  song: string;
+  artist: string;
+}
+
+function thumbnailUrlFor(videoId: string): string {
+  return `https://i.ytimg.com/vi/${videoId}/hqdefault.jpg`;
+}
+
+function requestedLabel(requestCount: number): string {
+  if (requestCount <= 1) return t("lyrics_requestedFirst");
+  if (requestCount === 2) return t("lyrics_requestedOneOther");
+  return t("lyrics_requestedNOthers", String(requestCount - 1));
+}
+
+export function createRequestSyncedButton(meta: RequestButtonMeta): HTMLElement {
+  const container = document.createElement("div");
+  container.className = `${FOOTER_CLASS}__container`;
+
+  const button = document.createElement("button");
+  button.type = "button";
+  button.style.height = "100%";
+  button.style.background = "none";
+  button.style.border = "none";
+  button.style.color = "inherit";
+  button.style.font = "inherit";
+  button.style.cursor = "pointer";
+  button.style.padding = "0";
+
+  const setLabel = (text: string) => {
+    button.textContent = text;
+  };
+
+  const setDisabled = (disabled: boolean) => {
+    button.disabled = disabled;
+    button.style.cursor = disabled ? "default" : "pointer";
+  };
+
+  let terminalState: "none" | "requested" | "landed" = "none";
+
+  const revertToIdle = () => {
+    setLabel(t("lyrics_requestSyncedVersion"));
+    setDisabled(false);
+  };
+
+  const showRequested = (requestCount: number) => {
+    terminalState = "requested";
+    setLabel(requestedLabel(requestCount));
+    setDisabled(true);
+  };
+
+  const showLanded = () => {
+    terminalState = "landed";
+    setLabel(t("lyrics_requestSyncedLanded"));
+    setDisabled(false);
+  };
+
+  const showErrorTemporarily = (text: string) => {
+    setLabel(text);
+    setDisabled(true);
+    window.setTimeout(() => {
+      if (terminalState === "none") revertToIdle();
+    }, 5000);
+  };
+
+  setLabel(t("lyrics_requestSyncedVersion"));
+
+  getRequest(meta.videoId).then(entry => {
+    if (entry && terminalState === "none") {
+      showRequested(entry.requestCount);
+    }
+  });
+
+  button.addEventListener("click", async () => {
+    if (terminalState === "landed") {
+      location.reload();
+      return;
+    }
+    if (terminalState === "requested") return;
+
+    setLabel(t("lyrics_requestSending"));
+    setDisabled(true);
+
+    const submission: UnisonLyricsRequest = {
+      videoId: meta.videoId,
+      song: meta.song,
+      artist: meta.artist,
+      thumbnailUrl: thumbnailUrlFor(meta.videoId),
+    };
+
+    const result = await requestLyrics(submission);
+
+    if (!result.success || !result.data) {
+      const isRateLimit = (result.error ?? "").toLowerCase().includes("rate") || (result.error ?? "").includes("429");
+      showErrorTemporarily(isRateLimit ? t("lyrics_requestErrorRateLimit") : t("lyrics_requestErrorNetwork"));
+      return;
+    }
+
+    const success = result.data;
+
+    if (success.status === "already_available") {
+      showLanded();
+      return;
+    }
+
+    await setRequest(meta.videoId, success.requestCount);
+    showRequested(success.requestCount);
+  });
+
+  container.appendChild(button);
   return container;
 }
 
