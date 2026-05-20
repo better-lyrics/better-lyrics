@@ -107,6 +107,19 @@ export const LOG_PREFIX_EDITOR = "[BetterLyrics:Editor]" as const;
 export const LOG_PREFIX_STORE = "[BetterLyrics:Store]" as const;
 export const LOG_PREFIX_UNISON = "[BetterLyrics:Unison]" as const;
 
+// -- Auth (Sign in with Better Lyrics) --------------------------
+
+export const LOG_PREFIX_AUTH = "[BetterLyrics:Auth]" as const;
+
+export const UNISON_WEB_ORIGIN = "https://unison.boidu.dev" as const;
+
+export const AUTH_APPROVAL_TTL_MS = 24 * 60 * 60 * 1000;
+
+export const AUTH_MESSAGE_TYPES = {
+  REQUEST: "bl-auth-request",
+  POPUP_RESULT: "bl-auth-popup-result",
+} as const;
+
 // Initialization and General Logs
 export const INITIALIZE_LOG =
   "%c[BetterLyrics] Loaded Successfully. Logs are enabled by default. You can disable them in the extension options." as const;
