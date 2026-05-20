@@ -1,0 +1,128 @@
+:root {
+  color-scheme: dark light;
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+  background: #0f0f12;
+  color: #ececec;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+
+.auth-page {
+  display: grid;
+  place-items: center;
+  min-height: 100vh;
+  padding: 24px;
+  box-sizing: border-box;
+}
+
+.auth-card {
+  width: 100%;
+  max-width: 400px;
+  background: #1a1a20;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 14px;
+  padding: 28px 24px;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.4);
+}
+
+.auth-card__header {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 20px;
+}
+
+.auth-card__logo {
+  border-radius: 8px;
+}
+
+.auth-card__title {
+  font-size: 1.05rem;
+  font-weight: 600;
+  margin: 0;
+  line-height: 1.3;
+}
+
+.auth-card__body {
+  margin-bottom: 24px;
+}
+
+.auth-card__subtitle {
+  font-size: 0.92rem;
+  margin: 0 0 14px;
+  opacity: 0.85;
+}
+
+.auth-card__explainer {
+  font-size: 0.82rem;
+  margin: 0;
+  opacity: 0.6;
+  line-height: 1.5;
+}
+
+.auth-card__remember {
+  margin-bottom: 22px;
+  font-size: 0.85rem;
+  opacity: 0.85;
+}
+
+.auth-card__remember label {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+}
+
+.auth-card__actions {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+}
+
+.auth-button {
+  font: inherit;
+  font-size: 0.9rem;
+  padding: 10px 18px;
+  border-radius: 8px;
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: background 0.15s ease, border-color 0.15s ease;
+}
+
+.auth-button[disabled] {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.auth-button--primary {
+  background: #f20c32;
+  color: #fff;
+}
+
+.auth-button--primary:hover:not([disabled]) {
+  background: #d80a2c;
+}
+
+.auth-button--secondary {
+  background: transparent;
+  color: #ececec;
+  border-color: rgba(255, 255, 255, 0.18);
+}
+
+.auth-button--secondary:hover:not([disabled]) {
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.auth-card__error {
+  margin-top: 16px;
+  padding: 10px 12px;
+  border-radius: 8px;
+  background: rgba(242, 12, 50, 0.15);
+  color: #ff8a9c;
+  font-size: 0.85rem;
+}
