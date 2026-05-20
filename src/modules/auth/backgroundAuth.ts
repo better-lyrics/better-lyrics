@@ -1,4 +1,4 @@
-import { AUTH_MESSAGE_TYPES, LOG_PREFIX_AUTH, UNISON_WEB_ORIGIN } from "@constants";
+import { AUTH_MESSAGE_TYPES, isAllowedAuthOrigin, LOG_PREFIX_AUTH } from "@constants";
 import { signPayload } from "@core/keyIdentity";
 import { isApproved, pruneExpired, rememberApproval } from "@modules/auth/approvedOrigins";
 
@@ -92,7 +92,7 @@ export function initBackgroundAuth(): void {
 
   chrome.runtime.onMessageExternal.addListener((message, sender, sendResponse) => {
     void (async () => {
-      if (sender.origin !== UNISON_WEB_ORIGIN) {
+      if (!isAllowedAuthOrigin(sender.origin)) {
         sendResponse({ ok: false, reason: "ORIGIN_MISMATCH" });
         return;
       }

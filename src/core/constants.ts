@@ -111,14 +111,22 @@ export const LOG_PREFIX_UNISON = "[BetterLyrics:Unison]" as const;
 
 export const LOG_PREFIX_AUTH = "[BetterLyrics:Auth]" as const;
 
-export const UNISON_WEB_ORIGIN = "https://unison.boidu.dev" as const;
-
 export const AUTH_APPROVAL_TTL_MS = 24 * 60 * 60 * 1000;
 
 export const AUTH_MESSAGE_TYPES = {
   REQUEST: "bl-auth-request",
   POPUP_RESULT: "bl-auth-popup-result",
 } as const;
+
+const AUTH_ALLOWED_ORIGINS: readonly string[] = ["https://unison.boidu.dev", "https://blrcunison.vercel.app"];
+
+const AUTH_ALLOWED_ORIGIN_PATTERNS: readonly RegExp[] = [/^https:\/\/[^/]+\.up\.railway\.app$/];
+
+export function isAllowedAuthOrigin(origin: string | undefined): boolean {
+  if (!origin) return false;
+  if (AUTH_ALLOWED_ORIGINS.includes(origin)) return true;
+  return AUTH_ALLOWED_ORIGIN_PATTERNS.some(re => re.test(origin));
+}
 
 // Initialization and General Logs
 export const INITIALIZE_LOG =
