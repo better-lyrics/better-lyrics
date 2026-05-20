@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en-US">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="color-scheme" content="dark light" />
+    <meta http-equiv="Content-Security-Policy" content="
+      default-src 'self';
+      script-src 'self';
+      style-src 'self' 'unsafe-inline';
+      img-src 'self' data:;
+    " />
+    <title>__MSG_auth_pageTitle__</title>
+    <link rel="stylesheet" href="../src/options/auth/auth.css" />
+    <style>body:not(.i18n-ready){opacity:0}</style>
+  </head>
+  <body class="auth-page">
+    <main class="auth-card">
+      <header class="auth-card__header">
+        <img class="auth-card__logo" src="../images/icons/icon-48.png" alt="Better Lyrics" width="48" height="48" />
+        <h1 class="auth-card__title" id="auth-title"></h1>
+      </header>
+
+      <section class="auth-card__body">
+        <p class="auth-card__subtitle" id="auth-subtitle"></p>
+        <p class="auth-card__explainer" id="auth-explainer"></p>
+      </section>
+
+      <section class="auth-card__remember">
+        <label>
+          <input type="checkbox" id="auth-remember" />
+          <span id="auth-remember-label"></span>
+        </label>
+      </section>
+
+      <footer class="auth-card__actions">
+        <button type="button" id="auth-cancel" class="auth-button auth-button--secondary"></button>
+        <button type="button" id="auth-approve" class="auth-button auth-button--primary"></button>
+      </footer>
+
+      <p class="auth-card__error" id="auth-error" hidden></p>
+    </main>
+
+    <script type="module" defer src="../src/options/auth/auth.ts"></script>
+  </body>
+</html>
