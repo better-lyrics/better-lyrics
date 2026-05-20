@@ -101,8 +101,6 @@ export interface UnisonLyricsRequest {
 
 export type UnisonRequestStatus = "created" | "already_requested" | "already_available";
 
-export interface UnisonRequestSuccess {
-  status: UnisonRequestStatus;
-  demand?: number;
-  requestCount?: number;
-}
+export type UnisonRequestSuccess =
+  | { status: "created" | "already_requested"; requestCount: number; demand?: number }
+  | { status: "already_available" };
