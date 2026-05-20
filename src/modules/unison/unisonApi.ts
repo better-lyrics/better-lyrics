@@ -6,6 +6,8 @@ import type {
   UnisonApiResponse,
   UnisonFeedEntry,
   UnisonLyricsEntry,
+  UnisonLyricsRequest,
+  UnisonRequestSuccess,
   UnisonSearchEntry,
   UnisonSubmission,
   VoteValue,
@@ -244,4 +246,8 @@ export async function reportLyrics(
   const data: Record<string, unknown> = { reason };
   if (details) data.details = details;
   return signedRequest<{ message: string } | null>(`/lyrics/${lyricsId}/report`, "POST", data);
+}
+
+export async function requestLyrics(request: UnisonLyricsRequest): Promise<ApiResult<UnisonRequestSuccess | null>> {
+  return signedRequest<UnisonRequestSuccess | null>("/requests", "POST", request as unknown as Record<string, unknown>);
 }
