@@ -18,6 +18,9 @@
     "storage",
     "alarms"
   ],
+  "externally_connectable": {
+    "matches": ["https://unison.boidu.dev/*"]
+  },
   "optional_permissions": [
     "downloads"
   ],
@@ -42,6 +45,10 @@
         "pages/marketplace.html",
         "pages/unison.html"
       ]
+    },
+    {
+      "matches": ["https://unison.boidu.dev/*"],
+      "resources": ["pages/auth.html"]
     }
   ],
   "chromium:background": {
