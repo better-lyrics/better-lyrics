@@ -988,10 +988,6 @@
     "message": "Request a synced version",
     "description": "Button label asking the community to contribute synced lyrics for the current song"
   },
-  "lyrics_requestSending": {
-    "message": "Sending…",
-    "description": "Button label shown while the request is being submitted"
-  },
   "lyrics_requestedFirst": {
     "message": "Requested · you're the first",
     "description": "Button label after a successful first-ever request for this song"

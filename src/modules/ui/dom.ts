@@ -215,7 +215,6 @@ function createRequestSyncedButton(meta: RequestButtonMeta): HTMLElement {
     }
     if (terminalState === "requested") return;
 
-    setLabel(t("lyrics_requestSending"));
     setDisabled(true);
 
     const submission: UnisonLyricsRequest = {
