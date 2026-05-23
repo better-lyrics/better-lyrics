@@ -250,6 +250,20 @@ ytmusic-app-layout[player-fullscreened]:not([blyrics-dfs]) > [slot="player-bar"]
   --dock-y-shift: var(--blyrics-fullscreen-bottom-dock-shift, -88px);
 }
 
+#layout[player-fullscreened]:not([blyrics-dfs]) .blyrics-unison-dock[data-position^="bottom-"] .blyrics-unison-dock__inner {
+  position: relative;
+}
+
+#layout[player-fullscreened]:not([blyrics-dfs]) .blyrics-unison-dock[data-position^="bottom-"] .blyrics-unison-dock__inner::before {
+  content: "";
+  position: absolute;
+  top: -88px;
+  bottom: 0;
+  left: -88px;
+  right: -88px;
+  z-index: -1;
+}
+
 /* Top-center autoscroll-button shift is smaller in fullscreen (no tab header) */
 #layout[player-fullscreened]:not([blyrics-dfs]) #side-panel:has(.autoscroll-resume-button:not([autoscroll-hidden="true"])) .blyrics-unison-dock[data-position="top-center"] {
   --dock-y-shift: 52px;

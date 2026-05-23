@@ -264,27 +264,39 @@ const unisonControlsRegistry = {
 };
 
 let unisonDockObserver: IntersectionObserver | null = null;
-let dockHoverAttrObserver: MutationObserver | null = null;
+let layoutAttrObserver: MutationObserver | null = null;
+let dockHoverActive = false;
 
-const FULLSCREEN_CONTROLS_ATTR = "show-fullscreen-controls";
-
-function startEnforcingFullscreenControls(): void {
+function ensureLayoutAttrObserver(): void {
+  if (layoutAttrObserver) return;
   const layout = document.getElementById("layout");
-  if (!layout || !layout.hasAttribute("player-fullscreened")) return;
-  layout.setAttribute(FULLSCREEN_CONTROLS_ATTR, "");
-  if (dockHoverAttrObserver) return;
-  dockHoverAttrObserver = new MutationObserver(() => {
-    if (!layout.hasAttribute(FULLSCREEN_CONTROLS_ATTR)) {
-      layout.setAttribute(FULLSCREEN_CONTROLS_ATTR, "");
+  if (!layout) return;
+  layoutAttrObserver = new MutationObserver(() => {
+    if (!dockHoverActive) return;
+    if (!layout.hasAttribute("player-fullscreened")) return;
+    if (!layout.hasAttribute("show-fullscreen-controls")) {
+      layout.setAttribute("show-fullscreen-controls", "");
     }
   });
-  dockHoverAttrObserver.observe(layout, { attributes: true, attributeFilter: [FULLSCREEN_CONTROLS_ATTR] });
+  layoutAttrObserver.observe(layout, { attributes: true, attributeFilter: ["show-fullscreen-controls"] });
 }
 
-function stopEnforcingFullscreenControls(): void {
-  if (!dockHoverAttrObserver) return;
-  dockHoverAttrObserver.disconnect();
-  dockHoverAttrObserver = null;
+function disconnectLayoutAttrObserver(): void {
+  layoutAttrObserver?.disconnect();
+  layoutAttrObserver = null;
+}
+
+function showPlayerBarOnDockHover(): void {
+  dockHoverActive = true;
+  const layout = document.getElementById("layout");
+  if (layout?.hasAttribute("player-fullscreened")) {
+    layout.setAttribute("show-fullscreen-controls", "");
+  }
+}
+
+function hidePlayerBarOnDockLeave(): void {
+  dockHoverActive = false;
+  document.getElementById("layout")?.removeAttribute("show-fullscreen-controls");
 }
 
 type DockSuppressionReason = "cardVisible" | "ad" | "loading";
@@ -447,8 +459,9 @@ export function mountUnisonDock(unisonData: UnisonData, position: string): void 
   inner.appendChild(buildUnisonVoteButton(unisonData, -1));
   inner.appendChild(createReportButton(unisonData.lyricsId));
 
-  inner.addEventListener("mouseenter", startEnforcingFullscreenControls);
-  inner.addEventListener("mouseleave", stopEnforcingFullscreenControls);
+  inner.addEventListener("mouseenter", showPlayerBarOnDockHover);
+  inner.addEventListener("mouseleave", hidePlayerBarOnDockLeave);
+  ensureLayoutAttrObserver();
 
   dock.appendChild(inner);
   sidePanel.appendChild(dock);
@@ -473,7 +486,8 @@ export function unmountUnisonDock(): void {
     unisonDockObserver.disconnect();
     unisonDockObserver = null;
   }
-  stopEnforcingFullscreenControls();
+  hidePlayerBarOnDockLeave();
+  disconnectLayoutAttrObserver();
   dockSuppressionReasons.delete("cardVisible");
   const dock = document.getElementsByClassName(UNISON_DOCK_CLASS)[0];
   if (dock) dock.remove();
