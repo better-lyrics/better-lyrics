@@ -264,6 +264,28 @@ const unisonControlsRegistry = {
 };
 
 let unisonDockObserver: IntersectionObserver | null = null;
+let dockHoverAttrObserver: MutationObserver | null = null;
+
+const FULLSCREEN_CONTROLS_ATTR = "show-fullscreen-controls";
+
+function startEnforcingFullscreenControls(): void {
+  const layout = document.getElementById("layout");
+  if (!layout || !layout.hasAttribute("player-fullscreened")) return;
+  layout.setAttribute(FULLSCREEN_CONTROLS_ATTR, "");
+  if (dockHoverAttrObserver) return;
+  dockHoverAttrObserver = new MutationObserver(() => {
+    if (!layout.hasAttribute(FULLSCREEN_CONTROLS_ATTR)) {
+      layout.setAttribute(FULLSCREEN_CONTROLS_ATTR, "");
+    }
+  });
+  dockHoverAttrObserver.observe(layout, { attributes: true, attributeFilter: [FULLSCREEN_CONTROLS_ATTR] });
+}
+
+function stopEnforcingFullscreenControls(): void {
+  if (!dockHoverAttrObserver) return;
+  dockHoverAttrObserver.disconnect();
+  dockHoverAttrObserver = null;
+}
 
 type DockSuppressionReason = "cardVisible" | "ad" | "loading";
 const dockSuppressionReasons = new Set<DockSuppressionReason>();
@@ -425,6 +447,9 @@ export function mountUnisonDock(unisonData: UnisonData, position: string): void 
   inner.appendChild(buildUnisonVoteButton(unisonData, -1));
   inner.appendChild(createReportButton(unisonData.lyricsId));
 
+  inner.addEventListener("mouseenter", startEnforcingFullscreenControls);
+  inner.addEventListener("mouseleave", stopEnforcingFullscreenControls);
+
   dock.appendChild(inner);
   sidePanel.appendChild(dock);
   applyDockSuppression();
@@ -448,6 +473,7 @@ export function unmountUnisonDock(): void {
     unisonDockObserver.disconnect();
     unisonDockObserver = null;
   }
+  stopEnforcingFullscreenControls();
   dockSuppressionReasons.delete("cardVisible");
   const dock = document.getElementsByClassName(UNISON_DOCK_CLASS)[0];
   if (dock) dock.remove();
