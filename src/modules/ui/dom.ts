@@ -264,6 +264,40 @@ const unisonControlsRegistry = {
 };
 
 let unisonDockObserver: IntersectionObserver | null = null;
+let layoutAttrObserver: MutationObserver | null = null;
+let dockHoverActive = false;
+
+function ensureLayoutAttrObserver(): void {
+  if (layoutAttrObserver) return;
+  const layout = document.getElementById("layout");
+  if (!layout) return;
+  layoutAttrObserver = new MutationObserver(() => {
+    if (!dockHoverActive) return;
+    if (!layout.hasAttribute("player-fullscreened")) return;
+    if (!layout.hasAttribute("show-fullscreen-controls")) {
+      layout.setAttribute("show-fullscreen-controls", "");
+    }
+  });
+  layoutAttrObserver.observe(layout, { attributes: true, attributeFilter: ["show-fullscreen-controls"] });
+}
+
+function disconnectLayoutAttrObserver(): void {
+  layoutAttrObserver?.disconnect();
+  layoutAttrObserver = null;
+}
+
+function showPlayerBarOnDockHover(): void {
+  dockHoverActive = true;
+  const layout = document.getElementById("layout");
+  if (layout?.hasAttribute("player-fullscreened")) {
+    layout.setAttribute("show-fullscreen-controls", "");
+  }
+}
+
+function hidePlayerBarOnDockLeave(): void {
+  dockHoverActive = false;
+  document.getElementById("layout")?.removeAttribute("show-fullscreen-controls");
+}
 
 type DockSuppressionReason = "cardVisible" | "ad" | "loading";
 const dockSuppressionReasons = new Set<DockSuppressionReason>();
@@ -425,6 +459,10 @@ export function mountUnisonDock(unisonData: UnisonData, position: string): void 
   inner.appendChild(buildUnisonVoteButton(unisonData, -1));
   inner.appendChild(createReportButton(unisonData.lyricsId));
 
+  inner.addEventListener("mouseenter", showPlayerBarOnDockHover);
+  inner.addEventListener("mouseleave", hidePlayerBarOnDockLeave);
+  ensureLayoutAttrObserver();
+
   dock.appendChild(inner);
   sidePanel.appendChild(dock);
   applyDockSuppression();
@@ -448,6 +486,8 @@ export function unmountUnisonDock(): void {
     unisonDockObserver.disconnect();
     unisonDockObserver = null;
   }
+  hidePlayerBarOnDockLeave();
+  disconnectLayoutAttrObserver();
   dockSuppressionReasons.delete("cardVisible");
   const dock = document.getElementsByClassName(UNISON_DOCK_CLASS)[0];
   if (dock) dock.remove();
