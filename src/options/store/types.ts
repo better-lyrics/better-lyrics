@@ -1,3 +1,5 @@
+import type { ThemeSettingField } from "../themes";
+
 export interface LockfileEntry {
   repo: string;
   id: string;
@@ -20,6 +22,7 @@ export interface StoreThemeMetadata {
   creators: string[];
   minVersion: string;
   hasShaders: boolean;
+  hasSettings: boolean;
   tags?: string[];
   version: string;
   images?: string[];
@@ -47,6 +50,8 @@ export interface InstalledStoreTheme {
   title: string;
   creators: string[];
   css: string;
+  settings?: { [field: string]: ThemeSettingField; };
+  savedSettings?: { [field: string]: any };
   shaderConfig?: Record<string, unknown>;
   installedAt: number;
   version: string;
@@ -58,6 +63,7 @@ export interface InstalledStoreTheme {
   imageUrls?: string[];
   minVersion?: string;
   hasShaders?: boolean;
+  hasSettings?: boolean;
   tags?: string[];
   commit?: string;
 }

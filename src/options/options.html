@@ -476,6 +476,21 @@
 			</div>
 		</div>
 
+		<div id="custom-modal-overlay" class="modal-overlay">
+			<div class="modal custom-modal">
+				<div class="modal-header">
+					<h3 id="modal-title" class="modal-title"></h3>
+					<button id="modal-close" class="modal-close-btn" aria-label="Close">
+						<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+							<path d="M6.28 5.22a.75.75 0 0 0-1.06 1.06L8.94 10l-3.72 3.72a.75.75 0 1 0 1.06 1.06L10 11.06l3.72 3.72a.75.75 0 1 0 1.06-1.06L11.06 10l3.72-3.72a.75.75 0 0 0-1.06-1.06L10 8.94 6.28 5.22Z"></path>
+						</svg>
+					</button>
+				</div>
+				<div class="modal-body"></div>
+				<div class="modal-footer"></div>
+			</div>
+		</div>
+
 		<div id="lang-exclusions-modal-overlay" class="modal-overlay">
 			<div class="modal lang-exclusions-modal">
 				<div class="modal-header">
@@ -584,6 +599,26 @@
 				</div>
 				<div class="theme-modal-body">
 					<div id="theme-modal-grid"></div>
+				</div>
+			</div>
+		</div>
+
+		<div id="theme-file-modal-overlay" class="modal-overlay">
+			<div class="modal theme-file-modal">
+				<div class="modal-header">
+					<h3 id="theme-file-modal-title" class="modal-title">__MSG_options_themeFile_import__</h3>
+					<button id="theme-file-modal-close" class="modal-close-btn" aria-label="Close">
+						<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+							<path d="M6.28 5.22a.75.75 0 0 0-1.06 1.06L8.94 10l-3.72 3.72a.75.75 0 1 0 1.06 1.06L10 11.06l3.72 3.72a.75.75 0 1 0 1.06-1.06L11.06 10l3.72-3.72a.75.75 0 0 0-1.06-1.06L10 8.94 6.28 5.22Z"></path>
+						</svg>
+					</button>
+				</div>
+				<div class="modal-body">
+					<span id="theme-file-select">__MSG_options_themeFile_selectImport__</span>
+					<div id="theme-file-selections">
+						<button id="theme-file-code" class="theme-file-selection">__MSG_options_themeFile_code__</button>
+						<button id="theme-file-settings" class="theme-file-selection">__MSG_options_themeFile_settings__</button>
+					</div>
 				</div>
 			</div>
 		</div>

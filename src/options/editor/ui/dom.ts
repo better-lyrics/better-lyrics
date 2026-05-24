@@ -5,6 +5,7 @@ export const modalInput = document.getElementById("modal-input") as HTMLInputEle
 export const modalConfirmBtn = document.getElementById("modal-confirm") as HTMLButtonElement;
 export const modalCancelBtn = document.getElementById("modal-cancel") as HTMLButtonElement;
 export const modalCloseBtn = document.getElementById("modal-close") as HTMLButtonElement;
+
 export const syncIndicator = document.getElementById("sync-indicator")!;
 export const themeNameDisplay = document.getElementById("theme-name-display");
 export const themeNameText = document.getElementById("theme-name-text");
@@ -21,6 +22,13 @@ export const themePreviewAuthor = document.getElementById("theme-preview-author"
 export const themeModalOverlay = document.getElementById("theme-modal-overlay") as HTMLElement | null;
 export const themeModalClose = document.getElementById("theme-modal-close") as HTMLButtonElement | null;
 export const themeModalGrid = document.getElementById("theme-modal-grid") as HTMLElement | null;
+
+export const themeFileOverlay = document.getElementById("theme-file-modal-overlay") as HTMLElement | null;
+export const themeFileTitle = document.getElementById("theme-file-modal-title");
+export const themeFileClose = document.getElementById("theme-file-modal-close") as HTMLButtonElement | null;
+export const themeFileSelect = document.getElementById("theme-file-select");
+export const themeFileCode = document.getElementById("theme-file-code") as HTMLButtonElement | null;
+export const themeFileSettings = document.getElementById("theme-file-settings") as HTMLButtonElement | null;
 
 export const openEditCSS = (): void => {
   const editCSS = document.getElementById("css");

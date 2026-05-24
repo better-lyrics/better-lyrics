@@ -14,20 +14,18 @@ export interface Theme {
 interface CustomTheme {
   name: string;
   css: string;
-  settings?: {
-    [field: string]: CTSettingFieldToggle | CTSettingFieldRange | CTSettingFieldDropdown | CTSettingFieldColor | CTSettingFieldTextfield | CTSettingField
-  };
+  settings?: { [field: string]: ThemeSettingField; };
   /** Modified through user actions */
   savedSettings?: { [field: string]: any };
   timestamp: number;
 }
 
-enum CTSettingFieldAttrType {
+enum ThemeSettingFieldAttrType {
   CSS = "css",
   RICS = "rics"
 }
 
-enum CTSettingFieldType {
+enum ThemeSettingFieldType {
   TOGGLE = "toggle",
   RANGE = "range",
   DROPDOWN = "dropdown",
@@ -35,7 +33,7 @@ enum CTSettingFieldType {
   TEXTFIELD = "textfield"
 }
 
-enum CTSettingFieldConditionals {
+enum ThemeSettingFieldConditionals {
   EQUAL = "equals",
   NOTEQUAL = "not-equal",
   GREATERTHAN = "greater-than",
@@ -46,12 +44,12 @@ enum CTSettingFieldConditionals {
   ENDS = "ends"
 }
 
-interface CTSettingField {
+export interface ThemeSettingField {
   label: string;
-  type: CTSettingFieldType | string;
+  type: ThemeSettingFieldType | string;
   /** CSS starts with `--` prefix while RICS starts with `$` prefix */
   attribute: string;
-  attrType: CTSettingFieldAttrType | string;
+  attrType: ThemeSettingFieldAttrType | string;
   /** 
    * Use `$VALUE$` for accessing the current setting field value on the `attrValue`.
    * 
@@ -73,33 +71,34 @@ interface CTSettingField {
    * ]
    * ```
    */
-  available?: [{settingField: string, condition: string | CTSettingFieldConditionals, value: any}][];
+  available?: [{settingField: string, condition: string | ThemeSettingFieldConditionals, value: any}][];
+  default: any;
 }
 
-interface CTSettingFieldToggle extends CTSettingField {
+interface ThemeSettingFieldToggle extends ThemeSettingField {
   onValue: any;
   offValue: any;
   default: boolean;
 }
 
-interface CTSettingFieldRange extends CTSettingField {
+interface ThemeSettingFieldRange extends ThemeSettingField {
   min: number;
   max: number;
   step: number;
   default: number;
 }
 
-interface CTSettingFieldDropdown extends CTSettingField {
+interface ThemeSettingFieldDropdown extends ThemeSettingField {
   options: { [label: string]: any };
   /** Default index from zero to `n - 1` */
   default: number;
 }
 
-interface CTSettingFieldColor extends CTSettingField {
+interface ThemeSettingFieldColor extends ThemeSettingField {
   default: string;
 }
 
-interface CTSettingFieldTextfield extends CTSettingField {
+interface ThemeSettingFieldTextfield extends ThemeSettingField {
   onlyAllow?: "number" | "alphabetical" | "alphanumeric";
   default: string;
 }
@@ -177,7 +176,7 @@ export async function getCustomThemes(): Promise<CustomTheme[]> {
   return result.customThemes || [];
 }
 
-export async function saveCustomTheme(name: string, css: string, settings?: { [field: string]: CTSettingField }): Promise<void> {
+export async function saveCustomTheme(name: string, css: string, settings?: { [field: string]: ThemeSettingField }): Promise<void> {
   const customThemes = await getCustomThemes();
   const existingIndex = customThemes.findIndex(theme => theme.name === name);
   const existingTheme = existingIndex !== -1 ? customThemes[existingIndex] : undefined;
@@ -207,10 +206,19 @@ export async function updateCustomThemeSavedSettings(name: string, savedSettings
   }
 
   const theme = customThemes[themeIndex];
-  theme.savedSettings = {
-    ...(theme.savedSettings || {}),
-    ...savedSettings,
-  };
+
+  if (theme.settings) {
+    for (const key in savedSettings) {
+      if (!theme.settings[key]) { delete savedSettings[key]; }
+      if (theme.settings[key] && theme.settings[key].default == savedSettings[key]) { delete savedSettings[key]; }
+    }
+    
+    theme.savedSettings = {
+      ...(theme.savedSettings || {}),
+      ...savedSettings,
+    };
+  }
+  
   customThemes[themeIndex] = {
     ...theme,
     timestamp: Date.now(),
@@ -244,8 +252,8 @@ export async function renameCustomTheme(oldName: string, newName: string): Promi
   await chrome.storage.local.set({ customThemes });
 }
 
-export async function addSettingFieldCustomTheme(name: string, type: CTSettingFieldType | string, id: string, data: CTSettingField): Promise<void> {
-  if (!Object.values(CTSettingFieldType).find(ftype => ftype === type)) {
+export async function addSettingFieldCustomTheme(name: string, type: ThemeSettingFieldType | string, id: string, data: ThemeSettingField): Promise<void> {
+  if (!Object.values(ThemeSettingFieldType).find(ftype => ftype === type)) {
     throw new Error(`Invalid setting field type "${type}"`);
   }
 
@@ -270,26 +278,26 @@ export async function addSettingFieldCustomTheme(name: string, type: CTSettingFi
   await chrome.storage.local.set({ customThemes });
 }
 
-function getDefaultValueForSettingField(field: CTSettingField): any {
-  if (field.type === CTSettingFieldType.TOGGLE) {
-    const toggleField = field as CTSettingFieldToggle;
+function getDefaultValueForSettingField(field: ThemeSettingField): any {
+  if (field.type === ThemeSettingFieldType.TOGGLE) {
+    const toggleField = field as ThemeSettingFieldToggle;
     return toggleField.default ? toggleField.onValue : toggleField.offValue;
   }
-  if (field.type === CTSettingFieldType.RANGE) {
-    const rangeField = field as CTSettingFieldRange;
+  if (field.type === ThemeSettingFieldType.RANGE) {
+    const rangeField = field as ThemeSettingFieldRange;
     return rangeField.default;
   }
-  if (field.type === CTSettingFieldType.DROPDOWN) {
-    const dropdownField = field as CTSettingFieldDropdown;
+  if (field.type === ThemeSettingFieldType.DROPDOWN) {
+    const dropdownField = field as ThemeSettingFieldDropdown;
     const values = Object.values(dropdownField.options);
     return values[dropdownField.default] ?? values[0];
   }
-  if (field.type === CTSettingFieldType.COLOR) {
-    const colorField = field as CTSettingFieldColor;
+  if (field.type === ThemeSettingFieldType.COLOR) {
+    const colorField = field as ThemeSettingFieldColor;
     return colorField.default;
   }
-  if (field.type === CTSettingFieldType.TEXTFIELD) {
-    const textField = field as CTSettingFieldTextfield;
+  if (field.type === ThemeSettingFieldType.TEXTFIELD) {
+    const textField = field as ThemeSettingFieldTextfield;
     return textField.default;
   }
   return undefined;
@@ -300,7 +308,7 @@ export async function getCustomThemeByName(name: string): Promise<CustomTheme | 
   return customThemes.find(theme => theme.name === name);
 }
 
-export async function updateCustomThemeSettings(name: string, settings?: { [field: string]: CTSettingField }): Promise<void> {
+export async function updateCustomThemeSettings(name: string, settings?: { [field: string]: ThemeSettingField }): Promise<void> {
   const customThemes = await getCustomThemes();
   const themeIndex = customThemes.findIndex(theme => theme.name === name);
   if (themeIndex === -1) {

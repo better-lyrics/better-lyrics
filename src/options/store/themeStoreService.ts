@@ -7,6 +7,7 @@ import type {
   ThemeLockfile,
   ThemeValidationResult,
 } from "./types";
+import type { ThemeSettingField } from "../themes";
 
 const DEFAULT_TIMEOUT_MS = 10000;
 
@@ -157,6 +158,19 @@ async function checkRegistryFileExists(themeId: string, file: string): Promise<b
   }
 }
 
+export async function fetchRegistryThemeSettings(themeId: string): Promise<{ [field: string]: ThemeSettingField } | null> {
+  const url = getRegistryFileUrl(themeId, "settings.json");
+
+  try {
+    const response = await fetchWithTimeout(url, { cache: "no-store" });
+    if (!response.ok) return null;
+    return response.json();
+  } catch (err) {
+    console.warn(LOG_PREFIX_STORE, "Failed to fetch registry theme settings:", err);
+    return null;
+  }
+}
+
 export async function fetchRegistryShaderConfig(themeId: string): Promise<Record<string, unknown> | null> {
   const url = getRegistryFileUrl(themeId, "shader.json");
 
@@ -249,6 +263,23 @@ export async function fetchThemeCSS(repo: string, branchOverride?: string): Prom
   }
 
   return { css: await cssResponse.text(), isRics: false };
+}
+
+export async function fetchThemeSettings(repo: string, branchOverride?: string): Promise<{ [field: string]: ThemeSettingField } | null> {
+  const branch = branchOverride ?? (await getDefaultBranch(repo));
+  const url = getRawGitHubUrl(repo, branch, "settings.json");
+
+  const exists = await checkFileExists(url);
+  if (!exists) return null;
+
+  try {
+    const response = await fetchWithTimeout(url, { cache: "no-store" });
+    if (!response.ok) return null;
+    return response.json();
+  } catch (err) {
+    console.warn(LOG_PREFIX_STORE, "Failed to fetch theme settings:", err);
+    return null;
+  }
 }
 
 async function checkFileExists(url: string): Promise<boolean> {

@@ -140,13 +140,9 @@ async function getCurrentCustomTheme(): Promise<ReturnType<typeof getCustomTheme
   return getCustomThemeByName(themeName);
 }
 
-function getEditorElement(): HTMLElement | null {
-  return document.getElementById("editor");
-}
-
 function setThemeSettingsVisibility(visible: boolean): void {
   themeSettingsVisible = visible;
-  const editor = getEditorElement();
+  const editor = document.getElementById("editor");
   if (editor) {
     editor.style.display = visible ? "none" : "block";
   }
@@ -365,11 +361,6 @@ async function renderThemeSettings(): Promise<void> {
 
   if (!themeName) {
     themeSettingsContainer.appendChild(createThemeSettingsNotice("No theme selected. Choose a custom theme to view its settings."));
-    return;
-  }
-
-  if (!isCustom) {
-    themeSettingsContainer.appendChild(createThemeSettingsNotice("Theme settings are only available for saved custom themes."));
     return;
   }
 

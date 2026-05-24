@@ -3,12 +3,15 @@ import { getLocalStorage, getSyncStorage } from "@core/storage";
 import {
   fetchFullTheme,
   fetchRegistryShaderConfig,
+  fetchRegistryThemeSettings,
   fetchSingleStoreTheme,
   fetchThemeCSS,
   fetchThemeMetadata,
+  fetchThemeSettings,
   fetchThemeShaderConfig,
 } from "./themeStoreService";
 import type { InstalledStoreTheme, StoreTheme, ThemeSource } from "./types";
+import type { ThemeSettingField } from "../themes";
 
 async function fetchCssFromUrl(url: string): Promise<string> {
   const response = await fetch(url);
@@ -128,16 +131,23 @@ export async function installTheme(theme: StoreTheme, options: InstallOptions = 
 
   let css: string;
   let shaderConfig: Record<string, unknown> | null = null;
+  let settings: { [field: string]: ThemeSettingField } | null = null;
 
   if (isRegistryTheme) {
     css = await fetchCssFromUrl(theme.cssUrl);
     if (theme.hasShaders) {
       shaderConfig = await fetchRegistryShaderConfig(theme.id);
     }
+    if (theme.hasSettings) {
+      settings = await fetchRegistryThemeSettings(theme.id);
+    }
   } else {
     const branch = options.branch;
     const cssResult = await fetchThemeCSS(theme.repo, branch);
     css = cssResult.css;
+    if (theme.hasSettings) {
+      settings = await fetchThemeSettings(theme.repo, branch);
+    }
     if (theme.hasShaders) {
       shaderConfig = await fetchThemeShaderConfig(theme.repo, branch);
     }
@@ -150,6 +160,7 @@ export async function installTheme(theme: StoreTheme, options: InstallOptions = 
     creators: theme.creators,
     css,
     shaderConfig: shaderConfig || undefined,
+    settings: settings || undefined,
     installedAt: Date.now(),
     version: theme.version,
     source: options.source,
@@ -160,6 +171,7 @@ export async function installTheme(theme: StoreTheme, options: InstallOptions = 
     imageUrls: theme.imageUrls,
     minVersion: theme.minVersion,
     hasShaders: theme.hasShaders,
+    hasSettings: theme.hasSettings,
     tags: theme.tags,
     commit: theme.commit,
   };

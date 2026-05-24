@@ -359,6 +359,31 @@
     "description": "Double-click to rename tooltip"
   },
 
+  "options_themeFile_import": {
+    "message": "Import Theme File",
+    "description": "Theme file import modal title"
+  },
+  "options_themeFile_selectImport": {
+    "message": "Which part of the theme would you like to import?",
+    "description": "Theme file select part to import label"
+  },
+  "options_themeFile_export": {
+    "message": "Export Theme File",
+    "description": "Theme file export modal title"
+  },
+  "options_themeFile_selectExport": {
+    "message": "Which part of the theme would you like to export?",
+    "description": "Theme file select part to export label"
+  },
+  "options_themeFile_code": {
+    "message": "CSS/RICS stylesheet code",
+    "description": "Option label for importing/exporting theme's code"
+  },
+  "options_themeFile_settings": {
+    "message": "Theme settings",
+    "description": "Option label for importing/exporting theme's settings"
+  },
+
   "options_provider_betterLyrics": {
     "message": "Better Lyrics",
     "description": "Better Lyrics provider name"

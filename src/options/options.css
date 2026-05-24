@@ -535,6 +535,19 @@ body {
     color: #ff7961;
 }
 
+#theme-settings {
+	display: flex;
+	flex-direction: column;
+	padding: 1rem;
+}
+
+.setting-field {
+	border-radius: .5rem;
+	margin: 0;
+	text-align: left;
+	font-size: 1rem;
+}
+
 .ie-utils-container {
 	display: flex;
 	align-items: flex-start;
