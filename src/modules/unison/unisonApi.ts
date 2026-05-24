@@ -25,7 +25,7 @@ async function signedRequest<T>(
   data: Record<string, unknown>
 ): Promise<ApiResult<T>> {
   try {
-    const signed = await signPayload(data);
+    let signed = await signPayload(data);
     let needsRegistration = !(await isKeyRegistered());
 
     const body: Record<string, unknown> = {
@@ -47,6 +47,9 @@ async function signedRequest<T>(
     if (response.status === 400 && !needsRegistration) {
       cachedErrorBody = await response.json().catch(() => null);
       if (cachedErrorBody?.error === "PUBLIC_KEY_REQUIRED") {
+        signed = await signPayload(data);
+        body.payload = signed.payload;
+        body.signature = signed.signature;
         body.publicKey = signed.publicKey;
         needsRegistration = true;
         response = await fetchWithTimeout(`${UNISON_API_BASE_URL}${endpoint}`, {

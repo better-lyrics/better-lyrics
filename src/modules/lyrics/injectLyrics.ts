@@ -1,5 +1,6 @@
 import {
   BACKGROUND_LYRIC_CLASS,
+  EXPLICIT_WORD_CLASS,
   HAS_TRAILING_SPACE_CLASS,
   LOG_PREFIX,
   LYRICS_CLASS,
@@ -244,6 +245,7 @@ function splitLongPart(part: LyricPart, threshold: number): LyricPart[] {
       durationMs: subEnd - subStart,
       words: chunk,
       isBackground: part.isBackground,
+      explicit: part.explicit,
     });
     charsBefore += chunk.length;
   }
@@ -283,6 +285,7 @@ function createLyricsLine(parts: LyricPart[], line: LineData, lyricElement: HTML
       durationMs: originalPart.durationMs,
       words: core,
       isBackground: originalPart.isBackground,
+      explicit: originalPart.explicit,
     };
     const subParts = splitLongPart(cleanedPart, wrapThreshold);
 
@@ -323,6 +326,9 @@ function createLyricsLine(parts: LyricPart[], line: LineData, lyricElement: HTML
       }
       if (part.isBackground) {
         span.classList.add(BACKGROUND_LYRIC_CLASS);
+      }
+      if (part.explicit) {
+        span.classList.add(EXPLICIT_WORD_CLASS);
       }
 
       // Non-final sub-parts signal a group-flush (wrap opportunity) without a trailing-space

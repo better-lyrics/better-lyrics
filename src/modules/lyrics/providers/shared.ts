@@ -81,6 +81,7 @@ export interface LyricPart {
   words: string;
   durationMs: number;
   isBackground?: boolean;
+  explicit?: boolean;
 }
 
 export interface ProviderParameters {

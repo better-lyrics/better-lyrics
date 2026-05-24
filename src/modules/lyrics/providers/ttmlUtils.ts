@@ -108,6 +108,7 @@ function parseLyricPart(p: ParagraphElementOrBackground[], beginTime: number, ig
       if (subPart["#text"] && (!ignoreSpanSpace || localP.length <= 1)) {
         text += subPart["#text"];
         let lastPart = parts[parts.length - 1];
+
         parts.push({
           startTimeMs: lastPart ? lastPart.startTimeMs + lastPart.durationMs : beginTime,
           durationMs: 0,
@@ -118,12 +119,14 @@ function parseLyricPart(p: ParagraphElementOrBackground[], beginTime: number, ig
         let spanText = subPart.span[0]["#text"]!;
         let startTimeMs = parseTime(subPart[":@"]?.["@_begin"]);
         let endTimeMs = parseTime(subPart[":@"]?.["@_end"]);
+        let explicit = subPart[":@"]?.["@_explicit"] === "true" || subPart[":@"]?.["@_obscene"] === "true";
 
         parts.push({
           startTimeMs,
           durationMs: endTimeMs - startTimeMs,
           isBackground,
           words: spanText,
+          explicit,
         });
         text += spanText;
 
