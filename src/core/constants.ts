@@ -125,7 +125,7 @@ export interface AuthPartner {
   iconUrl: string | null;
 }
 
-export const AUTH_PARTNERS: readonly AuthPartner[] = [
+const AUTH_PARTNERS: readonly AuthPartner[] = [
   { id: "unison", origin: "https://unison.boidu.dev", iconUrl: null },
   { id: "blrcunison", origin: "https://blrcunison.vercel.app", iconUrl: "https://blrcunison.vercel.app/logo_mono.svg" },
 ];
