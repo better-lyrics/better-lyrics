@@ -1046,15 +1046,15 @@
     "description": "Report reason: other"
   },
   "unison_confidence_low": {
-    "message": "Low Confidence",
+    "message": "Încrederea scăzută",
     "description": "Low confidence indicator"
   },
   "unison_confidence_medium": {
-    "message": "Medium Confidence",
+    "message": "Încrederea medie",
     "description": "Medium confidence indicator"
   },
   "unison_confidence_high": {
-    "message": "High Confidence",
+    "message": "Încrederea mare",
     "description": "High confidence indicator"
   },
   "unison_format_lrc": {
@@ -1130,7 +1130,7 @@
     "description": "Back button text in detail view"
   },
   "unison_noPreview": {
-    "message": "Paste or drop lyrics to see a preview",
+    "message": "Lipește sau aruncă versuri pentru a vedea o previzualizare",
     "description": "Empty state text shown in submit preview before lyrics are entered"
   },
   "unison_preview": {
