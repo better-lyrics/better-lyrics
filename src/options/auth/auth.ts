@@ -25,6 +25,11 @@ function originLabel(origin: string): string {
   }
 }
 
+function bindStaticAssets(): void {
+  const logo = document.getElementById("auth-logo") as HTMLImageElement | null;
+  if (logo) logo.src = chrome.runtime.getURL("icons/icon-512.png");
+}
+
 function bindStaticText(): void {
   const explainer = document.getElementById("auth-explainer");
   if (explainer) explainer.textContent = t("auth_consentExplainer");
@@ -102,6 +107,7 @@ async function main(): Promise<void> {
   initI18n();
   document.body.classList.add("i18n-ready");
 
+  bindStaticAssets();
   bindStaticText();
 
   const params = readParams();

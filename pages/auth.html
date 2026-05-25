@@ -16,7 +16,7 @@
   <body class="auth-page">
     <main class="auth-card">
       <header class="auth-card__header">
-        <img class="auth-card__logo" src="../images/icons/icon-48.png" alt="Better Lyrics" width="48" height="48" />
+        <img class="auth-card__logo" id="auth-logo" alt="Better Lyrics" width="24" height="24" />
         <h1 class="auth-card__title" id="auth-title"></h1>
       </header>
 
@@ -32,13 +32,13 @@
         </label>
       </section>
 
-      <footer class="auth-card__actions">
-        <button type="button" id="auth-cancel" class="auth-button auth-button--secondary"></button>
-        <button type="button" id="auth-approve" class="auth-button auth-button--primary"></button>
-      </footer>
-
       <p class="auth-card__error" id="auth-error" hidden></p>
     </main>
+
+    <footer class="auth-page__footer">
+      <button type="button" id="auth-cancel" class="auth-button auth-button--secondary"></button>
+      <button type="button" id="auth-approve" class="auth-button auth-button--primary"></button>
+    </footer>
 
     <script type="module" defer src="../src/options/auth/auth.ts"></script>
   </body>
