@@ -6,10 +6,15 @@
     <meta http-equiv="Content-Security-Policy" content="
       default-src 'self';
       script-src 'self';
-      style-src 'self' 'unsafe-inline';
+			style-src 'self' 'unsafe-inline' https://api.fontshare.com;
+			font-src https://cdn.fontshare.com;
       img-src 'self' data:;
     " />
     <title>__MSG_auth_pageTitle__</title>
+		<link
+			href="https://api.fontshare.com/v2/css?f[]=satoshi@1&display=swap"
+			rel="stylesheet"
+		/>
     <link rel="stylesheet" href="../src/options/auth/auth.css" />
     <style>body:not(.i18n-ready){opacity:0}</style>
   </head>

@@ -16,7 +16,7 @@ body {
   min-height: 100vh;
   background: #1a1a20;
   color: #ececec;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  font-family: "Satoshi", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
 }
 
 .auth-page {
