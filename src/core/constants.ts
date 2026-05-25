@@ -118,11 +118,7 @@ export const AUTH_MESSAGE_TYPES = {
   POPUP_RESULT: "bl-auth-popup-result",
 } as const;
 
-const AUTH_ALLOWED_ORIGINS: readonly string[] = [
-  "https://unison.boidu.dev",
-  "https://blrcunison.vercel.app",
-  "https://unison-unison-pr-14.up.railway.app",
-];
+const AUTH_ALLOWED_ORIGINS: readonly string[] = ["https://unison.boidu.dev", "https://blrcunison.vercel.app"];
 
 export function isAllowedAuthOrigin(origin: string | undefined): boolean {
   if (!origin) return false;
