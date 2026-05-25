@@ -1,4 +1,4 @@
-import { AUTH_PORT_NAME_PREFIX, LOG_PREFIX_AUTH } from "@constants";
+import { type AuthPartner, AUTH_PORT_NAME_PREFIX, getAuthPartnerByOrigin, LOG_PREFIX_AUTH } from "@constants";
 import { initI18n, loadLocaleOverride, t } from "@core/i18n";
 import { getIdentity } from "@core/keyIdentity";
 
@@ -7,6 +7,20 @@ interface RequestParams {
   nonce: string;
   origin: string;
 }
+
+const IS_DEV = (() => {
+  try {
+    return process.env.NODE_ENV !== "production";
+  } catch {
+    return false;
+  }
+})();
+
+const DEV_STUB_PARTNER: AuthPartner = {
+  id: "dev-boidu",
+  origin: "https://boidu.dev",
+  iconUrl: "https://boidu.dev/logo.jpg",
+};
 
 function readParams(): RequestParams | null {
   const url = new URL(window.location.href);
@@ -25,9 +39,23 @@ function originLabel(origin: string): string {
   }
 }
 
-function bindStaticAssets(): void {
+function renderLogos(partner: AuthPartner | undefined): void {
   const logo = document.getElementById("auth-logo") as HTMLImageElement | null;
   if (logo) logo.src = chrome.runtime.getURL("icons/icon-512.png");
+
+  const pulse = document.getElementById("auth-pulse");
+  const partnerLogo = document.getElementById("auth-partner-logo") as HTMLImageElement | null;
+  if (!pulse || !partnerLogo) return;
+
+  if (!partner || partner.iconUrl === null) {
+    pulse.hidden = true;
+    partnerLogo.hidden = true;
+    return;
+  }
+
+  partnerLogo.src = partner.iconUrl;
+  pulse.hidden = false;
+  partnerLogo.hidden = false;
 }
 
 function bindStaticText(): void {
@@ -67,7 +95,7 @@ async function bindDynamicText(params: RequestParams): Promise<void> {
   }
 }
 
-function wireActions(params: RequestParams, port: chrome.runtime.Port): void {
+function wireActions(port: chrome.runtime.Port): void {
   const approve = document.getElementById("auth-approve") as HTMLButtonElement | null;
   const cancel = document.getElementById("auth-cancel") as HTMLButtonElement | null;
   const remember = document.getElementById("auth-remember") as HTMLInputElement | null;
@@ -93,28 +121,45 @@ function wireActions(params: RequestParams, port: chrome.runtime.Port): void {
   });
 }
 
+function wireDevActions(): void {
+  const approve = document.getElementById("auth-approve") as HTMLButtonElement | null;
+  const cancel = document.getElementById("auth-cancel") as HTMLButtonElement | null;
+  approve?.addEventListener("click", () => console.log(LOG_PREFIX_AUTH, "[dev] approve clicked"));
+  cancel?.addEventListener("click", () => console.log(LOG_PREFIX_AUTH, "[dev] cancel clicked"));
+}
+
 async function main(): Promise<void> {
   await loadLocaleOverride();
   initI18n();
   document.body.classList.add("i18n-ready");
 
-  bindStaticAssets();
   bindStaticText();
 
   const params = readParams();
+
   if (!params) {
-    showError("auth_invalidRequest");
-    const approve = document.getElementById("auth-approve") as HTMLButtonElement | null;
-    const cancel = document.getElementById("auth-cancel") as HTMLButtonElement | null;
-    if (approve) approve.disabled = true;
-    if (cancel) cancel.disabled = true;
+    if (!IS_DEV) {
+      renderLogos(undefined);
+      showError("auth_invalidRequest");
+      const approve = document.getElementById("auth-approve") as HTMLButtonElement | null;
+      const cancel = document.getElementById("auth-cancel") as HTMLButtonElement | null;
+      if (approve) approve.disabled = true;
+      if (cancel) cancel.disabled = true;
+      return;
+    }
+
+    renderLogos(DEV_STUB_PARTNER);
+    await bindDynamicText({ requestId: "dev", nonce: "dev-stub-nonce-1234567890", origin: DEV_STUB_PARTNER.origin });
+    wireDevActions();
     return;
   }
+
+  renderLogos(getAuthPartnerByOrigin(params.origin));
 
   const port = chrome.runtime.connect({ name: `${AUTH_PORT_NAME_PREFIX}${params.requestId}` });
 
   await bindDynamicText(params);
-  wireActions(params, port);
+  wireActions(port);
 }
 
 document.addEventListener("DOMContentLoaded", () => {

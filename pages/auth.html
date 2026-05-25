@@ -7,8 +7,8 @@
       default-src 'self';
       script-src 'self';
 			style-src 'self' 'unsafe-inline' https://api.fontshare.com;
-			font-src https://cdn.fontshare.com;
-      img-src 'self' data:;
+			font-src 'self' data: https://cdn.fontshare.com;
+      img-src 'self' data: https://blrcunison.vercel.app https://boidu.dev;
     " />
     <title>__MSG_auth_pageTitle__</title>
 		<link
@@ -21,7 +21,15 @@
   <body class="auth-page">
     <main class="auth-card">
       <header class="auth-card__header">
-        <img class="auth-card__logo" id="auth-logo" alt="Better Lyrics" width="24" height="24" />
+        <span class="auth-card__logos" id="auth-logos">
+          <img class="auth-card__logo" id="auth-logo" alt="Better Lyrics" width="24" height="24" />
+          <span class="auth-card__pulse" id="auth-pulse" hidden>
+            <span class="auth-card__pulse-dot"></span>
+            <span class="auth-card__pulse-dot"></span>
+            <span class="auth-card__pulse-dot"></span>
+          </span>
+          <img class="auth-card__logo" id="auth-partner-logo" alt="" width="24" height="24" hidden />
+        </span>
         <h1 class="auth-card__title" id="auth-title"></h1>
       </header>
 
@@ -31,8 +39,11 @@
       </section>
 
       <section class="auth-card__remember">
-        <label>
-          <input type="checkbox" id="auth-remember" />
+        <label class="auth-remember">
+          <span class="auth-remember__toggle">
+            <input type="checkbox" id="auth-remember" />
+            <span class="auth-remember__checkmark"></span>
+          </span>
           <span id="auth-remember-label"></span>
         </label>
       </section>

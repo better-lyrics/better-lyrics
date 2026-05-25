@@ -119,11 +119,24 @@ export const AUTH_MESSAGE_TYPES = {
 
 export const AUTH_PORT_NAME_PREFIX = "bl-auth-popup:" as const;
 
-const AUTH_ALLOWED_ORIGINS: readonly string[] = ["https://unison.boidu.dev", "https://blrcunison.vercel.app"];
+export interface AuthPartner {
+  id: string;
+  origin: string;
+  iconUrl: string | null;
+}
+
+export const AUTH_PARTNERS: readonly AuthPartner[] = [
+  { id: "unison", origin: "https://unison.boidu.dev", iconUrl: null },
+  { id: "blrcunison", origin: "https://blrcunison.vercel.app", iconUrl: "https://blrcunison.vercel.app/logo_mono.svg" },
+];
+
+export function getAuthPartnerByOrigin(origin: string | undefined): AuthPartner | undefined {
+  if (!origin) return undefined;
+  return AUTH_PARTNERS.find(p => p.origin === origin);
+}
 
 export function isAllowedAuthOrigin(origin: string | undefined): boolean {
-  if (!origin) return false;
-  return AUTH_ALLOWED_ORIGINS.includes(origin);
+  return getAuthPartnerByOrigin(origin) !== undefined;
 }
 
 // Initialization and General Logs
