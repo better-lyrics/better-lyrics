@@ -1,4 +1,4 @@
-import { AUTH_MESSAGE_TYPES, isAllowedAuthOrigin, LOG_PREFIX_AUTH } from "@constants";
+import { AUTH_MESSAGE_TYPES, AUTH_PORT_NAME_PREFIX, isAllowedAuthOrigin, LOG_PREFIX_AUTH } from "@constants";
 import { signPayload } from "@core/keyIdentity";
 import { isApproved, pruneExpired, rememberApproval } from "@modules/auth/approvedOrigins";
 
@@ -7,21 +7,6 @@ interface AuthRequest {
   nonce: string;
   origin: string;
 }
-
-interface PopupApprove {
-  type: typeof AUTH_MESSAGE_TYPES.POPUP_RESULT;
-  requestId: string;
-  result: "approve";
-  remember: boolean;
-}
-
-interface PopupCancel {
-  type: typeof AUTH_MESSAGE_TYPES.POPUP_RESULT;
-  requestId: string;
-  result: "cancel";
-}
-
-type PopupResult = PopupApprove | PopupCancel;
 
 interface SignedBody {
   payload: Record<string, unknown>;
@@ -37,7 +22,14 @@ interface PendingRequest {
   resolve: (response: ExternalResponse) => void;
   origin: string;
   nonce: string;
+  port: chrome.runtime.Port | null;
   windowId: number | null;
+  resolved: boolean;
+}
+
+interface PortInboundMessage {
+  result: "approve" | "cancel";
+  remember?: boolean;
 }
 
 const pending = new Map<string, PendingRequest>();
@@ -52,6 +44,22 @@ function isValidAuthRequest(msg: unknown): msg is AuthRequest {
     typeof m.origin === "string" &&
     m.origin.length > 0
   );
+}
+
+function isValidPortMessage(msg: unknown): msg is PortInboundMessage {
+  if (!msg || typeof msg !== "object") return false;
+  const m = msg as Record<string, unknown>;
+  return m.result === "approve" || m.result === "cancel";
+}
+
+function resolveSlot(slot: PendingRequest, requestId: string, response: ExternalResponse): void {
+  if (slot.resolved) return;
+  slot.resolved = true;
+  pending.delete(requestId);
+  slot.resolve(response);
+  if (slot.windowId !== null) {
+    chrome.windows.remove(slot.windowId).catch(err => console.warn(LOG_PREFIX_AUTH, "window remove failed", err));
+  }
 }
 
 async function signFor(request: AuthRequest): Promise<ExternalResponse> {
@@ -83,6 +91,21 @@ async function openConsentPopup(requestId: string, request: AuthRequest): Promis
     console.warn(LOG_PREFIX_AUTH, "popup open failed", err);
     return null;
   }
+}
+
+async function handlePortMessage(requestId: string, slot: PendingRequest, msg: PortInboundMessage): Promise<void> {
+  if (slot.resolved) return;
+
+  if (msg.result === "cancel") {
+    resolveSlot(slot, requestId, { ok: false, reason: "USER_CANCELLED" });
+    return;
+  }
+
+  if (msg.remember) {
+    await rememberApproval(slot.origin);
+  }
+  const signed = await signFor({ type: AUTH_MESSAGE_TYPES.REQUEST, nonce: slot.nonce, origin: slot.origin });
+  resolveSlot(slot, requestId, signed);
 }
 
 // -- Public API --------------------------
@@ -117,49 +140,39 @@ export function initBackgroundAuth(): void {
         return;
       }
 
-      pending.set(requestId, { resolve: sendResponse, origin: message.origin, nonce: message.nonce, windowId });
+      pending.set(requestId, {
+        resolve: sendResponse,
+        origin: message.origin,
+        nonce: message.nonce,
+        port: null,
+        windowId,
+        resolved: false,
+      });
     })();
     return true;
   });
 
-  chrome.runtime.onMessage.addListener((message: unknown, _sender, sendResponse) => {
-    if (!message || typeof message !== "object") return false;
-    const m = message as PopupResult;
-    if (m.type !== AUTH_MESSAGE_TYPES.POPUP_RESULT) return false;
-
-    void (async () => {
-      const slot = pending.get(m.requestId);
-      if (!slot) {
-        sendResponse({ ok: false });
-        return;
-      }
-      pending.delete(m.requestId);
-
-      if (slot.windowId !== null) {
-        chrome.windows.remove(slot.windowId).catch(() => {});
-      }
-
-      if (m.result === "cancel") {
-        slot.resolve({ ok: false, reason: "USER_CANCELLED" });
-        sendResponse({ ok: true });
-        return;
-      }
-
-      if (m.remember) {
-        await rememberApproval(slot.origin);
-      }
-      slot.resolve(await signFor({ type: AUTH_MESSAGE_TYPES.REQUEST, nonce: slot.nonce, origin: slot.origin }));
-      sendResponse({ ok: true });
-    })();
-    return true;
-  });
-
-  chrome.windows.onRemoved.addListener(windowId => {
-    for (const [requestId, slot] of pending) {
-      if (slot.windowId === windowId) {
-        pending.delete(requestId);
-        slot.resolve({ ok: false, reason: "USER_DISMISSED" });
-      }
+  chrome.runtime.onConnect.addListener(port => {
+    if (!port.name.startsWith(AUTH_PORT_NAME_PREFIX)) return;
+    const requestId = port.name.slice(AUTH_PORT_NAME_PREFIX.length);
+    const slot = pending.get(requestId);
+    if (!slot) {
+      port.disconnect();
+      return;
     }
+
+    slot.port = port;
+
+    port.onMessage.addListener(msg => {
+      if (!isValidPortMessage(msg)) return;
+      void handlePortMessage(requestId, slot, msg).catch(err =>
+        console.warn(LOG_PREFIX_AUTH, "port message handler failed", err)
+      );
+    });
+
+    port.onDisconnect.addListener(() => {
+      if (slot.resolved) return;
+      resolveSlot(slot, requestId, { ok: false, reason: "USER_DISMISSED" });
+    });
   });
 }

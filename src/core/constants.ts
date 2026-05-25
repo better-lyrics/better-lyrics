@@ -115,8 +115,9 @@ export const AUTH_APPROVAL_TTL_MS = 24 * 60 * 60 * 1000;
 
 export const AUTH_MESSAGE_TYPES = {
   REQUEST: "bl-auth-request",
-  POPUP_RESULT: "bl-auth-popup-result",
 } as const;
+
+export const AUTH_PORT_NAME_PREFIX = "bl-auth-popup:" as const;
 
 const AUTH_ALLOWED_ORIGINS: readonly string[] = ["https://unison.boidu.dev", "https://blrcunison.vercel.app"];
 

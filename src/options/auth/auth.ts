@@ -1,4 +1,4 @@
-import { AUTH_MESSAGE_TYPES, LOG_PREFIX_AUTH } from "@constants";
+import { AUTH_PORT_NAME_PREFIX, LOG_PREFIX_AUTH } from "@constants";
 import { initI18n, loadLocaleOverride, t } from "@core/i18n";
 import { getIdentity } from "@core/keyIdentity";
 
@@ -67,37 +67,28 @@ async function bindDynamicText(params: RequestParams): Promise<void> {
   }
 }
 
-function wireActions(params: RequestParams): void {
+function wireActions(params: RequestParams, port: chrome.runtime.Port): void {
   const approve = document.getElementById("auth-approve") as HTMLButtonElement | null;
   const cancel = document.getElementById("auth-cancel") as HTMLButtonElement | null;
   const remember = document.getElementById("auth-remember") as HTMLInputElement | null;
 
-  approve?.addEventListener("click", async () => {
+  approve?.addEventListener("click", () => {
     approve.disabled = true;
     if (cancel) cancel.disabled = true;
     try {
-      await chrome.runtime.sendMessage({
-        type: AUTH_MESSAGE_TYPES.POPUP_RESULT,
-        requestId: params.requestId,
-        result: "approve",
-        remember: remember?.checked === true,
-      });
+      port.postMessage({ result: "approve", remember: remember?.checked === true });
     } catch (err) {
-      console.warn(LOG_PREFIX_AUTH, "approve send failed", err);
+      console.warn(LOG_PREFIX_AUTH, "approve post failed", err);
     }
   });
 
-  cancel?.addEventListener("click", async () => {
+  cancel?.addEventListener("click", () => {
     if (approve) approve.disabled = true;
     cancel.disabled = true;
     try {
-      await chrome.runtime.sendMessage({
-        type: AUTH_MESSAGE_TYPES.POPUP_RESULT,
-        requestId: params.requestId,
-        result: "cancel",
-      });
+      port.postMessage({ result: "cancel" });
     } catch (err) {
-      console.warn(LOG_PREFIX_AUTH, "cancel send failed", err);
+      console.warn(LOG_PREFIX_AUTH, "cancel post failed", err);
     }
   });
 }
@@ -120,8 +111,10 @@ async function main(): Promise<void> {
     return;
   }
 
+  const port = chrome.runtime.connect({ name: `${AUTH_PORT_NAME_PREFIX}${params.requestId}` });
+
   await bindDynamicText(params);
-  wireActions(params);
+  wireActions(params, port);
 }
 
 document.addEventListener("DOMContentLoaded", () => {
