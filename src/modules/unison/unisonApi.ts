@@ -6,6 +6,8 @@ import type {
   UnisonApiResponse,
   UnisonFeedEntry,
   UnisonLyricsEntry,
+  UnisonLyricsRequest,
+  UnisonRequestSuccess,
   UnisonSearchEntry,
   UnisonSubmission,
   VoteValue,
@@ -17,6 +19,7 @@ interface ApiResult<T> {
   success: boolean;
   data: T;
   error?: string;
+  status?: number;
 }
 
 async function signedRequest<T>(
@@ -25,7 +28,7 @@ async function signedRequest<T>(
   data: Record<string, unknown>
 ): Promise<ApiResult<T>> {
   try {
-    const signed = await signPayload(data);
+    let signed = await signPayload(data);
     let needsRegistration = !(await isKeyRegistered());
 
     const body: Record<string, unknown> = {
@@ -47,6 +50,9 @@ async function signedRequest<T>(
     if (response.status === 400 && !needsRegistration) {
       cachedErrorBody = await response.json().catch(() => null);
       if (cachedErrorBody?.error === "PUBLIC_KEY_REQUIRED") {
+        signed = await signPayload(data);
+        body.payload = signed.payload;
+        body.signature = signed.signature;
         body.publicKey = signed.publicKey;
         needsRegistration = true;
         response = await fetchWithTimeout(`${UNISON_API_BASE_URL}${endpoint}`, {
@@ -62,7 +68,7 @@ async function signedRequest<T>(
       const errorData = cachedErrorBody ?? (await response.json().catch(() => null));
       const error = errorData?.error ?? `Request failed: ${response.status}`;
       console.warn(LOG_PREFIX_UNISON, error);
-      return { success: false, data: null as T, error };
+      return { success: false, data: null as T, error, status: response.status };
     }
 
     if (needsRegistration) {
@@ -241,4 +247,8 @@ export async function reportLyrics(
   const data: Record<string, unknown> = { reason };
   if (details) data.details = details;
   return signedRequest<{ message: string } | null>(`/lyrics/${lyricsId}/report`, "POST", data);
+}
+
+export async function requestLyrics(request: UnisonLyricsRequest): Promise<ApiResult<UnisonRequestSuccess | null>> {
+  return signedRequest<UnisonRequestSuccess | null>("/requests", "POST", request as unknown as Record<string, unknown>);
 }
