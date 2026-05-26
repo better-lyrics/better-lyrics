@@ -593,7 +593,8 @@ function injectLyrics(data: LyricSourceResultWithMeta, keepLoaderVisible = false
       data.duration,
       data.providerKey,
       data.videoId,
-      unisonData
+      unisonData,
+      syncType === "none"
     );
   } else {
     addNoLyricsButton(data.song, data.artist, data.album, data.duration, data.videoId);
