@@ -13,6 +13,7 @@ import {
   HOMEPAGE_ICON_URL,
   HOMEPAGE_URL,
   LOADER_TRANSITION_ENDED,
+  LOG_PREFIX_UNISON,
   LYRICS_AD_OVERLAY_ID,
   LYRICS_CLASS,
   LYRICS_CONTENT_ID,
@@ -43,6 +44,9 @@ import {
   SCROLL_POS_OFFSET_RATIO,
   toMs,
 } from "@modules/ui/animationEngine";
+import { getRequest, setRequest } from "@modules/unison/lyricsRequestTracker";
+import type { UnisonLyricsRequest } from "@modules/unison/types";
+import { requestLyrics } from "@modules/unison/unisonApi";
 import { log } from "@utils";
 import { generatePetName } from "@/core/keyIdentity";
 import { byId, deleteVote, type UnisonData, vote } from "../lyrics/providers/unison";
@@ -411,6 +415,135 @@ export function setSourceSwitchAvailability(prevAvailable: boolean, nextAvailabl
   applySourceSwitchVisibility(AppState.currentProviderKey ?? undefined);
 }
 
+// -- Request Synced Version Button --------------------------
+
+interface RequestButtonMeta {
+  videoId: string;
+  song: string;
+  artist: string;
+}
+
+function thumbnailUrlFor(videoId: string): string {
+  return `https://i.ytimg.com/vi/${videoId}/hqdefault.jpg`;
+}
+
+function requestedLabel(requestCount: number): string {
+  if (requestCount <= 1) return t("lyrics_requestedFirst");
+  if (requestCount === 2) return t("lyrics_requestedOneOther");
+  return t("lyrics_requestedNOthers", String(requestCount - 1));
+}
+
+function errorLabelFor(status: number | undefined): string {
+  if (status === 429) return t("lyrics_requestErrorRateLimit");
+  if (status === undefined) return t("lyrics_requestErrorNetwork");
+  if (status >= 500) return t("lyrics_requestErrorServer");
+  return t("lyrics_requestErrorGeneric");
+}
+
+function createRequestSyncedButton(meta: RequestButtonMeta): HTMLElement {
+  const container = document.createElement("div");
+  container.className = `${FOOTER_CLASS}__container`;
+
+  const button = document.createElement("button");
+  button.type = "button";
+  button.style.height = "100%";
+  button.style.background = "none";
+  button.style.border = "none";
+  button.style.color = "inherit";
+  button.style.font = "inherit";
+  button.style.cursor = "pointer";
+  button.style.padding = "0";
+
+  const setLabel = (text: string) => {
+    button.textContent = text;
+  };
+
+  const setDisabled = (disabled: boolean) => {
+    button.disabled = disabled;
+    button.style.cursor = disabled ? "default" : "pointer";
+  };
+
+  let terminalState: "none" | "requested" | "landed" = "none";
+
+  const revertToIdle = () => {
+    setLabel(t("lyrics_requestSyncedVersion"));
+    setDisabled(false);
+  };
+
+  const showRequested = (requestCount: number) => {
+    terminalState = "requested";
+    setLabel(requestedLabel(requestCount));
+    setDisabled(true);
+  };
+
+  const showLanded = () => {
+    terminalState = "landed";
+    setLabel(t("lyrics_requestSyncedLanded"));
+    setDisabled(false);
+  };
+
+  const showErrorTemporarily = (text: string) => {
+    setLabel(text);
+    setDisabled(true);
+    window.setTimeout(() => {
+      if (terminalState === "none") revertToIdle();
+    }, 5000);
+  };
+
+  setLabel(t("lyrics_requestSyncedVersion"));
+  setDisabled(true);
+
+  getRequest(meta.videoId).then(entry => {
+    if (entry && terminalState === "none") {
+      showRequested(entry.requestCount);
+    } else if (terminalState === "none") {
+      setDisabled(false);
+    }
+  });
+
+  button.addEventListener("click", async () => {
+    if (terminalState === "landed") {
+      location.reload();
+      return;
+    }
+    if (terminalState === "requested") return;
+
+    setDisabled(true);
+
+    const submission: UnisonLyricsRequest = {
+      videoId: meta.videoId,
+      song: meta.song,
+      artist: meta.artist,
+      thumbnailUrl: thumbnailUrlFor(meta.videoId),
+    };
+
+    const result = await requestLyrics(submission);
+
+    if (!result.success || !result.data) {
+      console.warn(LOG_PREFIX_UNISON, "requestLyrics failed", {
+        videoId: meta.videoId,
+        status: result.status,
+        error: result.error,
+      });
+      showErrorTemporarily(errorLabelFor(result.status));
+      return;
+    }
+
+    const success = result.data;
+
+    if (success.status === "already_available") {
+      showLanded();
+      return;
+    }
+
+    await setRequest(meta.videoId, success.requestCount);
+    showRequested(success.requestCount);
+  });
+
+  container.appendChild(button);
+  return container;
+}
+
 let lyricsObserver: MutationObserver | null = null;
 let adStateObserver: MutationObserver | null = null;
 
@@ -519,7 +652,8 @@ export function addFooter(
   duration: number,
   providerKey?: string,
   videoId?: string,
-  unisonData?: UnisonData
+  unisonData?: UnisonData,
+  showRequestButton = false
 ): void {
   const existingFooter = document.getElementsByClassName(FOOTER_CLASS)[0];
   if (existingFooter) {
@@ -531,7 +665,7 @@ export function addFooter(
   const footer = document.createElement("div");
   footer.classList.add(FOOTER_CLASS);
   lyricsElement.appendChild(footer);
-  createFooter(song, artist, album, duration, videoId);
+  createFooter(song, artist, album, duration, videoId, showRequestButton);
   applyActionsBarPlacement(AppState.actionsBarAnchor, AppState.actionsBarPlacement);
 
   const footerLink = document.getElementById("betterLyricsFooterLink") as HTMLAnchorElement;
@@ -903,7 +1037,14 @@ function getTrustTier(reputation: number): "new" | "trusted" | "veteran" | "expe
  * @param album - Album name
  * @param duration - Song duration in seconds
  */
-function createFooter(song: string, artist: string, album: string, duration: number, videoId?: string): void {
+function createFooter(
+  song: string,
+  artist: string,
+  album: string,
+  duration: number,
+  videoId?: string,
+  showRequestButton = false
+): void {
   try {
     const footer = document.getElementsByClassName(FOOTER_CLASS)[0] as HTMLElement;
     footer.replaceChildren();
@@ -979,6 +1120,9 @@ function createFooter(song: string, artist: string, album: string, duration: num
           href: buildUnisonSubmitUrl(song, artist, album, duration, videoId).toString(),
         })
       );
+    }
+    if (videoId && showRequestButton) {
+      footer.appendChild(createRequestSyncedButton({ videoId, song, artist }));
     }
     footer.appendChild(discordLink);
 
@@ -1355,6 +1499,7 @@ export function addNoLyricsButton(
         href: buildUnisonSubmitUrl(song, artist, album, duration, videoId).toString(),
       })
     );
+    buttonContainer.appendChild(createRequestSyncedButton({ videoId, song, artist }));
   }
 
   lyricsWrapper.appendChild(buttonContainer);

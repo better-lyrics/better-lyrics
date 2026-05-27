@@ -6,6 +6,8 @@ import type {
   UnisonApiResponse,
   UnisonFeedEntry,
   UnisonLyricsEntry,
+  UnisonLyricsRequest,
+  UnisonRequestSuccess,
   UnisonSearchEntry,
   UnisonSubmission,
   VoteValue,
@@ -17,6 +19,7 @@ interface ApiResult<T> {
   success: boolean;
   data: T;
   error?: string;
+  status?: number;
 }
 
 async function signedRequest<T>(
@@ -65,7 +68,7 @@ async function signedRequest<T>(
       const errorData = cachedErrorBody ?? (await response.json().catch(() => null));
       const error = errorData?.error ?? `Request failed: ${response.status}`;
       console.warn(LOG_PREFIX_UNISON, error);
-      return { success: false, data: null as T, error };
+      return { success: false, data: null as T, error, status: response.status };
     }
 
     if (needsRegistration) {
@@ -244,4 +247,8 @@ export async function reportLyrics(
   const data: Record<string, unknown> = { reason };
   if (details) data.details = details;
   return signedRequest<{ message: string } | null>(`/lyrics/${lyricsId}/report`, "POST", data);
+}
+
+export async function requestLyrics(request: UnisonLyricsRequest): Promise<ApiResult<UnisonRequestSuccess | null>> {
+  return signedRequest<UnisonRequestSuccess | null>("/requests", "POST", request as unknown as Record<string, unknown>);
 }
