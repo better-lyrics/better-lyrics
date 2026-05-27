@@ -89,3 +89,16 @@ export type ReportReason = "wrong_song" | "bad_sync" | "offensive" | "spam" | "o
 export type UnisonFormat = "lrc" | "ttml" | "plain";
 export type UnisonSyncType = "richsync" | "linesync" | "plain";
 export type UnisonConfidence = "low" | "medium" | "high";
+
+// -- Request Types --------------------------
+
+export interface UnisonLyricsRequest {
+  videoId: string;
+  song: string;
+  artist: string;
+  thumbnailUrl: string;
+}
+
+export type UnisonRequestSuccess =
+  | { status: "created" | "already_requested"; requestCount: number; demand?: number }
+  | { status: "already_available" };

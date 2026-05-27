@@ -949,6 +949,48 @@
     "message": "Invia testi con Unison",
     "description": "Button text for submitting lyrics to Unison"
   },
+  "lyrics_requestSyncedVersion": {
+    "message": "Request a synced version",
+    "description": "Button label asking the community to contribute synced lyrics for the current song"
+  },
+  "lyrics_requestedFirst": {
+    "message": "Requested · you're the first",
+    "description": "Button label after a successful first-ever request for this song"
+  },
+  "lyrics_requestedOneOther": {
+    "message": "Requested · 1 other wants this",
+    "description": "Button label after a successful request when exactly one other person has also requested"
+  },
+  "lyrics_requestedNOthers": {
+    "message": "Requested · $N$ others want this",
+    "description": "Button label after a successful request when N other people have also requested",
+    "placeholders": {
+      "n": {
+        "content": "$1",
+        "example": "12"
+      }
+    }
+  },
+  "lyrics_requestErrorRateLimit": {
+    "message": "Try again in a minute",
+    "description": "Button label shown briefly when the request is rate-limited"
+  },
+  "lyrics_requestErrorNetwork": {
+    "message": "Couldn't reach Unison",
+    "description": "Button label shown briefly when the request fails for a transport/network reason (no HTTP response received)"
+  },
+  "lyrics_requestErrorServer": {
+    "message": "Unison is having trouble",
+    "description": "Button label shown briefly when the request fails with a 5xx server error"
+  },
+  "lyrics_requestErrorGeneric": {
+    "message": "Couldn't send the request",
+    "description": "Button label shown briefly when the request fails for any other reason (catch-all)"
+  },
+  "lyrics_requestSyncedLanded": {
+    "message": "Synced version available. Refresh.",
+    "description": "Button label when the server reports a synced version already exists; clicking reloads the page"
+  },
   "unison_pageTitle": {
     "message": "Unison - Better Lyrics",
     "description": "Page title for the Unison dashboard"
