@@ -1199,8 +1199,8 @@
     "description": "Identity label prefix"
   },
   "unison_loadMore": {
-    "message": "Load more",
-    "description": "Load more button for feed pagination"
+    "message": "Loading more...",
+    "description": "Auto-loading indicator shown at the bottom of the feed while the next page is being fetched"
   },
   "unison_votes": {
     "message": "votes",
@@ -1321,6 +1321,10 @@
   "unison_noSubmissions": {
     "message": "You haven't submitted any lyrics yet.",
     "description": "Empty state for my submissions tab"
+  },
+  "unison_noFilterResults": {
+    "message": "No lyrics match your filters",
+    "description": "Empty state shown when the active sort/filter combination returns no entries"
   },
   "unison_sync": {
     "message": "Sync",

@@ -37,8 +37,24 @@ const ICONS = {
   confidenceUnverified: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><g fill="none"><path fill-rule="evenodd" clip-rule="evenodd" d="M2 12C2 6.477 6.477 2 12 2s10 4.477 10 10s-4.477 10-10 10S2 17.523 2 12zm10-5a2 2 0 0 0-2 2a1 1 0 0 1-2 0a4 4 0 1 1 5.31 3.78a.674.674 0 0 0-.273.169a.177.177 0 0 0-.037.054v.497a1 1 0 1 1-2 0V13c0-1.152.924-1.856 1.655-2.11A2.001 2.001 0 0 0 12 7zm1 6.007v-.004v.004zM13 17a1 1 0 1 1-2 0a1 1 0 0 1 2 0z" fill="currentColor"/></g></svg>`,
   confidenceTrusted: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="currentColor" d="m11.998 2l.118.007l.059.008l.061.013l.111.034a1 1 0 0 1 .217.112l.104.082l.255.218a11 11 0 0 0 7.189 2.537l.342-.01a1 1 0 0 1 1.005.717a13 13 0 0 1-9.208 16.25a1 1 0 0 1-.502 0A13 13 0 0 1 2.54 5.718a1 1 0 0 1 1.005-.717a11 11 0 0 0 7.531-2.527l.263-.225l.096-.075a1 1 0 0 1 .217-.112l.112-.034a1 1 0 0 1 .119-.021zm3.71 7.293a1 1 0 0 0-1.415 0L11 12.585l-1.293-1.292l-.094-.083a1 1 0 0 0-1.32 1.497l2 2l.094.083a1 1 0 0 0 1.32-.083l4-4l.083-.094a1 1 0 0 0-.083-1.32z"/></svg>`,
   confidenceTopRated: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="currentColor" d="m12 14.475l1.925 1.15q.275.175.538-.012t.187-.513l-.5-2.175l1.7-1.475q.25-.225.15-.537t-.45-.338l-2.225-.175l-.875-2.075q-.125-.3-.45-.3t-.45.3l-.875 2.075l-2.225.175q-.35.025-.45.338t.15.537l1.7 1.475l-.5 2.175q-.075.325.188.513t.537.012zM8.65 20H6q-.825 0-1.412-.587T4 18v-2.65L2.075 13.4q-.275-.3-.425-.662T1.5 12t.15-.737t.425-.663L4 8.65V6q0-.825.588-1.412T6 4h2.65l1.95-1.925q.3-.275.663-.425T12 1.5t.738.15t.662.425L15.35 4H18q.825 0 1.413.588T20 6v2.65l1.925 1.95q.275.3.425.663t.15.737t-.15.738t-.425.662L20 15.35V18q0 .825-.587 1.413T18 20h-2.65l-1.95 1.925q-.3.275-.662.425T12 22.5t-.737-.15t-.663-.425z"/></svg>`,
-  sortDirection: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="currentColor" d="M12 16l-6-6h12z"/></svg>`,
 } as const;
+
+const SORT_ICON_PATH = {
+  desc: "m278.6 438.6l-96 96c-12.5 12.5-32.8 12.5-45.3 0l-96-96c-12.5-12.5-12.5-32.8 0-45.3s32.8-12.5 45.3 0l41.4 41.4V128c0-17.7 14.3-32 32-32s32 14.3 32 32v306.7l41.4-41.4c12.5-12.5 32.8-12.5 45.3 0s12.5 32.8 0 45.3zM352 544c-17.7 0-32-14.3-32-32s14.3-32 32-32h32c17.7 0 32 14.3 32 32s-14.3 32-32 32zm0-128c-17.7 0-32-14.3-32-32s14.3-32 32-32h96c17.7 0 32 14.3 32 32s-14.3 32-32 32zm0-128c-17.7 0-32-14.3-32-32s14.3-32 32-32h160c17.7 0 32 14.3 32 32s-14.3 32-32 32zm0-128c-17.7 0-32-14.3-32-32s14.3-32 32-32h224c17.7 0 32 14.3 32 32s-14.3 32-32 32z",
+  asc: "M352 96c-17.7 0-32 14.3-32 32s14.3 32 32 32h32c17.7 0 32-14.3 32-32s-14.3-32-32-32zm0 128c-17.7 0-32 14.3-32 32s14.3 32 32 32h96c17.7 0 32-14.3 32-32s-14.3-32-32-32zm0 128c-17.7 0-32 14.3-32 32s14.3 32 32 32h160c17.7 0 32-14.3 32-32s-14.3-32-32-32zm0 128c-17.7 0-32 14.3-32 32s14.3 32 32 32h224c17.7 0 32-14.3 32-32s-14.3-32-32-32zM182.6 105.4c-12.5-12.5-32.8-12.5-45.3 0l-96 96c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0l41.4-41.4V512c0 17.7 14.3 32 32 32s32-14.3 32-32V205.3l41.4 41.4c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3l-96-96z",
+} as const;
+
+function createSortIcon(direction: "desc" | "asc"): SVGSVGElement {
+  const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+  svg.setAttribute("viewBox", "0 0 640 640");
+  svg.setAttribute("aria-hidden", "true");
+  svg.classList.add("sort-direction-icon");
+  const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+  path.setAttribute("fill", "currentColor");
+  path.setAttribute("d", SORT_ICON_PATH[direction]);
+  svg.appendChild(path);
+  return svg;
+}
 
 const iconParser = new DOMParser();
 
@@ -64,7 +80,7 @@ let viewSubmit: HTMLElement;
 let resultsGrid: HTMLElement;
 let noResults: HTMLElement;
 let feedContainer: HTMLElement;
-let feedMoreBtn: HTMLButtonElement;
+let feedMoreBtn: HTMLElement;
 let filterBar: HTMLElement;
 let filterLanguageSelect: HTMLSelectElement;
 let detailMeta: HTMLElement;
@@ -233,7 +249,7 @@ export function initUnisonPage(): void {
   resultsGrid = document.getElementById("unison-results-grid") as HTMLElement;
   noResults = document.getElementById("unison-no-results") as HTMLElement;
   feedContainer = document.getElementById("unison-feed") as HTMLElement;
-  feedMoreBtn = document.getElementById("unison-feed-more") as HTMLButtonElement;
+  feedMoreBtn = document.getElementById("unison-feed-more") as HTMLElement;
   filterBar = document.getElementById("unison-filters") as HTMLElement;
   filterLanguageSelect = document.getElementById("unison-filter-language") as HTMLSelectElement;
   detailMeta = document.getElementById("unison-detail-meta") as HTMLElement;
@@ -324,30 +340,24 @@ const LANGUAGE_OPTIONS = ["en", "ja", "ko", "es", "fr", "de", "it", "pt", "zh", 
 function setupFilterBar(): void {
   populateLanguageOptions();
 
-  for (const chip of filterBar.querySelectorAll<HTMLLabelElement>(".unison-filter-chip--sort")) {
-    const iconSlot = chip.querySelector(".unison-filter-chip__icon");
-    if (iconSlot) iconSlot.replaceChildren(svgIcon("sortDirection"));
-  }
-
   filterBar.querySelectorAll<HTMLLabelElement>(".unison-filter-chip--sort").forEach(chip => {
     chip.addEventListener("click", e => {
-      const input = chip.querySelector<HTMLInputElement>('input[type="radio"]');
-      if (!input || !input.checked) return;
       e.preventDefault();
+      const input = chip.querySelector<HTMLInputElement>('input[type="radio"]');
+      if (!input) return;
       const cache = feedTabCache[activeFeedTab];
-      cache.filters.sortDir = cache.filters.sortDir === "desc" ? "asc" : "desc";
-      renderFilterBarFromActiveTab();
-      onFilterChange();
-    });
-  });
-
-  filterBar.querySelectorAll<HTMLInputElement>('input[name="unison-filter-sort"]').forEach(input => {
-    input.addEventListener("change", () => {
-      if (!input.checked) return;
-      const cache = feedTabCache[activeFeedTab];
-      cache.filters.sort = input.value as FeedFilters["sort"];
-      cache.filters.sortDir = "desc";
-      renderFilterBarFromActiveTab();
+      let animateDirChange = false;
+      if (cache.filters.sort !== input.value) {
+        cache.filters.sort = input.value as FeedFilters["sort"];
+        cache.filters.sortDir = "desc";
+      } else if (cache.filters.sortDir === "desc") {
+        cache.filters.sortDir = "asc";
+        animateDirChange = true;
+      } else {
+        cache.filters.sort = "default";
+        cache.filters.sortDir = "desc";
+      }
+      renderFilterBarFromActiveTab(animateDirChange);
       onFilterChange();
     });
   });
@@ -358,11 +368,16 @@ function setupFilterBar(): void {
     ["unison-filter-format", "format"],
   ];
   for (const [name, key] of radioGroups) {
-    filterBar.querySelectorAll<HTMLInputElement>(`input[name="${name}"]`).forEach(input => {
-      input.addEventListener("change", () => {
-        if (!input.checked) return;
+    filterBar.querySelectorAll<HTMLLabelElement>(`.unison-filter-chip:has(input[name="${name}"])`).forEach(chip => {
+      chip.addEventListener("click", e => {
+        e.preventDefault();
+        const input = chip.querySelector<HTMLInputElement>('input[type="radio"]');
+        if (!input) return;
         const cache = feedTabCache[activeFeedTab];
-        (cache.filters[key] as string) = input.value;
+        const current = cache.filters[key] as string;
+        const next = current === input.value && input.value !== "all" ? "all" : input.value;
+        (cache.filters[key] as string) = next;
+        renderFilterBarFromActiveTab();
         onFilterChange();
       });
     });
@@ -401,23 +416,25 @@ function onFilterChange(): void {
   void loadActiveTabPage();
 }
 
-function renderFilterBarFromActiveTab(): void {
+function renderFilterBarFromActiveTab(animateSort = false): void {
   const filters = feedTabCache[activeFeedTab].filters;
 
-  filterBar.querySelectorAll<HTMLInputElement>('input[name="unison-filter-sort"]').forEach(input => {
-    input.checked = filters.sort !== "default" && input.value === filters.sort;
-  });
   for (const chip of filterBar.querySelectorAll<HTMLLabelElement>(".unison-filter-chip--sort")) {
     const input = chip.querySelector<HTMLInputElement>('input[type="radio"]');
+    const iconSlot = chip.querySelector(".unison-filter-chip__icon");
     const labelEl = chip.querySelector(".unison-filter-chip__label");
-    if (!input || !labelEl) continue;
-    if (input.checked) {
-      chip.dataset.direction = filters.sortDir;
+    if (!input || !iconSlot || !labelEl) continue;
+    const isSelected = filters.sort !== "default" && input.value === filters.sort;
+    input.checked = isSelected;
+    iconSlot.replaceChildren();
+    if (isSelected) {
+      const icon = createSortIcon(filters.sortDir);
+      if (animateSort) icon.classList.add("sort-direction-icon--animate");
+      iconSlot.appendChild(icon);
       const labelText = filters.sortDir === "asc" ? chip.dataset.labelAsc : chip.dataset.labelDesc;
       if (labelText) labelEl.textContent = labelText;
-    } else {
-      delete chip.dataset.direction;
-      if (chip.dataset.labelDesc) labelEl.textContent = chip.dataset.labelDesc;
+    } else if (chip.dataset.labelDesc) {
+      labelEl.textContent = chip.dataset.labelDesc;
     }
   }
 
@@ -519,6 +536,30 @@ function updateTabActiveState(): void {
 
 // -- Feed --------------------------
 
+function isDefaultFilters(filters: FeedFilters): boolean {
+  return (
+    filters.sort === DEFAULT_FEED_FILTERS.sort &&
+    filters.sortDir === DEFAULT_FEED_FILTERS.sortDir &&
+    filters.syncType === DEFAULT_FEED_FILTERS.syncType &&
+    filters.tier === DEFAULT_FEED_FILTERS.tier &&
+    filters.format === DEFAULT_FEED_FILTERS.format &&
+    filters.language === DEFAULT_FEED_FILTERS.language
+  );
+}
+
+function createFeedEmptyState(tab: FeedTabName, filters: FeedFilters): HTMLElement {
+  const wrap = document.createElement("div");
+  wrap.className = "unison-empty-state";
+  const p = document.createElement("p");
+  if (isDefaultFilters(filters)) {
+    p.textContent = tab === "mine" ? t("unison_noSubmissions") : t("unison_noFilterResults");
+  } else {
+    p.textContent = t("unison_noFilterResults");
+  }
+  wrap.appendChild(p);
+  return wrap;
+}
+
 async function loadMySubmissions(): Promise<void> {
   const cache = feedTabCache.mine;
   if (cache.loading || !cache.hasMore) return;
@@ -532,12 +573,7 @@ async function loadMySubmissions(): Promise<void> {
 
     if (entries.length === 0) {
       if (cursor === undefined) {
-        const empty = document.createElement("div");
-        empty.className = "unison-empty-state";
-        const p = document.createElement("p");
-        p.textContent = t("unison_noSubmissions");
-        empty.appendChild(p);
-        appendToTab("mine", empty);
+        appendToTab("mine", createFeedEmptyState("mine", cache.filters));
       }
       cache.hasMore = false;
       cache.loaded = true;
@@ -566,6 +602,9 @@ async function loadFeed(): Promise<void> {
     const result = await getFeed(cursor, cache.filters);
 
     if (!result.success || result.data.entries.length === 0) {
+      if (cursor === undefined && result.success) {
+        appendToTab("recent", createFeedEmptyState("recent", cache.filters));
+      }
       cache.hasMore = false;
       cache.loaded = true;
       return;
