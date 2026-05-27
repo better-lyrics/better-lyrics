@@ -428,6 +428,10 @@ function formatRelativeTime(timestampSec: number): string {
   return `${days}d ago`;
 }
 
+function formatScoreNumber(score: number): string {
+  return Number.isInteger(score) ? score.toString() : score.toFixed(2);
+}
+
 // -- Lyrics Card --------------------------
 
 interface LyricsCardOptions {
@@ -498,7 +502,7 @@ function createLyricsCard(entry: UnisonSearchEntry | UnisonFeedEntry, options: L
 
   const score = document.createElement("span");
   score.className = "unison-card-score";
-  score.textContent = `${entry.effectiveScore >= 0 ? "+" : ""}${entry.effectiveScore}`;
+  score.textContent = `${entry.effectiveScore >= 0 ? "+" : ""}${formatScoreNumber(entry.effectiveScore)}`;
 
   const sep = document.createElement("span");
   sep.className = "unison-card-sep";
@@ -614,7 +618,7 @@ function renderDetail(entry: UnisonLyricsEntry, isOwn: boolean = false): void {
 
   const scoreText = document.createElement("span");
   scoreText.className = "unison-detail-score";
-  scoreText.textContent = String(entry.effectiveScore);
+  scoreText.textContent = formatScoreNumber(entry.effectiveScore);
 
   const voteText = document.createElement("span");
   voteText.className = "unison-detail-votes";
