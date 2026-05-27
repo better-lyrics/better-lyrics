@@ -1,7 +1,9 @@
 import { LOG_PREFIX_UNISON, UNISON_API_BASE_URL } from "@constants";
 import { getIdentity, isKeyRegistered, markKeyRegistered, signPayload } from "@/core/keyIdentity";
 import { fetchWithTimeout } from "@/options/store/themeStoreService";
+import { DEFAULT_FEED_FILTERS } from "./types";
 import type {
+  FeedFilters,
   ReportReason,
   UnisonApiResponse,
   UnisonFeedEntry,
@@ -109,13 +111,24 @@ interface FeedResponse {
   nextCursor?: number;
 }
 
+function appendFeedFilterParams(params: URLSearchParams, filters: FeedFilters): void {
+  if (filters.sort !== DEFAULT_FEED_FILTERS.sort) params.set("sort", filters.sort);
+  if (filters.sortDir !== DEFAULT_FEED_FILTERS.sortDir) params.set("sortDir", filters.sortDir);
+  if (filters.syncType !== DEFAULT_FEED_FILTERS.syncType) params.set("syncType", filters.syncType);
+  if (filters.tier !== DEFAULT_FEED_FILTERS.tier) params.set("tier", filters.tier);
+  if (filters.format !== DEFAULT_FEED_FILTERS.format) params.set("format", filters.format);
+  if (filters.language !== DEFAULT_FEED_FILTERS.language) params.set("language", filters.language);
+}
+
 export async function getFeed(
-  cursor?: number
+  cursor?: number,
+  filters: FeedFilters = DEFAULT_FEED_FILTERS
 ): Promise<ApiResult<{ entries: UnisonFeedEntry[]; nextCursor?: number }>> {
   try {
     const params = new URLSearchParams();
     if (cursor !== undefined) params.set("cursor", String(cursor));
     params.set("limit", "20");
+    appendFeedFilterParams(params, filters);
 
     const headers: Record<string, string> = {};
     try {
@@ -140,12 +153,14 @@ export async function getFeed(
 }
 
 export async function getMySubmissions(
-  cursor?: number
+  cursor?: number,
+  filters: FeedFilters = DEFAULT_FEED_FILTERS
 ): Promise<ApiResult<{ entries: UnisonFeedEntry[]; nextCursor?: number }>> {
   try {
     const params = new URLSearchParams();
     if (cursor !== undefined) params.set("cursor", String(cursor));
     params.set("limit", "20");
+    appendFeedFilterParams(params, filters);
 
     const headers: Record<string, string> = {};
     try {

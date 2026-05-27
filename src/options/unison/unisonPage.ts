@@ -1,13 +1,15 @@
 import { XMLParser } from "fast-xml-parser";
 import { LOG_PREFIX_UNISON } from "@constants";
 import { t } from "@core/i18n";
-import type {
-  ReportReason,
-  UnisonFeedEntry,
-  UnisonFormat,
-  UnisonLyricsEntry,
-  UnisonSearchEntry,
-  VoteValue,
+import {
+  DEFAULT_FEED_FILTERS,
+  type FeedFilters,
+  type ReportReason,
+  type UnisonFeedEntry,
+  type UnisonFormat,
+  type UnisonLyricsEntry,
+  type UnisonSearchEntry,
+  type VoteValue,
 } from "@modules/unison/types";
 import {
   castVote,
@@ -32,9 +34,19 @@ const ICONS = {
   externalLink: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6H6a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-6m-7 1l9-9m-5 0h5v5"/></svg>`,
   back: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="currentColor" d="m9.55 12l7.35 7.35q.375.375.363.875t-.388.875t-.875.375t-.875-.375l-7.7-7.675q-.3-.3-.45-.675t-.15-.75t.15-.75t.45-.675l7.7-7.7q.375-.375.888-.363t.887.388t.375.875t-.375.875z"/></svg>`,
   trash: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="currentColor" d="M3 6.386c0-.484.345-.877.771-.877h2.665c.529-.016.996-.399 1.176-.965l.03-.1l.115-.391c.07-.24.131-.45.217-.637c.338-.739.964-1.252 1.687-1.383c.184-.033.378-.033.6-.033h3.478c.223 0 .417 0 .6.033c.723.131 1.35.644 1.687 1.383c.086.187.147.396.218.637l.114.391l.03.1c.18.566.74.95 1.27.965h2.57c.427 0 .772.393.772.877s-.345.877-.771.877H3.77c-.425 0-.77-.393-.77-.877"/><path fill="currentColor" fill-rule="evenodd" d="M9.425 11.482c.413-.044.78.273.821.707l.5 5.263c.041.433-.26.82-.671.864c-.412.043-.78-.273-.821-.707l-.5-5.263c-.041-.434.26-.821.671-.864m5.15 0c.412.043.713.43.671.864l-.5 5.263c-.04.434-.408.75-.82.707c-.413-.044-.713-.43-.672-.864l.5-5.264c.041-.433.409-.75.82-.707" clip-rule="evenodd"/><path fill="currentColor" d="M11.596 22h.808c2.783 0 4.174 0 5.08-.886c.904-.886.996-2.339 1.181-5.245l.267-4.188c.1-1.577.15-2.366-.303-2.865c-.454-.5-1.22-.5-2.753-.5H8.124c-1.533 0-2.3 0-2.753.5s-.404 1.288-.303 2.865l.267 4.188c.185 2.906.277 4.36 1.182 5.245c.905.886 2.296.886 5.079.886" opacity=".5"/></svg>`,
+  confidenceUnverified: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><g fill="none"><path fill-rule="evenodd" clip-rule="evenodd" d="M2 12C2 6.477 6.477 2 12 2s10 4.477 10 10s-4.477 10-10 10S2 17.523 2 12zm10-5a2 2 0 0 0-2 2a1 1 0 0 1-2 0a4 4 0 1 1 5.31 3.78a.674.674 0 0 0-.273.169a.177.177 0 0 0-.037.054v.497a1 1 0 1 1-2 0V13c0-1.152.924-1.856 1.655-2.11A2.001 2.001 0 0 0 12 7zm1 6.007v-.004v.004zM13 17a1 1 0 1 1-2 0a1 1 0 0 1 2 0z" fill="currentColor"/></g></svg>`,
+  confidenceTrusted: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="currentColor" d="m11.998 2l.118.007l.059.008l.061.013l.111.034a1 1 0 0 1 .217.112l.104.082l.255.218a11 11 0 0 0 7.189 2.537l.342-.01a1 1 0 0 1 1.005.717a13 13 0 0 1-9.208 16.25a1 1 0 0 1-.502 0A13 13 0 0 1 2.54 5.718a1 1 0 0 1 1.005-.717a11 11 0 0 0 7.531-2.527l.263-.225l.096-.075a1 1 0 0 1 .217-.112l.112-.034a1 1 0 0 1 .119-.021zm3.71 7.293a1 1 0 0 0-1.415 0L11 12.585l-1.293-1.292l-.094-.083a1 1 0 0 0-1.32 1.497l2 2l.094.083a1 1 0 0 0 1.32-.083l4-4l.083-.094a1 1 0 0 0-.083-1.32z"/></svg>`,
+  confidenceTopRated: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="currentColor" d="m12 14.475l1.925 1.15q.275.175.538-.012t.187-.513l-.5-2.175l1.7-1.475q.25-.225.15-.537t-.45-.338l-2.225-.175l-.875-2.075q-.125-.3-.45-.3t-.45.3l-.875 2.075l-2.225.175q-.35.025-.45.338t.15.537l1.7 1.475l-.5 2.175q-.075.325.188.513t.537.012zM8.65 20H6q-.825 0-1.412-.587T4 18v-2.65L2.075 13.4q-.275-.3-.425-.662T1.5 12t.15-.737t.425-.663L4 8.65V6q0-.825.588-1.412T6 4h2.65l1.95-1.925q.3-.275.663-.425T12 1.5t.738.15t.662.425L15.35 4H18q.825 0 1.413.588T20 6v2.65l1.925 1.95q.275.3.425.663t.15.737t-.15.738t-.425.662L20 15.35V18q0 .825-.587 1.413T18 20h-2.65l-1.95 1.925q-.3.275-.662.425T12 22.5t-.737-.15t-.663-.425z"/></svg>`,
+  sortDirection: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="currentColor" d="M12 16l-6-6h12z"/></svg>`,
 } as const;
 
 const iconParser = new DOMParser();
+
+const CONFIDENCE_ICON_KEY = {
+  low: "confidenceUnverified",
+  medium: "confidenceTrusted",
+  high: "confidenceTopRated",
+} as const satisfies Record<"low" | "medium" | "high", keyof typeof ICONS>;
 
 function svgIcon(key: keyof typeof ICONS): SVGSVGElement {
   const doc = iconParser.parseFromString(ICONS[key], "image/svg+xml");
@@ -53,6 +65,8 @@ let resultsGrid: HTMLElement;
 let noResults: HTMLElement;
 let feedContainer: HTMLElement;
 let feedMoreBtn: HTMLButtonElement;
+let filterBar: HTMLElement;
+let filterLanguageSelect: HTMLSelectElement;
 let detailMeta: HTMLElement;
 let detailPreview: HTMLElement;
 let detailLyrics: HTMLElement;
@@ -65,8 +79,37 @@ let composerLink: HTMLAnchorElement;
 
 // -- Feed State --------------------------
 
-let feedNextCursor: number | undefined;
-let activeFeedTab: "recent" | "mine" = "recent";
+type FeedTabName = "recent" | "mine";
+
+interface FeedTabCache {
+  fragment: DocumentFragment;
+  cursor: number | undefined;
+  hasMore: boolean;
+  loaded: boolean;
+  loading: boolean;
+  scrollY: number;
+  filters: FeedFilters;
+}
+
+function createEmptyFeedTabCache(filters: FeedFilters = { ...DEFAULT_FEED_FILTERS }): FeedTabCache {
+  return {
+    fragment: document.createDocumentFragment(),
+    cursor: undefined,
+    hasMore: true,
+    loaded: false,
+    loading: false,
+    scrollY: 0,
+    filters,
+  };
+}
+
+const feedTabCache: Record<FeedTabName, FeedTabCache> = {
+  recent: createEmptyFeedTabCache(),
+  mine: createEmptyFeedTabCache(),
+};
+
+let activeFeedTab: FeedTabName = "recent";
+let feedSentinelObserver: IntersectionObserver | undefined;
 
 // -- Dev Stub --------------------------
 
@@ -171,18 +214,12 @@ function routeFromParams(): void {
   showView("search");
   searchInput.value = "";
 
-  const tab = params.get("tab");
-  if (tab === "mine") {
-    activeFeedTab = "mine";
+  const requestedTab: FeedTabName = params.get("tab") === "mine" ? "mine" : "recent";
+  if (!feedContainer.hidden && requestedTab !== activeFeedTab) {
+    switchTab(requestedTab);
   } else {
-    activeFeedTab = "recent";
-  }
-
-  showFeed();
-  if (activeFeedTab === "mine") {
-    loadMySubmissions();
-  } else {
-    loadFeed();
+    activeFeedTab = requestedTab;
+    showFeed();
   }
 }
 
@@ -197,6 +234,8 @@ export function initUnisonPage(): void {
   noResults = document.getElementById("unison-no-results") as HTMLElement;
   feedContainer = document.getElementById("unison-feed") as HTMLElement;
   feedMoreBtn = document.getElementById("unison-feed-more") as HTMLButtonElement;
+  filterBar = document.getElementById("unison-filters") as HTMLElement;
+  filterLanguageSelect = document.getElementById("unison-filter-language") as HTMLSelectElement;
   detailMeta = document.getElementById("unison-detail-meta") as HTMLElement;
   detailPreview = document.getElementById("unison-detail-preview") as HTMLElement;
   detailLyrics = document.getElementById("unison-detail-lyrics") as HTMLElement;
@@ -208,6 +247,8 @@ export function initUnisonPage(): void {
   composerLink = document.getElementById("unison-composer-link") as HTMLAnchorElement;
 
   setupFeedTabs();
+  setupFilterBar();
+  setupFilterShortcuts();
   setupSearch();
   setupFeedMore();
   setupSubmitForm();
@@ -237,21 +278,205 @@ async function loadIdentity(): Promise<void> {
 
 function showFeed(): void {
   feedContainer.hidden = false;
-  feedContainer.replaceChildren();
-  feedNextCursor = undefined;
-  feedMoreBtn.hidden = true;
+  filterBar.hidden = false;
   resultsGrid.hidden = true;
   resultsGrid.replaceChildren();
   noResults.hidden = true;
   updateTabActiveState();
+  applyActiveTabContent();
 }
 
 function showSearchResults(): void {
+  saveActiveTabContent();
   feedContainer.hidden = true;
   feedContainer.replaceChildren();
   feedMoreBtn.hidden = true;
+  filterBar.hidden = true;
   resultsGrid.hidden = false;
   noResults.hidden = true;
+}
+
+function saveActiveTabContent(): void {
+  if (feedContainer.hidden) return;
+  const cache = feedTabCache[activeFeedTab];
+  cache.scrollY = window.scrollY;
+  while (feedContainer.firstChild) {
+    cache.fragment.appendChild(feedContainer.firstChild);
+  }
+}
+
+function applyActiveTabContent(): void {
+  const cache = feedTabCache[activeFeedTab];
+  feedContainer.replaceChildren(cache.fragment);
+  renderFilterBarFromActiveTab();
+  updateSentinel();
+  if (!cache.loaded) {
+    void loadActiveTabPage();
+  } else {
+    window.scrollTo({ top: cache.scrollY });
+  }
+}
+
+// -- Filter Bar --------------------------
+
+const LANGUAGE_OPTIONS = ["en", "ja", "ko", "es", "fr", "de", "it", "pt", "zh", "ru", "hi"];
+
+function setupFilterBar(): void {
+  populateLanguageOptions();
+
+  for (const chip of filterBar.querySelectorAll<HTMLLabelElement>(".unison-filter-chip--sort")) {
+    const iconSlot = chip.querySelector(".unison-filter-chip__icon");
+    if (iconSlot) iconSlot.replaceChildren(svgIcon("sortDirection"));
+  }
+
+  filterBar.querySelectorAll<HTMLLabelElement>(".unison-filter-chip--sort").forEach(chip => {
+    chip.addEventListener("click", e => {
+      const input = chip.querySelector<HTMLInputElement>('input[type="radio"]');
+      if (!input || !input.checked) return;
+      e.preventDefault();
+      const cache = feedTabCache[activeFeedTab];
+      cache.filters.sortDir = cache.filters.sortDir === "desc" ? "asc" : "desc";
+      renderFilterBarFromActiveTab();
+      onFilterChange();
+    });
+  });
+
+  filterBar.querySelectorAll<HTMLInputElement>('input[name="unison-filter-sort"]').forEach(input => {
+    input.addEventListener("change", () => {
+      if (!input.checked) return;
+      const cache = feedTabCache[activeFeedTab];
+      cache.filters.sort = input.value as FeedFilters["sort"];
+      cache.filters.sortDir = "desc";
+      renderFilterBarFromActiveTab();
+      onFilterChange();
+    });
+  });
+
+  const radioGroups: ReadonlyArray<readonly [string, keyof FeedFilters]> = [
+    ["unison-filter-sync", "syncType"],
+    ["unison-filter-tier", "tier"],
+    ["unison-filter-format", "format"],
+  ];
+  for (const [name, key] of radioGroups) {
+    filterBar.querySelectorAll<HTMLInputElement>(`input[name="${name}"]`).forEach(input => {
+      input.addEventListener("change", () => {
+        if (!input.checked) return;
+        const cache = feedTabCache[activeFeedTab];
+        (cache.filters[key] as string) = input.value;
+        onFilterChange();
+      });
+    });
+  }
+
+  filterLanguageSelect.addEventListener("change", () => {
+    const cache = feedTabCache[activeFeedTab];
+    cache.filters.language = filterLanguageSelect.value;
+    onFilterChange();
+  });
+}
+
+function populateLanguageOptions(): void {
+  let displayNames: Intl.DisplayNames | null = null;
+  try {
+    displayNames = new Intl.DisplayNames(undefined, { type: "language" });
+  } catch {
+    displayNames = null;
+  }
+  for (const code of LANGUAGE_OPTIONS) {
+    const opt = document.createElement("option");
+    opt.value = code;
+    opt.textContent = displayNames?.of(code) ?? code;
+    filterLanguageSelect.appendChild(opt);
+  }
+}
+
+function onFilterChange(): void {
+  const cache = feedTabCache[activeFeedTab];
+  cache.cursor = undefined;
+  cache.hasMore = true;
+  cache.loaded = false;
+  cache.scrollY = 0;
+  while (cache.fragment.firstChild) cache.fragment.removeChild(cache.fragment.firstChild);
+  if (!feedContainer.hidden) feedContainer.replaceChildren();
+  void loadActiveTabPage();
+}
+
+function renderFilterBarFromActiveTab(): void {
+  const filters = feedTabCache[activeFeedTab].filters;
+
+  filterBar.querySelectorAll<HTMLInputElement>('input[name="unison-filter-sort"]').forEach(input => {
+    input.checked = filters.sort !== "default" && input.value === filters.sort;
+  });
+  for (const chip of filterBar.querySelectorAll<HTMLLabelElement>(".unison-filter-chip--sort")) {
+    const input = chip.querySelector<HTMLInputElement>('input[type="radio"]');
+    const labelEl = chip.querySelector(".unison-filter-chip__label");
+    if (!input || !labelEl) continue;
+    if (input.checked) {
+      chip.dataset.direction = filters.sortDir;
+      const labelText = filters.sortDir === "asc" ? chip.dataset.labelAsc : chip.dataset.labelDesc;
+      if (labelText) labelEl.textContent = labelText;
+    } else {
+      delete chip.dataset.direction;
+      if (chip.dataset.labelDesc) labelEl.textContent = chip.dataset.labelDesc;
+    }
+  }
+
+  setFilterRadio("unison-filter-sync", filters.syncType);
+  setFilterRadio("unison-filter-tier", filters.tier);
+  setFilterRadio("unison-filter-format", filters.format);
+
+  filterLanguageSelect.value = filters.language;
+}
+
+function setFilterRadio(name: string, value: string): void {
+  filterBar.querySelectorAll<HTMLInputElement>(`input[name="${name}"]`).forEach(input => {
+    input.checked = input.value === value;
+  });
+}
+
+function setupFilterShortcuts(): void {
+  const shortcutMap = new Map<string, HTMLLabelElement>();
+  for (const chip of filterBar.querySelectorAll<HTMLLabelElement>(".unison-filter-chip")) {
+    const kbd = chip.querySelector("kbd");
+    if (!kbd?.textContent) continue;
+    shortcutMap.set(kbd.textContent.trim().toUpperCase(), chip);
+  }
+
+  document.addEventListener("keydown", e => {
+    if (isInputFocused()) return;
+    if (e.metaKey || e.ctrlKey || e.altKey) return;
+    if (filterBar.hidden) return;
+    const chip = shortcutMap.get(e.key.toUpperCase());
+    if (!chip) return;
+    e.preventDefault();
+    chip.click();
+  });
+}
+
+function loadActiveTabPage(): Promise<void> {
+  return activeFeedTab === "mine" ? loadMySubmissions() : loadFeed();
+}
+
+function updateSentinel(): void {
+  const cache = feedTabCache[activeFeedTab];
+  feedMoreBtn.hidden = !cache.hasMore || !cache.loaded;
+  if (feedMoreBtn.hidden || cache.loading) return;
+  requestAnimationFrame(() => {
+    const current = feedTabCache[activeFeedTab];
+    if (feedMoreBtn.hidden || current.loading || !current.hasMore) return;
+    const rect = feedMoreBtn.getBoundingClientRect();
+    if (rect.top < window.innerHeight + 200) {
+      void loadActiveTabPage();
+    }
+  });
+}
+
+function appendToTab(tab: FeedTabName, node: Node): void {
+  if (tab === activeFeedTab && !feedContainer.hidden) {
+    feedContainer.appendChild(node);
+  } else {
+    feedTabCache[tab].fragment.appendChild(node);
+  }
 }
 
 // -- Feed Tabs --------------------------
@@ -266,26 +491,25 @@ function setupFeedTabs(): void {
   tabRecent = document.createElement("button");
   tabRecent.className = "unison-feed-tab unison-feed-tab--active";
   tabRecent.textContent = t("unison_tabFeed");
-  tabRecent.addEventListener("click", () => {
-    if (activeFeedTab === "recent") return;
-    activeFeedTab = "recent";
-    showFeed();
-    loadFeed();
-  });
+  tabRecent.addEventListener("click", () => switchTab("recent"));
 
   tabMine = document.createElement("button");
   tabMine.className = "unison-feed-tab";
   tabMine.textContent = t("unison_tabMySubmissions");
-  tabMine.addEventListener("click", () => {
-    if (activeFeedTab === "mine") return;
-    activeFeedTab = "mine";
-    showFeed();
-    loadMySubmissions();
-  });
+  tabMine.addEventListener("click", () => switchTab("mine"));
 
   tabsRow.appendChild(tabRecent);
   tabsRow.appendChild(tabMine);
-  feedContainer.parentElement?.insertBefore(tabsRow, feedContainer);
+  const anchor = filterBar ?? feedContainer;
+  anchor.parentElement?.insertBefore(tabsRow, anchor);
+}
+
+function switchTab(next: FeedTabName): void {
+  if (next === activeFeedTab) return;
+  saveActiveTabContent();
+  activeFeedTab = next;
+  updateTabActiveState();
+  applyActiveTabContent();
 }
 
 function updateTabActiveState(): void {
@@ -295,60 +519,82 @@ function updateTabActiveState(): void {
 
 // -- Feed --------------------------
 
-async function loadMySubmissions(cursor?: number): Promise<void> {
-  const result = await getMySubmissions(cursor);
-  const realEntries = result.success ? result.data.entries : [];
-  const stubEntries = IS_DEV && cursor === undefined ? [DEV_STUB_SUBMISSION] : [];
-  const entries = [...stubEntries, ...realEntries];
+async function loadMySubmissions(): Promise<void> {
+  const cache = feedTabCache.mine;
+  if (cache.loading || !cache.hasMore) return;
+  cache.loading = true;
+  try {
+    const cursor = cache.cursor;
+    const result = await getMySubmissions(cursor, cache.filters);
+    const realEntries = result.success ? result.data.entries : [];
+    const stubEntries = IS_DEV && cursor === undefined ? [DEV_STUB_SUBMISSION] : [];
+    const entries = [...stubEntries, ...realEntries];
 
-  if (entries.length === 0) {
-    if (!cursor) {
-      feedContainer.replaceChildren();
-      const empty = document.createElement("div");
-      empty.className = "unison-empty-state";
-      const p = document.createElement("p");
-      p.textContent = t("unison_noSubmissions");
-      empty.appendChild(p);
-      feedContainer.appendChild(empty);
+    if (entries.length === 0) {
+      if (cursor === undefined) {
+        const empty = document.createElement("div");
+        empty.className = "unison-empty-state";
+        const p = document.createElement("p");
+        p.textContent = t("unison_noSubmissions");
+        empty.appendChild(p);
+        appendToTab("mine", empty);
+      }
+      cache.hasMore = false;
+      cache.loaded = true;
+      return;
     }
-    feedMoreBtn.hidden = true;
-    return;
-  }
 
-  for (const entry of entries) {
-    feedContainer.appendChild(createLyricsCard(entry, { fromMine: true }));
-  }
+    for (const entry of entries) {
+      appendToTab("mine", createLyricsCard(entry, { fromMine: true }));
+    }
 
-  feedNextCursor = result.success ? result.data.nextCursor : undefined;
-  feedMoreBtn.hidden = feedNextCursor === undefined;
+    cache.cursor = result.success ? result.data.nextCursor : undefined;
+    cache.hasMore = cache.cursor !== undefined;
+    cache.loaded = true;
+  } finally {
+    cache.loading = false;
+    if (activeFeedTab === "mine") updateSentinel();
+  }
 }
 
-async function loadFeed(cursor?: number): Promise<void> {
-  const result = await getFeed(cursor);
+async function loadFeed(): Promise<void> {
+  const cache = feedTabCache.recent;
+  if (cache.loading || !cache.hasMore) return;
+  cache.loading = true;
+  try {
+    const cursor = cache.cursor;
+    const result = await getFeed(cursor, cache.filters);
 
-  if (!result.success || result.data.entries.length === 0) {
-    if (!cursor) feedContainer.replaceChildren();
-    feedMoreBtn.hidden = true;
-    return;
+    if (!result.success || result.data.entries.length === 0) {
+      cache.hasMore = false;
+      cache.loaded = true;
+      return;
+    }
+
+    for (const entry of result.data.entries) {
+      appendToTab("recent", createLyricsCard(entry));
+    }
+
+    cache.cursor = result.data.nextCursor;
+    cache.hasMore = cache.cursor !== undefined;
+    cache.loaded = true;
+  } finally {
+    cache.loading = false;
+    if (activeFeedTab === "recent") updateSentinel();
   }
-
-  for (const entry of result.data.entries) {
-    feedContainer.appendChild(createLyricsCard(entry));
-  }
-
-  feedNextCursor = result.data.nextCursor;
-  feedMoreBtn.hidden = feedNextCursor === undefined;
 }
 
 function setupFeedMore(): void {
-  feedMoreBtn.addEventListener("click", () => {
-    if (feedNextCursor === undefined) return;
-    if (activeFeedTab === "mine") {
-      loadMySubmissions(feedNextCursor);
-    } else {
-      loadFeed(feedNextCursor);
-    }
-  });
+  feedSentinelObserver = new IntersectionObserver(
+    entries => {
+      if (!entries.some(e => e.isIntersecting)) return;
+      const cache = feedTabCache[activeFeedTab];
+      if (!cache.loaded || cache.loading || !cache.hasMore) return;
+      void loadActiveTabPage();
+    },
+    { rootMargin: "200px" }
+  );
+  feedSentinelObserver.observe(feedMoreBtn);
 }
 
 // -- Search --------------------------
@@ -439,8 +685,16 @@ interface LyricsCardOptions {
 }
 
 function createLyricsCard(entry: UnisonSearchEntry | UnisonFeedEntry, options: LyricsCardOptions = {}): HTMLElement {
-  const card = document.createElement("div");
+  const card = document.createElement("a");
   card.className = "unison-card";
+
+  const navParams: Record<string, string> = { id: String(entry.id) };
+  if (options.fromMine) navParams.mine = "1";
+  const cardUrl = new URL(window.location.pathname, window.location.origin);
+  for (const [key, value] of Object.entries(navParams)) {
+    cardUrl.searchParams.set(key, value);
+  }
+  card.href = cardUrl.toString();
 
   if ("userVote" in entry && entry.userVote === 1) {
     card.classList.add("unison-card--voted-up");
@@ -448,9 +702,9 @@ function createLyricsCard(entry: UnisonSearchEntry | UnisonFeedEntry, options: L
     card.classList.add("unison-card--voted-down");
   }
 
-  card.addEventListener("click", () => {
-    const navParams: Record<string, string> = { id: String(entry.id) };
-    if (options.fromMine) navParams.mine = "1";
+  card.addEventListener("click", e => {
+    if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button !== 0) return;
+    e.preventDefault();
     navigateTo(navParams);
   });
 
@@ -478,19 +732,20 @@ function createLyricsCard(entry: UnisonSearchEntry | UnisonFeedEntry, options: L
 
   const syncBadge = document.createElement("span");
   syncBadge.className = "unison-badge unison-badge--sync";
-  syncBadge.textContent = entry.syncType;
+  syncBadge.textContent = t(`unison_sync${entry.syncType[0].toUpperCase()}${entry.syncType.slice(1)}`);
   badges.appendChild(syncBadge);
 
   const confidenceBadge = document.createElement("span");
   confidenceBadge.className = `unison-badge unison-badge--confidence unison-badge--confidence-${entry.confidence}`;
 
-  const confidenceDot = document.createElement("span");
-  confidenceDot.className = "unison-confidence-dot";
+  const confidenceIconWrap = document.createElement("span");
+  confidenceIconWrap.className = "unison-confidence-icon";
+  confidenceIconWrap.appendChild(svgIcon(CONFIDENCE_ICON_KEY[entry.confidence]));
 
   const confidenceLabel = document.createElement("span");
   confidenceLabel.textContent = t(`unison_confidence_${entry.confidence}`);
 
-  confidenceBadge.appendChild(confidenceDot);
+  confidenceBadge.appendChild(confidenceIconWrap);
   confidenceBadge.appendChild(confidenceLabel);
   badges.appendChild(confidenceBadge);
 

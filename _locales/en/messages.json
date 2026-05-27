@@ -1123,16 +1123,56 @@
     "description": "Report reason: other"
   },
   "unison_confidence_low": {
-    "message": "Low Confidence",
-    "description": "Low confidence indicator"
+    "message": "Unverified",
+    "description": "Tier label for entries with fewer than the minimum votes for confidence"
   },
   "unison_confidence_medium": {
-    "message": "Medium Confidence",
-    "description": "Medium confidence indicator"
+    "message": "Trusted",
+    "description": "Tier label for entries the community has accepted (the baseline 'good enough' tier)"
   },
   "unison_confidence_high": {
-    "message": "High Confidence",
-    "description": "High confidence indicator"
+    "message": "Top-Rated",
+    "description": "Tier label for entries with diverse community approval (rare, top tier)"
+  },
+  "unison_sortTopRated": {
+    "message": "Top-Rated",
+    "description": "Sort by effective score, highest first"
+  },
+  "unison_sortBottomRated": {
+    "message": "Bottom-Rated",
+    "description": "Sort by effective score, lowest first"
+  },
+  "unison_sortMostVoted": {
+    "message": "Most-Voted",
+    "description": "Sort by vote count, most first"
+  },
+  "unison_sortLeastVoted": {
+    "message": "Least-Voted",
+    "description": "Sort by vote count, fewest first"
+  },
+  "unison_syncRichsync": {
+    "message": "Richsync",
+    "description": "Sync type: word/syllable-level timing. Reused by the sync badge on cards and the sync filter chip"
+  },
+  "unison_syncLinesync": {
+    "message": "Linesync",
+    "description": "Sync type: line-level timing. Reused by the sync badge on cards and the sync filter chip"
+  },
+  "unison_syncPlain": {
+    "message": "Plain",
+    "description": "Sync type: unsynced lyrics. Reused by the sync badge on cards and the sync filter chip"
+  },
+  "unison_tier": {
+    "message": "Tier",
+    "description": "Filter bar group label for confidence tier"
+  },
+  "unison_tierTrustedPlus": {
+    "message": "Trusted+",
+    "description": "Tier filter chip hiding Unverified entries (shows Trusted and above)"
+  },
+  "unison_languageAll": {
+    "message": "All languages",
+    "description": "Language dropdown default option"
   },
   "unison_format_lrc": {
     "message": "LRC",
