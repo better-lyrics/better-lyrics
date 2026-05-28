@@ -105,6 +105,7 @@ interface FeedTabCache {
   loading: boolean;
   scrollY: number;
   filters: FeedFilters;
+  requestId: number;
 }
 
 function createEmptyFeedTabCache(filters: FeedFilters = { ...DEFAULT_FEED_FILTERS }): FeedTabCache {
@@ -116,6 +117,7 @@ function createEmptyFeedTabCache(filters: FeedFilters = { ...DEFAULT_FEED_FILTER
     loading: false,
     scrollY: 0,
     filters,
+    requestId: 0,
   };
 }
 
@@ -170,6 +172,7 @@ const DEV_STUB_LYRICS_ENTRY: UnisonLyricsEntry = {
 type View = "search" | "detail" | "submit";
 
 function showView(view: View): void {
+  if (view !== "search") saveActiveTabContent();
   viewSearch.hidden = view !== "search";
   viewDetail.hidden = view !== "detail";
   viewSubmit.hidden = view !== "submit";
@@ -394,7 +397,8 @@ function populateLanguageOptions(): void {
   let displayNames: Intl.DisplayNames | null = null;
   try {
     displayNames = new Intl.DisplayNames(undefined, { type: "language" });
-  } catch {
+  } catch (err) {
+    console.warn(LOG_PREFIX_UNISON, "Intl.DisplayNames unavailable, falling back to language codes", err);
     displayNames = null;
   }
   for (const code of LANGUAGE_OPTIONS) {
@@ -407,6 +411,8 @@ function populateLanguageOptions(): void {
 
 function onFilterChange(): void {
   const cache = feedTabCache[activeFeedTab];
+  cache.requestId++;
+  cache.loading = false;
   cache.cursor = undefined;
   cache.hasMore = true;
   cache.loaded = false;
@@ -462,7 +468,7 @@ function setupFilterShortcuts(): void {
   document.addEventListener("keydown", e => {
     if (isInputFocused()) return;
     if (e.metaKey || e.ctrlKey || e.altKey) return;
-    if (filterBar.hidden) return;
+    if (viewSearch.hidden || filterBar.hidden) return;
     const chip = shortcutMap.get(e.key.toUpperCase());
     if (!chip) return;
     e.preventDefault();
@@ -564,15 +570,18 @@ async function loadMySubmissions(): Promise<void> {
   const cache = feedTabCache.mine;
   if (cache.loading || !cache.hasMore) return;
   cache.loading = true;
+  const token = cache.requestId;
   try {
     const cursor = cache.cursor;
     const result = await getMySubmissions(cursor, cache.filters);
+    if (token !== cache.requestId) return;
+
     const realEntries = result.success ? result.data.entries : [];
     const stubEntries = IS_DEV && cursor === undefined ? [DEV_STUB_SUBMISSION] : [];
     const entries = [...stubEntries, ...realEntries];
 
     if (entries.length === 0) {
-      if (cursor === undefined) {
+      if (cursor === undefined && result.success) {
         appendToTab("mine", createFeedEmptyState("mine", cache.filters));
       }
       cache.hasMore = false;
@@ -588,8 +597,10 @@ async function loadMySubmissions(): Promise<void> {
     cache.hasMore = cache.cursor !== undefined;
     cache.loaded = true;
   } finally {
-    cache.loading = false;
-    if (activeFeedTab === "mine") updateSentinel();
+    if (token === cache.requestId) {
+      cache.loading = false;
+      if (activeFeedTab === "mine") updateSentinel();
+    }
   }
 }
 
@@ -597,9 +608,11 @@ async function loadFeed(): Promise<void> {
   const cache = feedTabCache.recent;
   if (cache.loading || !cache.hasMore) return;
   cache.loading = true;
+  const token = cache.requestId;
   try {
     const cursor = cache.cursor;
     const result = await getFeed(cursor, cache.filters);
+    if (token !== cache.requestId) return;
 
     if (!result.success || result.data.entries.length === 0) {
       if (cursor === undefined && result.success) {
@@ -618,8 +631,10 @@ async function loadFeed(): Promise<void> {
     cache.hasMore = cache.cursor !== undefined;
     cache.loaded = true;
   } finally {
-    cache.loading = false;
-    if (activeFeedTab === "recent") updateSentinel();
+    if (token === cache.requestId) {
+      cache.loading = false;
+      if (activeFeedTab === "recent") updateSentinel();
+    }
   }
 }
 
