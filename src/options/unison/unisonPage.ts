@@ -558,7 +558,7 @@ function createFeedEmptyState(tab: FeedTabName, filters: FeedFilters): HTMLEleme
   wrap.className = "unison-empty-state";
   const p = document.createElement("p");
   if (isDefaultFilters(filters)) {
-    p.textContent = tab === "mine" ? t("unison_noSubmissions") : t("unison_noFilterResults");
+    p.textContent = tab === "mine" ? t("unison_noSubmissions") : t("unison_noFeedYet");
   } else {
     p.textContent = t("unison_noFilterResults");
   }

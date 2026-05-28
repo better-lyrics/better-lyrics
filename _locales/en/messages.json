@@ -1326,6 +1326,10 @@
     "message": "No lyrics match your filters",
     "description": "Empty state shown when the active sort/filter combination returns no entries"
   },
+  "unison_noFeedYet": {
+    "message": "No lyrics here yet",
+    "description": "Empty state shown when the recent feed is empty with no filters applied"
+  },
   "unison_sync": {
     "message": "Sync",
     "description": "Sync type label in detail view"
