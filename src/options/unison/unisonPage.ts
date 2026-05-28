@@ -23,6 +23,7 @@ import {
   searchLyrics,
   submitLyrics,
 } from "@modules/unison/unisonApi";
+import { UnisonErrorCode } from "@modules/unison/errorCodes";
 import { getDisplayName } from "@/core/keyIdentity";
 
 // -- SVG Icons --------------------------
@@ -37,6 +38,8 @@ const ICONS = {
   confidenceUnverified: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><g fill="none"><path fill-rule="evenodd" clip-rule="evenodd" d="M2 12C2 6.477 6.477 2 12 2s10 4.477 10 10s-4.477 10-10 10S2 17.523 2 12zm10-5a2 2 0 0 0-2 2a1 1 0 0 1-2 0a4 4 0 1 1 5.31 3.78a.674.674 0 0 0-.273.169a.177.177 0 0 0-.037.054v.497a1 1 0 1 1-2 0V13c0-1.152.924-1.856 1.655-2.11A2.001 2.001 0 0 0 12 7zm1 6.007v-.004v.004zM13 17a1 1 0 1 1-2 0a1 1 0 0 1 2 0z" fill="currentColor"/></g></svg>`,
   confidenceTrusted: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="currentColor" d="m11.998 2l.118.007l.059.008l.061.013l.111.034a1 1 0 0 1 .217.112l.104.082l.255.218a11 11 0 0 0 7.189 2.537l.342-.01a1 1 0 0 1 1.005.717a13 13 0 0 1-9.208 16.25a1 1 0 0 1-.502 0A13 13 0 0 1 2.54 5.718a1 1 0 0 1 1.005-.717a11 11 0 0 0 7.531-2.527l.263-.225l.096-.075a1 1 0 0 1 .217-.112l.112-.034a1 1 0 0 1 .119-.021zm3.71 7.293a1 1 0 0 0-1.415 0L11 12.585l-1.293-1.292l-.094-.083a1 1 0 0 0-1.32 1.497l2 2l.094.083a1 1 0 0 0 1.32-.083l4-4l.083-.094a1 1 0 0 0-.083-1.32z"/></svg>`,
   confidenceTopRated: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="currentColor" d="m12 14.475l1.925 1.15q.275.175.538-.012t.187-.513l-.5-2.175l1.7-1.475q.25-.225.15-.537t-.45-.338l-2.225-.175l-.875-2.075q-.125-.3-.45-.3t-.45.3l-.875 2.075l-2.225.175q-.35.025-.45.338t.15.537l1.7 1.475l-.5 2.175q-.075.325.188.513t.537.012zM8.65 20H6q-.825 0-1.412-.587T4 18v-2.65L2.075 13.4q-.275-.3-.425-.662T1.5 12t.15-.737t.425-.663L4 8.65V6q0-.825.588-1.412T6 4h2.65l1.95-1.925q.3-.275.663-.425T12 1.5t.738.15t.662.425L15.35 4H18q.825 0 1.413.588T20 6v2.65l1.925 1.95q.275.3.425.663t.15.737t-.15.738t-.425.662L20 15.35V18q0 .825-.587 1.413T18 20h-2.65l-1.95 1.925q-.3.275-.662.425T12 22.5t-.737-.15t-.663-.425z"/></svg>`,
+  success: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><!-- Icon from IconaMoon by Dariush Habibpour - https://creativecommons.org/licenses/by/4.0/ --><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="m15 10l-4 4l-2-2"/></g></svg>`,
+  error: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><!-- Icon from IconaMoon by Dariush Habibpour - https://creativecommons.org/licenses/by/4.0/ --><g fill="none" stroke="currentColor" stroke-linejoin="round"><circle cx="12" cy="12" r="9" stroke-linecap="round" stroke-width="2"/><path stroke-width="3" d="M12 16h.01v.01H12z"/><path stroke-linecap="round" stroke-width="2" d="M12 12V8"/></g></svg>`,
 } as const;
 
 const SORT_ICON_PATH = {
@@ -1094,14 +1097,14 @@ function createDetailDeleteButton(unisonId: number): HTMLButtonElement {
 
     const result = await deleteLyrics(unisonId);
 
-    if (result.success || result.error === "Lyrics not found") {
+    if (result.success || result.code === UnisonErrorCode.NOT_FOUND) {
       navigateTo({ tab: "mine" });
       return;
     }
 
     confirming = false;
     btn.disabled = false;
-    const message = result.error === "Not your submission" ? t("unison_deleteForbidden") : t("unison_deleteFailed");
+    const message = result.code === UnisonErrorCode.NOT_OWNER ? t("unison_deleteForbidden") : t("unison_deleteFailed");
     setError(message);
     revertTimer = setTimeout(() => {
       revertTimer = undefined;
@@ -1439,7 +1442,7 @@ async function handleSubmit(): Promise<void> {
   let format = formatSelect.value as UnisonFormat | "auto";
 
   if (!song || !artist || !videoId || !lyrics) {
-    showFeedback(submitFeedback, t("unison_validationRequired"), true);
+    showFeedback(submitFeedback, { title: t("unison_validationRequired"), isError: true });
     return;
   }
 
@@ -1463,18 +1466,55 @@ async function handleSubmit(): Promise<void> {
   submitBtn.disabled = false;
 
   if (result.success) {
-    showFeedback(submitFeedback, t("unison_submitSuccess"), false);
+    showFeedback(submitFeedback, { title: t("unison_submitSuccess"), isError: false });
     if (result.data?.id) {
       setTimeout(() => navigateTo({ id: String(result.data!.id) }), 1500);
     }
   } else {
-    showFeedback(submitFeedback, result.error ?? t("unison_submitFailed"), true);
+    showFeedback(submitFeedback, {
+      title: result.error ?? t("unison_submitFailed"),
+      hint: result.hint,
+      isError: true,
+    });
   }
 }
 
-function showFeedback(el: HTMLElement, message: string, isError: boolean): void {
+interface FeedbackOptions {
+  title: string;
+  hint?: string;
+  isError: boolean;
+}
+
+function humanizeTitle(s: string): string {
+  if (!/^[A-Z][A-Z0-9_]*$/.test(s)) return s;
+  const spaced = s.replace(/_/g, " ").toLowerCase();
+  return spaced.charAt(0).toUpperCase() + spaced.slice(1);
+}
+
+function showFeedback(el: HTMLElement, opts: FeedbackOptions): void {
   el.hidden = false;
-  el.textContent = message;
-  el.classList.toggle("unison-feedback--error", isError);
-  el.classList.toggle("unison-feedback--success", !isError);
+  el.replaceChildren();
+  el.classList.toggle("unison-feedback--error", opts.isError);
+  el.classList.toggle("unison-feedback--success", !opts.isError);
+
+  const icon = svgIcon(opts.isError ? "error" : "success");
+  icon.classList.add("unison-feedback-icon");
+
+  const body = document.createElement("div");
+  body.className = "unison-feedback-body";
+
+  const title = document.createElement("div");
+  title.className = "unison-feedback-title";
+  title.textContent = humanizeTitle(opts.title);
+  body.appendChild(title);
+
+  if (opts.hint) {
+    const hint = document.createElement("div");
+    hint.className = "unison-feedback-hint";
+    hint.textContent = opts.hint;
+    body.appendChild(hint);
+  }
+
+  el.appendChild(icon);
+  el.appendChild(body);
 }

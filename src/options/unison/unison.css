@@ -1023,9 +1023,36 @@ select.unison-input {
 /* -- Feedback --------------------------  */
 
 .unison-feedback {
-  padding: 0.5rem 0.75rem;
-  border-radius: 0.375rem;
+  padding: 0.625rem 0.75rem;
+  border-radius: 1rem;
   font-size: 0.8125rem;
+  display: flex;
+  align-items: flex-start;
+  gap: 0.625rem;
+}
+
+.unison-feedback-icon {
+  width: 1.125rem;
+  height: 1.125rem;
+  flex-shrink: 0;
+}
+
+.unison-feedback-body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  min-width: 0;
+  flex: 1;
+}
+
+.unison-feedback-title {
+  font-weight: 500;
+  line-height: 1.4;
+}
+
+.unison-feedback-hint {
+  font-size: 0.75rem;
+  opacity: 0.8;
 }
 
 .unison-feedback--success {
