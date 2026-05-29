@@ -349,21 +349,21 @@ kbd {
 }
 
 .unison-badge--confidence-low {
-  background: rgba(200, 140, 160, 0.1);
-  border: 1px solid rgba(200, 140, 160, 0.2);
-  color: rgb(200, 140, 160);
+  background: rgba(254, 240, 138, 0.08);
+  border: 1px solid rgba(254, 240, 138, 0.18);
+  color: rgb(254, 240, 138);
 }
 
 .unison-badge--confidence-medium {
-  background: rgba(200, 185, 140, 0.1);
-  border: 1px solid rgba(200, 185, 140, 0.2);
-  color: rgb(200, 185, 140);
+  background: rgba(125, 211, 252, 0.08);
+  border: 1px solid rgba(125, 211, 252, 0.18);
+  color: rgb(125, 211, 252);
 }
 
 .unison-badge--confidence-high {
-  background: rgba(140, 190, 180, 0.1);
-  border: 1px solid rgba(140, 190, 180, 0.2);
-  color: rgb(140, 190, 180);
+  background: rgba(134, 239, 172, 0.08);
+  border: 1px solid rgba(134, 239, 172, 0.18);
+  color: rgb(134, 239, 172);
 }
 
 /* -- Card Footer --------------------------  */
@@ -453,11 +453,11 @@ kbd {
 /* -- Card Vote Indicator --------------------------  */
 
 .unison-card--voted-up {
-  border: 1px solid rgba(140, 190, 180, 0.4);
+  border: 1px solid rgba(134, 239, 172, 0.4);
 }
 
 .unison-card--voted-down {
-  border: 1px solid rgba(200, 140, 160, 0.4);
+  border: 1px solid rgba(248, 113, 113, 0.4);
 }
 
 /* -- Feed --------------------------  */
