@@ -130,13 +130,20 @@ export async function signInstall(themeId: string): Promise<SignedInstall> {
   };
 }
 
-export async function signPayload<T extends Record<string, unknown>>(data: T): Promise<SignedPayload<T>> {
+interface SignPayloadOptions {
+  nonce?: string;
+}
+
+export async function signPayload<T extends Record<string, unknown>>(
+  data: T,
+  options?: SignPayloadOptions
+): Promise<SignedPayload<T>> {
   const identity = await getIdentity();
 
   const payload = {
     ...data,
     timestamp: Date.now(),
-    nonce: crypto.randomUUID(),
+    nonce: options?.nonce ?? crypto.randomUUID(),
     keyId: identity.keyId,
   };
 

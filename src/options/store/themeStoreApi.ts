@@ -8,6 +8,7 @@ import {
   signPayload,
   signRating,
 } from "@core/keyIdentity";
+import { UnisonErrorCode } from "@modules/unison/errorCodes";
 import { fetchWithTimeout } from "./themeStoreService";
 import type { AllThemeStats, ApiResult, RatingResult } from "./types";
 
@@ -69,7 +70,7 @@ export async function trackInstall(themeId: string): Promise<ApiResult<number | 
 
     if (response.status === 400 && !needsRegistration) {
       const errorData = await response.json().catch(() => null);
-      if (errorData?.error === "PUBLIC_KEY_REQUIRED") {
+      if (errorData?.code === UnisonErrorCode.PUBLIC_KEY_REQUIRED) {
         signed = await signInstall(themeId);
         body.payload = signed.payload;
         body.signature = signed.signature;
@@ -147,7 +148,7 @@ export async function submitRating(
 
     if (response.status === 400 && !needsRegistration) {
       const errorData = await response.json().catch(() => null);
-      if (errorData?.error === "PUBLIC_KEY_REQUIRED") {
+      if (errorData?.code === UnisonErrorCode.PUBLIC_KEY_REQUIRED) {
         signed = await signRating(themeId, rating);
         body.payload = signed.payload;
         body.signature = signed.signature;
@@ -208,7 +209,7 @@ export async function fetchUserRatings(): Promise<ApiResult<Record<string, numbe
 
     if (response.status === 400 && !needsRegistration) {
       const errorData = await response.json().catch(() => null);
-      if (errorData?.error === "PUBLIC_KEY_REQUIRED") {
+      if (errorData?.code === UnisonErrorCode.PUBLIC_KEY_REQUIRED) {
         signed = await signPayload({});
         body.payload = signed.payload;
         body.signature = signed.signature;

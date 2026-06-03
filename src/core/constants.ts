@@ -107,6 +107,38 @@ export const LOG_PREFIX_EDITOR = "[BetterLyrics:Editor]" as const;
 export const LOG_PREFIX_STORE = "[BetterLyrics:Store]" as const;
 export const LOG_PREFIX_UNISON = "[BetterLyrics:Unison]" as const;
 
+// -- Auth (Sign in with Better Lyrics) --------------------------
+
+export const LOG_PREFIX_AUTH = "[BetterLyrics:Auth]" as const;
+
+export const AUTH_APPROVAL_TTL_MS = 24 * 60 * 60 * 1000;
+
+export const AUTH_MESSAGE_TYPES = {
+  REQUEST: "bl-auth-request",
+} as const;
+
+export const AUTH_PORT_NAME_PREFIX = "bl-auth-popup:" as const;
+
+export interface AuthPartner {
+  id: string;
+  origin: string;
+  iconUrl: string | null;
+}
+
+const AUTH_PARTNERS: readonly AuthPartner[] = [
+  { id: "unison", origin: "https://unison.boidu.dev", iconUrl: null },
+  { id: "blrcunison", origin: "https://blrcunison.vercel.app", iconUrl: "https://blrcunison.vercel.app/logo_mono.svg" },
+];
+
+export function getAuthPartnerByOrigin(origin: string | undefined): AuthPartner | undefined {
+  if (!origin) return undefined;
+  return AUTH_PARTNERS.find(p => p.origin === origin);
+}
+
+export function isAllowedAuthOrigin(origin: string | undefined): boolean {
+  return getAuthPartnerByOrigin(origin) !== undefined;
+}
+
 // Initialization and General Logs
 export const INITIALIZE_LOG =
   "%c[BetterLyrics] Loaded Successfully. Logs are enabled by default. You can disable them in the extension options." as const;
