@@ -984,6 +984,44 @@
     "message": "Submit lyrics with Unison",
     "description": "Button text for submitting lyrics to Unison"
   },
+  "auth_pageTitle": {
+    "message": "Sign in with Better Lyrics",
+    "description": "Browser tab title for the auth consent popup"
+  },
+  "auth_consentHeading": {
+    "message": "Sign in to $ORIGIN$",
+    "description": "Consent prompt heading. $ORIGIN$ is replaced with the requesting site, e.g. unison.boidu.dev",
+    "placeholders": {
+      "origin": { "content": "$1", "example": "unison.boidu.dev" }
+    }
+  },
+  "auth_consentSubheading": {
+    "message": "You will sign in as $NAME$.",
+    "description": "Identifies the current BL identity. $NAME$ is the deterministic display name.",
+    "placeholders": {
+      "name": { "content": "$1", "example": "Curious-Otter-7392" }
+    }
+  },
+  "auth_consentExplainer": {
+    "message": "Better Lyrics will sign a one-time message proving you control this identity. The site never sees your private key.",
+    "description": "Short explainer body in the consent popup"
+  },
+  "auth_rememberLabel": {
+    "message": "Don't ask again for 24 hours",
+    "description": "Checkbox label allowing the user to remember this approval"
+  },
+  "auth_approve": {
+    "message": "Approve",
+    "description": "Primary button: approve the sign-in request"
+  },
+  "auth_cancel": {
+    "message": "Cancel",
+    "description": "Secondary button: reject the sign-in request"
+  },
+  "auth_invalidRequest": {
+    "message": "Invalid sign-in request.",
+    "description": "Error state shown when the popup receives malformed parameters"
+  },
   "lyrics_requestSyncedVersion": {
     "message": "Request a synced version",
     "description": "Button label asking the community to contribute synced lyrics for the current song"

@@ -88,15 +88,15 @@
     "description": "Show stylized animations setting label"
   },
   "options_display_passiveScroll": {
-    "message": "Auto-scroll unsynced lyrics",
+    "message": "Desplazar letras sin sincronizar automáticamente",
     "description": "Auto-scroll unsynced lyrics setting label"
   },
   "options_display_unisonActions": {
-    "message": "Unison Actions",
+    "message": "Acciones de Unison",
     "description": "Display-section row label for the Unison Actions modal trigger"
   },
   "options_unisonModal_title": {
-    "message": "Unison Actions",
+    "message": "Acciones de Unison",
     "description": "Title of the Unison Actions modal"
   },
   "options_unisonModal_showPinned": {
@@ -806,7 +806,7 @@
     "description": "Resume Autoscroll button label"
   },
   "options_language_exclusions": {
-    "message": "Language exclusions",
+    "message": "Exclusiones de idiomas",
     "description": "Label for language exclusions setting"
   },
   "options_manage": {
@@ -934,7 +934,7 @@
     "description": "Body text for the built-in themes deprecation banner"
   },
   "deprecation_builtin_cta": {
-    "message": "Browse Marketplace",
+    "message": "Explorar la Tienda",
     "description": "CTA button text in the deprecation banner to open the marketplace"
   },
   "theme_modal_section_builtin": {
@@ -1096,7 +1096,7 @@
     "description": "Medium confidence indicator"
   },
   "unison_confidence_high": {
-    "message": "High Confidence",
+    "message": "Fiabilidad alta",
     "description": "High confidence indicator"
   },
   "unison_format_lrc": {
