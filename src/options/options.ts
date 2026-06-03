@@ -580,6 +580,7 @@ async function initIdentityUI(): Promise<void> {
 
   document.getElementById("export-identity-btn")?.addEventListener("click", handleExportIdentity);
   document.getElementById("import-identity-btn")?.addEventListener("click", handleImportIdentity);
+  initImportIdentityModal();
 }
 
 async function handleExportIdentity(): Promise<void> {
@@ -649,26 +650,124 @@ function fallbackDownloadIdentity(content: string, filename: string): void {
 }
 
 async function handleImportIdentity(): Promise<void> {
+  openImportIdentityModal();
+}
+
+// -- Import Identity Modal --------------------------
+
+function getImportIdentityModalElements() {
+  const overlay = document.getElementById("import-identity-modal-overlay");
+  const closeBtn = document.getElementById("import-identity-modal-close");
+  const fileBtn = document.getElementById("import-identity-file-btn");
+  const cancelBtn = document.getElementById("import-identity-cancel");
+  const confirmBtn = document.getElementById("import-identity-confirm");
+  const textarea = document.getElementById("import-identity-textarea") as HTMLTextAreaElement | null;
+  return { overlay, closeBtn, fileBtn, cancelBtn, confirmBtn, textarea };
+}
+
+function openImportIdentityModal(): void {
+  const { overlay, textarea } = getImportIdentityModalElements();
+  if (!overlay || !textarea) return;
+  textarea.value = "";
+  overlay.classList.add("active");
+  setTimeout(() => textarea.focus(), 100);
+}
+
+function closeImportIdentityModal(): void {
+  const { overlay } = getImportIdentityModalElements();
+  overlay?.classList.remove("active");
+}
+
+async function importIdentityFromJson(json: string): Promise<void> {
+  try {
+    const imported = await importIdentity(json);
+    updateIdentityDisplay(imported);
+    showAlert(t("options_alert_importSuccess"));
+    closeImportIdentityModal();
+  } catch (err) {
+    const message = err instanceof Error ? err.message : "Invalid identity file";
+    showAlert(message);
+  }
+}
+
+function triggerIdentityFilePicker(): void {
   const input = document.createElement("input");
   input.type = "file";
-  input.accept = ".json";
+  input.accept = ".json,application/json";
+  input.style.display = "none";
 
-  input.onchange = async e => {
-    const file = (e.target as HTMLInputElement).files?.[0];
-    if (!file) return;
-
-    try {
-      const text = await file.text();
-      const imported = await importIdentity(text);
-      updateIdentityDisplay(imported);
-      showAlert(t("options_alert_importSuccess"));
-    } catch (err) {
-      const message = err instanceof Error ? err.message : "Invalid identity file";
-      showAlert(message);
-    }
+  const cleanup = (): void => {
+    input.remove();
   };
 
+  input.addEventListener("change", async event => {
+    try {
+      const file = (event.target as HTMLInputElement).files?.[0];
+      if (!file) return;
+      const text = await file.text();
+      await importIdentityFromJson(text);
+    } finally {
+      cleanup();
+    }
+  });
+
+  input.addEventListener("cancel", cleanup);
+
+  document.body.appendChild(input);
   input.click();
+}
+
+function initImportIdentityModal(): void {
+  const { overlay, closeBtn, fileBtn, cancelBtn, confirmBtn, textarea } = getImportIdentityModalElements();
+  if (!overlay || !closeBtn || !fileBtn || !cancelBtn || !confirmBtn || !textarea) return;
+
+  closeBtn.addEventListener("click", closeImportIdentityModal);
+  cancelBtn.addEventListener("click", closeImportIdentityModal);
+
+  overlay.addEventListener("click", e => {
+    if (e.target === overlay) closeImportIdentityModal();
+  });
+
+  document.addEventListener("keydown", e => {
+    if (e.key === "Escape" && overlay.classList.contains("active")) {
+      closeImportIdentityModal();
+    }
+  });
+
+  fileBtn.addEventListener("click", triggerIdentityFilePicker);
+
+  confirmBtn.addEventListener("click", async () => {
+    const json = textarea.value.trim();
+    if (!json) {
+      showAlert(t("options_alert_importEmpty"));
+      return;
+    }
+    await importIdentityFromJson(json);
+  });
+
+  textarea.addEventListener("dragover", e => {
+    if (!e.dataTransfer?.types.includes("Files")) return;
+    e.preventDefault();
+    e.dataTransfer.dropEffect = "copy";
+    textarea.classList.add("dragging");
+  });
+
+  textarea.addEventListener("dragleave", () => {
+    textarea.classList.remove("dragging");
+  });
+
+  textarea.addEventListener("drop", async e => {
+    const file = e.dataTransfer?.files?.[0];
+    if (!file) return;
+    e.preventDefault();
+    textarea.classList.remove("dragging");
+    try {
+      textarea.value = await file.text();
+    } catch (err) {
+      const message = err instanceof Error ? err.message : "Failed to read file";
+      showAlert(message);
+    }
+  });
 }
 
 function updateIdentityDisplay(identity: KeyIdentity): void {
