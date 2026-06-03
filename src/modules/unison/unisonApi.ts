@@ -1,7 +1,10 @@
 import { LOG_PREFIX_UNISON, UNISON_API_BASE_URL } from "@constants";
 import { getIdentity, isKeyRegistered, markKeyRegistered, signPayload } from "@/core/keyIdentity";
 import { fetchWithTimeout } from "@/options/store/themeStoreService";
+import { UnisonErrorCode } from "./errorCodes";
+import { DEFAULT_FEED_FILTERS } from "./types";
 import type {
+  FeedFilters,
   ReportReason,
   UnisonApiResponse,
   UnisonFeedEntry,
@@ -19,7 +22,15 @@ interface ApiResult<T> {
   success: boolean;
   data: T;
   error?: string;
+  code?: string;
+  hint?: string;
   status?: number;
+}
+
+interface UnisonErrorBody {
+  error?: string;
+  code?: string;
+  hint?: string;
 }
 
 async function signedRequest<T>(
@@ -45,11 +56,11 @@ async function signedRequest<T>(
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(body),
     });
-    let cachedErrorBody: { error?: string } | null = null;
+    let cachedErrorBody: UnisonErrorBody | null = null;
 
     if (response.status === 400 && !needsRegistration) {
       cachedErrorBody = await response.json().catch(() => null);
-      if (cachedErrorBody?.error === "PUBLIC_KEY_REQUIRED") {
+      if (cachedErrorBody?.code === UnisonErrorCode.PUBLIC_KEY_REQUIRED) {
         signed = await signPayload(data);
         body.payload = signed.payload;
         body.signature = signed.signature;
@@ -65,10 +76,17 @@ async function signedRequest<T>(
     }
 
     if (!response.ok) {
-      const errorData = cachedErrorBody ?? (await response.json().catch(() => null));
+      const errorData: UnisonErrorBody | null = cachedErrorBody ?? (await response.json().catch(() => null));
       const error = errorData?.error ?? `Request failed: ${response.status}`;
       console.warn(LOG_PREFIX_UNISON, error);
-      return { success: false, data: null as T, error, status: response.status };
+      return {
+        success: false,
+        data: null as T,
+        error,
+        code: errorData?.code,
+        hint: errorData?.hint,
+        status: response.status,
+      };
     }
 
     if (needsRegistration) {
@@ -109,13 +127,24 @@ interface FeedResponse {
   nextCursor?: number;
 }
 
+function appendFeedFilterParams(params: URLSearchParams, filters: FeedFilters): void {
+  if (filters.sort !== DEFAULT_FEED_FILTERS.sort) params.set("sort", filters.sort);
+  if (filters.sortDir !== DEFAULT_FEED_FILTERS.sortDir) params.set("sortDir", filters.sortDir);
+  if (filters.syncType !== DEFAULT_FEED_FILTERS.syncType) params.set("syncType", filters.syncType);
+  if (filters.tier !== DEFAULT_FEED_FILTERS.tier) params.set("tier", filters.tier);
+  if (filters.format !== DEFAULT_FEED_FILTERS.format) params.set("format", filters.format);
+  if (filters.language !== DEFAULT_FEED_FILTERS.language) params.set("language", filters.language);
+}
+
 export async function getFeed(
-  cursor?: number
+  cursor?: number,
+  filters: FeedFilters = DEFAULT_FEED_FILTERS
 ): Promise<ApiResult<{ entries: UnisonFeedEntry[]; nextCursor?: number }>> {
   try {
     const params = new URLSearchParams();
     if (cursor !== undefined) params.set("cursor", String(cursor));
     params.set("limit", "20");
+    appendFeedFilterParams(params, filters);
 
     const headers: Record<string, string> = {};
     try {
@@ -140,12 +169,14 @@ export async function getFeed(
 }
 
 export async function getMySubmissions(
-  cursor?: number
+  cursor?: number,
+  filters: FeedFilters = DEFAULT_FEED_FILTERS
 ): Promise<ApiResult<{ entries: UnisonFeedEntry[]; nextCursor?: number }>> {
   try {
     const params = new URLSearchParams();
     if (cursor !== undefined) params.set("cursor", String(cursor));
     params.set("limit", "20");
+    appendFeedFilterParams(params, filters);
 
     const headers: Record<string, string> = {};
     try {
