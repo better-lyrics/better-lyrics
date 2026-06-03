@@ -31,6 +31,7 @@ import { AppState } from "@core/appState";
 import { t } from "@core/i18n";
 import { disconnectResizeObserver } from "@modules/lyrics/injectLyrics";
 import type { ThumbnailElement } from "@modules/lyrics/requestSniffer/NextResponse";
+import { getSongMetadata } from "@modules/lyrics/requestSniffer/requestSniffer";
 import {
   animEngineState,
   getResumeScrollElement,
@@ -134,6 +135,16 @@ function thumbnailUrlFor(videoId: string): string {
   return `https://i.ytimg.com/vi/${videoId}/hqdefault.jpg`;
 }
 
+async function resolveArtworkUrl(videoId: string): Promise<string> {
+  const sniffed = await getSongMetadata(videoId);
+  if (sniffed?.thumbnail?.url) return getHighResImageUrl(sniffed.thumbnail);
+
+  const ytImg = document.querySelector<HTMLImageElement>("#thumbnail>#img");
+  if (ytImg?.src) return getHighResImageUrl({ url: ytImg.src, width: 0, height: 0 });
+
+  return thumbnailUrlFor(videoId);
+}
+
 function requestedLabel(requestCount: number): string {
   if (requestCount <= 1) return t("lyrics_requestedFirst");
   if (requestCount === 2) return t("lyrics_requestedOneOther");
@@ -221,7 +232,7 @@ function createRequestSyncedButton(meta: RequestButtonMeta): HTMLElement {
       videoId: meta.videoId,
       song: meta.song,
       artist: meta.artist,
-      thumbnailUrl: thumbnailUrlFor(meta.videoId),
+      thumbnailUrl: await resolveArtworkUrl(meta.videoId),
     };
 
     const result = await requestLyrics(submission);

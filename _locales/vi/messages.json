@@ -949,6 +949,50 @@
     "message": "Gửi lời bài hát với Unison",
     "description": "Button text for submitting lyrics to Unison"
   },
+  "auth_pageTitle": {
+    "message": "Sign in with Better Lyrics",
+    "description": "Browser tab title for the auth consent popup"
+  },
+  "auth_consentHeading": {
+    "message": "Sign in to $ORIGIN$",
+    "description": "Consent prompt heading. $ORIGIN$ is replaced with the requesting site, e.g. unison.boidu.dev",
+    "placeholders": {
+      "origin": {
+        "content": "$1",
+        "example": "unison.boidu.dev"
+      }
+    }
+  },
+  "auth_consentSubheading": {
+    "message": "You will sign in as $NAME$.",
+    "description": "Identifies the current BL identity. $NAME$ is the deterministic display name.",
+    "placeholders": {
+      "name": {
+        "content": "$1",
+        "example": "Curious-Otter-7392"
+      }
+    }
+  },
+  "auth_consentExplainer": {
+    "message": "Better Lyrics will sign a one-time message proving you control this identity. The site never sees your private key.",
+    "description": "Short explainer body in the consent popup"
+  },
+  "auth_rememberLabel": {
+    "message": "Don't ask again for 24 hours",
+    "description": "Checkbox label allowing the user to remember this approval"
+  },
+  "auth_approve": {
+    "message": "Approve",
+    "description": "Primary button: approve the sign-in request"
+  },
+  "auth_cancel": {
+    "message": "Cancel",
+    "description": "Secondary button: reject the sign-in request"
+  },
+  "auth_invalidRequest": {
+    "message": "Invalid sign-in request.",
+    "description": "Error state shown when the popup receives malformed parameters"
+  },
   "lyrics_requestSyncedVersion": {
     "message": "Request a synced version",
     "description": "Button label asking the community to contribute synced lyrics for the current song"
@@ -1088,16 +1132,56 @@
     "description": "Report reason: other"
   },
   "unison_confidence_low": {
-    "message": "Độ tin cậy thấp",
-    "description": "Low confidence indicator"
+    "message": "Unverified",
+    "description": "Tier label for entries with fewer than the minimum votes for confidence"
   },
   "unison_confidence_medium": {
-    "message": "Độ tin cậy trung bình",
-    "description": "Medium confidence indicator"
+    "message": "Trusted",
+    "description": "Tier label for entries the community has accepted (the baseline 'good enough' tier)"
   },
   "unison_confidence_high": {
-    "message": "Độ tin cậy cao",
-    "description": "High confidence indicator"
+    "message": "Top-Rated",
+    "description": "Tier label for entries with diverse community approval (rare, top tier)"
+  },
+  "unison_sortTopRated": {
+    "message": "Top-Rated",
+    "description": "Sort by effective score, highest first"
+  },
+  "unison_sortBottomRated": {
+    "message": "Bottom-Rated",
+    "description": "Sort by effective score, lowest first"
+  },
+  "unison_sortMostVoted": {
+    "message": "Most-Voted",
+    "description": "Sort by vote count, most first"
+  },
+  "unison_sortLeastVoted": {
+    "message": "Least-Voted",
+    "description": "Sort by vote count, fewest first"
+  },
+  "unison_syncRichsync": {
+    "message": "Richsync",
+    "description": "Sync type: word/syllable-level timing. Reused by the sync badge on cards and the sync filter chip"
+  },
+  "unison_syncLinesync": {
+    "message": "Linesync",
+    "description": "Sync type: line-level timing. Reused by the sync badge on cards and the sync filter chip"
+  },
+  "unison_syncPlain": {
+    "message": "Plain",
+    "description": "Sync type: unsynced lyrics. Reused by the sync badge on cards and the sync filter chip"
+  },
+  "unison_tier": {
+    "message": "Tier",
+    "description": "Filter bar group label for confidence tier"
+  },
+  "unison_tierTrustedPlus": {
+    "message": "Trusted+",
+    "description": "Tier filter chip hiding Unverified entries (shows Trusted and above)"
+  },
+  "unison_languageAll": {
+    "message": "All languages",
+    "description": "Language dropdown default option"
   },
   "unison_format_lrc": {
     "message": "LRC",
@@ -1124,8 +1208,8 @@
     "description": "Identity label prefix"
   },
   "unison_loadMore": {
-    "message": "Tải thêm",
-    "description": "Load more button for feed pagination"
+    "message": "Loading more...",
+    "description": "Auto-loading indicator shown at the bottom of the feed while the next page is being fetched"
   },
   "unison_votes": {
     "message": "lượt bình chọn",
@@ -1246,6 +1330,14 @@
   "unison_noSubmissions": {
     "message": "Bạn chưa từng gửi lời bài hát nào cả.",
     "description": "Empty state for my submissions tab"
+  },
+  "unison_noFilterResults": {
+    "message": "No lyrics match your filters",
+    "description": "Empty state shown when the active sort/filter combination returns no entries"
+  },
+  "unison_noFeedYet": {
+    "message": "No lyrics here yet",
+    "description": "Empty state shown when the recent feed is empty with no filters applied"
   },
   "unison_sync": {
     "message": "Đồng bộ",
