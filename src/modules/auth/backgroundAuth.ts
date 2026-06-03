@@ -175,4 +175,14 @@ export function initBackgroundAuth(): void {
       resolveSlot(slot, requestId, { ok: false, reason: "USER_DISMISSED" });
     });
   });
+
+  chrome.windows.onRemoved.addListener(closedWindowId => {
+    for (const [requestId, slot] of pending) {
+      if (slot.windowId === closedWindowId && !slot.resolved) {
+        slot.windowId = null;
+        resolveSlot(slot, requestId, { ok: false, reason: "USER_DISMISSED" });
+        return;
+      }
+    }
+  });
 }
