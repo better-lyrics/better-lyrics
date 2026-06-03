@@ -1,5 +1,5 @@
 import { MUSIC_NOTES } from "@constants";
-import { log } from "@utils";
+import { langCodesMatch, log } from "@utils";
 import type { LyricsArray, ProviderParameters } from "./shared";
 
 export async function ytCaptions(providerParameters: ProviderParameters): Promise<void> {
@@ -27,12 +27,13 @@ export async function ytCaptions(providerParameters: ProviderParameters): Promis
     log("Found Caption Tracks, but couldn't determine the default", audioTrackData);
     providerParameters.sourceMap["yt-captions"].filled = true;
     providerParameters.sourceMap["yt-captions"].lyricSourceResult = null;
+    return;
   }
 
   let captionsUrl: URL | null = null;
   for (let captionTracksKey in audioTrackData.captionTracks) {
     let data = audioTrackData.captionTracks[captionTracksKey];
-    if (!data.displayName.includes("auto-generated") && data.languageCode === langCode) {
+    if (!data.displayName.includes("auto-generated") && langCodesMatch(data.languageCode, langCode)) {
       captionsUrl = new URL(data.url);
       break;
     }
