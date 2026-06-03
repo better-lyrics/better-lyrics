@@ -18,6 +18,12 @@
     "storage",
     "alarms"
   ],
+  "externally_connectable": {
+    "matches": [
+      "https://unison.boidu.dev/*",
+      "https://blrcunison.vercel.app/*"
+    ]
+  },
   "optional_permissions": [
     "downloads"
   ],
@@ -42,6 +48,13 @@
         "pages/marketplace.html",
         "pages/unison.html"
       ]
+    },
+    {
+      "matches": [
+        "https://unison.boidu.dev/*",
+        "https://blrcunison.vercel.app/*"
+      ],
+      "resources": ["pages/auth.html"]
     }
   ],
   "chromium:background": {
