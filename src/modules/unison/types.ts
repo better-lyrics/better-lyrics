@@ -90,6 +90,30 @@ export type UnisonFormat = "lrc" | "ttml" | "plain";
 export type UnisonSyncType = "richsync" | "linesync" | "plain";
 export type UnisonConfidence = "low" | "medium" | "high";
 
+// -- Feed Filters --------------------------
+
+export type FeedSort = "default" | "newest" | "top-rated" | "most-voted";
+export type FeedSortDir = "desc" | "asc";
+export type FeedTierFilter = "all" | "trusted-plus" | "top-rated";
+
+export interface FeedFilters {
+  sort: FeedSort;
+  sortDir: FeedSortDir;
+  syncType: "all" | UnisonSyncType;
+  tier: FeedTierFilter;
+  format: "all" | UnisonFormat;
+  language: string;
+}
+
+export const DEFAULT_FEED_FILTERS: FeedFilters = {
+  sort: "default",
+  sortDir: "desc",
+  syncType: "all",
+  tier: "all",
+  format: "all",
+  language: "all",
+};
+
 // -- Request Types --------------------------
 
 export interface UnisonLyricsRequest {

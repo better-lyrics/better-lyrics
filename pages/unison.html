@@ -53,11 +53,108 @@
 
 			<!-- Search View -->
 			<section id="unison-view-search" class="unison-view" hidden>
+				<div id="unison-filters" class="unison-filters" hidden>
+					<div class="unison-filter-group">
+						<span class="unison-filter-label">__MSG_marketplace_sortBy__</span>
+						<div class="unison-filter-options" role="group" aria-label="__MSG_marketplace_sortBy__">
+							<label class="unison-filter-chip unison-filter-chip--sort" data-label-desc="__MSG_marketplace_sortNewest__" data-label-asc="__MSG_marketplace_sortOldest__">
+								<input type="radio" name="unison-filter-sort" value="newest">
+								<span class="unison-filter-chip__icon" aria-hidden="true"></span>
+								<span class="unison-filter-chip__label">__MSG_marketplace_sortNewest__</span>
+								<kbd>1</kbd>
+							</label>
+							<label class="unison-filter-chip unison-filter-chip--sort" data-label-desc="__MSG_unison_sortTopRated__" data-label-asc="__MSG_unison_sortBottomRated__">
+								<input type="radio" name="unison-filter-sort" value="top-rated">
+								<span class="unison-filter-chip__icon" aria-hidden="true"></span>
+								<span class="unison-filter-chip__label">__MSG_unison_sortTopRated__</span>
+								<kbd>2</kbd>
+							</label>
+							<label class="unison-filter-chip unison-filter-chip--sort" data-label-desc="__MSG_unison_sortMostVoted__" data-label-asc="__MSG_unison_sortLeastVoted__">
+								<input type="radio" name="unison-filter-sort" value="most-voted">
+								<span class="unison-filter-chip__icon" aria-hidden="true"></span>
+								<span class="unison-filter-chip__label">__MSG_unison_sortMostVoted__</span>
+								<kbd>3</kbd>
+							</label>
+						</div>
+					</div>
+					<div class="unison-filter-group">
+						<span class="unison-filter-label">__MSG_unison_sync__</span>
+						<div class="unison-filter-options" role="group" aria-label="__MSG_unison_sync__">
+							<label class="unison-filter-chip">
+								<input type="radio" name="unison-filter-sync" value="all" checked>
+								<span>__MSG_marketplace_showAll__</span>
+							</label>
+							<label class="unison-filter-chip">
+								<input type="radio" name="unison-filter-sync" value="richsync">
+								<span>__MSG_unison_syncRichsync__</span>
+								<kbd>Q</kbd>
+							</label>
+							<label class="unison-filter-chip">
+								<input type="radio" name="unison-filter-sync" value="linesync">
+								<span>__MSG_unison_syncLinesync__</span>
+								<kbd>W</kbd>
+							</label>
+							<label class="unison-filter-chip">
+								<input type="radio" name="unison-filter-sync" value="plain">
+								<span>__MSG_unison_syncPlain__</span>
+								<kbd>E</kbd>
+							</label>
+						</div>
+					</div>
+					<div class="unison-filter-group">
+						<span class="unison-filter-label">__MSG_unison_tier__</span>
+						<div class="unison-filter-options" role="group" aria-label="__MSG_unison_tier__">
+							<label class="unison-filter-chip">
+								<input type="radio" name="unison-filter-tier" value="all" checked>
+								<span>__MSG_marketplace_showAll__</span>
+							</label>
+							<label class="unison-filter-chip">
+								<input type="radio" name="unison-filter-tier" value="trusted-plus">
+								<span>__MSG_unison_tierTrustedPlus__</span>
+								<kbd>D</kbd>
+							</label>
+							<label class="unison-filter-chip">
+								<input type="radio" name="unison-filter-tier" value="top-rated">
+								<span>__MSG_unison_confidence_high__</span>
+								<kbd>F</kbd>
+							</label>
+						</div>
+					</div>
+					<div class="unison-filter-group">
+						<span class="unison-filter-label">__MSG_unison_format__</span>
+						<div class="unison-filter-options" role="group" aria-label="__MSG_unison_format__">
+							<label class="unison-filter-chip">
+								<input type="radio" name="unison-filter-format" value="all" checked>
+								<span>__MSG_marketplace_showAll__</span>
+							</label>
+							<label class="unison-filter-chip">
+								<input type="radio" name="unison-filter-format" value="lrc">
+								<span>__MSG_unison_format_lrc__</span>
+								<kbd>Z</kbd>
+							</label>
+							<label class="unison-filter-chip">
+								<input type="radio" name="unison-filter-format" value="ttml">
+								<span>__MSG_unison_format_ttml__</span>
+								<kbd>X</kbd>
+							</label>
+							<label class="unison-filter-chip">
+								<input type="radio" name="unison-filter-format" value="plain">
+								<span>__MSG_unison_format_plain__</span>
+								<kbd>C</kbd>
+							</label>
+						</div>
+					</div>
+					<div class="unison-filter-group">
+						<span class="unison-filter-label">__MSG_unison_language__</span>
+						<div class="unison-filter-options">
+							<select id="unison-filter-language" class="unison-filter-select" aria-label="__MSG_unison_language__">
+								<option value="all">__MSG_unison_languageAll__</option>
+							</select>
+						</div>
+					</div>
+				</div>
 				<div id="unison-feed" class="unison-feed"></div>
-				<button id="unison-feed-more" class="unison-feed-more" hidden>
-					<svg class="unison-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M15.312 11.424a5.5 5.5 0 0 1-9.201 2.466l-.312-.311h2.433a.75.75 0 0 0 0-1.5H3.989a.75.75 0 0 0-.75.75v4.242a.75.75 0 0 0 1.5 0v-2.43l.31.31a7 7 0 0 0 11.712-3.138.75.75 0 0 0-1.449-.39Zm1.23-3.723a.75.75 0 0 0 .219-.53V2.929a.75.75 0 0 0-1.5 0v2.43l-.31-.31A7 7 0 0 0 3.239 8.188a.75.75 0 1 0 1.448.389A5.5 5.5 0 0 1 13.89 6.11l.311.31h-2.432a.75.75 0 0 0 0 1.5h4.243a.75.75 0 0 0 .53-.219Z" clip-rule="evenodd"/></svg>
-					__MSG_unison_loadMore__
-				</button>
+				<div id="unison-feed-more" class="unison-feed-more" hidden>__MSG_unison_loadMore__</div>
 				<div id="unison-results-grid" class="unison-results-grid"></div>
 				<div id="unison-no-results" class="unison-empty-state" hidden>
 					<p>__MSG_unison_noResults__</p>

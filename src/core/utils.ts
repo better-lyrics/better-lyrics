@@ -55,3 +55,13 @@ export function languageMatchesAny(lang: string, collection: string[] | Record<s
   const baseLang = lang.split("-")[0];
   return baseLang !== lang && check(baseLang);
 }
+
+/**
+ * Compare base language codes, e.g. "en" matches "en-US"
+ */
+export function langCodesMatch(lang1: string, lang2: string): boolean {
+  if (!lang1 || !lang2) return false;
+  const base1 = lang1.split("-")[0];
+  const base2 = lang2.split("-")[0];
+  return base1 === base2;
+}

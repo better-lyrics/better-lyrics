@@ -45,7 +45,7 @@ import {
   renderLoader,
   setExtraHeight,
 } from "@modules/ui/dom";
-import { getRelativeBounds, languageMatchesAny, log } from "@utils";
+import { getRelativeBounds, langCodesMatch, languageMatchesAny, log } from "@utils";
 
 let disableRichsync = registerThemeSetting("blyrics-disable-richsync", false, true);
 let lineSyncedAnimationDelay = registerThemeSetting("blyrics-line-synced-animation-delay", 50, true);
@@ -196,8 +196,6 @@ const TRAILING_ATTACHED_PUNCT_REGEX = /^[\p{Pe}\p{Pf}\p{Po}]+$/u;
  * unbroken runs such as SEA-language lyrics. Duration is distributed linearly across sub-parts.
  */
 function splitLongPart(part: LyricPart, threshold: number): LyricPart[] {
-  if (threshold <= 0 || part.words.length <= threshold) return [part];
-
   let segments: string[];
   try {
     const segmenter = new Intl.Segmenter(undefined, { granularity: "word" });
@@ -216,28 +214,14 @@ function splitLongPart(part: LyricPart, threshold: number): LyricPart[] {
     return acc;
   }, [] as string[]);
 
-  const chunks: string[] = [];
-  let current = "";
-  for (const seg of segments) {
-    if (current.length > 0 && current.length + seg.length > threshold) {
-      chunks.push(current);
-      current = seg;
-    } else {
-      current += seg;
-    }
-  }
-  if (current.length > 0) chunks.push(current);
-
-  if (chunks.length <= 1) return [part];
-
   const totalChars = part.words.length;
   const subParts: LyricPart[] = [];
   let charsBefore = 0;
-  for (let i = 0; i < chunks.length; i++) {
-    const chunk = chunks[i];
+  for (let i = 0; i < segments.length; i++) {
+    const chunk = segments[i];
     const subStart = part.startTimeMs + Math.round((part.durationMs * charsBefore) / totalChars);
     const subEnd =
-      i === chunks.length - 1
+      i === segments.length - 1
         ? part.startTimeMs + part.durationMs
         : part.startTimeMs + Math.round((part.durationMs * (charsBefore + chunk.length)) / totalChars);
     subParts.push({
@@ -261,33 +245,55 @@ function createLyricsLine(parts: LyricPart[], line: LineData, lyricElement: HTML
   let lastEmittedSpan: HTMLSpanElement | null = null;
   const wrapThreshold = longWordWrapThreshold.getNumberValue();
 
+  parts = parts.flatMap(original => {
+    const parts = original.words.match(/^(\s*)([\s\S]*?)(\s*)$/u);
+    let returnArray: LyricPart[] = [];
+    if (parts && parts.length > 0) {
+      const beginWhitespace = parts[1];
+      const core = parts[2];
+      const endWhitespace = parts[3];
+      if (core.length === 0) {
+        return [original];
+      }
+
+      if (beginWhitespace.length > 0) {
+        returnArray.push({
+          startTimeMs: original.startTimeMs,
+          words: beginWhitespace,
+          durationMs: 0,
+          explicit: original.explicit,
+          isBackground: original.isBackground,
+        });
+      }
+      returnArray.push({
+        startTimeMs: original.startTimeMs,
+        words: core,
+        durationMs: original.durationMs,
+        explicit: original.explicit,
+        isBackground: original.isBackground,
+      });
+      if (endWhitespace.length > 0) {
+        returnArray.push({
+          startTimeMs: original.startTimeMs + original.durationMs,
+          words: endWhitespace,
+          durationMs: 0,
+          explicit: original.explicit,
+          isBackground: original.isBackground,
+        });
+      }
+    }
+    return returnArray;
+  });
+
   parts.forEach(originalPart => {
-    // Separate leading whitespace from the part's core text. Whitespace is not emitted
-    // as DOM content; it becomes a class on the preceding span so CSS can re-add spacing in a way
-    // that disappears cleanly at line / row ends.
-    // Trailing whitespace isn't removed at this stage and is used to insert the appropriate classes later
-    const match = originalPart.words.match(/^(\s*)([\s\S]*?)$/u);
-    const leadingWs = match?.[1] ?? "";
-    const core = match?.[2] ?? originalPart.words;
-    if (core.length === 0) {
+    if (originalPart.words.trim().length === 0) {
       if (lastEmittedSpan) {
         lastEmittedSpan.classList.add(HAS_TRAILING_SPACE_CLASS);
       }
       return;
     }
 
-    if (leadingWs.length > 0 && lastEmittedSpan) {
-      lastEmittedSpan.classList.add(HAS_TRAILING_SPACE_CLASS);
-    }
-
-    const cleanedPart: LyricPart = {
-      startTimeMs: originalPart.startTimeMs,
-      durationMs: originalPart.durationMs,
-      words: core,
-      isBackground: originalPart.isBackground,
-      explicit: originalPart.explicit,
-    };
-    const subParts = splitLongPart(cleanedPart, wrapThreshold);
+    const subParts = splitLongPart(originalPart, wrapThreshold);
 
     subParts.forEach((part, subIdx) => {
       const isLastSub = subIdx === subParts.length - 1;
@@ -362,9 +368,6 @@ function createLyricsLine(parts: LyricPart[], line: LineData, lyricElement: HTML
   }
 
   groupByWordAndInsert(lyricElement, lyricElementsBuffer);
-  if (lyricElement.children.length > 0) {
-    lyricElement.children[lyricElement.children.length - 1].classList.add(HAS_TRAILING_SPACE_CLASS);
-  }
 }
 
 function createBreakElem(lyricElement: HTMLElement, order: number) {
@@ -888,14 +891,4 @@ function isSameText(str1: string, str2: string): boolean {
     .trim();
 
   return str1 === str2;
-}
-
-/**
- * Compare base language codes, e.g. "en" matches "en-US"
- */
-function langCodesMatch(lang1: string, lang2: string): boolean {
-  if (!lang1 || !lang2) return false;
-  const base1 = lang1.split("-")[0];
-  const base2 = lang2.split("-")[0];
-  return base1 === base2;
 }
