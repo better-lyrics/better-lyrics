@@ -1,6 +1,6 @@
 {
   "manifest_version": 3,
-  "version": "2.3.0.1",
+  "version": "2.3.0.2",
   "default_locale": "en",
   "name": "Better Lyrics (Lyrics for Youtube Music)",
   "description": "__MSG_extensionDescription__",
@@ -54,7 +54,9 @@
         "https://unison.boidu.dev/*",
         "https://blrcunison.vercel.app/*"
       ],
-      "resources": ["pages/auth.html"]
+      "resources": [
+        "pages/auth.html"
+      ]
     }
   ],
   "chromium:background": {
@@ -109,5 +111,5 @@
   "action": {
     "default_popup": "src/options/options.html"
   },
-  "version_name": "2.3.0-canary 1"
+  "version_name": "2.3.0-canary 2"
 }

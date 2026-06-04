@@ -11,7 +11,7 @@
 		<nav id="navbar">
 			<h1>
 				<img src="https://betterlyrics.org/icon-512.png" alt="Better Lyrics" width="24" height="24">
-				<div class="heading">Better Lyrics <span>2.3.0-canary 1</span></div>
+				<div class="heading">Better Lyrics <span>2.3.0-canary 2</span></div>
 			</h1>
 			<div class="nav-container">
 				<a href="https://github.com/better-lyrics/better-lyrics" target="_blank">
@@ -586,22 +586,21 @@
 				<div class="modal-header">
 					<h3 class="modal-title">__MSG_options_actionsBarModal_title__</h3>
 					<button id="actions-bar-modal-close" class="modal-close-btn" aria-label="Close">
-						<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
 							<path d="M6.28 5.22a.75.75 0 0 0-1.06 1.06L8.94 10l-3.72 3.72a.75.75 0 1 0 1.06 1.06L10 11.06l3.72 3.72a.75.75 0 1 0 1.06-1.06L11.06 10l3.72-3.72a.75.75 0 0 0-1.06-1.06L10 8.94 6.28 5.22Z"></path>
-						</svg>
-					</button>
-				</div>
-
-				<div class="modal-body" id="actions-bar-modal-body">
-					<div class="container actions-bar-modal-row">
-						<div class="actions-bar-modal-row__text">
-							<span>__MSG_options_actionsBarModal_floating__</span>
-							<p class="modal-row-hint">__MSG_options_actionsBarModal_floating_hint__</p>
-						</div>
-						<label>
-							<input type="checkbox" id="isActionsBarFloating">
-							<span class="checkmark"></span>
-						</label>
+					</svg>
+				</button>
+			</div>
+			<div class="modal-body" id="actions-bar-modal-body">
+				<div class="container actions-bar-modal-row">
+					<div class="actions-bar-modal-row__text">
+						<span>__MSG_options_actionsBarModal_floating__</span>
+						<p class="modal-row-hint">__MSG_options_actionsBarModal_floating_hint__</p>
+					</div>
+					<label>
+						<input type="checkbox" id="isActionsBarFloating">
+						<span class="checkmark"></span>
+					</label>
 					</div>
 					<div class="container actions-bar-modal-row">
 						<div class="actions-bar-modal-row__text">
@@ -626,6 +625,39 @@
 							</div>
 						</div>
 					</div>
+        </div>
+      </div>
+    </div>
+    
+		<div id="import-identity-modal-overlay" class="modal-overlay">
+			<div class="modal import-identity-modal">
+				<div class="modal-header">
+					<h3 class="modal-title">__MSG_options_identityImport_title__</h3>
+					<button id="import-identity-modal-close" class="modal-close-btn" aria-label="Close">
+						<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+							<path d="M6.28 5.22a.75.75 0 0 0-1.06 1.06L8.94 10l-3.72 3.72a.75.75 0 1 0 1.06 1.06L10 11.06l3.72 3.72a.75.75 0 1 0 1.06-1.06L11.06 10l3.72-3.72a.75.75 0 0 0-1.06-1.06L10 8.94 6.28 5.22Z"></path>
+						</svg>
+					</button>
+				</div>
+				<div class="modal-body">
+					<button id="import-identity-file-btn" class="modal-btn modal-btn-secondary import-identity-file-btn">
+						<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="16" height="16">
+							<path fill-rule="evenodd" d="M12 2.25a.75.75 0 0 1 .75.75v11.69l3.22-3.22a.75.75 0 1 1 1.06 1.06l-4.5 4.5a.75.75 0 0 1-1.06 0l-4.5-4.5a.75.75 0 1 1 1.06-1.06l3.22 3.22V3a.75.75 0 0 1 .75-.75Zm-9 13.5a.75.75 0 0 1 .75.75v2.25a1.5 1.5 0 0 0 1.5 1.5h13.5a1.5 1.5 0 0 0 1.5-1.5V16.5a.75.75 0 0 1 1.5 0v2.25a3 3 0 0 1-3 3H5.25a3 3 0 0 1-3-3V16.5a.75.75 0 0 1 .75-.75Z" clip-rule="evenodd"></path>
+						</svg>
+						<span>__MSG_options_identityImport_chooseFile__</span>
+					</button>
+					<div class="modal-divider">
+						<span>__MSG_options_identityImport_or__</span>
+					</div>
+					<textarea id="import-identity-textarea" class="modal-textarea" rows="6" spellcheck="false" placeholder="__MSG_options_identityImport_pastePlaceholder__"></textarea>
+				</div>
+				<div class="modal-footer">
+					<button id="import-identity-cancel" class="modal-btn modal-btn-secondary">
+						__MSG_options_modal_cancel__
+					</button>
+					<button id="import-identity-confirm" class="modal-btn modal-btn-primary">
+						__MSG_options_identityImport_import__
+					</button>
 				</div>
 			</div>
 		</div>
