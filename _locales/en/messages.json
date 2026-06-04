@@ -255,6 +255,30 @@
     "message": "Import Key",
     "description": "Import key button label"
   },
+  "options_identityImport_title": {
+    "message": "Import Identity",
+    "description": "Title of the import identity modal"
+  },
+  "options_identityImport_chooseFile": {
+    "message": "Choose File",
+    "description": "Label for the file picker button in the import identity modal"
+  },
+  "options_identityImport_or": {
+    "message": "or",
+    "description": "Divider between file picker and paste textarea in the import identity modal"
+  },
+  "options_identityImport_pastePlaceholder": {
+    "message": "Paste identity JSON here...",
+    "description": "Placeholder for the identity JSON textarea"
+  },
+  "options_identityImport_import": {
+    "message": "Import",
+    "description": "Confirm button label inside the import identity modal"
+  },
+  "options_alert_importEmpty": {
+    "message": "Paste identity JSON or choose a file first.",
+    "description": "Shown when the user clicks Import with no JSON provided"
+  },
 
   "options_modal_selectTheme": {
     "message": "Select a Theme",
