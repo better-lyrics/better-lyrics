@@ -1307,8 +1307,8 @@ export function injectSongAttributes(title: string, artist: string): void {
  * @param artist - Artist name
  */
 function getGeniusLink(song: string, artist: string): string {
-  const searchQuery = encodeURIComponent(`${artist.trim()} - ${song.trim()}`);
-  return `https://genius.com/search?q=${searchQuery}`;
+  const query = encodeURIComponent(`!ducky site:genius.com ${artist.trim()} ${song.trim()}`);
+  return `https://duckduckgo.com/?q=${query}`;
 }
 
 export function setExtraHeight() {
