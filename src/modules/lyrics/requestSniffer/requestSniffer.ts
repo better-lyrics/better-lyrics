@@ -1,3 +1,4 @@
+import {isDevelopmentBuild} from "@core/devLifecycle";
 import type { LongBylineText, NextResponse, ThumbnailElement } from "@modules/lyrics/requestSniffer/NextResponse";
 import { log } from "@utils";
 import { parseTime } from "./utils";
@@ -37,17 +38,44 @@ interface VideoMetadata {
   segmentMap: SegmentMap | null;
 }
 
-const browseIdToVideoIdMap = new Map<string, string>();
-const videoIdToLyricsMap = new Map<string, LyricsInfo>();
-const videoMetaDataMap = new Map<string, VideoMetadata>();
-const videoIdToAlbumMap = new Map<string, string | null>();
+interface RequestSnifferState {
+  browseIdToVideoIdMap: Map<string, string>;
+  videoIdToLyricsMap: Map<string, LyricsInfo>;
+  videoMetaDataMap: Map<string, VideoMetadata>;
+  videoIdToAlbumMap: Map<string, string | null>;
+  firstRequestMissedVideoId: string | null;
+}
+
+const DEVELOPMENT_STATE_KEY = "__betterLyricsRequestSnifferStateV1";
+
+function createRequestSnifferState(): RequestSnifferState {
+  return {
+    browseIdToVideoIdMap: new Map(),
+    videoIdToLyricsMap: new Map(),
+    videoMetaDataMap: new Map(),
+    videoIdToAlbumMap: new Map(),
+    firstRequestMissedVideoId: null,
+  };
+}
+
+function getRequestSnifferState(): RequestSnifferState {
+  if (!isDevelopmentBuild()) return createRequestSnifferState();
+
+  const developmentGlobal = globalThis as typeof globalThis & {
+    [DEVELOPMENT_STATE_KEY]?: RequestSnifferState;
+  };
+  console.log("developmentGlobal", developmentGlobal);
+  developmentGlobal[DEVELOPMENT_STATE_KEY] ??= createRequestSnifferState();
+  return developmentGlobal[DEVELOPMENT_STATE_KEY];
+}
+
+const requestSnifferState = getRequestSnifferState();
+const {browseIdToVideoIdMap, videoIdToLyricsMap, videoMetaDataMap, videoIdToAlbumMap} = requestSnifferState;
 
 // /**
 //  * ContinuationId -> Last song in the playlist (before the continuation)
 //  */
 // const continuationMap = new Map<string, VideoMetadata>();
-
-let firstRequestMissedVideoId: string | null = null;
 
 /**
  *
@@ -178,7 +206,7 @@ export async function getSongAlbum(videoId: string, signal?: AbortSignal): Promi
 export function setupRequestSniffer(): void {
   let url = new URL(window.location.href);
   if (url.searchParams.has("v")) {
-    firstRequestMissedVideoId = url.searchParams.get("v");
+    requestSnifferState.firstRequestMissedVideoId = url.searchParams.get("v");
   }
 
   document.addEventListener("blyrics-send-response", (event: Event) => {
@@ -429,9 +457,9 @@ export function setupRequestSniffer(): void {
       let browseId = requestJson.browseId;
       let videoId = browseIdToVideoIdMap.get(browseId);
 
-      if (browseId !== undefined && videoId === undefined && firstRequestMissedVideoId !== null) {
+      if (browseId !== undefined && videoId === undefined && requestSnifferState.firstRequestMissedVideoId !== null) {
         // it is possible that we missed the first request, so let's just try it with this id
-        videoId = firstRequestMissedVideoId;
+        videoId = requestSnifferState.firstRequestMissedVideoId;
       }
 
       if (videoId !== undefined) {
@@ -443,9 +471,9 @@ export function setupRequestSniffer(): void {
             ?.text;
         if (lyrics && sourceText) {
           videoIdToLyricsMap.set(videoId, { hasLyrics: true, lyrics, sourceText });
-          if (videoId === firstRequestMissedVideoId) {
+          if (videoId === requestSnifferState.firstRequestMissedVideoId) {
             browseIdToVideoIdMap.set(browseId, videoId);
-            firstRequestMissedVideoId = null;
+            requestSnifferState.firstRequestMissedVideoId = null;
           }
         } else {
           videoIdToLyricsMap.set(videoId, { hasLyrics: false, lyrics: null, sourceText: null });

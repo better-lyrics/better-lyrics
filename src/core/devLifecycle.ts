@@ -9,7 +9,7 @@ interface ChromeEventLike {
   removeListener: (callback: (...args: never[]) => unknown) => void;
 }
 
-function isDevelopmentBuild(): boolean {
+export function isDevelopmentBuild(): boolean {
   try {
     const permissions = chrome.runtime.getManifest().permissions ?? [];
     return permissions.includes("management") && permissions.includes("scripting");
