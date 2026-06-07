@@ -47,7 +47,7 @@ import {
 } from "@modules/ui/dom";
 import { getRelativeBounds, langCodesMatch, languageMatchesAny, log } from "@utils";
 
-let disableRichsync = registerThemeSetting("blyrics-disable-richsync", false, true);
+let disableRichsync = registerThemeSetting("blyrics-disable-richsync", true, true);
 let lineSyncedAnimationDelay = registerThemeSetting("blyrics-line-synced-animation-delay", 50, true);
 let longWordThreshold = registerThemeSetting("blyrics-long-word-threshold", 1500, true);
 let longWordWrapThreshold = registerThemeSetting("blyrics-long-word-wrap-threshold", 5, true);

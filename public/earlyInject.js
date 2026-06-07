@@ -3,6 +3,9 @@
  * Intercepts YouTube Music API requests to extract song metadata and timing information.
  */
 
+const lifecycleKey = "__betterLyricsEarlyInjectLifecycle";
+window[lifecycleKey]?.dispose?.();
+
 /** Store reference to original fetch function */
 const originalFetch = window.fetch;
 
@@ -121,3 +124,12 @@ window.fetch = async function (request, init) {
     return originalFetch(request, init);
   }
 };
+
+const injectedFetch = window.fetch;
+const dispose = () => {
+  if (window.fetch === injectedFetch) {
+    window.fetch = originalFetch;
+  }
+};
+window[lifecycleKey] = { dispose };
+globalThis.registerCleanup?.(dispose);

@@ -7,6 +7,9 @@
  * Interval ID for the lyrics tick timer.
  * @type {number|null|undefined}
  */
+const lifecycleKey = "__betterLyricsPlayerScriptLifecycle";
+window[lifecycleKey]?.dispose?.();
+
 let tickLyricsInterval;
 
 /**
@@ -203,15 +206,25 @@ const stopLyricsTick = () => {
   }
 };
 
-window.addEventListener("unload", stopLyricsTick);
-
-document.addEventListener("blyrics-seek-to", event => {
+const handleSeek = event => {
   const player = document.getElementById("movie_player");
   const seekTime = event.detail ?? 0;
   if (player && seekTime >= 0) {
     player.seekTo(seekTime, true);
     player.playVideo();
   }
-});
+};
+
+const dispose = () => {
+  stopLyricsTick();
+  window.removeEventListener("unload", stopLyricsTick);
+  document.removeEventListener("blyrics-seek-to", handleSeek);
+  document.documentElement.style.removeProperty("--blyrics-video-aspect-ratio");
+};
+
+window.addEventListener("unload", stopLyricsTick);
+document.addEventListener("blyrics-seek-to", handleSeek);
+window[lifecycleKey] = { dispose };
+globalThis.registerCleanup?.(dispose);
 
 startLyricsTick();

@@ -31,6 +31,30 @@ function removeSourcemaps(dir: string): number {
   return count;
 }
 
+function removeSourcemapReferences(dir: string): number {
+  let count = 0;
+  const files = readdirSync(dir);
+
+  for (const file of files) {
+    const filePath = join(dir, file);
+    const stat = statSync(filePath);
+
+    if (stat.isDirectory()) {
+      count += removeSourcemapReferences(filePath);
+    } else if (file.endsWith(".js")) {
+      const source = readFileSync(filePath, "utf-8");
+      const withoutReference = source.replace(/\r?\n?\/\/# sourceMappingURL=.*\.map\s*$/, "\n");
+
+      if (withoutReference !== source) {
+        writeFileSync(filePath, withoutReference);
+        count++;
+      }
+    }
+  }
+
+  return count;
+}
+
 function getVersion(): string {
   const packageJson = JSON.parse(readFileSync("./package.json", "utf-8"));
   return packageJson.version;
@@ -53,16 +77,19 @@ try {
     }
 
     if (browser === "edge") {
-      console.log("Removing key field from manifest.json for edge...");
+      console.log("Removing Chrome-only manifest fields for edge...");
       const manifestPath = join(distDir, "manifest.json");
       const manifest = JSON.parse(readFileSync(manifestPath, "utf-8"));
       delete manifest.key;
+      delete manifest.update_url;
       writeFileSync(manifestPath, JSON.stringify(manifest, null, 2));
     }
 
     console.log("Removing sourcemaps...");
     const removed = removeSourcemaps(distDir);
     console.log(`Removed ${removed} sourcemap file(s)`);
+    const referencesRemoved = removeSourcemapReferences(distDir);
+    console.log(`Removed ${referencesRemoved} sourcemap reference(s)`);
 
     if (existsSync(zipPath)) {
       rmSync(zipPath);

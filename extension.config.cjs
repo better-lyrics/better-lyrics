@@ -1,46 +1,58 @@
+const startingUrl = "https://music.youtube.com/watch?v=D_3nlLlPMxA&list=RDAMVMEmq17wn71jA";
+
 module.exports = {
-  dev: {
-    browser: "chrome",
-  },
-  config: (config) => {
-    config.devtool = "source-map";
-    return config;
+  commands: {
+    dev: {
+      browser: "chromium",
+      polyfill: true,
+      startingUrl,
+    },
+    start: {
+      browser: "chromium",
+      polyfill: true,
+      startingUrl,
+    },
+    preview: {
+      browser: "chromium",
+      polyfill: true,
+      startingUrl,
+    },
+    build: {
+      browser: "chrome,edge,firefox",
+      polyfill: true,
+    },
   },
   browser: {
     chrome: {
       preferences: { theme: "dark" },
-      excludeBrowserFlags: [ // this appears to not work
-        '--hide-scrollbars', // Allow scrollbars to be visible
-        '--mute-audio', // Allow audio to play
-        '--disable-component-extensions-with-background-pages' // Allow component extensions to load
+      excludeBrowserFlags: [
+        "--hide-scrollbars",
+        "--mute-audio",
+        "--disable-component-extensions-with-background-pages",
       ],
-      browserFlags: [
-        "--remote-debugging-port",
-        "9222",
-        "https://music.youtube.com/watch?v=D_3nlLlPMxA&list=RDAMVMEmq17wn71jA",
-      ],
+      browserFlags: ["--remote-debugging-port", "9222"],
       profile: "dist/chrome-profile",
     },
     firefox: {
       preferences: { theme: "dark" },
       excludeBrowserFlags: [
-        '--hide-scrollbars', // Allow scrollbars to be visible
-        '--disable-component-extensions-with-background-pages' // Allow component extensions to load
-      ],
-      browserFlags: [
-        "https://music.youtube.com/watch?v=Emq17wn71jA&list=RDAMVMxe9j9hPn6Bc",
+        "--hide-scrollbars",
+        "--disable-component-extensions-with-background-pages",
       ],
       profile: "dist/firefox-profile",
     },
   },
   config: (config) => {
     const isCanaryRelease = process.env.RELEASE_TYPE === "canary";
+    const shouldBuildSourcemaps = process.env.BUILD_SOURCEMAPS === "true";
     const isDevelopment = config.mode !== "production";
 
     if (!isDevelopment) {
-      console.log("\x1b[31m[BetterLyrics]\x1b[0m Building for", isCanaryRelease ? "canary release" : "standard release");
+      console.log(
+        "\x1b[31m[BetterLyrics]\x1b[0m Building for",
+        isCanaryRelease ? "canary release" : "standard release",
+      );
 
-      // Minify locale JSON files for prod builds
       config.plugins.push({
         apply: (compiler) => {
           compiler.hooks.emit.tap("MinifyLocales", (compilation) => {
@@ -58,11 +70,8 @@ module.exports = {
         },
       });
     }
-    config.devtool = (isDevelopment || isCanaryRelease) ? "source-map" : false;
-    config.output = {
-      ...config.output,
-      publicPath: "chrome-extension://effdbpeggelllpfkjppbokhmmiinhlmg/",
-    };
+    config.devtool = isDevelopment || shouldBuildSourcemaps || isCanaryRelease ? "source-map" : false;
+
     return config;
-  }
+  },
 };

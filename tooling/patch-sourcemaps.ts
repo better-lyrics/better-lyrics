@@ -34,9 +34,9 @@ const jsFiles = findFiles(`./dist/${browser}`, ".js");
 
 jsFiles.forEach(file => {
   const fileName = path.basename(file);
-  const sourceMappingURL = `\n//# sourceMappingURL=${SOURCEMAPS_BASE_URL}/${browser}/v${version}-${gitHash}/${fileName}.map`;
+  const sourceMappingURL = `//# sourceMappingURL=${SOURCEMAPS_BASE_URL}/${browser}/v${version}-${gitHash}/${fileName}.map`;
   let fileString = fs.readFileSync(file, "utf-8");
-  // Replace the sourceMappingURL at the bottom:
-  fileString = fileString.replace(/\/\/# sourceMappingURL=.*\.map$/, sourceMappingURL);
-  fs.writeFileSync(file, fileString);
+  const patched = fileString.replace(/\r?\n?\/\/# sourceMappingURL=.*\.map\s*$/, `\n${sourceMappingURL}`);
+
+  fs.writeFileSync(file, patched === fileString ? `${fileString.trimEnd()}\n${sourceMappingURL}\n` : `${patched.trimEnd()}\n`);
 });
