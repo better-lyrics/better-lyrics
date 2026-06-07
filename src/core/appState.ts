@@ -47,6 +47,7 @@ interface AppStateType {
   unisonPinnedDockPosition: string;
   isUnisonAutoHideInFullscreenEnabled: boolean;
   currentUnisonData: UnisonData | null;
+  lyricOffset: number;
 }
 
 export const AppState: AppStateType = {
@@ -76,11 +77,13 @@ export const AppState: AppStateType = {
   unisonPinnedDockPosition: UNISON_DOCK_DEFAULT_POSITION,
   isUnisonAutoHideInFullscreenEnabled: true,
   currentUnisonData: null,
+  lyricOffset: 0,
 };
 
 export function reloadLyrics(): void {
   AppState.lyricAbortController?.abort("Reloading lyrics");
   AppState.lastVideoId = null;
+  AppState.lyricOffset = 0;
 }
 
 export function handleModifications(detail: PlayerDetails): void {
@@ -92,6 +95,7 @@ export function handleModifications(detail: PlayerDetails): void {
   }
 
   AppState.currentInjectionId++;
+  AppState.lyricOffset = 0;
   AppState.lyricAbortController = new AbortController();
   AppState.lyricInjectionPromise = createLyrics(detail, AppState.lyricAbortController.signal).catch(err => {
     log(GENERAL_ERROR_LOG, err);

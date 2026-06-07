@@ -40,6 +40,7 @@ import {
   resetThumbnailState,
   showYtThumbnail,
 } from "./dom";
+import { updateLyricOffset } from "@modules/ui/syncOffsetControl";
 
 let wakeLock: WakeLockSentinel | null = null;
 
@@ -548,6 +549,22 @@ export function setupAltHoverHandler(): void {
   document.addEventListener("keydown", (e: KeyboardEvent) => {
     if (e.key === "Alt") {
       updateAltState(true);
+    }
+    
+    // Lyrics offset shortcuts
+    if (e.altKey && (e.key === "[" || e.key === "]")) {
+      const tabSelector = document.getElementsByClassName(TAB_HEADER_CLASS)[1];
+      const isLyricsTabActive = tabSelector?.getAttribute("aria-selected") === "true";
+      const isFullscreen = document.querySelector("ytmusic-app-layout")?.hasAttribute("player-fullscreened");
+
+      if (isLyricsTabActive || isFullscreen) {
+        if (e.key === "[") {
+          updateLyricOffset(-0.1);
+        } else if (e.key === "]") {
+          updateLyricOffset(0.1);
+        }
+        e.preventDefault();
+      }
     }
   });
 
