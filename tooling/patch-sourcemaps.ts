@@ -38,5 +38,8 @@ jsFiles.forEach(file => {
   let fileString = fs.readFileSync(file, "utf-8");
   const patched = fileString.replace(/\r?\n?\/\/# sourceMappingURL=.*\.map\s*$/, `\n${sourceMappingURL}`);
 
-  fs.writeFileSync(file, patched === fileString ? `${fileString.trimEnd()}\n${sourceMappingURL}\n` : `${patched.trimEnd()}\n`);
+  fs.writeFileSync(
+    file,
+    patched === fileString ? `${fileString.trimEnd()}\n${sourceMappingURL}\n` : `${patched.trimEnd()}\n`
+  );
 });

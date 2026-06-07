@@ -84,7 +84,7 @@ async function modify(isDisposed: () => boolean = () => false): Promise<void> {
  * Initializes the application by setting up the DOM content loaded event listener.
  * Entry point for the BetterLyrics extension.
  */
-export default function init(): () => void {
+function init(): () => void {
   const lifecycle = createDevelopmentLifecycle();
   let disposed = false;
   const run = () => {

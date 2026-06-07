@@ -1,4 +1,4 @@
-import {isDevelopmentBuild} from "@core/devLifecycle";
+import { isDevelopmentBuild } from "@core/devLifecycle";
 import type { LongBylineText, NextResponse, ThumbnailElement } from "@modules/lyrics/requestSniffer/NextResponse";
 import { log } from "@utils";
 import { parseTime } from "./utils";
@@ -70,7 +70,7 @@ function getRequestSnifferState(): RequestSnifferState {
 }
 
 const requestSnifferState = getRequestSnifferState();
-const {browseIdToVideoIdMap, videoIdToLyricsMap, videoMetaDataMap, videoIdToAlbumMap} = requestSnifferState;
+const { browseIdToVideoIdMap, videoIdToLyricsMap, videoMetaDataMap, videoIdToAlbumMap } = requestSnifferState;
 
 // /**
 //  * ContinuationId -> Last song in the playlist (before the continuation)
