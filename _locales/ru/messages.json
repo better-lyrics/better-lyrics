@@ -1,6 +1,6 @@
 {
   "extensionName": {
-    "message": "Better Lyrics (Текст для Youtube Music)",
+    "message": "Better Lyrics (Тексты для Youtube Music)",
     "description": "The name of the extension"
   },
   "extensionDescription": {
@@ -246,6 +246,30 @@
   "options_identity_importKey": {
     "message": "Импортировать ключ",
     "description": "Import key button label"
+  },
+  "options_identityImport_title": {
+    "message": "Импортировать идентификатор",
+    "description": "Title of the import identity modal"
+  },
+  "options_identityImport_chooseFile": {
+    "message": "Выберите файл",
+    "description": "Label for the file picker button in the import identity modal"
+  },
+  "options_identityImport_or": {
+    "message": "или",
+    "description": "Divider between file picker and paste textarea in the import identity modal"
+  },
+  "options_identityImport_pastePlaceholder": {
+    "message": "Вставьте идентификатор JSON...",
+    "description": "Placeholder for the identity JSON textarea"
+  },
+  "options_identityImport_import": {
+    "message": "Импорт",
+    "description": "Confirm button label inside the import identity modal"
+  },
+  "options_alert_importEmpty": {
+    "message": "Сначала вставьте идентификатор JSON или выберите файл.",
+    "description": "Shown when the user clicks Import with no JSON provided"
   },
   "options_modal_selectTheme": {
     "message": "Выберите тему",
@@ -786,7 +810,7 @@
     "description": "Loading message while searching for lyrics"
   },
   "lyrics_stillSearching": {
-    "message": "Всё ещё ищет текст...",
+    "message": "Всё ещё ищем текст...",
     "description": "Loading message while still searching"
   },
   "lyrics_noSyncedLyrics": {
@@ -794,7 +818,7 @@
     "description": "Message when no synced lyrics found"
   },
   "lyrics_adPlaying": {
-    "message": "[пум-пум-пум]",
+    "message": "[па-ра-рам]",
     "description": "Message shown during ad playback"
   },
   "lyrics_notFound": {
@@ -946,15 +970,15 @@
     "description": "Section title for custom themes in the theme chooser modal"
   },
   "lyrics_submitToUnison": {
-    "message": "Отправить текст песни с Унисон",
+    "message": "Отправить текст в Unison",
     "description": "Button text for submitting lyrics to Unison"
   },
   "auth_pageTitle": {
-    "message": "Sign in with Better Lyrics",
+    "message": "Войти через Better Lyrics",
     "description": "Browser tab title for the auth consent popup"
   },
   "auth_consentHeading": {
-    "message": "Sign in to $ORIGIN$",
+    "message": "Войти в $ORIGIN$",
     "description": "Consent prompt heading. $ORIGIN$ is replaced with the requesting site, e.g. unison.boidu.dev",
     "placeholders": {
       "origin": {
@@ -964,7 +988,7 @@
     }
   },
   "auth_consentSubheading": {
-    "message": "You will sign in as $NAME$.",
+    "message": "Вы войдете как $NAME$.",
     "description": "Identifies the current BL identity. $NAME$ is the deterministic display name.",
     "placeholders": {
       "name": {
@@ -974,39 +998,39 @@
     }
   },
   "auth_consentExplainer": {
-    "message": "Better Lyrics will sign a one-time message proving you control this identity. The site never sees your private key.",
+    "message": "Better Lyrics подпишет одноразовое сообщение, подтверждающее вашу личность. Сайт не имеет доступа к вашему ключу.",
     "description": "Short explainer body in the consent popup"
   },
   "auth_rememberLabel": {
-    "message": "Don't ask again for 24 hours",
+    "message": "Не спрашивать следующие сутки",
     "description": "Checkbox label allowing the user to remember this approval"
   },
   "auth_approve": {
-    "message": "Approve",
+    "message": "Утвердить",
     "description": "Primary button: approve the sign-in request"
   },
   "auth_cancel": {
-    "message": "Cancel",
+    "message": "Отменить",
     "description": "Secondary button: reject the sign-in request"
   },
   "auth_invalidRequest": {
-    "message": "Invalid sign-in request.",
+    "message": "Неверный запрос на вход.",
     "description": "Error state shown when the popup receives malformed parameters"
   },
   "lyrics_requestSyncedVersion": {
-    "message": "Request a synced version",
+    "message": "Запрос синхронизированной версии",
     "description": "Button label asking the community to contribute synced lyrics for the current song"
   },
   "lyrics_requestedFirst": {
-    "message": "Requested · you're the first",
+    "message": "Запрошено · вы первый",
     "description": "Button label after a successful first-ever request for this song"
   },
   "lyrics_requestedOneOther": {
-    "message": "Requested · 1 other wants this",
+    "message": "Запрошено · кто-то уже запросил(-а)",
     "description": "Button label after a successful request when exactly one other person has also requested"
   },
   "lyrics_requestedNOthers": {
-    "message": "Requested · $N$ others want this",
+    "message": "Запрошенные · $N$ уже запросили",
     "description": "Button label after a successful request when N other people have also requested",
     "placeholders": {
       "n": {
@@ -1016,23 +1040,23 @@
     }
   },
   "lyrics_requestErrorRateLimit": {
-    "message": "Try again in a minute",
+    "message": "Попробуйте снова через минуту",
     "description": "Button label shown briefly when the request is rate-limited"
   },
   "lyrics_requestErrorNetwork": {
-    "message": "Couldn't reach Unison",
+    "message": "Нет связи с Unison",
     "description": "Button label shown briefly when the request fails for a transport/network reason (no HTTP response received)"
   },
   "lyrics_requestErrorServer": {
-    "message": "Unison is having trouble",
+    "message": "Проблемы с Unison...",
     "description": "Button label shown briefly when the request fails with a 5xx server error"
   },
   "lyrics_requestErrorGeneric": {
-    "message": "Couldn't send the request",
+    "message": "Не удалось отправить запрос",
     "description": "Button label shown briefly when the request fails for any other reason (catch-all)"
   },
   "lyrics_requestSyncedLanded": {
-    "message": "Synced version available. Refresh.",
+    "message": "Доступна синхронизированная версия. Обновить.",
     "description": "Button label when the server reports a synced version already exists; clicking reloads the page"
   },
   "unison_pageTitle": {
@@ -1132,55 +1156,55 @@
     "description": "Report reason: other"
   },
   "unison_confidence_low": {
-    "message": "Unverified",
+    "message": "Не подтвержден",
     "description": "Tier label for entries with fewer than the minimum votes for confidence"
   },
   "unison_confidence_medium": {
-    "message": "Trusted",
+    "message": "Надёжный",
     "description": "Tier label for entries the community has accepted (the baseline 'good enough' tier)"
   },
   "unison_confidence_high": {
-    "message": "Top-Rated",
+    "message": "Лучший",
     "description": "Tier label for entries with diverse community approval (rare, top tier)"
   },
   "unison_sortTopRated": {
-    "message": "Top-Rated",
+    "message": "Лучшие",
     "description": "Sort by effective score, highest first"
   },
   "unison_sortBottomRated": {
-    "message": "Bottom-Rated",
+    "message": "Худшие",
     "description": "Sort by effective score, lowest first"
   },
   "unison_sortMostVoted": {
-    "message": "Most-Voted",
+    "message": "Любимые",
     "description": "Sort by vote count, most first"
   },
   "unison_sortLeastVoted": {
-    "message": "Least-Voted",
+    "message": "Нелюбимые",
     "description": "Sort by vote count, fewest first"
   },
   "unison_syncRichsync": {
-    "message": "Richsync",
+    "message": "Слогословные",
     "description": "Sync type: word/syllable-level timing. Reused by the sync badge on cards and the sync filter chip"
   },
   "unison_syncLinesync": {
-    "message": "Linesync",
+    "message": "Строчные",
     "description": "Sync type: line-level timing. Reused by the sync badge on cards and the sync filter chip"
   },
   "unison_syncPlain": {
-    "message": "Plain",
+    "message": "Простой текст",
     "description": "Sync type: unsynced lyrics. Reused by the sync badge on cards and the sync filter chip"
   },
   "unison_tier": {
-    "message": "Tier",
+    "message": "Уровень",
     "description": "Filter bar group label for confidence tier"
   },
   "unison_tierTrustedPlus": {
-    "message": "Trusted+",
+    "message": "Надёжный+",
     "description": "Tier filter chip hiding Unverified entries (shows Trusted and above)"
   },
   "unison_languageAll": {
-    "message": "All languages",
+    "message": "Все языки",
     "description": "Language dropdown default option"
   },
   "unison_format_lrc": {
@@ -1208,7 +1232,7 @@
     "description": "Identity label prefix"
   },
   "unison_loadMore": {
-    "message": "Loading more...",
+    "message": "Загрузка...",
     "description": "Auto-loading indicator shown at the bottom of the feed while the next page is being fetched"
   },
   "unison_votes": {
@@ -1332,11 +1356,11 @@
     "description": "Empty state for my submissions tab"
   },
   "unison_noFilterResults": {
-    "message": "No lyrics match your filters",
+    "message": "Нет подходящих текстов",
     "description": "Empty state shown when the active sort/filter combination returns no entries"
   },
   "unison_noFeedYet": {
-    "message": "No lyrics here yet",
+    "message": "Здесь пока нет текстов",
     "description": "Empty state shown when the recent feed is empty with no filters applied"
   },
   "unison_sync": {
