@@ -100,51 +100,51 @@
     "description": "Title of the Unison Actions modal"
   },
   "options_unisonModal_showPinned": {
-    "message": "Show pinned actions",
+    "message": "Mostrar acciones fijadas",
     "description": "Toggle label inside the Unison Actions modal for the floating dock"
   },
   "options_unisonModal_showPinned_hint": {
-    "message": "A floating control to upvote, downvote, or report Unison lyrics",
+    "message": "Botones flotantes para votar, vetar o reportar letras de Unison",
     "description": "Hint text under the Show pinned actions toggle"
   },
   "options_unisonModal_autoHide": {
-    "message": "Auto-hide in fullscreen",
+    "message": "Ocultar automáticamente en pantalla completa",
     "description": "Toggle label inside the Unison Actions modal for auto-hiding the dock when idle in fullscreen"
   },
   "options_unisonModal_autoHide_hint": {
-    "message": "Hide the floating control when you are idle in fullscreen mode",
+    "message": "Ocultar los botones flotantes cuando inactivo en pantalla completa",
     "description": "Hint text under the Auto-hide in fullscreen toggle"
   },
   "options_unisonModal_position": {
-    "message": "Position",
+    "message": "Posición",
     "description": "Label above the visual position picker in the Unison Actions modal"
   },
   "options_unisonModal_position_topLeft": {
-    "message": "Top left",
+    "message": "Arriba izquierda",
     "description": "Tooltip for the top-left cell in the Unison position picker"
   },
   "options_unisonModal_position_topCenter": {
-    "message": "Top center",
+    "message": "Arriba centrado",
     "description": "Tooltip for the top-center cell in the Unison position picker"
   },
   "options_unisonModal_position_topRight": {
-    "message": "Top right",
+    "message": "Arriba derecha",
     "description": "Tooltip for the top-right cell in the Unison position picker"
   },
   "options_unisonModal_position_bottomLeft": {
-    "message": "Bottom left",
+    "message": "Abajo izquierda",
     "description": "Tooltip for the bottom-left cell in the Unison position picker"
   },
   "options_unisonModal_position_bottomCenter": {
-    "message": "Bottom center",
+    "message": "Abajo centrado",
     "description": "Tooltip for the bottom-center cell in the Unison position picker"
   },
   "options_unisonModal_position_bottomRight": {
-    "message": "Bottom right",
+    "message": "Abajo derecha",
     "description": "Tooltip for the bottom-right cell in the Unison position picker"
   },
   "options_language_displayLanguage": {
-    "message": "Display Language",
+    "message": "Idioma mostrado",
     "description": "Label for the UI language selector dropdown"
   },
   "options_language_displayLanguageAuto": {
@@ -152,7 +152,7 @@
     "description": "Option label for automatic language detection based on browser settings"
   },
   "options_language_title": {
-    "message": "Configuración de idioma",
+    "message": "Configuración de idiomas",
     "description": "Language settings section title"
   },
   "options_language_description": {
@@ -196,11 +196,11 @@
     "description": "Choose a theme button label"
   },
   "options_themes_change": {
-    "message": "Change",
+    "message": "Cambiar",
     "description": "Change theme button label"
   },
   "options_themes_customTheme": {
-    "message": "Custom Theme",
+    "message": "Tema personalizado",
     "description": "Display name for unnamed custom themes"
   },
   "options_themes_customStyles": {
@@ -246,6 +246,30 @@
   "options_identity_importKey": {
     "message": "Importar clave",
     "description": "Import key button label"
+  },
+  "options_identityImport_title": {
+    "message": "Importar identidad",
+    "description": "Title of the import identity modal"
+  },
+  "options_identityImport_chooseFile": {
+    "message": "Escoger archivo",
+    "description": "Label for the file picker button in the import identity modal"
+  },
+  "options_identityImport_or": {
+    "message": "o",
+    "description": "Divider between file picker and paste textarea in the import identity modal"
+  },
+  "options_identityImport_pastePlaceholder": {
+    "message": "Pega aquí la identidad en JSON...",
+    "description": "Placeholder for the identity JSON textarea"
+  },
+  "options_identityImport_import": {
+    "message": "Importar",
+    "description": "Confirm button label inside the import identity modal"
+  },
+  "options_alert_importEmpty": {
+    "message": "Pega una indentidad JSON o escoge un archivo primero.",
+    "description": "Shown when the user clicks Import with no JSON provided"
   },
   "options_modal_selectTheme": {
     "message": "Seleccionar un tema",
@@ -684,7 +708,7 @@
     "description": "Install/remove shortcut"
   },
   "marketplace_shortcutsApply": {
-    "message": "Apply theme",
+    "message": "Aplicar tema",
     "description": "Apply theme shortcut label"
   },
   "marketplace_shortcutsPrevImage": {
@@ -728,7 +752,7 @@
     "description": "Empty installed themes message"
   },
   "marketplace_lastUpdatedOn": {
-    "message": "Last updated on $date$",
+    "message": "Última actualización: $date$",
     "description": "Tooltip showing full date when a theme was last updated",
     "placeholders": {
       "date": {
@@ -766,11 +790,11 @@
     "description": "Powered by label"
   },
   "editor_playground": {
-    "message": "Playground",
+    "message": "Pruebas",
     "description": "Playground link text"
   },
   "editor_docs": {
-    "message": "Docs",
+    "message": "Documentación",
     "description": "Docs link text"
   },
   "lyrics_source": {
@@ -802,7 +826,7 @@
     "description": "Message when no lyrics are available"
   },
   "lyrics_resumeAutoscroll": {
-    "message": "Resume Autoscroll",
+    "message": "Reajustar",
     "description": "Resume Autoscroll button label"
   },
   "options_language_exclusions": {
@@ -810,35 +834,35 @@
     "description": "Label for language exclusions setting"
   },
   "options_manage": {
-    "message": "Manage",
+    "message": "Configurar",
     "description": "Manage button label"
   },
   "options_language_exclusionsTitle": {
-    "message": "Language Exclusions",
+    "message": "Exclusión de idiomas",
     "description": "Modal title for language exclusions"
   },
   "options_romanization_tab": {
-    "message": "Romanization",
+    "message": "Romanización",
     "description": "Romanization tab label"
   },
   "options_translation_tab": {
-    "message": "Translation",
+    "message": "Traducción",
     "description": "Translation tab label"
   },
   "options_searchLanguages": {
-    "message": "Search languages...",
+    "message": "Buscar idiomas...",
     "description": "Search input placeholder"
   },
   "options_romanization_hint": {
-    "message": "Click to toggle. Excluded languages will not be romanized.",
+    "message": "Click para alternar. Los idiomas excluidos no serán romanizados.",
     "description": "Hint text for romanization exclusions"
   },
   "options_translation_hint": {
-    "message": "Click to toggle. Excluded source languages will not be translated.",
+    "message": "Click para alternar. Los idiomas de fuente excluidos no serán traducidos.",
     "description": "Hint text for translation exclusions"
   },
   "options_resetToDefault": {
-    "message": "Reset $TYPE$ to Default",
+    "message": "Resetear $TYPE$ a Predeterminado",
     "description": "Reset to default button label",
     "placeholders": {
       "type": {
@@ -848,7 +872,7 @@
     }
   },
   "options_romanization_resetTitle": {
-    "message": "Reset $TYPE$ Exclusions",
+    "message": "Resetear exclusiones de $TYPE$",
     "description": "Modal title for resetting exclusions",
     "placeholders": {
       "type": {
@@ -858,15 +882,15 @@
     }
   },
   "options_romanization_resetMessage": {
-    "message": "This will clear all excluded languages. Continue?",
+    "message": "Esto borrará todos los idiomas excluidos. ¿Continuar?",
     "description": "Confirmation message for resetting exclusions"
   },
   "options_reset": {
-    "message": "Reset",
+    "message": "Resetear",
     "description": "Reset button label"
   },
   "options_cancel": {
-    "message": "Cancel",
+    "message": "Cancelar",
     "description": "Cancel button label"
   },
   "options_romanization_resetSuccess": {
@@ -910,7 +934,7 @@
     }
   },
   "theme_author_you": {
-    "message": "by You",
+    "message": "por Tú",
     "description": "Author label for custom user themes on theme selector button"
   },
   "symlink_installFailed": {
