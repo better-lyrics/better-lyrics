@@ -17,16 +17,18 @@ if (!zipPath) {
   process.exit(1);
 }
 
+const env = {
+  ...process.env,
+  EXTENSION_ID: extensionId,
+  CLIENT_ID: clientId,
+  CLIENT_SECRET: clientSecret,
+  REFRESH_TOKEN: refreshToken,
+};
+
 try {
   execSync("npm install -g chrome-webstore-upload-cli");
-  execSync(
-    `chrome-webstore-upload upload --source ${zipPath} --extension-id ${extensionId} --client-id ${clientId} --client-secret ${clientSecret} --refresh-token ${refreshToken}`,
-    { stdio: "inherit" }
-  );
-  execSync(
-    `chrome-webstore-upload publish --extension-id ${extensionId} --client-id ${clientId} --client-secret ${clientSecret} --refresh-token ${refreshToken}`,
-    { stdio: "inherit" }
-  );
+  execSync(`chrome-webstore-upload upload --source ${zipPath}`, { stdio: "inherit", env });
+  execSync("chrome-webstore-upload publish", { stdio: "inherit", env });
   console.log("Successfully published to Chrome Web Store.");
 } catch (error) {
   console.error("Failed to publish to Chrome Web Store:", error);
