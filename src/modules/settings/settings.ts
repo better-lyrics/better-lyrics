@@ -5,6 +5,7 @@ import { log, setUpLog } from "@core/utils";
 import { calculateLyricPositions } from "@modules/lyrics/injectLyrics";
 import { clearCache as clearTranslationCache } from "@modules/lyrics/translation";
 import { mountUnisonDock, reloadAlbumArt, unmountUnisonDock, updateUnisonDockPosition } from "@modules/ui/dom";
+import { isPlayerFullscreened, onFullscreenChange } from "@modules/ui/observer";
 import { applyCustomStyles, getAndApplyCustomStyles } from "@modules/ui/styleInjector";
 
 let hasInitializedMessageListener = false;
@@ -118,47 +119,75 @@ function onAutoHideCursor(
 
 let mouseTimer: number | null = null;
 let cursorEventListener: ((this: Document, ev: MouseEvent) => any) | null = null;
+let cursorAutoHideSettingEnabled = false;
+let fullscreenCursorHandlersRegistered = false;
+let cursorVisible = true;
+
+function detachCursorListener(): void {
+  if (mouseTimer) {
+    window.clearTimeout(mouseTimer);
+    mouseTimer = null;
+  }
+  if (cursorEventListener) {
+    document.removeEventListener("mousemove", cursorEventListener);
+    cursorEventListener = null;
+  }
+  document.getElementById("layout")?.removeAttribute("cursor-hidden");
+  cursorVisible = true;
+}
+
+function attachCursorListener(): void {
+  if (cursorEventListener) return;
+
+  cursorVisible = true;
+  document.getElementById("layout")?.removeAttribute("cursor-hidden");
+
+  function disappearCursor(): void {
+    mouseTimer = null;
+    if (cursorVisible) {
+      document.getElementById("layout")?.setAttribute("cursor-hidden", "");
+    }
+    cursorVisible = false;
+  }
+
+  function handleMouseMove(): void {
+    if (mouseTimer) {
+      window.clearTimeout(mouseTimer);
+    }
+    if (!cursorVisible) {
+      document.getElementById("layout")?.removeAttribute("cursor-hidden");
+      cursorVisible = true;
+    }
+    mouseTimer = window.setTimeout(disappearCursor, 3000);
+  }
+
+  cursorEventListener = handleMouseMove;
+  document.addEventListener("mousemove", handleMouseMove);
+  mouseTimer = window.setTimeout(disappearCursor, 3000);
+}
+
+function syncCursorListener(): void {
+  if (cursorAutoHideSettingEnabled && isPlayerFullscreened()) {
+    attachCursorListener();
+  } else {
+    detachCursorListener();
+  }
+}
 
 export function hideCursorOnIdle(): void {
+  if (!fullscreenCursorHandlersRegistered) {
+    fullscreenCursorHandlersRegistered = true;
+    onFullscreenChange(syncCursorListener, syncCursorListener);
+  }
+
   onAutoHideCursor(
     () => {
-      let cursorVisible = true;
-
-      function disappearCursor() {
-        mouseTimer = null;
-        if (cursorVisible) {
-          document.getElementById("layout")!.setAttribute("cursor-hidden", "");
-        }
-        cursorVisible = false;
-      }
-
-      function handleMouseMove() {
-        if (mouseTimer) {
-          window.clearTimeout(mouseTimer);
-        }
-        if (!cursorVisible) {
-          document.getElementById("layout")!.removeAttribute("cursor-hidden");
-          cursorVisible = true;
-        }
-        mouseTimer = window.setTimeout(disappearCursor, 3000);
-      }
-
-      if (cursorEventListener) {
-        document.removeEventListener("mousemove", cursorEventListener);
-      }
-
-      cursorEventListener = handleMouseMove;
-      document.addEventListener("mousemove", handleMouseMove);
+      cursorAutoHideSettingEnabled = true;
+      syncCursorListener();
     },
     () => {
-      if (mouseTimer) {
-        window.clearTimeout(mouseTimer);
-      }
-      document.getElementById("layout")!.removeAttribute("cursor-hidden");
-      if (cursorEventListener) {
-        document.removeEventListener("mousemove", cursorEventListener);
-        cursorEventListener = null;
-      }
+      cursorAutoHideSettingEnabled = false;
+      syncCursorListener();
     }
   );
 }
