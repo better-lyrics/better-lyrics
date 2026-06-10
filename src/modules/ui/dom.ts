@@ -44,7 +44,6 @@ import { getRequest, setRequest } from "@modules/unison/lyricsRequestTracker";
 import type { UnisonLyricsRequest } from "@modules/unison/types";
 import { requestLyrics } from "@modules/unison/unisonApi";
 import { log } from "@utils";
-import { generatePetName } from "@/core/keyIdentity";
 import { byId, deleteVote, type UnisonData, vote } from "../lyrics/providers/unison";
 import { scrollEventHandler } from "./observer";
 import { showReportModal } from "./reportLyrics";
@@ -652,7 +651,7 @@ function createSubmitterBlock(submitter: NonNullable<UnisonData["submitter"]>): 
 
   const handleEl = document.createElement("strong");
   handleEl.className = `${FOOTER_CLASS}__author-name`;
-  handleEl.textContent = submitter.displayName ?? generatePetName(submitter.keyId);
+  handleEl.textContent = submitter.displayName ?? submitter.keyId.slice(0, 6);
 
   const tier = getTrustTier(submitter.reputation);
   const tierEl = document.createElement("span");
