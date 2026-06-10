@@ -331,6 +331,10 @@
     "message": "Saved",
     "description": "Status when nickname is saved"
   },
+  "options_nickname_status_submitting": {
+    "message": "Saving...",
+    "description": "Status while nickname save is in flight"
+  },
   "options_nickname_status_rateLimited": {
     "message": "Slow down, try again in a moment",
     "description": "Status when nickname checks are rate limited"
