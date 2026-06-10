@@ -725,10 +725,10 @@ function initNicknameModal(): void {
 
   const mapCheckResult = (data: NicknameCheckResponse["data"]): NicknameStatusKind => {
     if (!data) return "error";
-    if (data.available) return "available";
+    if (data.reason === "SELF") return "self";
     if (data.reason === "INVALID_FORMAT") return "invalid";
     if (data.reason === "TAKEN") return "taken";
-    if (data.reason === "SELF") return "self";
+    if (data.available) return "available";
     return "error";
   };
 
