@@ -564,7 +564,6 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   initIdentityUI();
-  hydrateNicknameDisplay();
   initNicknameModal();
 });
 
@@ -613,16 +612,6 @@ interface NicknameMutationResponse {
   };
 }
 
-async function hydrateNicknameDisplay(): Promise<void> {
-  const display = document.getElementById("nickname-display");
-  if (!display) return;
-  try {
-    display.textContent = await getDisplayName();
-  } catch (error) {
-    console.error(LOG_PREFIX, "Failed to load nickname display:", error);
-  }
-}
-
 function getNicknameModalElements() {
   const overlay = document.getElementById("nickname-modal-overlay");
   const closeBtn = document.getElementById("nickname-modal-close");
@@ -637,7 +626,7 @@ function getNicknameModalElements() {
 function openNicknameModal(): void {
   const { overlay, input, saveBtn } = getNicknameModalElements();
   if (!overlay || !input || !saveBtn) return;
-  const display = document.getElementById("nickname-display");
+  const display = document.getElementById("identity-display-name");
   input.value = display?.textContent ?? "";
   saveBtn.disabled = true;
   overlay.classList.add("active");
@@ -765,8 +754,6 @@ function initNicknameModal(): void {
   });
 
   const applyDisplayName = (newDisplayName: string): void => {
-    const display = document.getElementById("nickname-display");
-    if (display) display.textContent = newDisplayName;
     const identityEl = document.getElementById("identity-display-name");
     if (identityEl) identityEl.textContent = newDisplayName;
   };

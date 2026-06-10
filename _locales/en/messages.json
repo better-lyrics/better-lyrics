@@ -275,10 +275,6 @@
     "message": "Import",
     "description": "Confirm button label inside the import identity modal"
   },
-  "options_nickname_title": {
-    "message": "Nickname",
-    "description": "Nickname subsection title"
-  },
   "options_nickname_description": {
     "message": "Pick a name for yourself across Better Lyrics. Letters, numbers, and underscore, 3 to 20 characters.",
     "description": "Nickname subsection description"

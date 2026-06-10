@@ -991,8 +991,7 @@ hr {
     transform: translateX(16px);
 }
 
-#identity-display-name,
-#nickname-display {
+#identity-display-name {
 	font-family: "JetBrains Mono", Consolas, "Courier New", monospace !important;
 	background: rgba(0, 0, 0, 0.15);
 	padding: 0.25rem 0.5rem;
