@@ -998,6 +998,9 @@ hr {
 	font-size: 0.875em;
 	border-radius: 0.25rem;
 	border: 1px solid rgba(255, 255, 255, 0.15);
+	height: 25px;
+	display: grid;
+	place-items: center;
 }
 
 .identity-edit-row {
