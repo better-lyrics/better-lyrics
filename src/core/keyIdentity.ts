@@ -1,3 +1,4 @@
+import { IDENTITY_ACTIONS, IDENTITY_ADJECTIVES, IDENTITY_NOUNS } from "@constants";
 import { getLocalStorage } from "./storage";
 
 // -- Types ------------------------------------
@@ -275,6 +276,13 @@ async function hashPublicKey(jwk: JsonWebKey): Promise<string> {
   const buffer = new TextEncoder().encode(canonical);
   const hashBuffer = await crypto.subtle.digest(HASH_ALGORITHM, buffer);
   return bufferToHex(hashBuffer);
+}
+
+export function generatePetName(keyId: string): string {
+  const adjIndex = parseInt(keyId.slice(0, 2), 16) % IDENTITY_ADJECTIVES.length;
+  const nounIndex = parseInt(keyId.slice(2, 4), 16) % IDENTITY_NOUNS.length;
+  const actionIndex = parseInt(keyId.slice(4, 6), 16) % IDENTITY_ACTIONS.length;
+  return `${IDENTITY_ADJECTIVES[adjIndex]}${IDENTITY_NOUNS[nounIndex]}${IDENTITY_ACTIONS[actionIndex]}`;
 }
 
 async function loadFromStorage(): Promise<KeyIdentity | null> {
