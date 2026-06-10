@@ -1,8 +1,8 @@
 // Function to save user options
 
-import { LOG_PREFIX, ROMANIZATION_LANGUAGES, UNISON_DOCK_DEFAULT_POSITION } from "@constants";
+import { LOG_PREFIX, ROMANIZATION_LANGUAGES, UNISON_API_BASE_URL, UNISON_DOCK_DEFAULT_POSITION } from "@constants";
 import { getLanguageDisplayName, initI18n, loadLocaleOverride, SUPPORTED_LOCALES, t } from "@core/i18n";
-import { exportIdentity, getIdentity, importIdentity, type KeyIdentity } from "@core/keyIdentity";
+import { exportIdentity, getIdentity, importIdentity, type KeyIdentity, signPayload } from "@core/keyIdentity";
 import Sortable from "sortablejs";
 import { showModal } from "./editor/ui/feedback";
 import { initStoreUI, setupYourThemesButton } from "./store/store";
@@ -564,6 +564,7 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   initIdentityUI();
+  initNicknameUI();
 });
 
 async function initIdentityUI(): Promise<void> {
@@ -581,6 +582,195 @@ async function initIdentityUI(): Promise<void> {
   document.getElementById("export-identity-btn")?.addEventListener("click", handleExportIdentity);
   document.getElementById("import-identity-btn")?.addEventListener("click", handleImportIdentity);
   initImportIdentityModal();
+}
+
+type NicknameStatusKind =
+  | "idle"
+  | "typing"
+  | "checking"
+  | "available"
+  | "self"
+  | "taken"
+  | "invalid"
+  | "rateLimited"
+  | "submitting"
+  | "saved"
+  | "error";
+
+interface NicknameCheckResponse {
+  success: boolean;
+  data?: {
+    available: boolean;
+    reason?: "INVALID_FORMAT" | "TAKEN" | "SELF";
+  };
+}
+
+interface NicknameMutationResponse {
+  success: boolean;
+  data?: {
+    keyId: string;
+    displayName: string;
+  };
+}
+
+async function initNicknameUI(): Promise<void> {
+  const input = document.getElementById("nickname-input") as HTMLInputElement | null;
+  const status = document.getElementById("nickname-status");
+  const saveBtn = document.getElementById("nickname-save-btn") as HTMLButtonElement | null;
+  const resetBtn = document.getElementById("nickname-reset-btn") as HTMLButtonElement | null;
+  if (!input || !status || !saveBtn || !resetBtn) return;
+
+  try {
+    const identity = await getIdentity();
+    input.value = identity.displayName;
+  } catch (error) {
+    console.error(LOG_PREFIX, "Failed to load identity for nickname UI:", error);
+  }
+
+  let checkSeq = 0;
+  let debounceTimer: ReturnType<typeof setTimeout> | null = null;
+
+  const setStatus = (kind: NicknameStatusKind): void => {
+    status.dataset.state = kind;
+    status.textContent = kind === "idle" || kind === "typing" ? "" : t(`options_nickname_status_${kind}`);
+    saveBtn.disabled = kind !== "available";
+  };
+
+  setStatus("idle");
+
+  const mapCheckResult = (data: NicknameCheckResponse["data"]): NicknameStatusKind => {
+    if (!data) return "error";
+    if (data.available) return "available";
+    if (data.reason === "INVALID_FORMAT") return "invalid";
+    if (data.reason === "TAKEN") return "taken";
+    if (data.reason === "SELF") return "self";
+    return "error";
+  };
+
+  const runCheck = async (nickname: string, seq: number): Promise<void> => {
+    setStatus("checking");
+    try {
+      const signed = await signPayload({ nickname });
+      const response = await fetch(`${UNISON_API_BASE_URL}/auth/nickname/check`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(signed),
+      });
+      if (seq !== checkSeq) return;
+      if (response.status === 429) {
+        setStatus("rateLimited");
+        return;
+      }
+      if (!response.ok) {
+        setStatus("error");
+        return;
+      }
+      const json = (await response.json()) as NicknameCheckResponse;
+      if (seq !== checkSeq) return;
+      setStatus(mapCheckResult(json.data));
+    } catch (error) {
+      if (seq !== checkSeq) return;
+      console.warn(LOG_PREFIX, "Nickname availability check failed:", error);
+      setStatus("error");
+    }
+  };
+
+  input.addEventListener("input", () => {
+    const value = input.value;
+    const seq = ++checkSeq;
+    if (debounceTimer) clearTimeout(debounceTimer);
+    if (value.length === 0) {
+      setStatus("idle");
+      return;
+    }
+    setStatus("typing");
+    debounceTimer = setTimeout(() => {
+      if (seq !== checkSeq) return;
+      runCheck(value, seq);
+    }, 350);
+  });
+
+  saveBtn.addEventListener("click", async () => {
+    const nickname = input.value;
+    if (!nickname) return;
+    saveBtn.disabled = true;
+    resetBtn.disabled = true;
+    setStatus("submitting");
+    try {
+      const signed = await signPayload({ nickname });
+      const response = await fetch(`${UNISON_API_BASE_URL}/auth/nickname`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(signed),
+      });
+      if (response.status === 400) {
+        setStatus("invalid");
+        resetBtn.disabled = false;
+        return;
+      }
+      if (response.status === 409) {
+        setStatus("taken");
+        resetBtn.disabled = false;
+        return;
+      }
+      if (response.status === 429) {
+        setStatus("rateLimited");
+        resetBtn.disabled = false;
+        return;
+      }
+      if (!response.ok) {
+        setStatus("error");
+        resetBtn.disabled = false;
+        return;
+      }
+      const json = (await response.json()) as NicknameMutationResponse;
+      const newDisplayName = json.data?.displayName ?? nickname;
+      const displayNameEl = document.getElementById("identity-display-name");
+      if (displayNameEl) displayNameEl.textContent = newDisplayName;
+      setStatus("saved");
+      resetBtn.disabled = false;
+    } catch (error) {
+      console.warn(LOG_PREFIX, "Nickname save failed:", error);
+      setStatus("error");
+      resetBtn.disabled = false;
+    }
+  });
+
+  resetBtn.addEventListener("click", async () => {
+    saveBtn.disabled = true;
+    resetBtn.disabled = true;
+    setStatus("submitting");
+    try {
+      const signed = await signPayload({});
+      const response = await fetch(`${UNISON_API_BASE_URL}/auth/nickname`, {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(signed),
+      });
+      if (response.status === 429) {
+        setStatus("rateLimited");
+        resetBtn.disabled = false;
+        return;
+      }
+      if (!response.ok) {
+        setStatus("error");
+        resetBtn.disabled = false;
+        return;
+      }
+      const json = (await response.json()) as NicknameMutationResponse;
+      const newDisplayName = json.data?.displayName ?? "";
+      const displayNameEl = document.getElementById("identity-display-name");
+      if (displayNameEl) displayNameEl.textContent = newDisplayName;
+      input.value = newDisplayName;
+      checkSeq++;
+      setStatus("saved");
+      resetBtn.disabled = false;
+    } catch (error) {
+      console.warn(LOG_PREFIX, "Nickname reset failed:", error);
+      setStatus("error");
+      resetBtn.disabled = false;
+    }
+  });
 }
 
 async function handleExportIdentity(): Promise<void> {
