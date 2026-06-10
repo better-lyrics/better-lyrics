@@ -652,7 +652,7 @@ function createSubmitterBlock(submitter: NonNullable<UnisonData["submitter"]>): 
 
   const handleEl = document.createElement("strong");
   handleEl.className = `${FOOTER_CLASS}__author-name`;
-  handleEl.textContent = generatePetName(submitter.keyId);
+  handleEl.textContent = submitter.displayName ?? generatePetName(submitter.keyId);
 
   const tier = getTrustTier(submitter.reputation);
   const tierEl = document.createElement("span");
