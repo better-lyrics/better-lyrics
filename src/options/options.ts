@@ -578,9 +578,31 @@ async function initIdentityUI(): Promise<void> {
     displayNameEl.textContent = t("options_alert_identityLoadError");
   }
 
+  refreshResolvedDisplayName();
+
   document.getElementById("export-identity-btn")?.addEventListener("click", handleExportIdentity);
   document.getElementById("import-identity-btn")?.addEventListener("click", handleImportIdentity);
   initImportIdentityModal();
+}
+
+async function refreshResolvedDisplayName(): Promise<void> {
+  const displayNameEl = document.getElementById("identity-display-name");
+  if (!displayNameEl) return;
+  try {
+    const signed = await signPayload({});
+    const response = await fetch(`${UNISON_API_BASE_URL}/auth/nickname/me`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(signed),
+    });
+    if (!response.ok) return;
+    const json = (await response.json()) as { success?: boolean; data?: { displayName?: string } };
+    if (json.success && typeof json.data?.displayName === "string") {
+      displayNameEl.textContent = json.data.displayName;
+    }
+  } catch (error) {
+    console.warn(LOG_PREFIX, "Failed to refresh resolved display name:", error);
+  }
 }
 
 type NicknameStatusKind =
