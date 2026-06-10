@@ -564,7 +564,8 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   initIdentityUI();
-  initNicknameUI();
+  hydrateNicknameDisplay();
+  initNicknameModal();
 });
 
 async function initIdentityUI(): Promise<void> {
@@ -612,18 +613,64 @@ interface NicknameMutationResponse {
   };
 }
 
-async function initNicknameUI(): Promise<void> {
-  const input = document.getElementById("nickname-input") as HTMLInputElement | null;
-  const status = document.getElementById("nickname-status");
-  const saveBtn = document.getElementById("nickname-save-btn") as HTMLButtonElement | null;
-  const resetBtn = document.getElementById("nickname-reset-btn") as HTMLButtonElement | null;
-  if (!input || !status || !saveBtn || !resetBtn) return;
-
+async function hydrateNicknameDisplay(): Promise<void> {
+  const display = document.getElementById("nickname-display");
+  if (!display) return;
   try {
-    input.value = await getDisplayName();
+    display.textContent = await getDisplayName();
   } catch (error) {
-    console.error(LOG_PREFIX, "Failed to load identity for nickname UI:", error);
+    console.error(LOG_PREFIX, "Failed to load nickname display:", error);
   }
+}
+
+function getNicknameModalElements() {
+  const overlay = document.getElementById("nickname-modal-overlay");
+  const closeBtn = document.getElementById("nickname-modal-close");
+  const cancelBtn = document.getElementById("nickname-modal-cancel");
+  const saveBtn = document.getElementById("nickname-modal-save") as HTMLButtonElement | null;
+  const resetBtn = document.getElementById("nickname-modal-reset") as HTMLButtonElement | null;
+  const input = document.getElementById("nickname-modal-input") as HTMLInputElement | null;
+  const status = document.getElementById("nickname-modal-status");
+  return { overlay, closeBtn, cancelBtn, saveBtn, resetBtn, input, status };
+}
+
+function openNicknameModal(): void {
+  const { overlay, input, saveBtn } = getNicknameModalElements();
+  if (!overlay || !input || !saveBtn) return;
+  const display = document.getElementById("nickname-display");
+  input.value = display?.textContent ?? "";
+  saveBtn.disabled = true;
+  overlay.classList.add("active");
+  setTimeout(() => {
+    input.focus();
+    input.select();
+  }, 100);
+}
+
+function closeNicknameModal(): void {
+  const { overlay } = getNicknameModalElements();
+  overlay?.classList.remove("active");
+}
+
+function initNicknameModal(): void {
+  const { overlay, closeBtn, cancelBtn, saveBtn, resetBtn, input, status } = getNicknameModalElements();
+  if (!overlay || !closeBtn || !cancelBtn || !saveBtn || !resetBtn || !input || !status) return;
+
+  const editBtn = document.getElementById("nickname-edit-btn");
+  editBtn?.addEventListener("click", openNicknameModal);
+
+  closeBtn.addEventListener("click", closeNicknameModal);
+  cancelBtn.addEventListener("click", closeNicknameModal);
+
+  overlay.addEventListener("click", e => {
+    if (e.target === overlay) closeNicknameModal();
+  });
+
+  document.addEventListener("keydown", e => {
+    if (e.key === "Escape" && overlay.classList.contains("active")) {
+      closeNicknameModal();
+    }
+  });
 
   let checkSeq = 0;
   let debounceTimer: ReturnType<typeof setTimeout> | null = null;
@@ -688,6 +735,13 @@ async function initNicknameUI(): Promise<void> {
     }, 350);
   });
 
+  const applyDisplayName = (newDisplayName: string): void => {
+    const display = document.getElementById("nickname-display");
+    if (display) display.textContent = newDisplayName;
+    const identityEl = document.getElementById("identity-display-name");
+    if (identityEl) identityEl.textContent = newDisplayName;
+  };
+
   saveBtn.addEventListener("click", async () => {
     const nickname = input.value;
     if (!nickname) return;
@@ -723,10 +777,10 @@ async function initNicknameUI(): Promise<void> {
       }
       const json = (await response.json()) as NicknameMutationResponse;
       const newDisplayName = json.data?.displayName ?? nickname;
-      const displayNameEl = document.getElementById("identity-display-name");
-      if (displayNameEl) displayNameEl.textContent = newDisplayName;
+      applyDisplayName(newDisplayName);
       setStatus("saved");
       resetBtn.disabled = false;
+      closeNicknameModal();
     } catch (error) {
       console.warn(LOG_PREFIX, "Nickname save failed:", error);
       setStatus("error");
@@ -757,12 +811,12 @@ async function initNicknameUI(): Promise<void> {
       }
       const json = (await response.json()) as NicknameMutationResponse;
       const newDisplayName = json.data?.displayName ?? "";
-      const displayNameEl = document.getElementById("identity-display-name");
-      if (displayNameEl) displayNameEl.textContent = newDisplayName;
+      applyDisplayName(newDisplayName);
       input.value = newDisplayName;
       checkSeq++;
       setStatus("saved");
       resetBtn.disabled = false;
+      closeNicknameModal();
     } catch (error) {
       console.warn(LOG_PREFIX, "Nickname reset failed:", error);
       setStatus("error");

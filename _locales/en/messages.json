@@ -295,6 +295,18 @@
     "message": "Reset to default",
     "description": "Nickname reset button label"
   },
+  "options_nickname_modalTitle": {
+    "message": "Set your nickname",
+    "description": "Nickname modal title"
+  },
+  "options_nickname_edit": {
+    "message": "Edit",
+    "description": "Nickname edit button label"
+  },
+  "options_nickname_editLabel": {
+    "message": "Edit nickname",
+    "description": "Accessible label for the nickname edit button"
+  },
   "options_nickname_status_checking": {
     "message": "Checking...",
     "description": "Status while checking nickname availability"
