@@ -2,7 +2,7 @@
 
 import { LOG_PREFIX, ROMANIZATION_LANGUAGES, UNISON_API_BASE_URL, UNISON_DOCK_DEFAULT_POSITION } from "@constants";
 import { getLanguageDisplayName, initI18n, loadLocaleOverride, SUPPORTED_LOCALES, t } from "@core/i18n";
-import { exportIdentity, getIdentity, importIdentity, type KeyIdentity, signPayload } from "@core/keyIdentity";
+import { exportIdentity, getDisplayName, importIdentity, signPayload } from "@core/keyIdentity";
 import Sortable from "sortablejs";
 import { showModal } from "./editor/ui/feedback";
 import { initStoreUI, setupYourThemesButton } from "./store/store";
@@ -572,8 +572,7 @@ async function initIdentityUI(): Promise<void> {
   if (!displayNameEl) return;
 
   try {
-    const identity = await getIdentity();
-    displayNameEl.textContent = identity.displayName;
+    displayNameEl.textContent = await getDisplayName();
   } catch (error) {
     console.error(LOG_PREFIX, "Failed to load identity:", error);
     displayNameEl.textContent = t("options_alert_identityLoadError");
@@ -621,8 +620,7 @@ async function initNicknameUI(): Promise<void> {
   if (!input || !status || !saveBtn || !resetBtn) return;
 
   try {
-    const identity = await getIdentity();
-    input.value = identity.displayName;
+    input.value = await getDisplayName();
   } catch (error) {
     console.error(LOG_PREFIX, "Failed to load identity for nickname UI:", error);
   }
@@ -775,9 +773,9 @@ async function initNicknameUI(): Promise<void> {
 
 async function handleExportIdentity(): Promise<void> {
   try {
-    const identity = await getIdentity();
+    const displayName = await getDisplayName();
     const exportData = await exportIdentity();
-    const filename = `better-lyrics-identity-${identity.displayName}.json`;
+    const filename = `better-lyrics-identity-${displayName}.json`;
 
     chrome.permissions.contains({ permissions: ["downloads"] }, hasPermission => {
       if (hasPermission) {
@@ -870,8 +868,8 @@ function closeImportIdentityModal(): void {
 
 async function importIdentityFromJson(json: string): Promise<void> {
   try {
-    const imported = await importIdentity(json);
-    updateIdentityDisplay(imported);
+    await importIdentity(json);
+    await updateIdentityDisplay();
     showAlert(t("options_alert_importSuccess"));
     closeImportIdentityModal();
   } catch (err) {
@@ -960,10 +958,10 @@ function initImportIdentityModal(): void {
   });
 }
 
-function updateIdentityDisplay(identity: KeyIdentity): void {
+async function updateIdentityDisplay(): Promise<void> {
   const displayNameEl = document.getElementById("identity-display-name");
   if (displayNameEl) {
-    displayNameEl.textContent = identity.displayName;
+    displayNameEl.textContent = await getDisplayName();
   }
 }
 

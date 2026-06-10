@@ -7,7 +7,6 @@ export interface KeyIdentity {
   keyId: string;
   publicKey: JsonWebKey;
   privateKey: JsonWebKey;
-  displayName: string;
   createdAt: number;
 }
 
@@ -49,7 +48,6 @@ interface IdentityExport {
   keyId: string;
   publicKey: JsonWebKey;
   privateKey: JsonWebKey;
-  displayName: string;
   exportedAt: number;
   certificate?: string;
 }
@@ -170,7 +168,6 @@ export async function exportIdentity(): Promise<string> {
     keyId: identity.keyId,
     publicKey: identity.publicKey,
     privateKey: identity.privateKey,
-    displayName: identity.displayName,
     exportedAt: Date.now(),
     certificate: certificate ?? undefined,
   };
@@ -199,7 +196,6 @@ export async function importIdentity(json: string): Promise<KeyIdentity> {
     keyId: parsed.keyId,
     publicKey: parsed.publicKey,
     privateKey: parsed.privateKey,
-    displayName: parsed.displayName,
     createdAt: Date.now(),
   };
 
@@ -219,7 +215,7 @@ export async function importIdentity(json: string): Promise<KeyIdentity> {
 
 export async function getDisplayName(): Promise<string> {
   const identity = await getIdentity();
-  return identity.displayName;
+  return identity.keyId.slice(0, 6);
 }
 
 export async function isKeyRegistered(): Promise<boolean> {
@@ -258,13 +254,11 @@ async function generateKeyIdentity(): Promise<KeyIdentity> {
   const privateKeyJwk = await crypto.subtle.exportKey("jwk", keyPair.privateKey);
 
   const keyId = await hashPublicKey(publicKeyJwk);
-  const displayName = generatePetName(keyId);
 
   return {
     keyId,
     publicKey: publicKeyJwk,
     privateKey: privateKeyJwk,
-    displayName,
     createdAt: Date.now(),
   };
 }
@@ -326,7 +320,7 @@ function isValidKeyIdentity(obj: unknown): obj is KeyIdentity {
   return (
     typeof candidate.keyId === "string" &&
     candidate.keyId.length === 64 &&
-    typeof candidate.displayName === "string" &&
+    (candidate.displayName === undefined || typeof candidate.displayName === "string") &&
     typeof candidate.createdAt === "number" &&
     isValidPublicJwk(candidate.publicKey) &&
     isValidPrivateJwk(candidate.privateKey)
@@ -342,7 +336,7 @@ function isValidIdentityExport(obj: unknown): obj is IdentityExport {
     candidate.version === 1 &&
     typeof candidate.keyId === "string" &&
     candidate.keyId.length === 64 &&
-    typeof candidate.displayName === "string" &&
+    (candidate.displayName === undefined || typeof candidate.displayName === "string") &&
     typeof candidate.exportedAt === "number" &&
     isValidPublicJwk(candidate.publicKey) &&
     isValidPrivateJwk(candidate.privateKey)

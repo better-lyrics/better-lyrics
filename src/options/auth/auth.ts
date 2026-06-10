@@ -1,6 +1,6 @@
 import { type AuthPartner, AUTH_PORT_NAME_PREFIX, getAuthPartnerByOrigin, LOG_PREFIX_AUTH } from "@constants";
 import { initI18n, loadLocaleOverride, t } from "@core/i18n";
-import { getIdentity } from "@core/keyIdentity";
+import { getDisplayName } from "@core/keyIdentity";
 
 interface RequestParams {
   requestId: string;
@@ -86,8 +86,8 @@ async function bindDynamicText(params: RequestParams): Promise<void> {
   const subtitle = document.getElementById("auth-subtitle");
   if (subtitle) {
     try {
-      const identity = await getIdentity();
-      subtitle.textContent = t("auth_consentSubheading", identity.displayName);
+      const displayName = await getDisplayName();
+      subtitle.textContent = t("auth_consentSubheading", displayName);
     } catch (err) {
       console.warn(LOG_PREFIX_AUTH, "identity load failed", err);
       subtitle.textContent = t("auth_consentSubheading", "");
