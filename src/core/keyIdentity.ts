@@ -215,7 +215,7 @@ export async function importIdentity(json: string): Promise<KeyIdentity> {
 
 export async function getDisplayName(): Promise<string> {
   const identity = await getIdentity();
-  return identity.keyId.slice(0, 6);
+  return generatePetName(identity.keyId);
 }
 
 export async function isKeyRegistered(): Promise<boolean> {
