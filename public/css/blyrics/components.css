@@ -265,6 +265,20 @@
 	filter: brightness(10);
 }
 
+.blyrics-footer__shaders {
+	background-color: var(--blyrics-footer-bg-color);
+	border: 1px solid var(--blyrics-footer-border-color);
+	padding: 0.5rem;
+	border-radius: var(--blyrics-border-radius);
+	display: grid;
+	place-items: center;
+	transition: background-color 0.2s;
+}
+
+.blyrics-footer__shaders:hover {
+	background-color: var(--blyrics-footer-bg-color-hover, var(--blyrics-footer-bg-color));
+}
+
 .blyrics-footer__vote {
 	background-color: var(--blyrics-footer-bg-color);
 	border: none;
