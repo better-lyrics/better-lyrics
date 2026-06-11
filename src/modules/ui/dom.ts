@@ -40,6 +40,7 @@ import { getSongMetadata } from "@modules/lyrics/requestSniffer/requestSniffer";
 import {
   animEngineState,
   getResumeScrollElement,
+  lyricsElementAdded,
   reflow,
   resetAnimEngineState,
   SCROLL_POS_OFFSET_RATIO,
@@ -676,6 +677,7 @@ export function addFooter(
   const footer = document.createElement("div");
   footer.classList.add(FOOTER_CLASS);
   lyricsElement.appendChild(footer);
+  observeFooterForRecalc(footer);
   createFooter(song, artist, album, duration, videoId, showRequestButton);
   applyActionsBarPlacement(AppState.actionsBarAnchor, AppState.actionsBarPlacement);
 
@@ -966,7 +968,7 @@ function createSubmitterBlock(submitter: NonNullable<UnisonData["submitter"]>): 
 
   const handleEl = document.createElement("strong");
   handleEl.className = `${FOOTER_CLASS}__author-name`;
-  handleEl.textContent = generatePetName(submitter.keyId);
+  handleEl.textContent = submitter.displayName ?? generatePetName(submitter.keyId);
 
   const tier = getTrustTier(submitter.reputation);
   const tierEl = document.createElement("span");
@@ -1647,6 +1649,18 @@ function getGeniusLink(song: string, artist: string): string {
   return `https://duckduckgo.com/?q=${query}`;
 }
 
+let footerResizeObserver: ResizeObserver | null = null;
+
+function observeFooterForRecalc(footer: HTMLElement): void {
+  if (footerResizeObserver) {
+    footerResizeObserver.disconnect();
+  }
+  footerResizeObserver = new ResizeObserver(() => {
+    lyricsElementAdded();
+  });
+  footerResizeObserver.observe(footer);
+}
+
 export function setExtraHeight() {
   const lyricsElement = document.getElementsByClassName(LYRICS_CLASS)[0] as HTMLElement;
   updateActionsBarLayoutVars();
@@ -1677,5 +1691,5 @@ export function setExtraHeight() {
     tabRendererHeight - lyricsHeight
   );
 
-  document.documentElement.style.setProperty("--blyrics-padding-bottom", extraHeight + "px");
+  document.documentElement.style.setProperty("--blyrics-padding-bottom", Math.ceil(extraHeight) + "px");
 }
