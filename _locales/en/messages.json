@@ -1123,6 +1123,10 @@
     "message": "Invalid sign-in request.",
     "description": "Error state shown when the popup receives malformed parameters"
   },
+  "auth_sessionExpired": {
+    "message": "Sign-in expired. Please close this window and try again.",
+    "description": "Shown in the sign-in consent popup when the connection to the extension's service worker is lost before the user can approve or cancel."
+  },
   "lyrics_requestSyncedVersion": {
     "message": "Request a synced version",
     "description": "Button label asking the community to contribute synced lyrics for the current song"
