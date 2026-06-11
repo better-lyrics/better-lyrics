@@ -1,4 +1,4 @@
-import { IDENTITY_ACTIONS, IDENTITY_ADJECTIVES, IDENTITY_NOUNS, UNISON_API_BASE_URL } from "@constants";
+import { IDENTITY_ACTIONS, IDENTITY_ADJECTIVES, IDENTITY_NOUNS, LOG_PREFIX, UNISON_API_BASE_URL } from "@constants";
 import { getLocalStorage } from "./storage";
 
 // -- Types ------------------------------------
@@ -230,8 +230,8 @@ async function fetchResolvedDisplayName(): Promise<string> {
         return json.data.displayName;
       }
     }
-  } catch (_err) {
-    /* fall through to local petname */
+  } catch (err) {
+    console.warn(`${LOG_PREFIX} resolveDisplayName fallback`, err);
   }
   return generatePetName(identity.keyId);
 }
