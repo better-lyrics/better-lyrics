@@ -208,7 +208,7 @@ body {
   align-items: center;
   gap: 6px;
   min-height: 1.25rem;
-  margin: 12px 0 8px;
+  margin: 4px 0 16px;
   font-size: 0.8125rem;
   color: rgba(255, 255, 255, 0.55);
   transition: color 120ms ease;
