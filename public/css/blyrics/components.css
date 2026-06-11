@@ -265,6 +265,39 @@
 	filter: brightness(10);
 }
 
+.blyrics-footer__container.blyrics-footer__shaders {
+	border: none;
+	box-shadow: rgba(0, 0, 0, 0.1) 0px 10px 15px -3px, rgba(0, 0, 0, 0.05) 0px 4px 6px -2px, inset rgba(255, 255, 255, 0.1) 0px 1px 0px 0px;
+	background-color: var(--blyrics-footer-bg-color);
+	background-image: linear-gradient(135deg, hsla(0, 0%, 100%, 0.05) 0%, hsla(0, 0%, 100%, 0.2) 50%, hsla(0, 0%, 100%, 0.05) 100%);
+	background-size: 200% 100%;
+	background-repeat: no-repeat;
+	color: var(--blyrics-footer-link-color);
+	cursor: pointer;
+	text-decoration: none;
+}
+
+.blyrics-footer__container.blyrics-footer__shaders > span {
+	background-image: linear-gradient(135deg, hsla(0, 0%, 100%, 0.6) 0%, hsla(0, 0%, 100%, 1) 50%, hsla(0, 0%, 100%, 0.6) 100%);
+	background-size: 200% 100%;
+	background-clip: text;
+	-webkit-background-clip: text;
+	color: transparent;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+	.blyrics-footer__container.blyrics-footer__shaders,
+	.blyrics-footer__container.blyrics-footer__shaders > span {
+		animation: blyrics-shaders-shimmer 20s infinite cubic-bezier(0.4, 0, 0.6, 1);
+	}
+}
+
+@keyframes blyrics-shaders-shimmer {
+	0% { background-position: 200% 0; }
+	25% { background-position: -200% 0; }
+	100% { background-position: -200% 0; }
+}
+
 .blyrics-footer__vote {
 	background-color: var(--blyrics-footer-bg-color);
 	border: none;

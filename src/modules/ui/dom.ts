@@ -817,12 +817,23 @@ function createFooter(
       if (!settings.isShadersPromoEnabled) return;
       if (!shouldRenderShadersPromo()) return;
 
-      const shadersButton = createActionButton({
-        text: t("lyrics_getShaders"),
-        href: getShadersStoreUrl(),
-        logoSrc: chrome.runtime.getURL("images/icons/shaders.png"),
-        logoAlt: "Better Lyrics Shaders",
-      });
+      const shadersButton = document.createElement("a");
+      shadersButton.className = `${FOOTER_CLASS}__container ${FOOTER_CLASS}__shaders`;
+      shadersButton.href = getShadersStoreUrl();
+      shadersButton.target = "_blank";
+      shadersButton.rel = "noreferrer noopener";
+
+      const shadersImage = document.createElement("img");
+      shadersImage.src = chrome.runtime.getURL("images/icons/shaders.png");
+      shadersImage.alt = "Better Lyrics Shaders";
+      shadersImage.width = 20;
+      shadersImage.height = 20;
+      shadersButton.appendChild(shadersImage);
+
+      const shadersLabel = document.createElement("span");
+      shadersLabel.textContent = t("lyrics_getShaders");
+      shadersButton.appendChild(shadersLabel);
+
       footer.insertBefore(shadersButton, discordLink);
     });
     footer.appendChild(discordLink);
