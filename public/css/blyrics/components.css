@@ -287,13 +287,13 @@
 @media (prefers-reduced-motion: no-preference) {
 	.blyrics-footer__container.blyrics-footer__shaders,
 	.blyrics-footer__container.blyrics-footer__shaders > span {
-		animation: blyrics-shaders-shimmer 10s infinite ease-in-out;
+		animation: blyrics-shaders-shimmer 8s infinite ease-in-out;
 	}
 }
 
 @keyframes blyrics-shaders-shimmer {
 	0% { background-position: 50% 0; }
-	50% { background-position: -150% 0; }
+	37.5% { background-position: -150% 0; }
 	100% { background-position: -150% 0; }
 }
 
