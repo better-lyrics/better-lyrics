@@ -2,7 +2,7 @@
 
 import { LOG_PREFIX, ROMANIZATION_LANGUAGES, UNISON_API_BASE_URL, UNISON_DOCK_DEFAULT_POSITION } from "@constants";
 import { getLanguageDisplayName, initI18n, loadLocaleOverride, SUPPORTED_LOCALES, t } from "@core/i18n";
-import { exportIdentity, getDisplayName, importIdentity, signPayload } from "@core/keyIdentity";
+import { exportIdentity, getDisplayName, importIdentity, invalidateDisplayName, signPayload } from "@core/keyIdentity";
 import Sortable from "sortablejs";
 import { showModal } from "./editor/ui/feedback";
 import { initStoreUI, setupYourThemesButton } from "./store/store";
@@ -578,31 +578,9 @@ async function initIdentityUI(): Promise<void> {
     displayNameEl.textContent = t("options_alert_identityLoadError");
   }
 
-  refreshResolvedDisplayName();
-
   document.getElementById("export-identity-btn")?.addEventListener("click", handleExportIdentity);
   document.getElementById("import-identity-btn")?.addEventListener("click", handleImportIdentity);
   initImportIdentityModal();
-}
-
-async function refreshResolvedDisplayName(): Promise<void> {
-  const displayNameEl = document.getElementById("identity-display-name");
-  if (!displayNameEl) return;
-  try {
-    const signed = await signPayload({});
-    const response = await fetch(`${UNISON_API_BASE_URL}/auth/nickname/me`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(signed),
-    });
-    if (!response.ok) return;
-    const json = (await response.json()) as { success?: boolean; data?: { displayName?: string } };
-    if (json.success && typeof json.data?.displayName === "string") {
-      displayNameEl.textContent = json.data.displayName;
-    }
-  } catch (error) {
-    console.warn(LOG_PREFIX, "Failed to refresh resolved display name:", error);
-  }
 }
 
 type NicknameStatusKind =
@@ -815,6 +793,7 @@ function initNicknameModal(): void {
       }
       const json = (await response.json()) as NicknameMutationResponse;
       const newDisplayName = json.data?.displayName ?? nickname;
+      invalidateDisplayName(newDisplayName);
       applyDisplayName(newDisplayName);
       setStatus("saved");
       resetBtn.disabled = false;
@@ -849,6 +828,7 @@ function initNicknameModal(): void {
       }
       const json = (await response.json()) as NicknameMutationResponse;
       const newDisplayName = json.data?.displayName ?? "";
+      invalidateDisplayName(newDisplayName);
       applyDisplayName(newDisplayName);
       input.value = newDisplayName;
       checkSeq++;

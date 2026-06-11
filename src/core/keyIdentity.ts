@@ -1,4 +1,4 @@
-import { IDENTITY_ACTIONS, IDENTITY_ADJECTIVES, IDENTITY_NOUNS } from "@constants";
+import { IDENTITY_ACTIONS, IDENTITY_ADJECTIVES, IDENTITY_NOUNS, UNISON_API_BASE_URL } from "@constants";
 import { getLocalStorage } from "./storage";
 
 // -- Types ------------------------------------
@@ -213,9 +213,38 @@ export async function importIdentity(json: string): Promise<KeyIdentity> {
   return identity;
 }
 
-export async function getDisplayName(): Promise<string> {
+let cachedDisplayName: Promise<string> | null = null;
+
+async function fetchResolvedDisplayName(): Promise<string> {
   const identity = await getIdentity();
+  try {
+    const signed = await signPayload({});
+    const response = await fetch(`${UNISON_API_BASE_URL}/auth/nickname/me`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(signed),
+    });
+    if (response.ok) {
+      const json = (await response.json()) as { success?: boolean; data?: { displayName?: string } };
+      if (json.success && typeof json.data?.displayName === "string") {
+        return json.data.displayName;
+      }
+    }
+  } catch (_err) {
+    /* fall through to local petname */
+  }
   return generatePetName(identity.keyId);
+}
+
+export async function getDisplayName(): Promise<string> {
+  if (!cachedDisplayName) {
+    cachedDisplayName = fetchResolvedDisplayName();
+  }
+  return cachedDisplayName;
+}
+
+export function invalidateDisplayName(newValue?: string): void {
+  cachedDisplayName = newValue !== undefined ? Promise.resolve(newValue) : null;
 }
 
 export async function isKeyRegistered(): Promise<boolean> {
