@@ -94,6 +94,10 @@
     "message": "Auto-scroll unsynced lyrics",
     "description": "Auto-scroll unsynced lyrics setting label"
   },
+  "options_display_shadersPromo": {
+    "message": "Show link to Better Lyrics Shaders",
+    "description": "Toggle label for the Shaders companion link shown in the lyrics footer"
+  },
   "options_display_unisonActions": {
     "message": "Unison Actions",
     "description": "Display-section row label for the Unison Actions modal trigger"
