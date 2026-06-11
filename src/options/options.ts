@@ -631,7 +631,7 @@ interface NicknameCheckResponse {
   success: boolean;
   data?: {
     available: boolean;
-    reason?: "INVALID_FORMAT" | "TAKEN" | "SELF";
+    reason?: "INVALID_FORMAT" | "TAKEN" | "SELF" | "RESERVED";
   };
 }
 
@@ -718,7 +718,7 @@ function initNicknameModal(): void {
     if (!data) return "error";
     if (data.reason === "SELF") return "self";
     if (data.reason === "INVALID_FORMAT") return "invalid";
-    if (data.reason === "TAKEN") return "taken";
+    if (data.reason === "TAKEN" || data.reason === "RESERVED") return "taken";
     if (data.available) return "available";
     return "error";
   };
