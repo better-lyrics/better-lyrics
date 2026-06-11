@@ -268,10 +268,8 @@
 .blyrics-footer__container.blyrics-footer__shaders {
 	border: none;
 	box-shadow: rgba(0, 0, 0, 0.1) 0px 10px 15px -3px, rgba(0, 0, 0, 0.05) 0px 4px 6px -2px, inset rgba(255, 255, 255, 0.1) 0px 1px 0px 0px;
-	background-color: var(--blyrics-footer-bg-color);
-	background-image: linear-gradient(135deg, hsla(0, 0%, 100%, 0.05) 0%, hsla(0, 0%, 100%, 0.2) 50%, hsla(0, 0%, 100%, 0.05) 100%);
+	background: linear-gradient(135deg, hsla(0, 0%, 100%, 0.05) 12.5%, hsla(0, 0%, 100%, 0.15) 50%, hsla(0, 0%, 100%, 0.05) 87.5%);
 	background-size: 200% 100%;
-	background-repeat: no-repeat;
 	color: var(--blyrics-footer-link-color);
 	cursor: pointer;
 	text-decoration: none;
