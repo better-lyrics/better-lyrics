@@ -292,9 +292,9 @@
 }
 
 @keyframes blyrics-shaders-shimmer {
-	0% { background-position: -150% 0; }
-	25% { background-position: 50% 0; }
-	100% { background-position: 50% 0; }
+	0% { background-position: 50% 0; }
+	15% { background-position: -150% 0; }
+	100% { background-position: -150% 0; }
 }
 
 .blyrics-footer__vote {
