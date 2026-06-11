@@ -242,6 +242,10 @@
 	flex-wrap: wrap;
 }
 
+.blyrics-footer img {
+	user-select: none;
+}
+
 .blyrics-footer__discord {
 	background-color: var(--blyrics-footer-bg-color);
 	border: 1px solid var(--blyrics-footer-border-color);
@@ -278,7 +282,7 @@
 }
 
 .blyrics-footer__container.blyrics-footer__shaders > span {
-	background-image: linear-gradient(110deg, hsla(0, 0%, 100%, 0.675) 30%, hsla(0, 0%, 100%, 1) 50%, hsla(0, 0%, 100%, 0.675) 70%);
+	background-image: linear-gradient(110deg, hsla(0, 0%, 100%, 0.75) 30%, hsla(0, 0%, 100%, 1) 50%, hsla(0, 0%, 100%, 0.75) 70%);
 	background-size: 200% 100%;
 	background-clip: text;
 	-webkit-background-clip: text;
@@ -288,13 +292,13 @@
 @media (prefers-reduced-motion: no-preference) {
 	.blyrics-footer__container.blyrics-footer__shaders,
 	.blyrics-footer__container.blyrics-footer__shaders > span {
-		animation: blyrics-shaders-shimmer 7s infinite ease-in-out;
+		animation: blyrics-shaders-shimmer 6s infinite ease-in-out;
 	}
 }
 
 @keyframes blyrics-shaders-shimmer {
 	0% { background-position: 50% 0; }
-	28.57% { background-position: -150% 0; }
+	16.67% { background-position: -150% 0; }
 	100% { background-position: -150% 0; }
 }
 
