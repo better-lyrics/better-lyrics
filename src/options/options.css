@@ -1037,7 +1037,8 @@ hr {
 }
 
 #nickname-modal-status[data-state="invalid"],
-#nickname-modal-status[data-state="rateLimited"] {
+#nickname-modal-status[data-state="rateLimited"],
+#nickname-modal-status[data-state="profane"] {
 	color: #f5b942;
 }
 

@@ -591,6 +591,7 @@ type NicknameStatusKind =
   | "self"
   | "taken"
   | "invalid"
+  | "profane"
   | "rateLimited"
   | "submitting"
   | "saved"
@@ -612,6 +613,7 @@ const NICKNAME_STATUS_ICON_FOR: Record<NicknameStatusKind, keyof typeof NICKNAME
   self: "info",
   taken: "cross",
   invalid: "warn",
+  profane: "warn",
   rateLimited: "warn",
   submitting: "spinner",
   saved: "check",
@@ -631,7 +633,7 @@ interface NicknameCheckResponse {
   success: boolean;
   data?: {
     available: boolean;
-    reason?: "INVALID_FORMAT" | "TAKEN" | "SELF" | "RESERVED";
+    reason?: "INVALID_FORMAT" | "TAKEN" | "SELF" | "RESERVED" | "PROFANE";
   };
 }
 
@@ -718,6 +720,7 @@ function initNicknameModal(): void {
     if (!data) return "error";
     if (data.reason === "SELF") return "self";
     if (data.reason === "INVALID_FORMAT") return "invalid";
+    if (data.reason === "PROFANE") return "profane";
     if (data.reason === "TAKEN" || data.reason === "RESERVED") return "taken";
     if (data.available) return "available";
     return "error";
@@ -790,7 +793,14 @@ function initNicknameModal(): void {
         return;
       }
       if (response.status === 409) {
-        setStatus("taken");
+        let conflict: NicknameStatusKind = "taken";
+        try {
+          const errJson = (await response.clone().json()) as { error?: string };
+          if (errJson.error === "NICKNAME_PROFANE") conflict = "profane";
+        } catch (err) {
+          console.warn(LOG_PREFIX, "Nickname conflict body parse failed:", err);
+        }
+        setStatus(conflict);
         resetBtn.disabled = false;
         return;
       }

@@ -319,6 +319,10 @@
     "message": "3 to 20 letters, numbers, or underscores",
     "description": "Status when nickname format is invalid"
   },
+  "options_nickname_status_profane": {
+    "message": "Not allowed, try another",
+    "description": "Status when nickname is flagged as inappropriate by the server"
+  },
   "options_nickname_status_self": {
     "message": "This is your current nickname",
     "description": "Status when entered nickname matches current"
