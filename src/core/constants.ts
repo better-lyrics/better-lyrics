@@ -123,6 +123,8 @@ export const AUTH_MESSAGE_TYPES = {
 
 export const AUTH_PORT_NAME_PREFIX = "bl-auth-popup:" as const;
 
+export const BL_AUTH_SITE_PORT_NAME = "bl-auth-site" as const;
+
 export interface AuthPartner {
   id: string;
   origin: string;
