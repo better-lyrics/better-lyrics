@@ -814,6 +814,7 @@ function createFooter(
       footer.appendChild(createRequestSyncedButton({ videoId, song, artist }));
     }
     chrome.storage.sync.get({ isShadersPromoEnabled: true }, settings => {
+      if (!discordLink.isConnected) return;
       if (!settings.isShadersPromoEnabled) return;
       if (!shouldRenderShadersPromo()) return;
 
