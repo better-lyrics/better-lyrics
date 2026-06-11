@@ -1,8 +1,8 @@
 // Function to save user options
 
-import { LOG_PREFIX, ROMANIZATION_LANGUAGES, UNISON_DOCK_DEFAULT_POSITION } from "@constants";
+import { LOG_PREFIX, ROMANIZATION_LANGUAGES, UNISON_API_BASE_URL, UNISON_DOCK_DEFAULT_POSITION } from "@constants";
 import { getLanguageDisplayName, initI18n, loadLocaleOverride, SUPPORTED_LOCALES, t } from "@core/i18n";
-import { exportIdentity, getIdentity, importIdentity, type KeyIdentity } from "@core/keyIdentity";
+import { exportIdentity, getDisplayName, importIdentity, invalidateDisplayName, signPayload } from "@core/keyIdentity";
 import Sortable from "sortablejs";
 import { showModal } from "./editor/ui/feedback";
 import { initStoreUI, setupYourThemesButton } from "./store/store";
@@ -564,6 +564,7 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   initIdentityUI();
+  initNicknameModal();
 });
 
 async function initIdentityUI(): Promise<void> {
@@ -571,8 +572,7 @@ async function initIdentityUI(): Promise<void> {
   if (!displayNameEl) return;
 
   try {
-    const identity = await getIdentity();
-    displayNameEl.textContent = identity.displayName;
+    displayNameEl.textContent = await getDisplayName();
   } catch (error) {
     console.error(LOG_PREFIX, "Failed to load identity:", error);
     displayNameEl.textContent = t("options_alert_identityLoadError");
@@ -583,11 +583,301 @@ async function initIdentityUI(): Promise<void> {
   initImportIdentityModal();
 }
 
+type NicknameStatusKind =
+  | "idle"
+  | "typing"
+  | "checking"
+  | "available"
+  | "self"
+  | "taken"
+  | "invalid"
+  | "profane"
+  | "rateLimited"
+  | "submitting"
+  | "saved"
+  | "error";
+
+const NICKNAME_STATUS_ICON_MARKUP: Record<string, string> = {
+  check: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" width="14" height="14" aria-hidden="true"><path fill-rule="evenodd" d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.75.75 0 1 1 1.06-1.06L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z" clip-rule="evenodd"/></svg>`,
+  cross: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" width="14" height="14" aria-hidden="true"><path fill-rule="evenodd" d="M5.28 4.22a.75.75 0 0 0-1.06 1.06L6.94 8l-2.72 2.72a.75.75 0 1 0 1.06 1.06L8 9.06l2.72 2.72a.75.75 0 1 0 1.06-1.06L9.06 8l2.72-2.72a.75.75 0 0 0-1.06-1.06L8 6.94 5.28 4.22Z" clip-rule="evenodd"/></svg>`,
+  warn: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" width="14" height="14" aria-hidden="true"><path fill-rule="evenodd" d="M6.701 2.252a1.5 1.5 0 0 1 2.598 0l5.196 9.001A1.5 1.5 0 0 1 13.196 13.5H2.804a1.5 1.5 0 0 1-1.299-2.247l5.196-9.001ZM8 5.5a.75.75 0 0 1 .75.75v3a.75.75 0 0 1-1.5 0v-3A.75.75 0 0 1 8 5.5Zm0 6.5a.75.75 0 1 0 0-1.5.75.75 0 0 0 0 1.5Z" clip-rule="evenodd"/></svg>`,
+  info: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" width="14" height="14" aria-hidden="true"><path fill-rule="evenodd" d="M8 14.5a6.5 6.5 0 1 0 0-13 6.5 6.5 0 0 0 0 13ZM8 7a.75.75 0 0 1 .75.75v3.5a.75.75 0 0 1-1.5 0v-3.5A.75.75 0 0 1 8 7Zm0-2.5a.875.875 0 1 1 0 1.75.875.875 0 0 1 0-1.75Z" clip-rule="evenodd"/></svg>`,
+  spinner: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="none" width="14" height="14" aria-hidden="true" class="nickname-status-spinner"><circle cx="8" cy="8" r="6" stroke="currentColor" stroke-opacity="0.25" stroke-width="2"/><path d="M14 8a6 6 0 0 0-6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>`,
+};
+
+const NICKNAME_STATUS_ICON_FOR: Record<NicknameStatusKind, keyof typeof NICKNAME_STATUS_ICON_MARKUP | null> = {
+  idle: null,
+  typing: null,
+  checking: "spinner",
+  available: "check",
+  self: "info",
+  taken: "cross",
+  invalid: "warn",
+  profane: "warn",
+  rateLimited: "warn",
+  submitting: "spinner",
+  saved: "check",
+  error: "cross",
+};
+
+const NICKNAME_STATUS_ICON_NODES: Record<string, SVGElement> = (() => {
+  const parser = new DOMParser();
+  const nodes: Record<string, SVGElement> = {};
+  for (const [key, markup] of Object.entries(NICKNAME_STATUS_ICON_MARKUP)) {
+    nodes[key] = parser.parseFromString(markup, "image/svg+xml").documentElement as unknown as SVGElement;
+  }
+  return nodes;
+})();
+
+interface NicknameCheckResponse {
+  success: boolean;
+  data?: {
+    available: boolean;
+    reason?: "INVALID_FORMAT" | "TAKEN" | "SELF" | "RESERVED" | "PROFANE";
+  };
+}
+
+interface NicknameMutationResponse {
+  success: boolean;
+  data?: {
+    keyId: string;
+    displayName: string;
+  };
+}
+
+function getNicknameModalElements() {
+  const overlay = document.getElementById("nickname-modal-overlay");
+  const closeBtn = document.getElementById("nickname-modal-close");
+  const cancelBtn = document.getElementById("nickname-modal-cancel");
+  const saveBtn = document.getElementById("nickname-modal-save") as HTMLButtonElement | null;
+  const resetBtn = document.getElementById("nickname-modal-reset") as HTMLButtonElement | null;
+  const input = document.getElementById("nickname-modal-input") as HTMLInputElement | null;
+  const status = document.getElementById("nickname-modal-status");
+  return { overlay, closeBtn, cancelBtn, saveBtn, resetBtn, input, status };
+}
+
+function openNicknameModal(): void {
+  const { overlay, input, saveBtn } = getNicknameModalElements();
+  if (!overlay || !input || !saveBtn) return;
+  const display = document.getElementById("identity-display-name");
+  input.value = display?.textContent ?? "";
+  saveBtn.disabled = true;
+  overlay.classList.add("active");
+  setTimeout(() => {
+    input.focus();
+    input.select();
+  }, 100);
+}
+
+function closeNicknameModal(): void {
+  const { overlay } = getNicknameModalElements();
+  overlay?.classList.remove("active");
+}
+
+function initNicknameModal(): void {
+  const { overlay, closeBtn, cancelBtn, saveBtn, resetBtn, input, status } = getNicknameModalElements();
+  if (!overlay || !closeBtn || !cancelBtn || !saveBtn || !resetBtn || !input || !status) return;
+
+  const editBtn = document.getElementById("nickname-edit-btn");
+  editBtn?.addEventListener("click", openNicknameModal);
+
+  closeBtn.addEventListener("click", closeNicknameModal);
+  cancelBtn.addEventListener("click", closeNicknameModal);
+
+  overlay.addEventListener("click", e => {
+    if (e.target === overlay) closeNicknameModal();
+  });
+
+  document.addEventListener("keydown", e => {
+    if (e.key === "Escape" && overlay.classList.contains("active")) {
+      closeNicknameModal();
+    }
+  });
+
+  let checkSeq = 0;
+  let debounceTimer: ReturnType<typeof setTimeout> | null = null;
+
+  const setStatus = (kind: NicknameStatusKind): void => {
+    status.dataset.state = kind;
+    saveBtn.disabled = kind !== "available";
+    if (kind === "idle" || kind === "typing") {
+      status.replaceChildren();
+      return;
+    }
+    const iconKey = NICKNAME_STATUS_ICON_FOR[kind];
+    const label = document.createElement("span");
+    label.textContent = t(`options_nickname_status_${kind}`);
+    if (iconKey) {
+      status.replaceChildren(NICKNAME_STATUS_ICON_NODES[iconKey].cloneNode(true), label);
+    } else {
+      status.replaceChildren(label);
+    }
+  };
+
+  setStatus("idle");
+
+  const mapCheckResult = (data: NicknameCheckResponse["data"]): NicknameStatusKind => {
+    if (!data) return "error";
+    if (data.reason === "SELF") return "self";
+    if (data.reason === "INVALID_FORMAT") return "invalid";
+    if (data.reason === "PROFANE") return "profane";
+    if (data.reason === "TAKEN" || data.reason === "RESERVED") return "taken";
+    if (data.available) return "available";
+    return "error";
+  };
+
+  const runCheck = async (nickname: string, seq: number): Promise<void> => {
+    setStatus("checking");
+    try {
+      const signed = await signPayload({ nickname });
+      const response = await fetch(`${UNISON_API_BASE_URL}/auth/nickname/check`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(signed),
+      });
+      if (seq !== checkSeq) return;
+      if (response.status === 429) {
+        setStatus("rateLimited");
+        return;
+      }
+      if (!response.ok) {
+        setStatus("error");
+        return;
+      }
+      const json = (await response.json()) as NicknameCheckResponse;
+      if (seq !== checkSeq) return;
+      setStatus(mapCheckResult(json.data));
+    } catch (error) {
+      if (seq !== checkSeq) return;
+      console.warn(LOG_PREFIX, "Nickname availability check failed:", error);
+      setStatus("error");
+    }
+  };
+
+  input.addEventListener("input", () => {
+    const value = input.value;
+    const seq = ++checkSeq;
+    if (debounceTimer) clearTimeout(debounceTimer);
+    if (value.length === 0) {
+      setStatus("idle");
+      return;
+    }
+    setStatus("typing");
+    debounceTimer = setTimeout(() => {
+      if (seq !== checkSeq) return;
+      runCheck(value, seq);
+    }, 350);
+  });
+
+  const applyDisplayName = (newDisplayName: string): void => {
+    const identityEl = document.getElementById("identity-display-name");
+    if (identityEl) identityEl.textContent = newDisplayName;
+  };
+
+  saveBtn.addEventListener("click", async () => {
+    const nickname = input.value;
+    if (!nickname) return;
+    saveBtn.disabled = true;
+    resetBtn.disabled = true;
+    setStatus("submitting");
+    try {
+      const signed = await signPayload({ nickname });
+      const response = await fetch(`${UNISON_API_BASE_URL}/auth/nickname`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(signed),
+      });
+      if (response.status === 400) {
+        setStatus("invalid");
+        resetBtn.disabled = false;
+        return;
+      }
+      if (response.status === 409) {
+        let conflict: NicknameStatusKind = "taken";
+        try {
+          const errJson = (await response.clone().json()) as { error?: string };
+          if (errJson.error === "NICKNAME_PROFANE") conflict = "profane";
+        } catch (err) {
+          console.warn(LOG_PREFIX, "Nickname conflict body parse failed:", err);
+        }
+        setStatus(conflict);
+        resetBtn.disabled = false;
+        return;
+      }
+      if (response.status === 429) {
+        setStatus("rateLimited");
+        resetBtn.disabled = false;
+        return;
+      }
+      if (!response.ok) {
+        setStatus("error");
+        resetBtn.disabled = false;
+        return;
+      }
+      const json = (await response.json()) as NicknameMutationResponse;
+      const newDisplayName = json.data?.displayName ?? nickname;
+      invalidateDisplayName(newDisplayName);
+      applyDisplayName(newDisplayName);
+      setStatus("saved");
+      resetBtn.disabled = false;
+      closeNicknameModal();
+    } catch (error) {
+      console.warn(LOG_PREFIX, "Nickname save failed:", error);
+      setStatus("error");
+      resetBtn.disabled = false;
+    }
+  });
+
+  resetBtn.addEventListener("click", async () => {
+    saveBtn.disabled = true;
+    resetBtn.disabled = true;
+    setStatus("submitting");
+    try {
+      const signed = await signPayload({});
+      const response = await fetch(`${UNISON_API_BASE_URL}/auth/nickname`, {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(signed),
+      });
+      if (response.status === 429) {
+        setStatus("rateLimited");
+        resetBtn.disabled = false;
+        return;
+      }
+      if (!response.ok) {
+        setStatus("error");
+        resetBtn.disabled = false;
+        return;
+      }
+      const json = (await response.json()) as NicknameMutationResponse;
+      const responseDisplayName = json.data?.displayName;
+      let resolvedDisplayName: string;
+      if (typeof responseDisplayName === "string" && responseDisplayName.length > 0) {
+        invalidateDisplayName(responseDisplayName);
+        resolvedDisplayName = responseDisplayName;
+      } else {
+        invalidateDisplayName();
+        resolvedDisplayName = await getDisplayName();
+      }
+      applyDisplayName(resolvedDisplayName);
+      input.value = resolvedDisplayName;
+      checkSeq++;
+      setStatus("saved");
+      resetBtn.disabled = false;
+      closeNicknameModal();
+    } catch (error) {
+      console.warn(LOG_PREFIX, "Nickname reset failed:", error);
+      setStatus("error");
+      resetBtn.disabled = false;
+    }
+  });
+}
+
 async function handleExportIdentity(): Promise<void> {
   try {
-    const identity = await getIdentity();
+    const displayName = await getDisplayName();
     const exportData = await exportIdentity();
-    const filename = `better-lyrics-identity-${identity.displayName}.json`;
+    const filename = `better-lyrics-identity-${displayName}.json`;
 
     chrome.permissions.contains({ permissions: ["downloads"] }, hasPermission => {
       if (hasPermission) {
@@ -680,8 +970,8 @@ function closeImportIdentityModal(): void {
 
 async function importIdentityFromJson(json: string): Promise<void> {
   try {
-    const imported = await importIdentity(json);
-    updateIdentityDisplay(imported);
+    await importIdentity(json);
+    await updateIdentityDisplay();
     showAlert(t("options_alert_importSuccess"));
     closeImportIdentityModal();
   } catch (err) {
@@ -770,10 +1060,10 @@ function initImportIdentityModal(): void {
   });
 }
 
-function updateIdentityDisplay(identity: KeyIdentity): void {
+async function updateIdentityDisplay(): Promise<void> {
   const displayNameEl = document.getElementById("identity-display-name");
   if (displayNameEl) {
-    displayNameEl.textContent = identity.displayName;
+    displayNameEl.textContent = await getDisplayName();
   }
 }
 
