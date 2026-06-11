@@ -3,7 +3,7 @@ import { getLocalStorage } from "./storage";
 
 // -- Types ------------------------------------
 
-export interface KeyIdentity {
+interface KeyIdentity {
   keyId: string;
   publicKey: JsonWebKey;
   privateKey: JsonWebKey;
