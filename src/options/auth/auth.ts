@@ -72,10 +72,11 @@ function bindStaticText(): void {
   if (cancel) cancel.textContent = t("auth_cancel");
 }
 
-function showError(messageKey: string): void {
+function showError(messageKey: string, state: "error" | "warning" = "error"): void {
   const error = document.getElementById("auth-error");
   if (!error) return;
   error.textContent = t(messageKey);
+  error.dataset.state = state;
   error.hidden = false;
 }
 
@@ -107,6 +108,7 @@ function wireActions(port: chrome.runtime.Port): void {
       port.postMessage({ result: "approve", remember: remember?.checked === true });
     } catch (err) {
       console.warn(LOG_PREFIX_AUTH, "approve post failed", err);
+      showError("auth_sessionExpired");
     }
   });
 
@@ -117,6 +119,7 @@ function wireActions(port: chrome.runtime.Port): void {
       port.postMessage({ result: "cancel" });
     } catch (err) {
       console.warn(LOG_PREFIX_AUTH, "cancel post failed", err);
+      showError("auth_sessionExpired");
     }
   });
 }

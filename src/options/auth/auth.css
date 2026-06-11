@@ -204,10 +204,20 @@ body {
 }
 
 .auth-card__error {
-  margin-top: 16px;
-  padding: 10px 12px;
-  border-radius: 8px;
-  background: rgba(242, 12, 50, 0.15);
-  color: #ff8a9c;
-  font-size: 0.85rem;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 1.25rem;
+  margin: 12px 0 0;
+  font-size: 0.8125rem;
+  color: rgba(255, 255, 255, 0.55);
+  transition: color 120ms ease;
+}
+
+.auth-card__error[data-state="error"] {
+  color: #ff7961;
+}
+
+.auth-card__error[data-state="warning"] {
+  color: #f5b942;
 }
