@@ -84,7 +84,6 @@ function showError(messageKey: string, state: "error" | "warning" = "error"): vo
   const icon = STATUS_ICON_TEMPLATE.cloneNode(true);
   const text = document.createTextNode(t(messageKey));
   error.replaceChildren(icon, text);
-  error.hidden = false;
 }
 
 async function bindDynamicText(params: RequestParams): Promise<void> {
