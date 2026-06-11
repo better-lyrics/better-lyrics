@@ -209,6 +209,7 @@ export async function importIdentity(json: string): Promise<KeyIdentity> {
   }
 
   cachedIdentity = identity;
+  invalidateDisplayName();
 
   return identity;
 }
