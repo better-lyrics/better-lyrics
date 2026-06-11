@@ -1,4 +1,10 @@
-import { AUTH_MESSAGE_TYPES, AUTH_PORT_NAME_PREFIX, isAllowedAuthOrigin, LOG_PREFIX_AUTH } from "@constants";
+import {
+  AUTH_MESSAGE_TYPES,
+  AUTH_PORT_NAME_PREFIX,
+  BL_AUTH_SITE_PORT_NAME,
+  isAllowedAuthOrigin,
+  LOG_PREFIX_AUTH,
+} from "@constants";
 import { signPayload } from "@core/keyIdentity";
 import { isApproved, pruneExpired, rememberApproval } from "@modules/auth/approvedOrigins";
 
@@ -19,7 +25,7 @@ type ExternalResponse =
   | { ok: false; reason: "ORIGIN_MISMATCH" | "INVALID_REQUEST" | "USER_CANCELLED" | "USER_DISMISSED" | "SIGN_FAILED" };
 
 interface PendingRequest {
-  resolve: (response: ExternalResponse) => void;
+  sitePort: chrome.runtime.Port;
   origin: string;
   nonce: string;
   port: chrome.runtime.Port | null;
@@ -56,7 +62,14 @@ function resolveSlot(slot: PendingRequest, requestId: string, response: External
   if (slot.resolved) return;
   slot.resolved = true;
   pending.delete(requestId);
-  slot.resolve(response);
+
+  try {
+    slot.sitePort.postMessage(response);
+    slot.sitePort.disconnect();
+  } catch (err) {
+    console.warn(LOG_PREFIX_AUTH, "site port post failed", err);
+  }
+
   if (slot.windowId !== null) {
     chrome.windows.remove(slot.windowId).catch(err => console.warn(LOG_PREFIX_AUTH, "window remove failed", err));
   }
@@ -113,43 +126,78 @@ async function handlePortMessage(requestId: string, slot: PendingRequest, msg: P
 export function initBackgroundAuth(): void {
   pruneExpired().catch(err => console.warn(LOG_PREFIX_AUTH, "pruneExpired failed", err));
 
-  chrome.runtime.onMessageExternal.addListener((message, sender, sendResponse) => {
-    void (async () => {
-      if (!isAllowedAuthOrigin(sender.origin)) {
-        sendResponse({ ok: false, reason: "ORIGIN_MISMATCH" });
-        return;
-      }
-      if (!isValidAuthRequest(message)) {
-        sendResponse({ ok: false, reason: "INVALID_REQUEST" });
-        return;
-      }
-      if (sender.origin !== message.origin) {
-        sendResponse({ ok: false, reason: "ORIGIN_MISMATCH" });
-        return;
-      }
+  chrome.runtime.onConnectExternal.addListener(sitePort => {
+    if (sitePort.name !== BL_AUTH_SITE_PORT_NAME) {
+      sitePort.disconnect();
+      return;
+    }
 
-      if (await isApproved(message.origin)) {
-        sendResponse(await signFor(message));
-        return;
-      }
+    const senderOrigin = sitePort.sender?.origin;
+    if (!isAllowedAuthOrigin(senderOrigin)) {
+      sitePort.disconnect();
+      return;
+    }
 
-      const requestId = crypto.randomUUID();
-      const windowId = await openConsentPopup(requestId, message);
-      if (windowId === null) {
-        sendResponse({ ok: false, reason: "USER_DISMISSED" });
-        return;
-      }
+    let handled = false;
 
-      pending.set(requestId, {
-        resolve: sendResponse,
-        origin: message.origin,
-        nonce: message.nonce,
-        port: null,
-        windowId,
-        resolved: false,
-      });
-    })();
-    return true;
+    sitePort.onMessage.addListener(message => {
+      if (handled) return;
+      handled = true;
+
+      void (async () => {
+        if (!isValidAuthRequest(message)) {
+          sitePort.postMessage({ ok: false, reason: "INVALID_REQUEST" });
+          sitePort.disconnect();
+          return;
+        }
+        if (senderOrigin !== message.origin) {
+          sitePort.postMessage({ ok: false, reason: "ORIGIN_MISMATCH" });
+          sitePort.disconnect();
+          return;
+        }
+
+        if (await isApproved(message.origin)) {
+          const signed = await signFor(message);
+          try {
+            sitePort.postMessage(signed);
+            sitePort.disconnect();
+          } catch (err) {
+            console.warn(LOG_PREFIX_AUTH, "site port post failed", err);
+          }
+          return;
+        }
+
+        const requestId = crypto.randomUUID();
+        const windowId = await openConsentPopup(requestId, message);
+        if (windowId === null) {
+          sitePort.postMessage({ ok: false, reason: "USER_DISMISSED" });
+          sitePort.disconnect();
+          return;
+        }
+
+        pending.set(requestId, {
+          sitePort,
+          origin: message.origin,
+          nonce: message.nonce,
+          port: null,
+          windowId,
+          resolved: false,
+        });
+      })().catch(err => console.warn(LOG_PREFIX_AUTH, "site port handler failed", err));
+    });
+
+    sitePort.onDisconnect.addListener(() => {
+      for (const [requestId, slot] of pending) {
+        if (slot.sitePort === sitePort && !slot.resolved) {
+          slot.resolved = true;
+          pending.delete(requestId);
+          if (slot.windowId !== null) {
+            chrome.windows.remove(slot.windowId).catch(() => {});
+          }
+          return;
+        }
+      }
+    });
   });
 
   chrome.runtime.onConnect.addListener(port => {
