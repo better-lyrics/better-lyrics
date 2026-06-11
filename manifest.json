@@ -43,7 +43,6 @@
         "css/disablestylizedanimations.css",
         "css/themesong.css",
         "css/themes/*.css",
-        "images/icons/shaders.png",
         "*.js.map",
         "pages/standalone-editor.html",
         "pages/marketplace.html",

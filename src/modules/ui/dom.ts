@@ -25,7 +25,6 @@ import {
   SHADERS_AMO_URL,
   SHADERS_CWS_URL,
   SHADERS_DETECTION_SELECTOR,
-  SHADERS_LOGO_PATH,
   type SyncType,
   TAB_RENDERER_SELECTOR,
   TRANSLATED_LYRICS_CLASS,
@@ -50,6 +49,7 @@ import type { UnisonLyricsRequest } from "@modules/unison/types";
 import { requestLyrics } from "@modules/unison/unisonApi";
 import { log } from "@utils";
 import { generatePetName } from "@/core/keyIdentity";
+import shadersIconUrl from "../../../images/icons/shaders.png";
 import { byId, deleteVote, type UnisonData, vote } from "../lyrics/providers/unison";
 import { scrollEventHandler } from "./observer";
 import { showReportModal } from "./reportLyrics";
@@ -819,7 +819,7 @@ function createFooter(
       if (!shouldRenderShadersPromo()) return;
 
       const shadersImage = document.createElement("img");
-      shadersImage.src = chrome.runtime.getURL(SHADERS_LOGO_PATH);
+      shadersImage.src = shadersIconUrl;
       shadersImage.alt = "Better Lyrics Shaders";
       shadersImage.width = 20;
       shadersImage.height = 20;
