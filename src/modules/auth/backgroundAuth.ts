@@ -28,7 +28,7 @@ interface PendingRequest {
   sitePort: chrome.runtime.Port;
   origin: string;
   nonce: string;
-  port: chrome.runtime.Port | null;
+  popupPort: chrome.runtime.Port | null;
   windowId: number | null;
   resolved: boolean;
 }
@@ -66,6 +66,7 @@ function resolveSlot(slot: PendingRequest, requestId: string, response: External
   try {
     slot.sitePort.postMessage(response);
     slot.sitePort.disconnect();
+    slot.popupPort?.disconnect();
   } catch (err) {
     console.warn(LOG_PREFIX_AUTH, "site port post failed", err);
   }
@@ -139,6 +140,7 @@ export function initBackgroundAuth(): void {
     }
 
     let handled = false;
+    let siteConnected = true;
 
     sitePort.onMessage.addListener(message => {
       if (handled) return;
@@ -158,6 +160,7 @@ export function initBackgroundAuth(): void {
 
         if (await isApproved(message.origin)) {
           const signed = await signFor(message);
+          if (!siteConnected) return;
           try {
             sitePort.postMessage(signed);
             sitePort.disconnect();
@@ -174,12 +177,16 @@ export function initBackgroundAuth(): void {
           sitePort.disconnect();
           return;
         }
+        if (!siteConnected) {
+          chrome.windows.remove(windowId).catch(err => console.warn(LOG_PREFIX_AUTH, "window remove failed", err));
+          return;
+        }
 
         pending.set(requestId, {
           sitePort,
           origin: message.origin,
           nonce: message.nonce,
-          port: null,
+          popupPort: null,
           windowId,
           resolved: false,
         });
@@ -187,12 +194,16 @@ export function initBackgroundAuth(): void {
     });
 
     sitePort.onDisconnect.addListener(() => {
+      siteConnected = false;
       for (const [requestId, slot] of pending) {
         if (slot.sitePort === sitePort && !slot.resolved) {
           slot.resolved = true;
           pending.delete(requestId);
+          slot.popupPort?.disconnect();
           if (slot.windowId !== null) {
-            chrome.windows.remove(slot.windowId).catch(() => {});
+            chrome.windows
+              .remove(slot.windowId)
+              .catch(err => console.warn(LOG_PREFIX_AUTH, "window remove failed", err));
           }
           return;
         }
@@ -209,7 +220,7 @@ export function initBackgroundAuth(): void {
       return;
     }
 
-    slot.port = port;
+    slot.popupPort = port;
 
     port.onMessage.addListener(msg => {
       if (!isValidPortMessage(msg)) return;
