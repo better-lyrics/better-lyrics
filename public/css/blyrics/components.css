@@ -277,7 +277,7 @@
 }
 
 .blyrics-footer__container.blyrics-footer__shaders > span {
-	background-image: linear-gradient(135deg, hsla(0, 0%, 100%, 0.6) 0%, hsla(0, 0%, 100%, 1) 50%, hsla(0, 0%, 100%, 0.6) 100%);
+	background-image: linear-gradient(135deg, hsla(0, 0%, 100%, 0.25) 30%, hsla(0, 0%, 100%, 1) 50%, hsla(0, 0%, 100%, 0.25) 70%);
 	background-size: 200% 100%;
 	background-clip: text;
 	-webkit-background-clip: text;
@@ -287,13 +287,13 @@
 @media (prefers-reduced-motion: no-preference) {
 	.blyrics-footer__container.blyrics-footer__shaders,
 	.blyrics-footer__container.blyrics-footer__shaders > span {
-		animation: blyrics-shaders-shimmer 20s infinite cubic-bezier(0.4, 0, 0.6, 1);
+		animation: blyrics-shaders-shimmer 16s infinite cubic-bezier(0.4, 0, 0.6, 1);
 	}
 }
 
 @keyframes blyrics-shaders-shimmer {
 	0% { background-position: 50% 0; }
-	15% { background-position: -150% 0; }
+	6.25% { background-position: -150% 0; }
 	100% { background-position: -150% 0; }
 }
 
