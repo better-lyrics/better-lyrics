@@ -99,6 +99,7 @@ async function bindDynamicText(params: RequestParams): Promise<void> {
       console.warn(LOG_PREFIX_AUTH, "identity load failed", err);
       subtitle.textContent = t("auth_consentSubheading", "");
     }
+    subtitle.dataset.ready = "true";
   }
 }
 

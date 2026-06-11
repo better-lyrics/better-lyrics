@@ -94,6 +94,12 @@ body {
 .auth-card__subtitle {
   font-size: 0.92rem;
   margin: 0 0 14px;
+  min-height: 1.2em;
+  opacity: 0;
+  transition: opacity 200ms ease;
+}
+
+.auth-card__subtitle[data-ready] {
   opacity: 0.85;
 }
 
