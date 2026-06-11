@@ -92,7 +92,7 @@
     "description": "Auto-scroll unsynced lyrics setting label"
   },
   "options_display_shadersPromo": {
-    "message": "Show link to Better Lyrics Shaders",
+    "message": "Mostra link a Better Lyrics Shaders",
     "description": "Toggle label for the Shaders companion link shown in the lyrics footer"
   },
   "options_display_unisonActions": {
@@ -878,7 +878,7 @@
     "description": "Search on Genius button text"
   },
   "lyrics_getShaders": {
-    "message": "Get Better Lyrics Shaders",
+    "message": "Ottieni Better Lyrics Shaders",
     "description": "Footer button text linking to the Better Lyrics Shaders companion extension"
   },
   "lyrics_searching": {
@@ -1092,6 +1092,10 @@
   "auth_invalidRequest": {
     "message": "Richiesta di accesso non valida.",
     "description": "Error state shown when the popup receives malformed parameters"
+  },
+  "auth_sessionExpired": {
+    "message": "Sign-in expired. Please close this window and try again.",
+    "description": "Shown in the sign-in consent popup when the connection to the extension's service worker is lost before the user can approve or cancel."
   },
   "lyrics_requestSyncedVersion": {
     "message": "Richiedi una versione sincronizzata",
