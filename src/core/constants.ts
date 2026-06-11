@@ -28,6 +28,7 @@ export const TAB_RENDERER_SELECTOR = "#tab-renderer" as const;
 export const NO_LYRICS_TEXT_SELECTOR =
   "#tab-renderer > ytmusic-message-renderer > yt-formatted-string.text.style-scope.ytmusic-message-renderer" as const;
 export const FULLSCREEN_BUTTON_SELECTOR = ".fullscreen-button" as const;
+export const SHADERS_DETECTION_SELECTOR = '[id^="better-lyrics-kawarp-"]' as const;
 
 // DOM IDs and Attributes
 export const LYRICS_LOADER_ID = "blyrics-loader" as const;
@@ -54,7 +55,6 @@ export const DISCORD_INVITE_URL = "https://discord.gg/UsHE3d5fWF" as const;
 export const SHADERS_CWS_URL =
   "https://chromewebstore.google.com/detail/better-lyrics-shaders/mffpncjphfmkppebdoaehdlnagnlpfai" as const;
 export const SHADERS_AMO_URL = "https://addons.mozilla.org/en-US/firefox/addon/better-lyrics-shaders/" as const;
-export const SHADERS_DETECTION_SELECTOR = '[id^="better-lyrics-kawarp-"]' as const;
 export const THEME_STORE_API_URL = "https://better-lyrics-themes-api.boidu.dev" as const;
 export const UNISON_API_BASE_URL = "https://unison.boidu.dev" as const;
 export const THEME_STORE_TURNSTILE_URL = `${THEME_STORE_API_URL}/turnstile` as const;
