@@ -911,6 +911,11 @@
     "description": "Search on Genius button text"
   },
 
+  "lyrics_getShaders": {
+    "message": "Get Better Lyrics Shaders",
+    "description": "Footer button text linking to the Better Lyrics Shaders companion extension"
+  },
+
   "lyrics_searching": {
     "message": "Better Lyrics is searching for lyrics...",
     "description": "Loading message while searching for lyrics"

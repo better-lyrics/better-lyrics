@@ -49,7 +49,6 @@ import type { UnisonLyricsRequest } from "@modules/unison/types";
 import { requestLyrics } from "@modules/unison/unisonApi";
 import { log } from "@utils";
 import { generatePetName } from "@/core/keyIdentity";
-import shadersIconUrl from "../../../images/icons/shaders.png";
 import { byId, deleteVote, type UnisonData, vote } from "../lyrics/providers/unison";
 import { scrollEventHandler } from "./observer";
 import { showReportModal } from "./reportLyrics";
@@ -818,20 +817,13 @@ function createFooter(
       if (!settings.isShadersPromoEnabled) return;
       if (!shouldRenderShadersPromo()) return;
 
-      const shadersImage = document.createElement("img");
-      shadersImage.src = shadersIconUrl;
-      shadersImage.alt = "Better Lyrics Shaders";
-      shadersImage.width = 20;
-      shadersImage.height = 20;
-
-      const shadersLink = document.createElement("a");
-      shadersLink.className = `${FOOTER_CLASS}__shaders`;
-      shadersLink.href = getShadersStoreUrl();
-      shadersLink.target = "_blank";
-      shadersLink.rel = "noopener noreferrer";
-      shadersLink.appendChild(shadersImage);
-
-      footer.insertBefore(shadersLink, discordLink);
+      const shadersButton = createActionButton({
+        text: t("lyrics_getShaders"),
+        href: getShadersStoreUrl(),
+        logoSrc: chrome.runtime.getURL("images/icons/shaders.png"),
+        logoAlt: "Better Lyrics Shaders",
+      });
+      footer.insertBefore(shadersButton, discordLink);
     });
     footer.appendChild(discordLink);
 
