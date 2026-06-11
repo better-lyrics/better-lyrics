@@ -998,6 +998,58 @@ hr {
 	font-size: 0.875em;
 	border-radius: 0.25rem;
 	border: 1px solid rgba(255, 255, 255, 0.15);
+	height: 25px;
+	display: grid;
+	place-items: center;
+}
+
+.identity-edit-row {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	flex: 1;
+	justify-content: flex-end;
+}
+
+#nickname-modal-status {
+	display: flex;
+	align-items: center;
+	gap: 6px;
+	min-height: 1.25rem;
+	margin: 0.5rem 0 0;
+	font-size: 0.8125rem;
+	color: rgba(255, 255, 255, 0.55);
+	transition: color 120ms ease;
+}
+
+#nickname-modal-status:empty {
+	margin: 0;
+}
+
+#nickname-modal-status[data-state="available"],
+#nickname-modal-status[data-state="saved"] {
+	color: #4caf50;
+}
+
+#nickname-modal-status[data-state="taken"],
+#nickname-modal-status[data-state="error"] {
+	color: #ff7961;
+}
+
+#nickname-modal-status[data-state="invalid"],
+#nickname-modal-status[data-state="rateLimited"],
+#nickname-modal-status[data-state="profane"] {
+	color: #f5b942;
+}
+
+.nickname-status-spinner {
+	animation: nickname-status-spin 700ms linear infinite;
+}
+
+@keyframes nickname-status-spin {
+	to {
+		transform: rotate(360deg);
+	}
 }
 
 .provider-name {

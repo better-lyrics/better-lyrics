@@ -275,6 +275,74 @@
     "message": "Import",
     "description": "Confirm button label inside the import identity modal"
   },
+  "options_nickname_description": {
+    "message": "Pick a name for yourself across Better Lyrics. Letters, numbers, and underscore, 3 to 20 characters.",
+    "description": "Nickname subsection description"
+  },
+  "options_nickname_placeholder": {
+    "message": "Pick a nickname",
+    "description": "Nickname input placeholder"
+  },
+  "options_nickname_save": {
+    "message": "Save",
+    "description": "Nickname save button label"
+  },
+  "options_nickname_reset": {
+    "message": "Reset to default",
+    "description": "Nickname reset button label"
+  },
+  "options_nickname_modalTitle": {
+    "message": "Set your nickname",
+    "description": "Nickname modal title"
+  },
+  "options_nickname_edit": {
+    "message": "Edit",
+    "description": "Nickname edit button label"
+  },
+  "options_nickname_editLabel": {
+    "message": "Edit nickname",
+    "description": "Accessible label for the nickname edit button"
+  },
+  "options_nickname_status_checking": {
+    "message": "Checking...",
+    "description": "Status while checking nickname availability"
+  },
+  "options_nickname_status_available": {
+    "message": "Available",
+    "description": "Status when nickname is available"
+  },
+  "options_nickname_status_taken": {
+    "message": "Already taken",
+    "description": "Status when nickname is already taken"
+  },
+  "options_nickname_status_invalid": {
+    "message": "3 to 20 letters, numbers, or underscores",
+    "description": "Status when nickname format is invalid"
+  },
+  "options_nickname_status_profane": {
+    "message": "Not allowed, try another",
+    "description": "Status when nickname is flagged as inappropriate by the server"
+  },
+  "options_nickname_status_self": {
+    "message": "This is your current nickname",
+    "description": "Status when entered nickname matches current"
+  },
+  "options_nickname_status_saved": {
+    "message": "Saved",
+    "description": "Status when nickname is saved"
+  },
+  "options_nickname_status_submitting": {
+    "message": "Saving...",
+    "description": "Status while nickname save is in flight"
+  },
+  "options_nickname_status_rateLimited": {
+    "message": "Slow down, try again in a moment",
+    "description": "Status when nickname checks are rate limited"
+  },
+  "options_nickname_status_error": {
+    "message": "Could not reach the server",
+    "description": "Status when nickname request fails"
+  },
   "options_alert_importEmpty": {
     "message": "Paste identity JSON or choose a file first.",
     "description": "Shown when the user clicks Import with no JSON provided"

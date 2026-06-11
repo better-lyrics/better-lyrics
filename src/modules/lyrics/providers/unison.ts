@@ -7,6 +7,7 @@ import { fillTtml } from "./ttmlUtils";
 interface SubmitterInfo {
   keyId: string;
   reputation: number;
+  displayName?: string;
 }
 
 interface UnisonResponse {
