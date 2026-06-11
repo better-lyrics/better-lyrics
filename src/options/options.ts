@@ -840,10 +840,17 @@ function initNicknameModal(): void {
         return;
       }
       const json = (await response.json()) as NicknameMutationResponse;
-      const newDisplayName = json.data?.displayName ?? "";
-      invalidateDisplayName(newDisplayName);
-      applyDisplayName(newDisplayName);
-      input.value = newDisplayName;
+      const responseDisplayName = json.data?.displayName;
+      let resolvedDisplayName: string;
+      if (typeof responseDisplayName === "string" && responseDisplayName.length > 0) {
+        invalidateDisplayName(responseDisplayName);
+        resolvedDisplayName = responseDisplayName;
+      } else {
+        invalidateDisplayName();
+        resolvedDisplayName = await getDisplayName();
+      }
+      applyDisplayName(resolvedDisplayName);
+      input.value = resolvedDisplayName;
       checkSeq++;
       setStatus("saved");
       resetBtn.disabled = false;
