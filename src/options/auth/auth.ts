@@ -72,11 +72,54 @@ function bindStaticText(): void {
   if (cancel) cancel.textContent = t("auth_cancel");
 }
 
+function createStatusIcon(): SVGSVGElement {
+  const svgNs = "http://www.w3.org/2000/svg";
+  const svg = document.createElementNS(svgNs, "svg");
+  svg.setAttribute("xmlns", svgNs);
+  svg.setAttribute("viewBox", "0 0 16 16");
+  svg.setAttribute("fill", "none");
+  svg.setAttribute("width", "14");
+  svg.setAttribute("height", "14");
+  svg.setAttribute("aria-hidden", "true");
+
+  const circle = document.createElementNS(svgNs, "circle");
+  circle.setAttribute("cx", "8");
+  circle.setAttribute("cy", "8");
+  circle.setAttribute("r", "6");
+  circle.setAttribute("stroke", "currentColor");
+  circle.setAttribute("stroke-width", "2");
+  svg.appendChild(circle);
+
+  const stem = document.createElementNS(svgNs, "line");
+  stem.setAttribute("x1", "8");
+  stem.setAttribute("y1", "5");
+  stem.setAttribute("x2", "8");
+  stem.setAttribute("y2", "9");
+  stem.setAttribute("stroke", "currentColor");
+  stem.setAttribute("stroke-width", "2");
+  stem.setAttribute("stroke-linecap", "round");
+  svg.appendChild(stem);
+
+  const dot = document.createElementNS(svgNs, "line");
+  dot.setAttribute("x1", "8");
+  dot.setAttribute("y1", "11.5");
+  dot.setAttribute("x2", "8");
+  dot.setAttribute("y2", "11.5");
+  dot.setAttribute("stroke", "currentColor");
+  dot.setAttribute("stroke-width", "2");
+  dot.setAttribute("stroke-linecap", "round");
+  svg.appendChild(dot);
+
+  return svg;
+}
+
 function showError(messageKey: string, state: "error" | "warning" = "error"): void {
   const error = document.getElementById("auth-error");
   if (!error) return;
-  error.textContent = t(messageKey);
   error.dataset.state = state;
+  const icon = createStatusIcon();
+  const text = document.createTextNode(t(messageKey));
+  error.replaceChildren(icon, text);
   error.hidden = false;
 }
 
