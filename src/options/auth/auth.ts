@@ -158,6 +158,23 @@ async function main(): Promise<void> {
 
   const port = chrome.runtime.connect({ name: `${AUTH_PORT_NAME_PREFIX}${params.requestId}` });
 
+  const heartbeat = window.setInterval(() => {
+    try {
+      port.postMessage({ type: "heartbeat" });
+    } catch {
+      window.clearInterval(heartbeat);
+    }
+  }, 15_000);
+
+  port.onDisconnect.addListener(() => {
+    window.clearInterval(heartbeat);
+    showError("auth_sessionExpired");
+    const approve = document.getElementById("auth-approve") as HTMLButtonElement | null;
+    const cancel = document.getElementById("auth-cancel") as HTMLButtonElement | null;
+    if (approve) approve.disabled = true;
+    if (cancel) cancel.disabled = true;
+  });
+
   await bindDynamicText(params);
   wireActions(port);
 }
