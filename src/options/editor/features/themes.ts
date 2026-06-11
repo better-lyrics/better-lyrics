@@ -1,5 +1,6 @@
 import { LOG_PREFIX_EDITOR } from "@constants";
 import { t } from "@core/i18n";
+import { cloneIcon } from "@core/icons";
 import { getSyncStorage } from "@core/storage";
 import {
   getInstalledStoreThemes,
@@ -60,53 +61,6 @@ export async function preloadInstalledThemeImages(): Promise<void> {
 
 type EditorThemeSource = "marketplace" | "github" | "custom" | "builtin" | null;
 
-function createMarketplaceIcon(): SVGSVGElement {
-  const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
-  svg.setAttribute("viewBox", "0 0 24 24");
-  svg.setAttribute("fill", "currentColor");
-  const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
-  path.setAttribute(
-    "d",
-    "M5.223 2.25c-.497 0-.974.198-1.325.55l-1.3 1.298A3.75 3.75 0 0 0 7.5 9.75c.627.47 1.406.75 2.25.75.844 0 1.624-.28 2.25-.75.626.47 1.406.75 2.25.75.844 0 1.623-.28 2.25-.75a3.75 3.75 0 0 0 4.902-5.652l-1.3-1.299a1.875 1.875 0 0 0-1.325-.549H5.223Z"
-  );
-  svg.appendChild(path);
-  const pathFill = document.createElementNS("http://www.w3.org/2000/svg", "path");
-  pathFill.setAttribute("fill-rule", "evenodd");
-  pathFill.setAttribute(
-    "d",
-    "M3 20.25v-8.755c1.42.674 3.08.673 4.5 0A5.234 5.234 0 0 0 9.75 12c.804 0 1.568-.182 2.25-.506a5.234 5.234 0 0 0 2.25.506c.804 0 1.567-.182 2.25-.506 1.42.674 3.08.675 4.5.001v8.755h.75a.75.75 0 0 1 0 1.5H2.25a.75.75 0 0 1 0-1.5H3Zm3-6a.75.75 0 0 1 .75-.75h3a.75.75 0 0 1 .75.75v3a.75.75 0 0 1-.75.75h-3a.75.75 0 0 1-.75-.75v-3Zm8.25-.75a.75.75 0 0 0-.75.75v5.25c0 .414.336.75.75.75h3a.75.75 0 0 0 .75-.75v-5.25a.75.75 0 0 0-.75-.75h-3Z"
-  );
-  pathFill.setAttribute("clip-rule", "evenodd");
-  svg.appendChild(pathFill);
-  return svg;
-}
-
-function createBundledIcon(): SVGSVGElement {
-  const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
-  svg.setAttribute("viewBox", "0 0 24 24");
-  svg.setAttribute("fill", "currentColor");
-  const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
-  path.setAttribute(
-    "d",
-    "M11.15 12.335v9.18a.6.6 0 0 1-.15-.08l-6.51-3.91a1.9 1.9 0 0 1-.7-.7a1.9 1.9 0 0 1-.25-1v-8.07zm9.31-4.58v8.1a2.1 2.1 0 0 1-.27.95a1.74 1.74 0 0 1-.69.71l-6.51 3.91l-.14.07v-9.17l3.26-2v2.77a.85.85 0 1 0 1.7 0v-3.74zm-5.18 1.15l-3.28 2l-7.66-4.6l.11-.07l3.06-1.63zm4.37-2.62l-2.71 1.62l-7.64-4.28l1.66-.87a2 2 0 0 1 1-.27a2.1 2.1 0 0 1 1 .28l6.47 3.46a.5.5 0 0 1 .22.06"
-  );
-  svg.appendChild(path);
-  return svg;
-}
-
-function createGitHubIcon(): SVGSVGElement {
-  const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
-  svg.setAttribute("viewBox", "0 0 24 24");
-  svg.setAttribute("fill", "currentColor");
-  const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
-  path.setAttribute(
-    "d",
-    "M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385c.6.105.825-.255.825-.57c0-.285-.015-1.23-.015-2.235c-3.015.555-3.795-.735-4.035-1.41c-.135-.345-.72-1.41-1.23-1.695c-.42-.225-1.02-.78-.015-.795c.945-.015 1.62.87 1.845 1.23c1.08 1.815 2.805 1.305 3.495.99c.105-.78.42-1.305.765-1.605c-2.67-.3-5.46-1.335-5.46-5.925c0-1.305.465-2.385 1.23-3.225c-.12-.3-.54-1.53.12-3.18c0 0 1.005-.315 3.3 1.23c.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23c.66 1.65.24 2.88.12 3.18c.765.84 1.23 1.905 1.23 3.225c0 4.605-2.805 5.625-5.475 5.925c.435.375.81 1.095.81 2.22c0 1.605-.015 2.895-.015 3.3c0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"
-  );
-  svg.appendChild(path);
-  return svg;
-}
-
 function updateSourceBadge(source: EditorThemeSource): void {
   if (!themeSourceBadge) return;
 
@@ -114,11 +68,11 @@ function updateSourceBadge(source: EditorThemeSource): void {
   themeSourceBadge.classList.remove("active");
 
   if (source === "marketplace") {
-    themeSourceBadge.appendChild(createMarketplaceIcon());
+    themeSourceBadge.appendChild(cloneIcon("marketplace"));
     themeSourceBadge.appendChild(document.createTextNode("Marketplace"));
     themeSourceBadge.classList.add("active");
   } else if (source === "github") {
-    themeSourceBadge.appendChild(createGitHubIcon());
+    themeSourceBadge.appendChild(cloneIcon("github"));
     themeSourceBadge.appendChild(document.createTextNode("GitHub"));
     themeSourceBadge.classList.add("active");
   }
@@ -492,7 +446,7 @@ export async function updateThemeSelectorButton(): Promise<void> {
   let displayName = themeName || t("options_themes_chooseTheme");
   let authorText = "";
   let badgeLabel = "";
-  let badgeIcon: SVGSVGElement | null = null;
+  let badgeIcon: SVGElement | null = null;
   let bgUrl = "";
 
   if (!themeName) {
@@ -513,7 +467,7 @@ export async function updateThemeSelectorButton(): Promise<void> {
       if (installedTheme) {
         const author = installedTheme.creators?.join(", ");
         if (author) authorText = t("theme_author_prefix", author);
-        badgeIcon = installedTheme.source === "url" ? createGitHubIcon() : createMarketplaceIcon();
+        badgeIcon = installedTheme.source === "url" ? cloneIcon("github") : cloneIcon("marketplace");
         badgeLabel = installedTheme.source === "url" ? "GitHub" : "Marketplace";
         bgUrl = installedTheme.imageUrls?.[0] ?? installedTheme.coverUrl ?? "";
       }
@@ -574,7 +528,7 @@ async function populateThemeModal(): Promise<void> {
 
   const cta = document.createElement("button");
   cta.className = "theme-deprecation-cta";
-  cta.appendChild(createMarketplaceIcon());
+  cta.appendChild(cloneIcon("marketplace"));
   cta.appendChild(document.createTextNode(t("deprecation_builtin_cta")));
   cta.addEventListener("click", () => {
     chrome.tabs.create({ url: chrome.runtime.getURL("pages/marketplace.html") });
@@ -673,7 +627,7 @@ function createThemeCard(options: ThemeCardOptions, storedThemeName?: string): H
   if (options.storeId) {
     const badge = document.createElement("div");
     badge.className = "theme-card-badge";
-    const icon = createMarketplaceIcon();
+    const icon = cloneIcon("marketplace");
     icon.classList.add("theme-card-badge-icon");
     badge.appendChild(icon);
     badge.appendChild(document.createTextNode(t("symlink_badge_marketplace")));
@@ -681,7 +635,7 @@ function createThemeCard(options: ThemeCardOptions, storedThemeName?: string): H
   } else if (!options.isCustom) {
     const badge = document.createElement("div");
     badge.className = "theme-card-badge";
-    const icon = createBundledIcon();
+    const icon = cloneIcon("bundled");
     icon.classList.add("theme-card-badge-icon", "theme-card-badge-icon--bundled");
     badge.appendChild(icon);
     badge.appendChild(document.createTextNode(t("symlink_badge_bundled")));

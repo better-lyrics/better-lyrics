@@ -1,7 +1,7 @@
 import { XMLParser } from "fast-xml-parser";
 import { LOG_PREFIX_UNISON } from "@constants";
 import { t } from "@core/i18n";
-import { cloneVoteIcon, type VoteIconKind } from "@core/voteIcons";
+import { cloneIcon, type IconKind } from "@core/icons";
 import {
   DEFAULT_FEED_FILTERS,
   type FeedFilters,
@@ -29,51 +29,14 @@ import { getDisplayName } from "@/core/keyIdentity";
 
 // -- SVG Icons --------------------------
 
-const ICONS = {
-  externalLink: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6H6a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-6m-7 1l9-9m-5 0h5v5"/></svg>`,
-  back: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="currentColor" d="m9.55 12l7.35 7.35q.375.375.363.875t-.388.875t-.875.375t-.875-.375l-7.7-7.675q-.3-.3-.45-.675t-.15-.75t.15-.75t.45-.675l7.7-7.7q.375-.375.888-.363t.887.388t.375.875t-.375.875z"/></svg>`,
-  trash: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="currentColor" d="M3 6.386c0-.484.345-.877.771-.877h2.665c.529-.016.996-.399 1.176-.965l.03-.1l.115-.391c.07-.24.131-.45.217-.637c.338-.739.964-1.252 1.687-1.383c.184-.033.378-.033.6-.033h3.478c.223 0 .417 0 .6.033c.723.131 1.35.644 1.687 1.383c.086.187.147.396.218.637l.114.391l.03.1c.18.566.74.95 1.27.965h2.57c.427 0 .772.393.772.877s-.345.877-.771.877H3.77c-.425 0-.77-.393-.77-.877"/><path fill="currentColor" fill-rule="evenodd" d="M9.425 11.482c.413-.044.78.273.821.707l.5 5.263c.041.433-.26.82-.671.864c-.412.043-.78-.273-.821-.707l-.5-5.263c-.041-.434.26-.821.671-.864m5.15 0c.412.043.713.43.671.864l-.5 5.263c-.04.434-.408.75-.82.707c-.413-.044-.713-.43-.672-.864l.5-5.264c.041-.433.409-.75.82-.707" clip-rule="evenodd"/><path fill="currentColor" d="M11.596 22h.808c2.783 0 4.174 0 5.08-.886c.904-.886.996-2.339 1.181-5.245l.267-4.188c.1-1.577.15-2.366-.303-2.865c-.454-.5-1.22-.5-2.753-.5H8.124c-1.533 0-2.3 0-2.753.5s-.404 1.288-.303 2.865l.267 4.188c.185 2.906.277 4.36 1.182 5.245c.905.886 2.296.886 5.079.886" opacity=".5"/></svg>`,
-  confidenceUnverified: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><g fill="none"><path fill-rule="evenodd" clip-rule="evenodd" d="M2 12C2 6.477 6.477 2 12 2s10 4.477 10 10s-4.477 10-10 10S2 17.523 2 12zm10-5a2 2 0 0 0-2 2a1 1 0 0 1-2 0a4 4 0 1 1 5.31 3.78a.674.674 0 0 0-.273.169a.177.177 0 0 0-.037.054v.497a1 1 0 1 1-2 0V13c0-1.152.924-1.856 1.655-2.11A2.001 2.001 0 0 0 12 7zm1 6.007v-.004v.004zM13 17a1 1 0 1 1-2 0a1 1 0 0 1 2 0z" fill="currentColor"/></g></svg>`,
-  confidenceTrusted: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="currentColor" d="m11.998 2l.118.007l.059.008l.061.013l.111.034a1 1 0 0 1 .217.112l.104.082l.255.218a11 11 0 0 0 7.189 2.537l.342-.01a1 1 0 0 1 1.005.717a13 13 0 0 1-9.208 16.25a1 1 0 0 1-.502 0A13 13 0 0 1 2.54 5.718a1 1 0 0 1 1.005-.717a11 11 0 0 0 7.531-2.527l.263-.225l.096-.075a1 1 0 0 1 .217-.112l.112-.034a1 1 0 0 1 .119-.021zm3.71 7.293a1 1 0 0 0-1.415 0L11 12.585l-1.293-1.292l-.094-.083a1 1 0 0 0-1.32 1.497l2 2l.094.083a1 1 0 0 0 1.32-.083l4-4l.083-.094a1 1 0 0 0-.083-1.32z"/></svg>`,
-  confidenceTopRated: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="currentColor" d="m12 14.475l1.925 1.15q.275.175.538-.012t.187-.513l-.5-2.175l1.7-1.475q.25-.225.15-.537t-.45-.338l-2.225-.175l-.875-2.075q-.125-.3-.45-.3t-.45.3l-.875 2.075l-2.225.175q-.35.025-.45.338t.15.537l1.7 1.475l-.5 2.175q-.075.325.188.513t.537.012zM8.65 20H6q-.825 0-1.412-.587T4 18v-2.65L2.075 13.4q-.275-.3-.425-.662T1.5 12t.15-.737t.425-.663L4 8.65V6q0-.825.588-1.412T6 4h2.65l1.95-1.925q.3-.275.663-.425T12 1.5t.738.15t.662.425L15.35 4H18q.825 0 1.413.588T20 6v2.65l1.925 1.95q.275.3.425.663t.15.737t-.15.738t-.425.662L20 15.35V18q0 .825-.587 1.413T18 20h-2.65l-1.95 1.925q-.3.275-.662.425T12 22.5t-.737-.15t-.663-.425z"/></svg>`,
-  success: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><!-- Icon from IconaMoon by Dariush Habibpour - https://creativecommons.org/licenses/by/4.0/ --><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="m15 10l-4 4l-2-2"/></g></svg>`,
-  error: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><!-- Icon from IconaMoon by Dariush Habibpour - https://creativecommons.org/licenses/by/4.0/ --><g fill="none" stroke="currentColor" stroke-linejoin="round"><circle cx="12" cy="12" r="9" stroke-linecap="round" stroke-width="2"/><path stroke-width="3" d="M12 16h.01v.01H12z"/><path stroke-linecap="round" stroke-width="2" d="M12 12V8"/></g></svg>`,
-} as const;
-
-const SORT_ICON_PATH = {
-  desc: "m278.6 438.6l-96 96c-12.5 12.5-32.8 12.5-45.3 0l-96-96c-12.5-12.5-12.5-32.8 0-45.3s32.8-12.5 45.3 0l41.4 41.4V128c0-17.7 14.3-32 32-32s32 14.3 32 32v306.7l41.4-41.4c12.5-12.5 32.8-12.5 45.3 0s12.5 32.8 0 45.3zM352 544c-17.7 0-32-14.3-32-32s14.3-32 32-32h32c17.7 0 32 14.3 32 32s-14.3 32-32 32zm0-128c-17.7 0-32-14.3-32-32s14.3-32 32-32h96c17.7 0 32 14.3 32 32s-14.3 32-32 32zm0-128c-17.7 0-32-14.3-32-32s14.3-32 32-32h160c17.7 0 32 14.3 32 32s-14.3 32-32 32zm0-128c-17.7 0-32-14.3-32-32s14.3-32 32-32h224c17.7 0 32 14.3 32 32s-14.3 32-32 32z",
-  asc: "M352 96c-17.7 0-32 14.3-32 32s14.3 32 32 32h32c17.7 0 32-14.3 32-32s-14.3-32-32-32zm0 128c-17.7 0-32 14.3-32 32s14.3 32 32 32h96c17.7 0 32-14.3 32-32s-14.3-32-32-32zm0 128c-17.7 0-32 14.3-32 32s14.3 32 32 32h160c17.7 0 32-14.3 32-32s-14.3-32-32-32zm0 128c-17.7 0-32 14.3-32 32s14.3 32 32 32h224c17.7 0 32-14.3 32-32s-14.3-32-32-32zM182.6 105.4c-12.5-12.5-32.8-12.5-45.3 0l-96 96c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0l41.4-41.4V512c0 17.7 14.3 32 32 32s32-14.3 32-32V205.3l41.4 41.4c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3l-96-96z",
-} as const;
-
-function createSortIcon(direction: "desc" | "asc"): SVGSVGElement {
-  const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
-  svg.setAttribute("viewBox", "0 0 640 640");
-  svg.setAttribute("aria-hidden", "true");
-  svg.classList.add("sort-direction-icon");
-  const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
-  path.setAttribute("fill", "currentColor");
-  path.setAttribute("d", SORT_ICON_PATH[direction]);
-  svg.appendChild(path);
-  return svg;
-}
-
-const iconParser = new DOMParser();
-
 const CONFIDENCE_ICON_KEY = {
   low: "confidenceUnverified",
   medium: "confidenceTrusted",
   high: "confidenceTopRated",
-} as const satisfies Record<"low" | "medium" | "high", keyof typeof ICONS>;
+} as const satisfies Record<"low" | "medium" | "high", IconKind>;
 
-function svgIcon(key: keyof typeof ICONS): SVGSVGElement {
-  const doc = iconParser.parseFromString(ICONS[key], "image/svg+xml");
-  const svg = doc.documentElement as unknown as SVGSVGElement;
-  svg.classList.add("unison-icon");
-  return svg;
-}
-
-function voteIcon(kind: VoteIconKind): SVGElement {
-  const node = cloneVoteIcon(kind);
+function unisonIcon(kind: IconKind): SVGElement {
+  const node = cloneIcon(kind);
   node.classList.add("unison-icon");
   return node;
 }
@@ -441,7 +404,7 @@ function renderFilterBarFromActiveTab(animateSort = false): void {
     input.checked = isSelected;
     iconSlot.replaceChildren();
     if (isSelected) {
-      const icon = createSortIcon(filters.sortDir);
+      const icon = cloneIcon(filters.sortDir === "asc" ? "sortAsc" : "sortDesc");
       if (animateSort) icon.classList.add("sort-direction-icon--animate");
       iconSlot.appendChild(icon);
       const labelText = filters.sortDir === "asc" ? chip.dataset.labelAsc : chip.dataset.labelDesc;
@@ -801,7 +764,7 @@ function createLyricsCard(entry: UnisonSearchEntry | UnisonFeedEntry, options: L
 
   const confidenceIconWrap = document.createElement("span");
   confidenceIconWrap.className = "unison-confidence-icon";
-  confidenceIconWrap.appendChild(svgIcon(CONFIDENCE_ICON_KEY[entry.confidence]));
+  confidenceIconWrap.appendChild(unisonIcon(CONFIDENCE_ICON_KEY[entry.confidence]));
 
   const confidenceLabel = document.createElement("span");
   confidenceLabel.textContent = t(`unison_confidence_${entry.confidence}`);
@@ -950,12 +913,12 @@ function renderDetail(entry: UnisonLyricsEntry, isOwn: boolean = false): void {
   ytLink.href = `https://music.youtube.com/watch?v=${encodeURIComponent(entry.videoId)}`;
   ytLink.target = "_blank";
   ytLink.rel = "noreferrer noopener";
-  ytLink.appendChild(svgIcon("externalLink"));
+  ytLink.appendChild(unisonIcon("externalLink"));
   ytLink.append(t("unison_openInYTMusic"));
 
   const backBtn = document.createElement("button");
   backBtn.className = "unison-back-btn";
-  backBtn.appendChild(svgIcon("back"));
+  backBtn.appendChild(unisonIcon("back"));
   backBtn.append(t("unison_back"));
   backBtn.addEventListener("click", () => {
     window.history.back();
@@ -999,12 +962,12 @@ function createDetailVoting(unisonId: number, userVote?: 1 | -1 | null, isOwn: b
 
   const upBtn = document.createElement("button");
   upBtn.className = "unison-vote-btn";
-  upBtn.appendChild(voteIcon("upvote"));
+  upBtn.appendChild(unisonIcon("upvote"));
   upBtn.append(t("unison_upvote"));
 
   const downBtn = document.createElement("button");
   downBtn.className = "unison-vote-btn";
-  downBtn.appendChild(voteIcon("downvote"));
+  downBtn.appendChild(unisonIcon("downvote"));
   downBtn.append(t("unison_downvote"));
 
   let currentVote: "up" | "down" | null = userVote === 1 ? "up" : userVote === -1 ? "down" : null;
@@ -1040,7 +1003,7 @@ function createDetailVoting(unisonId: number, userVote?: 1 | -1 | null, isOwn: b
   if (!isOwn) {
     const reportBtn = document.createElement("button");
     reportBtn.className = "unison-vote-btn unison-vote-btn--report";
-    reportBtn.appendChild(voteIcon("reportMask"));
+    reportBtn.appendChild(unisonIcon("reportMask"));
     reportBtn.append(t("unison_report"));
     reportBtn.addEventListener("click", () => showReportMenu(unisonId, reportBtn));
     row.appendChild(reportBtn);
@@ -1055,17 +1018,17 @@ function createDetailDeleteButton(unisonId: number): HTMLButtonElement {
   btn.className = "unison-vote-btn unison-vote-btn--delete";
 
   const setIdle = () => {
-    btn.replaceChildren(svgIcon("trash"), document.createTextNode(t("unison_delete")));
+    btn.replaceChildren(unisonIcon("trash"), document.createTextNode(t("unison_delete")));
     btn.classList.remove("unison-vote-btn--delete-confirm");
   };
 
   const setConfirm = () => {
-    btn.replaceChildren(svgIcon("trash"), document.createTextNode(t("unison_deleteConfirm")));
+    btn.replaceChildren(unisonIcon("trash"), document.createTextNode(t("unison_deleteConfirm")));
     btn.classList.add("unison-vote-btn--delete-confirm");
   };
 
   const setError = (message: string) => {
-    btn.replaceChildren(svgIcon("trash"), document.createTextNode(message));
+    btn.replaceChildren(unisonIcon("trash"), document.createTextNode(message));
     btn.classList.remove("unison-vote-btn--delete-confirm");
   };
 
@@ -1136,7 +1099,7 @@ function showReportMenu(unisonId: number, anchor: HTMLButtonElement): void {
       menu.remove();
       const result = await reportLyrics(unisonId, reason);
       if (result.success) {
-        anchor.replaceChildren(voteIcon("reportMask"), t("unison_reportSuccess"));
+        anchor.replaceChildren(unisonIcon("reportMask"), t("unison_reportSuccess"));
         anchor.disabled = true;
       }
     });
@@ -1372,10 +1335,7 @@ function renderPreviewEmpty(container: HTMLElement): void {
   const empty = document.createElement("div");
   empty.className = "unison-preview-empty";
 
-  const logo = iconParser.parseFromString(
-    `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path d="M 216.877 101.494 C 129.312 123.247 77.337 215.006 103.18 301.61 C 121.687 363.631 176.581 409.295 240.38 414.757 C 287.712 418.809 329.728 405.453 364.631 372.705 C 402.973 336.73 419.903 291.754 414.474 239.817 C 408.507 182.738 378.509 140.758 327.553 113.442 C 291.849 96.169 254.947 92.037 216.877 101.494 Z M 111.49 258.009 C 111.657 203.346 135.045 160.293 181.947 132.029 C 257.535 86.476 354.347 118.494 389.27 199.487 C 425.321 283.1 374.187 380.741 284.761 397.772 C 230.539 408.099 184.56 391.825 147.1 351.356 C 123.778 324.1 111.384 293.035 111.49 258.009 Z M 275.782 205.816 C 285.751 205.816 295.066 205.859 304.381 205.802 C 312.272 205.755 316.316 201.706 316.432 193.751 C 316.512 188.253 316.544 182.75 316.422 177.253 C 316.252 169.635 312.169 165.693 304.507 165.667 C 292.342 165.626 280.176 165.637 268.011 165.66 C 259.036 165.678 255.746 169.021 255.743 178.109 C 255.734 207.273 255.743 236.436 255.729 265.6 C 255.729 267.311 255.584 269.021 255.493 271.034 C 252.926 269.96 250.993 269 248.965 268.328 C 234.723 263.608 221.596 265.768 210.09 275.438 C 198.291 285.355 193.507 298.277 196.25 313.409 C 200.094 334.613 218.73 348.223 240.237 346.153 C 260.242 344.228 275.646 326.851 275.757 305.878 C 275.856 287.047 275.781 268.215 275.782 248.883 C 275.782 234.286 275.782 220.188 275.782 205.816 Z" fill="currentColor"/></svg>`,
-    "image/svg+xml"
-  ).documentElement as unknown as SVGSVGElement;
+  const logo = cloneIcon("previewLogo");
   logo.classList.add("unison-preview-empty-logo");
 
   const label = document.createElement("span");
@@ -1501,7 +1461,7 @@ function showFeedback(el: HTMLElement, opts: FeedbackOptions): void {
   el.classList.toggle("unison-feedback--error", opts.isError);
   el.classList.toggle("unison-feedback--success", !opts.isError);
 
-  const icon = svgIcon(opts.isError ? "error" : "success");
+  const icon = unisonIcon(opts.isError ? "error" : "success");
   icon.classList.add("unison-feedback-icon");
 
   const body = document.createElement("div");

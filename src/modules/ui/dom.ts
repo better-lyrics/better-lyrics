@@ -32,8 +32,7 @@ import {
 } from "@constants";
 import { AppState } from "@core/appState";
 import { t } from "@core/i18n";
-import { cloneSyncIcon } from "@core/syncIcons";
-import { cloneVoteIcon } from "@core/voteIcons";
+import { cloneIcon } from "@core/icons";
 import { disconnectResizeObserver } from "@modules/lyrics/injectLyrics";
 import type { ThumbnailElement } from "@modules/lyrics/requestSniffer/NextResponse";
 import { getSongMetadata } from "@modules/lyrics/requestSniffer/requestSniffer";
@@ -360,7 +359,7 @@ export function addFooter(
     iconWrapper.style.display = "inline-flex";
     iconWrapper.style.verticalAlign = "middle";
     iconWrapper.style.color = syncTypeColors[info.syncType];
-    iconWrapper.appendChild(cloneSyncIcon(info.syncType, 14));
+    iconWrapper.appendChild(cloneIcon(info.syncType, { size: 14 }));
     footerLink.appendChild(iconWrapper);
   } else {
     footerLink.textContent = source || HOMEPAGE_DOMAIN;
@@ -473,7 +472,7 @@ function buildUnisonVoteButton(unisonData: UnisonData, voteValue: 1 | -1): HTMLB
   const btn = document.createElement("button");
   btn.className = `${FOOTER_CLASS}__vote`;
 
-  btn.appendChild(cloneVoteIcon(voteValue === 1 ? "upvote" : "downvote", 20));
+  btn.appendChild(cloneIcon(voteValue === 1 ? "upvote" : "downvote", { size: 20 }));
   if (unisonData.vote === voteValue) btn.classList.add(VOTE_ACTIVE_CLASS);
 
   const registry = voteValue === 1 ? unisonControlsRegistry.upvotes : unisonControlsRegistry.downvotes;
@@ -673,7 +672,7 @@ function createReportButton(lyricsId: number): HTMLButtonElement {
     showReportModal(lyricsId);
   });
 
-  button.appendChild(cloneVoteIcon("reportStroked", 20));
+  button.appendChild(cloneIcon("reportStroked", { size: 20 }));
   return button;
 }
 

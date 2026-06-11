@@ -3,8 +3,7 @@
 import { LOG_PREFIX, ROMANIZATION_LANGUAGES, UNISON_API_BASE_URL, UNISON_DOCK_DEFAULT_POSITION } from "@constants";
 import { getLanguageDisplayName, initI18n, loadLocaleOverride, SUPPORTED_LOCALES, t } from "@core/i18n";
 import { exportIdentity, getDisplayName, importIdentity, invalidateDisplayName, signPayload } from "@core/keyIdentity";
-import { cloneStatusIcon, type StatusIconKind } from "@core/statusIcons";
-import { cloneSyncIcon } from "@core/syncIcons";
+import { cloneIcon, type IconKind } from "@core/icons";
 import Sortable from "sortablejs";
 import { showModal } from "./editor/ui/feedback";
 import { initStoreUI, setupYourThemesButton } from "./store/store";
@@ -413,7 +412,7 @@ function createProviderElem(providerId: string, checked = true): HTMLLIElement |
   const tagElem = document.createElement("span");
   tagElem.classList.add("sync-tag", `sync-tag--${providerInfo.syncType}`);
   tagElem.dataset.tooltip = syncConfig.tooltip;
-  tagElem.appendChild(cloneSyncIcon(providerInfo.syncType, 16));
+  tagElem.appendChild(cloneIcon(providerInfo.syncType, { size: 16 }));
   const tagLabel = document.createElement("span");
   tagLabel.textContent = syncConfig.label;
   tagElem.appendChild(tagLabel);
@@ -598,7 +597,7 @@ type NicknameStatusKind =
   | "saved"
   | "error";
 
-const NICKNAME_STATUS_ICON_FOR: Record<NicknameStatusKind, StatusIconKind | null> = {
+const NICKNAME_STATUS_ICON_FOR: Record<NicknameStatusKind, IconKind | null> = {
   idle: null,
   typing: null,
   checking: "spinner",
@@ -692,7 +691,7 @@ function initNicknameModal(): void {
     const label = document.createElement("span");
     label.textContent = t(`options_nickname_status_${kind}`);
     if (iconKey) {
-      status.replaceChildren(cloneStatusIcon(iconKey), label);
+      status.replaceChildren(cloneIcon(iconKey, { size: 14 }), label);
     } else {
       status.replaceChildren(label);
     }

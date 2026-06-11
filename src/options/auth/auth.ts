@@ -1,7 +1,7 @@
 import { type AuthPartner, AUTH_PORT_NAME_PREFIX, getAuthPartnerByOrigin, LOG_PREFIX_AUTH } from "@constants";
 import { initI18n, loadLocaleOverride, t } from "@core/i18n";
 import { getDisplayName } from "@core/keyIdentity";
-import { cloneStatusIcon } from "@core/statusIcons";
+import { cloneIcon } from "@core/icons";
 
 interface RequestParams {
   requestId: string;
@@ -77,7 +77,7 @@ function showError(messageKey: string, state: "error" | "warning" = "error"): vo
   const error = document.getElementById("auth-error");
   if (!error) return;
   error.dataset.state = state;
-  const icon = cloneStatusIcon("warn");
+  const icon = cloneIcon("warn", { size: 14 });
   const text = document.createTextNode(t(messageKey));
   error.replaceChildren(icon, text);
 }

@@ -1,5 +1,6 @@
 import { LOG_PREFIX_STORE } from "@constants";
 import { t } from "@core/i18n";
+import { cloneIcon } from "@core/icons";
 import { getLocalStorage, getSyncStorage } from "@core/storage";
 import autoAnimate, { type AnimationController } from "@formkit/auto-animate";
 import DOMPurify from "dompurify";
@@ -374,92 +375,21 @@ function parseMarkdown(text: string): DocumentFragment {
   return template ? template.content : document.createDocumentFragment();
 }
 
-function createShaderIcon(): SVGSVGElement {
-  const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
-  svg.setAttribute("viewBox", "0 0 24 24");
-  const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
-  path.setAttribute("fill", "currentColor");
-  path.setAttribute("fill-rule", "evenodd");
-  path.setAttribute("clip-rule", "evenodd");
-  path.setAttribute(
-    "d",
-    "M8 2.25A6.75 6.75 0 0 0 1.25 9v6A6.75 6.75 0 0 0 8 21.75h8A6.75 6.75 0 0 0 22.75 15V9A6.75 6.75 0 0 0 16 2.25zm-2 6a.75.75 0 0 0-.75.75v6a.75.75 0 0 0 1.5 0v-2.25h2.821a.75.75 0 0 0 0-1.5H6.75v-1.5H11a.75.75 0 0 0 0-1.5zm7.576.27a.75.75 0 1 0-1.152.96l2.1 2.52l-2.1 2.52a.75.75 0 1 0 1.152.96l1.924-2.308l1.924 2.308a.75.75 0 1 0 1.152-.96l-2.1-2.52l2.1-2.52a.75.75 0 1 0-1.152-.96L15.5 10.829z"
-  );
-  svg.appendChild(path);
-  return svg;
-}
-
 function createShaderBadge(className: string): HTMLSpanElement {
   const badge = document.createElement("span");
   badge.className = className;
-  badge.appendChild(createShaderIcon());
+  badge.appendChild(cloneIcon("shader"));
   badge.appendChild(document.createTextNode(t("marketplace_shadersBadge")));
   return badge;
-}
-
-function createGitHubIcon(): SVGSVGElement {
-  const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
-  svg.setAttribute("viewBox", "0 0 24 24");
-  svg.setAttribute("fill", "currentColor");
-  const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
-  path.setAttribute(
-    "d",
-    "M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385c.6.105.825-.255.825-.57c0-.285-.015-1.23-.015-2.235c-3.015.555-3.795-.735-4.035-1.41c-.135-.345-.72-1.41-1.23-1.695c-.42-.225-1.02-.78-.015-.795c.945-.015 1.62.87 1.845 1.23c1.08 1.815 2.805 1.305 3.495.99c.105-.78.42-1.305.765-1.605c-2.67-.3-5.46-1.335-5.46-5.925c0-1.305.465-2.385 1.23-3.225c-.12-.3-.54-1.53.12-3.18c0 0 1.005-.315 3.3 1.23c.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23c.66 1.65.24 2.88.12 3.18c.765.84 1.23 1.905 1.23 3.225c0 4.605-2.805 5.625-5.475 5.925c.435.375.81 1.095.81 2.22c0 1.605-.015 2.895-.015 3.3c0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"
-  );
-  svg.appendChild(path);
-  return svg;
 }
 
 function createGitHubBadge(className: string, title: string): HTMLSpanElement {
   const badge = document.createElement("span");
   badge.className = className;
   badge.title = title;
-  badge.appendChild(createGitHubIcon());
+  badge.appendChild(cloneIcon("github"));
   badge.appendChild(document.createTextNode(t("marketplace_githubBadge")));
   return badge;
-}
-
-function createDownloadIcon(): SVGSVGElement {
-  const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
-  svg.setAttribute("viewBox", "0 0 20 20");
-  svg.setAttribute("fill", "currentColor");
-  const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
-  path.setAttribute(
-    "d",
-    "M10.75 2.75a.75.75 0 0 0-1.5 0v8.614L6.295 8.235a.75.75 0 1 0-1.09 1.03l4.25 4.5a.75.75 0 0 0 1.09 0l4.25-4.5a.75.75 0 0 0-1.09-1.03l-2.955 3.129V2.75ZM3.5 12.75a.75.75 0 0 0-1.5 0v2.5A2.75 2.75 0 0 0 4.75 18h10.5A2.75 2.75 0 0 0 18 15.25v-2.5a.75.75 0 0 0-1.5 0v2.5c0 .69-.56 1.25-1.25 1.25H4.75c-.69 0-1.25-.56-1.25-1.25v-2.5Z"
-  );
-  svg.appendChild(path);
-  return svg;
-}
-
-function createStarIcon(): SVGSVGElement {
-  const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
-  svg.setAttribute("viewBox", "0 0 20 20");
-  svg.setAttribute("fill", "currentColor");
-  const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
-  path.setAttribute("fill-rule", "evenodd");
-  path.setAttribute("clip-rule", "evenodd");
-  path.setAttribute(
-    "d",
-    "M10.868 2.884c-.321-.772-1.415-.772-1.736 0l-1.83 4.401-4.753.381c-.833.067-1.171 1.107-.536 1.651l3.62 3.102-1.106 4.637c-.194.813.691 1.456 1.405 1.02L10 15.591l4.069 2.485c.713.436 1.598-.207 1.404-1.02l-1.106-4.637 3.62-3.102c.635-.544.297-1.584-.536-1.65l-4.752-.382-1.831-4.401Z"
-  );
-  svg.appendChild(path);
-  return svg;
-}
-
-function createClockIcon(): SVGSVGElement {
-  const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
-  svg.setAttribute("viewBox", "0 0 20 20");
-  svg.setAttribute("fill", "currentColor");
-  const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
-  path.setAttribute("fill-rule", "evenodd");
-  path.setAttribute("clip-rule", "evenodd");
-  path.setAttribute(
-    "d",
-    "M10 18a8 8 0 1 0 0-16 8 8 0 0 0 0 16Zm.75-13a.75.75 0 0 0-1.5 0v5c0 .414.336.75.75.75h3.5a.75.75 0 0 0 0-1.5h-2.75V5Z"
-  );
-  svg.appendChild(path);
-  return svg;
 }
 
 function formatTimeAgo(isoDate: string): string {
@@ -532,33 +462,6 @@ function setupMarketplaceListeners(): void {
   setupMarketplaceFilters();
 }
 
-function createSortIcon(direction: "desc" | "asc"): SVGSVGElement {
-  const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
-  svg.setAttribute("width", "16");
-  svg.setAttribute("height", "16");
-  svg.setAttribute("viewBox", "0 0 640 640");
-  svg.setAttribute("aria-hidden", "true");
-  svg.classList.add("sort-direction-icon");
-
-  const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
-  path.setAttribute("fill", "currentColor");
-
-  if (direction === "desc") {
-    path.setAttribute(
-      "d",
-      "m278.6 438.6l-96 96c-12.5 12.5-32.8 12.5-45.3 0l-96-96c-12.5-12.5-12.5-32.8 0-45.3s32.8-12.5 45.3 0l41.4 41.4V128c0-17.7 14.3-32 32-32s32 14.3 32 32v306.7l41.4-41.4c12.5-12.5 32.8-12.5 45.3 0s12.5 32.8 0 45.3zM352 544c-17.7 0-32-14.3-32-32s14.3-32 32-32h32c17.7 0 32 14.3 32 32s-14.3 32-32 32zm0-128c-17.7 0-32-14.3-32-32s14.3-32 32-32h96c17.7 0 32 14.3 32 32s-14.3 32-32 32zm0-128c-17.7 0-32-14.3-32-32s14.3-32 32-32h160c17.7 0 32 14.3 32 32s-14.3 32-32 32zm0-128c-17.7 0-32-14.3-32-32s14.3-32 32-32h224c17.7 0 32 14.3 32 32s-14.3 32-32 32z"
-    );
-  } else {
-    path.setAttribute(
-      "d",
-      "M352 96c-17.7 0-32 14.3-32 32s14.3 32 32 32h32c17.7 0 32-14.3 32-32s-14.3-32-32-32zm0 128c-17.7 0-32 14.3-32 32s14.3 32 32 32h96c17.7 0 32-14.3 32-32s-14.3-32-32-32zm0 128c-17.7 0-32 14.3-32 32s14.3 32 32 32h160c17.7 0 32-14.3 32-32s-14.3-32-32-32zm0 128c-17.7 0-32 14.3-32 32s14.3 32 32 32h224c17.7 0 32-14.3 32-32s-14.3-32-32-32zM182.6 105.4c-12.5-12.5-32.8-12.5-45.3 0l-96 96c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0l41.4-41.4V512c0 17.7 14.3 32 32 32s32-14.3 32-32V205.3l41.4 41.4c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3l-96-96z"
-    );
-  }
-
-  svg.appendChild(path);
-  return svg;
-}
-
 function updateSortChipsUI(animate = true): void {
   const sortChips = document.querySelectorAll(".marketplace-filter-chip--sort");
 
@@ -577,7 +480,7 @@ function updateSortChipsUI(animate = true): void {
     iconContainer.replaceChildren();
 
     if (isSelected) {
-      const icon = createSortIcon(currentFilters.sortDirection);
+      const icon = cloneIcon(currentFilters.sortDirection === "asc" ? "sortAsc" : "sortDesc", { size: 16 });
       if (animate) {
         icon.classList.add("sort-direction-icon--animate");
       }
@@ -1399,7 +1302,7 @@ function createStoreThemeCard(
       const installStat = document.createElement("span");
       installStat.className = "store-card-stat";
       installStat.title = `${stats.installs} installs`;
-      installStat.appendChild(createDownloadIcon());
+      installStat.appendChild(cloneIcon("download"));
       installStat.appendChild(document.createTextNode(formatNumber(stats.installs)));
       statsRow.appendChild(installStat);
     }
@@ -1408,7 +1311,7 @@ function createStoreThemeCard(
       const ratingStat = document.createElement("span");
       ratingStat.className = "store-card-stat";
       ratingStat.title = `${stats.rating.toFixed(1)} average from ${stats.ratingCount} ratings`;
-      ratingStat.appendChild(createStarIcon());
+      ratingStat.appendChild(cloneIcon("star"));
       ratingStat.appendChild(document.createTextNode(stats.rating.toFixed(1)));
       statsRow.appendChild(ratingStat);
     }
@@ -1563,14 +1466,14 @@ async function openDetailModal(theme: StoreTheme, urlThemeInfo?: UrlThemeInfo): 
           const installStat = document.createElement("span");
           installStat.className = "detail-stat";
           installStat.title = `${themeStats.installs} downloads`;
-          installStat.appendChild(createDownloadIcon());
+          installStat.appendChild(cloneIcon("download"));
           installStat.appendChild(document.createTextNode(formatNumber(themeStats.installs)));
           statsRow.appendChild(installStat);
         }
         if (themeStats.ratingCount > 0) {
           const ratingStat = document.createElement("span");
           ratingStat.className = "detail-stat detail-stat-rating";
-          ratingStat.appendChild(createStarIcon());
+          ratingStat.appendChild(cloneIcon("star"));
           ratingStat.appendChild(
             document.createTextNode(`${themeStats.rating.toFixed(1)} (${themeStats.ratingCount})`)
           );
@@ -1591,7 +1494,7 @@ async function openDetailModal(theme: StoreTheme, urlThemeInfo?: UrlThemeInfo): 
         minute: "2-digit",
       });
       timeStat.dataset.tooltip = t("marketplace_lastUpdatedOn", [localized]);
-      timeStat.appendChild(createClockIcon());
+      timeStat.appendChild(cloneIcon("clock"));
       timeStat.appendChild(document.createTextNode(formatTimeAgo(theme.locked)));
       statsEl.appendChild(timeStat);
     }
@@ -1719,14 +1622,14 @@ async function openDetailModal(theme: StoreTheme, urlThemeInfo?: UrlThemeInfo): 
             const existingRatingStat = statsRow.querySelector(".detail-stat-rating");
             if (existingRatingStat) {
               existingRatingStat.replaceChildren();
-              existingRatingStat.appendChild(createStarIcon());
+              existingRatingStat.appendChild(cloneIcon("star"));
               existingRatingStat.appendChild(
                 document.createTextNode(`${ratingData.average.toFixed(1)} (${ratingData.count})`)
               );
             } else {
               const ratingStat = document.createElement("span");
               ratingStat.className = "detail-stat detail-stat-rating";
-              ratingStat.appendChild(createStarIcon());
+              ratingStat.appendChild(cloneIcon("star"));
               ratingStat.appendChild(document.createTextNode(`${ratingData.average.toFixed(1)} (${ratingData.count})`));
               statsRow.appendChild(ratingStat);
             }
