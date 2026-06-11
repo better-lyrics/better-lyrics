@@ -216,8 +216,7 @@ export async function importIdentity(json: string): Promise<KeyIdentity> {
 
 let cachedDisplayName: Promise<string> | null = null;
 
-async function fetchResolvedDisplayName(): Promise<string> {
-  const identity = await getIdentity();
+async function fetchResolvedDisplayName(): Promise<string | null> {
   try {
     const signed = await signPayload({});
     const response = await fetch(`${UNISON_API_BASE_URL}/auth/nickname/me`, {
@@ -234,12 +233,18 @@ async function fetchResolvedDisplayName(): Promise<string> {
   } catch (err) {
     console.warn(`${LOG_PREFIX} resolveDisplayName fallback`, err);
   }
-  return generatePetName(identity.keyId);
+  return null;
 }
 
 export async function getDisplayName(): Promise<string> {
   if (!cachedDisplayName) {
-    cachedDisplayName = fetchResolvedDisplayName();
+    const pending = fetchResolvedDisplayName().then(async resolved => {
+      if (resolved !== null) return resolved;
+      cachedDisplayName = null;
+      const identity = await getIdentity();
+      return generatePetName(identity.keyId);
+    });
+    cachedDisplayName = pending;
   }
   return cachedDisplayName;
 }
