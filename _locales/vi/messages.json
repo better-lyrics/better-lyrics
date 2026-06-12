@@ -4,7 +4,7 @@
     "description": "The name of the extension"
   },
   "extensionDescription": {
-    "message": "Nâng tầm trải nghiệm YouTube Music với lời bài hát được đồng bộ hóa đẹp mắt, hỗ trợ đa ngôn ngữ, dịch thuật thời gian thực và nhiều tính năng khác.",
+    "message": "Nâng tầm trải nghiệm YouTube Music với lời bài hát được đồng bộ hóa đẹp mắt, hỗ trợ đa ngôn ngữ, dịch thuật thời gian thực và nhiều tính năng khác",
     "description": "The description of the extension"
   },
   "options_tab_general": {
@@ -90,6 +90,10 @@
   "options_display_passiveScroll": {
     "message": "Tự động cuộn lời bài hát không được đồng bộ",
     "description": "Auto-scroll unsynced lyrics setting label"
+  },
+  "options_display_shadersPromo": {
+    "message": "Show link to Better Lyrics Shaders",
+    "description": "Toggle label for the Shaders companion link shown in the lyrics footer"
   },
   "options_display_unisonActions": {
     "message": "Hành Động Unison",
@@ -266,6 +270,74 @@
   "options_identityImport_import": {
     "message": "Import",
     "description": "Confirm button label inside the import identity modal"
+  },
+  "options_nickname_description": {
+    "message": "Hãy chọn cái tên cho bạn trong Better Lyrics. Chữ, số, và dấu gạch dưới, từ 3 cho đến 20 ký tự.",
+    "description": "Nickname subsection description"
+  },
+  "options_nickname_placeholder": {
+    "message": "Hãy chọn một biệt danh",
+    "description": "Nickname input placeholder"
+  },
+  "options_nickname_save": {
+    "message": "Lưu",
+    "description": "Nickname save button label"
+  },
+  "options_nickname_reset": {
+    "message": "Đặt lại về mặc định",
+    "description": "Nickname reset button label"
+  },
+  "options_nickname_modalTitle": {
+    "message": "Đặt biệt danh của bạn",
+    "description": "Nickname modal title"
+  },
+  "options_nickname_edit": {
+    "message": "Chỉnh sửa",
+    "description": "Nickname edit button label"
+  },
+  "options_nickname_editLabel": {
+    "message": "Chỉnh sửa biệt danh",
+    "description": "Accessible label for the nickname edit button"
+  },
+  "options_nickname_status_checking": {
+    "message": "Đang kiểm tra...",
+    "description": "Status while checking nickname availability"
+  },
+  "options_nickname_status_available": {
+    "message": "Khả dụng",
+    "description": "Status when nickname is available"
+  },
+  "options_nickname_status_taken": {
+    "message": "Đã tồn tại",
+    "description": "Status when nickname is already taken"
+  },
+  "options_nickname_status_invalid": {
+    "message": "Từ 3 cho đến 20 chữ, số hoặc dấu gạch dưới",
+    "description": "Status when nickname format is invalid"
+  },
+  "options_nickname_status_profane": {
+    "message": "Không được phép, hãy thử cái khác",
+    "description": "Status when nickname is flagged as inappropriate by the server"
+  },
+  "options_nickname_status_self": {
+    "message": "Đây là biệt danh hiện tại của bạn",
+    "description": "Status when entered nickname matches current"
+  },
+  "options_nickname_status_saved": {
+    "message": "Đã lưu",
+    "description": "Status when nickname is saved"
+  },
+  "options_nickname_status_submitting": {
+    "message": "Đang lưu...",
+    "description": "Status while nickname save is in flight"
+  },
+  "options_nickname_status_rateLimited": {
+    "message": "Từ từ đã, hãy thử lại sau một lúc",
+    "description": "Status when nickname checks are rate limited"
+  },
+  "options_nickname_status_error": {
+    "message": "Không thể kết nối đến máy chủ",
+    "description": "Status when nickname request fails"
   },
   "options_alert_importEmpty": {
     "message": "Paste identity JSON or choose a file first.",
@@ -805,6 +877,10 @@
     "message": "Tìm trên Genius",
     "description": "Search on Genius button text"
   },
+  "lyrics_getShaders": {
+    "message": "Get Better Lyrics Shaders",
+    "description": "Footer button text linking to the Better Lyrics Shaders companion extension"
+  },
   "lyrics_searching": {
     "message": "Better Lyrics đang tìm lời bài hát...",
     "description": "Loading message while searching for lyrics"
@@ -1016,6 +1092,10 @@
   "auth_invalidRequest": {
     "message": "Invalid sign-in request.",
     "description": "Error state shown when the popup receives malformed parameters"
+  },
+  "auth_sessionExpired": {
+    "message": "Sign-in expired. Please close this window and try again.",
+    "description": "Shown in the sign-in consent popup when the connection to the extension's service worker is lost before the user can approve or cancel."
   },
   "lyrics_requestSyncedVersion": {
     "message": "Request a synced version",
