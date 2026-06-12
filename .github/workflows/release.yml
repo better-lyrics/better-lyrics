@@ -165,6 +165,7 @@ jobs:
         if: github.event.inputs.is_canary == 'false'
         env:
           EXTENSION_ID: ${{ secrets.GOOGLE_EXTENSION_ID }}
+          PUBLISHER_ID: ${{ secrets.GOOGLE_PUBLISHER_ID }}
           CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
           CLIENT_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET}}
           REFRESH_TOKEN: ${{ secrets.GOOGLE_REFRESH_TOKEN }}
