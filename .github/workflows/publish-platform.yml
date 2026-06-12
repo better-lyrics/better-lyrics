@@ -15,6 +15,7 @@ on:
 
 permissions:
   contents: read
+  actions: read
 
 jobs:
   publish:
@@ -24,6 +25,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           ref: v${{ inputs.version }}
+          fetch-depth: 0
 
       - name: Use Node.js
         uses: actions/setup-node@v3
@@ -44,12 +46,43 @@ jobs:
             echo "release_type=" >> $GITHUB_OUTPUT
           fi
 
-      - name: Build extension
+      - name: Find original release run for this tag
+        id: source
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          PARENT_SHA=$(git rev-parse "v${{ inputs.version }}^1")
+          echo "Tag v${{ inputs.version }} was cut on top of $PARENT_SHA"
+          RUN_ID=$(gh run list --workflow=release.yml --status=success --limit=100 \
+            --json databaseId,headSha \
+            --jq "[.[] | select(.headSha==\"$PARENT_SHA\") | .databaseId] | first")
+          if [[ -z "$RUN_ID" || "$RUN_ID" == "null" ]]; then
+            echo "No successful release run found for that SHA; will rebuild from tag."
+          else
+            echo "Found release run: $RUN_ID"
+            echo "run_id=$RUN_ID" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Download original build artifact
+        id: download
+        if: steps.source.outputs.run_id != ''
+        continue-on-error: true
+        uses: actions/download-artifact@v4
+        with:
+          name: ${{ inputs.platform }}-build
+          path: dist/${{ inputs.platform }}
+          run-id: ${{ steps.source.outputs.run_id }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Rebuild extension (fallback)
+        if: steps.download.outcome != 'success'
         env:
           RELEASE_TYPE: ${{ steps.meta.outputs.release_type }}
           SOURCEMAPS_API_KEY: ${{ secrets.SOURCEMAPS_API_KEY }}
           SOURCEMAPS_BASE_URL: ${{ env.SOURCEMAPS_API_URL }}
-        run: npm run build:ci
+        run: |
+          echo "Rebuilding from tag v${{ inputs.version }} (no artifact available)."
+          npm run build:ci
 
       - name: Publish to Chrome Web Store
         if: inputs.platform == 'chrome'
