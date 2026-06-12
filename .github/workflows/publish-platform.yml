@@ -82,6 +82,7 @@ jobs:
           SOURCEMAPS_BASE_URL: ${{ env.SOURCEMAPS_API_URL }}
         run: |
           echo "Rebuilding from tag v${{ inputs.version }} (no artifact available)."
+          rm -rf "dist/${{ inputs.platform }}"
           npm run build:ci
 
       - name: Publish to Chrome Web Store
