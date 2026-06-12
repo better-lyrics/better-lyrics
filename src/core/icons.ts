@@ -50,12 +50,48 @@ const ICON_NODES: Record<IconKind, SVGElement> = (() => {
   return nodes;
 })();
 
+let cloneCounter = 0;
+
 export function cloneIcon(kind: IconKind, options?: { size?: number }): SVGElement {
   const node = ICON_NODES[kind].cloneNode(true) as SVGElement;
+  uniquifyIds(node);
   if (options?.size !== undefined) {
     const dim = String(options.size);
     node.setAttribute("width", dim);
     node.setAttribute("height", dim);
   }
   return node;
+}
+
+function uniquifyIds(root: SVGElement): void {
+  const idHolders = root.querySelectorAll("[id]");
+  if (idHolders.length === 0) return;
+  const suffix = `-${++cloneCounter}`;
+  const remap = new Map<string, string>();
+  idHolders.forEach(el => {
+    const oldId = el.getAttribute("id");
+    if (!oldId) return;
+    const newId = `${oldId}${suffix}`;
+    el.setAttribute("id", newId);
+    remap.set(oldId, newId);
+  });
+  const all: Element[] = [root, ...Array.from(root.querySelectorAll("*"))];
+  for (const el of all) {
+    for (const attr of Array.from(el.attributes)) {
+      const updated = remapRefs(attr.value, remap);
+      if (updated !== attr.value) el.setAttribute(attr.name, updated);
+    }
+  }
+}
+
+function remapRefs(value: string, remap: Map<string, string>): string {
+  let out = value.replace(/url\(#([^)]+)\)/g, (match, id) => {
+    const mapped = remap.get(id);
+    return mapped ? `url(#${mapped})` : match;
+  });
+  if (out.startsWith("#")) {
+    const mapped = remap.get(out.slice(1));
+    if (mapped) out = `#${mapped}`;
+  }
+  return out;
 }
