@@ -94,6 +94,14 @@ body {
 .auth-card__subtitle {
   font-size: 0.92rem;
   margin: 0 0 14px;
+  max-height: 0;
+  opacity: 0;
+  overflow: hidden;
+  transition: max-height 220ms ease, opacity 220ms ease;
+}
+
+.auth-card__subtitle[data-ready] {
+  max-height: 3rem;
   opacity: 0.85;
 }
 
@@ -105,7 +113,7 @@ body {
 }
 
 .auth-card__remember {
-  margin-bottom: 22px;
+  margin-bottom: 16px;
   font-size: 0.85rem;
   opacity: 0.85;
 }
@@ -204,10 +212,28 @@ body {
 }
 
 .auth-card__error {
-  margin-top: 16px;
-  padding: 10px 12px;
-  border-radius: 8px;
-  background: rgba(242, 12, 50, 0.15);
-  color: #ff8a9c;
-  font-size: 0.85rem;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  max-height: 0;
+  margin: 0;
+  opacity: 0;
+  overflow: hidden;
+  font-size: 0.8125rem;
+  color: rgba(255, 255, 255, 0.55);
+  transition: max-height 220ms ease, margin 220ms ease, opacity 220ms ease, color 120ms ease;
+}
+
+.auth-card__error:not(:empty) {
+  max-height: 3rem;
+  margin: 0 0 16px;
+  opacity: 1;
+}
+
+.auth-card__error[data-state="error"] {
+  color: #ff7961;
+}
+
+.auth-card__error[data-state="warning"] {
+  color: #f5b942;
 }

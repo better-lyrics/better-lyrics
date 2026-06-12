@@ -11,6 +11,7 @@ interface Options {
   isLogsEnabled: boolean;
   isAutoSwitchEnabled: boolean;
   isAlbumArtEnabled: boolean;
+  isShadersPromoEnabled: boolean;
   isFullScreenDisabled: boolean;
   isStylizedAnimationsEnabled: boolean;
   isPassiveScrollEnabled: boolean;
@@ -48,6 +49,7 @@ const getOptionsFromForm = (): Options => {
     isLogsEnabled: (document.getElementById("logs") as HTMLInputElement).checked,
     isAutoSwitchEnabled: (document.getElementById("autoSwitch") as HTMLInputElement).checked,
     isAlbumArtEnabled: (document.getElementById("albumArt") as HTMLInputElement).checked,
+    isShadersPromoEnabled: (document.getElementById("isShadersPromoEnabled") as HTMLInputElement).checked,
     isFullScreenDisabled: (document.getElementById("isFullScreenDisabled") as HTMLInputElement).checked,
     isStylizedAnimationsEnabled: (document.getElementById("isStylizedAnimationsEnabled") as HTMLInputElement).checked,
     isPassiveScrollEnabled: (document.getElementById("isPassiveScrollEnabled") as HTMLInputElement).checked,
@@ -198,6 +200,7 @@ const restoreOptions = (): void => {
     isLogsEnabled: true,
     isAutoSwitchEnabled: false,
     isAlbumArtEnabled: true,
+    isShadersPromoEnabled: true,
     isCursorAutoHideEnabled: true,
     isFullScreenDisabled: false,
     isStylizedAnimationsEnabled: true,
@@ -240,6 +243,7 @@ const restoreOptions = (): void => {
 const setOptionsInForm = (items: Options): void => {
   (document.getElementById("logs") as HTMLInputElement).checked = items.isLogsEnabled;
   (document.getElementById("albumArt") as HTMLInputElement).checked = items.isAlbumArtEnabled;
+  (document.getElementById("isShadersPromoEnabled") as HTMLInputElement).checked = items.isShadersPromoEnabled;
   (document.getElementById("autoSwitch") as HTMLInputElement).checked = items.isAutoSwitchEnabled;
   (document.getElementById("cursorAutoHide") as HTMLInputElement).checked = items.isCursorAutoHideEnabled;
   (document.getElementById("isFullScreenDisabled") as HTMLInputElement).checked = items.isFullScreenDisabled;

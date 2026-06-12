@@ -3,13 +3,6 @@
   <head>
     <meta charset="utf-8" />
     <meta name="color-scheme" content="dark light" />
-    <meta http-equiv="Content-Security-Policy" content="
-      default-src 'self';
-      script-src 'self';
-			style-src 'self' 'unsafe-inline' https://api.fontshare.com;
-			font-src 'self' data: https://cdn.fontshare.com;
-      img-src 'self' data: https://blrcunison.vercel.app https://boidu.dev;
-    " />
     <title>__MSG_auth_pageTitle__</title>
 		<link
 			href="https://api.fontshare.com/v2/css?f[]=satoshi@1&display=swap"
@@ -48,7 +41,7 @@
         </label>
       </section>
 
-      <p class="auth-card__error" id="auth-error" hidden></p>
+      <p class="auth-card__error" id="auth-error" role="status"></p>
     </main>
 
     <footer class="auth-page__footer">
