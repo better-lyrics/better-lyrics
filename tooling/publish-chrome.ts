@@ -34,5 +34,5 @@ try {
   console.log("Successfully published to Chrome Web Store.");
 } catch (error) {
   console.error("Failed to publish to Chrome Web Store:", error);
-  process.exit(0); // Exit gracefully as in the original script
+  process.exit(1);
 }
