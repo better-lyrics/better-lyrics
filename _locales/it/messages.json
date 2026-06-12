@@ -104,7 +104,7 @@
     "description": "Title of the Unison Actions modal"
   },
   "options_unisonModal_showPinned": {
-    "message": "Mostra azioni salvate",
+    "message": "Mostra azioni bloccate",
     "description": "Toggle label inside the Unison Actions modal for the floating dock"
   },
   "options_unisonModal_showPinned_hint": {
@@ -1094,7 +1094,7 @@
     "description": "Error state shown when the popup receives malformed parameters"
   },
   "auth_sessionExpired": {
-    "message": "Sign-in expired. Please close this window and try again.",
+    "message": "Accesso scaduto. Per favore chiudi questa finestra e riprova.",
     "description": "Shown in the sign-in consent popup when the connection to the extension's service worker is lost before the user can approve or cancel."
   },
   "lyrics_requestSyncedVersion": {
