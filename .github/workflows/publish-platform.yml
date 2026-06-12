@@ -13,6 +13,9 @@ on:
         type: string
         required: true
 
+permissions:
+  contents: read
+
 jobs:
   publish:
     runs-on: ubuntu-latest
