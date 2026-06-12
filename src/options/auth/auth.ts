@@ -72,11 +72,18 @@ function bindStaticText(): void {
   if (cancel) cancel.textContent = t("auth_cancel");
 }
 
-function showError(messageKey: string): void {
+const STATUS_ICON_MARKUP = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" width="14" height="14" aria-hidden="true"><path fill-rule="evenodd" d="M6.701 2.252a1.5 1.5 0 0 1 2.598 0l5.196 9.001A1.5 1.5 0 0 1 13.196 13.5H2.804a1.5 1.5 0 0 1-1.299-2.247l5.196-9.001ZM8 5.5a.75.75 0 0 1 .75.75v3a.75.75 0 0 1-1.5 0v-3A.75.75 0 0 1 8 5.5Zm0 6.5a.75.75 0 1 0 0-1.5.75.75 0 0 0 0 1.5Z" clip-rule="evenodd"/></svg>`;
+
+const STATUS_ICON_TEMPLATE = new DOMParser().parseFromString(STATUS_ICON_MARKUP, "image/svg+xml")
+  .documentElement as unknown as SVGElement;
+
+function showError(messageKey: string, state: "error" | "warning" = "error"): void {
   const error = document.getElementById("auth-error");
   if (!error) return;
-  error.textContent = t(messageKey);
-  error.hidden = false;
+  error.dataset.state = state;
+  const icon = STATUS_ICON_TEMPLATE.cloneNode(true);
+  const text = document.createTextNode(t(messageKey));
+  error.replaceChildren(icon, text);
 }
 
 async function bindDynamicText(params: RequestParams): Promise<void> {
@@ -92,6 +99,7 @@ async function bindDynamicText(params: RequestParams): Promise<void> {
       console.warn(LOG_PREFIX_AUTH, "identity load failed", err);
       subtitle.textContent = t("auth_consentSubheading", "");
     }
+    subtitle.dataset.ready = "true";
   }
 }
 
@@ -107,6 +115,7 @@ function wireActions(port: chrome.runtime.Port): void {
       port.postMessage({ result: "approve", remember: remember?.checked === true });
     } catch (err) {
       console.warn(LOG_PREFIX_AUTH, "approve post failed", err);
+      showError("auth_sessionExpired");
     }
   });
 
@@ -117,6 +126,7 @@ function wireActions(port: chrome.runtime.Port): void {
       port.postMessage({ result: "cancel" });
     } catch (err) {
       console.warn(LOG_PREFIX_AUTH, "cancel post failed", err);
+      showError("auth_sessionExpired");
     }
   });
 }
@@ -157,6 +167,23 @@ async function main(): Promise<void> {
   renderLogos(getAuthPartnerByOrigin(params.origin));
 
   const port = chrome.runtime.connect({ name: `${AUTH_PORT_NAME_PREFIX}${params.requestId}` });
+
+  const heartbeat = window.setInterval(() => {
+    try {
+      port.postMessage({ type: "heartbeat" });
+    } catch {
+      window.clearInterval(heartbeat);
+    }
+  }, 15_000);
+
+  port.onDisconnect.addListener(() => {
+    window.clearInterval(heartbeat);
+    showError("auth_sessionExpired");
+    const approve = document.getElementById("auth-approve") as HTMLButtonElement | null;
+    const cancel = document.getElementById("auth-cancel") as HTMLButtonElement | null;
+    if (approve) approve.disabled = true;
+    if (cancel) cancel.disabled = true;
+  });
 
   await bindDynamicText(params);
   wireActions(port);

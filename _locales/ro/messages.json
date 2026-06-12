@@ -91,6 +91,10 @@
     "message": "Derulare automată versurilor nesincronizate",
     "description": "Auto-scroll unsynced lyrics setting label"
   },
+  "options_display_shadersPromo": {
+    "message": "Show link to Better Lyrics Shaders",
+    "description": "Toggle label for the Shaders companion link shown in the lyrics footer"
+  },
   "options_display_unisonActions": {
     "message": "Acțiuni pentru Unison",
     "description": "Display-section row label for the Unison Actions modal trigger"
@@ -266,6 +270,74 @@
   "options_identityImport_import": {
     "message": "Import",
     "description": "Confirm button label inside the import identity modal"
+  },
+  "options_nickname_description": {
+    "message": "Pick a name for yourself across Better Lyrics. Letters, numbers, and underscore, 3 to 20 characters.",
+    "description": "Nickname subsection description"
+  },
+  "options_nickname_placeholder": {
+    "message": "Pick a nickname",
+    "description": "Nickname input placeholder"
+  },
+  "options_nickname_save": {
+    "message": "Save",
+    "description": "Nickname save button label"
+  },
+  "options_nickname_reset": {
+    "message": "Reset to default",
+    "description": "Nickname reset button label"
+  },
+  "options_nickname_modalTitle": {
+    "message": "Set your nickname",
+    "description": "Nickname modal title"
+  },
+  "options_nickname_edit": {
+    "message": "Edit",
+    "description": "Nickname edit button label"
+  },
+  "options_nickname_editLabel": {
+    "message": "Edit nickname",
+    "description": "Accessible label for the nickname edit button"
+  },
+  "options_nickname_status_checking": {
+    "message": "Checking...",
+    "description": "Status while checking nickname availability"
+  },
+  "options_nickname_status_available": {
+    "message": "Available",
+    "description": "Status when nickname is available"
+  },
+  "options_nickname_status_taken": {
+    "message": "Already taken",
+    "description": "Status when nickname is already taken"
+  },
+  "options_nickname_status_invalid": {
+    "message": "3 to 20 letters, numbers, or underscores",
+    "description": "Status when nickname format is invalid"
+  },
+  "options_nickname_status_profane": {
+    "message": "Not allowed, try another",
+    "description": "Status when nickname is flagged as inappropriate by the server"
+  },
+  "options_nickname_status_self": {
+    "message": "This is your current nickname",
+    "description": "Status when entered nickname matches current"
+  },
+  "options_nickname_status_saved": {
+    "message": "Saved",
+    "description": "Status when nickname is saved"
+  },
+  "options_nickname_status_submitting": {
+    "message": "Saving...",
+    "description": "Status while nickname save is in flight"
+  },
+  "options_nickname_status_rateLimited": {
+    "message": "Slow down, try again in a moment",
+    "description": "Status when nickname checks are rate limited"
+  },
+  "options_nickname_status_error": {
+    "message": "Could not reach the server",
+    "description": "Status when nickname request fails"
   },
   "options_alert_importEmpty": {
     "message": "Paste identity JSON or choose a file first.",
@@ -805,6 +877,10 @@
     "message": "Caută pe Genius",
     "description": "Search on Genius button text"
   },
+  "lyrics_getShaders": {
+    "message": "Get Better Lyrics Shaders",
+    "description": "Footer button text linking to the Better Lyrics Shaders companion extension"
+  },
   "lyrics_searching": {
     "message": "Better Lyrics caută versuri...",
     "description": "Loading message while searching for lyrics"
@@ -1016,6 +1092,10 @@
   "auth_invalidRequest": {
     "message": "Invalid sign-in request.",
     "description": "Error state shown when the popup receives malformed parameters"
+  },
+  "auth_sessionExpired": {
+    "message": "Sign-in expired. Please close this window and try again.",
+    "description": "Shown in the sign-in consent popup when the connection to the extension's service worker is lost before the user can approve or cancel."
   },
   "lyrics_requestSyncedVersion": {
     "message": "Solicită o versiune sincronizată",

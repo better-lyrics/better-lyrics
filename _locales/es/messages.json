@@ -91,6 +91,10 @@
     "message": "Desplazar letras sin sincronizar automáticamente",
     "description": "Auto-scroll unsynced lyrics setting label"
   },
+  "options_display_shadersPromo": {
+    "message": "Mostrar enlace a Shaders de Better Lyrics",
+    "description": "Toggle label for the Shaders companion link shown in the lyrics footer"
+  },
   "options_display_unisonActions": {
     "message": "Acciones de Unison",
     "description": "Display-section row label for the Unison Actions modal trigger"
@@ -266,6 +270,74 @@
   "options_identityImport_import": {
     "message": "Importar",
     "description": "Confirm button label inside the import identity modal"
+  },
+  "options_nickname_description": {
+    "message": "Elige un nombre para ti mismo para Better Lyrics, Letras, números, y guión bajo, de 3 a 20 caracteres.",
+    "description": "Nickname subsection description"
+  },
+  "options_nickname_placeholder": {
+    "message": "Elige un apodo",
+    "description": "Nickname input placeholder"
+  },
+  "options_nickname_save": {
+    "message": "Guardar",
+    "description": "Nickname save button label"
+  },
+  "options_nickname_reset": {
+    "message": "Reestablecer a predeterminados",
+    "description": "Nickname reset button label"
+  },
+  "options_nickname_modalTitle": {
+    "message": "Ponte tu apodo",
+    "description": "Nickname modal title"
+  },
+  "options_nickname_edit": {
+    "message": "Editar",
+    "description": "Nickname edit button label"
+  },
+  "options_nickname_editLabel": {
+    "message": "Editar apodo",
+    "description": "Accessible label for the nickname edit button"
+  },
+  "options_nickname_status_checking": {
+    "message": "Comprobando...",
+    "description": "Status while checking nickname availability"
+  },
+  "options_nickname_status_available": {
+    "message": "Disponible",
+    "description": "Status when nickname is available"
+  },
+  "options_nickname_status_taken": {
+    "message": "Ya cogido",
+    "description": "Status when nickname is already taken"
+  },
+  "options_nickname_status_invalid": {
+    "message": "3 a 20 letras, números o guiones bajos",
+    "description": "Status when nickname format is invalid"
+  },
+  "options_nickname_status_profane": {
+    "message": "No permitido, prueba con otro",
+    "description": "Status when nickname is flagged as inappropriate by the server"
+  },
+  "options_nickname_status_self": {
+    "message": "Este es tu apodo actual",
+    "description": "Status when entered nickname matches current"
+  },
+  "options_nickname_status_saved": {
+    "message": "Guardado",
+    "description": "Status when nickname is saved"
+  },
+  "options_nickname_status_submitting": {
+    "message": "Guardando...",
+    "description": "Status while nickname save is in flight"
+  },
+  "options_nickname_status_rateLimited": {
+    "message": "Despacio, inténtalo de nuevo más tarde",
+    "description": "Status when nickname checks are rate limited"
+  },
+  "options_nickname_status_error": {
+    "message": "No se pudo llegar al servidor",
+    "description": "Status when nickname request fails"
   },
   "options_alert_importEmpty": {
     "message": "Pega una indentidad JSON o escoge un archivo primero.",
@@ -805,6 +877,10 @@
     "message": "Buscar en Genius",
     "description": "Search on Genius button text"
   },
+  "lyrics_getShaders": {
+    "message": "Consigue Shaders de Better Lyrics",
+    "description": "Footer button text linking to the Better Lyrics Shaders companion extension"
+  },
   "lyrics_searching": {
     "message": "Better Lyrics está buscando letras...",
     "description": "Loading message while searching for lyrics"
@@ -904,7 +980,7 @@
     }
   },
   "symlink_applied": {
-    "message": "Applied theme: $NAME$ (Marketplace)",
+    "message": "Tema aplicado: $NAME$ (Tienda)",
     "description": "Alert after successfully applying a symlinked theme from marketplace",
     "placeholders": {
       "name": {
@@ -914,7 +990,7 @@
     }
   },
   "builtin_applied": {
-    "message": "Applied theme: $NAME$",
+    "message": "Tema aplicado: $NAME$",
     "description": "Alert after successfully applying a bundled built-in theme",
     "placeholders": {
       "name": {
@@ -924,7 +1000,7 @@
     }
   },
   "theme_author_prefix": {
-    "message": "by $AUTHOR$",
+    "message": "por $AUTHOR$",
     "description": "Author prefix shown on theme selector button",
     "placeholders": {
       "author": {
@@ -938,19 +1014,19 @@
     "description": "Author label for custom user themes on theme selector button"
   },
   "symlink_installFailed": {
-    "message": "Couldn't install theme. Check your connection and try again.",
+    "message": "No se pudo instalar el tema, comprueba tu conexión y vuelve a intentar.",
     "description": "Alert when a symlinked theme fails to install from marketplace"
   },
   "symlink_badge_marketplace": {
-    "message": "Marketplace",
+    "message": "Tienda",
     "description": "Badge text on symlinked theme cards"
   },
   "symlink_badge_bundled": {
-    "message": "Bundled",
+    "message": "Empaquetado",
     "description": "Badge text on non-symlinked built-in theme cards"
   },
   "deprecation_builtin_title": {
-    "message": "Heads up, these themes are moving!",
+    "message": "¡Atención, estos temas se están moviendo!",
     "description": "Title for the built-in themes deprecation banner in theme modal"
   },
   "deprecation_builtin_body": {
@@ -1016,6 +1092,10 @@
   "auth_invalidRequest": {
     "message": "Invalid sign-in request.",
     "description": "Error state shown when the popup receives malformed parameters"
+  },
+  "auth_sessionExpired": {
+    "message": "Sign-in expired. Please close this window and try again.",
+    "description": "Shown in the sign-in consent popup when the connection to the extension's service worker is lost before the user can approve or cancel."
   },
   "lyrics_requestSyncedVersion": {
     "message": "Request a synced version",

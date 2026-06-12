@@ -16,6 +16,7 @@
   "ignore": ["src/types/**"],
   "ignoreDependencies": [
     "@codemirror/language",
+    "@plasmohq/edge-addons-api",
     "@types/chrome",
     "@typescript/lib-dom"
   ],

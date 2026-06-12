@@ -22,6 +22,9 @@ import {
   PLAYER_BAR_SELECTOR,
   PROVIDER_CONFIGS,
   ROMANIZED_LYRICS_CLASS,
+  SHADERS_AMO_URL,
+  SHADERS_CWS_URL,
+  SHADERS_DETECTION_SELECTOR,
   type SyncType,
   TAB_RENDERER_SELECTOR,
   TRANSLATED_LYRICS_CLASS,
@@ -728,6 +731,14 @@ function getTrustTier(reputation: number): "new" | "trusted" | "veteran" | "expe
   return "expert";
 }
 
+function shouldRenderShadersPromo(): boolean {
+  return document.querySelector(SHADERS_DETECTION_SELECTOR) === null;
+}
+
+function getShadersStoreUrl(): string {
+  return navigator.userAgent.includes("Firefox") ? SHADERS_AMO_URL : SHADERS_CWS_URL;
+}
+
 /**
  * Creates the footer elements including source link, Discord link, and add lyrics button.
  *
@@ -801,6 +812,30 @@ function createFooter(
     if (videoId && showRequestButton) {
       footer.appendChild(createRequestSyncedButton({ videoId, song, artist }));
     }
+    chrome.storage.sync.get({ isShadersPromoEnabled: true }, settings => {
+      if (!discordLink.isConnected) return;
+      if (!settings.isShadersPromoEnabled) return;
+      if (!shouldRenderShadersPromo()) return;
+
+      const shadersButton = document.createElement("a");
+      shadersButton.className = `${FOOTER_CLASS}__container ${FOOTER_CLASS}__shaders`;
+      shadersButton.href = getShadersStoreUrl();
+      shadersButton.target = "_blank";
+      shadersButton.rel = "noreferrer noopener";
+
+      const shadersImage = document.createElement("img");
+      shadersImage.src = chrome.runtime.getURL("images/icons/shaders.png");
+      shadersImage.alt = "Better Lyrics Shaders";
+      shadersImage.width = 20;
+      shadersImage.height = 20;
+      shadersButton.appendChild(shadersImage);
+
+      const shadersLabel = document.createElement("span");
+      shadersLabel.textContent = t("lyrics_getShaders");
+      shadersButton.appendChild(shadersLabel);
+
+      footer.insertBefore(shadersButton, discordLink);
+    });
     footer.appendChild(discordLink);
 
     footer.removeAttribute("is-empty");
