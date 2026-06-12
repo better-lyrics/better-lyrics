@@ -8,7 +8,15 @@ import {
 } from "../../store/themeStoreManager";
 import type { ThemeSource } from "../../store/types";
 import type { Theme } from "../../themes";
-import THEMES, { addSettingFieldCustomTheme, deleteCustomTheme, getCustomThemes, getCustomThemeByName, renameCustomTheme, saveCustomTheme, updateCustomThemeSavedSettings } from "../../themes";
+import THEMES, {
+  addSettingFieldCustomTheme,
+  deleteCustomTheme,
+  getCustomThemes,
+  getCustomThemeByName,
+  renameCustomTheme,
+  saveCustomTheme,
+  updateCustomThemeSavedSettings,
+} from "../../themes";
 import { SAVE_CUSTOM_THEME_DEBOUNCE, SAVE_DEBOUNCE_DELAY } from "../core/editor";
 import { editorStateManager } from "../core/state";
 import type { ThemeCardOptions } from "../types";
@@ -134,7 +142,7 @@ export function themeSourceToEditorSource(source: ThemeSource | undefined): Edit
 
 let themeSettingsVisible = false;
 
-async function getCurrentCustomTheme(): Promise<ReturnType<typeof getCustomThemeByName> | undefined> {
+async function _getCurrentCustomTheme(): Promise<ReturnType<typeof getCustomThemeByName> | undefined> {
   const themeName = editorStateManager.getCurrentThemeName();
   if (!themeName || !editorStateManager.getIsCustomTheme()) return undefined;
   return getCustomThemeByName(themeName);
@@ -321,7 +329,7 @@ function createFieldInput(
   return container;
 }
 
-function formatThemeComment(savedSettings?: { [field: string]: any }): string {
+function _formatThemeComment(savedSettings?: { [field: string]: any }): string {
   if (!savedSettings || Object.keys(savedSettings).length === 0) {
     return "";
   }
@@ -360,7 +368,9 @@ async function renderThemeSettings(): Promise<void> {
   themeSettingsContainer.appendChild(header);
 
   if (!themeName) {
-    themeSettingsContainer.appendChild(createThemeSettingsNotice("No theme selected. Choose a custom theme to view its settings."));
+    themeSettingsContainer.appendChild(
+      createThemeSettingsNotice("No theme selected. Choose a custom theme to view its settings.")
+    );
     return;
   }
 
@@ -374,7 +384,9 @@ async function renderThemeSettings(): Promise<void> {
   const savedSettings = customTheme.savedSettings || {};
 
   if (Object.keys(settings).length === 0) {
-    themeSettingsContainer.appendChild(createThemeSettingsNotice("This custom theme has no settings yet. Use the button above to add a field."));
+    themeSettingsContainer.appendChild(
+      createThemeSettingsNotice("This custom theme has no settings yet. Use the button above to add a field.")
+    );
     return;
   }
 
@@ -391,16 +403,18 @@ async function renderThemeSettings(): Promise<void> {
     fieldWrapper.style.background = "rgba(255,255,255,0.02)";
 
     fieldWrapper.appendChild(createFieldLabel(fieldDef.label || fieldId, fieldId));
-    fieldWrapper.appendChild(createFieldInput(themeName, fieldId, fieldDef, value, async newValue => {
-      await updateCustomThemeSavedSettings(themeName, { [fieldId]: newValue });
-      if (editorStateManager.getCurrentThemeName() === themeName && editorStateManager.getIsCustomTheme()) {
-        const customThemes = await getCustomThemes();
-        const index = customThemes.findIndex(theme => theme.name === themeName);
-        if (index !== -1) {
-          await themeManager.applyTheme(true, index, themeName);
+    fieldWrapper.appendChild(
+      createFieldInput(themeName, fieldId, fieldDef, value, async newValue => {
+        await updateCustomThemeSavedSettings(themeName, { [fieldId]: newValue });
+        if (editorStateManager.getCurrentThemeName() === themeName && editorStateManager.getIsCustomTheme()) {
+          const customThemes = await getCustomThemes();
+          const index = customThemes.findIndex(theme => theme.name === themeName);
+          if (index !== -1) {
+            await themeManager.applyTheme(true, index, themeName);
+          }
         }
-      }
-    }));
+      })
+    );
 
     list.appendChild(fieldWrapper);
   }
@@ -427,13 +441,23 @@ async function promptAddThemeSettingField(): Promise<void> {
   );
   if (!type) return;
 
-  const attribute = await showPrompt("Setting Key", "Enter the Blyrics setting key (without 'blyrics-' prefix):", "", "example: disable-richsync");
+  const attribute = await showPrompt(
+    "Setting Key",
+    "Enter the Blyrics setting key (without 'blyrics-' prefix):",
+    "",
+    "example: disable-richsync"
+  );
   if (!attribute) return;
 
   const attrType = await showPrompt("Attribute Type", "Enter the attribute type: css or rics:", "css", "css");
   if (!attrType) return;
 
-  const defaultValue = await showPrompt("Default Value", "Enter the default value for this setting:", "", "default value");
+  const defaultValue = await showPrompt(
+    "Default Value",
+    "Enter the default value for this setting:",
+    "",
+    "default value"
+  );
   if (defaultValue === null) return;
 
   let data: any = {

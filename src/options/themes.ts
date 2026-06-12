@@ -14,7 +14,7 @@ export interface Theme {
 interface CustomTheme {
   name: string;
   css: string;
-  settings?: { [field: string]: ThemeSettingField; };
+  settings?: { [field: string]: ThemeSettingField };
   /** Modified through user actions */
   savedSettings?: { [field: string]: any };
   timestamp: number;
@@ -22,7 +22,7 @@ interface CustomTheme {
 
 enum ThemeSettingFieldAttrType {
   CSS = "css",
-  RICS = "rics"
+  RICS = "rics",
 }
 
 enum ThemeSettingFieldType {
@@ -30,7 +30,7 @@ enum ThemeSettingFieldType {
   RANGE = "range",
   DROPDOWN = "dropdown",
   COLOR = "color",
-  TEXTFIELD = "textfield"
+  TEXTFIELD = "textfield",
 }
 
 enum ThemeSettingFieldConditionals {
@@ -41,7 +41,7 @@ enum ThemeSettingFieldConditionals {
   CONTAINS = "contains",
   NOTCONTAINS = "not-contains",
   STARTS = "starts",
-  ENDS = "ends"
+  ENDS = "ends",
 }
 
 export interface ThemeSettingField {
@@ -50,19 +50,19 @@ export interface ThemeSettingField {
   /** CSS starts with `--` prefix while RICS starts with `$` prefix */
   attribute: string;
   attrType: ThemeSettingFieldAttrType | string;
-  /** 
+  /**
    * Use `$VALUE$` for accessing the current setting field value on the `attrValue`.
-   * 
+   *
    * Use `$<SETTING-FIELD-ID>$` for accessing other setting field values on the `attrValue`
    */
   attrValue?: string;
-  /** 
-   * This property allows to make this setting field only effective and available under certain other setting field values 
-   * 
+  /**
+   * This property allows to make this setting field only effective and available under certain other setting field values
+   *
    * An array of an array of conditional values.
-   * 
+   *
    * The inner array represents a set of conditions (AND), and the outer array represents multiple sets of conditions (OR).
-   * 
+   *
    * For example, it could be built like this:
    * ```
    * [
@@ -71,7 +71,7 @@ export interface ThemeSettingField {
    * ]
    * ```
    */
-  available?: [{settingField: string, condition: string | ThemeSettingFieldConditionals, value: any}][];
+  available?: [{ settingField: string; condition: string | ThemeSettingFieldConditionals; value: any }][];
   default: any;
 }
 
@@ -176,7 +176,11 @@ export async function getCustomThemes(): Promise<CustomTheme[]> {
   return result.customThemes || [];
 }
 
-export async function saveCustomTheme(name: string, css: string, settings?: { [field: string]: ThemeSettingField }): Promise<void> {
+export async function saveCustomTheme(
+  name: string,
+  css: string,
+  settings?: { [field: string]: ThemeSettingField }
+): Promise<void> {
   const customThemes = await getCustomThemes();
   const existingIndex = customThemes.findIndex(theme => theme.name === name);
   const existingTheme = existingIndex !== -1 ? customThemes[existingIndex] : undefined;
@@ -198,7 +202,10 @@ export async function saveCustomTheme(name: string, css: string, settings?: { [f
   await chrome.storage.local.set({ customThemes });
 }
 
-export async function updateCustomThemeSavedSettings(name: string, savedSettings: { [field: string]: any }): Promise<void> {
+export async function updateCustomThemeSavedSettings(
+  name: string,
+  savedSettings: { [field: string]: any }
+): Promise<void> {
   const customThemes = await getCustomThemes();
   const themeIndex = customThemes.findIndex(theme => theme.name === name);
   if (themeIndex === -1) {
@@ -209,16 +216,20 @@ export async function updateCustomThemeSavedSettings(name: string, savedSettings
 
   if (theme.settings) {
     for (const key in savedSettings) {
-      if (!theme.settings[key]) { delete savedSettings[key]; }
-      if (theme.settings[key] && theme.settings[key].default == savedSettings[key]) { delete savedSettings[key]; }
+      if (!theme.settings[key]) {
+        delete savedSettings[key];
+      }
+      if (theme.settings[key] && theme.settings[key].default == savedSettings[key]) {
+        delete savedSettings[key];
+      }
     }
-    
+
     theme.savedSettings = {
       ...(theme.savedSettings || {}),
       ...savedSettings,
     };
   }
-  
+
   customThemes[themeIndex] = {
     ...theme,
     timestamp: Date.now(),
@@ -252,7 +263,12 @@ export async function renameCustomTheme(oldName: string, newName: string): Promi
   await chrome.storage.local.set({ customThemes });
 }
 
-export async function addSettingFieldCustomTheme(name: string, type: ThemeSettingFieldType | string, id: string, data: ThemeSettingField): Promise<void> {
+export async function addSettingFieldCustomTheme(
+  name: string,
+  type: ThemeSettingFieldType | string,
+  id: string,
+  data: ThemeSettingField
+): Promise<void> {
   if (!Object.values(ThemeSettingFieldType).find(ftype => ftype === type)) {
     throw new Error(`Invalid setting field type "${type}"`);
   }
@@ -267,8 +283,12 @@ export async function addSettingFieldCustomTheme(name: string, type: ThemeSettin
   }
 
   const theme = customThemes[themeIndex];
-  if (!theme.settings) { theme.settings = {}; }
-  if (!theme.savedSettings) { theme.savedSettings = {}; }
+  if (!theme.settings) {
+    theme.settings = {};
+  }
+  if (!theme.savedSettings) {
+    theme.savedSettings = {};
+  }
   if (theme.settings[id]) {
     throw new Error(`Field with Id "${id}" already exists!`);
   }
@@ -308,7 +328,10 @@ export async function getCustomThemeByName(name: string): Promise<CustomTheme | 
   return customThemes.find(theme => theme.name === name);
 }
 
-export async function updateCustomThemeSettings(name: string, settings?: { [field: string]: ThemeSettingField }): Promise<void> {
+export async function updateCustomThemeSettings(
+  name: string,
+  settings?: { [field: string]: ThemeSettingField }
+): Promise<void> {
   const customThemes = await getCustomThemes();
   const themeIndex = customThemes.findIndex(theme => theme.name === name);
   if (themeIndex === -1) {

@@ -99,6 +99,29 @@ export const ROMANIZATION_LANGUAGES: Record<string, string> = {
   fa: "Persian",
 };
 
+// Theme Settings
+export const THEME_SETTINGS_MAX_FIELDS = 50;
+export const THEME_SETTINGS_TYPES: Record<string, string> = {
+  range: "number",
+  color: "string",
+  dropdown: "number",
+  toggle: "boolean",
+  textfield: "string",
+};
+
+export const THEME_SETTINGS_ATTRIBUTE_TYPE = ["css", "rics"];
+
+export const THEME_SETTINGS_CONDITIONALS = [
+  "equals",
+  "not-equal",
+  "greater-than",
+  "less-than",
+  "contains",
+  "not-contains",
+  "starts",
+  "ends",
+];
+
 // Log Prefixes
 export const LOG_PREFIX = "[BetterLyrics]" as const;
 export const LOG_PREFIX_CONTENT = "[BetterLyrics:Content]" as const;
