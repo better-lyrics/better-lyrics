@@ -14,6 +14,7 @@ interface Options {
   isShadersPromoEnabled: boolean;
   isFullScreenDisabled: boolean;
   isStylizedAnimationsEnabled: boolean;
+  isLetterAnimationEnabled: boolean;
   isPassiveScrollEnabled: boolean;
   isTranslateEnabled: boolean;
   translationLanguage: string;
@@ -52,6 +53,7 @@ const getOptionsFromForm = (): Options => {
     isShadersPromoEnabled: (document.getElementById("isShadersPromoEnabled") as HTMLInputElement).checked,
     isFullScreenDisabled: (document.getElementById("isFullScreenDisabled") as HTMLInputElement).checked,
     isStylizedAnimationsEnabled: (document.getElementById("isStylizedAnimationsEnabled") as HTMLInputElement).checked,
+    isLetterAnimationEnabled: (document.getElementById("isLetterAnimationEnabled") as HTMLInputElement).checked,
     isPassiveScrollEnabled: (document.getElementById("isPassiveScrollEnabled") as HTMLInputElement).checked,
     isTranslateEnabled: (document.getElementById("translate") as HTMLInputElement).checked,
     translationLanguage: (document.getElementById("translationLanguage") as HTMLInputElement).value,
@@ -204,6 +206,7 @@ const restoreOptions = (): void => {
     isCursorAutoHideEnabled: true,
     isFullScreenDisabled: false,
     isStylizedAnimationsEnabled: true,
+    isLetterAnimationEnabled: false,
     isPassiveScrollEnabled: true,
     isTranslateEnabled: false,
     translationLanguage: "en",
@@ -249,6 +252,7 @@ const setOptionsInForm = (items: Options): void => {
   (document.getElementById("isFullScreenDisabled") as HTMLInputElement).checked = items.isFullScreenDisabled;
   (document.getElementById("isStylizedAnimationsEnabled") as HTMLInputElement).checked =
     items.isStylizedAnimationsEnabled;
+  (document.getElementById("isLetterAnimationEnabled") as HTMLInputElement).checked = items.isLetterAnimationEnabled;
   (document.getElementById("isPassiveScrollEnabled") as HTMLInputElement).checked = items.isPassiveScrollEnabled;
   (document.getElementById("translate") as HTMLInputElement).checked = items.isTranslateEnabled;
   (document.getElementById("translationLanguage") as HTMLInputElement).value = items.translationLanguage;
@@ -564,6 +568,12 @@ document.addEventListener("DOMContentLoaded", () => {
   document.getElementById("browse-themes-btn")?.addEventListener("click", () => {
     chrome.tabs.create({
       url: chrome.runtime.getURL("pages/marketplace.html"),
+    });
+  });
+
+  document.getElementById("open-unison-btn")?.addEventListener("click", () => {
+    chrome.tabs.create({
+      url: chrome.runtime.getURL("pages/unison.html"),
     });
   });
 
