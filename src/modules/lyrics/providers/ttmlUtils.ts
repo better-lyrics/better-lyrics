@@ -115,8 +115,8 @@ function parseLyricPart(p: ParagraphElementOrBackground[], beginTime: number, ig
           words: subPart["#text"],
           isBackground,
         });
-      } else if (subPart.span) {
-        let spanText = subPart.span[0]["#text"]!;
+      } else if (subPart.span && subPart.span[0]?.["#text"]) {
+        let spanText = subPart.span[0]["#text"];
         let startTimeMs = parseTime(subPart[":@"]?.["@_begin"]);
         let endTimeMs = parseTime(subPart[":@"]?.["@_end"]);
         let explicit = subPart[":@"]?.["@_explicit"] === "true" || subPart[":@"]?.["@_obscene"] === "true";
