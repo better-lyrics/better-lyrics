@@ -1,110 +1,110 @@
 {
   "extensionName": {
-    "message": "Better Lyrics (Lyrics for Youtube Music)",
+    "message": "Better Lyrics (YouTube Music için şarkı sözleri)",
     "description": "The name of the extension"
   },
   "extensionDescription": {
-    "message": "Enhance YouTube Music with beautiful time-synced lyrics, multilingual support, real-time translations and more",
+    "message": "YouTube Music'i harika zamanlı senkron şarkı sözleri, çoklu dil desteği, gerçek zamanlı çeviriler ve dahasıyla geliştirin",
     "description": "The description of the extension"
   },
   "options_tab_general": {
-    "message": "General",
+    "message": "Genel",
     "description": "General settings tab label"
   },
   "options_tab_display": {
-    "message": "Display",
+    "message": "Görüntü",
     "description": "Display settings tab label"
   },
   "options_tab_language": {
-    "message": "Language",
+    "message": "Dil",
     "description": "Language settings tab label"
   },
   "options_tab_sources": {
-    "message": "Sources",
+    "message": "Kaynaklar",
     "description": "Sources settings tab label"
   },
   "options_tab_identity": {
-    "message": "Identity",
+    "message": "Kimlik",
     "description": "Identity settings tab label"
   },
   "options_tab_themes": {
-    "message": "Themes",
+    "message": "Temalar",
     "description": "Themes settings tab label"
   },
   "options_general_title": {
-    "message": "General Settings",
+    "message": "Genel Ayarlar",
     "description": "General settings section title"
   },
   "options_general_description": {
-    "message": "Settings that affect the general behavior of Better Lyrics.",
+    "message": "Better Lyrics'in genel davranışlarını etkileyen ayarlar.",
     "description": "General settings section description"
   },
   "options_general_showLogs": {
-    "message": "Show logs",
+    "message": "Kayıtları göster",
     "description": "Show logs setting label"
   },
   "options_general_autoSwitch": {
-    "message": "Auto switch to lyrics tab",
+    "message": "Söz sekmesine otomatik geçiş",
     "description": "Auto switch to lyrics tab setting label"
   },
   "options_general_cache": {
-    "message": "Cache",
+    "message": "Bellek",
     "description": "Cache section label"
   },
   "options_general_clearCache": {
-    "message": "Clear Cache",
+    "message": "Belleği Sil",
     "description": "Clear cache button label"
   },
   "options_general_totalLyrics": {
-    "message": "Total lyrics in cache",
+    "message": "Bellekteki sözler",
     "description": "Total lyrics in cache label"
   },
   "options_general_cacheSize": {
-    "message": "Cache size",
+    "message": "Bellek hacmi",
     "description": "Cache size label"
   },
   "options_display_title": {
-    "message": "Display Settings",
+    "message": "Görüntü Ayarları",
     "description": "Display settings section title"
   },
   "options_display_description": {
-    "message": "Fine-tune the appearance of Better Lyrics.",
+    "message": "Better Lyrics'in görünümüne ince ayar yapın.",
     "description": "Display settings section description"
   },
   "options_display_disableFullscreen": {
-    "message": "Disable fullscreen mode",
+    "message": "Tam ekran modunu kapat",
     "description": "Disable fullscreen mode setting label"
   },
   "options_display_autoHideCursor": {
-    "message": "Auto-hide cursor in fullscreen mode",
+    "message": "İmleci tam ekranda otomatik gizle",
     "description": "Auto-hide cursor setting label"
   },
   "options_display_albumArt": {
-    "message": "Show blurred album art background",
+    "message": "Arkaplanda bulanık albüm kapağını göster",
     "description": "Show album art background setting label"
   },
   "options_display_stylizedAnimations": {
-    "message": "Show stylized animations",
+    "message": "Stilize animasyonları göster",
     "description": "Show stylized animations setting label"
   },
   "options_display_passiveScroll": {
-    "message": "Auto-scroll unsynced lyrics",
+    "message": "Asenkron sözleri otomatik kaydır",
     "description": "Auto-scroll unsynced lyrics setting label"
   },
   "options_display_shadersPromo": {
-    "message": "Show link to Better Lyrics Shaders",
+    "message": "Better Lyrics Gölgelendiricleri bağlantısını göster",
     "description": "Toggle label for the Shaders companion link shown in the lyrics footer"
   },
   "options_display_unisonActions": {
-    "message": "Unison Actions",
+    "message": "Unison Eylemleri",
     "description": "Display-section row label for the Unison Actions modal trigger"
   },
   "options_unisonModal_title": {
-    "message": "Unison Actions",
+    "message": "Unison Eylemleri",
     "description": "Title of the Unison Actions modal"
   },
   "options_unisonModal_showPinned": {
-    "message": "Show pinned actions",
+    "message": "Sabitlenmiş eylemleri göster",
     "description": "Toggle label inside the Unison Actions modal for the floating dock"
   },
   "options_unisonModal_showPinned_hint": {
@@ -156,43 +156,43 @@
     "description": "Option label for automatic language detection based on browser settings"
   },
   "options_language_title": {
-    "message": "Language Settings",
+    "message": "Dil Ayaları",
     "description": "Language settings section title"
   },
   "options_language_description": {
-    "message": "Language and translation settings for Better Lyrics.",
+    "message": "Better Lyrics için dil ve çeviri ayarları.",
     "description": "Language settings section description"
   },
   "options_language_romanization": {
-    "message": "Romanization",
+    "message": "Romanizasyon",
     "description": "Romanization setting label"
   },
   "options_language_translate": {
-    "message": "Translate song lyrics",
+    "message": "Şarkı sözlerini çevir",
     "description": "Translate song lyrics setting label"
   },
   "options_language_translationLanguage": {
-    "message": "Translation language",
+    "message": "Çevirilecek dil",
     "description": "Translation language setting label"
   },
   "options_sources_title": {
-    "message": "Lyric Source Preference",
+    "message": "Şarkı Sözü Kaynağı Tercihi",
     "description": "Sources settings section title"
   },
   "options_sources_description": {
-    "message": "Drag to reorder priority. Higher sources are tried first. Uncheck to disable.",
+    "message": "Önceliği değiştirmek için sürükleyin. Üstteki kaynaklar önceliklidir. Devre dışı bırakmak için tiki kaldırın.",
     "description": "Sources settings section description"
   },
   "options_themes_title": {
-    "message": "Theme Settings",
+    "message": "Tema Ayarları",
     "description": "Theme settings section title"
   },
   "options_themes_description": {
-    "message": "Customize the appearance of Better Lyrics.",
+    "message": "Better Lyrics'in görünümünü özelleştirin.",
     "description": "Theme settings section description"
   },
   "options_themes_theme": {
-    "message": "Theme",
+    "message": "Tema",
     "description": "Theme label"
   },
   "options_themes_chooseTheme": {
@@ -208,7 +208,7 @@
     "description": "Display name for unnamed custom themes"
   },
   "options_themes_customStyles": {
-    "message": "Custom Styles",
+    "message": "Özel Tasarımlar",
     "description": "Custom styles label"
   },
   "options_themes_create": {
@@ -216,23 +216,23 @@
     "description": "Create button label"
   },
   "options_themes_marketplace": {
-    "message": "Theme Marketplace",
+    "message": "Tema Mağazası",
     "description": "Theme marketplace button label"
   },
   "options_themes_installedThemes": {
-    "message": "Installed Themes",
+    "message": "Yüklü Temalar",
     "description": "Installed themes button label"
   },
   "options_identity_title": {
-    "message": "Identity",
+    "message": "Kimlik",
     "description": "Identity settings section title"
   },
   "options_identity_description": {
-    "message": "Your unique anonymous identity for Better Lyrics.",
+    "message": "Better Lyrics için eşsiz kimliğiniz.",
     "description": "Identity settings section description"
   },
   "options_identity_yourIdentity": {
-    "message": "Your identity",
+    "message": "İsminiz",
     "description": "Your identity label"
   },
   "options_identity_loading": {
@@ -240,15 +240,15 @@
     "description": "Loading identity placeholder"
   },
   "options_identity_exportImport": {
-    "message": "Export/Import",
+    "message": "İçe/Dışa Aktar",
     "description": "Export/Import section label"
   },
   "options_identity_exportKey": {
-    "message": "Export Key",
+    "message": "Dışa Aktar",
     "description": "Export key button label"
   },
   "options_identity_importKey": {
-    "message": "Import Key",
+    "message": "İçe Aktar",
     "description": "Import key button label"
   },
   "options_identityImport_title": {
@@ -356,7 +356,7 @@
     "description": "Confirm button label"
   },
   "options_alert_cacheCleared": {
-    "message": "Cache cleared successfully!",
+    "message": "Bellek başarıyla temizlendi!",
     "description": "Cache cleared success message"
   },
   "options_alert_cacheClearFailed": {
@@ -396,11 +396,11 @@
     "description": "Saving indicator text"
   },
   "options_editor_importFile": {
-    "message": "Import from file",
+    "message": "Dosyadan aktar",
     "description": "Import from file tooltip"
   },
   "options_editor_exportFile": {
-    "message": "Export to file",
+    "message": "Dosyaya aktar",
     "description": "Export to file tooltip"
   },
   "options_editor_saveAsTheme": {
@@ -412,19 +412,19 @@
     "description": "Open in new tab tooltip"
   },
   "options_editor_backToSettings": {
-    "message": "Back to Settings",
+    "message": "Ayarlara Dön",
     "description": "Back to settings button label"
   },
   "options_editor_fullExperienceNote": {
-    "message": "For the full editor experience, ",
+    "message": "İyi editör deneyimi için, ",
     "description": "Full editor experience note prefix"
   },
   "options_editor_openInNewTabLink": {
-    "message": "open this editor in a new tab",
+    "message": "editörü yeni sekmede aç",
     "description": "Open in new tab link text"
   },
   "options_editor_stylingGuide": {
-    "message": "Styling Guide",
+    "message": "Tasarı Rehberi",
     "description": "Styling guide link text"
   },
   "options_editor_renameTheme": {
@@ -468,7 +468,7 @@
     "description": "Youtube provider name"
   },
   "options_provider_youtubeCaptions": {
-    "message": "Youtube Captions",
+    "message": "YouTube Alt Yazıları",
     "description": "Youtube Captions provider name"
   },
   "options_provider_binilyrics": {
@@ -492,7 +492,7 @@
     "description": "Word sync type tooltip"
   },
   "options_syncType_line": {
-    "message": "Line",
+    "message": "Satır",
     "description": "Line sync type label"
   },
   "options_syncType_line_tooltip": {
@@ -500,7 +500,7 @@
     "description": "Line sync type tooltip"
   },
   "options_syncType_unsynced": {
-    "message": "Unsynced",
+    "message": "Asenkron",
     "description": "Unsynced sync type label"
   },
   "options_syncType_unsynced_tooltip": {
@@ -536,15 +536,15 @@
     "description": "Page title"
   },
   "marketplace_title": {
-    "message": "Theme Marketplace",
+    "message": "Tema Mağazası",
     "description": "Header title"
   },
   "marketplace_subtitle": {
-    "message": "Discover and install community themes",
+    "message": "Topluluk temalarını keşfet ve indir",
     "description": "Header subtitle"
   },
   "marketplace_searchPlaceholder": {
-    "message": "Search themes...",
+    "message": "Temaları ara...",
     "description": "Search input placeholder"
   },
   "marketplace_refresh": {
@@ -556,11 +556,11 @@
     "description": "Keyboard shortcuts button label"
   },
   "marketplace_sortBy": {
-    "message": "Sort by",
+    "message": "Sıralama",
     "description": "Sort filter group label"
   },
   "marketplace_sortRatingDesc": {
-    "message": "Highest rated",
+    "message": "En yüksek puan",
     "description": "Sort by highest rating"
   },
   "marketplace_sortRatingAsc": {
@@ -568,7 +568,7 @@
     "description": "Sort by lowest rating"
   },
   "marketplace_sortDownloadsDesc": {
-    "message": "Most downloaded",
+    "message": "En çok indirilen",
     "description": "Sort by most downloads"
   },
   "marketplace_sortDownloadsAsc": {
@@ -576,7 +576,7 @@
     "description": "Sort by least downloads"
   },
   "marketplace_sortNewest": {
-    "message": "Newest",
+    "message": "En yeni",
     "description": "Sort by newest"
   },
   "marketplace_sortOldest": {
@@ -588,15 +588,15 @@
     "description": "Show filter group label"
   },
   "marketplace_showAll": {
-    "message": "All",
+    "message": "Hepsi",
     "description": "Show all themes"
   },
   "marketplace_showInstalled": {
-    "message": "Installed",
+    "message": "Yüklü",
     "description": "Show installed themes"
   },
   "marketplace_showNotInstalled": {
-    "message": "Not installed",
+    "message": "Yüklü değil",
     "description": "Show not installed themes"
   },
   "marketplace_options": {
@@ -604,19 +604,19 @@
     "description": "Options filter group label"
   },
   "marketplace_hasShaders": {
-    "message": "Has shaders",
+    "message": "Gölgelendiricili",
     "description": "Filter for themes with shaders"
   },
   "marketplace_compatibleOnly": {
-    "message": "Compatible only",
+    "message": "Uyumlu olanlar",
     "description": "Filter for compatible themes"
   },
   "marketplace_installFromUrl": {
-    "message": "Install from URL",
+    "message": "URL'den indir",
     "description": "Install from URL button"
   },
   "marketplace_submitTheme": {
-    "message": "Submit a theme",
+    "message": "Bir tema gönder",
     "description": "Submit a theme link"
   },
   "marketplace_loading": {
@@ -632,19 +632,19 @@
     "description": "Empty state message"
   },
   "marketplace_grantPermission": {
-    "message": "Grant Permission",
+    "message": "İzin Ver",
     "description": "Grant permission button"
   },
   "marketplace_install": {
-    "message": "Install",
+    "message": "İndir",
     "description": "Install button"
   },
   "marketplace_remove": {
-    "message": "Remove",
+    "message": "Sil",
     "description": "Remove button"
   },
   "marketplace_apply": {
-    "message": "Apply",
+    "message": "Uygula",
     "description": "Apply button"
   },
   "marketplace_active": {
@@ -652,7 +652,7 @@
     "description": "Active theme indicator"
   },
   "marketplace_shadersBadge": {
-    "message": "Shaders",
+    "message": "Gölgelendiriciler",
     "description": "Shaders badge text"
   },
   "marketplace_githubBadge": {
@@ -660,15 +660,15 @@
     "description": "GitHub badge text"
   },
   "marketplace_urlModalTitle": {
-    "message": "Install from URL",
+    "message": "URL'den İndir",
     "description": "URL install modal title"
   },
   "marketplace_urlModalMessage": {
-    "message": "Enter a GitHub repository URL to install a theme directly:",
+    "message": "Temayı direkt olarak indirmek için GitHub depo bağlantısı girin:",
     "description": "URL install modal message"
   },
   "marketplace_urlModalPlaceholder": {
-    "message": "github.com/user/repo or github.com/user/repo/tree/branch",
+    "message": "github.com/user/repo ya da github.com/user/repo/tree/branch",
     "description": "URL input placeholder"
   },
   "marketplace_urlModalError": {
@@ -676,7 +676,7 @@
     "description": "URL validation error"
   },
   "marketplace_cancel": {
-    "message": "Cancel",
+    "message": "İptal",
     "description": "Cancel button"
   },
   "marketplace_urlPermissionTitle": {
@@ -846,7 +846,7 @@
     "description": "Export to file button"
   },
   "editor_saveAsTheme": {
-    "message": "Save as theme",
+    "message": "Tema olarak kaydet",
     "description": "Save as theme button"
   },
   "editor_stylingGuide": {
@@ -854,19 +854,19 @@
     "description": "Styling guide button"
   },
   "editor_tip": {
-    "message": "Tip: This is a standalone tab, you can move this editor to a separate window or use split-screen view alongside YouTube Music to see your changes in real-time. For more info, visit the",
+    "message": "İpucu: Bu, bağımsız bir sekmedir; bu düzenleyiciyi ayrı bir pencereye taşıyabilir veya YouTube Music ile birlikte bölünmüş ekran görünümünü kullanarak değişikliklerinizi gerçek zamanlı olarak görebilirsiniz. Daha fazla bilgi için şu sayfayı ziyaret edin",
     "description": "Editor tip text"
   },
   "editor_poweredBy": {
-    "message": "Powered by",
+    "message": "Altyapı",
     "description": "Powered by label"
   },
   "editor_playground": {
-    "message": "Playground",
+    "message": "Çalışma Alanı",
     "description": "Playground link text"
   },
   "editor_docs": {
-    "message": "Docs",
+    "message": "Belgeler",
     "description": "Docs link text"
   },
   "lyrics_source": {
@@ -882,11 +882,11 @@
     "description": "Footer button text linking to the Better Lyrics Shaders companion extension"
   },
   "lyrics_searching": {
-    "message": "Better Lyrics is searching for lyrics...",
+    "message": "Better Lyrics sözleri arıyor...",
     "description": "Loading message while searching for lyrics"
   },
   "lyrics_stillSearching": {
-    "message": "Still searching for synced lyrics...",
+    "message": "Senkron sözler hala aranıyor...",
     "description": "Loading message while still searching"
   },
   "lyrics_noSyncedLyrics": {
@@ -906,11 +906,11 @@
     "description": "Resume Autoscroll button label"
   },
   "options_language_exclusions": {
-    "message": "Language exclusions",
+    "message": "İstisna diller",
     "description": "Label for language exclusions setting"
   },
   "options_manage": {
-    "message": "Manage",
+    "message": "Yönet",
     "description": "Manage button label"
   },
   "options_language_exclusionsTitle": {
