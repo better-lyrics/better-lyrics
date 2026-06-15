@@ -675,7 +675,6 @@ kbd {
 .unison-vote-btn--delete {
   align-self: flex-start;
   color: rgba(239, 68, 68, 0.85);
-  border-color: rgba(239, 68, 68, 0.25);
 }
 
 .unison-vote-btn--delete:hover {
