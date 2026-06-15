@@ -108,51 +108,51 @@
     "description": "Toggle label inside the Unison Actions modal for the floating dock"
   },
   "options_unisonModal_showPinned_hint": {
-    "message": "A floating control to upvote, downvote, or report Unison lyrics",
+    "message": "Unison şarkı sözlerini oylamak ve ya raporlamak için kayan kontrol",
     "description": "Hint text under the Show pinned actions toggle"
   },
   "options_unisonModal_autoHide": {
-    "message": "Auto-hide in fullscreen",
+    "message": "Tam ekranda otomatik gizle",
     "description": "Toggle label inside the Unison Actions modal for auto-hiding the dock when idle in fullscreen"
   },
   "options_unisonModal_autoHide_hint": {
-    "message": "Hide the floating control when you are idle in fullscreen mode",
+    "message": "Tam ekranda olduğunuzda kayan kontrolü gizle",
     "description": "Hint text under the Auto-hide in fullscreen toggle"
   },
   "options_unisonModal_position": {
-    "message": "Position",
+    "message": "Pozisyon",
     "description": "Label above the visual position picker in the Unison Actions modal"
   },
   "options_unisonModal_position_topLeft": {
-    "message": "Top left",
+    "message": "Sol üst",
     "description": "Tooltip for the top-left cell in the Unison position picker"
   },
   "options_unisonModal_position_topCenter": {
-    "message": "Top center",
+    "message": "Orta üst",
     "description": "Tooltip for the top-center cell in the Unison position picker"
   },
   "options_unisonModal_position_topRight": {
-    "message": "Top right",
+    "message": "Sağ üst",
     "description": "Tooltip for the top-right cell in the Unison position picker"
   },
   "options_unisonModal_position_bottomLeft": {
-    "message": "Bottom left",
+    "message": "Sol alt",
     "description": "Tooltip for the bottom-left cell in the Unison position picker"
   },
   "options_unisonModal_position_bottomCenter": {
-    "message": "Bottom center",
+    "message": "Orta alt",
     "description": "Tooltip for the bottom-center cell in the Unison position picker"
   },
   "options_unisonModal_position_bottomRight": {
-    "message": "Bottom right",
+    "message": "Sağ alt",
     "description": "Tooltip for the bottom-right cell in the Unison position picker"
   },
   "options_language_displayLanguage": {
-    "message": "Display Language",
+    "message": "Görüntüleme Dili",
     "description": "Label for the UI language selector dropdown"
   },
   "options_language_displayLanguageAuto": {
-    "message": "Auto",
+    "message": "Otomatik",
     "description": "Option label for automatic language detection based on browser settings"
   },
   "options_language_title": {
@@ -196,15 +196,15 @@
     "description": "Theme label"
   },
   "options_themes_chooseTheme": {
-    "message": "Choose a theme",
+    "message": "Tema seç",
     "description": "Choose a theme button label"
   },
   "options_themes_change": {
-    "message": "Change",
+    "message": "Değiştir",
     "description": "Change theme button label"
   },
   "options_themes_customTheme": {
-    "message": "Custom Theme",
+    "message": "Özel Tema",
     "description": "Display name for unnamed custom themes"
   },
   "options_themes_customStyles": {
@@ -212,7 +212,7 @@
     "description": "Custom styles label"
   },
   "options_themes_create": {
-    "message": "Create",
+    "message": "Oluştur",
     "description": "Create button label"
   },
   "options_themes_marketplace": {
@@ -236,7 +236,7 @@
     "description": "Your identity label"
   },
   "options_identity_loading": {
-    "message": "Loading...",
+    "message": "Yükleniyor...",
     "description": "Loading identity placeholder"
   },
   "options_identity_exportImport": {
@@ -252,107 +252,107 @@
     "description": "Import key button label"
   },
   "options_identityImport_title": {
-    "message": "Import Identity",
+    "message": "Kimliği İçe Aktar",
     "description": "Title of the import identity modal"
   },
   "options_identityImport_chooseFile": {
-    "message": "Choose File",
+    "message": "Dosya Seç",
     "description": "Label for the file picker button in the import identity modal"
   },
   "options_identityImport_or": {
-    "message": "or",
+    "message": "ya da",
     "description": "Divider between file picker and paste textarea in the import identity modal"
   },
   "options_identityImport_pastePlaceholder": {
-    "message": "Paste identity JSON here...",
+    "message": "Kimlik JSON dosyasını buraya yapıştır...",
     "description": "Placeholder for the identity JSON textarea"
   },
   "options_identityImport_import": {
-    "message": "Import",
+    "message": "İçe Aktar",
     "description": "Confirm button label inside the import identity modal"
   },
   "options_nickname_description": {
-    "message": "Pick a name for yourself across Better Lyrics. Letters, numbers, and underscore, 3 to 20 characters.",
+    "message": "Better Lyrics'te kendinize bir kullanıcı adı seçin. Harfler, rakamlar ve alt çizgi kullanabilirsiniz; 3 ila 20 karakter arasında olmalıdır.",
     "description": "Nickname subsection description"
   },
   "options_nickname_placeholder": {
-    "message": "Pick a nickname",
+    "message": "Takma ad seçin",
     "description": "Nickname input placeholder"
   },
   "options_nickname_save": {
-    "message": "Save",
+    "message": "Kaydet",
     "description": "Nickname save button label"
   },
   "options_nickname_reset": {
-    "message": "Reset to default",
+    "message": "Varsayılana sıfırla",
     "description": "Nickname reset button label"
   },
   "options_nickname_modalTitle": {
-    "message": "Set your nickname",
+    "message": "Takma adınızı belirleyin",
     "description": "Nickname modal title"
   },
   "options_nickname_edit": {
-    "message": "Edit",
+    "message": "Düzenle",
     "description": "Nickname edit button label"
   },
   "options_nickname_editLabel": {
-    "message": "Edit nickname",
+    "message": "Takma adı düzenle",
     "description": "Accessible label for the nickname edit button"
   },
   "options_nickname_status_checking": {
-    "message": "Checking...",
+    "message": "Denetleniyor...",
     "description": "Status while checking nickname availability"
   },
   "options_nickname_status_available": {
-    "message": "Available",
+    "message": "Kullanılabilir",
     "description": "Status when nickname is available"
   },
   "options_nickname_status_taken": {
-    "message": "Already taken",
+    "message": "Çoktan alınmış",
     "description": "Status when nickname is already taken"
   },
   "options_nickname_status_invalid": {
-    "message": "3 to 20 letters, numbers, or underscores",
+    "message": "3 ila 20 harf, rakam veya alt çizgi",
     "description": "Status when nickname format is invalid"
   },
   "options_nickname_status_profane": {
-    "message": "Not allowed, try another",
+    "message": "Geçerli değil, başka bir şey deneyin",
     "description": "Status when nickname is flagged as inappropriate by the server"
   },
   "options_nickname_status_self": {
-    "message": "This is your current nickname",
+    "message": "Bu sizin geçerli takma adınız",
     "description": "Status when entered nickname matches current"
   },
   "options_nickname_status_saved": {
-    "message": "Saved",
+    "message": "Kaydedildi",
     "description": "Status when nickname is saved"
   },
   "options_nickname_status_submitting": {
-    "message": "Saving...",
+    "message": "Kaydediliyor...",
     "description": "Status while nickname save is in flight"
   },
   "options_nickname_status_rateLimited": {
-    "message": "Slow down, try again in a moment",
+    "message": "Yavaşlayın, bir süre sonra tekrar deneyin",
     "description": "Status when nickname checks are rate limited"
   },
   "options_nickname_status_error": {
-    "message": "Could not reach the server",
+    "message": "Sunucuyla bağlantı kurulamadı",
     "description": "Status when nickname request fails"
   },
   "options_alert_importEmpty": {
-    "message": "Paste identity JSON or choose a file first.",
+    "message": "Kimlik JSON dosyasını yapıştırın ya da ilk önce dosya seçin.",
     "description": "Shown when the user clicks Import with no JSON provided"
   },
   "options_modal_selectTheme": {
-    "message": "Select a Theme",
+    "message": "Bir Tema Seç",
     "description": "Theme modal title"
   },
   "options_modal_cancel": {
-    "message": "Cancel",
+    "message": "Vazgeç",
     "description": "Cancel button label"
   },
   "options_modal_confirm": {
-    "message": "Confirm",
+    "message": "Onayla",
     "description": "Confirm button label"
   },
   "options_alert_cacheCleared": {
@@ -360,39 +360,39 @@
     "description": "Cache cleared success message"
   },
   "options_alert_cacheClearFailed": {
-    "message": "Failed to clear cache!",
+    "message": "Bellek temizleme başarısız!",
     "description": "Cache clear failed message"
   },
   "options_alert_nothingToClear": {
-    "message": "Nothing to clear!",
+    "message": "Temizlenecek bir şey yok!",
     "description": "Nothing to clear message"
   },
   "options_alert_exportFailed": {
-    "message": "Failed to export identity",
+    "message": "Kimliği dışa aktarım başarısız",
     "description": "Export identity failed message"
   },
   "options_alert_fileSaveDialogOpened": {
-    "message": "Identity file save dialog opened.",
+    "message": "Kimlik dosyası kaydetme iletişim kutusu açıldı.",
     "description": "File save dialog opened message"
   },
   "options_alert_fileSaveFailed": {
-    "message": "Error saving file. Please try again.",
+    "message": "Dosya kaydederken hata oluştu. Lütfen tekrar deneyin.",
     "description": "File save failed message"
   },
   "options_alert_downloadInitiated": {
-    "message": "Identity file download initiated.",
+    "message": "Kimlik dosyası indirme işlemi başlatıldı.",
     "description": "Download initiated message"
   },
   "options_alert_importSuccess": {
-    "message": "Identity imported successfully!",
+    "message": "Kimlik başarıyla içeri aktarıldı!",
     "description": "Import success message"
   },
   "options_alert_identityLoadError": {
-    "message": "Error loading identity",
+    "message": "Kimlik yüklenirken hata oluştu",
     "description": "Identity load error message"
   },
   "options_editor_saving": {
-    "message": "Saving...",
+    "message": "Kaydediliyor...",
     "description": "Saving indicator text"
   },
   "options_editor_importFile": {
@@ -404,11 +404,11 @@
     "description": "Export to file tooltip"
   },
   "options_editor_saveAsTheme": {
-    "message": "Save as theme",
+    "message": "Tema olarak kaydet",
     "description": "Save as theme tooltip"
   },
   "options_editor_openInNewTab": {
-    "message": "Open in new tab",
+    "message": "Yeni sekmede aç",
     "description": "Open in new tab tooltip"
   },
   "options_editor_backToSettings": {
@@ -428,15 +428,15 @@
     "description": "Styling guide link text"
   },
   "options_editor_renameTheme": {
-    "message": "Rename custom theme",
+    "message": "Özel temayı yeniden isimlendir",
     "description": "Rename theme button title"
   },
   "options_editor_deleteTheme": {
-    "message": "Delete custom theme",
+    "message": "Özel temayı sil",
     "description": "Delete theme button title"
   },
   "options_editor_doubleClickRename": {
-    "message": "Double-click to rename",
+    "message": "Yeniden adlandırmak için çift tıkla",
     "description": "Double-click to rename tooltip"
   },
   "options_provider_betterLyrics": {
@@ -476,19 +476,19 @@
     "description": "BiniLyrics provider name"
   },
   "options_syncType_syllable": {
-    "message": "Syllable",
+    "message": "Hece",
     "description": "Syllable sync type label"
   },
   "options_syncType_syllable_tooltip": {
-    "message": "Highlights individual syllables as they're sung. Syllable syncing provides the best experience.",
+    "message": "Şarkı söylenirken tek tek heceleri vurgular. Hece senkronizasyonu en iyi deneyimi sunar.",
     "description": "Syllable sync type tooltip"
   },
   "options_syncType_word": {
-    "message": "Word",
+    "message": "Kelime",
     "description": "Word sync type label"
   },
   "options_syncType_word_tooltip": {
-    "message": "Highlights individual words as they're sung. Word syncing provides a good experience.",
+    "message": "Söylendikçe tek tek kelimeleri vurgular. Kelime senkronizasyonu iyi bir deneyim sunar.",
     "description": "Word sync type tooltip"
   },
   "options_syncType_line": {
@@ -496,7 +496,7 @@
     "description": "Line sync type label"
   },
   "options_syncType_line_tooltip": {
-    "message": "Highlights entire lines as they're sung. Line syncing provides a basic experience.",
+    "message": "Söylendikçe satırın tamamını vurgular. Satır senkronizasyonu basit bir deneyim sunar.",
     "description": "Line sync type tooltip"
   },
   "options_syncType_unsynced": {
@@ -504,35 +504,35 @@
     "description": "Unsynced sync type label"
   },
   "options_syncType_unsynced_tooltip": {
-    "message": "Lyrics without timing information. Unsynced lyrics provide a minimal experience.",
+    "message": "Zamanlama bilgisi eksik şarkı sözleri. Asenkron şarkı sözleri minimal bir deneyim sağlar.",
     "description": "Unsynced sync type tooltip"
   },
   "options_detail_rateTheme": {
-    "message": "Rate this theme",
+    "message": "Bu temayı değerlendir",
     "description": "Rate theme label"
   },
   "options_detail_install": {
-    "message": "Install",
+    "message": "İndir",
     "description": "Install button label"
   },
   "options_detail_viewOnGitHub": {
-    "message": "View on GitHub",
+    "message": "GitHub'da görüntüle",
     "description": "View on GitHub link text"
   },
   "options_detail_shaderInfo": {
-    "message": "This theme includes a shader config.",
+    "message": "Bu tema bir gölgelendirici yapılandırması içerir.",
     "description": "Shader info text prefix"
   },
   "options_detail_downloadShader": {
-    "message": "Download shader.json",
+    "message": "shader.json dosyasını indir",
     "description": "Download shader link text"
   },
   "options_detail_shaderImportSuffix": {
-    "message": "and import it in",
+    "message": "ve içeri aktarın",
     "description": "Shader import suffix text before Better Lyrics Shaders link"
   },
   "marketplace_pageTitle": {
-    "message": "Better Lyrics Theme Marketplace",
+    "message": "Better Lyrics Tema Mağazası",
     "description": "Page title"
   },
   "marketplace_title": {
@@ -548,11 +548,11 @@
     "description": "Search input placeholder"
   },
   "marketplace_refresh": {
-    "message": "Refresh",
+    "message": "Yenile",
     "description": "Refresh button label"
   },
   "marketplace_keyboardShortcuts": {
-    "message": "Keyboard shortcuts",
+    "message": "Klavye kısayolları",
     "description": "Keyboard shortcuts button label"
   },
   "marketplace_sortBy": {
@@ -564,7 +564,7 @@
     "description": "Sort by highest rating"
   },
   "marketplace_sortRatingAsc": {
-    "message": "Lowest rated",
+    "message": "En düşük puanlı",
     "description": "Sort by lowest rating"
   },
   "marketplace_sortDownloadsDesc": {
@@ -572,7 +572,7 @@
     "description": "Sort by most downloads"
   },
   "marketplace_sortDownloadsAsc": {
-    "message": "Least downloaded",
+    "message": "En az indirilen",
     "description": "Sort by least downloads"
   },
   "marketplace_sortNewest": {
@@ -580,11 +580,11 @@
     "description": "Sort by newest"
   },
   "marketplace_sortOldest": {
-    "message": "Oldest",
+    "message": "En eski",
     "description": "Sort by oldest"
   },
   "marketplace_show": {
-    "message": "Show",
+    "message": "Göster",
     "description": "Show filter group label"
   },
   "marketplace_showAll": {
@@ -600,7 +600,7 @@
     "description": "Show not installed themes"
   },
   "marketplace_options": {
-    "message": "Options",
+    "message": "Seçenekler",
     "description": "Options filter group label"
   },
   "marketplace_hasShaders": {
@@ -620,15 +620,15 @@
     "description": "Submit a theme link"
   },
   "marketplace_loading": {
-    "message": "Loading themes...",
+    "message": "Temalar yükleniyor...",
     "description": "Loading message"
   },
   "marketplace_retry": {
-    "message": "Retry",
+    "message": "Yeniden Dene",
     "description": "Retry button"
   },
   "marketplace_noThemesMatch": {
-    "message": "No themes match your filters",
+    "message": "Filtrelerinzle hiçbir tema eşleşmiyor",
     "description": "Empty state message"
   },
   "marketplace_grantPermission": {
@@ -648,7 +648,7 @@
     "description": "Apply button"
   },
   "marketplace_active": {
-    "message": "Active",
+    "message": "Aktif",
     "description": "Active theme indicator"
   },
   "marketplace_shadersBadge": {
@@ -672,7 +672,7 @@
     "description": "URL input placeholder"
   },
   "marketplace_urlModalError": {
-    "message": "Please enter a GitHub repository URL",
+    "message": "Lütfen GitHub depo URL'si girin",
     "description": "URL validation error"
   },
   "marketplace_cancel": {
@@ -680,111 +680,111 @@
     "description": "Cancel button"
   },
   "marketplace_urlPermissionTitle": {
-    "message": "Additional Permission Required",
+    "message": "Ek İzin Gerekli",
     "description": "URL permission modal title"
   },
   "marketplace_urlPermissionWhy": {
-    "message": "Why is this needed?",
+    "message": "Bu neden gerekli?",
     "description": "URL permission explanation title"
   },
   "marketplace_urlPermissionDesc": {
-    "message": "Installing themes from custom GitHub URLs requires broader access than the marketplace. This allows Better Lyrics to:",
+    "message": "Temaları GitHub URL'sinden yüklemek, mağazadan yüklemeye göre daha kapsamlı izinler gerektirir. Bu Better Lyrics'in şunları yapmasına izin verir:",
     "description": "URL permission description"
   },
   "marketplace_urlPermissionItem1": {
-    "message": "Fetch theme files from any GitHub repository",
+    "message": "Herhangi bir GitHub deposundan tema dosyalarını almak",
     "description": "URL permission list item 1"
   },
   "marketplace_urlPermissionItem2": {
-    "message": "Detect the default branch of the repository",
+    "message": "Deponun varsayılan dalını tespit etmek",
     "description": "URL permission list item 2"
   },
   "marketplace_urlPermissionItem3": {
-    "message": "Validate the theme structure before installation",
+    "message": "Kurulumdan önce tema yapısını doğrulamak",
     "description": "URL permission list item 3"
   },
   "marketplace_urlPermissionNote": {
-    "message": "This permission is only used when you install themes via URL. Marketplace themes don't require this.",
+    "message": "Bu izinler sadece URL ile tema indirirken gereklidir. Mağaza temaları buna ihtiyaç duymaz.",
     "description": "URL permission note"
   },
   "marketplace_shortcutsTitle": {
-    "message": "Keyboard Shortcuts",
+    "message": "Klavye Kısayolları",
     "description": "Shortcuts modal title"
   },
   "marketplace_shortcutsNavigation": {
-    "message": "Navigation",
+    "message": "Navigasyon",
     "description": "Navigation shortcuts group"
   },
   "marketplace_shortcutsSearch": {
-    "message": "Search themes",
+    "message": "Temaları ara",
     "description": "Search shortcut label"
   },
   "marketplace_shortcutsRefresh": {
-    "message": "Refresh marketplace",
+    "message": "Mağazayı yenile",
     "description": "Refresh shortcut label"
   },
   "marketplace_shortcutsInstallUrl": {
-    "message": "Install from URL",
+    "message": "URL'den yükle",
     "description": "Install from URL shortcut label"
   },
   "marketplace_shortcutsSort": {
-    "message": "Sort",
+    "message": "Sıralama",
     "description": "Sort shortcuts group"
   },
   "marketplace_shortcutsSortHint": {
-    "message": "press again to toggle direction",
+    "message": "yönü değiştirmek için tekrar basın",
     "description": "Sort toggle hint"
   },
   "marketplace_shortcutsByRating": {
-    "message": "By rating",
+    "message": "Puana göre",
     "description": "Sort by rating shortcut"
   },
   "marketplace_shortcutsByDownloads": {
-    "message": "By downloads",
+    "message": "İndirmelere göre",
     "description": "Sort by downloads shortcut"
   },
   "marketplace_shortcutsByDate": {
-    "message": "By date",
+    "message": "Tarihe göre",
     "description": "Sort by date shortcut"
   },
   "marketplace_shortcutsFilters": {
-    "message": "Filters",
+    "message": "Filtreler",
     "description": "Filters shortcuts group"
   },
   "marketplace_shortcutsShowAll": {
-    "message": "Show all",
+    "message": "Tümünü göster",
     "description": "Show all shortcut"
   },
   "marketplace_shortcutsShowInstalled": {
-    "message": "Show installed",
+    "message": "İndirilenleri göster",
     "description": "Show installed shortcut"
   },
   "marketplace_shortcutsShowNotInstalled": {
-    "message": "Show not installed",
+    "message": "İndirilmemişleri göster",
     "description": "Show not installed shortcut"
   },
   "marketplace_shortcutsToggleShaders": {
-    "message": "Toggle shaders",
+    "message": "Gölgelendiricileri aç/kapat",
     "description": "Toggle shaders shortcut"
   },
   "marketplace_shortcutsToggleCompatible": {
-    "message": "Toggle compatible",
+    "message": "Uyumluluk modunu değiştir",
     "description": "Toggle compatible shortcut"
   },
   "marketplace_shortcutsDetails": {
-    "message": "Theme Details",
+    "message": "Tema Detayları",
     "description": "Theme details shortcuts group"
   },
   "marketplace_shortcutsInstallRemove": {
-    "message": "Install / Remove",
+    "message": "Yükle / Kaldır",
     "description": "Install/remove shortcut"
   },
   "marketplace_shortcutsApply": {
-    "message": "Apply theme",
+    "message": "Temayı uygula",
     "description": "Apply theme shortcut label"
   },
   "marketplace_shortcutsPrevImage": {
-    "message": "Previous image",
+    "message": "Önceki görsel",
     "description": "Previous image shortcut"
   },
   "marketplace_shortcutsNextImage": {
