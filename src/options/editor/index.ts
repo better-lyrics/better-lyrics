@@ -11,10 +11,9 @@ import {
   handleRenameTheme,
   handleSaveTheme,
   initStoreThemeListener,
-  initializeThemeSettings,
+  initializeThemeSettingsEditor,
   openThemeModal,
   preloadInstalledThemeImages,
-  refreshThemeSettingsUI,
   saveToStorage,
   setThemeName,
 } from "./features/themes";
@@ -120,13 +119,13 @@ function initializeThemeActions() {
 function initializeFileOperations() {
   function closeThemeFile() {
     if (themeFileOverlay) {
-      const modal = document.querySelector(".theme-file-modal")
+      const modal = document.querySelector(".theme-file-modal");
       if (modal) {
         modal.classList.add("closing");
       }
 
       themeFileOverlay.classList.remove("active");
-  
+
       setTimeout(() => {
         if (themeModalOverlay) {
           themeModalOverlay.style.display = "none";
@@ -151,15 +150,19 @@ function initializeFileOperations() {
       closeThemeFile();
     }
   });
-  
+
   document.getElementById("file-import-btn")?.addEventListener("click", () => {
     if (!themeFileOverlay) {
       showAlert("Theme file operation interface not found!");
       return;
     }
 
-    if (themeFileTitle) { themeFileTitle.innerText = t("options_themeFile_import"); }
-    if (themeFileSelect) { themeFileSelect.innerText = t("options_themeFile_selectImport"); }
+    if (themeFileTitle) {
+      themeFileTitle.innerText = t("options_themeFile_import");
+    }
+    if (themeFileSelect) {
+      themeFileSelect.innerText = t("options_themeFile_selectImport");
+    }
 
     requestAnimationFrame(() => {
       if (themeFileOverlay) {
@@ -193,8 +196,12 @@ function initializeFileOperations() {
       return;
     }
 
-    if (themeFileTitle) { themeFileTitle.innerText = t("options_themeFile_export"); }
-    if (themeFileSelect) { themeFileSelect.innerText = t("options_themeFile_selectExport"); }
+    if (themeFileTitle) {
+      themeFileTitle.innerText = t("options_themeFile_export");
+    }
+    if (themeFileSelect) {
+      themeFileSelect.innerText = t("options_themeFile_selectExport");
+    }
 
     requestAnimationFrame(() => {
       if (themeFileOverlay) {
@@ -208,7 +215,7 @@ function initializeFileOperations() {
         showAlert("Editor not initialized!");
         return;
       }
-      
+
       const css = editor.state.doc.toString();
       if (!css) {
         showAlert("No styles to export!");
@@ -276,7 +283,7 @@ export function initialize() {
     initializeEditorKeyboardShortcuts();
     initializeThemeModal();
     initializeThemeActions();
-    initializeThemeSettings();
+    initializeThemeSettingsEditor();
     initializeFileOperations();
     initializeStorageListeners();
     initStoreThemeListener();

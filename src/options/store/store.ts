@@ -37,6 +37,7 @@ import {
   validateThemeRepo,
 } from "./themeStoreService";
 import { cleanupTurnstile, getTurnstileToken } from "./turnstile";
+import { fillThemeSettings } from "../options";
 
 let detailModalOverlay: HTMLElement | null = null;
 let urlModalOverlay: HTMLElement | null = null;
@@ -2197,6 +2198,7 @@ async function handleApplyTheme(theme: InstalledStoreTheme): Promise<boolean> {
     const success = await applyStoreThemeComplete({
       themeId: theme.id,
       css,
+      settings: { fields: theme.settings, saved: theme.savedSettings },
       title: theme.title,
       creators: theme.creators,
       source: theme.source,
@@ -2210,6 +2212,7 @@ async function handleApplyTheme(theme: InstalledStoreTheme): Promise<boolean> {
     updateYourThemesDropdown();
     toggleYourThemesDropdown(false);
     await refreshStoreCards();
+    fillThemeSettings();
 
     const detailApplyBtn = document.getElementById("detail-apply-btn") as HTMLButtonElement | null;
     if (detailApplyBtn && detailApplyBtn.style.display !== "none") {

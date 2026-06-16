@@ -1,4 +1,9 @@
-import { LOG_PREFIX_EDITOR } from "@constants";
+import {
+  LOG_PREFIX_EDITOR,
+  THEME_SETTINGS_ATTRIBUTE_TYPE,
+  THEME_SETTINGS_MAX_FIELDS,
+  THEME_SETTINGS_TYPES,
+} from "@constants";
 import { t } from "@core/i18n";
 import { getSyncStorage } from "@core/storage";
 import {
@@ -7,7 +12,7 @@ import {
   installSymlinkedThemeFromMarketplace,
 } from "../../store/themeStoreManager";
 import type { ThemeSource } from "../../store/types";
-import type { Theme } from "../../themes";
+import type { Theme, ThemeSettingField } from "../../themes";
 import THEMES, {
   addSettingFieldCustomTheme,
   deleteCustomTheme,
@@ -35,12 +40,16 @@ import {
   themePreviewName,
   themeSelectorBtn,
   themeSettingsContainer,
+  themeSettingsEditorFields,
+  themeSettingsEditorTotal,
   themeSourceBadge,
 } from "../ui/dom";
 import { showAlert, showConfirm, showPrompt } from "../ui/feedback";
 import {
   applyStoreThemeComplete,
+  applyThemeSettingsToCSS,
   broadcastRICSToTabs,
+  loadThemeSettings,
   saveToStorageWithFallback,
   showSyncError,
   showSyncSuccess,
@@ -140,7 +149,40 @@ export function themeSourceToEditorSource(source: ThemeSource | undefined): Edit
   return null;
 }
 
+// Theme settings
 let themeSettingsVisible = false;
+
+/**
+ * Validates the JSON data of the setting fields and returns
+ * an array of warnings with the source and cause
+ */
+export function validateThemeSettingFields(settingFields: { [field: string]: ThemeSettingField }) {
+  if (typeof settingFields !== "object" || Array.isArray(settingFields)) return null;
+
+  const warns = [];
+  for (const field in settingFields) {
+    const scheme = { field };
+    const setting = settingFields[field];
+    if (typeof setting !== "object" || Array.isArray(setting)) {
+      warns.push({ ...scheme, cause: "INVALID_FIELD" });
+      continue;
+    }
+    if (typeof setting.type !== "string" || !THEME_SETTINGS_TYPES[setting.type]) {
+      warns.push({ ...scheme, cause: "FIELD_TYPE" });
+      continue;
+    }
+    if (typeof setting.label !== "string") {
+      warns.push({ ...scheme, cause: "FIELD_LABEL" });
+      continue;
+    }
+    if (setting.type !== "heading" && typeof setting.attribute !== "string") {
+      warns.push({ ...scheme, cause: "FIELD_ATTRIBUTE_NAME" });
+      continue;
+    }
+  }
+
+  return warns;
+}
 
 async function _getCurrentCustomTheme(): Promise<ReturnType<typeof getCustomThemeByName> | undefined> {
   const themeName = editorStateManager.getCurrentThemeName();
@@ -148,21 +190,7 @@ async function _getCurrentCustomTheme(): Promise<ReturnType<typeof getCustomThem
   return getCustomThemeByName(themeName);
 }
 
-function setThemeSettingsVisibility(visible: boolean): void {
-  themeSettingsVisible = visible;
-  const editor = document.getElementById("editor");
-  if (editor) {
-    editor.style.display = visible ? "none" : "block";
-  }
-  if (themeSettingsContainer) {
-    themeSettingsContainer.style.display = visible ? "block" : "none";
-  }
-  if (modifyThemeSettingsBtn) {
-    modifyThemeSettingsBtn.classList.toggle("active", visible);
-  }
-}
-
-function createThemeSettingsNotice(message: string): HTMLElement {
+function _createThemeSettingsNotice(message: string): HTMLElement {
   const wrapper = document.createElement("div");
   wrapper.style.padding = "1rem";
   wrapper.style.color = "var(--fg-secondary, #ddd)";
@@ -171,7 +199,7 @@ function createThemeSettingsNotice(message: string): HTMLElement {
   return wrapper;
 }
 
-function createFieldLabel(label: string, id: string): HTMLElement {
+function _createFieldLabel(label: string, id: string): HTMLElement {
   const wrapper = document.createElement("div");
   wrapper.style.display = "flex";
   wrapper.style.justifyContent = "space-between";
@@ -208,7 +236,7 @@ function parseFieldValue(field: any, rawValue: string): any {
   }
 }
 
-function getFieldDefaultValue(field: any): any {
+function _getFieldDefaultValue(field: any): any {
   if (field.default !== undefined) return field.default;
   if (field.type === "toggle") {
     return field.onValue ?? field.offValue ?? false;
@@ -226,7 +254,7 @@ function getFieldDefaultValue(field: any): any {
   return "";
 }
 
-function createFieldInput(
+function _createFieldInput(
   themeName: string,
   fieldId: string,
   field: any,
@@ -329,100 +357,125 @@ function createFieldInput(
   return container;
 }
 
-function _formatThemeComment(savedSettings?: { [field: string]: any }): string {
-  if (!savedSettings || Object.keys(savedSettings).length === 0) {
-    return "";
-  }
-  const entries = Object.entries(savedSettings)
-    .map(([key, value]) => `blyrics-${key} = ${value};`)
-    .join(" ");
-  return `/* ${entries} */\n\n`;
-}
-
 async function renderThemeSettings(): Promise<void> {
-  if (!themeSettingsContainer) return;
-  themeSettingsContainer.replaceChildren();
+  if (!themeSettingsEditorFields) return;
+  themeSettingsEditorFields.replaceChildren();
 
-  const themeName = editorStateManager.getCurrentThemeName();
-  const isCustom = editorStateManager.getIsCustomTheme();
-  const header = document.createElement("div");
-  header.style.display = "flex";
-  header.style.justifyContent = "space-between";
-  header.style.alignItems = "center";
-  header.style.marginBottom = "1rem";
+  const themeSettings = await loadThemeSettings();
 
-  const title = document.createElement("h3");
-  title.textContent = "Theme Settings";
-  title.style.margin = "0";
-  header.appendChild(title);
+  // Process each field
+  if (themeSettingsEditorTotal)
+    themeSettingsEditorTotal.innerText = `${Object.keys(themeSettings.fields || {}).length}/${THEME_SETTINGS_MAX_FIELDS} fields`;
 
-  const addFieldBtn = document.createElement("button");
-  addFieldBtn.textContent = "Add Setting Field";
-  addFieldBtn.className = "small-btn";
-  addFieldBtn.disabled = !isCustom;
-  addFieldBtn.addEventListener("click", async () => {
-    await promptAddThemeSettingField();
-    await renderThemeSettings();
-  });
-  header.appendChild(addFieldBtn);
-  themeSettingsContainer.appendChild(header);
+  for (const fields in { ...themeSettings.fields }) {
+    const field = themeSettings.fields![fields];
 
-  if (!themeName) {
-    themeSettingsContainer.appendChild(
-      createThemeSettingsNotice("No theme selected. Choose a custom theme to view its settings.")
-    );
-    return;
+    const fieldElement = document.createElement("div");
+    fieldElement.className = "theme-setting-field";
+
+    const sortableHandle = document.createElement("span");
+    sortableHandle.className = "sortable-handle";
+    fieldElement.appendChild(sortableHandle);
+
+    const fieldInfo = document.createElement("div");
+    fieldInfo.className = "theme-setting-field-info";
+
+    const fieldType = document.createElement("span");
+    fieldType.className = "theme-setting-field-type";
+    fieldType.innerText = field.type.toUpperCase();
+    fieldInfo.appendChild(fieldType);
+
+    const fieldLabel = document.createElement("span");
+    fieldLabel.className = "theme-setting-field-label";
+    fieldLabel.innerText = `${field.label || fields}`;
+    fieldInfo.appendChild(fieldLabel);
+
+    fieldElement.appendChild(fieldInfo);
+
+    const fieldActions = document.createElement("div");
+    fieldActions.className = "theme-setting-field-actions";
+    fieldActions.innerHTML = `<button class="edit-theme-btn" title="Modify theme setting field" style="display: unset; height: stretch;">
+							<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+								<path d="m5.433 13.917 1.262-3.155A4 4 0 0 1 7.58 9.42l6.92-6.918a2.121 2.121 0 0 1 3 3l-6.92 6.918c-.383.383-.84.685-1.343.886l-3.154 1.262a.5.5 0 0 1-.65-.65Z"></path>
+								<path d="M3.5 5.75c0-.69.56-1.25 1.25-1.25H10A.75.75 0 0 0 10 3H4.75A2.75 2.75 0 0 0 2 5.75v9.5A2.75 2.75 0 0 0 4.75 18h9.5A2.75 2.75 0 0 0 17 15.25V10a.75.75 0 0 0-1.5 0v5.25c0 .69-.56 1.25-1.25 1.25h-9.5c-.69 0-1.25-.56-1.25-1.25v-9.5Z"></path>
+							</svg>
+						</button>
+    
+    <button class="delete-theme-btn" title="Delete theme setting field" style="display: unset; height: stretch;">
+							<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+								<path fill="currentColor" d="M7 21q-.825 0-1.412-.587T5 19V6q-.425 0-.712-.288T4 5t.288-.712T5 4h4q0-.425.288-.712T10 3h4q.425 0 .713.288T15 4h4q.425 0 .713.288T20 5t-.288.713T19 6v13q0 .825-.587 1.413T17 21zM17 6H7v13h10zm-7 11q.425 0 .713-.288T11 16V9q0-.425-.288-.712T10 8t-.712.288T9 9v7q0 .425.288.713T10 17m4 0q.425 0 .713-.288T15 16V9q0-.425-.288-.712T14 8t-.712.288T13 9v7q0 .425.288.713T14 17M7 6v13z"></path>
+							</svg>
+						</button>
+</div>`;
+
+    fieldElement.appendChild(fieldActions);
+    themeSettingsEditorFields.appendChild(fieldElement);
   }
 
-  const customTheme = await getCustomThemeByName(themeName);
-  if (!customTheme) {
-    themeSettingsContainer.appendChild(createThemeSettingsNotice("Custom theme metadata not found."));
-    return;
-  }
-
-  const settings = customTheme.settings || {};
-  const savedSettings = customTheme.savedSettings || {};
-
-  if (Object.keys(settings).length === 0) {
-    themeSettingsContainer.appendChild(
-      createThemeSettingsNotice("This custom theme has no settings yet. Use the button above to add a field.")
-    );
-    return;
-  }
-
-  const list = document.createElement("div");
-  list.style.display = "grid";
-  list.style.gap = "1rem";
-
-  for (const [fieldId, fieldDef] of Object.entries(settings)) {
-    const value = savedSettings[fieldId] ?? getFieldDefaultValue(fieldDef);
-    const fieldWrapper = document.createElement("div");
-    fieldWrapper.style.padding = "1rem";
-    fieldWrapper.style.border = "1px solid rgba(255,255,255,0.08)";
-    fieldWrapper.style.borderRadius = "0.75rem";
-    fieldWrapper.style.background = "rgba(255,255,255,0.02)";
-
-    fieldWrapper.appendChild(createFieldLabel(fieldDef.label || fieldId, fieldId));
-    fieldWrapper.appendChild(
-      createFieldInput(themeName, fieldId, fieldDef, value, async newValue => {
-        await updateCustomThemeSavedSettings(themeName, { [fieldId]: newValue });
-        if (editorStateManager.getCurrentThemeName() === themeName && editorStateManager.getIsCustomTheme()) {
-          const customThemes = await getCustomThemes();
-          const index = customThemes.findIndex(theme => theme.name === themeName);
-          if (index !== -1) {
-            await themeManager.applyTheme(true, index, themeName);
-          }
-        }
-      })
-    );
-
-    list.appendChild(fieldWrapper);
-  }
-
-  themeSettingsContainer.appendChild(list);
+  // if (!themeSettingsContainer) return;
+  // const themeName = editorStateManager.getCurrentThemeName();
+  // const isCustom = editorStateManager.getIsCustomTheme();
+  // const header = document.createElement("div");
+  // header.style.display = "flex";
+  // header.style.justifyContent = "space-between";
+  // header.style.alignItems = "center";
+  // header.style.marginBottom = "1rem";
+  // const title = document.createElement("h3");
+  // title.textContent = "Theme Settings";
+  // title.style.margin = "0";
+  // header.appendChild(title);
+  // const addFieldBtn = document.createElement("button");
+  // addFieldBtn.textContent = "Add Setting Field";
+  // addFieldBtn.className = "small-btn";
+  // addFieldBtn.disabled = !isCustom;
+  // addFieldBtn.addEventListener("click", async () => {
+  //   await promptAddThemeSettingField();
+  //   await renderThemeSettings();
+  // });
+  // header.appendChild(addFieldBtn);
+  // themeSettingsContainer.appendChild(header);
+  // if (!themeName) {
+  //   themeSettingsContainer.appendChild(createThemeSettingsNotice("No theme selected. Choose a custom theme to view its settings."));
+  //   return;
+  // }
+  // const customTheme = await getCustomThemeByName(themeName);
+  // if (!customTheme) {
+  //   themeSettingsContainer.appendChild(createThemeSettingsNotice("Custom theme metadata not found."));
+  //   return;
+  // }
+  // const settings = customTheme.settings || {};
+  // const savedSettings = customTheme.savedSettings || {};
+  // if (Object.keys(settings).length === 0) {
+  //   themeSettingsContainer.appendChild(createThemeSettingsNotice("This custom theme has no settings yet. Use the button above to add a field."));
+  //   return;
+  // }
+  // const list = document.createElement("div");
+  // list.style.display = "grid";
+  // list.style.gap = "1rem";
+  // for (const [fieldId, fieldDef] of Object.entries(settings)) {
+  //   const value = savedSettings[fieldId] ?? getFieldDefaultValue(fieldDef);
+  //   const fieldWrapper = document.createElement("div");
+  //   fieldWrapper.style.padding = "1rem";
+  //   fieldWrapper.style.border = "1px solid rgba(255,255,255,0.08)";
+  //   fieldWrapper.style.borderRadius = "0.75rem";
+  //   fieldWrapper.style.background = "rgba(255,255,255,0.02)";
+  //   fieldWrapper.appendChild(createFieldLabel(fieldDef.label || fieldId, fieldId));
+  //   fieldWrapper.appendChild(createFieldInput(themeName, fieldId, fieldDef, value, async newValue => {
+  //     await updateCustomThemeSavedSettings(themeName, { [fieldId]: newValue });
+  //     if (editorStateManager.getCurrentThemeName() === themeName && editorStateManager.getIsCustomTheme()) {
+  //       const customThemes = await getCustomThemes();
+  //       const index = customThemes.findIndex(theme => theme.name === themeName);
+  //       if (index !== -1) {
+  //         await themeManager.applyTheme(true, index, themeName);
+  //       }
+  //     }
+  //   }));
+  //   list.appendChild(fieldWrapper);
+  // }
+  // themeSettingsContainer.appendChild(list);
 }
 
-async function promptAddThemeSettingField(): Promise<void> {
+async function _promptAddThemeSettingField(): Promise<void> {
   const themeName = editorStateManager.getCurrentThemeName();
   if (!themeName) return;
 
@@ -520,11 +573,24 @@ async function promptAddThemeSettingField(): Promise<void> {
   }
 }
 
-export function initializeThemeSettings(): void {
+export function initializeThemeSettingsEditor(): void {
   if (modifyThemeSettingsBtn) {
     modifyThemeSettingsBtn.addEventListener("click", async () => {
       themeSettingsVisible = !themeSettingsVisible;
-      setThemeSettingsVisibility(themeSettingsVisible);
+      const visible = themeSettingsVisible;
+      const editor = document.getElementById("editor");
+      if (editor) {
+        editor.style.display = visible ? "none" : "";
+      }
+      if (themeSettingsContainer) {
+        themeSettingsContainer.style.display = visible ? "" : "none";
+      }
+      if (modifyThemeSettingsBtn) {
+        modifyThemeSettingsBtn.dataset.tooltip = visible
+          ? t("options_editor_modifyStyle")
+          : t("options_editor_modifyThemeSettings");
+        modifyThemeSettingsBtn.classList.toggle("active", visible);
+      }
       if (themeSettingsVisible) {
         await renderThemeSettings();
       }
@@ -538,6 +604,7 @@ export async function refreshThemeSettingsUI(): Promise<void> {
   }
 }
 
+// Theme manager
 class ThemeManager {
   async applyTheme(isCustom: boolean, index: number, themeName: string): Promise<void> {
     console.log(LOG_PREFIX_EDITOR, `Applying ${isCustom ? "custom" : "built-in"} theme: ${themeName}`);
@@ -563,7 +630,8 @@ class ThemeManager {
       throw new Error(`Custom theme at index ${index} not found`);
     }
 
-    const themeContent = `/* ${selectedTheme.name}, a custom theme for BetterLyrics */\n\n${selectedTheme.css}\n`;
+    const css = applyThemeSettingsToCSS(selectedTheme.css, selectedTheme.settings, selectedTheme.savedSettings);
+    const themeContent = `/* ${selectedTheme.name}, a custom theme for BetterLyrics */\n\n${css}\n`;
 
     await editorStateManager.queueOperation("theme", async () => {
       console.log(LOG_PREFIX_EDITOR, `Setting custom theme: ${selectedTheme.name}`);
@@ -577,7 +645,7 @@ class ThemeManager {
       showThemeName(selectedTheme.name, "custom");
       updateThemeSelectorButton();
 
-      await this.saveTheme(themeContent);
+      await this.saveTheme(selectedTheme.css, { fields: selectedTheme.settings, saved: selectedTheme.savedSettings });
 
       showAlert(`Applied custom theme: ${selectedTheme.name}`);
     });
@@ -610,6 +678,7 @@ class ThemeManager {
       const success = await applyStoreThemeComplete({
         themeId: installed.id,
         css: installed.css,
+        settings: { fields: installed.settings, saved: installed.savedSettings },
         title: installed.title || theme.name,
         creators: installed.creators || [],
         source: "marketplace",
@@ -629,7 +698,7 @@ class ThemeManager {
     console.log(LOG_PREFIX_EDITOR, `Using bundled fallback for: ${selectedTheme.name}`);
 
     const response = await fetch(chrome.runtime.getURL(`css/themes/${selectedTheme.path}`));
-    const css = await response.text();
+    let css = await response.text();
 
     const themeContent = `/* ${selectedTheme.name}, a theme for BetterLyrics by ${selectedTheme.author} ${selectedTheme.link && `(${selectedTheme.link})`} */\n\n${css}\n`;
 
@@ -651,12 +720,15 @@ class ThemeManager {
     });
   }
 
-  private async saveTheme(css: string): Promise<void> {
+  private async saveTheme(
+    css: string,
+    settings: { fields?: { [field: string]: ThemeSettingField }; saved?: { [field: string]: any } } = {}
+  ): Promise<void> {
     editorStateManager.incrementSaveCount();
     editorStateManager.setIsSaving(true);
 
     try {
-      const result = await saveToStorageWithFallback(css, true);
+      const result = await saveToStorageWithFallback(css, settings, true);
 
       if (!result.success || !result.strategy) {
         throw new Error(`Failed to save theme: ${result.error?.message || "Unknown error"}`);
@@ -677,6 +749,10 @@ async function applyStoreThemeToEditor(
   themeId: string,
   css: string,
   title: string,
+  settings: {
+    fields: { [field: string]: ThemeSettingField };
+    saved: { [field: string]: any };
+  },
   source: EditorThemeSource = "marketplace"
 ): Promise<void> {
   console.log(
@@ -688,6 +764,7 @@ async function applyStoreThemeToEditor(
     await editorStateManager.queueOperation("theme", async () => {
       console.log(LOG_PREFIX_EDITOR, `Setting marketplace theme: ${title}, content length: ${css.length}`);
 
+      css = applyThemeSettingsToCSS(css, settings.fields, settings.saved);
       await editorStateManager.setEditorContent(css, `store-theme:${themeId}`, false);
 
       editorStateManager.setCurrentThemeName(title);
@@ -717,15 +794,19 @@ export function initStoreThemeListener(): void {
       themeId: string;
       css: string;
       title: string;
+      settings: {
+        fields: { [field: string]: ThemeSettingField };
+        saved: { [field: string]: any };
+      };
       source?: "marketplace" | "url";
     }>;
-    const { themeId, css, title, source } = customEvent.detail;
+    const { themeId, css, title, settings, source } = customEvent.detail;
     const editorSource: EditorThemeSource = source === "url" ? "github" : "marketplace";
     console.log(
       LOG_PREFIX_EDITOR,
       `Event detail: themeId=${themeId}, title=${title}, source=${source}, CSS length=${css.length}`
     );
-    await applyStoreThemeToEditor(themeId, css, title, editorSource);
+    await applyStoreThemeToEditor(themeId, css, title, settings, editorSource);
   });
 }
 
@@ -835,7 +916,7 @@ function debounceSave() {
   editorStateManager.setSaveTimeout(window.setTimeout(saveToStorage, SAVE_DEBOUNCE_DELAY));
 }
 
-export function saveToStorage(isTheme = false) {
+export async function saveToStorage(isTheme = false) {
   console.log(LOG_PREFIX_EDITOR, "saveToStorage called, isTheme:", isTheme);
   const currentEditor = editorStateManager.getEditor();
   if (!currentEditor) {
@@ -854,7 +935,7 @@ export function saveToStorage(isTheme = false) {
     editorStateManager.setCurrentThemeName(null);
   }
 
-  saveToStorageWithFallback(css, isTheme)
+  saveToStorageWithFallback(css, await loadThemeSettings(), isTheme)
     .then(result => {
       console.log(LOG_PREFIX_EDITOR, "saveToStorageWithFallback result:", result);
       if (result.success && result.strategy) {

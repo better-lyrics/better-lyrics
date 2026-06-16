@@ -19,6 +19,7 @@ import {
   setActiveStoreTheme,
 } from "./store/themeStoreManager";
 import { fetchAllStoreThemes } from "./store/themeStoreService";
+import type { ThemeSettingField } from "./themes";
 
 const THEME_UPDATE_ALARM = "theme-update-check";
 const UPDATE_INTERVAL_MINUTES = 360; // 6 hours
@@ -36,7 +37,12 @@ const SYMLINKED_THEME_MAP: Record<string, string> = {
 
 const SYNC_STORAGE_LIMIT = 7000;
 
-async function saveThemeCSS(css: string, title: string, creators: string[]): Promise<void> {
+async function saveThemeCSS(
+  css: string,
+  settings: { fields?: { [field: string]: ThemeSettingField }; saved?: { [field: string]: any } },
+  title: string,
+  creators: string[]
+): Promise<void> {
   const themeContent = `/* ${title}, a marketplace theme by ${creators.join(", ")} */\n\n${css}\n`;
   const cssSize = new Blob([themeContent]).size;
 
@@ -69,7 +75,12 @@ async function migrateSymlinkedThemes(): Promise<void> {
           await chrome.storage.sync.remove("activeStoreTheme");
           return;
         }
-        await saveThemeCSS(installed.css, installed.title, installed.creators);
+        await saveThemeCSS(
+          installed.css,
+          { fields: installed.settings, saved: installed.savedSettings },
+          installed.title,
+          installed.creators
+        );
         console.log(LOG_PREFIX_BACKGROUND, `Migrated active theme: ${themeName} → store:${storeId}`);
       }
     }

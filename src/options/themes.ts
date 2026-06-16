@@ -21,7 +21,7 @@ interface CustomTheme {
   timestamp: number;
 }
 
-export type ThemeSettingFieldType = "toggle" | "range" | "dropdown" | "color" | "textfield";
+export type ThemeSettingFieldType = "heading" | "toggle" | "range" | "dropdown" | "color" | "textfield";
 export type ThemeSettingFieldAttributeType = "css" | "rics";
 export type ThemeSettingFieldConditionals =
   | "equals"
@@ -35,14 +35,15 @@ export type ThemeSettingFieldConditionals =
   | "ends"
   | "not-ends";
 
-interface ThemeSettingFieldBase {
+export interface ThemeSettingFieldBase {
   /** An index defining property */
   pos?: number;
   label: string;
   type: ThemeSettingFieldType;
   /** CSS starts with `--` prefix while RICS starts with `$` prefix */
   attribute: string;
-  attrType: ThemeSettingFieldAttributeType;
+  /** Optional attribute type. Defaults to `css` */
+  attrType?: ThemeSettingFieldAttributeType;
   /**
    * Use `$VALUE$` to use the current setting field's raw saved value on the `attrValue`.
    *
@@ -70,10 +71,14 @@ interface ThemeSettingFieldBase {
   default: any;
 }
 
+export interface ThemeSettingFieldHeading extends Pick<ThemeSettingFieldBase, "pos" | "label" | "available"> {
+  type: "heading";
+}
+
 export interface ThemeSettingFieldToggle extends ThemeSettingFieldBase {
   type: "toggle";
-  onValue: any;
-  offValue: any;
+  onValue: string;
+  offValue: string;
   default: boolean;
 }
 
@@ -96,6 +101,7 @@ export interface ThemeSettingFieldDropdown extends ThemeSettingFieldBase {
 
 export interface ThemeSettingFieldColor extends ThemeSettingFieldBase {
   type: "color";
+  /** A hex color based string, like `#000` or `#ffffff` */
   default: string;
 }
 
@@ -106,6 +112,7 @@ export interface ThemeSettingFieldTextfield extends ThemeSettingFieldBase {
 }
 
 export type ThemeSettingField =
+  | ThemeSettingFieldHeading
   | ThemeSettingFieldToggle
   | ThemeSettingFieldRange
   | ThemeSettingFieldDropdown
@@ -237,6 +244,10 @@ export async function renameCustomTheme(oldName: string, newName: string): Promi
 }
 
 function getDefaultValueForSettingField(field: ThemeSettingField): any {
+  if (field.type === "heading") {
+    const headingField = field as ThemeSettingFieldHeading;
+    return headingField.label;
+  }
   if (field.type === "toggle") {
     const toggleField = field as ThemeSettingFieldToggle;
     return toggleField.default ? toggleField.onValue : toggleField.offValue;
@@ -334,10 +345,7 @@ export async function updateCustomThemeSavedSettings(
 
   if (theme.settings) {
     for (const key in savedSettings) {
-      if (!theme.settings[key]) {
-        delete savedSettings[key];
-      }
-      if (theme.settings[key] && theme.settings[key].default == savedSettings[key]) {
+      if (!theme.settings[key] || theme.settings[key].type === "heading") {
         delete savedSettings[key];
       }
     }

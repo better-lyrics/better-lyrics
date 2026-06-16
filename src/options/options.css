@@ -535,19 +535,6 @@ body {
     color: #ff7961;
 }
 
-#theme-settings {
-	display: flex;
-	flex-direction: column;
-	padding: 1rem;
-}
-
-.setting-field {
-	border-radius: .5rem;
-	margin: 0;
-	text-align: left;
-	font-size: 1rem;
-}
-
 .ie-utils-container {
 	display: flex;
 	align-items: flex-start;
@@ -1726,6 +1713,103 @@ input.cm-textfield:focus-visible {
 
 #modal-overlay {
 	z-index: 10001;
+}
+
+#theme-file-selections {
+	display: flex;
+	flex-direction: column;
+	margin-top: 1rem;
+}
+
+.theme-file-selection {
+	margin: 0;
+	background-color: transparent;
+	border: hsla(0, 0, 100%, .2) solid 1px;
+	text-align: left;
+}
+
+.theme-file-selection:hover {
+	border: hsla(0, 0, 100%, .5) solid 1px;
+}
+
+.theme-file-selection:first-of-type {
+	border-radius: 1rem 1rem 0 0;
+}
+
+.theme-file-selection:last-of-type {
+	border-radius: 0 0 1rem 1rem;
+}
+
+/* -- Theme Settings -------------------------- */
+
+#theme-settings {
+	display: flex;
+	flex-direction: column;
+	padding: 1rem;
+	box-shadow: hsla(0,0,100%,.15) 0 0 2px inset;
+	border-radius: 0 0 1rem 1rem
+}
+
+#theme-settings-editor-header {
+	display: flex;
+	flex-direction: row;
+	justify-content: space-between;
+	padding-bottom: .75rem;
+	margin-bottom: .75rem;
+	border-bottom: 1px solid hsla(0,0,100%,.1);
+}
+
+#theme-settings-editor-fields {
+	display: flex;
+	flex-direction: column;
+	gap: .5rem;
+}
+
+.theme-setting-field {
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	gap: .25rem;
+	text-align: left;
+	border-radius: .3rem;
+	margin: 0;
+	font-size: 1rem;
+	padding: .5rem;
+	background: hsla(0,0,100%,.1);
+	border: hsla(0,0,100%,.1) solid 1px;
+}
+
+.theme-setting-field-info {
+	display: flex;
+	flex-direction: column;
+	width: stretch;
+}
+
+.theme-setting-field-type {
+	font-size: .7rem;
+	opacity: .5;
+}
+
+.theme-setting-field-actions {
+    display: flex;
+    flex-direction: row;
+    gap: .25rem;
+    align-items: center;
+    height: stretch;
+    margin-left: .25rem;
+}
+
+.theme-settings-modal-fields {
+    margin-top: 1rem;
+    border-top: hsla(0,0,100%,.1) solid 1px;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    padding-top: 1rem;
+}
+
+.theme-settings-container {
+	margin: 0 !important;
 }
 
 @keyframes slideUp {

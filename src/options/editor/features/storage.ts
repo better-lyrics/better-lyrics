@@ -3,6 +3,7 @@ import { compressString, decompressString, isCompressed } from "@core/compressio
 import { getLocalStorage, getSyncStorage, loadChunkedStyles } from "@core/storage";
 import { setActiveStoreTheme } from "@/options/store/themeStoreManager";
 import type { InstalledStoreTheme } from "@/options/store/types";
+import type { ThemeSettingField } from "@/options/themes";
 import { CHUNK_SIZE, LOCAL_STORAGE_SAFE_LIMIT, MAX_RETRY_ATTEMPTS, SYNC_STORAGE_LIMIT } from "../core/editor";
 import { editorStateManager } from "../core/state";
 import type { SaveResult } from "../types";
@@ -14,6 +15,10 @@ interface CSSStorageData {
   cssStorageType?: "sync" | "local" | "chunked";
   customCSS?: string | null;
   cssCompressed?: boolean;
+  themeSettings?: {
+    fields?: { [field: string]: ThemeSettingField };
+    saved?: { [field: string]: any };
+  } | null;
 }
 
 interface ChunkMetadata {
@@ -119,7 +124,15 @@ const getStorageStrategy = (css: string): "local" | "sync" | "chunked" => {
   return cssSize > SYNC_STORAGE_LIMIT ? "local" : "sync";
 };
 
-export const saveToStorageWithFallback = async (css: string, _isTheme = false, retryCount = 0): Promise<SaveResult> => {
+export const saveToStorageWithFallback = async (
+  css: string,
+  themeSettings: {
+    fields?: { [field: string]: ThemeSettingField };
+    saved?: { [field: string]: any };
+  } = {},
+  _isTheme = false,
+  retryCount = 0
+): Promise<SaveResult> => {
   try {
     const cssSize = new Blob([css]).size;
     console.log(LOG_PREFIX_EDITOR, `Saving CSS: ${cssSize} bytes (${(cssSize / 1024).toFixed(2)} KB)`);
@@ -138,22 +151,27 @@ export const saveToStorageWithFallback = async (css: string, _isTheme = false, r
 
     if (strategy === "chunked") {
       await saveChunkedCSS(cssToStore);
-      await chrome.storage.sync.set({ cssCompressed: shouldCompress });
+      await chrome.storage.sync.set({ cssCompressed: shouldCompress, themeSettings });
       return { success: true, strategy: "chunked" };
     }
 
     if (strategy === "local") {
       const estimatedSize = compressedSize * 1.2;
       await clearLyricsCacheIfNeeded(estimatedSize);
-      await chrome.storage.local.set({ customCSS: cssToStore, cssCompressed: shouldCompress });
+      await chrome.storage.local.set({ customCSS: cssToStore, cssCompressed: shouldCompress, themeSettings });
       await chrome.storage.sync.set({ cssStorageType: "local", cssCompressed: shouldCompress });
       await clearCSSChunks();
-      await chrome.storage.sync.remove("customCSS");
+      await chrome.storage.sync.remove(["customCSS", "themeSettings"]);
       console.log(LOG_PREFIX_EDITOR, "Saved to local storage");
     } else {
-      await chrome.storage.sync.set({ customCSS: cssToStore, cssStorageType: "sync", cssCompressed: shouldCompress });
+      await chrome.storage.sync.set({
+        customCSS: cssToStore,
+        cssStorageType: "sync",
+        cssCompressed: shouldCompress,
+        themeSettings,
+      });
       await clearCSSChunks();
-      await chrome.storage.local.remove(["customCSS", "cssCompressed"]);
+      await chrome.storage.local.remove(["customCSS", "cssCompressed", "themeSettings"]);
       console.log(LOG_PREFIX_EDITOR, "Saved to sync storage");
     }
 
@@ -169,7 +187,7 @@ export const saveToStorageWithFallback = async (css: string, _isTheme = false, r
         const cssToStore = shouldCompress ? compressString(css) : css;
 
         await saveChunkedCSS(cssToStore);
-        await chrome.storage.sync.set({ cssCompressed: shouldCompress });
+        await chrome.storage.sync.set({ cssCompressed: shouldCompress, themeSettings });
         return { success: true, strategy: "chunked", wasRetry: true };
       } catch (chunkError) {
         console.error(LOG_PREFIX_EDITOR, "Chunked storage fallback failed:", chunkError);
@@ -181,23 +199,116 @@ export const saveToStorageWithFallback = async (css: string, _isTheme = false, r
   }
 };
 
+export function applyThemeSettingsToCSS(
+  css: string,
+  settings: { [field: string]: ThemeSettingField } = {},
+  saved: { [field: string]: any } = {}
+): string {
+  if (Object.keys(settings).length < 1) {
+    return css;
+  }
+
+  // string injection goes crazy
+  for (const field in settings) {
+    const setting = settings[field];
+    if (setting.type === "heading") continue;
+
+    const attribute = setting.attribute;
+    if (!attribute) continue;
+
+    if (setting.attrType !== "css" && setting.attrType !== "rics") {
+      setting.attrType = "css";
+    }
+
+    let savedVal = saved[field] || setting.default;
+    if (!savedVal) continue;
+
+    if (setting.type === "dropdown") {
+      const option = setting.options[savedVal];
+      if (option) savedVal = option;
+      else savedVal = setting.options[0];
+    } else if (setting.type === "toggle") {
+      savedVal = savedVal ? setting.onValue : setting.offValue;
+    }
+
+    const setValue = setting.attrValue || "$VALUE$";
+
+    const escapedAttr = attribute.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    const value = setValue?.replaceAll("$VALUE$", savedVal).replace(/\$([^$]+)\$/g, (_, inner) => {
+      const innerSetting = settings[inner];
+      if (innerSetting)
+        return innerSetting.type === "heading" ? innerSetting.label : saved[inner] || innerSetting.default;
+    });
+
+    if (setting.attrType === "css") {
+      const declaration = `${attribute}: ${value};`;
+
+      // if attribute exists, replace its value
+      const existingAttrRegex = new RegExp(`(${escapedAttr}\\s*:\\s*)[^;]+;`, "g");
+
+      if (existingAttrRegex.test(css)) {
+        css = css.replace(existingAttrRegex, `$1${value};`);
+        continue;
+      }
+
+      // if not, append the new attribute inside root
+      const rootBlockRegex = /(:root\s*\{)([^}]*)(\})/;
+
+      if (rootBlockRegex.test(css)) {
+        css = css.replace(rootBlockRegex, (_, open, body, close) => {
+          const trimmedBody = body.replace(/\s+$/, "");
+          const indentMatch = body.match(/\n(\s+)\S/);
+          const indent = (indentMatch ? indentMatch[1] : null) || "  ";
+          return `${open}${trimmedBody}\n${indent}${declaration}\n${close}`;
+        });
+        continue;
+      }
+
+      // if no root, add root block at the very top
+      css = `:root { ${declaration} }\n\n${css}`;
+    } else if (setting.attrType === "rics") {
+      const existingVarRegex = new RegExp(`(${escapedAttr}\\s*:\\s*)[^;]+;`, "g");
+
+      // if variable exists, replace its value
+      if (existingVarRegex.test(css)) {
+        css = css.replace(existingVarRegex, `$1${value};`);
+        continue;
+      }
+
+      // otherwise, prepend it at the very top
+      css = `${attribute}: ${value};\n${css}`;
+    }
+  }
+
+  return css;
+}
+
 async function loadCustomCSS(): Promise<string> {
   let css: string | null = null;
   let compressed = false;
+  let settings: { fields?: {}; saved?: {} } | null = null;
 
   try {
-    const syncData = await getSyncStorage<CSSStorageData>(["cssStorageType", "customCSS", "cssCompressed"]);
+    const syncData = await getSyncStorage<CSSStorageData>([
+      "cssStorageType",
+      "customCSS",
+      "cssCompressed",
+      "themeSettings",
+    ]);
 
     if (syncData.cssStorageType === "chunked") {
       css = await loadChunkedStyles();
       compressed = syncData.cssCompressed || false;
+      settings = syncData.themeSettings || null;
     } else if (syncData.cssStorageType === "local") {
-      const localData = await getLocalStorage<CSSStorageData>(["customCSS", "cssCompressed"]);
+      const localData = await getLocalStorage<CSSStorageData>(["customCSS", "cssCompressed", "themeSettings"]);
       css = localData.customCSS ?? null;
       compressed = localData.cssCompressed || false;
+      settings = localData.themeSettings || null;
     } else {
       css = syncData.customCSS ?? null;
       compressed = syncData.cssCompressed || false;
+      settings = syncData.themeSettings || null;
     }
   } catch (error) {
     console.error("Error loading CSS:", error);
@@ -205,17 +316,24 @@ async function loadCustomCSS(): Promise<string> {
       const chunkedStyles = await loadChunkedStyles();
       if (chunkedStyles) {
         css = chunkedStyles;
-        const syncCompressedData = await getSyncStorage<CSSStorageData>(["cssCompressed"]);
+        const syncCompressedData = await getSyncStorage<CSSStorageData>(["cssCompressed", "themeSettings"]);
         compressed = syncCompressedData.cssCompressed || false;
+        settings = syncCompressedData.themeSettings || null;
       } else {
-        const localData = await getLocalStorage<CSSStorageData>(["customCSS", "cssCompressed"]);
+        const localData = await getLocalStorage<CSSStorageData>(["customCSS", "cssCompressed", "themeSettings"]);
         if (localData.customCSS) {
           css = localData.customCSS;
           compressed = localData.cssCompressed || false;
+          settings = localData.themeSettings || null;
         } else {
-          const fallbackSyncData = await getSyncStorage<CSSStorageData>(["customCSS", "cssCompressed"]);
+          const fallbackSyncData = await getSyncStorage<CSSStorageData>([
+            "customCSS",
+            "cssCompressed",
+            "themeSettings",
+          ]);
           css = fallbackSyncData.customCSS ?? null;
           compressed = fallbackSyncData.cssCompressed || false;
+          settings = fallbackSyncData.themeSettings || null;
         }
       }
     } catch (fallbackError) {
@@ -226,10 +344,32 @@ async function loadCustomCSS(): Promise<string> {
   if (!css) return "";
 
   if (compressed || isCompressed(css)) {
-    return decompressString(css);
+    const decompressed = decompressString(css);
+    const cssModified = applyThemeSettingsToCSS(decompressed, settings?.fields, settings?.saved);
+    return cssModified;
   }
 
-  return css;
+  const cssModified = applyThemeSettingsToCSS(css, settings?.fields, settings?.saved);
+  return cssModified;
+}
+
+export async function loadThemeSettings(): Promise<{
+  fields?: { [field: string]: ThemeSettingField };
+  saved?: { [field: string]: any };
+}> {
+  try {
+    const syncData = await getSyncStorage<CSSStorageData>(["cssStorageType", "themeSettings"]);
+    if (syncData.cssStorageType === "local") {
+      const localData = await getLocalStorage<CSSStorageData>(["themeSettings"]);
+      return { ...localData.themeSettings };
+    } else {
+      return { ...syncData.themeSettings };
+    }
+  } catch (error) {
+    console.error("Error loading theme settings:", error);
+  }
+
+  return {};
 }
 
 export function showSyncSuccess(strategy: "local" | "sync" | "chunked", wasRetry?: boolean): void {
@@ -299,12 +439,14 @@ interface ApplyStoreThemeOptions {
   css: string;
   title: string;
   creators: string[];
+  settings?: { fields?: { [field: string]: ThemeSettingField }; saved?: { [field: string]: any } };
   source?: "marketplace" | "url";
 }
 
 export async function applyStoreThemeComplete(options: ApplyStoreThemeOptions): Promise<boolean> {
-  const { themeId, css, title, creators, source } = options;
-  const themeContent = `/* ${title}, a marketplace theme by ${creators.join(", ")} */\n\n${css}\n`;
+  const { themeId, css, title, creators, settings, source } = options;
+  const cssModified = applyThemeSettingsToCSS(css, settings?.fields, settings?.saved);
+  const themeContent = `/* ${title}, a marketplace theme by ${creators.join(", ")} */\n\n${cssModified}\n`;
 
   try {
     editorStateManager.incrementSaveCount();
@@ -312,13 +454,13 @@ export async function applyStoreThemeComplete(options: ApplyStoreThemeOptions): 
     await chrome.storage.sync.set({ themeName: `store:${themeId}` });
     await setActiveStoreTheme(themeId);
 
-    const saveResult = await saveToStorageWithFallback(themeContent, true);
+    const saveResult = await saveToStorageWithFallback(themeContent, settings, true);
     if (!saveResult.success) {
       throw new Error("Failed to save theme to storage");
     }
 
     const event = new CustomEvent("store-theme-applied", {
-      detail: { themeId, css: themeContent, title, source },
+      detail: { themeId, css: themeContent, settings, title, source },
     });
     document.dispatchEvent(event);
 
@@ -356,6 +498,10 @@ class StorageManager {
       if (Object.hasOwn(changes, "customCSS_chunk_0")) {
         console.log(LOG_PREFIX_EDITOR, "Chunked CSS detected, handling as CSS change");
         await this.handleCSSChange(changes.customCSS_chunk_0);
+      }
+
+      if (Object.hasOwn(changes, "themeSettings")) {
+        await this.handleThemeSettingsChange();
       }
 
       if (namespace === "local") {
@@ -427,6 +573,26 @@ class StorageManager {
     });
   }
 
+  private async handleThemeSettingsChange(): Promise<void> {
+    if (editorStateManager.getIsSaving()) {
+      console.log(LOG_PREFIX_EDITOR, "Skipping theme reload (save in progress)");
+      return;
+    }
+
+    if (editorStateManager.getIsUserTyping()) {
+      console.log(LOG_PREFIX_EDITOR, "Skipping theme reload (user is typing)");
+      return;
+    }
+
+    console.log(LOG_PREFIX_EDITOR, "Applying theme settings to CSS");
+
+    await editorStateManager.queueOperation("storage", async () => {
+      const css = await loadCustomCSS();
+      console.log(LOG_PREFIX_EDITOR, `CSS loaded from theme change: ${css.length} bytes`);
+      await editorStateManager.setEditorContent(css, "theme-settings-change");
+    });
+  }
+
   private async handleIndividualThemeUpdate(
     themeId: string,
     change: { oldValue?: InstalledStoreTheme; newValue?: InstalledStoreTheme }
@@ -472,7 +638,7 @@ class StorageManager {
       const editorSource = themeSourceToEditorSource(newTheme.source);
       showThemeName(displayName, editorSource);
 
-      const result = await saveToStorageWithFallback(themeContent, true);
+      const result = await saveToStorageWithFallback(themeContent, await loadThemeSettings(), true);
       if (result.success && result.strategy) {
         showSyncSuccess(result.strategy, result.wasRetry);
         await broadcastRICSToTabs(themeContent, result.strategy);

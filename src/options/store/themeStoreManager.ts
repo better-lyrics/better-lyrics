@@ -1,4 +1,4 @@
-import { LOG_PREFIX_STORE } from "@constants";
+import { LOG_PREFIX_STORE, THEME_SETTINGS_TYPES } from "@constants";
 import { getLocalStorage, getSyncStorage } from "@core/storage";
 import {
   fetchFullTheme,
@@ -12,6 +12,7 @@ import {
 } from "./themeStoreService";
 import type { InstalledStoreTheme, StoreTheme, ThemeSource } from "./types";
 import type { ThemeSettingField } from "../themes";
+import { validateThemeSettingFields } from "../editor/features/themes";
 
 async function fetchCssFromUrl(url: string): Promise<string> {
   const response = await fetch(url);
@@ -127,6 +128,7 @@ export async function getInstalledTheme(themeId: string): Promise<InstalledStore
 export async function installTheme(theme: StoreTheme, options: InstallOptions = {}): Promise<InstalledStoreTheme> {
   await ensureMigrated();
 
+  const installed = await getInstalledTheme(theme.id);
   const isRegistryTheme = !!theme.commit && options.source !== "url";
 
   let css: string;
@@ -153,6 +155,15 @@ export async function installTheme(theme: StoreTheme, options: InstallOptions = 
     }
   }
 
+  // remove saved theme settings fields that no longer exist in the theme settings
+  if (installed?.savedSettings && settings) {
+    for (const key in installed.savedSettings) {
+      if (!(key in settings)) {
+        delete installed.savedSettings[key];
+      }
+    }
+  }
+
   const installedTheme: InstalledStoreTheme = {
     id: theme.id,
     repo: theme.repo,
@@ -161,6 +172,7 @@ export async function installTheme(theme: StoreTheme, options: InstallOptions = 
     css,
     shaderConfig: shaderConfig || undefined,
     settings: settings || undefined,
+    savedSettings: installed?.savedSettings || undefined,
     installedAt: Date.now(),
     version: theme.version,
     source: options.source,
@@ -206,6 +218,59 @@ export async function removeTheme(themeId: string): Promise<void> {
   const activeTheme = await getActiveStoreTheme();
   if (activeTheme === themeId) {
     await clearActiveStoreTheme();
+  }
+}
+
+export async function setSavedThemeSettings(themeId: string, savedSettings: { [field: string]: any }): Promise<void> {
+  await ensureMigrated();
+
+  const installed = await getInstalledTheme(themeId);
+  if (!installed) {
+    throw new Error(`Cannot save settings: theme "${themeId}" is not installed`);
+  }
+
+  // check if the theme has settings and validate the value of the gonna-be-saved settings
+  if (installed.settings) {
+    for (const field in savedSettings) {
+      if (!(field in installed.settings)) {
+        delete savedSettings[field];
+        continue;
+      }
+
+      if (typeof savedSettings[field] !== typeof THEME_SETTINGS_TYPES[installed.settings[field].type]) {
+        delete savedSettings[field];
+      }
+    }
+  }
+
+  const updatedTheme = { ...installed, savedSettings };
+
+  try {
+    await chrome.storage.local.set({ [getThemeStorageKey(themeId)]: updatedTheme });
+  } catch (err) {
+    if (err instanceof Error && err.message.includes("QUOTA")) {
+      throw new Error(
+        `Cannot save theme settings: storage is full. Please remove some installed themes and try again.`
+      );
+    }
+    throw err;
+  }
+}
+
+export async function removeSavedThemeSettings(themeId: string): Promise<void> {
+  await ensureMigrated();
+
+  const installed = await getInstalledTheme(themeId);
+  if (!installed) {
+    throw new Error(`Cannot remove settings: theme "${themeId}" is not installed`);
+  }
+
+  const updatedTheme = { ...installed, savedSettings: undefined };
+
+  try {
+    await chrome.storage.local.set({ [getThemeStorageKey(themeId)]: updatedTheme });
+  } catch (err) {
+    throw err;
   }
 }
 
