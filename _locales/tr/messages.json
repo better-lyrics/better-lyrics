@@ -788,43 +788,43 @@
     "description": "Previous image shortcut"
   },
   "marketplace_shortcutsNextImage": {
-    "message": "Next image",
+    "message": "Sıradaki görsel",
     "description": "Next image shortcut"
   },
   "marketplace_shortcutsGeneral": {
-    "message": "General",
+    "message": "Genel",
     "description": "General shortcuts group"
   },
   "marketplace_shortcutsCloseModal": {
-    "message": "Close modal",
+    "message": "Pencereyi kapat",
     "description": "Close modal shortcut"
   },
   "marketplace_shortcutsShowShortcuts": {
-    "message": "Show shortcuts",
+    "message": "Kısayolları göster",
     "description": "Show shortcuts shortcut"
   },
   "marketplace_shortcutsApplyTheme": {
-    "message": "Apply theme (after install)",
+    "message": "Temayı uygula (indirildikten sonra)",
     "description": "Apply theme shortcut"
   },
   "marketplace_ratingFailed": {
-    "message": "Failed to submit rating",
+    "message": "Derecelendirme gönderilemedi",
     "description": "Rating submission error"
   },
   "marketplace_shaderFetchFailed": {
-    "message": "Failed to fetch shader config",
+    "message": "Gölgelendirici yapılandırması eşlenemedi",
     "description": "Shader fetch error"
   },
   "marketplace_applyFailed": {
-    "message": "Failed to apply theme",
+    "message": "Tema uygulanamadı",
     "description": "Theme apply error"
   },
   "marketplace_noThemesInstalled": {
-    "message": "No themes installed yet",
+    "message": "Henüz tema yüklenmedi",
     "description": "Empty installed themes message"
   },
   "marketplace_lastUpdatedOn": {
-    "message": "Last updated on $date$",
+    "message": "Son güncelleme: $date$",
     "description": "Tooltip showing full date when a theme was last updated",
     "placeholders": {
       "date": {
@@ -834,15 +834,15 @@
     }
   },
   "editor_pageTitle": {
-    "message": "Better Lyrics Styles Editor",
+    "message": "Better Lyrics Tasarı Editörü",
     "description": "Standalone editor page title"
   },
   "editor_importFromFile": {
-    "message": "Import from file",
+    "message": "Dosyadan aktar",
     "description": "Import from file button"
   },
   "editor_exportToFile": {
-    "message": "Export to file",
+    "message": "Dosyaya aktar",
     "description": "Export to file button"
   },
   "editor_saveAsTheme": {
@@ -850,7 +850,7 @@
     "description": "Save as theme button"
   },
   "editor_stylingGuide": {
-    "message": "Styling guide",
+    "message": "Tasarı rehberi",
     "description": "Styling guide button"
   },
   "editor_tip": {
@@ -870,15 +870,15 @@
     "description": "Docs link text"
   },
   "lyrics_source": {
-    "message": "Source: ",
+    "message": "Kaynak: ",
     "description": "Lyrics source label"
   },
   "lyrics_searchOnGenius": {
-    "message": "Search on Genius",
+    "message": "Genius'ta araştır",
     "description": "Search on Genius button text"
   },
   "lyrics_getShaders": {
-    "message": "Get Better Lyrics Shaders",
+    "message": "Better Lyrics Gölgelendiricileri Yükle",
     "description": "Footer button text linking to the Better Lyrics Shaders companion extension"
   },
   "lyrics_searching": {
@@ -890,19 +890,19 @@
     "description": "Loading message while still searching"
   },
   "lyrics_noSyncedLyrics": {
-    "message": "Better Lyrics could not find synced lyrics",
+    "message": "Better Lyrics senkronize şarkı sözleri bulamadı",
     "description": "Message when no synced lyrics found"
   },
   "lyrics_adPlaying": {
-    "message": "[elevator music]",
+    "message": "[asansör müziği]",
     "description": "Message shown during ad playback"
   },
   "lyrics_notFound": {
-    "message": "No lyrics found for this song",
+    "message": "Bu şarkı için sözler bulunamadı",
     "description": "Message when no lyrics are available"
   },
   "lyrics_resumeAutoscroll": {
-    "message": "Resume Autoscroll",
+    "message": "Otomatik Kaydırmayı Devam Ettir",
     "description": "Resume Autoscroll button label"
   },
   "options_language_exclusions": {
@@ -914,31 +914,31 @@
     "description": "Manage button label"
   },
   "options_language_exclusionsTitle": {
-    "message": "Language Exclusions",
+    "message": "Dil İstisnaları",
     "description": "Modal title for language exclusions"
   },
   "options_romanization_tab": {
-    "message": "Romanization",
+    "message": "Romanizasyon",
     "description": "Romanization tab label"
   },
   "options_translation_tab": {
-    "message": "Translation",
+    "message": "Çeviri",
     "description": "Translation tab label"
   },
   "options_searchLanguages": {
-    "message": "Search languages...",
+    "message": "Dilleri Ara...",
     "description": "Search input placeholder"
   },
   "options_romanization_hint": {
-    "message": "Click to toggle. Excluded languages will not be romanized.",
+    "message": "Değiştirmek için tıkla. Hariç tutulan diller romanize edilmeyecek.",
     "description": "Hint text for romanization exclusions"
   },
   "options_translation_hint": {
-    "message": "Click to toggle. Excluded source languages will not be translated.",
+    "message": "Değiştirmek için tıkla. Hariç tutulan diller çevirilmeyecek.",
     "description": "Hint text for translation exclusions"
   },
   "options_resetToDefault": {
-    "message": "Reset $TYPE$ to Default",
+    "message": "$TYPE$'ı Varsayılana Sıfırla",
     "description": "Reset to default button label",
     "placeholders": {
       "type": {
@@ -948,7 +948,7 @@
     }
   },
   "options_romanization_resetTitle": {
-    "message": "Reset $TYPE$ Exclusions",
+    "message": "$TYPE$ İstisnalarını Sıfırla",
     "description": "Modal title for resetting exclusions",
     "placeholders": {
       "type": {
@@ -958,19 +958,19 @@
     }
   },
   "options_romanization_resetMessage": {
-    "message": "This will clear all excluded languages. Continue?",
+    "message": "Bu tüm dil istisnalarını silecek. Devam edilsin mi?",
     "description": "Confirmation message for resetting exclusions"
   },
   "options_reset": {
-    "message": "Reset",
+    "message": "Sıfırla",
     "description": "Reset button label"
   },
   "options_cancel": {
-    "message": "Cancel",
+    "message": "Vazgeç",
     "description": "Cancel button label"
   },
   "options_romanization_resetSuccess": {
-    "message": "$TYPE$ exclusions reset to default",
+    "message": "$TYPE$ istisnaları varsayılana sıfırlandı",
     "description": "Success message after resetting exclusions",
     "placeholders": {
       "type": {
@@ -980,7 +980,7 @@
     }
   },
   "symlink_applied": {
-    "message": "Applied theme: $NAME$ (Marketplace)",
+    "message": "Tema uygulandı: $NAME$ (Mağaza)",
     "description": "Alert after successfully applying a symlinked theme from marketplace",
     "placeholders": {
       "name": {
@@ -990,7 +990,7 @@
     }
   },
   "builtin_applied": {
-    "message": "Applied theme: $NAME$",
+    "message": "Tema uygulandı: $NAME$",
     "description": "Alert after successfully applying a bundled built-in theme",
     "placeholders": {
       "name": {
@@ -1000,7 +1000,7 @@
     }
   },
   "theme_author_prefix": {
-    "message": "by $AUTHOR$",
+    "message": "$AUTHOR$ tarafından",
     "description": "Author prefix shown on theme selector button",
     "placeholders": {
       "author": {
@@ -1010,51 +1010,51 @@
     }
   },
   "theme_author_you": {
-    "message": "by You",
+    "message": "sizin tarafınızdan",
     "description": "Author label for custom user themes on theme selector button"
   },
   "symlink_installFailed": {
-    "message": "Couldn't install theme. Check your connection and try again.",
+    "message": "Tema yüklenemedi. Bağlantınızı kontrol edin ve tekrar deneyin.",
     "description": "Alert when a symlinked theme fails to install from marketplace"
   },
   "symlink_badge_marketplace": {
-    "message": "Marketplace",
+    "message": "Mağaza",
     "description": "Badge text on symlinked theme cards"
   },
   "symlink_badge_bundled": {
-    "message": "Bundled",
+    "message": "Paketlenmiş",
     "description": "Badge text on non-symlinked built-in theme cards"
   },
   "deprecation_builtin_title": {
-    "message": "Heads up, these themes are moving!",
+    "message": "Dikkat, bu temalar taşınıyor!",
     "description": "Title for the built-in themes deprecation banner in theme modal"
   },
   "deprecation_builtin_body": {
-    "message": "We're migrating built-in themes to the Theme Marketplace. Some already have, look for the Marketplace badge. The rest will follow in a future update, with CSS backups on GitHub and Discord.",
+    "message": "Yerleşik temaları Tema Mağazası'na taşıyoruz. Bazıları halihazırda taşınmış durumda; Tema Mağazası rozetine bakabilirsiniz. Geri kalanlar ise gelecek bir güncellemede taşınacak; bu temaların CSS yedekleri GitHub ve Discord'da bulunacak.",
     "description": "Body text for the built-in themes deprecation banner"
   },
   "deprecation_builtin_cta": {
-    "message": "Browse Marketplace",
+    "message": "Mağazayı Keşfedin",
     "description": "CTA button text in the deprecation banner to open the marketplace"
   },
   "theme_modal_section_builtin": {
-    "message": "Built-in Themes",
+    "message": "Yerleşik Temalar",
     "description": "Section title for built-in themes in the theme chooser modal"
   },
   "theme_modal_section_custom": {
-    "message": "Custom Themes",
+    "message": "Özel Temalar",
     "description": "Section title for custom themes in the theme chooser modal"
   },
   "lyrics_submitToUnison": {
-    "message": "Submit lyrics with Unison",
+    "message": "Unison ile şarkı sözü gönderin",
     "description": "Button text for submitting lyrics to Unison"
   },
   "auth_pageTitle": {
-    "message": "Sign in with Better Lyrics",
+    "message": "Better Lyrics ile giriş yapın",
     "description": "Browser tab title for the auth consent popup"
   },
   "auth_consentHeading": {
-    "message": "Sign in to $ORIGIN$",
+    "message": "$ORIGIN$'e giriş yapın",
     "description": "Consent prompt heading. $ORIGIN$ is replaced with the requesting site, e.g. unison.boidu.dev",
     "placeholders": {
       "origin": {
@@ -1064,7 +1064,7 @@
     }
   },
   "auth_consentSubheading": {
-    "message": "You will sign in as $NAME$.",
+    "message": "$NAME$ olarak giriş yapacaksınız.",
     "description": "Identifies the current BL identity. $NAME$ is the deterministic display name.",
     "placeholders": {
       "name": {
@@ -1074,7 +1074,7 @@
     }
   },
   "auth_consentExplainer": {
-    "message": "Better Lyrics will sign a one-time message proving you control this identity. The site never sees your private key.",
+    "message": "Better Lyrics, bu kimliğin size ait olduğunu doğrulayan tek seferlik bir mesaj imzalayacaktır. Site, özel anahtarınızı hiçbir zaman görmez.",
     "description": "Short explainer body in the consent popup"
   },
   "auth_rememberLabel": {
@@ -1376,27 +1376,27 @@
     "description": "ISRC field label"
   },
   "unison_placeholder_song": {
-    "message": "e.g. Bohemian Rhapsody",
+    "message": "ör: Bohemian Rhapsody",
     "description": "Placeholder for song input"
   },
   "unison_placeholder_artist": {
-    "message": "e.g. Queen",
+    "message": "ör: Queen",
     "description": "Placeholder for artist input"
   },
   "unison_placeholder_album": {
-    "message": "e.g. A Night at the Opera",
+    "message": "ör: A Night at the Opera",
     "description": "Placeholder for album input"
   },
   "unison_placeholder_duration": {
-    "message": "e.g. 354",
+    "message": "ör: 354",
     "description": "Placeholder for duration input"
   },
   "unison_placeholder_videoId": {
-    "message": "e.g. dQw4w9WgXcQ",
+    "message": "ör: dQw4w9WgXcQ",
     "description": "Placeholder for video ID input"
   },
   "unison_placeholder_isrc": {
-    "message": "e.g. GBAYE0601498",
+    "message": "ör: GBAYE0601498",
     "description": "Placeholder for ISRC input"
   },
   "unison_placeholder_lyrics": {
