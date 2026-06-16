@@ -1486,6 +1486,7 @@
   height: 36px;
   border: none;
   border-radius: 0.75rem;
+  corner-shape: squircle;
   cursor: pointer;
   font-size: 0.875rem;
   margin: 0;
@@ -1625,6 +1626,7 @@
   flex-shrink: 0;
   padding: 0.375rem 0.75rem;
   border-radius: 0.75rem;
+  corner-shape: squircle;
   font-size: 0.75rem;
   font-weight: 600;
   cursor: pointer;
@@ -1661,6 +1663,7 @@
   height: 36px;
   padding: 0 14px;
   border-radius: 0.75rem;
+  corner-shape: squircle;
   font-size: 0.875rem;
   font-weight: 500;
   cursor: pointer;

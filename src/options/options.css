@@ -21,6 +21,7 @@ nav a {
     display: grid;
     place-items: center;
     border-radius: 0.75rem;
+    corner-shape: squircle;
     cursor: pointer;
 }
 
@@ -213,6 +214,7 @@ body {
     border: none;
     width: 100%;
     border-radius: 0.75rem;
+    corner-shape: squircle;
     text-align: center;
     cursor: pointer;
 }
@@ -234,6 +236,7 @@ body {
     padding-right: 16px;
     border: none;
     border-radius: 0.75rem;
+    corner-shape: squircle;
     cursor: pointer;
     font-size: 0.875rem;
     width: fit-content;
@@ -344,6 +347,7 @@ body {
     padding-right: 16px;
     border: none;
     border-radius: 0.75rem;
+    corner-shape: squircle;
     text-align: center;
     cursor: pointer;
     font-size: 0.875rem;
@@ -362,6 +366,7 @@ body {
     height: 28px;
     padding: 0 10px 0 8px;
     border-radius: 0.75rem;
+    corner-shape: squircle;
     font-size: 0.75rem;
     font-weight: 500;
     cursor: pointer;
@@ -425,6 +430,7 @@ body {
 	gap: 0.375rem;
 	padding: 8px 14px 8px 10px;
 	border-radius: 0.75rem;
+	corner-shape: squircle;
 	width: fit-content;
 	white-space: nowrap;
 	background: hsla(0, 0%, 100%, 0.1);
@@ -591,6 +597,7 @@ body {
 	padding: 10px;
 	border: none;
 	border-radius: 0.75rem;
+	corner-shape: squircle;
 	cursor: pointer;
 	width: fit-content;
 	box-shadow: rgba(0, 0, 0, 0.025) 0px 10px 15px -3px, rgba(0, 0, 0, 0.0125) 0px 4px 6px -2px, rgba(255, 255, 255, 0.1) 0px 1px inset;
@@ -1685,6 +1692,7 @@ input.cm-textfield:focus-visible {
 
 .edit-theme-btn {
 	border-radius: 0.75rem 0.25rem 0.25rem 0.75rem;
+	corner-shape: squircle;
 	color: rgba(255, 255, 255, 0.6);
 }
 
@@ -1698,6 +1706,7 @@ input.cm-textfield:focus-visible {
 
 .delete-theme-btn {
 	border-radius: 0.25rem 0.75rem 0.75rem 0.25rem;
+	corner-shape: squircle;
 	color: rgba(255, 100, 100, 0.8);
 }
 
@@ -1801,6 +1810,7 @@ input.cm-textfield:focus-visible {
 	display: grid;
 	place-items: center;
 	border-radius: 0.75rem;
+	corner-shape: squircle;
 	transition: all 0.2s;
 	margin: 0;
 }
@@ -1872,6 +1882,7 @@ input.cm-textfield:focus-visible {
 .modal-btn {
 	padding: 0.625rem 1.25rem;
 	border-radius: 0.75rem;
+	corner-shape: squircle;
 	font-size: 0.875rem;
 	font-weight: 600;
 	cursor: pointer;
@@ -2213,6 +2224,7 @@ input.cm-textfield:focus-visible {
 
 .modal-tab {
 	border-radius: 0.75rem;
+	corner-shape: squircle;
 	padding: 0.375rem 0.75rem;
 	border: none;
 	background: none;
