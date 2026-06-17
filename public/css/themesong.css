@@ -62,13 +62,21 @@
       --blyrics-background-img: unset !important;
     }
 
-		ytmusic-player[player-ui-state=FULLSCREEN] {
-    	margin: 0 auto !important;
-		}
+    ytmusic-player[player-ui-state=FULLSCREEN] {
+      margin: 0 auto !important;
+    }
 
-		#song-image{
+    #song-image{
       height: 100% !important;
       padding-top: 100% !important;
+    }
+
+    ytmusic-player[player-ui-state=FULLSCREEN] #song-image #img {
+      height: 100% !important;
+      width: 100% !important;
+    }
+    ytmusic-player[player-ui-state="FULLSCREEN"] {
+      border-radius: var(--ts-songimg-border-radius) !important;
     }
   }
 }
