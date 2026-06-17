@@ -70,5 +70,13 @@
       height: 100% !important;
       padding-top: 100% !important;
     }
+
+		ytmusic-player[player-ui-state=FULLSCREEN] #song-image #img {
+			height: 100% !important;
+			width: 100% !important;
+		}
+		ytmusic-player[player-ui-state="FULLSCREEN"] {
+			border-radius: var(--ts-songimg-border-radius) !important;
+		}
   }
 }
