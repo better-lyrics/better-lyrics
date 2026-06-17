@@ -92,7 +92,7 @@
     "description": "Auto-scroll unsynced lyrics setting label"
   },
   "options_display_shadersPromo": {
-    "message": "Show link to Better Lyrics Shaders",
+    "message": "แสดงลิงก์ไปยัง Shaders ของ Better Lyrics",
     "description": "Toggle label for the Shaders companion link shown in the lyrics footer"
   },
   "options_display_unisonActions": {
@@ -252,95 +252,95 @@
     "description": "Import key button label"
   },
   "options_identityImport_title": {
-    "message": "Import Identity",
+    "message": "นำเข้าคีย์ตัวตน",
     "description": "Title of the import identity modal"
   },
   "options_identityImport_chooseFile": {
-    "message": "Choose File",
+    "message": "เลือกไฟล์",
     "description": "Label for the file picker button in the import identity modal"
   },
   "options_identityImport_or": {
-    "message": "or",
+    "message": "หรือ",
     "description": "Divider between file picker and paste textarea in the import identity modal"
   },
   "options_identityImport_pastePlaceholder": {
-    "message": "Paste identity JSON here...",
+    "message": "วางคีย์ตัวตนที่นี่",
     "description": "Placeholder for the identity JSON textarea"
   },
   "options_identityImport_import": {
-    "message": "Import",
+    "message": "นำเข้า",
     "description": "Confirm button label inside the import identity modal"
   },
   "options_nickname_description": {
-    "message": "Pick a name for yourself across Better Lyrics. Letters, numbers, and underscore, 3 to 20 characters.",
+    "message": "เลือกชื่อของคุณสำหรับใช้ใน Better Lyrics จากตัวอักษรภาษาอังกฤษ ตัวเลข และขีดล่าง ความยาว 3 ถึง 20 ตัวอักษร",
     "description": "Nickname subsection description"
   },
   "options_nickname_placeholder": {
-    "message": "Pick a nickname",
+    "message": "เลือกชื่อเล่น",
     "description": "Nickname input placeholder"
   },
   "options_nickname_save": {
-    "message": "Save",
+    "message": "บันทึก",
     "description": "Nickname save button label"
   },
   "options_nickname_reset": {
-    "message": "Reset to default",
+    "message": "รีเซ็ตเป็นค่าเริ่มต้น",
     "description": "Nickname reset button label"
   },
   "options_nickname_modalTitle": {
-    "message": "Set your nickname",
+    "message": "ตั้งชื่อเล่นของคุณ",
     "description": "Nickname modal title"
   },
   "options_nickname_edit": {
-    "message": "Edit",
+    "message": "แก้ไข",
     "description": "Nickname edit button label"
   },
   "options_nickname_editLabel": {
-    "message": "Edit nickname",
+    "message": "แก้ไขชื่อเล่น",
     "description": "Accessible label for the nickname edit button"
   },
   "options_nickname_status_checking": {
-    "message": "Checking...",
+    "message": "กำลังตรวจสอบ",
     "description": "Status while checking nickname availability"
   },
   "options_nickname_status_available": {
-    "message": "Available",
+    "message": "ว่างพร้อมใช้งาน",
     "description": "Status when nickname is available"
   },
   "options_nickname_status_taken": {
-    "message": "Already taken",
+    "message": "มีคนใช้แล้ว",
     "description": "Status when nickname is already taken"
   },
   "options_nickname_status_invalid": {
-    "message": "3 to 20 letters, numbers, or underscores",
+    "message": "เฉพาะตัวอักษรภาษาอังกฤษ ตัวเลข และขีดล่าง ความยาว 3 ถึง 20 ตัวอักษร",
     "description": "Status when nickname format is invalid"
   },
   "options_nickname_status_profane": {
-    "message": "Not allowed, try another",
+    "message": "ไม่สามารถใช้ชื่อนี้ได้ โปรดลองอีกครั้ง",
     "description": "Status when nickname is flagged as inappropriate by the server"
   },
   "options_nickname_status_self": {
-    "message": "This is your current nickname",
+    "message": "ชื่อนี้เป็นชื่อปัจจุบันของคุณ",
     "description": "Status when entered nickname matches current"
   },
   "options_nickname_status_saved": {
-    "message": "Saved",
+    "message": "บันทึกแล้ว",
     "description": "Status when nickname is saved"
   },
   "options_nickname_status_submitting": {
-    "message": "Saving...",
+    "message": "กำลังบันทึก",
     "description": "Status while nickname save is in flight"
   },
   "options_nickname_status_rateLimited": {
-    "message": "Slow down, try again in a moment",
+    "message": "โปรดรอก่อนแล้วลองใหม่อีกครั้งในอีกสักครู่",
     "description": "Status when nickname checks are rate limited"
   },
   "options_nickname_status_error": {
-    "message": "Could not reach the server",
+    "message": "ไม่สามารถเข้าถึงเซิร์ฟเวอร์ได้",
     "description": "Status when nickname request fails"
   },
   "options_alert_importEmpty": {
-    "message": "Paste identity JSON or choose a file first.",
+    "message": "โปรดวาง JSON คีย์ตัวตนหรือเลือกไฟล์ก่อน",
     "description": "Shown when the user clicks Import with no JSON provided"
   },
   "options_modal_selectTheme": {
@@ -500,7 +500,7 @@
     "description": "Line sync type tooltip"
   },
   "options_syncType_unsynced": {
-    "message": "เนื้อเพลงไม่ได้ถูกเน้นตามเวลา",
+    "message": "ยังไม่ซิงก์เวลา",
     "description": "Unsynced sync type label"
   },
   "options_syncType_unsynced_tooltip": {
@@ -878,7 +878,7 @@
     "description": "Search on Genius button text"
   },
   "lyrics_getShaders": {
-    "message": "Get Better Lyrics Shaders",
+    "message": "ติดตั้ง Shaders สำหรับ Better Lyrics",
     "description": "Footer button text linking to the Better Lyrics Shaders companion extension"
   },
   "lyrics_searching": {
@@ -1050,11 +1050,11 @@
     "description": "Button text for submitting lyrics to Unison"
   },
   "auth_pageTitle": {
-    "message": "Sign in with Better Lyrics",
+    "message": "เข้าสู่ระบบด้วย Better Lyrics",
     "description": "Browser tab title for the auth consent popup"
   },
   "auth_consentHeading": {
-    "message": "Sign in to $ORIGIN$",
+    "message": "เข้าสู่ระบบไปยัง $ORIGIN$",
     "description": "Consent prompt heading. $ORIGIN$ is replaced with the requesting site, e.g. unison.boidu.dev",
     "placeholders": {
       "origin": {
@@ -1064,7 +1064,7 @@
     }
   },
   "auth_consentSubheading": {
-    "message": "You will sign in as $NAME$.",
+    "message": "คุณกำลังเข้าสู่ระบบในชื่อ $NAME$",
     "description": "Identifies the current BL identity. $NAME$ is the deterministic display name.",
     "placeholders": {
       "name": {
@@ -1074,43 +1074,43 @@
     }
   },
   "auth_consentExplainer": {
-    "message": "Better Lyrics will sign a one-time message proving you control this identity. The site never sees your private key.",
+    "message": "Better Lyrics จะลงลายเซ็นอิเล็กทรอนิกส์เพื่อยืนยันว่าคุณเป็นเจ้าของตัวตนนี้โดยเว็บไซต์จะไม่เห็นคีย์ลับส่วนตัวของคุณ",
     "description": "Short explainer body in the consent popup"
   },
   "auth_rememberLabel": {
-    "message": "Don't ask again for 24 hours",
+    "message": "ไม่ต้องถามซ้ำอีกใน 24 ชั่วโมง",
     "description": "Checkbox label allowing the user to remember this approval"
   },
   "auth_approve": {
-    "message": "Approve",
+    "message": "อนุญาต",
     "description": "Primary button: approve the sign-in request"
   },
   "auth_cancel": {
-    "message": "Cancel",
+    "message": "ยกเลิก",
     "description": "Secondary button: reject the sign-in request"
   },
   "auth_invalidRequest": {
-    "message": "Invalid sign-in request.",
+    "message": "คำขอเข้าสู่ระบบไม่ถูกต้อง",
     "description": "Error state shown when the popup receives malformed parameters"
   },
   "auth_sessionExpired": {
-    "message": "Sign-in expired. Please close this window and try again.",
+    "message": "การขอเข้าสู่ระบบนี้หมดอายุแล้ว โปรดปิดหน้าต่างนี้แล้วลองใหม่อีกครั้ง",
     "description": "Shown in the sign-in consent popup when the connection to the extension's service worker is lost before the user can approve or cancel."
   },
   "lyrics_requestSyncedVersion": {
-    "message": "Request a synced version",
+    "message": "ส่งคำขอให้มีเนื้อเพลงแบบซิงก์เวลา",
     "description": "Button label asking the community to contribute synced lyrics for the current song"
   },
   "lyrics_requestedFirst": {
-    "message": "Requested · you're the first",
+    "message": "ส่งคำขอแล้ว · คุณเป็นคนแรก",
     "description": "Button label after a successful first-ever request for this song"
   },
   "lyrics_requestedOneOther": {
-    "message": "Requested · 1 other wants this",
+    "message": "ส่งคำขอแล้ว · มีอีก 1 คนต้องการเช่นกัน",
     "description": "Button label after a successful request when exactly one other person has also requested"
   },
   "lyrics_requestedNOthers": {
-    "message": "Requested · $N$ others want this",
+    "message": "ส่งคำขอแล้ว · มีอีก $N$ ต้องการเช่นกัน",
     "description": "Button label after a successful request when N other people have also requested",
     "placeholders": {
       "n": {
@@ -1120,23 +1120,23 @@
     }
   },
   "lyrics_requestErrorRateLimit": {
-    "message": "Try again in a minute",
+    "message": "ลองใหม่ในอีกประมาณ 1 นาที",
     "description": "Button label shown briefly when the request is rate-limited"
   },
   "lyrics_requestErrorNetwork": {
-    "message": "Couldn't reach Unison",
+    "message": "ไม่สามารถเข้าถึง Unison ได้",
     "description": "Button label shown briefly when the request fails for a transport/network reason (no HTTP response received)"
   },
   "lyrics_requestErrorServer": {
-    "message": "Unison is having trouble",
+    "message": "Unison เกิดปัญหาบางประการ",
     "description": "Button label shown briefly when the request fails with a 5xx server error"
   },
   "lyrics_requestErrorGeneric": {
-    "message": "Couldn't send the request",
+    "message": "ไม่สามารถส่งคำขอได้",
     "description": "Button label shown briefly when the request fails for any other reason (catch-all)"
   },
   "lyrics_requestSyncedLanded": {
-    "message": "Synced version available. Refresh.",
+    "message": "เนื้อเพลงเวอร์ชันซิงก์กับเวลาพร้อมใช้แล้ว รีเฟรชเลยหรือไม่",
     "description": "Button label when the server reports a synced version already exists; clicking reloads the page"
   },
   "unison_pageTitle": {
@@ -1236,55 +1236,55 @@
     "description": "Report reason: other"
   },
   "unison_confidence_low": {
-    "message": "Unverified",
+    "message": "ยังไม่ถูกยืนยัน",
     "description": "Tier label for entries with fewer than the minimum votes for confidence"
   },
   "unison_confidence_medium": {
-    "message": "Trusted",
+    "message": "เชื่อถือได้",
     "description": "Tier label for entries the community has accepted (the baseline 'good enough' tier)"
   },
   "unison_confidence_high": {
-    "message": "Top-Rated",
+    "message": "ได้คะแนนสูงสุด",
     "description": "Tier label for entries with diverse community approval (rare, top tier)"
   },
   "unison_sortTopRated": {
-    "message": "Top-Rated",
+    "message": "คะแนนสูงสุดก่อน",
     "description": "Sort by effective score, highest first"
   },
   "unison_sortBottomRated": {
-    "message": "Bottom-Rated",
+    "message": "คะแนนต่ำสุดก่อน",
     "description": "Sort by effective score, lowest first"
   },
   "unison_sortMostVoted": {
-    "message": "Most-Voted",
+    "message": "จำนวนโหวตมากสุดก่อน",
     "description": "Sort by vote count, most first"
   },
   "unison_sortLeastVoted": {
-    "message": "Least-Voted",
+    "message": "จำนวนโหวตน้อยสุดก่อน",
     "description": "Sort by vote count, fewest first"
   },
   "unison_syncRichsync": {
-    "message": "Richsync",
+    "message": "ซิงก์ละเอียด",
     "description": "Sync type: word/syllable-level timing. Reused by the sync badge on cards and the sync filter chip"
   },
   "unison_syncLinesync": {
-    "message": "Linesync",
+    "message": "ซิงก์รายบรรทัด",
     "description": "Sync type: line-level timing. Reused by the sync badge on cards and the sync filter chip"
   },
   "unison_syncPlain": {
-    "message": "Plain",
+    "message": "เนื้อเพลงเปล่า",
     "description": "Sync type: unsynced lyrics. Reused by the sync badge on cards and the sync filter chip"
   },
   "unison_tier": {
-    "message": "Tier",
+    "message": "ระดับ",
     "description": "Filter bar group label for confidence tier"
   },
   "unison_tierTrustedPlus": {
-    "message": "Trusted+",
+    "message": "เชื่อมั่นได้ขึ้นไป",
     "description": "Tier filter chip hiding Unverified entries (shows Trusted and above)"
   },
   "unison_languageAll": {
-    "message": "All languages",
+    "message": "ภาษาทั้งหมด",
     "description": "Language dropdown default option"
   },
   "unison_format_lrc": {
@@ -1312,7 +1312,7 @@
     "description": "Identity label prefix"
   },
   "unison_loadMore": {
-    "message": "Loading more...",
+    "message": "โหลดเพิ่ม",
     "description": "Auto-loading indicator shown at the bottom of the feed while the next page is being fetched"
   },
   "unison_votes": {
@@ -1436,11 +1436,11 @@
     "description": "Empty state for my submissions tab"
   },
   "unison_noFilterResults": {
-    "message": "No lyrics match your filters",
+    "message": "ไม่พบเนื้อเพลงที่ตรงตามตัวกรองของคุณ",
     "description": "Empty state shown when the active sort/filter combination returns no entries"
   },
   "unison_noFeedYet": {
-    "message": "No lyrics here yet",
+    "message": "ไม่พบเนื้อเพลงใด ๆ ตอนนี้",
     "description": "Empty state shown when the recent feed is empty with no filters applied"
   },
   "unison_sync": {

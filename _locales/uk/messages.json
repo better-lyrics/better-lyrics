@@ -1094,7 +1094,7 @@
     "description": "Error state shown when the popup receives malformed parameters"
   },
   "auth_sessionExpired": {
-    "message": "Sign-in expired. Please close this window and try again.",
+    "message": "Термін дії входу минув. Закрийте це вікно та спробуйте ще раз.",
     "description": "Shown in the sign-in consent popup when the connection to the extension's service worker is lost before the user can approve or cancel."
   },
   "lyrics_requestSyncedVersion": {
