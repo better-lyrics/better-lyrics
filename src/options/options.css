@@ -1812,6 +1812,53 @@ input.cm-textfield:focus-visible {
 	margin: 0 !important;
 }
 
+.theme-range-container {
+	display: flex;
+	justify-content: space-between;
+	width: stretch;
+}
+
+.theme-slider-container {
+    display: flex;
+    width: stretch;
+    align-items: center;
+    gap: 1rem;
+    justify-content: space-between;
+}
+
+.slider {
+    display: flex;
+    align-items: center;
+    width: stretch;
+    border-radius: 1rem;
+    background: hsl(0, 0%, 100%, .1);
+    height: .4rem;
+    cursor: pointer;
+    position: relative;
+}
+
+.slider--bar {
+    transition: .2s;
+    background: gray;
+    border-radius: inherit;
+    height: stretch;
+}
+
+.slider:hover > .slider--head {
+    opacity: 1;
+}
+
+.slider--head {
+    opacity: 0;
+    transition: .2s;
+    left: -.375rem;
+    position: absolute;
+    border-radius: 1rem;
+    width: .75rem;
+    height: .75rem;
+    background: gray;
+}
+
 @keyframes slideUp {
 	from {
 		opacity: 0;

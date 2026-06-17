@@ -8,6 +8,7 @@ import { showModal } from "./editor/ui/feedback";
 import { loadThemeSettings } from "./editor/features/storage";
 import { initStoreUI, setupYourThemesButton } from "./store/store";
 import { themeSettingsBtn, themeSettingsModalClose, themeSettingsModalOverlay } from "./editor/ui/dom";
+import { handleSlider, registerSlider } from "./editor/ui/slider";
 
 interface Options {
   isLogsEnabled: boolean;
@@ -717,10 +718,16 @@ export async function fillThemeSettings() {
       const rangeContainer = document.createElement("div");
       rangeContainer.classList.add("theme-settings-container");
       rangeContainer.classList.add("container");
+      rangeContainer.style.display = "flex";
+      rangeContainer.style.flexDirection = "column";
+      rangeContainer.style.gap = ".5rem";
+
+      const div = document.createElement("div");
+      div.className = "theme-range-container";
 
       const span = document.createElement("span");
       span.innerText = settingField.label;
-      rangeContainer.appendChild(span);
+      div.appendChild(span);
 
       const input = document.createElement("input");
       input.type = "number";
@@ -735,8 +742,50 @@ export async function fillThemeSettings() {
       input.value = savedVal;
 
       registeredInputEvents.push(input.addEventListener("change", () => {}));
+      div.appendChild(input);
+      rangeContainer.appendChild(div);
 
-      rangeContainer.appendChild(input);
+      const sliderElement = document.createElement("div");
+      sliderElement.className = "theme-slider-container";
+
+      const min = document.createElement("span");
+      min.innerText = `${settingField.min}`;
+      min.className = "slider--min";
+      sliderElement.appendChild(min);
+
+      const slider = document.createElement("div");
+      slider.id = `theme-settings-slider-${field}`;
+      slider.className = "slider slider--nonimmediate";
+      slider.setAttribute("min", `${settingField.min}`);
+      slider.setAttribute("max", `${settingField.max}`);
+      slider.setAttribute("step", `${settingField.step}`);
+      slider.setAttribute("value", `${savedVal}`);
+
+      const sliderBar = document.createElement("div");
+      sliderBar.className = "slider--bar";
+      slider.appendChild(sliderBar);
+
+      const sliderHead = document.createElement("div");
+      sliderHead.className = "slider--head";
+      slider.appendChild(sliderHead);
+
+      sliderElement.appendChild(slider);
+
+      registerSlider(
+        slider.id,
+        val => {
+          input.value = `${val}`;
+        },
+        "display"
+      );
+      handleSlider(slider);
+
+      const max = document.createElement("span");
+      max.className = "slider--max";
+      max.innerText = `${settingField.max}`;
+      sliderElement.appendChild(max);
+
+      rangeContainer.appendChild(sliderElement);
       themeSettingsFields.appendChild(rangeContainer);
     }
   }
