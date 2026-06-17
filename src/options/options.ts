@@ -616,7 +616,8 @@ export async function fillThemeSettings() {
       settingField.type === "heading" ? settingField.label : { ...themeSettings.saved }[field] || settingField.default;
 
     if (settingField.type === "heading") {
-      const heading = document.createElement("h2");
+      const heading = document.createElement("h1");
+      heading.className = "theme-settings-heading";
       heading.innerText = savedVal;
       themeSettingsFields.appendChild(heading);
     }
@@ -774,7 +775,7 @@ export async function fillThemeSettings() {
       registerSlider(
         slider.id,
         val => {
-          input.value = `${val}`;
+          input.value = `${val.toFixed(3)}`;
         },
         "display"
       );

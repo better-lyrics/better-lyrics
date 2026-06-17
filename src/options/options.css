@@ -1808,6 +1808,10 @@ input.cm-textfield:focus-visible {
     padding-top: 1rem;
 }
 
+.theme-settings-heading {
+	font-weight: bold;
+}
+
 .theme-settings-container {
 	margin: 0 !important;
 }
