@@ -1180,7 +1180,7 @@
     "description": "Text after Composer link in submit hint"
   },
   "unison_upvote": {
-    "message": "Upvote",
+    "message": "Olumlu Oy Ver",
     "description": "Upvote button tooltip"
   },
   "unison_downvote": {
@@ -1400,15 +1400,15 @@
     "description": "Placeholder for ISRC input"
   },
   "unison_placeholder_lyrics": {
-    "message": "Paste LRC, TTML, or plain text lyrics here. You can also drag & drop a file.",
+    "message": "LRC, TTML ya da düz metin sözlerini buraya yapıştırın. Ayrıca bir dosyayı sürükleyip bırakabilirsiniz.",
     "description": "Placeholder for lyrics textarea"
   },
   "unison_durationHint": {
-    "message": "Song length in seconds",
+    "message": "Şarkının saniye cinsinden uzunluğu",
     "description": "Hint text below duration field label"
   },
   "unison_videoIdHint": {
-    "message": "11-character ID from the YouTube Music URL",
+    "message": "YouTube Music URL'sinden 11 karakterlik ID",
     "description": "Hint text below video ID field label"
   },
   "unison_formatHint": {
