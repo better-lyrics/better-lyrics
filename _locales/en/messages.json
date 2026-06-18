@@ -189,6 +189,10 @@
     "message": "Drag to reorder priority. Higher sources are tried first. Uncheck to disable.",
     "description": "Sources settings section description"
   },
+  "options_sources_openUnison": {
+    "message": "Unison",
+    "description": "Label on the small button in the Sources section header that opens the Unison page"
+  },
 
   "options_themes_title": {
     "message": "Theme Settings",

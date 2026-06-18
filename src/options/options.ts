@@ -567,6 +567,12 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
 
+  document.getElementById("open-unison-btn")?.addEventListener("click", () => {
+    chrome.tabs.create({
+      url: chrome.runtime.getURL("pages/unison.html"),
+    });
+  });
+
   initIdentityUI();
   initNicknameModal();
 });
