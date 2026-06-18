@@ -1,5 +1,17 @@
 // -- API Response Types --------------------------
 
+export interface UnisonSubmitter {
+  keyId: string;
+  reputation: number;
+  displayName: string;
+}
+
+export interface UnisonFulfillment {
+  demand: number;
+  requestCount: number;
+  fulfilledAt: number;
+}
+
 export interface UnisonLyricsEntry {
   id: number;
   videoId: string;
@@ -15,6 +27,8 @@ export interface UnisonLyricsEntry {
   effectiveScore: number;
   voteCount: number;
   confidence: UnisonConfidence;
+  submitter?: UnisonSubmitter;
+  fulfilled?: UnisonFulfillment;
   userVote?: 1 | -1 | null;
 }
 

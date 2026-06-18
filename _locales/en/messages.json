@@ -1489,6 +1489,32 @@
     "message": "Language",
     "description": "Language label in detail view"
   },
+  "unison_uploadedBy": {
+    "message": "Uploaded by",
+    "description": "Metadata row label in the Unison detail sidebar, before the uploader's name which links to their curator page"
+  },
+  "unison_languageUnspecified": {
+    "message": "Not specified",
+    "description": "Default option in the submission form's language dropdown, used when the submitter has not chosen a language"
+  },
+  "unison_fulfilledBadge": {
+    "message": "Requested & fulfilled",
+    "description": "Badge on the Unison detail page shown when this lyric answered a community request"
+  },
+  "unison_fulfilledNote": {
+    "message": "Someone wanted this on Better Lyrics, and $name$ came through with it.",
+    "description": "Sentence on the Unison detail page explaining that the lyric fulfilled a community request. $name$ is the uploader's display name",
+    "placeholders": {
+      "name": {
+        "content": "$1",
+        "example": "AcousticPrestoRemix"
+      }
+    }
+  },
+  "unison_fulfilledBoardLink": {
+    "message": "See the requests board",
+    "description": "Link on the Unison detail page that opens the community requests board (queue of most-wanted songs)"
+  },
   "unison_validationRequired": {
     "message": "Please fill in song, artist, video ID, and lyrics.",
     "description": "Validation error when required fields are missing"

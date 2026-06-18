@@ -10,6 +10,7 @@
       "!**/*.js.map",
       "!**/dist",
       "!**/node_modules",
+      "!**/.claude",
       "!www/.next/**/*",
       "!src/options.html",
       "!src/core/generated/**",
