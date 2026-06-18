@@ -1448,15 +1448,15 @@
     "description": "Sync type label in detail view"
   },
   "unison_language": {
-    "message": "Language",
+    "message": "Dil",
     "description": "Language label in detail view"
   },
   "unison_validationRequired": {
-    "message": "Please fill in song, artist, video ID, and lyrics.",
+    "message": "Lütfen şarkıyı, sanatçıyı, video kimliğini ve sözleri girin.",
     "description": "Validation error when required fields are missing"
   },
   "unison_submitFailed": {
-    "message": "Submission failed",
+    "message": "Gönderilemedi",
     "description": "Fallback error message when submission fails"
   },
   "report_lyrics_title": {
