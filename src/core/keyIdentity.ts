@@ -1,13 +1,12 @@
-import { IDENTITY_ACTIONS, IDENTITY_ADJECTIVES, IDENTITY_NOUNS } from "@constants";
+import { IDENTITY_ACTIONS, IDENTITY_ADJECTIVES, IDENTITY_NOUNS, LOG_PREFIX, UNISON_API_BASE_URL } from "@constants";
 import { getLocalStorage } from "./storage";
 
 // -- Types ------------------------------------
 
-export interface KeyIdentity {
+interface KeyIdentity {
   keyId: string;
   publicKey: JsonWebKey;
   privateKey: JsonWebKey;
-  displayName: string;
   createdAt: number;
 }
 
@@ -49,7 +48,6 @@ interface IdentityExport {
   keyId: string;
   publicKey: JsonWebKey;
   privateKey: JsonWebKey;
-  displayName: string;
   exportedAt: number;
   certificate?: string;
 }
@@ -170,7 +168,6 @@ export async function exportIdentity(): Promise<string> {
     keyId: identity.keyId,
     publicKey: identity.publicKey,
     privateKey: identity.privateKey,
-    displayName: identity.displayName,
     exportedAt: Date.now(),
     certificate: certificate ?? undefined,
   };
@@ -199,7 +196,6 @@ export async function importIdentity(json: string): Promise<KeyIdentity> {
     keyId: parsed.keyId,
     publicKey: parsed.publicKey,
     privateKey: parsed.privateKey,
-    displayName: parsed.displayName,
     createdAt: Date.now(),
   };
 
@@ -213,13 +209,48 @@ export async function importIdentity(json: string): Promise<KeyIdentity> {
   }
 
   cachedIdentity = identity;
+  invalidateDisplayName();
 
   return identity;
 }
 
+let cachedDisplayName: Promise<string> | null = null;
+
+async function fetchResolvedDisplayName(): Promise<string | null> {
+  try {
+    const signed = await signPayload({});
+    const response = await fetch(`${UNISON_API_BASE_URL}/auth/nickname/me`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(signed),
+    });
+    if (response.ok) {
+      const json = (await response.json()) as { success?: boolean; data?: { displayName?: string } };
+      if (json.success && typeof json.data?.displayName === "string") {
+        return json.data.displayName;
+      }
+    }
+  } catch (err) {
+    console.warn(`${LOG_PREFIX} resolveDisplayName fallback`, err);
+  }
+  return null;
+}
+
 export async function getDisplayName(): Promise<string> {
-  const identity = await getIdentity();
-  return identity.displayName;
+  if (!cachedDisplayName) {
+    const pending = fetchResolvedDisplayName().then(async resolved => {
+      if (resolved !== null) return resolved;
+      cachedDisplayName = null;
+      const identity = await getIdentity();
+      return generatePetName(identity.keyId);
+    });
+    cachedDisplayName = pending;
+  }
+  return cachedDisplayName;
+}
+
+export function invalidateDisplayName(newValue?: string): void {
+  cachedDisplayName = newValue !== undefined ? Promise.resolve(newValue) : null;
 }
 
 export async function isKeyRegistered(): Promise<boolean> {
@@ -258,13 +289,11 @@ async function generateKeyIdentity(): Promise<KeyIdentity> {
   const privateKeyJwk = await crypto.subtle.exportKey("jwk", keyPair.privateKey);
 
   const keyId = await hashPublicKey(publicKeyJwk);
-  const displayName = generatePetName(keyId);
 
   return {
     keyId,
     publicKey: publicKeyJwk,
     privateKey: privateKeyJwk,
-    displayName,
     createdAt: Date.now(),
   };
 }
@@ -326,7 +355,7 @@ function isValidKeyIdentity(obj: unknown): obj is KeyIdentity {
   return (
     typeof candidate.keyId === "string" &&
     candidate.keyId.length === 64 &&
-    typeof candidate.displayName === "string" &&
+    (candidate.displayName === undefined || typeof candidate.displayName === "string") &&
     typeof candidate.createdAt === "number" &&
     isValidPublicJwk(candidate.publicKey) &&
     isValidPrivateJwk(candidate.privateKey)
@@ -342,7 +371,7 @@ function isValidIdentityExport(obj: unknown): obj is IdentityExport {
     candidate.version === 1 &&
     typeof candidate.keyId === "string" &&
     candidate.keyId.length === 64 &&
-    typeof candidate.displayName === "string" &&
+    (candidate.displayName === undefined || typeof candidate.displayName === "string") &&
     typeof candidate.exportedAt === "number" &&
     isValidPublicJwk(candidate.publicKey) &&
     isValidPrivateJwk(candidate.privateKey)

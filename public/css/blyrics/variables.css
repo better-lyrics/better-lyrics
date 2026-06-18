@@ -58,7 +58,7 @@
 		display-p3 1 1 1 / var(--blyrics-translated-opacity, 0.6)
 	);
 
-	--blyrics-footer-font-family: Roboto, Noto Naskh Arabic UI, Arial, sans-serif;
+	--blyrics-footer-font-family: Satoshi, Roboto, Noto Naskh Arabic UI, Arial, sans-serif;
 	--blyrics-footer-font-size: 14px;
 	--blyrics-footer-font-weight: 400;
 

@@ -91,6 +91,10 @@
     "message": "Автопрокрутка текстів пісень",
     "description": "Auto-scroll unsynced lyrics setting label"
   },
+  "options_display_shadersPromo": {
+    "message": "Показати посилання на Better Lyrics Shaders",
+    "description": "Toggle label for the Shaders companion link shown in the lyrics footer"
+  },
   "options_display_unisonActions": {
     "message": "Дії з Unison",
     "description": "Display-section row label for the Unison Actions modal trigger"
@@ -246,6 +250,98 @@
   "options_identity_importKey": {
     "message": "Імпортувати",
     "description": "Import key button label"
+  },
+  "options_identityImport_title": {
+    "message": "Імпортувати",
+    "description": "Title of the import identity modal"
+  },
+  "options_identityImport_chooseFile": {
+    "message": "Обрати файл",
+    "description": "Label for the file picker button in the import identity modal"
+  },
+  "options_identityImport_or": {
+    "message": "чи",
+    "description": "Divider between file picker and paste textarea in the import identity modal"
+  },
+  "options_identityImport_pastePlaceholder": {
+    "message": "Вставити JSON профілю...",
+    "description": "Placeholder for the identity JSON textarea"
+  },
+  "options_identityImport_import": {
+    "message": "Імпортувати",
+    "description": "Confirm button label inside the import identity modal"
+  },
+  "options_nickname_description": {
+    "message": "Оберіть ім’я (від 3 до 20 символів) для Better Lyrics. Можна використовувати літери, цифри та підкреслення.",
+    "description": "Nickname subsection description"
+  },
+  "options_nickname_placeholder": {
+    "message": "Обрати псевдонім",
+    "description": "Nickname input placeholder"
+  },
+  "options_nickname_save": {
+    "message": "Зберегти",
+    "description": "Nickname save button label"
+  },
+  "options_nickname_reset": {
+    "message": "Скинути до типових",
+    "description": "Nickname reset button label"
+  },
+  "options_nickname_modalTitle": {
+    "message": "Встановити псевдонім",
+    "description": "Nickname modal title"
+  },
+  "options_nickname_edit": {
+    "message": "Редагувати",
+    "description": "Nickname edit button label"
+  },
+  "options_nickname_editLabel": {
+    "message": "Редагувати псевдонім",
+    "description": "Accessible label for the nickname edit button"
+  },
+  "options_nickname_status_checking": {
+    "message": "Перевірка...",
+    "description": "Status while checking nickname availability"
+  },
+  "options_nickname_status_available": {
+    "message": "Доступно",
+    "description": "Status when nickname is available"
+  },
+  "options_nickname_status_taken": {
+    "message": "Уже зайнято",
+    "description": "Status when nickname is already taken"
+  },
+  "options_nickname_status_invalid": {
+    "message": "від 3 до 20 літер, цифр або підкреслення",
+    "description": "Status when nickname format is invalid"
+  },
+  "options_nickname_status_profane": {
+    "message": "Недопустиме ім’я, спробуйте інше",
+    "description": "Status when nickname is flagged as inappropriate by the server"
+  },
+  "options_nickname_status_self": {
+    "message": "Це ваш поточний псевдонім",
+    "description": "Status when entered nickname matches current"
+  },
+  "options_nickname_status_saved": {
+    "message": "Збережено",
+    "description": "Status when nickname is saved"
+  },
+  "options_nickname_status_submitting": {
+    "message": "Збереження...",
+    "description": "Status while nickname save is in flight"
+  },
+  "options_nickname_status_rateLimited": {
+    "message": "Зачекайте трохи й спробуйте знову",
+    "description": "Status when nickname checks are rate limited"
+  },
+  "options_nickname_status_error": {
+    "message": "Не вдалося зв’язатися із сервером",
+    "description": "Status when nickname request fails"
+  },
+  "options_alert_importEmpty": {
+    "message": "Спочатку вставте JSON профілю чи виберіть файл.",
+    "description": "Shown when the user clicks Import with no JSON provided"
   },
   "options_modal_selectTheme": {
     "message": "Вибрати тему",
@@ -781,6 +877,10 @@
     "message": "Пошук на Genius",
     "description": "Search on Genius button text"
   },
+  "lyrics_getShaders": {
+    "message": "Отримати Better Lyrics Shaders",
+    "description": "Footer button text linking to the Better Lyrics Shaders companion extension"
+  },
   "lyrics_searching": {
     "message": "Better Lyrics шукає текст пісні...",
     "description": "Loading message while searching for lyrics"
@@ -950,11 +1050,11 @@
     "description": "Button text for submitting lyrics to Unison"
   },
   "auth_pageTitle": {
-    "message": "Sign in with Better Lyrics",
+    "message": "Увійти за допомогою Better Lyrics",
     "description": "Browser tab title for the auth consent popup"
   },
   "auth_consentHeading": {
-    "message": "Sign in to $ORIGIN$",
+    "message": "Увійти в $ORIGIN$",
     "description": "Consent prompt heading. $ORIGIN$ is replaced with the requesting site, e.g. unison.boidu.dev",
     "placeholders": {
       "origin": {
@@ -964,7 +1064,7 @@
     }
   },
   "auth_consentSubheading": {
-    "message": "You will sign in as $NAME$.",
+    "message": "Ви ввійдете як $NAME$.",
     "description": "Identifies the current BL identity. $NAME$ is the deterministic display name.",
     "placeholders": {
       "name": {
@@ -974,24 +1074,28 @@
     }
   },
   "auth_consentExplainer": {
-    "message": "Better Lyrics will sign a one-time message proving you control this identity. The site never sees your private key.",
+    "message": "Better Lyrics підпише одноразове повідомлення, яке підтверджує, що ви контролюєте цей профіль. Сайт ніколи не побачить ваш ключ.",
     "description": "Short explainer body in the consent popup"
   },
   "auth_rememberLabel": {
-    "message": "Don't ask again for 24 hours",
+    "message": "Не запитувати знову протягом 24 годин",
     "description": "Checkbox label allowing the user to remember this approval"
   },
   "auth_approve": {
-    "message": "Approve",
+    "message": "Підтвердити",
     "description": "Primary button: approve the sign-in request"
   },
   "auth_cancel": {
-    "message": "Cancel",
+    "message": "Скасувати",
     "description": "Secondary button: reject the sign-in request"
   },
   "auth_invalidRequest": {
-    "message": "Invalid sign-in request.",
+    "message": "Недійсний запит на вхід.",
     "description": "Error state shown when the popup receives malformed parameters"
+  },
+  "auth_sessionExpired": {
+    "message": "Термін дії входу минув. Закрийте це вікно та спробуйте ще раз.",
+    "description": "Shown in the sign-in consent popup when the connection to the extension's service worker is lost before the user can approve or cancel."
   },
   "lyrics_requestSyncedVersion": {
     "message": "Запит синхронізованої версії",
@@ -1132,55 +1236,55 @@
     "description": "Report reason: other"
   },
   "unison_confidence_low": {
-    "message": "Unverified",
+    "message": "Непідтверджений",
     "description": "Tier label for entries with fewer than the minimum votes for confidence"
   },
   "unison_confidence_medium": {
-    "message": "Trusted",
+    "message": "Надійний",
     "description": "Tier label for entries the community has accepted (the baseline 'good enough' tier)"
   },
   "unison_confidence_high": {
-    "message": "Top-Rated",
+    "message": "Високорейтинговий",
     "description": "Tier label for entries with diverse community approval (rare, top tier)"
   },
   "unison_sortTopRated": {
-    "message": "Top-Rated",
+    "message": "Високорейтинговий",
     "description": "Sort by effective score, highest first"
   },
   "unison_sortBottomRated": {
-    "message": "Bottom-Rated",
+    "message": "Низькорейтинговий",
     "description": "Sort by effective score, lowest first"
   },
   "unison_sortMostVoted": {
-    "message": "Most-Voted",
+    "message": "Найбільше голосів",
     "description": "Sort by vote count, most first"
   },
   "unison_sortLeastVoted": {
-    "message": "Least-Voted",
+    "message": "Найменше голосів",
     "description": "Sort by vote count, fewest first"
   },
   "unison_syncRichsync": {
-    "message": "Richsync",
+    "message": "За складами",
     "description": "Sync type: word/syllable-level timing. Reused by the sync badge on cards and the sync filter chip"
   },
   "unison_syncLinesync": {
-    "message": "Linesync",
+    "message": "За рядками",
     "description": "Sync type: line-level timing. Reused by the sync badge on cards and the sync filter chip"
   },
   "unison_syncPlain": {
-    "message": "Plain",
+    "message": "Простий текст",
     "description": "Sync type: unsynced lyrics. Reused by the sync badge on cards and the sync filter chip"
   },
   "unison_tier": {
-    "message": "Tier",
+    "message": "Рівень",
     "description": "Filter bar group label for confidence tier"
   },
   "unison_tierTrustedPlus": {
-    "message": "Trusted+",
+    "message": "Надійний+",
     "description": "Tier filter chip hiding Unverified entries (shows Trusted and above)"
   },
   "unison_languageAll": {
-    "message": "All languages",
+    "message": "Усі мови",
     "description": "Language dropdown default option"
   },
   "unison_format_lrc": {
@@ -1208,7 +1312,7 @@
     "description": "Identity label prefix"
   },
   "unison_loadMore": {
-    "message": "Loading more...",
+    "message": "Ще завантажується...",
     "description": "Auto-loading indicator shown at the bottom of the feed while the next page is being fetched"
   },
   "unison_votes": {
@@ -1332,11 +1436,11 @@
     "description": "Empty state for my submissions tab"
   },
   "unison_noFilterResults": {
-    "message": "No lyrics match your filters",
+    "message": "Відсутні тексти пісень, які відповідають вашим фільтрам",
     "description": "Empty state shown when the active sort/filter combination returns no entries"
   },
   "unison_noFeedYet": {
-    "message": "No lyrics here yet",
+    "message": "Текст пісні поки що відсутній",
     "description": "Empty state shown when the recent feed is empty with no filters applied"
   },
   "unison_sync": {

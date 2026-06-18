@@ -91,6 +91,10 @@
     "message": "Scorri in automatico testi non sincronizzati",
     "description": "Auto-scroll unsynced lyrics setting label"
   },
+  "options_display_shadersPromo": {
+    "message": "Mostra link a Better Lyrics Shaders",
+    "description": "Toggle label for the Shaders companion link shown in the lyrics footer"
+  },
   "options_display_unisonActions": {
     "message": "Azioni Unison",
     "description": "Display-section row label for the Unison Actions modal trigger"
@@ -100,7 +104,7 @@
     "description": "Title of the Unison Actions modal"
   },
   "options_unisonModal_showPinned": {
-    "message": "Mostra azioni salvate",
+    "message": "Mostra azioni bloccate",
     "description": "Toggle label inside the Unison Actions modal for the floating dock"
   },
   "options_unisonModal_showPinned_hint": {
@@ -246,6 +250,98 @@
   "options_identity_importKey": {
     "message": "Importa chiave",
     "description": "Import key button label"
+  },
+  "options_identityImport_title": {
+    "message": "Importa Identità",
+    "description": "Title of the import identity modal"
+  },
+  "options_identityImport_chooseFile": {
+    "message": "Scegli File",
+    "description": "Label for the file picker button in the import identity modal"
+  },
+  "options_identityImport_or": {
+    "message": "oppure",
+    "description": "Divider between file picker and paste textarea in the import identity modal"
+  },
+  "options_identityImport_pastePlaceholder": {
+    "message": "Incolla JSON identità qui...",
+    "description": "Placeholder for the identity JSON textarea"
+  },
+  "options_identityImport_import": {
+    "message": "Importa",
+    "description": "Confirm button label inside the import identity modal"
+  },
+  "options_nickname_description": {
+    "message": "Scegli un nome per te all'interno di Better Lyrics. Lettere, numeri e trattino basso, dai 3 ai 20 caratteri.",
+    "description": "Nickname subsection description"
+  },
+  "options_nickname_placeholder": {
+    "message": "Scegli un nome utente",
+    "description": "Nickname input placeholder"
+  },
+  "options_nickname_save": {
+    "message": "Salva",
+    "description": "Nickname save button label"
+  },
+  "options_nickname_reset": {
+    "message": "Reimposta a predefinito",
+    "description": "Nickname reset button label"
+  },
+  "options_nickname_modalTitle": {
+    "message": "Imposta il tuo nome utente",
+    "description": "Nickname modal title"
+  },
+  "options_nickname_edit": {
+    "message": "Modifica",
+    "description": "Nickname edit button label"
+  },
+  "options_nickname_editLabel": {
+    "message": "Modifica nome utente",
+    "description": "Accessible label for the nickname edit button"
+  },
+  "options_nickname_status_checking": {
+    "message": "Verifica...",
+    "description": "Status while checking nickname availability"
+  },
+  "options_nickname_status_available": {
+    "message": "Disponibile",
+    "description": "Status when nickname is available"
+  },
+  "options_nickname_status_taken": {
+    "message": "Già in uso",
+    "description": "Status when nickname is already taken"
+  },
+  "options_nickname_status_invalid": {
+    "message": "Dai 3 a 20 lettere, numeri, o trattini bassi",
+    "description": "Status when nickname format is invalid"
+  },
+  "options_nickname_status_profane": {
+    "message": "Non permesso, prova un altro",
+    "description": "Status when nickname is flagged as inappropriate by the server"
+  },
+  "options_nickname_status_self": {
+    "message": "Questo è il tuo nome utente attuale",
+    "description": "Status when entered nickname matches current"
+  },
+  "options_nickname_status_saved": {
+    "message": "Salvato",
+    "description": "Status when nickname is saved"
+  },
+  "options_nickname_status_submitting": {
+    "message": "Salvataggio...",
+    "description": "Status while nickname save is in flight"
+  },
+  "options_nickname_status_rateLimited": {
+    "message": "Rallenta, riprova tra un momento",
+    "description": "Status when nickname checks are rate limited"
+  },
+  "options_nickname_status_error": {
+    "message": "Impossibile raggiungere il server",
+    "description": "Status when nickname request fails"
+  },
+  "options_alert_importEmpty": {
+    "message": "Incolla JSON identità o scegli prima un file.",
+    "description": "Shown when the user clicks Import with no JSON provided"
   },
   "options_modal_selectTheme": {
     "message": "Seleziona un tema",
@@ -781,6 +877,10 @@
     "message": "Cerca su Genius",
     "description": "Search on Genius button text"
   },
+  "lyrics_getShaders": {
+    "message": "Ottieni Better Lyrics Shaders",
+    "description": "Footer button text linking to the Better Lyrics Shaders companion extension"
+  },
   "lyrics_searching": {
     "message": "Better Lyrics sta cercando i testi...",
     "description": "Loading message while searching for lyrics"
@@ -802,7 +902,7 @@
     "description": "Message when no lyrics are available"
   },
   "lyrics_resumeAutoscroll": {
-    "message": "Resume Autoscroll",
+    "message": "Riprendi Scorrimento Automatico",
     "description": "Resume Autoscroll button label"
   },
   "options_language_exclusions": {
@@ -950,11 +1050,11 @@
     "description": "Button text for submitting lyrics to Unison"
   },
   "auth_pageTitle": {
-    "message": "Sign in with Better Lyrics",
+    "message": "Accedi con Better Lyrics",
     "description": "Browser tab title for the auth consent popup"
   },
   "auth_consentHeading": {
-    "message": "Sign in to $ORIGIN$",
+    "message": "Accedi a $ORIGIN$",
     "description": "Consent prompt heading. $ORIGIN$ is replaced with the requesting site, e.g. unison.boidu.dev",
     "placeholders": {
       "origin": {
@@ -964,7 +1064,7 @@
     }
   },
   "auth_consentSubheading": {
-    "message": "You will sign in as $NAME$.",
+    "message": "Farai l'accesso come $NAME$.",
     "description": "Identifies the current BL identity. $NAME$ is the deterministic display name.",
     "placeholders": {
       "name": {
@@ -974,39 +1074,43 @@
     }
   },
   "auth_consentExplainer": {
-    "message": "Better Lyrics will sign a one-time message proving you control this identity. The site never sees your private key.",
+    "message": "Better Lyrics firmerà un messaggio di una volta provando che tu controlli questa identità. Il sito non vede mai la tua chiave privata.",
     "description": "Short explainer body in the consent popup"
   },
   "auth_rememberLabel": {
-    "message": "Don't ask again for 24 hours",
+    "message": "Non chiedere di nuovo per 24 ore",
     "description": "Checkbox label allowing the user to remember this approval"
   },
   "auth_approve": {
-    "message": "Approve",
+    "message": "Approva",
     "description": "Primary button: approve the sign-in request"
   },
   "auth_cancel": {
-    "message": "Cancel",
+    "message": "Annulla",
     "description": "Secondary button: reject the sign-in request"
   },
   "auth_invalidRequest": {
-    "message": "Invalid sign-in request.",
+    "message": "Richiesta di accesso non valida.",
     "description": "Error state shown when the popup receives malformed parameters"
   },
+  "auth_sessionExpired": {
+    "message": "Accesso scaduto. Per favore chiudi questa finestra e riprova.",
+    "description": "Shown in the sign-in consent popup when the connection to the extension's service worker is lost before the user can approve or cancel."
+  },
   "lyrics_requestSyncedVersion": {
-    "message": "Request a synced version",
+    "message": "Richiedi una versione sincronizzata",
     "description": "Button label asking the community to contribute synced lyrics for the current song"
   },
   "lyrics_requestedFirst": {
-    "message": "Requested · you're the first",
+    "message": "Richiesto · sei il primo",
     "description": "Button label after a successful first-ever request for this song"
   },
   "lyrics_requestedOneOther": {
-    "message": "Requested · 1 other wants this",
+    "message": "Richiesto · 1 altro l'ha richiesto",
     "description": "Button label after a successful request when exactly one other person has also requested"
   },
   "lyrics_requestedNOthers": {
-    "message": "Requested · $N$ others want this",
+    "message": "Richiesto · $N$ altri l'hanno richiesto",
     "description": "Button label after a successful request when N other people have also requested",
     "placeholders": {
       "n": {
@@ -1016,23 +1120,23 @@
     }
   },
   "lyrics_requestErrorRateLimit": {
-    "message": "Try again in a minute",
+    "message": "Riprova tra un minuto",
     "description": "Button label shown briefly when the request is rate-limited"
   },
   "lyrics_requestErrorNetwork": {
-    "message": "Couldn't reach Unison",
+    "message": "Impossibile connettersi ad Unison",
     "description": "Button label shown briefly when the request fails for a transport/network reason (no HTTP response received)"
   },
   "lyrics_requestErrorServer": {
-    "message": "Unison is having trouble",
+    "message": "Unison sta avendo problemi",
     "description": "Button label shown briefly when the request fails with a 5xx server error"
   },
   "lyrics_requestErrorGeneric": {
-    "message": "Couldn't send the request",
+    "message": "Impossibile inviare la richiesta",
     "description": "Button label shown briefly when the request fails for any other reason (catch-all)"
   },
   "lyrics_requestSyncedLanded": {
-    "message": "Synced version available. Refresh.",
+    "message": "Versione sincronizzata disponibile. Ricarica.",
     "description": "Button label when the server reports a synced version already exists; clicking reloads the page"
   },
   "unison_pageTitle": {
@@ -1092,23 +1196,23 @@
     "description": "Report success tooltip text"
   },
   "unison_delete": {
-    "message": "Delete",
+    "message": "Elimina",
     "description": "Delete button label on a user's own Unison submission card"
   },
   "unison_deleteConfirm": {
-    "message": "Confirm delete?",
+    "message": "Conferma eliminazione?",
     "description": "Delete button label after first click, asking the user to confirm before sending the request"
   },
   "unison_deleteSuccess": {
-    "message": "Deleted",
+    "message": "Eliminato",
     "description": "Transient label shown on the delete button after a successful delete"
   },
   "unison_deleteForbidden": {
-    "message": "Not your submission",
+    "message": "Non la tua richiesta",
     "description": "Error message shown on the delete button when the server rejects the request because the caller is not the submitter"
   },
   "unison_deleteFailed": {
-    "message": "Delete failed",
+    "message": "Eliminazione fallita",
     "description": "Generic error message shown on the delete button when the request fails for any other reason"
   },
   "unison_report_wrong_song": {
@@ -1132,31 +1236,31 @@
     "description": "Report reason: other"
   },
   "unison_confidence_low": {
-    "message": "Unverified",
+    "message": "Non verificato",
     "description": "Tier label for entries with fewer than the minimum votes for confidence"
   },
   "unison_confidence_medium": {
-    "message": "Trusted",
+    "message": "Affidabile",
     "description": "Tier label for entries the community has accepted (the baseline 'good enough' tier)"
   },
   "unison_confidence_high": {
-    "message": "Top-Rated",
+    "message": "Miglior voto",
     "description": "Tier label for entries with diverse community approval (rare, top tier)"
   },
   "unison_sortTopRated": {
-    "message": "Top-Rated",
+    "message": "Miglior voto",
     "description": "Sort by effective score, highest first"
   },
   "unison_sortBottomRated": {
-    "message": "Bottom-Rated",
+    "message": "Peggior voto",
     "description": "Sort by effective score, lowest first"
   },
   "unison_sortMostVoted": {
-    "message": "Most-Voted",
+    "message": "Più votato",
     "description": "Sort by vote count, most first"
   },
   "unison_sortLeastVoted": {
-    "message": "Least-Voted",
+    "message": "Meno votato",
     "description": "Sort by vote count, fewest first"
   },
   "unison_syncRichsync": {
@@ -1168,19 +1272,19 @@
     "description": "Sync type: line-level timing. Reused by the sync badge on cards and the sync filter chip"
   },
   "unison_syncPlain": {
-    "message": "Plain",
+    "message": "Basilare",
     "description": "Sync type: unsynced lyrics. Reused by the sync badge on cards and the sync filter chip"
   },
   "unison_tier": {
-    "message": "Tier",
+    "message": "Voto",
     "description": "Filter bar group label for confidence tier"
   },
   "unison_tierTrustedPlus": {
-    "message": "Trusted+",
+    "message": "Affidabile+",
     "description": "Tier filter chip hiding Unverified entries (shows Trusted and above)"
   },
   "unison_languageAll": {
-    "message": "All languages",
+    "message": "Tutte le lingue",
     "description": "Language dropdown default option"
   },
   "unison_format_lrc": {
@@ -1208,7 +1312,7 @@
     "description": "Identity label prefix"
   },
   "unison_loadMore": {
-    "message": "Loading more...",
+    "message": "Caricando altri...",
     "description": "Auto-loading indicator shown at the bottom of the feed while the next page is being fetched"
   },
   "unison_votes": {
@@ -1264,7 +1368,7 @@
     "description": "Column title for parsed lyrics preview in detail view"
   },
   "unison_rawLyrics": {
-    "message": "Raw Lyrics",
+    "message": "Testi Normali",
     "description": "Column title for raw lyrics source in detail view"
   },
   "unison_isrc": {
@@ -1272,51 +1376,51 @@
     "description": "ISRC field label"
   },
   "unison_placeholder_song": {
-    "message": "e.g. Bohemian Rhapsody",
+    "message": "es. Bohemian Rhapsody",
     "description": "Placeholder for song input"
   },
   "unison_placeholder_artist": {
-    "message": "e.g. Queen",
+    "message": "es. Queen",
     "description": "Placeholder for artist input"
   },
   "unison_placeholder_album": {
-    "message": "e.g. A Night at the Opera",
+    "message": "es. A Night at the Opera",
     "description": "Placeholder for album input"
   },
   "unison_placeholder_duration": {
-    "message": "e.g. 354",
+    "message": "es. 354",
     "description": "Placeholder for duration input"
   },
   "unison_placeholder_videoId": {
-    "message": "e.g. dQw4w9WgXcQ",
+    "message": "es. dQw4w9WgXcQ",
     "description": "Placeholder for video ID input"
   },
   "unison_placeholder_isrc": {
-    "message": "e.g. GBAYE0601498",
+    "message": "es. GBAYE0601498",
     "description": "Placeholder for ISRC input"
   },
   "unison_placeholder_lyrics": {
-    "message": "Paste LRC, TTML, or plain text lyrics here. You can also drag & drop a file.",
+    "message": "Incolla LRC, TTML, o testo semplice qui. Puoi anche trascinare e rilasciare un file.",
     "description": "Placeholder for lyrics textarea"
   },
   "unison_durationHint": {
-    "message": "Song length in seconds",
+    "message": "Durata canzone in secondi",
     "description": "Hint text below duration field label"
   },
   "unison_videoIdHint": {
-    "message": "11-character ID from the YouTube Music URL",
+    "message": "ID da 11 caratteri dall'URL di YouTube Music",
     "description": "Hint text below video ID field label"
   },
   "unison_formatHint": {
-    "message": "Auto-detected from lyrics content",
+    "message": "Rilevato automaticamente dal contenuto del testo",
     "description": "Hint text below format field label"
   },
   "unison_isrcHintPrefix": {
-    "message": "Find it using an",
+    "message": "Trovalo usando un",
     "description": "Text before ISRC finder link"
   },
   "unison_isrcHintLinkText": {
-    "message": "ISRC lookup tool",
+    "message": "Strumento di ricerca ISRC",
     "description": "Link text for ISRC finder"
   },
   "unison_tabFeed": {
@@ -1324,35 +1428,35 @@
     "description": "Feed tab label for recent submissions"
   },
   "unison_tabMySubmissions": {
-    "message": "My Submissions",
+    "message": "I miei invii",
     "description": "Feed tab label for user's own submissions"
   },
   "unison_noSubmissions": {
-    "message": "You haven't submitted any lyrics yet.",
+    "message": "Non hai ancora inviato nessun testo.",
     "description": "Empty state for my submissions tab"
   },
   "unison_noFilterResults": {
-    "message": "No lyrics match your filters",
+    "message": "Nessun testo corrisponde ai tuoi filtri",
     "description": "Empty state shown when the active sort/filter combination returns no entries"
   },
   "unison_noFeedYet": {
-    "message": "No lyrics here yet",
+    "message": "Ancora nessun testo qui",
     "description": "Empty state shown when the recent feed is empty with no filters applied"
   },
   "unison_sync": {
-    "message": "Sync",
+    "message": "Sincronizzato",
     "description": "Sync type label in detail view"
   },
   "unison_language": {
-    "message": "Language",
+    "message": "Lingua",
     "description": "Language label in detail view"
   },
   "unison_validationRequired": {
-    "message": "Please fill in song, artist, video ID, and lyrics.",
+    "message": "Per favore scrivi il nome del brano, l'artista, l'ID del video e il testo.",
     "description": "Validation error when required fields are missing"
   },
   "unison_submitFailed": {
-    "message": "Submission failed",
+    "message": "Invio fallito",
     "description": "Fallback error message when submission fails"
   },
   "report_lyrics_title": {
@@ -1364,83 +1468,83 @@
     "description": "Information about using the report lyrics modal"
   },
   "report_lyrics_wrong_song": {
-    "message": "Wrong song or version",
+    "message": "Brano o versione errata",
     "description": "Reason for the report that the lyrics are for the wrong song or version"
   },
   "report_lyrics_bad_sync": {
-    "message": "Bad synchronization",
+    "message": "Sincronizzazione non corretta",
     "description": "Reason for the report that the lyrics are too off on the part synchronization"
   },
   "report_lyrics_offensive": {
-    "message": "Offensive",
+    "message": "Offensivo",
     "description": "Reason for the report that the lyrics are offensive or too offensive"
   },
   "report_lyrics_spam": {
-    "message": "Spam or lyrics are irrelevant to the song",
+    "message": "Spam o testo irrilevante al brano",
     "description": "Reason for the report that the lyrics are a spam attempt and/or irrelevant with the sung parts"
   },
   "report_lyrics_other": {
-    "message": "Other reason",
+    "message": "Altro motivo",
     "description": "Reason for the report that the lyrics is bad in other reasons"
   },
   "report_lyrics_details_placeholder": {
-    "message": "Additional details about this report",
+    "message": "Dettagli aggiuntivi su questa segnalazione",
     "description": "Placeholder for report lyrics details input"
   },
   "report_lyrics_submit": {
-    "message": "Submit",
+    "message": "Invia",
     "description": "Submit button for reporting lyrics"
   },
   "report_lyrics_cancel": {
-    "message": "Cancel",
+    "message": "Annulla",
     "description": "Cancel button for reporting lyrics"
   },
   "report_lyrics_reporting": {
-    "message": "Reporting lyrics...",
+    "message": "Segnalazione testo...",
     "description": "Report lyrics on a reporting process"
   },
   "report_lyrics_success": {
-    "message": "Thanks for the heads up! We'll take a look soon.",
+    "message": "Grazie per la segnalazione! Daremo un occhiata presto.",
     "description": "Shown after a lyrics report is successfully submitted"
   },
   "report_lyrics_already": {
-    "message": "We've got this one already. Thanks though!",
+    "message": "Abbiamo già questa segnalazione. Grazie però!",
     "description": "Shown when the user tries to report the same lyrics twice"
   },
   "report_lyrics_error": {
-    "message": "That didn't go through. Mind trying again?",
+    "message": "La segnalazione non è stata inviata. Ti dispiace riprovare di nuovo?",
     "description": "Shown when a lyrics report fails to submit"
   },
   "unison_tier_new": {
-    "message": "new",
+    "message": "nuovo",
     "description": "Trust tier badge for low-reputation Unison submitters"
   },
   "unison_tier_trusted": {
-    "message": "trusted",
+    "message": "affidabile",
     "description": "Trust tier badge for mid-reputation Unison submitters"
   },
   "unison_tier_veteran": {
-    "message": "veteran",
+    "message": "veterano",
     "description": "Trust tier badge for high-reputation Unison submitters"
   },
   "unison_tier_expert": {
-    "message": "expert",
+    "message": "esperto",
     "description": "Trust tier badge for top-reputation Unison submitters"
   },
   "unison_submitted_this": {
-    "message": "submitted this lyric",
+    "message": "ha inviato questo testo",
     "description": "Sub-label under the submitter name in the Unison footer card"
   },
   "unison_score_label": {
-    "message": "score",
+    "message": "punteggio",
     "description": "Noun shown after the numeric score in the Unison footer (e.g. the 'score' in '4.85 score · 12 votes')"
   },
   "unison_vote_singular": {
-    "message": "vote",
+    "message": "voto",
     "description": "Singular noun used after the number 1 in the Unison vote count (e.g. '1 vote')"
   },
   "unison_vote_plural": {
-    "message": "votes",
+    "message": "voti",
     "description": "Plural noun used after numbers other than 1 in the Unison vote count (e.g. '5 votes')"
   }
 }

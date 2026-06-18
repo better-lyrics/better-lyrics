@@ -22,6 +22,9 @@ import {
   PLAYER_BAR_SELECTOR,
   PROVIDER_CONFIGS,
   ROMANIZED_LYRICS_CLASS,
+  SHADERS_AMO_URL,
+  SHADERS_CWS_URL,
+  SHADERS_DETECTION_SELECTOR,
   type SyncType,
   TAB_RENDERER_SELECTOR,
   TRANSLATED_LYRICS_CLASS,
@@ -35,6 +38,7 @@ import { getSongMetadata } from "@modules/lyrics/requestSniffer/requestSniffer";
 import {
   animEngineState,
   getResumeScrollElement,
+  lyricsElementAdded,
   reflow,
   resetAnimEngineState,
   SCROLL_POS_OFFSET_RATIO,
@@ -363,6 +367,7 @@ export function addFooter(
   const footer = document.createElement("div");
   footer.classList.add(FOOTER_CLASS);
   lyricsElement.appendChild(footer);
+  observeFooterForRecalc(footer);
   createFooter(song, artist, album, duration, videoId, showRequestButton);
 
   const footerLink = document.getElementById("betterLyricsFooterLink") as HTMLAnchorElement;
@@ -652,7 +657,7 @@ function createSubmitterBlock(submitter: NonNullable<UnisonData["submitter"]>): 
 
   const handleEl = document.createElement("strong");
   handleEl.className = `${FOOTER_CLASS}__author-name`;
-  handleEl.textContent = generatePetName(submitter.keyId);
+  handleEl.textContent = submitter.displayName ?? generatePetName(submitter.keyId);
 
   const tier = getTrustTier(submitter.reputation);
   const tierEl = document.createElement("span");
@@ -724,6 +729,14 @@ function getTrustTier(reputation: number): "new" | "trusted" | "veteran" | "expe
   if (reputation < 1.5) return "trusted";
   if (reputation < 1.85) return "veteran";
   return "expert";
+}
+
+function shouldRenderShadersPromo(): boolean {
+  return document.querySelector(SHADERS_DETECTION_SELECTOR) === null;
+}
+
+function getShadersStoreUrl(): string {
+  return navigator.userAgent.includes("Firefox") ? SHADERS_AMO_URL : SHADERS_CWS_URL;
 }
 
 /**
@@ -799,6 +812,30 @@ function createFooter(
     if (videoId && showRequestButton) {
       footer.appendChild(createRequestSyncedButton({ videoId, song, artist }));
     }
+    chrome.storage.sync.get({ isShadersPromoEnabled: true }, settings => {
+      if (!discordLink.isConnected) return;
+      if (!settings.isShadersPromoEnabled) return;
+      if (!shouldRenderShadersPromo()) return;
+
+      const shadersButton = document.createElement("a");
+      shadersButton.className = `${FOOTER_CLASS}__container ${FOOTER_CLASS}__shaders`;
+      shadersButton.href = getShadersStoreUrl();
+      shadersButton.target = "_blank";
+      shadersButton.rel = "noreferrer noopener";
+
+      const shadersImage = document.createElement("img");
+      shadersImage.src = chrome.runtime.getURL("images/icons/shaders.png");
+      shadersImage.alt = "Better Lyrics Shaders";
+      shadersImage.width = 20;
+      shadersImage.height = 20;
+      shadersButton.appendChild(shadersImage);
+
+      const shadersLabel = document.createElement("span");
+      shadersLabel.textContent = t("lyrics_getShaders");
+      shadersButton.appendChild(shadersLabel);
+
+      footer.insertBefore(shadersButton, discordLink);
+    });
     footer.appendChild(discordLink);
 
     footer.removeAttribute("is-empty");
@@ -1311,6 +1348,18 @@ function getGeniusLink(song: string, artist: string): string {
   return `https://duckduckgo.com/?q=${query}`;
 }
 
+let footerResizeObserver: ResizeObserver | null = null;
+
+function observeFooterForRecalc(footer: HTMLElement): void {
+  if (footerResizeObserver) {
+    footerResizeObserver.disconnect();
+  }
+  footerResizeObserver = new ResizeObserver(() => {
+    lyricsElementAdded();
+  });
+  footerResizeObserver.observe(footer);
+}
+
 export function setExtraHeight() {
   const lyricsElement = document.getElementsByClassName(LYRICS_CLASS)[0] as HTMLElement;
   const lyricsHeight = lyricsElement.getBoundingClientRect().height;
@@ -1337,5 +1386,5 @@ export function setExtraHeight() {
     tabRendererHeight - lyricsHeight
   );
 
-  document.documentElement.style.setProperty("--blyrics-padding-bottom", extraHeight + "px");
+  document.documentElement.style.setProperty("--blyrics-padding-bottom", Math.ceil(extraHeight) + "px");
 }

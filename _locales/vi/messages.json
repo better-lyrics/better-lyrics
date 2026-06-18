@@ -4,7 +4,7 @@
     "description": "The name of the extension"
   },
   "extensionDescription": {
-    "message": "Nâng tầm trải nghiệm YouTube Music với lời bài hát được đồng bộ hóa đẹp mắt, hỗ trợ đa ngôn ngữ, dịch thuật thời gian thực và nhiều tính năng khác.",
+    "message": "Nâng tầm trải nghiệm YouTube Music với lời bài hát được đồng bộ hóa đẹp mắt, hỗ trợ đa ngôn ngữ, dịch thuật thời gian thực và nhiều tính năng khác",
     "description": "The description of the extension"
   },
   "options_tab_general": {
@@ -90,6 +90,10 @@
   "options_display_passiveScroll": {
     "message": "Tự động cuộn lời bài hát không được đồng bộ",
     "description": "Auto-scroll unsynced lyrics setting label"
+  },
+  "options_display_shadersPromo": {
+    "message": "Hiển thị link tới Better Lyrics Shaders",
+    "description": "Toggle label for the Shaders companion link shown in the lyrics footer"
   },
   "options_display_unisonActions": {
     "message": "Hành Động Unison",
@@ -246,6 +250,98 @@
   "options_identity_importKey": {
     "message": "Nhập khóa",
     "description": "Import key button label"
+  },
+  "options_identityImport_title": {
+    "message": "Nhập danh tính",
+    "description": "Title of the import identity modal"
+  },
+  "options_identityImport_chooseFile": {
+    "message": "Chọn File",
+    "description": "Label for the file picker button in the import identity modal"
+  },
+  "options_identityImport_or": {
+    "message": "hoặc",
+    "description": "Divider between file picker and paste textarea in the import identity modal"
+  },
+  "options_identityImport_pastePlaceholder": {
+    "message": "Dán JSON danh tính vào đây...",
+    "description": "Placeholder for the identity JSON textarea"
+  },
+  "options_identityImport_import": {
+    "message": "Nhập",
+    "description": "Confirm button label inside the import identity modal"
+  },
+  "options_nickname_description": {
+    "message": "Hãy chọn cái tên cho bạn trong Better Lyrics. Chữ, số, và dấu gạch dưới, từ 3 cho đến 20 ký tự.",
+    "description": "Nickname subsection description"
+  },
+  "options_nickname_placeholder": {
+    "message": "Hãy chọn một biệt danh",
+    "description": "Nickname input placeholder"
+  },
+  "options_nickname_save": {
+    "message": "Lưu",
+    "description": "Nickname save button label"
+  },
+  "options_nickname_reset": {
+    "message": "Đặt lại về mặc định",
+    "description": "Nickname reset button label"
+  },
+  "options_nickname_modalTitle": {
+    "message": "Đặt biệt danh của bạn",
+    "description": "Nickname modal title"
+  },
+  "options_nickname_edit": {
+    "message": "Chỉnh sửa",
+    "description": "Nickname edit button label"
+  },
+  "options_nickname_editLabel": {
+    "message": "Chỉnh sửa biệt danh",
+    "description": "Accessible label for the nickname edit button"
+  },
+  "options_nickname_status_checking": {
+    "message": "Đang kiểm tra...",
+    "description": "Status while checking nickname availability"
+  },
+  "options_nickname_status_available": {
+    "message": "Khả dụng",
+    "description": "Status when nickname is available"
+  },
+  "options_nickname_status_taken": {
+    "message": "Đã tồn tại",
+    "description": "Status when nickname is already taken"
+  },
+  "options_nickname_status_invalid": {
+    "message": "Từ 3 cho đến 20 chữ, số hoặc dấu gạch dưới",
+    "description": "Status when nickname format is invalid"
+  },
+  "options_nickname_status_profane": {
+    "message": "Không được phép, hãy thử cái khác",
+    "description": "Status when nickname is flagged as inappropriate by the server"
+  },
+  "options_nickname_status_self": {
+    "message": "Đây là biệt danh hiện tại của bạn",
+    "description": "Status when entered nickname matches current"
+  },
+  "options_nickname_status_saved": {
+    "message": "Đã lưu",
+    "description": "Status when nickname is saved"
+  },
+  "options_nickname_status_submitting": {
+    "message": "Đang lưu...",
+    "description": "Status while nickname save is in flight"
+  },
+  "options_nickname_status_rateLimited": {
+    "message": "Từ từ đã, hãy thử lại sau một lúc",
+    "description": "Status when nickname checks are rate limited"
+  },
+  "options_nickname_status_error": {
+    "message": "Không thể kết nối đến máy chủ",
+    "description": "Status when nickname request fails"
+  },
+  "options_alert_importEmpty": {
+    "message": "Dán JSON danh tính hoặc chọn file trước.",
+    "description": "Shown when the user clicks Import with no JSON provided"
   },
   "options_modal_selectTheme": {
     "message": "Chọn một chủ đề",
@@ -781,6 +877,10 @@
     "message": "Tìm trên Genius",
     "description": "Search on Genius button text"
   },
+  "lyrics_getShaders": {
+    "message": "Nhận Better Lyrics Shaders",
+    "description": "Footer button text linking to the Better Lyrics Shaders companion extension"
+  },
   "lyrics_searching": {
     "message": "Better Lyrics đang tìm lời bài hát...",
     "description": "Loading message while searching for lyrics"
@@ -950,11 +1050,11 @@
     "description": "Button text for submitting lyrics to Unison"
   },
   "auth_pageTitle": {
-    "message": "Sign in with Better Lyrics",
+    "message": "Đăng nhập bằng Better Lyrics",
     "description": "Browser tab title for the auth consent popup"
   },
   "auth_consentHeading": {
-    "message": "Sign in to $ORIGIN$",
+    "message": "Đăng nhập vào $ORIGIN$",
     "description": "Consent prompt heading. $ORIGIN$ is replaced with the requesting site, e.g. unison.boidu.dev",
     "placeholders": {
       "origin": {
@@ -964,7 +1064,7 @@
     }
   },
   "auth_consentSubheading": {
-    "message": "You will sign in as $NAME$.",
+    "message": "Bạn sẽ đăng nhập với tư cách là $NAME$.",
     "description": "Identifies the current BL identity. $NAME$ is the deterministic display name.",
     "placeholders": {
       "name": {
@@ -974,39 +1074,43 @@
     }
   },
   "auth_consentExplainer": {
-    "message": "Better Lyrics will sign a one-time message proving you control this identity. The site never sees your private key.",
+    "message": "Better Lyrics sẽ thực hiện ký xác thực một lần để chứng minh bạn sở hữu danh tính này. Trang web sẽ không bao giờ nhìn thấy được khóa bí mật của bạn.",
     "description": "Short explainer body in the consent popup"
   },
   "auth_rememberLabel": {
-    "message": "Don't ask again for 24 hours",
+    "message": "Đừng hỏi lại trong vòng 24 giờ",
     "description": "Checkbox label allowing the user to remember this approval"
   },
   "auth_approve": {
-    "message": "Approve",
+    "message": "Chấp thuận",
     "description": "Primary button: approve the sign-in request"
   },
   "auth_cancel": {
-    "message": "Cancel",
+    "message": "Hủy bỏ",
     "description": "Secondary button: reject the sign-in request"
   },
   "auth_invalidRequest": {
-    "message": "Invalid sign-in request.",
+    "message": "Yêu cầu đăng nhập không hợp lệ.",
     "description": "Error state shown when the popup receives malformed parameters"
   },
+  "auth_sessionExpired": {
+    "message": "Hết hạn đăng nhập. Vui lòng đóng cửa sổ này và thử lại lần nữa.",
+    "description": "Shown in the sign-in consent popup when the connection to the extension's service worker is lost before the user can approve or cancel."
+  },
   "lyrics_requestSyncedVersion": {
-    "message": "Request a synced version",
+    "message": "Yêu cầu đồng bộ lời bài hát",
     "description": "Button label asking the community to contribute synced lyrics for the current song"
   },
   "lyrics_requestedFirst": {
-    "message": "Requested · you're the first",
+    "message": "Đã được yêu cầu · bạn là người đầu tiên",
     "description": "Button label after a successful first-ever request for this song"
   },
   "lyrics_requestedOneOther": {
-    "message": "Requested · 1 other wants this",
+    "message": "Đã được yêu cầu · 1 người muốn điều này",
     "description": "Button label after a successful request when exactly one other person has also requested"
   },
   "lyrics_requestedNOthers": {
-    "message": "Requested · $N$ others want this",
+    "message": "Đã được yêu cầu · $N$ người muốn điều này",
     "description": "Button label after a successful request when N other people have also requested",
     "placeholders": {
       "n": {
@@ -1016,23 +1120,23 @@
     }
   },
   "lyrics_requestErrorRateLimit": {
-    "message": "Try again in a minute",
+    "message": "Hãy thử lại sau một phút",
     "description": "Button label shown briefly when the request is rate-limited"
   },
   "lyrics_requestErrorNetwork": {
-    "message": "Couldn't reach Unison",
+    "message": "Không thể truy cập Unison",
     "description": "Button label shown briefly when the request fails for a transport/network reason (no HTTP response received)"
   },
   "lyrics_requestErrorServer": {
-    "message": "Unison is having trouble",
+    "message": "Unison đang gặp chút vấn đề",
     "description": "Button label shown briefly when the request fails with a 5xx server error"
   },
   "lyrics_requestErrorGeneric": {
-    "message": "Couldn't send the request",
+    "message": "Không thể gửi yêu cầu được",
     "description": "Button label shown briefly when the request fails for any other reason (catch-all)"
   },
   "lyrics_requestSyncedLanded": {
-    "message": "Synced version available. Refresh.",
+    "message": "Phiên bản lời bài hát được đồng bộ đã có sẵn. Làm mới lại trang để hiển thị.",
     "description": "Button label when the server reports a synced version already exists; clicking reloads the page"
   },
   "unison_pageTitle": {
@@ -1132,31 +1236,31 @@
     "description": "Report reason: other"
   },
   "unison_confidence_low": {
-    "message": "Unverified",
+    "message": "Chưa xác thực",
     "description": "Tier label for entries with fewer than the minimum votes for confidence"
   },
   "unison_confidence_medium": {
-    "message": "Trusted",
+    "message": "Đáng tin cậy",
     "description": "Tier label for entries the community has accepted (the baseline 'good enough' tier)"
   },
   "unison_confidence_high": {
-    "message": "Top-Rated",
+    "message": "Được đánh giá cao",
     "description": "Tier label for entries with diverse community approval (rare, top tier)"
   },
   "unison_sortTopRated": {
-    "message": "Top-Rated",
+    "message": "Đánh giá cao nhất",
     "description": "Sort by effective score, highest first"
   },
   "unison_sortBottomRated": {
-    "message": "Bottom-Rated",
+    "message": "Đánh giá thấp nhất",
     "description": "Sort by effective score, lowest first"
   },
   "unison_sortMostVoted": {
-    "message": "Most-Voted",
+    "message": "Bình chọn nhiều nhất",
     "description": "Sort by vote count, most first"
   },
   "unison_sortLeastVoted": {
-    "message": "Least-Voted",
+    "message": "Bình chọn ít nhất",
     "description": "Sort by vote count, fewest first"
   },
   "unison_syncRichsync": {
@@ -1168,19 +1272,19 @@
     "description": "Sync type: line-level timing. Reused by the sync badge on cards and the sync filter chip"
   },
   "unison_syncPlain": {
-    "message": "Plain",
+    "message": "Không được đồng bộ",
     "description": "Sync type: unsynced lyrics. Reused by the sync badge on cards and the sync filter chip"
   },
   "unison_tier": {
-    "message": "Tier",
+    "message": "Mức độ",
     "description": "Filter bar group label for confidence tier"
   },
   "unison_tierTrustedPlus": {
-    "message": "Trusted+",
+    "message": "Đáng tin cậy+",
     "description": "Tier filter chip hiding Unverified entries (shows Trusted and above)"
   },
   "unison_languageAll": {
-    "message": "All languages",
+    "message": "Tất cả ngôn ngữ",
     "description": "Language dropdown default option"
   },
   "unison_format_lrc": {
@@ -1208,7 +1312,7 @@
     "description": "Identity label prefix"
   },
   "unison_loadMore": {
-    "message": "Loading more...",
+    "message": "Đang load thêm...",
     "description": "Auto-loading indicator shown at the bottom of the feed while the next page is being fetched"
   },
   "unison_votes": {
@@ -1332,11 +1436,11 @@
     "description": "Empty state for my submissions tab"
   },
   "unison_noFilterResults": {
-    "message": "No lyrics match your filters",
+    "message": "Không có lời bài hát nào phù hợp với bộ lọc của bạn",
     "description": "Empty state shown when the active sort/filter combination returns no entries"
   },
   "unison_noFeedYet": {
-    "message": "No lyrics here yet",
+    "message": "Không có lời bài hát nào ở đây cả",
     "description": "Empty state shown when the recent feed is empty with no filters applied"
   },
   "unison_sync": {

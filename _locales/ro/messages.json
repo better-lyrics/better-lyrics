@@ -91,6 +91,10 @@
     "message": "Derulare automată versurilor nesincronizate",
     "description": "Auto-scroll unsynced lyrics setting label"
   },
+  "options_display_shadersPromo": {
+    "message": "Show link to Better Lyrics Shaders",
+    "description": "Toggle label for the Shaders companion link shown in the lyrics footer"
+  },
   "options_display_unisonActions": {
     "message": "Acțiuni pentru Unison",
     "description": "Display-section row label for the Unison Actions modal trigger"
@@ -246,6 +250,98 @@
   "options_identity_importKey": {
     "message": "Cheie Import",
     "description": "Import key button label"
+  },
+  "options_identityImport_title": {
+    "message": "Import Identity",
+    "description": "Title of the import identity modal"
+  },
+  "options_identityImport_chooseFile": {
+    "message": "Choose File",
+    "description": "Label for the file picker button in the import identity modal"
+  },
+  "options_identityImport_or": {
+    "message": "or",
+    "description": "Divider between file picker and paste textarea in the import identity modal"
+  },
+  "options_identityImport_pastePlaceholder": {
+    "message": "Paste identity JSON here...",
+    "description": "Placeholder for the identity JSON textarea"
+  },
+  "options_identityImport_import": {
+    "message": "Import",
+    "description": "Confirm button label inside the import identity modal"
+  },
+  "options_nickname_description": {
+    "message": "Pick a name for yourself across Better Lyrics. Letters, numbers, and underscore, 3 to 20 characters.",
+    "description": "Nickname subsection description"
+  },
+  "options_nickname_placeholder": {
+    "message": "Pick a nickname",
+    "description": "Nickname input placeholder"
+  },
+  "options_nickname_save": {
+    "message": "Save",
+    "description": "Nickname save button label"
+  },
+  "options_nickname_reset": {
+    "message": "Reset to default",
+    "description": "Nickname reset button label"
+  },
+  "options_nickname_modalTitle": {
+    "message": "Set your nickname",
+    "description": "Nickname modal title"
+  },
+  "options_nickname_edit": {
+    "message": "Edit",
+    "description": "Nickname edit button label"
+  },
+  "options_nickname_editLabel": {
+    "message": "Edit nickname",
+    "description": "Accessible label for the nickname edit button"
+  },
+  "options_nickname_status_checking": {
+    "message": "Checking...",
+    "description": "Status while checking nickname availability"
+  },
+  "options_nickname_status_available": {
+    "message": "Available",
+    "description": "Status when nickname is available"
+  },
+  "options_nickname_status_taken": {
+    "message": "Already taken",
+    "description": "Status when nickname is already taken"
+  },
+  "options_nickname_status_invalid": {
+    "message": "3 to 20 letters, numbers, or underscores",
+    "description": "Status when nickname format is invalid"
+  },
+  "options_nickname_status_profane": {
+    "message": "Not allowed, try another",
+    "description": "Status when nickname is flagged as inappropriate by the server"
+  },
+  "options_nickname_status_self": {
+    "message": "This is your current nickname",
+    "description": "Status when entered nickname matches current"
+  },
+  "options_nickname_status_saved": {
+    "message": "Saved",
+    "description": "Status when nickname is saved"
+  },
+  "options_nickname_status_submitting": {
+    "message": "Saving...",
+    "description": "Status while nickname save is in flight"
+  },
+  "options_nickname_status_rateLimited": {
+    "message": "Slow down, try again in a moment",
+    "description": "Status when nickname checks are rate limited"
+  },
+  "options_nickname_status_error": {
+    "message": "Could not reach the server",
+    "description": "Status when nickname request fails"
+  },
+  "options_alert_importEmpty": {
+    "message": "Paste identity JSON or choose a file first.",
+    "description": "Shown when the user clicks Import with no JSON provided"
   },
   "options_modal_selectTheme": {
     "message": "Selectați o Temă",
@@ -781,6 +877,10 @@
     "message": "Caută pe Genius",
     "description": "Search on Genius button text"
   },
+  "lyrics_getShaders": {
+    "message": "Get Better Lyrics Shaders",
+    "description": "Footer button text linking to the Better Lyrics Shaders companion extension"
+  },
   "lyrics_searching": {
     "message": "Better Lyrics caută versuri...",
     "description": "Loading message while searching for lyrics"
@@ -954,7 +1054,7 @@
     "description": "Browser tab title for the auth consent popup"
   },
   "auth_consentHeading": {
-    "message": "Sign in to $ORIGIN$",
+    "message": "Conectează-te la $ORIGIN$",
     "description": "Consent prompt heading. $ORIGIN$ is replaced with the requesting site, e.g. unison.boidu.dev",
     "placeholders": {
       "origin": {
@@ -964,7 +1064,7 @@
     }
   },
   "auth_consentSubheading": {
-    "message": "You will sign in as $NAME$.",
+    "message": "Te vei conecta ca $NAME$.",
     "description": "Identifies the current BL identity. $NAME$ is the deterministic display name.",
     "placeholders": {
       "name": {
@@ -978,35 +1078,39 @@
     "description": "Short explainer body in the consent popup"
   },
   "auth_rememberLabel": {
-    "message": "Don't ask again for 24 hours",
+    "message": "Nu mai cere 24 de ore din nou",
     "description": "Checkbox label allowing the user to remember this approval"
   },
   "auth_approve": {
-    "message": "Approve",
+    "message": "Aprobă",
     "description": "Primary button: approve the sign-in request"
   },
   "auth_cancel": {
-    "message": "Cancel",
+    "message": "Anulează",
     "description": "Secondary button: reject the sign-in request"
   },
   "auth_invalidRequest": {
     "message": "Invalid sign-in request.",
     "description": "Error state shown when the popup receives malformed parameters"
   },
+  "auth_sessionExpired": {
+    "message": "Sign-in expired. Please close this window and try again.",
+    "description": "Shown in the sign-in consent popup when the connection to the extension's service worker is lost before the user can approve or cancel."
+  },
   "lyrics_requestSyncedVersion": {
-    "message": "Request a synced version",
+    "message": "Solicită o versiune sincronizată",
     "description": "Button label asking the community to contribute synced lyrics for the current song"
   },
   "lyrics_requestedFirst": {
-    "message": "Requested · you're the first",
+    "message": "Solicitat · Ești primul",
     "description": "Button label after a successful first-ever request for this song"
   },
   "lyrics_requestedOneOther": {
-    "message": "Requested · 1 other wants this",
+    "message": "Solicitat · încă 1 vrea asta",
     "description": "Button label after a successful request when exactly one other person has also requested"
   },
   "lyrics_requestedNOthers": {
-    "message": "Requested · $N$ others want this",
+    "message": "Solicitat · $N$ alții vor asta",
     "description": "Button label after a successful request when N other people have also requested",
     "placeholders": {
       "n": {
@@ -1016,7 +1120,7 @@
     }
   },
   "lyrics_requestErrorRateLimit": {
-    "message": "Try again in a minute",
+    "message": "Încearcă din nou într-un minut",
     "description": "Button label shown briefly when the request is rate-limited"
   },
   "lyrics_requestErrorNetwork": {
@@ -1132,31 +1236,31 @@
     "description": "Report reason: other"
   },
   "unison_confidence_low": {
-    "message": "Unverified",
+    "message": "Neverificat",
     "description": "Tier label for entries with fewer than the minimum votes for confidence"
   },
   "unison_confidence_medium": {
-    "message": "Trusted",
+    "message": "De încredere",
     "description": "Tier label for entries the community has accepted (the baseline 'good enough' tier)"
   },
   "unison_confidence_high": {
-    "message": "Top-Rated",
+    "message": "De încredere mare",
     "description": "Tier label for entries with diverse community approval (rare, top tier)"
   },
   "unison_sortTopRated": {
-    "message": "Top-Rated",
+    "message": "De încredere mare",
     "description": "Sort by effective score, highest first"
   },
   "unison_sortBottomRated": {
-    "message": "Bottom-Rated",
+    "message": "De încredere mica",
     "description": "Sort by effective score, lowest first"
   },
   "unison_sortMostVoted": {
-    "message": "Most-Voted",
+    "message": "Cele mai votate",
     "description": "Sort by vote count, most first"
   },
   "unison_sortLeastVoted": {
-    "message": "Least-Voted",
+    "message": "Cele mai puțin votate",
     "description": "Sort by vote count, fewest first"
   },
   "unison_syncRichsync": {
@@ -1172,15 +1276,15 @@
     "description": "Sync type: unsynced lyrics. Reused by the sync badge on cards and the sync filter chip"
   },
   "unison_tier": {
-    "message": "Tier",
+    "message": "Nivel",
     "description": "Filter bar group label for confidence tier"
   },
   "unison_tierTrustedPlus": {
-    "message": "Trusted+",
+    "message": "De încredere+",
     "description": "Tier filter chip hiding Unverified entries (shows Trusted and above)"
   },
   "unison_languageAll": {
-    "message": "All languages",
+    "message": "Toate limbile",
     "description": "Language dropdown default option"
   },
   "unison_format_lrc": {
@@ -1208,7 +1312,7 @@
     "description": "Identity label prefix"
   },
   "unison_loadMore": {
-    "message": "Loading more...",
+    "message": "Se încarcă mai multe...",
     "description": "Auto-loading indicator shown at the bottom of the feed while the next page is being fetched"
   },
   "unison_votes": {
@@ -1332,11 +1436,11 @@
     "description": "Empty state for my submissions tab"
   },
   "unison_noFilterResults": {
-    "message": "No lyrics match your filters",
+    "message": "Nu există versuri care să corespundă filtrelor",
     "description": "Empty state shown when the active sort/filter combination returns no entries"
   },
   "unison_noFeedYet": {
-    "message": "No lyrics here yet",
+    "message": "Nici un vers aici încă",
     "description": "Empty state shown when the recent feed is empty with no filters applied"
   },
   "unison_sync": {
