@@ -3,6 +3,7 @@ html {
     min-width: 600px;
     max-width: 600px;
     overflow: auto;
+    scrollbar-width: thin;
 }
 
 nav {
@@ -133,7 +134,7 @@ body {
     box-sizing: border-box;
     overflow: hidden;
     min-height: 3.5rem;
-    outline: 1px solid #48494b;
+    outline: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .theme-preview-card::before {
@@ -2265,4 +2266,37 @@ input.cm-textfield:focus-visible {
 
 .lang-exclusions-tab-content::-webkit-scrollbar-thumb:hover {
 	background: rgba(255, 255, 255, 0.3);
+}
+
+/* -- Squircle corners ---------------------------- */
+/* Feature-gated: browsers without corner-shape keep the original radii below. */
+
+@supports (corner-shape: superellipse(1.6)) {
+    .settings-group,
+    .modal,
+    .theme-preview-card {
+        border-radius: 1.5rem;
+    }
+
+    .text-group,
+    .sortable-item,
+    .theme-card,
+    .theme-deprecation-banner {
+        border-radius: 1rem;
+    }
+
+    .position-frame {
+        border-radius: 1.25rem;
+    }
+
+    .settings-group,
+    .text-group,
+    .sortable-item,
+    .modal,
+    .theme-preview-card,
+    .theme-card,
+    .theme-deprecation-banner,
+    .position-frame {
+        corner-shape: superellipse(1.6);
+    }
 }

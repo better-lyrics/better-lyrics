@@ -2004,3 +2004,35 @@ kbd.kbd-icon svg {
 .toast .toast-action kbd {
   margin-left: 0.5rem;
 }
+
+/* -- Squircle corners ---------------------------- */
+/* Feature-gated: browsers without corner-shape keep the original radii above. */
+
+@supports (corner-shape: superellipse(1.6)) {
+  .marketplace-filters {
+    border-radius: 1.5rem;
+  }
+
+  #your-themes-dropdown,
+  #status-css.toast {
+    border-radius: 1.25rem;
+  }
+
+  .store-card,
+  .store-filter-dropdown {
+    border-radius: 1rem;
+  }
+
+  .detail-shader-info {
+    border-radius: 0.75rem;
+  }
+
+  .marketplace-filters,
+  #your-themes-dropdown,
+  #status-css.toast,
+  .store-card,
+  .store-filter-dropdown,
+  .detail-shader-info {
+    corner-shape: superellipse(1.6);
+  }
+}
