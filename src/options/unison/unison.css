@@ -777,6 +777,7 @@ kbd {
   background: rgba(255, 255, 255, 0.03);
   border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 0.5rem;
+  margin: 0;
   padding: 1.25rem;
   font-size: 0.8125rem;
   line-height: 1.7;
@@ -1332,4 +1333,32 @@ select.unison-input {
 .unison-filter-select option {
   background: #1a1a1c;
   color: rgba(255, 255, 255, 0.9);
+}
+
+/* -- Squircle corners ---------------------------- */
+/* Feature-gated: browsers without corner-shape keep the original radii above. */
+
+@supports (corner-shape: superellipse(1.6)) {
+  .unison-filters,
+  .unison-feedback {
+    border-radius: 1.5rem;
+  }
+
+  .unison-card,
+  .unison-report-dropdown,
+  .unison-detail-preview,
+  .unison-detail-pre,
+  .unison-preview-content {
+    border-radius: 1rem;
+  }
+
+  .unison-filters,
+  .unison-feedback,
+  .unison-card,
+  .unison-report-dropdown,
+  .unison-detail-preview,
+  .unison-detail-pre,
+  .unison-preview-content {
+    corner-shape: superellipse(1.6);
+  }
 }
