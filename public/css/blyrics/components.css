@@ -722,3 +722,13 @@ ytmusic-player-page:not([is-mweb-modernization-enabled]) #side-panel:has(.blyric
 		background-position: -200% 0;
 	}
 }
+
+/* -- Squircle corners ---------------------------- */
+/* Feature-gated: browsers without corner-shape keep the original radius above. */
+
+@supports (corner-shape: superellipse(1.6)) {
+	.blyrics-footer__container.blyrics-footer__unison-card {
+		border-radius: 1.75rem;
+		corner-shape: superellipse(1.6);
+	}
+}
