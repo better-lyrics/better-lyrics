@@ -214,6 +214,11 @@ function splitLongPart(part: LyricPart, threshold: number): LyricPart[] {
     return acc;
   }, [] as string[]);
 
+  while (segments.length > 1 && !/[\p{L}\p{N}]/u.test(segments[0])) {
+    segments[1] = segments[0] + segments[1];
+    segments.shift();
+  }
+
   const totalChars = part.words.length;
   const subParts: LyricPart[] = [];
   let charsBefore = 0;
