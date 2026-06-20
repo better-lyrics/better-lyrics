@@ -92,7 +92,7 @@
     "description": "Auto-scroll unsynced lyrics setting label"
   },
   "options_display_shadersPromo": {
-    "message": "Hiển thị link tới Better Lyrics Shaders",
+    "message": "Hiển thị đường liên kết tới Better Lyrics Shaders",
     "description": "Toggle label for the Shaders companion link shown in the lyrics footer"
   },
   "options_display_unisonActions": {
@@ -180,7 +180,7 @@
     "description": "Sources settings section title"
   },
   "options_sources_description": {
-    "message": "Kéo để sắp xếp độ ưu tiên. Nguồn cao hơn sẽ được thử tìm lời bài hát trước. Bỏ chọn để tắt tìm kiếm một nguồn cụ thể.",
+    "message": "Kéo để sắp xếp độ ưu tiên. Nguồn cao hơn sẽ được ưu tiên tìm lời bài hát trước. Bỏ chọn để tắt tìm kiếm một nguồn cụ thể.",
     "description": "Sources settings section description"
   },
   "options_sources_openUnison": {
@@ -236,7 +236,7 @@
     "description": "Identity settings section description"
   },
   "options_identity_warning": {
-    "message": "Treat this like your password. Never share it. Export a backup. No one can recover a lost identity, not even admins.",
+    "message": "Xem cái này như mật khẩu. Đừng chia sẻ. Hãy tạo bản sao. Không ai có thể khôi phục lại danh tính đã mất, kể cả những quản trị viên.",
     "description": "Security warning in the Identity settings tab: keep the identity private and back it up because it is unrecoverable"
   },
   "options_identity_yourIdentity": {
@@ -348,7 +348,7 @@
     "description": "Status when nickname request fails"
   },
   "options_alert_importEmpty": {
-    "message": "Dán JSON danh tính hoặc chọn file trước.",
+    "message": "Dán JSON danh tính hoặc chọn tệp tin trước.",
     "description": "Shown when the user clicks Import with no JSON provided"
   },
   "options_modal_selectTheme": {
@@ -364,7 +364,7 @@
     "description": "Confirm button label"
   },
   "options_alert_cacheCleared": {
-    "message": "Bộ nhớ cache đã được xóa thành công!",
+    "message": "Bộ nhớ đệm đã được xóa thành công!",
     "description": "Cache cleared success message"
   },
   "options_alert_cacheClearFailed": {
@@ -680,7 +680,7 @@
     "description": "URL input placeholder"
   },
   "marketplace_urlModalError": {
-    "message": "Vui lòng nhập URL kho lưu trữ GitHub.",
+    "message": "Vui lòng nhập URL kho lưu trữ GitHub",
     "description": "URL validation error"
   },
   "marketplace_cancel": {
@@ -700,7 +700,7 @@
     "description": "URL permission description"
   },
   "marketplace_urlPermissionItem1": {
-    "message": "Tải các tệp chủ đề từ bất kỳ kho lưu trữ GitHub nào.",
+    "message": "Tải các tệp chủ đề từ bất kỳ kho lưu trữ GitHub nào",
     "description": "URL permission list item 1"
   },
   "marketplace_urlPermissionItem2": {
@@ -902,7 +902,7 @@
     "description": "Message when no synced lyrics found"
   },
   "lyrics_adPlaying": {
-    "message": "[It's quảng cáo time]",
+    "message": "[Dế kêu...]",
     "description": "Message shown during ad playback"
   },
   "lyrics_notFound": {
@@ -1038,7 +1038,7 @@
     "description": "Title for the built-in themes deprecation banner in theme modal"
   },
   "deprecation_builtin_body": {
-    "message": "Chúng tôi đang chuyển các giao diện tích hợp sẵn sang Cửa hàng Chủ đề. Một số giao diện đã được chuyển rồi, hãy tìm biểu tượng Marketplace. Các giao diện còn lại sẽ được cập nhật trong bản cập nhật tiếp theo, với các bản sao lưu CSS trên GitHub và Discord.",
+    "message": "Chúng tôi đang chuyển các giao diện tích hợp sẵn sang Cửa hàng Chủ đề. Một số giao diện đã được chuyển, hãy tìm biểu tượng Marketplace. Các giao diện còn lại sẽ được cập nhật trong bản cập nhật tiếp theo, với các bản sao lưu CSS trên GitHub và Discord.",
     "description": "Body text for the built-in themes deprecation banner"
   },
   "deprecation_builtin_cta": {
@@ -1320,7 +1320,7 @@
     "description": "Identity label prefix"
   },
   "unison_loadMore": {
-    "message": "Đang load thêm...",
+    "message": "Đang tải thêm...",
     "description": "Auto-loading indicator shown at the bottom of the feed while the next page is being fetched"
   },
   "unison_votes": {
@@ -1368,7 +1368,7 @@
     "description": "Back button text in detail view"
   },
   "unison_noPreview": {
-    "message": "Dán hoặc kéo và thả lời bài hát để xem trước",
+    "message": "Dán hoặc kéo thả lời bài hát để xem trước",
     "description": "Empty state text shown in submit preview before lyrics are entered"
   },
   "unison_preview": {
@@ -1436,7 +1436,7 @@
     "description": "Feed tab label for recent submissions"
   },
   "unison_tabMySubmissions": {
-    "message": "Bài đã nộp của tôi",
+    "message": "Đóng góp của tôi",
     "description": "Feed tab label for user's own submissions"
   },
   "unison_noSubmissions": {
@@ -1458,6 +1458,32 @@
   "unison_language": {
     "message": "Ngôn ngữ",
     "description": "Language label in detail view"
+  },
+  "unison_uploadedBy": {
+    "message": "Tải lên bởi",
+    "description": "Metadata row label in the Unison detail sidebar, before the uploader's name which links to their curator page"
+  },
+  "unison_languageUnspecified": {
+    "message": "Không được chỉ định",
+    "description": "Default option in the submission form's language dropdown, used when the submitter has not chosen a language"
+  },
+  "unison_fulfilledBadge": {
+    "message": "Yêu cầu đã hoàn thành",
+    "description": "Badge on the Unison detail page shown when this lyric answered a community request"
+  },
+  "unison_fulfilledNote": {
+    "message": "Có ai đó đã yêu cầu bản lời này trên Better Lyrics, và $name$ đã hoàn thành xuất sắc.",
+    "description": "Sentence on the Unison detail page explaining that the lyric fulfilled a community request. $name$ is the uploader's display name",
+    "placeholders": {
+      "name": {
+        "content": "$1",
+        "example": "AcousticPrestoRemix"
+      }
+    }
+  },
+  "unison_fulfilledBoardLink": {
+    "message": "Xem bảng yêu cầu",
+    "description": "Link on the Unison detail page that opens the community requests board (queue of most-wanted songs)"
   },
   "unison_validationRequired": {
     "message": "Vui lòng điền thông tin bài hát, nghệ sĩ, ID video và lời bài hát.",
