@@ -1044,6 +1044,11 @@ select.unison-input {
   cursor: pointer;
 }
 
+.unison-input option {
+  background: #1a1a1c;
+  color: rgba(255, 255, 255, 0.9);
+}
+
 .unison-textarea {
   background: rgba(255, 255, 255, 0.025);
   border: 1px solid rgba(255, 255, 255, 0.1);
