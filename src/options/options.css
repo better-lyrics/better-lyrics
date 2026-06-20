@@ -46,10 +46,6 @@ h1 img {
     align-self: center;
 }
 
-option {
-	background-color: rgba(0, 0, 0, 0.8);
-}
-
 .heading {
     font-size: 1.5rem;
     font-weight: 600;
