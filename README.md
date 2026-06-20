@@ -8,7 +8,7 @@ Better Lyrics upgrades your YouTube Music™ experience by providing beautiful t
 
 <p align="left">
  <a aria-label="License" href="https://www.gnu.org/licenses/gpl-3.0.en.html"><img src="https://img.shields.io/badge/license-GPL_v3-blue.svg" alt=""/></a>
- <img src="https://img.shields.io/badge/version-2.2.0-blue.svg" alt=""/>
+ <img src="https://img.shields.io/badge/version-2.3.1-blue.svg" alt=""/>
 
  <img src="https://img.shields.io/badge/status-active-brightgreen.svg" alt=""/>
  <a aria-label="Better Stack Badge" href="https://better-lyrics-status.boidu.dev"><img height="20" src="https://uptime.betterstack.com/status-badges/v2/monitor/1dqoz.svg" alt="Better Stack Badge" /></a>
@@ -227,9 +227,6 @@ Yes you can! Please follow the contributing guidelines below.
 Better Lyrics fetches from many providers, so the first thing to try is switching to a different one in extension settings (Sources tab); a better version may already exist elsewhere.
 
 If you want to fix the lyrics for everyone, use **Unison**, our built-in community lyrics platform. Unison is the recommended contribution path going forward (it replaces LRCLIBup, which we no longer use).
-
-> [!IMPORTANT]
-> Unison isn't live in the store builds yet. If you're on the Chrome, Firefox, or Edge version, lyrics you submit through Unison won't show up in your extension until the next release. To try it now, install from source.
 
 You can:
 

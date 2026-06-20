@@ -28,6 +28,7 @@ export const TAB_RENDERER_SELECTOR = "#tab-renderer" as const;
 export const NO_LYRICS_TEXT_SELECTOR =
   "#tab-renderer > ytmusic-message-renderer > yt-formatted-string.text.style-scope.ytmusic-message-renderer" as const;
 export const FULLSCREEN_BUTTON_SELECTOR = ".fullscreen-button" as const;
+export const SHADERS_DETECTION_SELECTOR = '[id^="better-lyrics-kawarp-"]' as const;
 
 // DOM IDs and Attributes
 export const LYRICS_LOADER_ID = "blyrics-loader" as const;
@@ -51,6 +52,9 @@ export const HOMEPAGE_DOMAIN = "betterlyrics.org" as const;
 export const HOMEPAGE_ICON_URL = "https://betterlyrics.org/icon-512.png" as const;
 export const UNISON_API_URL = "https://unison.boidu.dev/lyrics" as const;
 export const DISCORD_INVITE_URL = "https://discord.gg/UsHE3d5fWF" as const;
+export const SHADERS_CWS_URL =
+  "https://chromewebstore.google.com/detail/better-lyrics-shaders/mffpncjphfmkppebdoaehdlnagnlpfai" as const;
+export const SHADERS_AMO_URL = "https://addons.mozilla.org/en-US/firefox/addon/better-lyrics-shaders/" as const;
 export const THEME_STORE_API_URL = "https://better-lyrics-themes-api.boidu.dev" as const;
 export const UNISON_API_BASE_URL = "https://unison.boidu.dev" as const;
 export const THEME_STORE_TURNSTILE_URL = `${THEME_STORE_API_URL}/turnstile` as const;
@@ -106,6 +110,48 @@ export const LOG_PREFIX_BACKGROUND = "[BetterLyrics:Background]" as const;
 export const LOG_PREFIX_EDITOR = "[BetterLyrics:Editor]" as const;
 export const LOG_PREFIX_STORE = "[BetterLyrics:Store]" as const;
 export const LOG_PREFIX_UNISON = "[BetterLyrics:Unison]" as const;
+
+// -- Auth (Sign in with Better Lyrics) --------------------------
+
+export const LOG_PREFIX_AUTH = "[BetterLyrics:Auth]" as const;
+
+export const AUTH_APPROVAL_TTL_MS = 24 * 60 * 60 * 1000;
+
+export const AUTH_MESSAGE_TYPES = {
+  REQUEST: "bl-auth-request",
+} as const;
+
+export const AUTH_PORT_NAME_PREFIX = "bl-auth-popup:" as const;
+
+export const BL_AUTH_SITE_PORT_NAME = "bl-auth-site" as const;
+
+export interface AuthPartner {
+  id: string;
+  origin: string;
+  iconUrl: string | null;
+}
+
+const AUTH_PARTNER_METADATA: Record<string, Pick<AuthPartner, "id" | "iconUrl">> = {
+  "https://unison.boidu.dev": { id: "unison", iconUrl: null },
+  "https://blrcunison.vercel.app": { id: "blrcunison", iconUrl: "https://blrcunison.vercel.app/logo_mono.svg" },
+};
+
+const AUTH_PARTNERS: readonly AuthPartner[] = (chrome.runtime.getManifest().externally_connectable?.matches ?? [])
+  .map(match => match.replace(/\/\*$/, ""))
+  .map(origin => ({
+    origin,
+    id: AUTH_PARTNER_METADATA[origin]?.id ?? origin,
+    iconUrl: AUTH_PARTNER_METADATA[origin]?.iconUrl ?? null,
+  }));
+
+export function getAuthPartnerByOrigin(origin: string | undefined): AuthPartner | undefined {
+  if (!origin) return undefined;
+  return AUTH_PARTNERS.find(p => p.origin === origin);
+}
+
+export function isAllowedAuthOrigin(origin: string | undefined): boolean {
+  return getAuthPartnerByOrigin(origin) !== undefined;
+}
 
 // Initialization and General Logs
 export const INITIALIZE_LOG =

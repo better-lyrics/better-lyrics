@@ -1,6 +1,6 @@
 {
   "extensionName": {
-    "message": "Better Lyrics (Текст для Youtube Music)",
+    "message": "Better Lyrics (Тексты для Youtube Music)",
     "description": "The name of the extension"
   },
   "extensionDescription": {
@@ -91,6 +91,10 @@
     "message": "Автопрокрутка несинхронизированных текстов",
     "description": "Auto-scroll unsynced lyrics setting label"
   },
+  "options_display_shadersPromo": {
+    "message": "Show link to Better Lyrics Shaders",
+    "description": "Toggle label for the Shaders companion link shown in the lyrics footer"
+  },
   "options_display_unisonActions": {
     "message": "Действия Unison",
     "description": "Display-section row label for the Unison Actions modal trigger"
@@ -179,6 +183,10 @@
     "message": "Перетащите для изменения приоритета. Сначала попробуйте источники, что повыше. Снимите флажок, чтобы отключить.",
     "description": "Sources settings section description"
   },
+  "options_sources_openUnison": {
+    "message": "Unison",
+    "description": "Label on the small button in the Sources section header that opens the Unison page"
+  },
   "options_themes_title": {
     "message": "Настройки темы",
     "description": "Theme settings section title"
@@ -227,6 +235,10 @@
     "message": "Ваш уникальный анонимный ID для Better Lyrics.",
     "description": "Identity settings section description"
   },
+  "options_identity_warning": {
+    "message": "Treat this like your password. Never share it. Export a backup. No one can recover a lost identity, not even admins.",
+    "description": "Security warning in the Identity settings tab: keep the identity private and back it up because it is unrecoverable"
+  },
   "options_identity_yourIdentity": {
     "message": "Ваш ID",
     "description": "Your identity label"
@@ -246,6 +258,98 @@
   "options_identity_importKey": {
     "message": "Импортировать ключ",
     "description": "Import key button label"
+  },
+  "options_identityImport_title": {
+    "message": "Импортировать идентификатор",
+    "description": "Title of the import identity modal"
+  },
+  "options_identityImport_chooseFile": {
+    "message": "Выберите файл",
+    "description": "Label for the file picker button in the import identity modal"
+  },
+  "options_identityImport_or": {
+    "message": "или",
+    "description": "Divider between file picker and paste textarea in the import identity modal"
+  },
+  "options_identityImport_pastePlaceholder": {
+    "message": "Вставьте идентификатор JSON...",
+    "description": "Placeholder for the identity JSON textarea"
+  },
+  "options_identityImport_import": {
+    "message": "Импорт",
+    "description": "Confirm button label inside the import identity modal"
+  },
+  "options_nickname_description": {
+    "message": "Pick a name for yourself across Better Lyrics. Letters, numbers, and underscore, 3 to 20 characters.",
+    "description": "Nickname subsection description"
+  },
+  "options_nickname_placeholder": {
+    "message": "Pick a nickname",
+    "description": "Nickname input placeholder"
+  },
+  "options_nickname_save": {
+    "message": "Save",
+    "description": "Nickname save button label"
+  },
+  "options_nickname_reset": {
+    "message": "Reset to default",
+    "description": "Nickname reset button label"
+  },
+  "options_nickname_modalTitle": {
+    "message": "Set your nickname",
+    "description": "Nickname modal title"
+  },
+  "options_nickname_edit": {
+    "message": "Edit",
+    "description": "Nickname edit button label"
+  },
+  "options_nickname_editLabel": {
+    "message": "Edit nickname",
+    "description": "Accessible label for the nickname edit button"
+  },
+  "options_nickname_status_checking": {
+    "message": "Checking...",
+    "description": "Status while checking nickname availability"
+  },
+  "options_nickname_status_available": {
+    "message": "Available",
+    "description": "Status when nickname is available"
+  },
+  "options_nickname_status_taken": {
+    "message": "Already taken",
+    "description": "Status when nickname is already taken"
+  },
+  "options_nickname_status_invalid": {
+    "message": "3 to 20 letters, numbers, or underscores",
+    "description": "Status when nickname format is invalid"
+  },
+  "options_nickname_status_profane": {
+    "message": "Not allowed, try another",
+    "description": "Status when nickname is flagged as inappropriate by the server"
+  },
+  "options_nickname_status_self": {
+    "message": "This is your current nickname",
+    "description": "Status when entered nickname matches current"
+  },
+  "options_nickname_status_saved": {
+    "message": "Saved",
+    "description": "Status when nickname is saved"
+  },
+  "options_nickname_status_submitting": {
+    "message": "Saving...",
+    "description": "Status while nickname save is in flight"
+  },
+  "options_nickname_status_rateLimited": {
+    "message": "Slow down, try again in a moment",
+    "description": "Status when nickname checks are rate limited"
+  },
+  "options_nickname_status_error": {
+    "message": "Could not reach the server",
+    "description": "Status when nickname request fails"
+  },
+  "options_alert_importEmpty": {
+    "message": "Сначала вставьте идентификатор JSON или выберите файл.",
+    "description": "Shown when the user clicks Import with no JSON provided"
   },
   "options_modal_selectTheme": {
     "message": "Выберите тему",
@@ -781,12 +885,16 @@
     "message": "Искать на Genius",
     "description": "Search on Genius button text"
   },
+  "lyrics_getShaders": {
+    "message": "Get Better Lyrics Shaders",
+    "description": "Footer button text linking to the Better Lyrics Shaders companion extension"
+  },
   "lyrics_searching": {
     "message": "Better Lyrics ищет текст песни...",
     "description": "Loading message while searching for lyrics"
   },
   "lyrics_stillSearching": {
-    "message": "Всё ещё ищет текст...",
+    "message": "Всё ещё ищем текст...",
     "description": "Loading message while still searching"
   },
   "lyrics_noSyncedLyrics": {
@@ -794,7 +902,7 @@
     "description": "Message when no synced lyrics found"
   },
   "lyrics_adPlaying": {
-    "message": "[пум-пум-пум]",
+    "message": "[па-ра-рам]",
     "description": "Message shown during ad playback"
   },
   "lyrics_notFound": {
@@ -946,8 +1054,98 @@
     "description": "Section title for custom themes in the theme chooser modal"
   },
   "lyrics_submitToUnison": {
-    "message": "Отправить текст песни с Унисон",
+    "message": "Отправить текст в Unison",
     "description": "Button text for submitting lyrics to Unison"
+  },
+  "auth_pageTitle": {
+    "message": "Войти через Better Lyrics",
+    "description": "Browser tab title for the auth consent popup"
+  },
+  "auth_consentHeading": {
+    "message": "Войти в $ORIGIN$",
+    "description": "Consent prompt heading. $ORIGIN$ is replaced with the requesting site, e.g. unison.boidu.dev",
+    "placeholders": {
+      "origin": {
+        "content": "$1",
+        "example": "unison.boidu.dev"
+      }
+    }
+  },
+  "auth_consentSubheading": {
+    "message": "Вы войдете как $NAME$.",
+    "description": "Identifies the current BL identity. $NAME$ is the deterministic display name.",
+    "placeholders": {
+      "name": {
+        "content": "$1",
+        "example": "Curious-Otter-7392"
+      }
+    }
+  },
+  "auth_consentExplainer": {
+    "message": "Better Lyrics подпишет одноразовое сообщение, подтверждающее вашу личность. Сайт не имеет доступа к вашему ключу.",
+    "description": "Short explainer body in the consent popup"
+  },
+  "auth_rememberLabel": {
+    "message": "Не спрашивать следующие сутки",
+    "description": "Checkbox label allowing the user to remember this approval"
+  },
+  "auth_approve": {
+    "message": "Утвердить",
+    "description": "Primary button: approve the sign-in request"
+  },
+  "auth_cancel": {
+    "message": "Отменить",
+    "description": "Secondary button: reject the sign-in request"
+  },
+  "auth_invalidRequest": {
+    "message": "Неверный запрос на вход.",
+    "description": "Error state shown when the popup receives malformed parameters"
+  },
+  "auth_sessionExpired": {
+    "message": "Sign-in expired. Please close this window and try again.",
+    "description": "Shown in the sign-in consent popup when the connection to the extension's service worker is lost before the user can approve or cancel."
+  },
+  "lyrics_requestSyncedVersion": {
+    "message": "Запрос синхронизированной версии",
+    "description": "Button label asking the community to contribute synced lyrics for the current song"
+  },
+  "lyrics_requestedFirst": {
+    "message": "Запрошено · вы первый",
+    "description": "Button label after a successful first-ever request for this song"
+  },
+  "lyrics_requestedOneOther": {
+    "message": "Запрошено · кто-то уже запросил(-а)",
+    "description": "Button label after a successful request when exactly one other person has also requested"
+  },
+  "lyrics_requestedNOthers": {
+    "message": "Запрошенные · $N$ уже запросили",
+    "description": "Button label after a successful request when N other people have also requested",
+    "placeholders": {
+      "n": {
+        "content": "$1",
+        "example": "12"
+      }
+    }
+  },
+  "lyrics_requestErrorRateLimit": {
+    "message": "Попробуйте снова через минуту",
+    "description": "Button label shown briefly when the request is rate-limited"
+  },
+  "lyrics_requestErrorNetwork": {
+    "message": "Нет связи с Unison",
+    "description": "Button label shown briefly when the request fails for a transport/network reason (no HTTP response received)"
+  },
+  "lyrics_requestErrorServer": {
+    "message": "Проблемы с Unison...",
+    "description": "Button label shown briefly when the request fails with a 5xx server error"
+  },
+  "lyrics_requestErrorGeneric": {
+    "message": "Не удалось отправить запрос",
+    "description": "Button label shown briefly when the request fails for any other reason (catch-all)"
+  },
+  "lyrics_requestSyncedLanded": {
+    "message": "Доступна синхронизированная версия. Обновить.",
+    "description": "Button label when the server reports a synced version already exists; clicking reloads the page"
   },
   "unison_pageTitle": {
     "message": "Унисон - Better Lyrics",
@@ -1046,16 +1244,56 @@
     "description": "Report reason: other"
   },
   "unison_confidence_low": {
-    "message": "Низкая уверенность",
-    "description": "Low confidence indicator"
+    "message": "Не подтвержден",
+    "description": "Tier label for entries with fewer than the minimum votes for confidence"
   },
   "unison_confidence_medium": {
-    "message": "Средняя уверенность",
-    "description": "Medium confidence indicator"
+    "message": "Надёжный",
+    "description": "Tier label for entries the community has accepted (the baseline 'good enough' tier)"
   },
   "unison_confidence_high": {
-    "message": "Высокая уверенность",
-    "description": "High confidence indicator"
+    "message": "Лучший",
+    "description": "Tier label for entries with diverse community approval (rare, top tier)"
+  },
+  "unison_sortTopRated": {
+    "message": "Лучшие",
+    "description": "Sort by effective score, highest first"
+  },
+  "unison_sortBottomRated": {
+    "message": "Худшие",
+    "description": "Sort by effective score, lowest first"
+  },
+  "unison_sortMostVoted": {
+    "message": "Любимые",
+    "description": "Sort by vote count, most first"
+  },
+  "unison_sortLeastVoted": {
+    "message": "Нелюбимые",
+    "description": "Sort by vote count, fewest first"
+  },
+  "unison_syncRichsync": {
+    "message": "Слогословные",
+    "description": "Sync type: word/syllable-level timing. Reused by the sync badge on cards and the sync filter chip"
+  },
+  "unison_syncLinesync": {
+    "message": "Строчные",
+    "description": "Sync type: line-level timing. Reused by the sync badge on cards and the sync filter chip"
+  },
+  "unison_syncPlain": {
+    "message": "Простой текст",
+    "description": "Sync type: unsynced lyrics. Reused by the sync badge on cards and the sync filter chip"
+  },
+  "unison_tier": {
+    "message": "Уровень",
+    "description": "Filter bar group label for confidence tier"
+  },
+  "unison_tierTrustedPlus": {
+    "message": "Надёжный+",
+    "description": "Tier filter chip hiding Unverified entries (shows Trusted and above)"
+  },
+  "unison_languageAll": {
+    "message": "Все языки",
+    "description": "Language dropdown default option"
   },
   "unison_format_lrc": {
     "message": "LRC",
@@ -1082,8 +1320,8 @@
     "description": "Identity label prefix"
   },
   "unison_loadMore": {
-    "message": "Загрузить ещё",
-    "description": "Load more button for feed pagination"
+    "message": "Загрузка...",
+    "description": "Auto-loading indicator shown at the bottom of the feed while the next page is being fetched"
   },
   "unison_votes": {
     "message": "голосов",
@@ -1205,6 +1443,14 @@
     "message": "Вы ещё не отправляли текстов.",
     "description": "Empty state for my submissions tab"
   },
+  "unison_noFilterResults": {
+    "message": "Нет подходящих текстов",
+    "description": "Empty state shown when the active sort/filter combination returns no entries"
+  },
+  "unison_noFeedYet": {
+    "message": "Здесь пока нет текстов",
+    "description": "Empty state shown when the recent feed is empty with no filters applied"
+  },
   "unison_sync": {
     "message": "Синхронизация",
     "description": "Sync type label in detail view"
@@ -1212,6 +1458,32 @@
   "unison_language": {
     "message": "Язык",
     "description": "Language label in detail view"
+  },
+  "unison_uploadedBy": {
+    "message": "Uploaded by",
+    "description": "Metadata row label in the Unison detail sidebar, before the uploader's name which links to their curator page"
+  },
+  "unison_languageUnspecified": {
+    "message": "Not specified",
+    "description": "Default option in the submission form's language dropdown, used when the submitter has not chosen a language"
+  },
+  "unison_fulfilledBadge": {
+    "message": "Requested & fulfilled",
+    "description": "Badge on the Unison detail page shown when this lyric answered a community request"
+  },
+  "unison_fulfilledNote": {
+    "message": "Someone wanted this on Better Lyrics, and $name$ came through with it.",
+    "description": "Sentence on the Unison detail page explaining that the lyric fulfilled a community request. $name$ is the uploader's display name",
+    "placeholders": {
+      "name": {
+        "content": "$1",
+        "example": "AcousticPrestoRemix"
+      }
+    }
+  },
+  "unison_fulfilledBoardLink": {
+    "message": "See the requests board",
+    "description": "Link on the Unison detail page that opens the community requests board (queue of most-wanted songs)"
   },
   "unison_validationRequired": {
     "message": "Пожалуйста, укажите песню, исполнителя, ID видео и текст.",

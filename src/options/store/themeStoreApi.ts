@@ -8,6 +8,7 @@ import {
   signPayload,
   signRating,
 } from "@core/keyIdentity";
+import { UnisonErrorCode } from "@modules/unison/errorCodes";
 import { fetchWithTimeout } from "./themeStoreService";
 import type { AllThemeStats, ApiResult, RatingResult } from "./types";
 
@@ -49,7 +50,7 @@ export async function trackInstall(themeId: string): Promise<ApiResult<number | 
   }
 
   try {
-    const signed = await signInstall(themeId);
+    let signed = await signInstall(themeId);
     let needsRegistration = !(await isKeyRegistered());
 
     const body: Record<string, unknown> = {
@@ -69,7 +70,10 @@ export async function trackInstall(themeId: string): Promise<ApiResult<number | 
 
     if (response.status === 400 && !needsRegistration) {
       const errorData = await response.json().catch(() => null);
-      if (errorData?.error === "PUBLIC_KEY_REQUIRED") {
+      if (errorData?.code === UnisonErrorCode.PUBLIC_KEY_REQUIRED) {
+        signed = await signInstall(themeId);
+        body.payload = signed.payload;
+        body.signature = signed.signature;
         body.publicKey = signed.publicKey;
         needsRegistration = true;
         response = await fetchWithTimeout(`${THEME_STORE_API_URL}/api/install/${encodeURIComponent(themeId)}`, {
@@ -113,7 +117,7 @@ export async function submitRating(
   }
 
   try {
-    const signed = await signRating(themeId, rating);
+    let signed = await signRating(themeId, rating);
     const certificate = await getCertificate();
     let needsRegistration = !(await isKeyRegistered());
 
@@ -144,7 +148,10 @@ export async function submitRating(
 
     if (response.status === 400 && !needsRegistration) {
       const errorData = await response.json().catch(() => null);
-      if (errorData?.error === "PUBLIC_KEY_REQUIRED") {
+      if (errorData?.code === UnisonErrorCode.PUBLIC_KEY_REQUIRED) {
+        signed = await signRating(themeId, rating);
+        body.payload = signed.payload;
+        body.signature = signed.signature;
         body.publicKey = signed.publicKey;
         needsRegistration = true;
         response = await fetchWithTimeout(`${THEME_STORE_API_URL}/api/rate/${encodeURIComponent(themeId)}`, {
@@ -182,7 +189,7 @@ export async function submitRating(
 
 export async function fetchUserRatings(): Promise<ApiResult<Record<string, number>>> {
   try {
-    const signed = await signPayload({});
+    let signed = await signPayload({});
     let needsRegistration = !(await isKeyRegistered());
 
     const body: Record<string, unknown> = {
@@ -202,7 +209,10 @@ export async function fetchUserRatings(): Promise<ApiResult<Record<string, numbe
 
     if (response.status === 400 && !needsRegistration) {
       const errorData = await response.json().catch(() => null);
-      if (errorData?.error === "PUBLIC_KEY_REQUIRED") {
+      if (errorData?.code === UnisonErrorCode.PUBLIC_KEY_REQUIRED) {
+        signed = await signPayload({});
+        body.payload = signed.payload;
+        body.signature = signed.signature;
         body.publicKey = signed.publicKey;
         needsRegistration = true;
         response = await fetchWithTimeout(`${THEME_STORE_API_URL}/api/user/ratings`, {

@@ -11,6 +11,7 @@ import {
   HOMEPAGE_ICON_URL,
   HOMEPAGE_URL,
   LOADER_TRANSITION_ENDED,
+  LOG_PREFIX_UNISON,
   LYRICS_AD_OVERLAY_ID,
   LYRICS_CLASS,
   LYRICS_LOADER_ID,
@@ -21,6 +22,9 @@ import {
   PLAYER_BAR_SELECTOR,
   PROVIDER_CONFIGS,
   ROMANIZED_LYRICS_CLASS,
+  SHADERS_AMO_URL,
+  SHADERS_CWS_URL,
+  SHADERS_DETECTION_SELECTOR,
   type SyncType,
   TAB_RENDERER_SELECTOR,
   TRANSLATED_LYRICS_CLASS,
@@ -30,14 +34,20 @@ import { AppState } from "@core/appState";
 import { t } from "@core/i18n";
 import { disconnectResizeObserver } from "@modules/lyrics/injectLyrics";
 import type { ThumbnailElement } from "@modules/lyrics/requestSniffer/NextResponse";
+import { getSongMetadata } from "@modules/lyrics/requestSniffer/requestSniffer";
 import {
   animEngineState,
   getResumeScrollElement,
+  lyricsElementAdded,
   reflow,
   resetAnimEngineState,
   SCROLL_POS_OFFSET_RATIO,
   toMs,
 } from "@modules/ui/animationEngine";
+import { getRequest, setRequest } from "@modules/unison/lyricsRequestTracker";
+import { getTrustTier } from "@modules/unison/trustTier";
+import type { UnisonLyricsRequest } from "@modules/unison/types";
+import { requestLyrics } from "@modules/unison/unisonApi";
 import { log } from "@utils";
 import { generatePetName } from "@/core/keyIdentity";
 import { byId, deleteVote, type UnisonData, vote } from "../lyrics/providers/unison";
@@ -115,6 +125,145 @@ function createActionButton(options: ActionButtonOptions): HTMLElement {
   link.style.height = "100%";
   container.appendChild(link);
 
+  return container;
+}
+
+// -- Request Synced Version Button --------------------------
+
+interface RequestButtonMeta {
+  videoId: string;
+  song: string;
+  artist: string;
+}
+
+function thumbnailUrlFor(videoId: string): string {
+  return `https://i.ytimg.com/vi/${videoId}/hqdefault.jpg`;
+}
+
+async function resolveArtworkUrl(videoId: string): Promise<string> {
+  const sniffed = await getSongMetadata(videoId);
+  if (sniffed?.thumbnail?.url) return getHighResImageUrl(sniffed.thumbnail);
+
+  const ytImg = document.querySelector<HTMLImageElement>("#thumbnail>#img");
+  if (ytImg?.src) return getHighResImageUrl({ url: ytImg.src, width: 0, height: 0 });
+
+  return thumbnailUrlFor(videoId);
+}
+
+function requestedLabel(requestCount: number): string {
+  if (requestCount <= 1) return t("lyrics_requestedFirst");
+  if (requestCount === 2) return t("lyrics_requestedOneOther");
+  return t("lyrics_requestedNOthers", String(requestCount - 1));
+}
+
+function errorLabelFor(status: number | undefined): string {
+  if (status === 429) return t("lyrics_requestErrorRateLimit");
+  if (status === undefined) return t("lyrics_requestErrorNetwork");
+  if (status >= 500) return t("lyrics_requestErrorServer");
+  return t("lyrics_requestErrorGeneric");
+}
+
+function createRequestSyncedButton(meta: RequestButtonMeta): HTMLElement {
+  const container = document.createElement("div");
+  container.className = `${FOOTER_CLASS}__container`;
+
+  const button = document.createElement("button");
+  button.type = "button";
+  button.style.height = "100%";
+  button.style.background = "none";
+  button.style.border = "none";
+  button.style.color = "inherit";
+  button.style.font = "inherit";
+  button.style.cursor = "pointer";
+  button.style.padding = "0";
+
+  const setLabel = (text: string) => {
+    button.textContent = text;
+  };
+
+  const setDisabled = (disabled: boolean) => {
+    button.disabled = disabled;
+    button.style.cursor = disabled ? "default" : "pointer";
+  };
+
+  let terminalState: "none" | "requested" | "landed" = "none";
+
+  const revertToIdle = () => {
+    setLabel(t("lyrics_requestSyncedVersion"));
+    setDisabled(false);
+  };
+
+  const showRequested = (requestCount: number) => {
+    terminalState = "requested";
+    setLabel(requestedLabel(requestCount));
+    setDisabled(true);
+  };
+
+  const showLanded = () => {
+    terminalState = "landed";
+    setLabel(t("lyrics_requestSyncedLanded"));
+    setDisabled(false);
+  };
+
+  const showErrorTemporarily = (text: string) => {
+    setLabel(text);
+    setDisabled(true);
+    window.setTimeout(() => {
+      if (terminalState === "none") revertToIdle();
+    }, 5000);
+  };
+
+  setLabel(t("lyrics_requestSyncedVersion"));
+  setDisabled(true);
+
+  getRequest(meta.videoId).then(entry => {
+    if (entry && terminalState === "none") {
+      showRequested(entry.requestCount);
+    } else if (terminalState === "none") {
+      setDisabled(false);
+    }
+  });
+
+  button.addEventListener("click", async () => {
+    if (terminalState === "landed") {
+      location.reload();
+      return;
+    }
+    if (terminalState === "requested") return;
+
+    setDisabled(true);
+
+    const submission: UnisonLyricsRequest = {
+      videoId: meta.videoId,
+      song: meta.song,
+      artist: meta.artist,
+      thumbnailUrl: await resolveArtworkUrl(meta.videoId),
+    };
+
+    const result = await requestLyrics(submission);
+
+    if (!result.success || !result.data) {
+      console.warn(LOG_PREFIX_UNISON, "requestLyrics failed", {
+        videoId: meta.videoId,
+        status: result.status,
+        error: result.error,
+      });
+      showErrorTemporarily(errorLabelFor(result.status));
+      return;
+    }
+
+    const success = result.data;
+
+    if (success.status === "already_available") {
+      showLanded();
+      return;
+    }
+
+    await setRequest(meta.videoId, success.requestCount);
+    showRequested(success.requestCount);
+  });
+
+  container.appendChild(button);
   return container;
 }
 
@@ -208,7 +357,8 @@ export function addFooter(
   duration: number,
   providerKey?: string,
   videoId?: string,
-  unisonData?: UnisonData
+  unisonData?: UnisonData,
+  showRequestButton = false
 ): void {
   if (document.getElementsByClassName(FOOTER_CLASS).length !== 0) {
     document.getElementsByClassName(FOOTER_CLASS)[0].remove();
@@ -218,7 +368,8 @@ export function addFooter(
   const footer = document.createElement("div");
   footer.classList.add(FOOTER_CLASS);
   lyricsElement.appendChild(footer);
-  createFooter(song, artist, album, duration, videoId);
+  observeFooterForRecalc(footer);
+  createFooter(song, artist, album, duration, videoId, showRequestButton);
 
   const footerLink = document.getElementById("betterLyricsFooterLink") as HTMLAnchorElement;
   sourceHref = sourceHref || HOMEPAGE_URL;
@@ -264,6 +415,40 @@ const unisonControlsRegistry = {
 };
 
 let unisonDockObserver: IntersectionObserver | null = null;
+let layoutAttrObserver: MutationObserver | null = null;
+let dockHoverActive = false;
+
+function ensureLayoutAttrObserver(): void {
+  if (layoutAttrObserver) return;
+  const layout = document.getElementById("layout");
+  if (!layout) return;
+  layoutAttrObserver = new MutationObserver(() => {
+    if (!dockHoverActive) return;
+    if (!layout.hasAttribute("player-fullscreened")) return;
+    if (!layout.hasAttribute("show-fullscreen-controls")) {
+      layout.setAttribute("show-fullscreen-controls", "");
+    }
+  });
+  layoutAttrObserver.observe(layout, { attributes: true, attributeFilter: ["show-fullscreen-controls"] });
+}
+
+function disconnectLayoutAttrObserver(): void {
+  layoutAttrObserver?.disconnect();
+  layoutAttrObserver = null;
+}
+
+function showPlayerBarOnDockHover(): void {
+  dockHoverActive = true;
+  const layout = document.getElementById("layout");
+  if (layout?.hasAttribute("player-fullscreened")) {
+    layout.setAttribute("show-fullscreen-controls", "");
+  }
+}
+
+function hidePlayerBarOnDockLeave(): void {
+  dockHoverActive = false;
+  document.getElementById("layout")?.removeAttribute("show-fullscreen-controls");
+}
 
 type DockSuppressionReason = "cardVisible" | "ad" | "loading";
 const dockSuppressionReasons = new Set<DockSuppressionReason>();
@@ -425,6 +610,10 @@ export function mountUnisonDock(unisonData: UnisonData, position: string): void 
   inner.appendChild(buildUnisonVoteButton(unisonData, -1));
   inner.appendChild(createReportButton(unisonData.lyricsId));
 
+  inner.addEventListener("mouseenter", showPlayerBarOnDockHover);
+  inner.addEventListener("mouseleave", hidePlayerBarOnDockLeave);
+  ensureLayoutAttrObserver();
+
   dock.appendChild(inner);
   sidePanel.appendChild(dock);
   applyDockSuppression();
@@ -448,6 +637,8 @@ export function unmountUnisonDock(): void {
     unisonDockObserver.disconnect();
     unisonDockObserver = null;
   }
+  hidePlayerBarOnDockLeave();
+  disconnectLayoutAttrObserver();
   dockSuppressionReasons.delete("cardVisible");
   const dock = document.getElementsByClassName(UNISON_DOCK_CLASS)[0];
   if (dock) dock.remove();
@@ -467,7 +658,7 @@ function createSubmitterBlock(submitter: NonNullable<UnisonData["submitter"]>): 
 
   const handleEl = document.createElement("strong");
   handleEl.className = `${FOOTER_CLASS}__author-name`;
-  handleEl.textContent = generatePetName(submitter.keyId);
+  handleEl.textContent = submitter.displayName ?? generatePetName(submitter.keyId);
 
   const tier = getTrustTier(submitter.reputation);
   const tierEl = document.createElement("span");
@@ -534,11 +725,12 @@ function setScoreLine(refs: ScoreLineRefs, score: number, votes: number): void {
   refs.voteLabel.textContent = ` ${votes === 1 ? t("unison_vote_singular") : t("unison_vote_plural")}`;
 }
 
-function getTrustTier(reputation: number): "new" | "trusted" | "veteran" | "expert" {
-  if (reputation < 0.5) return "new";
-  if (reputation < 1.5) return "trusted";
-  if (reputation < 1.85) return "veteran";
-  return "expert";
+function shouldRenderShadersPromo(): boolean {
+  return document.querySelector(SHADERS_DETECTION_SELECTOR) === null;
+}
+
+function getShadersStoreUrl(): string {
+  return navigator.userAgent.includes("Firefox") ? SHADERS_AMO_URL : SHADERS_CWS_URL;
 }
 
 /**
@@ -549,7 +741,14 @@ function getTrustTier(reputation: number): "new" | "trusted" | "veteran" | "expe
  * @param album - Album name
  * @param duration - Song duration in seconds
  */
-function createFooter(song: string, artist: string, album: string, duration: number, videoId?: string): void {
+function createFooter(
+  song: string,
+  artist: string,
+  album: string,
+  duration: number,
+  videoId?: string,
+  showRequestButton = false
+): void {
   try {
     const footer = document.getElementsByClassName(FOOTER_CLASS)[0] as HTMLElement;
     footer.replaceChildren();
@@ -604,6 +803,33 @@ function createFooter(song: string, artist: string, album: string, duration: num
         })
       );
     }
+    if (videoId && showRequestButton) {
+      footer.appendChild(createRequestSyncedButton({ videoId, song, artist }));
+    }
+    chrome.storage.sync.get({ isShadersPromoEnabled: true }, settings => {
+      if (!discordLink.isConnected) return;
+      if (!settings.isShadersPromoEnabled) return;
+      if (!shouldRenderShadersPromo()) return;
+
+      const shadersButton = document.createElement("a");
+      shadersButton.className = `${FOOTER_CLASS}__container ${FOOTER_CLASS}__shaders`;
+      shadersButton.href = getShadersStoreUrl();
+      shadersButton.target = "_blank";
+      shadersButton.rel = "noreferrer noopener";
+
+      const shadersImage = document.createElement("img");
+      shadersImage.src = chrome.runtime.getURL("images/icons/shaders.png");
+      shadersImage.alt = "Better Lyrics Shaders";
+      shadersImage.width = 20;
+      shadersImage.height = 20;
+      shadersButton.appendChild(shadersImage);
+
+      const shadersLabel = document.createElement("span");
+      shadersLabel.textContent = t("lyrics_getShaders");
+      shadersButton.appendChild(shadersLabel);
+
+      footer.insertBefore(shadersButton, discordLink);
+    });
     footer.appendChild(discordLink);
 
     footer.removeAttribute("is-empty");
@@ -979,6 +1205,7 @@ export function addNoLyricsButton(
         href: buildUnisonSubmitUrl(song, artist, album, duration, videoId).toString(),
       })
     );
+    buttonContainer.appendChild(createRequestSyncedButton({ videoId, song, artist }));
   }
 
   lyricsWrapper.appendChild(buttonContainer);
@@ -1111,8 +1338,20 @@ export function injectSongAttributes(title: string, artist: string): void {
  * @param artist - Artist name
  */
 function getGeniusLink(song: string, artist: string): string {
-  const searchQuery = encodeURIComponent(`${artist.trim()} - ${song.trim()}`);
-  return `https://genius.com/search?q=${searchQuery}`;
+  const query = encodeURIComponent(`!ducky site:genius.com ${artist.trim()} ${song.trim()}`);
+  return `https://duckduckgo.com/?q=${query}`;
+}
+
+let footerResizeObserver: ResizeObserver | null = null;
+
+function observeFooterForRecalc(footer: HTMLElement): void {
+  if (footerResizeObserver) {
+    footerResizeObserver.disconnect();
+  }
+  footerResizeObserver = new ResizeObserver(() => {
+    lyricsElementAdded();
+  });
+  footerResizeObserver.observe(footer);
 }
 
 export function setExtraHeight() {
@@ -1141,5 +1380,5 @@ export function setExtraHeight() {
     tabRendererHeight - lyricsHeight
   );
 
-  document.documentElement.style.setProperty("--blyrics-padding-bottom", extraHeight + "px");
+  document.documentElement.style.setProperty("--blyrics-padding-bottom", Math.ceil(extraHeight) + "px");
 }

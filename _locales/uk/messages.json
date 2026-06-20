@@ -91,6 +91,10 @@
     "message": "Автопрокрутка текстів пісень",
     "description": "Auto-scroll unsynced lyrics setting label"
   },
+  "options_display_shadersPromo": {
+    "message": "Показати посилання на Better Lyrics Shaders",
+    "description": "Toggle label for the Shaders companion link shown in the lyrics footer"
+  },
   "options_display_unisonActions": {
     "message": "Дії з Unison",
     "description": "Display-section row label for the Unison Actions modal trigger"
@@ -179,6 +183,10 @@
     "message": "Перетягніть для зміни пріоритету. Джерела зверху мають вищий пріоритет. Зніміть прапорець, щоб вимкнути.",
     "description": "Sources settings section description"
   },
+  "options_sources_openUnison": {
+    "message": "Unison",
+    "description": "Label on the small button in the Sources section header that opens the Unison page"
+  },
   "options_themes_title": {
     "message": "Стиль інтерфейсу",
     "description": "Theme settings section title"
@@ -227,6 +235,10 @@
     "message": "Ваш унікальний анонімний профіль в Better Lyrics.",
     "description": "Identity settings section description"
   },
+  "options_identity_warning": {
+    "message": "Treat this like your password. Never share it. Export a backup. No one can recover a lost identity, not even admins.",
+    "description": "Security warning in the Identity settings tab: keep the identity private and back it up because it is unrecoverable"
+  },
   "options_identity_yourIdentity": {
     "message": "Ваш ідентифікатор",
     "description": "Your identity label"
@@ -246,6 +258,98 @@
   "options_identity_importKey": {
     "message": "Імпортувати",
     "description": "Import key button label"
+  },
+  "options_identityImport_title": {
+    "message": "Імпортувати",
+    "description": "Title of the import identity modal"
+  },
+  "options_identityImport_chooseFile": {
+    "message": "Обрати файл",
+    "description": "Label for the file picker button in the import identity modal"
+  },
+  "options_identityImport_or": {
+    "message": "чи",
+    "description": "Divider between file picker and paste textarea in the import identity modal"
+  },
+  "options_identityImport_pastePlaceholder": {
+    "message": "Вставити JSON профілю...",
+    "description": "Placeholder for the identity JSON textarea"
+  },
+  "options_identityImport_import": {
+    "message": "Імпортувати",
+    "description": "Confirm button label inside the import identity modal"
+  },
+  "options_nickname_description": {
+    "message": "Оберіть ім’я (від 3 до 20 символів) для Better Lyrics. Можна використовувати літери, цифри та підкреслення.",
+    "description": "Nickname subsection description"
+  },
+  "options_nickname_placeholder": {
+    "message": "Обрати псевдонім",
+    "description": "Nickname input placeholder"
+  },
+  "options_nickname_save": {
+    "message": "Зберегти",
+    "description": "Nickname save button label"
+  },
+  "options_nickname_reset": {
+    "message": "Скинути до типових",
+    "description": "Nickname reset button label"
+  },
+  "options_nickname_modalTitle": {
+    "message": "Встановити псевдонім",
+    "description": "Nickname modal title"
+  },
+  "options_nickname_edit": {
+    "message": "Редагувати",
+    "description": "Nickname edit button label"
+  },
+  "options_nickname_editLabel": {
+    "message": "Редагувати псевдонім",
+    "description": "Accessible label for the nickname edit button"
+  },
+  "options_nickname_status_checking": {
+    "message": "Перевірка...",
+    "description": "Status while checking nickname availability"
+  },
+  "options_nickname_status_available": {
+    "message": "Доступно",
+    "description": "Status when nickname is available"
+  },
+  "options_nickname_status_taken": {
+    "message": "Уже зайнято",
+    "description": "Status when nickname is already taken"
+  },
+  "options_nickname_status_invalid": {
+    "message": "від 3 до 20 літер, цифр або підкреслення",
+    "description": "Status when nickname format is invalid"
+  },
+  "options_nickname_status_profane": {
+    "message": "Недопустиме ім’я, спробуйте інше",
+    "description": "Status when nickname is flagged as inappropriate by the server"
+  },
+  "options_nickname_status_self": {
+    "message": "Це ваш поточний псевдонім",
+    "description": "Status when entered nickname matches current"
+  },
+  "options_nickname_status_saved": {
+    "message": "Збережено",
+    "description": "Status when nickname is saved"
+  },
+  "options_nickname_status_submitting": {
+    "message": "Збереження...",
+    "description": "Status while nickname save is in flight"
+  },
+  "options_nickname_status_rateLimited": {
+    "message": "Зачекайте трохи й спробуйте знову",
+    "description": "Status when nickname checks are rate limited"
+  },
+  "options_nickname_status_error": {
+    "message": "Не вдалося зв’язатися із сервером",
+    "description": "Status when nickname request fails"
+  },
+  "options_alert_importEmpty": {
+    "message": "Спочатку вставте JSON профілю чи виберіть файл.",
+    "description": "Shown when the user clicks Import with no JSON provided"
   },
   "options_modal_selectTheme": {
     "message": "Вибрати тему",
@@ -781,6 +885,10 @@
     "message": "Пошук на Genius",
     "description": "Search on Genius button text"
   },
+  "lyrics_getShaders": {
+    "message": "Отримати Better Lyrics Shaders",
+    "description": "Footer button text linking to the Better Lyrics Shaders companion extension"
+  },
   "lyrics_searching": {
     "message": "Better Lyrics шукає текст пісні...",
     "description": "Loading message while searching for lyrics"
@@ -949,6 +1057,96 @@
     "message": "Подати текст через Unison",
     "description": "Button text for submitting lyrics to Unison"
   },
+  "auth_pageTitle": {
+    "message": "Увійти за допомогою Better Lyrics",
+    "description": "Browser tab title for the auth consent popup"
+  },
+  "auth_consentHeading": {
+    "message": "Увійти в $ORIGIN$",
+    "description": "Consent prompt heading. $ORIGIN$ is replaced with the requesting site, e.g. unison.boidu.dev",
+    "placeholders": {
+      "origin": {
+        "content": "$1",
+        "example": "unison.boidu.dev"
+      }
+    }
+  },
+  "auth_consentSubheading": {
+    "message": "Ви ввійдете як $NAME$.",
+    "description": "Identifies the current BL identity. $NAME$ is the deterministic display name.",
+    "placeholders": {
+      "name": {
+        "content": "$1",
+        "example": "Curious-Otter-7392"
+      }
+    }
+  },
+  "auth_consentExplainer": {
+    "message": "Better Lyrics підпише одноразове повідомлення, яке підтверджує, що ви контролюєте цей профіль. Сайт ніколи не побачить ваш ключ.",
+    "description": "Short explainer body in the consent popup"
+  },
+  "auth_rememberLabel": {
+    "message": "Не запитувати знову протягом 24 годин",
+    "description": "Checkbox label allowing the user to remember this approval"
+  },
+  "auth_approve": {
+    "message": "Підтвердити",
+    "description": "Primary button: approve the sign-in request"
+  },
+  "auth_cancel": {
+    "message": "Скасувати",
+    "description": "Secondary button: reject the sign-in request"
+  },
+  "auth_invalidRequest": {
+    "message": "Недійсний запит на вхід.",
+    "description": "Error state shown when the popup receives malformed parameters"
+  },
+  "auth_sessionExpired": {
+    "message": "Термін дії входу минув. Закрийте це вікно та спробуйте ще раз.",
+    "description": "Shown in the sign-in consent popup when the connection to the extension's service worker is lost before the user can approve or cancel."
+  },
+  "lyrics_requestSyncedVersion": {
+    "message": "Запит синхронізованої версії",
+    "description": "Button label asking the community to contribute synced lyrics for the current song"
+  },
+  "lyrics_requestedFirst": {
+    "message": "Запит створено · ви перші",
+    "description": "Button label after a successful first-ever request for this song"
+  },
+  "lyrics_requestedOneOther": {
+    "message": "Запит створено · ще 1 особа хоче цього",
+    "description": "Button label after a successful request when exactly one other person has also requested"
+  },
+  "lyrics_requestedNOthers": {
+    "message": "Запит створено · ще $N$ осіб хочуть цього",
+    "description": "Button label after a successful request when N other people have also requested",
+    "placeholders": {
+      "n": {
+        "content": "$1",
+        "example": "12"
+      }
+    }
+  },
+  "lyrics_requestErrorRateLimit": {
+    "message": "Повторіть спробу за хвилину",
+    "description": "Button label shown briefly when the request is rate-limited"
+  },
+  "lyrics_requestErrorNetwork": {
+    "message": "Немає з'єднання з Unison",
+    "description": "Button label shown briefly when the request fails for a transport/network reason (no HTTP response received)"
+  },
+  "lyrics_requestErrorServer": {
+    "message": "З Unison виникли проблеми",
+    "description": "Button label shown briefly when the request fails with a 5xx server error"
+  },
+  "lyrics_requestErrorGeneric": {
+    "message": "Не вдалося надіслати запит",
+    "description": "Button label shown briefly when the request fails for any other reason (catch-all)"
+  },
+  "lyrics_requestSyncedLanded": {
+    "message": "Синхронізована версія вже є. Перезавантажити.",
+    "description": "Button label when the server reports a synced version already exists; clicking reloads the page"
+  },
   "unison_pageTitle": {
     "message": "Unison - Better Lyrics",
     "description": "Page title for the Unison dashboard"
@@ -1046,16 +1244,56 @@
     "description": "Report reason: other"
   },
   "unison_confidence_low": {
-    "message": "Низька впевненість",
-    "description": "Low confidence indicator"
+    "message": "Непідтверджений",
+    "description": "Tier label for entries with fewer than the minimum votes for confidence"
   },
   "unison_confidence_medium": {
-    "message": "Середня впевненість",
-    "description": "Medium confidence indicator"
+    "message": "Надійний",
+    "description": "Tier label for entries the community has accepted (the baseline 'good enough' tier)"
   },
   "unison_confidence_high": {
-    "message": "Висока впевненість",
-    "description": "High confidence indicator"
+    "message": "Високорейтинговий",
+    "description": "Tier label for entries with diverse community approval (rare, top tier)"
+  },
+  "unison_sortTopRated": {
+    "message": "Високорейтинговий",
+    "description": "Sort by effective score, highest first"
+  },
+  "unison_sortBottomRated": {
+    "message": "Низькорейтинговий",
+    "description": "Sort by effective score, lowest first"
+  },
+  "unison_sortMostVoted": {
+    "message": "Найбільше голосів",
+    "description": "Sort by vote count, most first"
+  },
+  "unison_sortLeastVoted": {
+    "message": "Найменше голосів",
+    "description": "Sort by vote count, fewest first"
+  },
+  "unison_syncRichsync": {
+    "message": "За складами",
+    "description": "Sync type: word/syllable-level timing. Reused by the sync badge on cards and the sync filter chip"
+  },
+  "unison_syncLinesync": {
+    "message": "За рядками",
+    "description": "Sync type: line-level timing. Reused by the sync badge on cards and the sync filter chip"
+  },
+  "unison_syncPlain": {
+    "message": "Простий текст",
+    "description": "Sync type: unsynced lyrics. Reused by the sync badge on cards and the sync filter chip"
+  },
+  "unison_tier": {
+    "message": "Рівень",
+    "description": "Filter bar group label for confidence tier"
+  },
+  "unison_tierTrustedPlus": {
+    "message": "Надійний+",
+    "description": "Tier filter chip hiding Unverified entries (shows Trusted and above)"
+  },
+  "unison_languageAll": {
+    "message": "Усі мови",
+    "description": "Language dropdown default option"
   },
   "unison_format_lrc": {
     "message": "LRC",
@@ -1082,8 +1320,8 @@
     "description": "Identity label prefix"
   },
   "unison_loadMore": {
-    "message": "Завантажити більше",
-    "description": "Load more button for feed pagination"
+    "message": "Ще завантажується...",
+    "description": "Auto-loading indicator shown at the bottom of the feed while the next page is being fetched"
   },
   "unison_votes": {
     "message": "голос(и)",
@@ -1205,6 +1443,14 @@
     "message": "Ви ще не подали жодних текстів пісень.",
     "description": "Empty state for my submissions tab"
   },
+  "unison_noFilterResults": {
+    "message": "Відсутні тексти пісень, які відповідають вашим фільтрам",
+    "description": "Empty state shown when the active sort/filter combination returns no entries"
+  },
+  "unison_noFeedYet": {
+    "message": "Текст пісні поки що відсутній",
+    "description": "Empty state shown when the recent feed is empty with no filters applied"
+  },
   "unison_sync": {
     "message": "Синхронізація",
     "description": "Sync type label in detail view"
@@ -1212,6 +1458,32 @@
   "unison_language": {
     "message": "Мова",
     "description": "Language label in detail view"
+  },
+  "unison_uploadedBy": {
+    "message": "Завантажив",
+    "description": "Metadata row label in the Unison detail sidebar, before the uploader's name which links to their curator page"
+  },
+  "unison_languageUnspecified": {
+    "message": "Не вказано",
+    "description": "Default option in the submission form's language dropdown, used when the submitter has not chosen a language"
+  },
+  "unison_fulfilledBadge": {
+    "message": "Запит і виконання",
+    "description": "Badge on the Unison detail page shown when this lyric answered a community request"
+  },
+  "unison_fulfilledNote": {
+    "message": "Хтось хотів, щоб це було на Better Lyrics і $name$ це здійснив.",
+    "description": "Sentence on the Unison detail page explaining that the lyric fulfilled a community request. $name$ is the uploader's display name",
+    "placeholders": {
+      "name": {
+        "content": "$1",
+        "example": "AcousticPrestoRemix"
+      }
+    }
+  },
+  "unison_fulfilledBoardLink": {
+    "message": "Переглянути дошку запитів",
+    "description": "Link on the Unison detail page that opens the community requests board (queue of most-wanted songs)"
   },
   "unison_validationRequired": {
     "message": "Будь ласка, вкажіть назву пісні, виконавця, ідентифікатор відео і текст.",

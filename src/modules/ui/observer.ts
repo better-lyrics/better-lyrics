@@ -93,15 +93,16 @@ function cleanupWakeLock(): void {
 
 type FullscreenCallback = () => void;
 
-function onFullscreenChange(onEnter: FullscreenCallback, onExit: FullscreenCallback): void {
+const fullscreenEnterCallbacks: FullscreenCallback[] = [];
+const fullscreenExitCallbacks: FullscreenCallback[] = [];
+
+function ensureFullscreenObserver(): void {
+  if (fullscreenObserver) return;
+
   const appLayout = document.querySelector("ytmusic-app-layout");
   if (!appLayout) {
-    setTimeout(() => onFullscreenChange(onEnter, onExit), 1000);
+    setTimeout(ensureFullscreenObserver, 1000);
     return;
-  }
-
-  if (fullscreenObserver) {
-    fullscreenObserver.disconnect();
   }
 
   let wasFullscreen = appLayout.hasAttribute("player-fullscreened");
@@ -110,15 +111,25 @@ function onFullscreenChange(onEnter: FullscreenCallback, onExit: FullscreenCallb
     const isFullscreen = appLayout.hasAttribute("player-fullscreened");
 
     if (!wasFullscreen && isFullscreen) {
-      onEnter();
+      fullscreenEnterCallbacks.forEach(cb => cb());
     } else if (wasFullscreen && !isFullscreen) {
-      onExit();
+      fullscreenExitCallbacks.forEach(cb => cb());
     }
 
     wasFullscreen = isFullscreen;
   });
 
   fullscreenObserver.observe(appLayout, { attributes: true, attributeFilter: ["player-fullscreened"] });
+}
+
+export function onFullscreenChange(onEnter: FullscreenCallback, onExit: FullscreenCallback): void {
+  fullscreenEnterCallbacks.push(onEnter);
+  fullscreenExitCallbacks.push(onExit);
+  ensureFullscreenObserver();
+}
+
+export function isPlayerFullscreened(): boolean {
+  return document.querySelector("ytmusic-app-layout")?.hasAttribute("player-fullscreened") ?? false;
 }
 
 export function setupWakeLockForFullscreen(): void {

@@ -1,6 +1,6 @@
 {
   "manifest_version": 3,
-  "version": "2.3.0.1",
+  "version": "2.3.1",
   "default_locale": "en",
   "name": "Better Lyrics (Lyrics for Youtube Music)",
   "description": "__MSG_extensionDescription__",
@@ -18,10 +18,19 @@
     "storage",
     "alarms"
   ],
+  "externally_connectable": {
+    "matches": [
+      "https://unison.boidu.dev/*",
+      "https://blrcunison.vercel.app/*"
+    ]
+  },
   "optional_permissions": [
     "downloads"
   ],
   "optional_host_permissions": [],
+  "content_security_policy": {
+    "extension_pages": "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://api.fontshare.com https://fonts.googleapis.com; font-src 'self' data: https://cdn.fontshare.com https://fonts.gstatic.com; img-src 'self' data: https://blrcunison.vercel.app https://boidu.dev https://betterlyrics.org https://raw.githubusercontent.com https://placehold.co; connect-src https://unison.boidu.dev https://raw.githubusercontent.com https://api.github.com https://better-lyrics-themes-api.boidu.dev; frame-src https://better-lyrics-themes-api.boidu.dev;"
+  },
   "options_ui": {
     "page": "src/options/options.html",
     "open_in_tab": false
@@ -37,10 +46,20 @@
         "css/disablestylizedanimations.css",
         "css/themesong.css",
         "css/themes/*.css",
+        "images/icons/shaders.png",
         "*.js.map",
         "pages/standalone-editor.html",
         "pages/marketplace.html",
         "pages/unison.html"
+      ]
+    },
+    {
+      "matches": [
+        "https://unison.boidu.dev/*",
+        "https://blrcunison.vercel.app/*"
+      ],
+      "resources": [
+        "pages/auth.html"
       ]
     }
   ],
@@ -96,5 +115,5 @@
   "action": {
     "default_popup": "src/options/options.html"
   },
-  "version_name": "2.3.0-canary 1"
+  "version_name": "2.3.1"
 }

@@ -1485,7 +1485,7 @@
   padding: 0 12px;
   height: 36px;
   border: none;
-  border-radius: 0.5rem;
+  border-radius: 0.75rem;
   cursor: pointer;
   font-size: 0.875rem;
   margin: 0;
@@ -1624,7 +1624,7 @@
 .your-themes-item-apply {
   flex-shrink: 0;
   padding: 0.375rem 0.75rem;
-  border-radius: 0.375rem;
+  border-radius: 0.75rem;
   font-size: 0.75rem;
   font-weight: 600;
   cursor: pointer;
@@ -1660,7 +1660,7 @@
 .store-buttons-row button {
   height: 36px;
   padding: 0 14px;
-  border-radius: 0.5rem;
+  border-radius: 0.75rem;
   font-size: 0.875rem;
   font-weight: 500;
   cursor: pointer;
@@ -2003,4 +2003,36 @@ kbd.kbd-icon svg {
 
 .toast .toast-action kbd {
   margin-left: 0.5rem;
+}
+
+/* -- Squircle corners ---------------------------- */
+/* Feature-gated: browsers without corner-shape keep the original radii above. */
+
+@supports (corner-shape: superellipse(1.6)) {
+  .marketplace-filters {
+    border-radius: 1.5rem;
+  }
+
+  #your-themes-dropdown,
+  #status-css.toast {
+    border-radius: 1.25rem;
+  }
+
+  .store-card,
+  .store-filter-dropdown {
+    border-radius: 1rem;
+  }
+
+  .detail-shader-info {
+    border-radius: 0.75rem;
+  }
+
+  .marketplace-filters,
+  #your-themes-dropdown,
+  #status-css.toast,
+  .store-card,
+  .store-filter-dropdown,
+  .detail-shader-info {
+    corner-shape: superellipse(1.6);
+  }
 }

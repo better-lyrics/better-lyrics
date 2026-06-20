@@ -69,9 +69,9 @@ ytmusic-player-page:not([is-mweb-modernization-enabled])[player-fullscreened]:no
   margin: 0 auto;
 }
 
-ytmusic-player-page:not([blyrics-dfs])[blyrics-video-mode] #movie_player,
-ytmusic-player-page:not([blyrics-dfs])[blyrics-video-mode] #song-media-window,
-ytmusic-player-page:not([blyrics-dfs])[blyrics-video-mode] #player.ytmusic-player-page {
+ytmusic-player-page:not([blyrics-dfs])[blyrics-video-mode]:not([player-ui-state=MINIPLAYER]) #movie_player,
+ytmusic-player-page:not([blyrics-dfs])[blyrics-video-mode]:not([player-ui-state=MINIPLAYER]) #song-media-window,
+ytmusic-player-page:not([blyrics-dfs])[blyrics-video-mode]:not([player-ui-state=MINIPLAYER]) #player.ytmusic-player-page {
   aspect-ratio: var(--blyrics-video-aspect-ratio);
   height: auto;
   min-height: 0;
@@ -87,9 +87,9 @@ ytmusic-player-page:not([blyrics-dfs])[blyrics-video-mode] #av-id {
 
 /* Cap #player width so width / aspect-ratio (its derived height) fits in the
    available vertical space. Without this, tall videos like 4:3 overflow on
-   wide screens — the bottom is hidden by the player bar in non-fullscreen, or
+   wide screens: the bottom is hidden by the player bar in non-fullscreen, or
    pushes the song-info off-screen in fullscreen. */
-ytmusic-player-page:not([blyrics-dfs])[blyrics-video-mode]:not([player-fullscreened]) #player.ytmusic-player-page {
+ytmusic-player-page:not([blyrics-dfs])[blyrics-video-mode]:not([player-fullscreened]):not([player-ui-state=MINIPLAYER]) #player.ytmusic-player-page {
   width: min(
     100%,
     calc((100vh - 80px - var(--ytmusic-player-page-vertical-padding) - var(--ytmusic-nav-bar-height) - var(--ytmusic-player-bar-height)) * (var(--blyrics-video-aspect-ratio)))
@@ -245,9 +245,23 @@ ytmusic-app-layout[player-fullscreened]:not([blyrics-dfs]) > [slot="player-bar"]
   top: 16px;
 }
 
-/* Pin bottom-anchored dock above the player bar always, avoids hover/wake-zone chase loop */
-#layout[player-fullscreened]:not([blyrics-dfs]) .blyrics-unison-dock[data-position^="bottom-"] {
-  --dock-y-shift: var(--blyrics-fullscreen-bottom-dock-shift, -24px);
+#layout[player-fullscreened]:not([blyrics-dfs])[show-fullscreen-controls] .blyrics-unison-dock[data-position^="bottom-"],
+#layout[player-fullscreened]:not([blyrics-dfs]):has(.blyrics-unison-dock__inner:hover) .blyrics-unison-dock[data-position^="bottom-"] {
+  --dock-y-shift: var(--blyrics-fullscreen-bottom-dock-shift, -88px);
+}
+
+#layout[player-fullscreened]:not([blyrics-dfs]) .blyrics-unison-dock[data-position^="bottom-"] .blyrics-unison-dock__inner {
+  position: relative;
+}
+
+#layout[player-fullscreened]:not([blyrics-dfs]) .blyrics-unison-dock[data-position^="bottom-"] .blyrics-unison-dock__inner::before {
+  content: "";
+  position: absolute;
+  top: -88px;
+  bottom: 0;
+  left: -88px;
+  right: -88px;
+  z-index: -1;
 }
 
 /* Top-center autoscroll-button shift is smaller in fullscreen (no tab header) */

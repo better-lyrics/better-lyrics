@@ -91,6 +91,10 @@
     "message": "Auto-scroll unsynced lyrics",
     "description": "Auto-scroll unsynced lyrics setting label"
   },
+  "options_display_shadersPromo": {
+    "message": "Show link to Better Lyrics Shaders",
+    "description": "Toggle label for the Shaders companion link shown in the lyrics footer"
+  },
   "options_display_unisonActions": {
     "message": "Unison Actions",
     "description": "Display-section row label for the Unison Actions modal trigger"
@@ -179,6 +183,10 @@
     "message": "Glissez pour réorganiser la priorité. Les sources en haut sont essayées en premier. Décochez pour désactiver.",
     "description": "Sources settings section description"
   },
+  "options_sources_openUnison": {
+    "message": "Unison",
+    "description": "Label on the small button in the Sources section header that opens the Unison page"
+  },
   "options_themes_title": {
     "message": "Paramètres de thème",
     "description": "Theme settings section title"
@@ -227,6 +235,10 @@
     "message": "Votre identité anonyme unique pour Better Lyrics.",
     "description": "Identity settings section description"
   },
+  "options_identity_warning": {
+    "message": "Treat this like your password. Never share it. Export a backup. No one can recover a lost identity, not even admins.",
+    "description": "Security warning in the Identity settings tab: keep the identity private and back it up because it is unrecoverable"
+  },
   "options_identity_yourIdentity": {
     "message": "Votre identité",
     "description": "Your identity label"
@@ -246,6 +258,98 @@
   "options_identity_importKey": {
     "message": "Importer la clé",
     "description": "Import key button label"
+  },
+  "options_identityImport_title": {
+    "message": "Import Identity",
+    "description": "Title of the import identity modal"
+  },
+  "options_identityImport_chooseFile": {
+    "message": "Choose File",
+    "description": "Label for the file picker button in the import identity modal"
+  },
+  "options_identityImport_or": {
+    "message": "or",
+    "description": "Divider between file picker and paste textarea in the import identity modal"
+  },
+  "options_identityImport_pastePlaceholder": {
+    "message": "Paste identity JSON here...",
+    "description": "Placeholder for the identity JSON textarea"
+  },
+  "options_identityImport_import": {
+    "message": "Import",
+    "description": "Confirm button label inside the import identity modal"
+  },
+  "options_nickname_description": {
+    "message": "Pick a name for yourself across Better Lyrics. Letters, numbers, and underscore, 3 to 20 characters.",
+    "description": "Nickname subsection description"
+  },
+  "options_nickname_placeholder": {
+    "message": "Pick a nickname",
+    "description": "Nickname input placeholder"
+  },
+  "options_nickname_save": {
+    "message": "Save",
+    "description": "Nickname save button label"
+  },
+  "options_nickname_reset": {
+    "message": "Reset to default",
+    "description": "Nickname reset button label"
+  },
+  "options_nickname_modalTitle": {
+    "message": "Set your nickname",
+    "description": "Nickname modal title"
+  },
+  "options_nickname_edit": {
+    "message": "Edit",
+    "description": "Nickname edit button label"
+  },
+  "options_nickname_editLabel": {
+    "message": "Edit nickname",
+    "description": "Accessible label for the nickname edit button"
+  },
+  "options_nickname_status_checking": {
+    "message": "Checking...",
+    "description": "Status while checking nickname availability"
+  },
+  "options_nickname_status_available": {
+    "message": "Available",
+    "description": "Status when nickname is available"
+  },
+  "options_nickname_status_taken": {
+    "message": "Already taken",
+    "description": "Status when nickname is already taken"
+  },
+  "options_nickname_status_invalid": {
+    "message": "3 to 20 letters, numbers, or underscores",
+    "description": "Status when nickname format is invalid"
+  },
+  "options_nickname_status_profane": {
+    "message": "Not allowed, try another",
+    "description": "Status when nickname is flagged as inappropriate by the server"
+  },
+  "options_nickname_status_self": {
+    "message": "This is your current nickname",
+    "description": "Status when entered nickname matches current"
+  },
+  "options_nickname_status_saved": {
+    "message": "Saved",
+    "description": "Status when nickname is saved"
+  },
+  "options_nickname_status_submitting": {
+    "message": "Saving...",
+    "description": "Status while nickname save is in flight"
+  },
+  "options_nickname_status_rateLimited": {
+    "message": "Slow down, try again in a moment",
+    "description": "Status when nickname checks are rate limited"
+  },
+  "options_nickname_status_error": {
+    "message": "Could not reach the server",
+    "description": "Status when nickname request fails"
+  },
+  "options_alert_importEmpty": {
+    "message": "Paste identity JSON or choose a file first.",
+    "description": "Shown when the user clicks Import with no JSON provided"
   },
   "options_modal_selectTheme": {
     "message": "Sélectionner un thème",
@@ -781,6 +885,10 @@
     "message": "Rechercher sur Genius",
     "description": "Search on Genius button text"
   },
+  "lyrics_getShaders": {
+    "message": "Get Better Lyrics Shaders",
+    "description": "Footer button text linking to the Better Lyrics Shaders companion extension"
+  },
   "lyrics_searching": {
     "message": "Better Lyrics recherche les paroles...",
     "description": "Loading message while searching for lyrics"
@@ -949,6 +1057,96 @@
     "message": "Submit lyrics with Unison",
     "description": "Button text for submitting lyrics to Unison"
   },
+  "auth_pageTitle": {
+    "message": "Sign in with Better Lyrics",
+    "description": "Browser tab title for the auth consent popup"
+  },
+  "auth_consentHeading": {
+    "message": "Sign in to $ORIGIN$",
+    "description": "Consent prompt heading. $ORIGIN$ is replaced with the requesting site, e.g. unison.boidu.dev",
+    "placeholders": {
+      "origin": {
+        "content": "$1",
+        "example": "unison.boidu.dev"
+      }
+    }
+  },
+  "auth_consentSubheading": {
+    "message": "You will sign in as $NAME$.",
+    "description": "Identifies the current BL identity. $NAME$ is the deterministic display name.",
+    "placeholders": {
+      "name": {
+        "content": "$1",
+        "example": "Curious-Otter-7392"
+      }
+    }
+  },
+  "auth_consentExplainer": {
+    "message": "Better Lyrics will sign a one-time message proving you control this identity. The site never sees your private key.",
+    "description": "Short explainer body in the consent popup"
+  },
+  "auth_rememberLabel": {
+    "message": "Don't ask again for 24 hours",
+    "description": "Checkbox label allowing the user to remember this approval"
+  },
+  "auth_approve": {
+    "message": "Approve",
+    "description": "Primary button: approve the sign-in request"
+  },
+  "auth_cancel": {
+    "message": "Cancel",
+    "description": "Secondary button: reject the sign-in request"
+  },
+  "auth_invalidRequest": {
+    "message": "Invalid sign-in request.",
+    "description": "Error state shown when the popup receives malformed parameters"
+  },
+  "auth_sessionExpired": {
+    "message": "Sign-in expired. Please close this window and try again.",
+    "description": "Shown in the sign-in consent popup when the connection to the extension's service worker is lost before the user can approve or cancel."
+  },
+  "lyrics_requestSyncedVersion": {
+    "message": "Request a synced version",
+    "description": "Button label asking the community to contribute synced lyrics for the current song"
+  },
+  "lyrics_requestedFirst": {
+    "message": "Requested · you're the first",
+    "description": "Button label after a successful first-ever request for this song"
+  },
+  "lyrics_requestedOneOther": {
+    "message": "Requested · 1 other wants this",
+    "description": "Button label after a successful request when exactly one other person has also requested"
+  },
+  "lyrics_requestedNOthers": {
+    "message": "Requested · $N$ others want this",
+    "description": "Button label after a successful request when N other people have also requested",
+    "placeholders": {
+      "n": {
+        "content": "$1",
+        "example": "12"
+      }
+    }
+  },
+  "lyrics_requestErrorRateLimit": {
+    "message": "Try again in a minute",
+    "description": "Button label shown briefly when the request is rate-limited"
+  },
+  "lyrics_requestErrorNetwork": {
+    "message": "Couldn't reach Unison",
+    "description": "Button label shown briefly when the request fails for a transport/network reason (no HTTP response received)"
+  },
+  "lyrics_requestErrorServer": {
+    "message": "Unison is having trouble",
+    "description": "Button label shown briefly when the request fails with a 5xx server error"
+  },
+  "lyrics_requestErrorGeneric": {
+    "message": "Couldn't send the request",
+    "description": "Button label shown briefly when the request fails for any other reason (catch-all)"
+  },
+  "lyrics_requestSyncedLanded": {
+    "message": "Synced version available. Refresh.",
+    "description": "Button label when the server reports a synced version already exists; clicking reloads the page"
+  },
   "unison_pageTitle": {
     "message": "Unison - Better Lyrics",
     "description": "Page title for the Unison dashboard"
@@ -1046,16 +1244,56 @@
     "description": "Report reason: other"
   },
   "unison_confidence_low": {
-    "message": "Low Confidence",
-    "description": "Low confidence indicator"
+    "message": "Unverified",
+    "description": "Tier label for entries with fewer than the minimum votes for confidence"
   },
   "unison_confidence_medium": {
-    "message": "Medium Confidence",
-    "description": "Medium confidence indicator"
+    "message": "Trusted",
+    "description": "Tier label for entries the community has accepted (the baseline 'good enough' tier)"
   },
   "unison_confidence_high": {
-    "message": "High Confidence",
-    "description": "High confidence indicator"
+    "message": "Top-Rated",
+    "description": "Tier label for entries with diverse community approval (rare, top tier)"
+  },
+  "unison_sortTopRated": {
+    "message": "Top-Rated",
+    "description": "Sort by effective score, highest first"
+  },
+  "unison_sortBottomRated": {
+    "message": "Bottom-Rated",
+    "description": "Sort by effective score, lowest first"
+  },
+  "unison_sortMostVoted": {
+    "message": "Most-Voted",
+    "description": "Sort by vote count, most first"
+  },
+  "unison_sortLeastVoted": {
+    "message": "Least-Voted",
+    "description": "Sort by vote count, fewest first"
+  },
+  "unison_syncRichsync": {
+    "message": "Richsync",
+    "description": "Sync type: word/syllable-level timing. Reused by the sync badge on cards and the sync filter chip"
+  },
+  "unison_syncLinesync": {
+    "message": "Linesync",
+    "description": "Sync type: line-level timing. Reused by the sync badge on cards and the sync filter chip"
+  },
+  "unison_syncPlain": {
+    "message": "Plain",
+    "description": "Sync type: unsynced lyrics. Reused by the sync badge on cards and the sync filter chip"
+  },
+  "unison_tier": {
+    "message": "Tier",
+    "description": "Filter bar group label for confidence tier"
+  },
+  "unison_tierTrustedPlus": {
+    "message": "Trusted+",
+    "description": "Tier filter chip hiding Unverified entries (shows Trusted and above)"
+  },
+  "unison_languageAll": {
+    "message": "All languages",
+    "description": "Language dropdown default option"
   },
   "unison_format_lrc": {
     "message": "LRC",
@@ -1082,8 +1320,8 @@
     "description": "Identity label prefix"
   },
   "unison_loadMore": {
-    "message": "Load more",
-    "description": "Load more button for feed pagination"
+    "message": "Loading more...",
+    "description": "Auto-loading indicator shown at the bottom of the feed while the next page is being fetched"
   },
   "unison_votes": {
     "message": "votes",
@@ -1205,6 +1443,14 @@
     "message": "You haven't submitted any lyrics yet.",
     "description": "Empty state for my submissions tab"
   },
+  "unison_noFilterResults": {
+    "message": "No lyrics match your filters",
+    "description": "Empty state shown when the active sort/filter combination returns no entries"
+  },
+  "unison_noFeedYet": {
+    "message": "No lyrics here yet",
+    "description": "Empty state shown when the recent feed is empty with no filters applied"
+  },
   "unison_sync": {
     "message": "Sync",
     "description": "Sync type label in detail view"
@@ -1212,6 +1458,32 @@
   "unison_language": {
     "message": "Language",
     "description": "Language label in detail view"
+  },
+  "unison_uploadedBy": {
+    "message": "Uploaded by",
+    "description": "Metadata row label in the Unison detail sidebar, before the uploader's name which links to their curator page"
+  },
+  "unison_languageUnspecified": {
+    "message": "Not specified",
+    "description": "Default option in the submission form's language dropdown, used when the submitter has not chosen a language"
+  },
+  "unison_fulfilledBadge": {
+    "message": "Requested & fulfilled",
+    "description": "Badge on the Unison detail page shown when this lyric answered a community request"
+  },
+  "unison_fulfilledNote": {
+    "message": "Someone wanted this on Better Lyrics, and $name$ came through with it.",
+    "description": "Sentence on the Unison detail page explaining that the lyric fulfilled a community request. $name$ is the uploader's display name",
+    "placeholders": {
+      "name": {
+        "content": "$1",
+        "example": "AcousticPrestoRemix"
+      }
+    }
+  },
+  "unison_fulfilledBoardLink": {
+    "message": "See the requests board",
+    "description": "Link on the Unison detail page that opens the community requests board (queue of most-wanted songs)"
   },
   "unison_validationRequired": {
     "message": "Please fill in song, artist, video ID, and lyrics.",

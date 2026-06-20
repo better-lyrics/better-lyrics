@@ -1,0 +1,137 @@
+name: Publish Platform
+
+on:
+  workflow_dispatch:
+    inputs:
+      platform:
+        description: "Platform to publish to"
+        type: choice
+        options: [chrome, edge, firefox]
+        required: true
+      version:
+        description: "Version to publish (e.g. 2.3.1, must match an existing tag)"
+        type: string
+        required: true
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout at tag
+        uses: actions/checkout@v4
+        with:
+          ref: v${{ inputs.version }}
+          fetch-depth: 0
+
+      - name: Use Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: "20.x"
+
+      - name: Install dependencies
+        run: |
+          npm install
+          npm install --no-save @biomejs/cli-linux-x64@2.0.4 @rspack/binding-linux-x64-gnu@1.5.8
+
+      - name: Detect release type
+        id: meta
+        run: |
+          if [[ "${{ inputs.version }}" == *canary* || "${{ inputs.version }}" =~ ^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+ ]]; then
+            echo "release_type=canary" >> $GITHUB_OUTPUT
+          else
+            echo "release_type=" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Find original release run for this tag
+        id: source
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          PARENT_SHA=$(git rev-parse "v${{ inputs.version }}^1")
+          echo "Tag v${{ inputs.version }} was cut on top of $PARENT_SHA"
+          RUN_ID=$(gh run list --workflow=release.yml --status=success --limit=100 \
+            --json databaseId,headSha \
+            --jq "[.[] | select(.headSha==\"$PARENT_SHA\") | .databaseId] | first")
+          if [[ -z "$RUN_ID" || "$RUN_ID" == "null" ]]; then
+            echo "No successful release run found for that SHA; will rebuild from tag."
+          else
+            echo "Found release run: $RUN_ID"
+            echo "run_id=$RUN_ID" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Download original build artifact
+        id: download
+        if: steps.source.outputs.run_id != ''
+        continue-on-error: true
+        uses: actions/download-artifact@v4
+        with:
+          name: ${{ inputs.platform }}-build
+          path: dist/${{ inputs.platform }}
+          run-id: ${{ steps.source.outputs.run_id }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Rebuild extension (fallback)
+        if: steps.download.outcome != 'success'
+        env:
+          RELEASE_TYPE: ${{ steps.meta.outputs.release_type }}
+          SOURCEMAPS_API_KEY: ${{ secrets.SOURCEMAPS_API_KEY }}
+          SOURCEMAPS_BASE_URL: ${{ env.SOURCEMAPS_API_URL }}
+        run: |
+          echo "Rebuilding from tag v${{ inputs.version }} (no artifact available)."
+          rm -rf "dist/${{ inputs.platform }}"
+          npm run build:ci
+
+      - name: Publish to Chrome Web Store
+        if: inputs.platform == 'chrome'
+        env:
+          EXTENSION_ID: ${{ secrets.GOOGLE_EXTENSION_ID }}
+          PUBLISHER_ID: ${{ secrets.GOOGLE_PUBLISHER_ID }}
+          CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
+          CLIENT_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET }}
+          REFRESH_TOKEN: ${{ secrets.GOOGLE_REFRESH_TOKEN }}
+        run: |
+          cd dist/chrome && zip -r "../chrome-v${{ inputs.version }}.zip" . && cd -
+          npx tsx tooling/publish-chrome.ts "dist/chrome-v${{ inputs.version }}.zip"
+
+      - name: Publish to Edge Add-ons
+        if: inputs.platform == 'edge'
+        env:
+          CLIENT_ID: ${{ secrets.EDGE_CLIENT_ID }}
+          API_KEY: ${{ secrets.EDGE_API_KEY }}
+          PRODUCT_ID: ${{ secrets.EDGE_PRODUCT_ID }}
+        run: |
+          cd dist/edge && zip -r "../edge-v${{ inputs.version }}.zip" . && cd -
+          npx tsx tooling/publish-edge.ts "dist/edge-v${{ inputs.version }}.zip"
+
+      - name: Install web-ext
+        if: inputs.platform == 'firefox'
+        run: npm install -g web-ext
+
+      - name: Sign Firefox Add-on (Canary, unlisted)
+        if: inputs.platform == 'firefox' && steps.meta.outputs.release_type == 'canary'
+        env:
+          FIREFOX_JWT_ISSUER: ${{ secrets.FIREFOX_JWT_ISSUER }}
+          FIREFOX_JWT_SECRET: ${{ secrets.FIREFOX_JWT_SECRET }}
+        run: |
+          web-ext sign --channel=unlisted \
+                       --api-key="$FIREFOX_JWT_ISSUER" \
+                       --api-secret="$FIREFOX_JWT_SECRET" \
+                       --artifacts-dir=dist/signed-firefox \
+                       --source-dir=dist/firefox
+
+      - name: Sign and Publish Firefox Add-on (Listed)
+        if: inputs.platform == 'firefox' && steps.meta.outputs.release_type == ''
+        env:
+          FIREFOX_JWT_ISSUER: ${{ secrets.FIREFOX_JWT_ISSUER }}
+          FIREFOX_JWT_SECRET: ${{ secrets.FIREFOX_JWT_SECRET }}
+        run: |
+          web-ext sign --channel=listed \
+                       --api-key="$FIREFOX_JWT_ISSUER" \
+                       --api-secret="$FIREFOX_JWT_SECRET" \
+                       --upload-source-code \
+                       --artifacts-dir=dist/signed-firefox \
+                       --source-dir=dist/firefox

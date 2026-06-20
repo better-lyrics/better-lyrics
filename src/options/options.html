@@ -11,7 +11,7 @@
 		<nav id="navbar">
 			<h1>
 				<img src="https://betterlyrics.org/icon-512.png" alt="Better Lyrics" width="24" height="24">
-				<div class="heading">Better Lyrics <span>2.3.0-canary 1</span></div>
+				<div class="heading">Better Lyrics <span>2.3.1</span></div>
 			</h1>
 			<div class="nav-container">
 				<a href="https://github.com/better-lyrics/better-lyrics" target="_blank">
@@ -147,6 +147,13 @@
 						<span>__MSG_options_display_passiveScroll__</span>
 						<label>
 							<input type="checkbox" id="isPassiveScrollEnabled">
+							<span class="checkmark"></span>
+						</label>
+					</div>
+					<div class="container">
+						<span>__MSG_options_display_shadersPromo__</span>
+						<label>
+							<input type="checkbox" id="isShadersPromoEnabled">
 							<span class="checkmark"></span>
 						</label>
 					</div>
@@ -351,6 +358,10 @@
 						</svg>
 
 						__MSG_options_sources_title__
+						<button class="unison-open-btn" id="open-unison-btn">
+							<img src="https://betterlyrics.org/icon-512.png" alt="" width="14" height="14">
+							__MSG_options_sources_openUnison__
+						</button>
 					</h2>
 					<p>
 						__MSG_options_sources_description__
@@ -426,9 +437,24 @@
 					__MSG_options_identity_title__
 				</h2>
 				<p>__MSG_options_identity_description__</p>
+				<div class="identity-warning" role="note">
+					<svg class="identity-warning__icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" width="14" height="14" aria-hidden="true">
+						<path fill-rule="evenodd" d="M6.701 2.252a1.5 1.5 0 0 1 2.598 0l5.196 9.001A1.5 1.5 0 0 1 13.196 13.5H2.804a1.5 1.5 0 0 1-1.299-2.247l5.196-9.001ZM8 5.5a.75.75 0 0 1 .75.75v3a.75.75 0 0 1-1.5 0v-3A.75.75 0 0 1 8 5.5Zm0 6.5a.75.75 0 1 0 0-1.5.75.75 0 0 0 0 1.5Z" clip-rule="evenodd"></path>
+					</svg>
+					<p class="identity-warning__text">__MSG_options_identity_warning__</p>
+				</div>
 				<div class="container container--small">
 					<p class="text-group__title">__MSG_options_identity_yourIdentity__</p>
-					<code id="identity-display-name">__MSG_options_identity_loading__</code>
+					<div class="identity-edit-row">
+						<code id="identity-display-name">__MSG_options_identity_loading__</code>
+						<button class="small-btn" id="nickname-edit-btn" aria-label="__MSG_options_nickname_editLabel__">
+							<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" width="16" height="16">
+								<path d="M13.488 2.513a1.75 1.75 0 0 0-2.475 0L6.75 6.774a2.75 2.75 0 0 0-.596.892l-.848 2.047a.75.75 0 0 0 .98.98l2.047-.848a2.75 2.75 0 0 0 .892-.596l4.261-4.262a1.75 1.75 0 0 0 0-2.474Z"></path>
+								<path d="M4.75 3.5c-.69 0-1.25.56-1.25 1.25v6.5c0 .69.56 1.25 1.25 1.25h6.5c.69 0 1.25-.56 1.25-1.25V9A.75.75 0 0 1 14 9v2.25A2.75 2.75 0 0 1 11.25 14h-6.5A2.75 2.75 0 0 1 2 11.25v-6.5A2.75 2.75 0 0 1 4.75 2H7a.75.75 0 0 1 0 1.5H4.75Z"></path>
+							</svg>
+							__MSG_options_nickname_edit__
+						</button>
+					</div>
 				</div>
 				<div class="container container--small">
 					<p>__MSG_options_identity_exportImport__</p>
@@ -568,6 +594,68 @@
 							</div>
 						</div>
 					</div>
+				</div>
+			</div>
+		</div>
+
+		<div id="import-identity-modal-overlay" class="modal-overlay">
+			<div class="modal import-identity-modal">
+				<div class="modal-header">
+					<h3 class="modal-title">__MSG_options_identityImport_title__</h3>
+					<button id="import-identity-modal-close" class="modal-close-btn" aria-label="Close">
+						<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+							<path d="M6.28 5.22a.75.75 0 0 0-1.06 1.06L8.94 10l-3.72 3.72a.75.75 0 1 0 1.06 1.06L10 11.06l3.72 3.72a.75.75 0 1 0 1.06-1.06L11.06 10l3.72-3.72a.75.75 0 0 0-1.06-1.06L10 8.94 6.28 5.22Z"></path>
+						</svg>
+					</button>
+				</div>
+				<div class="modal-body">
+					<button id="import-identity-file-btn" class="modal-btn modal-btn-secondary import-identity-file-btn">
+						<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="16" height="16">
+							<path fill-rule="evenodd" d="M12 2.25a.75.75 0 0 1 .75.75v11.69l3.22-3.22a.75.75 0 1 1 1.06 1.06l-4.5 4.5a.75.75 0 0 1-1.06 0l-4.5-4.5a.75.75 0 1 1 1.06-1.06l3.22 3.22V3a.75.75 0 0 1 .75-.75Zm-9 13.5a.75.75 0 0 1 .75.75v2.25a1.5 1.5 0 0 0 1.5 1.5h13.5a1.5 1.5 0 0 0 1.5-1.5V16.5a.75.75 0 0 1 1.5 0v2.25a3 3 0 0 1-3 3H5.25a3 3 0 0 1-3-3V16.5a.75.75 0 0 1 .75-.75Z" clip-rule="evenodd"></path>
+						</svg>
+						<span>__MSG_options_identityImport_chooseFile__</span>
+					</button>
+					<div class="modal-divider">
+						<span>__MSG_options_identityImport_or__</span>
+					</div>
+					<textarea id="import-identity-textarea" class="modal-textarea" rows="6" spellcheck="false" placeholder="__MSG_options_identityImport_pastePlaceholder__"></textarea>
+				</div>
+				<div class="modal-footer">
+					<button id="import-identity-cancel" class="modal-btn modal-btn-secondary">
+						__MSG_options_modal_cancel__
+					</button>
+					<button id="import-identity-confirm" class="modal-btn modal-btn-primary">
+						__MSG_options_identityImport_import__
+					</button>
+				</div>
+			</div>
+		</div>
+
+		<div id="nickname-modal-overlay" class="modal-overlay">
+			<div class="modal nickname-modal">
+				<div class="modal-header">
+					<h3 class="modal-title">__MSG_options_nickname_modalTitle__</h3>
+					<button id="nickname-modal-close" class="modal-close-btn" aria-label="Close">
+						<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+							<path d="M6.28 5.22a.75.75 0 0 0-1.06 1.06L8.94 10l-3.72 3.72a.75.75 0 1 0 1.06 1.06L10 11.06l3.72 3.72a.75.75 0 1 0 1.06-1.06L11.06 10l3.72-3.72a.75.75 0 0 0-1.06-1.06L10 8.94 6.28 5.22Z"></path>
+						</svg>
+					</button>
+				</div>
+				<div class="modal-body">
+					<p class="modal-message">__MSG_options_nickname_description__</p>
+					<input type="text" id="nickname-modal-input" class="modal-input" maxlength="20" autocomplete="off" spellcheck="false" placeholder="__MSG_options_nickname_placeholder__">
+					<p id="nickname-modal-status" role="status"></p>
+				</div>
+				<div class="modal-footer">
+					<button id="nickname-modal-reset" class="modal-btn modal-btn-secondary">
+						__MSG_options_nickname_reset__
+					</button>
+					<button id="nickname-modal-cancel" class="modal-btn modal-btn-secondary">
+						__MSG_options_modal_cancel__
+					</button>
+					<button id="nickname-modal-save" class="modal-btn modal-btn-primary">
+						__MSG_options_nickname_save__
+					</button>
 				</div>
 			</div>
 		</div>
