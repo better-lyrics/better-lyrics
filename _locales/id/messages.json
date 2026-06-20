@@ -240,7 +240,7 @@
     "description": "Security warning in the Identity settings tab: keep the identity private and back it up because it is unrecoverable"
   },
   "options_identity_yourIdentity": {
-    "message": "Identitas Kamu",
+    "message": "Sinkron",
     "description": "Your identity label"
   },
   "options_identity_loading": {
@@ -436,7 +436,7 @@
     "description": "Styling guide link text"
   },
   "options_editor_renameTheme": {
-    "message": "Ubah nama tema kustom",
+    "message": "Namai ulang tema kustomH",
     "description": "Rename theme button title"
   },
   "options_editor_deleteTheme": {
@@ -832,7 +832,7 @@
     "description": "Empty installed themes message"
   },
   "marketplace_lastUpdatedOn": {
-    "message": "Terakhir diperbarui pada $date$",
+    "message": "Terakhir update pada $date$",
     "description": "Tooltip showing full date when a theme was last updated",
     "placeholders": {
       "date": {
@@ -1460,19 +1460,19 @@
     "description": "Language label in detail view"
   },
   "unison_uploadedBy": {
-    "message": "Uploaded by",
+    "message": "Dikirim oleh",
     "description": "Metadata row label in the Unison detail sidebar, before the uploader's name which links to their curator page"
   },
   "unison_languageUnspecified": {
-    "message": "Not specified",
+    "message": "Tidak ditentukan",
     "description": "Default option in the submission form's language dropdown, used when the submitter has not chosen a language"
   },
   "unison_fulfilledBadge": {
-    "message": "Requested & fulfilled",
+    "message": "Diminta & dilakukan",
     "description": "Badge on the Unison detail page shown when this lyric answered a community request"
   },
   "unison_fulfilledNote": {
-    "message": "Someone wanted this on Better Lyrics, and $name$ came through with it.",
+    "message": "Seseorang mau liriknya di Better Lyrics, dan $name$ membuat liriknya.",
     "description": "Sentence on the Unison detail page explaining that the lyric fulfilled a community request. $name$ is the uploader's display name",
     "placeholders": {
       "name": {
@@ -1482,7 +1482,7 @@
     }
   },
   "unison_fulfilledBoardLink": {
-    "message": "See the requests board",
+    "message": "Lihat papan permintaan",
     "description": "Link on the Unison detail page that opens the community requests board (queue of most-wanted songs)"
   },
   "unison_validationRequired": {
