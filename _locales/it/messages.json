@@ -183,6 +183,10 @@
     "message": "Trascina per riordinare la priorità. Le fonti in alto vengono provate prima. Deseleziona per disabilitare.",
     "description": "Sources settings section description"
   },
+  "options_sources_openUnison": {
+    "message": "Unison",
+    "description": "Label on the small button in the Sources section header that opens the Unison page"
+  },
   "options_themes_title": {
     "message": "Impostazioni tema",
     "description": "Theme settings section title"
@@ -230,6 +234,10 @@
   "options_identity_description": {
     "message": "La tua identità anonima unica per Better Lyrics.",
     "description": "Identity settings section description"
+  },
+  "options_identity_warning": {
+    "message": "Trattala come la tua password. Non condividerla mai. Esporta un backup. Nessuno può recuperare un'identità persa, neanche gli amministratori.",
+    "description": "Security warning in the Identity settings tab: keep the identity private and back it up because it is unrecoverable"
   },
   "options_identity_yourIdentity": {
     "message": "La tua identità",

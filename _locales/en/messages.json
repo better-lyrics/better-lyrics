@@ -241,6 +241,10 @@
     "message": "Drag to reorder priority. Higher sources are tried first. Uncheck to disable.",
     "description": "Sources settings section description"
   },
+  "options_sources_openUnison": {
+    "message": "Unison",
+    "description": "Label on the small button in the Sources section header that opens the Unison page"
+  },
 
   "options_themes_title": {
     "message": "Theme Settings",
@@ -290,6 +294,10 @@
   "options_identity_description": {
     "message": "Your unique anonymous identity for Better Lyrics.",
     "description": "Identity settings section description"
+  },
+  "options_identity_warning": {
+    "message": "Treat this like your password. Never share it. Export a backup. No one can recover a lost identity, not even admins.",
+    "description": "Security warning in the Identity settings tab: keep the identity private and back it up because it is unrecoverable"
   },
   "options_identity_yourIdentity": {
     "message": "Your identity",
@@ -1556,6 +1564,32 @@
   "unison_language": {
     "message": "Language",
     "description": "Language label in detail view"
+  },
+  "unison_uploadedBy": {
+    "message": "Uploaded by",
+    "description": "Metadata row label in the Unison detail sidebar, before the uploader's name which links to their curator page"
+  },
+  "unison_languageUnspecified": {
+    "message": "Not specified",
+    "description": "Default option in the submission form's language dropdown, used when the submitter has not chosen a language"
+  },
+  "unison_fulfilledBadge": {
+    "message": "Requested & fulfilled",
+    "description": "Badge on the Unison detail page shown when this lyric answered a community request"
+  },
+  "unison_fulfilledNote": {
+    "message": "Someone wanted this on Better Lyrics, and $name$ came through with it.",
+    "description": "Sentence on the Unison detail page explaining that the lyric fulfilled a community request. $name$ is the uploader's display name",
+    "placeholders": {
+      "name": {
+        "content": "$1",
+        "example": "AcousticPrestoRemix"
+      }
+    }
+  },
+  "unison_fulfilledBoardLink": {
+    "message": "See the requests board",
+    "description": "Link on the Unison detail page that opens the community requests board (queue of most-wanted songs)"
   },
   "unison_validationRequired": {
     "message": "Please fill in song, artist, video ID, and lyrics.",
