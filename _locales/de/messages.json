@@ -183,6 +183,10 @@
     "message": "Ziehen zum Neuordnen. Obere Quellen werden zuerst verwendet. Deaktivieren durch Abhaken.",
     "description": "Sources settings section description"
   },
+  "options_sources_openUnison": {
+    "message": "Unison",
+    "description": "Label on the small button in the Sources section header that opens the Unison page"
+  },
   "options_themes_title": {
     "message": "Design-Einstellungen",
     "description": "Theme settings section title"
@@ -230,6 +234,10 @@
   "options_identity_description": {
     "message": "Deine einzigartige anonyme Identität für Better Lyrics.",
     "description": "Identity settings section description"
+  },
+  "options_identity_warning": {
+    "message": "Behandeln Sie dies wie Ihr Passwort. Teilen Sie es mit niemandem. Exportieren Sie ein Backup und verlieren Sie es nie, da niemand, noch nicht einmal ein Administrator.",
+    "description": "Security warning in the Identity settings tab: keep the identity private and back it up because it is unrecoverable"
   },
   "options_identity_yourIdentity": {
     "message": "Deine Identität",

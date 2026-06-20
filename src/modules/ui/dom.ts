@@ -45,6 +45,7 @@ import {
   toMs,
 } from "@modules/ui/animationEngine";
 import { getRequest, setRequest } from "@modules/unison/lyricsRequestTracker";
+import { getTrustTier } from "@modules/unison/trustTier";
 import type { UnisonLyricsRequest } from "@modules/unison/types";
 import { requestLyrics } from "@modules/unison/unisonApi";
 import { log } from "@utils";
@@ -722,13 +723,6 @@ function setScoreLine(refs: ScoreLineRefs, score: number, votes: number): void {
   refs.scoreLabel.textContent = ` ${t("unison_score_label")}`;
   refs.voteNum.textContent = String(votes);
   refs.voteLabel.textContent = ` ${votes === 1 ? t("unison_vote_singular") : t("unison_vote_plural")}`;
-}
-
-function getTrustTier(reputation: number): "new" | "trusted" | "veteran" | "expert" {
-  if (reputation < 0.5) return "new";
-  if (reputation < 1.5) return "trusted";
-  if (reputation < 1.85) return "veteran";
-  return "expert";
 }
 
 function shouldRenderShadersPromo(): boolean {

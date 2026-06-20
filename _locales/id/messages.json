@@ -183,6 +183,10 @@
     "message": "Tarik untuk menyusun prioritas. Sumber teratas dicoba lebih duluan. Hapus centang untuk mematikan.",
     "description": "Sources settings section description"
   },
+  "options_sources_openUnison": {
+    "message": "Unison",
+    "description": "Label on the small button in the Sources section header that opens the Unison page"
+  },
   "options_themes_title": {
     "message": "Pengaturan Tema",
     "description": "Theme settings section title"
@@ -230,6 +234,10 @@
   "options_identity_description": {
     "message": "Identitas unik milikmu untuk Better Lyrics.",
     "description": "Identity settings section description"
+  },
+  "options_identity_warning": {
+    "message": "Anggap aja kayak kata sandi sendiri. Jangan dibagikan. Ekspor cadangan. Nggak ada yang bisa balikin identitas hilang, bahkan admin sekalipun.",
+    "description": "Security warning in the Identity settings tab: keep the identity private and back it up because it is unrecoverable"
   },
   "options_identity_yourIdentity": {
     "message": "Identitas Kamu",
