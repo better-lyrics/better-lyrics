@@ -1459,6 +1459,32 @@
     "message": "Мова",
     "description": "Language label in detail view"
   },
+  "unison_uploadedBy": {
+    "message": "Завантажив",
+    "description": "Metadata row label in the Unison detail sidebar, before the uploader's name which links to their curator page"
+  },
+  "unison_languageUnspecified": {
+    "message": "Не вказано",
+    "description": "Default option in the submission form's language dropdown, used when the submitter has not chosen a language"
+  },
+  "unison_fulfilledBadge": {
+    "message": "Запит і виконання",
+    "description": "Badge on the Unison detail page shown when this lyric answered a community request"
+  },
+  "unison_fulfilledNote": {
+    "message": "Хтось хотів, щоб це було на Better Lyrics і $name$ це здійснив.",
+    "description": "Sentence on the Unison detail page explaining that the lyric fulfilled a community request. $name$ is the uploader's display name",
+    "placeholders": {
+      "name": {
+        "content": "$1",
+        "example": "AcousticPrestoRemix"
+      }
+    }
+  },
+  "unison_fulfilledBoardLink": {
+    "message": "Переглянути дошку запитів",
+    "description": "Link on the Unison detail page that opens the community requests board (queue of most-wanted songs)"
+  },
   "unison_validationRequired": {
     "message": "Будь ласка, вкажіть назву пісні, виконавця, ідентифікатор відео і текст.",
     "description": "Validation error when required fields are missing"
