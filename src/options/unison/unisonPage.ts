@@ -1315,7 +1315,7 @@ function setupSubmitForm(): void {
   const composerHint = document.getElementById("unison-composer-hint");
   if (composerHint) {
     const link = document.createElement("a");
-    link.href = "https://composer.boidu.dev/";
+    link.href = "https://composer.betterlyrics.org/";
     link.target = "_blank";
     link.rel = "noreferrer noopener";
     link.className = "unison-inline-link";
@@ -1407,7 +1407,7 @@ function updateComposerLink(): void {
   const videoId = (document.getElementById("unison-field-videoId") as HTMLInputElement).value;
   const isrc = (document.getElementById("unison-field-isrc") as HTMLInputElement).value;
 
-  const url = new URL("https://composer.boidu.dev/");
+  const url = new URL("https://composer.betterlyrics.org/");
   if (song) url.searchParams.set("title", song);
   if (artist) url.searchParams.set("artist", artist);
   if (album) url.searchParams.set("album", album);
