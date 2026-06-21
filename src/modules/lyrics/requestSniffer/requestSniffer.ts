@@ -236,9 +236,9 @@ export function setupRequestSniffer(): void {
                   }
                   return (
                     trimmed.length > 0 &&
-                    (trimmed !== r.text ||
+                    (trimmed === r.text ||
                       (r.navigationEndpoint?.browseEndpoint.browseEndpointContextSupportedConfigs
-                        .browseEndpointContextMusicConfig.pageType || "") !== "MUSIC_PAGE_TYPE_ARTIST") &&
+                        .browseEndpointContextMusicConfig.pageType || "") === "MUSIC_PAGE_TYPE_ARTIST") &&
                     !hasVideoWord
                   );
                 })
