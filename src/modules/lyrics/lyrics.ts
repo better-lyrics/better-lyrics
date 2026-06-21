@@ -25,6 +25,13 @@ function isInstrumentalOnly(lyrics: Lyric[]): boolean {
   return /^\[?instrumental\s*only\]?$/i.test(lyrics[0].words.trim());
 }
 
+function normalizeArtist(artist: string): string {
+  return artist
+    .trim()
+    .replace(", & ", ", ")
+    .replace(/\s*[,،、，､፣]\s*/gu, ", ");
+}
+
 export type LyricSourceResultWithMeta = LyricSourceResult & {
   song: string;
   artist: string;
@@ -144,8 +151,7 @@ export async function createLyrics(detail: PlayerDetails, signal: AbortSignal): 
     }
 
     song = song.trim();
-    artist = artist.trim();
-    artist = artist.replace(", & ", ", ");
+    artist = normalizeArtist(artist);
     let album = await getSongAlbum(videoId, signal);
     if (!album) {
       album = "";
@@ -346,8 +352,7 @@ export async function preFetchLyrics(
   }
 
   song = song.trim();
-  artist = artist.trim();
-  artist = artist.replace(", & ", ", ");
+  artist = normalizeArtist(artist);
   let album = await getSongAlbum(videoId, signal);
   if (!album) {
     album = "";
