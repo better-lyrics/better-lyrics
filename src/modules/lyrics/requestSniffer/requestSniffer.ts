@@ -234,7 +234,7 @@ export function setupRequestSniffer(): void {
                   if (hasVideoWord) {
                     byLineIsVideo = true;
                   }
-                  return trimmed.length > 0 && trimmed !== "•" && trimmed !== "&" && !hasVideoWord;
+                  return trimmed.length > 0 && trimmed == r.text && !hasVideoWord;
                 })
                 .map(r => r.text);
 
