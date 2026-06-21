@@ -16,6 +16,7 @@ export const LOCALE_CODES = [
   "ro",
   "ru",
   "th",
+  "tr",
   "uk",
   "vi",
   "zh_CN",
