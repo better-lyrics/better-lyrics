@@ -1486,11 +1486,11 @@
     "description": "Link on the Unison detail page that opens the community requests board (queue of most-wanted songs)"
   },
   "unison_validationRequired": {
-    "message": "Please fill in song, artist, video ID, and lyrics.",
+    "message": "Por favor, rellene la canción, el artista, el ID de vídeo y la letra.",
     "description": "Validation error when required fields are missing"
   },
   "unison_submitFailed": {
-    "message": "Submission failed",
+    "message": "El envió ha fallado",
     "description": "Fallback error message when submission fails"
   },
   "report_lyrics_title": {
