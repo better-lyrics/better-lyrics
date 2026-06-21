@@ -236,7 +236,7 @@
     "description": "Identity settings section description"
   },
   "options_identity_warning": {
-    "message": "Treat this like your password. Never share it. Export a backup. No one can recover a lost identity, not even admins.",
+    "message": "Ставтеся до цього, мов це ваш пароль. Ніколи нікому не поширюйте. Створіть резервну копію. Втрачений профіль не можуть відновити навіть адміністратори.",
     "description": "Security warning in the Identity settings tab: keep the identity private and back it up because it is unrecoverable"
   },
   "options_identity_yourIdentity": {
@@ -1460,7 +1460,7 @@
     "description": "Language label in detail view"
   },
   "unison_uploadedBy": {
-    "message": "Завантажив",
+    "message": "Завантажено",
     "description": "Metadata row label in the Unison detail sidebar, before the uploader's name which links to their curator page"
   },
   "unison_languageUnspecified": {
@@ -1468,11 +1468,11 @@
     "description": "Default option in the submission form's language dropdown, used when the submitter has not chosen a language"
   },
   "unison_fulfilledBadge": {
-    "message": "Запит і виконання",
+    "message": "Виконано на запит",
     "description": "Badge on the Unison detail page shown when this lyric answered a community request"
   },
   "unison_fulfilledNote": {
-    "message": "Хтось хотів, щоб це було на Better Lyrics і $name$ це здійснив.",
+    "message": "Хтось хотів, щоб це було на Better Lyrics і користувач $name$ це здійснив.",
     "description": "Sentence on the Unison detail page explaining that the lyric fulfilled a community request. $name$ is the uploader's display name",
     "placeholders": {
       "name": {
