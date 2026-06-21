@@ -124,7 +124,7 @@ export async function createLyrics(detail: PlayerDetails, signal: AbortSignal): 
 
     if (matchingSong) {
       song = matchingSong.title;
-      artist = matchingSong.artist;
+      artist = matchingSong.artist || artist;
 
       if (isMusicVideo && matchingSong.counterpartVideoId && matchingSong.segmentMap) {
         log("Switching VideoId to Audio Id");
