@@ -343,7 +343,7 @@ export async function preFetchLyrics(
 
   if (matchingSong) {
     song = matchingSong.title;
-    artist = matchingSong.artist;
+    artist = matchingSong.artist || artist;
 
     if (isMusicVideo && matchingSong.counterpartVideoId && matchingSong.segmentMap) {
       swappedVideoId = true;
