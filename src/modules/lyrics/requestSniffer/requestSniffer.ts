@@ -234,7 +234,13 @@ export function setupRequestSniffer(): void {
                   if (hasVideoWord) {
                     byLineIsVideo = true;
                   }
-                  return trimmed.length > 0 && trimmed == r.text && !hasVideoWord;
+                  return (
+                    trimmed.length > 0 &&
+                    (trimmed !== r.text ||
+                      (r.navigationEndpoint?.browseEndpoint.browseEndpointContextSupportedConfigs
+                        .browseEndpointContextMusicConfig.pageType || "") !== "MUSIC_PAGE_TYPE_ARTIST") &&
+                    !hasVideoWord
+                  );
                 })
                 .map(r => r.text);
 
