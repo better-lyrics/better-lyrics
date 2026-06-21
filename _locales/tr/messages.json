@@ -236,7 +236,7 @@
     "description": "Identity settings section description"
   },
   "options_identity_warning": {
-    "message": "Treat this like your password. Never share it. Export a backup. No one can recover a lost identity, not even admins.",
+    "message": "Bunu bir şifre gibi düşünün. Asla paylaşmayın. Bir yedek oluşturun. Kaybolmuş bir kimliği, yöneticiler dahil kimse geri getiremez.",
     "description": "Security warning in the Identity settings tab: keep the identity private and back it up because it is unrecoverable"
   },
   "options_identity_yourIdentity": {
@@ -1420,39 +1420,39 @@
     "description": "Hint text below video ID field label"
   },
   "unison_formatHint": {
-    "message": "Auto-detected from lyrics content",
+    "message": "Şarkı sözü içeriğinden otomatik algılama",
     "description": "Hint text below format field label"
   },
   "unison_isrcHintPrefix": {
-    "message": "Find it using an",
+    "message": "Kullanarak bul",
     "description": "Text before ISRC finder link"
   },
   "unison_isrcHintLinkText": {
-    "message": "ISRC lookup tool",
+    "message": "ISRC arama aracı",
     "description": "Link text for ISRC finder"
   },
   "unison_tabFeed": {
-    "message": "Feed",
+    "message": "Akış",
     "description": "Feed tab label for recent submissions"
   },
   "unison_tabMySubmissions": {
-    "message": "My Submissions",
+    "message": "Gönderimlerim",
     "description": "Feed tab label for user's own submissions"
   },
   "unison_noSubmissions": {
-    "message": "You haven't submitted any lyrics yet.",
+    "message": "Heniz şarkı sözü göndermediniz.",
     "description": "Empty state for my submissions tab"
   },
   "unison_noFilterResults": {
-    "message": "No lyrics match your filters",
+    "message": "Filtrelerinzle hiçbir şarkı sözü eşleşmiyor",
     "description": "Empty state shown when the active sort/filter combination returns no entries"
   },
   "unison_noFeedYet": {
-    "message": "No lyrics here yet",
+    "message": "Burada henüz şarkı sözü yok",
     "description": "Empty state shown when the recent feed is empty with no filters applied"
   },
   "unison_sync": {
-    "message": "Sync",
+    "message": "Senkronizasyon",
     "description": "Sync type label in detail view"
   },
   "unison_language": {
@@ -1460,19 +1460,19 @@
     "description": "Language label in detail view"
   },
   "unison_uploadedBy": {
-    "message": "Uploaded by",
+    "message": "Yükleyen",
     "description": "Metadata row label in the Unison detail sidebar, before the uploader's name which links to their curator page"
   },
   "unison_languageUnspecified": {
-    "message": "Not specified",
+    "message": "Belirtilmedi",
     "description": "Default option in the submission form's language dropdown, used when the submitter has not chosen a language"
   },
   "unison_fulfilledBadge": {
-    "message": "Requested & fulfilled",
+    "message": "Talep edildi & yerine getirildi",
     "description": "Badge on the Unison detail page shown when this lyric answered a community request"
   },
   "unison_fulfilledNote": {
-    "message": "Someone wanted this on Better Lyrics, and $name$ came through with it.",
+    "message": "Better Lyrics'te birisi bunu istemişti ve $name$ bunu gerçekleştirdi.",
     "description": "Sentence on the Unison detail page explaining that the lyric fulfilled a community request. $name$ is the uploader's display name",
     "placeholders": {
       "name": {
@@ -1482,7 +1482,7 @@
     }
   },
   "unison_fulfilledBoardLink": {
-    "message": "See the requests board",
+    "message": "İstek panosuna bakın",
     "description": "Link on the Unison detail page that opens the community requests board (queue of most-wanted songs)"
   },
   "unison_validationRequired": {
@@ -1494,91 +1494,91 @@
     "description": "Fallback error message when submission fails"
   },
   "report_lyrics_title": {
-    "message": "Report Lyrics",
+    "message": "Şarkı Sözlerini Raporla",
     "description": "Title for the report lyrics modal"
   },
   "report_lyrics_info": {
-    "message": "Specify the reason why the lyrics for this song are not compatible",
+    "message": "Bu şarkı sözlerinin uyumlu olmamasının sebebini belirtin",
     "description": "Information about using the report lyrics modal"
   },
   "report_lyrics_wrong_song": {
-    "message": "Wrong song or version",
+    "message": "Yanlış şarkı ya varyant",
     "description": "Reason for the report that the lyrics are for the wrong song or version"
   },
   "report_lyrics_bad_sync": {
-    "message": "Bad synchronization",
+    "message": "Kötü senkronizasyon",
     "description": "Reason for the report that the lyrics are too off on the part synchronization"
   },
   "report_lyrics_offensive": {
-    "message": "Offensive",
+    "message": "Ofansif",
     "description": "Reason for the report that the lyrics are offensive or too offensive"
   },
   "report_lyrics_spam": {
-    "message": "Spam or lyrics are irrelevant to the song",
+    "message": "Spam veya alakasız şarkı sözleri",
     "description": "Reason for the report that the lyrics are a spam attempt and/or irrelevant with the sung parts"
   },
   "report_lyrics_other": {
-    "message": "Other reason",
+    "message": "Başka bir sebep",
     "description": "Reason for the report that the lyrics is bad in other reasons"
   },
   "report_lyrics_details_placeholder": {
-    "message": "Additional details about this report",
+    "message": "Bu raporla alakalı ek detaylar",
     "description": "Placeholder for report lyrics details input"
   },
   "report_lyrics_submit": {
-    "message": "Submit",
+    "message": "Gönder",
     "description": "Submit button for reporting lyrics"
   },
   "report_lyrics_cancel": {
-    "message": "Cancel",
+    "message": "Vazgeç",
     "description": "Cancel button for reporting lyrics"
   },
   "report_lyrics_reporting": {
-    "message": "Reporting lyrics...",
+    "message": "Şarkı sözleri bildiriliyor...",
     "description": "Report lyrics on a reporting process"
   },
   "report_lyrics_success": {
-    "message": "Thanks for the heads up! We'll take a look soon.",
+    "message": "Bildiri için teşekkürler! Yakında göz atacağız.",
     "description": "Shown after a lyrics report is successfully submitted"
   },
   "report_lyrics_already": {
-    "message": "We've got this one already. Thanks though!",
+    "message": "Bunu zaten aldık. Yine de teşekkürler!",
     "description": "Shown when the user tries to report the same lyrics twice"
   },
   "report_lyrics_error": {
-    "message": "That didn't go through. Mind trying again?",
+    "message": "Gerçekleşmedi. Tekrar denemek ister misiniz?",
     "description": "Shown when a lyrics report fails to submit"
   },
   "unison_tier_new": {
-    "message": "new",
+    "message": "yeni",
     "description": "Trust tier badge for low-reputation Unison submitters"
   },
   "unison_tier_trusted": {
-    "message": "trusted",
+    "message": "güvenilir",
     "description": "Trust tier badge for mid-reputation Unison submitters"
   },
   "unison_tier_veteran": {
-    "message": "veteran",
+    "message": "kıdemli",
     "description": "Trust tier badge for high-reputation Unison submitters"
   },
   "unison_tier_expert": {
-    "message": "expert",
+    "message": "uzman",
     "description": "Trust tier badge for top-reputation Unison submitters"
   },
   "unison_submitted_this": {
-    "message": "submitted this lyric",
+    "message": "şarkı sözleri gönderildi",
     "description": "Sub-label under the submitter name in the Unison footer card"
   },
   "unison_score_label": {
-    "message": "score",
+    "message": "puan",
     "description": "Noun shown after the numeric score in the Unison footer (e.g. the 'score' in '4.85 score · 12 votes')"
   },
   "unison_vote_singular": {
-    "message": "vote",
+    "message": "oyla",
     "description": "Singular noun used after the number 1 in the Unison vote count (e.g. '1 vote')"
   },
   "unison_vote_plural": {
-    "message": "votes",
+    "message": "oylar",
     "description": "Plural noun used after numbers other than 1 in the Unison vote count (e.g. '5 votes')"
   }
 }
