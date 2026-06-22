@@ -6,6 +6,45 @@
 /** Store reference to original fetch function */
 const originalFetch = window.fetch;
 
+// -- English byline override --------------------------
+function dispatchSniffResponse(url, requestJson, responseJson, status) {
+  document.dispatchEvent(
+    new CustomEvent("blyrics-send-response", {
+      detail: { url, requestJson, responseJson, status, timestamp: Date.now() },
+    })
+  );
+}
+
+/**
+ * Re-fetches a /next request forcing the English locale so the request sniffer reads
+ * canonical (non-localized) artist and album names. Reuses the page's auth via originalFetch.
+ *
+ * @param {string} url - Original /next request URL
+ * @param {string} requestBodyText - Original request body (JSON string)
+ * @param {Headers} headers - Original request headers
+ * @returns {Promise<object>} Parsed English /next response
+ */
+async function fetchEnglishNext(url, requestBodyText, headers) {
+  const body = JSON.parse(requestBodyText);
+  if (!body?.context?.client) {
+    throw new Error("Missing client context");
+  }
+  body.context.client.hl = "en";
+
+  const englishUrl = url.replace(/([?&]hl=)[^&]+/i, "$1en");
+  const englishHeaders = new Headers(headers);
+  englishHeaders.delete("content-encoding");
+  englishHeaders.delete("content-length");
+
+  const response = await originalFetch(englishUrl, {
+    method: "POST",
+    headers: englishHeaders,
+    body: JSON.stringify(body),
+    credentials: "include",
+  });
+  return response.json();
+}
+
 /**
  * Overrides the global fetch function to intercept YouTube Music API requests.
  * Extracts and dispatches song data for lyrics synchronization.
@@ -93,16 +132,22 @@ window.fetch = async function (request, init) {
             responseJson = { error: "Failed to parse response JSON" };
           }
 
-          const event = new CustomEvent("blyrics-send-response", {
-            detail: {
-              url: clonedResponseForJson.url || urlString,
-              requestJson: requestJson,
-              responseJson: responseJson,
-              status: clonedResponseForJson.status,
-              timestamp: Date.now(),
-            },
-          });
-          document.dispatchEvent(event);
+          const eventUrl = clonedResponseForJson.url || urlString;
+          const status = clonedResponseForJson.status;
+          const isNext = urlString.startsWith("https://music.youtube.com/youtubei/v1/next");
+          const origHl = requestJson?.context?.client?.hl;
+
+          if (isNext && origHl && origHl !== "en") {
+            fetchEnglishNext(urlString, awaitedTexts[0], originalRequestForJson.headers).then(
+              englishJson => dispatchSniffResponse(eventUrl, requestJson, englishJson, status),
+              error => {
+                console.error("Better Lyrics: English /next fetch failed, using localized response:", error);
+                dispatchSniffResponse(eventUrl, requestJson, responseJson, status);
+              }
+            );
+          } else {
+            dispatchSniffResponse(eventUrl, requestJson, responseJson, status);
+          }
         })
         .catch(error => {
           console.error(

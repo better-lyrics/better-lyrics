@@ -238,6 +238,20 @@ export function setupRequestSniffer(): void {
                   artists.push(run.text);
                 }
               }
+
+              if (artists.length === 0) {
+                // Topic uploads list every artist in a single unlinked run before the first separator
+                const bulletIndex = longByLineText.runs.findIndex(run => run.text.trim() === "•");
+                const runs = bulletIndex === -1 ? longByLineText.runs : longByLineText.runs.slice(0, bulletIndex);
+                return [
+                  runs
+                    .map(run => run.text)
+                    .join("")
+                    .trim(),
+                  album,
+                ];
+              }
+
               return [artists.join(", "), album];
             }
 

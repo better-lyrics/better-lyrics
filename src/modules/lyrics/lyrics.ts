@@ -26,10 +26,7 @@ function isInstrumentalOnly(lyrics: Lyric[]): boolean {
 }
 
 function normalizeArtist(artist: string): string {
-  return artist
-    .trim()
-    .replace(", & ", ", ")
-    .replace(/\s*[,،、，､፣]\s*/gu, ", ");
+  return artist.trim().replace(", & ", ", ");
 }
 
 export type LyricSourceResultWithMeta = LyricSourceResult & {
