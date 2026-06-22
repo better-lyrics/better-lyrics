@@ -1,6 +1,6 @@
 {
   "manifest_version": 3,
-  "version": "2.3.2.1",
+  "version": "2.3.2",
   "default_locale": "en",
   "name": "Better Lyrics (Lyrics for Youtube Music)",
   "description": "__MSG_extensionDescription__",
@@ -115,5 +115,5 @@
   "action": {
     "default_popup": "src/options/options.html"
   },
-  "version_name": "2.3.2-canary 1"
+  "version_name": "2.3.2"
 }
