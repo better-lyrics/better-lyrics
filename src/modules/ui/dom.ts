@@ -1,5 +1,6 @@
 import {
   AD_PLAYING_ATTR,
+  BACKGROUND_LYRIC_CLASS,
   DISCORD_INVITE_URL,
   DISCORD_LOGO_SRC,
   FONT_LINK,
@@ -273,11 +274,15 @@ function createRequestSyncedButton(meta: RequestButtonMeta): HTMLElement {
 // where the source had a space. Reconstructing from it keeps words spaced ("I'll meet you") while
 // leaving syllables of one word fused ("divide", not "di vi de").
 function wordsToText(words: NodeListOf<Element>): string {
-  return Array.from(words)
-    .map(w => (w.textContent ?? "") + (w.classList.contains(HAS_TRAILING_SPACE_CLASS) ? " " : ""))
-    .join("")
-    .replace(/\s+/g, " ")
-    .trim();
+  let out = "";
+  let prevBackground: boolean | null = null;
+  for (const w of words) {
+    const isBackground = w.classList.contains(BACKGROUND_LYRIC_CLASS);
+    if (prevBackground !== null && isBackground !== prevBackground) out += " ";
+    out += (w.textContent ?? "") + (w.classList.contains(HAS_TRAILING_SPACE_CLASS) ? " " : "");
+    prevBackground = isBackground;
+  }
+  return out.replace(/\s+/g, " ").trim();
 }
 
 function extractLineText(root: DocumentFragment | Element): string {
