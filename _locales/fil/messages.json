@@ -1,10 +1,10 @@
 {
   "extensionName": {
-    "message": "Better Lyrics (Letras para YouTube Music)",
+    "message": "Better Lyrics (Lyrics for Youtube Music)",
     "description": "The name of the extension"
   },
   "extensionDescription": {
-    "message": "Mejora YouTube Music con hermosas letras sincronizadas, soporte multilingüe, traducciones en tiempo real y más",
+    "message": "Enhance YouTube Music with beautiful time-synced lyrics, multilingual support, real-time translations and more",
     "description": "The description of the extension"
   },
   "options_tab_general": {
@@ -12,143 +12,143 @@
     "description": "General settings tab label"
   },
   "options_tab_display": {
-    "message": "Pantalla",
+    "message": "Display",
     "description": "Display settings tab label"
   },
   "options_tab_language": {
-    "message": "Idioma",
+    "message": "Language",
     "description": "Language settings tab label"
   },
   "options_tab_sources": {
-    "message": "Fuentes",
+    "message": "Sources",
     "description": "Sources settings tab label"
   },
   "options_tab_identity": {
-    "message": "Identidad",
+    "message": "Identity",
     "description": "Identity settings tab label"
   },
   "options_tab_themes": {
-    "message": "Temas",
+    "message": "Themes",
     "description": "Themes settings tab label"
   },
   "options_general_title": {
-    "message": "Configuración general",
+    "message": "General Settings",
     "description": "General settings section title"
   },
   "options_general_description": {
-    "message": "Configuraciones que afectan el comportamiento general de Better Lyrics.",
+    "message": "Settings that affect the general behavior of Better Lyrics.",
     "description": "General settings section description"
   },
   "options_general_showLogs": {
-    "message": "Mostrar registros",
+    "message": "Show logs",
     "description": "Show logs setting label"
   },
   "options_general_autoSwitch": {
-    "message": "Cambiar automáticamente a la pestaña de letras",
+    "message": "Auto switch to lyrics tab",
     "description": "Auto switch to lyrics tab setting label"
   },
   "options_general_cache": {
-    "message": "Caché",
+    "message": "Cache",
     "description": "Cache section label"
   },
   "options_general_clearCache": {
-    "message": "Limpiar caché",
+    "message": "Clear Cache",
     "description": "Clear cache button label"
   },
   "options_general_totalLyrics": {
-    "message": "Total de letras en caché",
+    "message": "Total lyrics in cache",
     "description": "Total lyrics in cache label"
   },
   "options_general_cacheSize": {
-    "message": "Tamaño del caché",
+    "message": "Cache size",
     "description": "Cache size label"
   },
   "options_display_title": {
-    "message": "Configuración de pantalla",
+    "message": "Display Settings",
     "description": "Display settings section title"
   },
   "options_display_description": {
-    "message": "Ajusta la apariencia de Better Lyrics.",
+    "message": "Fine-tune the appearance of Better Lyrics.",
     "description": "Display settings section description"
   },
   "options_display_disableFullscreen": {
-    "message": "Desactivar modo pantalla completa",
+    "message": "Disable fullscreen mode",
     "description": "Disable fullscreen mode setting label"
   },
   "options_display_autoHideCursor": {
-    "message": "Ocultar cursor automáticamente en pantalla completa",
+    "message": "Auto-hide cursor in fullscreen mode",
     "description": "Auto-hide cursor setting label"
   },
   "options_display_albumArt": {
-    "message": "Mostrar fondo difuminado con portada del álbum",
+    "message": "Show blurred album art background",
     "description": "Show album art background setting label"
   },
   "options_display_stylizedAnimations": {
-    "message": "Mostrar animaciones estilizadas",
+    "message": "Show stylized animations",
     "description": "Show stylized animations setting label"
   },
   "options_display_passiveScroll": {
-    "message": "Desplazar letras sin sincronizar automáticamente",
+    "message": "Auto-scroll unsynced lyrics",
     "description": "Auto-scroll unsynced lyrics setting label"
   },
   "options_display_shadersPromo": {
-    "message": "Mostrar enlace a Shaders de Better Lyrics",
+    "message": "Show link to Better Lyrics Shaders",
     "description": "Toggle label for the Shaders companion link shown in the lyrics footer"
   },
   "options_display_unisonActions": {
-    "message": "Acciones de Unison",
+    "message": "Unison Actions",
     "description": "Display-section row label for the Unison Actions modal trigger"
   },
   "options_unisonModal_title": {
-    "message": "Acciones de Unison",
+    "message": "Unison Actions",
     "description": "Title of the Unison Actions modal"
   },
   "options_unisonModal_showPinned": {
-    "message": "Mostrar acciones fijadas",
+    "message": "Show pinned actions",
     "description": "Toggle label inside the Unison Actions modal for the floating dock"
   },
   "options_unisonModal_showPinned_hint": {
-    "message": "Botones flotantes para votar, vetar o reportar letras de Unison",
+    "message": "A floating control to upvote, downvote, or report Unison lyrics",
     "description": "Hint text under the Show pinned actions toggle"
   },
   "options_unisonModal_autoHide": {
-    "message": "Ocultar automáticamente en pantalla completa",
+    "message": "Auto-hide in fullscreen",
     "description": "Toggle label inside the Unison Actions modal for auto-hiding the dock when idle in fullscreen"
   },
   "options_unisonModal_autoHide_hint": {
-    "message": "Ocultar los botones flotantes cuando inactivo en pantalla completa",
+    "message": "Hide the floating control when you are idle in fullscreen mode",
     "description": "Hint text under the Auto-hide in fullscreen toggle"
   },
   "options_unisonModal_position": {
-    "message": "Posición",
+    "message": "Position",
     "description": "Label above the visual position picker in the Unison Actions modal"
   },
   "options_unisonModal_position_topLeft": {
-    "message": "Arriba izquierda",
+    "message": "Top left",
     "description": "Tooltip for the top-left cell in the Unison position picker"
   },
   "options_unisonModal_position_topCenter": {
-    "message": "Arriba centrado",
+    "message": "Top center",
     "description": "Tooltip for the top-center cell in the Unison position picker"
   },
   "options_unisonModal_position_topRight": {
-    "message": "Arriba derecha",
+    "message": "Top right",
     "description": "Tooltip for the top-right cell in the Unison position picker"
   },
   "options_unisonModal_position_bottomLeft": {
-    "message": "Abajo izquierda",
+    "message": "Bottom left",
     "description": "Tooltip for the bottom-left cell in the Unison position picker"
   },
   "options_unisonModal_position_bottomCenter": {
-    "message": "Abajo centrado",
+    "message": "Bottom center",
     "description": "Tooltip for the bottom-center cell in the Unison position picker"
   },
   "options_unisonModal_position_bottomRight": {
-    "message": "Abajo derecha",
+    "message": "Bottom right",
     "description": "Tooltip for the bottom-right cell in the Unison position picker"
   },
   "options_language_displayLanguage": {
-    "message": "Idioma mostrado",
+    "message": "Display Language",
     "description": "Label for the UI language selector dropdown"
   },
   "options_language_displayLanguageAuto": {
@@ -156,31 +156,31 @@
     "description": "Option label for automatic language detection based on browser settings"
   },
   "options_language_title": {
-    "message": "Configuración de idiomas",
+    "message": "Language Settings",
     "description": "Language settings section title"
   },
   "options_language_description": {
-    "message": "Configuraciones de idioma y traducción para Better Lyrics.",
+    "message": "Language and translation settings for Better Lyrics.",
     "description": "Language settings section description"
   },
   "options_language_romanization": {
-    "message": "Romanización",
+    "message": "Romanization",
     "description": "Romanization setting label"
   },
   "options_language_translate": {
-    "message": "Traducir letras de canciones",
+    "message": "Translate song lyrics",
     "description": "Translate song lyrics setting label"
   },
   "options_language_translationLanguage": {
-    "message": "Idioma de traducción",
+    "message": "Translation language",
     "description": "Translation language setting label"
   },
   "options_sources_title": {
-    "message": "Preferencia de fuente de letras",
+    "message": "Lyric Source Preference",
     "description": "Sources settings section title"
   },
   "options_sources_description": {
-    "message": "Arrastra para reordenar la prioridad. Las fuentes superiores se prueban primero. Desmarca para desactivar.",
+    "message": "Drag to reorder priority. Higher sources are tried first. Uncheck to disable.",
     "description": "Sources settings section description"
   },
   "options_sources_openUnison": {
@@ -188,51 +188,51 @@
     "description": "Label on the small button in the Sources section header that opens the Unison page"
   },
   "options_themes_title": {
-    "message": "Configuración de temas",
+    "message": "Theme Settings",
     "description": "Theme settings section title"
   },
   "options_themes_description": {
-    "message": "Personaliza la apariencia de Better Lyrics.",
+    "message": "Customize the appearance of Better Lyrics.",
     "description": "Theme settings section description"
   },
   "options_themes_theme": {
-    "message": "Tema",
+    "message": "Theme",
     "description": "Theme label"
   },
   "options_themes_chooseTheme": {
-    "message": "Elegir un tema",
+    "message": "Choose a theme",
     "description": "Choose a theme button label"
   },
   "options_themes_change": {
-    "message": "Cambiar",
+    "message": "Change",
     "description": "Change theme button label"
   },
   "options_themes_customTheme": {
-    "message": "Tema personalizado",
+    "message": "Custom Theme",
     "description": "Display name for unnamed custom themes"
   },
   "options_themes_customStyles": {
-    "message": "Estilos personalizados",
+    "message": "Custom Styles",
     "description": "Custom styles label"
   },
   "options_themes_create": {
-    "message": "Crear",
+    "message": "Create",
     "description": "Create button label"
   },
   "options_themes_marketplace": {
-    "message": "Tienda de temas",
+    "message": "Theme Marketplace",
     "description": "Theme marketplace button label"
   },
   "options_themes_installedThemes": {
-    "message": "Temas instalados",
+    "message": "Installed Themes",
     "description": "Installed themes button label"
   },
   "options_identity_title": {
-    "message": "Identidad",
+    "message": "Identity",
     "description": "Identity settings section title"
   },
   "options_identity_description": {
-    "message": "Tu identidad anónima única para Better Lyrics.",
+    "message": "Your unique anonymous identity for Better Lyrics.",
     "description": "Identity settings section description"
   },
   "options_identity_warning": {
@@ -240,211 +240,211 @@
     "description": "Security warning in the Identity settings tab: keep the identity private and back it up because it is unrecoverable"
   },
   "options_identity_yourIdentity": {
-    "message": "Tu identidad",
+    "message": "Your identity",
     "description": "Your identity label"
   },
   "options_identity_loading": {
-    "message": "Cargando...",
+    "message": "Loading...",
     "description": "Loading identity placeholder"
   },
   "options_identity_exportImport": {
-    "message": "Exportar/Importar",
+    "message": "Export/Import",
     "description": "Export/Import section label"
   },
   "options_identity_exportKey": {
-    "message": "Exportar clave",
+    "message": "Export Key",
     "description": "Export key button label"
   },
   "options_identity_importKey": {
-    "message": "Importar clave",
+    "message": "Import Key",
     "description": "Import key button label"
   },
   "options_identityImport_title": {
-    "message": "Importar identidad",
+    "message": "Import Identity",
     "description": "Title of the import identity modal"
   },
   "options_identityImport_chooseFile": {
-    "message": "Escoger archivo",
+    "message": "Choose File",
     "description": "Label for the file picker button in the import identity modal"
   },
   "options_identityImport_or": {
-    "message": "o",
+    "message": "or",
     "description": "Divider between file picker and paste textarea in the import identity modal"
   },
   "options_identityImport_pastePlaceholder": {
-    "message": "Pega aquí la identidad en JSON...",
+    "message": "Paste identity JSON here...",
     "description": "Placeholder for the identity JSON textarea"
   },
   "options_identityImport_import": {
-    "message": "Importar",
+    "message": "Import",
     "description": "Confirm button label inside the import identity modal"
   },
   "options_nickname_description": {
-    "message": "Elige un nombre para ti mismo para Better Lyrics, Letras, números, y guión bajo, de 3 a 20 caracteres.",
+    "message": "Pick a name for yourself across Better Lyrics. Letters, numbers, and underscore, 3 to 20 characters.",
     "description": "Nickname subsection description"
   },
   "options_nickname_placeholder": {
-    "message": "Elige un apodo",
+    "message": "Pick a nickname",
     "description": "Nickname input placeholder"
   },
   "options_nickname_save": {
-    "message": "Guardar",
+    "message": "Save",
     "description": "Nickname save button label"
   },
   "options_nickname_reset": {
-    "message": "Reestablecer a predeterminados",
+    "message": "Reset to default",
     "description": "Nickname reset button label"
   },
   "options_nickname_modalTitle": {
-    "message": "Ponte tu apodo",
+    "message": "Set your nickname",
     "description": "Nickname modal title"
   },
   "options_nickname_edit": {
-    "message": "Editar",
+    "message": "Edit",
     "description": "Nickname edit button label"
   },
   "options_nickname_editLabel": {
-    "message": "Editar apodo",
+    "message": "Edit nickname",
     "description": "Accessible label for the nickname edit button"
   },
   "options_nickname_status_checking": {
-    "message": "Comprobando...",
+    "message": "Checking...",
     "description": "Status while checking nickname availability"
   },
   "options_nickname_status_available": {
-    "message": "Disponible",
+    "message": "Available",
     "description": "Status when nickname is available"
   },
   "options_nickname_status_taken": {
-    "message": "Ya cogido",
+    "message": "Already taken",
     "description": "Status when nickname is already taken"
   },
   "options_nickname_status_invalid": {
-    "message": "3 a 20 letras, números o guiones bajos",
+    "message": "3 to 20 letters, numbers, or underscores",
     "description": "Status when nickname format is invalid"
   },
   "options_nickname_status_profane": {
-    "message": "No permitido, prueba con otro",
+    "message": "Not allowed, try another",
     "description": "Status when nickname is flagged as inappropriate by the server"
   },
   "options_nickname_status_self": {
-    "message": "Este es tu apodo actual",
+    "message": "This is your current nickname",
     "description": "Status when entered nickname matches current"
   },
   "options_nickname_status_saved": {
-    "message": "Guardado",
+    "message": "Saved",
     "description": "Status when nickname is saved"
   },
   "options_nickname_status_submitting": {
-    "message": "Guardando...",
+    "message": "Saving...",
     "description": "Status while nickname save is in flight"
   },
   "options_nickname_status_rateLimited": {
-    "message": "Despacio, inténtalo de nuevo más tarde",
+    "message": "Slow down, try again in a moment",
     "description": "Status when nickname checks are rate limited"
   },
   "options_nickname_status_error": {
-    "message": "No se pudo llegar al servidor",
+    "message": "Could not reach the server",
     "description": "Status when nickname request fails"
   },
   "options_alert_importEmpty": {
-    "message": "Pega una indentidad JSON o escoge un archivo primero.",
+    "message": "Paste identity JSON or choose a file first.",
     "description": "Shown when the user clicks Import with no JSON provided"
   },
   "options_modal_selectTheme": {
-    "message": "Seleccionar un tema",
+    "message": "Select a Theme",
     "description": "Theme modal title"
   },
   "options_modal_cancel": {
-    "message": "Cancelar",
+    "message": "Cancel",
     "description": "Cancel button label"
   },
   "options_modal_confirm": {
-    "message": "Confirmar",
+    "message": "Confirm",
     "description": "Confirm button label"
   },
   "options_alert_cacheCleared": {
-    "message": "¡Caché limpiado correctamente!",
+    "message": "Cache cleared successfully!",
     "description": "Cache cleared success message"
   },
   "options_alert_cacheClearFailed": {
-    "message": "¡Error al limpiar el caché!",
+    "message": "Failed to clear cache!",
     "description": "Cache clear failed message"
   },
   "options_alert_nothingToClear": {
-    "message": "¡Nada que limpiar!",
+    "message": "Nothing to clear!",
     "description": "Nothing to clear message"
   },
   "options_alert_exportFailed": {
-    "message": "Error al exportar la identidad",
+    "message": "Failed to export identity",
     "description": "Export identity failed message"
   },
   "options_alert_fileSaveDialogOpened": {
-    "message": "Diálogo de guardado de archivo abierto.",
+    "message": "Identity file save dialog opened.",
     "description": "File save dialog opened message"
   },
   "options_alert_fileSaveFailed": {
-    "message": "Error al guardar el archivo. Por favor, inténtalo de nuevo.",
+    "message": "Error saving file. Please try again.",
     "description": "File save failed message"
   },
   "options_alert_downloadInitiated": {
-    "message": "Descarga del archivo de identidad iniciada.",
+    "message": "Identity file download initiated.",
     "description": "Download initiated message"
   },
   "options_alert_importSuccess": {
-    "message": "¡Identidad importada correctamente!",
+    "message": "Identity imported successfully!",
     "description": "Import success message"
   },
   "options_alert_identityLoadError": {
-    "message": "Error al cargar la identidad",
+    "message": "Error loading identity",
     "description": "Identity load error message"
   },
   "options_editor_saving": {
-    "message": "Guardando...",
+    "message": "Saving...",
     "description": "Saving indicator text"
   },
   "options_editor_importFile": {
-    "message": "Importar desde archivo",
+    "message": "Import from file",
     "description": "Import from file tooltip"
   },
   "options_editor_exportFile": {
-    "message": "Exportar a archivo",
+    "message": "Export to file",
     "description": "Export to file tooltip"
   },
   "options_editor_saveAsTheme": {
-    "message": "Guardar como tema",
+    "message": "Save as theme",
     "description": "Save as theme tooltip"
   },
   "options_editor_openInNewTab": {
-    "message": "Abrir en nueva pestaña",
+    "message": "Open in new tab",
     "description": "Open in new tab tooltip"
   },
   "options_editor_backToSettings": {
-    "message": "Volver a configuración",
+    "message": "Back to Settings",
     "description": "Back to settings button label"
   },
   "options_editor_fullExperienceNote": {
-    "message": "Para la experiencia completa del editor, ",
+    "message": "For the full editor experience, ",
     "description": "Full editor experience note prefix"
   },
   "options_editor_openInNewTabLink": {
-    "message": "abre este editor en una nueva pestaña",
+    "message": "open this editor in a new tab",
     "description": "Open in new tab link text"
   },
   "options_editor_stylingGuide": {
-    "message": "Guía de estilos",
+    "message": "Styling Guide",
     "description": "Styling guide link text"
   },
   "options_editor_renameTheme": {
-    "message": "Renombrar tema personalizado",
+    "message": "Rename custom theme",
     "description": "Rename theme button title"
   },
   "options_editor_deleteTheme": {
-    "message": "Eliminar tema personalizado",
+    "message": "Delete custom theme",
     "description": "Delete theme button title"
   },
   "options_editor_doubleClickRename": {
-    "message": "Doble clic para renombrar",
+    "message": "Double-click to rename",
     "description": "Double-click to rename tooltip"
   },
   "options_provider_betterLyrics": {
@@ -472,11 +472,11 @@
     "description": "LRClib provider name"
   },
   "options_provider_youtube": {
-    "message": "YouTube",
+    "message": "Youtube",
     "description": "Youtube provider name"
   },
   "options_provider_youtubeCaptions": {
-    "message": "Subtítulos de YouTube",
+    "message": "Youtube Captions",
     "description": "Youtube Captions provider name"
   },
   "options_provider_binilyrics": {
@@ -484,179 +484,179 @@
     "description": "BiniLyrics provider name"
   },
   "options_syncType_syllable": {
-    "message": "Sílaba",
+    "message": "Syllable",
     "description": "Syllable sync type label"
   },
   "options_syncType_syllable_tooltip": {
-    "message": "Resalta sílabas individuales mientras se cantan. La sincronización por sílabas ofrece la mejor experiencia.",
+    "message": "Highlights individual syllables as they're sung. Syllable syncing provides the best experience.",
     "description": "Syllable sync type tooltip"
   },
   "options_syncType_word": {
-    "message": "Palabra",
+    "message": "Word",
     "description": "Word sync type label"
   },
   "options_syncType_word_tooltip": {
-    "message": "Resalta palabras individuales mientras se cantan. La sincronización por palabras ofrece una buena experiencia.",
+    "message": "Highlights individual words as they're sung. Word syncing provides a good experience.",
     "description": "Word sync type tooltip"
   },
   "options_syncType_line": {
-    "message": "Línea",
+    "message": "Line",
     "description": "Line sync type label"
   },
   "options_syncType_line_tooltip": {
-    "message": "Resalta líneas completas mientras se cantan. La sincronización por líneas ofrece una experiencia básica.",
+    "message": "Highlights entire lines as they're sung. Line syncing provides a basic experience.",
     "description": "Line sync type tooltip"
   },
   "options_syncType_unsynced": {
-    "message": "Sin sincronizar",
+    "message": "Unsynced",
     "description": "Unsynced sync type label"
   },
   "options_syncType_unsynced_tooltip": {
-    "message": "Letras sin información de tiempo. Las letras sin sincronizar ofrecen una experiencia mínima.",
+    "message": "Lyrics without timing information. Unsynced lyrics provide a minimal experience.",
     "description": "Unsynced sync type tooltip"
   },
   "options_detail_rateTheme": {
-    "message": "Calificar este tema",
+    "message": "Rate this theme",
     "description": "Rate theme label"
   },
   "options_detail_install": {
-    "message": "Instalar",
+    "message": "Install",
     "description": "Install button label"
   },
   "options_detail_viewOnGitHub": {
-    "message": "Ver en GitHub",
+    "message": "View on GitHub",
     "description": "View on GitHub link text"
   },
   "options_detail_shaderInfo": {
-    "message": "Este tema incluye una configuración de shader.",
+    "message": "This theme includes a shader config.",
     "description": "Shader info text prefix"
   },
   "options_detail_downloadShader": {
-    "message": "Descargar shader.json",
+    "message": "Download shader.json",
     "description": "Download shader link text"
   },
   "options_detail_shaderImportSuffix": {
-    "message": "e impórtalo en",
+    "message": "and import it in",
     "description": "Shader import suffix text before Better Lyrics Shaders link"
   },
   "marketplace_pageTitle": {
-    "message": "Tienda de temas de Better Lyrics",
+    "message": "Better Lyrics Theme Marketplace",
     "description": "Page title"
   },
   "marketplace_title": {
-    "message": "Tienda de temas",
+    "message": "Theme Marketplace",
     "description": "Header title"
   },
   "marketplace_subtitle": {
-    "message": "Descubre e instala temas de la comunidad",
+    "message": "Discover and install community themes",
     "description": "Header subtitle"
   },
   "marketplace_searchPlaceholder": {
-    "message": "Buscar temas...",
+    "message": "Search themes...",
     "description": "Search input placeholder"
   },
   "marketplace_refresh": {
-    "message": "Actualizar",
+    "message": "Refresh",
     "description": "Refresh button label"
   },
   "marketplace_keyboardShortcuts": {
-    "message": "Atajos de teclado",
+    "message": "Keyboard shortcuts",
     "description": "Keyboard shortcuts button label"
   },
   "marketplace_sortBy": {
-    "message": "Ordenar por",
+    "message": "Sort by",
     "description": "Sort filter group label"
   },
   "marketplace_sortRatingDesc": {
-    "message": "Mejor valorados",
+    "message": "Highest rated",
     "description": "Sort by highest rating"
   },
   "marketplace_sortRatingAsc": {
-    "message": "Menos valorados",
+    "message": "Lowest rated",
     "description": "Sort by lowest rating"
   },
   "marketplace_sortDownloadsDesc": {
-    "message": "Más descargados",
+    "message": "Most downloaded",
     "description": "Sort by most downloads"
   },
   "marketplace_sortDownloadsAsc": {
-    "message": "Menos descargados",
+    "message": "Least downloaded",
     "description": "Sort by least downloads"
   },
   "marketplace_sortNewest": {
-    "message": "Más recientes",
+    "message": "Newest",
     "description": "Sort by newest"
   },
   "marketplace_sortOldest": {
-    "message": "Más antiguos",
+    "message": "Oldest",
     "description": "Sort by oldest"
   },
   "marketplace_show": {
-    "message": "Mostrar",
+    "message": "Show",
     "description": "Show filter group label"
   },
   "marketplace_showAll": {
-    "message": "Todos",
+    "message": "All",
     "description": "Show all themes"
   },
   "marketplace_showInstalled": {
-    "message": "Instalados",
+    "message": "Installed",
     "description": "Show installed themes"
   },
   "marketplace_showNotInstalled": {
-    "message": "No instalados",
+    "message": "Not installed",
     "description": "Show not installed themes"
   },
   "marketplace_options": {
-    "message": "Opciones",
+    "message": "Options",
     "description": "Options filter group label"
   },
   "marketplace_hasShaders": {
-    "message": "Con shaders",
+    "message": "Has shaders",
     "description": "Filter for themes with shaders"
   },
   "marketplace_compatibleOnly": {
-    "message": "Solo compatibles",
+    "message": "Compatible only",
     "description": "Filter for compatible themes"
   },
   "marketplace_installFromUrl": {
-    "message": "Instalar desde URL",
+    "message": "Install from URL",
     "description": "Install from URL button"
   },
   "marketplace_submitTheme": {
-    "message": "Enviar un tema",
+    "message": "Submit a theme",
     "description": "Submit a theme link"
   },
   "marketplace_loading": {
-    "message": "Cargando temas...",
+    "message": "Loading themes...",
     "description": "Loading message"
   },
   "marketplace_retry": {
-    "message": "Reintentar",
+    "message": "Retry",
     "description": "Retry button"
   },
   "marketplace_noThemesMatch": {
-    "message": "Ningún tema coincide con tus filtros",
+    "message": "No themes match your filters",
     "description": "Empty state message"
   },
   "marketplace_grantPermission": {
-    "message": "Conceder permiso",
+    "message": "Grant Permission",
     "description": "Grant permission button"
   },
   "marketplace_install": {
-    "message": "Instalar",
+    "message": "Install",
     "description": "Install button"
   },
   "marketplace_remove": {
-    "message": "Eliminar",
+    "message": "Remove",
     "description": "Remove button"
   },
   "marketplace_apply": {
-    "message": "Aplicar",
+    "message": "Apply",
     "description": "Apply button"
   },
   "marketplace_active": {
-    "message": "Activo",
+    "message": "Active",
     "description": "Active theme indicator"
   },
   "marketplace_shadersBadge": {
@@ -668,135 +668,135 @@
     "description": "GitHub badge text"
   },
   "marketplace_urlModalTitle": {
-    "message": "Instalar desde URL",
+    "message": "Install from URL",
     "description": "URL install modal title"
   },
   "marketplace_urlModalMessage": {
-    "message": "Introduce la URL de un repositorio de GitHub para instalar un tema directamente:",
+    "message": "Enter a GitHub repository URL to install a theme directly:",
     "description": "URL install modal message"
   },
   "marketplace_urlModalPlaceholder": {
-    "message": "github.com/usuario/repo o github.com/usuario/repo/tree/rama",
+    "message": "github.com/user/repo or github.com/user/repo/tree/branch",
     "description": "URL input placeholder"
   },
   "marketplace_urlModalError": {
-    "message": "Por favor, introduce la URL de un repositorio de GitHub",
+    "message": "Please enter a GitHub repository URL",
     "description": "URL validation error"
   },
   "marketplace_cancel": {
-    "message": "Cancelar",
+    "message": "Cancel",
     "description": "Cancel button"
   },
   "marketplace_urlPermissionTitle": {
-    "message": "Permiso adicional requerido",
+    "message": "Additional Permission Required",
     "description": "URL permission modal title"
   },
   "marketplace_urlPermissionWhy": {
-    "message": "¿Por qué es necesario?",
+    "message": "Why is this needed?",
     "description": "URL permission explanation title"
   },
   "marketplace_urlPermissionDesc": {
-    "message": "Instalar temas desde URLs de GitHub personalizadas requiere un acceso más amplio que la tienda. Esto permite a Better Lyrics:",
+    "message": "Installing themes from custom GitHub URLs requires broader access than the marketplace. This allows Better Lyrics to:",
     "description": "URL permission description"
   },
   "marketplace_urlPermissionItem1": {
-    "message": "Obtener archivos de temas desde cualquier repositorio de GitHub",
+    "message": "Fetch theme files from any GitHub repository",
     "description": "URL permission list item 1"
   },
   "marketplace_urlPermissionItem2": {
-    "message": "Detectar la rama predeterminada del repositorio",
+    "message": "Detect the default branch of the repository",
     "description": "URL permission list item 2"
   },
   "marketplace_urlPermissionItem3": {
-    "message": "Validar la estructura del tema antes de la instalación",
+    "message": "Validate the theme structure before installation",
     "description": "URL permission list item 3"
   },
   "marketplace_urlPermissionNote": {
-    "message": "Este permiso solo se usa cuando instalas temas a través de URL. Los temas de la tienda no lo requieren.",
+    "message": "This permission is only used when you install themes via URL. Marketplace themes don't require this.",
     "description": "URL permission note"
   },
   "marketplace_shortcutsTitle": {
-    "message": "Atajos de teclado",
+    "message": "Keyboard Shortcuts",
     "description": "Shortcuts modal title"
   },
   "marketplace_shortcutsNavigation": {
-    "message": "Navegación",
+    "message": "Navigation",
     "description": "Navigation shortcuts group"
   },
   "marketplace_shortcutsSearch": {
-    "message": "Buscar temas",
+    "message": "Search themes",
     "description": "Search shortcut label"
   },
   "marketplace_shortcutsRefresh": {
-    "message": "Actualizar tienda",
+    "message": "Refresh marketplace",
     "description": "Refresh shortcut label"
   },
   "marketplace_shortcutsInstallUrl": {
-    "message": "Instalar desde URL",
+    "message": "Install from URL",
     "description": "Install from URL shortcut label"
   },
   "marketplace_shortcutsSort": {
-    "message": "Ordenar",
+    "message": "Sort",
     "description": "Sort shortcuts group"
   },
   "marketplace_shortcutsSortHint": {
-    "message": "pulsa de nuevo para invertir",
+    "message": "press again to toggle direction",
     "description": "Sort toggle hint"
   },
   "marketplace_shortcutsByRating": {
-    "message": "Por valoración",
+    "message": "By rating",
     "description": "Sort by rating shortcut"
   },
   "marketplace_shortcutsByDownloads": {
-    "message": "Por descargas",
+    "message": "By downloads",
     "description": "Sort by downloads shortcut"
   },
   "marketplace_shortcutsByDate": {
-    "message": "Por fecha",
+    "message": "By date",
     "description": "Sort by date shortcut"
   },
   "marketplace_shortcutsFilters": {
-    "message": "Filtros",
+    "message": "Filters",
     "description": "Filters shortcuts group"
   },
   "marketplace_shortcutsShowAll": {
-    "message": "Mostrar todos",
+    "message": "Show all",
     "description": "Show all shortcut"
   },
   "marketplace_shortcutsShowInstalled": {
-    "message": "Mostrar instalados",
+    "message": "Show installed",
     "description": "Show installed shortcut"
   },
   "marketplace_shortcutsShowNotInstalled": {
-    "message": "Mostrar no instalados",
+    "message": "Show not installed",
     "description": "Show not installed shortcut"
   },
   "marketplace_shortcutsToggleShaders": {
-    "message": "Alternar shaders",
+    "message": "Toggle shaders",
     "description": "Toggle shaders shortcut"
   },
   "marketplace_shortcutsToggleCompatible": {
-    "message": "Alternar compatible",
+    "message": "Toggle compatible",
     "description": "Toggle compatible shortcut"
   },
   "marketplace_shortcutsDetails": {
-    "message": "Detalles del tema",
+    "message": "Theme Details",
     "description": "Theme details shortcuts group"
   },
   "marketplace_shortcutsInstallRemove": {
-    "message": "Instalar / Eliminar",
+    "message": "Install / Remove",
     "description": "Install/remove shortcut"
   },
   "marketplace_shortcutsApply": {
-    "message": "Aplicar tema",
+    "message": "Apply theme",
     "description": "Apply theme shortcut label"
   },
   "marketplace_shortcutsPrevImage": {
-    "message": "Imagen anterior",
+    "message": "Previous image",
     "description": "Previous image shortcut"
   },
   "marketplace_shortcutsNextImage": {
-    "message": "Imagen siguiente",
+    "message": "Next image",
     "description": "Next image shortcut"
   },
   "marketplace_shortcutsGeneral": {
@@ -804,35 +804,35 @@
     "description": "General shortcuts group"
   },
   "marketplace_shortcutsCloseModal": {
-    "message": "Cerrar ventana",
+    "message": "Close modal",
     "description": "Close modal shortcut"
   },
   "marketplace_shortcutsShowShortcuts": {
-    "message": "Mostrar atajos",
+    "message": "Show shortcuts",
     "description": "Show shortcuts shortcut"
   },
   "marketplace_shortcutsApplyTheme": {
-    "message": "Aplicar tema (tras instalar)",
+    "message": "Apply theme (after install)",
     "description": "Apply theme shortcut"
   },
   "marketplace_ratingFailed": {
-    "message": "Error al enviar la valoración",
+    "message": "Failed to submit rating",
     "description": "Rating submission error"
   },
   "marketplace_shaderFetchFailed": {
-    "message": "Error al obtener la configuración del shader",
+    "message": "Failed to fetch shader config",
     "description": "Shader fetch error"
   },
   "marketplace_applyFailed": {
-    "message": "Error al aplicar el tema",
+    "message": "Failed to apply theme",
     "description": "Theme apply error"
   },
   "marketplace_noThemesInstalled": {
-    "message": "No hay temas instalados",
+    "message": "No themes installed yet",
     "description": "Empty installed themes message"
   },
   "marketplace_lastUpdatedOn": {
-    "message": "Última actualización: $date$",
+    "message": "Last updated on $date$",
     "description": "Tooltip showing full date when a theme was last updated",
     "placeholders": {
       "date": {
@@ -842,111 +842,111 @@
     }
   },
   "editor_pageTitle": {
-    "message": "Editor CSS de Better Lyrics",
+    "message": "Better Lyrics Styles Editor",
     "description": "Standalone editor page title"
   },
   "editor_importFromFile": {
-    "message": "Importar desde archivo",
+    "message": "Import from file",
     "description": "Import from file button"
   },
   "editor_exportToFile": {
-    "message": "Exportar a archivo",
+    "message": "Export to file",
     "description": "Export to file button"
   },
   "editor_saveAsTheme": {
-    "message": "Guardar como tema",
+    "message": "Save as theme",
     "description": "Save as theme button"
   },
   "editor_stylingGuide": {
-    "message": "Guía de estilos",
+    "message": "Styling guide",
     "description": "Styling guide button"
   },
   "editor_tip": {
-    "message": "Consejo: Esta pestaña independiente se puede mover a una ventana separada o usar en vista dividida junto a YouTube Music para ver los cambios en tiempo real. Para más información, visita la",
+    "message": "Tip: This is a standalone tab, you can move this editor to a separate window or use split-screen view alongside YouTube Music to see your changes in real-time. For more info, visit the",
     "description": "Editor tip text"
   },
   "editor_poweredBy": {
-    "message": "Desarrollado por",
+    "message": "Powered by",
     "description": "Powered by label"
   },
   "editor_playground": {
-    "message": "Pruebas",
+    "message": "Playground",
     "description": "Playground link text"
   },
   "editor_docs": {
-    "message": "Documentación",
+    "message": "Docs",
     "description": "Docs link text"
   },
   "lyrics_source": {
-    "message": "Fuente: ",
+    "message": "Source: ",
     "description": "Lyrics source label"
   },
   "lyrics_searchOnGenius": {
-    "message": "Buscar en Genius",
+    "message": "Search on Genius",
     "description": "Search on Genius button text"
   },
   "lyrics_getShaders": {
-    "message": "Consigue Shaders de Better Lyrics",
+    "message": "Get Better Lyrics Shaders",
     "description": "Footer button text linking to the Better Lyrics Shaders companion extension"
   },
   "lyrics_searching": {
-    "message": "Better Lyrics está buscando letras...",
+    "message": "Better Lyrics is searching for lyrics...",
     "description": "Loading message while searching for lyrics"
   },
   "lyrics_stillSearching": {
-    "message": "Todavía buscando letras sincronizadas...",
+    "message": "Still searching for synced lyrics...",
     "description": "Loading message while still searching"
   },
   "lyrics_noSyncedLyrics": {
-    "message": "Better Lyrics no pudo encontrar letras sincronizadas",
+    "message": "Better Lyrics could not find synced lyrics",
     "description": "Message when no synced lyrics found"
   },
   "lyrics_adPlaying": {
-    "message": "[música de ascensor]",
+    "message": "[elevator music]",
     "description": "Message shown during ad playback"
   },
   "lyrics_notFound": {
-    "message": "No se encontraron letras para esta canción",
+    "message": "No lyrics found for this song",
     "description": "Message when no lyrics are available"
   },
   "lyrics_resumeAutoscroll": {
-    "message": "Reajustar",
+    "message": "Resume Autoscroll",
     "description": "Resume Autoscroll button label"
   },
   "options_language_exclusions": {
-    "message": "Exclusiones de idiomas",
+    "message": "Language exclusions",
     "description": "Label for language exclusions setting"
   },
   "options_manage": {
-    "message": "Configurar",
+    "message": "Manage",
     "description": "Manage button label"
   },
   "options_language_exclusionsTitle": {
-    "message": "Exclusión de idiomas",
+    "message": "Language Exclusions",
     "description": "Modal title for language exclusions"
   },
   "options_romanization_tab": {
-    "message": "Romanización",
+    "message": "Romanization",
     "description": "Romanization tab label"
   },
   "options_translation_tab": {
-    "message": "Traducción",
+    "message": "Translation",
     "description": "Translation tab label"
   },
   "options_searchLanguages": {
-    "message": "Buscar idiomas...",
+    "message": "Search languages...",
     "description": "Search input placeholder"
   },
   "options_romanization_hint": {
-    "message": "Click para alternar. Los idiomas excluidos no serán romanizados.",
+    "message": "Click to toggle. Excluded languages will not be romanized.",
     "description": "Hint text for romanization exclusions"
   },
   "options_translation_hint": {
-    "message": "Click para alternar. Los idiomas de fuente excluidos no serán traducidos.",
+    "message": "Click to toggle. Excluded source languages will not be translated.",
     "description": "Hint text for translation exclusions"
   },
   "options_resetToDefault": {
-    "message": "Resetear $TYPE$ a Predeterminado",
+    "message": "Reset $TYPE$ to Default",
     "description": "Reset to default button label",
     "placeholders": {
       "type": {
@@ -956,7 +956,7 @@
     }
   },
   "options_romanization_resetTitle": {
-    "message": "Resetear exclusiones de $TYPE$",
+    "message": "Reset $TYPE$ Exclusions",
     "description": "Modal title for resetting exclusions",
     "placeholders": {
       "type": {
@@ -966,15 +966,15 @@
     }
   },
   "options_romanization_resetMessage": {
-    "message": "Esto borrará todos los idiomas excluidos. ¿Continuar?",
+    "message": "This will clear all excluded languages. Continue?",
     "description": "Confirmation message for resetting exclusions"
   },
   "options_reset": {
-    "message": "Resetear",
+    "message": "Reset",
     "description": "Reset button label"
   },
   "options_cancel": {
-    "message": "Cancelar",
+    "message": "Cancel",
     "description": "Cancel button label"
   },
   "options_romanization_resetSuccess": {
@@ -988,7 +988,7 @@
     }
   },
   "symlink_applied": {
-    "message": "Tema aplicado: $NAME$ (Tienda)",
+    "message": "Applied theme: $NAME$ (Marketplace)",
     "description": "Alert after successfully applying a symlinked theme from marketplace",
     "placeholders": {
       "name": {
@@ -998,7 +998,7 @@
     }
   },
   "builtin_applied": {
-    "message": "Tema aplicado: $NAME$",
+    "message": "Applied theme: $NAME$",
     "description": "Alert after successfully applying a bundled built-in theme",
     "placeholders": {
       "name": {
@@ -1008,7 +1008,7 @@
     }
   },
   "theme_author_prefix": {
-    "message": "por $AUTHOR$",
+    "message": "by $AUTHOR$",
     "description": "Author prefix shown on theme selector button",
     "placeholders": {
       "author": {
@@ -1018,23 +1018,23 @@
     }
   },
   "theme_author_you": {
-    "message": "por Tú",
+    "message": "by You",
     "description": "Author label for custom user themes on theme selector button"
   },
   "symlink_installFailed": {
-    "message": "No se pudo instalar el tema, comprueba tu conexión y vuelve a intentar.",
+    "message": "Couldn't install theme. Check your connection and try again.",
     "description": "Alert when a symlinked theme fails to install from marketplace"
   },
   "symlink_badge_marketplace": {
-    "message": "Tienda",
+    "message": "Marketplace",
     "description": "Badge text on symlinked theme cards"
   },
   "symlink_badge_bundled": {
-    "message": "Empaquetado",
+    "message": "Bundled",
     "description": "Badge text on non-symlinked built-in theme cards"
   },
   "deprecation_builtin_title": {
-    "message": "¡Atención, estos temas se están moviendo!",
+    "message": "Heads up, these themes are moving!",
     "description": "Title for the built-in themes deprecation banner in theme modal"
   },
   "deprecation_builtin_body": {
@@ -1042,7 +1042,7 @@
     "description": "Body text for the built-in themes deprecation banner"
   },
   "deprecation_builtin_cta": {
-    "message": "Explorar la Tienda",
+    "message": "Browse Marketplace",
     "description": "CTA button text in the deprecation banner to open the marketplace"
   },
   "theme_modal_section_builtin": {
@@ -1486,11 +1486,11 @@
     "description": "Link on the Unison detail page that opens the community requests board (queue of most-wanted songs)"
   },
   "unison_validationRequired": {
-    "message": "Por favor, rellene la canción, el artista, el ID de vídeo y la letra.",
+    "message": "Please fill in song, artist, video ID, and lyrics.",
     "description": "Validation error when required fields are missing"
   },
   "unison_submitFailed": {
-    "message": "El envió ha fallado",
+    "message": "Submission failed",
     "description": "Fallback error message when submission fails"
   },
   "report_lyrics_title": {
