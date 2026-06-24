@@ -1,3 +1,10 @@
+export interface ThemeBuild {
+  version: string;
+  minVersion: string;
+  path: string;
+  integrity: string;
+}
+
 export interface LockfileEntry {
   repo: string;
   id: string;
@@ -5,6 +12,7 @@ export interface LockfileEntry {
   commit: string;
   integrity: string;
   locked: string;
+  builds?: ThemeBuild[];
 }
 
 export interface ThemeLockfile {
@@ -37,6 +45,8 @@ export interface StoreTheme extends ResolvedStoreThemeMetadata {
   shaderUrl?: string;
   commit?: string;
   locked?: string;
+  registryPath?: string;
+  integrity?: string;
 }
 
 export type ThemeSource = "marketplace" | "url";
@@ -60,6 +70,14 @@ export interface InstalledStoreTheme {
   hasShaders?: boolean;
   tags?: string[];
   commit?: string;
+}
+
+export interface ResolvedBuild {
+  id: string;
+  version: string;
+  minVersion: string;
+  path: string;
+  integrity: string;
 }
 
 export interface ThemeValidationResult {

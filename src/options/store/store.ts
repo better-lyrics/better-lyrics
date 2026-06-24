@@ -172,7 +172,7 @@ function generateSyntheticTestThemes(): StoreTheme[] {
     return {
       id: `test-generated-${i}`,
       title: `${adj} ${noun} ${i + 1}`,
-      description: `Auto-generated theme #${i + 1} — ${adj.toLowerCase()} ${noun.toLowerCase()} aesthetic for stress-testing the marketplace.`,
+      description: `Auto-generated theme #${i + 1}: ${adj.toLowerCase()} ${noun.toLowerCase()} aesthetic for stress-testing the marketplace.`,
       creators,
       version: "1.0.0",
       minVersion: i % 17 === 0 ? "99.0.0" : "2.0.0",
@@ -1849,7 +1849,7 @@ async function openDetailModal(theme: StoreTheme, urlThemeInfo?: UrlThemeInfo): 
       try {
         const isRegistryTheme = !!theme.commit && !urlThemeInfo;
         const shaderConfig = isRegistryTheme
-          ? await fetchRegistryShaderConfig(theme.id)
+          ? await fetchRegistryShaderConfig(theme.registryPath ?? `themes/${theme.id}`)
           : await fetchThemeShaderConfig(theme.repo);
         if (!shaderConfig) {
           showAlert(t("marketplace_shaderFetchFailed"));

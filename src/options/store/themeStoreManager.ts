@@ -132,7 +132,8 @@ export async function installTheme(theme: StoreTheme, options: InstallOptions = 
   if (isRegistryTheme) {
     css = await fetchCssFromUrl(theme.cssUrl);
     if (theme.hasShaders) {
-      shaderConfig = await fetchRegistryShaderConfig(theme.id);
+      const shaderBasePath = theme.registryPath ?? `themes/${theme.id}`;
+      shaderConfig = await fetchRegistryShaderConfig(shaderBasePath);
     }
   } else {
     const branch = options.branch;
@@ -249,38 +250,7 @@ export async function installSymlinkedThemeFromMarketplace(storeId: string): Pro
   }
 }
 
-function parseVersion(version: string): number[] {
-  const cleanVersion = version.replace(/-.*$/, "");
-  return cleanVersion.split(".").map(part => {
-    const num = parseInt(part, 10);
-    if (isNaN(num)) {
-      console.warn(LOG_PREFIX_STORE, `Non-numeric version part "${part}" in "${version}", treating as 0`);
-      return 0;
-    }
-    return num;
-  });
-}
-
-function compareVersions(current: string, required: string): boolean {
-  const currentParts = parseVersion(current);
-  const requiredParts = parseVersion(required);
-
-  const maxLength = Math.max(currentParts.length, requiredParts.length);
-
-  for (let i = 0; i < maxLength; i++) {
-    const currentPart = currentParts[i] || 0;
-    const requiredPart = requiredParts[i] || 0;
-
-    if (currentPart > requiredPart) return true;
-    if (currentPart < requiredPart) return false;
-  }
-
-  return true;
-}
-
-export function isVersionCompatible(themeMinVersion: string, extensionVersion: string): boolean {
-  return compareVersions(extensionVersion, themeMinVersion);
-}
+export { isVersionCompatible } from "./themeBuildResolver";
 
 async function checkForThemeUpdates(
   installed: InstalledStoreTheme[],
