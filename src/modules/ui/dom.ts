@@ -1,11 +1,13 @@
 import {
   AD_PLAYING_ATTR,
+  BACKGROUND_LYRIC_CLASS,
   DISCORD_INVITE_URL,
   DISCORD_LOGO_SRC,
   FONT_LINK,
   FOOTER_CLASS,
   FOOTER_NOT_VISIBLE_LOG,
   GENIUS_LOGO_SRC,
+  HAS_TRAILING_SPACE_CLASS,
   HIDDEN_CLASS,
   HOMEPAGE_DOMAIN,
   HOMEPAGE_ICON_URL,
@@ -29,6 +31,7 @@ import {
   TAB_RENDERER_SELECTOR,
   TRANSLATED_LYRICS_CLASS,
   UNISON_DOCK_CLASS,
+  WORD_CLASS,
 } from "@constants";
 import { AppState } from "@core/appState";
 import { t } from "@core/i18n";
@@ -267,6 +270,28 @@ function createRequestSyncedButton(meta: RequestButtonMeta): HTMLElement {
   return container;
 }
 
+// Word spans hold no whitespace; gaps are rendered from HAS_TRAILING_SPACE_CLASS, which is set only
+// where the source had a space. Reconstructing from it keeps words spaced ("I'll meet you") while
+// leaving syllables of one word fused ("divide", not "di vi de").
+function wordsToText(words: NodeListOf<Element>): string {
+  let out = "";
+  let prevBackground: boolean | null = null;
+  for (const w of words) {
+    const isBackground = w.classList.contains(BACKGROUND_LYRIC_CLASS);
+    if (prevBackground !== null && isBackground !== prevBackground) out += " ";
+    out += (w.textContent ?? "") + (w.classList.contains(HAS_TRAILING_SPACE_CLASS) ? " " : "");
+    prevBackground = isBackground;
+  }
+  return out.replace(/\s+/g, " ").trim();
+}
+
+function extractLineText(root: DocumentFragment | Element): string {
+  const main = wordsToText(root.querySelectorAll(`.${WORD_CLASS}`));
+  const romanized = root.querySelector(`.${ROMANIZED_LYRICS_CLASS}`)?.textContent?.trim();
+  const translated = root.querySelector(`.${TRANSLATED_LYRICS_CLASS}`)?.textContent?.trim();
+  return [main, romanized, translated].filter(Boolean).join("\n");
+}
+
 let lyricsObserver: MutationObserver | null = null;
 let adStateObserver: MutationObserver | null = null;
 /**
@@ -303,7 +328,7 @@ export function createLyricsWrapper(): HTMLElement {
     const lineElements = fragment.querySelectorAll(".blyrics--line");
 
     if (lineElements.length === 0) {
-      const text = fragment.textContent?.replace(/\s+/g, " ").trim();
+      const text = extractLineText(fragment) || fragment.textContent?.replace(/\s+/g, " ").trim();
       if (text && e.clipboardData) {
         e.preventDefault();
         e.clipboardData.setData("text/plain", text);
@@ -314,17 +339,8 @@ export function createLyricsWrapper(): HTMLElement {
     const lines: string[] = [];
 
     for (const line of lineElements) {
-      const words = line.querySelectorAll(".blyrics--word");
-      const mainText = Array.from(words)
-        .map(w => w.textContent?.trim())
-        .filter(Boolean)
-        .join(" ");
-
-      const romanized = line.querySelector(`.${ROMANIZED_LYRICS_CLASS}`)?.textContent?.trim();
-      const translated = line.querySelector(`.${TRANSLATED_LYRICS_CLASS}`)?.textContent?.trim();
-
-      const lineParts = [mainText, romanized, translated].filter(Boolean);
-      if (lineParts.length > 0) lines.push(lineParts.join("\n"));
+      const text = extractLineText(line);
+      if (text) lines.push(text);
     }
 
     if (lines.length > 0) {
