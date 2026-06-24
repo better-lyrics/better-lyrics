@@ -8,7 +8,7 @@ Better Lyrics upgrades your YouTube Music™ experience by providing beautiful t
 
 <p align="left">
  <a aria-label="License" href="https://www.gnu.org/licenses/gpl-3.0.en.html"><img src="https://img.shields.io/badge/license-GPL_v3-blue.svg" alt=""/></a>
- <img src="https://img.shields.io/badge/version-2.3.1-blue.svg" alt=""/>
+ <img src="https://img.shields.io/badge/version-2.3.2-blue.svg" alt=""/>
 
  <img src="https://img.shields.io/badge/status-active-brightgreen.svg" alt=""/>
  <a aria-label="Better Stack Badge" href="https://better-lyrics-status.boidu.dev"><img height="20" src="https://uptime.betterstack.com/status-badges/v2/monitor/1dqoz.svg" alt="Better Stack Badge" /></a>

@@ -225,29 +225,34 @@ export function setupRequestSniffer(): void {
             let primaryId = primaryRenderer?.videoId;
             let primaryTitle = primaryRenderer?.title.runs[0].text;
 
-            function extractByLineInfo(longByLineText: LongBylineText) {
-              let byLineIsVideo = false;
-              let longByLine = longByLineText.runs
-                .filter(r => {
-                  let trimmed = r.text.trim();
-                  let hasVideoWord = trimmed.includes("views") || trimmed.includes("likes");
-                  if (hasVideoWord) {
-                    byLineIsVideo = true;
-                  }
-                  return trimmed.length > 0 && trimmed !== "•" && trimmed !== "&" && !hasVideoWord;
-                })
-                .map(r => r.text);
-
-              let artist: string;
+            function extractByLineInfo(longByLineText: LongBylineText): [string, string] {
+              const artists: string[] = [];
               let album = "";
-              if (byLineIsVideo) {
-                artist = longByLine?.join(", ");
-              } else {
-                // Last elm is year, second to last is album, rest is artists
-                album = longByLine[longByLine?.length - 2];
-                artist = longByLine?.slice(0, -2).join(", ");
+              for (const run of longByLineText.runs) {
+                const browse = run.navigationEndpoint?.browseEndpoint;
+                const pageType =
+                  browse?.browseEndpointContextSupportedConfigs?.browseEndpointContextMusicConfig?.pageType;
+                if (pageType === "MUSIC_PAGE_TYPE_ALBUM") {
+                  album = run.text;
+                } else if (browse) {
+                  artists.push(run.text);
+                }
               }
-              return [artist, album];
+
+              if (artists.length === 0) {
+                // Topic uploads list every artist in a single unlinked run before the first separator
+                const bulletIndex = longByLineText.runs.findIndex(run => run.text.trim() === "•");
+                const runs = bulletIndex === -1 ? longByLineText.runs : longByLineText.runs.slice(0, bulletIndex);
+                return [
+                  runs
+                    .map(run => run.text)
+                    .join("")
+                    .trim(),
+                  album,
+                ];
+              }
+
+              return [artists.join(", "), album];
             }
 
             let [primaryArtist, primaryAlbum] = extractByLineInfo(primaryRenderer?.longBylineText);

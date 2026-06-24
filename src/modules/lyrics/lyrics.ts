@@ -25,6 +25,10 @@ function isInstrumentalOnly(lyrics: Lyric[]): boolean {
   return /^\[?instrumental\s*only\]?$/i.test(lyrics[0].words.trim());
 }
 
+function normalizeArtist(artist: string): string {
+  return artist.trim().replace(", & ", ", ");
+}
+
 export type LyricSourceResultWithMeta = LyricSourceResult & {
   song: string;
   artist: string;
@@ -124,7 +128,7 @@ export async function createLyrics(detail: PlayerDetails, signal: AbortSignal): 
 
     if (matchingSong) {
       song = matchingSong.title;
-      artist = matchingSong.artist;
+      artist = matchingSong.artist || artist;
 
       if (isMusicVideo && matchingSong.counterpartVideoId && matchingSong.segmentMap) {
         log("Switching VideoId to Audio Id");
@@ -144,8 +148,7 @@ export async function createLyrics(detail: PlayerDetails, signal: AbortSignal): 
     }
 
     song = song.trim();
-    artist = artist.trim();
-    artist = artist.replace(", & ", ", ");
+    artist = normalizeArtist(artist);
     let album = await getSongAlbum(videoId, signal);
     if (!album) {
       album = "";
@@ -337,7 +340,7 @@ export async function preFetchLyrics(
 
   if (matchingSong) {
     song = matchingSong.title;
-    artist = matchingSong.artist;
+    artist = matchingSong.artist || artist;
 
     if (isMusicVideo && matchingSong.counterpartVideoId && matchingSong.segmentMap) {
       swappedVideoId = true;
@@ -346,8 +349,7 @@ export async function preFetchLyrics(
   }
 
   song = song.trim();
-  artist = artist.trim();
-  artist = artist.replace(", & ", ", ");
+  artist = normalizeArtist(artist);
   let album = await getSongAlbum(videoId, signal);
   if (!album) {
     album = "";
