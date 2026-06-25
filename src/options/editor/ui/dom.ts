@@ -31,9 +31,15 @@ export const themeFileSelect = document.getElementById("theme-file-select");
 export const themeFileCode = document.getElementById("theme-file-code") as HTMLButtonElement | null;
 export const themeFileSettings = document.getElementById("theme-file-settings") as HTMLButtonElement | null;
 
+export const themeSettingsEditor = document.getElementById("theme-settings-editor") as HTMLElement | null;
 export const themeSettingsEditorHeader = document.getElementById("theme-settings-editor-header") as HTMLElement | null;
 export const themeSettingsEditorTotal = document.getElementById("theme-settings-editor-total") as HTMLElement | null;
 export const themeSettingsEditorFields = document.getElementById("theme-settings-editor-fields") as HTMLElement | null;
+export const addSettingsFieldBtn = document.getElementById("add-settings-field-btn");
+export const themeSettingsFieldEditor = document.getElementById("theme-settings-field-editor") as HTMLElement | null;
+export const themeSettingsFieldEditorInputs = document.getElementById("theme-settings-field-editor-inputs") as HTMLElement | null;
+export const themeSettingsFieldEditorActions = document.getElementById("theme-settings-field-editor-actions") as HTMLElement | null;
+export const returnThemeSettings = document.getElementById("return-theme-settings-btn") as HTMLButtonElement | null;
 
 export const themeSettingsFields = document.getElementById("theme-settings-fields") as HTMLElement | null;
 

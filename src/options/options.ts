@@ -1,6 +1,13 @@
 // Function to save user options
 
-import { LOG_PREFIX, ROMANIZATION_LANGUAGES, UNISON_API_BASE_URL, UNISON_DOCK_DEFAULT_POSITION } from "@constants";
+import {
+  LOG_PREFIX,
+  ROMANIZATION_LANGUAGES,
+  THEME_SETTINGS_ATTRIBUTE_TYPE,
+  THEME_SETTINGS_TYPES,
+  UNISON_API_BASE_URL,
+  UNISON_DOCK_DEFAULT_POSITION,
+} from "@constants";
 import { getLanguageDisplayName, initI18n, loadLocaleOverride, SUPPORTED_LOCALES, t } from "@core/i18n";
 import { exportIdentity, getDisplayName, importIdentity, invalidateDisplayName, signPayload } from "@core/keyIdentity";
 import Sortable from "sortablejs";
@@ -575,7 +582,7 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   initThemeSettings();
-  
+
   document.getElementById("open-unison-btn")?.addEventListener("click", () => {
     chrome.tabs.create({
       url: chrome.runtime.getURL("pages/unison.html"),
@@ -598,7 +605,7 @@ function initThemeSettings() {
 
   themeSettingsModalClose?.addEventListener("click", () => {
     if (themeSettingsModalOverlay) {
-      const modal = themeSettingsModalOverlay.querySelector(".theme-settings-modal");
+      const modal = themeSettingsModalOverlay.querySelector(".modal");
       if (modal) modal.classList.add("closing");
       themeSettingsModalOverlay.classList.remove("active");
 
@@ -615,10 +622,17 @@ export async function fillThemeSettings() {
   themeSettingsFields.replaceChildren();
 
   const themeSettings = await loadThemeSettings();
-  if (themeSettingsBtn) themeSettingsBtn.style.display = !themeSettings.fields ? "none" : "";
+  if (themeSettingsBtn)
+    themeSettingsBtn.style.display = Object.keys({ ...themeSettings.fields }).length > 0 ? "" : "none";
 
   for (const field in { ...themeSettings.fields }) {
     const settingField = themeSettings.fields![field];
+    if (
+      !settingField.type ||
+      (settingField.type !== "heading" && typeof settingField.default !== THEME_SETTINGS_TYPES[settingField.type])
+    )
+      continue;
+
     const savedVal =
       settingField.type === "heading" ? settingField.label : { ...themeSettings.saved }[field] || settingField.default;
 
@@ -655,6 +669,9 @@ export async function fillThemeSettings() {
       themeSettingsFields.appendChild(checkboxContainer);
     }
     if (settingField.type === "dropdown") {
+      if (!settingField.options || settingField.options.length < 1 || !settingField.options.every(opt => opt.value))
+        continue;
+
       const dropdownContainer = document.createElement("div");
       dropdownContainer.classList.add("theme-settings-container");
       dropdownContainer.classList.add("container");
@@ -672,7 +689,7 @@ export async function fillThemeSettings() {
       settingField.options.forEach(opt => {
         const option = document.createElement("option");
         option.value = opt.value;
-        option.innerText = opt.label;
+        option.innerText = opt.label || opt.value;
         select.appendChild(option);
       });
 
@@ -723,6 +740,13 @@ export async function fillThemeSettings() {
       themeSettingsFields.appendChild(textContainer);
     }
     if (settingField.type === "range") {
+      if (
+        typeof settingField.min !== "number" ||
+        typeof settingField.max !== "number" ||
+        typeof settingField.step !== "number"
+      )
+        continue;
+
       const rangeContainer = document.createElement("div");
       rangeContainer.classList.add("theme-settings-container");
       rangeContainer.classList.add("container");

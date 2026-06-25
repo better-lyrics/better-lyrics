@@ -487,6 +487,44 @@
     "message": "Apply",
     "description": "Apply button label"
   },
+  "options_themeSettings_full": {
+    "message": "Sorry, you cannot add more than $MAX$ fields. Change your theme settings layout to meet exactly your needs",
+    "description": "Message when Theme Settings has reached maximum allowed fields",
+    "placeholders": {
+      "max": {
+        "content": "$1",
+        "example": "50"
+      }
+    }
+  },
+  "options_themeSettings_unspecified": {
+    "message": "Unspecified",
+    "description": "Default option in every dropdown of Theme Settings Field Editor"
+  },
+  "options_themeSettings_heading": {
+    "message": "Heading",
+    "description": "Heading setting field type"
+  },
+  "options_themeSettings_toggle": {
+    "message": "Toggle",
+    "description": "Toggle setting field type"
+  },
+  "options_themeSettings_range": {
+    "message": "Range",
+    "description": "Range setting field type"
+  },
+  "options_themeSettings_dropdown": {
+    "message": "Dropdown",
+    "description": "Dropdown setting field type"
+  },
+  "options_themeSettings_textfield": {
+    "message": "Text Field",
+    "description": "Textfield setting field type"
+  },
+  "options_themeSettings_color": {
+    "message": "Color",
+    "description": "Color setting field type"
+  },
 
   "options_themeFile_import": {
     "message": "Import Theme File",

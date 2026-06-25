@@ -22,7 +22,18 @@ interface CustomTheme {
 }
 
 export type ThemeSettingFieldType = "heading" | "toggle" | "range" | "dropdown" | "color" | "textfield";
-export type ThemeSettingFieldAttributeType = "css" | "rics";
+export type ThemeSettingFieldAttributeType = "css" | "rics" | "knobs";
+
+/**
+ * Some conditionals are only available to certain types.
+ * When a condition is set to a field with a type that the condition are incompatible with,
+ * the condition automatically passes anyway
+ *
+ * - `greater-than` & `less-than` on a `textfield` will be compared based on the string value length
+ * - `greater-than` & `less-than` on a `color` will sum the RGB values and use it as a comparison
+ * - `greater-than` & `less-than` on a `dropdown` will be compared based on the selected index value
+ * - `equals` & `not-equals` are the **only conditions** available to `toggle` field
+ */
 export type ThemeSettingFieldConditionals =
   | "equals"
   | "not-equals"
@@ -51,7 +62,7 @@ export interface ThemeSettingFieldBase {
    */
   attrValue?: string;
   /**
-   * This property allows to make this setting field only effective and available under certain other setting field values
+   * This property allows this setting field to only effectively available and dependable under certain other setting field values
    *
    * An array of an array of conditional values.
    *
@@ -71,8 +82,9 @@ export interface ThemeSettingFieldBase {
   default: any;
 }
 
-export interface ThemeSettingFieldHeading extends Pick<ThemeSettingFieldBase, "pos" | "label" | "available"> {
+export interface ThemeSettingFieldHeading extends ThemeSettingFieldBase {
   type: "heading";
+  default: undefined;
 }
 
 export interface ThemeSettingFieldToggle extends ThemeSettingFieldBase {
@@ -107,7 +119,8 @@ export interface ThemeSettingFieldColor extends ThemeSettingFieldBase {
 
 export interface ThemeSettingFieldTextfield extends ThemeSettingFieldBase {
   type: "textfield";
-  onlyAllow?: "number" | "alphabetical" | "alphanumeric";
+  /** RegEx like pattern */
+  pattern?: "string";
   default: string;
 }
 
@@ -243,35 +256,6 @@ export async function renameCustomTheme(oldName: string, newName: string): Promi
   await chrome.storage.local.set({ customThemes });
 }
 
-function getDefaultValueForSettingField(field: ThemeSettingField): any {
-  if (field.type === "heading") {
-    const headingField = field as ThemeSettingFieldHeading;
-    return headingField.label;
-  }
-  if (field.type === "toggle") {
-    const toggleField = field as ThemeSettingFieldToggle;
-    return toggleField.default ? toggleField.onValue : toggleField.offValue;
-  }
-  if (field.type === "range") {
-    const rangeField = field as ThemeSettingFieldRange;
-    return rangeField.default;
-  }
-  if (field.type === "dropdown") {
-    const dropdownField = field as ThemeSettingFieldDropdown;
-    const values = Object.values(dropdownField.options);
-    return values[dropdownField.default] ?? values[0];
-  }
-  if (field.type === "color") {
-    const colorField = field as ThemeSettingFieldColor;
-    return colorField.default;
-  }
-  if (field.type === "textfield") {
-    const textField = field as ThemeSettingFieldTextfield;
-    return textField.default;
-  }
-  return undefined;
-}
-
 export async function addSettingFieldCustomTheme(
   name: string,
   type: ThemeSettingFieldType | string,
@@ -295,15 +279,11 @@ export async function addSettingFieldCustomTheme(
   if (!theme.settings) {
     theme.settings = {};
   }
-  if (!theme.savedSettings) {
-    theme.savedSettings = {};
-  }
   if (theme.settings[id]) {
     throw new Error(`Field with Id "${id}" already exists!`);
   }
 
   theme.settings[id] = data;
-  theme.savedSettings[id] = getDefaultValueForSettingField(data);
   await chrome.storage.local.set({ customThemes });
 }
 
@@ -312,7 +292,7 @@ export async function getCustomThemeByName(name: string): Promise<CustomTheme | 
   return customThemes.find(theme => theme.name === name);
 }
 
-export async function updateCustomThemeSettings(
+export async function setCustomThemeSettings(
   name: string,
   settings?: { [field: string]: ThemeSettingField }
 ): Promise<void> {
@@ -331,9 +311,9 @@ export async function updateCustomThemeSettings(
   await chrome.storage.local.set({ customThemes });
 }
 
-export async function updateCustomThemeSavedSettings(
+export async function setCustomThemeSavedSettings(
   name: string,
-  savedSettings: { [field: string]: any }
+  savedSettings?: { [field: string]: any }
 ): Promise<void> {
   const customThemes = await getCustomThemes();
   const themeIndex = customThemes.findIndex(theme => theme.name === name);

@@ -20,15 +20,17 @@ import THEMES, {
   getCustomThemeByName,
   renameCustomTheme,
   saveCustomTheme,
-  updateCustomThemeSavedSettings,
+  setCustomThemeSavedSettings,
 } from "../../themes";
 import { SAVE_CUSTOM_THEME_DEBOUNCE, SAVE_DEBOUNCE_DELAY } from "../core/editor";
 import { editorStateManager } from "../core/state";
 import type { ThemeCardOptions } from "../types";
 import {
+  addSettingsFieldBtn,
   deleteThemeBtn,
   editThemeBtn,
   modifyThemeSettingsBtn,
+  returnThemeSettings,
   syncIndicator,
   themeModalGrid,
   themeModalOverlay,
@@ -40,8 +42,11 @@ import {
   themePreviewName,
   themeSelectorBtn,
   themeSettingsContainer,
+  themeSettingsEditor,
   themeSettingsEditorFields,
   themeSettingsEditorTotal,
+  themeSettingsFieldEditor,
+  themeSettingsFieldEditorInputs,
   themeSourceBadge,
 } from "../ui/dom";
 import { showAlert, showConfirm, showPrompt } from "../ui/feedback";
@@ -151,6 +156,7 @@ export function themeSourceToEditorSource(source: ThemeSource | undefined): Edit
 
 // Theme settings
 let themeSettingsVisible = false;
+let themeSettingsEVisible = true;
 
 /**
  * Validates the JSON data of the setting fields and returns
@@ -161,22 +167,21 @@ export function validateThemeSettingFields(settingFields: { [field: string]: The
 
   const warns = [];
   for (const field in settingFields) {
-    const scheme = { field };
     const setting = settingFields[field];
     if (typeof setting !== "object" || Array.isArray(setting)) {
-      warns.push({ ...scheme, cause: "INVALID_FIELD" });
+      warns.push({ field, cause: "INVALID_FIELD" });
       continue;
     }
     if (typeof setting.type !== "string" || !THEME_SETTINGS_TYPES[setting.type]) {
-      warns.push({ ...scheme, cause: "FIELD_TYPE" });
+      warns.push({ field, cause: "FIELD_TYPE" });
       continue;
     }
     if (typeof setting.label !== "string") {
-      warns.push({ ...scheme, cause: "FIELD_LABEL" });
+      warns.push({ field, cause: "FIELD_LABEL" });
       continue;
     }
     if (setting.type !== "heading" && typeof setting.attribute !== "string") {
-      warns.push({ ...scheme, cause: "FIELD_ATTRIBUTE_NAME" });
+      warns.push({ field, cause: "FIELD_ATTRIBUTE_NAME" });
       continue;
     }
   }
@@ -184,180 +189,7 @@ export function validateThemeSettingFields(settingFields: { [field: string]: The
   return warns;
 }
 
-async function _getCurrentCustomTheme(): Promise<ReturnType<typeof getCustomThemeByName> | undefined> {
-  const themeName = editorStateManager.getCurrentThemeName();
-  if (!themeName || !editorStateManager.getIsCustomTheme()) return undefined;
-  return getCustomThemeByName(themeName);
-}
-
-function _createThemeSettingsNotice(message: string): HTMLElement {
-  const wrapper = document.createElement("div");
-  wrapper.style.padding = "1rem";
-  wrapper.style.color = "var(--fg-secondary, #ddd)";
-  wrapper.style.fontSize = "0.95rem";
-  wrapper.textContent = message;
-  return wrapper;
-}
-
-function _createFieldLabel(label: string, id: string): HTMLElement {
-  const wrapper = document.createElement("div");
-  wrapper.style.display = "flex";
-  wrapper.style.justifyContent = "space-between";
-  wrapper.style.alignItems = "center";
-
-  const labelElm = document.createElement("span");
-  labelElm.textContent = label;
-  labelElm.style.fontWeight = "600";
-
-  const idElm = document.createElement("span");
-  idElm.textContent = id;
-  idElm.style.opacity = "0.7";
-  idElm.style.fontSize = "0.85rem";
-
-  wrapper.appendChild(labelElm);
-  wrapper.appendChild(idElm);
-  return wrapper;
-}
-
-function parseFieldValue(field: any, rawValue: string): any {
-  switch (field.type) {
-    case "toggle":
-      return rawValue.toLowerCase() === "true";
-    case "range":
-      return Number(rawValue);
-    case "dropdown":
-      return rawValue;
-    case "color":
-      return rawValue;
-    case "textfield":
-      return rawValue;
-    default:
-      return rawValue;
-  }
-}
-
-function _getFieldDefaultValue(field: any): any {
-  if (field.default !== undefined) return field.default;
-  if (field.type === "toggle") {
-    return field.onValue ?? field.offValue ?? false;
-  }
-  if (field.type === "range") {
-    return field.min ?? 0;
-  }
-  if (field.type === "dropdown") {
-    const values = Object.values(field.options || {});
-    return values[field.default] ?? values[0] ?? "";
-  }
-  if (field.type === "color") {
-    return field.default ?? "#ffffff";
-  }
-  return "";
-}
-
-function _createFieldInput(
-  themeName: string,
-  fieldId: string,
-  field: any,
-  currentValue: any,
-  onChange: (value: any) => void
-): HTMLElement {
-  const container = document.createElement("div");
-  container.style.marginTop = "0.75rem";
-
-  let input: HTMLElement;
-
-  switch (field.type) {
-    case "toggle": {
-      const checkbox = document.createElement("input");
-      checkbox.type = "checkbox";
-      checkbox.checked = currentValue === field.onValue || currentValue === true;
-      checkbox.addEventListener("change", () => {
-        onChange(checkbox.checked ? field.onValue : field.offValue);
-      });
-      input = checkbox;
-      break;
-    }
-    case "range": {
-      const wrapper = document.createElement("div");
-      wrapper.style.display = "flex";
-      wrapper.style.alignItems = "center";
-      wrapper.style.gap = "0.75rem";
-
-      const range = document.createElement("input");
-      range.type = "range";
-      range.min = String(field.min ?? 0);
-      range.max = String(field.max ?? 100);
-      range.step = String(field.step ?? 1);
-      range.value = String(currentValue ?? field.default ?? field.min ?? 0);
-      const valueInput = document.createElement("input");
-      valueInput.type = "number";
-      valueInput.value = range.value;
-      valueInput.min = range.min;
-      valueInput.max = range.max;
-      valueInput.step = range.step;
-      range.addEventListener("input", () => {
-        valueInput.value = range.value;
-      });
-      const commit = () => {
-        const parsed = Number(valueInput.value);
-        if (!Number.isNaN(parsed)) {
-          range.value = String(parsed);
-          onChange(parsed);
-        }
-      };
-      range.addEventListener("change", commit);
-      valueInput.addEventListener("change", commit);
-
-      wrapper.appendChild(range);
-      wrapper.appendChild(valueInput);
-      input = wrapper;
-      break;
-    }
-    case "dropdown": {
-      const select = document.createElement("select");
-      const options = field.options || {};
-      const values = Object.values(options);
-      Object.entries(options).forEach(([label, value]) => {
-        const option = document.createElement("option");
-        option.value = String(value);
-        option.textContent = label;
-        select.appendChild(option);
-      });
-      select.value = String(currentValue ?? values[0] ?? "");
-      select.addEventListener("change", () => {
-        onChange(parseFieldValue(field, select.value));
-      });
-      input = select;
-      break;
-    }
-    case "color": {
-      const color = document.createElement("input");
-      color.type = "color";
-      color.value = String(currentValue ?? field.default ?? "#ffffff");
-      color.addEventListener("change", () => {
-        onChange(color.value);
-      });
-      input = color;
-      break;
-    }
-    default: {
-      const text = document.createElement("input");
-      text.type = "text";
-      text.value = String(currentValue ?? field.default ?? "");
-      text.style.width = "100%";
-      text.addEventListener("change", () => {
-        onChange(text.value);
-      });
-      input = text;
-      break;
-    }
-  }
-
-  container.appendChild(input);
-  return container;
-}
-
-async function renderThemeSettings(): Promise<void> {
+export async function renderThemeSettings(): Promise<void> {
   if (!themeSettingsEditorFields) return;
   themeSettingsEditorFields.replaceChildren();
 
@@ -365,7 +197,7 @@ async function renderThemeSettings(): Promise<void> {
 
   // Process each field
   if (themeSettingsEditorTotal)
-    themeSettingsEditorTotal.innerText = `${Object.keys(themeSettings.fields || {}).length}/${THEME_SETTINGS_MAX_FIELDS} fields`;
+    themeSettingsEditorTotal.innerText = `${Object.keys(themeSettings.fields || {}).length} / ${THEME_SETTINGS_MAX_FIELDS}`;
 
   for (const fields in { ...themeSettings.fields }) {
     const field = themeSettings.fields![fields];
@@ -394,208 +226,238 @@ async function renderThemeSettings(): Promise<void> {
 
     const fieldActions = document.createElement("div");
     fieldActions.className = "theme-setting-field-actions";
-    fieldActions.innerHTML = `<button class="edit-theme-btn" title="Modify theme setting field" style="display: unset; height: stretch;">
-							<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-								<path d="m5.433 13.917 1.262-3.155A4 4 0 0 1 7.58 9.42l6.92-6.918a2.121 2.121 0 0 1 3 3l-6.92 6.918c-.383.383-.84.685-1.343.886l-3.154 1.262a.5.5 0 0 1-.65-.65Z"></path>
-								<path d="M3.5 5.75c0-.69.56-1.25 1.25-1.25H10A.75.75 0 0 0 10 3H4.75A2.75 2.75 0 0 0 2 5.75v9.5A2.75 2.75 0 0 0 4.75 18h9.5A2.75 2.75 0 0 0 17 15.25V10a.75.75 0 0 0-1.5 0v5.25c0 .69-.56 1.25-1.25 1.25h-9.5c-.69 0-1.25-.56-1.25-1.25v-9.5Z"></path>
-							</svg>
-						</button>
-    
-    <button class="delete-theme-btn" title="Delete theme setting field" style="display: unset; height: stretch;">
-							<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-								<path fill="currentColor" d="M7 21q-.825 0-1.412-.587T5 19V6q-.425 0-.712-.288T4 5t.288-.712T5 4h4q0-.425.288-.712T10 3h4q.425 0 .713.288T15 4h4q.425 0 .713.288T20 5t-.288.713T19 6v13q0 .825-.587 1.413T17 21zM17 6H7v13h10zm-7 11q.425 0 .713-.288T11 16V9q0-.425-.288-.712T10 8t-.712.288T9 9v7q0 .425.288.713T10 17m4 0q.425 0 .713-.288T15 16V9q0-.425-.288-.712T14 8t-.712.288T13 9v7q0 .425.288.713T14 17M7 6v13z"></path>
-							</svg>
-						</button>
-</div>`;
+
+    const fieldEdit = document.createElement("button");
+    fieldEdit.className = "edit-theme-btn";
+    fieldEdit.title = "Modify theme setting field";
+    fieldEdit.style.display = "unset";
+    fieldEdit.style.height = "stretch";
+    fieldEdit.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path d="m5.433 13.917 1.262-3.155A4 4 0 0 1 7.58 9.42l6.92-6.918a2.121 2.121 0 0 1 3 3l-6.92 6.918c-.383.383-.84.685-1.343.886l-3.154 1.262a.5.5 0 0 1-.65-.65Z"></path><path d="M3.5 5.75c0-.69.56-1.25 1.25-1.25H10A.75.75 0 0 0 10 3H4.75A2.75 2.75 0 0 0 2 5.75v9.5A2.75 2.75 0 0 0 4.75 18h9.5A2.75 2.75 0 0 0 17 15.25V10a.75.75 0 0 0-1.5 0v5.25c0 .69-.56 1.25-1.25 1.25h-9.5c-.69 0-1.25-.56-1.25-1.25v-9.5Z"></path></svg>`;
+    fieldActions.appendChild(fieldEdit);
+
+    const fieldDelete = document.createElement("button");
+    fieldDelete.className = "delete-theme-btn";
+    fieldDelete.title = "Delete theme setting field";
+    fieldDelete.style.display = "unset";
+    fieldDelete.style.height = "stretch";
+    fieldDelete.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="currentColor" d="M7 21q-.825 0-1.412-.587T5 19V6q-.425 0-.712-.288T4 5t.288-.712T5 4h4q0-.425.288-.712T10 3h4q.425 0 .713.288T15 4h4q.425 0 .713.288T20 5t-.288.713T19 6v13q0 .825-.587 1.413T17 21zM17 6H7v13h10zm-7 11q.425 0 .713-.288T11 16V9q0-.425-.288-.712T10 8t-.712.288T9 9v7q0 .425.288.713T10 17m4 0q.425 0 .713-.288T15 16V9q0-.425-.288-.712T14 8t-.712.288T13 9v7q0 .425.288.713T14 17M7 6v13z"></path></svg>`;
+    fieldActions.appendChild(fieldDelete);
 
     fieldElement.appendChild(fieldActions);
     themeSettingsEditorFields.appendChild(fieldElement);
   }
-
-  // if (!themeSettingsContainer) return;
-  // const themeName = editorStateManager.getCurrentThemeName();
-  // const isCustom = editorStateManager.getIsCustomTheme();
-  // const header = document.createElement("div");
-  // header.style.display = "flex";
-  // header.style.justifyContent = "space-between";
-  // header.style.alignItems = "center";
-  // header.style.marginBottom = "1rem";
-  // const title = document.createElement("h3");
-  // title.textContent = "Theme Settings";
-  // title.style.margin = "0";
-  // header.appendChild(title);
-  // const addFieldBtn = document.createElement("button");
-  // addFieldBtn.textContent = "Add Setting Field";
-  // addFieldBtn.className = "small-btn";
-  // addFieldBtn.disabled = !isCustom;
-  // addFieldBtn.addEventListener("click", async () => {
-  //   await promptAddThemeSettingField();
-  //   await renderThemeSettings();
-  // });
-  // header.appendChild(addFieldBtn);
-  // themeSettingsContainer.appendChild(header);
-  // if (!themeName) {
-  //   themeSettingsContainer.appendChild(createThemeSettingsNotice("No theme selected. Choose a custom theme to view its settings."));
-  //   return;
-  // }
-  // const customTheme = await getCustomThemeByName(themeName);
-  // if (!customTheme) {
-  //   themeSettingsContainer.appendChild(createThemeSettingsNotice("Custom theme metadata not found."));
-  //   return;
-  // }
-  // const settings = customTheme.settings || {};
-  // const savedSettings = customTheme.savedSettings || {};
-  // if (Object.keys(settings).length === 0) {
-  //   themeSettingsContainer.appendChild(createThemeSettingsNotice("This custom theme has no settings yet. Use the button above to add a field."));
-  //   return;
-  // }
-  // const list = document.createElement("div");
-  // list.style.display = "grid";
-  // list.style.gap = "1rem";
-  // for (const [fieldId, fieldDef] of Object.entries(settings)) {
-  //   const value = savedSettings[fieldId] ?? getFieldDefaultValue(fieldDef);
-  //   const fieldWrapper = document.createElement("div");
-  //   fieldWrapper.style.padding = "1rem";
-  //   fieldWrapper.style.border = "1px solid rgba(255,255,255,0.08)";
-  //   fieldWrapper.style.borderRadius = "0.75rem";
-  //   fieldWrapper.style.background = "rgba(255,255,255,0.02)";
-  //   fieldWrapper.appendChild(createFieldLabel(fieldDef.label || fieldId, fieldId));
-  //   fieldWrapper.appendChild(createFieldInput(themeName, fieldId, fieldDef, value, async newValue => {
-  //     await updateCustomThemeSavedSettings(themeName, { [fieldId]: newValue });
-  //     if (editorStateManager.getCurrentThemeName() === themeName && editorStateManager.getIsCustomTheme()) {
-  //       const customThemes = await getCustomThemes();
-  //       const index = customThemes.findIndex(theme => theme.name === themeName);
-  //       if (index !== -1) {
-  //         await themeManager.applyTheme(true, index, themeName);
-  //       }
-  //     }
-  //   }));
-  //   list.appendChild(fieldWrapper);
-  // }
-  // themeSettingsContainer.appendChild(list);
 }
 
-async function _promptAddThemeSettingField(): Promise<void> {
-  const themeName = editorStateManager.getCurrentThemeName();
-  if (!themeName) return;
+const fieldEditorInputs: Record<string, HTMLElement> = {};
 
-  const label = await showPrompt("Add Theme Setting", "Enter a setting label:", "", "Label");
-  if (!label) return;
+interface FieldEditorInput {
+  [key: string]: any;
+  type?: string;
+  id: string;
+  label: string;
+  desc?: string;
+  placeholder?: string;
+  pattern?: string | RegExp;
+  min?: number;
+  max?: number;
+  optional?: boolean;
+  options?: Record<string, string> | string[];
+  default?: number;
+}
 
-  const idValue = label.trim().toLowerCase().replace(/\s+/g, "-");
-  const fieldId = await showPrompt("Theme Setting ID", "Enter a unique setting id:", idValue, "setting-id");
-  if (!fieldId) return;
+function addFieldEditorInput(field: FieldEditorInput) {
+  const container = document.createElement("div");
+  container.className = "theme-settings-field-editor-container";
 
-  const type = await showPrompt(
-    "Setting Type",
-    "Enter a field type: toggle, range, dropdown, color, textfield",
-    "toggle",
-    "toggle"
-  );
-  if (!type) return;
+  const label = document.createElement("span");
+  label.className = "theme-settings-field-editor-label";
+  label.innerText = field.label;
 
-  const attribute = await showPrompt(
-    "Setting Key",
-    "Enter the Blyrics setting key (without 'blyrics-' prefix):",
-    "",
-    "example: disable-richsync"
-  );
-  if (!attribute) return;
-
-  const attrType = await showPrompt("Attribute Type", "Enter the attribute type: css or rics:", "css", "css");
-  if (!attrType) return;
-
-  const defaultValue = await showPrompt(
-    "Default Value",
-    "Enter the default value for this setting:",
-    "",
-    "default value"
-  );
-  if (defaultValue === null) return;
-
-  let data: any = {
-    label: label.trim(),
-    type: type.trim(),
-    attribute: `blyrics-${attribute.trim()}`,
-    attrType: attrType.trim(),
-    attrValue: "$VALUE$",
-  };
-
-  if (type === "toggle") {
-    const onValue = await showPrompt("Toggle On Value", "Enter the value when enabled:", "true", "true");
-    if (onValue === null) return;
-    const offValue = await showPrompt("Toggle Off Value", "Enter the value when disabled:", "false", "false");
-    if (offValue === null) return;
-    data.onValue = onValue;
-    data.offValue = offValue;
-    data.default = defaultValue.trim().toLowerCase() === "true";
-  } else if (type === "range") {
-    const min = await showPrompt("Range Minimum", "Enter the minimum value:", "0", "0");
-    if (min === null) return;
-    const max = await showPrompt("Range Maximum", "Enter the maximum value:", "100", "100");
-    if (max === null) return;
-    const step = await showPrompt("Range Step", "Enter the step value:", "1", "1");
-    if (step === null) return;
-    data.min = Number(min);
-    data.max = Number(max);
-    data.step = Number(step);
-    data.default = Number(defaultValue);
-  } else if (type === "dropdown") {
-    const options = await showPrompt(
-      "Dropdown Options",
-      "Enter label=value pairs separated by commas (eg. small=8,medium=16,large=24):",
-      "",
-      "small=8,medium=16"
-    );
-    if (options === null) return;
-    const parsedOptions: Record<string, string> = {};
-    options.split(",").forEach(pair => {
-      const [labelOption, valueOption] = pair.split("=").map(part => part.trim());
-      if (labelOption && valueOption !== undefined) {
-        parsedOptions[labelOption] = valueOption;
-      }
-    });
-    data.options = parsedOptions;
-    const defaultIndex = Number(defaultValue);
-    data.default = Number.isNaN(defaultIndex) ? 0 : defaultIndex;
-  } else if (type === "color") {
-    data.default = defaultValue || "#ffffff";
-  } else {
-    data.default = defaultValue;
+  if (!field.optional) {
+    const important = document.createElement("span");
+    important.className = "important";
+    important.innerText = " *";
+    label.appendChild(important);
   }
 
-  try {
-    await addSettingFieldCustomTheme(themeName, type.trim(), fieldId.trim(), data);
-    showAlert(`Theme setting field "${fieldId.trim()}" created.`);
-  } catch (error: any) {
-    console.error("Failed to add theme setting field:", error);
-    showAlert(error.message || "Unable to add theme setting field.");
+  container.appendChild(label);
+
+  if (field.desc) {
+    const description = document.createElement("span");
+    description.className = "theme-settings-field-editor-description";
+    description.innerText = field.desc;
+    container.appendChild(description);
+  }
+
+  if (!field.type || field.type === "text" || field.type === "number") {
+    const input = document.createElement("input");
+    input.id = `theme-settings-field-editor-${field.id}`;
+    input.type = field.type || "text";
+    if (field.min) {
+      if (input.type === "text") input.minLength = field.min;
+      if (input.type === "number") input.min = `${field.min}`;
+    }
+    if (field.max) {
+      if (input.type === "text") input.maxLength = field.max;
+      if (input.type === "number") input.max = `${field.max}`;
+    }
+    input.placeholder = field.placeholder || "";
+
+    if (field.pattern) {
+      input.addEventListener("input", () => {
+        input.value = input.value.trim().toLowerCase().replace(field.pattern!, "");
+      });
+    }
+
+    fieldEditorInputs[field.id] = input;
+    container.appendChild(input);
+  } else if (field.type === "options" && field.options) {
+    const select = document.createElement("select");
+    select.id = `theme-settings-field-editor-${field.id}`;
+    select.className = "select";
+    select.style.maxWidth = "stretch";
+
+    if (Array.isArray(field.options)) {
+      for (const options of field.options) {
+        const option = document.createElement("option");
+        option.value = options;
+        option.innerText = options;
+        select.appendChild(option);
+      }
+    } else {
+      for (const options in field.options) {
+        const option = document.createElement("option");
+        option.value = options;
+        option.innerText = field.options[options];
+        select.appendChild(option);
+      }
+    }
+
+    fieldEditorInputs[field.id] = select;
+    container.appendChild(select);
+  }
+
+  themeSettingsFieldEditorInputs?.appendChild(container);
+  return fieldEditorInputs[field.id];
+}
+
+function fillThemeSettingsFieldEditor(): void {
+  const fieldTypes: Record<string, string> = { unspecified: t("options_themeSettings_unspecified") };
+  Object.keys(THEME_SETTINGS_TYPES).forEach(v => (fieldTypes[v] = t(`options_themeSettings_${v}`)));
+
+  const fieldAttributeTypes = {
+    css: "CSS (--)",
+    rics: "RICS ($)",
+    knobs: "Knobs (/* */)",
+  };
+
+  const typeInput = addFieldEditorInput({
+    type: "options",
+    id: "type",
+    label: "Type",
+    desc: "What type of setting field would suit to store kinds of value",
+    options: fieldTypes,
+  });
+
+  // fill input field
+  [
+    {
+      id: "id",
+      label: "Identifier",
+      desc: "A field identifier, used to differentiate each fields",
+      placeholder: "2-50 characters; allowed characters: a-z, 0-9, _ -",
+      min: 2,
+      max: 50,
+      pattern: /[^a-z0-9_-]/g,
+    },
+    {
+      id: "label",
+      label: "Label",
+      desc: "What does the field supposed to do in short terms",
+      placeholder: "1-50 characters explaining the field",
+      min: 1,
+      max: 50,
+    },
+    {
+      id: "attribute-name",
+      label: "Attribute Name",
+      desc: "The corresponding name of the attribute to capture the value\nWould be placed like --attribute-name on CSS",
+      placeholder: "2-50 characters; allowed characters: a-z, 0-9, _ -",
+      min: 2,
+      max: 50,
+      pattern: /[^a-z0-9_-]/g,
+    },
+    {
+      type: "options",
+      id: "attribute-type",
+      label: "Attribute Type",
+      desc: "What level of attribute would this field's value be recognized in",
+      options: fieldAttributeTypes,
+      default: 0,
+    },
+    {
+      type: "list",
+      id: "available",
+      label: "Available conditions",
+      desc: "List of condition groups of conditions of other setting field values to make this field effectively available and dependable",
+      optional: true,
+    },
+  ].forEach(v => addFieldEditorInput(v));
+
+  if (typeInput instanceof HTMLSelectElement) {
+    typeInput.addEventListener("change", () => {
+      const visibleFieldsType: Record<string, string[]> = {
+        heading: ["type", "id", "label"],
+      };
+
+      const visibleFields = !THEME_SETTINGS_TYPES[typeInput.value]
+        ? ["type"]
+        : visibleFieldsType[typeInput.value] || Object.keys(fieldEditorInputs);
+
+      for (const field in fieldEditorInputs) {
+        const parent = fieldEditorInputs[field].parentElement;
+        if (parent) parent.style.display = visibleFields.includes(field) ? "" : "none";
+      }
+    });
   }
 }
 
 export function initializeThemeSettingsEditor(): void {
-  if (modifyThemeSettingsBtn) {
-    modifyThemeSettingsBtn.addEventListener("click", async () => {
-      themeSettingsVisible = !themeSettingsVisible;
-      const visible = themeSettingsVisible;
-      const editor = document.getElementById("editor");
-      if (editor) {
-        editor.style.display = visible ? "none" : "";
+  modifyThemeSettingsBtn?.addEventListener("click", async () => {
+    themeSettingsVisible = !themeSettingsVisible;
+    const visible = themeSettingsVisible;
+    const editor = document.getElementById("editor");
+    if (editor) {
+      editor.style.display = visible ? "none" : "";
+    }
+    if (themeSettingsContainer) {
+      themeSettingsContainer.style.display = visible ? "" : "none";
+    }
+    if (modifyThemeSettingsBtn) {
+      modifyThemeSettingsBtn.dataset.tooltip = visible
+        ? t("options_editor_modifyStyle")
+        : t("options_editor_modifyThemeSettings");
+      modifyThemeSettingsBtn.classList.toggle("active", visible);
+    }
+    if (themeSettingsVisible) {
+      await renderThemeSettings();
+    }
+  });
+
+  [addSettingsFieldBtn, returnThemeSettings].forEach(button =>
+    button?.addEventListener("click", () => {
+      themeSettingsEVisible = !themeSettingsEVisible;
+      const visible = themeSettingsEVisible;
+      if (themeSettingsEditor) {
+        themeSettingsEditor.style.display = visible ? "" : "none";
       }
-      if (themeSettingsContainer) {
-        themeSettingsContainer.style.display = visible ? "" : "none";
+      if (themeSettingsFieldEditor) {
+        themeSettingsFieldEditor.style.display = visible ? "none" : "";
       }
-      if (modifyThemeSettingsBtn) {
-        modifyThemeSettingsBtn.dataset.tooltip = visible
-          ? t("options_editor_modifyStyle")
-          : t("options_editor_modifyThemeSettings");
-        modifyThemeSettingsBtn.classList.toggle("active", visible);
-      }
-      if (themeSettingsVisible) {
-        await renderThemeSettings();
-      }
-    });
-  }
+    })
+  );
+
+  fillThemeSettingsFieldEditor();
 }
 
 export async function refreshThemeSettingsUI(): Promise<void> {
@@ -935,7 +797,7 @@ export async function saveToStorage(isTheme = false) {
     editorStateManager.setCurrentThemeName(null);
   }
 
-  saveToStorageWithFallback(css, await loadThemeSettings(), isTheme)
+  saveToStorageWithFallback(css, null, isTheme)
     .then(result => {
       console.log(LOG_PREFIX_EDITOR, "saveToStorageWithFallback result:", result);
       if (result.success && result.strategy) {
@@ -967,7 +829,7 @@ async function updateCreateEditButton(): Promise<void> {
   const hasContent = customCSS && customCSS.trim().length > 0;
 
   const showEdit = !isDefaultTheme && hasContent;
-  textSpan.textContent = showEdit ? "Edit" : "Create";
+  textSpan.textContent = showEdit ? "Edit" : t("options_themes_create");
 }
 
 export async function updateThemeSelectorButton(): Promise<void> {

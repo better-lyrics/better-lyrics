@@ -1,8 +1,8 @@
-import { GENERAL_ERROR_LOG, LOG_PREFIX } from "@constants";
+import { GENERAL_ERROR_LOG, LOG_PREFIX, THEME_SETTINGS_TYPES } from "@constants";
 import { decompressString, isCompressed } from "@core/compression";
 import { compileRicsToStyles, getLocalStorage, getSyncStorage, loadChunkedStyles } from "@core/storage";
 import { setThemeSettings } from "@modules/settings/themeOptions";
-import { log } from "@utils";
+import { hexToRgbSum, invertRegExp, log } from "@utils";
 import type { ThemeSettingField } from "@/options/themes";
 import { cachedDurations } from "./animationEngine";
 
@@ -39,36 +39,99 @@ function applyThemeSettingsToCSS(
     return css;
   }
 
+  const normalize = (type: string, val: any) => {
+    if (type === "textfield") return val.length;
+    if (type === "color") return hexToRgbSum(val)!;
+    return val;
+  };
+
+  function dependable(field: string, raw: boolean = false) {
+    const setting = settings[field];
+    let savedVal = typeof saved[field] === THEME_SETTINGS_TYPES[setting.type] ? saved[field] : setting.default;
+
+    if (!raw) {
+      if (setting.type === "dropdown") {
+        if (!Array.isArray(setting.options)) return null;
+        const option = setting.options[savedVal];
+        if (option) savedVal = option.value;
+        else savedVal = setting.options[0]?.value;
+      } else if (setting.type === "toggle") {
+        savedVal = savedVal ? setting.onValue || "" : setting.offValue || "";
+      }
+    }
+
+    if (savedVal !== THEME_SETTINGS_TYPES[setting.type] || savedVal === null || savedVal === undefined) return null;
+
+    if (Array.isArray(setting.available)) {
+      for (const conditions of setting.available) {
+        for (const condition of conditions) {
+          const dependant = settings[condition.settingField];
+          if (
+            !dependant ||
+            dependant.type === "heading" ||
+            (dependant.type === "toggle" && condition.condition !== "equals" && condition.condition !== "not-equals")
+          )
+            continue;
+
+          const dependaval = dependable(condition.settingField, true);
+          if (dependaval === null) return null;
+
+          const stringified = String(dependaval);
+          const val = condition.value;
+
+          if (condition.condition === "contains") {
+            if (!stringified.includes(val)) return null;
+          } else if (condition.condition === "ends") {
+            if (!stringified.endsWith(val)) return null;
+          } else if (condition.condition === "equals") {
+            if (stringified !== val) return null;
+          } else if (condition.condition === "greater-than") {
+            if (normalize(dependant.type, dependaval)! <= val) return null;
+          } else if (condition.condition === "less-than") {
+            if (normalize(dependant.type, dependaval)! >= val) return null;
+          } else if (condition.condition === "starts") {
+            if (!stringified.startsWith(val)) return null;
+          } else if (condition.condition === "not-contains") {
+            if (stringified.includes(val)) return null;
+          } else if (condition.condition === "not-ends") {
+            if (stringified.endsWith(val)) return null;
+          } else if (condition.condition === "not-equals") {
+            if (stringified === val) return null;
+          } else if (condition.condition === "not-starts") {
+            if (stringified.startsWith(val)) return null;
+          }
+        }
+      }
+    }
+
+    return savedVal;
+  }
+
   // string injection goes crazy
   for (const field in settings) {
     const setting = settings[field];
     if (setting.type === "heading") continue;
 
+    const savedVal = dependable(field);
+    if (savedVal === null) continue;
+
     const attribute = setting.attribute;
     if (!attribute) continue;
 
-    if (setting.attrType !== "css" && setting.attrType !== "rics") {
-      setting.attrType = "css";
+    if (setting.attrType !== "css" && setting.attrType !== "rics") setting.attrType = "css";
+
+    let setValue = setting.attrValue || "$VALUE$";
+    if (setting.type === "textfield" && setting.pattern) {
+      setValue = setValue.replace(invertRegExp(new RegExp(setting.pattern)), "");
     }
-
-    let savedVal = saved[field] || setting.default;
-    if (!savedVal) continue;
-
-    if (setting.type === "dropdown") {
-      const option = setting.options[savedVal];
-      if (option) savedVal = option;
-      else savedVal = setting.options[0];
-    } else if (setting.type === "toggle") {
-      savedVal = savedVal ? setting.onValue : setting.offValue;
-    }
-
-    const setValue = setting.attrValue || "$VALUE$";
 
     const escapedAttr = attribute.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-    const value = setValue?.replaceAll("$VALUE$", savedVal).replace(/\$([^$]+)\$/g, (_, inner) => {
+    const value = setValue?.replaceAll("$VALUE$", savedVal).replace(/\$([^$]+)\$/g, (_, i: string) => {
+      const inner = i.toLowerCase();
       const innerSetting = settings[inner];
       if (innerSetting)
-        return innerSetting.type === "heading" ? innerSetting.label : saved[inner] || innerSetting.default;
+        return (innerSetting.type === "heading" ? innerSetting.label || "" : saved[inner]) || innerSetting.default;
+      return i;
     });
 
     if (setting.attrType === "css") {
@@ -108,6 +171,44 @@ function applyThemeSettingsToCSS(
 
       // otherwise, prepend it at the very top
       css = `${attribute}: ${value};\n${css}`;
+    } else if (setting.attrType === "knobs") {
+      const existingKnobRegex = new RegExp(`(^|[\\s])(${escapedAttr})(\\s*=\\s*)[^;]+;`, "g");
+
+      // if knob exist, replace its value
+      if (existingKnobRegex.test(css)) {
+        css = css.replace(existingKnobRegex, `$1$2$3${value};`);
+        continue;
+      }
+
+      // no knob? check all /* */ comment blocks
+      const commentBlockRegex = /\/\*[\s\S]*?\*\//g;
+      const commentMatches = [...css.matchAll(commentBlockRegex)];
+
+      if (commentMatches.length > 0) {
+        // get that first comment block
+        const firstMatch = commentMatches[0];
+        const fullBlock = firstMatch[0];
+        const blockStart = firstMatch.index;
+        const blockEnd = blockStart + fullBlock.length;
+
+        // put the knob line
+        const closingIndex = fullBlock.lastIndexOf("*/");
+        const beforeClose = fullBlock.slice(0, closingIndex);
+        const afterClose = fullBlock.slice(closingIndex);
+
+        const trimmedBefore = beforeClose.replace(/\s+$/, "");
+        const fullBlockIndent = fullBlock.match(/\n(\s+)\S/);
+        const indent = fullBlockIndent ? fullBlockIndent[1] : "  ";
+
+        const newBlock = `${trimmedBefore}\n${indent}${attribute} = ${value};\n${afterClose}`;
+
+        css = css.slice(0, blockStart) + newBlock + css.slice(blockEnd);
+        continue;
+      }
+
+      // no comment block? put that block on the very top
+      const newCommentBlock = `/*\n  ${attribute} = ${value};\n*/\n`;
+      css = `${newCommentBlock}${css}`;
     }
   }
 

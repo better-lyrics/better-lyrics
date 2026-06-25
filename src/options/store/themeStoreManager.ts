@@ -262,15 +262,15 @@ export async function removeSavedThemeSettings(themeId: string): Promise<void> {
 
   const installed = await getInstalledTheme(themeId);
   if (!installed) {
-    throw new Error(`Cannot remove settings: theme "${themeId}" is not installed`);
+    throw new Error(`Cannot remove theme settings: theme "${themeId}" is not installed`);
   }
 
-  const updatedTheme = { ...installed, savedSettings: undefined };
+  delete installed.savedSettings;
 
   try {
-    await chrome.storage.local.set({ [getThemeStorageKey(themeId)]: updatedTheme });
+    await chrome.storage.local.set({ [getThemeStorageKey(themeId)]: installed });
   } catch (err) {
-    throw err;
+    throw new Error(`Cannot remove theme settings: ${err}`);
   }
 }
 

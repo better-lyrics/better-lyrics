@@ -46,6 +46,16 @@ h1 img {
     align-self: center;
 }
 
+input:not([type="color"]) {
+	padding: .25rem;
+}
+
+input[type="color"] {
+    inline-size: 30px;
+    block-size: 30px;
+    border: 0;
+}
+
 .heading {
     font-size: 1.5rem;
     font-weight: 600;
@@ -607,7 +617,7 @@ body {
 	background-color: hsla(0, 0%, 100%, 0.15);
 }
 
-.icon-btn::after {
+.icon-btn:not([class*="no-dropdown"])::after {
 	--ease: ease-out;
 	content: attr(data-tooltip);
 	position: absolute;
@@ -1778,10 +1788,13 @@ input.cm-textfield:focus-visible {
 }
 
 .theme-file-selection {
+    display: flex;
+    align-items: center;
+    padding: .5rem;
+    gap: .25rem;
 	margin: 0;
 	background-color: transparent;
 	border: hsla(0, 0, 100%, .2) solid 1px;
-	text-align: left;
 }
 
 .theme-file-selection:hover {
@@ -1821,6 +1834,11 @@ input.cm-textfield:focus-visible {
 	gap: .5rem;
 }
 
+#theme-settings-editor-total {
+	opacity: .5;
+	font-weight: bold;
+}
+
 .theme-setting-field {
 	display: flex;
 	flex-direction: row;
@@ -1855,6 +1873,53 @@ input.cm-textfield:focus-visible {
     margin-left: .25rem;
 }
 
+#theme-settings-field-editor,
+#theme-settings-field-editor-inputs {
+    display: flex;
+    flex-direction: column;
+    gap: .5rem;
+}
+
+#theme-settings-field-editor-header {
+    display: flex;
+    gap: .4rem;
+	align-items: center;
+    position: absolute;
+    background: rgba(0,0,0,.5);
+    padding: .6rem;
+    border-radius: .8rem;
+    backdrop-filter: blur(.2rem);
+    z-index: 2;
+    font-size: large;
+}
+
+#theme-settings-field-editor-title {
+	width: stretch;
+	margin-left: .1rem;
+	text-align: right;
+}
+
+#theme-settings-field-editor-inputs {
+	margin-top: 4rem;
+}
+
+.theme-settings-field-editor-container {
+	background: #333;
+    display: flex;
+    flex-direction: column;
+    padding: .75rem;
+    border-radius: .5rem;
+    gap: .2rem;
+}
+
+.theme-settings-field-editor-label {
+	font-size: 1.1rem;
+}
+
+.theme-settings-field-editor-description {
+	opacity: .75;
+}
+
 .theme-settings-modal-fields {
     margin-top: 1rem;
     border-top: hsla(0,0,100%,.1) solid 1px;
@@ -1862,6 +1927,7 @@ input.cm-textfield:focus-visible {
     flex-direction: column;
     gap: 1rem;
     padding-top: 1rem;
+	overflow: auto;
 }
 
 .theme-settings-heading {
@@ -1916,7 +1982,7 @@ input.cm-textfield:focus-visible {
     border-radius: 1rem;
     width: .75rem;
     height: .75rem;
-    background: gray;
+    background: white;
 }
 
 @keyframes slideUp {

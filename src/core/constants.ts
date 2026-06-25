@@ -105,7 +105,9 @@ export const ROMANIZATION_LANGUAGES: Record<string, string> = {
 
 // Theme Settings
 export const THEME_SETTINGS_MAX_FIELDS = 50;
+
 export const THEME_SETTINGS_TYPES: Record<string, string> = {
+  heading: "string",
   range: "number",
   color: "string",
   dropdown: "number",
@@ -113,7 +115,43 @@ export const THEME_SETTINGS_TYPES: Record<string, string> = {
   textfield: "string",
 };
 
-export const THEME_SETTINGS_ATTRIBUTE_TYPE = ["css", "rics"];
+export const THEME_SETTINGS_TOGGLE = {
+  onValue: { type: "string", label: "Toggled-On Value" },
+  offValue: { type: "string", label: "Toggled-Off Value" },
+  default: { type: "boolean", label: "Default toggle" },
+};
+
+export const THEME_SETTINGS_RANGE = {
+  outrange: { type: "boolean", label: "Out of range", optional: true },
+  min: { type: "number", label: "Minimum range" },
+  max: { type: "number", label: "Maximum range" },
+  step: {
+    type: "number",
+    label: "Range steps",
+    desc: "As in how many steps the range takes, not how many steps the range reaches to maximum",
+  },
+  default: { type: "number", label: "Default range" },
+};
+
+export const THEME_SETTINGS_DROPDOWN = {
+  options: { type: "list", label: "Choosable options" },
+  default: { type: "number", label: "Default option" },
+};
+
+export const THEME_SETTINGS_COLOR = {
+  default: { type: "color", label: "Default color" },
+};
+
+export const THEME_SETTINGS_TEXTFIELD = {
+  pattern: {
+    type: "string",
+    label: "Allowed patterns",
+    desc: "Normal or RegEx patterns that can allow a certain characters to be filled in",
+  },
+  default: { type: "string", label: "Default value" },
+};
+
+export const THEME_SETTINGS_ATTRIBUTE_TYPE = ["css", "rics", "knobs"];
 
 export const THEME_SETTINGS_CONDITIONALS = [
   "equals",
@@ -123,7 +161,9 @@ export const THEME_SETTINGS_CONDITIONALS = [
   "contains",
   "not-contains",
   "starts",
+  "not-starts",
   "ends",
+  "not-ends",
 ];
 
 // Log Prefixes

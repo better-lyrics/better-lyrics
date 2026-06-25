@@ -3,8 +3,8 @@ import { LOG_PREFIX_EDITOR } from "@constants";
 import { initI18n, loadLocaleOverride, t } from "@core/i18n";
 import { createEditorState, createEditorView } from "./core/editor";
 import { editorStateManager } from "./core/state";
-import { generateDefaultFilename, importManager, saveCSSToFile } from "./features/import";
-import { storageManager } from "./features/storage";
+import { generateDefaultFilename, importManager, saveCSSToFile, saveThemeSettingsToFile } from "./features/import";
+import { loadThemeSettings, storageManager } from "./features/storage";
 import {
   closeThemeModal,
   handleDeleteTheme,
@@ -179,7 +179,7 @@ function initializeFileOperations() {
         if (!file) return;
 
         try {
-          await importManager.importCSSFile(file);
+          await importManager.importFile("css", file);
         } catch (err) {
           console.error(LOG_PREFIX_EDITOR, "File import error:", err);
         }
@@ -187,7 +187,22 @@ function initializeFileOperations() {
       input.click();
     });
 
-    themeFileSettings?.addEventListener("click", () => {});
+    themeFileSettings?.addEventListener("click", () => {
+      const input = document.createElement("input");
+      input.type = "file";
+      input.accept = ".json";
+      input.onchange = async (event: Event) => {
+        const file = (event.target as HTMLInputElement).files?.[0];
+        if (!file) return;
+
+        try {
+          await importManager.importFile("settings", file);
+        } catch (err) {
+          console.error(LOG_PREFIX_EDITOR, "File import error:", err);
+        }
+      };
+      input.click();
+    });
   });
 
   document.getElementById("file-export-btn")?.addEventListener("click", async () => {
@@ -222,11 +237,15 @@ function initializeFileOperations() {
         return;
       }
 
-      const defaultFilename = generateDefaultFilename();
+      const defaultFilename = generateDefaultFilename("rics");
       saveCSSToFile(css, defaultFilename);
     });
 
-    themeFileSettings?.addEventListener("click", () => {});
+    themeFileSettings?.addEventListener("click", async () => {
+      const themeSettings = await loadThemeSettings();
+      const defaultFilename = generateDefaultFilename("json");
+      saveThemeSettingsToFile({ ...themeSettings.fields }, defaultFilename);
+    });
   });
 
   document.getElementById("styling-guide-btn")?.addEventListener("click", () => {
