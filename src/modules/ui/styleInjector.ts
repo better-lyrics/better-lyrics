@@ -180,25 +180,26 @@ function applyThemeSettingsToCSS(
         continue;
       }
 
-      // no knob? check all /* */ comment blocks
+      // no knob? find a comment that has a knob like attribute
       const commentBlockRegex = /\/\*[\s\S]*?\*\//g;
-      const commentMatches = [...css.matchAll(commentBlockRegex)];
+      const genericKnobLineRegex = /[\w.-]+\s*=\s*[^;]+;/;
 
-      if (commentMatches.length > 0) {
-        // get that first comment block
-        const firstMatch = commentMatches[0];
-        const fullBlock = firstMatch[0];
-        const blockStart = firstMatch.index;
+      const commentMatches = [...css.matchAll(commentBlockRegex)];
+      const targetMatch = commentMatches.find(m => genericKnobLineRegex.test(m[0]));
+
+      if (targetMatch) {
+        const fullBlock = targetMatch[0];
+        const blockStart = targetMatch.index;
         const blockEnd = blockStart + fullBlock.length;
 
-        // put the knob line
+        // Insert the new knob line right before the closing "*/".
         const closingIndex = fullBlock.lastIndexOf("*/");
         const beforeClose = fullBlock.slice(0, closingIndex);
-        const afterClose = fullBlock.slice(closingIndex);
+        const afterClose = fullBlock.slice(closingIndex); // "*/"
 
         const trimmedBefore = beforeClose.replace(/\s+$/, "");
-        const fullBlockIndent = fullBlock.match(/\n(\s+)\S/);
-        const indent = fullBlockIndent ? fullBlockIndent[1] : "  ";
+        const blockIndent = fullBlock.match(/\n(\s+)\S/);
+        const indent = blockIndent ? blockIndent[1] : "  ";
 
         const newBlock = `${trimmedBefore}\n${indent}${attribute} = ${value};\n${afterClose}`;
 
@@ -206,7 +207,7 @@ function applyThemeSettingsToCSS(
         continue;
       }
 
-      // no comment block? put that block on the very top
+      // otherwise, prepend a new comment block on the top with the knob
       const newCommentBlock = `/*\n  ${attribute} = ${value};\n*/\n`;
       css = `${newCommentBlock}${css}`;
     }
