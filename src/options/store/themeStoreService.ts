@@ -179,17 +179,10 @@ export async function fetchRegistryShaderConfig(basePath: string): Promise<Recor
 }
 
 /**
- * Decides which build's path to fetch a theme from for the running extension version.
- * Order: store-api /resolve, then local builds[] from the lockfile entry, then legacy latest.
+ * Local-only resolution used by the listing path: never hits store-api.
+ * Order: local builds[] from the lockfile entry, then legacy latest.
  */
-async function resolveRegistryPath(lockEntry: LockfileEntry): Promise<{ path: string; integrity?: string }> {
-  const legacyPath = getLegacyRegistryPath(lockEntry.id);
-
-  const apiResolved = await resolveThemeBuild(lockEntry.id, EXTENSION_VERSION);
-  if (apiResolved) {
-    return { path: apiResolved.path, integrity: apiResolved.integrity };
-  }
-
+function resolveRegistryPathLocal(lockEntry: LockfileEntry): { path: string; integrity?: string } {
   if (lockEntry.builds && lockEntry.builds.length > 0) {
     const localResolved = resolveBuildForVersion(lockEntry.builds, EXTENSION_VERSION);
     if (localResolved) {
@@ -197,14 +190,69 @@ async function resolveRegistryPath(lockEntry: LockfileEntry): Promise<{ path: st
     }
   }
 
-  return { path: legacyPath, integrity: lockEntry.integrity };
+  return { path: getLegacyRegistryPath(lockEntry.id), integrity: lockEntry.integrity };
+}
+
+/**
+ * Authoritative resolution used by the install/update path.
+ * Order: store-api /resolve, then local builds[] from the lockfile entry, then legacy latest.
+ */
+async function resolveRegistryPathAuthoritative(lockEntry: LockfileEntry): Promise<{ path: string; integrity?: string }> {
+  const apiResolved = await resolveThemeBuild(lockEntry.id, EXTENSION_VERSION);
+  if (apiResolved) {
+    return { path: apiResolved.path, integrity: apiResolved.integrity };
+  }
+
+  return resolveRegistryPathLocal(lockEntry);
+}
+
+interface RegistryFileUrls {
+  cssUrl: string;
+  shaderUrl?: string;
+  registryPath: string;
+  integrity?: string;
+}
+
+/**
+ * Derives the css (rics-then-css), shader, and base path for a resolved registry build.
+ * Shared by the listing render and the install-time re-derivation.
+ */
+async function deriveRegistryFileUrls(
+  basePath: string,
+  hasShaders: boolean,
+  integrity?: string
+): Promise<RegistryFileUrls> {
+  const hasRics = await checkRegistryFileExists(basePath, "style.rics");
+  const cssUrl = hasRics ? getRegistryFileUrl(basePath, "style.rics") : getRegistryFileUrl(basePath, "style.css");
+  const shaderUrl = hasShaders ? getRegistryFileUrl(basePath, "shader.json") : undefined;
+  return { cssUrl, shaderUrl, registryPath: basePath, integrity };
+}
+
+/**
+ * Install-time resolution for a registry theme. Calls the authoritative store-api /resolve first
+ * (falling back to local builds[] then legacy), then re-derives the css/shader/base URLs from that
+ * path so install uses the build chosen at install time rather than the listing-time URLs.
+ */
+export async function resolveRegistryInstallUrls(theme: StoreTheme): Promise<RegistryFileUrls> {
+  const lockEntry: LockfileEntry = {
+    repo: theme.repo,
+    id: theme.id,
+    version: theme.version,
+    commit: theme.commit ?? "",
+    integrity: theme.integrity ?? "",
+    locked: theme.locked ?? "",
+    builds: theme.builds,
+  };
+
+  const { path: basePath, integrity } = await resolveRegistryPathAuthoritative(lockEntry);
+  return deriveRegistryFileUrls(basePath, theme.hasShaders, integrity);
 }
 
 async function fetchFullThemeFromRegistry(lockEntry: LockfileEntry): Promise<StoreTheme> {
   const themeId = lockEntry.id;
   const imageRoot = getLegacyRegistryPath(themeId);
 
-  const { path: basePath, integrity } = await resolveRegistryPath(lockEntry);
+  const { path: basePath, integrity } = resolveRegistryPathLocal(lockEntry);
 
   const [metadata, descriptionMd] = await Promise.all([
     fetchRegistryMetadata(themeId, basePath),
@@ -213,10 +261,7 @@ async function fetchFullThemeFromRegistry(lockEntry: LockfileEntry): Promise<Sto
 
   const description = descriptionMd ?? metadata.description ?? "";
 
-  const hasRics = await checkRegistryFileExists(basePath, "style.rics");
-  const cssUrl = hasRics ? getRegistryFileUrl(basePath, "style.rics") : getRegistryFileUrl(basePath, "style.css");
-
-  const shaderUrl = metadata.hasShaders ? getRegistryFileUrl(basePath, "shader.json") : undefined;
+  const { cssUrl, shaderUrl } = await deriveRegistryFileUrls(basePath, metadata.hasShaders);
 
   const imageUrls: string[] = [];
   const safeImages = metadata.images ? filterSafeImageFilenames(metadata.images) : [];
@@ -235,6 +280,9 @@ async function fetchFullThemeFromRegistry(lockEntry: LockfileEntry): Promise<Sto
     allImageUrls = [coverUrl];
   }
 
+  const builds = lockEntry.builds;
+  const latestBuild = builds && builds.length > 0 ? builds[0] : undefined;
+
   return {
     ...metadata,
     description,
@@ -248,6 +296,9 @@ async function fetchFullThemeFromRegistry(lockEntry: LockfileEntry): Promise<Sto
     locked: lockEntry.locked,
     registryPath: basePath,
     integrity,
+    builds,
+    latestVersion: latestBuild?.version,
+    latestMinVersion: latestBuild?.minVersion,
   };
 }
 

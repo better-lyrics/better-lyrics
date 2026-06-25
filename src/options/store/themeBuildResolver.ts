@@ -51,3 +51,29 @@ export function resolveBuildForVersion(builds: ThemeBuild[], extensionVersion: s
 
   return best;
 }
+
+/**
+ * A theme is usable when at least one of its builds qualifies for the extension version.
+ */
+export function isAnyBuildCompatible(builds: ThemeBuild[], extensionVersion: string): boolean {
+  return resolveBuildForVersion(builds, extensionVersion) !== null;
+}
+
+/**
+ * The lowest minVersion floor across all builds. Builds are sorted version DESC,
+ * so the lowest-version build (last entry) carries the lowest floor.
+ * Returns null when there are no builds (caller falls back to the legacy minVersion).
+ */
+export function lowestBuildFloor(builds: ThemeBuild[]): string | null {
+  if (builds.length === 0) return null;
+  return builds[builds.length - 1].minVersion;
+}
+
+/**
+ * True when the locally resolved build is not the latest published build.
+ * Builds are sorted version DESC, so builds[0] is the latest.
+ */
+export function isOlderBuild(resolvedVersion: string, builds: ThemeBuild[]): boolean {
+  if (builds.length === 0) return false;
+  return resolvedVersion !== builds[0].version;
+}

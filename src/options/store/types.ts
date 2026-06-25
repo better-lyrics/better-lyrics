@@ -47,6 +47,9 @@ export interface StoreTheme extends ResolvedStoreThemeMetadata {
   locked?: string;
   registryPath?: string;
   integrity?: string;
+  builds?: ThemeBuild[];
+  latestVersion?: string;
+  latestMinVersion?: string;
 }
 
 export type ThemeSource = "marketplace" | "url";

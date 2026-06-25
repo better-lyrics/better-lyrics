@@ -7,6 +7,7 @@ import {
   fetchThemeCSS,
   fetchThemeMetadata,
   fetchThemeShaderConfig,
+  resolveRegistryInstallUrls,
 } from "./themeStoreService";
 import type { InstalledStoreTheme, StoreTheme, ThemeSource } from "./types";
 
@@ -130,10 +131,13 @@ export async function installTheme(theme: StoreTheme, options: InstallOptions = 
   let shaderConfig: Record<string, unknown> | null = null;
 
   if (isRegistryTheme) {
-    css = await fetchCssFromUrl(theme.cssUrl);
+    // Authoritative resolution happens here at install time: ask store-api /resolve
+    // (falling back to local builds[] then legacy) and re-derive the file URLs from
+    // that path rather than reusing the listing-time URLs.
+    const installUrls = await resolveRegistryInstallUrls(theme);
+    css = await fetchCssFromUrl(installUrls.cssUrl);
     if (theme.hasShaders) {
-      const shaderBasePath = theme.registryPath ?? `themes/${theme.id}`;
-      shaderConfig = await fetchRegistryShaderConfig(shaderBasePath);
+      shaderConfig = await fetchRegistryShaderConfig(installUrls.registryPath);
     }
   } else {
     const branch = options.branch;
@@ -250,7 +254,7 @@ export async function installSymlinkedThemeFromMarketplace(storeId: string): Pro
   }
 }
 
-export { isVersionCompatible } from "./themeBuildResolver";
+export { isAnyBuildCompatible, isOlderBuild, isVersionCompatible, lowestBuildFloor } from "./themeBuildResolver";
 
 async function checkForThemeUpdates(
   installed: InstalledStoreTheme[],

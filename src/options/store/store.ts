@@ -10,7 +10,7 @@ import type { AllThemeStats, InstalledStoreTheme, StoreTheme, ThemeStats } from 
 let gridAnimationController: AnimationController | null = null;
 
 import { getDisplayName, hasCertificate } from "@core/keyIdentity";
-import { type AlertAction, showAlert } from "../editor/ui/feedback";
+import { type AlertAction, showAlert, showConfirm } from "../editor/ui/feedback";
 import { fetchAllStats, fetchUserRatings, submitRating, trackInstall } from "./themeStoreApi";
 import {
   applyStoreTheme,
@@ -20,8 +20,11 @@ import {
   getInstalledTheme,
   type InstallOptions,
   installTheme,
+  isAnyBuildCompatible,
+  isOlderBuild,
   isThemeInstalled,
   isVersionCompatible,
+  lowestBuildFloor,
   performSilentUpdates,
   refreshUrlThemesMetadata,
   removeTheme,
@@ -131,6 +134,29 @@ let currentFilters: FilterState = {
 };
 
 const EXTENSION_VERSION = chrome.runtime.getManifest().version;
+
+/**
+ * Builds-aware compatibility: a theme is usable when any build qualifies for the
+ * running extension. Legacy themes (no builds[]) fall back to their single minVersion.
+ */
+function isThemeCompatible(theme: StoreTheme): boolean {
+  if (theme.builds && theme.builds.length > 0) {
+    return isAnyBuildCompatible(theme.builds, EXTENSION_VERSION);
+  }
+  return isVersionCompatible(theme.minVersion, EXTENSION_VERSION);
+}
+
+/**
+ * The lowest version floor to surface in "Requires Better Lyrics vX+" copy. For builds-aware
+ * themes this is the lowest build floor; legacy themes keep their single minVersion.
+ */
+function themeFloorVersion(theme: StoreTheme): string {
+  if (theme.builds && theme.builds.length > 0) {
+    return lowestBuildFloor(theme.builds) ?? theme.minVersion;
+  }
+  return theme.minVersion;
+}
+
 const INITIAL_BATCH_SIZE = 30;
 const LOAD_MORE_BATCH_SIZE = 20;
 let currentVisibleCards: HTMLElement[] = [];
@@ -1053,8 +1079,7 @@ async function applyFiltersToGrid(): Promise<void> {
     const matchesSearch = matchesSearchQuery(theme, currentFilters.searchQuery);
     const matchesShowFilter = matchesInstallFilter(theme.id, installedIds, currentFilters.showFilter);
     const matchesShaderFilter = !currentFilters.hasShaders || theme.hasShaders;
-    const matchesVersionFilter =
-      !currentFilters.versionCompatible || isVersionCompatible(theme.minVersion, EXTENSION_VERSION);
+    const matchesVersionFilter = !currentFilters.versionCompatible || isThemeCompatible(theme);
 
     const matchesFilters = matchesSearch && matchesShowFilter && matchesShaderFilter && matchesVersionFilter;
 
@@ -1076,8 +1101,7 @@ async function applyFiltersToGrid(): Promise<void> {
       const storeTheme = installedThemeToStoreTheme(installed);
       const matchesSearch = matchesSearchQuery(storeTheme, currentFilters.searchQuery);
       const matchesShaderFilter = !currentFilters.hasShaders || storeTheme.hasShaders;
-      const matchesVersionFilter =
-        !currentFilters.versionCompatible || isVersionCompatible(storeTheme.minVersion, EXTENSION_VERSION);
+      const matchesVersionFilter = !currentFilters.versionCompatible || isThemeCompatible(storeTheme);
 
       let card = urlOnlyThemeCards.get(installed.id);
       if (!matchesSearch || !matchesShaderFilter || !matchesVersionFilter) {
@@ -1303,7 +1327,7 @@ function createStoreThemeCard(
     card.dataset.urlTheme = "true";
   }
 
-  const isCompatible = isVersionCompatible(theme.minVersion, EXTENSION_VERSION);
+  const isCompatible = isThemeCompatible(theme);
 
   const coverImg = document.createElement("img");
   coverImg.className = "store-card-cover";
@@ -1332,10 +1356,11 @@ function createStoreThemeCard(
   const actionBtn = document.createElement("button");
   actionBtn.className = `store-card-btn ${isInstalled ? "store-card-btn-remove" : "store-card-btn-install"}`;
   actionBtn.textContent = isInstalled ? t("marketplace_remove") : t("marketplace_install");
-  actionBtn.disabled = !isCompatible && !isInstalled;
 
+  // Incompatible themes stay installable: the button is never disabled, but it carries a hint
+  // and the install handler confirms with the user first.
   if (!isCompatible && !isInstalled) {
-    actionBtn.title = `Requires Better Lyrics v${theme.minVersion}+`;
+    actionBtn.title = `Requires Better Lyrics v${themeFloorVersion(theme)}+`;
   }
 
   actionBtn.addEventListener("click", async e => {
@@ -1431,9 +1456,10 @@ function createStoreThemeCard(
   }
 
   if (!isCompatible) {
+    const floor = themeFloorVersion(theme);
     const incompatBadge = document.createElement("span");
     incompatBadge.className = "store-card-badge-warn";
-    incompatBadge.title = `Requires Better Lyrics v${theme.minVersion} or higher`;
+    incompatBadge.title = `Requires Better Lyrics v${floor} or higher`;
 
     const warnIcon = document.createElementNS("http://www.w3.org/2000/svg", "svg");
     warnIcon.setAttribute("viewBox", "0 0 24 24");
@@ -1446,11 +1472,58 @@ function createStoreThemeCard(
     warnIcon.appendChild(warnPath);
 
     incompatBadge.appendChild(warnIcon);
-    incompatBadge.appendChild(document.createTextNode(`v${theme.minVersion}+`));
+    incompatBadge.appendChild(document.createTextNode(`v${floor}+`));
     content.appendChild(incompatBadge);
+  } else if (theme.builds && theme.latestVersion && isOlderBuild(theme.version, theme.builds)) {
+    content.appendChild(createOlderBuildBadge(theme.version, theme.latestVersion, theme.latestMinVersion));
   }
 
   return card;
+}
+
+function createInfoIcon(): SVGSVGElement {
+  const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+  svg.setAttribute("viewBox", "0 0 24 24");
+  svg.setAttribute("fill", "currentColor");
+  const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+  path.setAttribute("fill-rule", "evenodd");
+  path.setAttribute("clip-rule", "evenodd");
+  path.setAttribute(
+    "d",
+    "M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75s9.75-4.365 9.75-9.75S17.385 2.25 12 2.25M11.25 8a.75.75 0 0 1 1.5 0a.75.75 0 0 1-1.5 0m1.5 3a.75.75 0 0 0-1.5 0v5.25a.75.75 0 0 0 1.5 0z"
+  );
+  svg.appendChild(path);
+  return svg;
+}
+
+/**
+ * Shows on a card when the locally resolved build is behind the latest published build.
+ * The latest build needs a newer extension, so we surface the version gap without blocking.
+ */
+function createOlderBuildBadge(resolvedVersion: string, latestVersion: string, latestMinVersion?: string): HTMLSpanElement {
+  const badge = document.createElement("span");
+  badge.className = "store-card-badge-older";
+  const floorHint = latestMinVersion ? ` needs Better Lyrics ${latestMinVersion}+` : "";
+  badge.title = `You're on v${resolvedVersion}. Latest v${latestVersion}${floorHint}`;
+  badge.appendChild(createInfoIcon());
+  badge.appendChild(document.createTextNode(`v${resolvedVersion}`));
+  return badge;
+}
+
+/**
+ * Warns before installing or updating a theme with no qualifying build. Returns true when the
+ * user wants to proceed (best-effort legacy/latest install) and false when they cancel.
+ * Compatible themes skip the prompt and return true immediately.
+ */
+async function confirmIncompatibleInstall(theme: StoreTheme): Promise<boolean> {
+  if (isThemeCompatible(theme)) return true;
+  const floor = themeFloorVersion(theme);
+  return showConfirm(
+    t("marketplace_install"),
+    `This theme needs Better Lyrics v${floor}+ and may not work on your version. Install anyway?`,
+    false,
+    t("marketplace_install")
+  );
 }
 
 async function handleThemeAction(theme: StoreTheme, button: HTMLButtonElement): Promise<void> {
@@ -1475,6 +1548,9 @@ async function handleThemeAction(theme: StoreTheme, button: HTMLButtonElement): 
       }
       showAlert(`Removed ${theme.title}`);
     } else {
+      if (!(await confirmIncompatibleInstall(theme))) {
+        return;
+      }
       const installedTheme = await installTheme(theme, { source: "marketplace" });
       button.className = "store-card-btn store-card-btn-remove";
       button.textContent = t("marketplace_remove");
@@ -1796,6 +1872,9 @@ async function openDetailModal(theme: StoreTheme, urlThemeInfo?: UrlThemeInfo): 
           updateRatingEnabled?.(false);
           updateDetailApplyBtn(false, false);
         } else {
+          if (!(await confirmIncompatibleInstall(theme))) {
+            return;
+          }
           const installedTheme = await installTheme(theme, { source: "marketplace" });
           actionBtn.className = "store-card-btn store-card-btn-remove";
           setActionButtonContent(actionBtn, t("marketplace_remove"), "I");
