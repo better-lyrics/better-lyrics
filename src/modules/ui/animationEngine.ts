@@ -372,6 +372,8 @@ export function animationEngine(currentTime: number, eventCreationTime: number, 
       currentTime += getCSSDurationInMs(lyricsElement, "--blyrics-timing-offset") / 1000;
     }
 
+    currentTime += AppState.lyricOffset;
+
     const lyricScrollTime = currentTime + getCSSDurationInMs(lyricsElement, "--blyrics-scroll-timing-offset") / 1000;
 
     // Read layout values before the loop writes class changes, to avoid forced reflow
