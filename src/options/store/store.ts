@@ -336,6 +336,81 @@ function getTestThemes(): StoreTheme[] {
       imageUrls: [placeholderImage],
       cssUrl: "",
     },
+    {
+      // Latest build needs 2.5.0.0 (above this 2.3.2 extension), older 1.2.0 build needs 2.0.0.0.
+      // The resolver serves 1.2.0, so the card shows v1.2.0 plus an "older build" notice.
+      id: "test-older-build",
+      title: "Pinned Older Build",
+      description:
+        "Latest build needs a newer Better Lyrics than you have, so the store serves you the older build that still works.",
+      creators: ["Build Pinner"],
+      version: "1.2.0",
+      minVersion: "2.0.0.0",
+      hasShaders: false,
+      repo: "test/older-build-theme",
+      coverUrl: placeholderImage,
+      imageUrls: [placeholderImage],
+      cssUrl: "",
+      builds: [
+        { version: "2.0.0", minVersion: "2.5.0.0", path: "themes/test-older-build", integrity: "sha256-test" },
+        { version: "1.2.0", minVersion: "2.0.0.0", path: "themes/test-older-build/v/1.2.0", integrity: "sha256-test" },
+      ],
+      latestVersion: "2.0.0",
+      latestMinVersion: "2.5.0.0",
+    },
+    {
+      // Multiple builds, and this 2.3.2 extension qualifies for the newest one, so no older-build notice.
+      id: "test-builds-latest",
+      title: "Multi-Build On Latest",
+      description:
+        "Has multiple builds, and your version qualifies for the newest one, so no older-build notice shows.",
+      creators: ["Build Author"],
+      version: "2.0.0",
+      minVersion: "2.0.0.0",
+      hasShaders: false,
+      repo: "test/builds-latest-theme",
+      coverUrl: placeholderImage,
+      imageUrls: [placeholderImage],
+      cssUrl: "",
+      builds: [
+        { version: "2.0.0", minVersion: "2.0.0.0", path: "themes/test-builds-latest", integrity: "sha256-test" },
+        {
+          version: "1.0.0",
+          minVersion: "1.5.0.0",
+          path: "themes/test-builds-latest/v/1.0.0",
+          integrity: "sha256-test",
+        },
+      ],
+      latestVersion: "2.0.0",
+      latestMinVersion: "2.0.0.0",
+    },
+    {
+      // Every build needs more than 2.3.2. Install stays enabled but warns first; the floor copy
+      // shows the lowest build floor (2.5.0.0), not the latest build's floor.
+      id: "test-builds-incompatible",
+      title: "Incompatible (Builds)",
+      description:
+        "Every build needs a newer Better Lyrics than you have. Install is not blocked, but it warns before installing.",
+      creators: ["Future Dev"],
+      version: "3.0.0",
+      minVersion: "3.0.0.0",
+      hasShaders: false,
+      repo: "test/builds-incompatible-theme",
+      coverUrl: placeholderImage,
+      imageUrls: [placeholderImage],
+      cssUrl: "",
+      builds: [
+        { version: "3.0.0", minVersion: "3.0.0.0", path: "themes/test-builds-incompatible", integrity: "sha256-test" },
+        {
+          version: "2.5.0",
+          minVersion: "2.5.0.0",
+          path: "themes/test-builds-incompatible/v/2.5.0",
+          integrity: "sha256-test",
+        },
+      ],
+      latestVersion: "3.0.0",
+      latestMinVersion: "3.0.0.0",
+    },
   ];
 
   return [...curated, ...generateSyntheticTestThemes()];
@@ -355,6 +430,9 @@ function getTestStats(): AllThemeStats {
     "test-incompatible": { installs: 50, rating: 4.0, ratingCount: 50 },
     "test-multi-author": { installs: 3000, rating: 4.0, ratingCount: 3500 },
     "test-long-description": { installs: 600, rating: 4.3, ratingCount: 180 },
+    "test-older-build": { installs: 420, rating: 4.6, ratingCount: 130 },
+    "test-builds-latest": { installs: 980, rating: 4.4, ratingCount: 260 },
+    "test-builds-incompatible": { installs: 75, rating: 4.1, ratingCount: 40 },
   };
 
   const rand = pseudoRandom(0x5ed5);
