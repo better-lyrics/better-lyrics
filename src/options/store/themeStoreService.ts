@@ -252,7 +252,6 @@ export async function resolveRegistryInstallUrls(theme: StoreTheme): Promise<Reg
 
 async function fetchFullThemeFromRegistry(lockEntry: LockfileEntry): Promise<StoreTheme> {
   const themeId = lockEntry.id;
-  const imageRoot = getLegacyRegistryPath(themeId);
 
   const { path: basePath, integrity } = resolveRegistryPathLocal(lockEntry);
 
@@ -268,7 +267,7 @@ async function fetchFullThemeFromRegistry(lockEntry: LockfileEntry): Promise<Sto
   const imageUrls: string[] = [];
   const safeImages = metadata.images ? filterSafeImageFilenames(metadata.images) : [];
   for (const img of safeImages) {
-    imageUrls.push(`${THEME_REGISTRY_URL}/${imageRoot}/images/${img}`);
+    imageUrls.push(`${THEME_REGISTRY_URL}/${basePath}/images/${img}`);
   }
 
   let coverUrl: string;
@@ -278,7 +277,7 @@ async function fetchFullThemeFromRegistry(lockEntry: LockfileEntry): Promise<Sto
     coverUrl = imageUrls[0];
     allImageUrls = imageUrls;
   } else {
-    coverUrl = `${THEME_REGISTRY_URL}/${imageRoot}/cover.png`;
+    coverUrl = `${THEME_REGISTRY_URL}/${basePath}/cover.png`;
     allImageUrls = [coverUrl];
   }
 
