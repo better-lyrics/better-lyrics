@@ -609,6 +609,7 @@ function createUnisonFooterCard(unisonData: UnisonData): HTMLElement {
 
 const DOCK_PROXIMITY = 104;
 let dockProximityAttached = false;
+let dockProximityListener: ((event: MouseEvent) => void) | null = null;
 const DOCK_EXPANDED_CLASS = `${DOCK_CLASS}__inner--expanded`;
 
 // Pre-expands the dock when the cursor comes near, so the controls have settled into
@@ -620,46 +621,50 @@ const DOCK_EXPANDED_CLASS = `${DOCK_CLASS}__inner--expanded`;
 function ensureDockProximityListener(): void {
   if (dockProximityAttached) return;
   dockProximityAttached = true;
-  document.addEventListener(
-    "mousemove",
-    event => {
-      const inner = document.getElementsByClassName(`${DOCK_CLASS}__inner`)[0] as HTMLElement | undefined;
-      if (!inner) return;
-      const rect = inner.getBoundingClientRect();
-      if (rect.width === 0) return;
+  dockProximityListener = event => {
+    const inner = document.getElementsByClassName(`${DOCK_CLASS}__inner`)[0] as HTMLElement | undefined;
+    if (!inner) return;
+    const rect = inner.getBoundingClientRect();
+    if (rect.width === 0) return;
 
-      const position = (inner.parentElement as HTMLElement | null)?.dataset.position ?? "";
-      let { left, right, top, bottom } = rect;
-      if (position.includes("right")) left -= DOCK_PROXIMITY;
-      if (position.includes("left")) right += DOCK_PROXIMITY;
-      if (position.startsWith("top")) bottom += DOCK_PROXIMITY;
-      else top -= DOCK_PROXIMITY;
+    const position = (inner.parentElement as HTMLElement | null)?.dataset.position ?? "";
+    let { left, right, top, bottom } = rect;
+    if (position.includes("right")) left -= DOCK_PROXIMITY;
+    if (position.includes("left")) right += DOCK_PROXIMITY;
+    if (position.startsWith("top")) bottom += DOCK_PROXIMITY;
+    else top -= DOCK_PROXIMITY;
 
-      let near = event.clientX >= left && event.clientX <= right && event.clientY >= top && event.clientY <= bottom;
+    let near = event.clientX >= left && event.clientX <= right && event.clientY >= top && event.clientY <= bottom;
 
-      // While the source dropdown is open, treat its bounds (plus a bridging margin) as
-      // part of the dock so moving onto it does not collapse the dock or drop the player bar.
-      if (!near) {
-        const menu = document.querySelector(`.${DOCK_CLASS}__menu--open`);
-        if (menu) {
-          const m = menu.getBoundingClientRect();
-          const pad = 32;
-          near =
-            event.clientX >= m.left - pad &&
-            event.clientX <= m.right + pad &&
-            event.clientY >= m.top - pad &&
-            event.clientY <= m.bottom + pad;
-        }
+    // While the source dropdown is open, treat its bounds (plus a bridging margin) as
+    // part of the dock so moving onto it does not collapse the dock or drop the player bar.
+    if (!near) {
+      const menu = document.querySelector(`.${DOCK_CLASS}__menu--open`);
+      if (menu) {
+        const m = menu.getBoundingClientRect();
+        const pad = 32;
+        near =
+          event.clientX >= m.left - pad &&
+          event.clientX <= m.right + pad &&
+          event.clientY >= m.top - pad &&
+          event.clientY <= m.bottom + pad;
       }
+    }
 
-      if (near !== inner.classList.contains(DOCK_EXPANDED_CLASS)) {
-        inner.classList.toggle(DOCK_EXPANDED_CLASS, near);
-        if (near) showPlayerBarOnDockHover();
-        else hidePlayerBarOnDockLeave();
-      }
-    },
-    { passive: true }
-  );
+    if (near !== inner.classList.contains(DOCK_EXPANDED_CLASS)) {
+      inner.classList.toggle(DOCK_EXPANDED_CLASS, near);
+      if (near) showPlayerBarOnDockHover();
+      else hidePlayerBarOnDockLeave();
+    }
+  };
+  document.addEventListener("mousemove", dockProximityListener, { passive: true });
+}
+
+function removeDockProximityListener(): void {
+  if (!dockProximityListener) return;
+  document.removeEventListener("mousemove", dockProximityListener);
+  dockProximityListener = null;
+  dockProximityAttached = false;
 }
 
 // Mounts the dock if absent, otherwise refreshes its controls in place. The dock
@@ -755,6 +760,7 @@ export function unmountDock(): void {
   unmountVotingSegment();
   hidePlayerBarOnDockLeave();
   disconnectLayoutAttrObserver();
+  removeDockProximityListener();
   const dock = document.getElementsByClassName(DOCK_CLASS)[0];
   if (dock) dock.remove();
 }
