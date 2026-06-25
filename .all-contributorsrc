@@ -160,6 +160,15 @@
       "contributions": [
         "code"
       ]
+    },
+    {
+      "login": "MeDustyy",
+      "name": "Oleksandr",
+      "avatar_url": "https://avatars.githubusercontent.com/u/58863601?v=4",
+      "profile": "https://github.com/MeDustyy",
+      "contributions": [
+        "ideas"
+      ]
     }
   ],
   "badgeTemplate": "<img src=\"https://img.shields.io/badge/all_contributors-<%= contributors.length %>-orange.svg\" alt=\"\"/>",
