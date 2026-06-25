@@ -1,7 +1,7 @@
 import { LOG_PREFIX_STORE } from "@constants";
 import type { ThemeBuild } from "./types";
 
-export function parseVersion(version: string): number[] {
+function parseVersion(version: string): number[] {
   const cleanVersion = version.replace(/-.*$/, "");
   return cleanVersion.split(".").map(part => {
     const num = parseInt(part, 10);
@@ -13,7 +13,7 @@ export function parseVersion(version: string): number[] {
   });
 }
 
-export function compareVersions(current: string, required: string): boolean {
+function compareVersions(current: string, required: string): boolean {
   const currentParts = parseVersion(current);
   const requiredParts = parseVersion(required);
 

@@ -1500,7 +1500,11 @@ function createInfoIcon(): SVGSVGElement {
  * Shows on a card when the locally resolved build is behind the latest published build.
  * The latest build needs a newer extension, so we surface the version gap without blocking.
  */
-function createOlderBuildBadge(resolvedVersion: string, latestVersion: string, latestMinVersion?: string): HTMLSpanElement {
+function createOlderBuildBadge(
+  resolvedVersion: string,
+  latestVersion: string,
+  latestMinVersion?: string
+): HTMLSpanElement {
   const badge = document.createElement("span");
   badge.className = "store-card-badge-older";
   const floorHint = latestMinVersion ? ` needs Better Lyrics ${latestMinVersion}+` : "";

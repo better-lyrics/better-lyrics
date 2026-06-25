@@ -197,7 +197,9 @@ function resolveRegistryPathLocal(lockEntry: LockfileEntry): { path: string; int
  * Authoritative resolution used by the install/update path.
  * Order: store-api /resolve, then local builds[] from the lockfile entry, then legacy latest.
  */
-async function resolveRegistryPathAuthoritative(lockEntry: LockfileEntry): Promise<{ path: string; integrity?: string }> {
+async function resolveRegistryPathAuthoritative(
+  lockEntry: LockfileEntry
+): Promise<{ path: string; integrity?: string }> {
   const apiResolved = await resolveThemeBuild(lockEntry.id, EXTENSION_VERSION);
   if (apiResolved) {
     return { path: apiResolved.path, integrity: apiResolved.integrity };
