@@ -228,7 +228,11 @@ export function setupRequestSniffer(): void {
             function extractByLineInfo(longByLineText: LongBylineText): [string, string] {
               const artists: string[] = [];
               let album = "";
-              for (const run of longByLineText.runs) {
+              const runs = longByLineText?.runs;
+              if (!runs) {
+                return ["", album];
+              }
+              for (const run of runs) {
                 const browse = run.navigationEndpoint?.browseEndpoint;
                 const pageType =
                   browse?.browseEndpointContextSupportedConfigs?.browseEndpointContextMusicConfig?.pageType;
@@ -241,10 +245,10 @@ export function setupRequestSniffer(): void {
 
               if (artists.length === 0) {
                 // Topic uploads list every artist in a single unlinked run before the first separator
-                const bulletIndex = longByLineText.runs.findIndex(run => run.text.trim() === "•");
-                const runs = bulletIndex === -1 ? longByLineText.runs : longByLineText.runs.slice(0, bulletIndex);
+                const bulletIndex = runs.findIndex(run => run.text.trim() === "•");
+                const namedRuns = bulletIndex === -1 ? runs : runs.slice(0, bulletIndex);
                 return [
-                  runs
+                  namedRuns
                     .map(run => run.text)
                     .join("")
                     .trim(),
