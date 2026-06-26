@@ -608,9 +608,89 @@ function createUnisonFooterCard(unisonData: UnisonData): HTMLElement {
 }
 
 const DOCK_PROXIMITY = 104;
+const DOCK_LEAVE_GRACE = 120;
 let dockProximityAttached = false;
 let dockProximityListener: ((event: MouseEvent) => void) | null = null;
+let dockProximityRaf: number | null = null;
+let dockLeaveTimer: ReturnType<typeof setTimeout> | null = null;
 const DOCK_EXPANDED_CLASS = `${DOCK_CLASS}__inner--expanded`;
+
+// Activates immediately, but defers deactivation by a short grace window (cancelled if the
+// cursor returns), so brief excursions across a divider or during a layout shift do not drop
+// the player bar.
+function setDockNear(inner: HTMLElement, near: boolean): void {
+  if (near) {
+    if (dockLeaveTimer) {
+      clearTimeout(dockLeaveTimer);
+      dockLeaveTimer = null;
+    }
+    if (!inner.classList.contains(DOCK_EXPANDED_CLASS)) {
+      inner.classList.add(DOCK_EXPANDED_CLASS);
+      showPlayerBarOnDockHover();
+    }
+  } else if (inner.classList.contains(DOCK_EXPANDED_CLASS) && !dockLeaveTimer) {
+    dockLeaveTimer = setTimeout(() => {
+      dockLeaveTimer = null;
+      inner.classList.remove(DOCK_EXPANDED_CLASS);
+      hidePlayerBarOnDockLeave();
+    }, DOCK_LEAVE_GRACE);
+  }
+}
+
+function evaluateDockProximity(event: MouseEvent): void {
+  const inner = document.getElementsByClassName(`${DOCK_CLASS}__inner`)[0] as HTMLElement | undefined;
+  if (!inner) return;
+  const rect = inner.getBoundingClientRect();
+  if (rect.width === 0) return;
+
+  const dock = inner.parentElement as HTMLElement | null;
+  const position = dock?.dataset.position ?? "";
+  let { left, right, top, bottom } = rect;
+  if (position.includes("right")) left -= DOCK_PROXIMITY;
+  if (position.includes("left")) right += DOCK_PROXIMITY;
+  if (position.startsWith("top")) {
+    bottom += DOCK_PROXIMITY;
+  } else {
+    top -= DOCK_PROXIMITY;
+    // Activating a bottom dock translates it up by --dock-y-shift, which would carry this
+    // zone off the cursor and oscillate. Extend the zone down to the dock's resting edge so
+    // the shift can never eject the cursor. The live matrix stays exact mid-slide and follows
+    // any themed shift value.
+    const transform = dock ? getComputedStyle(dock).transform : "none";
+    const shiftY = transform === "none" ? 0 : new DOMMatrixReadOnly(transform).m42;
+    bottom -= shiftY;
+  }
+
+  let near = event.clientX >= left && event.clientX <= right && event.clientY >= top && event.clientY <= bottom;
+
+  // While the source dropdown is open, treat its bounds (plus a bridging margin) as
+  // part of the dock so moving onto it does not collapse the dock or drop the player bar.
+  if (!near) {
+    const menu = document.querySelector(`.${DOCK_CLASS}__menu--open`);
+    if (menu) {
+      const m = menu.getBoundingClientRect();
+      const pad = 32;
+      near =
+        event.clientX >= m.left - pad &&
+        event.clientX <= m.right + pad &&
+        event.clientY >= m.top - pad &&
+        event.clientY <= m.bottom + pad;
+    }
+  }
+
+  // The dock is what keeps the fullscreen controls shown, so while they are up, the cursor
+  // being anywhere over the player bar must hold the dock open: collapsing here would pull
+  // the bar out from under the pointer.
+  if (!near && document.getElementById("layout")?.hasAttribute("show-fullscreen-controls")) {
+    const bar = document.querySelector(PLAYER_BAR_SELECTOR);
+    if (bar) {
+      const b = bar.getBoundingClientRect();
+      near = event.clientX >= b.left && event.clientX <= b.right && event.clientY >= b.top && event.clientY <= b.bottom;
+    }
+  }
+
+  setDockNear(inner, near);
+}
 
 // Pre-expands the dock when the cursor comes near, so the controls have settled into
 // their revealed positions before the pointer reaches them, and keeps the player bar
@@ -618,44 +698,16 @@ const DOCK_EXPANDED_CLASS = `${DOCK_CLASS}__inner--expanded`;
 // panel interior (the approach side for the dock's anchor) and uses no overlay element,
 // so it never shadows clicks on the lyrics or player. Being position-based rather than
 // mouseenter/mouseleave, it stays stable while the cursor is held still during a click.
+// Reads are coalesced to one per frame to bound the per-move layout/style cost.
 function ensureDockProximityListener(): void {
   if (dockProximityAttached) return;
   dockProximityAttached = true;
   dockProximityListener = event => {
-    const inner = document.getElementsByClassName(`${DOCK_CLASS}__inner`)[0] as HTMLElement | undefined;
-    if (!inner) return;
-    const rect = inner.getBoundingClientRect();
-    if (rect.width === 0) return;
-
-    const position = (inner.parentElement as HTMLElement | null)?.dataset.position ?? "";
-    let { left, right, top, bottom } = rect;
-    if (position.includes("right")) left -= DOCK_PROXIMITY;
-    if (position.includes("left")) right += DOCK_PROXIMITY;
-    if (position.startsWith("top")) bottom += DOCK_PROXIMITY;
-    else top -= DOCK_PROXIMITY;
-
-    let near = event.clientX >= left && event.clientX <= right && event.clientY >= top && event.clientY <= bottom;
-
-    // While the source dropdown is open, treat its bounds (plus a bridging margin) as
-    // part of the dock so moving onto it does not collapse the dock or drop the player bar.
-    if (!near) {
-      const menu = document.querySelector(`.${DOCK_CLASS}__menu--open`);
-      if (menu) {
-        const m = menu.getBoundingClientRect();
-        const pad = 32;
-        near =
-          event.clientX >= m.left - pad &&
-          event.clientX <= m.right + pad &&
-          event.clientY >= m.top - pad &&
-          event.clientY <= m.bottom + pad;
-      }
-    }
-
-    if (near !== inner.classList.contains(DOCK_EXPANDED_CLASS)) {
-      inner.classList.toggle(DOCK_EXPANDED_CLASS, near);
-      if (near) showPlayerBarOnDockHover();
-      else hidePlayerBarOnDockLeave();
-    }
+    if (dockProximityRaf !== null) cancelAnimationFrame(dockProximityRaf);
+    dockProximityRaf = requestAnimationFrame(() => {
+      dockProximityRaf = null;
+      evaluateDockProximity(event);
+    });
   };
   document.addEventListener("mousemove", dockProximityListener, { passive: true });
 }
@@ -665,6 +717,14 @@ function removeDockProximityListener(): void {
   document.removeEventListener("mousemove", dockProximityListener);
   dockProximityListener = null;
   dockProximityAttached = false;
+  if (dockProximityRaf !== null) {
+    cancelAnimationFrame(dockProximityRaf);
+    dockProximityRaf = null;
+  }
+  if (dockLeaveTimer) {
+    clearTimeout(dockLeaveTimer);
+    dockLeaveTimer = null;
+  }
 }
 
 // Mounts the dock if absent, otherwise refreshes its controls in place. The dock

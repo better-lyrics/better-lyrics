@@ -651,6 +651,7 @@ ytmusic-player-page:not([is-mweb-modernization-enabled]) #side-panel:has(.blyric
 .blyrics-dock__control svg,
 .blyrics-dock__cycle svg,
 .blyrics-dock__offset-icon svg,
+.blyrics-dock__offset-step svg,
 .blyrics-dock__source-icon svg {
 	display: block;
 }
@@ -829,6 +830,9 @@ ytmusic-player-page:not([is-mweb-modernization-enabled]) #side-panel:has(.blyric
 .blyrics-dock__offset-icon {
 	display: inline-flex;
 	align-items: center;
+	justify-content: center;
+	width: 28px;
+	height: 28px;
 	padding: 0;
 	opacity: 0.82;
 	border: none;
@@ -857,8 +861,6 @@ ytmusic-player-page:not([is-mweb-modernization-enabled]) #side-panel:has(.blyric
 	max-width: 0;
 	opacity: 0;
 	overflow: hidden;
-	font-size: 17px;
-	line-height: 1;
 }
 
 .blyrics-dock__inner:hover .blyrics-dock__offset-step,
