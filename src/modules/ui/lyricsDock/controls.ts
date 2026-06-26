@@ -264,7 +264,8 @@ function buildOffsetControl(): HTMLElement {
   const minus = document.createElement("button");
   minus.type = "button";
   minus.className = `${DOCK_CLASS}__offset-step`;
-  minus.textContent = "-";
+  const minusIcon = parseSvgString(controlIcons.offsetEarlier);
+  if (minusIcon) minus.appendChild(minusIcon);
   minus.setAttribute("aria-label", t("lyricsDock_offsetEarlier"));
   minus.addEventListener("click", event => adjustLyricOffset(-stepFor(event)));
 
@@ -276,7 +277,8 @@ function buildOffsetControl(): HTMLElement {
   const plus = document.createElement("button");
   plus.type = "button";
   plus.className = `${DOCK_CLASS}__offset-step`;
-  plus.textContent = "+";
+  const plusIcon = parseSvgString(controlIcons.offsetLater);
+  if (plusIcon) plus.appendChild(plusIcon);
   plus.setAttribute("aria-label", t("lyricsDock_offsetLater"));
   plus.addEventListener("click", event => adjustLyricOffset(stepFor(event)));
 

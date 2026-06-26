@@ -245,23 +245,10 @@ ytmusic-app-layout[player-fullscreened]:not([blyrics-dfs]) > [slot="player-bar"]
   top: 16px;
 }
 
-#layout[player-fullscreened]:not([blyrics-dfs])[show-fullscreen-controls] .blyrics-dock[data-position^="bottom-"],
-#layout[player-fullscreened]:not([blyrics-dfs]):has(.blyrics-dock__inner:hover) .blyrics-dock[data-position^="bottom-"] {
+/* The proximity listener owns this attribute, including a corridor that covers the gap the
+   shift opens, so no CSS hover-bridge is needed to keep it latched. */
+#layout[player-fullscreened]:not([blyrics-dfs])[show-fullscreen-controls] .blyrics-dock[data-position^="bottom-"] {
   --dock-y-shift: var(--blyrics-fullscreen-bottom-dock-shift, -88px);
-}
-
-#layout[player-fullscreened]:not([blyrics-dfs]) .blyrics-dock[data-position^="bottom-"] .blyrics-dock__inner {
-  position: relative;
-}
-
-#layout[player-fullscreened]:not([blyrics-dfs]) .blyrics-dock[data-position^="bottom-"] .blyrics-dock__inner::before {
-  content: "";
-  position: absolute;
-  top: -88px;
-  bottom: 0;
-  left: -88px;
-  right: -88px;
-  z-index: -1;
 }
 
 /* Top-center autoscroll-button shift is smaller in fullscreen (no tab header) */
