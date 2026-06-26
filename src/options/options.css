@@ -46,10 +46,6 @@ h1 img {
     align-self: center;
 }
 
-input:not([type="color"]) {
-	padding: .25rem;
-}
-
 input[type="color"] {
     inline-size: 30px;
     block-size: 30px;
@@ -1910,6 +1906,10 @@ input.cm-textfield:focus-visible {
     padding: .75rem;
     border-radius: .5rem;
     gap: .2rem;
+}
+
+.theme-settings-field-editor-container > input:not([type="color"]) {
+	padding: 25rem;
 }
 
 .theme-settings-field-editor-label {
