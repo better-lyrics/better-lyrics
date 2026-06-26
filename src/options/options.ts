@@ -37,6 +37,7 @@ interface Options {
   isControlsDockEnabled: boolean;
   controlsDockPosition: string;
   isControlsDockAutoHideInFullscreenEnabled: boolean;
+  themeSettingsLivePreview: boolean;
   isDockSourceEnabled: boolean;
   isDockTranslateEnabled: boolean;
   isDockRomanizeEnabled: boolean;
@@ -276,6 +277,7 @@ const restoreOptions = (): void => {
     isControlsDockEnabled: true,
     controlsDockPosition: DOCK_DEFAULT_POSITION,
     isControlsDockAutoHideInFullscreenEnabled: true,
+    themeSettingsLivePreview: false,
     isDockSourceEnabled: true,
     isDockTranslateEnabled: true,
     isDockRomanizeEnabled: true,
