@@ -16,13 +16,14 @@ import {
 import { AppState, handleModifications, type PlayerDetails, reloadLyrics } from "@core/appState";
 import { preFetchLyrics } from "@modules/lyrics/lyrics";
 import { getSongMetadata } from "@modules/lyrics/requestSniffer/requestSniffer";
-import { onAutoSwitchEnabled, onFullScreenDisabled } from "@modules/settings/settings";
+import { onAutoSwitchEnabled, onFullScreenDisabled, wakeDockIdle } from "@modules/settings/settings";
 import {
   animationEngine,
   animEngineState,
   getResumeScrollElement,
   resetActiveAnimations,
 } from "@modules/ui/animationEngine";
+import { adjustLyricOffset, OFFSET_STEP, OFFSET_STEP_LARGE } from "@modules/ui/lyricsDock/offset";
 import {
   closePlayerPageIfOpenedForFullscreen,
   isNavigating,
@@ -559,6 +560,18 @@ export function setupAltHoverHandler(): void {
   document.addEventListener("keydown", (e: KeyboardEvent) => {
     if (e.key === "Alt") {
       updateAltState(true);
+    }
+
+    if (e.altKey && (e.code === "BracketLeft" || e.code === "BracketRight")) {
+      const tabSelector = document.getElementsByClassName(TAB_HEADER_CLASS)[1];
+      const isLyricsTabActive = tabSelector?.getAttribute("aria-selected") === "true";
+      const isFullscreen = document.querySelector("ytmusic-app-layout")?.hasAttribute("player-fullscreened");
+      if ((isLyricsTabActive || isFullscreen) && AppState.isDockOffsetEnabled) {
+        const step = e.shiftKey ? OFFSET_STEP_LARGE : OFFSET_STEP;
+        adjustLyricOffset(e.code === "BracketLeft" ? -step : step);
+        wakeDockIdle();
+        e.preventDefault();
+      }
     }
   });
 

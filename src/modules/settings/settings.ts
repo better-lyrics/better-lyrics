@@ -1,10 +1,16 @@
-import { LOG_PREFIX_CONTENT, LYRICS_DISABLED_ATTR, UNISON_DOCK_CLASS, UNISON_DOCK_DEFAULT_POSITION } from "@constants";
+import {
+  DOCK_CLASS,
+  DOCK_CONTROL_ORDER_DEFAULT,
+  DOCK_DEFAULT_POSITION,
+  LOG_PREFIX_CONTENT,
+  LYRICS_DISABLED_ATTR,
+} from "@constants";
 import { AppState, reloadLyrics } from "@core/appState";
 import { clearCache, compileRicsToStyles, getStorage } from "@core/storage";
 import { log, setUpLog } from "@core/utils";
 import { calculateLyricPositions } from "@modules/lyrics/injectLyrics";
 import { clearCache as clearTranslationCache } from "@modules/lyrics/translation";
-import { mountUnisonDock, reloadAlbumArt, unmountUnisonDock, updateUnisonDockPosition } from "@modules/ui/dom";
+import { mountDock, mountVotingSegment, reloadAlbumArt, unmountDock, updateDockPosition } from "@modules/ui/dom";
 import { isPlayerFullscreened, onFullscreenChange } from "@modules/ui/observer";
 import { applyCustomStyles, getAndApplyCustomStyles } from "@modules/ui/styleInjector";
 
@@ -222,8 +228,8 @@ export function listenForPopupMessages(): void {
       handleSettings();
       loadTranslationSettings();
       loadPassiveScrollSetting();
-      loadUnisonPinnedDockSettings(() => {
-        syncUnisonDock();
+      loadDockSettings(() => {
+        syncDock();
         hideDockOnIdleInFullscreen();
       });
       AppState.shouldInjectAlbumArt = "Unknown";
@@ -257,40 +263,75 @@ export function loadPassiveScrollSetting(): void {
   });
 }
 
-export function loadUnisonPinnedDockSettings(callback?: () => void): void {
+// Keeps only known control keys, drops duplicates, and appends any missing ones so the
+// dock always has the full set regardless of stale or partial stored orders.
+function normalizeDockControlsOrder(stored: unknown): string[] {
+  const known = DOCK_CONTROL_ORDER_DEFAULT as readonly string[];
+  const order = Array.isArray(stored) ? stored.filter(key => typeof key === "string" && known.includes(key)) : [];
+  const unique = [...new Set(order)];
+  for (const key of known) {
+    if (!unique.includes(key)) unique.push(key);
+  }
+  return unique;
+}
+
+export function loadDockSettings(callback?: () => void): void {
   getStorage(
-    {
-      isUnisonPinnedDockEnabled: true,
-      unisonPinnedDockPosition: UNISON_DOCK_DEFAULT_POSITION,
-      isUnisonAutoHideInFullscreenEnabled: true,
-    },
+    [
+      "isControlsDockEnabled",
+      "controlsDockPosition",
+      "isControlsDockAutoHideInFullscreenEnabled",
+      "isUnisonPinnedDockEnabled",
+      "unisonPinnedDockPosition",
+      "isUnisonAutoHideInFullscreenEnabled",
+      "isDockSourceEnabled",
+      "isDockTranslateEnabled",
+      "isDockRomanizeEnabled",
+      "isDockOffsetEnabled",
+      "dockControlsOrder",
+    ],
     items => {
-      AppState.isUnisonPinnedDockEnabled = items.isUnisonPinnedDockEnabled;
-      AppState.unisonPinnedDockPosition = items.unisonPinnedDockPosition;
-      AppState.isUnisonAutoHideInFullscreenEnabled = items.isUnisonAutoHideInFullscreenEnabled;
+      AppState.isControlsDockEnabled = items.isControlsDockEnabled ?? items.isUnisonPinnedDockEnabled ?? true;
+      AppState.controlsDockPosition =
+        items.controlsDockPosition ?? items.unisonPinnedDockPosition ?? DOCK_DEFAULT_POSITION;
+      AppState.isControlsDockAutoHideInFullscreenEnabled =
+        items.isControlsDockAutoHideInFullscreenEnabled ?? items.isUnisonAutoHideInFullscreenEnabled ?? true;
+      AppState.isDockSourceEnabled = items.isDockSourceEnabled ?? true;
+      AppState.isDockTranslateEnabled = items.isDockTranslateEnabled ?? true;
+      AppState.isDockRomanizeEnabled = items.isDockRomanizeEnabled ?? true;
+      AppState.isDockOffsetEnabled = items.isDockOffsetEnabled ?? true;
+      AppState.dockControlsOrder = normalizeDockControlsOrder(items.dockControlsOrder);
       callback?.();
     }
   );
 }
 
-function syncUnisonDock(): void {
-  if (!AppState.isUnisonPinnedDockEnabled) {
-    unmountUnisonDock();
+function syncDock(): void {
+  if (!AppState.isControlsDockEnabled) {
+    unmountDock();
     return;
   }
+  mountDock(AppState.controlsDockPosition);
+  updateDockPosition(AppState.controlsDockPosition);
   if (AppState.currentUnisonData) {
-    mountUnisonDock(AppState.currentUnisonData, AppState.unisonPinnedDockPosition);
-    updateUnisonDockPosition(AppState.unisonPinnedDockPosition);
+    mountVotingSegment(AppState.currentUnisonData);
   }
 }
 
-const DOCK_IDLE_HIDDEN_CLASS = `${UNISON_DOCK_CLASS}--idle-hidden`;
+const DOCK_IDLE_HIDDEN_CLASS = `${DOCK_CLASS}--idle-hidden`;
 
 let dockIdleTimer: number | null = null;
 let dockMouseListener: ((this: Document, ev: MouseEvent) => any) | null = null;
+let wakeDockIdleFn: (() => void) | null = null;
+
+// Re-shows the dock and restarts the idle timer, for non-mouse interactions (keyboard
+// offset shortcuts) that should keep the dock visible in fullscreen.
+export function wakeDockIdle(): void {
+  wakeDockIdleFn?.();
+}
 
 function setDockIdleHidden(hidden: boolean): void {
-  for (const dock of Array.from(document.getElementsByClassName(UNISON_DOCK_CLASS))) {
+  for (const dock of Array.from(document.getElementsByClassName(DOCK_CLASS))) {
     dock.classList.toggle(DOCK_IDLE_HIDDEN_CLASS, hidden);
   }
 }
@@ -305,8 +346,9 @@ export function hideDockOnIdleInFullscreen(): void {
     dockIdleTimer = null;
   }
   setDockIdleHidden(false);
+  wakeDockIdleFn = null;
 
-  if (!AppState.isUnisonAutoHideInFullscreenEnabled) return;
+  if (!AppState.isControlsDockAutoHideInFullscreenEnabled) return;
 
   let dockVisible = true;
 
@@ -314,6 +356,12 @@ export function hideDockOnIdleInFullscreen(): void {
     dockIdleTimer = null;
     if (!dockVisible) return;
     if (!document.getElementById("layout")?.hasAttribute("player-fullscreened")) return;
+    // Keep it up while the cursor is engaging the dock (clicking without moving the
+    // mouse would otherwise let this idle timer hide the dock mid-interaction).
+    if (document.querySelector(`.${DOCK_CLASS}__inner--expanded`)) {
+      dockIdleTimer = window.setTimeout(hideDock, 3000);
+      return;
+    }
     setDockIdleHidden(true);
     dockVisible = false;
   }
@@ -327,6 +375,7 @@ export function hideDockOnIdleInFullscreen(): void {
     dockIdleTimer = window.setTimeout(hideDock, 3000);
   }
 
+  wakeDockIdleFn = handleMouseMove;
   dockMouseListener = handleMouseMove;
   document.addEventListener("mousemove", handleMouseMove);
 }

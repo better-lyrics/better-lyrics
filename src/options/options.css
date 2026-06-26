@@ -2007,6 +2007,18 @@ input.cm-textfield:focus-visible {
 
 /* -- Unison Actions Modal --------------------------*/
 
+.unison-actions-modal {
+	max-height: 85vh;
+	display: flex;
+	flex-direction: column;
+}
+
+.unison-actions-modal .modal-body {
+	flex: 1;
+	min-height: 0;
+	overflow-y: auto;
+}
+
 .unison-modal-row {
 	align-items: center;
 }
@@ -2019,6 +2031,7 @@ input.cm-textfield:focus-visible {
 	display: flex;
 	flex-direction: column;
 	gap: 0.125rem;
+	flex: 1;
 	min-width: 0;
 }
 
@@ -2035,7 +2048,7 @@ input.cm-textfield:focus-visible {
 }
 
 .position-section__label {
-	font-size: 0.8125rem;
+	font-size: 1rem;
 	font-weight: 500;
 	color: rgba(255, 255, 255, 0.92);
 }
@@ -2125,6 +2138,77 @@ input.cm-textfield:focus-visible {
 	grid-row: 3;
 	grid-column: 3;
 	border-bottom-right-radius: 12px;
+}
+
+.controls-shown-picker {
+	display: grid;
+	grid-template-columns: repeat(4, 1fr);
+	gap: 4px;
+	padding: 4px;
+	margin-bottom: 1.5rem;
+	border-radius: 16px;
+	border: 1px solid rgba(255, 255, 255, 0.14);
+}
+
+.control-cell {
+	box-sizing: border-box;
+	display: grid;
+	place-items: center;
+	width: auto;
+	height: 32px;
+	padding: 0.25rem;
+	border-radius: 4px;
+	background: rgba(255, 255, 255, 0.04);
+	color: rgba(255, 255, 255, 0.45);
+	cursor: grab;
+	transition: background 0.15s ease, color 0.15s ease;
+}
+
+.control-cell:active {
+	cursor: grabbing;
+}
+
+.control-cell.dragging {
+	opacity: 0.4;
+	background: rgba(255, 255, 255, 0.12);
+}
+
+.controls-shown-picker .control-cell:first-child:not(.dragging) {
+	border-top-left-radius: 12px;
+	border-bottom-left-radius: 12px;
+}
+
+.controls-shown-picker .control-cell:last-child:not(.dragging) {
+	border-top-right-radius: 12px;
+	border-bottom-right-radius: 12px;
+}
+
+.control-cell input {
+	position: absolute;
+	width: 0;
+	height: 0;
+	opacity: 0;
+	pointer-events: none;
+}
+
+.control-cell__icon {
+	display: grid;
+	place-items: center;
+}
+
+.control-cell__icon svg {
+	width: 16px;
+	height: 16px;
+}
+
+.control-cell:hover {
+	background: rgba(255, 255, 255, 0.09);
+	color: rgba(255, 255, 255, 0.72);
+}
+
+.control-cell:has(input:checked) {
+	background: hsla(232, 84%, 70%, 0.18);
+	color: hsl(232, 84%, 78%);
 }
 
 #unison-actions-modal-body[data-pinned-disabled="true"] .unison-modal-row--dependent {

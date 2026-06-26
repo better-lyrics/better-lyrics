@@ -1,6 +1,12 @@
 // Function to save user options
 
-import { LOG_PREFIX, ROMANIZATION_LANGUAGES, UNISON_API_BASE_URL, UNISON_DOCK_DEFAULT_POSITION } from "@constants";
+import {
+  DOCK_CONTROL_ORDER_DEFAULT,
+  DOCK_DEFAULT_POSITION,
+  LOG_PREFIX,
+  ROMANIZATION_LANGUAGES,
+  UNISON_API_BASE_URL,
+} from "@constants";
 import { getLanguageDisplayName, initI18n, loadLocaleOverride, SUPPORTED_LOCALES, t } from "@core/i18n";
 import { exportIdentity, getDisplayName, importIdentity, invalidateDisplayName, signPayload } from "@core/keyIdentity";
 import Sortable from "sortablejs";
@@ -23,14 +29,27 @@ interface Options {
   romanizationDisabledLanguages: string[];
   translationDisabledLanguages: string[];
   uiLanguage: string;
-  isUnisonPinnedDockEnabled: boolean;
-  unisonPinnedDockPosition: string;
-  isUnisonAutoHideInFullscreenEnabled: boolean;
+  isControlsDockEnabled: boolean;
+  controlsDockPosition: string;
+  isControlsDockAutoHideInFullscreenEnabled: boolean;
+  isDockSourceEnabled: boolean;
+  isDockTranslateEnabled: boolean;
+  isDockRomanizeEnabled: boolean;
+  isDockOffsetEnabled: boolean;
+  dockControlsOrder: string[];
 }
 
 const saveOptions = (): void => {
   const options = getOptionsFromForm();
   saveOptionsToStorage(options);
+};
+
+// Coalesces rapid changes (spam-clicking a control tile or quick reordering) into a single
+// write so chrome.storage's write-per-minute quota is not exceeded.
+let saveOptionsTimer: ReturnType<typeof setTimeout> | null = null;
+const debouncedSaveOptions = (): void => {
+  if (saveOptionsTimer) clearTimeout(saveOptionsTimer);
+  saveOptionsTimer = setTimeout(saveOptions, 400);
 };
 
 // Function to get options from form elements
@@ -61,17 +80,37 @@ const getOptionsFromForm = (): Options => {
     romanizationDisabledLanguages: romanizationDisabledLanguages,
     translationDisabledLanguages: translationDisabledLanguages,
     uiLanguage: (document.getElementById("uiLanguage") as HTMLSelectElement).value,
-    isUnisonPinnedDockEnabled: (document.getElementById("isUnisonPinnedDockEnabled") as HTMLInputElement).checked,
-    unisonPinnedDockPosition: getSelectedUnisonPosition(),
-    isUnisonAutoHideInFullscreenEnabled: (
+    isControlsDockEnabled: (document.getElementById("isUnisonPinnedDockEnabled") as HTMLInputElement).checked,
+    controlsDockPosition: getSelectedUnisonPosition(),
+    isControlsDockAutoHideInFullscreenEnabled: (
       document.getElementById("isUnisonAutoHideInFullscreenEnabled") as HTMLInputElement
     ).checked,
+    isDockSourceEnabled: (document.getElementById("isDockSourceEnabled") as HTMLInputElement).checked,
+    isDockTranslateEnabled: (document.getElementById("isDockTranslateEnabled") as HTMLInputElement).checked,
+    isDockRomanizeEnabled: (document.getElementById("isDockRomanizeEnabled") as HTMLInputElement).checked,
+    isDockOffsetEnabled: (document.getElementById("isDockOffsetEnabled") as HTMLInputElement).checked,
+    dockControlsOrder: getDockControlsOrder(),
   };
 };
 
 function getSelectedUnisonPosition(): string {
   const selected = document.querySelector<HTMLElement>("#unison-position-frame .position-cell[data-selected='true']");
-  return selected?.dataset.pos ?? UNISON_DOCK_DEFAULT_POSITION;
+  return selected?.dataset.pos ?? DOCK_DEFAULT_POSITION;
+}
+
+function getDockControlsOrder(): string[] {
+  const cells = document.querySelectorAll<HTMLElement>(".controls-shown-picker .control-cell");
+  const order = Array.from(cells, cell => cell.dataset.control).filter((key): key is string => !!key);
+  return order.length ? order : [...DOCK_CONTROL_ORDER_DEFAULT];
+}
+
+function setDockControlsOrderInForm(order: string[]): void {
+  const picker = document.querySelector(".controls-shown-picker");
+  if (!picker || !Array.isArray(order)) return;
+  for (const key of order) {
+    const cell = picker.querySelector(`.control-cell[data-control="${key}"]`);
+    if (cell) picker.appendChild(cell);
+  }
 }
 
 // Function to save options to Chrome storage
@@ -228,12 +267,37 @@ const restoreOptions = (): void => {
     romanizationDisabledLanguages: [],
     translationDisabledLanguages: [],
     uiLanguage: "auto",
-    isUnisonPinnedDockEnabled: true,
-    unisonPinnedDockPosition: UNISON_DOCK_DEFAULT_POSITION,
-    isUnisonAutoHideInFullscreenEnabled: true,
+    isControlsDockEnabled: true,
+    controlsDockPosition: DOCK_DEFAULT_POSITION,
+    isControlsDockAutoHideInFullscreenEnabled: true,
+    isDockSourceEnabled: true,
+    isDockTranslateEnabled: true,
+    isDockRomanizeEnabled: true,
+    isDockOffsetEnabled: true,
+    dockControlsOrder: [...DOCK_CONTROL_ORDER_DEFAULT],
   };
 
-  chrome.storage.sync.get(defaultOptions, setOptionsInForm);
+  const readKeys = [
+    ...Object.keys(defaultOptions),
+    "isUnisonPinnedDockEnabled",
+    "unisonPinnedDockPosition",
+    "isUnisonAutoHideInFullscreenEnabled",
+  ];
+
+  chrome.storage.sync.get(readKeys, (raw: { [key: string]: any }) => {
+    setOptionsInForm({
+      ...defaultOptions,
+      ...(raw as Options),
+      isControlsDockEnabled:
+        raw.isControlsDockEnabled ?? raw.isUnisonPinnedDockEnabled ?? defaultOptions.isControlsDockEnabled,
+      controlsDockPosition:
+        raw.controlsDockPosition ?? raw.unisonPinnedDockPosition ?? defaultOptions.controlsDockPosition,
+      isControlsDockAutoHideInFullscreenEnabled:
+        raw.isControlsDockAutoHideInFullscreenEnabled ??
+        raw.isUnisonAutoHideInFullscreenEnabled ??
+        defaultOptions.isControlsDockAutoHideInFullscreenEnabled,
+    });
+  });
 
   document.getElementById("clear-cache")!.addEventListener("click", () => clearTransientLyrics());
   setupUnisonActionsModal();
@@ -254,11 +318,16 @@ const setOptionsInForm = (items: Options): void => {
   (document.getElementById("translationLanguage") as HTMLInputElement).value = items.translationLanguage;
   (document.getElementById("isRomanizationEnabled") as HTMLInputElement).checked = items.isRomanizationEnabled;
   (document.getElementById("uiLanguage") as HTMLSelectElement).value = items.uiLanguage;
-  (document.getElementById("isUnisonPinnedDockEnabled") as HTMLInputElement).checked = items.isUnisonPinnedDockEnabled;
+  (document.getElementById("isUnisonPinnedDockEnabled") as HTMLInputElement).checked = items.isControlsDockEnabled;
   (document.getElementById("isUnisonAutoHideInFullscreenEnabled") as HTMLInputElement).checked =
-    items.isUnisonAutoHideInFullscreenEnabled;
-  setUnisonPositionInForm(items.unisonPinnedDockPosition);
-  syncUnisonModalDependentState(items.isUnisonPinnedDockEnabled);
+    items.isControlsDockAutoHideInFullscreenEnabled;
+  setUnisonPositionInForm(items.controlsDockPosition);
+  (document.getElementById("isDockSourceEnabled") as HTMLInputElement).checked = items.isDockSourceEnabled;
+  (document.getElementById("isDockTranslateEnabled") as HTMLInputElement).checked = items.isDockTranslateEnabled;
+  (document.getElementById("isDockRomanizeEnabled") as HTMLInputElement).checked = items.isDockRomanizeEnabled;
+  (document.getElementById("isDockOffsetEnabled") as HTMLInputElement).checked = items.isDockOffsetEnabled;
+  setDockControlsOrderInForm(items.dockControlsOrder);
+  syncUnisonModalDependentState(items.isControlsDockEnabled);
   romanizationDisabledLanguages = items.romanizationDisabledLanguages || [];
   translationDisabledLanguages = items.translationDisabledLanguages || [];
   updateExclusionsConfigVisibility();
@@ -1381,4 +1450,18 @@ function setupUnisonActionsModal(): void {
   });
 
   autoHideToggle.addEventListener("change", saveOptions);
+
+  for (const id of ["isDockSourceEnabled", "isDockTranslateEnabled", "isDockRomanizeEnabled", "isDockOffsetEnabled"]) {
+    document.getElementById(id)?.addEventListener("change", debouncedSaveOptions);
+  }
+
+  const picker = document.querySelector<HTMLElement>(".controls-shown-picker");
+  if (picker) {
+    new Sortable(picker, {
+      animation: 150,
+      ghostClass: "dragging",
+      forceFallback: true,
+      onUpdate: debouncedSaveOptions,
+    });
+  }
 }

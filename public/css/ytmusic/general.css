@@ -105,7 +105,7 @@ ytmusic-message-renderer.ytmusic-tab-renderer {
   display: none !important;
 }
 
-#side-panel:has(#tab-renderer:not([page-type="MUSIC_PAGE_TYPE_TRACK_LYRICS"])) .blyrics-unison-dock {
+#side-panel:has(#tab-renderer:not([page-type="MUSIC_PAGE_TYPE_TRACK_LYRICS"])) .blyrics-dock {
   display: none !important;
 }
 
