@@ -1,6 +1,7 @@
-import { GENERAL_ERROR_LOG, UNISON_DOCK_DEFAULT_POSITION } from "@constants";
+import { DOCK_CONTROL_ORDER_DEFAULT, DOCK_DEFAULT_POSITION, GENERAL_ERROR_LOG } from "@constants";
 import type { LyricsData } from "@modules/lyrics/injectLyrics";
 import { createLyrics } from "@modules/lyrics/lyrics";
+import type { LyricSourceKey } from "@modules/lyrics/providers/shared";
 import type { UnisonData } from "@modules/lyrics/providers/unison";
 import { flushLoader } from "@modules/ui/dom";
 import { log } from "@utils";
@@ -43,9 +44,18 @@ interface AppStateType {
   isPassiveScrollEnabled: boolean;
   hasPreloadedNextSong: boolean;
   currentInjectionId: number;
-  isUnisonPinnedDockEnabled: boolean;
-  unisonPinnedDockPosition: string;
-  isUnisonAutoHideInFullscreenEnabled: boolean;
+  lyricOffset: number;
+  currentProviderKey: string | null;
+  manualProviderKey: LyricSourceKey | null;
+  availableProviderKeys: LyricSourceKey[];
+  isControlsDockEnabled: boolean;
+  controlsDockPosition: string;
+  isControlsDockAutoHideInFullscreenEnabled: boolean;
+  isDockSourceEnabled: boolean;
+  isDockTranslateEnabled: boolean;
+  isDockRomanizeEnabled: boolean;
+  isDockOffsetEnabled: boolean;
+  dockControlsOrder: string[];
   currentUnisonData: UnisonData | null;
 }
 
@@ -72,9 +82,18 @@ export const AppState: AppStateType = {
   isPassiveScrollEnabled: true,
   hasPreloadedNextSong: false,
   currentInjectionId: 0,
-  isUnisonPinnedDockEnabled: true,
-  unisonPinnedDockPosition: UNISON_DOCK_DEFAULT_POSITION,
-  isUnisonAutoHideInFullscreenEnabled: true,
+  lyricOffset: 0,
+  currentProviderKey: null,
+  manualProviderKey: null,
+  availableProviderKeys: [],
+  isControlsDockEnabled: true,
+  controlsDockPosition: DOCK_DEFAULT_POSITION,
+  isControlsDockAutoHideInFullscreenEnabled: true,
+  isDockSourceEnabled: true,
+  isDockTranslateEnabled: true,
+  isDockRomanizeEnabled: true,
+  isDockOffsetEnabled: true,
+  dockControlsOrder: [...DOCK_CONTROL_ORDER_DEFAULT],
   currentUnisonData: null,
 };
 
@@ -84,6 +103,12 @@ export function reloadLyrics(): void {
 }
 
 export function handleModifications(detail: PlayerDetails): void {
+  if (detail.videoId !== AppState.lastLoadedVideoId) {
+    AppState.lyricOffset = 0;
+    AppState.manualProviderKey = null;
+    AppState.availableProviderKeys = [];
+  }
+
   if (AppState.lyricInjectionPromise) {
     AppState.lyricAbortController?.abort("New song is being loaded");
     // flushLoader(); // Flush loader immediately when aborting

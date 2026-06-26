@@ -103,10 +103,19 @@ export async function loadChunkedStyles(): Promise<string | null> {
  * @param {Function} callback - Callback function to handle the retrieved data
  */
 export function getStorage(
-  key: string | { [key: string]: any },
+  key: string | string[] | { [key: string]: any },
   callback: (items: { [key: string]: any }) => void
 ): void {
   chrome.storage.sync.get(key, callback);
+}
+
+/**
+ * Cross-browser storage setter that works with both Chrome and Firefox.
+ *
+ * @param {Object} items - Key/value pairs to persist
+ */
+export function setStorage(items: { [key: string]: any }): void {
+  chrome.storage.sync.set(items);
 }
 
 /**

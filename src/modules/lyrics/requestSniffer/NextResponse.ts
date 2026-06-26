@@ -165,7 +165,7 @@ interface LengthTextRun {
 }
 
 export interface LongBylineText {
-  readonly runs: PurpleRun[];
+  readonly runs?: PurpleRun[];
 }
 
 export interface PurpleRun {
