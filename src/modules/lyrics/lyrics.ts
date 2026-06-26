@@ -106,11 +106,19 @@ export async function createLyrics(detail: PlayerDetails, signal: AbortSignal): 
 
     let segmentMap = matchingSong?.segmentMap || null;
 
+    const isSoftReload = AppState.lastLoadedVideoId === videoId && AppState.lyricData != null;
+
     if (isAVSwitch && segmentMap) {
       applySegmentMapToLyrics(AppState.lyricData, segmentMap);
       AppState.suppressZeroTime = Date.now() + 5000;
       AppState.areLyricsTicking = true; // Keep lyrics ticking while new lyrics are fetched.
       log("Switching between audio/video: Skipping Loader", segmentMap);
+    } else if (isSoftReload) {
+      // Same-song reload (provider switch or translation/romanization toggle): keep the
+      // current lyrics on screen and swap them in once the new ones are ready, no loader.
+      AppState.suppressZeroTime = Date.now() + 5000;
+      AppState.areLyricsTicking = true;
+      log("Soft reload: keeping current lyrics, skipping loader");
     } else {
       log("Not Switching between audio/video", isAVSwitch, segmentMap);
       renderLoader();
@@ -228,7 +236,13 @@ export async function createLyrics(detail: PlayerDetails, signal: AbortSignal): 
 
     let selectedProvider: string | undefined;
 
-    for (let provider of providerPriority) {
+    const pinnedProvider = AppState.manualProviderKey;
+    const orderedProviders =
+      pinnedProvider && providerPriority.includes(pinnedProvider)
+        ? [pinnedProvider, ...providerPriority.filter(provider => provider !== pinnedProvider)]
+        : providerPriority;
+
+    for (let provider of orderedProviders) {
       if (signal.aborted) {
         return;
       }
@@ -304,6 +318,17 @@ export async function createLyrics(detail: PlayerDetails, signal: AbortSignal): 
       providerKey: selectedProvider,
       ...lyrics,
     };
+
+    // Record which providers actually returned lyrics for this song so the dock's source
+    // dropdown and cycling only offer real choices instead of empties that fall back.
+    // Union with what is already known: pinning a provider wins the loop early before the
+    // rest of the stream lands, so a fresh filter alone would shrink the list each switch.
+    const collected = providerPriority.filter(key => {
+      const result = sourceMap[key]?.lyricSourceResult;
+      return !!result && "lyrics" in result && Array.isArray(result.lyrics) && result.lyrics.length > 0;
+    });
+    const known = new Set([...AppState.availableProviderKeys, ...collected]);
+    AppState.availableProviderKeys = providerPriority.filter(key => known.has(key));
 
     AppState.lastLoadedVideoId = detail.videoId;
     if (signal.aborted) {

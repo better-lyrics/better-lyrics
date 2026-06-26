@@ -153,6 +153,7 @@ export interface LyricsData {
   isMusicVideoSynced: boolean;
   tabSelector: HTMLElement;
   lyricsContainer: HTMLElement;
+  hasNonLatin: boolean;
 }
 
 /**
@@ -584,7 +585,26 @@ function injectLyrics(data: LyricSourceResultWithMeta, keepLoaderVisible = false
   }
   animEngineState.scrollResumeTime = 0;
 
+  const tabSelector = document.getElementsByClassName(TAB_HEADER_CLASS)[1] as HTMLElement;
+
+  let lyricsData = {
+    lines: lines,
+    syncType: syncType,
+    lyricWidth: lyricsContainer.clientWidth,
+    lyricHeight: lyricsContainer.clientHeight,
+    isMusicVideoSynced: data.musicVideoSynced === true,
+    tabSelector,
+    lyricsContainer,
+    hasNonLatin: lyrics.some(item => !!item.words && containsNonLatin(item.words)),
+  };
+
+  if (data.segmentMap) {
+    applySegmentMapToLyrics(lyricsData, data.segmentMap);
+  }
+
   if (lyrics[0].words !== t("lyrics_notFound")) {
+    // Set before addFooter so the dock controls read the current song's lyric data.
+    AppState.lyricData = lyricsData;
     const unisonData =
       data.source === "Unison" && "unisonData" in data ? (data as { unisonData: UnisonData }).unisonData : undefined;
     addFooter(
@@ -600,6 +620,7 @@ function injectLyrics(data: LyricSourceResultWithMeta, keepLoaderVisible = false
       syncType === "none"
     );
   } else {
+    AppState.lyricData = null;
     addNoLyricsButton(data.song, data.artist, data.album, data.duration, data.videoId);
   }
 
@@ -608,24 +629,6 @@ function injectLyrics(data: LyricSourceResultWithMeta, keepLoaderVisible = false
   if (lyrics[0].words === t("lyrics_notFound")) {
     lyricsContainer.dataset.noLyrics = "true";
   }
-
-  const tabSelector = document.getElementsByClassName(TAB_HEADER_CLASS)[1] as HTMLElement;
-
-  let lyricsData = {
-    lines: lines,
-    syncType: syncType,
-    lyricWidth: lyricsContainer.clientWidth,
-    lyricHeight: lyricsContainer.clientHeight,
-    isMusicVideoSynced: data.musicVideoSynced === true,
-    tabSelector,
-    lyricsContainer,
-  };
-
-  if (data.segmentMap) {
-    applySegmentMapToLyrics(lyricsData, data.segmentMap);
-  }
-
-  AppState.lyricData = lyricsData;
 
   AppState.areLyricsTicking = true;
   calculateLyricPositions();
