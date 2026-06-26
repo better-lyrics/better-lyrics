@@ -727,6 +727,63 @@ function removeDockProximityListener(): void {
   }
 }
 
+// -- Dock entry/exit effect ----------------------------------------------
+// The dock's shared reveal: scale, blur, and fade, the same values the dock uses to hide and
+// reappear. Used for elements entering or leaving the dock, and for the control set swap (which
+// also transitions width so the dock resizes smoothly between the two states).
+const DOCK_FX_CLASS = `${DOCK_CLASS}__fx`;
+const DOCK_FX_OUT_CLASS = `${DOCK_CLASS}__fx-out`;
+const DOCK_FX_MS = 320;
+
+// Reveals an element with the dock effect (scale up + sharpen + fade in).
+function animateDockEnter(el: HTMLElement): void {
+  el.classList.add(DOCK_FX_CLASS, DOCK_FX_OUT_CLASS);
+  void el.offsetWidth;
+  el.classList.remove(DOCK_FX_OUT_CLASS);
+  setTimeout(() => el.classList.remove(DOCK_FX_CLASS), DOCK_FX_MS + 40);
+}
+
+let dockControlsSwapFinalize: (() => void) | null = null;
+
+// Swaps the dock's control set: the outgoing set scales down, blurs, and fades, then the
+// incoming set reveals while the dock's width eases from the old to the new size. Finalizable
+// mid-flight so a rapid second change settles cleanly first.
+function animateControlsSwap(oldControls: HTMLElement, newControls: HTMLElement): void {
+  const widthFrom = oldControls.offsetWidth;
+  let swapTimer: ReturnType<typeof setTimeout>;
+  let doneTimer: ReturnType<typeof setTimeout>;
+
+  function finalize(): void {
+    clearTimeout(swapTimer);
+    clearTimeout(doneTimer);
+    if (oldControls.isConnected) oldControls.replaceWith(newControls);
+    newControls.classList.remove(DOCK_FX_CLASS, DOCK_FX_OUT_CLASS);
+    newControls.style.width = "";
+    dockControlsSwapFinalize = null;
+  }
+
+  dockControlsSwapFinalize = finalize;
+
+  oldControls.classList.add(DOCK_FX_CLASS);
+  void oldControls.offsetWidth;
+  oldControls.classList.add(DOCK_FX_OUT_CLASS);
+
+  swapTimer = setTimeout(() => {
+    if (!oldControls.isConnected) {
+      finalize();
+      return;
+    }
+    oldControls.replaceWith(newControls);
+    const widthTo = newControls.offsetWidth;
+    newControls.classList.add(DOCK_FX_CLASS, DOCK_FX_OUT_CLASS);
+    newControls.style.width = `${widthFrom}px`;
+    void newControls.offsetWidth;
+    newControls.classList.remove(DOCK_FX_OUT_CLASS);
+    newControls.style.width = `${widthTo}px`;
+    doneTimer = setTimeout(finalize, DOCK_FX_MS + 40);
+  }, DOCK_FX_MS);
+}
+
 // Mounts the dock if absent, otherwise refreshes its controls in place. The dock
 // element persists across re-injections so the cursor's hover state (and the expanded
 // reveal) is never lost during a provider switch or toggle.
@@ -763,17 +820,19 @@ export function mountDock(position: string): void {
   dock.dataset.position = position;
   closeSourceMenu();
 
+  dockControlsSwapFinalize?.();
+
   const controls = buildControlsSegment();
-  const appearingClass = `${DOCK_CLASS}__controls--appearing`;
   const existingControls = inner.querySelector(`.${DOCK_CLASS}__controls`) as HTMLElement | null;
   if (existingControls) {
     if (existingControls.dataset.shape !== controls.dataset.shape) {
-      controls.classList.add(appearingClass);
+      animateControlsSwap(existingControls, controls);
+    } else {
+      existingControls.replaceWith(controls);
     }
-    existingControls.replaceWith(controls);
   } else {
-    controls.classList.add(appearingClass);
     inner.prepend(controls);
+    animateDockEnter(controls);
   }
 
   applyDockSuppression();
@@ -793,6 +852,7 @@ export function mountVotingSegment(unisonData: UnisonData): void {
   segment.appendChild(buildUnisonVoteButton(unisonData, -1));
   segment.appendChild(createReportButton(unisonData.lyricsId));
   inner.appendChild(segment);
+  animateDockEnter(segment);
 
   const card = document.querySelector<HTMLElement>(`.${FOOTER_CLASS}__unison-card`);
   if (card) {
@@ -817,6 +877,7 @@ function unmountVotingSegment(): void {
 }
 
 export function unmountDock(): void {
+  dockControlsSwapFinalize?.();
   unmountVotingSegment();
   hidePlayerBarOnDockLeave();
   disconnectLayoutAttrObserver();
