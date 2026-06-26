@@ -96,27 +96,27 @@
     "description": "Toggle label for the Shaders companion link shown in the lyrics footer"
   },
   "options_display_unisonActions": {
-    "message": "Дії з Unison",
-    "description": "Display-section row label for the Unison Actions modal trigger"
+    "message": "Панель керування",
+    "description": "Display-section row label for the lyrics controls dock modal trigger"
   },
   "options_unisonModal_title": {
-    "message": "Дії з Unison",
-    "description": "Title of the Unison Actions modal"
+    "message": "Панель керування",
+    "description": "Title of the lyrics controls dock settings modal"
   },
   "options_unisonModal_showPinned": {
-    "message": "Закріпити дії на екрані",
-    "description": "Toggle label inside the Unison Actions modal for the floating dock"
+    "message": "Показувати панель керування",
+    "description": "Toggle label inside the lyrics controls dock modal for showing the floating dock"
   },
   "options_unisonModal_showPinned_hint": {
-    "message": "Плаваючі кнопки для голосування або скарги щодо тексту з Unison",
-    "description": "Hint text under the Show pinned actions toggle"
+    "message": "Плавуча панель для перемикання джерел, увімкнення перекладу й романізації, коригування синхронізації та взаємодії з Unison",
+    "description": "Hint text under the Show controls dock toggle"
   },
   "options_unisonModal_autoHide": {
     "message": "Приховувати в повноекранному режимі",
     "description": "Toggle label inside the Unison Actions modal for auto-hiding the dock when idle in fullscreen"
   },
   "options_unisonModal_autoHide_hint": {
-    "message": "Приховувати плаваючі кнопки під час простою в повноекранному режимі",
+    "message": "Приховувати панель під час простою в повноекранному режимі",
     "description": "Hint text under the Auto-hide in fullscreen toggle"
   },
   "options_unisonModal_position": {
@@ -146,6 +146,42 @@
   "options_unisonModal_position_bottomRight": {
     "message": "Унизу праворуч",
     "description": "Tooltip for the bottom-right cell in the Unison position picker"
+  },
+  "options_unisonModal_controlsShown": {
+    "message": "Елементи керування",
+    "description": "Label above the toggles that pick which controls appear in the lyrics dock"
+  },
+  "options_unisonModal_controlSource": {
+    "message": "Перемикач джерел",
+    "description": "Toggle label for showing the lyrics source switcher control in the dock"
+  },
+  "options_unisonModal_controlOffset": {
+    "message": "Зсув синхронізації",
+    "description": "Toggle label for showing the sync offset control in the dock"
+  },
+  "lyricsDock_chooseSource": {
+    "message": "Вибір джерела тексту",
+    "description": "Accessible label for the lyrics dock button that opens the source provider dropdown"
+  },
+  "lyricsDock_previousSource": {
+    "message": "Попереднє джерело",
+    "description": "Accessible label for the lyrics dock button that switches to the previous lyrics provider"
+  },
+  "lyricsDock_nextSource": {
+    "message": "Наступне джерело",
+    "description": "Accessible label for the lyrics dock button that switches to the next lyrics provider"
+  },
+  "lyricsDock_offsetEarlier": {
+    "message": "Зсув тексту назад",
+    "description": "Accessible label for the lyrics dock button that nudges sync timing earlier"
+  },
+  "lyricsDock_offsetLater": {
+    "message": "Зсув тексту вперед",
+    "description": "Accessible label for the lyrics dock button that nudges sync timing later"
+  },
+  "lyricsDock_offsetReset": {
+    "message": "Клацніть двічі для скидання",
+    "description": "Tooltip on the lyrics dock offset clock icon; double-clicking it resets the sync offset to zero"
   },
   "options_language_displayLanguage": {
     "message": "Відображувана мова",

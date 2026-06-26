@@ -96,20 +96,20 @@
     "description": "Toggle label for the Shaders companion link shown in the lyrics footer"
   },
   "options_display_unisonActions": {
-    "message": "Azioni Unison",
-    "description": "Display-section row label for the Unison Actions modal trigger"
+    "message": "Dock controlli testi",
+    "description": "Display-section row label for the lyrics controls dock modal trigger"
   },
   "options_unisonModal_title": {
-    "message": "Azioni Unison",
-    "description": "Title of the Unison Actions modal"
+    "message": "Dock controlli testi",
+    "description": "Title of the lyrics controls dock settings modal"
   },
   "options_unisonModal_showPinned": {
-    "message": "Mostra azioni bloccate",
-    "description": "Toggle label inside the Unison Actions modal for the floating dock"
+    "message": "Mostra dock controlli",
+    "description": "Toggle label inside the lyrics controls dock modal for showing the floating dock"
   },
   "options_unisonModal_showPinned_hint": {
-    "message": "Un controllo fluttuante per inviare un upvote, downvote, o segnalare testi Unison",
-    "description": "Hint text under the Show pinned actions toggle"
+    "message": "Un dock fluttuante per cambiare fonte, attivare e disattivare la traduzione e romanizzazione, sincronizzazione automatica e votare sui testi Unison",
+    "description": "Hint text under the Show controls dock toggle"
   },
   "options_unisonModal_autoHide": {
     "message": "Nascondi in automatico a schermo intero",
@@ -124,7 +124,7 @@
     "description": "Label above the visual position picker in the Unison Actions modal"
   },
   "options_unisonModal_position_topLeft": {
-    "message": "Alto a sinistra",
+    "message": "",
     "description": "Tooltip for the top-left cell in the Unison position picker"
   },
   "options_unisonModal_position_topCenter": {
@@ -146,6 +146,42 @@
   "options_unisonModal_position_bottomRight": {
     "message": "Basso a destra",
     "description": "Tooltip for the bottom-right cell in the Unison position picker"
+  },
+  "options_unisonModal_controlsShown": {
+    "message": "Controlli mostrati",
+    "description": "Label above the toggles that pick which controls appear in the lyrics dock"
+  },
+  "options_unisonModal_controlSource": {
+    "message": "Cambio fonte",
+    "description": "Toggle label for showing the lyrics source switcher control in the dock"
+  },
+  "options_unisonModal_controlOffset": {
+    "message": "Spostamento sincronizzazione",
+    "description": "Toggle label for showing the sync offset control in the dock"
+  },
+  "lyricsDock_chooseSource": {
+    "message": "Scegli fonte testi",
+    "description": "Accessible label for the lyrics dock button that opens the source provider dropdown"
+  },
+  "lyricsDock_previousSource": {
+    "message": "Fonte precedente",
+    "description": "Accessible label for the lyrics dock button that switches to the previous lyrics provider"
+  },
+  "lyricsDock_nextSource": {
+    "message": "Prossima fonte",
+    "description": "Accessible label for the lyrics dock button that switches to the next lyrics provider"
+  },
+  "lyricsDock_offsetEarlier": {
+    "message": "Sposta il testo più indietro",
+    "description": "Accessible label for the lyrics dock button that nudges sync timing earlier"
+  },
+  "lyricsDock_offsetLater": {
+    "message": "Sposta il testo più avanti",
+    "description": "Accessible label for the lyrics dock button that nudges sync timing later"
+  },
+  "lyricsDock_offsetReset": {
+    "message": "Doppio click per ripristinare",
+    "description": "Tooltip on the lyrics dock offset clock icon; double-clicking it resets the sync offset to zero"
   },
   "options_language_displayLanguage": {
     "message": "Lingua su Schermo",

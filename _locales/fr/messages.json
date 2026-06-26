@@ -88,35 +88,35 @@
     "description": "Show stylized animations setting label"
   },
   "options_display_passiveScroll": {
-    "message": "Auto-scroll unsynced lyrics",
+    "message": "Défilement automatique des paroles non synchronisées",
     "description": "Auto-scroll unsynced lyrics setting label"
   },
   "options_display_shadersPromo": {
-    "message": "Show link to Better Lyrics Shaders",
+    "message": "Afficher le lien vers Better Lyrics Shaders",
     "description": "Toggle label for the Shaders companion link shown in the lyrics footer"
   },
   "options_display_unisonActions": {
-    "message": "Unison Actions",
-    "description": "Display-section row label for the Unison Actions modal trigger"
+    "message": "Barre de contrôle des paroles",
+    "description": "Display-section row label for the lyrics controls dock modal trigger"
   },
   "options_unisonModal_title": {
-    "message": "Unison Actions",
-    "description": "Title of the Unison Actions modal"
+    "message": "Barre de contrôle des paroles",
+    "description": "Title of the lyrics controls dock settings modal"
   },
   "options_unisonModal_showPinned": {
-    "message": "Show pinned actions",
-    "description": "Toggle label inside the Unison Actions modal for the floating dock"
+    "message": "Afficher la barre de contrôle",
+    "description": "Toggle label inside the lyrics controls dock modal for showing the floating dock"
   },
   "options_unisonModal_showPinned_hint": {
-    "message": "A floating control to upvote, downvote, or report Unison lyrics",
-    "description": "Hint text under the Show pinned actions toggle"
+    "message": "Une barre flottante pour changer de source, activer la traduction et la romanisation, ajuster la synchronisation et voter sur les paroles Unison",
+    "description": "Hint text under the Show controls dock toggle"
   },
   "options_unisonModal_autoHide": {
-    "message": "Auto-hide in fullscreen",
+    "message": "Masquer automatiquement en plein écran",
     "description": "Toggle label inside the Unison Actions modal for auto-hiding the dock when idle in fullscreen"
   },
   "options_unisonModal_autoHide_hint": {
-    "message": "Hide the floating control when you are idle in fullscreen mode",
+    "message": "Masquer le contrôle flottant lorsque vous êtes inactif en mode plein écran",
     "description": "Hint text under the Auto-hide in fullscreen toggle"
   },
   "options_unisonModal_position": {
@@ -124,31 +124,67 @@
     "description": "Label above the visual position picker in the Unison Actions modal"
   },
   "options_unisonModal_position_topLeft": {
-    "message": "Top left",
+    "message": "En haut à gauche",
     "description": "Tooltip for the top-left cell in the Unison position picker"
   },
   "options_unisonModal_position_topCenter": {
-    "message": "Top center",
+    "message": "En haut au centre",
     "description": "Tooltip for the top-center cell in the Unison position picker"
   },
   "options_unisonModal_position_topRight": {
-    "message": "Top right",
+    "message": "En haut à droite",
     "description": "Tooltip for the top-right cell in the Unison position picker"
   },
   "options_unisonModal_position_bottomLeft": {
-    "message": "Bottom left",
+    "message": "En bas à gauche",
     "description": "Tooltip for the bottom-left cell in the Unison position picker"
   },
   "options_unisonModal_position_bottomCenter": {
-    "message": "Bottom center",
+    "message": "En bas au centre",
     "description": "Tooltip for the bottom-center cell in the Unison position picker"
   },
   "options_unisonModal_position_bottomRight": {
-    "message": "Bottom right",
+    "message": "En bas à droite",
     "description": "Tooltip for the bottom-right cell in the Unison position picker"
   },
+  "options_unisonModal_controlsShown": {
+    "message": "Contrôles affichés",
+    "description": "Label above the toggles that pick which controls appear in the lyrics dock"
+  },
+  "options_unisonModal_controlSource": {
+    "message": "Sélecteur de source",
+    "description": "Toggle label for showing the lyrics source switcher control in the dock"
+  },
+  "options_unisonModal_controlOffset": {
+    "message": "Décalage de sunchronisation",
+    "description": "Toggle label for showing the sync offset control in the dock"
+  },
+  "lyricsDock_chooseSource": {
+    "message": "Choisir la source des paroles",
+    "description": "Accessible label for the lyrics dock button that opens the source provider dropdown"
+  },
+  "lyricsDock_previousSource": {
+    "message": "Source précédente",
+    "description": "Accessible label for the lyrics dock button that switches to the previous lyrics provider"
+  },
+  "lyricsDock_nextSource": {
+    "message": "Source suivante",
+    "description": "Accessible label for the lyrics dock button that switches to the next lyrics provider"
+  },
+  "lyricsDock_offsetEarlier": {
+    "message": "Avancer les paroles",
+    "description": "Accessible label for the lyrics dock button that nudges sync timing earlier"
+  },
+  "lyricsDock_offsetLater": {
+    "message": "Retarder les paroles",
+    "description": "Accessible label for the lyrics dock button that nudges sync timing later"
+  },
+  "lyricsDock_offsetReset": {
+    "message": "Double-cliquez pour réinitialiser",
+    "description": "Tooltip on the lyrics dock offset clock icon; double-clicking it resets the sync offset to zero"
+  },
   "options_language_displayLanguage": {
-    "message": "Display Language",
+    "message": "Langue d’affichage",
     "description": "Label for the UI language selector dropdown"
   },
   "options_language_displayLanguageAuto": {
@@ -204,11 +240,11 @@
     "description": "Choose a theme button label"
   },
   "options_themes_change": {
-    "message": "Change",
+    "message": "Changer",
     "description": "Change theme button label"
   },
   "options_themes_customTheme": {
-    "message": "Custom Theme",
+    "message": "Thème personnalisé",
     "description": "Display name for unnamed custom themes"
   },
   "options_themes_customStyles": {
@@ -236,7 +272,7 @@
     "description": "Identity settings section description"
   },
   "options_identity_warning": {
-    "message": "Treat this like your password. Never share it. Export a backup. No one can recover a lost identity, not even admins.",
+    "message": "Traitez ceci comme votre mot de passe. Ne le partagez jamais. Exportez une sauvegarde. Personne ne peut récupérer une identité perdue, pas même les administrateurs.",
     "description": "Security warning in the Identity settings tab: keep the identity private and back it up because it is unrecoverable"
   },
   "options_identity_yourIdentity": {
@@ -260,7 +296,7 @@
     "description": "Import key button label"
   },
   "options_identityImport_title": {
-    "message": "Import Identity",
+    "message": "Importer l’identité",
     "description": "Title of the import identity modal"
   },
   "options_identityImport_chooseFile": {
@@ -268,87 +304,87 @@
     "description": "Label for the file picker button in the import identity modal"
   },
   "options_identityImport_or": {
-    "message": "or",
+    "message": "ou",
     "description": "Divider between file picker and paste textarea in the import identity modal"
   },
   "options_identityImport_pastePlaceholder": {
-    "message": "Paste identity JSON here...",
+    "message": "Collez le JSON d’identité ici...",
     "description": "Placeholder for the identity JSON textarea"
   },
   "options_identityImport_import": {
-    "message": "Import",
+    "message": "Importer",
     "description": "Confirm button label inside the import identity modal"
   },
   "options_nickname_description": {
-    "message": "Pick a name for yourself across Better Lyrics. Letters, numbers, and underscore, 3 to 20 characters.",
+    "message": "Choisissez un pseudo pour Better Lyrics. Lettres, chiffres et tiret bas, de 3 à 20 caractères.",
     "description": "Nickname subsection description"
   },
   "options_nickname_placeholder": {
-    "message": "Pick a nickname",
+    "message": "Choisir un pseudo",
     "description": "Nickname input placeholder"
   },
   "options_nickname_save": {
-    "message": "Save",
+    "message": "Enregistrer",
     "description": "Nickname save button label"
   },
   "options_nickname_reset": {
-    "message": "Reset to default",
+    "message": "Réinitialiser par défaut",
     "description": "Nickname reset button label"
   },
   "options_nickname_modalTitle": {
-    "message": "Set your nickname",
+    "message": "Définir votre pseudo",
     "description": "Nickname modal title"
   },
   "options_nickname_edit": {
-    "message": "Edit",
+    "message": "Modifier",
     "description": "Nickname edit button label"
   },
   "options_nickname_editLabel": {
-    "message": "Edit nickname",
+    "message": "Modifier le pseudo",
     "description": "Accessible label for the nickname edit button"
   },
   "options_nickname_status_checking": {
-    "message": "Checking...",
+    "message": "Vérification...",
     "description": "Status while checking nickname availability"
   },
   "options_nickname_status_available": {
-    "message": "Available",
+    "message": "Disponible",
     "description": "Status when nickname is available"
   },
   "options_nickname_status_taken": {
-    "message": "Already taken",
+    "message": "Déjà pris",
     "description": "Status when nickname is already taken"
   },
   "options_nickname_status_invalid": {
-    "message": "3 to 20 letters, numbers, or underscores",
+    "message": "3 à 20 lettres, chiffres ou tirets bas",
     "description": "Status when nickname format is invalid"
   },
   "options_nickname_status_profane": {
-    "message": "Not allowed, try another",
+    "message": "Non autorisé, essayez-en un autre",
     "description": "Status when nickname is flagged as inappropriate by the server"
   },
   "options_nickname_status_self": {
-    "message": "This is your current nickname",
+    "message": "C’est votre pseudo actuel",
     "description": "Status when entered nickname matches current"
   },
   "options_nickname_status_saved": {
-    "message": "Saved",
+    "message": "Sauvegardé",
     "description": "Status when nickname is saved"
   },
   "options_nickname_status_submitting": {
-    "message": "Saving...",
+    "message": "Sauvegarde en cours...",
     "description": "Status while nickname save is in flight"
   },
   "options_nickname_status_rateLimited": {
-    "message": "Slow down, try again in a moment",
+    "message": "Trop de tentatives, réessayez dans un instant",
     "description": "Status when nickname checks are rate limited"
   },
   "options_nickname_status_error": {
-    "message": "Could not reach the server",
+    "message": "Impossible de joindre le serveur",
     "description": "Status when nickname request fails"
   },
   "options_alert_importEmpty": {
-    "message": "Paste identity JSON or choose a file first.",
+    "message": "Collez le JSON d’identité ou choisissez d’abord un fichier.",
     "description": "Shown when the user clicks Import with no JSON provided"
   },
   "options_modal_selectTheme": {
@@ -424,7 +460,7 @@
     "description": "Back to settings button label"
   },
   "options_editor_fullExperienceNote": {
-    "message": "Pour l'expérience complète de l'éditeur, ",
+    "message": "Pour profiter de l’expérience complète de l’éditeur, ",
     "description": "Full editor experience note prefix"
   },
   "options_editor_openInNewTabLink": {
@@ -788,7 +824,7 @@
     "description": "Install/remove shortcut"
   },
   "marketplace_shortcutsApply": {
-    "message": "Apply theme",
+    "message": "Appliquer le thème",
     "description": "Apply theme shortcut label"
   },
   "marketplace_shortcutsPrevImage": {
@@ -832,7 +868,7 @@
     "description": "Empty installed themes message"
   },
   "marketplace_lastUpdatedOn": {
-    "message": "Last updated on $date$",
+    "message": "Dernière mise à jour le $date$",
     "description": "Tooltip showing full date when a theme was last updated",
     "placeholders": {
       "date": {
@@ -870,11 +906,11 @@
     "description": "Powered by label"
   },
   "editor_playground": {
-    "message": "Playground",
+    "message": "Espace de test",
     "description": "Playground link text"
   },
   "editor_docs": {
-    "message": "Docs",
+    "message": "Documentation",
     "description": "Docs link text"
   },
   "lyrics_source": {
@@ -886,7 +922,7 @@
     "description": "Search on Genius button text"
   },
   "lyrics_getShaders": {
-    "message": "Get Better Lyrics Shaders",
+    "message": "Obtenir Better Lyrics Shaders",
     "description": "Footer button text linking to the Better Lyrics Shaders companion extension"
   },
   "lyrics_searching": {
@@ -910,39 +946,39 @@
     "description": "Message when no lyrics are available"
   },
   "lyrics_resumeAutoscroll": {
-    "message": "Resume Autoscroll",
+    "message": "Reprendre le défilement automatique",
     "description": "Resume Autoscroll button label"
   },
   "options_language_exclusions": {
-    "message": "Language exclusions",
+    "message": "Langues exclues",
     "description": "Label for language exclusions setting"
   },
   "options_manage": {
-    "message": "Manage",
+    "message": "Gérer",
     "description": "Manage button label"
   },
   "options_language_exclusionsTitle": {
-    "message": "Language Exclusions",
+    "message": "Exclusions de langues",
     "description": "Modal title for language exclusions"
   },
   "options_romanization_tab": {
-    "message": "Romanization",
+    "message": "Romanisation",
     "description": "Romanization tab label"
   },
   "options_translation_tab": {
-    "message": "Translation",
+    "message": "Traduction",
     "description": "Translation tab label"
   },
   "options_searchLanguages": {
-    "message": "Search languages...",
+    "message": "Rechercher des langues...",
     "description": "Search input placeholder"
   },
   "options_romanization_hint": {
-    "message": "Click to toggle. Excluded languages will not be romanized.",
+    "message": "Cliquez pour activer ou désactiver. Les langues exclues ne seront pas romanisées.",
     "description": "Hint text for romanization exclusions"
   },
   "options_translation_hint": {
-    "message": "Click to toggle. Excluded source languages will not be translated.",
+    "message": "Cliquez pour activer ou désactiver. Les langues source exclues ne seront pas traduites.",
     "description": "Hint text for translation exclusions"
   },
   "options_resetToDefault": {
