@@ -82,9 +82,8 @@ export interface ThemeSettingFieldBase {
   default: any;
 }
 
-export interface ThemeSettingFieldHeading extends ThemeSettingFieldBase {
+export interface ThemeSettingFieldHeading extends Pick<ThemeSettingFieldBase, "pos" | "label"> {
   type: "heading";
-  default: undefined;
 }
 
 export interface ThemeSettingFieldToggle extends ThemeSettingFieldBase {

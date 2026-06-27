@@ -62,7 +62,7 @@ export interface InstalledStoreTheme {
   title: string;
   creators: string[];
   css: string;
-  settings?: { [field: string]: ThemeSettingField; };
+  settings?: { [field: string]: ThemeSettingField };
   savedSettings?: { [field: string]: any };
   shaderConfig?: Record<string, unknown>;
   installedAt: number;
