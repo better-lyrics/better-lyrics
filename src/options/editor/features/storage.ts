@@ -219,6 +219,8 @@ export function applyThemeSettingsToCSS(
 
   function dependable(field: string, raw: boolean = false) {
     const setting = settings[field];
+    if (setting.type === "heading") { return setting.label; }
+
     let savedVal = typeof saved[field] === THEME_SETTINGS_TYPES[setting.type] ? saved[field] : setting.default;
 
     if (!raw) {
@@ -302,7 +304,7 @@ export function applyThemeSettingsToCSS(
       const inner = i.toLowerCase();
       const innerSetting = settings[inner];
       if (innerSetting)
-        return (innerSetting.type === "heading" ? innerSetting.label || "" : saved[inner]) || innerSetting.default;
+        return innerSetting.type === "heading" ? innerSetting.label || "" : saved[inner] || innerSetting.default;
       return i;
     });
 
