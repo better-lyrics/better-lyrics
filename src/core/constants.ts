@@ -197,6 +197,8 @@ export const MUSIC_NOTES = "♪𝅘𝅥𝅮𝅘𝅥𝅯𝅘𝅥𝅰𝅘𝅥𝅱𝅘𝅥𝅲" as const;
 
 export const BLYRICS_INSTRUMENTAL_GAP_MS = 5000;
 
+export const LYRICS_CACHE_TTL_MS = 7 * 24 * 60 * 60 * 1000;
+
 export const PLAYER_BAR_SELECTOR = "ytmusic-player-bar" as const;
 export const AD_PLAYING_ATTR = "is-advertisement" as const;
 export const LYRICS_AD_OVERLAY_ID = "blyrics-ad-overlay" as const;
