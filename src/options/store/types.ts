@@ -1,4 +1,10 @@
 import type { ThemeSettingField } from "../themes";
+export interface ThemeBuild {
+  version: string;
+  minVersion: string;
+  path: string;
+  integrity: string;
+}
 
 export interface LockfileEntry {
   repo: string;
@@ -7,6 +13,7 @@ export interface LockfileEntry {
   commit: string;
   integrity: string;
   locked: string;
+  builds?: ThemeBuild[];
 }
 
 export interface ThemeLockfile {
@@ -40,6 +47,11 @@ export interface StoreTheme extends ResolvedStoreThemeMetadata {
   shaderUrl?: string;
   commit?: string;
   locked?: string;
+  registryPath?: string;
+  integrity?: string;
+  builds?: ThemeBuild[];
+  latestVersion?: string;
+  latestMinVersion?: string;
 }
 
 export type ThemeSource = "marketplace" | "url";
@@ -66,6 +78,14 @@ export interface InstalledStoreTheme {
   hasSettings?: boolean;
   tags?: string[];
   commit?: string;
+}
+
+export interface ResolvedBuild {
+  id: string;
+  version: string;
+  minVersion: string;
+  path: string;
+  integrity: string;
 }
 
 export interface ThemeValidationResult {

@@ -1,4 +1,6 @@
 import { LOG_PREFIX_STORE, THEME_REGISTRY_URL } from "@constants";
+import { resolveBuildForVersion } from "./themeBuildResolver";
+import { resolveThemeBuild } from "./themeStoreApi";
 import type {
   LockfileEntry,
   PermissionStatus,
@@ -8,6 +10,8 @@ import type {
   ThemeValidationResult,
 } from "./types";
 import type { ThemeSettingField } from "../themes";
+
+const EXTENSION_VERSION = chrome.runtime.getManifest().version;
 
 const DEFAULT_TIMEOUT_MS = 10000;
 
@@ -104,8 +108,12 @@ export async function requestUrlInstallPermissions(): Promise<boolean> {
   return true;
 }
 
-function getRegistryFileUrl(themeId: string, file: string): string {
-  return `${THEME_REGISTRY_URL}/themes/${themeId}/${file}`;
+function getLegacyRegistryPath(themeId: string): string {
+  return `themes/${themeId}`;
+}
+
+function getRegistryFileUrl(basePath: string, file: string): string {
+  return `${THEME_REGISTRY_URL}/${basePath}/${file}`;
 }
 
 function getLockfileUrl(): string {
@@ -123,8 +131,8 @@ async function fetchThemeLockfile(): Promise<ThemeLockfile> {
   return response.json();
 }
 
-async function fetchRegistryMetadata(themeId: string): Promise<StoreThemeMetadata> {
-  const url = getRegistryFileUrl(themeId, "metadata.json");
+async function fetchRegistryMetadata(themeId: string, basePath: string): Promise<StoreThemeMetadata> {
+  const url = getRegistryFileUrl(basePath, "metadata.json");
   const response = await fetchWithTimeout(url, { cache: "no-store" });
 
   if (!response.ok) {
@@ -134,8 +142,8 @@ async function fetchRegistryMetadata(themeId: string): Promise<StoreThemeMetadat
   return response.json();
 }
 
-async function fetchRegistryDescription(themeId: string): Promise<string | null> {
-  const url = getRegistryFileUrl(themeId, "DESCRIPTION.md");
+async function fetchRegistryDescription(basePath: string): Promise<string | null> {
+  const url = getRegistryFileUrl(basePath, "DESCRIPTION.md");
 
   try {
     const response = await fetchWithTimeout(url, { cache: "no-store" });
@@ -147,8 +155,8 @@ async function fetchRegistryDescription(themeId: string): Promise<string | null>
   }
 }
 
-async function checkRegistryFileExists(themeId: string, file: string): Promise<boolean> {
-  const url = getRegistryFileUrl(themeId, file);
+async function checkRegistryFileExists(basePath: string, file: string): Promise<boolean> {
+  const url = getRegistryFileUrl(basePath, file);
   try {
     const response = await fetchWithTimeout(url, { method: "HEAD" }, 5000);
     return response.ok;
@@ -158,8 +166,8 @@ async function checkRegistryFileExists(themeId: string, file: string): Promise<b
   }
 }
 
-export async function fetchRegistryThemeSettings(themeId: string): Promise<{ [field: string]: ThemeSettingField } | null> {
-  const url = getRegistryFileUrl(themeId, "settings.json");
+export async function fetchRegistryThemeSettings(basePath: string): Promise<{ [field: string]: ThemeSettingField } | null> {
+  const url = getRegistryFileUrl(basePath, "settings.json");
 
   try {
     const response = await fetchWithTimeout(url, { cache: "no-store" });
@@ -171,8 +179,8 @@ export async function fetchRegistryThemeSettings(themeId: string): Promise<{ [fi
   }
 }
 
-export async function fetchRegistryShaderConfig(themeId: string): Promise<Record<string, unknown> | null> {
-  const url = getRegistryFileUrl(themeId, "shader.json");
+export async function fetchRegistryShaderConfig(basePath: string): Promise<Record<string, unknown> | null> {
+  const url = getRegistryFileUrl(basePath, "shader.json");
 
   try {
     const response = await fetchWithTimeout(url, { cache: "no-store" });
@@ -184,25 +192,96 @@ export async function fetchRegistryShaderConfig(themeId: string): Promise<Record
   }
 }
 
+/**
+ * Local-only resolution used by the listing path: never hits store-api.
+ * Order: local builds[] from the lockfile entry, then legacy latest.
+ */
+function resolveRegistryPathLocal(lockEntry: LockfileEntry): { path: string; integrity?: string } {
+  if (lockEntry.builds && lockEntry.builds.length > 0) {
+    const localResolved = resolveBuildForVersion(lockEntry.builds, EXTENSION_VERSION);
+    if (localResolved) {
+      return { path: localResolved.path, integrity: localResolved.integrity };
+    }
+  }
+
+  return { path: getLegacyRegistryPath(lockEntry.id), integrity: lockEntry.integrity };
+}
+
+/**
+ * Authoritative resolution used by the install/update path.
+ * Order: store-api /resolve, then local builds[] from the lockfile entry, then legacy latest.
+ */
+async function resolveRegistryPathAuthoritative(
+  lockEntry: LockfileEntry
+): Promise<{ path: string; integrity?: string }> {
+  const apiResolved = await resolveThemeBuild(lockEntry.id, EXTENSION_VERSION);
+  if (apiResolved) {
+    return { path: apiResolved.path, integrity: apiResolved.integrity };
+  }
+
+  return resolveRegistryPathLocal(lockEntry);
+}
+
+interface RegistryFileUrls {
+  cssUrl: string;
+  shaderUrl?: string;
+  registryPath: string;
+  integrity?: string;
+}
+
+/**
+ * Derives the css (rics-then-css), shader, and base path for a resolved registry build.
+ * Shared by the listing render and the install-time re-derivation.
+ */
+async function deriveRegistryFileUrls(
+  basePath: string,
+  hasShaders: boolean,
+  integrity?: string
+): Promise<RegistryFileUrls> {
+  const hasRics = await checkRegistryFileExists(basePath, "style.rics");
+  const cssUrl = hasRics ? getRegistryFileUrl(basePath, "style.rics") : getRegistryFileUrl(basePath, "style.css");
+  const shaderUrl = hasShaders ? getRegistryFileUrl(basePath, "shader.json") : undefined;
+  return { cssUrl, shaderUrl, registryPath: basePath, integrity };
+}
+
+/**
+ * Install-time resolution for a registry theme. Calls the authoritative store-api /resolve first
+ * (falling back to local builds[] then legacy), then re-derives the css/shader/base URLs from that
+ * path so install uses the build chosen at install time rather than the listing-time URLs.
+ */
+export async function resolveRegistryInstallUrls(theme: StoreTheme): Promise<RegistryFileUrls> {
+  const lockEntry: LockfileEntry = {
+    repo: theme.repo,
+    id: theme.id,
+    version: theme.version,
+    commit: theme.commit ?? "",
+    integrity: theme.integrity ?? "",
+    locked: theme.locked ?? "",
+    builds: theme.builds,
+  };
+
+  const { path: basePath, integrity } = await resolveRegistryPathAuthoritative(lockEntry);
+  return deriveRegistryFileUrls(basePath, theme.hasShaders, integrity);
+}
+
 async function fetchFullThemeFromRegistry(lockEntry: LockfileEntry): Promise<StoreTheme> {
   const themeId = lockEntry.id;
 
+  const { path: basePath, integrity } = resolveRegistryPathLocal(lockEntry);
+
   const [metadata, descriptionMd] = await Promise.all([
-    fetchRegistryMetadata(themeId),
-    fetchRegistryDescription(themeId),
+    fetchRegistryMetadata(themeId, basePath),
+    fetchRegistryDescription(basePath),
   ]);
 
   const description = descriptionMd ?? metadata.description ?? "";
 
-  const hasRics = await checkRegistryFileExists(themeId, "style.rics");
-  const cssUrl = hasRics ? getRegistryFileUrl(themeId, "style.rics") : getRegistryFileUrl(themeId, "style.css");
-
-  const shaderUrl = metadata.hasShaders ? getRegistryFileUrl(themeId, "shader.json") : undefined;
+  const { cssUrl, shaderUrl } = await deriveRegistryFileUrls(basePath, metadata.hasShaders);
 
   const imageUrls: string[] = [];
   const safeImages = metadata.images ? filterSafeImageFilenames(metadata.images) : [];
   for (const img of safeImages) {
-    imageUrls.push(`${THEME_REGISTRY_URL}/themes/${themeId}/images/${img}`);
+    imageUrls.push(`${THEME_REGISTRY_URL}/${basePath}/images/${img}`);
   }
 
   let coverUrl: string;
@@ -212,9 +291,12 @@ async function fetchFullThemeFromRegistry(lockEntry: LockfileEntry): Promise<Sto
     coverUrl = imageUrls[0];
     allImageUrls = imageUrls;
   } else {
-    coverUrl = `${THEME_REGISTRY_URL}/themes/${themeId}/cover.png`;
+    coverUrl = `${THEME_REGISTRY_URL}/${basePath}/cover.png`;
     allImageUrls = [coverUrl];
   }
+
+  const builds = lockEntry.builds;
+  const latestBuild = builds && builds.length > 0 ? builds[0] : undefined;
 
   return {
     ...metadata,
@@ -224,9 +306,14 @@ async function fetchFullThemeFromRegistry(lockEntry: LockfileEntry): Promise<Sto
     imageUrls: allImageUrls,
     cssUrl,
     shaderUrl,
-    version: lockEntry.version,
+    version: metadata.version ?? lockEntry.version,
     commit: lockEntry.commit,
     locked: lockEntry.locked,
+    registryPath: basePath,
+    integrity,
+    builds,
+    latestVersion: latestBuild?.version,
+    latestMinVersion: latestBuild?.minVersion,
   };
 }
 

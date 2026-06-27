@@ -96,20 +96,20 @@
     "description": "Toggle label for the Shaders companion link shown in the lyrics footer"
   },
   "options_display_unisonActions": {
-    "message": "Tindakan Unison",
-    "description": "Display-section row label for the Unison Actions modal trigger"
+    "message": "Dok kontrol lirik",
+    "description": "Display-section row label for the lyrics controls dock modal trigger"
   },
   "options_unisonModal_title": {
-    "message": "Tindakan Unison",
-    "description": "Title of the Unison Actions modal"
+    "message": "Dok kontrol lirik",
+    "description": "Title of the lyrics controls dock settings modal"
   },
   "options_unisonModal_showPinned": {
-    "message": "Tampilkan tindakan yang disematkan",
-    "description": "Toggle label inside the Unison Actions modal for the floating dock"
+    "message": "Tampilkan dok kontrol",
+    "description": "Toggle label inside the lyrics controls dock modal for showing the floating dock"
   },
   "options_unisonModal_showPinned_hint": {
-    "message": "Tombol mengambang untuk memberikan suara setuju, tidak setuju, atau melaporkan lirik Unison",
-    "description": "Hint text under the Show pinned actions toggle"
+    "message": "Dok melayang untuk mengubah sumber, alihkan terjemahan dan romanisasi, cuitkan sinkronisasi, dan vote di lirik Unison",
+    "description": "Hint text under the Show controls dock toggle"
   },
   "options_unisonModal_autoHide": {
     "message": "Sembunyikan otomatis saat layar penuh",
@@ -146,6 +146,42 @@
   "options_unisonModal_position_bottomRight": {
     "message": "Bawah kanan",
     "description": "Tooltip for the bottom-right cell in the Unison position picker"
+  },
+  "options_unisonModal_controlsShown": {
+    "message": "Kontrol ditampilkan",
+    "description": "Label above the toggles that pick which controls appear in the lyrics dock"
+  },
+  "options_unisonModal_controlSource": {
+    "message": "Pengubah sumber",
+    "description": "Toggle label for showing the lyrics source switcher control in the dock"
+  },
+  "options_unisonModal_controlOffset": {
+    "message": "Offset sinkronisasi",
+    "description": "Toggle label for showing the sync offset control in the dock"
+  },
+  "lyricsDock_chooseSource": {
+    "message": "Pilih sumber lirik",
+    "description": "Accessible label for the lyrics dock button that opens the source provider dropdown"
+  },
+  "lyricsDock_previousSource": {
+    "message": "Sumber sebelumnya",
+    "description": "Accessible label for the lyrics dock button that switches to the previous lyrics provider"
+  },
+  "lyricsDock_nextSource": {
+    "message": "Sumber berikutnya",
+    "description": "Accessible label for the lyrics dock button that switches to the next lyrics provider"
+  },
+  "lyricsDock_offsetEarlier": {
+    "message": "Majukan lirik lebih awal",
+    "description": "Accessible label for the lyrics dock button that nudges sync timing earlier"
+  },
+  "lyricsDock_offsetLater": {
+    "message": "Mundurkan lirik lebih kemudian",
+    "description": "Accessible label for the lyrics dock button that nudges sync timing later"
+  },
+  "lyricsDock_offsetReset": {
+    "message": "Klik dua kali untuk mengatur ulang",
+    "description": "Tooltip on the lyrics dock offset clock icon; double-clicking it resets the sync offset to zero"
   },
   "options_language_displayLanguage": {
     "message": "Bahasa Tampilan",
