@@ -293,19 +293,18 @@ export async function purgeExpiredKeys(): Promise<void> {
 }
 
 /**
- * Returns stats for saved per-song lyric offsets: how many are stored and their total byte size.
+ * Returns stats for saved per-song lyric offsets: how many are stored.
  *
- * @returns {Promise<{count: number, size: number}>} Offset storage statistics
+ * @returns {Promise<{count: number}>} Offset storage statistics
  */
-export async function getOffsetInfo(): Promise<{ count: number; size: number }> {
+export async function getOffsetInfo(): Promise<{ count: number }> {
   try {
     const result = await chrome.storage.local.get(null);
     const offsetKeys = Object.keys(result).filter(key => key.startsWith(OFFSET_STORAGE_PREFIX));
-    const size = offsetKeys.reduce((acc, key) => acc + JSON.stringify(result[key]).length, 0);
-    return { count: offsetKeys.length, size };
+    return { count: offsetKeys.length };
   } catch (error) {
     log(GENERAL_ERROR_LOG, error);
-    return { count: 0, size: 0 };
+    return { count: 0 };
   }
 }
 
