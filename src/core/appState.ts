@@ -45,6 +45,9 @@ interface AppStateType {
   hasPreloadedNextSong: boolean;
   currentInjectionId: number;
   lyricOffset: number;
+  globalLyricOffset: number;
+  richsyncOffsetTrim: number;
+  lineOffsetTrim: number;
   currentProviderKey: string | null;
   manualProviderKey: LyricSourceKey | null;
   availableProviderKeys: LyricSourceKey[];
@@ -83,6 +86,9 @@ export const AppState: AppStateType = {
   hasPreloadedNextSong: false,
   currentInjectionId: 0,
   lyricOffset: 0,
+  globalLyricOffset: 0,
+  richsyncOffsetTrim: 0,
+  lineOffsetTrim: 0,
   currentProviderKey: null,
   manualProviderKey: null,
   availableProviderKeys: [],

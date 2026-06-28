@@ -114,6 +114,54 @@ body {
     margin-top: 1.5rem;
 }
 
+#offset-modal-overlay .container:first-of-type {
+    margin-top: 0;
+}
+
+.offset-stepper {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+}
+
+#offset-modal-overlay .offset-stepper__btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2rem;
+    height: 2rem;
+    margin: 0;
+    padding: 0;
+    border: none;
+    border-radius: 0.5rem;
+    background-color: hsla(0, 0%, 100%, 0.06);
+    color: rgba(255, 255, 255, 0.75);
+    cursor: pointer;
+    transition:
+        background-color 0.15s ease,
+        color 0.15s ease;
+}
+
+#offset-modal-overlay .offset-stepper__btn:hover {
+    background-color: hsla(0, 0%, 100%, 0.14);
+    color: #fff;
+}
+
+.offset-stepper__btn svg {
+    display: block;
+}
+
+.offset-stepper__value {
+    min-width: 3.5rem;
+    text-align: center;
+    font-size: 0.9rem;
+    font-weight: 500;
+    font-variant-numeric: tabular-nums;
+    color: #fff;
+    cursor: default;
+    user-select: none;
+}
+
 /* -- Theme Preview Card -------------------------- */
 
 .theme-preview-card {

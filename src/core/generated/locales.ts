@@ -4,6 +4,7 @@ export const LOCALE_CODES = [
   "de",
   "en",
   "es",
+  "fil",
   "fr",
   "hu",
   "id",

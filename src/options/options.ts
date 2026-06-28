@@ -7,6 +7,7 @@ import {
   ROMANIZATION_LANGUAGES,
   UNISON_API_BASE_URL,
 } from "@constants";
+import { attachHoldRepeat } from "@core/holdRepeat";
 import { getLanguageDisplayName, initI18n, loadLocaleOverride, SUPPORTED_LOCALES, t } from "@core/i18n";
 import { exportIdentity, getDisplayName, importIdentity, invalidateDisplayName, signPayload } from "@core/keyIdentity";
 import Sortable from "sortablejs";
@@ -37,6 +38,9 @@ interface Options {
   isDockRomanizeEnabled: boolean;
   isDockOffsetEnabled: boolean;
   dockControlsOrder: string[];
+  globalLyricOffset: number;
+  richsyncOffsetTrim: number;
+  lineOffsetTrim: number;
 }
 
 const saveOptions = (): void => {
@@ -90,6 +94,9 @@ const getOptionsFromForm = (): Options => {
     isDockRomanizeEnabled: (document.getElementById("isDockRomanizeEnabled") as HTMLInputElement).checked,
     isDockOffsetEnabled: (document.getElementById("isDockOffsetEnabled") as HTMLInputElement).checked,
     dockControlsOrder: getDockControlsOrder(),
+    globalLyricOffset: parseFloat((document.getElementById("globalLyricOffset") as HTMLInputElement).value) || 0,
+    richsyncOffsetTrim: parseFloat((document.getElementById("richsyncOffsetTrim") as HTMLInputElement).value) || 0,
+    lineOffsetTrim: parseFloat((document.getElementById("lineOffsetTrim") as HTMLInputElement).value) || 0,
   };
 };
 
@@ -275,6 +282,9 @@ const restoreOptions = (): void => {
     isDockRomanizeEnabled: true,
     isDockOffsetEnabled: true,
     dockControlsOrder: [...DOCK_CONTROL_ORDER_DEFAULT],
+    globalLyricOffset: 0,
+    richsyncOffsetTrim: 0,
+    lineOffsetTrim: 0,
   };
 
   const readKeys = [
@@ -301,6 +311,7 @@ const restoreOptions = (): void => {
 
   document.getElementById("clear-cache")!.addEventListener("click", () => clearTransientLyrics());
   setupUnisonActionsModal();
+  initOffsetModal();
 };
 
 // Function to set options in form elements
@@ -326,6 +337,9 @@ const setOptionsInForm = (items: Options): void => {
   (document.getElementById("isDockTranslateEnabled") as HTMLInputElement).checked = items.isDockTranslateEnabled;
   (document.getElementById("isDockRomanizeEnabled") as HTMLInputElement).checked = items.isDockRomanizeEnabled;
   (document.getElementById("isDockOffsetEnabled") as HTMLInputElement).checked = items.isDockOffsetEnabled;
+  setOffsetDisplay("globalLyricOffset", items.globalLyricOffset);
+  setOffsetDisplay("richsyncOffsetTrim", items.richsyncOffsetTrim);
+  setOffsetDisplay("lineOffsetTrim", items.lineOffsetTrim);
   setDockControlsOrderInForm(items.dockControlsOrder);
   syncUnisonModalDependentState(items.isControlsDockEnabled);
   romanizationDisabledLanguages = items.romanizationDisabledLanguages || [];
@@ -1464,4 +1478,76 @@ function setupUnisonActionsModal(): void {
       onUpdate: debouncedSaveOptions,
     });
   }
+}
+
+function formatOffsetDisplay(value: number): string {
+  const sign = value > 0 ? "+" : "";
+  return `${sign}${value.toFixed(1)}s`;
+}
+
+function setOffsetDisplay(id: string, value: number): void {
+  const input = document.getElementById(id) as HTMLInputElement | null;
+  if (input) input.value = String(value);
+  const display = document.querySelector<HTMLElement>(`.offset-stepper__value[data-for="${id}"]`);
+  if (display) display.textContent = formatOffsetDisplay(value);
+}
+
+function initOffsetModal(): void {
+  const openBtn = document.getElementById("offset-settings-btn");
+  const overlay = document.getElementById("offset-modal-overlay");
+  const closeBtn = document.getElementById("offset-modal-close");
+  if (!openBtn || !overlay || !closeBtn) return;
+
+  const close = (): void => overlay.classList.remove("active");
+  openBtn.addEventListener("click", () => overlay.classList.add("active"));
+  closeBtn.addEventListener("click", close);
+  overlay.addEventListener("click", event => {
+    if (event.target === overlay) close();
+  });
+  document.addEventListener("keydown", event => {
+    if (event.key === "Escape" && overlay.classList.contains("active")) close();
+  });
+
+  document.getElementById("offset-modal-reset")?.addEventListener("click", () => {
+    for (const id of ["globalLyricOffset", "richsyncOffsetTrim", "lineOffsetTrim"]) {
+      setOffsetDisplay(id, 0);
+    }
+    debouncedSaveOptions();
+  });
+
+  const OFFSET_STEP = 0.1;
+  const OFFSET_STEP_LARGE = 0.5;
+  const stepOffset = (id: string, delta: number): void => {
+    const input = document.getElementById(id) as HTMLInputElement | null;
+    const current = parseFloat(input?.value ?? "0") || 0;
+    setOffsetDisplay(id, Math.round((current + delta) * 10) / 10);
+    debouncedSaveOptions();
+  };
+
+  for (const btn of document.querySelectorAll<HTMLButtonElement>(".offset-stepper__btn")) {
+    attachHoldRepeat(btn, event => {
+      const id = btn.dataset.offset;
+      const dir = Number(btn.dataset.delta);
+      if (!id || !dir) return;
+      stepOffset(id, dir * (event.altKey || event.shiftKey ? OFFSET_STEP_LARGE : OFFSET_STEP));
+    });
+  }
+
+  for (const display of document.querySelectorAll<HTMLElement>(".offset-stepper__value")) {
+    display.addEventListener("dblclick", () => {
+      if (display.dataset.for) {
+        setOffsetDisplay(display.dataset.for, 0);
+        debouncedSaveOptions();
+      }
+    });
+  }
+
+  // Reflect changes coming from the dock (or another tab) live.
+  chrome.storage.onChanged.addListener((changes, area) => {
+    if (area !== "sync") return;
+    for (const id of ["globalLyricOffset", "richsyncOffsetTrim", "lineOffsetTrim"]) {
+      const change = changes[id];
+      if (change) setOffsetDisplay(id, Number(change.newValue ?? 0));
+    }
+  });
 }

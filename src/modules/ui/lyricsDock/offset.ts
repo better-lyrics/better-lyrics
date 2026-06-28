@@ -1,6 +1,6 @@
 import { LYRICS_CACHE_TTL_MS } from "@constants";
 import { AppState } from "@core/appState";
-import { getTransientStorage, setTransientStorage } from "@core/storage";
+import { getTransientStorage, setStorage, setTransientStorage } from "@core/storage";
 import { animationEngine, animEngineState } from "@modules/ui/animationEngine";
 
 export const OFFSET_STEP = 0.1;
@@ -12,9 +12,7 @@ function offsetKey(videoId: string, source: string): string {
   return `blyricsOffset_${videoId}_${source}`;
 }
 
-function applyLyricOffset(value: number): void {
-  AppState.lyricOffset = Math.round(value * 10) / 10;
-  refreshOffsetIndicator();
+function retickLyrics(): void {
   if (AppState.areLyricsTicking) {
     animationEngine(
       animEngineState.lastTime,
@@ -23,6 +21,78 @@ function applyLyricOffset(value: number): void {
       false
     );
   }
+}
+
+function round1(value: number): number {
+  return Math.round(value * 10) / 10;
+}
+
+function applyLyricOffset(value: number): void {
+  AppState.lyricOffset = round1(value);
+  refreshOffsetIndicator();
+  retickLyrics();
+}
+
+// Global + per-sync-type trims are user settings persisted to chrome.storage.sync; they stack
+// on top of the per-(video,source) nudge in animationEngine. Writes are debounced to stay
+// under sync's write-per-minute quota.
+export type GlobalOffsetKey = "globalLyricOffset" | "richsyncOffsetTrim" | "lineOffsetTrim";
+
+const SYNC_PERSIST_DELAY = 400;
+let syncPersistTimer: ReturnType<typeof setTimeout> | null = null;
+
+function persistGlobalOffsets(): void {
+  if (syncPersistTimer) clearTimeout(syncPersistTimer);
+  syncPersistTimer = setTimeout(() => {
+    setStorage({
+      globalLyricOffset: AppState.globalLyricOffset,
+      richsyncOffsetTrim: AppState.richsyncOffsetTrim,
+      lineOffsetTrim: AppState.lineOffsetTrim,
+    });
+  }, SYNC_PERSIST_DELAY);
+}
+
+const globalOffsetListeners = new Set<(key: GlobalOffsetKey, value: number) => void>();
+
+// Lets an open offset dropdown mirror changes driven from elsewhere (the options page) live.
+export function onGlobalOffsetChange(fn: (key: GlobalOffsetKey, value: number) => void): () => void {
+  globalOffsetListeners.add(fn);
+  return () => globalOffsetListeners.delete(fn);
+}
+
+function notifyGlobalOffset(key: GlobalOffsetKey): void {
+  for (const fn of globalOffsetListeners) fn(key, AppState[key]);
+}
+
+export function setGlobalOffsetValue(key: GlobalOffsetKey, value: number): number {
+  AppState[key] = round1(value);
+  retickLyrics();
+  notifyGlobalOffset(key);
+  persistGlobalOffsets();
+  return AppState[key];
+}
+
+export function adjustGlobalOffsetValue(key: GlobalOffsetKey, delta: number): number {
+  return setGlobalOffsetValue(key, AppState[key] + delta);
+}
+
+// Applies values loaded from storage (settings edits arriving via updateSettings) to state and
+// any open dropdown, without re-persisting them.
+export function applyGlobalOffsets(values: Record<GlobalOffsetKey, number>): void {
+  for (const key of ["globalLyricOffset", "richsyncOffsetTrim", "lineOffsetTrim"] as GlobalOffsetKey[]) {
+    AppState[key] = round1(values[key]);
+    notifyGlobalOffset(key);
+  }
+  retickLyrics();
+}
+
+export function resetGlobalOffsets(): void {
+  for (const key of ["globalLyricOffset", "richsyncOffsetTrim", "lineOffsetTrim"] as GlobalOffsetKey[]) {
+    AppState[key] = 0;
+    notifyGlobalOffset(key);
+  }
+  retickLyrics();
+  persistGlobalOffsets();
 }
 
 // Debounced so spam-clicking the +/- buttons doesn't trigger a full-storage rescan per click

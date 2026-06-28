@@ -186,6 +186,10 @@
     "message": "Double-click to reset",
     "description": "Tooltip on the lyrics dock offset clock icon; double-clicking it resets the sync offset to zero"
   },
+  "lyricsDock_offsetGlobal": {
+    "message": "Global",
+    "description": "Label in the lyrics dock offset menu for the global offset applied to all songs and sync types"
+  },
 
   "options_language_displayLanguage": {
     "message": "Display Language",

@@ -368,11 +368,13 @@ export function animationEngine(currentTime: number, eventCreationTime: number, 
 
     if (lyricData.syncType === "richsync") {
       currentTime += getCSSDurationInMs(lyricsElement, "--blyrics-richsync-timing-offset") / 1000;
+      currentTime += AppState.richsyncOffsetTrim;
     } else {
       currentTime += getCSSDurationInMs(lyricsElement, "--blyrics-timing-offset") / 1000;
+      currentTime += AppState.lineOffsetTrim;
     }
 
-    currentTime += AppState.lyricOffset;
+    currentTime += AppState.globalLyricOffset + AppState.lyricOffset;
 
     const lyricScrollTime = currentTime + getCSSDurationInMs(lyricsElement, "--blyrics-scroll-timing-offset") / 1000;
 

@@ -166,6 +166,13 @@
 							<span>__MSG_options_manage__</span>
 						</button>
 					</div>
+					<div class="container">
+						<span>__MSG_options_unisonModal_controlOffset__</span>
+						<button class="small-btn" id="offset-settings-btn">
+							<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></circle><path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 8v5h5"></path></svg>
+							<span>__MSG_options_manage__</span>
+						</button>
+					</div>
 				</div>
 			</div>
 			<div class="tab-content" id="language-content">
@@ -615,6 +622,51 @@
 							</div>
 						</div>
 					</div>
+				</div>
+			</div>
+		</div>
+
+		<div id="offset-modal-overlay" class="modal-overlay">
+			<div class="modal">
+				<div class="modal-header">
+					<h3 class="modal-title">__MSG_options_unisonModal_controlOffset__</h3>
+					<button id="offset-modal-close" class="modal-close-btn" aria-label="Close">
+						<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+							<path d="M6.28 5.22a.75.75 0 0 0-1.06 1.06L8.94 10l-3.72 3.72a.75.75 0 1 0 1.06 1.06L10 11.06l3.72 3.72a.75.75 0 1 0 1.06-1.06L11.06 10l3.72-3.72a.75.75 0 0 0-1.06-1.06L10 8.94 6.28 5.22Z"></path>
+						</svg>
+					</button>
+				</div>
+				<div class="modal-body">
+					<div class="container">
+						<span>__MSG_lyricsDock_offsetGlobal__</span>
+						<div class="offset-stepper">
+							<button type="button" class="offset-stepper__btn" data-offset="globalLyricOffset" data-delta="-1" aria-label="__MSG_lyricsDock_offsetEarlier__"><svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24"><path fill="currentColor" d="M6 13q-.425 0-.712-.288T5 12t.288-.712T6 11h12q.425 0 .713.288T19 12t-.288.713T18 13z"/></svg></button>
+							<span class="offset-stepper__value" data-for="globalLyricOffset">0.0s</span>
+							<button type="button" class="offset-stepper__btn" data-offset="globalLyricOffset" data-delta="1" aria-label="__MSG_lyricsDock_offsetLater__"><svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24"><path fill="currentColor" d="M11 13H6q-.425 0-.712-.288T5 12t.288-.712T6 11h5V6q0-.425.288-.712T12 5t.713.288T13 6v5h5q.425 0 .713.288T19 12t-.288.713T18 13h-5v5q0 .425-.288.713T12 19t-.712-.288T11 18z"/></svg></button>
+							<input type="hidden" id="globalLyricOffset">
+						</div>
+					</div>
+					<div class="container">
+						<span>__MSG_unison_syncRichsync__</span>
+						<div class="offset-stepper">
+							<button type="button" class="offset-stepper__btn" data-offset="richsyncOffsetTrim" data-delta="-1" aria-label="__MSG_lyricsDock_offsetEarlier__"><svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24"><path fill="currentColor" d="M6 13q-.425 0-.712-.288T5 12t.288-.712T6 11h12q.425 0 .713.288T19 12t-.288.713T18 13z"/></svg></button>
+							<span class="offset-stepper__value" data-for="richsyncOffsetTrim">0.0s</span>
+							<button type="button" class="offset-stepper__btn" data-offset="richsyncOffsetTrim" data-delta="1" aria-label="__MSG_lyricsDock_offsetLater__"><svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24"><path fill="currentColor" d="M11 13H6q-.425 0-.712-.288T5 12t.288-.712T6 11h5V6q0-.425.288-.712T12 5t.713.288T13 6v5h5q.425 0 .713.288T19 12t-.288.713T18 13h-5v5q0 .425-.288.713T12 19t-.712-.288T11 18z"/></svg></button>
+							<input type="hidden" id="richsyncOffsetTrim">
+						</div>
+					</div>
+					<div class="container">
+						<span>__MSG_unison_syncLinesync__</span>
+						<div class="offset-stepper">
+							<button type="button" class="offset-stepper__btn" data-offset="lineOffsetTrim" data-delta="-1" aria-label="__MSG_lyricsDock_offsetEarlier__"><svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24"><path fill="currentColor" d="M6 13q-.425 0-.712-.288T5 12t.288-.712T6 11h12q.425 0 .713.288T19 12t-.288.713T18 13z"/></svg></button>
+							<span class="offset-stepper__value" data-for="lineOffsetTrim">0.0s</span>
+							<button type="button" class="offset-stepper__btn" data-offset="lineOffsetTrim" data-delta="1" aria-label="__MSG_lyricsDock_offsetLater__"><svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24"><path fill="currentColor" d="M11 13H6q-.425 0-.712-.288T5 12t.288-.712T6 11h5V6q0-.425.288-.712T12 5t.713.288T13 6v5h5q.425 0 .713.288T19 12t-.288.713T18 13h-5v5q0 .425-.288.713T12 19t-.712-.288T11 18z"/></svg></button>
+							<input type="hidden" id="lineOffsetTrim">
+						</div>
+					</div>
+				</div>
+				<div class="modal-footer">
+					<button id="offset-modal-reset" class="modal-btn modal-btn-secondary">__MSG_options_reset__</button>
 				</div>
 			</div>
 		</div>

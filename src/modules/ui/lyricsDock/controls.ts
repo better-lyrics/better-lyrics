@@ -1,10 +1,22 @@
 import { DOCK_CLASS, PROVIDER_CONFIGS } from "@constants";
 import { AppState, reloadLyrics } from "@core/appState";
+import { attachHoldRepeat } from "@core/holdRepeat";
 import { t } from "@core/i18n";
 import { setStorage } from "@core/storage";
 import { providerPriority } from "@modules/lyrics/providers/shared";
 import { controlIcons, parseSvgString, syncTypeColors, syncTypeIcons } from "./icons";
-import { adjustLyricOffset, OFFSET_STEP, OFFSET_STEP_LARGE, onOffsetChange, resetLyricOffset } from "./offset";
+import {
+  adjustGlobalOffsetValue,
+  adjustLyricOffset,
+  type GlobalOffsetKey,
+  OFFSET_STEP,
+  OFFSET_STEP_LARGE,
+  onGlobalOffsetChange,
+  onOffsetChange,
+  resetGlobalOffsets,
+  resetLyricOffset,
+  setGlobalOffsetValue,
+} from "./offset";
 import { cycleProvider, selectProvider } from "./providerCycle";
 
 const CONTROL_ACTIVE_CLASS = `${DOCK_CLASS}__control--active`;
@@ -29,14 +41,15 @@ export function closeSourceMenu(): void {
 function positionSourceMenu(menu: HTMLElement, trigger: HTMLElement): void {
   const rect = trigger.getBoundingClientRect();
   const opensDown = (trigger.closest(`.${DOCK_CLASS}`)?.getAttribute("data-position") ?? "").startsWith("top");
-  menu.style.left = `${Math.max(8, rect.left - 4)}px`;
+  // Clamp within the viewport so a menu near the right edge doesn't overflow off-screen.
+  const maxLeft = window.innerWidth - menu.offsetWidth - 8;
+  menu.style.left = `${Math.min(Math.max(8, rect.left - 4), Math.max(8, maxLeft))}px`;
   menu.style.top = opensDown ? `${rect.bottom + 8}px` : "";
   menu.style.bottom = opensDown ? "" : `${window.innerHeight - rect.top + 8}px`;
 }
 
-function showSourceMenu(trigger: HTMLElement, currentKey: string | null): void {
+function showDockMenu(trigger: HTMLElement, menu: HTMLElement): void {
   closeSourceMenu();
-  const menu = buildSourceMenu(currentKey);
   document.body.appendChild(menu);
   positionSourceMenu(menu, trigger);
   requestAnimationFrame(() => menu.classList.add(MENU_OPEN_CLASS));
@@ -46,6 +59,14 @@ function showSourceMenu(trigger: HTMLElement, currentKey: string | null): void {
     if (!menu.contains(target) && !trigger.contains(target)) closeSourceMenu();
   };
   document.addEventListener("click", sourceMenuOutsideListener);
+}
+
+function showSourceMenu(trigger: HTMLElement, currentKey: string | null): void {
+  showDockMenu(trigger, buildSourceMenu(currentKey));
+}
+
+function showOffsetMenu(trigger: HTMLElement): void {
+  showDockMenu(trigger, buildOffsetMenu());
 }
 
 function buildSourceMenu(currentKey: string | null): HTMLElement {
@@ -249,17 +270,31 @@ function buildOffsetControl(): HTMLElement {
     const iconWrap = document.createElement("button");
     iconWrap.type = "button";
     iconWrap.className = `${DOCK_CLASS}__offset-icon`;
-    iconWrap.title = t("lyricsDock_offsetReset");
-    iconWrap.setAttribute("aria-label", t("lyricsDock_offsetReset"));
+    iconWrap.title = t("options_unisonModal_controlOffset");
+    iconWrap.setAttribute("aria-label", t("options_unisonModal_controlOffset"));
     iconWrap.appendChild(icon);
+    // Single click opens the global/granular offset menu; double click resets the per-song
+    // nudge. A short delay separates the two so a double click never opens the menu.
+    let clickTimer: ReturnType<typeof setTimeout> | null = null;
+    iconWrap.addEventListener("click", event => {
+      event.stopPropagation();
+      if (clickTimer) return;
+      clickTimer = setTimeout(() => {
+        clickTimer = null;
+        if (openSourceMenu) closeSourceMenu();
+        else showOffsetMenu(iconWrap);
+      }, 220);
+    });
     iconWrap.addEventListener("dblclick", event => {
       event.preventDefault();
+      if (clickTimer) {
+        clearTimeout(clickTimer);
+        clickTimer = null;
+      }
       resetLyricOffset();
     });
     control.appendChild(iconWrap);
   }
-
-  const stepFor = (event: MouseEvent) => (event.altKey || event.shiftKey ? OFFSET_STEP_LARGE : OFFSET_STEP);
 
   const minus = document.createElement("button");
   minus.type = "button";
@@ -267,7 +302,7 @@ function buildOffsetControl(): HTMLElement {
   const minusIcon = parseSvgString(controlIcons.offsetEarlier);
   if (minusIcon) minus.appendChild(minusIcon);
   minus.setAttribute("aria-label", t("lyricsDock_offsetEarlier"));
-  minus.addEventListener("click", event => adjustLyricOffset(-stepFor(event)));
+  attachHoldRepeat(minus, event => adjustLyricOffset(-stepFor(event)));
 
   const value = document.createElement("span");
   value.className = `${DOCK_CLASS}__offset-value`;
@@ -280,7 +315,7 @@ function buildOffsetControl(): HTMLElement {
   const plusIcon = parseSvgString(controlIcons.offsetLater);
   if (plusIcon) plus.appendChild(plusIcon);
   plus.setAttribute("aria-label", t("lyricsDock_offsetLater"));
-  plus.addEventListener("click", event => adjustLyricOffset(stepFor(event)));
+  attachHoldRepeat(plus, event => adjustLyricOffset(stepFor(event)));
 
   control.append(minus, value, plus);
 
@@ -296,6 +331,99 @@ function buildOffsetControl(): HTMLElement {
   });
 
   return control;
+}
+
+function stepFor(event: MouseEvent): number {
+  return event.altKey || event.shiftKey ? OFFSET_STEP_LARGE : OFFSET_STEP;
+}
+
+// -- Offset dropdown --------------------------
+// Quick-edit for the global + per-sync-type offsets, opened from the offset icon. Body-rendered
+// and positioned like the source menu, but stays open while stepping.
+function buildOffsetMenu(): HTMLElement {
+  const menu = document.createElement("div");
+  menu.className = `${DOCK_CLASS}__menu ${DOCK_CLASS}__menu--offset`;
+  const provider = currentProviderConfig();
+  if (provider) menu.style.setProperty("--dock-accent", syncTypeColors[provider.syncType]);
+
+  const reset = document.createElement("button");
+  reset.type = "button";
+  reset.className = `${DOCK_CLASS}__offset-reset`;
+  reset.textContent = t("options_reset");
+  reset.addEventListener("click", event => {
+    event.stopPropagation();
+    resetGlobalOffsets();
+  });
+
+  menu.append(
+    buildOffsetRow(t("lyricsDock_offsetGlobal"), "globalLyricOffset"),
+    buildOffsetRow(t("unison_syncRichsync"), "richsyncOffsetTrim"),
+    buildOffsetRow(t("unison_syncLinesync"), "lineOffsetTrim"),
+    reset
+  );
+  return menu;
+}
+
+function buildOffsetRow(label: string, key: GlobalOffsetKey): HTMLElement {
+  const row = document.createElement("div");
+  row.className = `${DOCK_CLASS}__offset-row`;
+
+  const labelEl = document.createElement("span");
+  labelEl.className = `${DOCK_CLASS}__offset-row-label`;
+  labelEl.textContent = label;
+
+  const value = document.createElement("span");
+  value.className = `${DOCK_CLASS}__offset-value`;
+  value.setAttribute("aria-live", "polite");
+  value.textContent = formatOffset(AppState[key]);
+
+  let last = AppState[key];
+  const render = (next: number): void => {
+    const goingUp = next >= last;
+    last = next;
+    value.textContent = formatOffset(next);
+    value.classList.remove(`${DOCK_CLASS}__offset-value--flash-up`, `${DOCK_CLASS}__offset-value--flash-down`);
+    requestAnimationFrame(() =>
+      value.classList.add(goingUp ? `${DOCK_CLASS}__offset-value--flash-up` : `${DOCK_CLASS}__offset-value--flash-down`)
+    );
+  };
+
+  // The buttons mutate state; the display refreshes through the change listener so the dock
+  // and the settings page stay in lockstep no matter which one drove the change. Self-detaches
+  // once the menu (and this node) leaves the DOM.
+  const unsubscribe = onGlobalOffsetChange((changedKey, next) => {
+    if (!value.isConnected) {
+      unsubscribe();
+      return;
+    }
+    if (changedKey === key) render(next);
+  });
+
+  const minus = buildOffsetRowStep(controlIcons.offsetEarlier, t("lyricsDock_offsetEarlier"), event =>
+    adjustGlobalOffsetValue(key, -stepFor(event))
+  );
+  const plus = buildOffsetRowStep(controlIcons.offsetLater, t("lyricsDock_offsetLater"), event =>
+    adjustGlobalOffsetValue(key, stepFor(event))
+  );
+  labelEl.addEventListener("dblclick", () => setGlobalOffsetValue(key, 0));
+
+  const controls = document.createElement("div");
+  controls.className = `${DOCK_CLASS}__offset-row-controls`;
+  controls.append(minus, value, plus);
+
+  row.append(labelEl, controls);
+  return row;
+}
+
+function buildOffsetRowStep(icon: string, label: string, onClick: (event: MouseEvent) => void): HTMLButtonElement {
+  const btn = document.createElement("button");
+  btn.type = "button";
+  btn.className = `${DOCK_CLASS}__offset-row-step`;
+  const svg = parseSvgString(icon);
+  if (svg) btn.appendChild(svg);
+  btn.setAttribute("aria-label", label);
+  attachHoldRepeat(btn, onClick);
+  return btn;
 }
 
 // Each dock control is built on demand and only when it can act, so the order list can
