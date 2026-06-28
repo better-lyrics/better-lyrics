@@ -1908,8 +1908,13 @@ input.cm-textfield:focus-visible {
     gap: .2rem;
 }
 
+.theme-settings-field-editor-container:has(> :nth-child(2)):has(> :nth-last-child(1):nth-child(2)) {
+	flex-direction: row;
+	justify-content: space-between;
+}
+
 .theme-settings-field-editor-container > input:not([type="color"]) {
-	padding: 25rem;
+	padding: .25rem;
 }
 
 .theme-settings-field-editor-label {
@@ -1927,7 +1932,8 @@ input.cm-textfield:focus-visible {
     flex-direction: column;
     gap: 1rem;
     padding-top: 1rem;
-	overflow: auto;
+    overflow: auto;
+    max-height: 15rem;
 }
 
 .theme-settings-heading {
@@ -1936,6 +1942,10 @@ input.cm-textfield:focus-visible {
 
 .theme-settings-container {
 	margin: 0 !important;
+}
+
+.theme-settings-container > span {
+	max-width: 80%;
 }
 
 .theme-range-container {

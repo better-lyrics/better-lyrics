@@ -47,6 +47,7 @@ export type ThemeSettingFieldConditionals =
   | "not-ends";
 
 export interface ThemeSettingFieldBase {
+  id?: string;
   /** An index defining property */
   pos?: number;
   label: string;
@@ -82,7 +83,7 @@ export interface ThemeSettingFieldBase {
   default: any;
 }
 
-export interface ThemeSettingFieldHeading extends Pick<ThemeSettingFieldBase, "pos" | "label"> {
+export interface ThemeSettingFieldHeading extends Pick<ThemeSettingFieldBase, "id" | "pos" | "label"> {
   type: "heading";
 }
 

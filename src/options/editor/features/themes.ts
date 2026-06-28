@@ -1,7 +1,11 @@
 import {
   LOG_PREFIX_EDITOR,
-  THEME_SETTINGS_ATTRIBUTE_TYPE,
+  THEME_SETTINGS_COLOR,
+  THEME_SETTINGS_DROPDOWN,
   THEME_SETTINGS_MAX_FIELDS,
+  THEME_SETTINGS_RANGE,
+  THEME_SETTINGS_TEXTFIELD,
+  THEME_SETTINGS_TOGGLE,
   THEME_SETTINGS_TYPES,
 } from "@constants";
 import { t } from "@core/i18n";
@@ -158,6 +162,37 @@ export function themeSourceToEditorSource(source: ThemeSource | undefined): Edit
 let themeSettingsVisible = false;
 let themeSettingsEVisible = true;
 
+function createEditIcon(): SVGSVGElement {
+  const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+  svg.setAttribute("viewBox", "0 0 20 20");
+  const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+  path.setAttribute(
+    "d",
+    "m5.433 13.917 1.262-3.155A4 4 0 0 1 7.58 9.42l6.92-6.918a2.121 2.121 0 0 1 3 3l-6.92 6.918c-.383.383-.84.685-1.343.886l-3.154 1.262a.5.5 0 0 1-.65-.65Z"
+  );
+  svg.appendChild(path);
+  const path2 = document.createElementNS("http://www.w3.org/2000/svg", "path");
+  path2.setAttribute(
+    "d",
+    "M3.5 5.75c0-.69.56-1.25 1.25-1.25H10A.75.75 0 0 0 10 3H4.75A2.75 2.75 0 0 0 2 5.75v9.5A2.75 2.75 0 0 0 4.75 18h9.5A2.75 2.75 0 0 0 17 15.25V10a.75.75 0 0 0-1.5 0v5.25c0 .69-.56 1.25-1.25 1.25h-9.5c-.69 0-1.25-.56-1.25-1.25v-9.5Z"
+  );
+  svg.appendChild(path2);
+  return svg;
+}
+
+function createDeleteIcon(): SVGSVGElement {
+  const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+  svg.setAttribute("viewBox", "0 0 24 24");
+  const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+  path.setAttribute("fill", "currentColor");
+  path.setAttribute(
+    "d",
+    "M7 21q-.825 0-1.412-.587T5 19V6q-.425 0-.712-.288T4 5t.288-.712T5 4h4q0-.425.288-.712T10 3h4q.425 0 .713.288T15 4h4q.425 0 .713.288T20 5t-.288.713T19 6v13q0 .825-.587 1.413T17 21zM17 6H7v13h10zm-7 11q.425 0 .713-.288T11 16V9q0-.425-.288-.712T10 8t-.712.288T9 9v7q0 .425.288.713T10 17m4 0q.425 0 .713-.288T15 16V9q0-.425-.288-.712T14 8t-.712.288T13 9v7q0 .425.288.713T14 17M7 6v13z"
+  );
+  svg.appendChild(path);
+  return svg;
+}
+
 /**
  * Validates the JSON data of the setting fields and returns
  * an array of warnings with the source and cause
@@ -195,13 +230,23 @@ export async function renderThemeSettings(): Promise<void> {
 
   const themeSettings = await loadThemeSettings();
 
-  // Process each field
   if (themeSettingsEditorTotal)
     themeSettingsEditorTotal.innerText = `${Object.keys(themeSettings.fields || {}).length} / ${THEME_SETTINGS_MAX_FIELDS}`;
 
-  for (const fields in { ...themeSettings.fields }) {
-    const field = themeSettings.fields![fields];
+  if (typeof themeSettings.fields !== "object") return;
 
+  const mapped: ThemeSettingField[] = [];
+
+  for (const field in themeSettings.fields) {
+    const setting = themeSettings.fields[field];
+    if (typeof setting.pos === "number") {
+      mapped[setting.pos] = { id: field, ...setting };
+    } else {
+      mapped[Object.keys(themeSettings.fields).length] = { id: field, ...setting };
+    }
+  }
+
+  for (const field of mapped) {
     const fieldElement = document.createElement("div");
     fieldElement.className = "theme-setting-field";
 
@@ -219,7 +264,7 @@ export async function renderThemeSettings(): Promise<void> {
 
     const fieldLabel = document.createElement("span");
     fieldLabel.className = "theme-setting-field-label";
-    fieldLabel.innerText = `${field.label || fields}`;
+    fieldLabel.innerText = `${field.label || field.id}`;
     fieldInfo.appendChild(fieldLabel);
 
     fieldElement.appendChild(fieldInfo);
@@ -232,7 +277,7 @@ export async function renderThemeSettings(): Promise<void> {
     fieldEdit.title = "Modify theme setting field";
     fieldEdit.style.display = "unset";
     fieldEdit.style.height = "stretch";
-    fieldEdit.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path d="m5.433 13.917 1.262-3.155A4 4 0 0 1 7.58 9.42l6.92-6.918a2.121 2.121 0 0 1 3 3l-6.92 6.918c-.383.383-.84.685-1.343.886l-3.154 1.262a.5.5 0 0 1-.65-.65Z"></path><path d="M3.5 5.75c0-.69.56-1.25 1.25-1.25H10A.75.75 0 0 0 10 3H4.75A2.75 2.75 0 0 0 2 5.75v9.5A2.75 2.75 0 0 0 4.75 18h9.5A2.75 2.75 0 0 0 17 15.25V10a.75.75 0 0 0-1.5 0v5.25c0 .69-.56 1.25-1.25 1.25h-9.5c-.69 0-1.25-.56-1.25-1.25v-9.5Z"></path></svg>`;
+    fieldEdit.appendChild(createEditIcon());
     fieldActions.appendChild(fieldEdit);
 
     const fieldDelete = document.createElement("button");
@@ -240,7 +285,7 @@ export async function renderThemeSettings(): Promise<void> {
     fieldDelete.title = "Delete theme setting field";
     fieldDelete.style.display = "unset";
     fieldDelete.style.height = "stretch";
-    fieldDelete.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="currentColor" d="M7 21q-.825 0-1.412-.587T5 19V6q-.425 0-.712-.288T4 5t.288-.712T5 4h4q0-.425.288-.712T10 3h4q.425 0 .713.288T15 4h4q.425 0 .713.288T20 5t-.288.713T19 6v13q0 .825-.587 1.413T17 21zM17 6H7v13h10zm-7 11q.425 0 .713-.288T11 16V9q0-.425-.288-.712T10 8t-.712.288T9 9v7q0 .425.288.713T10 17m4 0q.425 0 .713-.288T15 16V9q0-.425-.288-.712T14 8t-.712.288T13 9v7q0 .425.288.713T14 17M7 6v13z"></path></svg>`;
+    fieldDelete.appendChild(createDeleteIcon());
     fieldActions.appendChild(fieldDelete);
 
     fieldElement.appendChild(fieldActions);
@@ -311,7 +356,7 @@ function addFieldEditorInput(field: FieldEditorInput) {
 
     fieldEditorInputs[field.id] = input;
     container.appendChild(input);
-  } else if (field.type === "options" && field.options) {
+  } else if (field.type === "options") {
     const select = document.createElement("select");
     select.id = `theme-settings-field-editor-${field.id}`;
     select.className = "select";
@@ -324,7 +369,7 @@ function addFieldEditorInput(field: FieldEditorInput) {
         option.innerText = options;
         select.appendChild(option);
       }
-    } else {
+    } else if (typeof field.options === "object") {
       for (const options in field.options) {
         const option = document.createElement("option");
         option.value = options;
@@ -335,15 +380,64 @@ function addFieldEditorInput(field: FieldEditorInput) {
 
     fieldEditorInputs[field.id] = select;
     container.appendChild(select);
+  } else if (field.type === "color") {
+    const color = document.createElement("input");
+    color.id = `theme-settings-field-editor-${field.id}`;
+    color.type = "color";
+
+    fieldEditorInputs[field.id] = color;
+    container.appendChild(color);
+  } else if (field.type === "toggle") {
+    const label = document.createElement("label");
+
+    const toggle = document.createElement("input");
+    toggle.type = "checkbox";
+    toggle.id = field.id;
+    label.appendChild(toggle);
+
+    const checkmark = document.createElement("span");
+    checkmark.className = "checkmark";
+    label.appendChild(checkmark);
+
+    fieldEditorInputs[field.id] = toggle;
+    container.appendChild(label);
   }
 
   themeSettingsFieldEditorInputs?.appendChild(container);
   return fieldEditorInputs[field.id];
 }
 
+function updateTSFieldEditorInputs(inputType: string): void {
+  const visibleFieldsType: Record<string, string[]> = {
+    heading: ["type", "id", "label"],
+  };
+
+  const visibleFields = !THEME_SETTINGS_TYPES[inputType]
+    ? ["type"]
+    : visibleFieldsType[inputType] ||
+      Object.keys(fieldEditorInputs).filter(key => {
+        const split = key.split("-");
+        return split.length > 1 ? split[0] === inputType : split.length < 2;
+      });
+
+  for (const field in fieldEditorInputs) {
+    const parent = fieldEditorInputs[field].parentElement;
+    if (parent) parent.style.display = visibleFields.includes(field) ? "" : "none";
+  }
+}
+
 function fillThemeSettingsFieldEditor(): void {
   const fieldTypes: Record<string, string> = { unspecified: t("options_themeSettings_unspecified") };
   Object.keys(THEME_SETTINGS_TYPES).forEach(v => (fieldTypes[v] = t(`options_themeSettings_${v}`)));
+
+  const fieldTypeInputs: Record<string, any> = {
+    heading: {},
+    range: THEME_SETTINGS_RANGE,
+    color: THEME_SETTINGS_COLOR,
+    dropdown: THEME_SETTINGS_DROPDOWN,
+    toggle: THEME_SETTINGS_TOGGLE,
+    textfield: THEME_SETTINGS_TEXTFIELD,
+  };
 
   const fieldAttributeTypes = {
     css: "CSS (--)",
@@ -404,21 +498,23 @@ function fillThemeSettingsFieldEditor(): void {
     },
   ].forEach(v => addFieldEditorInput(v));
 
+  for (const fieldType in fieldTypeInputs) {
+    const inputs = fieldTypeInputs[fieldType];
+    for (const property in inputs) {
+      const data = inputs[property];
+      addFieldEditorInput({
+        id: `${fieldType}-${property}`,
+        type: data.type,
+        label: data.label,
+        desc: data.desc,
+        optional: data.optional,
+      });
+    }
+  }
+
   if (typeInput instanceof HTMLSelectElement) {
-    typeInput.addEventListener("change", () => {
-      const visibleFieldsType: Record<string, string[]> = {
-        heading: ["type", "id", "label"],
-      };
-
-      const visibleFields = !THEME_SETTINGS_TYPES[typeInput.value]
-        ? ["type"]
-        : visibleFieldsType[typeInput.value] || Object.keys(fieldEditorInputs);
-
-      for (const field in fieldEditorInputs) {
-        const parent = fieldEditorInputs[field].parentElement;
-        if (parent) parent.style.display = visibleFields.includes(field) ? "" : "none";
-      }
-    });
+    updateTSFieldEditorInputs(typeInput.value);
+    typeInput.addEventListener("change", () => updateTSFieldEditorInputs(typeInput.value));
   }
 }
 

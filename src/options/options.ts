@@ -17,6 +17,7 @@ import { loadThemeSettings } from "./editor/features/storage";
 import { initStoreUI, setupYourThemesButton } from "./store/store";
 import { themeSettingsBtn, themeSettingsModalClose, themeSettingsModalOverlay } from "./editor/ui/dom";
 import { handleSlider, registerSlider } from "./editor/ui/slider";
+import type { ThemeSettingField } from "./themes";
 
 interface Options {
   isLogsEnabled: boolean;
@@ -689,37 +690,49 @@ export async function fillThemeSettings() {
   if (themeSettingsBtn)
     themeSettingsBtn.style.display = Object.keys({ ...themeSettings.fields }).length > 0 ? "" : "none";
 
-  for (const field in { ...themeSettings.fields }) {
-    const settingField = themeSettings.fields![field];
+  if (typeof themeSettings.fields !== "object") return;
+
+  const mapped: ThemeSettingField[] = [];
+
+  for (const field in themeSettings.fields) {
+    const setting = themeSettings.fields[field];
+    if (typeof setting.pos === "number") {
+      mapped[setting.pos] = { id: field, ...setting };
+    } else {
+      mapped[Object.keys(themeSettings.fields).length] = { id: field, ...setting };
+    }
+  }
+
+  console.log(mapped);
+  for (const field of mapped) {
     if (
-      !settingField.type ||
-      (settingField.type !== "heading" && typeof settingField.default !== THEME_SETTINGS_TYPES[settingField.type])
+      !field.id ||
+      !field.type ||
+      (field.type !== "heading" && typeof field.default !== THEME_SETTINGS_TYPES[field.type])
     )
       continue;
 
-    const savedVal =
-      settingField.type === "heading" ? settingField.label : { ...themeSettings.saved }[field] || settingField.default;
+    const savedVal = field.type === "heading" ? field.label : { ...themeSettings.saved }[field.id] || field.default;
 
-    if (settingField.type === "heading") {
+    if (field.type === "heading") {
       const heading = document.createElement("h1");
       heading.className = "theme-settings-heading";
       heading.innerText = savedVal;
       themeSettingsFields.appendChild(heading);
-    }
-    if (settingField.type === "toggle") {
+    } else if (field.type === "toggle") {
       const checkboxContainer = document.createElement("div");
       checkboxContainer.classList.add("theme-settings-container");
       checkboxContainer.classList.add("container");
 
       const span = document.createElement("span");
-      span.innerText = settingField.label;
+      span.innerText = field.label;
       checkboxContainer.appendChild(span);
 
       const label = document.createElement("label");
 
       const input = document.createElement("input");
       input.type = "checkbox";
-      input.id = field;
+      input.id = field.id;
       input.checked = savedVal;
       label.appendChild(input);
 
@@ -731,85 +744,75 @@ export async function fillThemeSettings() {
 
       checkboxContainer.appendChild(label);
       themeSettingsFields.appendChild(checkboxContainer);
-    }
-    if (settingField.type === "dropdown") {
-      if (!settingField.options || settingField.options.length < 1 || !settingField.options.every(opt => opt.value))
-        continue;
+    } else if (field.type === "dropdown") {
+      if (!field.options || field.options.length < 1 || !field.options.every(opt => opt.value)) continue;
 
       const dropdownContainer = document.createElement("div");
       dropdownContainer.classList.add("theme-settings-container");
       dropdownContainer.classList.add("container");
 
       const span = document.createElement("span");
-      span.innerText = settingField.label;
+      span.innerText = field.label;
       dropdownContainer.appendChild(span);
 
       const selectEl = document.createElement("div");
       selectEl.className = "select";
 
       const select = document.createElement("select");
-      select.id = field;
+      select.id = field.id;
 
-      settingField.options.forEach(opt => {
+      field.options.forEach(opt => {
         const option = document.createElement("option");
         option.value = opt.value;
         option.innerText = opt.label || opt.value;
         select.appendChild(option);
       });
 
-      select.value = settingField.options[savedVal].value;
+      select.value = field.options[savedVal].value;
       selectEl.appendChild(select);
 
       registeredInputEvents.push(select.addEventListener("change", () => {}));
 
       dropdownContainer.appendChild(selectEl);
       themeSettingsFields.appendChild(dropdownContainer);
-    }
-    if (settingField.type === "color") {
+    } else if (field.type === "color") {
       const colorContainer = document.createElement("div");
       colorContainer.classList.add("theme-settings-container");
       colorContainer.classList.add("container");
 
       const span = document.createElement("span");
-      span.innerText = settingField.label;
+      span.innerText = field.label;
       colorContainer.appendChild(span);
 
       const input = document.createElement("input");
       input.type = "color";
-      input.id = field;
+      input.id = field.id;
       input.value = savedVal;
 
       registeredInputEvents.push(input.addEventListener("change", () => {}));
 
       colorContainer.appendChild(input);
       themeSettingsFields.appendChild(colorContainer);
-    }
-    if (settingField.type === "textfield") {
+    } else if (field.type === "textfield") {
       const textContainer = document.createElement("div");
       textContainer.classList.add("theme-settings-container");
       textContainer.classList.add("container");
 
       const span = document.createElement("span");
-      span.innerText = settingField.label;
+      span.innerText = field.label;
       textContainer.appendChild(span);
 
       const input = document.createElement("input");
       input.type = "text";
-      input.id = field;
+      input.id = field.id;
       input.value = savedVal;
 
       registeredInputEvents.push(input.addEventListener("change", () => {}));
 
       textContainer.appendChild(input);
       themeSettingsFields.appendChild(textContainer);
-    }
-    if (settingField.type === "range") {
-      if (
-        typeof settingField.min !== "number" ||
-        typeof settingField.max !== "number" ||
-        typeof settingField.step !== "number"
-      )
-        continue;
+    } else if (field.type === "range") {
+      if (typeof field.min !== "number" || typeof field.max !== "number" || typeof field.step !== "number") continue;
 
       const rangeContainer = document.createElement("div");
       rangeContainer.classList.add("theme-settings-container");
@@ -822,19 +825,19 @@ export async function fillThemeSettings() {
       div.className = "theme-range-container";
 
       const span = document.createElement("span");
-      span.innerText = settingField.label;
+      span.innerText = field.label;
       div.appendChild(span);
 
       const input = document.createElement("input");
       input.type = "number";
-      input.id = field;
+      input.id = field.id;
 
-      if (!settingField.outrange) {
-        input.min = `${settingField.min}`;
-        input.max = `${settingField.max}`;
+      if (!field.outrange) {
+        input.min = `${field.min}`;
+        input.max = `${field.max}`;
       }
 
-      input.step = `${settingField.step}`;
+      input.step = `${field.step}`;
       input.value = savedVal;
 
       registeredInputEvents.push(input.addEventListener("change", () => {}));
@@ -845,16 +848,16 @@ export async function fillThemeSettings() {
       sliderElement.className = "theme-slider-container";
 
       const min = document.createElement("span");
-      min.innerText = `${settingField.min}`;
+      min.innerText = `${field.min}`;
       min.className = "slider--min";
       sliderElement.appendChild(min);
 
       const slider = document.createElement("div");
       slider.id = `theme-settings-slider-${field}`;
       slider.className = "slider slider--nonimmediate";
-      slider.setAttribute("min", `${settingField.min}`);
-      slider.setAttribute("max", `${settingField.max}`);
-      slider.setAttribute("step", `${settingField.step}`);
+      slider.setAttribute("min", `${field.min}`);
+      slider.setAttribute("max", `${field.max}`);
+      slider.setAttribute("step", `${field.step}`);
       slider.setAttribute("value", `${savedVal}`);
 
       const sliderBar = document.createElement("div");
@@ -878,7 +881,7 @@ export async function fillThemeSettings() {
 
       const max = document.createElement("span");
       max.className = "slider--max";
-      max.innerText = `${settingField.max}`;
+      max.innerText = `${field.max}`;
       sliderElement.appendChild(max);
 
       rangeContainer.appendChild(sliderElement);

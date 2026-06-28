@@ -117,13 +117,13 @@ export const THEME_SETTINGS_TYPES: Record<string, string> = {
 };
 
 export const THEME_SETTINGS_TOGGLE = {
-  onValue: { type: "string", label: "Toggled-On Value" },
-  offValue: { type: "string", label: "Toggled-Off Value" },
-  default: { type: "boolean", label: "Default toggle" },
+  onValue: { type: "text", label: "Toggled-On Value" },
+  offValue: { type: "text", label: "Toggled-Off Value" },
+  default: { type: "toggle", label: "Default toggle" },
 };
 
 export const THEME_SETTINGS_RANGE = {
-  outrange: { type: "boolean", label: "Out of range", optional: true },
+  outrange: { type: "toggle", label: "Out of range", optional: true },
   min: { type: "number", label: "Minimum range" },
   max: { type: "number", label: "Maximum range" },
   step: {
@@ -145,11 +145,11 @@ export const THEME_SETTINGS_COLOR = {
 
 export const THEME_SETTINGS_TEXTFIELD = {
   pattern: {
-    type: "string",
+    type: "text",
     label: "Allowed patterns",
     desc: "Normal or RegEx patterns that can allow a certain characters to be filled in",
   },
-  default: { type: "string", label: "Default value" },
+  default: { type: "text", label: "Default value" },
 };
 
 export const THEME_SETTINGS_ATTRIBUTE_TYPE = ["css", "rics", "knobs"];
