@@ -924,6 +924,30 @@
       }
     }
   },
+  "marketplace_requiresVersion": {
+    "message": "Requires v$version$+",
+    "description": "Footer chip in the theme detail modal showing the minimum Better Lyrics version a theme needs",
+    "placeholders": {
+      "version": {
+        "content": "$1",
+        "example": "2.0.5.6"
+      }
+    }
+  },
+  "marketplace_discussion": {
+    "message": "Discussion",
+    "description": "Footer link in the theme detail modal that opens the theme's discussion thread"
+  },
+  "marketplace_commit": {
+    "message": "Commit $hash$",
+    "description": "Footer chip in the theme detail modal linking to the exact source commit a theme was built from",
+    "placeholders": {
+      "hash": {
+        "content": "$1",
+        "example": "a1b2c3d"
+      }
+    }
+  },
 
   "editor_pageTitle": {
     "message": "Better Lyrics Styles Editor",

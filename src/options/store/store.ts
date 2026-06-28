@@ -566,6 +566,34 @@ function createClockIcon(): SVGSVGElement {
   return svg;
 }
 
+function createTagIcon(): SVGSVGElement {
+  const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+  svg.setAttribute("viewBox", "0 0 24 24");
+  svg.setAttribute("fill", "currentColor");
+  const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+  path.setAttribute("fill-rule", "evenodd");
+  path.setAttribute("clip-rule", "evenodd");
+  path.setAttribute(
+    "d",
+    "M2.123 12.816c.287 1.003 1.06 1.775 2.605 3.32l1.83 1.83C9.248 20.657 10.592 22 12.262 22c1.671 0 3.015-1.344 5.704-4.033c2.69-2.69 4.034-4.034 4.034-5.705c0-1.67-1.344-3.015-4.033-5.704l-1.83-1.83c-1.546-1.545-2.318-2.318-3.321-2.605c-1.003-.288-2.068-.042-4.197.45l-1.228.283c-1.792.413-2.688.62-3.302 1.233S3.27 5.6 2.856 7.391l-.284 1.228c-.491 2.13-.737 3.194-.45 4.197m8-5.545a2.017 2.017 0 1 1-2.852 2.852a2.017 2.017 0 0 1 2.852-2.852m8.928 4.78l-6.979 6.98a.75.75 0 0 1-1.06-1.061l6.978-6.98a.75.75 0 0 1 1.061 1.061"
+  );
+  svg.appendChild(path);
+  return svg;
+}
+
+function createCommitIcon(): SVGSVGElement {
+  const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+  svg.setAttribute("viewBox", "0 0 16 16");
+  svg.setAttribute("fill", "currentColor");
+  const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+  path.setAttribute(
+    "d",
+    "M11.93 8.5a4.002 4.002 0 0 1-7.86 0H.75a.75.75 0 0 1 0-1.5h3.32a4.002 4.002 0 0 1 7.86 0h3.32a.75.75 0 0 1 0 1.5Zm-1.43-.75a2.5 2.5 0 1 0-5 0 2.5 2.5 0 0 0 5 0Z"
+  );
+  svg.appendChild(path);
+  return svg;
+}
+
 function formatTimeAgo(isoDate: string): string {
   const rtf = new Intl.RelativeTimeFormat(navigator.language, { numeric: "auto" });
   const diffMs = new Date(isoDate).getTime() - Date.now();
@@ -1737,26 +1765,64 @@ async function openDetailModal(theme: StoreTheme, urlThemeInfo?: UrlThemeInfo): 
         statsEl.appendChild(statsRow);
       }
     }
+  }
 
+  // -- Footer meta chips --------------------------
+  const metaRow = document.getElementById("detail-meta-row");
+  if (metaRow) {
+    metaRow.replaceChildren();
+    const floor = themeFloorVersion(theme);
+    if (floor && floor !== "0.0.0") {
+      const requiresChip = document.createElement("span");
+      requiresChip.className = "detail-meta-chip";
+      requiresChip.appendChild(createTagIcon());
+      const requiresText = document.createElement("span");
+      requiresText.className = "detail-meta-text";
+      requiresText.textContent = t("marketplace_requiresVersion", [floor]);
+      requiresChip.appendChild(requiresText);
+      metaRow.appendChild(requiresChip);
+    }
+    if (theme.repo && theme.commit) {
+      const commitChip = document.createElement("a");
+      commitChip.className = "detail-meta-chip detail-meta-link";
+      commitChip.href = `https://github.com/${theme.repo}/commit/${theme.commit}`;
+      commitChip.target = "_blank";
+      commitChip.rel = "noopener";
+      commitChip.appendChild(createCommitIcon());
+      const commitText = document.createElement("span");
+      commitText.className = "detail-meta-text";
+      commitText.textContent = t("marketplace_commit", [theme.commit.slice(0, 7)]);
+      commitChip.appendChild(commitText);
+      metaRow.appendChild(commitChip);
+    }
     if (theme.locked) {
-      const timeStat = document.createElement("span");
-      timeStat.className = "detail-stat detail-stat-updated";
+      const updatedChip = document.createElement("span");
+      updatedChip.className = "detail-meta-chip";
       const localized = new Date(theme.locked).toLocaleString(navigator.language, {
         year: "numeric",
-        month: "long",
+        month: "short",
         day: "numeric",
         hour: "numeric",
         minute: "2-digit",
       });
-      timeStat.dataset.tooltip = t("marketplace_lastUpdatedOn", [localized]);
-      timeStat.appendChild(createClockIcon());
-      timeStat.appendChild(document.createTextNode(formatTimeAgo(theme.locked)));
-      statsEl.appendChild(timeStat);
+      updatedChip.appendChild(createClockIcon());
+      const updatedText = document.createElement("span");
+      updatedText.className = "detail-meta-text";
+      updatedText.appendChild(document.createTextNode(`${t("marketplace_lastUpdatedOn", [localized])} `));
+      const relative = document.createElement("span");
+      relative.className = "detail-meta-muted";
+      relative.textContent = `(${formatTimeAgo(theme.locked)})`;
+      updatedText.appendChild(relative);
+      updatedChip.appendChild(updatedText);
+      metaRow.appendChild(updatedChip);
     }
+    metaRow.style.display = metaRow.childElementCount > 0 ? "flex" : "none";
   }
 
   const repoLinkContainer = document.getElementById("detail-repo-link");
   const repoAnchor = document.getElementById("detail-repo-anchor") as HTMLAnchorElement;
+  const discussionLink = document.getElementById("detail-discussion-link") as HTMLAnchorElement | null;
+  const discussionSep = document.getElementById("detail-footer-sep");
   const ricsBadge = document.getElementById("detail-rics-badge");
   if (repoLinkContainer && repoAnchor) {
     if (theme.repo) {
@@ -1765,6 +1831,17 @@ async function openDetailModal(theme: StoreTheme, urlThemeInfo?: UrlThemeInfo): 
       repoAnchor.textContent = theme.repo;
     } else {
       repoLinkContainer.style.display = "none";
+    }
+  }
+
+  if (discussionLink) {
+    if (theme.discussionUrl) {
+      discussionLink.href = theme.discussionUrl;
+      discussionLink.style.display = "inline-flex";
+      if (discussionSep) discussionSep.style.display = "inline-flex";
+    } else {
+      discussionLink.style.display = "none";
+      if (discussionSep) discussionSep.style.display = "none";
     }
   }
 
