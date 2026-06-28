@@ -238,8 +238,7 @@ export async function clearCache(): Promise<void> {
     const result = await chrome.storage.local.get(null);
     const lyricsKeys = Object.keys(result).filter(
       key =>
-        (key.startsWith("blyrics_") || key.startsWith(OFFSET_STORAGE_PREFIX)) &&
-        !PROTECTED_STORAGE_KEYS.includes(key as (typeof PROTECTED_STORAGE_KEYS)[number])
+        key.startsWith("blyrics_") && !PROTECTED_STORAGE_KEYS.includes(key as (typeof PROTECTED_STORAGE_KEYS)[number])
     );
     await chrome.storage.local.remove(lyricsKeys);
     await saveCacheInfo();
