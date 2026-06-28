@@ -186,6 +186,22 @@
     "message": "Global",
     "description": "Label in the lyrics dock offset menu for the global offset applied to all songs and sync types"
   },
+  "options_offsetModal_perSong": {
+    "message": "Per-song offsets",
+    "description": "Heading in the offset settings modal for the section that manages saved per-song sync offsets"
+  },
+  "options_offsetModal_perSongClear": {
+    "message": "Clear all",
+    "description": "Button in the offset settings modal that deletes every saved per-song sync offset"
+  },
+  "options_offsetModal_perSongCount": {
+    "message": "Saved offsets",
+    "description": "Label in the offset settings modal showing how many per-song sync offsets are stored"
+  },
+  "options_offsetModal_appliesTo": {
+    "message": "Applies to",
+    "description": "Label in the offset settings modal preceding the list of sync types a given offset affects"
+  },
 
   "options_language_displayLanguage": {
     "message": "Display Language",

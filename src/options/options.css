@@ -162,6 +162,41 @@ body {
     user-select: none;
 }
 
+#offset-modal-overlay .container.offset-row {
+    align-items: center;
+}
+
+.offset-info {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.offset-applies {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    font-size: 0.75rem;
+}
+
+.offset-applies__label {
+    color: rgba(255, 255, 255, 0.5);
+}
+
+.offset-applies__chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    font-weight: 500;
+}
+
+.offset-applies__chip svg {
+    display: block;
+    width: 0.875rem;
+    height: 0.875rem;
+}
+
 /* -- Theme Preview Card -------------------------- */
 
 .theme-preview-card {

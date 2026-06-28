@@ -10,6 +10,8 @@ import {
 import { attachHoldRepeat } from "@core/holdRepeat";
 import { getLanguageDisplayName, initI18n, loadLocaleOverride, SUPPORTED_LOCALES, t } from "@core/i18n";
 import { exportIdentity, getDisplayName, importIdentity, invalidateDisplayName, signPayload } from "@core/keyIdentity";
+import { clearAllOffsets, getOffsetInfo } from "@core/storage";
+import { parseSvgString, syncTypeColors } from "@modules/ui/lyricsDock/icons";
 import Sortable from "sortablejs";
 import { showModal } from "./editor/ui/feedback";
 import { initStoreUI, setupYourThemesButton } from "./store/store";
@@ -1513,8 +1515,16 @@ function initOffsetModal(): void {
   const closeBtn = document.getElementById("offset-modal-close");
   if (!openBtn || !overlay || !closeBtn) return;
 
+  const offsetCount = document.getElementById("offset-count");
+  const refreshOffsetCount = async (): Promise<void> => {
+    if (offsetCount) offsetCount.textContent = String((await getOffsetInfo()).count);
+  };
+
   const close = (): void => overlay.classList.remove("active");
-  openBtn.addEventListener("click", () => overlay.classList.add("active"));
+  openBtn.addEventListener("click", () => {
+    overlay.classList.add("active");
+    void refreshOffsetCount();
+  });
   closeBtn.addEventListener("click", close);
   overlay.addEventListener("click", event => {
     if (event.target === overlay) close();
@@ -1529,6 +1539,33 @@ function initOffsetModal(): void {
     }
     debouncedSaveOptions();
   });
+
+  document.getElementById("clear-offsets")?.addEventListener("click", async () => {
+    await clearAllOffsets();
+    await refreshOffsetCount();
+  });
+
+  const offsetApplies: Record<string, SyncType[]> = {
+    globalLyricOffset: ["syllable", "word", "line"],
+    richsyncOffsetTrim: ["syllable", "word"],
+    lineOffsetTrim: ["line"],
+  };
+  const syncConfig = getSyncTypeConfig();
+  for (const applies of document.querySelectorAll<HTMLElement>("#offset-modal-overlay .offset-applies")) {
+    const types = applies.dataset.offsetScope ? offsetApplies[applies.dataset.offsetScope] : undefined;
+    if (!types) continue;
+    for (const type of types) {
+      const chip = document.createElement("span");
+      chip.className = "offset-applies__chip";
+      chip.style.color = syncTypeColors[type];
+      const icon = parseSvgString(syncConfig[type].icon);
+      if (icon) chip.appendChild(icon);
+      const name = document.createElement("span");
+      name.textContent = syncConfig[type].label;
+      chip.appendChild(name);
+      applies.appendChild(chip);
+    }
+  }
 
   const OFFSET_STEP = 0.1;
   const OFFSET_STEP_LARGE = 0.5;

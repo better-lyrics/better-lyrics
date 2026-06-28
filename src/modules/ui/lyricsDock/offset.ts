@@ -1,6 +1,6 @@
-import { LYRICS_CACHE_TTL_MS, OFFSET_STORAGE_PREFIX } from "@constants";
+import { OFFSET_STORAGE_PREFIX } from "@constants";
 import { AppState } from "@core/appState";
-import { getTransientStorage, setStorage, setTransientStorage } from "@core/storage";
+import { getTransientStorage, setPersistentStorage, setStorage } from "@core/storage";
 import { animationEngine, animEngineState } from "@modules/ui/animationEngine";
 
 export const OFFSET_STEP = 0.1;
@@ -95,9 +95,8 @@ export function resetGlobalOffsets(): void {
   persistGlobalOffsets();
 }
 
-// Debounced so spam-clicking the +/- buttons doesn't trigger a full-storage rescan per click
-// (setTransientStorage refreshes cache info on every write). Key and value are captured now,
-// not at fire time, so a source switch mid-debounce still writes under the original source.
+// Debounced so spam-clicking the +/- buttons doesn't thrash storage. Key and value are captured
+// now, not at fire time, so a source switch mid-debounce still writes under the original source.
 let persistTimer: ReturnType<typeof setTimeout> | null = null;
 
 function persistCurrentOffset(): void {
@@ -108,7 +107,7 @@ function persistCurrentOffset(): void {
   const value = AppState.lyricOffset;
   if (persistTimer) clearTimeout(persistTimer);
   persistTimer = setTimeout(() => {
-    void setTransientStorage(key, value, LYRICS_CACHE_TTL_MS);
+    void setPersistentStorage(key, value);
   }, OFFSET_PERSIST_DELAY);
 }
 
