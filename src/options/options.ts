@@ -1428,6 +1428,19 @@ function syncUnisonModalDependentState(enabled: boolean): void {
   body.dataset.pinnedDisabled = enabled ? "false" : "true";
 }
 
+function resetDockSettings(): void {
+  (document.getElementById("isUnisonPinnedDockEnabled") as HTMLInputElement).checked = true;
+  (document.getElementById("isUnisonAutoHideInFullscreenEnabled") as HTMLInputElement).checked = true;
+  (document.getElementById("isDockSourceEnabled") as HTMLInputElement).checked = true;
+  (document.getElementById("isDockTranslateEnabled") as HTMLInputElement).checked = true;
+  (document.getElementById("isDockRomanizeEnabled") as HTMLInputElement).checked = true;
+  (document.getElementById("isDockOffsetEnabled") as HTMLInputElement).checked = true;
+  setUnisonPositionInForm(DOCK_DEFAULT_POSITION);
+  setDockControlsOrderInForm([...DOCK_CONTROL_ORDER_DEFAULT]);
+  syncUnisonModalDependentState(true);
+  saveOptions();
+}
+
 function setupUnisonActionsModal(): void {
   const openBtn = document.getElementById("unison-actions-btn");
   const overlay = document.getElementById("unison-actions-modal-overlay");
@@ -1468,6 +1481,8 @@ function setupUnisonActionsModal(): void {
   for (const id of ["isDockSourceEnabled", "isDockTranslateEnabled", "isDockRomanizeEnabled", "isDockOffsetEnabled"]) {
     document.getElementById(id)?.addEventListener("change", debouncedSaveOptions);
   }
+
+  document.getElementById("dock-settings-reset")?.addEventListener("click", resetDockSettings);
 
   const picker = document.querySelector<HTMLElement>(".controls-shown-picker");
   if (picker) {
