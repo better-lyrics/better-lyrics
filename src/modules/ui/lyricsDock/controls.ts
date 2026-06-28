@@ -24,12 +24,17 @@ const MENU_OPEN_CLASS = `${DOCK_CLASS}__menu--open`;
 
 let openSourceMenu: HTMLElement | null = null;
 let sourceMenuOutsideListener: ((event: MouseEvent) => void) | null = null;
+const menuCleanups = new WeakMap<HTMLElement, (() => void)[]>();
 
 // The menu is rendered in <body>, not inside the dock: the dock pill has backdrop-filter,
 // which makes it a backdrop root, so a menu nested inside it could only blur within the
 // pill's box and would look flat once it extends past the pill. Rendered in body and
 // positioned from the trigger's screen rect, its backdrop-filter samples the page.
 export function closeSourceMenu(): void {
+  if (openSourceMenu) {
+    menuCleanups.get(openSourceMenu)?.forEach(fn => fn());
+    menuCleanups.delete(openSourceMenu);
+  }
   openSourceMenu?.remove();
   openSourceMenu = null;
   if (sourceMenuOutsideListener) {
@@ -355,16 +360,18 @@ function buildOffsetMenu(): HTMLElement {
     resetGlobalOffsets();
   });
 
+  const cleanups: (() => void)[] = [];
   menu.append(
-    buildOffsetRow(t("lyricsDock_offsetGlobal"), "globalLyricOffset"),
-    buildOffsetRow(t("unison_syncRichsync"), "richsyncOffsetTrim"),
-    buildOffsetRow(t("unison_syncLinesync"), "lineOffsetTrim"),
+    buildOffsetRow(t("lyricsDock_offsetGlobal"), "globalLyricOffset", cleanups),
+    buildOffsetRow(t("unison_syncRichsync"), "richsyncOffsetTrim", cleanups),
+    buildOffsetRow(t("unison_syncLinesync"), "lineOffsetTrim", cleanups),
     reset
   );
+  menuCleanups.set(menu, cleanups);
   return menu;
 }
 
-function buildOffsetRow(label: string, key: GlobalOffsetKey): HTMLElement {
+function buildOffsetRow(label: string, key: GlobalOffsetKey, cleanups: (() => void)[]): HTMLElement {
   const row = document.createElement("div");
   row.className = `${DOCK_CLASS}__offset-row`;
 
@@ -389,15 +396,13 @@ function buildOffsetRow(label: string, key: GlobalOffsetKey): HTMLElement {
   };
 
   // The buttons mutate state; the display refreshes through the change listener so the dock
-  // and the settings page stay in lockstep no matter which one drove the change. Self-detaches
-  // once the menu (and this node) leaves the DOM.
-  const unsubscribe = onGlobalOffsetChange((changedKey, next) => {
-    if (!value.isConnected) {
-      unsubscribe();
-      return;
-    }
-    if (changedKey === key) render(next);
-  });
+  // and the settings page stay in lockstep no matter which one drove the change. The listener
+  // is torn down when the menu closes (see closeSourceMenu).
+  cleanups.push(
+    onGlobalOffsetChange((changedKey, next) => {
+      if (changedKey === key) render(next);
+    })
+  );
 
   const minus = buildOffsetRowStep(controlIcons.offsetEarlier, t("lyricsDock_offsetEarlier"), event =>
     adjustGlobalOffsetValue(key, -stepFor(event))

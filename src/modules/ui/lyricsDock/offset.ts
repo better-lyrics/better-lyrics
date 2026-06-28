@@ -1,4 +1,4 @@
-import { LYRICS_CACHE_TTL_MS } from "@constants";
+import { LYRICS_CACHE_TTL_MS, OFFSET_STORAGE_PREFIX } from "@constants";
 import { AppState } from "@core/appState";
 import { getTransientStorage, setStorage, setTransientStorage } from "@core/storage";
 import { animationEngine, animEngineState } from "@modules/ui/animationEngine";
@@ -9,7 +9,7 @@ export const OFFSET_STEP_LARGE = 0.5;
 const OFFSET_PERSIST_DELAY = 400;
 
 function offsetKey(videoId: string, source: string): string {
-  return `blyricsOffset_${videoId}_${source}`;
+  return `${OFFSET_STORAGE_PREFIX}${videoId}_${source}`;
 }
 
 function retickLyrics(): void {

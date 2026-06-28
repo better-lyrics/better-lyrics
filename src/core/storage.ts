@@ -1,4 +1,4 @@
-import { GENERAL_ERROR_LOG, LYRIC_SOURCE_KEYS, STORAGE_TRANSIENT_SET_LOG } from "@constants";
+import { GENERAL_ERROR_LOG, LYRIC_SOURCE_KEYS, OFFSET_STORAGE_PREFIX, STORAGE_TRANSIENT_SET_LOG } from "@constants";
 import { log, truncateSource } from "@utils";
 import { compileWithDetails } from "rics";
 import { compressString, decompressString, isCompressed } from "./compression";
@@ -238,7 +238,8 @@ export async function clearCache(): Promise<void> {
     const result = await chrome.storage.local.get(null);
     const lyricsKeys = Object.keys(result).filter(
       key =>
-        key.startsWith("blyrics_") && !PROTECTED_STORAGE_KEYS.includes(key as (typeof PROTECTED_STORAGE_KEYS)[number])
+        (key.startsWith("blyrics_") || key.startsWith(OFFSET_STORAGE_PREFIX)) &&
+        !PROTECTED_STORAGE_KEYS.includes(key as (typeof PROTECTED_STORAGE_KEYS)[number])
     );
     await chrome.storage.local.remove(lyricsKeys);
     await saveCacheInfo();
@@ -258,7 +259,7 @@ export async function purgeExpiredKeys(): Promise<void> {
     const keysToRemove: string[] = [];
 
     Object.keys(result).forEach(key => {
-      if (key.startsWith("blyrics_")) {
+      if (key.startsWith("blyrics_") || key.startsWith(OFFSET_STORAGE_PREFIX)) {
         const item = result[key] as TransientStorageItem;
         if (item.expiry && now >= item.expiry) {
           keysToRemove.push(key);
