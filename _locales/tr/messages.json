@@ -92,7 +92,7 @@
     "description": "Auto-scroll unsynced lyrics setting label"
   },
   "options_display_shadersPromo": {
-    "message": "Better Lyrics Gölgelendiricleri bağlantısını göster",
+    "message": "Better Lyrics Gölgelendiricileri bağlantısını göster",
     "description": "Toggle label for the Shaders companion link shown in the lyrics footer"
   },
   "options_display_unisonActions": {
@@ -216,7 +216,7 @@
     "description": "Sources settings section title"
   },
   "options_sources_description": {
-    "message": "Önceliği değiştirmek için sürükleyin. Üstteki kaynaklar önceliklidir. Devre dışı bırakmak için tiki kaldırın.",
+    "message": "Önceliği değiştirmek için sürükleyin. Üstteki kaynaklar önceliklidir. Devre dışı bırakmak için kapatın.",
     "description": "Sources settings section description"
   },
   "options_sources_openUnison": {
