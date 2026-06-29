@@ -53,9 +53,9 @@ export const themeSettingsModalClose = document.getElementById(
   "theme-settings-modal-close"
 ) as HTMLButtonElement | null;
 export const themeSettingsModalBody = document.getElementById("theme-settings-modal-body") as HTMLElement | null;
-export const themeSettingsModalBack = document.getElementById("theme-settings-modal-back") as HTMLButtonElement | null;
-export const themeSettingsModalNext = document.getElementById("theme-settings-modal-next") as HTMLButtonElement | null;
-export const themeSettingsModalSave = document.getElementById("theme-settings-modal-save") as HTMLButtonElement | null;
+export const themeSettingsCancelBtn = document.getElementById("theme-settings-cancel-btn") as HTMLButtonElement | null;
+export const themeSettingsOkBtn = document.getElementById("theme-settings-ok-btn") as HTMLButtonElement | null;
+export const themeSettingsApplyBtn = document.getElementById("theme-settings-apply-btn") as HTMLButtonElement | null;
 
 export const openEditCSS = (): void => {
   const editCSS = document.getElementById("css");

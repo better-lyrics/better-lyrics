@@ -117,7 +117,7 @@ async function saveChunkedCSS(css: string): Promise<void> {
   console.log(LOG_PREFIX_EDITOR, `Storage usage after save: ${finalUsage.used} / ${finalUsage.total} bytes`);
 }
 
-const getStorageStrategy = (css: string): "local" | "sync" | "chunked" => {
+export const getStorageStrategy = (css: string): "local" | "sync" | "chunked" => {
   const cssSize = new Blob([css]).size;
   if (cssSize > LOCAL_STORAGE_SAFE_LIMIT) {
     return "chunked";
@@ -219,7 +219,9 @@ export function applyThemeSettingsToCSS(
 
   function dependable(field: string, raw: boolean = false) {
     const setting = settings[field];
-    if (setting.type === "heading") { return setting.label; }
+    if (setting.type === "heading") {
+      return setting.label;
+    }
 
     let savedVal = typeof saved[field] === THEME_SETTINGS_TYPES[setting.type] ? saved[field] : setting.default;
 

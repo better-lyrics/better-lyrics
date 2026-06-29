@@ -5,7 +5,6 @@ import {
   DOCK_DEFAULT_POSITION,
   LOG_PREFIX,
   ROMANIZATION_LANGUAGES,
-  THEME_SETTINGS_ATTRIBUTE_TYPE,
   THEME_SETTINGS_TYPES,
   UNISON_API_BASE_URL,
 } from "@constants";
@@ -13,9 +12,21 @@ import { getLanguageDisplayName, initI18n, loadLocaleOverride, SUPPORTED_LOCALES
 import { exportIdentity, getDisplayName, importIdentity, invalidateDisplayName, signPayload } from "@core/keyIdentity";
 import Sortable from "sortablejs";
 import { showModal } from "./editor/ui/feedback";
-import { loadThemeSettings } from "./editor/features/storage";
+import {
+  applyThemeSettingsToCSS,
+  broadcastRICSToTabs,
+  getStorageStrategy,
+  loadCustomCSS,
+  loadThemeSettings,
+  saveToStorageWithFallback,
+} from "./editor/features/storage";
 import { initStoreUI, setupYourThemesButton } from "./store/store";
-import { themeSettingsBtn, themeSettingsModalClose, themeSettingsModalOverlay } from "./editor/ui/dom";
+import {
+  themeSettingsApplyBtn,
+  themeSettingsBtn,
+  themeSettingsModalClose,
+  themeSettingsModalOverlay,
+} from "./editor/ui/dom";
 import { handleSlider, registerSlider } from "./editor/ui/slider";
 import type { ThemeSettingField } from "./themes";
 
@@ -658,7 +669,30 @@ document.addEventListener("DOMContentLoaded", () => {
   initNicknameModal();
 });
 
-const registeredInputEvents = [];
+const changedFields: Record<string, any> = {};
+
+async function setChangedFields(field: string, value: any) {
+  changedFields[field] = value;
+  if ((document.getElementById("themeSettingsLivePreview") as HTMLInputElement).checked) {
+    const css = await loadCustomCSS(true);
+    const themeSettings = await loadThemeSettings();
+    const modifiedCSS = applyThemeSettingsToCSS(css, themeSettings.fields, { ...themeSettings.saved, changedFields });
+    console.log(themeSettings, changedFields);
+    broadcastRICSToTabs(modifiedCSS, getStorageStrategy(modifiedCSS));
+  }
+}
+
+function closeThemeSettings() {
+  if (themeSettingsModalOverlay) {
+    const modal = themeSettingsModalOverlay.querySelector(".modal");
+    if (modal) modal.classList.add("closing");
+    themeSettingsModalOverlay.classList.remove("active");
+
+    setTimeout(() => {
+      if (modal) modal.classList.remove("closing");
+    }, 200);
+  }
+}
 
 function initThemeSettings() {
   fillThemeSettings();
@@ -668,17 +702,9 @@ function initThemeSettings() {
     }
   });
 
-  themeSettingsModalClose?.addEventListener("click", () => {
-    if (themeSettingsModalOverlay) {
-      const modal = themeSettingsModalOverlay.querySelector(".modal");
-      if (modal) modal.classList.add("closing");
-      themeSettingsModalOverlay.classList.remove("active");
+  themeSettingsModalClose?.addEventListener("click", () => closeThemeSettings());
 
-      setTimeout(() => {
-        if (modal) modal.classList.remove("closing");
-      }, 200);
-    }
-  });
+  themeSettingsApplyBtn?.addEventListener("click", () => {});
 }
 
 export async function fillThemeSettings() {
@@ -736,7 +762,7 @@ export async function fillThemeSettings() {
       input.checked = savedVal;
       label.appendChild(input);
 
-      registeredInputEvents.push(input.addEventListener("change", () => {}));
+      input.addEventListener("change", () => setChangedFields(field.id!, input.checked));
 
       const checkmark = document.createElement("span");
       checkmark.className = "checkmark";
@@ -771,7 +797,12 @@ export async function fillThemeSettings() {
       select.value = field.options[savedVal].value;
       selectEl.appendChild(select);
 
-      registeredInputEvents.push(select.addEventListener("change", () => {}));
+      select.addEventListener("change", () =>
+        setChangedFields(
+          field.id!,
+          field.options.findIndex(val => val.value === select.value)
+        )
+      );
 
       dropdownContainer.appendChild(selectEl);
       themeSettingsFields.appendChild(dropdownContainer);
@@ -789,7 +820,7 @@ export async function fillThemeSettings() {
       input.id = field.id;
       input.value = savedVal;
 
-      registeredInputEvents.push(input.addEventListener("change", () => {}));
+      input.addEventListener("change", () => setChangedFields(field.id!, input.value));
 
       colorContainer.appendChild(input);
       themeSettingsFields.appendChild(colorContainer);
@@ -807,7 +838,7 @@ export async function fillThemeSettings() {
       input.id = field.id;
       input.value = savedVal;
 
-      registeredInputEvents.push(input.addEventListener("change", () => {}));
+      input.addEventListener("change", () => setChangedFields(field.id!, input.value));
 
       textContainer.appendChild(input);
       themeSettingsFields.appendChild(textContainer);
@@ -840,7 +871,8 @@ export async function fillThemeSettings() {
       input.step = `${field.step}`;
       input.value = savedVal;
 
-      registeredInputEvents.push(input.addEventListener("change", () => {}));
+      input.addEventListener("change", () => setChangedFields(field.id!, input.value));
+
       div.appendChild(input);
       rangeContainer.appendChild(div);
 
