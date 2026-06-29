@@ -926,7 +926,7 @@
     "description": "Footer button text linking to the Better Lyrics Shaders companion extension"
   },
   "lyrics_searching": {
-    "message": "Better Lyrics szuka tesktu piosenki...",
+    "message": "Better Lyrics szuka tekstu piosenki...",
     "description": "Loading message while searching for lyrics"
   },
   "lyrics_stillSearching": {
