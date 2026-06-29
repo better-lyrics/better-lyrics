@@ -802,7 +802,7 @@ export async function handleSaveTheme() {
   }
 
   const themeName = await showPrompt("Save as Theme", "Enter a name for this theme:", "", "Theme name");
-  if (!themeName || themeName.trim() === "") {
+  if (!themeName || themeName.trim() === "" || themeName.trim().startsWith(STORE_THEME_PREFIX)) {
     return;
   }
 
