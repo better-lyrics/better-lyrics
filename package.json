@@ -38,7 +38,7 @@
     "homepage": "https://github.com/better-lyrics/better-lyrics#readme",
     "dependencies": {
         "@codemirror/autocomplete": "^6.20.3",
-        "@codemirror/commands": "^6.10.3",
+        "@codemirror/commands": "^6.10.4",
         "@codemirror/lint": "^6.9.7",
         "@codemirror/search": "^6.7.1",
         "@codemirror/state": "^6.6.0",
