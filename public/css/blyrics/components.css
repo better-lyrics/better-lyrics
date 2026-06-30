@@ -568,12 +568,6 @@ ytmusic-player-page:not([is-mweb-modernization-enabled]) #side-panel:has(.blyric
 	opacity: 0;
 }
 
-.blyrics-dock__toggles {
-	display: inline-flex;
-	align-items: center;
-	gap: 4px;
-}
-
 .blyrics-dock__divider {
 	width: 1px;
 	align-self: stretch;
