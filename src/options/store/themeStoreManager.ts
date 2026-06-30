@@ -134,7 +134,7 @@ export async function installTheme(theme: StoreTheme, options: InstallOptions = 
 
   let css: string;
   let shaderConfig: Record<string, unknown> | null = null;
-  let settings: { [field: string]: ThemeSettingField } | null = null;
+  let settings: Record<string, ThemeSettingField> | null = null;
 
   if (isRegistryTheme) {
     // Authoritative resolution happens here at install time: ask store-api /resolve
@@ -142,11 +142,11 @@ export async function installTheme(theme: StoreTheme, options: InstallOptions = 
     // that path rather than reusing the listing-time URLs.
     const installUrls = await resolveRegistryInstallUrls(theme);
     css = await fetchCssFromUrl(installUrls.cssUrl);
+    if (theme.hasSettings) {
+      settings = await fetchRegistryThemeSettings(installUrls.registryPath);
+    }
     if (theme.hasShaders) {
       shaderConfig = await fetchRegistryShaderConfig(installUrls.registryPath);
-    }
-    if (theme.hasSettings) {
-      settings = await fetchRegistryThemeSettings(theme.id);
     }
   } else {
     const branch = options.branch;
@@ -160,8 +160,7 @@ export async function installTheme(theme: StoreTheme, options: InstallOptions = 
     }
   }
 
-  // remove saved theme settings fields that no longer exist in the theme settings
-  if (installed?.savedSettings && settings) {
+  if (settings && installed?.savedSettings) {
     for (const key in installed.savedSettings) {
       if (!(key in settings)) {
         delete installed.savedSettings[key];

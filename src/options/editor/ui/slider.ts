@@ -77,6 +77,8 @@ export function handleSlider(slider: HTMLElement) {
 
   slider.addEventListener("mousedown", e => {
     e.preventDefault();
+
+    const abortController = new AbortController();
     const moveHandler = (e: MouseEvent) => {
       const rect = slider.getBoundingClientRect();
       updateSlider(
@@ -86,13 +88,18 @@ export function handleSlider(slider: HTMLElement) {
       );
     };
 
-    document.addEventListener("mousemove", moveHandler);
-    document.addEventListener("mouseup", () => {
-      updateSlider(slider, parseFloat(slider.getAttribute("ref-val") || slider.getAttribute("value") || "0"));
-      slider.setAttribute("ref-val", slider.getAttribute("value")!);
-      slider.removeAttribute("ref-val");
-      document.removeEventListener("mousemove", moveHandler);
-    });
+    document.addEventListener("mousemove", moveHandler, { signal: abortController.signal });
+    document.addEventListener(
+      "mouseup",
+      () => {
+        updateSlider(slider, parseFloat(slider.getAttribute("ref-val") || slider.getAttribute("value") || "0"));
+        slider.setAttribute("ref-val", slider.getAttribute("value")!);
+        slider.removeAttribute("ref-val");
+
+        abortController.abort();
+      },
+      { signal: abortController.signal }
+    );
 
     moveHandler(e);
   });

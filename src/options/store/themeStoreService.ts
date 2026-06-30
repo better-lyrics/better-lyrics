@@ -227,6 +227,7 @@ async function resolveRegistryPathAuthoritative(
 interface RegistryFileUrls {
   cssUrl: string;
   shaderUrl?: string;
+  settingsUrl?: string;
   registryPath: string;
   integrity?: string;
 }
@@ -238,12 +239,14 @@ interface RegistryFileUrls {
 async function deriveRegistryFileUrls(
   basePath: string,
   hasShaders: boolean,
+  hasSettings: boolean,
   integrity?: string
 ): Promise<RegistryFileUrls> {
   const hasRics = await checkRegistryFileExists(basePath, "style.rics");
   const cssUrl = hasRics ? getRegistryFileUrl(basePath, "style.rics") : getRegistryFileUrl(basePath, "style.css");
   const shaderUrl = hasShaders ? getRegistryFileUrl(basePath, "shader.json") : undefined;
-  return { cssUrl, shaderUrl, registryPath: basePath, integrity };
+  const settingsUrl = hasSettings ? getRegistryFileUrl(basePath, "settings.json") : undefined;
+  return { cssUrl, shaderUrl, settingsUrl, registryPath: basePath, integrity };
 }
 
 /**
@@ -263,7 +266,7 @@ export async function resolveRegistryInstallUrls(theme: StoreTheme): Promise<Reg
   };
 
   const { path: basePath, integrity } = await resolveRegistryPathAuthoritative(lockEntry);
-  return deriveRegistryFileUrls(basePath, theme.hasShaders, integrity);
+  return deriveRegistryFileUrls(basePath, theme.hasShaders, theme.hasSettings, integrity);
 }
 
 async function fetchFullThemeFromRegistry(lockEntry: LockfileEntry): Promise<StoreTheme> {
@@ -278,7 +281,11 @@ async function fetchFullThemeFromRegistry(lockEntry: LockfileEntry): Promise<Sto
 
   const description = descriptionMd ?? metadata.description ?? "";
 
-  const { cssUrl, shaderUrl } = await deriveRegistryFileUrls(basePath, metadata.hasShaders);
+  const { cssUrl, shaderUrl, settingsUrl } = await deriveRegistryFileUrls(
+    basePath,
+    metadata.hasShaders,
+    metadata.hasSettings
+  );
 
   const imageUrls: string[] = [];
   const safeImages = metadata.images ? filterSafeImageFilenames(metadata.images) : [];
@@ -308,6 +315,7 @@ async function fetchFullThemeFromRegistry(lockEntry: LockfileEntry): Promise<Sto
     imageUrls: allImageUrls,
     cssUrl,
     shaderUrl,
+    settingsUrl,
     version: metadata.version ?? lockEntry.version,
     commit: lockEntry.commit,
     locked: lockEntry.locked,

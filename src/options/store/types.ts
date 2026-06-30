@@ -46,6 +46,7 @@ export interface StoreTheme extends ResolvedStoreThemeMetadata {
   imageUrls: string[];
   cssUrl: string;
   shaderUrl?: string;
+  settingsUrl?: string;
   commit?: string;
   locked?: string;
   registryPath?: string;
