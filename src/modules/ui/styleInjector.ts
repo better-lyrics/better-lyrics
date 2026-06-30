@@ -32,8 +32,8 @@ function parseBlyricsConfig(cssContent: string): Map<string, string> {
 
 function getFieldValueOnAvailable(
   field: string,
-  settings: { [field: string]: ThemeSettingField } = {},
-  saved: { [field: string]: any } = {},
+  settings: Record<string, ThemeSettingField> = {},
+  saved: Record<string, any> = {},
   raw: boolean = false
 ): any {
   const setting = settings[field];
@@ -110,8 +110,8 @@ function getFieldValueOnAvailable(
 
 function applyThemeSettingsToCSS(
   css: string,
-  settings: { [field: string]: ThemeSettingField } = {},
-  saved: { [field: string]: any } = {}
+  settings: Record<string, ThemeSettingField> = {},
+  saved: Record<string, any> = {}
 ): string {
   if (Object.keys(settings).length < 1) {
     return css;
@@ -247,8 +247,8 @@ interface CSSStorageData {
   customCSS?: string;
   cssCompressed?: boolean;
   themeSettings?: {
-    fields?: { [field: string]: ThemeSettingField };
-    saved?: { [field: string]: any };
+    fields?: Record<string, ThemeSettingField>;
+    saved?: Record<string, any>;
   };
 }
 

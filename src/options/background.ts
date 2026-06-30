@@ -39,7 +39,7 @@ const SYNC_STORAGE_LIMIT = 7000;
 
 async function saveThemeCSS(
   css: string,
-  settings: { fields?: { [field: string]: ThemeSettingField }; saved?: { [field: string]: any } },
+  settings: { fields?: Record<string, ThemeSettingField>; saved?: Record<string, any> },
   title: string,
   creators: string[]
 ): Promise<void> {

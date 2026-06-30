@@ -13,7 +13,6 @@ import {
 } from "./themeStoreService";
 import type { InstalledStoreTheme, StoreTheme, ThemeSource } from "./types";
 import type { ThemeSettingField } from "../themes";
-import { validateThemeSettingFields } from "../editor/features/themes";
 
 async function fetchCssFromUrl(url: string): Promise<string> {
   const response = await fetch(url);
@@ -225,7 +224,7 @@ export async function removeTheme(themeId: string): Promise<void> {
   }
 }
 
-export async function setSavedThemeSettings(themeId: string, savedSettings: { [field: string]: any }): Promise<void> {
+export async function setSavedThemeSettings(themeId: string, savedSettings: Record<string, any>): Promise<void> {
   await ensureMigrated();
 
   const installed = await getInstalledTheme(themeId);

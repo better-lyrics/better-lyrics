@@ -166,9 +166,7 @@ async function checkRegistryFileExists(basePath: string, file: string): Promise<
   }
 }
 
-export async function fetchRegistryThemeSettings(
-  basePath: string
-): Promise<{ [field: string]: ThemeSettingField } | null> {
+export async function fetchRegistryThemeSettings(basePath: string): Promise<Record<string, ThemeSettingField> | null> {
   const url = getRegistryFileUrl(basePath, "settings.json");
 
   try {
@@ -366,7 +364,7 @@ export async function fetchThemeCSS(repo: string, branchOverride?: string): Prom
 export async function fetchThemeSettings(
   repo: string,
   branchOverride?: string
-): Promise<{ [field: string]: ThemeSettingField } | null> {
+): Promise<Record<string, ThemeSettingField> | null> {
   const branch = branchOverride ?? (await getDefaultBranch(repo));
   const url = getRawGitHubUrl(repo, branch, "settings.json");
 

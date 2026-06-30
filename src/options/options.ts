@@ -18,6 +18,7 @@ import { showModal } from "./editor/ui/feedback";
 import {
   applyThemeSettingsToCSS,
   broadcastRICSToTabs,
+  getFieldValueOnAvailable,
   getStorageStrategy,
   loadCustomCSS,
   loadThemeSettings,
@@ -685,13 +686,24 @@ document.addEventListener("DOMContentLoaded", () => {
   initNicknameModal();
 });
 
+const fieldElements: Record<string, HTMLElement> = {};
 const changedFields: Record<string, any> = {};
 
 async function setChangedFields(field: string, value: any) {
   changedFields[field] = value;
+
+  const themeSettings = await loadThemeSettings();
+  for (const field in fieldElements) {
+    const element = fieldElements[field];
+    const fieldVal = getFieldValueOnAvailable(field, themeSettings.fields, {
+      ...themeSettings.saved,
+      ...changedFields,
+    });
+    element.style.display = fieldVal === null || fieldVal === undefined ? "none" : "";
+  }
+
   if ((document.getElementById("themeSettingsLivePreview") as HTMLInputElement).checked) {
     const css = await loadCustomCSS(true);
-    const themeSettings = await loadThemeSettings();
     const cssModified = applyThemeSettingsToCSS(css, themeSettings.fields, {
       ...themeSettings.saved,
       ...changedFields,
@@ -722,7 +734,9 @@ function initThemeSettings() {
 
   themeSettingsModalClose?.addEventListener("click", () => closeThemeSettings());
 
-  themeSettingsApplyBtn?.addEventListener("click", () => {});
+  themeSettingsApplyBtn?.addEventListener("click", async () =>
+    saveToStorageWithFallback(undefined, { ...(await loadThemeSettings()), saved: changedFields })
+  );
 }
 
 export async function fillThemeSettings() {
@@ -761,6 +775,8 @@ export async function fillThemeSettings() {
       const heading = document.createElement("h1");
       heading.className = "theme-settings-heading";
       heading.innerText = savedVal;
+
+      fieldElements[field.id] = heading;
       themeSettingsFields.appendChild(heading);
     } else if (field.type === "toggle") {
       const checkboxContainer = document.createElement("div");
@@ -786,6 +802,8 @@ export async function fillThemeSettings() {
       label.appendChild(checkmark);
 
       checkboxContainer.appendChild(label);
+
+      fieldElements[field.id] = checkboxContainer;
       themeSettingsFields.appendChild(checkboxContainer);
     } else if (field.type === "dropdown") {
       if (!field.options || field.options.length < 1 || !field.options.every(opt => opt.value)) continue;
@@ -822,6 +840,8 @@ export async function fillThemeSettings() {
       );
 
       dropdownContainer.appendChild(selectEl);
+
+      fieldElements[field.id] = dropdownContainer;
       themeSettingsFields.appendChild(dropdownContainer);
     } else if (field.type === "color") {
       const colorContainer = document.createElement("div");
@@ -840,6 +860,8 @@ export async function fillThemeSettings() {
       input.addEventListener("change", () => setChangedFields(field.id!, input.value));
 
       colorContainer.appendChild(input);
+
+      fieldElements[field.id] = colorContainer;
       themeSettingsFields.appendChild(colorContainer);
     } else if (field.type === "textfield") {
       const textContainer = document.createElement("div");
@@ -858,6 +880,8 @@ export async function fillThemeSettings() {
       input.addEventListener("change", () => setChangedFields(field.id!, input.value));
 
       textContainer.appendChild(input);
+
+      fieldElements[field.id] = textContainer;
       themeSettingsFields.appendChild(textContainer);
     } else if (field.type === "range") {
       if (typeof field.min !== "number" || typeof field.max !== "number" || typeof field.step !== "number") continue;
@@ -942,6 +966,8 @@ export async function fillThemeSettings() {
       sliderElement.appendChild(max);
 
       rangeContainer.appendChild(sliderElement);
+
+      fieldElements[field.id] = rangeContainer;
       themeSettingsFields.appendChild(rangeContainer);
     }
   }

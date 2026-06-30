@@ -165,6 +165,7 @@ let themeSettingsEVisible = true;
 function createEditIcon(): SVGSVGElement {
   const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
   svg.setAttribute("viewBox", "0 0 20 20");
+  svg.setAttribute("fill", "currentColor");
   const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
   path.setAttribute(
     "d",
@@ -197,7 +198,7 @@ function createDeleteIcon(): SVGSVGElement {
  * Validates the JSON data of the setting fields and returns
  * an array of warnings with the source and cause
  */
-export function validateThemeSettingFields(settingFields: { [field: string]: ThemeSettingField }) {
+export function validateThemeSettingFields(settingFields: Record<string, ThemeSettingField>) {
   if (typeof settingFields !== "object" || Array.isArray(settingFields)) return null;
 
   const warns = [];
@@ -680,7 +681,7 @@ class ThemeManager {
 
   private async saveTheme(
     css: string,
-    settings: { fields?: { [field: string]: ThemeSettingField }; saved?: { [field: string]: any } } = {}
+    settings: { fields?: Record<string, ThemeSettingField>; saved?: Record<string, any> } = {}
   ): Promise<void> {
     editorStateManager.incrementSaveCount();
     editorStateManager.setIsSaving(true);
@@ -708,8 +709,8 @@ async function applyStoreThemeToEditor(
   css: string,
   title: string,
   settings: {
-    fields?: { [field: string]: ThemeSettingField };
-    saved?: { [field: string]: any };
+    fields?: Record<string, ThemeSettingField>;
+    saved?: Record<string, any>;
   },
   source: EditorThemeSource = "marketplace"
 ): Promise<void> {
@@ -753,8 +754,8 @@ export function initStoreThemeListener(): void {
       css: string;
       title: string;
       settings: {
-        fields?: { [field: string]: ThemeSettingField };
-        saved?: { [field: string]: any };
+        fields?: Record<string, ThemeSettingField>;
+        saved?: Record<string, any>;
       };
       source?: "marketplace" | "url";
     }>;

@@ -15,9 +15,9 @@ export interface Theme {
 interface CustomTheme {
   name: string;
   css: string;
-  settings?: { [field: string]: ThemeSettingField };
+  settings?: Record<string, ThemeSettingField>;
   /** Modified through user actions */
-  savedSettings?: { [field: string]: any };
+  savedSettings?: Record<string, any>;
   timestamp: number;
 }
 
@@ -208,7 +208,7 @@ export async function getCustomThemes(): Promise<CustomTheme[]> {
 export async function saveCustomTheme(
   name: string,
   css: string,
-  settings?: { [field: string]: ThemeSettingField }
+  settings?: Record<string, ThemeSettingField>
 ): Promise<void> {
   const customThemes = await getCustomThemes();
   const existingIndex = customThemes.findIndex(theme => theme.name === name);
@@ -294,7 +294,7 @@ export async function getCustomThemeByName(name: string): Promise<CustomTheme | 
 
 export async function setCustomThemeSettings(
   name: string,
-  settings?: { [field: string]: ThemeSettingField }
+  settings?: Record<string, ThemeSettingField>
 ): Promise<void> {
   const customThemes = await getCustomThemes();
   const themeIndex = customThemes.findIndex(theme => theme.name === name);
@@ -311,10 +311,7 @@ export async function setCustomThemeSettings(
   await chrome.storage.local.set({ customThemes });
 }
 
-export async function setCustomThemeSavedSettings(
-  name: string,
-  savedSettings?: { [field: string]: any }
-): Promise<void> {
+export async function setCustomThemeSavedSettings(name: string, savedSettings?: Record<string, any>): Promise<void> {
   const customThemes = await getCustomThemes();
   const themeIndex = customThemes.findIndex(theme => theme.name === name);
   if (themeIndex === -1) {

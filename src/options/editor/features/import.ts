@@ -8,7 +8,7 @@ import {
   saveToStorageWithFallback,
   showSyncSuccess,
 } from "./storage";
-import { hideThemeName, updateThemeSelectorButton, validateThemeSettingFields } from "./themes";
+import { hideThemeName, updateThemeSelectorButton } from "./themes";
 import type { ThemeSettingField } from "@/options/themes";
 
 export const generateDefaultFilename = (filetype: string): string => {

@@ -17,8 +17,8 @@ interface CSSStorageData {
   customCSS?: string | null;
   cssCompressed?: boolean;
   themeSettings?: {
-    fields?: { [field: string]: ThemeSettingField };
-    saved?: { [field: string]: any };
+    fields?: Record<string, ThemeSettingField>;
+    saved?: Record<string, any>;
   } | null;
 }
 
@@ -128,8 +128,8 @@ export const getStorageStrategy = (css: string): "local" | "sync" | "chunked" =>
 export const saveToStorageWithFallback = async (
   css?: string,
   themeSettings?: {
-    fields?: { [field: string]: ThemeSettingField };
-    saved?: { [field: string]: any };
+    fields?: Record<string, ThemeSettingField>;
+    saved?: Record<string, any>;
   } | null,
   _isTheme = false,
   retryCount = 0
@@ -204,8 +204,8 @@ export const saveToStorageWithFallback = async (
 
 export function getFieldValueOnAvailable(
   field: string,
-  settings: { [field: string]: ThemeSettingField } = {},
-  saved: { [field: string]: any } = {},
+  settings: Record<string, ThemeSettingField> = {},
+  saved: Record<string, any> = {},
   raw: boolean = false
 ): any {
   const setting = settings[field];
@@ -282,8 +282,8 @@ export function getFieldValueOnAvailable(
 
 export function applyThemeSettingsToCSS(
   css: string,
-  settings: { [field: string]: ThemeSettingField } = {},
-  saved: { [field: string]: any } = {}
+  settings: Record<string, ThemeSettingField> = {},
+  saved: Record<string, any> = {}
 ): string {
   if (Object.keys(settings).length < 1) {
     return css;
@@ -469,8 +469,8 @@ export async function loadCustomCSS(raw?: boolean): Promise<string> {
 }
 
 export async function loadThemeSettings(): Promise<{
-  fields?: { [field: string]: ThemeSettingField };
-  saved?: { [field: string]: any };
+  fields?: Record<string, ThemeSettingField>;
+  saved?: Record<string, any>;
 }> {
   try {
     const syncData = await getSyncStorage<CSSStorageData>(["cssStorageType", "themeSettings"]);
@@ -554,7 +554,7 @@ interface ApplyStoreThemeOptions {
   css: string;
   title: string;
   creators: string[];
-  settings?: { fields?: { [field: string]: ThemeSettingField }; saved?: { [field: string]: any } };
+  settings?: { fields?: Record<string, ThemeSettingField>; saved?: Record<string, any> };
   source?: "marketplace" | "url";
 }
 
