@@ -708,8 +708,8 @@ async function applyStoreThemeToEditor(
   css: string,
   title: string,
   settings: {
-    fields: { [field: string]: ThemeSettingField };
-    saved: { [field: string]: any };
+    fields?: { [field: string]: ThemeSettingField };
+    saved?: { [field: string]: any };
   },
   source: EditorThemeSource = "marketplace"
 ): Promise<void> {
@@ -753,8 +753,8 @@ export function initStoreThemeListener(): void {
       css: string;
       title: string;
       settings: {
-        fields: { [field: string]: ThemeSettingField };
-        saved: { [field: string]: any };
+        fields?: { [field: string]: ThemeSettingField };
+        saved?: { [field: string]: any };
       };
       source?: "marketplace" | "url";
     }>;

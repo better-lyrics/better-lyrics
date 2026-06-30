@@ -676,9 +676,11 @@ async function setChangedFields(field: string, value: any) {
   if ((document.getElementById("themeSettingsLivePreview") as HTMLInputElement).checked) {
     const css = await loadCustomCSS(true);
     const themeSettings = await loadThemeSettings();
-    const modifiedCSS = applyThemeSettingsToCSS(css, themeSettings.fields, { ...themeSettings.saved, changedFields });
-    console.log(themeSettings, changedFields);
-    broadcastRICSToTabs(modifiedCSS, getStorageStrategy(modifiedCSS));
+    const cssModified = applyThemeSettingsToCSS(css, themeSettings.fields, {
+      ...themeSettings.saved,
+      ...changedFields,
+    });
+    await broadcastRICSToTabs(cssModified, getStorageStrategy(cssModified));
   }
 }
 
@@ -729,7 +731,6 @@ export async function fillThemeSettings() {
     }
   }
 
-  console.log(mapped);
   for (const field of mapped) {
     if (
       !field.id ||
@@ -738,7 +739,7 @@ export async function fillThemeSettings() {
     )
       continue;
 
-    const savedVal = field.type === "heading" ? field.label : { ...themeSettings.saved }[field.id] || field.default;
+    let savedVal = field.type === "heading" ? field.label : { ...themeSettings.saved }[field.id] || field.default;
 
     if (field.type === "heading") {
       const heading = document.createElement("h1");
@@ -844,6 +845,7 @@ export async function fillThemeSettings() {
       themeSettingsFields.appendChild(textContainer);
     } else if (field.type === "range") {
       if (typeof field.min !== "number" || typeof field.max !== "number" || typeof field.step !== "number") continue;
+      savedVal = Math.max(field.min, Math.min(field.max, savedVal));
 
       const rangeContainer = document.createElement("div");
       rangeContainer.classList.add("theme-settings-container");
@@ -871,7 +873,7 @@ export async function fillThemeSettings() {
       input.step = `${field.step}`;
       input.value = savedVal;
 
-      input.addEventListener("change", () => setChangedFields(field.id!, input.value));
+      input.addEventListener("change", () => setChangedFields(field.id!, Number(input.value)));
 
       div.appendChild(input);
       rangeContainer.appendChild(div);
@@ -908,6 +910,13 @@ export async function fillThemeSettings() {
           input.value = `${val.toFixed(3)}`;
         },
         "display"
+      );
+      registerSlider(
+        slider.id,
+        () => {
+          input.dispatchEvent(new Event("change"));
+        },
+        "core"
       );
       handleSlider(slider);
 

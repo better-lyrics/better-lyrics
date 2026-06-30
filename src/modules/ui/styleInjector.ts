@@ -1,4 +1,4 @@
-import { GENERAL_ERROR_LOG, LOG_PREFIX, THEME_SETTINGS_TYPES } from "@constants";
+import { GENERAL_ERROR_LOG, LOG_PREFIX, THEME_SETTINGS_ATTRIBUTE_TYPE, THEME_SETTINGS_TYPES } from "@constants";
 import { decompressString, isCompressed } from "@core/compression";
 import { compileRicsToStyles, getLocalStorage, getSyncStorage, loadChunkedStyles } from "@core/storage";
 import { setThemeSettings } from "@modules/settings/themeOptions";
@@ -30,6 +30,84 @@ function parseBlyricsConfig(cssContent: string): Map<string, string> {
   return configMap;
 }
 
+function getFieldValueOnAvailable(
+  field: string,
+  settings: { [field: string]: ThemeSettingField } = {},
+  saved: { [field: string]: any } = {},
+  raw: boolean = false
+): any {
+  const setting = settings[field];
+
+  let savedVal =
+    setting.type === "heading"
+      ? setting.label
+      : typeof saved[field] === THEME_SETTINGS_TYPES[setting.type]
+        ? saved[field]
+        : setting.default;
+
+  if (typeof savedVal !== THEME_SETTINGS_TYPES[setting.type] || savedVal === null || savedVal === undefined)
+    return null;
+
+  if (setting.type === "range") {
+    savedVal = Math.max(setting.min, Math.min(setting.max, savedVal));
+  }
+
+  if (!raw) {
+    if (setting.type === "dropdown") {
+      if (!Array.isArray(setting.options)) return null;
+      const option = setting.options[savedVal];
+      if (option) savedVal = option.value;
+      else savedVal = setting.options[0]?.value;
+    } else if (setting.type === "toggle") {
+      savedVal = savedVal ? setting.onValue || "" : setting.offValue || "";
+    }
+  }
+
+  if (Array.isArray(setting.available)) {
+    for (const conditions of setting.available) {
+      for (const condition of conditions) {
+        const dependant = settings[condition.settingField];
+        if (
+          !dependant ||
+          dependant.type === "heading" ||
+          (dependant.type === "toggle" && condition.condition !== "equals" && condition.condition !== "not-equals")
+        )
+          continue;
+
+        const dependaval = getFieldValueOnAvailable(condition.settingField, settings, saved, true);
+        if (dependaval === null) return null;
+
+        const stringified = String(dependaval);
+        const val = condition.value;
+
+        if (condition.condition === "contains") {
+          if (!stringified.includes(val)) return null;
+        } else if (condition.condition === "ends") {
+          if (!stringified.endsWith(val)) return null;
+        } else if (condition.condition === "equals") {
+          if (stringified !== val) return null;
+        } else if (condition.condition === "greater-than") {
+          if (getFieldValueOnAvailable(dependant.type, settings, saved, dependaval)! <= val) return null;
+        } else if (condition.condition === "less-than") {
+          if (getFieldValueOnAvailable(dependant.type, settings, saved, dependaval)! >= val) return null;
+        } else if (condition.condition === "starts") {
+          if (!stringified.startsWith(val)) return null;
+        } else if (condition.condition === "not-contains") {
+          if (stringified.includes(val)) return null;
+        } else if (condition.condition === "not-ends") {
+          if (stringified.endsWith(val)) return null;
+        } else if (condition.condition === "not-equals") {
+          if (stringified === val) return null;
+        } else if (condition.condition === "not-starts") {
+          if (stringified.startsWith(val)) return null;
+        }
+      }
+    }
+  }
+
+  return savedVal;
+}
+
 function applyThemeSettingsToCSS(
   css: string,
   settings: { [field: string]: ThemeSettingField } = {},
@@ -39,88 +117,18 @@ function applyThemeSettingsToCSS(
     return css;
   }
 
-  const normalize = (type: string, val: any) => {
-    if (type === "textfield") return val.length;
-    if (type === "color") return hexToRgbSum(val)!;
-    return val;
-  };
-
-  function dependable(field: string, raw: boolean = false) {
-    const setting = settings[field];
-    if (setting.type === "heading") { return setting.label; }
-
-    let savedVal = typeof saved[field] === THEME_SETTINGS_TYPES[setting.type] ? saved[field] : setting.default;
-
-    if (!raw) {
-      if (setting.type === "dropdown") {
-        if (!Array.isArray(setting.options)) return null;
-        const option = setting.options[savedVal];
-        if (option) savedVal = option.value;
-        else savedVal = setting.options[0]?.value;
-      } else if (setting.type === "toggle") {
-        savedVal = savedVal ? setting.onValue || "" : setting.offValue || "";
-      }
-    }
-
-    if (savedVal !== THEME_SETTINGS_TYPES[setting.type] || savedVal === null || savedVal === undefined) return null;
-
-    if (Array.isArray(setting.available)) {
-      for (const conditions of setting.available) {
-        for (const condition of conditions) {
-          const dependant = settings[condition.settingField];
-          if (
-            !dependant ||
-            dependant.type === "heading" ||
-            (dependant.type === "toggle" && condition.condition !== "equals" && condition.condition !== "not-equals")
-          )
-            continue;
-
-          const dependaval = dependable(condition.settingField, true);
-          if (dependaval === null) return null;
-
-          const stringified = String(dependaval);
-          const val = condition.value;
-
-          if (condition.condition === "contains") {
-            if (!stringified.includes(val)) return null;
-          } else if (condition.condition === "ends") {
-            if (!stringified.endsWith(val)) return null;
-          } else if (condition.condition === "equals") {
-            if (stringified !== val) return null;
-          } else if (condition.condition === "greater-than") {
-            if (normalize(dependant.type, dependaval)! <= val) return null;
-          } else if (condition.condition === "less-than") {
-            if (normalize(dependant.type, dependaval)! >= val) return null;
-          } else if (condition.condition === "starts") {
-            if (!stringified.startsWith(val)) return null;
-          } else if (condition.condition === "not-contains") {
-            if (stringified.includes(val)) return null;
-          } else if (condition.condition === "not-ends") {
-            if (stringified.endsWith(val)) return null;
-          } else if (condition.condition === "not-equals") {
-            if (stringified === val) return null;
-          } else if (condition.condition === "not-starts") {
-            if (stringified.startsWith(val)) return null;
-          }
-        }
-      }
-    }
-
-    return savedVal;
-  }
-
   // string injection goes crazy
   for (const field in settings) {
     const setting = settings[field];
     if (setting.type === "heading") continue;
 
-    const savedVal = dependable(field);
+    const savedVal = getFieldValueOnAvailable(field, settings, saved);
     if (savedVal === null) continue;
 
     const attribute = setting.attribute;
     if (!attribute) continue;
 
-    if (setting.attrType !== "css" && setting.attrType !== "rics") setting.attrType = "css";
+    if (!THEME_SETTINGS_ATTRIBUTE_TYPE.find(() => setting.attrType)) setting.attrType = "css";
 
     let setValue = setting.attrValue || "$VALUE$";
     if (setting.type === "textfield" && setting.pattern) {
@@ -172,7 +180,7 @@ function applyThemeSettingsToCSS(
       }
 
       // otherwise, prepend it at the very top
-      css = `${attribute}: ${value};\n${css}`;
+      css = `$${attribute}: ${value};\n${css}`;
     } else if (setting.attrType === "knobs") {
       const existingKnobRegex = new RegExp(`(^|[\\s])(${escapedAttr})(\\s*=\\s*)[^;]+;`, "g");
 
