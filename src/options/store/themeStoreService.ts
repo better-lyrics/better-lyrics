@@ -1,4 +1,4 @@
-import { LOG_PREFIX_STORE, THEME_REGISTRY_URL } from "@constants";
+import { LOG_PREFIX_STORE, THEME_DISCUSSIONS_URL, THEME_REGISTRY_URL } from "@constants";
 import { resolveBuildForVersion } from "./themeBuildResolver";
 import { resolveThemeBuild } from "./themeStoreApi";
 import type {
@@ -300,6 +300,7 @@ async function fetchFullThemeFromRegistry(lockEntry: LockfileEntry): Promise<Sto
     builds,
     latestVersion: latestBuild?.version,
     latestMinVersion: latestBuild?.minVersion,
+    discussionUrl: lockEntry.discussion ? `${THEME_DISCUSSIONS_URL}/${lockEntry.discussion}` : undefined,
   };
 }
 

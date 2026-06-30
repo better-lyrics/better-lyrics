@@ -1,4 +1,4 @@
-import { GENERAL_ERROR_LOG, LYRIC_SOURCE_KEYS, STORAGE_TRANSIENT_SET_LOG } from "@constants";
+import { GENERAL_ERROR_LOG, LYRIC_SOURCE_KEYS, OFFSET_STORAGE_PREFIX, STORAGE_TRANSIENT_SET_LOG } from "@constants";
 import { log, truncateSource } from "@utils";
 import { compileWithDetails } from "rics";
 import { compressString, decompressString, isCompressed } from "./compression";
@@ -176,6 +176,24 @@ export async function setTransientStorage(key: string, value: any, ttl: number):
   }
 }
 
+/**
+ * Stores a value in local storage with no expiry, so it survives cache purges.
+ * Used for durable per-song data such as saved lyric offsets.
+ *
+ * @param {string} key - Storage key
+ * @param {*} value - Value to store
+ */
+export async function setPersistentStorage(key: string, value: any): Promise<void> {
+  try {
+    const storedValue = typeof value === "string" ? compressString(value) : value;
+    await chrome.storage.local.set({
+      [key]: { type: "transient", value: storedValue, expiry: 0 },
+    });
+  } catch (error) {
+    log(GENERAL_ERROR_LOG, error);
+  }
+}
+
 function extractVideoIdFromCacheKey(key: string): string | null {
   const withoutPrefix = key.slice("blyrics_".length);
   for (const sourceKey of LYRIC_SOURCE_KEYS) {
@@ -271,5 +289,38 @@ export async function purgeExpiredKeys(): Promise<void> {
     }
   } catch (error) {
     log(GENERAL_ERROR_LOG, error);
+  }
+}
+
+/**
+ * Returns stats for saved per-song lyric offsets: how many are stored.
+ *
+ * @returns {Promise<{count: number}>} Offset storage statistics
+ */
+export async function getOffsetInfo(): Promise<{ count: number }> {
+  try {
+    const result = await chrome.storage.local.get(null);
+    const offsetKeys = Object.keys(result).filter(key => key.startsWith(OFFSET_STORAGE_PREFIX));
+    return { count: offsetKeys.length };
+  } catch (error) {
+    log(GENERAL_ERROR_LOG, error);
+    return { count: 0 };
+  }
+}
+
+/**
+ * Removes every saved per-song lyric offset from local storage.
+ *
+ * @returns {Promise<number>} The number of offsets removed
+ */
+export async function clearAllOffsets(): Promise<number> {
+  try {
+    const result = await chrome.storage.local.get(null);
+    const offsetKeys = Object.keys(result).filter(key => key.startsWith(OFFSET_STORAGE_PREFIX));
+    await chrome.storage.local.remove(offsetKeys);
+    return offsetKeys.length;
+  } catch (error) {
+    log(GENERAL_ERROR_LOG, error);
+    return 0;
   }
 }

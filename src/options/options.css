@@ -114,6 +114,89 @@ body {
     margin-top: 1.5rem;
 }
 
+#offset-modal-overlay .container:first-of-type {
+    margin-top: 0;
+}
+
+.offset-stepper {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+}
+
+#offset-modal-overlay .offset-stepper__btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2rem;
+    height: 2rem;
+    margin: 0;
+    padding: 0;
+    border: none;
+    border-radius: 0.5rem;
+    background-color: hsla(0, 0%, 100%, 0.06);
+    color: rgba(255, 255, 255, 0.75);
+    cursor: pointer;
+    transition:
+        background-color 0.15s ease,
+        color 0.15s ease;
+}
+
+#offset-modal-overlay .offset-stepper__btn:hover {
+    background-color: hsla(0, 0%, 100%, 0.14);
+    color: #fff;
+}
+
+.offset-stepper__btn svg {
+    display: block;
+}
+
+.offset-stepper__value {
+    min-width: 3.5rem;
+    text-align: center;
+    font-size: 0.9rem;
+    font-weight: 500;
+    font-variant-numeric: tabular-nums;
+    color: #fff;
+    cursor: default;
+    user-select: none;
+}
+
+#offset-modal-overlay .container.offset-row {
+    align-items: center;
+}
+
+.offset-info {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.offset-applies {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    font-size: 0.75rem;
+}
+
+.offset-applies__label {
+    color: rgba(255, 255, 255, 0.5);
+}
+
+.offset-applies__chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    font-weight: 500;
+}
+
+.offset-applies__chip svg {
+    display: block;
+    width: 0.875rem;
+    height: 0.875rem;
+}
+
 /* -- Theme Preview Card -------------------------- */
 
 .theme-preview-card {
