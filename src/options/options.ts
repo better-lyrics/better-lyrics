@@ -28,8 +28,10 @@ import { initStoreUI, setupYourThemesButton } from "./store/store";
 import {
   themeSettingsApplyBtn,
   themeSettingsBtn,
+  themeSettingsCancelBtn,
   themeSettingsModalClose,
   themeSettingsModalOverlay,
+  themeSettingsOkBtn,
 } from "./editor/ui/dom";
 import { handleSlider, registerSlider } from "./editor/ui/slider";
 import type { ThemeSettingField } from "./themes";
@@ -737,6 +739,16 @@ function initThemeSettings() {
   themeSettingsApplyBtn?.addEventListener("click", async () =>
     saveToStorageWithFallback(undefined, { ...(await loadThemeSettings()), saved: changedFields })
   );
+
+  themeSettingsOkBtn?.addEventListener("click", async () => {
+    saveToStorageWithFallback(undefined, { ...(await loadThemeSettings()), saved: changedFields });
+    closeThemeSettings();
+  });
+
+  themeSettingsCancelBtn?.addEventListener("click", () => {
+    closeThemeSettings();
+    fillThemeSettings();
+  });
 }
 
 export async function fillThemeSettings() {
