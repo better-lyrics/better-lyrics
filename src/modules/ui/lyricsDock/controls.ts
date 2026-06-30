@@ -224,6 +224,7 @@ function buildToggle(icon: string, active: boolean, label: string, onToggle: () 
 // when a toggle is spam-clicked (the reload also writes cache info), so the write and reload
 // are debounced to the settled state while the button's active class still flips instantly.
 const TOGGLE_PERSIST_DELAY = 400;
+const OFFSET_CLICK_DELAY = 220;
 let togglePersistTimer: ReturnType<typeof setTimeout> | null = null;
 
 function scheduleTogglePersist(): void {
@@ -288,7 +289,7 @@ function buildOffsetControl(): HTMLElement {
         clickTimer = null;
         if (openSourceMenu) closeSourceMenu();
         else showOffsetMenu(iconWrap);
-      }, 220);
+      }, OFFSET_CLICK_DELAY);
     });
     iconWrap.addEventListener("dblclick", event => {
       event.preventDefault();
