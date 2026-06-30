@@ -259,7 +259,7 @@ function passiveScrollEngine(isPlaying: boolean): void {
   tabRenderer.scrollTop = targetScroll;
   // Only skip the next scroll event if scrollTop actually changed.
   // When it doesn't change (pause phases, sub-pixel rounding), no programmatic
-  // scroll event fires — setting skipScrolls would eat user scroll events instead.
+  // scroll event fires, so setting skipScrolls would eat user scroll events instead.
   if (tabRenderer.scrollTop !== prevScrollTop) {
     animEngineState.skipScrolls = 1;
   }
@@ -368,11 +368,13 @@ export function animationEngine(currentTime: number, eventCreationTime: number, 
 
     if (lyricData.syncType === "richsync") {
       currentTime += getCSSDurationInMs(lyricsElement, "--blyrics-richsync-timing-offset") / 1000;
+      currentTime -= AppState.richsyncOffsetTrim;
     } else {
       currentTime += getCSSDurationInMs(lyricsElement, "--blyrics-timing-offset") / 1000;
+      currentTime -= AppState.lineOffsetTrim;
     }
 
-    currentTime += AppState.lyricOffset;
+    currentTime -= AppState.globalLyricOffset + AppState.lyricOffset;
 
     const lyricScrollTime = currentTime + getCSSDurationInMs(lyricsElement, "--blyrics-scroll-timing-offset") / 1000;
 

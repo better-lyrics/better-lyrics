@@ -1167,42 +1167,6 @@
   opacity: 0.7;
 }
 
-.detail-stat-updated {
-  position: relative;
-  cursor: default;
-}
-
-.detail-stat-updated::after {
-  content: attr(data-tooltip);
-  position: absolute;
-  bottom: calc(100% + 8px);
-  right: 0;
-  transform: translateY(4px);
-  padding: 6px 10px;
-  background-color: hsl(0, 0%, 20%);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  color: #fff;
-  font-size: 0.75rem;
-  font-weight: 500;
-  white-space: nowrap;
-  border-radius: 6px;
-  pointer-events: none;
-  opacity: 0;
-  visibility: hidden;
-  transition: opacity 0.15s var(--ease),
-             visibility 0.15s var(--ease),
-             transform 0.15s var(--ease);
-  transition-delay: 0s;
-  z-index: 100;
-}
-
-.detail-stat-updated:hover::after {
-  opacity: 1;
-  visibility: visible;
-  transform: translateY(0);
-  transition-delay: 0.2s;
-}
-
 #detail-description {
   font-size: 0.8125rem;
   color: rgba(255, 255, 255, 0.7);
@@ -1425,6 +1389,53 @@
   opacity: 0.4;
 }
 
+.detail-meta-row {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-top: 0.875rem;
+  padding-top: 1rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.detail-meta-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-size: 0.6875rem;
+  color: rgba(255, 255, 255, 0.5);
+  min-width: 0;
+  max-width: 100%;
+}
+
+.detail-meta-chip svg {
+  width: 0.8rem;
+  height: 0.8rem;
+  opacity: 0.7;
+  flex-shrink: 0;
+}
+
+.detail-meta-text {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  min-width: 0;
+}
+
+.detail-meta-muted {
+  color: rgba(255, 255, 255, 0.35);
+}
+
+.detail-meta-link {
+  text-decoration: none;
+  transition: color 0.15s ease-out;
+}
+
+.detail-meta-link:hover {
+  color: rgba(255, 255, 255, 0.85);
+}
+
 .detail-repo-link {
   display: flex;
   align-items: center;
@@ -1434,6 +1445,39 @@
   padding-top: 1rem;
   padding-bottom: 0.25rem;
   border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.detail-footer-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-size: 0.8125rem;
+  color: rgba(255, 255, 255, 0.6);
+  text-decoration: none;
+  transition: color 0.15s ease-out;
+}
+
+.detail-footer-sep {
+  display: inline-flex;
+  align-items: center;
+}
+
+.detail-repo-link-left .detail-footer-sep svg {
+  width: 3px;
+  height: 3px;
+  color: rgba(255, 255, 255, 0.25);
+}
+
+.detail-footer-link:hover {
+  color: rgba(255, 255, 255, 0.9);
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+}
+
+.detail-footer-link svg {
+  width: 0.9rem;
+  height: 0.9rem;
+  opacity: 0.7;
 }
 
 .detail-repo-link-left {
@@ -1461,6 +1505,7 @@
   text-decoration: underline;
   text-underline-offset: 0.2em;
 }
+
 
 .detail-rics-badge {
   display: none;

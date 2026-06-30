@@ -14,6 +14,7 @@ export interface LockfileEntry {
   integrity: string;
   locked: string;
   builds?: ThemeBuild[];
+  discussion?: number;
 }
 
 export interface ThemeLockfile {
@@ -52,6 +53,7 @@ export interface StoreTheme extends ResolvedStoreThemeMetadata {
   builds?: ThemeBuild[];
   latestVersion?: string;
   latestMinVersion?: string;
+  discussionUrl?: string;
 }
 
 export type ThemeSource = "marketplace" | "url";

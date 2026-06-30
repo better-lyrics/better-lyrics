@@ -92,23 +92,23 @@
     "description": "Auto-scroll unsynced lyrics setting label"
   },
   "options_display_shadersPromo": {
-    "message": "Better Lyrics Gölgelendiricleri bağlantısını göster",
+    "message": "Better Lyrics Gölgelendiricileri bağlantısını göster",
     "description": "Toggle label for the Shaders companion link shown in the lyrics footer"
   },
   "options_display_unisonActions": {
-    "message": "Lyrics controls dock",
+    "message": "Şarkı sözü denetim paneli",
     "description": "Display-section row label for the lyrics controls dock modal trigger"
   },
   "options_unisonModal_title": {
-    "message": "Lyrics controls dock",
+    "message": "Şarkı sözü denetim paneli",
     "description": "Title of the lyrics controls dock settings modal"
   },
   "options_unisonModal_showPinned": {
-    "message": "Show controls dock",
+    "message": "Denetim panelini göster",
     "description": "Toggle label inside the lyrics controls dock modal for showing the floating dock"
   },
   "options_unisonModal_showPinned_hint": {
-    "message": "A floating dock to switch source, toggle translation and romanization, nudge sync, and vote on Unison lyrics",
+    "message": "Unison şarkı sözlerinde kaynağı değiştirmek, çeviri ve Latin alfabesine çeviriyi değiştirmek, senkronizasyonu ayarlamak ve oy vermek için kullanılan bir yüzer platform",
     "description": "Hint text under the Show controls dock toggle"
   },
   "options_unisonModal_autoHide": {
@@ -148,39 +148,39 @@
     "description": "Tooltip for the bottom-right cell in the Unison position picker"
   },
   "options_unisonModal_controlsShown": {
-    "message": "Controls shown",
+    "message": "Gösterilen kontroller",
     "description": "Label above the toggles that pick which controls appear in the lyrics dock"
   },
   "options_unisonModal_controlSource": {
-    "message": "Source switcher",
+    "message": "Kaynak seçici",
     "description": "Toggle label for showing the lyrics source switcher control in the dock"
   },
   "options_unisonModal_controlOffset": {
-    "message": "Sync offset",
+    "message": "Senkronizasyon kayması",
     "description": "Toggle label for showing the sync offset control in the dock"
   },
   "lyricsDock_chooseSource": {
-    "message": "Choose lyrics source",
+    "message": "Şarkı sözü kaynağı seç",
     "description": "Accessible label for the lyrics dock button that opens the source provider dropdown"
   },
   "lyricsDock_previousSource": {
-    "message": "Previous source",
+    "message": "Önceki kaynak",
     "description": "Accessible label for the lyrics dock button that switches to the previous lyrics provider"
   },
   "lyricsDock_nextSource": {
-    "message": "Next source",
+    "message": "Sonraki kaynak",
     "description": "Accessible label for the lyrics dock button that switches to the next lyrics provider"
   },
   "lyricsDock_offsetEarlier": {
-    "message": "Shift lyrics earlier",
+    "message": "Şarkı sözlerini daha öne al",
     "description": "Accessible label for the lyrics dock button that nudges sync timing earlier"
   },
   "lyricsDock_offsetLater": {
-    "message": "Shift lyrics later",
+    "message": "Şarkı sözlerini daha geriye al",
     "description": "Accessible label for the lyrics dock button that nudges sync timing later"
   },
   "lyricsDock_offsetReset": {
-    "message": "Double-click to reset",
+    "message": "Sıfırlamak için çift tıkla",
     "description": "Tooltip on the lyrics dock offset clock icon; double-clicking it resets the sync offset to zero"
   },
   "options_language_displayLanguage": {
@@ -216,7 +216,7 @@
     "description": "Sources settings section title"
   },
   "options_sources_description": {
-    "message": "Önceliği değiştirmek için sürükleyin. Üstteki kaynaklar önceliklidir. Devre dışı bırakmak için tiki kaldırın.",
+    "message": "Önceliği değiştirmek için sürükleyin. Üstteki kaynaklar önceliklidir. Devre dışı bırakmak için kapatın.",
     "description": "Sources settings section description"
   },
   "options_sources_openUnison": {

@@ -26,27 +26,30 @@ ytmusic-player-bar,
 }
 
 /* YouTube Music specific overrides */
-#layout[player-ui-state="PLAYER_PAGE_OPEN"] #mini-guide-background,
-#layout[player-ui-state="PLAYER_PAGE_OPEN"] #nav-bar-background,
 #layout[player-ui-state="PLAYER_PAGE_OPEN"] #guide-wrapper {
   background-color: transparent !important;
   border-color: transparent !important;
 }
 
-#layout[player-ui-state="PLAYER_PAGE_OPEN"] ytmusic-player-bar,
-#layout[player-ui-state="PLAYER_PAGE_OPEN"] #player-bar-background {
+#layout[player-ui-state="PLAYER_PAGE_OPEN"] #mini-guide-background,
+#layout[player-ui-state="PLAYER_PAGE_OPEN"] #nav-bar-background,
+#layout[player-ui-state="PLAYER_PAGE_OPEN"] #player-bar-background,
+ytmusic-app[blyrics-stylized] #layout[player-ui-state="PLAYER_PAGE_OPEN"] #mini-guide-background,
+ytmusic-app[blyrics-stylized] #layout[player-ui-state="PLAYER_PAGE_OPEN"] #nav-bar-background,
+ytmusic-app[blyrics-stylized] #layout[player-ui-state="PLAYER_PAGE_OPEN"] #player-bar-background {
+  opacity: 0 !important;
+}
+
+#layout[player-ui-state="PLAYER_PAGE_OPEN"] ytmusic-player-bar {
   background: linear-gradient(0deg, transparent, transparent) !important;
 }
 
-ytmusic-app[blyrics-stylized] #layout[player-ui-state="PLAYER_PAGE_OPEN"] #mini-guide-background,
-ytmusic-app[blyrics-stylized] #layout[player-ui-state="PLAYER_PAGE_OPEN"] #nav-bar-background,
 ytmusic-app[blyrics-stylized] #layout[player-ui-state="PLAYER_PAGE_OPEN"] #guide-wrapper {
   background-color: transparent !important;
   border-color: transparent !important;
 }
 
-ytmusic-app[blyrics-stylized] #layout[player-ui-state="PLAYER_PAGE_OPEN"] ytmusic-player-bar,
-ytmusic-app[blyrics-stylized] #layout[player-ui-state="PLAYER_PAGE_OPEN"] #player-bar-background {
+ytmusic-app[blyrics-stylized] #layout[player-ui-state="PLAYER_PAGE_OPEN"] ytmusic-player-bar {
   background: linear-gradient(0deg, #00000000, #00000000) !important;
 }
 

@@ -56,6 +56,7 @@ import { generatePetName } from "@/core/keyIdentity";
 import { byId, deleteVote, type UnisonData, vote } from "../lyrics/providers/unison";
 import { buildControlsSegment, closeSourceMenu } from "./lyricsDock/controls";
 import { parseSvgString, syncTypeColors, syncTypeIcons } from "./lyricsDock/icons";
+import { loadSavedOffset } from "./lyricsDock/offset";
 import { scrollEventHandler } from "./observer";
 import { showReportModal } from "./reportLyrics";
 
@@ -391,6 +392,7 @@ export function addFooter(
   }
 
   AppState.currentProviderKey = providerKey ?? null;
+  void loadSavedOffset(AppState.lastLoadedVideoId, AppState.currentProviderKey);
 
   if (AppState.isControlsDockEnabled) {
     mountDock(AppState.controlsDockPosition);
@@ -644,6 +646,9 @@ function evaluateDockProximity(event: MouseEvent): void {
   if (rect.width === 0) return;
 
   const dock = inner.parentElement as HTMLElement | null;
+  if (dock?.classList.contains(`${DOCK_CLASS}--hidden`) || dock?.classList.contains(`${DOCK_CLASS}--idle-hidden`)) {
+    return;
+  }
   const position = dock?.dataset.position ?? "";
   let { left, right, top, bottom } = rect;
   if (position.includes("right")) left -= DOCK_PROXIMITY;

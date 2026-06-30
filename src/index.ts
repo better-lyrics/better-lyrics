@@ -10,6 +10,7 @@ import {
   hideDockOnIdleInFullscreen,
   listenForPopupMessages,
   loadDockSettings,
+  loadLyricOffsetSettings,
   loadPassiveScrollSetting,
   loadTranslationSettings,
   onAlbumArtEnabled,
@@ -46,6 +47,7 @@ async function modify(): Promise<void> {
   handleSettings();
   setupWakeLockForFullscreen();
   loadTranslationSettings();
+  loadLyricOffsetSettings();
   loadPassiveScrollSetting();
   loadDockSettings(hideDockOnIdleInFullscreen);
   subscribeToCustomStyles();

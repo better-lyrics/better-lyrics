@@ -1,4 +1,4 @@
-import { LYRIC_SOURCE_KEYS, PROVIDER_CONFIGS, PROVIDER_SWITCHED_LOG } from "@constants";
+import { LYRIC_SOURCE_KEYS, LYRICS_CACHE_TTL_MS, PROVIDER_CONFIGS, PROVIDER_SWITCHED_LOG } from "@constants";
 import { getTransientStorage, setTransientStorage } from "@core/storage";
 import { log } from "@utils";
 import unified from "./unified";
@@ -197,8 +197,7 @@ export async function saveLyricsToCache(providerParameters: ProviderParameters, 
       version: LYRIC_CACHE_VERSION,
       ...source.lyricSourceResult,
     };
-    const cacheTime = 7 * 24 * 60 * 60 * 1000;
-    await setTransientStorage(cacheKey, JSON.stringify(versionedData), cacheTime);
+    await setTransientStorage(cacheKey, JSON.stringify(versionedData), LYRICS_CACHE_TTL_MS);
   }
 }
 

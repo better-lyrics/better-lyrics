@@ -11,6 +11,7 @@ import { log, setUpLog } from "@core/utils";
 import { calculateLyricPositions } from "@modules/lyrics/injectLyrics";
 import { clearCache as clearTranslationCache } from "@modules/lyrics/translation";
 import { mountDock, mountVotingSegment, reloadAlbumArt, unmountDock, updateDockPosition } from "@modules/ui/dom";
+import { applyGlobalOffsets } from "@modules/ui/lyricsDock/offset";
 import { isPlayerFullscreened, onFullscreenChange } from "@modules/ui/observer";
 import { applyCustomStyles, getAndApplyCustomStyles } from "@modules/ui/styleInjector";
 
@@ -227,6 +228,7 @@ export function listenForPopupMessages(): void {
       hideCursorOnIdle();
       handleSettings();
       loadTranslationSettings();
+      loadLyricOffsetSettings();
       loadPassiveScrollSetting();
       loadDockSettings(() => {
         syncDock();
@@ -398,6 +400,26 @@ export function loadTranslationSettings(): void {
       AppState.translationLanguage = items.translationLanguage || "en";
       AppState.romanizationDisabledLanguages = items.romanizationDisabledLanguages || [];
       AppState.translationDisabledLanguages = items.translationDisabledLanguages || [];
+    }
+  );
+}
+
+/**
+ * Loads the global and per-sync-type lyric offsets from storage into AppState.
+ */
+export function loadLyricOffsetSettings(): void {
+  getStorage(
+    {
+      globalLyricOffset: 0,
+      richsyncOffsetTrim: 0,
+      lineOffsetTrim: 0,
+    },
+    items => {
+      applyGlobalOffsets({
+        globalLyricOffset: items.globalLyricOffset || 0,
+        richsyncOffsetTrim: items.richsyncOffsetTrim || 0,
+        lineOffsetTrim: items.lineOffsetTrim || 0,
+      });
     }
   );
 }
