@@ -180,23 +180,23 @@
     "description": "Accessible label for the lyrics dock button that nudges sync timing later"
   },
   "lyricsDock_offsetGlobal": {
-    "message": "Global",
+    "message": "Tổng quát",
     "description": "Label in the lyrics dock offset menu for the global offset applied to all songs and sync types"
   },
   "options_offsetModal_perSong": {
-    "message": "Per-song offsets",
+    "message": "Độ trễ đồng bộ cho từng bài hát",
     "description": "Heading in the offset settings modal for the section that manages saved per-song sync offsets"
   },
   "options_offsetModal_perSongClear": {
-    "message": "Clear all",
+    "message": "Xoá tất cả",
     "description": "Button in the offset settings modal that deletes every saved per-song sync offset"
   },
   "options_offsetModal_perSongCount": {
-    "message": "Saved offsets",
+    "message": "Độ trễ đồng bộ đã lưu",
     "description": "Label in the offset settings modal showing how many per-song sync offsets are stored"
   },
   "options_offsetModal_appliesTo": {
-    "message": "Applies to",
+    "message": "Áp dụng cho",
     "description": "Label in the offset settings modal preceding the list of sync types a given offset affects"
   },
   "options_language_displayLanguage": {
@@ -894,7 +894,7 @@
     }
   },
   "marketplace_requiresVersion": {
-    "message": "Requires v$version$+",
+    "message": "Yêu cầu phiên bản v$version$ trở lên",
     "description": "Footer chip in the theme detail modal showing the minimum Better Lyrics version a theme needs",
     "placeholders": {
       "version": {
@@ -904,11 +904,11 @@
     }
   },
   "marketplace_discussion": {
-    "message": "Discussion",
+    "message": "Thảo luận",
     "description": "Footer link in the theme detail modal that opens the theme's discussion thread"
   },
   "marketplace_commit": {
-    "message": "Commit $hash$",
+    "message": "Mã commit $hash$",
     "description": "Footer chip in the theme detail modal linking to the exact source commit a theme was built from",
     "placeholders": {
       "hash": {
