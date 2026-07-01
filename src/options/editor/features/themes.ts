@@ -58,6 +58,7 @@ import {
   applyStoreThemeComplete,
   applyThemeSettingsToCSS,
   broadcastRICSToTabs,
+  fillThemeSettings,
   loadThemeSettings,
   saveToStorageWithFallback,
   showSyncError,
@@ -602,6 +603,7 @@ class ThemeManager {
       editorStateManager.setIsCustomTheme(true);
 
       showThemeName(selectedTheme.name, "custom");
+      fillThemeSettings();
       updateThemeSelectorButton();
 
       await this.saveTheme(selectedTheme.css, { fields: selectedTheme.settings, saved: selectedTheme.savedSettings });
@@ -671,6 +673,7 @@ class ThemeManager {
       editorStateManager.setIsCustomTheme(false);
 
       showThemeName(selectedTheme.name, "builtin");
+      fillThemeSettings();
       updateThemeSelectorButton();
 
       await this.saveTheme(themeContent);

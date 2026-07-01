@@ -5,6 +5,7 @@ import { hexToRgbSum, invertRegExp } from "@/core/utils";
 import { setActiveStoreTheme } from "@/options/store/themeStoreManager";
 import type { InstalledStoreTheme } from "@/options/store/types";
 import type { ThemeSettingField } from "@/options/themes";
+import { fillThemeSettings } from "@/options/options";
 import { CHUNK_SIZE, LOCAL_STORAGE_SAFE_LIMIT, MAX_RETRY_ATTEMPTS, SYNC_STORAGE_LIMIT } from "../core/editor";
 import { editorStateManager } from "../core/state";
 import type { SaveResult } from "../types";
@@ -570,6 +571,7 @@ export async function applyStoreThemeComplete(options: ApplyStoreThemeOptions): 
 
     await chrome.storage.sync.set({ themeName: `store:${themeId}` });
     await setActiveStoreTheme(themeId);
+    fillThemeSettings();
 
     const saveResult = await saveToStorageWithFallback(themeContent, settings, true);
     if (!saveResult.success) {
