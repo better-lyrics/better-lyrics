@@ -403,6 +403,7 @@ function addFieldEditorInput(field: FieldEditorInput) {
 
     fieldEditorInputs[field.id] = toggle;
     container.appendChild(label);
+  } else if (field.type === "list") {
   }
 
   themeSettingsFieldEditorInputs?.appendChild(container);
@@ -603,7 +604,6 @@ class ThemeManager {
       editorStateManager.setIsCustomTheme(true);
 
       showThemeName(selectedTheme.name, "custom");
-      fillThemeSettings();
       updateThemeSelectorButton();
 
       await this.saveTheme(selectedTheme.css, { fields: selectedTheme.settings, saved: selectedTheme.savedSettings });
@@ -673,7 +673,6 @@ class ThemeManager {
       editorStateManager.setIsCustomTheme(false);
 
       showThemeName(selectedTheme.name, "builtin");
-      fillThemeSettings();
       updateThemeSelectorButton();
 
       await this.saveTheme(themeContent);
@@ -697,6 +696,7 @@ class ThemeManager {
       }
 
       showSyncSuccess(result.strategy, result.wasRetry);
+      fillThemeSettings();
       await broadcastRICSToTabs(css, result.strategy);
     } finally {
       editorStateManager.setIsSaving(false);

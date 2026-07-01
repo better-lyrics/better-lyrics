@@ -571,7 +571,6 @@ export async function applyStoreThemeComplete(options: ApplyStoreThemeOptions): 
 
     await chrome.storage.sync.set({ themeName: `store:${themeId}` });
     await setActiveStoreTheme(themeId);
-    fillThemeSettings();
 
     const saveResult = await saveToStorageWithFallback(themeContent, settings, true);
     if (!saveResult.success) {
@@ -582,6 +581,7 @@ export async function applyStoreThemeComplete(options: ApplyStoreThemeOptions): 
       detail: { themeId, css: themeContent, settings, title, source },
     });
     document.dispatchEvent(event);
+    fillThemeSettings();
 
     await broadcastRICSToTabs(modThemeContent, saveResult.strategy || "sync");
 
