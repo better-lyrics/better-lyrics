@@ -26,6 +26,7 @@ import THEMES, {
   saveCustomTheme,
   setCustomThemeSavedSettings,
 } from "../../themes";
+import { fillThemeSettings } from "../../options";
 import { SAVE_CUSTOM_THEME_DEBOUNCE, SAVE_DEBOUNCE_DELAY } from "../core/editor";
 import { editorStateManager } from "../core/state";
 import type { ThemeCardOptions } from "../types";
@@ -58,7 +59,6 @@ import {
   applyStoreThemeComplete,
   applyThemeSettingsToCSS,
   broadcastRICSToTabs,
-  fillThemeSettings,
   loadThemeSettings,
   saveToStorageWithFallback,
   showSyncError,

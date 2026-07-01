@@ -441,7 +441,7 @@ export async function fetchFullTheme(repo: string, branchOverride?: string): Pro
   const cssUrl = hasRics ? ricsUrl : `${baseUrl}style.css`;
 
   const shaderUrl = metadata.hasShaders ? `${baseUrl}shader.json` : undefined;
-  const settingsUrl = metadata.hasSettings ? `${baseUel}settings.json` : undefined;
+  const settingsUrl = metadata.hasSettings ? `${baseUrl}settings.json` : undefined;
 
   const imageUrls: string[] = [];
   const safeImages = metadata.images ? filterSafeImageFilenames(metadata.images) : [];
