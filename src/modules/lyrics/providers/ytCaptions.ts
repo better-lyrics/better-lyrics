@@ -94,7 +94,7 @@ export async function ytCaptions(providerParameters: ProviderParameters): Promis
   providerParameters.sourceMap["yt-captions"].lyricSourceResult = {
     lyrics: lyricsArray,
     language: langCode,
-    source: "Youtube Captions",
+    source: "YouTube Captions",
     sourceHref: "",
     musicVideoSynced: true,
   };
