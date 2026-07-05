@@ -1392,7 +1392,7 @@
     "description": "No search results message"
   },
   "unison_interactingAs": {
-    "message": "olarak etkileşime gir",
+    "message": "Etkileşimde bulunan:",
     "description": "Identity label prefix"
   },
   "unison_loadMore": {
