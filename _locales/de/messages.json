@@ -1,6 +1,6 @@
 {
   "extensionName": {
-    "message": "Better Lyrics (Lyrics for YouTube Music)",
+    "message": "Better Lyrics (Songtexte für YouTube Music)",
     "description": "The name of the extension"
   },
   "extensionDescription": {
@@ -192,7 +192,7 @@
     "description": "Button in the offset settings modal that deletes every saved per-song sync offset"
   },
   "options_offsetModal_perSongCount": {
-    "message": "Saved offsets",
+    "message": "Gespeicherte Zeitversätze",
     "description": "Label in the offset settings modal showing how many per-song sync offsets are stored"
   },
   "options_offsetModal_appliesTo": {
@@ -528,7 +528,7 @@
     "description": "YouTube provider name"
   },
   "options_provider_youtubeCaptions": {
-    "message": "YouTube Captions",
+    "message": "YouTube-Untertitel",
     "description": "YouTube Captions provider name"
   },
   "options_provider_binilyrics": {
@@ -894,7 +894,7 @@
     }
   },
   "marketplace_requiresVersion": {
-    "message": "Requires v$version$+",
+    "message": "Benötigt v$version$+",
     "description": "Footer chip in the theme detail modal showing the minimum Better Lyrics version a theme needs",
     "placeholders": {
       "version": {
@@ -904,7 +904,7 @@
     }
   },
   "marketplace_discussion": {
-    "message": "Discussion",
+    "message": "Diskussion",
     "description": "Footer link in the theme detail modal that opens the theme's discussion thread"
   },
   "marketplace_commit": {
