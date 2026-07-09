@@ -1,6 +1,6 @@
 {
   "extensionName": {
-    "message": "Better Lyrics (Lirik untuk YouTube Music)",
+    "message": "Better Lyrics (Lyrics for YouTube Music)",
     "description": "The name of the extension"
   },
   "extensionDescription": {
@@ -525,11 +525,11 @@
   },
   "options_provider_youtube": {
     "message": "YouTube",
-    "description": "Youtube provider name"
+    "description": "YouTube provider name"
   },
   "options_provider_youtubeCaptions": {
-    "message": "Subtitel YouTube",
-    "description": "Youtube Captions provider name"
+    "message": "YouTube Captions",
+    "description": "YouTube Captions provider name"
   },
   "options_provider_binilyrics": {
     "message": "BiniLyrics",
