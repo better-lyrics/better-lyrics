@@ -9,6 +9,7 @@ import { t } from "@core/i18n";
 import { type LyricsData, processLyrics } from "@modules/lyrics/injectLyrics";
 import { stringSimilarity } from "@modules/lyrics/lyricParseUtils";
 import { registerThemeSetting } from "@modules/settings/themeOptions";
+import { invalidateActiveLineIndex } from "@modules/ui/activeLineIndex";
 import { flushLoader, renderLoader } from "@modules/ui/dom";
 import { log } from "@utils";
 import type { Lyric, LyricSourceResult, ProviderParameters } from "./providers/shared";
@@ -67,6 +68,7 @@ export function applySegmentMapToLyrics(lyricData: LyricsData | null, segmentMap
           part.lyricElement.dataset.time = String(part.time);
         });
       }
+      invalidateActiveLineIndex(lyricData.lines);
     }
   }
 }

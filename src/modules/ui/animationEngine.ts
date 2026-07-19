@@ -16,6 +16,7 @@ import { calculateLyricPositions, type LineData } from "@modules/lyrics/injectLy
 import { registerThemeSetting } from "@modules/settings/themeOptions";
 import { hideAdOverlay, isAdPlaying, isLoaderActive, showAdOverlay } from "@modules/ui/dom";
 import { log } from "@utils";
+import { collectActiveLineCandidates, mergeSortedUniqueIndices } from "./activeLineIndex";
 import { ctx, resetDebugRender } from "./animationEngineDebug";
 
 const LYRIC_ENDING_THRESHOLD_S = registerThemeSetting("blyrics-lyric-ending-threshold-s", 0.5);
@@ -28,6 +29,9 @@ const ENABLE_DEBUG_RENDER = registerThemeSetting("blyrics-debug-renderer", false
 let cachedTabRendererHeight: number | null = null;
 let tabRendererResizeObserver: ResizeObserver | null = null;
 let observedTabRenderer: HTMLElement | null = null;
+let currentCandidateIndices: number[] = [];
+let previousCandidateIndices: number[] = [];
+const processedLineIndices: number[] = [];
 
 // 0.5 means the selected lyric will be in the middle of the screen, 0 means top, 1 means bottom
 export const SCROLL_POS_OFFSET_RATIO = registerThemeSetting("blyrics-target-scroll-pos-ratio", 0.37);
@@ -114,6 +118,9 @@ export function resetAnimEngineState(): void {
   animEngineState.passiveLastWallTime = 0;
   stopPassiveScrollLoop();
   cachedDurations.clear();
+  currentCandidateIndices.length = 0;
+  previousCandidateIndices.length = 0;
+  processedLineIndices.length = 0;
 }
 
 export let cachedDurations: Map<string, number> = new Map();
@@ -390,8 +397,17 @@ export function animationEngine(currentTime: number, eventCreationTime: number, 
     let activeElems = [] as LineData[];
     const linesToAnimate: LineData[] = [];
     let newLyricSelected = timeJumped;
+    const setUpAnimationEarlyTime = isPlaying ? 2 : 0;
+    collectActiveLineCandidates(
+      lines,
+      Math.min(currentTime, lyricScrollTime),
+      Math.max(currentTime + setUpAnimationEarlyTime, lyricScrollTime + EARLY_SCROLL_CONSIDER.getNumberValue()),
+      currentCandidateIndices
+    );
+    mergeSortedUniqueIndices(previousCandidateIndices, currentCandidateIndices, processedLineIndices);
 
-    lines.every((lineData, index) => {
+    for (const index of processedLineIndices) {
+      const lineData = lines[index];
       const time = lineData.time;
       let nextTime = Infinity;
       if (index + 1 < lines.length) {
@@ -427,12 +443,6 @@ export function animationEngine(currentTime: number, eventCreationTime: number, 
       /**
        * Time in seconds to set up animations. This shouldn't affect any visible effects, just help when the browser stutters
        */
-      let setUpAnimationEarlyTime: number = 2;
-
-      if (!isPlaying) {
-        setUpAnimationEarlyTime = 0;
-      }
-
       const effectiveEndTime = Math.max(nextTime, time + lineData.duration + 0.05);
       if (currentTime + setUpAnimationEarlyTime >= time && currentTime < effectiveEndTime) {
         lineData.isSelected = true;
@@ -489,8 +499,11 @@ export function animationEngine(currentTime: number, eventCreationTime: number, 
           lineData.isAnimating = false;
         }
       }
-      return true;
-    });
+    }
+
+    const candidateSwap = previousCandidateIndices;
+    previousCandidateIndices = currentCandidateIndices;
+    currentCandidateIndices = candidateSwap;
 
     // Batched animation to avoid multiple reflows and bring reflows from O(n) to O(1)
     if (linesToAnimate.length > 0) {
