@@ -168,7 +168,7 @@
     "description": "Accessible label for the lyrics dock button that switches to the previous lyrics provider"
   },
   "lyricsDock_nextSource": {
-    "message": "Next source",
+    "message": "次のソース",
     "description": "Accessible label for the lyrics dock button that switches to the next lyrics provider"
   },
   "lyricsDock_offsetEarlier": {
@@ -180,31 +180,31 @@
     "description": "Accessible label for the lyrics dock button that nudges sync timing later"
   },
   "lyricsDock_offsetGlobal": {
-    "message": "Global",
+    "message": "全体",
     "description": "Label in the lyrics dock offset menu for the global offset applied to all songs and sync types"
   },
   "options_offsetModal_perSong": {
-    "message": "Per-song offsets",
+    "message": "曲ごとのオフセット",
     "description": "Heading in the offset settings modal for the section that manages saved per-song sync offsets"
   },
   "options_offsetModal_perSongClear": {
-    "message": "Clear all",
+    "message": "全て消去",
     "description": "Button in the offset settings modal that deletes every saved per-song sync offset"
   },
   "options_offsetModal_perSongCount": {
-    "message": "Saved offsets",
+    "message": "保存されたオフセット",
     "description": "Label in the offset settings modal showing how many per-song sync offsets are stored"
   },
   "options_offsetModal_appliesTo": {
-    "message": "Applies to",
+    "message": "適用先",
     "description": "Label in the offset settings modal preceding the list of sync types a given offset affects"
   },
   "options_language_displayLanguage": {
-    "message": "Display Language",
+    "message": "表示言語",
     "description": "Label for the UI language selector dropdown"
   },
   "options_language_displayLanguageAuto": {
-    "message": "Auto",
+    "message": "自動",
     "description": "Option label for automatic language detection based on browser settings"
   },
   "options_language_title": {
@@ -256,11 +256,11 @@
     "description": "Choose a theme button label"
   },
   "options_themes_change": {
-    "message": "Change",
+    "message": "変更",
     "description": "Change theme button label"
   },
   "options_themes_customTheme": {
-    "message": "Custom Theme",
+    "message": "カスタムテーマ",
     "description": "Display name for unnamed custom themes"
   },
   "options_themes_customStyles": {
@@ -332,7 +332,7 @@
     "description": "Confirm button label inside the import identity modal"
   },
   "options_nickname_description": {
-    "message": "Pick a name for yourself across Better Lyrics. Letters, numbers, and underscore, 3 to 20 characters.",
+    "message": "より良い歌詞で自分の名前を選んでください。文字、数字、アンダーバー、3〜20文字。",
     "description": "Nickname subsection description"
   },
   "options_nickname_placeholder": {
@@ -372,35 +372,35 @@
     "description": "Status when nickname is already taken"
   },
   "options_nickname_status_invalid": {
-    "message": "3 to 20 letters, numbers, or underscores",
+    "message": "3〜20文字、数字、アンダーバー",
     "description": "Status when nickname format is invalid"
   },
   "options_nickname_status_profane": {
-    "message": "Not allowed, try another",
+    "message": "許可されていません。別のものをお試しください",
     "description": "Status when nickname is flagged as inappropriate by the server"
   },
   "options_nickname_status_self": {
-    "message": "This is your current nickname",
+    "message": "これはあなたの現在のニックネームです",
     "description": "Status when entered nickname matches current"
   },
   "options_nickname_status_saved": {
-    "message": "Saved",
+    "message": "保存しました",
     "description": "Status when nickname is saved"
   },
   "options_nickname_status_submitting": {
-    "message": "Saving...",
+    "message": "保存中…",
     "description": "Status while nickname save is in flight"
   },
   "options_nickname_status_rateLimited": {
-    "message": "Slow down, try again in a moment",
+    "message": "ちょっと待って、しばらくしてからもう一度お試しください",
     "description": "Status when nickname checks are rate limited"
   },
   "options_nickname_status_error": {
-    "message": "Could not reach the server",
+    "message": "サーバーに接続できませんでした",
     "description": "Status when nickname request fails"
   },
   "options_alert_importEmpty": {
-    "message": "Paste identity JSON or choose a file first.",
+    "message": "ID JSON を貼り付けるか、最初にファイルを選択します。",
     "description": "Shown when the user clicks Import with no JSON provided"
   },
   "options_modal_selectTheme": {
@@ -508,7 +508,7 @@
     "description": "Better Lyrics Legato provider name"
   },
   "options_provider_betterLyricsPortato": {
-    "message": "Better Lyrics Portato",
+    "message": "Better Lyrics Legato",
     "description": "Better Lyrics Portato provider name"
   },
   "options_provider_betterLyricsUnison": {
@@ -1212,15 +1212,15 @@
     "description": "Button label shown briefly when the request fails for a transport/network reason (no HTTP response received)"
   },
   "lyrics_requestErrorServer": {
-    "message": "Unison is having trouble",
+    "message": "Unisonに問題があります",
     "description": "Button label shown briefly when the request fails with a 5xx server error"
   },
   "lyrics_requestErrorGeneric": {
-    "message": "Couldn't send the request",
+    "message": "リクエストを送信できませんでした",
     "description": "Button label shown briefly when the request fails for any other reason (catch-all)"
   },
   "lyrics_requestSyncedLanded": {
-    "message": "Synced version available. Refresh.",
+    "message": "同期されたバージョンが利用可能です。更新します。",
     "description": "Button label when the server reports a synced version already exists; clicking reloads the page"
   },
   "unison_pageTitle": {
@@ -1232,27 +1232,27 @@
     "description": "Unison branding title"
   },
   "unison_subtitle": {
-    "message": "Community Lyrics",
+    "message": "コミュニティの歌詞",
     "description": "Unison subtitle text"
   },
   "unison_search": {
-    "message": "Search lyrics",
+    "message": "歌詞を検索",
     "description": "Search button label"
   },
   "unison_searchPlaceholder": {
-    "message": "Search songs, artists, or lyrics...",
+    "message": "曲、アーティスト、または歌詞を検索…",
     "description": "Search input placeholder"
   },
   "unison_submit": {
-    "message": "Submit Lyrics",
+    "message": "歌詞を投稿",
     "description": "Submit lyrics button text"
   },
   "unison_submitSuccess": {
-    "message": "Lyrics submitted!",
+    "message": "歌詞が投稿されました！",
     "description": "Success message after submitting lyrics"
   },
   "unison_submitDescription": {
-    "message": "Submit community lyrics for any YouTube Music track. Paste LRC (timestamped), TTML (XML), or plain text. Synced formats are prioritized.",
+    "message": "任意のYouTube音楽トラックにコミュニティの歌詞を投稿します。LRC（タイムスタンプ）、TTML（XML）、プレーンテキストを貼り付けます。同期されたフォーマットが優先されます。",
     "description": "Description text for the submission form"
   },
   "unison_composerHintPrefix": {
@@ -1440,19 +1440,19 @@
     "description": "Link text to open song in YouTube Music"
   },
   "unison_back": {
-    "message": "Back",
+    "message": "戻る",
     "description": "Back button text in detail view"
   },
   "unison_noPreview": {
-    "message": "Paste or drop lyrics to see a preview",
+    "message": "プレビューを表示するには歌詞を貼り付けるかドロップしてください",
     "description": "Empty state text shown in submit preview before lyrics are entered"
   },
   "unison_preview": {
-    "message": "Preview",
+    "message": "プレビュー",
     "description": "Column title for parsed lyrics preview in detail view"
   },
   "unison_rawLyrics": {
-    "message": "Raw Lyrics",
+    "message": "生の歌詞",
     "description": "Column title for raw lyrics source in detail view"
   },
   "unison_isrc": {
@@ -1460,87 +1460,87 @@
     "description": "ISRC field label"
   },
   "unison_placeholder_song": {
-    "message": "e.g. Bohemian Rhapsody",
+    "message": "例： ボヘミアン・ラプソディ",
     "description": "Placeholder for song input"
   },
   "unison_placeholder_artist": {
-    "message": "e.g. Queen",
+    "message": "例： クイーン",
     "description": "Placeholder for artist input"
   },
   "unison_placeholder_album": {
-    "message": "e.g. A Night at the Opera",
+    "message": "例： オペラ座の夜",
     "description": "Placeholder for album input"
   },
   "unison_placeholder_duration": {
-    "message": "e.g. 354",
+    "message": "例: 354",
     "description": "Placeholder for duration input"
   },
   "unison_placeholder_videoId": {
-    "message": "e.g. dQw4w9WgXcQ",
+    "message": "例: dQw4w9WgXcQ",
     "description": "Placeholder for video ID input"
   },
   "unison_placeholder_isrc": {
-    "message": "e.g. GBAYE0601498",
+    "message": "例: GBAYE0601498",
     "description": "Placeholder for ISRC input"
   },
   "unison_placeholder_lyrics": {
-    "message": "Paste LRC, TTML, or plain text lyrics here. You can also drag & drop a file.",
+    "message": "ここにLRC、TTML、またはプレーンテキストの歌詞を貼り付けてください。ファイルをドラッグ＆ドロップすることもできます。",
     "description": "Placeholder for lyrics textarea"
   },
   "unison_durationHint": {
-    "message": "Song length in seconds",
+    "message": "曲の長さ（秒）",
     "description": "Hint text below duration field label"
   },
   "unison_videoIdHint": {
-    "message": "11-character ID from the YouTube Music URL",
+    "message": "YouTubeの音楽URLから11文字のID",
     "description": "Hint text below video ID field label"
   },
   "unison_formatHint": {
-    "message": "Auto-detected from lyrics content",
+    "message": "歌詞の内容から自動検出",
     "description": "Hint text below format field label"
   },
   "unison_isrcHintPrefix": {
-    "message": "Find it using an",
+    "message": "次を使用して検索：",
     "description": "Text before ISRC finder link"
   },
   "unison_isrcHintLinkText": {
-    "message": "ISRC lookup tool",
+    "message": "ISRC 検索ツール",
     "description": "Link text for ISRC finder"
   },
   "unison_tabFeed": {
-    "message": "Feed",
+    "message": "フィード",
     "description": "Feed tab label for recent submissions"
   },
   "unison_tabMySubmissions": {
-    "message": "My Submissions",
+    "message": "自分の投稿履歴",
     "description": "Feed tab label for user's own submissions"
   },
   "unison_noSubmissions": {
-    "message": "You haven't submitted any lyrics yet.",
+    "message": "まだ歌詞を投稿していません。",
     "description": "Empty state for my submissions tab"
   },
   "unison_noFilterResults": {
-    "message": "No lyrics match your filters",
+    "message": "フィルターに一致する歌詞がありません",
     "description": "Empty state shown when the active sort/filter combination returns no entries"
   },
   "unison_noFeedYet": {
-    "message": "No lyrics here yet",
+    "message": "歌詞はまだありません",
     "description": "Empty state shown when the recent feed is empty with no filters applied"
   },
   "unison_sync": {
-    "message": "Sync",
+    "message": "同期",
     "description": "Sync type label in detail view"
   },
   "unison_language": {
-    "message": "Language",
+    "message": "言語",
     "description": "Language label in detail view"
   },
   "unison_uploadedBy": {
-    "message": "Uploaded by",
+    "message": "投稿者",
     "description": "Metadata row label in the Unison detail sidebar, before the uploader's name which links to their curator page"
   },
   "unison_languageUnspecified": {
-    "message": "Not specified",
+    "message": "指定なし",
     "description": "Default option in the submission form's language dropdown, used when the submitter has not chosen a language"
   },
   "unison_fulfilledBadge": {
@@ -1558,91 +1558,91 @@
     }
   },
   "unison_fulfilledBoardLink": {
-    "message": "See the requests board",
+    "message": "リクエストボードを見る",
     "description": "Link on the Unison detail page that opens the community requests board (queue of most-wanted songs)"
   },
   "unison_validationRequired": {
-    "message": "Please fill in song, artist, video ID, and lyrics.",
+    "message": "曲、アーティスト、ビデオID、歌詞を入力してください。",
     "description": "Validation error when required fields are missing"
   },
   "unison_submitFailed": {
-    "message": "Submission failed",
+    "message": "投稿に失敗しました",
     "description": "Fallback error message when submission fails"
   },
   "report_lyrics_title": {
-    "message": "Report Lyrics",
+    "message": "歌詞を報告",
     "description": "Title for the report lyrics modal"
   },
   "report_lyrics_info": {
-    "message": "Specify the reason why the lyrics for this song are not compatible",
+    "message": "この曲の歌詞が互換性がない理由を指定してください",
     "description": "Information about using the report lyrics modal"
   },
   "report_lyrics_wrong_song": {
-    "message": "Wrong song or version",
+    "message": "曲またはバージョンが間違っています",
     "description": "Reason for the report that the lyrics are for the wrong song or version"
   },
   "report_lyrics_bad_sync": {
-    "message": "Bad synchronization",
+    "message": "同期が正しくありません",
     "description": "Reason for the report that the lyrics are too off on the part synchronization"
   },
   "report_lyrics_offensive": {
-    "message": "Offensive",
+    "message": "不快",
     "description": "Reason for the report that the lyrics are offensive or too offensive"
   },
   "report_lyrics_spam": {
-    "message": "Spam or lyrics are irrelevant to the song",
+    "message": "スパムまたは歌詞は曲とは関係ありません",
     "description": "Reason for the report that the lyrics are a spam attempt and/or irrelevant with the sung parts"
   },
   "report_lyrics_other": {
-    "message": "Other reason",
+    "message": "他の理由",
     "description": "Reason for the report that the lyrics is bad in other reasons"
   },
   "report_lyrics_details_placeholder": {
-    "message": "Additional details about this report",
+    "message": "このレポートについての詳細情報",
     "description": "Placeholder for report lyrics details input"
   },
   "report_lyrics_submit": {
-    "message": "Submit",
+    "message": "送信",
     "description": "Submit button for reporting lyrics"
   },
   "report_lyrics_cancel": {
-    "message": "Cancel",
+    "message": "キャンセル",
     "description": "Cancel button for reporting lyrics"
   },
   "report_lyrics_reporting": {
-    "message": "Reporting lyrics...",
+    "message": "歌詞を報告しています…",
     "description": "Report lyrics on a reporting process"
   },
   "report_lyrics_success": {
-    "message": "Thanks for the heads up! We'll take a look soon.",
+    "message": "報告してくれてありがとう！すぐに確認します。",
     "description": "Shown after a lyrics report is successfully submitted"
   },
   "report_lyrics_already": {
-    "message": "We've got this one already. Thanks though!",
+    "message": "既にこの歌詞の報告を受け取っています。報告しようとしていただき、ありがとうございます！",
     "description": "Shown when the user tries to report the same lyrics twice"
   },
   "report_lyrics_error": {
-    "message": "That didn't go through. Mind trying again?",
+    "message": "報告に失敗しました。もう一度試してみますか？",
     "description": "Shown when a lyrics report fails to submit"
   },
   "unison_tier_new": {
-    "message": "new",
+    "message": "新しい",
     "description": "Trust tier badge for low-reputation Unison submitters"
   },
   "unison_tier_trusted": {
-    "message": "trusted",
+    "message": "信頼済",
     "description": "Trust tier badge for mid-reputation Unison submitters"
   },
   "unison_tier_veteran": {
-    "message": "veteran",
+    "message": "ベテラン",
     "description": "Trust tier badge for high-reputation Unison submitters"
   },
   "unison_tier_expert": {
-    "message": "expert",
+    "message": "エキスパート",
     "description": "Trust tier badge for top-reputation Unison submitters"
   },
   "unison_submitted_this": {
-    "message": "submitted this lyric",
+    "message": "この歌詞を提出しました",
     "description": "Sub-label under the submitter name in the Unison footer card"
   },
   "unison_score_label": {
