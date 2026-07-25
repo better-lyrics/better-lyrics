@@ -6,6 +6,9 @@
 version: 2
 updates:
   - package-ecosystem: "npm"
-    directory: "/" 
+    directory: "/"
     schedule:
       interval: "weekly"
+    ignore:
+      - dependency-name: "extension"
+        versions: [">= 3.0.0"]
