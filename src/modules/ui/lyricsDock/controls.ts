@@ -4,6 +4,7 @@ import { attachHoldRepeat } from "@core/holdRepeat";
 import { t } from "@core/i18n";
 import { setStorage } from "@core/storage";
 import { providerPriority } from "@modules/lyrics/providers/shared";
+import { pictureInPictureController } from "@modules/ui/pictureInPicture/browserController";
 import { controlIcons, parseSvgString, syncTypeColors, syncTypeIcons } from "./icons";
 import {
   adjustGlobalOffsetValue,
@@ -217,6 +218,24 @@ function buildToggle(icon: string, active: boolean, label: string, onToggle: () 
     btn.classList.toggle(CONTROL_ACTIVE_CLASS);
     onToggle();
   });
+  return btn;
+}
+
+function buildPictureInPictureControl(): HTMLButtonElement | null {
+  if (!pictureInPictureController.isSupported()) return null;
+
+  const label = t("picture_in_picture_open");
+  const btn = document.createElement("button");
+  btn.type = "button";
+  btn.className = `${DOCK_CLASS}__control`;
+  btn.dataset.blyricsPictureInPictureToggle = "true";
+  btn.setAttribute("aria-label", label);
+  btn.title = label;
+
+  const icon = parseSvgString(controlIcons.pictureInPicture);
+  if (icon) btn.appendChild(icon);
+
+  btn.addEventListener("click", () => pictureInPictureController.toggle());
   return btn;
 }
 
@@ -477,6 +496,12 @@ export function buildControlsSegment(): HTMLElement {
       sections.push(section);
       shape.push(key);
     }
+  }
+
+  const pictureInPictureControl = buildPictureInPictureControl();
+  if (pictureInPictureControl) {
+    sections.push(pictureInPictureControl);
+    shape.push("pictureInPicture");
   }
 
   // Used by the dock mount to animate controls in only when the set of controls changes

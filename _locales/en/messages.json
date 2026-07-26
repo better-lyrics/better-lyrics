@@ -94,6 +94,22 @@
     "message": "Auto-scroll unsynced lyrics",
     "description": "Auto-scroll unsynced lyrics setting label"
   },
+  "picture_in_picture_open": {
+    "message": "Open Picture-in-Picture lyrics",
+    "description": "Accessible label for the dock action that opens the floating lyrics window"
+  },
+  "picture_in_picture_loading": {
+    "message": "Loading lyrics…",
+    "description": "Status displayed while the Picture-in-Picture lyrics window initializes"
+  },
+  "options_display_pipAutoRestore": {
+    "message": "Reopen floating lyrics automatically",
+    "description": "Setting label for automatically reopening the floating lyrics window after page load"
+  },
+  "options_display_pipAutoRestoreTooltip": {
+    "message": "Keeps the floating lyrics window from closing for good when you reload or move between songs and pages. Browsers only let a floating window open right after you interact with the page, so it reopens on your first click or key press instead of instantly.",
+    "description": "Help tooltip explaining what automatic floating-lyrics reopening does and why it waits for the first interaction"
+  },
   "options_display_shadersPromo": {
     "message": "Show link to Better Lyrics Shaders",
     "description": "Toggle label for the Shaders companion link shown in the lyrics footer"

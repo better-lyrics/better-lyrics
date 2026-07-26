@@ -27,6 +27,10 @@ import {
   setupHomepageFullscreenHandler,
   setupWakeLockForFullscreen,
 } from "@modules/ui/observer";
+import {
+  initializePictureInPictureAutoRestore,
+  mirrorNativeMiniPlayerButton,
+} from "@modules/ui/pictureInPicture/browserController";
 import { subscribeToCustomStyles } from "@modules/ui/styleInjector";
 import { log, setUpLog } from "@utils";
 
@@ -84,6 +88,8 @@ async function modify(): Promise<void> {
  * Entry point for the BetterLyrics extension.
  */
 function init(): void {
+  initializePictureInPictureAutoRestore();
+  mirrorNativeMiniPlayerButton();
   document.addEventListener("DOMContentLoaded", modify);
 }
 

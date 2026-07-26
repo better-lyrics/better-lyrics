@@ -14,6 +14,7 @@ export interface PlayerDetails {
   duration: string;
   audioTrackData: any;
   browserTime: number;
+  isPlaying: boolean;
   playing: boolean;
   playbackRate?: number;
   contentRect: {
@@ -61,6 +62,7 @@ interface AppStateType {
   isDockOffsetEnabled: boolean;
   dockControlsOrder: string[];
   currentUnisonData: UnisonData | null;
+  isPictureInPictureOpen: boolean;
 }
 
 export const AppState: AppStateType = {
@@ -102,6 +104,7 @@ export const AppState: AppStateType = {
   isDockOffsetEnabled: true,
   dockControlsOrder: [...DOCK_CONTROL_ORDER_DEFAULT],
   currentUnisonData: null,
+  isPictureInPictureOpen: false,
 };
 
 export function reloadLyrics(): void {

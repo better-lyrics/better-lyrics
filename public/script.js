@@ -70,6 +70,7 @@ const publishPlayerSnapshot = () => {
           duration,
           audioTrackData: player.getAudioTrack(),
           browserTime: Date.now(),
+          isPlaying,
           playing: isPlaying && !isBuffering && !isSeeking && !isUiSeeking,
           playbackRate: observedVideoElement?.playbackRate ?? 1,
           contentRect: cachedContentRect ?? { width: 0, height: 0 },
@@ -176,6 +177,25 @@ document.addEventListener("blyrics-seek-to", event => {
   if (player && seekTime >= 0) {
     player.seekTo(seekTime, true);
     player.playVideo();
+  }
+});
+
+document.addEventListener("blyrics-player-control", event => {
+  const player = document.getElementById("movie_player");
+  if (!player) return;
+  switch (event.detail) {
+    case "previous":
+      if (typeof player.previousVideo === "function") player.previousVideo();
+      break;
+    case "play-pause": {
+      const playing = player.getPlayerStateObject?.().isPlaying === true;
+      if (playing) player.pauseVideo();
+      else player.playVideo();
+      break;
+    }
+    case "next":
+      if (typeof player.nextVideo === "function") player.nextVideo();
+      break;
   }
 });
 
