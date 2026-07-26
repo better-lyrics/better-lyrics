@@ -182,8 +182,10 @@ JavaScript controls animation timing with the Web Animations API, but the visual
 | `--blyrics-highlight-swipe-end-from`          | `-0.1`                            | Swipe gradient end value before animation                                                    |
 | `--blyrics-highlight-swipe-start-to`          | `1.4`                             | Swipe gradient start value after animation                                                   |
 | `--blyrics-highlight-swipe-end-to`            | `1.5`                             | Swipe gradient end value after animation                                                     |
-| `--blyrics-highlight-glow-filter-from`     | `drop-shadow(0 0 0.8rem var(--blyrics-glow-color))` | Glow start filter                                                   |
-| `--blyrics-highlight-glow-filter-to`       | `drop-shadow(0 0 0 var(--blyrics-glow-color))` | Glow end filter                                                        |
+| `--blyrics-highlight-glow-radius-from`     | `0.8rem`                          | Glow blur radius at the start of the pulse; color stays `var(--blyrics-glow-color)` and resolves per word |
+| `--blyrics-highlight-glow-radius-to`       | `0`                               | Glow blur radius at the end of the pulse                                                     |
+| `--blyrics-highlight-glow-filter-from`     | (unset)                           | Optional full override of the glow start filter; when set, its color resolves once at the container (one color for all words) |
+| `--blyrics-highlight-glow-filter-to`       | (unset)                           | Optional full override of the glow end filter                                               |
 | `--blyrics-highlight-glow-duration-ratio`     | `1.2`                             | Glow duration multiplier relative to word duration                                           |
 | `--blyrics-highlight-glow-min-duration`       | `1.2s`                            | Minimum glow duration                                                                        |
 | `--blyrics-highlight-glow-easing`             | `ease`                            | Glow easing                                                                                  |

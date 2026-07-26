@@ -59,8 +59,8 @@ Essential reference for creating custom themes. For deep dives, see [STYLING.md]
   --blyrics-highlight-swipe-end-from: -0.1;
   --blyrics-highlight-swipe-start-to: 1.4;
   --blyrics-highlight-swipe-end-to: 1.5;
-  --blyrics-highlight-glow-filter-from: drop-shadow(0 0 0.8rem var(--blyrics-glow-color));
-  --blyrics-highlight-glow-filter-to: drop-shadow(0 0 0 var(--blyrics-glow-color));
+  --blyrics-highlight-glow-radius-from: 0.8rem;
+  --blyrics-highlight-glow-radius-to: 0;
   --blyrics-highlight-glow-duration-ratio: 1.2;
   --blyrics-highlight-glow-min-duration: 1.2s;
   --blyrics-highlight-glow-easing: ease;
@@ -590,6 +590,8 @@ Target sustained notes for special effects:
   --blyrics-glow-color: color(display-p3 1 0.8 0.3 / 1);
 }
 ```
+
+`--blyrics-glow-color` resolves per word, so different long words can glow different colors. Tune the blur with `--blyrics-highlight-glow-radius-from` / `--blyrics-highlight-glow-radius-to` while keeping per-word color. Overriding the full `--blyrics-highlight-glow-filter-from` / `--blyrics-highlight-glow-filter-to` instead resolves the color once at the container, so every word shares one glow color.
 
 ### 15. Pause Behavior
 

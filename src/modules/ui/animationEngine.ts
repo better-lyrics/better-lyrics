@@ -1175,6 +1175,20 @@ function getCSSOffset(lyricsElement: HTMLElement, property: string, fallback: nu
   return Math.max(0, Math.min(1, getCSSNumber(lyricsElement, property, fallback)));
 }
 
+// Compose the glow filter so the color stays an unresolved var(--blyrics-glow-color).
+// Reading a fully composed --blyrics-highlight-glow-filter-* off the container resolves the
+// nested color there, which would defeat per-word overrides like
+// .blyrics--word[data-long-word] { --blyrics-glow-color: ... }. Building the filter here with
+// the color left as a literal var lets the Web Animations API resolve it against each animated
+// word instead. A theme that sets the full filter var still wins, but its color resolves once
+// at the container (globally), as before.
+function resolveGlowFilter(lyricsElement: HTMLElement, suffix: "from" | "to", radiusDefault: string): string {
+  const override = getCSSValue(lyricsElement, `--blyrics-highlight-glow-filter-${suffix}`, "");
+  if (override) return override;
+  const radius = getCSSValue(lyricsElement, `--blyrics-highlight-glow-radius-${suffix}`, radiusDefault);
+  return `drop-shadow(0 0 ${radius} var(--blyrics-glow-color))`;
+}
+
 function readAnimationConfig(lyricsElement: HTMLElement): AnimationConfig {
   const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   const scrollDurationMs = getCSSDurationWithFallback(lyricsElement, "--blyrics-lyric-scroll-duration", "650ms");
@@ -1221,16 +1235,8 @@ function readAnimationConfig(lyricsElement: HTMLElement): AnimationConfig {
       swipeEndFrom: getCSSValue(lyricsElement, "--blyrics-highlight-swipe-end-from", "-0.1"),
       swipeStartTo: getCSSValue(lyricsElement, "--blyrics-highlight-swipe-start-to", "1.4"),
       swipeEndTo: getCSSValue(lyricsElement, "--blyrics-highlight-swipe-end-to", "1.5"),
-      glowFrom: getCSSValue(
-        lyricsElement,
-        "--blyrics-highlight-glow-filter-from",
-        "drop-shadow(0 0 0.8rem var(--blyrics-glow-color))"
-      ),
-      glowTo: getCSSValue(
-        lyricsElement,
-        "--blyrics-highlight-glow-filter-to",
-        "drop-shadow(0 0 0 var(--blyrics-glow-color))"
-      ),
+      glowFrom: resolveGlowFilter(lyricsElement, "from", "0.8rem"),
+      glowTo: resolveGlowFilter(lyricsElement, "to", "0"),
       glowDurationRatio: getCSSNumber(lyricsElement, "--blyrics-highlight-glow-duration-ratio", 1.2),
       glowMinDurationMs: getCSSDurationWithFallback(lyricsElement, "--blyrics-highlight-glow-min-duration", "1.2s"),
       glowEasing: getCSSValue(lyricsElement, "--blyrics-highlight-glow-easing", "ease"),
