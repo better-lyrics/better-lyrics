@@ -232,7 +232,7 @@ body {
 
 .blyrics-pip-lyrics .blyrics-container {
   --blyrics-font-size: clamp(1rem, 5cqw, 2.4rem) !important;
-  --blyrics-translated-font-size: clamp(0.75rem, 4.5cqw, 1.6rem) !important;
+  --blyrics-translated-font-size: clamp(0.675rem, 2.5cqw, 1.5rem) !important;
   --blyrics-padding: clamp(0.25rem, 2cqw, 0.5rem) !important;
   margin: 0 !important;
   margin-block: 0 !important;
@@ -245,6 +245,13 @@ body {
 .blyrics-pip-lyrics .blyrics-container::before,
 .blyrics-pip-lyrics .blyrics-container::after {
   display: none !important;
+}
+
+/* Romanization is otherwise sized at the translated size over 1.25; here both secondary lines
+   share one size so the variable above is the only knob. */
+.blyrics-pip-lyrics .blyrics--romanized {
+  font-size: var(--blyrics-translated-font-size);
+  padding: 0.125rem 0.375rem;
 }
 
 .blyrics-pip-lyrics .blyrics-container > div {
