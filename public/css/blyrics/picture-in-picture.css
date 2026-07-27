@@ -139,22 +139,22 @@ body {
 
 .blyrics-pip-artwork__control:hover {
   background: rgb(255 255 255 / 22%);
-  transform: scale(1.08);
+  transform: scale(1.05);
 }
 
 .blyrics-pip-artwork__control:active {
-  transform: scale(0.94);
+  transform: scale(0.95);
 }
 
 .blyrics-pip-artwork__control--play-pause {
   background: rgb(255 255 255 / 92%);
   color: #111;
-  transform: scale(1.08);
+  transform: scale(1.05);
 }
 
 .blyrics-pip-artwork__control--play-pause:hover {
   background: #fff;
-  transform: scale(1.16);
+  transform: scale(1.1);
 }
 
 .blyrics-pip-artwork__control--play-pause:active {
