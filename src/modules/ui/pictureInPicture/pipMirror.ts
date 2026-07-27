@@ -11,7 +11,7 @@ function tagTree(root: Element): void {
   walk(root);
 }
 
-export function indexTree(root: Element): Map<string, Element> {
+function indexTree(root: Element): Map<string, Element> {
   const map = new Map<string, Element>();
   const walk = (el: Element) => {
     const key = el.getAttribute(MIRROR_ID_ATTR);
@@ -39,7 +39,7 @@ export function needsRebuild(): boolean {
   return rebuildRequested;
 }
 
-export function mirrorAttribute(source: Element, attributeName: string): void {
+function mirrorAttribute(source: Element, attributeName: string): void {
   const twin = idToTwin.get(source.getAttribute(MIRROR_ID_ATTR) ?? "");
   if (!twin) return;
   const value = source.getAttribute(attributeName);
@@ -90,10 +90,6 @@ export function buildTwin(mainRoot: HTMLElement, pipDoc: Document): HTMLElement 
   rebuildRequested = false;
   startObserver(mainRoot);
   return twin;
-}
-
-export function getTwinRoot(): HTMLElement | null {
-  return twinRoot;
 }
 
 export function sync(mainRoot: HTMLElement): void {
