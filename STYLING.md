@@ -574,6 +574,32 @@ The scale animation uses `--blyrics-scale`, `--blyrics-active-scale`, and `--bly
 
 > **Important:** Prefer styling stable structure classes and data attributes. The extension may select multiple nearby lines for scrolling, so avoid assumptions that exactly one `.blyrics--active` line exists.
 
+#### Two clocks: `.blyrics--active` vs `.blyrics--animating`
+
+A line carries two independent state classes, and they do **not** open and close together.
+
+| Class | Clock | Window |
+| ----- | ----- | ------ |
+| `.blyrics--active` | Scroll clock: audio time plus `--blyrics-scroll-timing-offset` (0.5s default) | Opens `--blyrics-early-scroll-consider-s` before the line, closes when the scroll target moves on |
+| `.blyrics--animating` | Audio clock | Opens ~2s before the line so animations can be prepared, closes only once the line's own words have finished |
+| `.blyrics--paused` | Play state | Present on the line and on each of its words whenever playback is paused. Lets theme-authored CSS animations freeze alongside the engine's `element.animate()` pause |
+
+Because the scroll clock deliberately runs ahead of the audio, `.blyrics--active` is dropped roughly half a second **before** a line stops being sung. Anything that dims, blurs, or shrinks previous lines should account for that:
+
+```css
+/* dims the previous line while its last word is still playing */
+.blyrics-container > div:not(.blyrics--active) {
+  opacity: 0.33;
+}
+
+/* keeps it lit until the line is genuinely done */
+.blyrics-container > div.blyrics--animating {
+  opacity: 1;
+}
+```
+
+Use `.blyrics--active` for scroll-anchored affordances (which line is centered, cursor, hit targets) and `.blyrics--animating` for anything that must survive until the singing stops.
+
 ### Styling Each Word
 
 Every word uses the `.blyrics--word` class:
