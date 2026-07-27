@@ -1,10 +1,12 @@
 import {
+  ANIMATING_CLASS,
   CURRENT_LYRICS_CLASS,
   FOOTER_CLASS,
   LOG_PREFIX,
   LYRICS_CHECK_INTERVAL_ERROR,
   LYRICS_CLASS,
   NO_LYRICS_ELEMENT_LOG,
+  PAUSED_CLASS,
   TAB_HEADER_CLASS,
   TAB_RENDERER_SELECTOR,
   USER_SCROLLING_CLASS,
@@ -204,6 +206,7 @@ function resetLineAnimationState(lineData: LineData): void {
 function setAnimationsPlayState(lineData: LineData, isPlaying: boolean): void {
   const children = [lineData, ...lineData.parts];
   for (const part of children) {
+    part.lyricElement.classList.toggle(PAUSED_CLASS, !isPlaying);
     for (const animation of part.animations) {
       if (isPlaying) {
         animation.play();
@@ -211,6 +214,13 @@ function setAnimationsPlayState(lineData: LineData, isPlaying: boolean): void {
         animation.pause();
       }
     }
+  }
+}
+
+function clearLineStateClasses(lineData: LineData): void {
+  lineData.lyricElement.classList.remove(ANIMATING_CLASS);
+  for (const part of [lineData, ...lineData.parts]) {
+    part.lyricElement.classList.remove(PAUSED_CLASS);
   }
 }
 
@@ -2068,7 +2078,10 @@ export function animationEngine(currentTime: number, eventCreationTime: number, 
 
       const effectiveEndTime = Math.max(nextTime, time + lineData.duration + 0.05);
       if (currentTime + setUpAnimationEarlyTime >= time && currentTime < effectiveEndTime) {
-        lineData.isSelected = true;
+        if (!lineData.isSelected) {
+          lineData.isSelected = true;
+          lineData.lyricElement.classList.add(ANIMATING_CLASS);
+        }
 
         if (isPlaying !== lineData.isAnimationPlayStatePlaying) {
           lineData.isAnimationPlayStatePlaying = isPlaying;
@@ -2145,6 +2158,7 @@ export function animationEngine(currentTime: number, eventCreationTime: number, 
             lineData.isAnimationPlayStatePlaying = false;
           }
           lineData.isSelected = false;
+          clearLineStateClasses(lineData);
         } else if (hasLineAnimations(lineData) && (timeJumped || currentTime > staleAnimationEndTime)) {
           logAnimationCleanup(
             timeJumped ? "time-jump-reset" : "stale-reset",
