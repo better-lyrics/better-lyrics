@@ -220,12 +220,7 @@ body {
   flex: 1;
   container-type: size;
   overflow: hidden;
-  scrollbar-width: none;
   mask-image: linear-gradient(to bottom, transparent, #000 12%, #000 84%, transparent);
-}
-
-.blyrics-pip-lyrics::-webkit-scrollbar {
-  display: none;
 }
 
 .blyrics-pip-scroller {

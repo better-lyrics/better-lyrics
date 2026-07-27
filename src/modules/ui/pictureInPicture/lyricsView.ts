@@ -1,7 +1,9 @@
-import { CURRENT_LYRICS_CLASS } from "@constants";
+import { CURRENT_LYRICS_CLASS, LINE_CLASS, LYRICS_CLASS, PLAYER_BAR_SELECTOR, SEEK_EVENT } from "@constants";
 import type { PlayerDetails } from "@core/appState";
 import { t } from "@core/i18n";
+import { getSeekTimeFromClick } from "@modules/lyrics/injectLyrics";
 import { getSongMetadata } from "@modules/lyrics/requestSniffer/requestSniffer";
+import { animEngineState } from "@modules/ui/animationEngine";
 import { MIRROR_ID_ATTR } from "./pipMirror";
 
 interface DisplayMetadata {
@@ -15,7 +17,6 @@ type PlayerControlIcon = Exclude<PlayerControlAction, "play-pause"> | "play" | "
 
 const PLAYER_TIME_EVENT = "blyrics-send-player-time";
 const PLAYER_CONTROL_EVENT = "blyrics-player-control";
-const SEEK_EVENT = "blyrics-seek-to";
 const ARTWORK_SIZE = 512;
 const VISIBLE_METADATA_CHECK_INTERVAL = 250;
 const PLAYER_CONTROLS_IDLE_DELAY = 2000;
@@ -44,7 +45,7 @@ function getFallbackArtworkUrl(videoId: string): string {
 }
 
 function getVisiblePlayerMetadata(sourceDocument: Document): DisplayMetadata {
-  const playerBar = sourceDocument.querySelector("ytmusic-player-bar");
+  const playerBar = sourceDocument.querySelector(PLAYER_BAR_SELECTOR);
   const title = playerBar?.querySelector<HTMLElement>("yt-formatted-string.title, .title.ytmusic-player-bar");
   const byline = playerBar?.querySelector<HTMLElement>("yt-formatted-string.byline, .byline.ytmusic-player-bar");
   const bylineText = byline?.textContent?.trim() ?? "";
@@ -66,7 +67,7 @@ function getVisiblePlayerMetadata(sourceDocument: Document): DisplayMetadata {
 }
 
 function getSourcePlayerControl(sourceDocument: Document, action: PlayerControlAction): HTMLElement | null {
-  return sourceDocument.querySelector<HTMLElement>(`ytmusic-player-bar #${PLAYER_CONTROL_IDS[action]}`);
+  return sourceDocument.querySelector<HTMLElement>(`${PLAYER_BAR_SELECTOR} #${PLAYER_CONTROL_IDS[action]}`);
 }
 
 function getSourceControlLabel(sourceDocument: Document, action: PlayerControlAction, fallback: string): string {
@@ -142,13 +143,16 @@ export class PictureInPictureLyricsView {
     artworkControls.className = "blyrics-pip-artwork__controls";
     const previousButton = this.createPlayerControlButton(
       "previous",
-      getSourceControlLabel(sourceDocument, "previous", "Previous")
+      getSourceControlLabel(sourceDocument, "previous", t("picture_in_picture_previous"))
     );
     this.playPauseButton = this.createPlayerControlButton(
       "play-pause",
-      getSourceControlLabel(sourceDocument, "play-pause", "Play")
+      getSourceControlLabel(sourceDocument, "play-pause", t("picture_in_picture_play"))
     );
-    const nextButton = this.createPlayerControlButton("next", getSourceControlLabel(sourceDocument, "next", "Next"));
+    const nextButton = this.createPlayerControlButton(
+      "next",
+      getSourceControlLabel(sourceDocument, "next", t("picture_in_picture_next"))
+    );
     artworkControls.append(previousButton, this.playPauseButton, nextButton);
     this.artworkContainer.append(artworkPlaceholder, this.artwork, this.artworkVideo, artworkControls);
 
@@ -175,7 +179,7 @@ export class PictureInPictureLyricsView {
       signal: this.lifecycleController.signal,
     });
 
-    this.renderStatus(t("picture_in_picture_loading"), true);
+    this.renderStatus(t("picture_in_picture_loading"));
 
     content.append(header, this.lyricsViewport);
     this.shell.append(this.artworkContainer, content);
@@ -238,11 +242,14 @@ export class PictureInPictureLyricsView {
   };
 
   private readonly handleLyricClick = (event: MouseEvent): void => {
-    const timed = (event.target as Element | null)?.closest<HTMLElement>("[data-time]");
-    if (!timed) return;
-    const seekTime = Number.parseFloat(timed.dataset.time ?? "");
-    if (!Number.isFinite(seekTime)) return;
+    const line = (event.target as Element | null)?.closest<HTMLElement>(`.${LINE_CLASS}`);
+    if (!line) return;
+    const sync = line.closest<HTMLElement>(`.${LYRICS_CLASS}`)?.dataset.sync;
+    if (sync !== "synced" && sync !== "richsync") return;
+    const seekTime = getSeekTimeFromClick(event, line);
+    if (seekTime === null) return;
     this.sourceDocument.dispatchEvent(new CustomEvent(SEEK_EVENT, { detail: seekTime }));
+    animEngineState.scrollResumeTime = 0;
   };
 
   private readonly handlePointerMove = (): void => {
@@ -304,7 +311,11 @@ export class PictureInPictureLyricsView {
     this.playPauseButton.toggleAttribute("data-playing", isPlaying);
     this.playPauseButton.setAttribute(
       "aria-label",
-      getSourceControlLabel(this.sourceDocument, "play-pause", isPlaying ? "Pause" : "Play")
+      getSourceControlLabel(
+        this.sourceDocument,
+        "play-pause",
+        isPlaying ? t("picture_in_picture_pause") : t("picture_in_picture_play")
+      )
     );
   }
 
@@ -372,12 +383,11 @@ export class PictureInPictureLyricsView {
     this.artwork.src = url;
   }
 
-  private renderStatus(message: string, isLoading: boolean): void {
+  private renderStatus(message: string): void {
     const status = this.pipWindow.document.createElement("p");
     status.className = "blyrics-pip-lyrics__status";
     status.setAttribute("role", "status");
     status.textContent = message;
     this.lyricsViewport.replaceChildren(status);
-    this.shell.setAttribute("aria-busy", String(isLoading));
   }
 }

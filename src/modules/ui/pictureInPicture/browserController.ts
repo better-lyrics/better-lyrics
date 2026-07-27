@@ -12,6 +12,7 @@ const LYRIC_STYLESHEET_PATH = "css/blyrics/index.css";
 const CUSTOM_STYLE_ID = "blyrics-custom-style";
 const MINI_PLAYER_BUTTON_SELECTOR = ".player-minimize-button";
 let activeView: PictureInPictureLyricsView | null = null;
+let activeWindow: Window | null = null;
 let lastMirroredRoot: HTMLElement | null = null;
 let syncFrame: number | null = null;
 let themeObserver: MutationObserver | null = null;
@@ -21,6 +22,7 @@ let hasMirroredMiniPlayer = false;
 let autoRestoreInteractionController: AbortController | null = null;
 
 function renderLoadingShell(pipWindow: Window): void {
+  activeWindow = pipWindow;
   AppState.isPictureInPictureOpen = true;
   if (!AppState.areLyricsLoaded || AppState.lastLoadedVideoId !== AppState.lastVideoId) {
     AppState.queueLyricInjection = true;
@@ -33,6 +35,7 @@ function renderLoadingShell(pipWindow: Window): void {
 }
 
 function mirrorCustomTheme(pipWindow: Window): void {
+  stopThemeMirror();
   const pipStyle = pipWindow.document.createElement("style");
   pipStyle.id = CUSTOM_STYLE_ID;
   pipWindow.document.head.appendChild(pipStyle);
@@ -65,10 +68,21 @@ function startSyncLoop(pipWindow: Window): void {
 }
 
 function stopSyncLoop(pipWindow: Window): void {
-  if (syncFrame !== null) {
-    pipWindow.cancelAnimationFrame(syncFrame);
-    syncFrame = null;
-  }
+  if (syncFrame === null || activeWindow !== pipWindow) return;
+  pipWindow.cancelAnimationFrame(syncFrame);
+  syncFrame = null;
+}
+
+// A closed window's pagehide can arrive after its successor opened; only the owner may tear down.
+function teardownWindow(pipWindow: Window): void {
+  if (activeWindow !== pipWindow) return;
+  AppState.isPictureInPictureOpen = false;
+  stopSyncLoop(pipWindow);
+  stopThemeMirror();
+  teardownMirror();
+  activeView = null;
+  lastMirroredRoot = null;
+  activeWindow = null;
 }
 
 function injectLyricStyles(pipWindow: Window): void {
@@ -111,24 +125,14 @@ export const pictureInPictureController = new PictureInPictureController<Window>
   renderLoadingShell,
   injectStylesheet,
   closeWindow: pipWindow => {
-    AppState.isPictureInPictureOpen = false;
-    stopSyncLoop(pipWindow);
-    activeView = null;
-    lastMirroredRoot = null;
-    teardownMirror();
-    stopThemeMirror();
+    teardownWindow(pipWindow);
     pipWindow.close();
   },
   observePageHide: (pipWindow, listener) =>
     pipWindow.addEventListener(
       "pagehide",
       () => {
-        AppState.isPictureInPictureOpen = false;
-        stopSyncLoop(pipWindow);
-        activeView = null;
-        lastMirroredRoot = null;
-        teardownMirror();
-        stopThemeMirror();
+        teardownWindow(pipWindow);
         listener();
       },
       { once: true }

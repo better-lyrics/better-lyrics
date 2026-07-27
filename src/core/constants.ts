@@ -8,6 +8,7 @@ export const CURRENT_LYRICS_CLASS = "blyrics--active" as const;
 export const ZERO_DURATION_ANIMATION_CLASS = "blyrics-zero-dur-animate" as const;
 export const RTL_CLASS = "blyrics-rtl" as const;
 export const WORD_CLASS = "blyrics--word" as const;
+export const LINE_CLASS = "blyrics--line" as const;
 export const BACKGROUND_LYRIC_CLASS = "blyrics-background-lyric" as const;
 export const EXPLICIT_WORD_CLASS = "blyrics-explicit" as const;
 export const USER_SCROLLING_CLASS = "blyrics-user-scrolling" as const;
@@ -33,6 +34,10 @@ export const LYRICS_WRAPPER_ID = "blyrics-wrapper" as const;
 export const LYRICS_DISABLED_ATTR = "blyrics-dfs" as const;
 export const HIDDEN_CLASS = "blyrics-hidden" as const;
 export const REPORT_MODAL = "blyrics-report-lyrics" as const;
+
+// Custom Events
+// Duplicated as a literal in public/script.js; that file is a page-world script and cannot import.
+export const SEEK_EVENT = "blyrics-seek-to" as const;
 
 // Assets and Resources
 export const DISCORD_LOGO_SRC =

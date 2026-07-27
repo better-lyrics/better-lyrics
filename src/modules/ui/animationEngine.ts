@@ -1955,7 +1955,6 @@ export function animationEngine(currentTime: number, eventCreationTime: number, 
   }
 
   const tabSelector = lyricData.tabSelector;
-  console.assert(tabSelector != null);
 
   const playerState = document.getElementById("player-page")?.getAttribute("player-ui-state");
   const isPlayerOpen =
@@ -1963,8 +1962,9 @@ export function animationEngine(currentTime: number, eventCreationTime: number, 
     playerState === "PLAYER_PAGE_OPEN" ||
     playerState === "FULLSCREEN" ||
     playerState === "MINIPLAYER_IN_PLAYER_PAGE";
-  // Don't tick lyrics if they're not visible
-  if (tabSelector.getAttribute("aria-selected") !== "true" || !isPlayerOpen) {
+  const isMainLyricsVisible = tabSelector?.getAttribute("aria-selected") === "true" && isPlayerOpen;
+  // Don't tick lyrics if they're not visible anywhere
+  if (!isMainLyricsVisible && !AppState.isPictureInPictureOpen) {
     clearVisibleLyricWillChange();
     return;
   }
@@ -2012,7 +2012,7 @@ export function animationEngine(currentTime: number, eventCreationTime: number, 
     }
     const tabRendererHeight = cachedTabRendererHeight ?? tabRenderer.getBoundingClientRect().height;
     let scrollTop = tabRenderer.scrollTop;
-    if (animationConfig.enabled.scroll) {
+    if (isMainLyricsVisible && animationConfig.enabled.scroll) {
       updateVisibleLyricWillChange(lines, scrollTop, pendingLineScroll?.toScrollTop ?? scrollTop, tabRendererHeight);
     } else {
       cancelPendingLineScroll();
@@ -2170,7 +2170,7 @@ export function animationEngine(currentTime: number, eventCreationTime: number, 
       }
     }
 
-    if (animEngineState.scrollResumeTime < Date.now() || animEngineState.scrollPos === -1) {
+    if (isMainLyricsVisible && (animEngineState.scrollResumeTime < Date.now() || animEngineState.scrollPos === -1)) {
       if (activeElems.length == 0) {
         activeElems.push(lyricData.lines[0]);
       }
@@ -2367,7 +2367,7 @@ export function animationEngine(currentTime: number, eventCreationTime: number, 
       }
     }
 
-    if (animEngineState.wasUserScrolling && animEngineState.scrollResumeTime < Date.now()) {
+    if (isMainLyricsVisible && animEngineState.wasUserScrolling && animEngineState.scrollResumeTime < Date.now()) {
       getResumeScrollElement().setAttribute("autoscroll-hidden", "true");
       lyricsElement.classList.remove(USER_SCROLLING_CLASS);
       animEngineState.wasUserScrolling = false;

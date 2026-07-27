@@ -102,6 +102,22 @@
     "message": "Loading lyrics…",
     "description": "Status displayed while the Picture-in-Picture lyrics window initializes"
   },
+  "picture_in_picture_previous": {
+    "message": "Previous",
+    "description": "Accessible label for the previous track button in the Picture-in-Picture lyrics window, used when the YouTube Music player bar exposes no label of its own"
+  },
+  "picture_in_picture_play": {
+    "message": "Play",
+    "description": "Accessible label for the play button in the Picture-in-Picture lyrics window, used when the YouTube Music player bar exposes no label of its own"
+  },
+  "picture_in_picture_pause": {
+    "message": "Pause",
+    "description": "Accessible label for the pause button in the Picture-in-Picture lyrics window, used when the YouTube Music player bar exposes no label of its own"
+  },
+  "picture_in_picture_next": {
+    "message": "Next",
+    "description": "Accessible label for the next track button in the Picture-in-Picture lyrics window, used when the YouTube Music player bar exposes no label of its own"
+  },
   "options_display_pipAutoRestore": {
     "message": "Reopen floating lyrics automatically",
     "description": "Setting label for automatically reopening the floating lyrics window after page load"
