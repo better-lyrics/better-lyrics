@@ -1,4 +1,4 @@
-import { FONT_LINK, GENERAL_ERROR_LOG, LYRICS_CLASS, NOTO_SANS_UNIVERSAL_LINK } from "@constants";
+import { FONT_LINK, GENERAL_ERROR_LOG, LYRICS_CLASS, NOTO_SANS_UNIVERSAL_LINK, TAB_HEADER_CLASS } from "@constants";
 import { AppState } from "@core/appState";
 import { t } from "@core/i18n";
 import { getStorage } from "@core/storage";
@@ -26,6 +26,10 @@ function renderLoadingShell(pipWindow: Window): void {
   AppState.isPictureInPictureOpen = true;
   if (!AppState.areLyricsLoaded || AppState.lastLoadedVideoId !== AppState.lastVideoId) {
     AppState.queueLyricInjection = true;
+  } else {
+    // Opening from a non-lyrics side panel tab leaves ticking off, and nothing else turns it
+    // back on while the lyrics stay loaded, so the window would mount a frozen snapshot.
+    AppState.areLyricsTicking = true;
   }
   pipWindow.document.title = t("picture_in_picture_open");
   injectLyricStyles(pipWindow);
@@ -77,6 +81,10 @@ function stopSyncLoop(pipWindow: Window): void {
 function teardownWindow(pipWindow: Window): void {
   if (activeWindow !== pipWindow) return;
   AppState.isPictureInPictureOpen = false;
+  const tabSelector = document.getElementsByClassName(TAB_HEADER_CLASS)[1];
+  if (tabSelector?.getAttribute("aria-selected") !== "true") {
+    AppState.areLyricsTicking = false;
+  }
   stopSyncLoop(pipWindow);
   stopThemeMirror();
   teardownMirror();
@@ -190,7 +198,9 @@ function armAutoRestore(): void {
     if (!pictureInPictureController.isOpen()) pictureInPictureController.toggle();
   };
 
-  document.addEventListener("pointerdown", attemptOpen, { capture: true, signal: controller.signal });
+  // Must be click, not pointerdown: pointerdown only grants transient user activation for a
+  // mouse, so a touch or pen tap would spend the single attempt on a request that cannot resolve.
+  document.addEventListener("click", attemptOpen, { capture: true, signal: controller.signal });
   document.addEventListener("keydown", attemptOpen, { capture: true, signal: controller.signal });
 }
 

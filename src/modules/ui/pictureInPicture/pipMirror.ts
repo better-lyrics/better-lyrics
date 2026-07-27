@@ -28,11 +28,13 @@ let observer: MutationObserver | null = null;
 let rebuildRequested = false;
 let sourceToTwin = new WeakMap<Animation, Animation>();
 let knownSources = new Set<Animation>();
+let skippedSources = new WeakSet<Animation>();
 
 function resetMirrorAnimations(): void {
   for (const source of knownSources) sourceToTwin.get(source)?.cancel();
   sourceToTwin = new WeakMap();
   knownSources = new Set();
+  skippedSources = new WeakSet();
 }
 
 export function needsRebuild(): boolean {
@@ -98,19 +100,24 @@ export function sync(mainRoot: HTMLElement): void {
   const nextKnown = new Set<Animation>();
 
   for (const source of live) {
+    if (skippedSources.has(source)) continue;
     const effect = source.effect;
     if (!(effect instanceof KeyframeEffect) || !(effect.target instanceof Element)) continue;
     const twinElement = idToTwin.get(effect.target.getAttribute(MIRROR_ID_ATTR) ?? "");
     if (!twinElement) continue;
-    const keyframes = effect.getKeyframes();
-    // The engine's per-line scroll easing is the only animation that touches the CSS `translate`
-    // property; the PiP twin reflows to the window so those pixel offsets do not map. Scroll is
-    // driven instead by active-line centering in the view.
-    if (keyframes.some(frame => frame.translate !== undefined)) continue;
-    nextKnown.add(source);
 
     let twin = sourceToTwin.get(source);
     if (!twin) {
+      // getKeyframes() reserializes every property, so it stays behind the twin cache and the
+      // skip decision is memoized; keyframes never change once an animation is created.
+      const keyframes = effect.getKeyframes();
+      // The engine's per-line scroll easing is the only animation that touches the CSS `translate`
+      // property; the PiP twin reflows to the window so those pixel offsets do not map. Scroll is
+      // driven instead by active-line centering in the view.
+      if (keyframes.some(frame => frame.translate !== undefined)) {
+        skippedSources.add(source);
+        continue;
+      }
       twin = twinElement.animate(keyframes, {
         ...effect.getTiming(),
         composite: effect.composite,
@@ -118,6 +125,7 @@ export function sync(mainRoot: HTMLElement): void {
       });
       sourceToTwin.set(source, twin);
     }
+    nextKnown.add(source);
     if (source.currentTime !== null) twin.currentTime = source.currentTime;
     twin.playbackRate = source.playbackRate;
     if (source.playState === "paused") twin.pause();
