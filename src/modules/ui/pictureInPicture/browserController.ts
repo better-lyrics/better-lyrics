@@ -11,6 +11,7 @@ const STYLESHEET_PATH = "css/blyrics/picture-in-picture.css";
 const LYRIC_STYLESHEET_PATH = "css/blyrics/index.css";
 const CUSTOM_STYLE_ID = "blyrics-custom-style";
 const MINI_PLAYER_BUTTON_SELECTOR = ".player-minimize-button";
+const PIP_OPEN_ATTRIBUTE = "blyrics-pip-open";
 let activeView: PictureInPictureLyricsView | null = null;
 let activeWindow: Window | null = null;
 let lastMirroredRoot: HTMLElement | null = null;
@@ -24,6 +25,7 @@ let autoRestoreInteractionController: AbortController | null = null;
 function renderLoadingShell(pipWindow: Window): void {
   activeWindow = pipWindow;
   AppState.isPictureInPictureOpen = true;
+  document.documentElement.setAttribute(PIP_OPEN_ATTRIBUTE, "");
   if (!AppState.areLyricsLoaded || AppState.lastLoadedVideoId !== AppState.lastVideoId) {
     AppState.queueLyricInjection = true;
   } else {
@@ -81,6 +83,7 @@ function stopSyncLoop(pipWindow: Window): void {
 function teardownWindow(pipWindow: Window): void {
   if (activeWindow !== pipWindow) return;
   AppState.isPictureInPictureOpen = false;
+  document.documentElement.removeAttribute(PIP_OPEN_ATTRIBUTE);
   const tabSelector = document.getElementsByClassName(TAB_HEADER_CLASS)[1];
   if (tabSelector?.getAttribute("aria-selected") !== "true") {
     AppState.areLyricsTicking = false;

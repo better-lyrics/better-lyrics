@@ -133,9 +133,15 @@ export function sync(mainRoot: HTMLElement): void {
   }
 
   for (const source of knownSources) {
-    if (!nextKnown.has(source)) {
+    if (nextKnown.has(source)) continue;
+    // Dropping out of getAnimations() does not mean the source ended: an unrendered target takes
+    // its animation off the list while it is still running. Retire the twin only once the source
+    // is genuinely gone, so a stall can never blank the window.
+    if (source.playState === "idle") {
       sourceToTwin.get(source)?.cancel();
       sourceToTwin.delete(source);
+    } else {
+      nextKnown.add(source);
     }
   }
   knownSources = nextKnown;
