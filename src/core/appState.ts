@@ -60,6 +60,7 @@ interface AppStateType {
   isDockTranslateEnabled: boolean;
   isDockRomanizeEnabled: boolean;
   isDockOffsetEnabled: boolean;
+  isDockPictureInPictureEnabled: boolean;
   dockControlsOrder: string[];
   currentUnisonData: UnisonData | null;
   isPictureInPictureOpen: boolean;
@@ -102,6 +103,7 @@ export const AppState: AppStateType = {
   isDockTranslateEnabled: true,
   isDockRomanizeEnabled: true,
   isDockOffsetEnabled: true,
+  isDockPictureInPictureEnabled: true,
   dockControlsOrder: [...DOCK_CONTROL_ORDER_DEFAULT],
   currentUnisonData: null,
   isPictureInPictureOpen: false,

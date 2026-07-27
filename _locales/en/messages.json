@@ -190,6 +190,10 @@
     "message": "Source switcher",
     "description": "Toggle label for showing the lyrics source switcher control in the dock"
   },
+  "options_unisonModal_controlPictureInPicture": {
+    "message": "Floating window",
+    "description": "Toggle label for showing the control that opens the floating lyrics window in the dock"
+  },
   "options_unisonModal_controlOffset": {
     "message": "Sync offset",
     "description": "Toggle label for showing the sync offset control in the dock"

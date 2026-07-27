@@ -469,6 +469,7 @@ const controlBuilders: Record<string, () => HTMLElement | null> = {
         )
       : null,
   offset: () => (isSynced() && AppState.isDockOffsetEnabled ? buildOffsetControl() : null),
+  pictureInPicture: () => (AppState.isDockPictureInPictureEnabled ? buildPictureInPictureControl() : null),
 };
 
 function buildDivider(): HTMLElement {
@@ -496,12 +497,6 @@ export function buildControlsSegment(): HTMLElement {
       sections.push(section);
       shape.push(key);
     }
-  }
-
-  const pictureInPictureControl = buildPictureInPictureControl();
-  if (pictureInPictureControl) {
-    sections.push(pictureInPictureControl);
-    shape.push("pictureInPicture");
   }
 
   // Used by the dock mount to animate controls in only when the set of controls changes
