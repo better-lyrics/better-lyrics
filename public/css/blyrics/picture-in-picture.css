@@ -107,8 +107,7 @@ body {
   inset: 0;
   display: flex;
   align-items: center;
-  justify-content: center;
-  gap: clamp(2px, 1.2vw, 7px);
+  justify-content: space-evenly;
   background: rgb(0 0 0 / 48%);
   opacity: 0;
   pointer-events: none;
