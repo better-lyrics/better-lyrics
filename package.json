@@ -63,7 +63,7 @@
         "@types/node": "^26.1.1",
         "@types/sortablejs": "^1.15.9",
         "@typescript/lib-dom": "npm:@types/web@^0.0.280",
-        "jsdom": "^29.1.1",
+        "jsdom": "^30.0.0",
         "knip": "^5.88.1",
         "tsx": "^4.23.1",
         "typescript": "^6.0.3"
