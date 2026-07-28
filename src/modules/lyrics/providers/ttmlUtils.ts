@@ -16,6 +16,7 @@ import type {
   TransliterationItem,
   TtmlRoot,
 } from "@/modules/lyrics/providers/ttmlTypes";
+import type { UnisonData } from "@modules/lyrics/providers/unison";
 
 /**
  * Parse time in hh:mm:ss.xx or offset-time with unit indicators "h", "m", "s", "ms" (e.g 432.25s)
@@ -229,6 +230,7 @@ interface FillTtmlOptions {
   source: string;
   sourceHref: string;
   cacheAllowed?: boolean;
+  unisonData?: UnisonData;
 }
 
 export async function fillTtml(
@@ -240,10 +242,10 @@ export async function fillTtml(
     source: HOMEPAGE_DOMAIN,
     sourceHref: HOMEPAGE_URL,
     cacheAllowed: true,
-  },
-  ...args: unknown[]
+    unisonData: undefined,
+  }
 ) {
-  const { richsyncKey, syncedKey, source, sourceHref, cacheAllowed } = options;
+  const { richsyncKey, syncedKey, source, sourceHref, cacheAllowed, unisonData } = options;
   const parserOptions: X2jOptions = {
     ignoreAttributes: false,
     attributeNamePrefix: "@_",
@@ -411,7 +413,7 @@ export async function fillTtml(
     musicVideoSynced: false,
     source,
     sourceHref,
-    ...(args[0] || {}),
+    unisonData,
   };
 
   if (isWordSynced) {

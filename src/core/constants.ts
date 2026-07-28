@@ -5,22 +5,21 @@ export const TAB_HEADER_CLASS = "tab-header style-scope ytmusic-player-page" as 
 export const TAB_CONTENT_CLASS = "tab-content style-scope tp-yt-paper-tab" as const;
 export const LYRICS_CLASS = "blyrics-container" as const;
 export const CURRENT_LYRICS_CLASS = "blyrics--active" as const;
+export const ANIMATING_CLASS = "blyrics--animating" as const;
+export const PAUSED_CLASS = "blyrics--paused" as const;
 export const ZERO_DURATION_ANIMATION_CLASS = "blyrics-zero-dur-animate" as const;
 export const RTL_CLASS = "blyrics-rtl" as const;
 export const WORD_CLASS = "blyrics--word" as const;
-export const HAS_TRAILING_SPACE_CLASS = "blyrics--has-trailing-space" as const;
+export const LINE_CLASS = "blyrics--line" as const;
 export const BACKGROUND_LYRIC_CLASS = "blyrics-background-lyric" as const;
 export const EXPLICIT_WORD_CLASS = "blyrics-explicit" as const;
-export const ANIMATING_CLASS = "blyrics--animating" as const;
-export const PAUSED_CLASS = "blyrics--paused" as const;
-export const PRE_ANIMATING_CLASS = "blyrics--pre-animating" as const;
 export const USER_SCROLLING_CLASS = "blyrics-user-scrolling" as const;
 export const TRANSLATED_LYRICS_CLASS = "blyrics--translated" as const;
 export const ROMANIZED_LYRICS_CLASS = "blyrics--romanized" as const;
 export const FOOTER_CLASS = "blyrics-footer" as const;
 export const DOCK_CLASS = "blyrics-dock" as const;
 export const DOCK_DEFAULT_POSITION = "bottom-right" as const;
-export const DOCK_CONTROL_ORDER_DEFAULT = ["source", "translate", "romanize", "offset"] as const;
+export const DOCK_CONTROL_ORDER_DEFAULT = ["source", "translate", "romanize", "offset", "pictureInPicture"] as const;
 export const MODAL_OVERLAY_CLASS = "blyrics-modal-overlay" as const;
 export const MODAL_CLASS = "blyrics-modal" as const;
 
@@ -37,6 +36,10 @@ export const LYRICS_WRAPPER_ID = "blyrics-wrapper" as const;
 export const LYRICS_DISABLED_ATTR = "blyrics-dfs" as const;
 export const HIDDEN_CLASS = "blyrics-hidden" as const;
 export const REPORT_MODAL = "blyrics-report-lyrics" as const;
+
+// Custom Events
+// Duplicated as a literal in public/script.js; that file is a page-world script and cannot import.
+export const SEEK_EVENT = "blyrics-seek-to" as const;
 
 // Assets and Resources
 export const DISCORD_LOGO_SRC =
@@ -233,8 +236,6 @@ export const PROVIDER_SWITCHED_LOG = "[BetterLyrics] Switching to provider = " a
 export const LYRICS_TAB_HIDDEN_LOG =
   "[BetterLyrics] (Safe to ignore) Lyrics tab is hidden, skipping lyrics fetch" as const;
 export const LYRICS_TAB_CLICKED_LOG = "[BetterLyrics] Lyrics tab clicked, fetching lyrics" as const;
-export const LYRICS_WRAPPER_NOT_VISIBLE_LOG =
-  "[BetterLyrics] (Safe to ignore) Lyrics wrapper is not visible, unable to inject lyrics" as const;
 export const LYRICS_WRAPPER_CREATED_LOG = "[BetterLyrics] Lyrics wrapper created" as const;
 export const FOOTER_NOT_VISIBLE_LOG =
   "[BetterLyrics] (Safe to ignore) Footer is not visible, unable to inject source link" as const;
@@ -262,6 +263,7 @@ export const MUSIC_NOTES = "♪𝅘𝅥𝅮𝅘𝅥𝅯𝅘𝅥𝅰𝅘𝅥𝅱𝅘𝅥𝅲" as const;
 export const BLYRICS_INSTRUMENTAL_GAP_MS = 5000;
 
 export const LYRICS_CACHE_TTL_MS = 7 * 24 * 60 * 60 * 1000;
+export const LYRICS_NEGATIVE_CACHE_TTL_MS = 30 * 60 * 1000;
 
 export const OFFSET_STORAGE_PREFIX = "blyricsOffset_";
 

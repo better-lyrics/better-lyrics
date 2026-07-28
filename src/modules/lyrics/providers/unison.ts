@@ -34,10 +34,6 @@ export enum UnisonReportReason {
   OTHER = "other",
 }
 
-export type UnisonLyricSourceResult = LyricSourceResult & {
-  unisonData: UnisonData;
-};
-
 export interface UnisonData {
   vote: 1 | -1 | null;
   votes: number;
@@ -124,16 +120,23 @@ export default async function unison(providerParameters: ProviderParameters): Pr
     headers: { "x-key-id": (await getIdentity()).keyId },
   });
 
-  providerParameters.sourceMap["unison-richsynced"].filled = true;
-  providerParameters.sourceMap["unison-synced"].filled = true;
-  providerParameters.sourceMap["unison-plain"].filled = true;
-
-  if (!response.ok) {
+  if (response.status === 404) {
+    providerParameters.sourceMap["unison-richsynced"].filled = true;
+    providerParameters.sourceMap["unison-synced"].filled = true;
+    providerParameters.sourceMap["unison-plain"].filled = true;
     providerParameters.sourceMap["unison-richsynced"].lyricSourceResult = null;
     providerParameters.sourceMap["unison-synced"].lyricSourceResult = null;
     providerParameters.sourceMap["unison-plain"].lyricSourceResult = null;
     return;
   }
+
+  if (!response.ok) {
+    return;
+  }
+
+  providerParameters.sourceMap["unison-richsynced"].filled = true;
+  providerParameters.sourceMap["unison-synced"].filled = true;
+  providerParameters.sourceMap["unison-plain"].filled = true;
 
   const responseData: UnisonResponse = await response.json().then(json => json.data);
 
@@ -144,12 +147,6 @@ export default async function unison(providerParameters: ProviderParameters): Pr
     return;
   }
 
-  const result = {
-    cacheAllowed: false,
-    source: "Unison",
-    sourceHref: chrome.runtime.getURL("pages/unison.html"),
-  };
-
   const unisonData: UnisonData = {
     vote: responseData.userVote,
     votes: responseData.voteCount,
@@ -158,25 +155,26 @@ export default async function unison(providerParameters: ProviderParameters): Pr
     submitter: responseData.submitter,
   };
 
+  const result = {
+    cacheAllowed: false,
+    source: "Unison",
+    sourceHref: chrome.runtime.getURL("pages/unison.html"),
+    unisonData,
+  };
+
   switch (responseData.format) {
     case "ttml":
-      await fillTtml(
-        responseData.lyrics,
-        providerParameters,
-        {
-          richsyncKey: "unison-richsynced",
-          syncedKey: "unison-synced",
-          ...result,
-        },
-        { unisonData }
-      );
+      await fillTtml(responseData.lyrics, providerParameters, {
+        richsyncKey: "unison-richsynced",
+        syncedKey: "unison-synced",
+        ...result,
+      });
       providerParameters.sourceMap["unison-plain"].lyricSourceResult = null;
       break;
     case "lrc":
       const lrc = parseLRC(responseData.lyrics, responseData.duration);
       const res = {
         ...result,
-        unisonData,
         lyrics: lrc,
       };
 
@@ -191,7 +189,6 @@ export default async function unison(providerParameters: ProviderParameters): Pr
       providerParameters.sourceMap["unison-plain"].lyricSourceResult = plain
         ? {
             ...result,
-            unisonData,
             lyrics: plain,
           }
         : null;

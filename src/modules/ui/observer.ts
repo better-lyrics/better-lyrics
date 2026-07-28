@@ -20,8 +20,9 @@ import { onAutoSwitchEnabled, onFullScreenDisabled, wakeDockIdle } from "@module
 import {
   animationEngine,
   animEngineState,
+  cancelPendingLineScroll,
   getResumeScrollElement,
-  resetActiveAnimations,
+  noteAnimationVisibilityChange,
 } from "@modules/ui/animationEngine";
 import { adjustLyricOffset, OFFSET_STEP, OFFSET_STEP_LARGE } from "@modules/ui/lyricsDock/offset";
 import {
@@ -56,6 +57,38 @@ let hasInitializedHomepageFullscreen = false;
 let hasInitializedAltHover = false;
 let hasInitializedLyrics = false;
 let metadataAbortController: AbortController | null = null;
+const ANIMATION_ENGINE_INTERVAL_MS = 20;
+let animationFrameRequest: number | null = null;
+let lastAnimationEngineRun = -Infinity;
+let latestPlayerPlaying = false;
+let latestPlayerTime = 0;
+let latestPlayerSnapshotTime = 0;
+let latestPlayerDuration = 0;
+let latestPlaybackRate = 1;
+
+function runAnimationEngine(now: number, force = false): void {
+  if (!force && (!latestPlayerPlaying || now - lastAnimationEngineRun < ANIMATION_ENGINE_INTERVAL_MS)) return;
+
+  lastAnimationEngineRun = now;
+  const wallTime = Date.now();
+  const elapsedS = latestPlayerPlaying
+    ? (Math.max(0, wallTime - latestPlayerSnapshotTime) * latestPlaybackRate) / 1000
+    : 0;
+  const currentTime = Math.min(latestPlayerTime + elapsedS, latestPlayerDuration || Infinity);
+  if (AppState.suppressZeroTime < wallTime || currentTime !== 0) {
+    animationEngine(currentTime, wallTime, latestPlayerPlaying);
+  }
+}
+
+function animationFrameLoop(now: number): void {
+  runAnimationEngine(now);
+  animationFrameRequest = requestAnimationFrame(animationFrameLoop);
+}
+
+function startAnimationFrameLoop(): void {
+  if (animationFrameRequest !== null) return;
+  animationFrameRequest = requestAnimationFrame(animationFrameLoop);
+}
 
 async function requestWakeLock(): Promise<void> {
   if (!("wakeLock" in navigator)) {
@@ -238,11 +271,11 @@ export function lyricReloader(): void {
         setTimeout(() => {
           tabRenderer.scrollTop = scrollPositions[i];
           // Don't start ticking until we set the height
-          AppState.areLyricsTicking = AppState.areLyricsLoaded && i === 1;
+          AppState.areLyricsTicking = AppState.areLyricsLoaded && (i === 1 || AppState.isPictureInPictureOpen);
         }, 0);
         currentTab = i;
 
-        if (i !== 1) {
+        if (i !== 1 && !AppState.isPictureInPictureOpen) {
           // stop ticking immediately
           AppState.areLyricsTicking = false;
         }
@@ -281,14 +314,22 @@ export function initializeLyrics(): void {
   hasInitializedLyrics = true;
 
   document.addEventListener("visibilitychange", () => {
+    noteAnimationVisibilityChange();
     if (document.visibilityState === "visible") {
-      resetActiveAnimations();
+      runAnimationEngine(performance.now(), true);
     }
   });
+
+  startAnimationFrameLoop();
 
   // @ts-ignore
   document.addEventListener("blyrics-send-player-time", (event: CustomEvent<PlayerDetails>) => {
     const detail = event.detail;
+    latestPlayerPlaying = detail.playing;
+    latestPlayerTime = detail.currentTime;
+    latestPlayerSnapshotTime = detail.browserTime;
+    latestPlayerDuration = Number(detail.duration);
+    latestPlaybackRate = detail.playbackRate ?? 1;
 
     const currentVideoId = detail.videoId;
     const currentVideoDetails = detail.song + " " + detail.artist;
@@ -363,7 +404,7 @@ export function initializeLyrics(): void {
       injectSongAttributes(detail.song, detail.artist);
     }
 
-    if (AppState.lyricInjectionFailed) {
+    if (AppState.lyricInjectionFailed && !AppState.isPictureInPictureOpen) {
       const tabSelector = document.getElementsByClassName(TAB_HEADER_CLASS)[1];
       if (tabSelector && tabSelector.getAttribute("aria-selected") !== "true") {
         return; // wait to resolve until tab is visible
@@ -386,8 +427,8 @@ export function initializeLyrics(): void {
       }
     }
 
-    if (AppState.suppressZeroTime < Date.now() || detail.currentTime !== 0) {
-      animationEngine(detail.currentTime, detail.browserTime, detail.playing);
+    if (document.visibilityState === "visible") {
+      runAnimationEngine(performance.now(), true);
     }
   });
 }
@@ -407,6 +448,7 @@ export function scrollEventHandler(): void {
     animEngineState.skipScrollsDecayTimes.shift();
     return;
   }
+  cancelPendingLineScroll();
   if (!isLoaderActive()) {
     if (animEngineState.scrollResumeTime < Date.now()) {
       log(PAUSING_LYRICS_SCROLL_LOG);

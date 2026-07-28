@@ -1,6 +1,6 @@
 {
   "extensionName": {
-    "message": "Better Lyrics (เนื้อเพลงสำหรับ Youtube Music)",
+    "message": "Better Lyrics (Lyrics for YouTube Music)",
     "description": "The name of the extension"
   },
   "extensionDescription": {
@@ -179,9 +179,25 @@
     "message": "Shift lyrics later",
     "description": "Accessible label for the lyrics dock button that nudges sync timing later"
   },
-  "lyricsDock_offsetReset": {
-    "message": "Double-click to reset",
-    "description": "Tooltip on the lyrics dock offset clock icon; double-clicking it resets the sync offset to zero"
+  "lyricsDock_offsetGlobal": {
+    "message": "Global",
+    "description": "Label in the lyrics dock offset menu for the global offset applied to all songs and sync types"
+  },
+  "options_offsetModal_perSong": {
+    "message": "Per-song offsets",
+    "description": "Heading in the offset settings modal for the section that manages saved per-song sync offsets"
+  },
+  "options_offsetModal_perSongClear": {
+    "message": "Clear all",
+    "description": "Button in the offset settings modal that deletes every saved per-song sync offset"
+  },
+  "options_offsetModal_perSongCount": {
+    "message": "Saved offsets",
+    "description": "Label in the offset settings modal showing how many per-song sync offsets are stored"
+  },
+  "options_offsetModal_appliesTo": {
+    "message": "Applies to",
+    "description": "Label in the offset settings modal preceding the list of sync types a given offset affects"
   },
   "options_language_displayLanguage": {
     "message": "ภาษาที่แสดงผล",
@@ -508,12 +524,12 @@
     "description": "LRClib provider name"
   },
   "options_provider_youtube": {
-    "message": "Youtube",
-    "description": "Youtube provider name"
+    "message": "YouTube",
+    "description": "YouTube provider name"
   },
   "options_provider_youtubeCaptions": {
-    "message": "คำอธิบายภาพของ Youtube",
-    "description": "Youtube Captions provider name"
+    "message": "YouTube Captions",
+    "description": "YouTube Captions provider name"
   },
   "options_provider_binilyrics": {
     "message": "BiniLyrics",
@@ -874,6 +890,30 @@
       "date": {
         "content": "$1",
         "example": "January 15, 2025, 3:42 PM"
+      }
+    }
+  },
+  "marketplace_requiresVersion": {
+    "message": "Requires v$version$+",
+    "description": "Footer chip in the theme detail modal showing the minimum Better Lyrics version a theme needs",
+    "placeholders": {
+      "version": {
+        "content": "$1",
+        "example": "2.0.5.6"
+      }
+    }
+  },
+  "marketplace_discussion": {
+    "message": "Discussion",
+    "description": "Footer link in the theme detail modal that opens the theme's discussion thread"
+  },
+  "marketplace_commit": {
+    "message": "Commit $hash$",
+    "description": "Footer chip in the theme detail modal linking to the exact source commit a theme was built from",
+    "placeholders": {
+      "hash": {
+        "content": "$1",
+        "example": "a1b2c3d"
       }
     }
   },

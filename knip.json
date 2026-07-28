@@ -10,14 +10,12 @@
     "src/options/auth/auth.ts",
     "public/earlyInject.js",
     "public/script.js",
-    "src/core/generated/locales.ts"
+    "src/core/generated/locales.ts",
+    "src/**/*.selfcheck.ts"
   ],
   "project": ["src/**/*.ts", "public/**/*.js"],
-  "ignore": ["src/types/**"],
   "ignoreDependencies": [
     "@codemirror/language",
-    "@plasmohq/edge-addons-api",
-    "@types/chrome",
     "@typescript/lib-dom"
   ],
   "ignoreIssues": {

@@ -62,25 +62,17 @@
 	transform: translateY(100%) !important;
 }
 
-
-/* Setup the Wavy Path Transition */
 .blyrics--wave-path {
-	/* Set the transform origin to the bottom of the wave shape (y=4) */
+	/* Set the transform origin to the bottom of the wave shape (y=4). */
 	transform-box: fill-box;
 	transform-origin: bottom;
 
-	/* Wiggle animation (indefinite) */
-	animation: blyrics-wave 1.25s ease-in-out infinite;
-	animation-play-state: paused;
-
-	/* Prepare the flatten transition */
+	/* Prepare the WAAPI flatten transition. */
 	transform: scaleY(1.2);
 }
 
 /* Trigger the Flattening */
 .blyrics--instrumental.blyrics--animating:not(.blyrics--paused) .blyrics--wave-path {
-	animation-play-state: running;
-
 	/* Flatten the wave to 0 height */
 	transform: scaleY(0);
 

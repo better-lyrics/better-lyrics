@@ -7,10 +7,10 @@
 const originalFetch = window.fetch;
 
 // -- English byline override --------------------------
-function dispatchSniffResponse(url, requestJson, responseJson, status) {
+function dispatchSniffResponse(url, requestJson, responseJson, status, localizedResponseJson) {
   document.dispatchEvent(
     new CustomEvent("blyrics-send-response", {
-      detail: { url, requestJson, responseJson, status, timestamp: Date.now() },
+      detail: { url, requestJson, responseJson, localizedResponseJson, status, timestamp: Date.now() },
     })
   );
 }
@@ -139,7 +139,7 @@ window.fetch = async function (request, init) {
 
           if (isNext && origHl && origHl !== "en") {
             fetchEnglishNext(urlString, awaitedTexts[0], originalRequestForJson.headers).then(
-              englishJson => dispatchSniffResponse(eventUrl, requestJson, englishJson, status),
+              englishJson => dispatchSniffResponse(eventUrl, requestJson, englishJson, status, responseJson),
               error => {
                 console.error("Better Lyrics: English /next fetch failed, using localized response:", error);
                 dispatchSniffResponse(eventUrl, requestJson, responseJson, status);

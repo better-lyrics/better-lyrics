@@ -1,12 +1,16 @@
 /**
  * Creates an HTML element representing an instrumental break in the lyrics.
  *
+ * @param container - Element to place instrumental parts into
  * @param durationMs - Duration of the instrumental break in milliseconds
  * @param lineIndex - Line index for unique SVG element IDs
  * @returns HTMLDivElement representing the instrumental break
  */
-export function createInstrumentalElement(durationMs: number, lineIndex: number): HTMLDivElement {
-  const container = document.createElement("div");
+export function createInstrumentalElement(
+  container: HTMLDivElement,
+  durationMs: number,
+  lineIndex: number
+): HTMLDivElement {
   container.classList.add("blyrics--instrumental");
   container.style.setProperty("--blyrics-duration", `${durationMs}ms`);
 

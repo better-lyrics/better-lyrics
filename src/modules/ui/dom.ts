@@ -1,6 +1,5 @@
 import {
   AD_PLAYING_ATTR,
-  BACKGROUND_LYRIC_CLASS,
   DISCORD_INVITE_URL,
   DISCORD_LOGO_SRC,
   DOCK_CLASS,
@@ -8,11 +7,11 @@ import {
   FOOTER_CLASS,
   FOOTER_NOT_VISIBLE_LOG,
   GENIUS_LOGO_SRC,
-  HAS_TRAILING_SPACE_CLASS,
   HIDDEN_CLASS,
   HOMEPAGE_DOMAIN,
   HOMEPAGE_ICON_URL,
   HOMEPAGE_URL,
+  LINE_CLASS,
   LOADER_TRANSITION_ENDED,
   LOG_PREFIX_UNISON,
   LYRICS_AD_OVERLAY_ID,
@@ -31,11 +30,10 @@ import {
   type SyncType,
   TAB_RENDERER_SELECTOR,
   TRANSLATED_LYRICS_CLASS,
-  WORD_CLASS,
 } from "@constants";
 import { AppState } from "@core/appState";
 import { t } from "@core/i18n";
-import { disconnectResizeObserver } from "@modules/lyrics/injectLyrics";
+import { disconnectResizeObserver, WORD_HIGHLIGHT_CLASS } from "@modules/lyrics/injectLyrics";
 import type { ThumbnailElement } from "@modules/lyrics/requestSniffer/NextResponse";
 import { getSongMetadata } from "@modules/lyrics/requestSniffer/requestSniffer";
 import {
@@ -51,7 +49,7 @@ import { getRequest, setRequest } from "@modules/unison/lyricsRequestTracker";
 import { getTrustTier } from "@modules/unison/trustTier";
 import type { UnisonLyricsRequest } from "@modules/unison/types";
 import { requestLyrics } from "@modules/unison/unisonApi";
-import { log } from "@utils";
+import { getRelativeLayoutBounds, log } from "@utils";
 import { generatePetName } from "@/core/keyIdentity";
 import { byId, deleteVote, type UnisonData, vote } from "../lyrics/providers/unison";
 import { buildControlsSegment, closeSourceMenu } from "./lyricsDock/controls";
@@ -249,28 +247,6 @@ function createRequestSyncedButton(meta: RequestButtonMeta): HTMLElement {
   return container;
 }
 
-// Word spans hold no whitespace; gaps are rendered from HAS_TRAILING_SPACE_CLASS, which is set only
-// where the source had a space. Reconstructing from it keeps words spaced ("I'll meet you") while
-// leaving syllables of one word fused ("divide", not "di vi de").
-function wordsToText(words: NodeListOf<Element>): string {
-  let out = "";
-  let prevBackground: boolean | null = null;
-  for (const w of words) {
-    const isBackground = w.classList.contains(BACKGROUND_LYRIC_CLASS);
-    if (prevBackground !== null && isBackground !== prevBackground) out += " ";
-    out += (w.textContent ?? "") + (w.classList.contains(HAS_TRAILING_SPACE_CLASS) ? " " : "");
-    prevBackground = isBackground;
-  }
-  return out.replace(/\s+/g, " ").trim();
-}
-
-function extractLineText(root: DocumentFragment | Element): string {
-  const main = wordsToText(root.querySelectorAll(`.${WORD_CLASS}`));
-  const romanized = root.querySelector(`.${ROMANIZED_LYRICS_CLASS}`)?.textContent?.trim();
-  const translated = root.querySelector(`.${TRANSLATED_LYRICS_CLASS}`)?.textContent?.trim();
-  return [main, romanized, translated].filter(Boolean).join("\n");
-}
-
 let lyricsObserver: MutationObserver | null = null;
 let adStateObserver: MutationObserver | null = null;
 /**
@@ -288,8 +264,6 @@ export function createLyricsWrapper(): HTMLElement {
 
   if (existingWrapper) {
     existingWrapper.replaceChildren();
-    existingWrapper.style.top = "";
-    existingWrapper.style.transition = "";
     return existingWrapper;
   }
 
@@ -304,10 +278,12 @@ export function createLyricsWrapper(): HTMLElement {
     const range = selection.getRangeAt(0);
     const fragment = range.cloneContents();
 
-    const lineElements = fragment.querySelectorAll(".blyrics--line");
+    fragment.querySelectorAll(`.${WORD_HIGHLIGHT_CLASS}`).forEach(el => el.remove());
+
+    const lineElements = fragment.querySelectorAll(`.${LINE_CLASS}`);
 
     if (lineElements.length === 0) {
-      const text = extractLineText(fragment) || fragment.textContent?.replace(/\s+/g, " ").trim();
+      const text = fragment.textContent?.replace(/\s+/g, " ").trim();
       if (text && e.clipboardData) {
         e.preventDefault();
         e.clipboardData.setData("text/plain", text);
@@ -318,8 +294,14 @@ export function createLyricsWrapper(): HTMLElement {
     const lines: string[] = [];
 
     for (const line of lineElements) {
-      const text = extractLineText(line);
-      if (text) lines.push(text);
+      const mainLine = Array.from(line.children).find(child => child.classList.contains("blyrics-line-main"));
+      const mainText = mainLine?.textContent?.replace(/\s+/g, " ").trim();
+
+      const romanized = line.querySelector(`.${ROMANIZED_LYRICS_CLASS}`)?.textContent?.trim();
+      const translated = line.querySelector(`.${TRANSLATED_LYRICS_CLASS}`)?.textContent?.trim();
+
+      const lineParts = [mainText, romanized, translated].filter(Boolean);
+      if (lineParts.length > 0) lines.push(lineParts.join("\n"));
     }
 
     if (lines.length > 0) {
@@ -1607,29 +1589,33 @@ function observeFooterForRecalc(footer: HTMLElement): void {
 }
 
 export function setExtraHeight() {
-  const lyricsElement = document.getElementsByClassName(LYRICS_CLASS)[0] as HTMLElement;
-  const lyricsHeight = lyricsElement.getBoundingClientRect().height;
-  const tabRenderer = document.querySelector(TAB_RENDERER_SELECTOR) as HTMLElement;
+  const lyricsElement = document.getElementsByClassName(LYRICS_CLASS)[0] as HTMLElement | undefined;
+  const tabRenderer = document.querySelector(TAB_RENDERER_SELECTOR) as HTMLElement | null;
+  if (!lyricsElement || !tabRenderer) return;
+
   const tabRendererHeight = tabRenderer.getBoundingClientRect().height;
   const scrollPosOffsetRatio = SCROLL_POS_OFFSET_RATIO.getNumberValue();
+  const currentPaddingBottom = Number.parseFloat(window.getComputedStyle(lyricsElement).paddingBottom) || 0;
+  const lyricsHeightWithoutBottomPadding = Math.max(0, lyricsElement.scrollHeight - currentPaddingBottom);
 
-  const firstLyric = document.querySelector("#blyrics-wrapper > div > div:nth-child(1)");
+  const lyricLines = lyricsElement.querySelectorAll<HTMLElement>(`:scope > .${LINE_CLASS}`);
+  const firstLyric = lyricLines[0] ?? null;
+  const lastLyric = lyricLines[lyricLines.length - 1] ?? null;
+  const firstLyricHeight = firstLyric ? getRelativeLayoutBounds(lyricsElement, firstLyric).height : 0;
+  const lastLyricBounds = lastLyric ? getRelativeLayoutBounds(lyricsElement, lastLyric) : null;
 
-  const paddingTop = Math.max(
-    0,
-    tabRendererHeight * scrollPosOffsetRatio - (firstLyric?.getBoundingClientRect().height || 0) / 2
-  );
+  const paddingTop = Math.max(0, tabRendererHeight * scrollPosOffsetRatio - firstLyricHeight / 2);
 
   document.documentElement.style.setProperty("--blyrics-padding-top", paddingTop + "px");
 
-  const footer = document.querySelector("#blyrics-wrapper > div > div.blyrics-footer");
-  const lastLyric = document.querySelector(".blyrics--line:not(:has(~ .blyrics--line))");
+  const lastLyricTargetContentHeight = lastLyricBounds
+    ? lastLyricBounds.y + lastLyricBounds.height / 2 + tabRendererHeight * (1 - scrollPosOffsetRatio)
+    : tabRendererHeight;
 
-  let extraHeight = Math.max(
-    tabRendererHeight * (1 - scrollPosOffsetRatio) -
-      (footer?.getBoundingClientRect().height || 0) -
-      (lastLyric?.getBoundingClientRect().height || 0) / 2,
-    tabRendererHeight - lyricsHeight
+  const extraHeight = Math.max(
+    lastLyricTargetContentHeight - lyricsHeightWithoutBottomPadding,
+    tabRendererHeight - lyricsHeightWithoutBottomPadding,
+    0
   );
 
   document.documentElement.style.setProperty("--blyrics-padding-bottom", Math.ceil(extraHeight) + "px");

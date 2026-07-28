@@ -18,8 +18,6 @@ function createDebugCanvas() {
   canvas = document.createElement("canvas");
   canvas.id = CANVAS_ID;
   canvas.style.position = "fixed";
-  // canvas.style.top = "0";
-  // canvas.style.left = "0";
   canvas.style.width = "100%";
   canvas.style.height = "100%";
   canvas.style.order = "100";

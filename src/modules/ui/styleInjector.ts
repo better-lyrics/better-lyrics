@@ -4,7 +4,8 @@ import { compileRicsToStyles, getLocalStorage, getSyncStorage, loadChunkedStyles
 import { setThemeSettings } from "@modules/settings/themeOptions";
 import { hexToRgbSum, invertRegExp, log } from "@utils";
 import type { ThemeSettingField } from "@/options/themes";
-import { cachedDurations } from "./animationEngine";
+import { log } from "@utils";
+import { clearAnimationStyleCache } from "./animationEngine";
 
 let hasSubscribedToStyles = false;
 
@@ -239,7 +240,7 @@ export function applyCustomStyles(css: string): void {
     styleTag.textContent = css;
     document.head.appendChild(styleTag);
   }
-  cachedDurations.clear();
+  clearAnimationStyleCache();
 }
 
 interface CSSStorageData {

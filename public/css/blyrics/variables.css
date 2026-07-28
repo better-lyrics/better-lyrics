@@ -63,12 +63,27 @@
 	--blyrics-footer-font-weight: 400;
 
 	/* Animations */
+	--blyrics-animate-line-scale: 1;
+	--blyrics-animate-word-wobble: 1;
+	--blyrics-animate-highlight-swipe: 1;
+	--blyrics-animate-highlight-glow: 1;
+	--blyrics-animate-highlight-fade: 1;
+	--blyrics-animate-scroll: 1;
+	--blyrics-animate-instrumental: 1;
+
 	--blyrics-loader-transition-duration: 0.6s;
 	--blyrics-loader-transition-easing: cubic-bezier(0.22, 1, 0.36, 1);
 	--blyrics-scale-transition-duration: var(
 		--blyrics-transition-duration,
 		0.166s
 	);
+	--blyrics-line-enter-transform-from: scale(var(--blyrics-scale));
+	--blyrics-line-enter-transform-to: scale(var(--blyrics-active-scale));
+	--blyrics-line-exit-transform-from: scale(var(--blyrics-active-scale));
+	--blyrics-line-exit-transform-to: scale(var(--blyrics-scale));
+	--blyrics-line-enter-easing: ease;
+	--blyrics-line-exit-easing: ease;
+
 	--blyrics-lyric-highlight-fade-in-duration: var(
 		--blyrics-opacity-transition,
 		0.33s
@@ -77,7 +92,40 @@
 		--blyrics-opacity-transition,
 		0.5s
 	);
+	--blyrics-lyric-highlight-fade-in-easing: ease;
+	--blyrics-lyric-highlight-fade-out-easing: ease;
+	--blyrics-highlight-swipe-easing: linear;
+	--blyrics-highlight-swipe-start-from: -0.2;
+	--blyrics-highlight-swipe-end-from: -0.1;
+	--blyrics-highlight-swipe-start-to: 1.4;
+	--blyrics-highlight-swipe-end-to: 1.5;
+	--blyrics-highlight-glow-radius-from: 0.8rem;
+	--blyrics-highlight-glow-radius-to: 0;
+	--blyrics-highlight-glow-duration-ratio: 1.2;
+	--blyrics-highlight-glow-min-duration: 1.2s;
+	--blyrics-highlight-glow-easing: ease;
+
 	--blyrics-wobble-duration: 1s;
+	--blyrics-word-wobble-transform-from: scaleX(1);
+	--blyrics-word-wobble-transform-peak: translateX(0.05em) scaleX(1.025);
+	--blyrics-word-wobble-transform-settle: translateX(0) scaleX(1);
+	--blyrics-word-wobble-transform-to: scaleX(1);
+	--blyrics-word-wobble-peak-offset: 0.125;
+	--blyrics-word-wobble-settle-offset: 0.75;
+	--blyrics-word-wobble-easing: ease;
+	--blyrics-word-wobble-peak-easing: ease-in-out;
+	--blyrics-word-wobble-end-easing: ease-out;
+
+	--blyrics-instrumental-fill-fade-duration: 150ms;
+	--blyrics-instrumental-fill-fade-easing: ease;
+	--blyrics-instrumental-fill-transform-from: translateY(78%);
+	--blyrics-instrumental-fill-transform-to: translateY(-4%);
+	--blyrics-instrumental-fill-easing: linear;
+	--blyrics-instrumental-wave-transform-from: scaleY(1.2);
+	--blyrics-instrumental-wave-transform-to: scaleY(0.0001);
+	--blyrics-instrumental-wave-easing: ease-in;
+	--blyrics-instrumental-wave-oscillation-duration: 1.25s;
+	--blyrics-instrumental-wave-oscillation-easing: ease-in-out;
 
 	/* Layout */
 	--blyrics-padding: 2rem;
@@ -96,11 +144,11 @@
 	/* Lyric Transition Properties */
 	--blyrics-lyric-scroll-duration: var(
 		--blyrics-lyric-transition-duration,
-		750ms
+		650ms
 	);
 	--blyrics-lyric-scroll-timing-function: var(
 		--blyrics-lyric-transition-timing-function,
-		cubic-bezier(0.86, 0, 0.07, 1)
+		cubic-bezier(0.86, 0, 0.2, 1)
 	);
 
 	/* Gradient stops */
@@ -119,4 +167,22 @@
     	var(--blyrics-ui-text-color) 50%,
     	color-mix(in srgb, var(--blyrics-ui-text-color) 50%, transparent) 70%
   	);
+}
+
+/* Reduced-motion disables the vestibular triggers (zoom-on-active line scale,
+   translateX word wobble, and instrumental fill/wave motion) and flattens the
+   active/inactive scale delta. Smooth scroll remains enabled, but the animation
+   engine suppresses side-specific line-scroll differential effects.
+   Everything else is left on by design:
+     - karaoke swipe + highlight glow: gradient mask / drop-shadow fills, not movement.
+     - highlight fade-in / fade-out: opacity transitions are not motion. */
+@media (prefers-reduced-motion: reduce) {
+	:root {
+		--blyrics-animate-line-scale: 0;
+		--blyrics-animate-word-wobble: 0;
+		--blyrics-animate-instrumental: 0;
+
+		--blyrics-scale: 1;
+		--blyrics-active-scale: 1;
+	}
 }

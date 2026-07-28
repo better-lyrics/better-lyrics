@@ -1,10 +1,16 @@
-import { LYRIC_SOURCE_KEYS, LYRICS_CACHE_TTL_MS, PROVIDER_CONFIGS, PROVIDER_SWITCHED_LOG } from "@constants";
+import {
+  LYRIC_SOURCE_KEYS,
+  LYRICS_CACHE_TTL_MS,
+  LYRICS_NEGATIVE_CACHE_TTL_MS,
+  PROVIDER_CONFIGS,
+  PROVIDER_SWITCHED_LOG,
+} from "@constants";
 import { getTransientStorage, setTransientStorage } from "@core/storage";
 import { log } from "@utils";
 import unified from "./unified";
 import ytLyrics, { type YTLyricSourceResult } from "./yt";
 import { ytCaptions } from "./ytCaptions";
-import unison, { type UnisonLyricSourceResult } from "@modules/lyrics/providers/unison";
+import unison, { type UnisonData } from "@modules/lyrics/providers/unison";
 /** Current version of the lyrics cache format */
 const LYRIC_CACHE_VERSION = "2.1.0";
 
@@ -42,7 +48,7 @@ interface AudioTrackData {
 interface LyricSource {
   filled: boolean;
   resultCached: boolean;
-  lyricSourceResult: LyricSourceResult | UnisonLyricSourceResult | YTLyricSourceResult | null;
+  lyricSourceResult: LyricSourceResult | YTLyricSourceResult | null;
   lyricSourceFiller: (providerParameters: ProviderParameters) => Promise<void>;
 }
 
@@ -57,7 +63,7 @@ export interface LyricSourceResult {
   artist?: string;
   song?: string;
   duration?: number;
-  unisonId?: number;
+  unisonData?: UnisonData;
 }
 
 export type LyricsArray = Lyric[];
@@ -185,6 +191,17 @@ export function newSourceMap(): SourceMapType {
 
 export async function saveLyricsToCache(providerParameters: ProviderParameters, provider: LyricSourceKey) {
   let source = providerParameters.sourceMap[provider];
+  if (source.filled && !source.resultCached && !source.lyricSourceResult && provider !== "metadata") {
+    source.resultCached = true;
+    const cacheKey = `blyrics_${providerParameters.videoId}_${provider}`;
+    await setTransientStorage(
+      cacheKey,
+      JSON.stringify({ version: LYRIC_CACHE_VERSION, missing: true }),
+      LYRICS_NEGATIVE_CACHE_TTL_MS
+    );
+    return;
+  }
+
   if (
     source.filled &&
     !source.resultCached &&
@@ -218,8 +235,12 @@ export async function getLyrics(
       const data = JSON.parse(cachedData);
       if (data && data.version && data.version === LYRIC_CACHE_VERSION) {
         lyricSource.filled = true;
-        lyricSource.lyricSourceResult = data;
         lyricSource.resultCached = true;
+        if (data.missing === true) {
+          lyricSource.lyricSourceResult = null;
+          return null;
+        }
+        lyricSource.lyricSourceResult = data;
         return data;
       }
     }

@@ -5,6 +5,7 @@ class Setting {
   value: number | boolean | string;
   readonly defaultValue: number | boolean | string;
   readonly requiresLyricReload: boolean;
+  private manuallySet = false;
 
   constructor(
     type: "number" | "boolean" | "string",
@@ -28,6 +29,14 @@ class Setting {
 
   public getStringValue(): string {
     return this.value as string;
+  }
+
+  public isManuallySet(): boolean {
+    return this.manuallySet;
+  }
+
+  public setManuallySet(manuallySet: boolean): void {
+    this.manuallySet = manuallySet;
   }
 }
 
@@ -58,13 +67,17 @@ export function setThemeSettings(map: Map<string, string>) {
         const parsed = parseFloat(value);
         if (isNaN(parsed)) {
           setting.value = setting.defaultValue;
+          setting.setManuallySet(false);
         } else {
           setting.value = parsed;
+          setting.setManuallySet(true);
         }
       } else if (setting.type === "boolean") {
         setting.value = value.toLowerCase() === "true";
+        setting.setManuallySet(true);
       } else {
         setting.value = value;
+        setting.setManuallySet(true);
       }
 
       if (setting.requiresLyricReload && lastValue !== setting.value) {
@@ -77,9 +90,12 @@ export function setThemeSettings(map: Map<string, string>) {
   for (const [key, setting] of keyToSettingMap.entries()) {
     if (!map.has(key) && setting.value !== setting.defaultValue) {
       setting.value = setting.defaultValue;
+      setting.setManuallySet(false);
       if (setting.requiresLyricReload) {
         needsLyricReload = true;
       }
+    } else if (!map.has(key)) {
+      setting.setManuallySet(false);
     }
   }
 

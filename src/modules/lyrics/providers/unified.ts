@@ -6,6 +6,16 @@ import { parseQRC } from "./qrcUtils";
 import { type LyricSourceKey, type LyricSourceResult, type ProviderParameters, saveLyricsToCache } from "./shared";
 import { fillTtml } from "@modules/lyrics/providers/ttmlUtils";
 
+const JWT_RENEWAL_THRESHOLD_SECONDS = 60 * 60;
+
+interface JwtMetadata {
+  secondsUntilExpiry: number;
+  isExpired: boolean;
+  shouldRenew: boolean;
+}
+
+let authenticationTokenPromise: Promise<string | null> | null = null;
+
 /**
  * Handles the Turnstile challenge by creating an iframe and returning a Promise.
  */
@@ -67,68 +77,127 @@ function handleTurnstile(): Promise<string> {
   });
 }
 
+function getJwtMetadata(token: string): JwtMetadata | null {
+  try {
+    const payloadBase64Url = token.split(".")[1];
+    if (!payloadBase64Url) return null;
+    const payloadBase64 = payloadBase64Url.replace(/-/g, "+").replace(/_/g, "/");
+    const paddedPayloadBase64 = payloadBase64.padEnd(
+      payloadBase64.length + ((4 - (payloadBase64.length % 4)) % 4),
+      "="
+    );
+    const decodedPayload = atob(paddedPayloadBase64);
+    const payload = JSON.parse(decodedPayload) as { exp?: unknown };
+    const expiresAtSeconds = Number(payload.exp);
+    if (!Number.isFinite(expiresAtSeconds)) return null;
+
+    const secondsUntilExpiry = expiresAtSeconds - Date.now() / 1000;
+    return {
+      secondsUntilExpiry,
+      isExpired: secondsUntilExpiry <= 0,
+      shouldRenew: secondsUntilExpiry <= JWT_RENEWAL_THRESHOLD_SECONDS,
+    };
+  } catch (e) {
+    console.error(LOG_PREFIX, "Error decoding JWT on client-side:", e);
+    return null;
+  }
+}
+
+function requestNewAuthenticationToken(reason: string): Promise<string | null> {
+  if (authenticationTokenPromise) {
+    log(LOG_PREFIX, "Authentication token request already in progress; reusing it.");
+    return authenticationTokenPromise;
+  }
+
+  const promise = (async () => {
+    try {
+      log(LOG_PREFIX, `Requesting new JWT (${reason})...`);
+      const turnstileToken = await handleTurnstile();
+
+      const response = await fetch(CUBEY_LYRICS_API_URL + "verify-turnstile", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ token: turnstileToken }),
+        credentials: "include",
+      });
+
+      if (!response.ok) throw new Error(`API verification failed: ${response.statusText}`);
+
+      const data = (await response.json()) as { jwt?: unknown };
+      const newJwt = data.jwt;
+
+      if (typeof newJwt !== "string" || !newJwt) throw new Error("No JWT returned from API after verification.");
+
+      await chrome.storage.local.set({ jwtToken: newJwt });
+      log(LOG_PREFIX, "New JWT received and stored.");
+      return newJwt;
+    } catch (error) {
+      console.error(LOG_PREFIX, "Authentication process failed:", error);
+      return null;
+    }
+  })();
+
+  authenticationTokenPromise = promise;
+  void promise.finally(() => {
+    if (authenticationTokenPromise === promise) {
+      authenticationTokenPromise = null;
+    }
+  });
+
+  return promise;
+}
+
 /**
  * Gets a valid JWT, either from storage or by forcing a new Turnstile challenge.
  */
 async function getAuthenticationToken(forceNew = false): Promise<string | null> {
-  function isJwtExpired(token: string): boolean {
-    try {
-      const payloadBase64Url = token.split(".")[1];
-      if (!payloadBase64Url) return true;
-      const payloadBase64 = payloadBase64Url.replace(/-/g, "+").replace(/_/g, "/");
-      const decodedPayload = atob(payloadBase64);
-      const payload = JSON.parse(decodedPayload);
-      const expirationTimeInSeconds = payload.exp;
-      if (!expirationTimeInSeconds) return true;
-      const nowInSeconds = Date.now() / 1000;
-      return nowInSeconds > expirationTimeInSeconds;
-    } catch (e) {
-      console.error(LOG_PREFIX, "Error decoding JWT on client-side:", e);
-      return true;
-    }
-  }
-
   if (forceNew) {
-    log(LOG_PREFIX, "Forcing new token, removing any existing one.");
-    await chrome.storage.local.remove("jwtToken");
-  } else {
-    const storedData = await getLocalStorage<{ jwtToken?: string }>(["jwtToken"]);
-    if (storedData.jwtToken) {
-      if (isJwtExpired(storedData.jwtToken)) {
-        log(LOG_PREFIX, "Local JWT has expired. Removing and requesting a new one.");
-        await chrome.storage.local.remove("jwtToken");
-      } else {
-        log(LOG_PREFIX, "Using valid, non-expired JWT for bypass.");
-        return storedData.jwtToken;
+    log(LOG_PREFIX, "Forcing new token refresh.");
+    return requestNewAuthenticationToken("forced refresh");
+  }
+
+  const storedData = await getLocalStorage<{ jwtToken?: string }>(["jwtToken"]);
+  const storedJwt = storedData.jwtToken;
+  if (!storedJwt) {
+    log(LOG_PREFIX, "No local JWT found, initiating Turnstile challenge...");
+    return requestNewAuthenticationToken("missing token");
+  }
+
+  const metadata = getJwtMetadata(storedJwt);
+  if (!metadata) {
+    log(LOG_PREFIX, "Local JWT is invalid, requesting a new one.");
+    return requestNewAuthenticationToken("invalid token");
+  }
+
+  if (metadata.isExpired) {
+    log(LOG_PREFIX, "Local JWT has expired, requesting a new one.");
+    return requestNewAuthenticationToken("expired token");
+  }
+
+  if (metadata.shouldRenew) {
+    log(LOG_PREFIX, `Local JWT expires in ${Math.round(metadata.secondsUntilExpiry)} seconds; renewing in background.`);
+    void requestNewAuthenticationToken("near-expiry token").then(newJwt => {
+      if (!newJwt) {
+        console.warn(LOG_PREFIX, "Background JWT renewal failed; keeping the existing token.");
       }
-    }
-  }
-
-  try {
-    log(LOG_PREFIX, "No valid JWT found, initiating Turnstile challenge...");
-    const turnstileToken = await handleTurnstile();
-
-    const response = await fetch(CUBEY_LYRICS_API_URL + "verify-turnstile", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ token: turnstileToken }),
-      credentials: "include",
     });
-
-    if (!response.ok) throw new Error(`API verification failed: ${response.statusText}`);
-
-    const data = await response.json();
-    const newJwt = data.jwt;
-
-    if (!newJwt) throw new Error("No JWT returned from API after verification.");
-
-    await chrome.storage.local.set({ jwtToken: newJwt });
-    log(LOG_PREFIX, "New JWT received and stored.");
-    return newJwt;
-  } catch (error) {
-    console.error(LOG_PREFIX, "Authentication process failed:", error);
-    return null;
+    return storedJwt;
   }
+
+  log(LOG_PREFIX, "Using valid JWT for bypass.");
+  return storedJwt;
+}
+
+export function prewarmAuthenticationToken(): void {
+  void getAuthenticationToken()
+    .then(token => {
+      if (!token) {
+        console.warn(LOG_PREFIX, "Authentication prewarm did not obtain a JWT.");
+      }
+    })
+    .catch(error => {
+      console.warn(LOG_PREFIX, "Authentication prewarm failed:", error);
+    });
 }
 
 // Managed keys for this provider
@@ -233,6 +302,7 @@ async function startStream(providerParameters: ProviderParameters, retryCount = 
   if (isrc) body.append("isrc", isrc);
   body.append("token", jwt);
 
+  let completedNormally = false;
   try {
     const response = await fetch(CUBEY_LYRICS_API_URL + "v2/lyrics", {
       method: "POST",
@@ -282,6 +352,7 @@ async function startStream(providerParameters: ProviderParameters, retryCount = 
         if (buffer.trim()) {
           await parseSSEMessage(buffer, providerParameters);
         }
+        completedNormally = true;
         break;
       }
     }
@@ -294,7 +365,7 @@ async function startStream(providerParameters: ProviderParameters, retryCount = 
   } finally {
     // Ensure all waiters are resolved (cleared) when stream ends
     MANAGED_KEYS.forEach(key => {
-      if (!providerParameters.sourceMap[key].filled) {
+      if (completedNormally && !providerParameters.sourceMap[key].filled) {
         providerParameters.sourceMap[key].filled = true;
       }
       resolveWaiter(providerParameters, key);

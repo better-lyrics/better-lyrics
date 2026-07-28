@@ -2,6 +2,7 @@ import { INITIALIZE_LOG } from "@constants";
 import { AppState } from "@core/appState";
 import { injectI18nCssVars, loadLocaleOverride, subscribeToLocaleChanges } from "@core/i18n";
 import { purgeExpiredKeys, saveCacheInfo } from "@core/storage";
+import { prewarmAuthenticationToken } from "@modules/lyrics/providers/unified";
 import { initProviders } from "@modules/lyrics/providers/shared";
 import { setupRequestSniffer } from "@modules/lyrics/requestSniffer/requestSniffer";
 import {
@@ -26,6 +27,10 @@ import {
   setupHomepageFullscreenHandler,
   setupWakeLockForFullscreen,
 } from "@modules/ui/observer";
+import {
+  initializePictureInPictureAutoRestore,
+  mirrorNativeMiniPlayerButton,
+} from "@modules/ui/pictureInPicture/browserController";
 import { subscribeToCustomStyles } from "@modules/ui/styleInjector";
 import { log, setUpLog } from "@utils";
 
@@ -59,6 +64,7 @@ async function modify(): Promise<void> {
   disableInertWhenFullscreen();
   setupAltHoverHandler();
   initProviders();
+  prewarmAuthenticationToken();
   setUpAvButtonListener();
   log(
     INITIALIZE_LOG,
@@ -82,6 +88,8 @@ async function modify(): Promise<void> {
  * Entry point for the BetterLyrics extension.
  */
 function init(): void {
+  initializePictureInPictureAutoRestore();
+  mirrorNativeMiniPlayerButton();
   document.addEventListener("DOMContentLoaded", modify);
 }
 
