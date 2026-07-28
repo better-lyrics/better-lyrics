@@ -385,6 +385,10 @@ export class PictureInPictureLyricsView {
     const controller = new AbortController();
     this.artworkController = controller;
     this.fallbackArtworkUrl = getFallbackArtworkUrl(videoId);
+    // The metadata poll runs for seconds, so the previous song's art has to go now rather than when
+    // its replacement arrives. Leaving src alone keeps the onerror fallback from firing.
+    this.artwork.removeAttribute("data-loaded");
+    this.shell.style.removeProperty("--blyrics-pip-art");
 
     void getArtworkMetadata(videoId, 250, controller.signal).then(metadata => {
       if (controller.signal.aborted || this.currentVideoId !== videoId) return;
