@@ -98,10 +98,8 @@ export class PictureInPictureLyricsView {
   private readonly playPauseButton: HTMLButtonElement;
   private readonly title: HTMLElement;
   private readonly byline: HTMLElement;
-  private readonly content: HTMLElement;
   private readonly lyricsViewport: HTMLElement;
   private readonly lyricsScroller: HTMLElement;
-  private loader: HTMLElement | null = null;
   private readonly lifecycleController = new AbortController();
   private artworkController: AbortController | null = null;
   private currentVideoId: string | null = null;
@@ -159,8 +157,8 @@ export class PictureInPictureLyricsView {
     artworkControls.append(previousButton, this.playPauseButton, nextButton);
     this.artworkContainer.append(artworkPlaceholder, this.artwork, this.artworkVideo, artworkControls);
 
-    this.content = pipDocument.createElement("section");
-    this.content.className = "blyrics-pip-content";
+    const content = pipDocument.createElement("section");
+    content.className = "blyrics-pip-content";
 
     const header = pipDocument.createElement("header");
     header.className = "blyrics-pip-header";
@@ -182,9 +180,10 @@ export class PictureInPictureLyricsView {
       signal: this.lifecycleController.signal,
     });
 
-    this.content.append(header, this.lyricsViewport);
     this.showSearching();
-    this.shell.append(this.artworkContainer, this.content);
+
+    content.append(header, this.lyricsViewport);
+    this.shell.append(this.artworkContainer, content);
     pipDocument.body.replaceChildren(this.shell);
 
     sourceDocument.addEventListener(PLAYER_TIME_EVENT, this.handlePlayerTime, {
@@ -203,22 +202,19 @@ export class PictureInPictureLyricsView {
 
   mountLyrics(twinRoot: HTMLElement): void {
     this.isSearching = false;
-    this.loader?.remove();
-    this.loader = null;
     this.lyricsScroller.replaceChildren(twinRoot);
     this.lyricsViewport.replaceChildren(this.lyricsScroller);
     this.shell.setAttribute("aria-busy", "false");
   }
 
-  // Called from the sync loop, so it has to no-op once the loader is already up. It hangs off the
-  // content column rather than the lyrics viewport so it centres on the artwork, not below it.
+  // Called from the sync loop, so it has to no-op once the loader is already up.
   showSearching(): void {
     if (this.isSearching) return;
     this.isSearching = true;
 
     const pipDocument = this.pipWindow.document;
-    this.loader = pipDocument.createElement("div");
-    this.loader.className = "blyrics-pip-loader";
+    const loader = pipDocument.createElement("div");
+    loader.className = "blyrics-pip-loader";
 
     const mark = pipDocument.createElement("span");
     mark.className = "blyrics-pip-loader__mark";
@@ -229,9 +225,8 @@ export class PictureInPictureLyricsView {
     label.setAttribute("role", "status");
     label.textContent = t("lyrics_searching");
 
-    this.loader.append(mark, label);
-    this.lyricsViewport.replaceChildren();
-    this.content.appendChild(this.loader);
+    loader.append(mark, label);
+    this.lyricsViewport.replaceChildren(loader);
     this.shell.setAttribute("aria-busy", "true");
   }
 

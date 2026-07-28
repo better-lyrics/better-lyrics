@@ -177,7 +177,6 @@ body {
 }
 
 .blyrics-pip-content {
-  position: relative;
   display: flex;
   min-width: 0;
   flex: 1;
@@ -287,15 +286,12 @@ body {
   height: 1em;
 }
 
-/* Spans the whole content column, header included, so it lines up with the artwork's centre. */
 .blyrics-pip-loader {
-  position: absolute;
   display: flex;
-  inset: 0;
+  min-height: 100%;
   align-items: center;
   justify-content: center;
   gap: clamp(8px, 2.5vw, 12px);
-  pointer-events: none;
 }
 
 .blyrics-pip-loader__mark {
@@ -332,16 +328,5 @@ body {
 
   .blyrics-pip-header {
     padding-bottom: 4px;
-  }
-
-  /* Too short to centre on the artwork without landing on the byline, so it sits under the
-     header instead and takes the space the empty viewport would have held. */
-  .blyrics-pip-loader {
-    position: static;
-    flex: 1;
-  }
-
-  .blyrics-pip-content:has(.blyrics-pip-loader) .blyrics-pip-lyrics {
-    display: none;
   }
 }
