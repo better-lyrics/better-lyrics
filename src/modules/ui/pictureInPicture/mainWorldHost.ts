@@ -1,4 +1,4 @@
-import { GENERAL_ERROR_LOG } from "@constants";
+import { GENERAL_ERROR_LOG, MINI_PLAYER_BUTTON_SELECTOR, PICTURE_IN_PICTURE_TOGGLE_SELECTOR } from "@constants";
 import {
   onInit,
   onMetadata,
@@ -10,8 +10,6 @@ import type { PictureInPictureController } from "./controller";
 import { createPictureInPictureHost } from "./pipHost";
 import type { PictureInPictureSongMetadata } from "./types";
 
-const TOGGLE_SELECTOR = "[data-blyrics-picture-in-picture-toggle]";
-const MINI_PLAYER_BUTTON_SELECTOR = ".player-minimize-button";
 const IGNORED_AUTO_RESTORE_KEYS = new Set(["Escape", "Alt", "Control", "Meta", "Shift"]);
 
 let resources: PictureInPictureInitPayload | null = null;
@@ -89,7 +87,7 @@ function armAutoRestore(): void {
     hasAttemptedAutoRestore = true;
     disarmAutoRestore();
     const target = event.target;
-    if (target instanceof Element && target.closest(TOGGLE_SELECTOR)) return;
+    if (target instanceof Element && target.closest(PICTURE_IN_PICTURE_TOGGLE_SELECTOR)) return;
     if (!controller?.isOpen()) controller?.toggle();
   };
 
@@ -108,7 +106,7 @@ function observeToggleClicks(): void {
       if (!controller) return;
       const target = event.target;
       if (!(target instanceof Element)) return;
-      if (target.closest(TOGGLE_SELECTOR)) {
+      if (target.closest(PICTURE_IN_PICTURE_TOGGLE_SELECTOR)) {
         controller.toggle();
         return;
       }

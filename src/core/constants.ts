@@ -29,6 +29,8 @@ export const NO_LYRICS_TEXT_SELECTOR =
   "#tab-renderer > ytmusic-message-renderer > yt-formatted-string.text.style-scope.ytmusic-message-renderer" as const;
 export const FULLSCREEN_BUTTON_SELECTOR = ".fullscreen-button" as const;
 export const SHADERS_DETECTION_SELECTOR = '[id^="better-lyrics-kawarp-"]' as const;
+export const MINI_PLAYER_BUTTON_SELECTOR = ".player-minimize-button" as const;
+export const PICTURE_IN_PICTURE_TOGGLE_SELECTOR = "[data-blyrics-picture-in-picture-toggle]" as const;
 
 // DOM IDs and Attributes
 export const LYRICS_LOADER_ID = "blyrics-loader" as const;

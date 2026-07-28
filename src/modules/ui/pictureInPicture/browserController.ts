@@ -1,4 +1,11 @@
-import { FONT_LINK, GENERAL_ERROR_LOG, NOTO_SANS_UNIVERSAL_LINK, TAB_HEADER_CLASS } from "@constants";
+import {
+  FONT_LINK,
+  GENERAL_ERROR_LOG,
+  MINI_PLAYER_BUTTON_SELECTOR,
+  NOTO_SANS_UNIVERSAL_LINK,
+  PICTURE_IN_PICTURE_TOGGLE_SELECTOR,
+  TAB_HEADER_CLASS,
+} from "@constants";
 import { AppState } from "@core/appState";
 import { t } from "@core/i18n";
 import { getStorage } from "@core/storage";
@@ -11,7 +18,6 @@ import type { PictureInPictureToggle, PictureInPictureViewDependencies } from ".
 
 const STYLESHEET_PATH = "css/blyrics/picture-in-picture.css";
 const LYRIC_STYLESHEET_PATH = "css/blyrics/index.css";
-const MINI_PLAYER_BUTTON_SELECTOR = ".player-minimize-button";
 const PIP_STRING_KEYS = [
   "picture_in_picture_open",
   "picture_in_picture_loading",
@@ -110,7 +116,7 @@ function createPageWorldDelegate(): PictureInPictureToggle {
         sendMetadata({ requestId: signal.requestId, metadata })
       );
     } else if (signal.type === "ready") {
-      publishResources();
+      publishPictureInPictureResources();
     }
   });
 
@@ -121,7 +127,10 @@ function createPageWorldDelegate(): PictureInPictureToggle {
   };
 }
 
-function publishResources(): void {
+// The page world caches this payload, so the strings must be resolved after the locale override has
+// loaded. `modify()` calls this again once it has; the `ready` handshake only bootstraps the toggle.
+export function publishPictureInPictureResources(): void {
+  if (!delegatesToPageWorld) return;
   getStorage({ isPictureInPictureAutoRestoreEnabled: false }, items => {
     sendInit({
       strings: Object.fromEntries(PIP_STRING_KEYS.map(key => [key, t(key)])),
@@ -165,7 +174,7 @@ function armAutoRestore(): void {
     hasAttemptedAutoRestore = true;
     disarmAutoRestore();
     const target = event.target;
-    if (target instanceof Element && target.closest("[data-blyrics-picture-in-picture-toggle]")) return;
+    if (target instanceof Element && target.closest(PICTURE_IN_PICTURE_TOGGLE_SELECTOR)) return;
     if (!pictureInPictureController.isOpen()) pictureInPictureController.toggle();
   };
 
@@ -180,9 +189,10 @@ export function initializePictureInPictureAutoRestore(): void {
   hasInitializedAutoRestore = true;
 
   if (delegatesToPageWorld) {
-    publishResources();
     chrome.storage.onChanged.addListener((changes, areaName) => {
-      if (areaName === "sync" && changes.isPictureInPictureAutoRestoreEnabled) publishResources();
+      if (areaName === "sync" && changes.isPictureInPictureAutoRestoreEnabled) {
+        publishPictureInPictureResources();
+      }
     });
     return;
   }
