@@ -143,6 +143,8 @@ body {
   opacity: 1;
 }
 
+/* The 3D presets stop the slot clipping so the card can leave it, which also stops the slot
+   clipping this scrim, so it carries the radius itself. */
 .blyrics-pip-artwork__controls {
   position: absolute;
   z-index: 4;
@@ -150,13 +152,20 @@ body {
   display: flex;
   align-items: center;
   justify-content: space-evenly;
+  border-radius: inherit;
   background: rgb(0 0 0 / 48%);
   opacity: 0;
   pointer-events: none;
   transition: opacity 180ms ease;
 }
 
-.blyrics-pip-artwork:hover:not([data-controls-idle]) .blyrics-pip-artwork__controls {
+/* Suppressed mid-swap. The scrim is anchored to the slot while the card moves in 3D, so it cannot
+   follow the artwork; hovering during a transition would otherwise leave a square of black hanging
+   where the card no longer is. Moving it into the card is not the answer either, since it would
+   then flip away with the card. */
+.blyrics-pip-shell:not([data-running="true"])
+  .blyrics-pip-artwork:hover:not([data-controls-idle])
+  .blyrics-pip-artwork__controls {
   opacity: 1;
   pointer-events: auto;
 }
