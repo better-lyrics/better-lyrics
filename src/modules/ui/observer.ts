@@ -422,7 +422,10 @@ export function initializeLyrics(): void {
       }
     }
 
-    if (document.visibilityState === "visible") {
+    // A window owning a Picture-in-Picture document still reports "hidden", and this is the only
+    // path that ticks the engine while playback is paused, so pausing would never reach the
+    // running word animations.
+    if (document.visibilityState === "visible" || AppState.isPictureInPictureOpen) {
       runAnimationEngine(performance.now(), true);
     }
   });
