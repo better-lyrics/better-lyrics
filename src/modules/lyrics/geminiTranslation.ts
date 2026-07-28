@@ -18,7 +18,7 @@ export async function translateBatchGemini(request: BatchRequest): Promise<Batch
   const models =
     AppState.geminiModelFallback && AppState.geminiModelFallback.length > 0
       ? AppState.geminiModelFallback
-      : ["gemini-3.5-flash-lite", "gemini-3.6-flash", "gemini-3.1-flash-lite"];
+      : ["gemini-3.1-flash-lite", "gemini-3.5-flash-lite", "gemini-3.6-flash"];
   const apiKey = AppState.geminiApiKey;
 
   if (!apiKey) {

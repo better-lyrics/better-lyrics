@@ -88,7 +88,7 @@ export const AppState: AppStateType = {
   isTranslateEnabled: false,
   translationProvider: "google",
   geminiApiKey: "",
-  geminiModelFallback: ["gemini-3.5-flash-lite", "gemini-3.6-flash", "gemini-3.1-flash-lite"],
+  geminiModelFallback: ["gemini-3.1-flash-lite", "gemini-3.5-flash-lite", "gemini-3.6-flash"],
   geminiTranslationMode: "speed",
   isRomanizationEnabled: false,
   romanizationDisabledLanguages: [],

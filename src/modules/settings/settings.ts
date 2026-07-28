@@ -368,7 +368,7 @@ export function loadTranslationSettings(): void {
       isTranslateEnabled: false,
       translationProvider: "google",
       geminiApiKey: "",
-      geminiModelFallback: ["gemini-3.5-flash-lite", "gemini-3.6-flash", "gemini-3.1-flash-lite"],
+      geminiModelFallback: ["gemini-3.1-flash-lite", "gemini-3.5-flash-lite", "gemini-3.6-flash"],
       geminiTranslationMode: "speed",
       isRomanizationEnabled: false,
       translationLanguage: "en",
@@ -380,9 +380,9 @@ export function loadTranslationSettings(): void {
       AppState.translationProvider = items.translationProvider || "google";
       AppState.geminiApiKey = items.geminiApiKey || "";
       AppState.geminiModelFallback = items.geminiModelFallback || [
+        "gemini-3.1-flash-lite",
         "gemini-3.5-flash-lite",
         "gemini-3.6-flash",
-        "gemini-3.1-flash-lite",
       ];
       AppState.geminiTranslationMode = (items.geminiTranslationMode as "speed" | "quality") || "speed";
       AppState.isRomanizationEnabled = items.isRomanizationEnabled;

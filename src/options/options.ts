@@ -291,7 +291,7 @@ const restoreOptions = (): void => {
     isTranslateEnabled: false,
     translationProvider: "google",
     geminiApiKey: "",
-    geminiModelFallback: ["gemini-3.5-flash-lite", "gemini-3.6-flash", "gemini-3.1-flash-lite"],
+    geminiModelFallback: ["gemini-3.1-flash-lite", "gemini-3.5-flash-lite", "gemini-3.6-flash"],
     geminiTranslationMode: "speed",
     translationLanguage: "en",
     isRomanizationEnabled: false,
@@ -580,7 +580,7 @@ function renderGeminiModelsList(enabledModels: string[]) {
   if (!list) return;
   list.innerHTML = "";
 
-  const ALL_GEMINI_MODELS = ["gemini-3.5-flash-lite", "gemini-3.6-flash", "gemini-3.1-flash-lite"];
+  const ALL_GEMINI_MODELS = ["gemini-3.1-flash-lite", "gemini-3.5-flash-lite", "gemini-3.6-flash"];
   const allModels = [...enabledModels, ...ALL_GEMINI_MODELS.filter(m => !enabledModels.includes(m))];
 
   allModels.forEach(model => {
@@ -1043,7 +1043,7 @@ function initLangExclusionsModal(): void {
   if (resetFallbackBtn) {
     resetFallbackBtn.textContent = t("options_resetToDefault", t("options_language_sequence"));
     resetFallbackBtn.addEventListener("click", () => {
-      const defaultFallback = ["gemini-3.5-flash-lite", "gemini-3.6-flash", "gemini-3.1-flash-lite"];
+      const defaultFallback = ["gemini-3.1-flash-lite", "gemini-3.5-flash-lite", "gemini-3.6-flash"];
       renderGeminiModelsList(defaultFallback);
       if (geminiTranslationMode) {
         geminiTranslationMode.value = "speed";

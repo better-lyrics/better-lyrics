@@ -285,7 +285,7 @@
     "description": "Dropdown label to select which translation engine to use"
   },
   "options_language_googleTranslate": {
-    "message": "Google Translate (Free)",
+    "message": "Google Translate",
     "description": "Google Translate provider option"
   },
   "options_language_geminiApi": {
@@ -321,7 +321,7 @@
     "description": "Success message when user clears local translation cache"
   },
   "options_language_sequence": {
-    "message": "Sequence: ",
+    "message": "Sequence",
     "description": "Label prefix displaying the order of attempted models"
   },
   "options_language_translationMode": {
@@ -329,11 +329,11 @@
     "description": "Setting label to choose between translation modes"
   },
   "options_language_translationModeSpeed": {
-    "message": "Speed (Fast, cost-efficient)",
+    "message": "Speed",
     "description": "Speed mode translation option description"
   },
   "options_language_translationModeQuality": {
-    "message": "Quality (High accuracy, slower, uses reasoning models if available)",
+    "message": "Quality",
     "description": "Quality mode translation option description"
   },
 
