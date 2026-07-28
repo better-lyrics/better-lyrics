@@ -98,10 +98,6 @@
     "message": "Open Picture-in-Picture lyrics",
     "description": "Accessible label for the dock action that opens the floating lyrics window"
   },
-  "picture_in_picture_loading": {
-    "message": "Loading lyrics…",
-    "description": "Status displayed while the Picture-in-Picture lyrics window initializes"
-  },
   "picture_in_picture_previous": {
     "message": "Previous",
     "description": "Accessible label for the previous track button in the Picture-in-Picture lyrics window, used when the YouTube Music player bar exposes no label of its own"
