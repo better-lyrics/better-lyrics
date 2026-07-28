@@ -39,10 +39,23 @@ import {
 const STORE_THEME_PREFIX = "store:";
 const preloadedImages = new Set<string>();
 
-function preloadImage(url: string): Promise<void> {
-  if (!url || preloadedImages.has(url)) return Promise.resolve();
-  preloadedImages.add(url);
+function documentLoaded(): Promise<void> {
+  if (document.readyState === "complete") return Promise.resolve();
   return new Promise(resolve => {
+    window.addEventListener("load", () => resolve(), { once: true });
+  });
+}
+
+/**
+ * An in-flight image delays the document load event, and Chrome keeps the action
+ * popup hidden until that event fires, so cover art must not start downloading
+ * until the popup is already on screen.
+ */
+async function preloadImage(url: string): Promise<void> {
+  if (!url || preloadedImages.has(url)) return;
+  preloadedImages.add(url);
+  await documentLoaded();
+  await new Promise<void>(resolve => {
     const img = new Image();
     img.onload = () => resolve();
     img.onerror = () => resolve();
