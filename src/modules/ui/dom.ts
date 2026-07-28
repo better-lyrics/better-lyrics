@@ -11,6 +11,7 @@ import {
   HOMEPAGE_DOMAIN,
   HOMEPAGE_ICON_URL,
   HOMEPAGE_URL,
+  LINE_CLASS,
   LOADER_TRANSITION_ENDED,
   LOG_PREFIX_UNISON,
   LYRICS_AD_OVERLAY_ID,
@@ -279,7 +280,7 @@ export function createLyricsWrapper(): HTMLElement {
 
     fragment.querySelectorAll(`.${WORD_HIGHLIGHT_CLASS}`).forEach(el => el.remove());
 
-    const lineElements = fragment.querySelectorAll(".blyrics--line");
+    const lineElements = fragment.querySelectorAll(`.${LINE_CLASS}`);
 
     if (lineElements.length === 0) {
       const text = fragment.textContent?.replace(/\s+/g, " ").trim();
@@ -1597,7 +1598,7 @@ export function setExtraHeight() {
   const currentPaddingBottom = Number.parseFloat(window.getComputedStyle(lyricsElement).paddingBottom) || 0;
   const lyricsHeightWithoutBottomPadding = Math.max(0, lyricsElement.scrollHeight - currentPaddingBottom);
 
-  const lyricLines = lyricsElement.querySelectorAll<HTMLElement>(":scope > .blyrics--line");
+  const lyricLines = lyricsElement.querySelectorAll<HTMLElement>(`:scope > .${LINE_CLASS}`);
   const firstLyric = lyricLines[0] ?? null;
   const lastLyric = lyricLines[lyricLines.length - 1] ?? null;
   const firstLyricHeight = firstLyric ? getRelativeLayoutBounds(lyricsElement, firstLyric).height : 0;

@@ -108,6 +108,18 @@ ytmusic-message-renderer.ytmusic-tab-renderer {
   display: none !important;
 }
 
+/* The floating window mirrors the word highlight by replaying its animations, and those target
+   ::after pseudo-elements, which a display:none subtree never generates. Collapse the lyrics
+   instead of unrendering them so the pseudo-elements survive; height 0 with the overflow clipped
+   means they still take no space on the other tabs. */
+html[blyrics-pip-open] #tab-renderer:not([page-type="MUSIC_PAGE_TYPE_TRACK_LYRICS"]) #blyrics-wrapper {
+  display: block !important;
+  height: 0 !important;
+  min-height: 0 !important;
+  overflow: hidden !important;
+  pointer-events: none !important;
+}
+
 #side-panel:has(#tab-renderer:not([page-type="MUSIC_PAGE_TYPE_TRACK_LYRICS"])) .blyrics-dock {
   display: none !important;
 }

@@ -146,8 +146,7 @@ export async function createLyrics(detail: PlayerDetails, signal: AbortSignal): 
     }
 
     const tabSelector = document.getElementsByClassName(TAB_HEADER_CLASS)[1];
-    console.assert(tabSelector != null);
-    if (tabSelector.getAttribute("aria-selected") !== "true") {
+    if (tabSelector?.getAttribute("aria-selected") !== "true" && !AppState.isPictureInPictureOpen) {
       AppState.areLyricsLoaded = false;
       AppState.areLyricsTicking = false;
       AppState.lyricInjectionFailed = true;

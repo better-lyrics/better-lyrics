@@ -114,6 +114,76 @@ body {
     margin-top: 1.5rem;
 }
 
+.setting-row__text {
+    display: flex;
+    min-width: 0;
+    flex: 1;
+    flex-direction: column;
+    gap: 0.2rem;
+}
+
+.setting-row__title-line {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+}
+
+.setting-help {
+    position: relative;
+    display: inline-grid;
+    place-items: center;
+    width: 15px;
+    height: 15px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.12);
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 0.625rem;
+    font-weight: 700;
+    cursor: help;
+    user-select: none;
+}
+
+.setting-help:hover,
+.setting-help:focus-visible {
+    background: rgba(255, 255, 255, 0.2);
+    color: #fff;
+}
+
+.setting-help::after {
+    content: attr(data-tooltip);
+    position: absolute;
+    bottom: calc(100% + 8px);
+    left: 50%;
+    width: max-content;
+    max-width: 240px;
+    padding: 8px 10px;
+    background-color: hsl(0, 0%, 20%);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: rgba(255, 255, 255, 0.75);
+    font-size: 0.6875rem;
+    font-weight: 500;
+    line-height: 1.4;
+    text-align: left;
+    white-space: normal;
+    border-radius: 6px;
+    pointer-events: none;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateX(-50%) translateY(4px);
+    transition:
+        opacity 0.15s ease-out,
+        visibility 0.15s ease-out,
+        transform 0.15s ease-out;
+    z-index: 100;
+}
+
+.setting-help:hover::after,
+.setting-help:focus-visible::after {
+    opacity: 1;
+    visibility: visible;
+    transform: translateX(-50%) translateY(0);
+}
+
 #offset-modal-overlay .container:first-of-type {
     margin-top: 0;
 }
@@ -2225,7 +2295,7 @@ input.cm-textfield:focus-visible {
 
 .controls-shown-picker {
 	display: grid;
-	grid-template-columns: repeat(4, 1fr);
+	grid-template-columns: repeat(5, 1fr);
 	gap: 4px;
 	padding: 4px;
 	margin-bottom: 1.5rem;

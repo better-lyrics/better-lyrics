@@ -1,6 +1,7 @@
 import {
   BACKGROUND_LYRIC_CLASS,
   EXPLICIT_WORD_CLASS,
+  LINE_CLASS,
   LOG_PREFIX,
   LYRICS_CLASS,
   LYRICS_FOUND_LOG,
@@ -11,6 +12,7 @@ import {
   ROMANIZATION_LANGUAGES,
   ROMANIZED_LYRICS_CLASS,
   RTL_CLASS,
+  SEEK_EVENT,
   SYNC_DISABLED_LOG,
   TAB_HEADER_CLASS,
   TRANSLATED_LYRICS_CLASS,
@@ -546,7 +548,7 @@ function buildLineSyncedParts(item: Lyric): LyricPart[] {
   return parts;
 }
 
-function getSeekTimeFromClick(event: MouseEvent, lyricElement: HTMLElement): number | null {
+export function getSeekTimeFromClick(event: MouseEvent, lyricElement: HTMLElement): number | null {
   const target = event.target as HTMLElement;
   const container = lyricElement.closest(`.${LYRICS_CLASS}`) as HTMLElement | null;
   const isRichsync = container?.dataset.sync === "richsync";
@@ -587,7 +589,7 @@ function addSeekHandler(lyricElement: HTMLElement, allZero: boolean): void {
     if (seekTime === null) return;
 
     log(LOG_PREFIX, `Seeking to ${seekTime.toFixed(2)}s`);
-    document.dispatchEvent(new CustomEvent("blyrics-seek-to", { detail: seekTime }));
+    document.dispatchEvent(new CustomEvent(SEEK_EVENT, { detail: seekTime }));
     animEngineState.scrollResumeTime = 0;
   });
 }
@@ -642,7 +644,7 @@ function injectLyrics(data: LyricSourceResultWithMeta, keepLoaderVisible = false
     lyricElement.dataset.time = String(line.time);
     lyricElement.dataset.duration = String(line.duration);
     lyricElement.dataset.lineNumber = String(lineIndex);
-    lyricElement.classList.add("blyrics--line");
+    lyricElement.classList.add(LINE_CLASS);
     lyricElement.dir = "auto";
     addSeekHandler(lyricElement, allZero);
     lines.push(line);

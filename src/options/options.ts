@@ -24,6 +24,7 @@ interface Options {
   isFullScreenDisabled: boolean;
   isStylizedAnimationsEnabled: boolean;
   isPassiveScrollEnabled: boolean;
+  isPictureInPictureAutoRestoreEnabled: boolean;
   isTranslateEnabled: boolean;
   translationLanguage: string;
   isCursorAutoHideEnabled: boolean;
@@ -39,6 +40,7 @@ interface Options {
   isDockTranslateEnabled: boolean;
   isDockRomanizeEnabled: boolean;
   isDockOffsetEnabled: boolean;
+  isDockPictureInPictureEnabled: boolean;
   dockControlsOrder: string[];
   globalLyricOffset: number;
   richsyncOffsetTrim: number;
@@ -78,6 +80,9 @@ const getOptionsFromForm = (): Options => {
     isFullScreenDisabled: (document.getElementById("isFullScreenDisabled") as HTMLInputElement).checked,
     isStylizedAnimationsEnabled: (document.getElementById("isStylizedAnimationsEnabled") as HTMLInputElement).checked,
     isPassiveScrollEnabled: (document.getElementById("isPassiveScrollEnabled") as HTMLInputElement).checked,
+    isPictureInPictureAutoRestoreEnabled: (
+      document.getElementById("isPictureInPictureAutoRestoreEnabled") as HTMLInputElement
+    ).checked,
     isTranslateEnabled: (document.getElementById("translate") as HTMLInputElement).checked,
     translationLanguage: (document.getElementById("translationLanguage") as HTMLInputElement).value,
     isCursorAutoHideEnabled: (document.getElementById("cursorAutoHide") as HTMLInputElement).checked,
@@ -95,6 +100,8 @@ const getOptionsFromForm = (): Options => {
     isDockTranslateEnabled: (document.getElementById("isDockTranslateEnabled") as HTMLInputElement).checked,
     isDockRomanizeEnabled: (document.getElementById("isDockRomanizeEnabled") as HTMLInputElement).checked,
     isDockOffsetEnabled: (document.getElementById("isDockOffsetEnabled") as HTMLInputElement).checked,
+    isDockPictureInPictureEnabled: (document.getElementById("isDockPictureInPictureEnabled") as HTMLInputElement)
+      .checked,
     dockControlsOrder: getDockControlsOrder(),
     globalLyricOffset: parseFloat((document.getElementById("globalLyricOffset") as HTMLInputElement).value) || 0,
     richsyncOffsetTrim: parseFloat((document.getElementById("richsyncOffsetTrim") as HTMLInputElement).value) || 0,
@@ -119,6 +126,11 @@ function setDockControlsOrderInForm(order: string[]): void {
   for (const key of order) {
     const cell = picker.querySelector(`.control-cell[data-control="${key}"]`);
     if (cell) picker.appendChild(cell);
+  }
+  // A control added after the stored order was written is absent from it, so re-append it here;
+  // otherwise it stays put while every listed cell moves past it and it ends up first.
+  for (const cell of Array.from(picker.querySelectorAll<HTMLElement>(".control-cell"))) {
+    if (cell.dataset.control && !order.includes(cell.dataset.control)) picker.appendChild(cell);
   }
 }
 
@@ -253,6 +265,7 @@ const restoreOptions = (): void => {
     isFullScreenDisabled: false,
     isStylizedAnimationsEnabled: true,
     isPassiveScrollEnabled: true,
+    isPictureInPictureAutoRestoreEnabled: false,
     isTranslateEnabled: false,
     translationLanguage: "en",
     isRomanizationEnabled: false,
@@ -283,6 +296,7 @@ const restoreOptions = (): void => {
     isDockTranslateEnabled: true,
     isDockRomanizeEnabled: true,
     isDockOffsetEnabled: true,
+    isDockPictureInPictureEnabled: true,
     dockControlsOrder: [...DOCK_CONTROL_ORDER_DEFAULT],
     globalLyricOffset: 0,
     richsyncOffsetTrim: 0,
@@ -327,6 +341,8 @@ const setOptionsInForm = (items: Options): void => {
   (document.getElementById("isStylizedAnimationsEnabled") as HTMLInputElement).checked =
     items.isStylizedAnimationsEnabled;
   (document.getElementById("isPassiveScrollEnabled") as HTMLInputElement).checked = items.isPassiveScrollEnabled;
+  (document.getElementById("isPictureInPictureAutoRestoreEnabled") as HTMLInputElement).checked =
+    items.isPictureInPictureAutoRestoreEnabled;
   (document.getElementById("translate") as HTMLInputElement).checked = items.isTranslateEnabled;
   (document.getElementById("translationLanguage") as HTMLInputElement).value = items.translationLanguage;
   (document.getElementById("isRomanizationEnabled") as HTMLInputElement).checked = items.isRomanizationEnabled;
@@ -339,6 +355,8 @@ const setOptionsInForm = (items: Options): void => {
   (document.getElementById("isDockTranslateEnabled") as HTMLInputElement).checked = items.isDockTranslateEnabled;
   (document.getElementById("isDockRomanizeEnabled") as HTMLInputElement).checked = items.isDockRomanizeEnabled;
   (document.getElementById("isDockOffsetEnabled") as HTMLInputElement).checked = items.isDockOffsetEnabled;
+  (document.getElementById("isDockPictureInPictureEnabled") as HTMLInputElement).checked =
+    items.isDockPictureInPictureEnabled;
   setOffsetDisplay("globalLyricOffset", items.globalLyricOffset);
   setOffsetDisplay("richsyncOffsetTrim", items.richsyncOffsetTrim);
   setOffsetDisplay("lineOffsetTrim", items.lineOffsetTrim);
@@ -1437,6 +1455,7 @@ function resetDockSettings(): void {
   (document.getElementById("isDockTranslateEnabled") as HTMLInputElement).checked = true;
   (document.getElementById("isDockRomanizeEnabled") as HTMLInputElement).checked = true;
   (document.getElementById("isDockOffsetEnabled") as HTMLInputElement).checked = true;
+  (document.getElementById("isDockPictureInPictureEnabled") as HTMLInputElement).checked = true;
   setUnisonPositionInForm(DOCK_DEFAULT_POSITION);
   setDockControlsOrderInForm([...DOCK_CONTROL_ORDER_DEFAULT]);
   syncUnisonModalDependentState(true);
@@ -1480,7 +1499,13 @@ function setupUnisonActionsModal(): void {
 
   autoHideToggle.addEventListener("change", saveOptions);
 
-  for (const id of ["isDockSourceEnabled", "isDockTranslateEnabled", "isDockRomanizeEnabled", "isDockOffsetEnabled"]) {
+  for (const id of [
+    "isDockSourceEnabled",
+    "isDockTranslateEnabled",
+    "isDockRomanizeEnabled",
+    "isDockOffsetEnabled",
+    "isDockPictureInPictureEnabled",
+  ]) {
     document.getElementById(id)?.addEventListener("change", debouncedSaveOptions);
   }
 

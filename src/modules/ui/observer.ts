@@ -271,11 +271,11 @@ export function lyricReloader(): void {
         setTimeout(() => {
           tabRenderer.scrollTop = scrollPositions[i];
           // Don't start ticking until we set the height
-          AppState.areLyricsTicking = AppState.areLyricsLoaded && i === 1;
+          AppState.areLyricsTicking = AppState.areLyricsLoaded && (i === 1 || AppState.isPictureInPictureOpen);
         }, 0);
         currentTab = i;
 
-        if (i !== 1) {
+        if (i !== 1 && !AppState.isPictureInPictureOpen) {
           // stop ticking immediately
           AppState.areLyricsTicking = false;
         }
@@ -404,7 +404,7 @@ export function initializeLyrics(): void {
       injectSongAttributes(detail.song, detail.artist);
     }
 
-    if (AppState.lyricInjectionFailed) {
+    if (AppState.lyricInjectionFailed && !AppState.isPictureInPictureOpen) {
       const tabSelector = document.getElementsByClassName(TAB_HEADER_CLASS)[1];
       if (tabSelector && tabSelector.getAttribute("aria-selected") !== "true") {
         return; // wait to resolve until tab is visible

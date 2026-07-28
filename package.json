@@ -17,6 +17,7 @@
         "lint": "biome lint --write . && biome format --write .",
         "update-version": "tsx tooling/update-version.ts",
         "typecheck": "npm run generate:locales && tsc --noEmit",
+        "selfcheck": "tsx tooling/run-selfchecks.ts",
         "knip": "knip --cache",
         "knip:fix": "knip --fix",
         "knip:ci": "knip --no-exit-code --reporter github-actions"

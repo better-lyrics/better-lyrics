@@ -10,7 +10,8 @@
     "src/options/auth/auth.ts",
     "public/earlyInject.js",
     "public/script.js",
-    "src/core/generated/locales.ts"
+    "src/core/generated/locales.ts",
+    "src/**/*.selfcheck.ts"
   ],
   "project": ["src/**/*.ts", "public/**/*.js"],
   "ignoreDependencies": [
