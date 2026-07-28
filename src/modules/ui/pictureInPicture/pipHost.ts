@@ -53,7 +53,13 @@ export function createPictureInPictureHost(
     const view = activeView;
     if (!view) return;
     const mainRoot = document.getElementsByClassName(LYRICS_CLASS)[0] as HTMLElement | undefined;
-    if (!mainRoot) return;
+    if (!mainRoot) {
+      // The page drops its lyrics container while fetching, so this covers the first open and every
+      // song switch after it; without it the window keeps mirroring the previous song.
+      view.showSearching();
+      lastMirroredRoot = null;
+      return;
+    }
     if (mainRoot !== lastMirroredRoot || needsRebuild() || !view.hasTwinMounted()) {
       const twin = buildTwin(mainRoot, view.pipDocument);
       view.mountLyrics(twin);

@@ -15,7 +15,7 @@ import {
 } from "@constants";
 import { AppState, handleModifications, type PlayerDetails, reloadLyrics } from "@core/appState";
 import { preFetchLyrics } from "@modules/lyrics/lyrics";
-import { getSongMetadata } from "@modules/lyrics/requestSniffer/requestSniffer";
+import { getArtworkMetadata, getSongMetadata } from "@modules/lyrics/requestSniffer/requestSniffer";
 import { onAutoSwitchEnabled, onFullScreenDisabled, wakeDockIdle } from "@modules/settings/settings";
 import {
   animationEngine,
@@ -354,13 +354,8 @@ export function initializeLyrics(): void {
       metadataAbortController = abortController;
 
       const videoIdAtStart = detail.videoId;
-      getSongMetadata(detail.videoId, 250, abortController.signal).then(async songMetadata => {
+      getArtworkMetadata(detail.videoId, 250, abortController.signal).then(songMetadata => {
         if (AppState.lastVideoId !== videoIdAtStart) return;
-
-        if (songMetadata?.isVideo && songMetadata.counterpartVideoId) {
-          songMetadata = await getSongMetadata(songMetadata.counterpartVideoId, 10, abortController.signal);
-          if (AppState.lastVideoId !== videoIdAtStart) return;
-        }
 
         if (songMetadata) {
           addThumbnail(songMetadata.smallThumbnail);
@@ -427,7 +422,10 @@ export function initializeLyrics(): void {
       }
     }
 
-    if (document.visibilityState === "visible") {
+    // A window owning a Picture-in-Picture document still reports "hidden", and this is the only
+    // path that ticks the engine while playback is paused, so pausing would never reach the
+    // running word animations.
+    if (document.visibilityState === "visible" || AppState.isPictureInPictureOpen) {
       runAnimationEngine(performance.now(), true);
     }
   });

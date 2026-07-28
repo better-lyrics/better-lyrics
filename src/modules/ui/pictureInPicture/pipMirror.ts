@@ -94,6 +94,13 @@ export function buildTwin(mainRoot: HTMLElement, pipDoc: Document): HTMLElement 
   return twin;
 }
 
+function copyPlaybackState(source: Animation, twin: Animation): void {
+  if (source.currentTime !== null) twin.currentTime = source.currentTime;
+  twin.playbackRate = source.playbackRate;
+  if (source.playState === "paused") twin.pause();
+  else if (source.playState === "running" && twin.playState !== "running") twin.play();
+}
+
 export function sync(mainRoot: HTMLElement): void {
   if (!twinRoot) return;
   const live = mainRoot.getAnimations({ subtree: true });
@@ -126,23 +133,26 @@ export function sync(mainRoot: HTMLElement): void {
       sourceToTwin.set(source, twin);
     }
     nextKnown.add(source);
-    if (source.currentTime !== null) twin.currentTime = source.currentTime;
-    twin.playbackRate = source.playbackRate;
-    if (source.playState === "paused") twin.pause();
-    else if (source.playState === "running" && twin.playState !== "running") twin.play();
+    copyPlaybackState(source, twin);
   }
 
   for (const source of knownSources) {
     if (nextKnown.has(source)) continue;
     // Dropping out of getAnimations() does not mean the source ended: an unrendered target takes
-    // its animation off the list while it is still running. Retire the twin only once the source
-    // is genuinely gone, so a stall can never blank the window.
-    if (source.playState === "idle") {
+    // its animation off the list while it is still running. Only a source that is cancelled or
+    // finished is genuinely gone, so a stall can never blank the window. Retiring the finished
+    // ones matters because several engine animations fill forwards, and a surviving twin of one
+    // outranks the theme's own declarations and pins its line visible.
+    if (source.playState === "idle" || source.playState === "finished") {
       sourceToTwin.get(source)?.cancel();
       sourceToTwin.delete(source);
-    } else {
-      nextKnown.add(source);
+      continue;
     }
+    // A minimised window unrenders every target at once, so without this the retained twins freeze
+    // at whatever value they held and the lines they belong to stop matching the page.
+    const twin = sourceToTwin.get(source);
+    if (twin) copyPlaybackState(source, twin);
+    nextKnown.add(source);
   }
   knownSources = nextKnown;
 }

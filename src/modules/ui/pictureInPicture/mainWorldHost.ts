@@ -47,7 +47,7 @@ function createController(): PictureInPictureController<Window> {
   return createPictureInPictureHost({
     view: {
       translate: key => resources?.strings[key] ?? "",
-      getSongMetadata: requestSongMetadata,
+      getArtworkMetadata: requestSongMetadata,
       resetScrollResume: () => sendSignal({ type: "reset-scroll" }),
     },
     windowTitle: () => resources?.strings.picture_in_picture_open ?? "",

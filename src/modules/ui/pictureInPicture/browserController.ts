@@ -9,7 +9,7 @@ import {
 import { AppState } from "@core/appState";
 import { t } from "@core/i18n";
 import { getStorage } from "@core/storage";
-import { getSongMetadata } from "@modules/lyrics/requestSniffer/requestSniffer";
+import { getArtworkMetadata } from "@modules/lyrics/requestSniffer/requestSniffer";
 import { animEngineState } from "@modules/ui/animationEngine";
 import { log } from "@utils";
 import { onSignal, sendInit, sendMetadata } from "./bridge";
@@ -20,7 +20,7 @@ const STYLESHEET_PATH = "css/blyrics/picture-in-picture.css";
 const LYRIC_STYLESHEET_PATH = "css/blyrics/index.css";
 const PIP_STRING_KEYS = [
   "picture_in_picture_open",
-  "picture_in_picture_loading",
+  "lyrics_searching",
   "picture_in_picture_previous",
   "picture_in_picture_play",
   "picture_in_picture_pause",
@@ -33,7 +33,7 @@ let autoRestoreInteractionController: AbortController | null = null;
 
 const isolatedViewDependencies: PictureInPictureViewDependencies = {
   translate: t,
-  getSongMetadata,
+  getArtworkMetadata,
   resetScrollResume: () => {
     animEngineState.scrollResumeTime = 0;
   },
@@ -112,7 +112,7 @@ function createPageWorldDelegate(): PictureInPictureToggle {
     } else if (signal.type === "reset-scroll") {
       animEngineState.scrollResumeTime = 0;
     } else if (signal.type === "want-metadata") {
-      void getSongMetadata(signal.videoId, 250).then(metadata =>
+      void getArtworkMetadata(signal.videoId, 250).then(metadata =>
         sendMetadata({ requestId: signal.requestId, metadata })
       );
     } else if (signal.type === "ready") {

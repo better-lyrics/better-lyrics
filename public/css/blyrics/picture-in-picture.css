@@ -286,14 +286,32 @@ body {
   height: 1em;
 }
 
-.blyrics-pip-lyrics__status {
-  display: grid;
+.blyrics-pip-loader {
+  display: flex;
   min-height: 100%;
+  align-items: center;
+  justify-content: center;
+  gap: clamp(8px, 2.5vw, 12px);
+}
+
+.blyrics-pip-loader__mark {
+  flex: 0 0 auto;
+  width: clamp(14px, 4.5vw, 19px);
+  height: clamp(14px, 4.5vw, 19px);
+  background: url("https://betterlyrics.org/icon-512.png") 50% / cover;
+  animation: blyrics-spin 1.5s linear infinite;
+}
+
+.blyrics-pip-loader__label {
   margin: 0;
-  place-items: center start;
-  color: rgb(255 255 255 / 56%);
-  font-size: clamp(12px, 3.5vw, 16px);
+  background: var(--blyrics-shimmer-gradient) 0 0 / 200% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  font-size: clamp(10px, 2.4vw, 12px);
+  font-weight: 700;
   line-height: 1.4;
+  animation: blyrics-shimmer 3s linear infinite;
 }
 
 @media (max-height: 130px) {
