@@ -4,7 +4,7 @@ import { t } from "@core/i18n";
 import { getStorage } from "@core/storage";
 import { log } from "@utils";
 import { PictureInPictureController } from "./controller";
-import { PictureInPictureLyricsView } from "./lyricsView";
+import { DEFAULT_ARTWORK_TRANSITION, PictureInPictureLyricsView } from "./lyricsView";
 import { buildTwin, needsRebuild, sync as syncMirror, teardown as teardownMirror } from "./pipMirror";
 
 const STYLESHEET_PATH = "css/blyrics/picture-in-picture.css";
@@ -21,6 +21,9 @@ let hasInitializedAutoRestore = false;
 let hasAttemptedAutoRestore = false;
 let hasMirroredMiniPlayer = false;
 let autoRestoreInteractionController: AbortController | null = null;
+// Held raw rather than resolved: the view is the one place that validates it,
+// and a window may not exist yet when the setting changes.
+let storedArtworkTransition: unknown = DEFAULT_ARTWORK_TRANSITION;
 
 function renderLoadingShell(pipWindow: Window): void {
   activeWindow = pipWindow;
@@ -37,6 +40,7 @@ function renderLoadingShell(pipWindow: Window): void {
   injectLyricStyles(pipWindow);
   mirrorCustomTheme(pipWindow);
   activeView = new PictureInPictureLyricsView(pipWindow, document);
+  activeView.setTransition(storedArtworkTransition);
   startSyncLoop(pipWindow);
 }
 
@@ -217,12 +221,24 @@ export function initializePictureInPictureAutoRestore(): void {
   if (hasInitializedAutoRestore) return;
   hasInitializedAutoRestore = true;
 
-  getStorage({ isPictureInPictureAutoRestoreEnabled: false }, items => {
-    if (items.isPictureInPictureAutoRestoreEnabled) armAutoRestore();
-  });
+  getStorage(
+    { isPictureInPictureAutoRestoreEnabled: false, pipArtworkTransition: DEFAULT_ARTWORK_TRANSITION },
+    items => {
+      if (items.isPictureInPictureAutoRestoreEnabled) armAutoRestore();
+      storedArtworkTransition = items.pipArtworkTransition;
+      activeView?.setTransition(storedArtworkTransition);
+    }
+  );
 
   chrome.storage.onChanged.addListener((changes, areaName) => {
-    if (areaName !== "sync" || !changes.isPictureInPictureAutoRestoreEnabled || hasAttemptedAutoRestore) return;
+    if (areaName !== "sync") return;
+
+    if (changes.pipArtworkTransition) {
+      storedArtworkTransition = changes.pipArtworkTransition.newValue ?? DEFAULT_ARTWORK_TRANSITION;
+      activeView?.setTransition(storedArtworkTransition);
+    }
+
+    if (!changes.isPictureInPictureAutoRestoreEnabled || hasAttemptedAutoRestore) return;
     if (changes.isPictureInPictureAutoRestoreEnabled.newValue === true) {
       armAutoRestore();
     } else {

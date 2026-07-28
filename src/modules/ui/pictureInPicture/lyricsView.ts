@@ -22,6 +22,23 @@ const VISIBLE_METADATA_CHECK_INTERVAL = 250;
 const PLAYER_CONTROLS_IDLE_DELAY = 2000;
 const SCROLL_ANCHOR_RATIO = 0.4;
 
+// Durations mirror the keyframes in picture-in-picture.css; they only gate the
+// rapid-skip guard, so drift shows up as a guard that releases early or late.
+const ARTWORK_TRANSITION_DURATIONS = {
+  shuffle: 980,
+  flip: 820,
+  push: 620,
+  crossfade: 620,
+} as const;
+
+type ArtworkTransition = keyof typeof ARTWORK_TRANSITION_DURATIONS;
+export const DEFAULT_ARTWORK_TRANSITION: ArtworkTransition = "shuffle";
+
+// The cover already on screen outlives a track change so that the common case,
+// where the next cover is prefetched and decodes at once, never blinks. Past
+// this the metadata poll is genuinely slow and stale art is the worse lie.
+const ARTWORK_STALE_GRACE = 600;
+
 const PLAYER_CONTROL_IDS: Record<PlayerControlAction, string> = {
   previous: "previous-button",
   "play-pause": "play-pause-button",
@@ -77,6 +94,31 @@ function getSourceControlLabel(sourceDocument: Document, action: PlayerControlAc
   );
 }
 
+// Faces are siblings rather than nested layers because the slot clips its
+// content, and an ancestor that clips flattens any preserve-3d beneath it.
+function createArtworkFace(document: Document): [HTMLElement, HTMLImageElement] {
+  const face = document.createElement("div");
+  face.className = "blyrics-pip-artwork__face";
+
+  const placeholder = document.createElement("span");
+  placeholder.className = "blyrics-pip-artwork__placeholder";
+  placeholder.setAttribute("aria-hidden", "true");
+
+  const image = document.createElement("img");
+  image.className = "blyrics-pip-artwork__image";
+  image.alt = "";
+  image.draggable = false;
+
+  face.append(placeholder, image);
+  return [face, image];
+}
+
+// Warms the browser cache so a transition never has to wait on a decode.
+export function preloadArtwork(url: string): void {
+  const proxy = new Image();
+  proxy.src = getArtworkUrl(url);
+}
+
 function createControlIcon(document: Document, icon: PlayerControlIcon): SVGSVGElement {
   const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
   svg.classList.add("blyrics-pip-artwork__control-icon", `blyrics-pip-artwork__control-icon--${icon}`);
@@ -93,7 +135,8 @@ function createControlIcon(document: Document, icon: PlayerControlIcon): SVGSVGE
 export class PictureInPictureLyricsView {
   private readonly shell: HTMLElement;
   private readonly artworkContainer: HTMLElement;
-  private readonly artwork: HTMLImageElement;
+  private readonly artworkFaces: readonly [HTMLElement, HTMLElement];
+  private readonly artworkImages: readonly [HTMLImageElement, HTMLImageElement];
   private readonly artworkVideo: HTMLVideoElement;
   private readonly playPauseButton: HTMLButtonElement;
   private readonly title: HTMLElement;
@@ -109,6 +152,11 @@ export class PictureInPictureLyricsView {
   private lastPointerMoveTime = 0;
   private fallbackArtworkUrl = "";
   private isSearching = false;
+  private artworkTransition: ArtworkTransition = DEFAULT_ARTWORK_TRANSITION;
+  private artworkIndex = 0;
+  private artworkBusyUntil = 0;
+  private artworkBusyTimer: number | null = null;
+  private artworkStaleTimer: number | null = null;
 
   constructor(
     private readonly pipWindow: Window,
@@ -119,18 +167,21 @@ export class PictureInPictureLyricsView {
     this.shell = pipDocument.createElement("main");
     this.shell.className = "blyrics-pip-shell";
     this.shell.setAttribute("aria-busy", "true");
+    this.shell.setAttribute("blyrics-pip-transition", this.artworkTransition);
 
     this.artworkContainer = pipDocument.createElement("div");
     this.artworkContainer.className = "blyrics-pip-artwork";
 
-    const artworkPlaceholder = pipDocument.createElement("span");
-    artworkPlaceholder.className = "blyrics-pip-artwork__placeholder";
-    artworkPlaceholder.setAttribute("aria-hidden", "true");
+    const [frontFace, frontImage] = createArtworkFace(pipDocument);
+    const [backFace, backImage] = createArtworkFace(pipDocument);
+    this.artworkFaces = [frontFace, backFace];
+    this.artworkImages = [frontImage, backImage];
+    frontFace.setAttribute("data-front", "true");
+    backFace.setAttribute("data-front", "false");
 
-    this.artwork = pipDocument.createElement("img");
-    this.artwork.className = "blyrics-pip-artwork__image";
-    this.artwork.alt = "";
-    this.artwork.draggable = false;
+    const artworkCard = pipDocument.createElement("div");
+    artworkCard.className = "blyrics-pip-artwork__card";
+    artworkCard.append(frontFace, backFace);
 
     this.artworkVideo = pipDocument.createElement("video");
     this.artworkVideo.className = "blyrics-pip-artwork__video";
@@ -155,7 +206,7 @@ export class PictureInPictureLyricsView {
       getSourceControlLabel(sourceDocument, "next", t("picture_in_picture_next"))
     );
     artworkControls.append(previousButton, this.playPauseButton, nextButton);
-    this.artworkContainer.append(artworkPlaceholder, this.artwork, this.artworkVideo, artworkControls);
+    this.artworkContainer.append(artworkCard, this.artworkVideo, artworkControls);
 
     const content = pipDocument.createElement("section");
     content.className = "blyrics-pip-content";
@@ -299,7 +350,9 @@ export class PictureInPictureLyricsView {
   private readonly destroy = (): void => {
     this.lifecycleController.abort();
     this.artworkController?.abort();
+    this.clearArtworkStaleTimer();
     if (this.controlsIdleTimer !== null) this.pipWindow.clearTimeout(this.controlsIdleTimer);
+    if (this.artworkBusyTimer !== null) this.pipWindow.clearTimeout(this.artworkBusyTimer);
   };
 
   private createPlayerControlButton(action: PlayerControlAction, label: string): HTMLButtonElement {
@@ -385,10 +438,12 @@ export class PictureInPictureLyricsView {
     const controller = new AbortController();
     this.artworkController = controller;
     this.fallbackArtworkUrl = getFallbackArtworkUrl(videoId);
-    // The metadata poll runs for seconds, so the previous song's art has to go now rather than when
-    // its replacement arrives. Leaving src alone keeps the onerror fallback from firing.
-    this.artwork.removeAttribute("data-loaded");
-    this.shell.style.removeProperty("--blyrics-pip-art");
+    this.clearArtworkStaleTimer();
+    this.artworkStaleTimer = this.pipWindow.setTimeout(() => {
+      this.artworkStaleTimer = null;
+      this.artworkContainer.removeAttribute("data-has-art");
+      this.shell.style.removeProperty("--blyrics-pip-art");
+    }, ARTWORK_STALE_GRACE);
 
     void getArtworkMetadata(videoId, 250, controller.signal).then(metadata => {
       if (controller.signal.aborted || this.currentVideoId !== videoId) return;
@@ -396,19 +451,89 @@ export class PictureInPictureLyricsView {
       const displayByline = metadata?.displayByline || metadata?.artist;
       if (displayByline) this.byline.textContent = displayByline;
       // The fallback is a 16:9 video frame, so it only lands when the queue yielded no art at all.
-      this.setArtwork(metadata?.thumbnail?.url ? getArtworkUrl(metadata.thumbnail.url) : this.fallbackArtworkUrl);
+      this.setArtwork(
+        metadata?.thumbnail?.url ? getArtworkUrl(metadata.thumbnail.url) : this.fallbackArtworkUrl,
+        videoId,
+        controller
+      );
     });
   }
 
-  private setArtwork(url: string): void {
-    this.shell.style.setProperty("--blyrics-pip-art", `url("${url}")`);
-    this.artwork.removeAttribute("data-loaded");
-    this.artwork.onload = () => this.artwork.setAttribute("data-loaded", "true");
-    this.artwork.onerror = () => {
-      if (this.artwork.src !== this.fallbackArtworkUrl) {
-        this.setArtwork(this.fallbackArtworkUrl);
-      }
+  // Loads into the hidden face and only transitions once that face has decoded:
+  // fading in an undecoded image fades in nothing, which is how the placeholder
+  // gets back on screen.
+  private setArtwork(url: string, videoId: string, controller: AbortController): void {
+    const nextIndex = 1 - this.artworkIndex;
+    const image = this.artworkImages[nextIndex];
+    const { signal } = controller;
+
+    const commit = (): void => {
+      if (signal.aborted || this.currentVideoId !== videoId) return;
+      this.clearArtworkStaleTimer();
+      this.artworkContainer.setAttribute("data-has-art", "true");
+      this.shell.style.setProperty("--blyrics-pip-art", `url("${url}")`);
+      this.runArtworkSwap(nextIndex);
     };
-    this.artwork.src = url;
+
+    image.addEventListener(
+      "error",
+      () => {
+        if (signal.aborted || url === this.fallbackArtworkUrl) return;
+        this.setArtwork(this.fallbackArtworkUrl, videoId, controller);
+      },
+      { once: true, signal }
+    );
+    image.src = url;
+
+    if (!image.complete) {
+      image.addEventListener("load", commit, { once: true, signal });
+    } else if (image.naturalWidth > 0) {
+      commit();
+    }
+  }
+
+  private runArtworkSwap(nextIndex: number): void {
+    const duration = ARTWORK_TRANSITION_DURATIONS[this.artworkTransition];
+    const now = this.pipWindow.performance.now();
+    const isBusy = this.artworkBusyUntil > now;
+
+    if (this.artworkBusyTimer !== null) this.pipWindow.clearTimeout(this.artworkBusyTimer);
+    this.shell.setAttribute("data-running", "false");
+    void this.shell.offsetWidth;
+
+    // A swap landing mid-transition snaps to its final state rather than
+    // restarting the keyframes from off-frame. The cooldown has to EXTEND on
+    // each snap, not clear: clearing it lets the very next swap animate again,
+    // so a sustained burst alternates animate, snap, animate, and that flicker
+    // is its own kind of jank.
+    if (!isBusy) {
+      this.shell.setAttribute("data-running", "true");
+      this.artworkBusyTimer = this.pipWindow.setTimeout(() => {
+        this.artworkBusyTimer = null;
+        this.shell.setAttribute("data-running", "false");
+      }, duration);
+    }
+
+    this.artworkIndex = nextIndex;
+    this.artworkFaces[nextIndex].setAttribute("data-front", "true");
+    this.artworkFaces[1 - nextIndex].setAttribute("data-front", "false");
+    this.shell.setAttribute("data-artwork-flipped", nextIndex === 1 ? "true" : "false");
+    this.artworkBusyUntil = now + duration;
+  }
+
+  private clearArtworkStaleTimer(): void {
+    if (this.artworkStaleTimer === null) return;
+    this.pipWindow.clearTimeout(this.artworkStaleTimer);
+    this.artworkStaleTimer = null;
+  }
+
+  setTransition(name: unknown): void {
+    const transition =
+      typeof name === "string" && name in ARTWORK_TRANSITION_DURATIONS
+        ? (name as ArtworkTransition)
+        : DEFAULT_ARTWORK_TRANSITION;
+    if (transition === this.artworkTransition) return;
+    this.artworkTransition = transition;
+    this.shell.setAttribute("blyrics-pip-transition", transition);
   }
 }

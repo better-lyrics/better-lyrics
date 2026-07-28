@@ -122,6 +122,30 @@
     "message": "Keeps the floating lyrics window from closing for good when you reload or move between songs and pages. Browsers only let a floating window open right after you interact with the page, so it reopens on your first click or key press instead of instantly.",
     "description": "Help tooltip explaining what automatic floating-lyrics reopening does and why it waits for the first interaction"
   },
+  "options_display_pipArtworkTransition": {
+    "message": "Floating window album art transition",
+    "description": "Setting label for choosing how album art changes between songs in the floating lyrics window"
+  },
+  "options_display_pipArtworkTransitionTooltip": {
+    "message": "Chooses how the album art changes when a new song starts in the floating lyrics window. If your system is set to reduce motion, every option becomes a simple fade instead.",
+    "description": "Help tooltip explaining the floating-window album art transition setting and its reduced-motion behaviour"
+  },
+  "options_pipTransition_shuffle": {
+    "message": "Shuffle",
+    "description": "Name of an album art transition where the artwork tilts back and the new cover is dealt in like a playing card"
+  },
+  "options_pipTransition_flip": {
+    "message": "Flip",
+    "description": "Name of an album art transition where the artwork rotates like a card to reveal the new cover on its other side"
+  },
+  "options_pipTransition_push": {
+    "message": "Push",
+    "description": "Name of an album art transition where the new cover slides in from the side and pushes the old one out"
+  },
+  "options_pipTransition_crossfade": {
+    "message": "Crossfade",
+    "description": "Name of an album art transition where the new cover fades in over the old one"
+  },
   "options_display_shadersPromo": {
     "message": "Show link to Better Lyrics Shaders",
     "description": "Toggle label for the Shaders companion link shown in the lyrics footer"

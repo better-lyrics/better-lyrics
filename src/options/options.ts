@@ -25,6 +25,7 @@ interface Options {
   isStylizedAnimationsEnabled: boolean;
   isPassiveScrollEnabled: boolean;
   isPictureInPictureAutoRestoreEnabled: boolean;
+  pipArtworkTransition: string;
   isTranslateEnabled: boolean;
   translationLanguage: string;
   isCursorAutoHideEnabled: boolean;
@@ -83,6 +84,7 @@ const getOptionsFromForm = (): Options => {
     isPictureInPictureAutoRestoreEnabled: (
       document.getElementById("isPictureInPictureAutoRestoreEnabled") as HTMLInputElement
     ).checked,
+    pipArtworkTransition: (document.getElementById("pipArtworkTransition") as HTMLSelectElement).value,
     isTranslateEnabled: (document.getElementById("translate") as HTMLInputElement).checked,
     translationLanguage: (document.getElementById("translationLanguage") as HTMLInputElement).value,
     isCursorAutoHideEnabled: (document.getElementById("cursorAutoHide") as HTMLInputElement).checked,
@@ -266,6 +268,7 @@ const restoreOptions = (): void => {
     isStylizedAnimationsEnabled: true,
     isPassiveScrollEnabled: true,
     isPictureInPictureAutoRestoreEnabled: false,
+    pipArtworkTransition: "shuffle",
     isTranslateEnabled: false,
     translationLanguage: "en",
     isRomanizationEnabled: false,
@@ -343,6 +346,7 @@ const setOptionsInForm = (items: Options): void => {
   (document.getElementById("isPassiveScrollEnabled") as HTMLInputElement).checked = items.isPassiveScrollEnabled;
   (document.getElementById("isPictureInPictureAutoRestoreEnabled") as HTMLInputElement).checked =
     items.isPictureInPictureAutoRestoreEnabled;
+  (document.getElementById("pipArtworkTransition") as HTMLSelectElement).value = items.pipArtworkTransition;
   (document.getElementById("translate") as HTMLInputElement).checked = items.isTranslateEnabled;
   (document.getElementById("translationLanguage") as HTMLInputElement).value = items.translationLanguage;
   (document.getElementById("isRomanizationEnabled") as HTMLInputElement).checked = items.isRomanizationEnabled;
