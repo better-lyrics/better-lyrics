@@ -94,6 +94,13 @@ export function buildTwin(mainRoot: HTMLElement, pipDoc: Document): HTMLElement 
   return twin;
 }
 
+function copyPlaybackState(source: Animation, twin: Animation): void {
+  if (source.currentTime !== null) twin.currentTime = source.currentTime;
+  twin.playbackRate = source.playbackRate;
+  if (source.playState === "paused") twin.pause();
+  else if (source.playState === "running" && twin.playState !== "running") twin.play();
+}
+
 export function sync(mainRoot: HTMLElement): void {
   if (!twinRoot) return;
   const live = mainRoot.getAnimations({ subtree: true });
@@ -126,10 +133,7 @@ export function sync(mainRoot: HTMLElement): void {
       sourceToTwin.set(source, twin);
     }
     nextKnown.add(source);
-    if (source.currentTime !== null) twin.currentTime = source.currentTime;
-    twin.playbackRate = source.playbackRate;
-    if (source.playState === "paused") twin.pause();
-    else if (source.playState === "running" && twin.playState !== "running") twin.play();
+    copyPlaybackState(source, twin);
   }
 
   for (const source of knownSources) {
@@ -140,9 +144,13 @@ export function sync(mainRoot: HTMLElement): void {
     if (source.playState === "idle") {
       sourceToTwin.get(source)?.cancel();
       sourceToTwin.delete(source);
-    } else {
-      nextKnown.add(source);
+      continue;
     }
+    // A minimised window unrenders every target at once, so without this the retained twins freeze
+    // at whatever value they held and the lines they belong to stop matching the page.
+    const twin = sourceToTwin.get(source);
+    if (twin) copyPlaybackState(source, twin);
+    nextKnown.add(source);
   }
   knownSources = nextKnown;
 }
