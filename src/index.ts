@@ -45,7 +45,7 @@ async function modify(): Promise<void> {
   await injectHeadTags();
   await loadLocaleOverride();
   injectI18nCssVars();
-  subscribeToLocaleChanges();
+  subscribeToLocaleChanges(publishPictureInPictureResources);
   publishPictureInPictureResources();
   setupAdObserver();
   enableLyricsTab();

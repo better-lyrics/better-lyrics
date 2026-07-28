@@ -41,6 +41,7 @@
         "*://music.youtube.com/*"
       ],
       "resources": [
+        "_locales/*/messages.json",
         "css/blyrics/*.css",
         "css/ytmusic/*.css",
         "css/disablestylizedanimations.css",
