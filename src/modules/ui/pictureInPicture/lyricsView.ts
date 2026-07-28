@@ -2,7 +2,7 @@ import { CURRENT_LYRICS_CLASS, LINE_CLASS, LYRICS_CLASS, PLAYER_BAR_SELECTOR, SE
 import type { PlayerDetails } from "@core/appState";
 import { t } from "@core/i18n";
 import { getSeekTimeFromClick } from "@modules/lyrics/injectLyrics";
-import { getSongMetadata } from "@modules/lyrics/requestSniffer/requestSniffer";
+import { getArtworkMetadata } from "@modules/lyrics/requestSniffer/requestSniffer";
 import { animEngineState } from "@modules/ui/animationEngine";
 import { MIRROR_ID_ATTR } from "./pipMirror";
 
@@ -108,6 +108,7 @@ export class PictureInPictureLyricsView {
   private controlsIdleTimer: number | null = null;
   private lastPointerMoveTime = 0;
   private fallbackArtworkUrl = "";
+  private isSearching = false;
 
   constructor(
     private readonly pipWindow: Window,
@@ -179,7 +180,7 @@ export class PictureInPictureLyricsView {
       signal: this.lifecycleController.signal,
     });
 
-    this.renderStatus(t("picture_in_picture_loading"));
+    this.showSearching();
 
     content.append(header, this.lyricsViewport);
     this.shell.append(this.artworkContainer, content);
@@ -200,9 +201,33 @@ export class PictureInPictureLyricsView {
   }
 
   mountLyrics(twinRoot: HTMLElement): void {
+    this.isSearching = false;
     this.lyricsScroller.replaceChildren(twinRoot);
     this.lyricsViewport.replaceChildren(this.lyricsScroller);
     this.shell.setAttribute("aria-busy", "false");
+  }
+
+  // Called from the sync loop, so it has to no-op once the loader is already up.
+  showSearching(): void {
+    if (this.isSearching) return;
+    this.isSearching = true;
+
+    const pipDocument = this.pipWindow.document;
+    const loader = pipDocument.createElement("div");
+    loader.className = "blyrics-pip-loader";
+
+    const mark = pipDocument.createElement("span");
+    mark.className = "blyrics-pip-loader__mark";
+    mark.setAttribute("aria-hidden", "true");
+
+    const label = pipDocument.createElement("p");
+    label.className = "blyrics-pip-loader__label";
+    label.setAttribute("role", "status");
+    label.textContent = t("lyrics_searching");
+
+    loader.append(mark, label);
+    this.lyricsViewport.replaceChildren(loader);
+    this.shell.setAttribute("aria-busy", "true");
   }
 
   hasTwinMounted(): boolean {
@@ -360,14 +385,14 @@ export class PictureInPictureLyricsView {
     const controller = new AbortController();
     this.artworkController = controller;
     this.fallbackArtworkUrl = getFallbackArtworkUrl(videoId);
-    this.setArtwork(this.fallbackArtworkUrl);
 
-    void getSongMetadata(videoId, 250, controller.signal).then(metadata => {
-      if (controller.signal.aborted || this.currentVideoId !== videoId || !metadata) return;
-      if (metadata.displayTitle) this.title.textContent = metadata.displayTitle;
-      const displayByline = metadata.displayByline || metadata.artist;
+    void getArtworkMetadata(videoId, 250, controller.signal).then(metadata => {
+      if (controller.signal.aborted || this.currentVideoId !== videoId) return;
+      if (metadata?.displayTitle) this.title.textContent = metadata.displayTitle;
+      const displayByline = metadata?.displayByline || metadata?.artist;
       if (displayByline) this.byline.textContent = displayByline;
-      if (metadata.thumbnail?.url) this.setArtwork(getArtworkUrl(metadata.thumbnail.url));
+      // The fallback is a 16:9 video frame, so it only lands when the queue yielded no art at all.
+      this.setArtwork(metadata?.thumbnail?.url ? getArtworkUrl(metadata.thumbnail.url) : this.fallbackArtworkUrl);
     });
   }
 
@@ -381,13 +406,5 @@ export class PictureInPictureLyricsView {
       }
     };
     this.artwork.src = url;
-  }
-
-  private renderStatus(message: string): void {
-    const status = this.pipWindow.document.createElement("p");
-    status.className = "blyrics-pip-lyrics__status";
-    status.setAttribute("role", "status");
-    status.textContent = message;
-    this.lyricsViewport.replaceChildren(status);
   }
 }
