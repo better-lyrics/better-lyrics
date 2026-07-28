@@ -1,3 +1,4 @@
+import { LOG_PREFIX } from "@constants";
 import { log } from "@utils";
 
 const NATIVE_LYRICS_SHELF_SELECTOR = "#tab-renderer ytmusic-description-shelf-renderer";
@@ -46,11 +47,12 @@ function shouldHandleMutation(mutation: MutationRecord): boolean {
 }
 
 function handleMutations(mutations: MutationRecord[]): void {
-  log("Native lyrics focus observer fired", { mutationCount: mutations.length });
-
-  if (mutations.some(shouldHandleMutation)) {
-    scheduleApply();
+  if (!mutations.some(shouldHandleMutation)) {
+    return;
   }
+
+  log(LOG_PREFIX, "Native lyrics focus observer fired", { mutationCount: mutations.length });
+  scheduleApply();
 }
 
 export function disableNativeLyricsFocus(): void {
