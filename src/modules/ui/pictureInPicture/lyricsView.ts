@@ -469,9 +469,12 @@ export class PictureInPictureLyricsView {
     const commit = (): void => {
       if (signal.aborted || this.currentVideoId !== videoId) return;
       this.clearArtworkStaleTimer();
+      // There is nothing to transition from when the placeholder is what is on screen, so the first
+      // cover in a window, and any cover that lands after a slow lookup fell back, just appears.
+      const isFirstArtwork = !this.artworkContainer.hasAttribute("data-has-art");
       this.artworkContainer.setAttribute("data-has-art", "true");
       this.shell.style.setProperty("--blyrics-pip-art", `url("${url}")`);
-      this.runArtworkSwap(nextIndex);
+      this.runArtworkSwap(nextIndex, isFirstArtwork);
     };
 
     image.addEventListener(
@@ -491,7 +494,7 @@ export class PictureInPictureLyricsView {
     }
   }
 
-  private runArtworkSwap(nextIndex: number): void {
+  private runArtworkSwap(nextIndex: number, skipAnimation: boolean): void {
     const duration = ARTWORK_TRANSITION_DURATIONS[this.artworkTransition];
     const now = this.pipWindow.performance.now();
     const isBusy = this.artworkBusyUntil > now;
@@ -505,7 +508,7 @@ export class PictureInPictureLyricsView {
     // each snap, not clear: clearing it lets the very next swap animate again,
     // so a sustained burst alternates animate, snap, animate, and that flicker
     // is its own kind of jank.
-    if (!isBusy) {
+    if (!skipAnimation && !isBusy) {
       this.shell.setAttribute("data-running", "true");
       this.artworkBusyTimer = this.pipWindow.setTimeout(() => {
         this.artworkBusyTimer = null;
@@ -517,7 +520,9 @@ export class PictureInPictureLyricsView {
     this.artworkFaces[nextIndex].setAttribute("data-front", "true");
     this.artworkFaces[1 - nextIndex].setAttribute("data-front", "false");
     this.shell.setAttribute("data-artwork-flipped", nextIndex === 1 ? "true" : "false");
-    this.artworkBusyUntil = now + duration;
+    // A skipped swap opens no cooldown, or the very next track change would find the guard busy
+    // and snap a transition the viewer was owed.
+    if (!skipAnimation) this.artworkBusyUntil = now + duration;
   }
 
   private clearArtworkStaleTimer(): void {
