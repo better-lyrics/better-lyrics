@@ -1,10 +1,8 @@
 import { CURRENT_LYRICS_CLASS, LINE_CLASS, LYRICS_CLASS, PLAYER_BAR_SELECTOR, SEEK_EVENT } from "@constants";
 import type { PlayerDetails } from "@core/appState";
-import { t } from "@core/i18n";
-import { getSeekTimeFromClick } from "@modules/lyrics/injectLyrics";
-import { getArtworkMetadata } from "@modules/lyrics/requestSniffer/requestSniffer";
-import { animEngineState } from "@modules/ui/animationEngine";
+import { getSeekTimeFromClick } from "@modules/lyrics/seekFromClick";
 import { MIRROR_ID_ATTR } from "./pipMirror";
+import type { PictureInPictureViewDependencies } from "./types";
 
 interface DisplayMetadata {
   readonly title: string;
@@ -160,7 +158,8 @@ export class PictureInPictureLyricsView {
 
   constructor(
     private readonly pipWindow: Window,
-    private readonly sourceDocument: Document
+    private readonly sourceDocument: Document,
+    private readonly dependencies: PictureInPictureViewDependencies
   ) {
     const pipDocument = pipWindow.document;
 
@@ -195,15 +194,15 @@ export class PictureInPictureLyricsView {
     artworkControls.className = "blyrics-pip-artwork__controls";
     const previousButton = this.createPlayerControlButton(
       "previous",
-      getSourceControlLabel(sourceDocument, "previous", t("picture_in_picture_previous"))
+      getSourceControlLabel(sourceDocument, "previous", dependencies.translate("picture_in_picture_previous"))
     );
     this.playPauseButton = this.createPlayerControlButton(
       "play-pause",
-      getSourceControlLabel(sourceDocument, "play-pause", t("picture_in_picture_play"))
+      getSourceControlLabel(sourceDocument, "play-pause", dependencies.translate("picture_in_picture_play"))
     );
     const nextButton = this.createPlayerControlButton(
       "next",
-      getSourceControlLabel(sourceDocument, "next", t("picture_in_picture_next"))
+      getSourceControlLabel(sourceDocument, "next", dependencies.translate("picture_in_picture_next"))
     );
     artworkControls.append(previousButton, this.playPauseButton, nextButton);
     this.artworkContainer.append(artworkCard, this.artworkVideo, artworkControls);
@@ -274,7 +273,7 @@ export class PictureInPictureLyricsView {
     const label = pipDocument.createElement("p");
     label.className = "blyrics-pip-loader__label";
     label.setAttribute("role", "status");
-    label.textContent = t("lyrics_searching");
+    label.textContent = this.dependencies.translate("lyrics_searching");
 
     loader.append(mark, label);
     this.lyricsViewport.replaceChildren(loader);
@@ -325,7 +324,7 @@ export class PictureInPictureLyricsView {
     const seekTime = getSeekTimeFromClick(event, line);
     if (seekTime === null) return;
     this.sourceDocument.dispatchEvent(new CustomEvent(SEEK_EVENT, { detail: seekTime }));
-    animEngineState.scrollResumeTime = 0;
+    this.dependencies.resetScrollResume();
   };
 
   private readonly handlePointerMove = (): void => {
@@ -392,7 +391,7 @@ export class PictureInPictureLyricsView {
       getSourceControlLabel(
         this.sourceDocument,
         "play-pause",
-        isPlaying ? t("picture_in_picture_pause") : t("picture_in_picture_play")
+        this.dependencies.translate(isPlaying ? "picture_in_picture_pause" : "picture_in_picture_play")
       )
     );
   }
@@ -445,7 +444,7 @@ export class PictureInPictureLyricsView {
       this.shell.style.removeProperty("--blyrics-pip-art");
     }, ARTWORK_STALE_GRACE);
 
-    void getArtworkMetadata(videoId, 250, controller.signal).then(metadata => {
+    void this.dependencies.getArtworkMetadata(videoId, 250, controller.signal).then(metadata => {
       if (controller.signal.aborted || this.currentVideoId !== videoId) return;
       if (metadata?.displayTitle) this.title.textContent = metadata.displayTitle;
       const displayByline = metadata?.displayByline || metadata?.artist;

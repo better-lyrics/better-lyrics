@@ -1,22 +1,32 @@
-import { FONT_LINK, GENERAL_ERROR_LOG, LYRICS_CLASS, NOTO_SANS_UNIVERSAL_LINK, TAB_HEADER_CLASS } from "@constants";
+import {
+  FONT_LINK,
+  GENERAL_ERROR_LOG,
+  MINI_PLAYER_BUTTON_SELECTOR,
+  NOTO_SANS_UNIVERSAL_LINK,
+  PICTURE_IN_PICTURE_TOGGLE_SELECTOR,
+  TAB_HEADER_CLASS,
+} from "@constants";
 import { AppState } from "@core/appState";
 import { t } from "@core/i18n";
 import { getStorage } from "@core/storage";
+import { getArtworkMetadata } from "@modules/lyrics/requestSniffer/requestSniffer";
+import { animEngineState } from "@modules/ui/animationEngine";
 import { log } from "@utils";
-import { PictureInPictureController } from "./controller";
-import { DEFAULT_ARTWORK_TRANSITION, PictureInPictureLyricsView } from "./lyricsView";
-import { buildTwin, needsRebuild, sync as syncMirror, teardown as teardownMirror } from "./pipMirror";
+import { onSignal, sendInit, sendMetadata } from "./bridge";
+import { DEFAULT_ARTWORK_TRANSITION } from "./lyricsView";
+import { createPictureInPictureHost } from "./pipHost";
+import type { PictureInPictureToggle, PictureInPictureViewDependencies } from "./types";
 
 const STYLESHEET_PATH = "css/blyrics/picture-in-picture.css";
 const LYRIC_STYLESHEET_PATH = "css/blyrics/index.css";
-const CUSTOM_STYLE_ID = "blyrics-custom-style";
-const MINI_PLAYER_BUTTON_SELECTOR = ".player-minimize-button";
-const PIP_OPEN_ATTRIBUTE = "blyrics-pip-open";
-let activeView: PictureInPictureLyricsView | null = null;
-let activeWindow: Window | null = null;
-let lastMirroredRoot: HTMLElement | null = null;
-let syncFrame: number | null = null;
-let themeObserver: MutationObserver | null = null;
+const PIP_STRING_KEYS = [
+  "picture_in_picture_open",
+  "lyrics_searching",
+  "picture_in_picture_previous",
+  "picture_in_picture_play",
+  "picture_in_picture_pause",
+  "picture_in_picture_next",
+] as const;
 let hasInitializedAutoRestore = false;
 let hasAttemptedAutoRestore = false;
 let hasMirroredMiniPlayer = false;
@@ -25,10 +35,16 @@ let autoRestoreInteractionController: AbortController | null = null;
 // and a window may not exist yet when the setting changes.
 let storedArtworkTransition: unknown = DEFAULT_ARTWORK_TRANSITION;
 
-function renderLoadingShell(pipWindow: Window): void {
-  activeWindow = pipWindow;
+const isolatedViewDependencies: PictureInPictureViewDependencies = {
+  translate: t,
+  getArtworkMetadata,
+  resetScrollResume: () => {
+    animEngineState.scrollResumeTime = 0;
+  },
+};
+
+function markPictureInPictureOpened(): void {
   AppState.isPictureInPictureOpen = true;
-  document.documentElement.setAttribute(PIP_OPEN_ATTRIBUTE, "");
   if (!AppState.areLyricsLoaded || AppState.lastLoadedVideoId !== AppState.lastVideoId) {
     AppState.queueLyricInjection = true;
   } else {
@@ -36,85 +52,14 @@ function renderLoadingShell(pipWindow: Window): void {
     // back on while the lyrics stay loaded, so the window would mount a frozen snapshot.
     AppState.areLyricsTicking = true;
   }
-  pipWindow.document.title = t("picture_in_picture_open");
-  injectLyricStyles(pipWindow);
-  mirrorCustomTheme(pipWindow);
-  activeView = new PictureInPictureLyricsView(pipWindow, document);
-  activeView.setTransition(storedArtworkTransition);
-  startSyncLoop(pipWindow);
 }
 
-function mirrorCustomTheme(pipWindow: Window): void {
-  stopThemeMirror();
-  const pipStyle = pipWindow.document.createElement("style");
-  pipStyle.id = CUSTOM_STYLE_ID;
-  pipWindow.document.head.appendChild(pipStyle);
-
-  const sync = (): void => {
-    pipStyle.textContent = document.getElementById(CUSTOM_STYLE_ID)?.textContent ?? "";
-  };
-  sync();
-
-  themeObserver = new MutationObserver(sync);
-  themeObserver.observe(document.head, { childList: true, subtree: true, characterData: true });
-}
-
-function stopThemeMirror(): void {
-  themeObserver?.disconnect();
-  themeObserver = null;
-}
-
-function startSyncLoop(pipWindow: Window): void {
-  stopSyncLoop(pipWindow);
-  const loop = (): void => {
-    try {
-      syncTwin();
-    } catch (error) {
-      reportFailure("Document Picture-in-Picture sync failed", error);
-    }
-    syncFrame = pipWindow.requestAnimationFrame(loop);
-  };
-  syncFrame = pipWindow.requestAnimationFrame(loop);
-}
-
-function stopSyncLoop(pipWindow: Window): void {
-  if (syncFrame === null || activeWindow !== pipWindow) return;
-  pipWindow.cancelAnimationFrame(syncFrame);
-  syncFrame = null;
-}
-
-// A closed window's pagehide can arrive after its successor opened; only the owner may tear down.
-function teardownWindow(pipWindow: Window): void {
-  if (activeWindow !== pipWindow) return;
+function markPictureInPictureClosed(): void {
   AppState.isPictureInPictureOpen = false;
-  document.documentElement.removeAttribute(PIP_OPEN_ATTRIBUTE);
   const tabSelector = document.getElementsByClassName(TAB_HEADER_CLASS)[1];
   if (tabSelector?.getAttribute("aria-selected") !== "true") {
     AppState.areLyricsTicking = false;
   }
-  stopSyncLoop(pipWindow);
-  stopThemeMirror();
-  teardownMirror();
-  activeView = null;
-  lastMirroredRoot = null;
-  activeWindow = null;
-}
-
-function injectLyricStyles(pipWindow: Window): void {
-  const lyricStyles = pipWindow.document.createElement("link");
-  lyricStyles.rel = "stylesheet";
-  lyricStyles.href = chrome.runtime.getURL(LYRIC_STYLESHEET_PATH);
-  pipWindow.document.head.appendChild(lyricStyles);
-
-  const fontLink = pipWindow.document.createElement("link");
-  fontLink.href = FONT_LINK;
-  fontLink.rel = "stylesheet";
-  pipWindow.document.head.appendChild(fontLink);
-
-  const notoFontLink = pipWindow.document.createElement("link");
-  notoFontLink.href = NOTO_SANS_UNIVERSAL_LINK;
-  notoFontLink.rel = "stylesheet";
-  pipWindow.document.head.appendChild(notoFontLink);
 }
 
 function injectStylesheet(pipWindow: Window, stylesheet: string): void {
@@ -134,45 +79,76 @@ function reportFailure(message: string, error: unknown): void {
   log(GENERAL_ERROR_LOG, `${message}: ${detail}`);
 }
 
-export const pictureInPictureController = new PictureInPictureController<Window>({
-  host: window,
-  loadStylesheet,
-  renderLoadingShell,
-  injectStylesheet,
-  closeWindow: pipWindow => {
-    teardownWindow(pipWindow);
-    pipWindow.close();
-  },
-  observePageHide: (pipWindow, listener) =>
-    pipWindow.addEventListener(
-      "pagehide",
-      () => {
-        teardownWindow(pipWindow);
-        listener();
-      },
-      { once: true }
-    ),
-  reportFailure,
-});
+// Gecko hands a content script a cross-origin wrapper on the Picture-in-Picture window, so nothing
+// in this world can script it (bugzilla 2045666 and 2053139, fixed upstream in Firefox 154). The
+// page world is unaffected on every version, so Gecko always delegates and Chromium never does.
+// `wrappedJSObject` is the Xray marker that identifies the sandbox with the restriction.
+const delegatesToPageWorld = "wrappedJSObject" in window;
 
-function syncTwin(): void {
-  const view = activeView;
-  if (!view) return;
-  const mainRoot = document.getElementsByClassName(LYRICS_CLASS)[0] as HTMLElement | undefined;
-  if (!mainRoot) {
-    // The page drops its lyrics container while fetching, so this covers the first open and every
-    // song switch after it; without it the window keeps mirroring the previous song.
-    view.showSearching();
-    lastMirroredRoot = null;
-    return;
-  }
-  if (mainRoot !== lastMirroredRoot || needsRebuild() || !view.hasTwinMounted()) {
-    const twin = buildTwin(mainRoot, view.pipDocument);
-    view.mountLyrics(twin);
-    lastMirroredRoot = mainRoot;
-  }
-  syncMirror(mainRoot);
-  view.updateScroll();
+export const pictureInPictureController: PictureInPictureToggle = delegatesToPageWorld
+  ? createPageWorldDelegate()
+  : createPictureInPictureHost({
+      view: isolatedViewDependencies,
+      artworkTransition: () => storedArtworkTransition,
+      windowTitle: () => t("picture_in_picture_open"),
+      stylesheetUrls: () => ({
+        lyrics: chrome.runtime.getURL(LYRIC_STYLESHEET_PATH),
+        fonts: [FONT_LINK, NOTO_SANS_UNIVERSAL_LINK],
+      }),
+      loadStylesheet,
+      injectStylesheet,
+      onOpened: markPictureInPictureOpened,
+      onClosed: markPictureInPictureClosed,
+      reportFailure,
+    });
+
+// The page world owns the window and already acted on the same click via its own capture listener,
+// so toggling here would open a second one. This exists to keep the dock button rendering and to
+// report the state the page world reports back.
+function createPageWorldDelegate(): PictureInPictureToggle {
+  let isOpen = false;
+  onSignal(signal => {
+    if (signal.type === "opened") {
+      isOpen = true;
+      markPictureInPictureOpened();
+    } else if (signal.type === "closed") {
+      isOpen = false;
+      markPictureInPictureClosed();
+    } else if (signal.type === "reset-scroll") {
+      animEngineState.scrollResumeTime = 0;
+    } else if (signal.type === "want-metadata") {
+      void getArtworkMetadata(signal.videoId, 250).then(metadata =>
+        sendMetadata({ requestId: signal.requestId, metadata })
+      );
+    } else if (signal.type === "ready") {
+      publishPictureInPictureResources();
+    }
+  });
+
+  return {
+    isSupported: () => "documentPictureInPicture" in window,
+    isOpen: () => isOpen,
+    toggle: () => undefined,
+  };
+}
+
+// The page world caches this payload, so the strings must be resolved after the locale override has
+// loaded. `modify()` calls this again once it has; the `ready` handshake only bootstraps the toggle.
+export function publishPictureInPictureResources(): void {
+  if (!delegatesToPageWorld) return;
+  getStorage(
+    { isPictureInPictureAutoRestoreEnabled: false, pipArtworkTransition: DEFAULT_ARTWORK_TRANSITION },
+    items => {
+      sendInit({
+        strings: Object.fromEntries(PIP_STRING_KEYS.map(key => [key, t(key)])),
+        lyricsStylesheetUrl: chrome.runtime.getURL(LYRIC_STYLESHEET_PATH),
+        pipStylesheetUrl: chrome.runtime.getURL(STYLESHEET_PATH),
+        fontUrls: [FONT_LINK, NOTO_SANS_UNIVERSAL_LINK],
+        autoRestoreEnabled: Boolean(items.isPictureInPictureAutoRestoreEnabled),
+        artworkTransition: String(items.pipArtworkTransition),
+      });
+    }
+  );
 }
 
 function disarmAutoRestore(): void {
@@ -207,7 +183,7 @@ function armAutoRestore(): void {
     hasAttemptedAutoRestore = true;
     disarmAutoRestore();
     const target = event.target;
-    if (target instanceof Element && target.closest("[data-blyrics-picture-in-picture-toggle]")) return;
+    if (target instanceof Element && target.closest(PICTURE_IN_PICTURE_TOGGLE_SELECTOR)) return;
     if (!pictureInPictureController.isOpen()) pictureInPictureController.toggle();
   };
 
@@ -221,12 +197,20 @@ export function initializePictureInPictureAutoRestore(): void {
   if (hasInitializedAutoRestore) return;
   hasInitializedAutoRestore = true;
 
+  if (delegatesToPageWorld) {
+    chrome.storage.onChanged.addListener((changes, areaName) => {
+      if (areaName === "sync" && (changes.isPictureInPictureAutoRestoreEnabled || changes.pipArtworkTransition)) {
+        publishPictureInPictureResources();
+      }
+    });
+    return;
+  }
+
   getStorage(
     { isPictureInPictureAutoRestoreEnabled: false, pipArtworkTransition: DEFAULT_ARTWORK_TRANSITION },
     items => {
       if (items.isPictureInPictureAutoRestoreEnabled) armAutoRestore();
       storedArtworkTransition = items.pipArtworkTransition;
-      activeView?.setTransition(storedArtworkTransition);
     }
   );
 
@@ -235,7 +219,6 @@ export function initializePictureInPictureAutoRestore(): void {
 
     if (changes.pipArtworkTransition) {
       storedArtworkTransition = changes.pipArtworkTransition.newValue ?? DEFAULT_ARTWORK_TRANSITION;
-      activeView?.setTransition(storedArtworkTransition);
     }
 
     if (!changes.isPictureInPictureAutoRestoreEnabled || hasAttemptedAutoRestore) return;
@@ -247,8 +230,9 @@ export function initializePictureInPictureAutoRestore(): void {
   });
 }
 
+// The page world runs its own copy of this against the same button when it owns the window.
 export function mirrorNativeMiniPlayerButton(): void {
-  if (hasMirroredMiniPlayer) return;
+  if (hasMirroredMiniPlayer || delegatesToPageWorld) return;
   hasMirroredMiniPlayer = true;
 
   document.addEventListener(

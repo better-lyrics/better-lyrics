@@ -99,11 +99,14 @@ export function getLanguageDisplayName(langCode: string): string {
   }
 }
 
-export function subscribeToLocaleChanges(): void {
+// Consumers that cache resolved strings rather than calling t() at render time have to
+// republish here, once the override has actually swapped, not from their own storage listener.
+export function subscribeToLocaleChanges(onLocaleApplied?: () => void): void {
   chrome.storage.onChanged.addListener(async (changes, area) => {
     if (area !== "sync" || !changes.uiLanguage) return;
     await loadLocaleOverride();
     injectI18nCssVars();
+    onLocaleApplied?.();
   });
 }
 

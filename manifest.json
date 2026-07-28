@@ -41,6 +41,7 @@
         "*://music.youtube.com/*"
       ],
       "resources": [
+        "_locales/*/messages.json",
         "css/blyrics/*.css",
         "css/ytmusic/*.css",
         "css/disablestylizedanimations.css",
@@ -107,6 +108,16 @@
       ],
       "js": [
         "public/script.js"
+      ],
+      "run_at": "document_end",
+      "world": "MAIN"
+    },
+    {
+      "matches": [
+        "*://music.youtube.com/*"
+      ],
+      "js": [
+        "src/pageWorld.ts"
       ],
       "run_at": "document_end",
       "world": "MAIN"

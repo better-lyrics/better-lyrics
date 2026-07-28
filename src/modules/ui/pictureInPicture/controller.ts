@@ -64,11 +64,13 @@ export class PictureInPictureController<TWindow> {
   private initialize(pipWindow: TWindow): void {
     this.isOpening = false;
     this.activeWindow = pipWindow;
-    this.dependencies.observePageHide(pipWindow, () => {
-      if (this.activeWindow === pipWindow) this.reset();
-    });
 
+    // Both calls must stay guarded: a browser that hands back a window this world cannot script
+    // throws on the very first property access, and an unguarded throw here strands an empty window.
     try {
+      this.dependencies.observePageHide(pipWindow, () => {
+        if (this.activeWindow === pipWindow) this.reset();
+      });
       this.dependencies.renderLoadingShell(pipWindow);
     } catch (error) {
       this.dependencies.reportFailure("Document Picture-in-Picture shell setup failed", error);

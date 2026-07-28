@@ -30,6 +30,7 @@ import {
 import {
   initializePictureInPictureAutoRestore,
   mirrorNativeMiniPlayerButton,
+  publishPictureInPictureResources,
 } from "@modules/ui/pictureInPicture/browserController";
 import { subscribeToCustomStyles } from "@modules/ui/styleInjector";
 import { log, setUpLog } from "@utils";
@@ -44,7 +45,8 @@ async function modify(): Promise<void> {
   await injectHeadTags();
   await loadLocaleOverride();
   injectI18nCssVars();
-  subscribeToLocaleChanges();
+  subscribeToLocaleChanges(publishPictureInPictureResources);
+  publishPictureInPictureResources();
   setupAdObserver();
   enableLyricsTab();
   setupHomepageFullscreenHandler();
