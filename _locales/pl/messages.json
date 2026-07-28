@@ -95,10 +95,6 @@
     "message": "Otwórz tekst piosenki w trybie „Obraz w obrazie”",
     "description": "Accessible label for the dock action that opens the floating lyrics window"
   },
-  "picture_in_picture_loading": {
-    "message": "Ładowanie tekstu piosenki…",
-    "description": "Status displayed while the Picture-in-Picture lyrics window initializes"
-  },
   "picture_in_picture_previous": {
     "message": "Poprzedni",
     "description": "Accessible label for the previous track button in the Picture-in-Picture lyrics window, used when the YouTube Music player bar exposes no label of its own"
