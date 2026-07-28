@@ -177,6 +177,7 @@ body {
 }
 
 .blyrics-pip-content {
+  position: relative;
   display: flex;
   min-width: 0;
   flex: 1;
@@ -286,17 +287,21 @@ body {
   height: 1em;
 }
 
+/* Spans the whole content column, header included, so it lines up with the artwork's centre. */
 .blyrics-pip-loader {
+  position: absolute;
   display: flex;
-  min-height: 100%;
+  inset: 0;
   align-items: center;
+  justify-content: center;
   gap: clamp(8px, 2.5vw, 12px);
+  pointer-events: none;
 }
 
 .blyrics-pip-loader__mark {
   flex: 0 0 auto;
-  width: clamp(22px, 7vw, 30px);
-  height: clamp(22px, 7vw, 30px);
+  width: clamp(14px, 4.5vw, 19px);
+  height: clamp(14px, 4.5vw, 19px);
   background: url("https://betterlyrics.org/icon-512.png") 50% / cover;
   animation: blyrics-spin 1.5s linear infinite;
 }
@@ -307,7 +312,7 @@ body {
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
-  font-size: clamp(12px, 3.5vw, 16px);
+  font-size: clamp(10px, 2.4vw, 12px);
   font-weight: 700;
   line-height: 1.4;
   animation: blyrics-shimmer 3s linear infinite;
@@ -327,5 +332,16 @@ body {
 
   .blyrics-pip-header {
     padding-bottom: 4px;
+  }
+
+  /* Too short to centre on the artwork without landing on the byline, so it sits under the
+     header instead and takes the space the empty viewport would have held. */
+  .blyrics-pip-loader {
+    position: static;
+    flex: 1;
+  }
+
+  .blyrics-pip-content:has(.blyrics-pip-loader) .blyrics-pip-lyrics {
+    display: none;
   }
 }
