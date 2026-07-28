@@ -110,6 +110,16 @@
       ],
       "run_at": "document_end",
       "world": "MAIN"
+    },
+    {
+      "matches": [
+        "*://music.youtube.com/*"
+      ],
+      "js": [
+        "src/pageWorld.ts"
+      ],
+      "run_at": "document_end",
+      "world": "MAIN"
     }
   ],
   "action": {

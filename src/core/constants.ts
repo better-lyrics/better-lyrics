@@ -141,17 +141,24 @@ const AUTH_PARTNER_METADATA: Record<string, Pick<AuthPartner, "id" | "iconUrl">>
   "https://blrcunison.vercel.app": { id: "blrcunison", iconUrl: "https://blrcunison.vercel.app/logo_mono.svg" },
 };
 
-const AUTH_PARTNERS: readonly AuthPartner[] = (chrome.runtime.getManifest().externally_connectable?.matches ?? [])
-  .map(match => match.replace(/\/\*$/, ""))
-  .map(origin => ({
-    origin,
-    id: AUTH_PARTNER_METADATA[origin]?.id ?? origin,
-    iconUrl: AUTH_PARTNER_METADATA[origin]?.iconUrl ?? null,
-  }));
+let authPartners: readonly AuthPartner[] | null = null;
+
+// Resolved on demand rather than at module scope: this file is imported by page-world code that
+// has no chrome.* at all, and reading the manifest eagerly would throw before it ran a line.
+function getAuthPartners(): readonly AuthPartner[] {
+  authPartners ??= (chrome.runtime.getManifest().externally_connectable?.matches ?? [])
+    .map(match => match.replace(/\/\*$/, ""))
+    .map(origin => ({
+      origin,
+      id: AUTH_PARTNER_METADATA[origin]?.id ?? origin,
+      iconUrl: AUTH_PARTNER_METADATA[origin]?.iconUrl ?? null,
+    }));
+  return authPartners;
+}
 
 export function getAuthPartnerByOrigin(origin: string | undefined): AuthPartner | undefined {
   if (!origin) return undefined;
-  return AUTH_PARTNERS.find(p => p.origin === origin);
+  return getAuthPartners().find(p => p.origin === origin);
 }
 
 export function isAllowedAuthOrigin(origin: string | undefined): boolean {
