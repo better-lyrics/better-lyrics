@@ -139,9 +139,11 @@ export function sync(mainRoot: HTMLElement): void {
   for (const source of knownSources) {
     if (nextKnown.has(source)) continue;
     // Dropping out of getAnimations() does not mean the source ended: an unrendered target takes
-    // its animation off the list while it is still running. Retire the twin only once the source
-    // is genuinely gone, so a stall can never blank the window.
-    if (source.playState === "idle") {
+    // its animation off the list while it is still running. Only a source that is cancelled or
+    // finished is genuinely gone, so a stall can never blank the window. Retiring the finished
+    // ones matters because several engine animations fill forwards, and a surviving twin of one
+    // outranks the theme's own declarations and pins its line visible.
+    if (source.playState === "idle" || source.playState === "finished") {
       sourceToTwin.get(source)?.cancel();
       sourceToTwin.delete(source);
       continue;
