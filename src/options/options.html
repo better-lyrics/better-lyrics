@@ -150,32 +150,11 @@
 						</label>
 					</div>
 					<div class="container">
-						<div class="setting-row__text">
-							<div class="setting-row__title-line">
-								<span>__MSG_options_display_pipAutoRestore__</span>
-								<span class="setting-help" tabindex="0" data-tooltip="__MSG_options_display_pipAutoRestoreTooltip__" aria-label="__MSG_options_display_pipAutoRestoreTooltip__">?</span>
-							</div>
-						</div>
-						<label>
-							<input type="checkbox" id="isPictureInPictureAutoRestoreEnabled">
-							<span class="checkmark"></span>
-						</label>
-					</div>
-					<div class="container">
-						<div class="setting-row__text">
-							<div class="setting-row__title-line">
-								<span>__MSG_options_display_pipArtworkTransition__</span>
-								<span class="setting-help" tabindex="0" data-tooltip="__MSG_options_display_pipArtworkTransitionTooltip__" aria-label="__MSG_options_display_pipArtworkTransitionTooltip__">?</span>
-							</div>
-						</div>
-						<div class="select">
-							<select id="pipArtworkTransition">
-								<option value="shuffle">__MSG_options_pipTransition_shuffle__</option>
-								<option value="flip">__MSG_options_pipTransition_flip__</option>
-								<option value="push">__MSG_options_pipTransition_push__</option>
-								<option value="crossfade">__MSG_options_pipTransition_crossfade__</option>
-							</select>
-						</div>
+						<span>__MSG_options_display_pipWindow__</span>
+						<button class="small-btn" id="pip-settings-btn">
+							<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M19 11h-8v6h8v-6zm4 8V4.98C23 3.88 22.1 3 21 3H3c-1.1 0-2 .88-2 1.98V19c0 1.1.9 2 2 2h18c1.1 0 2-.9 2-2zm-2 .02H3V4.97h18v14.05z"></path></svg>
+							<span>__MSG_options_manage__</span>
+						</button>
 					</div>
 					<div class="container">
 						<span>__MSG_options_display_shadersPromo__</span>
@@ -656,6 +635,76 @@
 				</div>
 				<div class="modal-footer">
 					<button id="dock-settings-reset" class="modal-btn modal-btn-secondary">__MSG_options_reset__</button>
+				</div>
+			</div>
+		</div>
+
+		<div id="pip-modal-overlay" class="modal-overlay">
+			<div class="modal">
+				<div class="modal-header">
+					<h3 class="modal-title">__MSG_options_display_pipWindow__</h3>
+					<button id="pip-modal-close" class="modal-close-btn" aria-label="Close">
+						<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+							<path d="M6.28 5.22a.75.75 0 0 0-1.06 1.06L8.94 10l-3.72 3.72a.75.75 0 1 0 1.06 1.06L10 11.06l3.72 3.72a.75.75 0 1 0 1.06-1.06L11.06 10l3.72-3.72a.75.75 0 0 0-1.06-1.06L10 8.94 6.28 5.22Z"></path>
+						</svg>
+					</button>
+				</div>
+				<div class="modal-body">
+					<div class="container">
+						<div class="setting-row__text">
+							<div class="setting-row__title-line">
+								<span>__MSG_options_display_pipAutoRestore__</span>
+								<span class="setting-help" tabindex="0" data-tooltip="__MSG_options_display_pipAutoRestoreTooltip__" aria-label="__MSG_options_display_pipAutoRestoreTooltip__">?</span>
+							</div>
+						</div>
+						<label>
+							<input type="checkbox" id="isPictureInPictureAutoRestoreEnabled">
+							<span class="checkmark"></span>
+						</label>
+					</div>
+					<div class="container">
+						<div class="setting-row__text">
+							<div class="setting-row__title-line">
+								<span>__MSG_options_display_pipArtworkTransition__</span>
+								<span class="setting-help" tabindex="0" data-tooltip="__MSG_options_display_pipArtworkTransitionTooltip__" aria-label="__MSG_options_display_pipArtworkTransitionTooltip__">?</span>
+							</div>
+						</div>
+						<div class="select">
+							<select id="pipArtworkTransition">
+								<option value="shuffle">__MSG_options_pipTransition_shuffle__</option>
+								<option value="flip">__MSG_options_pipTransition_flip__</option>
+								<option value="push">__MSG_options_pipTransition_push__</option>
+								<option value="crossfade">__MSG_options_pipTransition_crossfade__</option>
+							</select>
+						</div>
+					</div>
+					<div class="container">
+						<div class="setting-row__text">
+							<div class="setting-row__title-line">
+								<span>__MSG_options_display_pipTextTransition__</span>
+								<span class="setting-help" tabindex="0" data-tooltip="__MSG_options_display_pipTextTransitionTooltip__" aria-label="__MSG_options_display_pipTextTransitionTooltip__">?</span>
+							</div>
+						</div>
+						<div class="select">
+							<select id="pipTextTransition">
+								<option value="spring">__MSG_options_pipTransition_spring__</option>
+								<option value="push">__MSG_options_pipTransition_push__</option>
+								<option value="crossfade">__MSG_options_pipTransition_crossfade__</option>
+							</select>
+						</div>
+					</div>
+					<div class="container">
+						<div class="setting-row__text">
+							<div class="setting-row__title-line">
+								<span>__MSG_options_display_pipMarquee__</span>
+								<span class="setting-help" tabindex="0" data-tooltip="__MSG_options_display_pipMarqueeTooltip__" aria-label="__MSG_options_display_pipMarqueeTooltip__">?</span>
+							</div>
+						</div>
+						<label>
+							<input type="checkbox" id="pipMarqueeEnabled">
+							<span class="checkmark"></span>
+						</label>
+					</div>
 				</div>
 			</div>
 		</div>

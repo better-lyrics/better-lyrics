@@ -140,11 +140,35 @@
   },
   "options_pipTransition_push": {
     "message": "Push",
-    "description": "Name of an album art transition where the new cover slides in from the side and pushes the old one out"
+    "description": "Name of a transition, offered for both album art and song titles, where the new content slides in from the side and pushes the old out"
   },
   "options_pipTransition_crossfade": {
     "message": "Crossfade",
-    "description": "Name of an album art transition where the new cover fades in over the old one"
+    "description": "Name of a transition, offered for both album art and song titles, where the new content fades in over the old"
+  },
+  "options_pipTransition_spring": {
+    "message": "Spring",
+    "description": "Name of a song title transition where the words of the new title bounce up into place one after another"
+  },
+  "options_display_pipWindow": {
+    "message": "Floating lyrics window",
+    "description": "Label for the row that opens the settings for the floating lyrics window"
+  },
+  "options_display_pipTextTransition": {
+    "message": "Floating window title transition",
+    "description": "Setting label for choosing how the song title and artist change between songs in the floating lyrics window"
+  },
+  "options_display_pipTextTransitionTooltip": {
+    "message": "Chooses how the song title and artist change when a new song starts in the floating lyrics window. If your system is set to reduce motion, every option becomes a simple fade instead.",
+    "description": "Help tooltip explaining the floating-window title transition setting and its reduced-motion behaviour"
+  },
+  "options_display_pipMarquee": {
+    "message": "Scroll long titles",
+    "description": "Toggle label for whether a song title too long for the floating lyrics window scrolls across so it can be read in full"
+  },
+  "options_display_pipMarqueeTooltip": {
+    "message": "Lets a title too long for the window scroll across once, rest, then return to the start so you can read all of it. Turn this off to keep it still; either way the end of a long title fades out rather than being cut off. Reducing motion in your system settings also turns it off.",
+    "description": "Help tooltip explaining what scrolling long titles does, what turning it off looks like, and that reduced motion disables it"
   },
   "options_display_shadersPromo": {
     "message": "Show link to Better Lyrics Shaders",
