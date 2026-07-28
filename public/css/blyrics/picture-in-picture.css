@@ -47,6 +47,8 @@ body {
 }
 
 .blyrics-pip-artwork {
+  --blyrics-pip-artwork-radius: clamp(10px, 3vw, 18px);
+
   position: relative;
   flex: 0 0 auto;
   width: min(34vw, calc(100vh - clamp(24px, 7vw, 40px)));
@@ -55,7 +57,7 @@ body {
   align-self: center;
   aspect-ratio: 1;
   overflow: hidden;
-  border-radius: clamp(10px, 3vw, 18px);
+  border-radius: var(--blyrics-pip-artwork-radius);
   background: linear-gradient(145deg, #353538, #202023);
   box-shadow: 0 10px 30px rgb(0 0 0 / 38%);
 }
@@ -86,13 +88,19 @@ body {
   opacity: 1;
 }
 
+/* Gecko composites the video in its own layer and ignores the container's overflow clip, so the
+   radius has to sit on the video itself. The mask is not decorative: it is what makes that rounded
+   corner survive compositing. Without it the corners are square on Firefox even with the radius
+   set. `inherit` keeps the video matched to the container however the radius was set. */
 .blyrics-pip-artwork__video {
   position: absolute;
   inset: 0;
   width: 100%;
   height: 100%;
   object-fit: cover;
+  border-radius: inherit;
   opacity: 0;
+  mask-image: radial-gradient(#fff, #fff);
   pointer-events: none;
   transition: opacity 300ms ease;
 }
@@ -321,9 +329,10 @@ body {
   }
 
   .blyrics-pip-artwork {
+    --blyrics-pip-artwork-radius: 9px;
+
     width: calc(100vh - 16px);
     min-width: 64px;
-    border-radius: 9px;
   }
 
   .blyrics-pip-header {
