@@ -39,6 +39,10 @@ interface AppStateType {
   lastLoadedVideoId: string | null;
   lyricAbortController: AbortController | null;
   isTranslateEnabled: boolean;
+  translationProvider: "google" | "gemini";
+  geminiApiKey: string;
+  geminiModelFallback: string[];
+  geminiTranslationMode: "speed" | "quality";
   isRomanizationEnabled: boolean;
   romanizationDisabledLanguages: string[];
   translationDisabledLanguages: string[];
@@ -82,6 +86,10 @@ export const AppState: AppStateType = {
   lastLoadedVideoId: null,
   lyricAbortController: null,
   isTranslateEnabled: false,
+  translationProvider: "google",
+  geminiApiKey: "",
+  geminiModelFallback: ["gemini-3.5-flash-lite", "gemini-3.6-flash", "gemini-3.1-flash-lite"],
+  geminiTranslationMode: "speed",
   isRomanizationEnabled: false,
   romanizationDisabledLanguages: [],
   translationDisabledLanguages: [],

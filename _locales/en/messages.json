@@ -184,59 +184,71 @@
   },
   "options_unisonModal_controlsShown": {
     "message": "Controls shown",
-    "description": "Label above the toggles that pick which controls appear in the lyrics dock"
+    "description": "Section header in settings for customizing which elements appear in the lyrics controls dock"
   },
   "options_unisonModal_controlSource": {
-    "message": "Source switcher",
-    "description": "Toggle label for showing the lyrics source switcher control in the dock"
+    "message": "Source selection",
+    "description": "Toggle label for showing the source selector in the lyrics controls dock"
   },
   "options_unisonModal_controlPictureInPicture": {
     "message": "Floating window",
     "description": "Toggle label for showing the control that opens the floating lyrics window in the dock"
   },
   "options_unisonModal_controlOffset": {
-    "message": "Sync offset",
-    "description": "Toggle label for showing the sync offset control in the dock"
+    "message": "Sync adjuster (nudge offset)",
+    "description": "Toggle label for showing offset adjuster buttons in the lyrics controls dock"
   },
   "lyricsDock_chooseSource": {
-    "message": "Choose lyrics source",
-    "description": "Accessible label for the lyrics dock button that opens the source provider dropdown"
+    "message": "Select lyrics source",
+    "description": "Tooltip for the lyrics source selector dropdown in the controls dock"
   },
   "lyricsDock_previousSource": {
     "message": "Previous source",
-    "description": "Accessible label for the lyrics dock button that switches to the previous lyrics provider"
+    "description": "Tooltip/aria-label for the button to switch to the previous lyric provider"
   },
   "lyricsDock_nextSource": {
     "message": "Next source",
-    "description": "Accessible label for the lyrics dock button that switches to the next lyrics provider"
+    "description": "Tooltip/aria-label for the button to switch to the next lyric provider"
   },
   "lyricsDock_offsetEarlier": {
-    "message": "Shift lyrics earlier",
-    "description": "Accessible label for the lyrics dock button that nudges sync timing earlier"
+    "message": "Nudge lyrics earlier",
+    "description": "Tooltip/aria-label for the button to shift lyric timing earlier (offset -)"
   },
   "lyricsDock_offsetLater": {
-    "message": "Shift lyrics later",
-    "description": "Accessible label for the lyrics dock button that nudges sync timing later"
+    "message": "Nudge lyrics later",
+    "description": "Tooltip/aria-label for the button to shift lyric timing later (offset +)"
   },
   "lyricsDock_offsetGlobal": {
-    "message": "Global",
-    "description": "Label in the lyrics dock offset menu for the global offset applied to all songs and sync types"
+    "message": "Nudge offsets will apply globally across all tracks by default",
+    "description": "Small note shown in the offset config UI or options page"
   },
   "options_offsetModal_perSong": {
-    "message": "Per-song offsets",
-    "description": "Heading in the offset settings modal for the section that manages saved per-song sync offsets"
+    "message": "Save offsets on a per-song basis",
+    "description": "Toggle option label to remember offset tweaks specifically for the active song"
   },
   "options_offsetModal_perSongClear": {
-    "message": "Clear all",
-    "description": "Button in the offset settings modal that deletes every saved per-song sync offset"
+    "message": "Clear saved song offsets",
+    "description": "Button label to delete all saved individual song offsets"
   },
   "options_offsetModal_perSongCount": {
-    "message": "Saved offsets",
-    "description": "Label in the offset settings modal showing how many per-song sync offsets are stored"
+    "message": "Currently holding customized offsets for $COUNT$ songs.",
+    "description": "Label indicating how many song-specific offsets are currently saved",
+    "placeholders": {
+      "count": {
+        "content": "$1",
+        "example": "12"
+      }
+    }
   },
   "options_offsetModal_appliesTo": {
-    "message": "Applies to",
-    "description": "Label in the offset settings modal preceding the list of sync types a given offset affects"
+    "message": "Offsets apply to $PROVIDER$",
+    "description": "Description showing which provider the offset is active for",
+    "placeholders": {
+      "provider": {
+        "content": "$1",
+        "example": "Unison"
+      }
+    }
   },
 
   "options_language_displayLanguage": {
@@ -267,6 +279,62 @@
   "options_language_translationLanguage": {
     "message": "Translation language",
     "description": "Translation language setting label"
+  },
+  "options_language_translationProvider": {
+    "message": "Translation service",
+    "description": "Dropdown label to select which translation engine to use"
+  },
+  "options_language_googleTranslate": {
+    "message": "Google Translate (Free)",
+    "description": "Google Translate provider option"
+  },
+  "options_language_geminiApi": {
+    "message": "Gemini API",
+    "description": "Gemini API translation provider option"
+  },
+  "options_language_geminiApiSettings": {
+    "message": "Gemini API Settings",
+    "description": "Label for Gemini API settings button or collapsible container"
+  },
+  "options_language_geminiApiKeyPlaceholder": {
+    "message": "Enter your Gemini API key...",
+    "description": "Placeholder in the input field for Gemini API key"
+  },
+  "options_language_manageModelFallback": {
+    "message": "Manage Model Fallback",
+    "description": "Label for the settings trigger/modal to manage fallback options for Gemini models"
+  },
+  "options_language_clearTranslationCache": {
+    "message": "Clear Translation Cache",
+    "description": "Button label to clear cached Gemini/API translations"
+  },
+  "options_language_modelFallbackSequence": {
+    "message": "Model Fallback Sequence",
+    "description": "Title of the fallback sequence configuration popup or section"
+  },
+  "options_language_dragToReorder": {
+    "message": "Drag to reorder model preference. Topmost available model will be attempted first.",
+    "description": "Instruction label inside the model fallback modal"
+  },
+  "options_language_translationCacheCleared": {
+    "message": "Translation cache cleared successfully",
+    "description": "Success message when user clears local translation cache"
+  },
+  "options_language_sequence": {
+    "message": "Sequence: ",
+    "description": "Label prefix displaying the order of attempted models"
+  },
+  "options_language_translationMode": {
+    "message": "Translation mode",
+    "description": "Setting label to choose between translation modes"
+  },
+  "options_language_translationModeSpeed": {
+    "message": "Speed (Fast, cost-efficient)",
+    "description": "Speed mode translation option description"
+  },
+  "options_language_translationModeQuality": {
+    "message": "Quality (High accuracy, slower, uses reasoning models if available)",
+    "description": "Quality mode translation option description"
   },
 
   "options_sources_title": {
@@ -1025,6 +1093,14 @@
   "lyrics_source": {
     "message": "Source: ",
     "description": "Lyrics source label"
+  },
+  "lyrics_translationSource": {
+    "message": "Translation: ",
+    "description": "Label for translation source in footer (e.g. Translation: )"
+  },
+  "lyrics_translationErrorGemini": {
+    "message": "Gemini API translation error, please try again later",
+    "description": "Error message shown in the translation source capsule when all Gemini models fail"
   },
   "lyrics_searchOnGenius": {
     "message": "Search on Genius",

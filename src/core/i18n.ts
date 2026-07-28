@@ -88,10 +88,11 @@ export function t(key: string, substitutions?: string | string[]): string {
   return message || key;
 }
 
-export function getLanguageDisplayName(langCode: string): string {
+export function getLanguageDisplayName(langCode: string, locale?: string): string {
   try {
     const displayCode = DISPLAY_CODE_MAP[langCode] ?? langCode;
-    const displayNames = new Intl.DisplayNames([navigator.language], { type: "language" });
+    const targetLocale = locale || (typeof navigator !== "undefined" ? navigator.language : "en");
+    const displayNames = new Intl.DisplayNames([targetLocale], { type: "language" });
     return displayNames.of(displayCode) ?? langCode;
   } catch (e) {
     console.warn(`${LOG_PREFIX} Failed to get display name for "${langCode}":`, e);

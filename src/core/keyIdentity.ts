@@ -3,11 +3,12 @@ import { getLocalStorage } from "./storage";
 
 // -- Types ------------------------------------
 
-interface KeyIdentity {
+export interface KeyIdentity {
   keyId: string;
   publicKey: JsonWebKey;
   privateKey: JsonWebKey;
   createdAt: number;
+  displayName?: string;
 }
 
 interface SignedRatingPayload {
@@ -50,6 +51,7 @@ interface IdentityExport {
   privateKey: JsonWebKey;
   exportedAt: number;
   certificate?: string;
+  displayName?: string;
 }
 
 // -- Constants --------------------------------
