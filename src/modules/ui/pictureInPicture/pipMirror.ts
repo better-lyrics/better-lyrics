@@ -101,16 +101,38 @@ function copyPlaybackState(source: Animation, twin: Animation): void {
   else if (source.playState === "running" && twin.playState !== "running") twin.play();
 }
 
+// The engine builds these animations in the isolated world, so their effects carry that realm's
+// prototypes: `instanceof KeyframeEffect` is false when this file runs in the page world on Gecko
+// and every animation would be discarded. Shape checks hold across realms where `instanceof` does
+// not. Nodes are exempt because the DOM is shared, but nodeType costs nothing and cannot be fooled.
+function getKeyframeTarget(animation: Animation): Element | null {
+  const effect = animation.effect as KeyframeEffect | null;
+  if (!effect || typeof effect.getKeyframes !== "function" || typeof effect.getTiming !== "function") return null;
+  const target = effect.target;
+  return target && target.nodeType === Node.ELEMENT_NODE ? target : null;
+}
+
+// Gecko also returns nothing from Element.getAnimations() for animations another world created,
+// while the document-level call still reports them, so a subtree query mirrors an empty set there.
+// Scoping the document list by containment is equivalent on Chromium and works in both worlds.
+function getLiveAnimations(mainRoot: HTMLElement): Animation[] {
+  return mainRoot.ownerDocument.getAnimations().filter(animation => {
+    const target = getKeyframeTarget(animation);
+    return target !== null && mainRoot.contains(target);
+  });
+}
+
 export function sync(mainRoot: HTMLElement): void {
   if (!twinRoot) return;
-  const live = mainRoot.getAnimations({ subtree: true });
+  const live = getLiveAnimations(mainRoot);
   const nextKnown = new Set<Animation>();
 
   for (const source of live) {
     if (skippedSources.has(source)) continue;
-    const effect = source.effect;
-    if (!(effect instanceof KeyframeEffect) || !(effect.target instanceof Element)) continue;
-    const twinElement = idToTwin.get(effect.target.getAttribute(MIRROR_ID_ATTR) ?? "");
+    const target = getKeyframeTarget(source);
+    if (!target) continue;
+    const effect = source.effect as KeyframeEffect;
+    const twinElement = idToTwin.get(target.getAttribute(MIRROR_ID_ATTR) ?? "");
     if (!twinElement) continue;
 
     let twin = sourceToTwin.get(source);
