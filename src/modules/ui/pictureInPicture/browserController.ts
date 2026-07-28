@@ -13,7 +13,7 @@ import { getArtworkMetadata } from "@modules/lyrics/requestSniffer/requestSniffe
 import { animEngineState } from "@modules/ui/animationEngine";
 import { log } from "@utils";
 import { onSignal, sendInit, sendMetadata } from "./bridge";
-import { DEFAULT_ARTWORK_TRANSITION } from "./lyricsView";
+import { DEFAULT_ARTWORK_TRANSITION, DEFAULT_TEXT_TRANSITION } from "./lyricsView";
 import { createPictureInPictureHost } from "./pipHost";
 import type { PictureInPictureToggle, PictureInPictureViewDependencies } from "./types";
 
@@ -31,9 +31,18 @@ let hasInitializedAutoRestore = false;
 let hasAttemptedAutoRestore = false;
 let hasMirroredMiniPlayer = false;
 let autoRestoreInteractionController: AbortController | null = null;
-// Held raw rather than resolved: the view is the one place that validates it,
-// and a window may not exist yet when the setting changes.
+// Held raw rather than resolved: the view is the one place that validates them,
+// and a window may not exist yet when a setting changes.
 let storedArtworkTransition: unknown = DEFAULT_ARTWORK_TRANSITION;
+let storedTextTransition: unknown = DEFAULT_TEXT_TRANSITION;
+let storedMarqueeEnabled: unknown = true;
+
+const PIP_SETTING_DEFAULTS = {
+  isPictureInPictureAutoRestoreEnabled: false,
+  pipArtworkTransition: DEFAULT_ARTWORK_TRANSITION,
+  pipTextTransition: DEFAULT_TEXT_TRANSITION,
+  pipMarqueeEnabled: true,
+} as const;
 
 const isolatedViewDependencies: PictureInPictureViewDependencies = {
   translate: t,
@@ -90,6 +99,8 @@ export const pictureInPictureController: PictureInPictureToggle = delegatesToPag
   : createPictureInPictureHost({
       view: isolatedViewDependencies,
       artworkTransition: () => storedArtworkTransition,
+      textTransition: () => storedTextTransition,
+      marqueeEnabled: () => storedMarqueeEnabled,
       windowTitle: () => t("picture_in_picture_open"),
       stylesheetUrls: () => ({
         lyrics: chrome.runtime.getURL(LYRIC_STYLESHEET_PATH),
@@ -136,19 +147,18 @@ function createPageWorldDelegate(): PictureInPictureToggle {
 // loaded. `modify()` calls this again once it has; the `ready` handshake only bootstraps the toggle.
 export function publishPictureInPictureResources(): void {
   if (!delegatesToPageWorld) return;
-  getStorage(
-    { isPictureInPictureAutoRestoreEnabled: false, pipArtworkTransition: DEFAULT_ARTWORK_TRANSITION },
-    items => {
-      sendInit({
-        strings: Object.fromEntries(PIP_STRING_KEYS.map(key => [key, t(key)])),
-        lyricsStylesheetUrl: chrome.runtime.getURL(LYRIC_STYLESHEET_PATH),
-        pipStylesheetUrl: chrome.runtime.getURL(STYLESHEET_PATH),
-        fontUrls: [FONT_LINK, NOTO_SANS_UNIVERSAL_LINK],
-        autoRestoreEnabled: Boolean(items.isPictureInPictureAutoRestoreEnabled),
-        artworkTransition: String(items.pipArtworkTransition),
-      });
-    }
-  );
+  getStorage(PIP_SETTING_DEFAULTS, items => {
+    sendInit({
+      strings: Object.fromEntries(PIP_STRING_KEYS.map(key => [key, t(key)])),
+      lyricsStylesheetUrl: chrome.runtime.getURL(LYRIC_STYLESHEET_PATH),
+      pipStylesheetUrl: chrome.runtime.getURL(STYLESHEET_PATH),
+      fontUrls: [FONT_LINK, NOTO_SANS_UNIVERSAL_LINK],
+      autoRestoreEnabled: Boolean(items.isPictureInPictureAutoRestoreEnabled),
+      artworkTransition: String(items.pipArtworkTransition),
+      textTransition: String(items.pipTextTransition),
+      marqueeEnabled: items.pipMarqueeEnabled !== false,
+    });
+  });
 }
 
 function disarmAutoRestore(): void {
@@ -199,26 +209,33 @@ export function initializePictureInPictureAutoRestore(): void {
 
   if (delegatesToPageWorld) {
     chrome.storage.onChanged.addListener((changes, areaName) => {
-      if (areaName === "sync" && (changes.isPictureInPictureAutoRestoreEnabled || changes.pipArtworkTransition)) {
+      if (areaName === "sync" && Object.keys(PIP_SETTING_DEFAULTS).some(key => changes[key])) {
         publishPictureInPictureResources();
       }
     });
     return;
   }
 
-  getStorage(
-    { isPictureInPictureAutoRestoreEnabled: false, pipArtworkTransition: DEFAULT_ARTWORK_TRANSITION },
-    items => {
-      if (items.isPictureInPictureAutoRestoreEnabled) armAutoRestore();
-      storedArtworkTransition = items.pipArtworkTransition;
-    }
-  );
+  getStorage(PIP_SETTING_DEFAULTS, items => {
+    if (items.isPictureInPictureAutoRestoreEnabled) armAutoRestore();
+    storedArtworkTransition = items.pipArtworkTransition;
+    storedTextTransition = items.pipTextTransition;
+    storedMarqueeEnabled = items.pipMarqueeEnabled;
+  });
 
   chrome.storage.onChanged.addListener((changes, areaName) => {
     if (areaName !== "sync") return;
 
     if (changes.pipArtworkTransition) {
       storedArtworkTransition = changes.pipArtworkTransition.newValue ?? DEFAULT_ARTWORK_TRANSITION;
+    }
+
+    if (changes.pipTextTransition) {
+      storedTextTransition = changes.pipTextTransition.newValue ?? DEFAULT_TEXT_TRANSITION;
+    }
+
+    if (changes.pipMarqueeEnabled) {
+      storedMarqueeEnabled = changes.pipMarqueeEnabled.newValue ?? true;
     }
 
     if (!changes.isPictureInPictureAutoRestoreEnabled || hasAttemptedAutoRestore) return;

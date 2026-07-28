@@ -39,8 +39,10 @@ export interface PictureInPictureToggle {
 export interface PictureInPictureHostEnvironment {
   readonly view: PictureInPictureViewDependencies;
   // Read per sync tick rather than passed once, so a change to the setting reaches a window that is
-  // already open without either world needing its own update channel. The view validates it.
+  // already open without either world needing its own update channel. The view validates them.
   readonly artworkTransition: () => unknown;
+  readonly textTransition: () => unknown;
+  readonly marqueeEnabled: () => unknown;
   readonly windowTitle: () => string;
   readonly stylesheetUrls: () => { readonly lyrics: string; readonly fonts: readonly string[] };
   readonly loadStylesheet: () => Promise<string>;

@@ -51,6 +51,8 @@ function createController(): PictureInPictureController<Window> {
       resetScrollResume: () => sendSignal({ type: "reset-scroll" }),
     },
     artworkTransition: () => resources?.artworkTransition,
+    textTransition: () => resources?.textTransition,
+    marqueeEnabled: () => resources?.marqueeEnabled,
     windowTitle: () => resources?.strings.picture_in_picture_open ?? "",
     stylesheetUrls: () => ({
       lyrics: resources?.lyricsStylesheetUrl ?? "",

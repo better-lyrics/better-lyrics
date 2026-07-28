@@ -49,10 +49,16 @@ export function createPictureInPictureHost(
     }
   }
 
+  function applySettings(view: PictureInPictureLyricsView): void {
+    view.setTransition(environment.artworkTransition());
+    view.setTextTransition(environment.textTransition());
+    view.setMarqueeEnabled(environment.marqueeEnabled());
+  }
+
   function syncTwin(): void {
     const view = activeView;
     if (!view) return;
-    view.setTransition(environment.artworkTransition());
+    applySettings(view);
     const mainRoot = document.getElementsByClassName(LYRICS_CLASS)[0] as HTMLElement | undefined;
     if (!mainRoot) {
       // The page drops its lyrics container while fetching, so this covers the first open and every
@@ -97,7 +103,7 @@ export function createPictureInPictureHost(
     injectLyricStyles(pipWindow);
     mirrorCustomTheme(pipWindow);
     activeView = new PictureInPictureLyricsView(pipWindow, document, environment.view);
-    activeView.setTransition(environment.artworkTransition());
+    applySettings(activeView);
     startSyncLoop(pipWindow);
   }
 

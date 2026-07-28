@@ -12,6 +12,8 @@ export interface PictureInPictureInitPayload {
   readonly fontUrls: readonly string[];
   readonly autoRestoreEnabled: boolean;
   readonly artworkTransition: string;
+  readonly textTransition: string;
+  readonly marqueeEnabled: boolean;
 }
 
 export type PictureInPictureSignal =
