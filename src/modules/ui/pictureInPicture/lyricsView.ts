@@ -616,7 +616,7 @@ export class PictureInPictureLyricsView {
       this.setArtwork(
         metadata?.thumbnail?.url ? getArtworkUrl(metadata.thumbnail.url) : this.fallbackArtworkUrl,
         videoId,
-        controller
+        controller.signal
       );
     });
   }
@@ -624,10 +624,19 @@ export class PictureInPictureLyricsView {
   // Loads into the hidden face and only transitions once that face has decoded:
   // fading in an undecoded image fades in nothing, which is how the placeholder
   // gets back on screen.
-  private setArtwork(url: string, videoId: string, controller: AbortController): void {
+  private setArtwork(url: string, videoId: string, songSignal: AbortSignal): void {
+    if (songSignal.aborted) return;
     const nextIndex = 1 - this.artworkIndex;
     const image = this.artworkImages[nextIndex];
-    const { signal } = controller;
+
+    // Each attempt gets its own controller, chained to the song's. The fallback
+    // reuses this same element, and reassigning src does not detach what the
+    // attempt before it left on the element, so on one shared controller the
+    // first attempt's load handler outlived its own 404 and committed a second
+    // time over the fallback, cancelling the transition it had just started.
+    const attempt = new AbortController();
+    const { signal } = attempt;
+    songSignal.addEventListener("abort", () => attempt.abort(), { once: true, signal });
 
     const commit = (): void => {
       if (signal.aborted || this.currentVideoId !== videoId) return;
@@ -637,15 +646,16 @@ export class PictureInPictureLyricsView {
       const isFirstArtwork = !this.artworkContainer.hasAttribute("data-has-art");
       this.artworkContainer.setAttribute("data-has-art", "true");
       this.shell.style.setProperty("--blyrics-pip-art", `url("${url}")`);
-      this.paintBackdrop(nextIndex, url);
+      this.paintBackdrop(nextIndex, url, isFirstArtwork);
       this.runArtworkSwap(nextIndex, isFirstArtwork);
     };
 
     image.addEventListener(
       "error",
       () => {
-        if (signal.aborted || url === this.fallbackArtworkUrl) return;
-        this.setArtwork(this.fallbackArtworkUrl, videoId, controller);
+        if (url === this.fallbackArtworkUrl) return;
+        attempt.abort();
+        this.setArtwork(this.fallbackArtworkUrl, videoId, songSignal);
       },
       { once: true, signal }
     );
@@ -660,15 +670,14 @@ export class PictureInPictureLyricsView {
 
   // Rides the same index as the artwork faces so the wash and the cover are never
   // a track apart. The outgoing layer keeps its image and stays opaque underneath.
-  private paintBackdrop(nextIndex: number, url: string): void {
+  private paintBackdrop(nextIndex: number, url: string, skipAnimation: boolean): void {
     this.backdropLayers[nextIndex].style.backgroundImage = `url("${url}")`;
-    // Only a genuine change of layer counts as a transition. The opening paint
-    // lands on the layer that is already in front, so it stays silent, and the
-    // flag is cleared here rather than earlier because any state change that
-    // makes the animation newly match would start it.
-    if (this.backdropLayers[nextIndex].getAttribute("data-front") !== "true") {
-      this.backdrop.removeAttribute("data-first");
-    }
+    // The wash takes its cue from the cover: whenever the cover appears rather
+    // than crosses from something, so does this. Written in the same task as the
+    // data-front flip below, because any state change that makes the animation
+    // newly match would otherwise start it on whatever happened to be showing.
+    if (skipAnimation) this.backdrop.setAttribute("data-first", "true");
+    else this.backdrop.removeAttribute("data-first");
     this.backdropLayers[nextIndex].setAttribute("data-front", "true");
     this.backdropLayers[1 - nextIndex].setAttribute("data-front", "false");
   }
@@ -698,7 +707,17 @@ export class PictureInPictureLyricsView {
     this.artworkIndex = nextIndex;
     this.artworkFaces[nextIndex].setAttribute("data-front", "true");
     this.artworkFaces[1 - nextIndex].setAttribute("data-front", "false");
+    // Flip is a transition rather than keyframes, so withholding data-running
+    // never reached it, and withholding the flipped attribute is not an option
+    // either: the back face is statically rotated, so the card has to arrive at
+    // 180 for that cover to be visible at all. Suppress the transition and let
+    // the reflow commit the transform outright instead.
+    if (skipAnimation) this.shell.setAttribute("data-artwork-instant", "true");
     this.shell.setAttribute("data-artwork-flipped", nextIndex === 1 ? "true" : "false");
+    if (skipAnimation) {
+      void this.shell.offsetWidth;
+      this.shell.removeAttribute("data-artwork-instant");
+    }
     // A skipped swap opens no cooldown, or the very next track change would find the guard busy
     // and snap a transition the viewer was owed.
     if (!skipAnimation) this.artworkBusyUntil = now + duration;

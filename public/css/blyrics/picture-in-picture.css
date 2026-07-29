@@ -154,6 +154,14 @@ body {
   opacity: 0;
 }
 
+/* And its inverse. The placeholder is painted before the image and neither is
+   z-indexed, so uncovering it does not reveal it; without this, dropping
+   data-has-art when a lookup goes stale blanks the wash and leaves the previous
+   song's cover on the square. No transition, for the reason directly above. */
+.blyrics-pip-artwork:not([data-has-art="true"]) .blyrics-pip-artwork__image {
+  opacity: 0;
+}
+
 .blyrics-pip-artwork__image {
   object-fit: cover;
 }
@@ -650,6 +658,15 @@ body {
     0.9971,
     1
   );
+}
+
+/* Flip is the one preset that cannot be silenced by withholding data-running,
+   and it cannot be silenced by withholding the flipped attribute either, since
+   the back face below is statically rotated and only becomes visible once the
+   card reaches 180. So the first cover in a window arrives with the transition
+   switched off; script sets this, writes the flip, reflows and clears it. */
+.blyrics-pip-shell[data-artwork-instant] .blyrics-pip-artwork__card {
+  transition: none;
 }
 
 .blyrics-pip-shell[blyrics-pip-transition="flip"] .blyrics-pip-artwork__face {
