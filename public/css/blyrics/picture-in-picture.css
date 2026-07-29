@@ -146,18 +146,15 @@ body {
   opacity: 0.5;
 }
 
-/* A loading affordance must never sit underneath a transition. Layer opacity
-   alone does not guarantee that: toggling an animation on and off de-promotes
-   and re-promotes the compositor layer, and a single-frame gap there paints
-   whatever is beneath regardless of the opacity values. */
+/* Opacity alone will not keep the placeholder out from under a transition:
+   toggling an animation re-promotes the compositor layer and the gap paints
+   through. */
 .blyrics-pip-artwork[data-has-art="true"] .blyrics-pip-artwork__placeholder {
   opacity: 0;
 }
 
-/* And its inverse. The placeholder is painted before the image and neither is
-   z-indexed, so uncovering it does not reveal it; without this, dropping
-   data-has-art when a lookup goes stale blanks the wash and leaves the previous
-   song's cover on the square. No transition, for the reason directly above. */
+/* And its inverse: the placeholder paints before the image and neither is
+   z-indexed, so uncovering it is not enough to reveal it. */
 .blyrics-pip-artwork:not([data-has-art="true"]) .blyrics-pip-artwork__image {
   opacity: 0;
 }
@@ -660,13 +657,12 @@ body {
   );
 }
 
-/* Flip is the one preset that cannot be silenced by withholding data-running,
-   and it cannot be silenced by withholding the flipped attribute either, since
-   the back face below is statically rotated and only becomes visible once the
-   card reaches 180. So the first cover in a window arrives with the transition
-   switched off; script sets this, writes the flip, reflows and clears it. */
+/* The flipped attribute cannot be withheld to silence the first cover: the back
+   face below is statically rotated, so the card must reach 180 for it to show at
+   all. Script sets this, writes the flip, reflows and clears it. !important
+   because a theme retuning the preset would otherwise tie and win on order. */
 .blyrics-pip-shell[data-artwork-instant] .blyrics-pip-artwork__card {
-  transition: none;
+  transition: none !important;
 }
 
 .blyrics-pip-shell[blyrics-pip-transition="flip"] .blyrics-pip-artwork__face {
