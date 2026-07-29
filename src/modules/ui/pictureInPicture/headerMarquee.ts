@@ -95,9 +95,7 @@ export function fillHeaderLayer(layer: HTMLElement, text: string, plain: boolean
 // its boundary by up to half a second and left a supposedly fixed ramp measuring
 // anything but.
 //
-// Both ramps are always positive: arm() drops any row that does not overflow,
-// travelEase adds a fixed overhead on top of the travel, and the clamp only ever
-// scales them by a positive factor. Nothing here has to divide by zero.
+// Both ramps are positive by construction, so neither divisor can be zero.
 function velocityEase(rampIn: number, rampOut: number): string {
   const cruise = 1 - rampIn - rampOut;
   const total = rampIn / 2 + cruise + rampOut / 2;
@@ -151,17 +149,15 @@ export class PictureInPictureHeaderMarquee {
   constructor(
     private readonly pipWindow: Window,
     private readonly lines: readonly HTMLElement[],
-    signal: AbortSignal
+    signal: AbortSignal,
+    private readonly isSettled: () => boolean = () => true
   ) {
     this.style = pipWindow.document.createElement("style");
     pipWindow.document.head.appendChild(this.style);
     pipWindow.addEventListener("resize", this.scheduleRearm, { passive: true, signal });
-    // A row is measured in whichever face is resolved at the time, and the window
-    // opens on the fallback while the webfont is still in flight. Getting that
-    // wrong is not cosmetic: a row measured as fitting is left with no attributes
-    // at all, so it stays hard clipped mid-glyph for the whole track. `ready`
-    // covers the case where the face landed before this ran and loadingdone has
-    // already been and gone.
+    // A row measured in the fallback face can come out as fitting, and a row that
+    // fits is left with no attributes at all, so it stays hard clipped for the
+    // whole track. `ready` covers a face that landed before this ran.
     pipWindow.document.fonts.addEventListener("loadingdone", this.scheduleRearm, { signal });
     void pipWindow.document.fonts.ready.then(() => {
       if (!signal.aborted) this.scheduleRearm();
@@ -303,13 +299,13 @@ export class PictureInPictureHeaderMarquee {
     this.armTimer = null;
   }
 
-  // Resizing and webfont loads both invalidate the measurement, and a burst of
-  // either should still cost one pass.
+  // Debounced so a burst of font loads costs one pass, and dropped rather than
+  // queued mid-swap: re-arming would strip the transform pin() froze.
   private readonly scheduleRearm = (): void => {
     if (this.rearmTimer !== null) this.pipWindow.clearTimeout(this.rearmTimer);
     this.rearmTimer = this.pipWindow.setTimeout(() => {
       this.rearmTimer = null;
-      this.arm();
+      if (this.isSettled()) this.arm();
     }, REARM_DEBOUNCE);
   };
 }

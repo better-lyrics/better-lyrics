@@ -11,13 +11,13 @@ interface DisplayMetadata {
   readonly videoId: string | null;
 }
 
-// Each header row swaps on its own timeline, so its two stacked layers, which
-// of them is in front, and how long it stays busy all belong to the row.
+// Each row swaps on its own timeline, so its layers and timers belong to it.
 interface HeaderRow {
   readonly element: HTMLElement;
   readonly layers: readonly HTMLElement[];
   index: number;
   text: string;
+  pendingText: string | null;
   busyTimer: number | null;
 }
 
@@ -132,7 +132,7 @@ function createBackdropLayer(document: Document): HTMLElement {
 
 function createHeaderRow(element: HTMLElement): HeaderRow {
   createHeaderLine(element);
-  return { element, layers: getHeaderLayers(element), index: 0, text: "", busyTimer: null };
+  return { element, layers: getHeaderLayers(element), index: 0, text: "", pendingText: null, busyTimer: null };
 }
 
 function createArtworkFace(document: Document): [HTMLElement, HTMLImageElement] {
@@ -284,7 +284,8 @@ export class PictureInPictureLyricsView {
     this.marquee = new PictureInPictureHeaderMarquee(
       pipWindow,
       this.headerRows.map(row => row.element),
-      this.lifecycleController.signal
+      this.lifecycleController.signal,
+      this.isHeaderSettled
     );
 
     this.lyricsViewport = pipDocument.createElement("div");
@@ -470,59 +471,77 @@ export class PictureInPictureLyricsView {
   private showSong(detail: PlayerDetails): void {
     this.currentVideoId = detail.videoId;
     this.lastVisibleMetadataCheck = Date.now();
-    this.setHeaderText(detail.song, detail.artist);
+    this.setHeaderText(detail.song, detail.artist, true);
     this.clearAnimatedArtwork();
     this.loadArtwork(detail.videoId);
   }
 
-  // The header is rewritten from three places: a song change, the visible
-  // metadata poll a few times a second, and canonical metadata resolving
-  // seconds later. Rather than rank them, each row is diffed on its own and
-  // only a row whose text actually changed moves. So a byline that arrives late
-  // transitions in by itself, instead of appearing under a title that has to
-  // sit through a second animation it has no reason to run.
-  private setHeaderText(title: string, byline: string): void {
+  // Only a song change is an event. The visible metadata poll and the canonical
+  // metadata landing later are corrections, and they disagree with the player on
+  // byline format, so animating those sprang every track change twice. A row
+  // that was empty still animates, having something to arrive from.
+  private setHeaderText(title: string, byline: string, isSongChange = false): void {
     const incoming = [title, byline];
     const changed = this.headerRows.filter((row, position) => row.text !== incoming[position]);
     if (changed.length === 0) return;
 
     const isFirstPaint = !this.hasHeaderText;
     this.hasHeaderText = true;
+    const animating = changed.filter(row => isSongChange || row.text === "");
     this.headerRows.forEach((row, position) => {
       row.text = incoming[position];
     });
 
     for (const row of changed) {
+      if (!animating.includes(row)) {
+        this.correctRow(row);
+        continue;
+      }
       // Trailing the title only means something when the title is moving too.
-      const delay = changed.length > 1 && row === this.headerRows[1] ? HEADER_ROW_STAGGER : 0;
+      const delay = animating.length > 1 && row === this.headerRows[1] ? HEADER_ROW_STAGGER : 0;
       this.swapRow(row, isFirstPaint, delay);
     }
     // Both rows have to be filled before measuring, since they share one cycle.
     if (isFirstPaint) this.marquee.arm();
   }
 
+  // Rebuilding a row mid-swap would replace the word boxes in flight, so a
+  // correction landing during one waits for it.
+  private correctRow(row: HeaderRow): void {
+    if (row.busyTimer !== null) {
+      row.pendingText = row.text;
+      return;
+    }
+    fillHeaderLayer(row.layers[row.index], row.text, this.prefersReducedMotion);
+    this.armMarqueeWhenSettled();
+  }
+
+  private paintRow(row: HeaderRow, index: number): void {
+    row.index = index;
+    fillHeaderLayer(row.layers[index], row.text, this.prefersReducedMotion);
+    row.layers[index].setAttribute("data-front", "true");
+    row.layers[index].removeAttribute("aria-hidden");
+    row.layers[1 - index].setAttribute("data-front", "false");
+    row.layers[1 - index].setAttribute("aria-hidden", "true");
+  }
+
   private swapRow(row: HeaderRow, isFirstPaint: boolean, delayMs: number): void {
     if (row.busyTimer !== null) this.pipWindow.clearTimeout(row.busyTimer);
-    this.marquee.pin(row.element);
+    row.pendingText = null;
 
-    // Clearing the flag before the layers change mirrors the artwork: it means
-    // the outgoing layer is never briefly left visible under a rule that has
-    // stopped matching, and it is what lets a preset driven by the layer rather
-    // than by the words restart when a swap interrupts another.
+    // Nothing to transition from on the first song in a window, so it just
+    // appears, the same way the first cover does.
+    if (isFirstPaint) {
+      this.paintRow(row, row.index);
+      return;
+    }
+
+    this.marquee.pin(row.element);
+    // Cleared before the layers change so the outgoing layer is never left
+    // visible under a rule that has stopped matching.
     row.element.setAttribute("data-swapping", "false");
     void row.element.offsetWidth;
-
-    // There is nothing to transition from on the first song in a window, so it
-    // just appears, the same way the first cover does.
-    const next = isFirstPaint ? row.index : 1 - row.index;
-    row.index = next;
-    fillHeaderLayer(row.layers[next], row.text, this.prefersReducedMotion);
-    row.layers[next].setAttribute("data-front", "true");
-    row.layers[next].removeAttribute("aria-hidden");
-    row.layers[1 - next].setAttribute("data-front", "false");
-    row.layers[1 - next].setAttribute("aria-hidden", "true");
-
-    if (isFirstPaint) return;
+    this.paintRow(row, 1 - row.index);
 
     row.element.style.setProperty(HEADER_ROW_DELAY_PROPERTY, `${delayMs}ms`);
     row.element.setAttribute("data-swapping", "true");
@@ -530,6 +549,10 @@ export class PictureInPictureLyricsView {
       () => {
         row.busyTimer = null;
         row.element.removeAttribute("data-swapping");
+        if (row.pendingText !== null) {
+          fillHeaderLayer(row.layers[row.index], row.pendingText, this.prefersReducedMotion);
+          row.pendingText = null;
+        }
         this.armMarqueeWhenSettled();
       },
       this.rowSwapDuration(row) + delayMs + MARQUEE_REARM_DELAY
@@ -538,9 +561,10 @@ export class PictureInPictureLyricsView {
 
   // Rows share one marquee cycle, so it can only be measured once both have
   // stopped moving.
+  private readonly isHeaderSettled = (): boolean => this.headerRows.every(row => row.busyTimer === null);
+
   private armMarqueeWhenSettled(): void {
-    if (this.headerRows.some(row => row.busyTimer !== null)) return;
-    this.marquee.arm();
+    if (this.isHeaderSettled()) this.marquee.arm();
   }
 
   // Spring words run until the last word has landed, so a wordier row is busy
@@ -583,13 +607,12 @@ export class PictureInPictureLyricsView {
     else this.artworkVideo.pause();
   }
 
-  // The player bar can already be showing the next song before the player
-  // itself reports it, and with nothing to check the read against there is no
-  // way to tell. Taking it anyway put the next title up ahead of the song
-  // change meant to bring it in, so it has to be verifiably the same song.
+  // The player bar can be showing the next song before the player reports it, so
+  // a read that contradicts the current video is dropped. An unverifiable read is
+  // still taken, because it only ever lands as a correction and never animates.
   private refreshVisibleMetadata(videoId: string): void {
     const metadata = getVisiblePlayerMetadata(this.sourceDocument);
-    if (this.currentVideoId !== videoId || metadata.videoId !== videoId) return;
+    if (this.currentVideoId !== videoId || (metadata.videoId && metadata.videoId !== videoId)) return;
     this.setHeaderText(metadata.title || this.headerRows[0].text, metadata.byline || this.headerRows[1].text);
   }
 
@@ -599,12 +622,7 @@ export class PictureInPictureLyricsView {
     this.artworkController = controller;
     this.fallbackArtworkUrl = getFallbackArtworkUrl(videoId);
     this.clearArtworkStaleTimer();
-    this.artworkStaleTimer = this.pipWindow.setTimeout(() => {
-      this.artworkStaleTimer = null;
-      this.artworkContainer.removeAttribute("data-has-art");
-      this.shell.style.removeProperty("--blyrics-pip-art");
-      for (const layer of this.backdropLayers) layer.style.removeProperty("background-image");
-    }, ARTWORK_STALE_GRACE);
+    this.scheduleArtworkWipe(ARTWORK_STALE_GRACE);
 
     void this.dependencies.getArtworkMetadata(videoId, 250, controller.signal).then(metadata => {
       if (controller.signal.aborted || this.currentVideoId !== videoId) return;
@@ -629,11 +647,8 @@ export class PictureInPictureLyricsView {
     const nextIndex = 1 - this.artworkIndex;
     const image = this.artworkImages[nextIndex];
 
-    // Each attempt gets its own controller, chained to the song's. The fallback
-    // reuses this same element, and reassigning src does not detach what the
-    // attempt before it left on the element, so on one shared controller the
-    // first attempt's load handler outlived its own 404 and committed a second
-    // time over the fallback, cancelling the transition it had just started.
+    // One controller per attempt, chained to the song's: the fallback reuses this
+    // img, and reassigning src does not detach the previous load listener.
     const attempt = new AbortController();
     const { signal } = attempt;
     songSignal.addEventListener("abort", () => attempt.abort(), { once: true, signal });
@@ -672,10 +687,8 @@ export class PictureInPictureLyricsView {
   // a track apart. The outgoing layer keeps its image and stays opaque underneath.
   private paintBackdrop(nextIndex: number, url: string, skipAnimation: boolean): void {
     this.backdropLayers[nextIndex].style.backgroundImage = `url("${url}")`;
-    // The wash takes its cue from the cover: whenever the cover appears rather
-    // than crosses from something, so does this. Written in the same task as the
-    // data-front flip below, because any state change that makes the animation
-    // newly match would otherwise start it on whatever happened to be showing.
+    // The wash follows the cover. Written in the same task as the data-front flip
+    // below: any state change that makes the animation newly match starts it.
     if (skipAnimation) this.backdrop.setAttribute("data-first", "true");
     else this.backdrop.removeAttribute("data-first");
     this.backdropLayers[nextIndex].setAttribute("data-front", "true");
@@ -707,11 +720,8 @@ export class PictureInPictureLyricsView {
     this.artworkIndex = nextIndex;
     this.artworkFaces[nextIndex].setAttribute("data-front", "true");
     this.artworkFaces[1 - nextIndex].setAttribute("data-front", "false");
-    // Flip is a transition rather than keyframes, so withholding data-running
-    // never reached it, and withholding the flipped attribute is not an option
-    // either: the back face is statically rotated, so the card has to arrive at
-    // 180 for that cover to be visible at all. Suppress the transition and let
-    // the reflow commit the transform outright instead.
+    // Flip is a transition, not keyframes, so withholding data-running never
+    // reached it. Suppress the transition and let the reflow commit the transform.
     if (skipAnimation) this.shell.setAttribute("data-artwork-instant", "true");
     this.shell.setAttribute("data-artwork-flipped", nextIndex === 1 ? "true" : "false");
     if (skipAnimation) {
@@ -721,6 +731,22 @@ export class PictureInPictureLyricsView {
     // A skipped swap opens no cooldown, or the very next track change would find the guard busy
     // and snap a transition the viewer was owed.
     if (!skipAnimation) this.artworkBusyUntil = now + duration;
+  }
+
+  // The wipe really does blank the cover, so running it while a swap is still on
+  // screen finishes that swap on two placeholders. It waits the transition out.
+  private scheduleArtworkWipe(delayMs: number): void {
+    this.artworkStaleTimer = this.pipWindow.setTimeout(() => {
+      this.artworkStaleTimer = null;
+      const remaining = this.artworkBusyUntil - this.pipWindow.performance.now();
+      if (remaining > 0) {
+        this.scheduleArtworkWipe(remaining);
+        return;
+      }
+      this.artworkContainer.removeAttribute("data-has-art");
+      this.shell.style.removeProperty("--blyrics-pip-art");
+      for (const layer of this.backdropLayers) layer.style.removeProperty("background-image");
+    }, delayMs);
   }
 
   private clearArtworkStaleTimer(): void {
