@@ -11,6 +11,16 @@ interface DisplayMetadata {
   readonly videoId: string | null;
 }
 
+// Each header row swaps on its own timeline, so its two stacked layers, which
+// of them is in front, and how long it stays busy all belong to the row.
+interface HeaderRow {
+  readonly element: HTMLElement;
+  readonly layers: readonly HTMLElement[];
+  index: number;
+  text: string;
+  busyTimer: number | null;
+}
+
 type PlayerControlAction = "previous" | "play-pause" | "next";
 type PlayerControlIcon = Exclude<PlayerControlAction, "play-pause"> | "play" | "pause";
 
@@ -46,6 +56,7 @@ export const DEFAULT_TEXT_TRANSITION: TextTransition = "spring";
 // spring words step along the row from there.
 const HEADER_ROW_STAGGER = 90;
 const HEADER_WORD_STEP = 45;
+const HEADER_ROW_DELAY_PROPERTY = "--blyrics-pip-line-delay";
 const REDUCED_MOTION_TEXT_DURATION = 240;
 // The swap has to finish and the text has to sit still for a beat before the
 // marquee is let back in, or the two fight over the same row.
@@ -119,6 +130,11 @@ function createBackdropLayer(document: Document): HTMLElement {
   return layer;
 }
 
+function createHeaderRow(element: HTMLElement): HeaderRow {
+  createHeaderLine(element);
+  return { element, layers: getHeaderLayers(element), index: 0, text: "", busyTimer: null };
+}
+
 function createArtworkFace(document: Document): [HTMLElement, HTMLImageElement] {
   const face = document.createElement("div");
   face.className = "blyrics-pip-artwork__face";
@@ -164,7 +180,7 @@ export class PictureInPictureLyricsView {
   private readonly artworkImages: readonly [HTMLImageElement, HTMLImageElement];
   private readonly artworkVideo: HTMLVideoElement;
   private readonly playPauseButton: HTMLButtonElement;
-  private readonly headerRows: readonly [HTMLElement, HTMLElement];
+  private readonly headerRows: readonly [HeaderRow, HeaderRow];
   private readonly marquee: PictureInPictureHeaderMarquee;
   private readonly reducedMotionQuery: MediaQueryList;
   private readonly lyricsViewport: HTMLElement;
@@ -185,12 +201,7 @@ export class PictureInPictureLyricsView {
   private artworkStaleTimer: number | null = null;
   private textTransition: TextTransition = DEFAULT_TEXT_TRANSITION;
   private prefersReducedMotion = false;
-  private headerIndex = 0;
-  private headerTitle = "";
-  private headerByline = "";
   private hasHeaderText = false;
-  private hasPendingHeaderText = false;
-  private headerBusyTimer: number | null = null;
 
   constructor(
     private readonly pipWindow: Window,
@@ -262,8 +273,7 @@ export class PictureInPictureLyricsView {
     titleRow.className = "blyrics-pip-header__title";
     const bylineRow = pipDocument.createElement("p");
     bylineRow.className = "blyrics-pip-header__artist";
-    this.headerRows = [titleRow, bylineRow];
-    for (const row of this.headerRows) createHeaderLine(row);
+    this.headerRows = [createHeaderRow(titleRow), createHeaderRow(bylineRow)];
     header.append(titleRow, bylineRow);
 
     this.reducedMotionQuery = pipWindow.matchMedia("(prefers-reduced-motion: reduce)");
@@ -271,7 +281,11 @@ export class PictureInPictureLyricsView {
     this.reducedMotionQuery.addEventListener("change", this.handleReducedMotionChange, {
       signal: this.lifecycleController.signal,
     });
-    this.marquee = new PictureInPictureHeaderMarquee(pipWindow, this.headerRows, this.lifecycleController.signal);
+    this.marquee = new PictureInPictureHeaderMarquee(
+      pipWindow,
+      this.headerRows.map(row => row.element),
+      this.lifecycleController.signal
+    );
 
     this.lyricsViewport = pipDocument.createElement("div");
     this.lyricsViewport.className = "blyrics-pip-lyrics";
@@ -406,7 +420,9 @@ export class PictureInPictureLyricsView {
     this.marquee.destroy();
     if (this.controlsIdleTimer !== null) this.pipWindow.clearTimeout(this.controlsIdleTimer);
     if (this.artworkBusyTimer !== null) this.pipWindow.clearTimeout(this.artworkBusyTimer);
-    if (this.headerBusyTimer !== null) this.pipWindow.clearTimeout(this.headerBusyTimer);
+    for (const row of this.headerRows) {
+      if (row.busyTimer !== null) this.pipWindow.clearTimeout(row.busyTimer);
+    }
   };
 
   private createPlayerControlButton(action: PlayerControlAction, label: string): HTMLButtonElement {
@@ -454,81 +470,86 @@ export class PictureInPictureLyricsView {
   private showSong(detail: PlayerDetails): void {
     this.currentVideoId = detail.videoId;
     this.lastVisibleMetadataCheck = Date.now();
-    this.setHeaderText(detail.song, detail.artist, true);
+    this.setHeaderText(detail.song, detail.artist);
     this.clearAnimatedArtwork();
     this.loadArtwork(detail.videoId);
   }
 
-  // The header is rewritten from three places: here on a song change, from the
-  // visible-metadata poll a few times a second, and again when canonical
-  // metadata resolves seconds later. Only the first is a song change, so only
-  // the first may animate; the other two correct the row that is already up.
-  private setHeaderText(title: string, byline: string, isSongChange: boolean): void {
-    if (title === this.headerTitle && byline === this.headerByline) return;
-    this.headerTitle = title;
-    this.headerByline = byline;
+  // The header is rewritten from three places: a song change, the visible
+  // metadata poll a few times a second, and canonical metadata resolving
+  // seconds later. Rather than rank them, each row is diffed on its own and
+  // only a row whose text actually changed moves. So a byline that arrives late
+  // transitions in by itself, instead of appearing under a title that has to
+  // sit through a second animation it has no reason to run.
+  private setHeaderText(title: string, byline: string): void {
+    const incoming = [title, byline];
+    const changed = this.headerRows.filter((row, position) => row.text !== incoming[position]);
+    if (changed.length === 0) return;
+
+    const isFirstPaint = !this.hasHeaderText;
+    this.hasHeaderText = true;
+    this.headerRows.forEach((row, position) => {
+      row.text = incoming[position];
+    });
+
+    for (const row of changed) {
+      // Trailing the title only means something when the title is moving too.
+      const delay = changed.length > 1 && row === this.headerRows[1] ? HEADER_ROW_STAGGER : 0;
+      this.swapRow(row, isFirstPaint, delay);
+    }
+    // Both rows have to be filled before measuring, since they share one cycle.
+    if (isFirstPaint) this.marquee.arm();
+  }
+
+  private swapRow(row: HeaderRow, isFirstPaint: boolean, delayMs: number): void {
+    if (row.busyTimer !== null) this.pipWindow.clearTimeout(row.busyTimer);
+    this.marquee.pin(row.element);
+
+    // Clearing the flag before the layers change mirrors the artwork: it means
+    // the outgoing layer is never briefly left visible under a rule that has
+    // stopped matching, and it is what lets a preset driven by the layer rather
+    // than by the words restart when a swap interrupts another.
+    row.element.setAttribute("data-swapping", "false");
+    void row.element.offsetWidth;
 
     // There is nothing to transition from on the first song in a window, so it
     // just appears, the same way the first cover does.
-    if (!isSongChange || !this.hasHeaderText) {
-      this.hasHeaderText = true;
-      // A correction that lands while the header is still animating has to wait
-      // for it. Rebuilding the row now would replace the word boxes that are
-      // mid-flight and restart the whole thing from the beginning.
-      if (this.headerBusyTimer !== null) {
-        this.hasPendingHeaderText = true;
-        return;
-      }
-      this.paintHeader(this.headerIndex);
-      this.marquee.arm();
-      return;
-    }
+    const next = isFirstPaint ? row.index : 1 - row.index;
+    row.index = next;
+    fillHeaderLayer(row.layers[next], row.text, this.prefersReducedMotion);
+    row.layers[next].setAttribute("data-front", "true");
+    row.layers[next].removeAttribute("aria-hidden");
+    row.layers[1 - next].setAttribute("data-front", "false");
+    row.layers[1 - next].setAttribute("aria-hidden", "true");
 
-    this.hasPendingHeaderText = false;
-    this.marquee.pin();
-    this.headerIndex = 1 - this.headerIndex;
-    this.paintHeader(this.headerIndex);
-    this.runHeaderSwap();
+    if (isFirstPaint) return;
+
+    row.element.style.setProperty(HEADER_ROW_DELAY_PROPERTY, `${delayMs}ms`);
+    row.element.setAttribute("data-swapping", "true");
+    row.busyTimer = this.pipWindow.setTimeout(
+      () => {
+        row.busyTimer = null;
+        row.element.removeAttribute("data-swapping");
+        this.armMarqueeWhenSettled();
+      },
+      this.rowSwapDuration(row) + delayMs + MARQUEE_REARM_DELAY
+    );
   }
 
-  private paintHeader(index: number): void {
-    const texts = [this.headerTitle, this.headerByline];
-    this.headerRows.forEach((row, position) => {
-      const layers = getHeaderLayers(row);
-      fillHeaderLayer(layers[index], texts[position], this.prefersReducedMotion);
-      layers[index].setAttribute("data-front", "true");
-      layers[index].removeAttribute("aria-hidden");
-      layers[1 - index].setAttribute("data-front", "false");
-      layers[1 - index].setAttribute("aria-hidden", "true");
-    });
+  // Rows share one marquee cycle, so it can only be measured once both have
+  // stopped moving.
+  private armMarqueeWhenSettled(): void {
+    if (this.headerRows.some(row => row.busyTimer !== null)) return;
+    this.marquee.arm();
   }
 
-  private runHeaderSwap(): void {
-    const settled = this.headerSwapDuration() + MARQUEE_REARM_DELAY;
-    if (this.headerBusyTimer !== null) this.pipWindow.clearTimeout(this.headerBusyTimer);
-    this.shell.setAttribute("data-text-running", "false");
-    void this.shell.offsetWidth;
-    this.shell.setAttribute("data-text-running", "true");
-
-    this.headerBusyTimer = this.pipWindow.setTimeout(() => {
-      this.headerBusyTimer = null;
-      this.shell.setAttribute("data-text-running", "false");
-      if (this.hasPendingHeaderText) {
-        this.hasPendingHeaderText = false;
-        this.paintHeader(this.headerIndex);
-      }
-      this.marquee.arm();
-    }, settled);
-  }
-
-  // Spring words run until the last word has landed, so how long the header is
-  // busy depends on the wordiest of the two rows.
-  private headerSwapDuration(): number {
-    if (this.prefersReducedMotion) return REDUCED_MOTION_TEXT_DURATION + HEADER_ROW_STAGGER;
-    const base = TEXT_TRANSITION_DURATIONS[this.textTransition] + HEADER_ROW_STAGGER;
+  // Spring words run until the last word has landed, so a wordier row is busy
+  // for longer.
+  private rowSwapDuration(row: HeaderRow): number {
+    if (this.prefersReducedMotion) return REDUCED_MOTION_TEXT_DURATION;
+    const base = TEXT_TRANSITION_DURATIONS[this.textTransition];
     if (this.textTransition !== "spring") return base;
-    const words = Math.max(this.headerTitle.split(" ").length, this.headerByline.split(" ").length);
-    return base + Math.max(0, words - 1) * HEADER_WORD_STEP;
+    return base + Math.max(0, row.text.split(" ").length - 1) * HEADER_WORD_STEP;
   }
 
   private readonly handleReducedMotionChange = (event: MediaQueryListEvent): void => {
@@ -536,7 +557,9 @@ export class PictureInPictureLyricsView {
     // No rule can undo the word boxes, so the rows have to be rebuilt as single
     // text nodes for the fallback ellipsis to have anything to truncate.
     if (!this.hasHeaderText) return;
-    this.paintHeader(this.headerIndex);
+    for (const row of this.headerRows) {
+      fillHeaderLayer(row.layers[row.index], row.text, this.prefersReducedMotion);
+    }
     this.marquee.arm();
   };
 
@@ -560,10 +583,14 @@ export class PictureInPictureLyricsView {
     else this.artworkVideo.pause();
   }
 
+  // The player bar can already be showing the next song before the player
+  // itself reports it, and with nothing to check the read against there is no
+  // way to tell. Taking it anyway put the next title up ahead of the song
+  // change meant to bring it in, so it has to be verifiably the same song.
   private refreshVisibleMetadata(videoId: string): void {
     const metadata = getVisiblePlayerMetadata(this.sourceDocument);
-    if (this.currentVideoId !== videoId || (metadata.videoId && metadata.videoId !== videoId)) return;
-    this.setHeaderText(metadata.title || this.headerTitle, metadata.byline || this.headerByline, false);
+    if (this.currentVideoId !== videoId || metadata.videoId !== videoId) return;
+    this.setHeaderText(metadata.title || this.headerRows[0].text, metadata.byline || this.headerRows[1].text);
   }
 
   private loadArtwork(videoId: string): void {
@@ -582,9 +609,8 @@ export class PictureInPictureLyricsView {
     void this.dependencies.getArtworkMetadata(videoId, 250, controller.signal).then(metadata => {
       if (controller.signal.aborted || this.currentVideoId !== videoId) return;
       this.setHeaderText(
-        metadata?.displayTitle || this.headerTitle,
-        metadata?.displayByline || metadata?.artist || this.headerByline,
-        false
+        metadata?.displayTitle || this.headerRows[0].text,
+        metadata?.displayByline || metadata?.artist || this.headerRows[1].text
       );
       // The fallback is a 16:9 video frame, so it only lands when the queue yielded no art at all.
       this.setArtwork(

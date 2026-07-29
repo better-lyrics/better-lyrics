@@ -217,14 +217,12 @@ export class PictureInPictureHeaderMarquee {
   // mid-read rather than yanking back to the start first. The shift is inherited
   // from the row and the row is about to stop animating, so it has to be copied
   // to an inline transform, and copied before the layers swap over.
-  pin(): void {
+  pin(line: HTMLElement): void {
     this.clearArmTimer();
-    for (const line of this.lines) {
-      const shift = this.pipWindow.getComputedStyle(line).getPropertyValue(SHIFT_PROPERTY).trim();
-      const outgoing = line.querySelector<HTMLElement>(`.${LAYER_CLASS}[data-front="true"] .${SCROLL_CLASS}`);
-      if (outgoing && Number.parseFloat(shift)) outgoing.style.transform = `translateX(${shift})`;
-      line.removeAttribute("data-marquee");
-    }
+    const shift = this.pipWindow.getComputedStyle(line).getPropertyValue(SHIFT_PROPERTY).trim();
+    const outgoing = line.querySelector<HTMLElement>(`.${LAYER_CLASS}[data-front="true"] .${SCROLL_CLASS}`);
+    if (outgoing && Number.parseFloat(shift)) outgoing.style.transform = `translateX(${shift})`;
+    line.removeAttribute("data-marquee");
   }
 
   destroy(): void {

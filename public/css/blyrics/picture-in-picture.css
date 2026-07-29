@@ -717,22 +717,18 @@ body {
 
 /* -- Text transition presets -------------------------------------------------
    Same contract as the artwork: script writes blyrics-pip-text-transition and
-   data-text-running and nothing else, so the shapes stay retunable from a theme.
+   data-swapping and nothing else, so the shapes stay retunable from a theme.
    The header runs on its own flag because it changes on the song, while the
    artwork changes later, once its cover has decoded. */
-.blyrics-pip-header__artist .blyrics-pip-line__layer {
-  --blyrics-pip-line-delay: 90ms;
-}
-
-/* The outgoing row is invisible at rest and has to come back for the length of
+/* The outgoing layer is invisible at rest and has to come back for the length of
    the swap, or there is nothing on screen for its exit to animate. */
-.blyrics-pip-shell[data-text-running="true"] .blyrics-pip-line__layer {
+.blyrics-pip-line[data-swapping="true"] .blyrics-pip-line__layer[data-front="false"] {
   opacity: 1;
 }
 
 /* Preset: spring words. Each word rises into place on a sampled spring, stepped
    along the row, with the artist trailing the title by one delay. */
-.blyrics-pip-shell[blyrics-pip-text-transition="spring"][data-text-running="true"]
+.blyrics-pip-shell[blyrics-pip-text-transition="spring"] .blyrics-pip-line[data-swapping="true"]
   .blyrics-pip-line__layer[data-front="true"]
   .blyrics-pip-line__unit {
   animation: blyrics-pip-text-rise-in 620ms cubic-bezier(0.28, 1.3, 0.5, 1) both;
@@ -770,7 +766,7 @@ body {
   animation-delay: calc(var(--blyrics-pip-line-delay, 0ms) + var(--blyrics-pip-unit-index, 0) * 45ms);
 }
 
-.blyrics-pip-shell[blyrics-pip-text-transition="spring"][data-text-running="true"]
+.blyrics-pip-shell[blyrics-pip-text-transition="spring"] .blyrics-pip-line[data-swapping="true"]
   .blyrics-pip-line__layer[data-front="false"]
   .blyrics-pip-line__unit {
   animation: blyrics-pip-text-rise-out 380ms cubic-bezier(0.32, 0, 0.2, 1) both;
@@ -804,13 +800,13 @@ body {
 /* Preset: push and blur. Travels the same direction as the artwork push, which
    is physical rather than reading-order, since the artwork slot is always on the
    same side whatever the script. */
-.blyrics-pip-shell[blyrics-pip-text-transition="push"][data-text-running="true"]
+.blyrics-pip-shell[blyrics-pip-text-transition="push"] .blyrics-pip-line[data-swapping="true"]
   .blyrics-pip-line__layer[data-front="true"] {
   animation: blyrics-pip-text-push-in 460ms cubic-bezier(0.4, 0.02, 0.2, 1) both;
   animation-delay: var(--blyrics-pip-line-delay, 0ms);
 }
 
-.blyrics-pip-shell[blyrics-pip-text-transition="push"][data-text-running="true"]
+.blyrics-pip-shell[blyrics-pip-text-transition="push"] .blyrics-pip-line[data-swapping="true"]
   .blyrics-pip-line__layer[data-front="false"] {
   animation: blyrics-pip-text-push-out 460ms cubic-bezier(0.4, 0.02, 0.2, 1) both;
   animation-delay: var(--blyrics-pip-line-delay, 0ms);
@@ -845,13 +841,13 @@ body {
 }
 
 /* Preset: crossfade. Also what reduced motion collapses the other two to. */
-.blyrics-pip-shell[blyrics-pip-text-transition="crossfade"][data-text-running="true"]
+.blyrics-pip-shell[blyrics-pip-text-transition="crossfade"] .blyrics-pip-line[data-swapping="true"]
   .blyrics-pip-line__layer[data-front="true"] {
   animation: blyrics-pip-text-fade-in 300ms ease both;
   animation-delay: var(--blyrics-pip-line-delay, 0ms);
 }
 
-.blyrics-pip-shell[blyrics-pip-text-transition="crossfade"][data-text-running="true"]
+.blyrics-pip-shell[blyrics-pip-text-transition="crossfade"] .blyrics-pip-line[data-swapping="true"]
   .blyrics-pip-line__layer[data-front="false"] {
   animation: blyrics-pip-text-fade-out 300ms ease both;
   animation-delay: var(--blyrics-pip-line-delay, 0ms);
@@ -902,11 +898,11 @@ body {
     opacity: 1 !important;
   }
 
-  .blyrics-pip-shell[data-text-running="true"] .blyrics-pip-line__layer[data-front="true"] {
+  .blyrics-pip-line[data-swapping="true"] .blyrics-pip-line__layer[data-front="true"] {
     animation: blyrics-pip-text-fade-in 240ms ease both !important;
   }
 
-  .blyrics-pip-shell[data-text-running="true"] .blyrics-pip-line__layer[data-front="false"] {
+  .blyrics-pip-line[data-swapping="true"] .blyrics-pip-line__layer[data-front="false"] {
     animation: blyrics-pip-text-fade-out 240ms ease both !important;
   }
 
