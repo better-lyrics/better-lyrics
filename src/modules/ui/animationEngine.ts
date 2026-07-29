@@ -884,7 +884,10 @@ function startWordAnimations(
   resetPartAnimations(part);
 
   const rawElapsedMs = (currentTime - part.time) * 1000;
-  const timedDurationMs = part.duration * 1000;
+  // Providers do ship words that end before they start: one -0.01s word in a Musixmatch richsync
+  // was enough to make animate() throw here, and the throw took the rest of the tick with it, so
+  // the line never finished setting up and the engine tried it again on every frame.
+  const timedDurationMs = Math.max(0, part.duration * 1000);
   const isLineSyncedWord = part.lyricElement.classList.contains(LINE_SYNCED_WORD_CLASS);
   const swipeLeadMs = timedDurationMs * SWIPE_LEAD_RATIO.getNumberValue();
   const swipeTimeMs = rawElapsedMs + swipeLeadMs;
