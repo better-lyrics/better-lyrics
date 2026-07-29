@@ -215,51 +215,68 @@ body {
   pointer-events: auto;
 }
 
+.blyrics-pip-artwork__controls {
+  --blyrics-pip-control-size: clamp(24px, 8vw, 36px);
+}
+
 .blyrics-pip-artwork__control {
+  position: relative;
   box-sizing: border-box;
   display: grid;
-  width: clamp(24px, 8vw, 36px);
-  height: clamp(24px, 8vw, 36px);
+  width: var(--blyrics-pip-control-size);
+  height: var(--blyrics-pip-control-size);
   padding: 0;
   border: 0;
   border-radius: 50%;
   place-items: center;
-  background: rgb(0 0 0 / 28%);
-  backdrop-filter: blur(8px);
+  background: none;
   color: #fff;
   cursor: pointer;
+}
+
+/* The disc takes the hover pop rather than the button, because scaling the button scales the glyph
+   with it, and the hard outer bar of the skip icons then reads as sliding sideways instead of
+   growing. Held at one size, the glyph only ever gets a larger disc behind it. */
+.blyrics-pip-artwork__control::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: rgb(0 0 0 / 28%);
+  backdrop-filter: blur(8px);
   transition:
     background-color 140ms ease,
     transform 140ms ease;
 }
 
-.blyrics-pip-artwork__control:hover {
+.blyrics-pip-artwork__control:hover::before {
   background: rgb(255 255 255 / 22%);
-  transform: scale(1.05);
+  transform: scale(1.08);
 }
 
-.blyrics-pip-artwork__control:active {
+.blyrics-pip-artwork__control:active::before {
   transform: scale(0.95);
 }
 
 .blyrics-pip-artwork__control--play-pause {
-  background: rgb(255 255 255 / 92%);
+  width: calc(var(--blyrics-pip-control-size) * 1.25);
+  height: calc(var(--blyrics-pip-control-size) * 1.25);
   color: #111;
-  transform: scale(1.05);
 }
 
-.blyrics-pip-artwork__control--play-pause:hover {
+.blyrics-pip-artwork__control--play-pause::before {
+  background: rgb(255 255 255 / 92%);
+  backdrop-filter: none;
+}
+
+.blyrics-pip-artwork__control--play-pause:hover::before {
   background: #fff;
-  transform: scale(1.1);
-}
-
-.blyrics-pip-artwork__control--play-pause:active {
-  transform: scale(1);
 }
 
 .blyrics-pip-artwork__control-icon {
-  width: 62%;
-  height: 62%;
+  position: relative;
+  width: calc(var(--blyrics-pip-control-size) * 0.62);
+  height: calc(var(--blyrics-pip-control-size) * 0.62);
   fill: currentColor;
 }
 

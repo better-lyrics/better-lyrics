@@ -178,6 +178,12 @@ body {
     z-index: 100;
 }
 
+.setting-help[data-tooltip-placement="bottom"]::after {
+    top: calc(100% + 8px);
+    bottom: auto;
+    transform: translateX(-50%) translateY(-4px);
+}
+
 .setting-help:hover::after,
 .setting-help:focus-visible::after {
     opacity: 1;
