@@ -146,6 +146,7 @@ export class PictureInPictureHeaderMarquee {
   private rearmTimer: number | null = null;
   private keyframeSequence = 0;
   private isEnabled = true;
+  private lastMeasurements: string | null = null;
 
   constructor(
     private readonly pipWindow: Window,
@@ -175,21 +176,20 @@ export class PictureInPictureHeaderMarquee {
   // matters because the cycle is shared, so no row can be set up until all of
   // them have been sized.
   arm(): void {
-    this.clearArmTimer();
-
+    const fitting: HTMLElement[] = [];
     const measured: MeasuredLine[] = [];
+    const signature: string[] = [String(this.isEnabled)];
+
+    // Measuring reads scrollWidth and clientWidth, neither of which a running row can move, so
+    // the rows are sized before anything is torn down. That is what leaves the option of
+    // walking away below without having disturbed one.
     for (const line of this.lines) {
-      this.stop(line);
       const front = line.querySelector<HTMLElement>(`.${LAYER_CLASS}[data-front="true"]`);
       const scroll = front?.querySelector<HTMLElement>(`.${SCROLL_CLASS}`);
-      if (!front || !scroll) {
-        this.unmask(line);
-        continue;
-      }
-
-      const distance = Math.ceil(scroll.scrollWidth - line.clientWidth);
-      if (distance <= 1) {
-        this.unmask(line);
+      const distance = front && scroll ? Math.ceil(scroll.scrollWidth - line.clientWidth) : 0;
+      if (!front || !scroll || distance <= 1) {
+        fitting.push(line);
+        signature.push("fits");
         continue;
       }
 
@@ -208,7 +208,22 @@ export class PictureInPictureHeaderMarquee {
         shift: `${isRtl ? distance : -distance}px`,
         fade,
       });
+      signature.push(`${distance}:${line.clientWidth}:${fade}:${isRtl}`);
     }
+
+    // Re-arming is a restart: the row snaps home and sits out the lead-in again. Callers fire on
+    // anything that could have changed the metrics, and most of the time nothing has, so a row
+    // already travelling the same distance is left running. The armed half of the test is what
+    // covers a swap, which stops a row without changing a single thing it measures.
+    const measurements = signature.join("|");
+    const isArmed =
+      !this.isEnabled || this.armTimer !== null || measured.every(row => row.line.dataset.marquee === "read");
+    if (measurements === this.lastMeasurements && isArmed) return;
+    this.lastMeasurements = measurements;
+
+    this.clearArmTimer();
+    for (const line of this.lines) this.stop(line);
+    for (const line of fitting) this.unmask(line);
 
     // Only rows that actually scroll are in here, which is what scopes the shared
     // cycle to exactly the right set. A title that overflows while the artist

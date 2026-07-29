@@ -22,19 +22,53 @@ function indexTree(root: Element): Map<string, Element> {
   return map;
 }
 
+interface MirroredAnimation {
+  readonly twin: Animation;
+  readonly slot: string;
+}
+
 let twinRoot: HTMLElement | null = null;
 let idToTwin = new Map<string, Element>();
 let observer: MutationObserver | null = null;
 let rebuildRequested = false;
-let sourceToTwin = new WeakMap<Animation, Animation>();
+let sourceToTwin = new WeakMap<Animation, MirroredAnimation>();
 let knownSources = new Set<Animation>();
 let skippedSources = new WeakSet<Animation>();
+let slotToSource = new Map<string, Animation>();
 
 function resetMirrorAnimations(): void {
-  for (const source of knownSources) sourceToTwin.get(source)?.cancel();
+  for (const source of knownSources) sourceToTwin.get(source)?.twin.cancel();
   sourceToTwin = new WeakMap();
   knownSources = new Set();
   skippedSources = new WeakSet();
+  slotToSource = new Map();
+}
+
+const KEYFRAME_TIMING_KEYS = new Set(["offset", "computedOffset", "easing", "composite"]);
+
+// The engine holds one animation per element, pseudo-element and property set: a part's
+// animations are cancelled before it is re-animated. Naming that slot is what lets the mirror
+// hold the same invariant, instead of leaving a replaced animation's twin running alongside its
+// replacement and a beat behind it. A theme's CSS animations are keyed by name on top of that,
+// since two of those can legitimately drive the same property at once.
+function effectSlot(source: Animation, mirrorId: string, keyframes: readonly Keyframe[]): string {
+  const effect = source.effect as KeyframeEffect;
+  const properties = new Set<string>();
+  for (const frame of keyframes) {
+    for (const property of Object.keys(frame)) {
+      if (!KEYFRAME_TIMING_KEYS.has(property)) properties.add(property);
+    }
+  }
+  const cssName = (source as Partial<CSSAnimation>).animationName ?? "";
+  return `${mirrorId}|${effect.pseudoElement ?? ""}|${cssName}|${[...properties].sort().join(",")}`;
+}
+
+function retireTwin(source: Animation): void {
+  const mirrored = sourceToTwin.get(source);
+  if (!mirrored) return;
+  mirrored.twin.cancel();
+  sourceToTwin.delete(source);
+  if (slotToSource.get(mirrored.slot) === source) slotToSource.delete(mirrored.slot);
 }
 
 export function needsRebuild(): boolean {
@@ -132,11 +166,12 @@ export function sync(mainRoot: HTMLElement): void {
     const target = getKeyframeTarget(source);
     if (!target) continue;
     const effect = source.effect as KeyframeEffect;
-    const twinElement = idToTwin.get(target.getAttribute(MIRROR_ID_ATTR) ?? "");
+    const mirrorId = target.getAttribute(MIRROR_ID_ATTR) ?? "";
+    const twinElement = idToTwin.get(mirrorId);
     if (!twinElement) continue;
 
-    let twin = sourceToTwin.get(source);
-    if (!twin) {
+    let mirrored = sourceToTwin.get(source);
+    if (!mirrored) {
       // getKeyframes() reserializes every property, so it stays behind the twin cache and the
       // skip decision is memoized; keyframes never change once an animation is created.
       const keyframes = effect.getKeyframes();
@@ -147,15 +182,28 @@ export function sync(mainRoot: HTMLElement): void {
         skippedSources.add(source);
         continue;
       }
-      twin = twinElement.animate(keyframes, {
+      // Whatever held this slot has just been superseded in the page, so it goes now rather than
+      // whenever the retirement pass below gets to it. Waiting is what left two copies of a
+      // line's exit fade running out of phase, holding it lit after the page had let it go.
+      const slot = effectSlot(source, mirrorId, keyframes);
+      const previous = slotToSource.get(slot);
+      if (previous) {
+        retireTwin(previous);
+        // Dropped from the known set as well: the retirement pass would otherwise copy playback
+        // state onto the cancelled twin, which starts it over.
+        knownSources.delete(previous);
+      }
+      const twin = twinElement.animate(keyframes, {
         ...effect.getTiming(),
         composite: effect.composite,
         pseudoElement: effect.pseudoElement ?? undefined,
       });
-      sourceToTwin.set(source, twin);
+      mirrored = { twin, slot };
+      sourceToTwin.set(source, mirrored);
+      slotToSource.set(slot, source);
     }
     nextKnown.add(source);
-    copyPlaybackState(source, twin);
+    copyPlaybackState(source, mirrored.twin);
   }
 
   for (const source of knownSources) {
@@ -166,14 +214,13 @@ export function sync(mainRoot: HTMLElement): void {
     // ones matters because several engine animations fill forwards, and a surviving twin of one
     // outranks the theme's own declarations and pins its line visible.
     if (source.playState === "idle" || source.playState === "finished") {
-      sourceToTwin.get(source)?.cancel();
-      sourceToTwin.delete(source);
+      retireTwin(source);
       continue;
     }
     // A minimised window unrenders every target at once, so without this the retained twins freeze
     // at whatever value they held and the lines they belong to stop matching the page.
-    const twin = sourceToTwin.get(source);
-    if (twin) copyPlaybackState(source, twin);
+    const mirrored = sourceToTwin.get(source);
+    if (mirrored) copyPlaybackState(source, mirrored.twin);
     nextKnown.add(source);
   }
   knownSources = nextKnown;

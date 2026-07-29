@@ -55,8 +55,12 @@ export function createPictureInPictureHost(
     pipStyle.id = CUSTOM_STYLE_ID;
     pipWindow.document.head.appendChild(pipStyle);
 
+    // Every head mutation lands here, and the page rewrites <title> on each play, pause and track
+    // change. Re-assigning identical CSS is not free: the sheet is re-parsed, so every face the
+    // theme imports is re-resolved and the font event that follows re-arms the header marquee.
     const sync = (): void => {
-      pipStyle.textContent = document.getElementById(CUSTOM_STYLE_ID)?.textContent ?? "";
+      const next = document.getElementById(CUSTOM_STYLE_ID)?.textContent ?? "";
+      if (next !== pipStyle.textContent) pipStyle.textContent = next;
     };
     sync();
 
