@@ -13,7 +13,6 @@ const FADE_START_PROPERTY = "--blyrics-pip-marquee-fade-start";
 const FADE_END_PROPERTY = "--blyrics-pip-marquee-fade-end";
 const ALPHA_PROPERTY = "--blyrics-pip-marquee-alpha";
 const FADE_PROPERTY = "--blyrics-pip-marquee-fade";
-const DISTANCE_PROPERTY = "--blyrics-pip-marquee-distance";
 const CYCLE_PROPERTY = "--blyrics-pip-marquee-cycle";
 const UNIT_INDEX_PROPERTY = "--blyrics-pip-unit-index";
 
@@ -44,6 +43,8 @@ const EASE_STEPS = 12;
 interface MeasuredLine {
   readonly line: HTMLElement;
   readonly travelMs: number;
+  readonly shift: string;
+  readonly fade: string;
 }
 
 export function createHeaderLine(line: HTMLElement): void {
@@ -199,8 +200,14 @@ export class PictureInPictureHeaderMarquee {
       // keeps the softened edge from blinking every time a row is re-armed.
       line.dataset.overflows = "true";
       line.dataset.rtl = String(isRtl);
-      line.style.setProperty(DISTANCE_PROPERTY, `${isRtl ? distance : -distance}px`);
-      measured.push({ line, travelMs: (distance / SPEED_PX_PER_SECOND) * 1000 });
+      // Read once the attribute is on, so a theme overriding the fade is picked up.
+      const fade = this.pipWindow.getComputedStyle(line).getPropertyValue(FADE_PROPERTY).trim() || "0px";
+      measured.push({
+        line,
+        travelMs: (distance / SPEED_PX_PER_SECOND) * 1000,
+        shift: `${isRtl ? distance : -distance}px`,
+        fade,
+      });
     }
 
     // Only rows that actually scroll are in here, which is what scopes the shared
@@ -210,11 +217,11 @@ export class PictureInPictureHeaderMarquee {
     if (!this.isEnabled || measured.length === 0) return;
 
     const longest = Math.max(...measured.map(row => row.travelMs));
-    const { name, cycleMs } = this.writeKeyframes(longest);
-    for (const row of measured) {
-      row.line.style.animationName = name;
+    const { names, cycleMs } = this.writeKeyframes(longest, measured);
+    measured.forEach((row, index) => {
+      row.line.style.animationName = names[index];
       row.line.style.setProperty(CYCLE_PROPERTY, `${Math.round(cycleMs)}ms`);
-    }
+    });
 
     this.armTimer = this.pipWindow.setTimeout(() => {
       this.armTimer = null;
@@ -240,12 +247,14 @@ export class PictureInPictureHeaderMarquee {
     this.style.remove();
   }
 
-  // One rule per window rather than per row: linked rows share a timeline and
-  // differ only in how far they travel, so they cross their own gap over the
-  // same span. The steps(1) segment is what makes the return instant instead of
-  // a fast rewind, and it costs nothing because the text is already invisible
-  // across it.
-  private writeKeyframes(travelMs: number): { name: string; cycleMs: number } {
+  // One rule per row, all sharing the cycle length and phase percentages derived
+  // from the longest traveller, so linked rows still cross their own gap over the
+  // same span. They cannot share a single rule: the offsets have to be literals
+  // because Gecko will not interpolate a keyframe value containing var(), which
+  // left the row snapping to its end offset instead of scrolling to it. The
+  // steps(1) segment is what makes the return instant rather than a fast rewind,
+  // and it costs nothing because the text is already invisible across it.
+  private writeKeyframes(travelMs: number, rows: readonly MeasuredLine[]): { names: string[]; cycleMs: number } {
     const { duration, easing } = travelEase(travelMs);
     const cycleMs = REST_AT_HOME + duration + REST_AT_END + FADE_OUT * 2 + DARK_BEAT;
     const at = (elapsed: number): string => ((elapsed / cycleMs) * 100).toFixed(3);
@@ -255,22 +264,28 @@ export class PictureInPictureHeaderMarquee {
     const holdsUntil = arrives + REST_AT_END;
     const darkens = holdsUntil + FADE_OUT;
     const snaps = darkens + DARK_BEAT;
-    const name = `blyrics-pip-marquee-${(this.keyframeSequence += 1)}`;
-    const home = `${SHIFT_PROPERTY}: 0px; ${FADE_START_PROPERTY}: 0px; ${FADE_END_PROPERTY}: var(${FADE_PROPERTY});`;
-    const away = `${SHIFT_PROPERTY}: var(${DISTANCE_PROPERTY}); ${FADE_START_PROPERTY}: var(${FADE_PROPERTY}); ${FADE_END_PROPERTY}: 0px;`;
-
-    this.style.textContent = `@keyframes ${name} {
+    const sequence = (this.keyframeSequence += 1);
+    const names: string[] = [];
+    const blocks = rows.map((row, index) => {
+      const name = `blyrics-pip-marquee-${sequence}-${index}`;
+      names.push(name);
+      const home = `${SHIFT_PROPERTY}: 0px; ${FADE_START_PROPERTY}: 0px; ${FADE_END_PROPERTY}: ${row.fade};`;
+      const away = `${SHIFT_PROPERTY}: ${row.shift}; ${FADE_START_PROPERTY}: ${row.fade}; ${FADE_END_PROPERTY}: 0px;`;
+      return `@keyframes ${name} {
   0% { ${home} ${ALPHA_PROPERTY}: 1; }
   ${at(departs)}% { ${home} animation-timing-function: ${easing}; }
-  ${at(departs + ramp)}% { ${FADE_START_PROPERTY}: var(${FADE_PROPERTY}); }
-  ${at(arrives - ramp)}% { ${FADE_END_PROPERTY}: var(${FADE_PROPERTY}); }
+  ${at(departs + ramp)}% { ${FADE_START_PROPERTY}: ${row.fade}; }
+  ${at(arrives - ramp)}% { ${FADE_END_PROPERTY}: ${row.fade}; }
   ${at(arrives)}% { ${away} ${ALPHA_PROPERTY}: 1; }
   ${at(holdsUntil)}% { ${away} ${ALPHA_PROPERTY}: 1; }
   ${at(darkens)}% { ${away} ${ALPHA_PROPERTY}: 0; animation-timing-function: steps(1, end); }
   ${at(snaps)}% { ${home} ${ALPHA_PROPERTY}: 0; }
   100% { ${home} ${ALPHA_PROPERTY}: 1; }
 }`;
-    return { name, cycleMs };
+    });
+
+    this.style.textContent = blocks.join("\n");
+    return { names, cycleMs };
   }
 
   private stop(line: HTMLElement): void {
@@ -290,7 +305,6 @@ export class PictureInPictureHeaderMarquee {
   private unmask(line: HTMLElement): void {
     line.removeAttribute("data-overflows");
     line.removeAttribute("data-rtl");
-    line.style.removeProperty(DISTANCE_PROPERTY);
   }
 
   private clearArmTimer(): void {
