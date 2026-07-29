@@ -926,7 +926,13 @@ function startWordAnimations(
               offset: config.word.wobblePeakOffset,
               easing: config.word.wobblePeakEasing,
             },
-            { transform: config.word.wobbleSettle, offset: config.word.wobbleSettleOffset },
+            // The two offsets are read and clamped independently, so a theme is free to settle
+            // before it peaks. animate() rejects offsets that go backwards, and that throw would
+            // orphan the highlight animations above, which are not tracked until the end.
+            {
+              transform: config.word.wobbleSettle,
+              offset: Math.max(config.word.wobblePeakOffset, config.word.wobbleSettleOffset),
+            },
             { transform: config.word.wobbleTo, easing: config.word.wobbleEndEasing },
           ],
           {
