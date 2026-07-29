@@ -527,6 +527,7 @@ export class PictureInPictureLyricsView {
 
   private swapRow(row: HeaderRow, isFirstPaint: boolean, delayMs: number): void {
     if (row.busyTimer !== null) this.pipWindow.clearTimeout(row.busyTimer);
+    row.busyTimer = null;
     row.pendingText = null;
 
     // Nothing to transition from on the first song in a window, so it just
@@ -607,12 +608,14 @@ export class PictureInPictureLyricsView {
     else this.artworkVideo.pause();
   }
 
-  // The player bar can be showing the next song before the player reports it, so
-  // a read that contradicts the current video is dropped. An unverifiable read is
-  // still taken, because it only ever lands as a correction and never animates.
+  // The player bar can be showing the next song before the player reports it, and
+  // an unverifiable read cannot be told apart from one. Taking it anyway wrote the
+  // next song's text in early, and the song change meant to bring it in then found
+  // the row unchanged and skipped its transition. Losing a redundant fast path is
+  // the cheaper failure: canonical metadata carries the same localized strings.
   private refreshVisibleMetadata(videoId: string): void {
     const metadata = getVisiblePlayerMetadata(this.sourceDocument);
-    if (this.currentVideoId !== videoId || (metadata.videoId && metadata.videoId !== videoId)) return;
+    if (this.currentVideoId !== videoId || metadata.videoId !== videoId) return;
     this.setHeaderText(metadata.title || this.headerRows[0].text, metadata.byline || this.headerRows[1].text);
   }
 
