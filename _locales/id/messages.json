@@ -119,6 +119,42 @@
     "message": "Mencegah jendela lirik mengambang tertutup permanen saat halaman dimuat ulang atau saat berpindah lagu maupun halaman. Karena keterbatasan browser, jendela akan dibuka kembali setelah klik atau penekanan tombol pertama, bukan secara langsung.",
     "description": "Help tooltip explaining what automatic floating-lyrics reopening does and why it waits for the first interaction"
   },
+  "options_display_pipArtworkTransition": {
+    "message": "Transisi sampul album",
+    "description": "Setting label, shown inside the floating lyrics window settings, for choosing how album art changes between songs"
+  },
+  "options_pipTransition_shuffle": {
+    "message": "Acak",
+    "description": "Name of an album art transition where the artwork tilts back and the new cover is dealt in like a playing card"
+  },
+  "options_pipTransition_flip": {
+    "message": "Balik",
+    "description": "Name of an album art transition where the artwork rotates like a card to reveal the new cover on its other side"
+  },
+  "options_pipTransition_push": {
+    "message": "Dorong",
+    "description": "Name of a transition, offered for both album art and song titles, where the new content slides in from the side and pushes the old out"
+  },
+  "options_pipTransition_crossfade": {
+    "message": "Pudar silang",
+    "description": "Name of a transition, offered for both album art and song titles, where the new content fades in over the old"
+  },
+  "options_pipTransition_spring": {
+    "message": "Pantul",
+    "description": "Name of a song title transition where the words of the new title bounce up into place one after another"
+  },
+  "options_display_pipWindow": {
+    "message": "Jendela lirik mengambang",
+    "description": "Label for the row that opens the settings for the floating lyrics window"
+  },
+  "options_display_pipTextTransition": {
+    "message": "Transisi judul",
+    "description": "Setting label, shown inside the floating lyrics window settings, for choosing how the song title and artist change between songs"
+  },
+  "options_display_pipMarquee": {
+    "message": "Gulir judul panjang",
+    "description": "Toggle label for whether a song title too long for the floating lyrics window scrolls across so it can be read in full"
+  },
   "options_display_shadersPromo": {
     "message": "Buka tautan ke Better Lyrics Shaders",
     "description": "Toggle label for the Shaders companion link shown in the lyrics footer"
