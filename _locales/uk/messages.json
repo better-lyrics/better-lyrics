@@ -119,6 +119,42 @@
     "message": "Запобігає закриттю плавучого вікна текстів при перезавантаженні чи переходу між піснями й сторінками. Браузери дозволяють відкривати плавуче вікно лише після взаємодії зі сторінкою, тому воно відкриватиметься не миттєво, а при першому натисканні.",
     "description": "Help tooltip explaining what automatic floating-lyrics reopening does and why it waits for the first interaction"
   },
+  "options_display_pipArtworkTransition": {
+    "message": "Перехід обкладинки",
+    "description": "Setting label, shown inside the floating lyrics window settings, for choosing how album art changes between songs"
+  },
+  "options_pipTransition_shuffle": {
+    "message": "Тасування",
+    "description": "Name of an album art transition where the artwork tilts back and the new cover is dealt in like a playing card"
+  },
+  "options_pipTransition_flip": {
+    "message": "Перегортання",
+    "description": "Name of an album art transition where the artwork rotates like a card to reveal the new cover on its other side"
+  },
+  "options_pipTransition_push": {
+    "message": "Виштовхування",
+    "description": "Name of a transition, offered for both album art and song titles, where the new content slides in from the side and pushes the old out"
+  },
+  "options_pipTransition_crossfade": {
+    "message": "Плавна заміна",
+    "description": "Name of a transition, offered for both album art and song titles, where the new content fades in over the old"
+  },
+  "options_pipTransition_spring": {
+    "message": "Пружина",
+    "description": "Name of a song title transition where the words of the new title bounce up into place one after another"
+  },
+  "options_display_pipWindow": {
+    "message": "Плавуче вікно текстів",
+    "description": "Label for the row that opens the settings for the floating lyrics window"
+  },
+  "options_display_pipTextTransition": {
+    "message": "Перехід назви",
+    "description": "Setting label, shown inside the floating lyrics window settings, for choosing how the song title and artist change between songs"
+  },
+  "options_display_pipMarquee": {
+    "message": "Прогортувати довгі назви",
+    "description": "Toggle label for whether a song title too long for the floating lyrics window scrolls across so it can be read in full"
+  },
   "options_display_shadersPromo": {
     "message": "Показати посилання на Better Lyrics Shaders",
     "description": "Toggle label for the Shaders companion link shown in the lyrics footer"
