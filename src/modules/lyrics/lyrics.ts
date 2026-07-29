@@ -84,7 +84,6 @@ export async function createLyrics(detail: PlayerDetails, signal: AbortSignal): 
   let videoId = detail.videoId;
   let duration = Number(detail.duration);
   const audioTrackData = detail.audioTrackData;
-  const isMusicVideo = detail.contentRect.width !== 0 && detail.contentRect.height !== 0;
 
   if (!videoId) {
     log(SERVER_ERROR_LOG, "Invalid video id");
@@ -97,6 +96,9 @@ export async function createLyrics(detail: PlayerDetails, signal: AbortSignal): 
     // We should get recalled if we were executed without a valid song/artist and aren't able to get lyrics
 
     let matchingSong = await getSongMetadata(videoId, 1, signal);
+    let isMusicVideo =
+      (detail.contentRect.width !== 0 && detail.contentRect.height !== 0) ||
+      matchingSong?.isVideo === true;
     let swappedVideoId = false;
     let isAVSwitch =
       (matchingSong &&
@@ -137,6 +139,7 @@ export async function createLyrics(detail: PlayerDetails, signal: AbortSignal): 
     if (matchingSong) {
       song = matchingSong.title;
       artist = matchingSong.artist || artist;
+      isMusicVideo = isMusicVideo || matchingSong.isVideo === true;
 
       if (isMusicVideo && matchingSong.counterpartVideoId && matchingSong.segmentMap) {
         log("Switching VideoId to Audio Id");
