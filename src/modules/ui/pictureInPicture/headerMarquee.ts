@@ -38,7 +38,7 @@ const EDGE_RAMP = 750;
 // How long the softened edge is on screen before anything moves. Matches the
 // transition on the row so the two hand over cleanly.
 const MASK_LEAD = 620;
-const RESIZE_DEBOUNCE = 220;
+const REARM_DEBOUNCE = 220;
 const EASE_STEPS = 12;
 
 interface MeasuredLine {
@@ -94,6 +94,10 @@ export function fillHeaderLayer(layer: HTMLElement, text: string, plain: boolean
 // spreading points evenly put only two or three inside a ramp, which quantised
 // its boundary by up to half a second and left a supposedly fixed ramp measuring
 // anything but.
+//
+// Both ramps are always positive: arm() drops any row that does not overflow,
+// travelEase adds a fixed overhead on top of the travel, and the clamp only ever
+// scales them by a positive factor. Nothing here has to divide by zero.
 function velocityEase(rampIn: number, rampOut: number): string {
   const cruise = 1 - rampIn - rampOut;
   const total = rampIn / 2 + cruise + rampOut / 2;
@@ -103,7 +107,7 @@ function velocityEase(rampIn: number, rampOut: number): string {
   };
 
   push(0, 0);
-  for (let step = 1; step <= EASE_STEPS && rampIn > 0; step += 1) {
+  for (let step = 1; step <= EASE_STEPS; step += 1) {
     const time = (step / EASE_STEPS) * rampIn;
     push(time, (time * time) / (2 * rampIn));
   }
@@ -112,11 +116,10 @@ function velocityEase(rampIn: number, rampOut: number): string {
   const beforeRampOut = rampIn / 2 + cruise;
   push(cruiseEnd, beforeRampOut);
 
-  for (let step = 1; step <= EASE_STEPS && rampOut > 0; step += 1) {
+  for (let step = 1; step <= EASE_STEPS; step += 1) {
     const into = (step / EASE_STEPS) * rampOut;
     push(cruiseEnd + into, beforeRampOut + into - (into * into) / (2 * rampOut));
   }
-  if (rampOut === 0) push(1, total);
 
   return `linear(${points.join(", ")})`;
 }
@@ -141,7 +144,7 @@ function travelEase(pureTravelMs: number): { duration: number; easing: string } 
 export class PictureInPictureHeaderMarquee {
   private readonly style: HTMLStyleElement;
   private armTimer: number | null = null;
-  private resizeTimer: number | null = null;
+  private rearmTimer: number | null = null;
   private keyframeSequence = 0;
   private isEnabled = true;
 
@@ -152,7 +155,17 @@ export class PictureInPictureHeaderMarquee {
   ) {
     this.style = pipWindow.document.createElement("style");
     pipWindow.document.head.appendChild(this.style);
-    pipWindow.addEventListener("resize", this.handleResize, { passive: true, signal });
+    pipWindow.addEventListener("resize", this.scheduleRearm, { passive: true, signal });
+    // A row is measured in whichever face is resolved at the time, and the window
+    // opens on the fallback while the webfont is still in flight. Getting that
+    // wrong is not cosmetic: a row measured as fitting is left with no attributes
+    // at all, so it stays hard clipped mid-glyph for the whole track. `ready`
+    // covers the case where the face landed before this ran and loadingdone has
+    // already been and gone.
+    pipWindow.document.fonts.addEventListener("loadingdone", this.scheduleRearm, { signal });
+    void pipWindow.document.fonts.ready.then(() => {
+      if (!signal.aborted) this.scheduleRearm();
+    });
   }
 
   setEnabled(enabled: boolean): void {
@@ -227,7 +240,7 @@ export class PictureInPictureHeaderMarquee {
 
   destroy(): void {
     this.clearArmTimer();
-    if (this.resizeTimer !== null) this.pipWindow.clearTimeout(this.resizeTimer);
+    if (this.rearmTimer !== null) this.pipWindow.clearTimeout(this.rearmTimer);
     this.style.remove();
   }
 
@@ -290,11 +303,13 @@ export class PictureInPictureHeaderMarquee {
     this.armTimer = null;
   }
 
-  private readonly handleResize = (): void => {
-    if (this.resizeTimer !== null) this.pipWindow.clearTimeout(this.resizeTimer);
-    this.resizeTimer = this.pipWindow.setTimeout(() => {
-      this.resizeTimer = null;
+  // Resizing and webfont loads both invalidate the measurement, and a burst of
+  // either should still cost one pass.
+  private readonly scheduleRearm = (): void => {
+    if (this.rearmTimer !== null) this.pipWindow.clearTimeout(this.rearmTimer);
+    this.rearmTimer = this.pipWindow.setTimeout(() => {
+      this.rearmTimer = null;
       this.arm();
-    }, RESIZE_DEBOUNCE);
+    }, REARM_DEBOUNCE);
   };
 }
