@@ -91,6 +91,34 @@
     "message": "Gulir otomatis lirik taksinkron",
     "description": "Auto-scroll unsynced lyrics setting label"
   },
+  "picture_in_picture_open": {
+    "message": "Buka lirik mengambang",
+    "description": "Accessible label for the dock action that opens the floating lyrics window"
+  },
+  "picture_in_picture_previous": {
+    "message": "Sebelumnya",
+    "description": "Accessible label for the previous track button in the Picture-in-Picture lyrics window, used when the YouTube Music player bar exposes no label of its own"
+  },
+  "picture_in_picture_play": {
+    "message": "Putar",
+    "description": "Accessible label for the play button in the Picture-in-Picture lyrics window, used when the YouTube Music player bar exposes no label of its own"
+  },
+  "picture_in_picture_pause": {
+    "message": "Jeda",
+    "description": "Accessible label for the pause button in the Picture-in-Picture lyrics window, used when the YouTube Music player bar exposes no label of its own"
+  },
+  "picture_in_picture_next": {
+    "message": "Selanjutnya",
+    "description": "Accessible label for the next track button in the Picture-in-Picture lyrics window, used when the YouTube Music player bar exposes no label of its own"
+  },
+  "options_display_pipAutoRestore": {
+    "message": "Buka kembali lirik mengambang otomatis",
+    "description": "Setting label for automatically reopening the floating lyrics window after page load"
+  },
+  "options_display_pipAutoRestoreTooltip": {
+    "message": "Mencegah jendela lirik mengambang tertutup permanen saat halaman dimuat ulang atau saat berpindah lagu maupun halaman. Karena keterbatasan browser, jendela akan dibuka kembali setelah klik atau penekanan tombol pertama, bukan secara langsung.",
+    "description": "Help tooltip explaining what automatic floating-lyrics reopening does and why it waits for the first interaction"
+  },
   "options_display_shadersPromo": {
     "message": "Buka tautan ke Better Lyrics Shaders",
     "description": "Toggle label for the Shaders companion link shown in the lyrics footer"
@@ -154,6 +182,10 @@
   "options_unisonModal_controlSource": {
     "message": "Pengubah sumber",
     "description": "Toggle label for showing the lyrics source switcher control in the dock"
+  },
+  "options_unisonModal_controlPictureInPicture": {
+    "message": "Jendela mengambang",
+    "description": "Toggle label for showing the control that opens the floating lyrics window in the dock"
   },
   "options_unisonModal_controlOffset": {
     "message": "Geseran sinkronisasi",
