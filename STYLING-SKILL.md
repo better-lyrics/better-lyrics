@@ -258,7 +258,9 @@ Lyric timing is driven by `element.animate()`.
 | `.blyrics--word` | Word span |
 | `.blyrics-word-highlight` | Real highlight overlay for long wrapped words |
 | `.blyrics-line-synced-word` | Zero-duration line-synced word; fades in without rich-sync swipe |
-| `.blyrics--active` | Currently selected for scrolling/current line state |
+| `.blyrics--active` | Line is selected for scrolling. Runs on the **scroll clock**, which leads audio by `--blyrics-scroll-timing-offset` (0.5s default) |
+| `.blyrics--animating` | Line's animations are live. Runs on the **audio clock**, so it survives until the line's last word actually finishes |
+| `.blyrics--paused` | Playback is paused; on the line and on each word. Use it to freeze theme-authored CSS animations |
 | `.blyrics-user-scrolling` | User is scrolling manually |
 | `.blyrics-rtl` | RTL language support |
 | `.blyrics--translated` | Translation text |
@@ -595,7 +597,13 @@ Target sustained notes for special effects:
 
 ### 15. Pause Behavior
 
-Playback pause is handled by pausing the active Web Animations API animations in JavaScript.
+Playback pause is handled by pausing the active Web Animations API animations in JavaScript. The engine also puts `.blyrics--paused` on the line and on each of its words, so theme-authored CSS animations and transitions can freeze in step:
+
+```css
+.blyrics--paused .my-shimmer {
+  animation-play-state: paused;
+}
+```
 
 ## Best Practices
 
@@ -608,7 +616,8 @@ Playback pause is handled by pausing the active Web Animations API animations in
 7. **Exclude translation/romanization** - `:not(.blyrics--translated):not(.blyrics--romanized)`
 8. **Handle user scroll** - `.blyrics-user-scrolling`
 9. **Prefer structural selectors** such as `.blyrics-line-main`, `.blyrics-word-group`, and data attributes; use `.blyrics--active` only for current-line affordances
-10. **Respect RTL inline flow** - do not force `.blyrics-bidi-sensitive .blyrics-word-group` or `.blyrics-bidi-sensitive .blyrics--word` back to `inline-block`; word wobble transforms should be treated as unavailable on RTL-sensitive rows
+10. **Pick the right clock** - `.blyrics--active` for anything tied to scrolling, `.blyrics--animating` for anything that must hold while a line is still being sung. Dimming past lines off `.blyrics--active` alone will dim them roughly half a second early
+11. **Respect RTL inline flow** - do not force `.blyrics-bidi-sensitive .blyrics-word-group` or `.blyrics-bidi-sensitive .blyrics--word` back to `inline-block`; word wobble transforms should be treated as unavailable on RTL-sensitive rows
 
 ## Do NOT Modify
 

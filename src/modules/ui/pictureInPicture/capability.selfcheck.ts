@@ -194,4 +194,29 @@ assert.equal(
   "Given stylesheet injection failure, When the partial window closes, Then state resets"
 );
 
+const unscriptableWindow = new FakeWindow();
+const unscriptableDependencies = createDependencies(
+  new FakeApi([Promise.resolve(unscriptableWindow)]),
+  () => Promise.resolve(".pip {}"),
+  () => undefined
+);
+const unscriptableController = new PictureInPictureController({
+  ...unscriptableDependencies,
+  observePageHide: () => {
+    throw new Error("Permission denied to access property 'addEventListener' on cross-origin object");
+  },
+});
+unscriptableController.toggle();
+await settle();
+assert.equal(
+  unscriptableWindow.closeCount,
+  1,
+  "Given a window this world cannot script, When observing it throws, Then the empty window closes"
+);
+assert.equal(
+  unscriptableController.isOpen(),
+  false,
+  "Given a window this world cannot script, When observing it throws, Then state resets so the next click retries"
+);
+
 console.log("Picture-in-Picture controller selfcheck passed");

@@ -33,20 +33,63 @@ body {
   background: transparent;
 }
 
-.blyrics-pip-shell::before {
-  content: "";
+/* Two stacked layers rather than one background image, because background-image
+   cannot be transitioned. The group opacity sits on the WRAPPER so the pair
+   composites exactly once: two layers at 55% each would read as 80% through the
+   middle of a swap, and fading one out as the other fades in would dip to the
+   bare canvas instead. So both layers stay fully opaque, ordered by z-index, and
+   only the incoming one animates, which is the same rule the artwork faces
+   follow. --blyrics-pip-art is still published for themes that read it. */
+.blyrics-pip-backdrop {
   position: fixed;
   z-index: -1;
   inset: 0;
-  background-image: var(--blyrics-pip-art);
-  background-position: center;
-  background-size: cover;
-  filter: blur(28px) saturate(1.5) brightness(0.4);
   opacity: 0.55;
+  pointer-events: none;
   transition: opacity 0.4s ease;
 }
 
+.blyrics-pip-backdrop__layer {
+  position: absolute;
+  inset: 0;
+  background-position: center;
+  background-size: cover;
+  opacity: 1;
+  filter: blur(28px) saturate(1.5) brightness(0.4);
+}
+
+/* Suppressed until the first real change of cover. The wash has nothing to cross
+   from when the window opens, so fading it up there reads as a load rather than
+   a transition. Script clears data-first in the same task as the data-front
+   flip, because any state change that makes this rule stop matching would
+   otherwise start the animation on whatever happened to be showing. */
+.blyrics-pip-backdrop[data-first="true"] .blyrics-pip-backdrop__layer {
+  animation: none;
+}
+
+.blyrics-pip-backdrop__layer[data-front="true"] {
+  z-index: 2;
+  animation: blyrics-pip-backdrop-in 620ms ease both;
+}
+
+.blyrics-pip-backdrop__layer[data-front="false"] {
+  z-index: 1;
+}
+
+@keyframes blyrics-pip-backdrop-in {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
 .blyrics-pip-artwork {
+  --blyrics-pip-artwork-radius: clamp(10px, 3vw, 18px);
+  --blyrics-pip-artwork-shadow: 0 10px 30px rgb(0 0 0 / 38%);
+
   position: relative;
   flex: 0 0 auto;
   width: min(34vw, calc(100vh - clamp(24px, 7vw, 40px)));
@@ -55,9 +98,36 @@ body {
   align-self: center;
   aspect-ratio: 1;
   overflow: hidden;
-  border-radius: clamp(10px, 3vw, 18px);
+  border-radius: var(--blyrics-pip-artwork-radius);
+  box-shadow: var(--blyrics-pip-artwork-shadow);
+}
+
+.blyrics-pip-artwork__card {
+  position: absolute;
+  z-index: 1;
+  inset: 0;
+}
+
+/* -- The no-dip rule ---------------------------------------------------------
+   Both faces stay permanently opaque and are ordered by z-index; only the
+   incoming face ever animates opacity, and it does so over a fully opaque
+   outgoing face. Cross-fading the two against each other is what exposes
+   whatever is beneath: at the midpoint two 50% layers composite to 0.75. */
+.blyrics-pip-artwork__face {
+  position: absolute;
+  overflow: hidden;
+  inset: 0;
+  border-radius: var(--blyrics-pip-artwork-radius);
   background: linear-gradient(145deg, #353538, #202023);
-  box-shadow: 0 10px 30px rgb(0 0 0 / 38%);
+  opacity: 1;
+}
+
+.blyrics-pip-artwork__face[data-front="true"] {
+  z-index: 2;
+}
+
+.blyrics-pip-artwork__face[data-front="false"] {
+  z-index: 1;
 }
 
 .blyrics-pip-artwork__placeholder,
@@ -76,23 +146,40 @@ body {
   opacity: 0.5;
 }
 
+/* Opacity alone will not keep the placeholder out from under a transition:
+   toggling an animation re-promotes the compositor layer and the gap paints
+   through. */
+.blyrics-pip-artwork[data-has-art="true"] .blyrics-pip-artwork__placeholder {
+  opacity: 0;
+}
+
+/* And its inverse: the placeholder paints before the image and neither is
+   z-indexed, so uncovering it is not enough to reveal it. */
+.blyrics-pip-artwork:not([data-has-art="true"]) .blyrics-pip-artwork__image {
+  opacity: 0;
+}
+
 .blyrics-pip-artwork__image {
   object-fit: cover;
-  opacity: 0;
-  transition: opacity 180ms ease;
 }
 
-.blyrics-pip-artwork__image[data-loaded="true"] {
-  opacity: 1;
-}
+/* The motion cover sits above both faces rather than inside one: it is always
+   cleared on a track change, so it never has to take part in a transition.
 
+   Gecko composites the video in its own layer and ignores the container's overflow clip, so the
+   radius has to sit on the video itself. The mask is not decorative: it is what makes that rounded
+   corner survive compositing. Without it the corners are square on Firefox even with the radius
+   set. `inherit` keeps the video matched to the container however the radius was set. */
 .blyrics-pip-artwork__video {
   position: absolute;
+  z-index: 3;
   inset: 0;
   width: 100%;
   height: 100%;
   object-fit: cover;
+  border-radius: inherit;
   opacity: 0;
+  mask-image: radial-gradient(#fff, #fff);
   pointer-events: none;
   transition: opacity 300ms ease;
 }
@@ -101,20 +188,29 @@ body {
   opacity: 1;
 }
 
+/* The 3D presets stop the slot clipping so the card can leave it, which also stops the slot
+   clipping this scrim, so it carries the radius itself. */
 .blyrics-pip-artwork__controls {
   position: absolute;
-  z-index: 1;
+  z-index: 4;
   inset: 0;
   display: flex;
   align-items: center;
   justify-content: space-evenly;
+  border-radius: inherit;
   background: rgb(0 0 0 / 48%);
   opacity: 0;
   pointer-events: none;
   transition: opacity 180ms ease;
 }
 
-.blyrics-pip-artwork:hover:not([data-controls-idle]) .blyrics-pip-artwork__controls {
+/* Suppressed mid-swap. The scrim is anchored to the slot while the card moves in 3D, so it cannot
+   follow the artwork; hovering during a transition would otherwise leave a square of black hanging
+   where the card no longer is. Moving it into the card is not the answer either, since it would
+   then flip away with the card. */
+.blyrics-pip-shell:not([data-running="true"])
+  .blyrics-pip-artwork:hover:not([data-controls-idle])
+  .blyrics-pip-artwork__controls {
   opacity: 1;
   pointer-events: auto;
 }
@@ -191,15 +287,19 @@ body {
   padding: 2px 4px 9px;
 }
 
+/* Each row is a clipping box holding two stacked layers, since the outgoing text
+   has to stay in the DOM for an exit animation to exist at all. That leaves the
+   row height no longer content-derived, so it is pinned to its own line box. */
 .blyrics-pip-header__title,
 .blyrics-pip-header__artist {
+  position: relative;
   margin: 0;
   overflow: hidden;
-  text-overflow: ellipsis;
   white-space: nowrap;
 }
 
 .blyrics-pip-header__title {
+  height: 1.25em;
   font-size: clamp(15px, 4.5vw, 21px);
   font-weight: 720;
   line-height: 1.25;
@@ -207,10 +307,115 @@ body {
 }
 
 .blyrics-pip-header__artist {
+  height: 1.3em;
   margin-top: 2px;
   color: rgb(255 255 255 / 62%);
   font-size: clamp(11px, 3.3vw, 14px);
   line-height: 1.3;
+}
+
+.blyrics-pip-line__layer {
+  position: absolute;
+  overflow: hidden;
+  inset: 0;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.blyrics-pip-line__layer[data-front="false"] {
+  opacity: 0;
+}
+
+/* text-overflow is ignored on an overflowing inline-block, so a row built out of
+   word boxes has no ellipsis to show. That is the trade rather than an
+   oversight: a real ellipsis needs one plain text node, and one text node rules
+   out per-word motion. The marquee is what replaces it, and only the plain
+   fallback that reduced motion drops to still truncates. */
+.blyrics-pip-line__scroll {
+  display: inline-block;
+  white-space: nowrap;
+}
+
+.blyrics-pip-line__unit {
+  display: inline-block;
+  white-space: pre;
+}
+
+/* -- Header marquee ----------------------------------------------------------
+   Registering these is what makes the whole thing work. A registered <length>
+   interpolates, so it can drive a gradient stop, where a raw mask-image would
+   jump between states instead of easing. And because they inherit, one animation
+   on the row drives both the scroller's transform and the row's own mask, in
+   sync by construction rather than by hand. */
+@property --blyrics-pip-marquee-shift {
+  syntax: "<length>";
+  inherits: true;
+  initial-value: 0px;
+}
+
+@property --blyrics-pip-marquee-fade-start {
+  syntax: "<length>";
+  inherits: true;
+  initial-value: 0px;
+}
+
+@property --blyrics-pip-marquee-fade-end {
+  syntax: "<length>";
+  inherits: true;
+  initial-value: 0px;
+}
+
+@property --blyrics-pip-marquee-alpha {
+  syntax: "<number>";
+  inherits: true;
+  initial-value: 1;
+}
+
+/* Armed one beat before the scroll starts, so the softened edge eases in against
+   still text rather than snapping into being the moment the row moves. Start and
+   end mean the start and end of the reading direction, which is why the only
+   thing RTL has to change is the direction of the gradient. */
+.blyrics-pip-line[data-overflows] {
+  --blyrics-pip-marquee-fade: 20px;
+  --blyrics-pip-marquee-fade-end: var(--blyrics-pip-marquee-fade);
+
+  transition:
+    --blyrics-pip-marquee-fade-start 620ms ease,
+    --blyrics-pip-marquee-fade-end 620ms ease;
+  mask-image: linear-gradient(
+    to right,
+    transparent 0,
+    #000 var(--blyrics-pip-marquee-fade-start),
+    #000 calc(100% - var(--blyrics-pip-marquee-fade-end)),
+    transparent 100%
+  );
+}
+
+.blyrics-pip-line[data-overflows][data-rtl="true"] {
+  mask-image: linear-gradient(
+    to left,
+    transparent 0,
+    #000 var(--blyrics-pip-marquee-fade-start),
+    #000 calc(100% - var(--blyrics-pip-marquee-fade-end)),
+    transparent 100%
+  );
+}
+
+.blyrics-pip-line[data-overflows] .blyrics-pip-line__scroll {
+  opacity: var(--blyrics-pip-marquee-alpha);
+  transform: translateX(var(--blyrics-pip-marquee-shift));
+}
+
+/* Only a hook: the keyframes themselves are generated per window, because every
+   phase but the travel is a fixed wall-clock duration. Written as percentages
+   the rests and the blink would stretch with the length of the title, so the
+   same gesture ran over a second behind a long one and a couple of frames behind
+   a short one. Only the travel should care how much text there is. */
+.blyrics-pip-line[data-marquee="read"] {
+  animation-duration: var(--blyrics-pip-marquee-cycle);
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+  animation-fill-mode: both;
 }
 
 .blyrics-pip-lyrics {
@@ -252,6 +457,7 @@ body {
 .blyrics-pip-lyrics .blyrics--romanized {
   font-size: var(--blyrics-translated-font-size);
   padding: 0.125rem 0.375rem;
+  border-radius: 0.375rem;
 }
 
 .blyrics-pip-lyrics .blyrics-container > div {
@@ -285,14 +491,485 @@ body {
   height: 1em;
 }
 
-.blyrics-pip-lyrics__status {
-  display: grid;
+.blyrics-pip-loader {
+  display: flex;
   min-height: 100%;
+  align-items: center;
+  justify-content: center;
+  gap: clamp(8px, 2.5vw, 12px);
+}
+
+.blyrics-pip-loader__mark {
+  flex: 0 0 auto;
+  width: clamp(14px, 4.5vw, 19px);
+  height: clamp(14px, 4.5vw, 19px);
+  background: url("https://betterlyrics.org/icon-512.png") 50% / cover;
+  animation: blyrics-spin 1.5s linear infinite;
+}
+
+.blyrics-pip-loader__label {
   margin: 0;
-  place-items: center start;
-  color: rgb(255 255 255 / 56%);
-  font-size: clamp(12px, 3.5vw, 16px);
+  background: var(--blyrics-shimmer-gradient) 0 0 / 200% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  font-size: clamp(10px, 2.4vw, 12px);
+  font-weight: 700;
   line-height: 1.4;
+  animation: blyrics-shimmer 3s linear infinite;
+}
+
+/* -- Artwork transition presets ----------------------------------------------
+   Every preset lives here rather than in script, so a theme can retune or
+   replace one without the extension shipping a new build. Script only writes
+   blyrics-pip-transition, data-running, data-artwork-flipped and data-front. */
+
+/* The two 3D presets move the card out of its slot, so the slot stops clipping
+   and hands the shadow to whichever face is currently in front. */
+.blyrics-pip-shell[blyrics-pip-transition="flip"] .blyrics-pip-artwork,
+.blyrics-pip-shell[blyrics-pip-transition="shuffle"] .blyrics-pip-artwork {
+  overflow: visible;
+  box-shadow: none;
+  perspective: 900px;
+}
+
+.blyrics-pip-shell[blyrics-pip-transition="flip"] .blyrics-pip-artwork__card,
+.blyrics-pip-shell[blyrics-pip-transition="shuffle"] .blyrics-pip-artwork__card {
+  transform-style: preserve-3d;
+}
+
+.blyrics-pip-shell[blyrics-pip-transition="flip"] .blyrics-pip-artwork__face[data-front="true"],
+.blyrics-pip-shell[blyrics-pip-transition="shuffle"] .blyrics-pip-artwork__face[data-front="true"] {
+  box-shadow: var(--blyrics-pip-artwork-shadow);
+}
+
+/* Mid-deal the two faces are separate cards in space, so the pile casts too. At
+   rest they are coincident and only the front one may, or the shadow doubles to
+   roughly 0.62 alpha and the square reads as dirty. */
+.blyrics-pip-shell[blyrics-pip-transition="shuffle"][data-running="true"] .blyrics-pip-artwork__face {
+  box-shadow: var(--blyrics-pip-artwork-shadow);
+}
+
+/* Preset: crossfade. The quiet one, and the closest to what shipped before. */
+.blyrics-pip-shell[blyrics-pip-transition="crossfade"][data-running="true"]
+  .blyrics-pip-artwork__face[data-front="true"] {
+  animation: blyrics-pip-settle-in 620ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.blyrics-pip-shell[blyrics-pip-transition="crossfade"][data-running="true"]
+  .blyrics-pip-artwork__face[data-front="false"] {
+  animation: blyrics-pip-settle-out 620ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@keyframes blyrics-pip-settle-in {
+  from {
+    transform: scale(1.06);
+    opacity: 0;
+  }
+
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes blyrics-pip-settle-out {
+  from {
+    transform: scale(1);
+  }
+
+  to {
+    transform: scale(0.97);
+  }
+}
+
+/* Preset: push. The incoming face already carries the square's radius, so a
+   rounded card edge rides over the old cover and then sits flush. */
+.blyrics-pip-shell[blyrics-pip-transition="push"][data-running="true"] .blyrics-pip-artwork__face[data-front="true"] {
+  animation: blyrics-pip-push-in 620ms cubic-bezier(0.4, 0.02, 0.2, 1);
+}
+
+.blyrics-pip-shell[blyrics-pip-transition="push"][data-running="true"] .blyrics-pip-artwork__face[data-front="false"] {
+  animation: blyrics-pip-push-out 620ms cubic-bezier(0.4, 0.02, 0.2, 1);
+}
+
+@keyframes blyrics-pip-push-in {
+  from {
+    transform: translateX(104%);
+    box-shadow: -18px 0 34px rgb(0 0 0 / 62%);
+  }
+
+  90% {
+    box-shadow: -18px 0 34px rgb(0 0 0 / 62%);
+  }
+
+  to {
+    transform: translateX(0);
+    box-shadow: -18px 0 34px rgb(0 0 0 / 0%);
+  }
+}
+
+@keyframes blyrics-pip-push-out {
+  from {
+    transform: translateX(0);
+  }
+
+  to {
+    transform: translateX(-34%);
+  }
+}
+
+/* Preset: flip. linear() is sampled from a real spring (damping 0.68): it
+   overshoots 9.6 degrees past 180, returns, and has one small secondary settle.
+   Being a transition rather than a keyframe, it is also the only preset that
+   re-targets gracefully when a swap interrupts it. */
+.blyrics-pip-shell[blyrics-pip-transition="flip"] .blyrics-pip-artwork__card {
+  transition: transform 820ms;
+
+  /* Bezier first, so engines without linear() still get an overshoot. */
+  transition-timing-function: cubic-bezier(0.28, 1.3, 0.5, 1);
+  transition-timing-function: linear(
+    0,
+    0.0591,
+    0.197,
+    0.3672,
+    0.5384,
+    0.6914,
+    0.8169,
+    0.9122,
+    0.979,
+    1.0214,
+    1.0445,
+    1.0535,
+    1.0531,
+    1.0471,
+    1.0384,
+    1.0289,
+    1.0201,
+    1.0126,
+    1.0068,
+    1.0025,
+    0.9997,
+    0.998,
+    0.9972,
+    0.9971,
+    1
+  );
+}
+
+/* The flipped attribute cannot be withheld to silence the first cover: the back
+   face below is statically rotated, so the card must reach 180 for it to show at
+   all. Script sets this, writes the flip, reflows and clears it. !important
+   because a theme retuning the preset would otherwise tie and win on order. */
+.blyrics-pip-shell[data-artwork-instant] .blyrics-pip-artwork__card {
+  transition: none !important;
+}
+
+.blyrics-pip-shell[blyrics-pip-transition="flip"] .blyrics-pip-artwork__face {
+  backface-visibility: hidden;
+}
+
+.blyrics-pip-shell[blyrics-pip-transition="flip"] .blyrics-pip-artwork__face:nth-child(2) {
+  transform: rotateY(180deg);
+}
+
+.blyrics-pip-shell[blyrics-pip-transition="flip"][data-artwork-flipped="true"] .blyrics-pip-artwork__card {
+  transform: rotateY(180deg);
+}
+
+/* Preset: shuffle. Only the incoming card moves; the outgoing one is the pile,
+   sitting still and fully opaque underneath, so the slot is covered at every
+   frame and the deal needs no opacity ramp at all. */
+.blyrics-pip-shell[blyrics-pip-transition="shuffle"][data-running="true"] .blyrics-pip-artwork__card {
+  animation: blyrics-pip-dolly-deal 980ms both;
+}
+
+.blyrics-pip-shell[blyrics-pip-transition="shuffle"][data-running="true"] .blyrics-pip-artwork__face[data-front="true"] {
+  animation: blyrics-pip-deal-in 980ms both;
+}
+
+/* Held off-frame, then one continuous decelerating segment into place. The hold
+   costs nothing because the card is outside the window while it happens, so
+   there is no visible stop-start. */
+@keyframes blyrics-pip-deal-in {
+  0%,
+  16% {
+    transform: translate(-124%, -76%) rotate(-10deg);
+    animation-timing-function: cubic-bezier(0.24, 0.64, 0.22, 1);
+  }
+
+  64%,
+  100% {
+    transform: translate(0, 0) rotate(0deg);
+  }
+}
+
+/* Per-keyframe timing so the far point is a deliberate dwell rather than the
+   zero-velocity stutter one curve across a there-and-back would give. The card
+   lands inside the dwell. */
+@keyframes blyrics-pip-dolly-deal {
+  0% {
+    transform: translateZ(0) rotateY(0deg);
+    animation-timing-function: cubic-bezier(0.4, 0, 0.34, 1);
+  }
+
+  44% {
+    transform: translateZ(-190px) rotateY(-15deg);
+    animation-timing-function: linear;
+  }
+
+  68% {
+    transform: translateZ(-190px) rotateY(-15deg);
+    animation-timing-function: cubic-bezier(0.32, 0, 0.2, 1);
+  }
+
+  100% {
+    transform: translateZ(0) rotateY(0deg);
+  }
+}
+
+/* -- Text transition presets -------------------------------------------------
+   Same contract as the artwork: script writes blyrics-pip-text-transition and
+   data-swapping and nothing else, so the shapes stay retunable from a theme.
+   The header runs on its own flag because it changes on the song, while the
+   artwork changes later, once its cover has decoded. */
+/* The outgoing layer is invisible at rest and has to come back for the length of
+   the swap, or there is nothing on screen for its exit to animate. */
+.blyrics-pip-line[data-swapping="true"] .blyrics-pip-line__layer[data-front="false"] {
+  opacity: 1;
+}
+
+/* Preset: spring words. Each word rises into place on a sampled spring, stepped
+   along the row, with the artist trailing the title by one delay. */
+.blyrics-pip-shell[blyrics-pip-text-transition="spring"] .blyrics-pip-line[data-swapping="true"]
+  .blyrics-pip-line__layer[data-front="true"]
+  .blyrics-pip-line__unit {
+  animation: blyrics-pip-text-rise-in 620ms cubic-bezier(0.28, 1.3, 0.5, 1) both;
+
+  /* Bezier first, so engines without linear() still get an overshoot. */
+  animation-timing-function: linear(
+    0,
+    0.0591,
+    0.197,
+    0.3672,
+    0.5384,
+    0.6914,
+    0.8169,
+    0.9122,
+    0.979,
+    1.0214,
+    1.0445,
+    1.0535,
+    1.0531,
+    1.0471,
+    1.0384,
+    1.0289,
+    1.0201,
+    1.0126,
+    1.0068,
+    1.0025,
+    0.9997,
+    0.998,
+    0.9972,
+    0.9971,
+    1
+  );
+
+  /* Last, because the shorthand above resets the delay to zero. */
+  animation-delay: calc(var(--blyrics-pip-line-delay, 0ms) + var(--blyrics-pip-unit-index, 0) * 45ms);
+}
+
+.blyrics-pip-shell[blyrics-pip-text-transition="spring"] .blyrics-pip-line[data-swapping="true"]
+  .blyrics-pip-line__layer[data-front="false"]
+  .blyrics-pip-line__unit {
+  animation: blyrics-pip-text-rise-out 380ms cubic-bezier(0.32, 0, 0.2, 1) both;
+  animation-delay: calc(var(--blyrics-pip-line-delay, 0ms) + var(--blyrics-pip-unit-index, 0) * 22.5ms);
+}
+
+@keyframes blyrics-pip-text-rise-in {
+  from {
+    transform: translateY(100%);
+    opacity: 0;
+  }
+
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes blyrics-pip-text-rise-out {
+  from {
+    transform: translateY(0);
+    opacity: 1;
+  }
+
+  to {
+    transform: translateY(-100%);
+    opacity: 0;
+  }
+}
+
+/* Preset: push and blur. Travels the same direction as the artwork push, which
+   is physical rather than reading-order, since the artwork slot is always on the
+   same side whatever the script. */
+.blyrics-pip-shell[blyrics-pip-text-transition="push"] .blyrics-pip-line[data-swapping="true"]
+  .blyrics-pip-line__layer[data-front="true"] {
+  animation: blyrics-pip-text-push-in 460ms cubic-bezier(0.4, 0.02, 0.2, 1) both;
+  animation-delay: var(--blyrics-pip-line-delay, 0ms);
+}
+
+.blyrics-pip-shell[blyrics-pip-text-transition="push"] .blyrics-pip-line[data-swapping="true"]
+  .blyrics-pip-line__layer[data-front="false"] {
+  animation: blyrics-pip-text-push-out 460ms cubic-bezier(0.4, 0.02, 0.2, 1) both;
+  animation-delay: var(--blyrics-pip-line-delay, 0ms);
+}
+
+@keyframes blyrics-pip-text-push-in {
+  from {
+    transform: translateX(28px);
+    opacity: 0;
+    filter: blur(6px);
+  }
+
+  to {
+    transform: translateX(0);
+    opacity: 1;
+    filter: blur(0);
+  }
+}
+
+@keyframes blyrics-pip-text-push-out {
+  from {
+    transform: translateX(0);
+    opacity: 1;
+    filter: blur(0);
+  }
+
+  to {
+    transform: translateX(-28px);
+    opacity: 0;
+    filter: blur(6px);
+  }
+}
+
+/* Preset: crossfade. Also what reduced motion collapses the other two to. */
+.blyrics-pip-shell[blyrics-pip-text-transition="crossfade"] .blyrics-pip-line[data-swapping="true"]
+  .blyrics-pip-line__layer[data-front="true"] {
+  animation: blyrics-pip-text-fade-in 300ms ease both;
+  animation-delay: var(--blyrics-pip-line-delay, 0ms);
+}
+
+.blyrics-pip-shell[blyrics-pip-text-transition="crossfade"] .blyrics-pip-line[data-swapping="true"]
+  .blyrics-pip-line__layer[data-front="false"] {
+  animation: blyrics-pip-text-fade-out 300ms ease both;
+  animation-delay: var(--blyrics-pip-line-delay, 0ms);
+}
+
+/* A correction, as opposed to a song change: the same crossfade for every preset,
+   because a later, fuller byline is new information rather than a new track. It
+   must still be seen arriving, so it is never a silent swap. */
+.blyrics-pip-line[data-correcting="true"] .blyrics-pip-line__layer[data-front="true"] {
+  animation: blyrics-pip-text-fade-in 260ms ease both;
+}
+
+.blyrics-pip-line[data-correcting="true"] .blyrics-pip-line__layer[data-front="false"] {
+  animation: blyrics-pip-text-fade-out 260ms ease both;
+}
+
+@keyframes blyrics-pip-text-fade-in {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes blyrics-pip-text-fade-out {
+  from {
+    opacity: 1;
+  }
+
+  to {
+    opacity: 0;
+  }
+}
+
+/* -- Reduced motion ----------------------------------------------------------
+   Every preset collapses to a plain opacity crossfade with no scale, translate
+   or rotation. Deliberately not the crossfade preset: that one carries a 1.06
+   scale settle, which is still motion and is exactly what was opted out of. */
+@media (prefers-reduced-motion: reduce) {
+  /* The header falls all the way back to what shipped before the marquee: a real
+     ellipsis and a plain crossfade. Script has to rebuild the rows as single
+     text nodes to go with this, since no rule can undo the word boxes and
+     text-overflow does not apply to them. */
+  .blyrics-pip-line {
+    animation: none !important;
+    mask-image: none !important;
+  }
+
+  .blyrics-pip-line[data-overflows] {
+    transition: none !important;
+  }
+
+  .blyrics-pip-line__scroll,
+  .blyrics-pip-line__unit {
+    animation: none !important;
+    transform: none !important;
+    opacity: 1 !important;
+  }
+
+  .blyrics-pip-line[data-swapping="true"] .blyrics-pip-line__layer[data-front="true"] {
+    animation: blyrics-pip-text-fade-in 240ms ease both !important;
+  }
+
+  .blyrics-pip-line[data-swapping="true"] .blyrics-pip-line__layer[data-front="false"] {
+    animation: blyrics-pip-text-fade-out 240ms ease both !important;
+  }
+
+  .blyrics-pip-artwork {
+    perspective: none !important;
+  }
+
+  /* transform-style has to be flattened, not just the transforms zeroed. Two
+     faces with transform: none inside a preserve-3d context are coplanar at
+     z=0, sorting between coplanar elements in a 3D rendering context is
+     undefined, and z-index stops governing. That z-fight reads as the
+     placeholder flashing through. */
+  .blyrics-pip-artwork__card {
+    transform-style: flat !important;
+  }
+
+  .blyrics-pip-artwork__card,
+  .blyrics-pip-artwork__face {
+    transition: none !important;
+    animation: none !important;
+    transform: none !important;
+    backface-visibility: visible !important;
+  }
+
+  .blyrics-pip-shell[data-running="true"] .blyrics-pip-artwork__face[data-front="true"] {
+    animation: blyrics-pip-fade-plain 260ms ease !important;
+  }
+
+  /* The backdrop crossfade is plain opacity with nothing moving, so it stays,
+     just shortened to match the artwork. */
+  .blyrics-pip-backdrop__layer[data-front="true"] {
+    animation-duration: 260ms !important;
+  }
+}
+
+@keyframes blyrics-pip-fade-plain {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
 }
 
 @media (max-height: 130px) {
@@ -302,9 +979,10 @@ body {
   }
 
   .blyrics-pip-artwork {
+    --blyrics-pip-artwork-radius: 9px;
+
     width: calc(100vh - 16px);
     min-width: 64px;
-    border-radius: 9px;
   }
 
   .blyrics-pip-header {

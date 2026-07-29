@@ -35,7 +35,7 @@ import { AppState } from "@core/appState";
 import { t } from "@core/i18n";
 import { disconnectResizeObserver, WORD_HIGHLIGHT_CLASS } from "@modules/lyrics/injectLyrics";
 import type { ThumbnailElement } from "@modules/lyrics/requestSniffer/NextResponse";
-import { getSongMetadata } from "@modules/lyrics/requestSniffer/requestSniffer";
+import { getArtworkMetadata } from "@modules/lyrics/requestSniffer/requestSniffer";
 import {
   animEngineState,
   getResumeScrollElement,
@@ -121,7 +121,7 @@ function thumbnailUrlFor(videoId: string): string {
 }
 
 async function resolveArtworkUrl(videoId: string): Promise<string> {
-  const sniffed = await getSongMetadata(videoId);
+  const sniffed = await getArtworkMetadata(videoId);
   if (sniffed?.thumbnail?.url) return getHighResImageUrl(sniffed.thumbnail);
 
   const ytImg = document.querySelector<HTMLImageElement>("#thumbnail>#img");

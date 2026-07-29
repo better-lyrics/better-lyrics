@@ -623,7 +623,7 @@ export async function initStoreUI(): Promise<void> {
   setupKeyboardListeners();
 
   await Promise.all([loadUserRatings(), loadUserInstalls()]);
-  setTimeout(checkForThemeUpdates, 500);
+  setTimeout(checkForThemeUpdatesIfDue, 500);
 }
 
 export async function initMarketplaceUI(): Promise<void> {
@@ -1102,6 +1102,28 @@ async function refreshMarketplace(): Promise<void> {
   setSentinelVisible(false);
   resetFilters();
   await loadMarketplace();
+}
+
+const THEME_UPDATE_CHECK_KEY = "lastThemeUpdateCheck";
+const THEME_UPDATE_CHECK_INTERVAL_MS = 15 * 60 * 1000;
+
+/**
+ * A full check costs one request per registry theme, so opening the popup
+ * repeatedly should not re-run it. The background alarm covers the long tail.
+ */
+async function checkForThemeUpdatesIfDue(): Promise<void> {
+  try {
+    const stored = await getLocalStorage<{ [THEME_UPDATE_CHECK_KEY]?: number }>([THEME_UPDATE_CHECK_KEY]);
+    const lastCheck = stored[THEME_UPDATE_CHECK_KEY] ?? 0;
+    if (Date.now() - lastCheck < THEME_UPDATE_CHECK_INTERVAL_MS) return;
+
+    await chrome.storage.local.set({ [THEME_UPDATE_CHECK_KEY]: Date.now() });
+  } catch (err) {
+    console.warn(LOG_PREFIX_STORE, "Update check throttle failed:", err);
+    return;
+  }
+
+  await checkForThemeUpdates();
 }
 
 async function checkForThemeUpdates(): Promise<void> {

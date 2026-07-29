@@ -25,6 +25,9 @@ interface Options {
   isStylizedAnimationsEnabled: boolean;
   isPassiveScrollEnabled: boolean;
   isPictureInPictureAutoRestoreEnabled: boolean;
+  pipArtworkTransition: string;
+  pipTextTransition: string;
+  pipMarqueeEnabled: boolean;
   isTranslateEnabled: boolean;
   translationLanguage: string;
   isCursorAutoHideEnabled: boolean;
@@ -83,6 +86,9 @@ const getOptionsFromForm = (): Options => {
     isPictureInPictureAutoRestoreEnabled: (
       document.getElementById("isPictureInPictureAutoRestoreEnabled") as HTMLInputElement
     ).checked,
+    pipArtworkTransition: (document.getElementById("pipArtworkTransition") as HTMLSelectElement).value,
+    pipTextTransition: (document.getElementById("pipTextTransition") as HTMLSelectElement).value,
+    pipMarqueeEnabled: (document.getElementById("pipMarqueeEnabled") as HTMLInputElement).checked,
     isTranslateEnabled: (document.getElementById("translate") as HTMLInputElement).checked,
     translationLanguage: (document.getElementById("translationLanguage") as HTMLInputElement).value,
     isCursorAutoHideEnabled: (document.getElementById("cursorAutoHide") as HTMLInputElement).checked,
@@ -266,6 +272,9 @@ const restoreOptions = (): void => {
     isStylizedAnimationsEnabled: true,
     isPassiveScrollEnabled: true,
     isPictureInPictureAutoRestoreEnabled: false,
+    pipArtworkTransition: "shuffle",
+    pipTextTransition: "spring",
+    pipMarqueeEnabled: true,
     isTranslateEnabled: false,
     translationLanguage: "en",
     isRomanizationEnabled: false,
@@ -327,6 +336,7 @@ const restoreOptions = (): void => {
 
   document.getElementById("clear-cache")!.addEventListener("click", () => clearTransientLyrics());
   setupUnisonActionsModal();
+  initPictureInPictureModal();
   initOffsetModal();
 };
 
@@ -343,6 +353,9 @@ const setOptionsInForm = (items: Options): void => {
   (document.getElementById("isPassiveScrollEnabled") as HTMLInputElement).checked = items.isPassiveScrollEnabled;
   (document.getElementById("isPictureInPictureAutoRestoreEnabled") as HTMLInputElement).checked =
     items.isPictureInPictureAutoRestoreEnabled;
+  (document.getElementById("pipArtworkTransition") as HTMLSelectElement).value = items.pipArtworkTransition;
+  (document.getElementById("pipTextTransition") as HTMLSelectElement).value = items.pipTextTransition;
+  (document.getElementById("pipMarqueeEnabled") as HTMLInputElement).checked = items.pipMarqueeEnabled;
   (document.getElementById("translate") as HTMLInputElement).checked = items.isTranslateEnabled;
   (document.getElementById("translationLanguage") as HTMLInputElement).value = items.translationLanguage;
   (document.getElementById("isRomanizationEnabled") as HTMLInputElement).checked = items.isRomanizationEnabled;
@@ -1532,6 +1545,29 @@ function setOffsetDisplay(id: string, value: number): void {
   if (input) input.value = String(value);
   const display = document.querySelector<HTMLElement>(`.offset-stepper__value[data-for="${id}"]`);
   if (display) display.textContent = formatOffsetDisplay(value);
+}
+
+// The controls live outside #options, so the blanket change listener over that
+// subtree does not reach them and each one is bound here instead.
+function initPictureInPictureModal(): void {
+  const openBtn = document.getElementById("pip-settings-btn");
+  const overlay = document.getElementById("pip-modal-overlay");
+  const closeBtn = document.getElementById("pip-modal-close");
+  if (!openBtn || !overlay || !closeBtn) return;
+
+  const close = (): void => overlay.classList.remove("active");
+  openBtn.addEventListener("click", () => overlay.classList.add("active"));
+  closeBtn.addEventListener("click", close);
+  overlay.addEventListener("click", event => {
+    if (event.target === overlay) close();
+  });
+  document.addEventListener("keydown", event => {
+    if (event.key === "Escape" && overlay.classList.contains("active")) close();
+  });
+
+  for (const control of overlay.querySelectorAll("input, select")) {
+    control.addEventListener("change", saveOptions);
+  }
 }
 
 function initOffsetModal(): void {

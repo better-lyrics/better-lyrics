@@ -8,6 +8,50 @@ export interface DocumentPictureInPicture<TWindow = Window> {
   requestWindow(options: DocumentPictureInPictureWindowOptions): Promise<TWindow>;
 }
 
+// The view runs in whichever world owns the Picture-in-Picture window. Firefox content scripts get
+// a cross-origin wrapper on that window, so on Gecko it runs in the MAIN world where chrome.* and
+// the ISOLATED module singletons are out of reach; both are supplied through here instead.
+// Narrowed to what the view reads, so the MAIN world can satisfy it from a serialized bridge
+// payload rather than the full sniffed record.
+export interface PictureInPictureSongMetadata {
+  readonly displayTitle: string;
+  readonly displayByline: string;
+  readonly artist: string;
+  readonly thumbnail?: { readonly url: string };
+}
+
+export interface PictureInPictureViewDependencies {
+  readonly translate: (key: string) => string;
+  readonly getArtworkMetadata: (
+    videoId: string,
+    maxCheckCount?: number,
+    signal?: AbortSignal
+  ) => Promise<PictureInPictureSongMetadata | null>;
+  readonly resetScrollResume: () => void;
+}
+
+export interface PictureInPictureToggle {
+  isSupported(): boolean;
+  isOpen(): boolean;
+  toggle(): void;
+}
+
+export interface PictureInPictureHostEnvironment {
+  readonly view: PictureInPictureViewDependencies;
+  // Read per sync tick rather than passed once, so a change to the setting reaches a window that is
+  // already open without either world needing its own update channel. The view validates them.
+  readonly artworkTransition: () => unknown;
+  readonly textTransition: () => unknown;
+  readonly marqueeEnabled: () => unknown;
+  readonly windowTitle: () => string;
+  readonly stylesheetUrls: () => { readonly lyrics: string; readonly fonts: readonly string[] };
+  readonly loadStylesheet: () => Promise<string>;
+  readonly injectStylesheet: (pipWindow: Window, stylesheet: string) => void;
+  readonly onOpened: () => void;
+  readonly onClosed: () => void;
+  readonly reportFailure: (message: string, error: unknown) => void;
+}
+
 export interface PictureInPictureControllerDependencies<TWindow> {
   readonly host: object;
   readonly loadStylesheet: () => Promise<string>;

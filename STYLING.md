@@ -242,7 +242,7 @@ Animation effect flags use `1`/`0` values:
 | `--blyrics-animate-scroll` | `1` | Enable smooth WAAPI scroll animation |
 | `--blyrics-animate-instrumental` | `1` | Enable instrumental fill travel, wave flattening, and wave oscillation |
 
-The default CSS includes a `prefers-reduced-motion: reduce` block that disables the vestibular triggers — zoom-on-active line scale, translateX word wobble, and instrumental fill / wave motion — and flattens the active/inactive scale delta to `1`. Smooth scroll remains enabled as the position indicator for synced lyrics, but the engine suppresses side-specific line-scroll differential effects so every visible line uses the shared scroll duration, easing, and offsets. The karaoke gradient swipe on richsync lyrics and the highlight glow stay on because they are gradient / drop-shadow fills rather than movement; and the line-synced highlight fade-in / highlight fade-out are opacity transitions, not motion.
+The default CSS includes a `prefers-reduced-motion: reduce` block that disables the vestibular triggers (zoom-on-active line scale, translateX word wobble, and instrumental fill / wave motion) and flattens the active/inactive scale delta to `1`. Smooth scroll remains enabled as the position indicator for synced lyrics, but the engine suppresses side-specific line-scroll differential effects so every visible line uses the shared scroll duration, easing, and offsets. The karaoke gradient swipe on richsync lyrics and the highlight glow stay on because they are gradient / drop-shadow fills rather than movement; and the line-synced highlight fade-in / highlight fade-out are opacity transitions, not motion.
 
 Scroll smoothing uses per-line `translate` animations. When the lyrics pane autoscrolls, JS finds the lyric lines visible in the previous or current viewport and sets input variables on those lines: `--blyrics-line-scroll-relative-index` (`0` active, positive below, negative above), `--blyrics-line-scroll-abs-relative-index`, `--blyrics-line-scroll-side`, `--blyrics-line-scroll-delta-px`, and `--blyrics-line-scroll-distance-px`. Visible lyric lines also receive inline `will-change: transform, translate` so text rasterization does not shift when a scroll animation starts.
 
@@ -573,6 +573,32 @@ When a lyric becomes active, the line gets `.blyrics--active` for current-line s
 The scale animation uses `--blyrics-scale`, `--blyrics-active-scale`, and `--blyrics-scale-transition-duration`. Lyric timing is managed by the Web Animations API.
 
 > **Important:** Prefer styling stable structure classes and data attributes. The extension may select multiple nearby lines for scrolling, so avoid assumptions that exactly one `.blyrics--active` line exists.
+
+#### Two clocks: `.blyrics--active` vs `.blyrics--animating`
+
+A line carries two independent state classes, and they do **not** open and close together.
+
+| Class | Clock | Window |
+| ----- | ----- | ------ |
+| `.blyrics--active` | Scroll clock: audio time plus `--blyrics-scroll-timing-offset` (0.5s default) | Opens `--blyrics-early-scroll-consider-s` before the line, closes when the scroll target moves on |
+| `.blyrics--animating` | Audio clock | Opens ~2s before the line so animations can be prepared, closes only once the line's own words have finished |
+| `.blyrics--paused` | Play state | Present on the line and on each of its words whenever playback is paused. Lets theme-authored CSS animations freeze alongside the engine's `element.animate()` pause |
+
+Because the scroll clock deliberately runs ahead of the audio, `.blyrics--active` is dropped roughly half a second **before** a line stops being sung. Anything that dims, blurs, or shrinks previous lines should account for that:
+
+```css
+/* dims the previous line while its last word is still playing */
+.blyrics-container > div:not(.blyrics--active) {
+  opacity: 0.33;
+}
+
+/* keeps it lit until the line is genuinely done */
+.blyrics-container > div.blyrics--animating {
+  opacity: 1;
+}
+```
+
+Use `.blyrics--active` for scroll-anchored affordances (which line is centered, cursor, hit targets) and `.blyrics--animating` for anything that must survive until the singing stops.
 
 ### Styling Each Word
 

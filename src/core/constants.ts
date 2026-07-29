@@ -5,6 +5,8 @@ export const TAB_HEADER_CLASS = "tab-header style-scope ytmusic-player-page" as 
 export const TAB_CONTENT_CLASS = "tab-content style-scope tp-yt-paper-tab" as const;
 export const LYRICS_CLASS = "blyrics-container" as const;
 export const CURRENT_LYRICS_CLASS = "blyrics--active" as const;
+export const ANIMATING_CLASS = "blyrics--animating" as const;
+export const PAUSED_CLASS = "blyrics--paused" as const;
 export const ZERO_DURATION_ANIMATION_CLASS = "blyrics-zero-dur-animate" as const;
 export const RTL_CLASS = "blyrics-rtl" as const;
 export const WORD_CLASS = "blyrics--word" as const;
@@ -27,6 +29,8 @@ export const NO_LYRICS_TEXT_SELECTOR =
   "#tab-renderer > ytmusic-message-renderer > yt-formatted-string.text.style-scope.ytmusic-message-renderer" as const;
 export const FULLSCREEN_BUTTON_SELECTOR = ".fullscreen-button" as const;
 export const SHADERS_DETECTION_SELECTOR = '[id^="better-lyrics-kawarp-"]' as const;
+export const MINI_PLAYER_BUTTON_SELECTOR = ".player-minimize-button" as const;
+export const PICTURE_IN_PICTURE_TOGGLE_SELECTOR = "[data-blyrics-picture-in-picture-toggle]" as const;
 
 // DOM IDs and Attributes
 export const LYRICS_LOADER_ID = "blyrics-loader" as const;
@@ -128,33 +132,8 @@ export const AUTH_PORT_NAME_PREFIX = "bl-auth-popup:" as const;
 
 export const BL_AUTH_SITE_PORT_NAME = "bl-auth-site" as const;
 
-export interface AuthPartner {
-  id: string;
-  origin: string;
-  iconUrl: string | null;
-}
-
-const AUTH_PARTNER_METADATA: Record<string, Pick<AuthPartner, "id" | "iconUrl">> = {
-  "https://unison.boidu.dev": { id: "unison", iconUrl: null },
-  "https://blrcunison.vercel.app": { id: "blrcunison", iconUrl: "https://blrcunison.vercel.app/logo_mono.svg" },
-};
-
-const AUTH_PARTNERS: readonly AuthPartner[] = (chrome.runtime.getManifest().externally_connectable?.matches ?? [])
-  .map(match => match.replace(/\/\*$/, ""))
-  .map(origin => ({
-    origin,
-    id: AUTH_PARTNER_METADATA[origin]?.id ?? origin,
-    iconUrl: AUTH_PARTNER_METADATA[origin]?.iconUrl ?? null,
-  }));
-
-export function getAuthPartnerByOrigin(origin: string | undefined): AuthPartner | undefined {
-  if (!origin) return undefined;
-  return AUTH_PARTNERS.find(p => p.origin === origin);
-}
-
-export function isAllowedAuthOrigin(origin: string | undefined): boolean {
-  return getAuthPartnerByOrigin(origin) !== undefined;
-}
+// Auth partner resolution lives in @modules/auth/partners: it needs chrome.runtime, and this module
+// is imported by page-world code that has none.
 
 // Initialization and General Logs
 export const INITIALIZE_LOG =
