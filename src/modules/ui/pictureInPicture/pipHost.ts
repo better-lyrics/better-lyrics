@@ -7,6 +7,31 @@ import type { PictureInPictureHostEnvironment } from "./types";
 const CUSTOM_STYLE_ID = "blyrics-custom-style";
 const PIP_OPEN_ATTRIBUTE = "blyrics-pip-open";
 
+// Gecko ignores @property in a stylesheet that is cross-origin to the document, and ours are served
+// from moz-extension:// into a window of the page's own origin. An unregistered custom property
+// interpolates discretely, so the marquee snapped straight to its end offset and the highlight swipe
+// stepped instead of sweeping. Mirrors of the declarations in picture-in-picture.css and lyrics.css;
+// Chromium has already registered them from those sheets, where re-registering throws and is skipped.
+const ANIMATABLE_PROPERTIES: readonly PropertyDefinition[] = [
+  { name: "--blyrics-pip-marquee-shift", syntax: "<length>", inherits: true, initialValue: "0px" },
+  { name: "--blyrics-pip-marquee-fade-start", syntax: "<length>", inherits: true, initialValue: "0px" },
+  { name: "--blyrics-pip-marquee-fade-end", syntax: "<length>", inherits: true, initialValue: "0px" },
+  { name: "--blyrics-pip-marquee-alpha", syntax: "<number>", inherits: true, initialValue: "1" },
+  { name: "--lyric-transition-amount-start", syntax: "<number>", inherits: false, initialValue: "-0.2" },
+  { name: "--lyric-transition-amount-end", syntax: "<number>", inherits: false, initialValue: "-0.1" },
+];
+
+function registerAnimatableProperties(pipWindow: Window): void {
+  const { CSS: pipCss } = pipWindow as Window & typeof globalThis;
+  for (const definition of ANIMATABLE_PROPERTIES) {
+    try {
+      pipCss.registerProperty(definition);
+    } catch {
+      // Already registered from the stylesheet. Expected on Chromium, and on a reopened window.
+    }
+  }
+}
+
 // Everything here touches only the page document and the Picture-in-Picture document, so it runs
 // unchanged in either world. Extension APIs and the ISOLATED module singletons arrive through the
 // environment, which is the only thing that differs between the two callers.
@@ -100,6 +125,7 @@ export function createPictureInPictureHost(
     document.documentElement.setAttribute(PIP_OPEN_ATTRIBUTE, "");
     environment.onOpened();
     pipWindow.document.title = environment.windowTitle();
+    registerAnimatableProperties(pipWindow);
     injectLyricStyles(pipWindow);
     mirrorCustomTheme(pipWindow);
     activeView = new PictureInPictureLyricsView(pipWindow, document, environment.view);
