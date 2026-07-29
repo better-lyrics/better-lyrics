@@ -884,7 +884,10 @@ function startWordAnimations(
   resetPartAnimations(part);
 
   const rawElapsedMs = (currentTime - part.time) * 1000;
-  const timedDurationMs = part.duration * 1000;
+  // Providers do ship words that end before they start: one -0.01s word in a Musixmatch richsync
+  // was enough to make animate() throw here, and the throw took the rest of the tick with it, so
+  // the line never finished setting up and the engine tried it again on every frame.
+  const timedDurationMs = Math.max(0, part.duration * 1000);
   const isLineSyncedWord = part.lyricElement.classList.contains(LINE_SYNCED_WORD_CLASS);
   const swipeLeadMs = timedDurationMs * SWIPE_LEAD_RATIO.getNumberValue();
   const swipeTimeMs = rawElapsedMs + swipeLeadMs;
@@ -923,7 +926,13 @@ function startWordAnimations(
               offset: config.word.wobblePeakOffset,
               easing: config.word.wobblePeakEasing,
             },
-            { transform: config.word.wobbleSettle, offset: config.word.wobbleSettleOffset },
+            // The two offsets are read and clamped independently, so a theme is free to settle
+            // before it peaks. animate() rejects offsets that go backwards, and that throw would
+            // orphan the highlight animations above, which are not tracked until the end.
+            {
+              transform: config.word.wobbleSettle,
+              offset: Math.max(config.word.wobblePeakOffset, config.word.wobbleSettleOffset),
+            },
             { transform: config.word.wobbleTo, easing: config.word.wobbleEndEasing },
           ],
           {

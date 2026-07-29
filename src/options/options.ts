@@ -602,6 +602,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   initI18n();
   populateLanguageDropdown();
   initTabScrollIndicators();
+  initSettingHelpTooltips();
   restoreOptions();
   restoreActiveTab();
 });
@@ -661,6 +662,38 @@ function initTabScrollIndicators(): void {
 
   container.addEventListener("scroll", update);
   update();
+}
+
+// -- Setting help tooltips --------------------------
+
+const TOOLTIP_GAP = 8;
+
+// A modal body counts as a boundary even though it does not clip: a tooltip that runs past its top
+// covers the modal title, which is the thing the tooltip is explaining.
+function getBoundaryTop(element: HTMLElement): number {
+  for (let ancestor = element.parentElement; ancestor; ancestor = ancestor.parentElement) {
+    const clips = !getComputedStyle(ancestor)
+      .overflow.split(" ")
+      .every(axis => axis === "visible");
+
+    if (clips || ancestor.classList.contains("modal-body")) {
+      return ancestor.getBoundingClientRect().top;
+    }
+  }
+  return 0;
+}
+
+function initSettingHelpTooltips(): void {
+  for (const help of document.querySelectorAll<HTMLElement>(".setting-help")) {
+    const place = (): void => {
+      const height = parseFloat(getComputedStyle(help, "::after").height) || 0;
+      const spaceAbove = help.getBoundingClientRect().top - getBoundaryTop(help);
+      help.dataset.tooltipPlacement = spaceAbove >= height + TOOLTIP_GAP ? "top" : "bottom";
+    };
+
+    help.addEventListener("pointerenter", place);
+    help.addEventListener("focus", place);
+  }
 }
 
 document.addEventListener("DOMContentLoaded", () => {
