@@ -132,40 +132,8 @@ export const AUTH_PORT_NAME_PREFIX = "bl-auth-popup:" as const;
 
 export const BL_AUTH_SITE_PORT_NAME = "bl-auth-site" as const;
 
-export interface AuthPartner {
-  id: string;
-  origin: string;
-  iconUrl: string | null;
-}
-
-const AUTH_PARTNER_METADATA: Record<string, Pick<AuthPartner, "id" | "iconUrl">> = {
-  "https://unison.boidu.dev": { id: "unison", iconUrl: null },
-  "https://blrcunison.vercel.app": { id: "blrcunison", iconUrl: "https://blrcunison.vercel.app/logo_mono.svg" },
-};
-
-let authPartners: readonly AuthPartner[] | null = null;
-
-// Resolved on demand rather than at module scope: this file is imported by page-world code that
-// has no chrome.* at all, and reading the manifest eagerly would throw before it ran a line.
-function getAuthPartners(): readonly AuthPartner[] {
-  authPartners ??= (chrome.runtime.getManifest().externally_connectable?.matches ?? [])
-    .map(match => match.replace(/\/\*$/, ""))
-    .map(origin => ({
-      origin,
-      id: AUTH_PARTNER_METADATA[origin]?.id ?? origin,
-      iconUrl: AUTH_PARTNER_METADATA[origin]?.iconUrl ?? null,
-    }));
-  return authPartners;
-}
-
-export function getAuthPartnerByOrigin(origin: string | undefined): AuthPartner | undefined {
-  if (!origin) return undefined;
-  return getAuthPartners().find(p => p.origin === origin);
-}
-
-export function isAllowedAuthOrigin(origin: string | undefined): boolean {
-  return getAuthPartnerByOrigin(origin) !== undefined;
-}
+// Auth partner resolution lives in @modules/auth/partners: it needs chrome.runtime, and this module
+// is imported by page-world code that has none.
 
 // Initialization and General Logs
 export const INITIALIZE_LOG =
