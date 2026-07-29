@@ -2181,6 +2181,14 @@ input.cm-textfield:focus-visible {
     margin-top: 0;
 }
 
+#pip-modal-overlay .container:first-of-type {
+	margin-top: 0;
+}
+
+#pip-modal-overlay .container:last-of-type {
+	margin-bottom: 0;
+}
+
 .unison-modal-row__text {
 	display: flex;
 	flex-direction: column;
