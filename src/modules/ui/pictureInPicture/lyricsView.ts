@@ -17,7 +17,7 @@ interface HeaderRow {
   readonly layers: readonly HTMLElement[];
   index: number;
   text: string;
-  pendingText: string | null;
+  hasPendingCorrection: boolean;
   busyTimer: number | null;
 }
 
@@ -132,7 +132,14 @@ function createBackdropLayer(document: Document): HTMLElement {
 
 function createHeaderRow(element: HTMLElement): HeaderRow {
   createHeaderLine(element);
-  return { element, layers: getHeaderLayers(element), index: 0, text: "", pendingText: null, busyTimer: null };
+  return {
+    element,
+    layers: getHeaderLayers(element),
+    index: 0,
+    text: "",
+    hasPendingCorrection: false,
+    busyTimer: null,
+  };
 }
 
 function createArtworkFace(document: Document): [HTMLElement, HTMLImageElement] {
@@ -505,14 +512,19 @@ export class PictureInPictureLyricsView {
     if (isFirstPaint) this.marquee.arm();
   }
 
-  // Rebuilding a row mid-swap would replace the word boxes in flight, so a
-  // correction landing during one waits for it.
+  // A correction still has to be seen arriving, so it crossfades. What it must not
+  // do is run the preset: that is a second spring for the same track change, not a
+  // second piece of information. Mid-swap it waits, since rebuilding the row would
+  // replace the word boxes in flight.
   private correctRow(row: HeaderRow): void {
     if (row.busyTimer !== null) {
-      row.pendingText = row.text;
+      row.hasPendingCorrection = true;
       return;
     }
-    fillHeaderLayer(row.layers[row.index], row.text, this.prefersReducedMotion);
+    row.element.removeAttribute("data-correcting");
+    void row.element.offsetWidth;
+    this.paintRow(row, 1 - row.index);
+    row.element.setAttribute("data-correcting", "true");
     this.armMarqueeWhenSettled();
   }
 
@@ -528,7 +540,8 @@ export class PictureInPictureLyricsView {
   private swapRow(row: HeaderRow, isFirstPaint: boolean, delayMs: number): void {
     if (row.busyTimer !== null) this.pipWindow.clearTimeout(row.busyTimer);
     row.busyTimer = null;
-    row.pendingText = null;
+    row.hasPendingCorrection = false;
+    row.element.removeAttribute("data-correcting");
 
     // Nothing to transition from on the first song in a window, so it just
     // appears, the same way the first cover does.
@@ -550,9 +563,10 @@ export class PictureInPictureLyricsView {
       () => {
         row.busyTimer = null;
         row.element.removeAttribute("data-swapping");
-        if (row.pendingText !== null) {
-          fillHeaderLayer(row.layers[row.index], row.pendingText, this.prefersReducedMotion);
-          row.pendingText = null;
+        if (row.hasPendingCorrection) {
+          row.hasPendingCorrection = false;
+          this.correctRow(row);
+          return;
         }
         this.armMarqueeWhenSettled();
       },

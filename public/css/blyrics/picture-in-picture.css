@@ -866,6 +866,17 @@ body {
   animation-delay: var(--blyrics-pip-line-delay, 0ms);
 }
 
+/* A correction, as opposed to a song change: the same crossfade for every preset,
+   because a later, fuller byline is new information rather than a new track. It
+   must still be seen arriving, so it is never a silent swap. */
+.blyrics-pip-line[data-correcting="true"] .blyrics-pip-line__layer[data-front="true"] {
+  animation: blyrics-pip-text-fade-in 260ms ease both;
+}
+
+.blyrics-pip-line[data-correcting="true"] .blyrics-pip-line__layer[data-front="false"] {
+  animation: blyrics-pip-text-fade-out 260ms ease both;
+}
+
 @keyframes blyrics-pip-text-fade-in {
   from {
     opacity: 0;
