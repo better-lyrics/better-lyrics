@@ -49,8 +49,9 @@ const KEYFRAME_TIMING_KEYS = new Set(["offset", "computedOffset", "easing", "com
 // The engine holds one animation per element, pseudo-element and property set: a part's
 // animations are cancelled before it is re-animated. Naming that slot is what lets the mirror
 // hold the same invariant, instead of leaving a replaced animation's twin running alongside its
-// replacement and a beat behind it. A theme's CSS animations are keyed by name on top of that,
-// since two of those can legitimately drive the same property at once.
+// replacement and a beat behind it. Declarative animations are keyed by name and transitions by
+// property on top of that, since those can legitimately run at the same time as the engine's own
+// animation on a property, and nothing else in the key tells the three kinds apart.
 function effectSlot(source: Animation, mirrorId: string, keyframes: readonly Keyframe[]): string {
   const effect = source.effect as KeyframeEffect;
   const properties = new Set<string>();
@@ -59,8 +60,9 @@ function effectSlot(source: Animation, mirrorId: string, keyframes: readonly Key
       if (!KEYFRAME_TIMING_KEYS.has(property)) properties.add(property);
     }
   }
-  const cssName = (source as Partial<CSSAnimation>).animationName ?? "";
-  return `${mirrorId}|${effect.pseudoElement ?? ""}|${cssName}|${[...properties].sort().join(",")}`;
+  const declared = source as Partial<CSSAnimation> & Partial<CSSTransition>;
+  const declaredName = declared.animationName ?? declared.transitionProperty ?? "";
+  return `${mirrorId}|${effect.pseudoElement ?? ""}|${declaredName}|${[...properties].sort().join(",")}`;
 }
 
 function retireTwin(source: Animation): void {
@@ -189,9 +191,13 @@ export function sync(mainRoot: HTMLElement): void {
       const previous = slotToSource.get(slot);
       if (previous) {
         retireTwin(previous);
-        // Dropped from the known set as well: the retirement pass would otherwise copy playback
-        // state onto the cancelled twin, which starts it over.
+        // Superseded for good. Dropping it from the live sets is not enough on its own: a source
+        // that is still in effect comes straight back from getAnimations(), and the two would
+        // trade the slot every frame, rebuilding both twins and leaking a cancel listener each
+        // time. Skipping it costs one of a colliding pair its twin, which beats the churn.
+        skippedSources.add(previous);
         knownSources.delete(previous);
+        nextKnown.delete(previous);
       }
       const twin = twinElement.animate(keyframes, {
         ...effect.getTiming(),
