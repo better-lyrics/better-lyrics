@@ -201,6 +201,19 @@ export function sync(mainRoot: HTMLElement): void {
       mirrored = { twin, slot };
       sourceToTwin.set(source, mirrored);
       slotToSource.set(slot, source);
+      // A cancelled animation stops applying in the page immediately, while a twin holds whatever
+      // time it was last given, so the gap until the next sync pass notices is a gap where the
+      // window shows a value the page has already dropped. Only cancellation: a finished
+      // animation that fills forwards is still applying, and retiring its twin there would take
+      // the end state away and then put it back a frame later.
+      source.addEventListener(
+        "cancel",
+        () => {
+          retireTwin(source);
+          knownSources.delete(source);
+        },
+        { once: true }
+      );
     }
     nextKnown.add(source);
     copyPlaybackState(source, mirrored.twin);
