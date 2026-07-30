@@ -59,13 +59,6 @@ export function currentTickOptions(eventCreationTime: number, isPlaying: boolean
 // -- Re-sync on layout change --------------------------
 
 /**
- * Re-reads the main view's layout after the stylesheet or the lyrics DOM changed.
- */
-export function calculateLyricPositions(): void {
-  mainView.relayout();
-}
-
-/**
  * Renders the side panel again against the last player snapshot, without smooth scrolling. Used
  * whenever something other than the clock moved the lyrics: an offset change, a line arriving.
  */

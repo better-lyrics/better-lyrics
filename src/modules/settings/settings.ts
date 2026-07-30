@@ -12,7 +12,7 @@ import { log, setUpLog } from "@core/utils";
 import { clearCache as clearTranslationCache } from "@modules/lyrics/translation";
 import { mountDock, mountVotingSegment, reloadAlbumArt, unmountDock, updateDockPosition } from "@modules/ui/dom";
 import { applyGlobalOffsets } from "@modules/ui/lyricsDock/offset";
-import { calculateLyricPositions } from "@modules/ui/mainLyricsView";
+import { mainView } from "@modules/ui/mainLyricsView";
 import { isPlayerFullscreened, onFullscreenChange } from "@modules/ui/observer";
 import { publishPictureInPictureLyrics } from "@modules/ui/pictureInPicture/lyricsPublisher";
 import { applyCustomStyles, getAndApplyCustomStyles } from "@modules/ui/styleInjector";
@@ -212,12 +212,12 @@ export function listenForPopupMessages(): void {
         log(LOG_PREFIX_CONTENT, "Compiling RICS and applying styles");
         const compiledCSS = compileRicsToStyles(request.ricsSource);
         applyCustomStyles(compiledCSS);
-        calculateLyricPositions();
+        mainView.relayout();
         log(LOG_PREFIX_CONTENT, "Styles applied successfully");
       } else {
         log(LOG_PREFIX_CONTENT, "Loading styles from storage");
         getAndApplyCustomStyles().then(() => {
-          calculateLyricPositions();
+          mainView.relayout();
           log(LOG_PREFIX_CONTENT, "Styles loaded from storage and applied");
         });
       }

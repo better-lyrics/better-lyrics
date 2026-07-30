@@ -20,7 +20,7 @@ import {
   translateBatch,
 } from "@modules/lyrics/translation";
 import { addFooter, addNoLyricsButton, cleanup, createLyricsWrapper, flushLoader, renderLoader } from "@modules/ui/dom";
-import { calculateLyricPositions, lyricsElementAdded, mainView } from "@modules/ui/mainLyricsView";
+import { lyricsElementAdded, mainView } from "@modules/ui/mainLyricsView";
 import { disableNativeLyricsFocus } from "@modules/ui/nativeLyricsFocus";
 import { publishPictureInPictureLyrics } from "@modules/ui/pictureInPicture/lyricsPublisher";
 import {
@@ -200,7 +200,7 @@ function injectLyrics(
   }
 
   AppState.areLyricsTicking = true;
-  calculateLyricPositions();
+  mainView.relayout();
   if (allZero) {
     log(SYNC_DISABLED_LOG);
   }
