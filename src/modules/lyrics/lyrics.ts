@@ -52,6 +52,34 @@ export type LyricSourceResultWithMeta = LyricSourceResult & {
   providerKey?: string;
 };
 
+/**
+ * What a view needs to build its own lyric DOM from scratch: the parsed lines, the language the
+ * translation and romanization passes key off, and the timing context. The attribution and dock
+ * fields of {@link LyricSourceResultWithMeta} stay out; those are host chrome, not lyrics.
+ */
+export interface ParsedLyrics {
+  lyrics: Lyric[];
+  language?: string | null;
+  musicVideoSynced?: boolean | null;
+  segmentMap: SegmentMap | null;
+}
+
+/**
+ * Holds onto the parsed lyrics after injection has consumed them, so a second view can build from
+ * the same lines. Runs after {@link processLyrics} because injection calls cleanup(), which clears
+ * this alongside the render records.
+ */
+function retainParsedLyrics(data: LyricSourceResultWithMeta): void {
+  if (!data.lyrics) return;
+
+  AppState.parsedLyrics = {
+    lyrics: data.lyrics,
+    language: data.language,
+    musicVideoSynced: data.musicVideoSynced,
+    segmentMap: data.segmentMap,
+  };
+}
+
 export function applySegmentMapToLyrics(lyricData: LyricsData | null, segmentMap: SegmentMap) {
   if (segmentMap && lyricData) {
     lyricData.isMusicVideoSynced = !lyricData.isMusicVideoSynced;
@@ -218,6 +246,7 @@ export async function createLyrics(detail: PlayerDetails, signal: AbortSignal): 
           };
 
           processLyrics(document, seekPlayer, lyricsWithMeta, true, signal);
+          retainParsedLyrics(lyricsWithMeta);
         }
       }
       return lyrics;
@@ -347,6 +376,7 @@ export async function createLyrics(detail: PlayerDetails, signal: AbortSignal): 
       return;
     }
     processLyrics(document, seekPlayer, lyricsWithMeta, false, signal);
+    retainParsedLyrics(lyricsWithMeta);
     shouldCleanupLoader = false;
   } finally {
     if (shouldCleanupLoader) {
