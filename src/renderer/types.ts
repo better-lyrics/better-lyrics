@@ -59,13 +59,22 @@ export interface LyricsRendererDebugSink {
 export interface LyricsRendererHost {
   isViewVisible(): boolean;
   isLoaderActive(): boolean;
-  onAdState(isPlaying: boolean): void;
+  /**
+   * Reports whether an ad is playing, and lets the host move whatever it shows in place of lyrics
+   * into the matching state. One call rather than a query and a command, because the renderer never
+   * needs one without the other and the host already knows the answer when it is asked.
+   */
+  syncAdState(): boolean;
   /**
    * Resolved per tick rather than handed over once: YouTube Music swaps its scroll container out,
    * and the renderer is constructed before that container exists.
    */
   getScrollElement(): HTMLElement | null;
-  getResumeScrollElement(): HTMLElement | null;
+  /**
+   * Puts away whatever the host offers for resuming autoscroll. The renderer only ever dismisses it:
+   * the host decides what it looks like and when it appears.
+   */
+  hideResumeAffordance(): void;
   /**
    * Called when a lyric line is clicked. How the seek reaches the player is the host's business:
    * this extension dispatches an event at the page world, another consumer might set

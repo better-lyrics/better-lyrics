@@ -1,6 +1,6 @@
 const CANVAS_ID = "blyrics-lyric-debug-canvas";
 
-export let ctx: CanvasRenderingContext2D | null = null;
+let ctx: CanvasRenderingContext2D | null = null;
 
 let canvas: HTMLCanvasElement | null = null;
 function createDebugCanvas() {

@@ -21,7 +21,6 @@ import {
   animationEngine,
   animEngineState,
   cancelPendingLineScroll,
-  getResumeScrollElement,
   noteAnimationVisibilityChange,
 } from "@modules/ui/animationEngine";
 import { adjustLyricOffset, OFFSET_STEP, OFFSET_STEP_LARGE } from "@modules/ui/lyricsDock/offset";
@@ -32,6 +31,7 @@ import {
   isPlayerPageOpen,
   openPlayerPageForFullscreen,
 } from "@modules/ui/navigation";
+import { getResumeScrollElement } from "@modules/ui/resumeScrollButton";
 import { log } from "@utils";
 import {
   addThumbnail,

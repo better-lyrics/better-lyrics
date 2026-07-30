@@ -4,20 +4,16 @@ import {
   FOOTER_CLASS,
   LOG_PREFIX,
   LYRICS_CHECK_INTERVAL_ERROR,
-  LYRICS_CLASS,
   NO_LYRICS_ELEMENT_LOG,
   PAUSED_CLASS,
-  TAB_HEADER_CLASS,
-  TAB_RENDERER_SELECTOR,
   USER_SCROLLING_CLASS,
 } from "@constants";
 import { AppState } from "@core/appState";
-import { t } from "@core/i18n";
 import { calculateLyricPositions, type LineData, type PartData } from "@modules/lyrics/injectLyrics";
 import { registerThemeSetting } from "@modules/settings/themeOptions";
-import { hideAdOverlay, isAdPlaying, isLoaderActive, showAdOverlay } from "@modules/ui/dom";
+import { ytmHost } from "@modules/ui/lyricsHost";
+import type { LyricsRendererHost } from "@renderer/index";
 import { clamp, getRelativeLayoutBounds, log, positiveModulo, roundedMs } from "@utils";
-import { ctx, resetDebugRender } from "./animationEngineDebug";
 
 const LYRIC_ENDING_THRESHOLD_S = registerThemeSetting("blyrics-lyric-ending-threshold-s", 0.5);
 const EARLY_SCROLL_CONSIDER = registerThemeSetting("blyrics-early-scroll-consider-s", 0.62);
@@ -150,6 +146,7 @@ type EngineWindow = Window & typeof globalThis;
 interface AnimationEngineInstance extends AnimEngineViewState {
   document: Document;
   window: EngineWindow;
+  host: LyricsRendererHost;
   cachedTabRendererHeight: number | null;
   tabRendererResizeObserver: ResizeObserver | null;
   observedTabRenderer: HTMLElement | null;
@@ -172,13 +169,18 @@ interface AnimationEngineInstance extends AnimEngineViewState {
   destroy(): void;
 }
 
-function createAnimationEngineInstance(engineDocument: Document, engineWindow: EngineWindow): AnimationEngineInstance {
+function createAnimationEngineInstance(
+  engineDocument: Document,
+  engineWindow: EngineWindow,
+  host: LyricsRendererHost
+): AnimationEngineInstance {
   const reducedMotionQuery = engineWindow.matchMedia(REDUCED_MOTION_QUERY);
   const handleReducedMotionChange = (): void => clearStyleCaches(engine);
 
   const engine: AnimationEngineInstance = {
     document: engineDocument,
     window: engineWindow,
+    host,
     lines: [],
     lyricsContainer: null,
     lyricWidth: 0,
@@ -228,17 +230,7 @@ function createAnimationEngineInstance(engineDocument: Document, engineWindow: E
   return engine;
 }
 
-/**
- * The element the engine scrolls. It is resolved per call rather than once at creation: the
- * instance is built at import time, long before the tab renderer is mounted, and YouTube Music
- * swaps the node out often enough that the tick compares it against `observedTabRenderer` and
- * reinstalls the ResizeObserver whenever it changed.
- */
-function resolveScrollElement(engine: AnimationEngineInstance): HTMLElement | null {
-  return engine.document.querySelector<HTMLElement>(TAB_RENDERER_SELECTOR);
-}
-
-const mainEngine = createAnimationEngineInstance(document, window);
+const mainEngine = createAnimationEngineInstance(document, window, ytmHost);
 
 const playbackClock: PlaybackClock = {
   lastTime: 0,
@@ -2150,15 +2142,11 @@ function passiveScrollRAFLoop(engine: AnimationEngineInstance): void {
 }
 
 function passiveScrollEngine(engine: AnimationEngineInstance, isPlaying: boolean): void {
-  const lyricData = AppState.lyricData;
-  if (!lyricData) return;
+  if (!engine.host.isViewVisible()) return;
 
-  const tabSelector = lyricData.tabSelector;
-  if (!tabSelector || tabSelector.getAttribute("aria-selected") !== "true") return;
+  if (engine.host.isLoaderActive()) return;
 
-  if (isLoaderActive()) return;
-
-  const tabRenderer = resolveScrollElement(engine);
+  const tabRenderer = engine.host.getScrollElement();
   if (!tabRenderer) return;
 
   const now = Date.now();
@@ -2176,7 +2164,7 @@ function passiveScrollEngine(engine: AnimationEngineInstance, isPlaying: boolean
   }
 
   if (engine.wasUserScrolling) {
-    resumeScrollElement(engine).setAttribute("autoscroll-hidden", "true");
+    engine.host.hideResumeAffordance();
     engine.lyricsContainer?.classList.remove(USER_SCROLLING_CLASS);
     engine.wasUserScrolling = false;
 
@@ -2305,26 +2293,16 @@ function runAnimationEngine(
     return "lyrics-missing";
   }
 
-  const tabSelector = lyricData.tabSelector;
-
-  const playerState = document.getElementById("player-page")?.getAttribute("player-ui-state");
-  const isPlayerOpen =
-    !playerState ||
-    playerState === "PLAYER_PAGE_OPEN" ||
-    playerState === "FULLSCREEN" ||
-    playerState === "MINIPLAYER_IN_PLAYER_PAGE";
-  const isMainLyricsVisible = tabSelector?.getAttribute("aria-selected") === "true" && isPlayerOpen;
-  // Don't tick lyrics if they're not visible anywhere
+  const isMainLyricsVisible = engine.host.isViewVisible();
+  // Don't tick lyrics if they're not visible anywhere. The floating window term is here because one
+  // instance still feeds both views: task 5.4 gives that window its own instance and drops it.
   if (!isMainLyricsVisible && !AppState.isPictureInPictureOpen) {
     clearVisibleLyricWillChange(engine);
     return "ok";
   }
 
-  if (isAdPlaying()) {
-    showAdOverlay();
+  if (engine.host.syncAdState()) {
     return "ok";
-  } else {
-    hideAdOverlay();
   }
 
   try {
@@ -2353,7 +2331,7 @@ function runAnimationEngine(
     const { config: animationConfig, scrollTiming } = getAnimationSettings(engine, lyricsElement);
 
     // Read layout values before the loop writes class changes, to avoid forced reflow
-    const tabRenderer = resolveScrollElement(engine);
+    const tabRenderer = engine.host.getScrollElement();
     if (!tabRenderer) {
       clearVisibleLyricWillChange(engine);
       return "ok";
@@ -2583,7 +2561,7 @@ function runAnimationEngine(
         const matrix = new engine.window.DOMMatrix(transform);
         let yTransform = matrix.f;
         let yTop = scrollTop - yTransform;
-        resetDebugRender(yTop);
+        const ctx = engine.host.debug?.beginFrame(yTop);
         if (ctx) {
           ctx.strokeStyle = "green";
           ctx.fillStyle = "green";
@@ -2734,7 +2712,7 @@ function runAnimationEngine(
     }
 
     if (isMainLyricsVisible && engine.wasUserScrolling && engine.scrollResumeTime < Date.now()) {
-      resumeScrollElement(engine).setAttribute("autoscroll-hidden", "true");
+      engine.host.hideResumeAffordance();
       lyricsElement.classList.remove(USER_SCROLLING_CLASS);
       engine.wasUserScrolling = false;
     }
@@ -2814,37 +2792,6 @@ export function lyricsElementAdded(): void {
       AppState.areLyricsTicking = false;
     }
   });
-}
-
-/**
- * Gets or creates the resume autoscroll button element.
- *
- * @returns The resume scroll button element
- */
-function resumeScrollElement(engine: AnimationEngineInstance): HTMLElement {
-  let elem = document.getElementById("autoscroll-resume-button");
-  if (!elem) {
-    const wrapper = document.createElement("div");
-    wrapper.id = "autoscroll-resume-wrapper";
-    wrapper.className = "autoscroll-resume-wrapper";
-    elem = document.createElement("button");
-    elem.id = "autoscroll-resume-button";
-    elem.innerText = t("lyrics_resumeAutoscroll");
-    elem.classList.add("autoscroll-resume-button");
-    elem.setAttribute("autoscroll-hidden", "true");
-    elem.addEventListener("click", () => {
-      engine.scrollResumeTime = 0;
-      elem!.setAttribute("autoscroll-hidden", "true");
-    });
-
-    (document.querySelector("#side-panel > tp-yt-paper-tabs") as HTMLElement).after(wrapper);
-    wrapper.appendChild(elem);
-  }
-  return elem as HTMLElement;
-}
-
-export function getResumeScrollElement(): HTMLElement {
-  return resumeScrollElement(mainEngine);
 }
 
 /**
