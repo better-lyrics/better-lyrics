@@ -4,7 +4,7 @@ import { decompressString, isCompressed } from "@core/compression";
 import { compileRicsToStyles, getLocalStorage, getSyncStorage, loadChunkedStyles } from "@core/storage";
 import { setThemeSettings } from "@modules/settings/themeOptions";
 import { log } from "@utils";
-import { clearAnimationStyleCache } from "./animationEngine";
+import { clearAnimationStyleCache } from "./mainLyricsView";
 
 let hasSubscribedToStyles = false;
 

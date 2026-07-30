@@ -10,7 +10,7 @@ import { AppState } from "@core/appState";
 import { t } from "@core/i18n";
 import { getStorage } from "@core/storage";
 import { getArtworkMetadata } from "@modules/lyrics/requestSniffer/requestSniffer";
-import { animEngineState } from "@modules/ui/animationEngine";
+import { animEngineState } from "@modules/ui/mainLyricsView";
 import { log } from "@utils";
 import { onSignal, sendInit, sendMetadata } from "./bridge";
 import { DEFAULT_ARTWORK_TRANSITION, DEFAULT_TEXT_TRANSITION } from "./lyricsView";

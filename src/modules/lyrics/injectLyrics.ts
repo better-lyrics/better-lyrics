@@ -23,7 +23,7 @@ import {
   romanizeBatch,
   translateBatch,
 } from "@modules/lyrics/translation";
-import { animEngineState } from "@modules/ui/animationEngine";
+import { animEngineState } from "@modules/ui/mainLyricsView";
 import { addFooter, addNoLyricsButton, cleanup, createLyricsWrapper, flushLoader, renderLoader } from "@modules/ui/dom";
 import { calculateLyricPositions, lyricsElementAdded } from "@modules/ui/mainLyricsView";
 import { disableNativeLyricsFocus } from "@modules/ui/nativeLyricsFocus";

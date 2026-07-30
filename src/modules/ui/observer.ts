@@ -17,14 +17,14 @@ import { AppState, handleModifications, type PlayerDetails, reloadLyrics } from 
 import { preFetchLyrics } from "@modules/lyrics/lyrics";
 import { getArtworkMetadata, getSongMetadata } from "@modules/lyrics/requestSniffer/requestSniffer";
 import { onAutoSwitchEnabled, onFullScreenDisabled, wakeDockIdle } from "@modules/settings/settings";
+import { adjustLyricOffset, OFFSET_STEP, OFFSET_STEP_LARGE } from "@modules/ui/lyricsDock/offset";
 import {
   animationEngine,
   animEngineState,
   cancelPendingLineScroll,
+  currentTickOptions,
   noteAnimationVisibilityChange,
-} from "@modules/ui/animationEngine";
-import { adjustLyricOffset, OFFSET_STEP, OFFSET_STEP_LARGE } from "@modules/ui/lyricsDock/offset";
-import { currentTickOptions } from "@modules/ui/mainLyricsView";
+} from "@modules/ui/mainLyricsView";
 import { preloadArtwork } from "@modules/ui/pictureInPicture/lyricsView";
 import {
   closePlayerPageIfOpenedForFullscreen,

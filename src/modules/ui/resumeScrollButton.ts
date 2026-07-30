@@ -1,5 +1,5 @@
 import { t } from "@core/i18n";
-import { animEngineState } from "@modules/ui/animationEngine";
+import { animEngineState } from "@modules/ui/mainLyricsView";
 
 /**
  * Gets or creates the resume autoscroll button element.

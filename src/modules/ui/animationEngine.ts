@@ -1,4 +1,3 @@
-import { ytmHost } from "@modules/ui/lyricsHost";
 import {
   ANIMATING_CLASS,
   CURRENT_LYRICS_CLASS,
@@ -9,7 +8,7 @@ import {
 } from "@renderer/constants";
 import type { LineData, LyricsRendererHost, LyricSyncType, PartData, TickOptions } from "@renderer/index";
 import { registerThemeSetting } from "@renderer/themeSettings";
-import { clamp, getRelativeLayoutBounds, positiveModulo, roundedMs } from "@renderer/util";
+import { clamp, getRelativeLayoutBounds, positiveModulo, roundedMs, toMs } from "@renderer/util";
 
 const NO_LYRICS_ELEMENT_LOG = "No lyrics element found on the page, skipping lyrics injection";
 const LYRICS_CHECK_INTERVAL_ERROR = "Error in lyrics check interval:";
@@ -97,7 +96,7 @@ const PASSIVE_TOP_PAUSE_S = registerThemeSetting("blyrics-passive-scroll-top-pau
  * Everything that belongs to a single rendered lyrics view: one scroll container, one selection,
  * one set of pending scroll work.
  */
-interface AnimEngineViewState {
+export interface AnimEngineViewState {
   /**
    * The render records this view built, one per lyric line. They hold this view's elements and
    * this view's `Animation` objects, so a second view never shares them.
@@ -128,7 +127,7 @@ interface AnimEngineViewState {
 /**
  * The last player snapshot. It describes the media, not a view, so every instance reads the same one.
  */
-interface PlaybackClock {
+export interface PlaybackClock {
   lastTime: number;
   lastPlayState: boolean;
   /**
@@ -174,7 +173,7 @@ interface AnimationEngineInstance extends AnimEngineViewState {
   destroy(): void;
 }
 
-function createAnimationEngineInstance(
+export function createAnimationEngineInstance(
   engineDocument: Document,
   engineWindow: EngineWindow,
   host: LyricsRendererHost
@@ -237,124 +236,17 @@ function createAnimationEngineInstance(
   return engine;
 }
 
-const mainEngine = createAnimationEngineInstance(document, window, ytmHost);
-
-const playbackClock: PlaybackClock = {
+export const playbackClock: PlaybackClock = {
   lastTime: 0,
   lastPlayState: false,
   lastEventCreationTime: -1,
 };
 
 /**
- * Six modules still reach into engine state directly. Until those reads and writes become
- * intent-revealing methods, this forwards the fields they touch onto the one instance.
- */
-export const animEngineState: Pick<
-  AnimEngineViewState,
-  | "lines"
-  | "lyricsContainer"
-  | "syncType"
-  | "lyricWidth"
-  | "lyricHeight"
-  | "skipScrolls"
-  | "skipScrollsDecayTimes"
-  | "scrollResumeTime"
-  | "scrollPos"
-  | "nextScrollAllowedTime"
-  | "wasUserScrolling"
-> &
-  PlaybackClock = {
-  get lines(): LineData[] {
-    return mainEngine.lines;
-  },
-  set lines(value: LineData[]) {
-    mainEngine.lines = value;
-  },
-  get lyricsContainer(): HTMLElement | null {
-    return mainEngine.lyricsContainer;
-  },
-  set lyricsContainer(value: HTMLElement | null) {
-    mainEngine.lyricsContainer = value;
-  },
-  get syncType(): LyricSyncType {
-    return mainEngine.syncType;
-  },
-  set syncType(value: LyricSyncType) {
-    mainEngine.syncType = value;
-  },
-  get lyricWidth(): number {
-    return mainEngine.lyricWidth;
-  },
-  set lyricWidth(value: number) {
-    mainEngine.lyricWidth = value;
-  },
-  get lyricHeight(): number {
-    return mainEngine.lyricHeight;
-  },
-  set lyricHeight(value: number) {
-    mainEngine.lyricHeight = value;
-  },
-  get skipScrolls(): number {
-    return mainEngine.skipScrolls;
-  },
-  set skipScrolls(value: number) {
-    mainEngine.skipScrolls = value;
-  },
-  get skipScrollsDecayTimes(): number[] {
-    return mainEngine.skipScrollsDecayTimes;
-  },
-  set skipScrollsDecayTimes(value: number[]) {
-    mainEngine.skipScrollsDecayTimes = value;
-  },
-  get scrollResumeTime(): number {
-    return mainEngine.scrollResumeTime;
-  },
-  set scrollResumeTime(value: number) {
-    mainEngine.scrollResumeTime = value;
-  },
-  get scrollPos(): number {
-    return mainEngine.scrollPos;
-  },
-  set scrollPos(value: number) {
-    mainEngine.scrollPos = value;
-  },
-  get nextScrollAllowedTime(): number {
-    return mainEngine.nextScrollAllowedTime;
-  },
-  set nextScrollAllowedTime(value: number) {
-    mainEngine.nextScrollAllowedTime = value;
-  },
-  get wasUserScrolling(): boolean {
-    return mainEngine.wasUserScrolling;
-  },
-  set wasUserScrolling(value: boolean) {
-    mainEngine.wasUserScrolling = value;
-  },
-  get lastTime(): number {
-    return playbackClock.lastTime;
-  },
-  set lastTime(value: number) {
-    playbackClock.lastTime = value;
-  },
-  get lastPlayState(): boolean {
-    return playbackClock.lastPlayState;
-  },
-  set lastPlayState(value: boolean) {
-    playbackClock.lastPlayState = value;
-  },
-  get lastEventCreationTime(): number {
-    return playbackClock.lastEventCreationTime;
-  },
-  set lastEventCreationTime(value: number) {
-    playbackClock.lastEventCreationTime = value;
-  },
-};
-
-/**
  * Resets anim engine states
  * Called when song is switched or cleaned up
  */
-function resetEngineState(engine: AnimationEngineInstance): void {
+export function resetEngineState(engine: AnimationEngineInstance): void {
   dropPendingLineScroll(engine);
   clearLineScrollAnimations(engine);
   clearVisibleLyricWillChange(engine);
@@ -370,10 +262,6 @@ function resetEngineState(engine: AnimationEngineInstance): void {
   engine.passiveScrollAccumulatedTime = 0;
   engine.passiveLastWallTime = 0;
   stopPassiveScrollLoop(engine);
-}
-
-export function resetAnimEngineState(): void {
-  resetEngineState(mainEngine);
 }
 
 function resetPartAnimations(part: PartData): void {
@@ -827,7 +715,7 @@ function logAnimationCleanup(
   });
 }
 
-function noteVisibilityChange(engine: AnimationEngineInstance): void {
+export function noteVisibilityChange(engine: AnimationEngineInstance): void {
   if (!ENABLE_ANIMATION_TIMING_LOGS.getBooleanValue()) {
     return;
   }
@@ -855,10 +743,6 @@ function noteVisibilityChange(engine: AnimationEngineInstance): void {
     runningAnimationCount,
     resetSkipped: true,
   });
-}
-
-export function noteAnimationVisibilityChange(): void {
-  noteVisibilityChange(mainEngine);
 }
 
 function activeTextGradientKeyframes(config: AnimationConfig): Keyframe[] {
@@ -1378,15 +1262,11 @@ function startInstrumentalExitAnimations(
   });
 }
 
-function clearStyleCaches(engine: AnimationEngineInstance): void {
+export function clearStyleCaches(engine: AnimationEngineInstance): void {
   dropPendingLineScroll(engine);
   engine.cachedDurations.clear();
   engine.cachedCSSValues.clear();
   engine.cachedAnimationSettings = null;
-}
-
-export function clearAnimationStyleCache(): void {
-  clearStyleCaches(mainEngine);
 }
 
 function getCSSValue(
@@ -2024,14 +1904,10 @@ function discardLineScrollPlan(engine: AnimationEngineInstance, plan: LineScroll
   }
 }
 
-function dropPendingLineScroll(engine: AnimationEngineInstance): void {
+export function dropPendingLineScroll(engine: AnimationEngineInstance): void {
   if (!engine.pendingLineScroll) return;
   discardLineScrollPlan(engine, engine.pendingLineScroll.plan);
   engine.pendingLineScroll = null;
-}
-
-export function cancelPendingLineScroll(): void {
-  dropPendingLineScroll(mainEngine);
 }
 
 function pendingLineScrollMatches(
@@ -2263,9 +2139,9 @@ function setupTabRendererObserver(engine: AnimationEngineInstance, element: HTML
  * "lyrics-missing" means this instance has nothing left to render. Whether that ends ticking is the
  * driver's call, not the instance's: one instance running dry must not silence another.
  */
-type AnimationTickStatus = "ok" | "lyrics-missing";
+export type AnimationTickStatus = "ok" | "lyrics-missing";
 
-function runAnimationEngine(
+export function runAnimationEngine(
   engine: AnimationEngineInstance,
   currentTime: number,
   options: TickOptions
@@ -2745,17 +2621,6 @@ function runAnimationEngine(
   return "ok";
 }
 
-/**
- * Main lyrics synchronization function that handles timing, highlighting, and scrolling.
- *
- * @param currentTime - Current playback time in seconds
- * @param options - Player snapshot and user settings this tick renders against
- * @returns "lyrics-missing" when the tick found nothing to render, so the driver can stop ticking
- */
-export function animationEngine(currentTime: number, options: TickOptions): AnimationTickStatus {
-  return runAnimationEngine(mainEngine, currentTime, options);
-}
-
 // -- Layout --------------------------
 
 /**
@@ -2802,7 +2667,7 @@ function applyScrollPadding(engine: AnimationEngineInstance): void {
  *   measures every line as zero height at zero offset, which would leave the scroll maths with
  *   nothing to work from once rendering resumes.
  */
-function relayout(engine: AnimationEngineInstance, measureLines: boolean): void {
+export function relayout(engine: AnimationEngineInstance, measureLines: boolean): void {
   applyScrollPadding(engine);
   if (!measureLines) return;
 
@@ -2818,10 +2683,6 @@ function relayout(engine: AnimationEngineInstance, measureLines: boolean): void 
 
   engine.wasUserScrolling = true; // trigger rescrolls
   engine.host.debug?.resize();
-}
-
-export function relayoutMainLyrics(measureLines: boolean): void {
-  relayout(mainEngine, measureLines);
 }
 
 // -- Debounced Lyrics Update --------------------------
@@ -2842,7 +2703,7 @@ function cancelLyricPositionUpdate(engine: AnimationEngineInstance): void {
  *   and settings of the moment it runs. Returning null declines the frame, and with it the
  *   re-measurement: a driver that has stopped ticking is one whose lines may no longer be rendered.
  */
-function scheduleLyricPositionUpdate(
+export function scheduleLyricPositionUpdate(
   engine: AnimationEngineInstance,
   buildTickOptions: () => TickOptions | null,
   reportTickStatus: (status: AnimationTickStatus) => void
@@ -2858,35 +2719,4 @@ function scheduleLyricPositionUpdate(
     if (!options) return;
     reportTickStatus(runAnimationEngine(engine, playbackClock.lastTime, options));
   });
-}
-
-export function scheduleMainLyricPositionUpdate(
-  buildTickOptions: () => TickOptions | null,
-  reportTickStatus: (status: AnimationTickStatus) => void
-): void {
-  scheduleLyricPositionUpdate(mainEngine, buildTickOptions, reportTickStatus);
-}
-
-/**
- * Converts CSS duration value to milliseconds.
- *
- * @returns Duration in milliseconds
- */
-export function toMs(cssDuration: string): number {
-  if (!cssDuration) return 0;
-  if (cssDuration.endsWith("ms")) {
-    return parseFloat(cssDuration.slice(0, -2));
-  } else if (cssDuration.endsWith("s")) {
-    return parseFloat(cssDuration.slice(0, -1)) * 1000;
-  }
-  return 0;
-}
-
-/**
- * Forces a reflow/repaint of the element by accessing its offsetHeight.
- *
- * @param elt - Element to reflow
- */
-export function reflow(elt: HTMLElement): void {
-  void elt.offsetHeight;
 }

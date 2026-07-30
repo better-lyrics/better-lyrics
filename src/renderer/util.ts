@@ -11,6 +11,30 @@ export function roundedMs(value: number): number {
 }
 
 /**
+ * Converts CSS duration value to milliseconds.
+ *
+ * @returns Duration in milliseconds
+ */
+export function toMs(cssDuration: string): number {
+  if (!cssDuration) return 0;
+  if (cssDuration.endsWith("ms")) {
+    return parseFloat(cssDuration.slice(0, -2));
+  } else if (cssDuration.endsWith("s")) {
+    return parseFloat(cssDuration.slice(0, -1)) * 1000;
+  }
+  return 0;
+}
+
+/**
+ * Forces a reflow/repaint of the element by accessing its offsetHeight.
+ *
+ * @param elt - Element to reflow
+ */
+export function reflow(elt: HTMLElement): void {
+  void elt.offsetHeight;
+}
+
+/**
  * Returns the position and dimensions of a child element relative to its parent.
  *
  * @param parent - The parent element

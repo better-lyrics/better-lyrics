@@ -1,8 +1,7 @@
 import { OFFSET_STORAGE_PREFIX } from "@constants";
 import { AppState } from "@core/appState";
 import { getTransientStorage, setPersistentStorage, setStorage } from "@core/storage";
-import { animationEngine, animEngineState } from "@modules/ui/animationEngine";
-import { currentTickOptions } from "@modules/ui/mainLyricsView";
+import { animationEngine, animEngineState, currentTickOptions } from "@modules/ui/mainLyricsView";
 
 export const OFFSET_STEP = 0.1;
 export const OFFSET_STEP_LARGE = 0.5;
