@@ -83,6 +83,28 @@ function retainParsedLyrics(data: LyricSourceResultWithMeta): void {
   publishPictureInPictureLyrics();
 }
 
+/**
+ * How far a time recorded against the counterpart video moves when the same song is played back as
+ * its other version. Pure, so a view that renders the lyrics somewhere other than the side panel can
+ * shift a copy of them instead of the records the side panel is animating.
+ *
+ * @param segmentMap - Segment map pairing the two versions of the song
+ * @param timeMs - Time on the counterpart video's timeline, in milliseconds
+ * @returns The shift to add, in milliseconds
+ */
+export function getSegmentMapTimeShiftMs(segmentMap: SegmentMap, timeMs: number): number {
+  let lastTimeChange = 0;
+  for (let segment of segmentMap.segment) {
+    if (timeMs >= segment.counterpartVideoStartTimeMilliseconds) {
+      lastTimeChange = segment.primaryVideoStartTimeMilliseconds - segment.counterpartVideoStartTimeMilliseconds;
+      if (timeMs <= segment.counterpartVideoStartTimeMilliseconds + segment.durationMilliseconds) {
+        break;
+      }
+    }
+  }
+  return lastTimeChange;
+}
+
 export function applySegmentMapToLyrics(lyricData: LyricsData | null, lines: LineData[], segmentMap: SegmentMap) {
   if (segmentMap && lyricData) {
     lyricData.isMusicVideoSynced = !lyricData.isMusicVideoSynced;
@@ -92,18 +114,8 @@ export function applySegmentMapToLyrics(lyricData: LyricsData | null, lines: Lin
     if (!allZero) {
       for (let lyric of lines) {
         lyric.accumulatedOffsetMs = 1000000; // Force resync by setting to a very large value
-        let lastTimeChange = 0;
-        for (let segment of segmentMap.segment) {
-          let lyricTimeMs = lyric.time * 1000;
-          if (lyricTimeMs >= segment.counterpartVideoStartTimeMilliseconds) {
-            lastTimeChange = segment.primaryVideoStartTimeMilliseconds - segment.counterpartVideoStartTimeMilliseconds;
-            if (lyricTimeMs <= segment.counterpartVideoStartTimeMilliseconds + segment.durationMilliseconds) {
-              break;
-            }
-          }
-        }
 
-        let changeS = lastTimeChange / 1000;
+        let changeS = getSegmentMapTimeShiftMs(segmentMap, lyric.time * 1000) / 1000;
         lyric.time = lyric.time + changeS;
         lyric.lyricElement.dataset.time = String(lyric.time);
         lyric.parts.forEach(part => {
