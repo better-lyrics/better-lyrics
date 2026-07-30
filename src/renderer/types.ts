@@ -60,6 +60,11 @@ export interface LyricsRendererHost {
   isViewVisible(): boolean;
   isLoaderActive(): boolean;
   onAdState(isPlaying: boolean): void;
+  /**
+   * Resolved per tick rather than handed over once: YouTube Music swaps its scroll container out,
+   * and the renderer is constructed before that container exists.
+   */
+  getScrollElement(): HTMLElement | null;
   getResumeScrollElement(): HTMLElement | null;
   /**
    * Called when a lyric line is clicked. How the seek reaches the player is the host's business:
@@ -77,7 +82,6 @@ export interface LyricsRendererOptions {
   document: Document;
   window: Window;
   mount: HTMLElement;
-  scrollElement: HTMLElement;
   host: LyricsRendererHost;
 }
 
