@@ -335,10 +335,12 @@
 }
 
 /* The "Even Better Lyrics" theme scales every direct div child of
-   .blyrics-user-scrolling on hover; we don't want that on the footer. */
+   .blyrics-user-scrolling on hover; we don't want that on the footer. Pin the
+   resting scale rather than clearing the transform, or the footer grows to 1
+   from the .blyrics-container > div default of 0.95 on every hover. */
 .blyrics-container > .blyrics-footer:hover,
 .blyrics-user-scrolling > .blyrics-footer:hover {
-	transform: none;
+	transform: scale(var(--blyrics-scale));
 }
 
 .blyrics-footer__unison {
