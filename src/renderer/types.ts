@@ -162,6 +162,11 @@ export interface LyricsRenderer {
   resumeAutoscroll(): void;
   clearStyleCaches(): void;
   clearOnScreenLyrics(): boolean;
+  /**
+   * Re-measures the lines on the next frame and renders the view again against them. The predicate
+   * is the caller's half of whether that frame does anything, and only that half: whether the lines
+   * are on the screen to be measured at all is the renderer's own question, and it asks it itself.
+   */
   scheduleLyricPositionUpdate(isTicking: () => boolean, retick: () => void): void;
   retickFromPlaybackClock(
     buildOptions: (eventCreationTime: number, isPlaying: boolean) => TickOptions

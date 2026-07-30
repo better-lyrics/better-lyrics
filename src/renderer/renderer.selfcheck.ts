@@ -1386,6 +1386,41 @@ assert.equal(
   "Given a view whose container the page has hidden, When something asks it to measure, Then the scroll padding is rewritten and only the lines are held back"
 );
 
+// The measuring door that fires most: every streamed translation and romanization asks the view to
+// catch up with lines that moved, and the driver behind that answers for playback rather than for
+// layout, so it says yes while the page has the view off the screen.
+let hiddenRenderingChecks = 0;
+let hiddenReticks = 0;
+
+hiddenRenderer.scheduleLyricPositionUpdate(
+  () => {
+    hiddenRenderingChecks += 1;
+    return true;
+  },
+  () => {
+    hiddenReticks += 1;
+  }
+);
+
+const hiddenFrame = hidden.fakeWindow.requestedFrames.at(-1);
+assert.ok(
+  hiddenFrame,
+  "Given a hidden view asked to catch up with lines that moved, When the window is read, Then it holds the frame that was queued"
+);
+hiddenFrame(0);
+
+assert.deepEqual(
+  hiddenRenderer.lines.map(line => line.position),
+  [0, LINE_PITCH_PX, 2 * LINE_PITCH_PX],
+  "Given a hidden view whose driver says it is still ticking, When the frame it queued runs, Then the lines keep the positions they were measured at"
+);
+
+assert.deepEqual(
+  [hiddenRenderingChecks, hiddenReticks, hidden.measurements],
+  [1, 0, measurementsWhileRendered],
+  "Given a hidden view whose driver says it is still ticking, When the frame it queued runs, Then the driver is asked and the view still measures nothing and renders nothing against what it did not measure"
+);
+
 hidden.mount.isDisplayNone = false;
 hiddenLines[2].offsetTop = MOVED_LAST_LINE_TOP_PX;
 hidden.fakeWindow.dispatchWindowEvent("resize");
@@ -1397,6 +1432,82 @@ assert.deepEqual(
 );
 
 hiddenRenderer.destroy();
+
+// -- What is measurable is a question about the lines, not about the container -------------------
+// The container is not what a re-measurement reads, and it answers backwards in both directions. A
+// container under `display: contents` lays its lines out exactly as it would have while generating
+// no box of its own, and a container whose lines have gone off the screen still generates one.
+
+const { fixture: contents, host: contentsHost } = newViewFixture();
+const contentsRenderer = createLyricsRenderer({
+  document: asDocument(contents.fakeDocument),
+  window: asWindow(contents.fakeWindow),
+  mount: asElement<HTMLElement>(contents.mount),
+  host: contentsHost,
+});
+
+contentsRenderer.setLyrics(SYNCED_LYRICS);
+
+const contentsContainer = contentsRenderer.container;
+assert.ok(
+  contentsContainer !== null,
+  "Given lyrics built into a rendered mount, When the view is asked, Then it holds the container it built"
+);
+
+const contentsLines = asFakeNode(contentsContainer).childNodes.filter(child => child.classList.contains(LINE_CLASS));
+contentsLines.forEach((line, index) => {
+  line.offsetTop = index * LINE_PITCH_PX;
+  line.offsetHeight = LINE_HEIGHT_PX;
+});
+
+asFakeNode(contentsContainer).isDisplayContents = true;
+contentsRenderer.relayout();
+
+assert.deepEqual(
+  contentsRenderer.lines.map(line => line.position),
+  [0, LINE_PITCH_PX, 2 * LINE_PITCH_PX],
+  "Given a container that generates no box while the lines inside it do, When the view measures, Then it reads where the lines are rather than holding them back for a box it never reads"
+);
+
+// The other direction, which is the state an emptied container is left in: it goes on generating a
+// box of its own while the lines it was holding generate none.
+const measurementsWithContents = contents.measurements;
+asFakeNode(contentsContainer).isDisplayContents = false;
+for (const line of contentsLines) {
+  line.isDisplayNone = true;
+}
+contentsLines[2].offsetTop = MOVED_LAST_LINE_TOP_PX;
+contentsRenderer.relayout();
+
+assert.deepEqual(
+  [contentsRenderer.lines.map(line => line.position), contents.measurements],
+  [[0, LINE_PITCH_PX, 2 * LINE_PITCH_PX], measurementsWithContents],
+  "Given lines taken off the screen under a container that still generates a box, When the view measures, Then it holds the lines back rather than taking the container's answer for theirs"
+);
+
+contentsRenderer.destroy();
+
+// -- A view with no lines has nothing to hold back ----------------------------------------------
+// Holding one back would leave the container's own size unrecorded, and every later report of that
+// same size then reads as a change and measures again.
+
+const { fixture: empty, host: emptyHost } = newViewFixture();
+const emptyRenderer = createLyricsRenderer({
+  document: asDocument(empty.fakeDocument),
+  window: asWindow(empty.fakeWindow),
+  mount: asElement<HTMLElement>(empty.mount),
+  host: emptyHost,
+});
+
+emptyRenderer.setLyrics([]);
+
+assert.equal(
+  empty.measurements,
+  1,
+  "Given a song with no lines at all, When the view is built, Then it measured anyway, because there are no line positions for it to read as nothing"
+);
+
+emptyRenderer.destroy();
 
 // -- Unsynced lyrics resume sooner, and the view works that out for itself ----------------------
 // Which of the two resume delays a scroll gets is the only thing that says whether the view read
@@ -1447,7 +1558,7 @@ assert.deepEqual(
 
 unsyncedRenderer.destroy();
 
-const drivenFixtures = [panel, floating, rich, reflowed, hidden, unsynced];
+const drivenFixtures = [panel, floating, rich, reflowed, hidden, contents, empty, unsynced];
 
 assert.equal(
   ambientGlobalReads,

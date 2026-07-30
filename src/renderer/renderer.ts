@@ -16,6 +16,7 @@ import {
   scheduleLyricPositionUpdate as scheduleEngineLyricPositionUpdate,
   tickView,
 } from "./engine";
+import type { LineData } from "./inject";
 import type { LyricsRenderer, LyricsRendererHost, LyricsRendererOptions } from "./types";
 import { setLyrics as buildLyricsView } from "./view";
 
@@ -32,18 +33,27 @@ const SCROLLABLE_OVERFLOW = new Set(["auto", "scroll"]);
 function noop(): void {}
 
 /**
- * Whether the container generates a box, and so has anything to measure. A container the page has
- * hidden reports every line as zero height at zero offset, which reads as content that already runs
- * past the last line: the padding below it is then written as none, and nothing recomputes it once
- * the container comes back.
+ * Whether the lines generate boxes, and so have anything to measure. Lines the page is not
+ * rendering measure as zero height at zero offset, and every scroll target for the rest of the song
+ * is read off those numbers, so one measurement taken while they are off the screen strands the
+ * view until something measures it again.
  *
- * `getClientRects` rather than `offsetParent`: it answers for the boxes the element generates and
+ * The lines rather than the container holding them, because the lines are what a re-measurement
+ * reads. A container under `display: contents` renders its lines while generating no box of its
+ * own, and a container emptied of its lines still generates one: asking the container answers
+ * backwards in both directions. Asking the lines covers the container's own case as well, since a
+ * container that generates no box takes everything inside it with it.
+ *
+ * `getClientRects` rather than `offsetParent`: it answers for the boxes an element generates and
  * nothing else, while `offsetParent` is also null for a fixed or root element, so a consumer that
- * positions the container differently than this module's own stylesheet does would silently stop
- * being measured at all.
+ * positions its view differently than this module's own stylesheet does would silently stop being
+ * measured at all.
  */
-function hasLayoutBox(container: HTMLElement | null): boolean {
-  return container !== null && container.getClientRects().length > 0;
+function areLinesMeasurable(lines: readonly LineData[]): boolean {
+  // A view with no lines has nothing to hold back, and holding it back anyway would leave the
+  // container's own size unrecorded, so every later report of that same size reads as a change.
+  if (lines.length === 0) return true;
+  return lines.some(line => line.lyricElement.getClientRects().length > 0);
 }
 
 /**
@@ -149,13 +159,13 @@ export function createLyricsRenderer(rendererOptions: LyricsRendererOptions): Ly
    * per tick.
    *
    * The lines are only measurable while they are on screen, and whether they are is read off the
-   * container rather than asked of the consumer: a view that is hidden while a song loads is the
-   * normal case for a side panel, and a consumer that has to know to say so is one that will forget.
-   * The padding is worth rewriting either way, so only the lines are held back.
+   * lines themselves rather than asked of the consumer: a view that is hidden while a song loads is
+   * the normal case for a side panel, and a consumer that has to know to say so is one that will
+   * forget. The padding is worth rewriting either way, so only the lines are held back.
    */
   function measure(measureLines = true): void {
     forgetScrollElement();
-    relayout(engine, measureLines && hasLayoutBox(engine.lyricsContainer));
+    relayout(engine, measureLines && areLinesMeasurable(getRenderedLines(engine)));
   }
 
   function stopObservingContainer(): void {
@@ -269,7 +279,14 @@ export function createLyricsRenderer(rendererOptions: LyricsRendererOptions): Ly
     },
     scheduleLyricPositionUpdate(isTicking, retick) {
       if (isDestroyed) return;
-      scheduleEngineLyricPositionUpdate(engine, isTicking, retick);
+      // The caller's answer is one term rather than the whole of it. This is the measuring door that
+      // fires most, once per streamed translation and romanization, and it is reachable in exactly
+      // the state the guard exists for: the view ticks on while the page holds it off the screen.
+      scheduleEngineLyricPositionUpdate(
+        engine,
+        () => isTicking() && areLinesMeasurable(getRenderedLines(engine)),
+        retick
+      );
     },
     retickFromPlaybackClock(buildOptions) {
       if (isDestroyed) return "lyrics-missing";

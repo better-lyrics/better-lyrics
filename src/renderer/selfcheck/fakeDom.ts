@@ -119,6 +119,9 @@ export class FakeNode {
   // does: everything under it stops generating boxes, and a browser then answers nothing to every
   // measurement taken inside it.
   isDisplayNone = false;
+  // `display: contents`, which is the other half of that: this node generates no box of its own
+  // while everything under it is laid out exactly as it would have been.
+  isDisplayContents = false;
   private ownText = "";
 
   constructor(
@@ -134,8 +137,16 @@ export class FakeNode {
     return true;
   }
 
+  get generatesBox(): boolean {
+    return this.isRendered && !this.isDisplayContents;
+  }
+
   get offsetParent(): FakeNode | null {
-    return this.isRendered ? this.parentNode : null;
+    if (!this.generatesBox) return null;
+    for (let node = this.parentNode; node !== null; node = node.parentNode) {
+      if (node.generatesBox) return node;
+    }
+    return null;
   }
 
   get parentElement(): FakeNode | null {
@@ -143,12 +154,12 @@ export class FakeNode {
   }
 
   getBoundingClientRect(): { x: number; y: number; width: number; height: number } {
-    if (!this.isRendered) return { x: 0, y: 0, width: 0, height: 0 };
+    if (!this.generatesBox) return { x: 0, y: 0, width: 0, height: 0 };
     return { x: this.offsetLeft, y: this.offsetTop, width: this.offsetWidth, height: this.offsetHeight };
   }
 
   getClientRects(): { x: number; y: number; width: number; height: number }[] {
-    return this.isRendered ? [this.getBoundingClientRect()] : [];
+    return this.generatesBox ? [this.getBoundingClientRect()] : [];
   }
 
   animate(): FakeAnimation {
