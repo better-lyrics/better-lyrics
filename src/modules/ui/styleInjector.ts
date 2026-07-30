@@ -1,4 +1,5 @@
 import { GENERAL_ERROR_LOG, LOG_PREFIX } from "@constants";
+import { reloadLyrics } from "@core/appState";
 import { decompressString, isCompressed } from "@core/compression";
 import { compileRicsToStyles, getLocalStorage, getSyncStorage, loadChunkedStyles } from "@core/storage";
 import { setThemeSettings } from "@modules/settings/themeOptions";
@@ -31,7 +32,7 @@ function parseBlyricsConfig(cssContent: string): Map<string, string> {
 
 export function applyCustomStyles(css: string): void {
   let config = parseBlyricsConfig(css);
-  setThemeSettings(config);
+  let needsLyricReload = setThemeSettings(config);
 
   let styleTag = document.getElementById("blyrics-custom-style");
   if (styleTag) {
@@ -43,6 +44,10 @@ export function applyCustomStyles(css: string): void {
     document.head.appendChild(styleTag);
   }
   clearAnimationStyleCache();
+
+  if (needsLyricReload) {
+    reloadLyrics();
+  }
 }
 
 interface CSSStorageData {
