@@ -5,10 +5,10 @@ import {
   LINE_CLASS,
   PAUSED_CLASS,
   USER_SCROLLING_CLASS,
-} from "@renderer/constants";
-import type { LineData, LyricsRendererHost, LyricSyncType, PartData, TickOptions } from "@renderer/index";
-import { registerThemeSetting } from "@renderer/themeSettings";
-import { clamp, getRelativeLayoutBounds, positiveModulo, roundedMs, toMs } from "@renderer/util";
+} from "./constants";
+import type { LineData, LyricsRendererHost, LyricSyncType, PartData, TickOptions } from "./index";
+import { registerThemeSetting } from "./themeSettings";
+import { clamp, getRelativeLayoutBounds, positiveModulo, roundedMs, toMs } from "./util";
 
 const NO_LYRICS_ELEMENT_LOG = "No lyrics element found on the page, skipping lyrics injection";
 const LYRICS_CHECK_INTERVAL_ERROR = "Error in lyrics check interval:";

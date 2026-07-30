@@ -1,4 +1,5 @@
 import { AppState } from "@core/appState";
+import { ytmHost } from "@modules/ui/lyricsHost";
 import {
   type AnimationTickStatus,
   type AnimEngineViewState,
@@ -12,8 +13,7 @@ import {
   resetEngineState,
   runAnimationEngine,
   scheduleLyricPositionUpdate,
-} from "@modules/ui/animationEngine";
-import { ytmHost } from "@modules/ui/lyricsHost";
+} from "@renderer/engine";
 import type { LineData, LyricSyncType, TickOptions } from "@renderer/index";
 
 // -- The side panel's engine instance --------------------------
