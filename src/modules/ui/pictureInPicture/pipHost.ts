@@ -1,16 +1,10 @@
 import { DISABLE_EFFECTS_STYLE_ID, FOOTER_CLASS } from "@constants";
 import {
-  type AnimationEngineInstance,
-  clearLyrics,
-  noteContainerResize,
-  createAnimationEngineInstance,
-  getRenderedLines,
+  createLyricsRenderer,
   injectRomanization,
   injectTranslation,
   type Lyric,
-  relayout,
-  runAnimationEngine,
-  setLyrics,
+  type LyricsRenderer,
 } from "@renderer/index";
 import { setThemeSettings } from "@renderer/themeSettings";
 import { onLyrics, type PictureInPictureLyricsPayload } from "./bridge";
@@ -86,14 +80,13 @@ export function createPictureInPictureHost(
   environment: PictureInPictureHostEnvironment
 ): PictureInPictureController<Window> {
   let activeView: PictureInPictureLyricsView | null = null;
-  let activeEngine: AnimationEngineInstance | null = null;
+  let activeRenderer: LyricsRenderer | null = null;
   let activeWindow: Window | null = null;
   let lyricsPayload: PictureInPictureLyricsPayload | null = null;
   let builtLines: readonly Lyric[] | null = null;
   let clonedFooterSource: Element | null = null;
   let syncFrame: number | null = null;
   let themeObserver: MutationObserver | null = null;
-  let lyricsResizeObserver: ResizeObserver | null = null;
 
   function stopThemeMirror(): void {
     themeObserver?.disconnect();
@@ -147,29 +140,29 @@ export function createPictureInPictureHost(
    */
   function buildLyrics(): void {
     const view = activeView;
-    const engine = activeEngine;
-    if (!view || !engine) return;
+    const renderer = activeRenderer;
+    if (!view || !renderer) return;
 
     const lines = lyricsPayload?.lyrics ?? null;
     builtLines = lines;
-    clearLyrics(engine);
     // The container the copy hung off is about to go, so the next sync makes a fresh one.
     clonedFooterSource = null;
 
     if (!lines || lines.length === 0) {
-      stopLyricsResizeObserver();
+      renderer.clear();
       view.showSearching();
       return;
     }
 
-    setLyrics(engine, view.prepareLyricsMount(), [...lines], {
+    renderer.setLyrics([...lines], {
+      mount: view.prepareLyricsMount(),
       loaderVisible: false,
       noLyrics: lyricsPayload?.noLyrics === true,
     });
     applyDecorations();
     syncSourceFooter();
+    // The decorations and the footer both land after the build measured itself, and both add height.
     measureLyrics();
-    if (engine.lyricsContainer) observeLyricsResize(engine, engine.lyricsContainer);
   }
 
   /**
@@ -180,7 +173,7 @@ export function createPictureInPictureHost(
    * @returns Whether the lyrics changed height and want measuring again
    */
   function syncSourceFooter(): boolean {
-    const container = activeEngine?.lyricsContainer;
+    const container = activeRenderer?.container;
     if (!container) return false;
 
     const source = document.querySelector<HTMLElement>(`.${FOOTER_CLASS}`);
@@ -203,17 +196,18 @@ export function createPictureInPictureHost(
    * already carries one, so re-running costs a lookup per line.
    */
   function applyDecorations(): void {
-    const engine = activeEngine;
+    const renderer = activeRenderer;
+    const pipDocument = activeWindow?.document;
     const decorations = lyricsPayload?.decorations;
-    if (!engine || !decorations) return;
+    if (!renderer || !pipDocument || !decorations) return;
 
-    const lines = getRenderedLines(engine);
+    const lines = renderer.lines;
     for (const [index, decoration] of Object.entries(decorations)) {
       const line = lines[Number(index)];
       if (!line) continue;
       if (decoration.romanization) {
         injectRomanization(
-          engine.document,
+          pipDocument,
           line.lyricElement,
           line,
           decoration.romanization,
@@ -221,40 +215,13 @@ export function createPictureInPictureHost(
         );
       }
       if (decoration.translation) {
-        injectTranslation(engine.document, line.lyricElement, decoration.translation);
+        injectTranslation(pipDocument, line.lyricElement, decoration.translation);
       }
     }
   }
 
   function measureLyrics(): void {
-    if (activeEngine) relayout(activeEngine, true);
-  }
-
-  /**
-   * Line positions are measured once at build time, and at that point the window's stylesheets are
-   * still loading: they arrive as `<link>` elements. Everything the engine scrolls by comes from
-   * that measurement, so a layout that settles afterwards leaves the active line parked wherever
-   * the first guess put it. A theme makes the gap enormous, because the sizes the lines are built
-   * at are nothing like the ones the window's own clamps land on.
-   *
-   * The side panel does not drift like this because it re-measures from a ResizeObserver on its
-   * wrapper. This is that observer, with the same guard: re-measuring is what records the new size,
-   * so asking whether the size actually changed is what stops this feeding itself.
-   */
-  function observeLyricsResize(engine: AnimationEngineInstance, container: HTMLElement): void {
-    stopLyricsResizeObserver();
-    const observer = new engine.window.ResizeObserver(entries => {
-      const target = entries[entries.length - 1]?.target as HTMLElement | undefined;
-      if (!target || !activeEngine) return;
-      if (noteContainerResize(activeEngine, target.clientWidth, target.clientHeight)) measureLyrics();
-    });
-    observer.observe(container);
-    lyricsResizeObserver = observer;
-  }
-
-  function stopLyricsResizeObserver(): void {
-    lyricsResizeObserver?.disconnect();
-    lyricsResizeObserver = null;
+    activeRenderer?.relayout();
   }
 
   /**
@@ -264,8 +231,8 @@ export function createPictureInPictureHost(
    */
   function tickLyrics(): void {
     const view = activeView;
-    const engine = activeEngine;
-    if (!view || !engine) return;
+    const renderer = activeRenderer;
+    if (!view || !renderer) return;
     applySettings(view);
 
     const payload = lyricsPayload;
@@ -281,7 +248,7 @@ export function createPictureInPictureHost(
     // the window to the first line and back. The side panel's driver drops the same frames.
     if (currentTime === 0 && wallTime < payload.suppressZeroTimeUntil) return;
 
-    runAnimationEngine(engine, currentTime, {
+    renderer.tick(currentTime, {
       eventCreationTime: wallTime,
       isPlaying: snapshot.isPlaying,
       smoothScroll: true,
@@ -341,17 +308,13 @@ export function createPictureInPictureHost(
     injectLyricStyles(pipWindow);
     mirrorCustomTheme(pipWindow);
     activeView = new PictureInPictureLyricsView(pipWindow, document, environment.view);
-    activeEngine = createAnimationEngineInstance(
-      pipWindow.document,
-      pipWindow as Window & typeof globalThis,
-      createPictureInPictureLyricsHost(activeView, environment.view)
-    );
+    activeRenderer = createLyricsRenderer({
+      document: pipWindow.document,
+      window: pipWindow,
+      host: createPictureInPictureLyricsHost(activeView, environment.view),
+    });
     applySettings(activeView);
     buildLyrics();
-    // Lines measured before the theme's faces have loaded are measured at the fallback face's
-    // metrics, which leaves every scroll target a little off for the rest of the song.
-    void pipWindow.document.fonts.ready.then(measureLyrics);
-    pipWindow.addEventListener("resize", measureLyrics);
     startSyncLoop(pipWindow);
   }
 
@@ -362,10 +325,8 @@ export function createPictureInPictureHost(
     environment.onClosed();
     stopSyncLoop(pipWindow);
     stopThemeMirror();
-    stopLyricsResizeObserver();
-    pipWindow.removeEventListener("resize", measureLyrics);
-    activeEngine?.destroy();
-    activeEngine = null;
+    activeRenderer?.destroy();
+    activeRenderer = null;
     activeView = null;
     lyricsPayload = null;
     builtLines = null;

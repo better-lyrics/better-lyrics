@@ -36,7 +36,7 @@ import { AppState } from "@core/appState";
 import { t } from "@core/i18n";
 import type { ThumbnailElement } from "@modules/lyrics/requestSniffer/NextResponse";
 import { getArtworkMetadata } from "@modules/lyrics/requestSniffer/requestSniffer";
-import { clearLyricsFromViews, lyricsElementAdded } from "@modules/ui/mainLyricsView";
+import { lyricsElementAdded, mainView } from "@modules/ui/mainLyricsView";
 import { publishPictureInPictureLyrics } from "@modules/ui/pictureInPicture/lyricsPublisher";
 import { getResumeScrollElement } from "@modules/ui/resumeScrollButton";
 import { getRequest, setRequest } from "@modules/unison/lyricsRequestTracker";
@@ -1486,7 +1486,9 @@ export async function injectHeadTags(): Promise<void> {
  * Cleans up this elements and resets state when switching songs.
  */
 export function cleanup(): void {
-  clearLyricsFromViews();
+  // Only the side panel's view is reachable from here: the floating window holds its own renderer,
+  // in its own realm on Gecko, and drops the song off the lyrics publish this function ends with.
+  mainView.clear();
 
   if (lyricsObserver) {
     lyricsObserver.disconnect();

@@ -1,7 +1,6 @@
 import { AppState } from "@core/appState";
 import { ytmHost } from "@modules/ui/lyricsHost";
 import {
-  clearLyrics,
   createLyricsRenderer,
   forEveryLiveView,
   type LyricsRenderer,
@@ -25,16 +24,6 @@ export const mainView: LyricsRenderer = createLyricsRenderer({ document, window,
  */
 export function resumeAutoscroll(): void {
   forEveryLiveView(resetScrollResume);
-}
-
-/**
- * The song went away, so the lyrics go with it everywhere they were rendered.
- */
-export function clearLyricsFromViews(): void {
-  mainView.clear();
-  // The floating window builds its own container out of the same engine, so until it holds a
-  // renderer too this is the only way to reach it.
-  forEveryLiveView(clearLyrics);
 }
 
 // -- Tick options --------------------------
