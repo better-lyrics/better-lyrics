@@ -14,12 +14,15 @@ function offsetKey(videoId: string, source: string): string {
 
 function retickLyrics(): void {
   if (AppState.areLyricsTicking) {
-    animationEngine(
+    const status = animationEngine(
       animEngineState.lastTime,
       animEngineState.lastEventCreationTime,
       animEngineState.lastPlayState,
       false
     );
+    if (status === "lyrics-missing") {
+      AppState.areLyricsTicking = false;
+    }
   }
 }
 

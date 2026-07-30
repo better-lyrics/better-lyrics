@@ -2215,17 +2215,23 @@ function setupTabRendererObserver(engine: AnimationEngineInstance, element: HTML
   engine.cachedTabRendererHeight = element.getBoundingClientRect().height;
 }
 
+/**
+ * "lyrics-missing" means this instance has nothing left to render. Whether that ends ticking is the
+ * driver's call, not the instance's: one instance running dry must not silence another.
+ */
+type AnimationTickStatus = "ok" | "lyrics-missing";
+
 function runAnimationEngine(
   engine: AnimationEngineInstance,
   currentTime: number,
   eventCreationTime: number,
   isPlaying = true,
   smoothScroll = true
-) {
+): AnimationTickStatus {
   const now = Date.now();
   // const frameStart = performance.now();
   if (!AppState.areLyricsTicking || (currentTime === 0 && !isPlaying)) {
-    return;
+    return "ok";
   }
 
   if (AppState.lyricData?.syncType === "none") {
@@ -2233,9 +2239,9 @@ function runAnimationEngine(
       engine.scrollResumeTime = 0;
     }
     playbackClock.lastPlayState = isPlaying;
-    if (!AppState.isPassiveScrollEnabled) return;
+    if (!AppState.isPassiveScrollEnabled) return "ok";
     startPassiveScrollLoop(engine);
-    return;
+    return "ok";
   }
 
   const timeJumped =
@@ -2257,9 +2263,8 @@ function runAnimationEngine(
 
   let lyricData = AppState.lyricData;
   if (!lyricData) {
-    AppState.areLyricsTicking = false;
     log("Lyrics are ticking, but lyricData are null!");
-    return;
+    return "lyrics-missing";
   }
 
   const tabSelector = lyricData.tabSelector;
@@ -2274,12 +2279,12 @@ function runAnimationEngine(
   // Don't tick lyrics if they're not visible anywhere
   if (!isMainLyricsVisible && !AppState.isPictureInPictureOpen) {
     clearVisibleLyricWillChange(engine);
-    return;
+    return "ok";
   }
 
   if (isAdPlaying()) {
     showAdOverlay();
-    return;
+    return "ok";
   } else {
     hideAdOverlay();
   }
@@ -2288,9 +2293,8 @@ function runAnimationEngine(
     const lyricsElement = lyricData.lyricsContainer;
     // If lyrics element doesn't exist, clear the interval and return silently
     if (!lyricsElement) {
-      AppState.areLyricsTicking = false;
       log(NO_LYRICS_ELEMENT_LOG);
-      return;
+      return "lyrics-missing";
     }
 
     const lines = AppState.lyricData!.lines;
@@ -2314,7 +2318,7 @@ function runAnimationEngine(
     const tabRenderer = resolveScrollElement(engine);
     if (!tabRenderer) {
       clearVisibleLyricWillChange(engine);
-      return;
+      return "ok";
     }
     if (tabRenderer !== engine.observedTabRenderer) {
       setupTabRendererObserver(engine, tabRenderer);
@@ -2707,6 +2711,8 @@ function runAnimationEngine(
       log(LYRICS_CHECK_INTERVAL_ERROR, err);
     }
   }
+
+  return "ok";
 }
 
 /**
@@ -2716,12 +2722,24 @@ function runAnimationEngine(
  * @param eventCreationTime - Timestamp when the event was created (ms)
  * @param [isPlaying=true] - Whether audio is currently playing
  * @param [smoothScroll=true] - Whether to use smooth scrolling
+ * @returns "lyrics-missing" when the tick found nothing to render, so the driver can stop ticking
  */
-export function animationEngine(currentTime: number, eventCreationTime: number, isPlaying = true, smoothScroll = true) {
-  runAnimationEngine(mainEngine, currentTime, eventCreationTime, isPlaying, smoothScroll);
+export function animationEngine(
+  currentTime: number,
+  eventCreationTime: number,
+  isPlaying = true,
+  smoothScroll = true
+): AnimationTickStatus {
+  return runAnimationEngine(mainEngine, currentTime, eventCreationTime, isPlaying, smoothScroll);
 }
 
 // -- Debounced Lyrics Update --------------------------
+
+function cancelLyricPositionUpdate(engine: AnimationEngineInstance): void {
+  if (engine.pendingLyricsUpdateFrame === null) return;
+  engine.window.cancelAnimationFrame(engine.pendingLyricsUpdateFrame);
+  engine.pendingLyricsUpdateFrame = null;
+}
 
 /**
  * Called when a new lyrics element is added to trigger re-sync.
@@ -2729,13 +2747,10 @@ export function animationEngine(currentTime: number, eventCreationTime: number, 
  * when translations/romanizations load (each addition would otherwise
  * trigger calculateLyricPositions on ALL lines).
  */
-function cancelLyricPositionUpdate(engine: AnimationEngineInstance): void {
-  if (engine.pendingLyricsUpdateFrame === null) return;
-  engine.window.cancelAnimationFrame(engine.pendingLyricsUpdateFrame);
-  engine.pendingLyricsUpdateFrame = null;
-}
-
-function scheduleLyricPositionUpdate(engine: AnimationEngineInstance): void {
+function scheduleLyricPositionUpdate(
+  engine: AnimationEngineInstance,
+  reportTickStatus: (status: AnimationTickStatus) => void
+): void {
   if (!AppState.areLyricsTicking || engine.pendingLyricsUpdateFrame !== null) {
     return;
   }
@@ -2743,18 +2758,24 @@ function scheduleLyricPositionUpdate(engine: AnimationEngineInstance): void {
   engine.pendingLyricsUpdateFrame = engine.window.requestAnimationFrame(() => {
     engine.pendingLyricsUpdateFrame = null;
     calculateLyricPositions();
-    runAnimationEngine(
-      engine,
-      playbackClock.lastTime,
-      playbackClock.lastEventCreationTime,
-      playbackClock.lastPlayState,
-      false
+    reportTickStatus(
+      runAnimationEngine(
+        engine,
+        playbackClock.lastTime,
+        playbackClock.lastEventCreationTime,
+        playbackClock.lastPlayState,
+        false
+      )
     );
   });
 }
 
 export function lyricsElementAdded(): void {
-  scheduleLyricPositionUpdate(mainEngine);
+  scheduleLyricPositionUpdate(mainEngine, status => {
+    if (status === "lyrics-missing") {
+      AppState.areLyricsTicking = false;
+    }
+  });
 }
 
 /**

@@ -77,7 +77,9 @@ function runAnimationEngine(now: number, force = false): void {
     : 0;
   const currentTime = Math.min(latestPlayerTime + elapsedS, latestPlayerDuration || Infinity);
   if (AppState.suppressZeroTime < wallTime || currentTime !== 0) {
-    animationEngine(currentTime, wallTime, latestPlayerPlaying);
+    if (animationEngine(currentTime, wallTime, latestPlayerPlaying) === "lyrics-missing") {
+      AppState.areLyricsTicking = false;
+    }
   }
 }
 
