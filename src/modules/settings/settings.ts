@@ -13,6 +13,7 @@ import { mountDock, mountVotingSegment, reloadAlbumArt, unmountDock, updateDockP
 import { applyGlobalOffsets } from "@modules/ui/lyricsDock/offset";
 import { calculateLyricPositions } from "@modules/ui/mainLyricsView";
 import { isPlayerFullscreened, onFullscreenChange } from "@modules/ui/observer";
+import { publishPictureInPictureLyrics } from "@modules/ui/pictureInPicture/lyricsPublisher";
 import { applyCustomStyles, getAndApplyCustomStyles } from "@modules/ui/styleInjector";
 
 let hasInitializedMessageListener = false;
@@ -262,6 +263,9 @@ export function listenForPopupMessages(): void {
 export function loadPassiveScrollSetting(): void {
   getStorage({ isPassiveScrollEnabled: true }, items => {
     AppState.isPassiveScrollEnabled = items.isPassiveScrollEnabled;
+    // The side panel reads this off AppState every tick. The floating window only sees the copy
+    // that rode over on the last payload, so a change reaches it on a republish or not at all.
+    publishPictureInPictureLyrics();
   });
 }
 
