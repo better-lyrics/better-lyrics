@@ -134,12 +134,30 @@ export interface LyricsRendererOptions {
  * DOM needs.
  */
 export interface LyricsRenderer {
-  setLyrics(lyrics: Lyric[], options?: SetLyricsOptions & { mount?: HTMLElement }): void;
+  /**
+   * Replaces whatever this renderer last built. Every option has a default, so a consumer with an
+   * opinion about only one of them says only that one. The mount rides along with the CSS flags
+   * rather than taking a parameter of its own: it is an option of this call like the others, and a
+   * third parameter would have every caller that only wants to move the mount pass over the two in
+   * front of it.
+   */
+  setLyrics(lyrics: Lyric[], options?: Partial<SetLyricsOptions> & { mount?: HTMLElement }): void;
   tick(currentTimeS: number, options: TickOptions): AnimationTickStatus;
   relayout(measureLines?: boolean): void;
+  /**
+   * Drops the song and the DOM built for it. The renderer built that DOM, so it takes it away again.
+   */
   clear(): void;
+  /**
+   * Clears, and gives up the window and document it was holding. Final: everything here does
+   * nothing afterwards.
+   */
   destroy(): void;
-  noteUserScroll(isPassive: boolean): void;
+  /**
+   * The user scrolled the view. Whether that resumes sooner because the lyrics are unsynced is the
+   * renderer's own reading of what it has on screen, not something the caller has to supply.
+   */
+  noteUserScroll(): void;
   noteVisibilityChange(): void;
   resumeAutoscroll(): void;
   clearStyleCaches(): void;

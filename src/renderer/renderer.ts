@@ -5,6 +5,7 @@ import {
   createAnimationEngineInstance,
   getRenderedLines,
   getRenderedSyncType,
+  hasUnsyncedLyrics,
   noteContainerResize,
   noteUserScroll as noteEngineUserScroll,
   noteVisibilityChange as noteEngineVisibilityChange,
@@ -36,7 +37,12 @@ function findScrollElement(rendererWindow: Window, mount: HTMLElement | null): H
   for (let element = mount; element !== null; element = element.parentElement) {
     if (SCROLLABLE_OVERFLOW.has(rendererWindow.getComputedStyle(element).overflowY)) return element;
   }
-  return mount;
+  if (mount === null) return null;
+  // On an ordinary page every ancestor computes to `visible` and the document is what scrolls.
+  // Standing the mount in for one leaves autoscroll writing scrollTop onto an element that cannot
+  // scroll, which reads as lyrics that highlight and never move. `scrollingElement` is typed as
+  // `Element` for documents whose root need not be an HTMLElement; in an HTML one it is html or body.
+  return mount.ownerDocument.scrollingElement as HTMLElement | null;
 }
 
 /**
@@ -55,11 +61,26 @@ export function withHostDefaults(
 ): LyricsRendererHost {
   const given = overrides ?? {};
 
+  // The engine resolves the scroll element on every tick, and the walk reads a computed style per
+  // ancestor, so an unmemoised default forces style resolution sixty times a second. Only a new
+  // mount can change where the walk ends.
+  let walkedMount: HTMLElement | null = null;
+  let walkedScrollElement: HTMLElement | null = null;
+
+  function scrollElementForCurrentMount(): HTMLElement | null {
+    const mount = currentMount();
+    if (mount !== walkedMount) {
+      walkedMount = mount;
+      walkedScrollElement = findScrollElement(rendererWindow, mount);
+    }
+    return walkedScrollElement;
+  }
+
   return {
     isViewVisible: given.isViewVisible ?? (() => true),
     isLoaderActive: given.isLoaderActive ?? (() => false),
     syncAdState: given.syncAdState ?? (() => false),
-    getScrollElement: given.getScrollElement ?? (() => findScrollElement(rendererWindow, currentMount())),
+    getScrollElement: given.getScrollElement ?? scrollElementForCurrentMount,
     setResumeAffordanceVisible: given.setResumeAffordanceVisible ?? noop,
     seek:
       given.seek ??
@@ -104,6 +125,17 @@ export function createLyricsRenderer(rendererOptions: LyricsRendererOptions): Ly
   }
 
   /**
+   * Drops the song, DOM and all. The engine's own clear keeps the container it was handed, because
+   * the callers it was written for built that container themselves. This one built it, so leaving it
+   * behind would leave a cleared view showing the song it just dropped.
+   */
+  function clearBuiltView(): void {
+    stopObservingContainer();
+    engine.lyricsContainer?.remove();
+    clearLyrics(engine);
+  }
+
+  /**
    * Watches the built container for the layout it settles into. The guard is what stops this
    * feeding itself: re-measuring is what records the new size, so the observer has to ask whether
    * the size actually changed before it re-measures.
@@ -129,12 +161,20 @@ export function createLyricsRenderer(rendererOptions: LyricsRendererOptions): Ly
     measure();
   });
 
+  // Destruction is final, and every entry point below says so by doing nothing. Silently, because
+  // the frame a consumer already queued arriving one tick after it tore the view down is the normal
+  // case rather than a mistake, and a throw there turns an orderly shutdown into an error report.
+  // The ones that answer something answer what an emptied view answers.
   return {
     setLyrics(lyrics, options) {
+      if (isDestroyed) return;
       const nextMount = options?.mount ?? mount;
       if (!nextMount) {
         throw new Error("A lyrics renderer needs a mount: give one to createLyricsRenderer or to setLyrics");
       }
+      // Before the mount moves, so a second song built somewhere else takes the first one's
+      // container with it rather than orphaning it in the mount it was built in.
+      clearBuiltView();
       mount = nextMount;
 
       buildLyricsView(engine, nextMount, lyrics, {
@@ -145,40 +185,50 @@ export function createLyricsRenderer(rendererOptions: LyricsRendererOptions): Ly
       if (engine.lyricsContainer) observeContainer(engine.lyricsContainer);
     },
     tick(currentTimeS, options) {
+      if (isDestroyed) return "lyrics-missing";
       return tickView(engine, currentTimeS, resolveTickOptions(options));
     },
     relayout(measureLines = true) {
+      if (isDestroyed) return;
       measure(measureLines);
     },
     clear() {
-      stopObservingContainer();
-      clearLyrics(engine);
+      if (isDestroyed) return;
+      clearBuiltView();
     },
     destroy() {
+      if (isDestroyed) return;
       isDestroyed = true;
-      stopObservingContainer();
+      clearBuiltView();
       rendererWindow.removeEventListener("resize", remeasureForViewport);
       engine.destroy();
     },
-    noteUserScroll(isPassive) {
-      noteEngineUserScroll(engine, isPassive);
+    noteUserScroll() {
+      if (isDestroyed) return;
+      noteEngineUserScroll(engine, hasUnsyncedLyrics(engine));
     },
     noteVisibilityChange() {
+      if (isDestroyed) return;
       noteEngineVisibilityChange(engine);
     },
     resumeAutoscroll() {
+      if (isDestroyed) return;
       resetScrollResume(engine);
     },
     clearStyleCaches() {
+      if (isDestroyed) return;
       clearEngineStyleCaches(engine);
     },
     clearOnScreenLyrics() {
+      if (isDestroyed) return false;
       return clearEngineOnScreenLyrics(engine);
     },
     scheduleLyricPositionUpdate(isTicking, retick) {
+      if (isDestroyed) return;
       scheduleEngineLyricPositionUpdate(engine, isTicking, retick);
     },
     retickFromPlaybackClock(buildOptions) {
+      if (isDestroyed) return "lyrics-missing";
       return retickEngineFromPlaybackClock(engine, buildOptions);
     },
     get container() {
