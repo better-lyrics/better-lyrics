@@ -30,10 +30,11 @@ import {
   type SyncType,
   TAB_RENDERER_SELECTOR,
   TRANSLATED_LYRICS_CLASS,
+  WORD_HIGHLIGHT_CLASS,
 } from "@constants";
 import { AppState } from "@core/appState";
 import { t } from "@core/i18n";
-import { disconnectResizeObserver, WORD_HIGHLIGHT_CLASS } from "@modules/lyrics/injectLyrics";
+import { disconnectResizeObserver } from "@modules/lyrics/injectLyrics";
 import type { ThumbnailElement } from "@modules/lyrics/requestSniffer/NextResponse";
 import { getArtworkMetadata } from "@modules/lyrics/requestSniffer/requestSniffer";
 import {

@@ -1,34 +1,31 @@
 import {
+  BACKGROUND_LINE_CLASS,
   BACKGROUND_LYRIC_CLASS,
+  BIDI_RUN_CLASS,
+  BIDI_SENSITIVE_CLASS,
+  CONTENT_LINE_CLASS,
   EXPLICIT_WORD_CLASS,
-  LOG_PREFIX,
+  LINE_MAIN_CLASS,
+  LINE_SYNCED_WORD_CLASS,
+  LONG_WORD_GROUP_CLASS,
   ROMANIZED_LYRICS_CLASS,
   RTL_CLASS,
   TRANSLATED_LYRICS_CLASS,
   WORD_CLASS,
+  WORD_GROUP_CLASS,
+  WORD_HIGHLIGHT_CLASS,
   ZERO_DURATION_ANIMATION_CLASS,
-} from "@constants";
-import type { Lyric, LyricPart } from "@modules/lyrics/providers/shared";
-import { registerThemeSetting } from "@modules/settings/themeOptions";
-import { animEngineState } from "@modules/ui/animationEngine";
-import { log } from "@utils";
+} from "./constants";
 import { getSeekTimeFromClick } from "./seek";
-import { testRtl } from "./text";
+import { containsNonLatin, testRtl } from "./text";
+import { registerThemeSetting } from "./themeSettings";
+import type { Lyric, LyricPart, LyricSyncType } from "./types";
 
 export let disableRichsync = registerThemeSetting("blyrics-disable-richsync", false, true);
 let lineSyncedAnimationDelay = registerThemeSetting("blyrics-line-synced-animation-delay", 50, true);
 let longWordThreshold = registerThemeSetting("blyrics-long-word-threshold", 1500, true);
 let longWordWrapThreshold = registerThemeSetting("blyrics-long-word-wrap-threshold", 10, true);
 
-const LINE_MAIN_CLASS = "blyrics-line-main";
-const BACKGROUND_LINE_CLASS = "blyrics-background-line";
-const LINE_SYNCED_WORD_CLASS = "blyrics-line-synced-word";
-export const WORD_HIGHLIGHT_CLASS = "blyrics-word-highlight";
-const WORD_GROUP_CLASS = "blyrics-word-group";
-const LONG_WORD_GROUP_CLASS = "blyrics-word-group-long";
-const BIDI_RUN_CLASS = "blyrics-bidi-run";
-const BIDI_SENSITIVE_CLASS = "blyrics-bidi-sensitive";
-const CONTENT_LINE_CLASS = "blyrics-content-line";
 const RTL_SCRIPT_REGEX = /[\p{Script=Arabic}\p{Script=Hebrew}\p{Script=Syriac}\p{Script=Thaana}]/u;
 const LTR_SCRIPT_REGEX =
   /[\p{Script=Latin}\p{Script=Greek}\p{Script=Cyrillic}\p{Script=Han}\p{Script=Hangul}\p{Script=Hiragana}\p{Script=Katakana}]/u;
@@ -62,6 +59,23 @@ export function isNearestLyricRtl(lyrics: Lyric[], fromIndex: number): boolean {
     }
   }
   return false;
+}
+
+// -- Lyric shape --------------------------------------------
+
+// A line whose parts are missing, empty or overridden by the theme is rebuilt as line synced words,
+// which carry no duration, so only pre-existing timed parts count as rich sync.
+export function deriveSyncType(lyrics: Lyric[]): LyricSyncType {
+  const hasTimedParts =
+    !disableRichsync.getBooleanValue() &&
+    lyrics.some(item => !item.isInstrumental && item.parts?.some(part => part.durationMs !== 0) === true);
+
+  if (hasTimedParts) return "richsync";
+  return lyrics.every(item => item.startTimeMs === 0) ? "none" : "synced";
+}
+
+export function hasNonLatinLyrics(lyrics: Lyric[]): boolean {
+  return lyrics.some(item => !!item.words && containsNonLatin(item.words));
 }
 
 export interface PartData {
@@ -445,9 +459,7 @@ export function addSeekHandler(seek: (timeS: number) => void, lyricElement: HTML
     const seekTime = getSeekTimeFromClick(event, lyricElement);
     if (seekTime === null) return;
 
-    log(LOG_PREFIX, `Seeking to ${seekTime.toFixed(2)}s`);
     seek(seekTime);
-    animEngineState.scrollResumeTime = 0;
   });
 }
 

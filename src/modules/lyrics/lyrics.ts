@@ -28,7 +28,9 @@ import { animEngineState } from "@modules/ui/animationEngine";
 const hideInstrumentalOnly = registerThemeSetting("blyrics-hide-instrumental-only", false, true);
 
 function seekPlayer(timeS: number): void {
+  log(LOG_PREFIX, `Seeking to ${timeS.toFixed(2)}s`);
   document.dispatchEvent(new CustomEvent(SEEK_EVENT, { detail: timeS }));
+  animEngineState.scrollResumeTime = 0;
 }
 
 function isInstrumentalOnly(lyrics: Lyric[]): boolean {

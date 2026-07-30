@@ -42,21 +42,21 @@ import {
   containsNonLatin,
   createInstrumentalElement,
   createLyricsLine,
+  deriveSyncType,
   detectNonLatinLanguage,
   disableRichsync,
   findNearestAgent,
+  hasNonLatinLyrics,
   injectRomanization,
   injectTranslation,
   isNearestLyricRtl,
   type LineData,
   newLineData,
   type PartData,
-  WORD_HIGHLIGHT_CLASS,
 } from "@renderer/index";
 import { getRelativeLayoutBounds, langCodesMatch, languageMatchesAny, log } from "@utils";
 
 export type { LineData, PartData };
-export { WORD_HIGHLIGHT_CLASS };
 
 function isRomanizationDisabledForLang(lang: string): boolean {
   return languageMatchesAny(lang, AppState.romanizationDisabledLanguages);
@@ -200,7 +200,7 @@ function injectLyrics(
   }
 
   let lines: LineData[] = [];
-  let syncType: SyncType = allZero ? "none" : "synced";
+  const syncType: SyncType = deriveSyncType(lyrics);
 
   for (const [lineIndex, lyricItem] of lyrics.entries()) {
     let lyricElement = doc.createElement("div");
@@ -234,10 +234,6 @@ function injectLyrics(
 
     if (!lyricItem.parts || lyricItem.parts.length === 0 || disableRichsync.getBooleanValue()) {
       lyricItem.parts = buildLineSyncedParts(lyricItem);
-    }
-
-    if (!lyricItem.parts.every(part => part.durationMs === 0)) {
-      syncType = "richsync";
     }
 
     applyDirection(lyricElement, lyricItem.words);
@@ -274,7 +270,7 @@ function injectLyrics(
     isMusicVideoSynced: data.musicVideoSynced === true,
     tabSelector,
     lyricsContainer,
-    hasNonLatin: lyrics.some(item => !!item.words && containsNonLatin(item.words)),
+    hasNonLatin: hasNonLatinLyrics(lyrics),
   };
 
   // Set before addFooter so the dock controls read the current song's lyric data.

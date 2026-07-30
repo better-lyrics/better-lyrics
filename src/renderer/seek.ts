@@ -1,4 +1,4 @@
-import { LYRICS_CLASS, WORD_CLASS } from "@constants";
+import { LYRICS_CLASS, WORD_CLASS } from "./constants";
 
 export function getSeekTimeFromClick(event: MouseEvent, lyricElement: HTMLElement): number | null {
   const target = event.target as HTMLElement;

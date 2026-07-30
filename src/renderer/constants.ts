@@ -24,3 +24,15 @@ export const EXPLICIT_WORD_CLASS = "blyrics-explicit" as const;
 export const RTL_CLASS = "blyrics-rtl" as const;
 export const TRANSLATED_LYRICS_CLASS = "blyrics--translated" as const;
 export const ROMANIZED_LYRICS_CLASS = "blyrics--romanized" as const;
+
+// -- Line internals --------------------------------------------
+
+export const CONTENT_LINE_CLASS = "blyrics-content-line" as const;
+export const LINE_MAIN_CLASS = "blyrics-line-main" as const;
+export const BACKGROUND_LINE_CLASS = "blyrics-background-line" as const;
+export const WORD_GROUP_CLASS = "blyrics-word-group" as const;
+export const LONG_WORD_GROUP_CLASS = "blyrics-word-group-long" as const;
+export const WORD_HIGHLIGHT_CLASS = "blyrics-word-highlight" as const;
+export const LINE_SYNCED_WORD_CLASS = "blyrics-line-synced-word" as const;
+export const BIDI_RUN_CLASS = "blyrics-bidi-run" as const;
+export const BIDI_SENSITIVE_CLASS = "blyrics-bidi-sensitive" as const;

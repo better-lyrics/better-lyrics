@@ -4,9 +4,7 @@ import type { LyricSourceKey } from "@modules/lyrics/providers/shared";
 // existing importers keep reaching them through @constants.
 export {
   ANIMATING_CLASS,
-  BACKGROUND_LYRIC_CLASS,
   CURRENT_LYRICS_CLASS,
-  EXPLICIT_WORD_CLASS,
   FOOTER_CLASS,
   LINE_CLASS,
   LYRICS_CLASS,
@@ -16,8 +14,7 @@ export {
   RTL_CLASS,
   TRANSLATED_LYRICS_CLASS,
   USER_SCROLLING_CLASS,
-  WORD_CLASS,
-  ZERO_DURATION_ANIMATION_CLASS,
+  WORD_HIGHLIGHT_CLASS,
 } from "@renderer/constants";
 
 // DOM Class Names
