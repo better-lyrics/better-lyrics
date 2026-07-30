@@ -183,10 +183,6 @@ class FakeHost implements LyricsRendererHost {
     assert.fail("Nothing in this run clicks a line, so no view may ask its host to seek");
   }
 
-  translate(key: string): string {
-    return key;
-  }
-
   log(...args: unknown[]): void {
     this.logs.push(args);
   }

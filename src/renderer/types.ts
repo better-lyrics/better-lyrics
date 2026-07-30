@@ -86,7 +86,6 @@ export interface LyricsRendererHost {
    * currentTime on a media element directly.
    */
   seek(timeS: number): void;
-  translate(key: string): string;
   /**
    * Where the view's diagnostics go. The host owns the prefix and whether logging is on at all.
    */

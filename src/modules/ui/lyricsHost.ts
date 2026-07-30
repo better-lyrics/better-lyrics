@@ -1,5 +1,4 @@
 import { LOG_PREFIX, TAB_HEADER_CLASS, TAB_RENDERER_SELECTOR } from "@constants";
-import { t } from "@core/i18n";
 import { seekPlayer } from "@modules/lyrics/lyrics";
 import { hideAdOverlay, isAdPlaying, isLoaderActive, showAdOverlay } from "@modules/ui/dom";
 import { getResumeScrollElement } from "@modules/ui/resumeScrollButton";
@@ -57,7 +56,6 @@ export const ytmHost: LyricsRendererHost = {
     return document.querySelector<HTMLElement>(TAB_RENDERER_SELECTOR);
   },
   seek: seekPlayer,
-  translate: t,
   /**
    * Resolved per call rather than bound once: `log` is reassigned when the logging setting loads.
    */
