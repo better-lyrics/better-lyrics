@@ -24,6 +24,7 @@ export {
   scheduleLyricPositionUpdate,
 } from "./engine";
 export { hasNonLatinLyrics, injectRomanization, injectTranslation, type LineData, type PartData } from "./inject";
+export { createLyricsRenderer } from "./renderer";
 export { containsNonLatin, detectNonLatinLanguage } from "./text";
 export { registerThemeSetting, setThemeSettings } from "./themeSettings";
 export type {

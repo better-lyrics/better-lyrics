@@ -39,6 +39,14 @@ class FakeClassList {
     }
   }
 
+  toggle(name: string, force: boolean): void {
+    if (force) {
+      this.tokens.add(name);
+    } else {
+      this.tokens.delete(name);
+    }
+  }
+
   contains(name: string): boolean {
     return this.tokens.has(name);
   }
@@ -57,6 +65,21 @@ class FakeStyle {
   }
 }
 
+// The engine keeps every Animation it starts and later asks it where it got to. "idle" is what a
+// browser reports before one has a start time, and reporting it is what keeps the engine's timing
+// sampler out of a fake that has no honest answer for it.
+class FakeAnimation {
+  currentTime: number | null = null;
+  readonly playState = "idle";
+
+  cancel(): void {}
+  play(): void {}
+  pause(): void {}
+  addEventListener(): void {}
+}
+
+const SCOPE_CHILD_PREFIX = ":scope > ";
+
 export class FakeNode {
   readonly classList = new FakeClassList();
   readonly dataset: Record<string, string> = {};
@@ -64,10 +87,20 @@ export class FakeNode {
   readonly attributes: Record<string, string> = {};
   readonly childNodes: FakeNode[] = [];
   readonly clickListeners: ClickListener[] = [];
+  readonly dispatchedEvents: unknown[] = [];
   parentNode: FakeNode | null = null;
   dir = "";
+  // Nothing here lays anything out, so a self-check that needs a measurement writes what one would
+  // have produced and the module reads it back the way it reads a browser's.
   clientWidth = 0;
   clientHeight = 0;
+  offsetLeft = 0;
+  offsetTop = 0;
+  offsetWidth = 0;
+  offsetHeight = 0;
+  scrollWidth = 0;
+  scrollHeight = 0;
+  scrollTop = 0;
   private ownText = "";
 
   constructor(
@@ -75,6 +108,22 @@ export class FakeNode {
     readonly kind: FakeNodeKind,
     readonly name: string
   ) {}
+
+  get offsetParent(): FakeNode | null {
+    return this.parentNode;
+  }
+
+  get parentElement(): FakeNode | null {
+    return this.parentNode;
+  }
+
+  getBoundingClientRect(): { x: number; y: number; width: number; height: number } {
+    return { x: this.offsetLeft, y: this.offsetTop, width: this.offsetWidth, height: this.offsetHeight };
+  }
+
+  animate(): FakeAnimation {
+    return new FakeAnimation();
+  }
 
   get textContent(): string {
     return this.ownText + this.childNodes.map(child => child.textContent).join("");
@@ -145,6 +194,11 @@ export class FakeNode {
     }
   }
 
+  dispatchEvent(event: unknown): boolean {
+    this.dispatchedEvents.push(event);
+    return true;
+  }
+
   matches(selector: string): boolean {
     if (!selector.startsWith(".")) {
       throw new Error(`The fake node only understands class selectors, not "${selector}"`);
@@ -161,13 +215,18 @@ export class FakeNode {
     return null;
   }
 
-  querySelector(selector: string): FakeNode | null {
-    for (const child of this.childNodes) {
-      if (child.matches(selector)) return child;
-      const found = child.querySelector(selector);
-      if (found !== null) return found;
+  querySelectorAll(selector: string): FakeNode[] {
+    if (selector.startsWith(SCOPE_CHILD_PREFIX)) {
+      const childSelector = selector.slice(SCOPE_CHILD_PREFIX.length);
+      return this.childNodes.filter(child => child.matches(childSelector));
     }
-    return null;
+    return collectTree(this)
+      .slice(1)
+      .filter(node => node.matches(selector));
+  }
+
+  querySelector(selector: string): FakeNode | null {
+    return this.querySelectorAll(selector)[0] ?? null;
   }
 }
 
@@ -211,6 +270,14 @@ export function asDocument(fake: FakeDocument): Document {
 
 export function asElement<T extends Node>(fake: FakeNode): T {
   return fake as unknown as T;
+}
+
+/**
+ * The way back, for a self-check that has to reach the fake's own fields on an element the module
+ * built for itself.
+ */
+export function asFakeNode(element: Node): FakeNode {
+  return element as unknown as FakeNode;
 }
 
 export function collectTree(root: FakeNode): FakeNode[] {

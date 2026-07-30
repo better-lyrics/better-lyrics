@@ -8,6 +8,7 @@ import {
 } from "./constants";
 import type { LineData, LyricsRendererHost, LyricSyncType, PartData, TickOptions } from "./index";
 import { registerThemeSetting } from "./themeSettings";
+import type { ResolvedTickOptions } from "./types";
 import { clamp, getRelativeLayoutBounds, positiveModulo, roundedMs, toMs } from "./util";
 
 const NO_LYRICS_ELEMENT_LOG = "No lyrics element found on the page, skipping lyrics injection";
@@ -129,14 +130,17 @@ interface AnimEngineViewState {
 }
 
 /**
+ * Stands where a snapshot's wall clock timestamp would be when the time did not come from a live
+ * player, and so says nothing about how long ago it was sampled.
+ */
+const NO_PLAYER_SNAPSHOT = -1;
+
+/**
  * The last player snapshot. It describes the media, not a view, so every instance reads the same one.
  */
 interface PlaybackClock {
   lastTime: number;
   lastPlayState: boolean;
-  /**
-   * Take "-1" to mean that we have no sensible last event
-   */
   lastEventCreationTime: number;
 }
 
@@ -262,7 +266,7 @@ export function createAnimationEngineInstance(
 const playbackClock: PlaybackClock = {
   lastTime: 0,
   lastPlayState: false,
-  lastEventCreationTime: -1,
+  lastEventCreationTime: NO_PLAYER_SNAPSHOT,
 };
 
 /**
@@ -272,7 +276,7 @@ const playbackClock: PlaybackClock = {
 export function resetPlaybackClock(): void {
   playbackClock.lastTime = 0;
   playbackClock.lastPlayState = false;
-  playbackClock.lastEventCreationTime = -1;
+  playbackClock.lastEventCreationTime = NO_PLAYER_SNAPSHOT;
 }
 
 // -- View operations --------------------------
@@ -2262,13 +2266,44 @@ function setupTabRendererObserver(engine: AnimationEngineInstance, element: HTML
  */
 export type AnimationTickStatus = "ok" | "lyrics-missing";
 
+/**
+ * Fills in everything a caller left out of a tick. The tick reads each of these arithmetically, so
+ * a missing one would not fail: it would quietly turn the playback time into NaN and leave the view
+ * matching no line at all.
+ */
+export function resolveTickOptions(options: TickOptions): ResolvedTickOptions {
+  return {
+    isPlaying: options.isPlaying,
+    eventCreationTime: options.eventCreationTime ?? NO_PLAYER_SNAPSHOT,
+    smoothScroll: options.smoothScroll ?? true,
+    globalLyricOffset: options.globalLyricOffset ?? 0,
+    lyricOffset: options.lyricOffset ?? 0,
+    richsyncOffsetTrim: options.richsyncOffsetTrim ?? 0,
+    lineOffsetTrim: options.lineOffsetTrim ?? 0,
+    passiveScrollEnabled: options.passiveScrollEnabled ?? false,
+  };
+}
+
+/**
+ * Takes a tick as the public type allows one, partly filled in, and resolves it before rendering.
+ */
 export function runAnimationEngine(
   engine: AnimationEngineInstance,
   currentTime: number,
   options: TickOptions
 ): AnimationTickStatus {
-  const { eventCreationTime, isPlaying } = options;
-  const smoothScroll = options.smoothScroll ?? true;
+  return tickView(engine, currentTime, resolveTickOptions(options));
+}
+
+/**
+ * Renders one view against a tick with nothing left out.
+ */
+export function tickView(
+  engine: AnimationEngineInstance,
+  currentTime: number,
+  options: ResolvedTickOptions
+): AnimationTickStatus {
+  const { eventCreationTime, isPlaying, smoothScroll } = options;
   engine.passiveScrollEnabled = options.passiveScrollEnabled;
 
   const now = Date.now();
@@ -2303,7 +2338,7 @@ export function runAnimationEngine(
   playbackClock.lastEventCreationTime = eventCreationTime;
 
   let timeOffset = now - eventCreationTime;
-  if (!isPlaying || eventCreationTime === -1) {
+  if (!isPlaying || eventCreationTime === NO_PLAYER_SNAPSHOT) {
     timeOffset = 0;
   }
 
