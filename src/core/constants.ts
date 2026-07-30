@@ -1,22 +1,28 @@
 import type { LyricSourceKey } from "@modules/lyrics/providers/shared";
 
+// The renderer module owns the names it emits into the lyrics DOM. They are re-exported here so
+// existing importers keep reaching them through @constants.
+export {
+  ANIMATING_CLASS,
+  BACKGROUND_LYRIC_CLASS,
+  CURRENT_LYRICS_CLASS,
+  EXPLICIT_WORD_CLASS,
+  FOOTER_CLASS,
+  LINE_CLASS,
+  LYRICS_CLASS,
+  LYRICS_WRAPPER_ID,
+  PAUSED_CLASS,
+  ROMANIZED_LYRICS_CLASS,
+  RTL_CLASS,
+  TRANSLATED_LYRICS_CLASS,
+  USER_SCROLLING_CLASS,
+  WORD_CLASS,
+  ZERO_DURATION_ANIMATION_CLASS,
+} from "@renderer/constants";
+
 // DOM Class Names
 export const TAB_HEADER_CLASS = "tab-header style-scope ytmusic-player-page" as const;
 export const TAB_CONTENT_CLASS = "tab-content style-scope tp-yt-paper-tab" as const;
-export const LYRICS_CLASS = "blyrics-container" as const;
-export const CURRENT_LYRICS_CLASS = "blyrics--active" as const;
-export const ANIMATING_CLASS = "blyrics--animating" as const;
-export const PAUSED_CLASS = "blyrics--paused" as const;
-export const ZERO_DURATION_ANIMATION_CLASS = "blyrics-zero-dur-animate" as const;
-export const RTL_CLASS = "blyrics-rtl" as const;
-export const WORD_CLASS = "blyrics--word" as const;
-export const LINE_CLASS = "blyrics--line" as const;
-export const BACKGROUND_LYRIC_CLASS = "blyrics-background-lyric" as const;
-export const EXPLICIT_WORD_CLASS = "blyrics-explicit" as const;
-export const USER_SCROLLING_CLASS = "blyrics-user-scrolling" as const;
-export const TRANSLATED_LYRICS_CLASS = "blyrics--translated" as const;
-export const ROMANIZED_LYRICS_CLASS = "blyrics--romanized" as const;
-export const FOOTER_CLASS = "blyrics-footer" as const;
 export const DOCK_CLASS = "blyrics-dock" as const;
 export const DOCK_DEFAULT_POSITION = "bottom-right" as const;
 export const DOCK_CONTROL_ORDER_DEFAULT = ["source", "translate", "romanize", "offset", "pictureInPicture"] as const;
@@ -34,7 +40,6 @@ export const PICTURE_IN_PICTURE_TOGGLE_SELECTOR = "[data-blyrics-picture-in-pict
 
 // DOM IDs and Attributes
 export const LYRICS_LOADER_ID = "blyrics-loader" as const;
-export const LYRICS_WRAPPER_ID = "blyrics-wrapper" as const;
 export const LYRICS_DISABLED_ATTR = "blyrics-dfs" as const;
 export const HIDDEN_CLASS = "blyrics-hidden" as const;
 export const REPORT_MODAL = "blyrics-report-lyrics" as const;
