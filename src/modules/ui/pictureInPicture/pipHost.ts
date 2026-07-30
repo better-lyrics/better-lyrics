@@ -1,3 +1,4 @@
+import { FOOTER_CLASS } from "@constants";
 import {
   type AnimationEngineInstance,
   clearLyrics,
@@ -19,6 +20,7 @@ import type { PictureInPictureHostEnvironment } from "./types";
 
 const CUSTOM_STYLE_ID = "blyrics-custom-style";
 const PIP_OPEN_ATTRIBUTE = "blyrics-pip-open";
+const FOOTER_SOURCE_LINK_ID = "betterLyricsFooterLink";
 
 // Gecko ignores @property in a stylesheet that is cross-origin to the document, and ours are served
 // from moz-extension:// into a window of the page's own origin. An unregistered custom property
@@ -45,6 +47,24 @@ function hasSameLines(left: readonly Lyric[] | null, right: readonly Lyric[] | n
   );
 }
 
+/**
+ * Copies the side panel's attribution into the floating document, keeping only the container the
+ * source link sits in. Cloned rather than rebuilt: `addFooter` is host chrome the page world cannot
+ * run, and a hand built stand-in would drift from the real footer the first time it changes. Nothing
+ * in the copy is wired to anything, so every focusable comes out of the tab order.
+ */
+function importSourceFooter(source: Element, targetDocument: Document): HTMLElement | null {
+  const footer = targetDocument.importNode(source, true) as HTMLElement;
+  const sourceContainer = footer.querySelector(`#${FOOTER_SOURCE_LINK_ID}`)?.closest(`.${FOOTER_CLASS}__container`);
+  if (!sourceContainer) return null;
+
+  footer.replaceChildren(sourceContainer);
+  for (const focusable of footer.querySelectorAll("a, button, [tabindex]")) {
+    focusable.setAttribute("tabindex", "-1");
+  }
+  return footer;
+}
+
 function registerAnimatableProperties(pipWindow: Window): void {
   const { CSS: pipCss } = pipWindow as Window & typeof globalThis;
   for (const definition of ANIMATABLE_PROPERTIES) {
@@ -67,6 +87,7 @@ export function createPictureInPictureHost(
   let activeWindow: Window | null = null;
   let lyricsPayload: PictureInPictureLyricsPayload | null = null;
   let builtLines: readonly Lyric[] | null = null;
+  let clonedFooterSource: Element | null = null;
   let syncFrame: number | null = null;
   let themeObserver: MutationObserver | null = null;
 
@@ -123,6 +144,8 @@ export function createPictureInPictureHost(
     const lines = lyricsPayload?.lyrics ?? null;
     builtLines = lines;
     clearLyrics(engine);
+    // The container the copy hung off is about to go, so the next sync makes a fresh one.
+    clonedFooterSource = null;
 
     if (!lines || lines.length === 0) {
       view.showSearching();
@@ -134,7 +157,32 @@ export function createPictureInPictureHost(
       noLyrics: lyricsPayload?.noLyrics === true,
     });
     applyDecorations();
+    syncSourceFooter();
     measureLyrics();
+  }
+
+  /**
+   * Keeps the window's copy of the attribution in step with the opener's. Checked per frame rather
+   * than driven by the opener rendering: `addFooter` builds a fresh element on every song and on
+   * every provider switch, and both worlds can read the opener's DOM.
+   *
+   * @returns Whether the lyrics changed height and want measuring again
+   */
+  function syncSourceFooter(): boolean {
+    const container = activeEngine?.lyricsContainer;
+    if (!container) return false;
+
+    const source = document.querySelector<HTMLElement>(`.${FOOTER_CLASS}`);
+    if (source === clonedFooterSource) return false;
+    clonedFooterSource = source;
+
+    const previous = container.querySelector(`.${FOOTER_CLASS}`);
+    previous?.remove();
+    if (!source) return previous !== null;
+
+    const footer = importSourceFooter(source, container.ownerDocument);
+    if (footer) container.appendChild(footer);
+    return true;
   }
 
   /**
@@ -215,6 +263,7 @@ export function createPictureInPictureHost(
     stopSyncLoop(pipWindow);
     const loop = (): void => {
       try {
+        if (syncSourceFooter()) measureLyrics();
         tickLyrics();
       } catch (error) {
         environment.reportFailure("Document Picture-in-Picture sync failed", error);
@@ -279,6 +328,7 @@ export function createPictureInPictureHost(
     activeView = null;
     lyricsPayload = null;
     builtLines = null;
+    clonedFooterSource = null;
     activeWindow = null;
   }
 
