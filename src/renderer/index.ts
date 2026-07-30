@@ -7,6 +7,6 @@ export type {
   LyricsRendererDebugSink,
   LyricsRendererHost,
   LyricsRendererOptions,
-  SyncType,
+  LyricSyncType,
   TickOptions,
 } from "./types";

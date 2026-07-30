@@ -22,7 +22,9 @@ export interface Lyric {
   isInstrumental?: boolean;
 }
 
-export type SyncType = "richsync" | "synced" | "none";
+// Not SyncType: @constants already exports that name for provider sync quality
+// ("syllable" | "word" | "line" | "unsynced"), which is a different axis.
+export type LyricSyncType = "richsync" | "synced" | "none";
 
 // -- Ticking --------------------------------------------
 
@@ -59,7 +61,12 @@ export interface LyricsRendererHost {
   isLoaderActive(): boolean;
   onAdState(isPlaying: boolean): void;
   getResumeScrollElement(): HTMLElement | null;
-  seekTarget: Document;
+  /**
+   * Called when a lyric line is clicked. How the seek reaches the player is the host's business:
+   * this extension dispatches an event at the page world, another consumer might set
+   * currentTime on a media element directly.
+   */
+  seek(timeS: number): void;
   translate(key: string): string;
   debug?: LyricsRendererDebugSink;
 }
