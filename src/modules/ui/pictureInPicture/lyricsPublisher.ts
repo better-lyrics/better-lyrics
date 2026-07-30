@@ -6,7 +6,7 @@ import { sendLyrics } from "./bridge";
 /**
  * Hands the floating window the lyrics it renders and the settings it renders them against. Called
  * from every point where what the window shows would change: an injection, a cleanup, a theme
- * change, an offset nudge, and the window opening.
+ * change, an offset nudge, a translation or romanization batch landing, and the window opening.
  *
  * Nothing is sent while no window is open, so dragging an offset slider never serialises a lyrics
  * array for a listener that does not exist.
@@ -19,6 +19,7 @@ export function publishPictureInPictureLyrics(): void {
   sendLyrics({
     lyrics,
     noLyrics: lyrics !== null && lyrics.length > 0 && lyrics[0].words === t("lyrics_notFound"),
+    decorations: AppState.lyricDecorations,
     themeSettings: Object.fromEntries(getThemeConfig()),
     globalLyricOffset: AppState.globalLyricOffset,
     lyricOffset: AppState.lyricOffset,

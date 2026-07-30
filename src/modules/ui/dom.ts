@@ -1498,6 +1498,7 @@ export function cleanup(): void {
 
   AppState.lyricData = null;
   AppState.parsedLyrics = null;
+  AppState.lyricDecorations = {};
 
   const ytMusicLyrics = (document.querySelector(NO_LYRICS_TEXT_SELECTOR) as HTMLElement)?.parentElement;
   if (ytMusicLyrics) {

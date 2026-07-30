@@ -2,6 +2,9 @@ import {
   type AnimationEngineInstance,
   clearLyrics,
   createAnimationEngineInstance,
+  getRenderedLines,
+  injectRomanization,
+  injectTranslation,
   type Lyric,
   relayout,
   runAnimationEngine,
@@ -130,7 +133,38 @@ export function createPictureInPictureHost(
       loaderVisible: false,
       noLyrics: lyricsPayload?.noLyrics === true,
     });
+    applyDecorations();
     measureLyrics();
+  }
+
+  /**
+   * Hangs the translated and romanized text the opener fetched off this window's own line elements.
+   * Run after every build rather than only when the payload changes, because a theme change rebuilds
+   * the lyrics from scratch and would otherwise drop them. Both injectors no-op on a line that
+   * already carries one, so re-running costs a lookup per line.
+   */
+  function applyDecorations(): void {
+    const engine = activeEngine;
+    const decorations = lyricsPayload?.decorations;
+    if (!engine || !decorations) return;
+
+    const lines = getRenderedLines(engine);
+    for (const [index, decoration] of Object.entries(decorations)) {
+      const line = lines[Number(index)];
+      if (!line) continue;
+      if (decoration.romanization) {
+        injectRomanization(
+          engine.document,
+          line.lyricElement,
+          line,
+          decoration.romanization,
+          decoration.timedRomanization ?? null
+        );
+      }
+      if (decoration.translation) {
+        injectTranslation(engine.document, line.lyricElement, decoration.translation);
+      }
+    }
   }
 
   function measureLyrics(): void {
@@ -199,7 +233,14 @@ export function createPictureInPictureHost(
     const themeNeedsRebuild = setThemeSettings(new Map(Object.entries(payload.themeSettings)));
     // An offset nudge republishes the same lines. Rebuilding on one would throw away the DOM the
     // window is animating and restart the line it is part way through.
-    if (themeNeedsRebuild || !hasSameLines(builtLines, payload.lyrics)) buildLyrics();
+    if (themeNeedsRebuild || !hasSameLines(builtLines, payload.lyrics)) {
+      buildLyrics();
+      return;
+    }
+    // A translation or romanization batch lands on the same lines, so nothing above rebuilds and
+    // the new text has to be hung off the DOM that is already up. The lines grow, so re-measure.
+    applyDecorations();
+    measureLyrics();
   });
 
   function renderLoadingShell(pipWindow: Window): void {

@@ -31,6 +31,7 @@ import {
   setMainViewLyrics,
 } from "@modules/ui/mainLyricsView";
 import { disableNativeLyricsFocus } from "@modules/ui/nativeLyricsFocus";
+import { publishPictureInPictureLyrics } from "@modules/ui/pictureInPicture/lyricsPublisher";
 import {
   containsNonLatin,
   detectNonLatinLanguage,
@@ -42,6 +43,27 @@ import {
 import { langCodesMatch, languageMatchesAny, log } from "@utils";
 
 export type { LineData };
+
+/**
+ * What the translation and romanization passes put on one line. They inject straight into the main
+ * view's elements and write nothing back to the `Lyric` objects, so a second view building from the
+ * same lines would otherwise show neither.
+ */
+interface LyricLineDecoration {
+  romanization?: string;
+  timedRomanization?: LyricPart[];
+  translation?: string;
+}
+
+/**
+ * Keyed by the line's index in the lyrics array, which is the only handle a view that built its own
+ * elements has on the line these belong to.
+ */
+export type LyricDecorations = Record<number, LyricLineDecoration>;
+
+function recordLyricDecoration(index: number, decoration: LyricLineDecoration): void {
+  AppState.lyricDecorations[index] = { ...AppState.lyricDecorations[index], ...decoration };
+}
 
 function isRomanizationDisabledForLang(lang: string): boolean {
   return languageMatchesAny(lang, AppState.romanizationDisabledLanguages);
@@ -263,6 +285,10 @@ async function processBatchTranslationsAndRomanizations(
       if (romanizedResult) {
         if (!isSameText(romanizedResult, item.words)) {
           injectRomanization(doc, lyricElement, lineData, romanizedResult, timedRomanization);
+          recordLyricDecoration(index, {
+            romanization: romanizedResult,
+            timedRomanization: timedRomanization ?? undefined,
+          });
           didInjectCachedContent = true;
         }
       } else {
@@ -297,6 +323,7 @@ async function processBatchTranslationsAndRomanizations(
 
       if (translationResult && !isSameText(translationResult, item.words)) {
         injectTranslation(doc, lyricElement, translationResult);
+        recordLyricDecoration(index, { translation: translationResult });
         didInjectCachedContent = true;
       } else if (sourceLanguage !== targetTranslationLang || containsNonLatin(item.words) || !sourceLanguage) {
         translationBatch.push({ index, text: item.words });
@@ -334,9 +361,11 @@ async function processBatchTranslationsAndRomanizations(
           if (result) {
             const originalIndex = romanizationBatch[i].index;
             injectRomanization(doc, linesData[originalIndex].lyricElement, linesData[originalIndex], result);
+            recordLyricDecoration(originalIndex, { romanization: result });
           }
         });
         lyricsElementAdded();
+        publishPictureInPictureLyrics();
       })()
     );
   }
@@ -362,9 +391,11 @@ async function processBatchTranslationsAndRomanizations(
           if (result) {
             const originalIndex = translationBatch[i].index;
             injectTranslation(doc, linesData[originalIndex].lyricElement, result.translatedText);
+            recordLyricDecoration(originalIndex, { translation: result.translatedText });
           }
         });
         lyricsElementAdded();
+        publishPictureInPictureLyrics();
       })()
     );
   }

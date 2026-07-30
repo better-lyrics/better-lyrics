@@ -1,4 +1,5 @@
 import { GENERAL_ERROR_LOG } from "@constants";
+import type { LyricDecorations } from "@modules/lyrics/injectLyrics";
 import type { Lyric } from "@renderer/index";
 import type { PictureInPictureSongMetadata } from "./types";
 
@@ -39,6 +40,12 @@ export interface PictureInPictureLyricsPayload {
    */
   readonly lyrics: readonly Lyric[] | null;
   readonly noLyrics: boolean;
+  /**
+   * The translated and romanized text the isolated world injected into the side panel, per line
+   * index. It rides on the payload rather than arriving as its own message because the window
+   * rebuilds whenever the theme demands it, and the decorations have to survive that.
+   */
+  readonly decorations: LyricDecorations;
   /**
    * The parsed `--blyrics-*` config from the user's custom CSS. The module is bundled into both the
    * isolated and the page world, which are separate realms with separate copies of the theme
