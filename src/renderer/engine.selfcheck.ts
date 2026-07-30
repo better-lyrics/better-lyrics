@@ -250,7 +250,6 @@ function newTickOptions(): TickOptions {
     richsyncOffsetTrim: 0,
     lineOffsetTrim: 0,
     passiveScrollEnabled: false,
-    tickWhileViewHidden: false,
   };
 }
 

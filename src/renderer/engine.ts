@@ -2295,9 +2295,7 @@ export function runAnimationEngine(
 
   currentTime += timeOffset / 1000;
 
-  const isMainLyricsVisible = engine.host.isViewVisible();
-  // Don't tick lyrics if they're not visible anywhere.
-  if (!isMainLyricsVisible && !options.tickWhileViewHidden) {
+  if (!engine.host.isViewVisible()) {
     clearVisibleLyricWillChange(engine);
     return "ok";
   }
@@ -2342,7 +2340,7 @@ export function runAnimationEngine(
     }
     const tabRendererHeight = engine.cachedTabRendererHeight ?? tabRenderer.getBoundingClientRect().height;
     let scrollTop = tabRenderer.scrollTop;
-    if (isMainLyricsVisible && animationConfig.enabled.scroll) {
+    if (animationConfig.enabled.scroll) {
       updateVisibleLyricWillChange(
         engine,
         lines,
@@ -2514,7 +2512,7 @@ export function runAnimationEngine(
       }
     }
 
-    if (isMainLyricsVisible && (engine.scrollResumeTime < Date.now() || engine.scrollPos === -1)) {
+    if (engine.scrollResumeTime < Date.now() || engine.scrollPos === -1) {
       if (activeElems.length == 0) {
         activeElems.push(lines[0]);
       }
@@ -2713,7 +2711,7 @@ export function runAnimationEngine(
       }
     }
 
-    if (isMainLyricsVisible && engine.wasUserScrolling && engine.scrollResumeTime < Date.now()) {
+    if (engine.wasUserScrolling && engine.scrollResumeTime < Date.now()) {
       engine.host.setResumeAffordanceVisible(false);
       lyricsElement.classList.remove(USER_SCROLLING_CLASS);
       engine.wasUserScrolling = false;

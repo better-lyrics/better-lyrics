@@ -273,11 +273,11 @@ export function lyricReloader(): void {
         setTimeout(() => {
           tabRenderer.scrollTop = scrollPositions[i];
           // Don't start ticking until we set the height
-          AppState.areLyricsTicking = AppState.areLyricsLoaded && (i === 1 || AppState.isPictureInPictureOpen);
+          AppState.areLyricsTicking = AppState.areLyricsLoaded && i === 1;
         }, 0);
         currentTab = i;
 
-        if (i !== 1 && !AppState.isPictureInPictureOpen) {
+        if (i !== 1) {
           // stop ticking immediately
           AppState.areLyricsTicking = false;
         }
@@ -427,10 +427,7 @@ export function initializeLyrics(): void {
       }
     }
 
-    // A window owning a Picture-in-Picture document still reports "hidden", and this is the only
-    // path that ticks the engine while playback is paused, so pausing would never reach the
-    // running word animations.
-    if (document.visibilityState === "visible" || AppState.isPictureInPictureOpen) {
+    if (document.visibilityState === "visible") {
       runAnimationEngine(performance.now(), true);
     }
   });

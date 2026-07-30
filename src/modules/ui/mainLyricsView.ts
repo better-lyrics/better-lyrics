@@ -121,7 +121,6 @@ export function currentTickOptions(eventCreationTime: number, isPlaying: boolean
     richsyncOffsetTrim: AppState.richsyncOffsetTrim,
     lineOffsetTrim: AppState.lineOffsetTrim,
     passiveScrollEnabled: AppState.isPassiveScrollEnabled,
-    tickWhileViewHidden: AppState.isPictureInPictureOpen,
   };
 }
 

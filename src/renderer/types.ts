@@ -49,12 +49,6 @@ export interface TickOptions {
    * Whether the user has passive scrolling switched on. Only unsynced lyrics use it.
    */
   passiveScrollEnabled: boolean;
-  /**
-   * Temporary. The side panel keeps ticking behind another tab while a floating window is open, a
-   * leftover from when that window mirrored the side panel's animations rather than running its own
-   * instance. The task that makes the side panel independent takes this field with it.
-   */
-  tickWhileViewHidden: boolean;
 }
 
 // -- Host adapter --------------------------------------------

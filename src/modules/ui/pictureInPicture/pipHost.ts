@@ -249,7 +249,6 @@ export function createPictureInPictureHost(
       richsyncOffsetTrim: payload.richsyncOffsetTrim,
       lineOffsetTrim: payload.lineOffsetTrim,
       passiveScrollEnabled: payload.passiveScrollEnabled,
-      tickWhileViewHidden: false,
     });
   }
 

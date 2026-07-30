@@ -5,7 +5,6 @@ import {
   MINI_PLAYER_BUTTON_SELECTOR,
   NOTO_SANS_UNIVERSAL_LINK,
   PICTURE_IN_PICTURE_TOGGLE_SELECTOR,
-  TAB_HEADER_CLASS,
 } from "@constants";
 import { AppState } from "@core/appState";
 import { t } from "@core/i18n";
@@ -56,12 +55,10 @@ const isolatedViewDependencies: PictureInPictureViewDependencies = {
 
 function markPictureInPictureOpened(): void {
   AppState.isPictureInPictureOpen = true;
+  // The window builds from the lyrics the fetch retains, so a song that never got as far as an
+  // injection has to be asked for now, whichever side panel tab the user is on.
   if (!AppState.areLyricsLoaded || AppState.lastLoadedVideoId !== AppState.lastVideoId) {
     AppState.queueLyricInjection = true;
-  } else {
-    // Opening from a non-lyrics side panel tab leaves ticking off, and nothing else turns it
-    // back on while the lyrics stay loaded, so the window would mount a frozen snapshot.
-    AppState.areLyricsTicking = true;
   }
   // A window opened mid-song has to be given the lyrics that are already on screen; nothing else
   // will publish them until the next injection.
@@ -70,10 +67,6 @@ function markPictureInPictureOpened(): void {
 
 function markPictureInPictureClosed(): void {
   AppState.isPictureInPictureOpen = false;
-  const tabSelector = document.getElementsByClassName(TAB_HEADER_CLASS)[1];
-  if (tabSelector?.getAttribute("aria-selected") !== "true") {
-    AppState.areLyricsTicking = false;
-  }
 }
 
 function injectStylesheet(pipWindow: Window, stylesheet: string): void {
