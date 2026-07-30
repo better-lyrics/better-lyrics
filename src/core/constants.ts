@@ -3,7 +3,6 @@ import type { LyricSourceKey } from "@modules/lyrics/providers/shared";
 // The renderer module owns the names it emits into the lyrics DOM. They are re-exported here so
 // existing importers keep reaching them through @constants.
 export {
-  CURRENT_LYRICS_CLASS,
   FOOTER_CLASS,
   LINE_CLASS,
   LYRICS_CLASS,

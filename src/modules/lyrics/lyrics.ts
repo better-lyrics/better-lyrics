@@ -17,6 +17,7 @@ import { type LineData, type LyricsData, processLyrics } from "@modules/lyrics/i
 import { stringSimilarity } from "@modules/lyrics/lyricParseUtils";
 import { registerThemeSetting } from "@modules/settings/themeOptions";
 import { flushLoader, renderLoader } from "@modules/ui/dom";
+import { publishPictureInPictureLyrics } from "@modules/ui/pictureInPicture/lyricsPublisher";
 import { log } from "@utils";
 import type { Lyric, LyricSourceResult, ProviderParameters } from "./providers/shared";
 import { getLyrics, newSourceMap, providerPriority } from "./providers/shared";
@@ -67,7 +68,8 @@ export interface ParsedLyrics {
 /**
  * Holds onto the parsed lyrics after injection has consumed them, so a second view can build from
  * the same lines. Runs after {@link processLyrics} because injection calls cleanup(), which clears
- * this alongside the render records.
+ * this alongside the render records. That ordering is also why the floating window is told from
+ * here rather than from injectLyrics: the lines it builds from do not exist until now.
  */
 function retainParsedLyrics(data: LyricSourceResultWithMeta): void {
   if (!data.lyrics) return;
@@ -78,6 +80,7 @@ function retainParsedLyrics(data: LyricSourceResultWithMeta): void {
     musicVideoSynced: data.musicVideoSynced,
     segmentMap: data.segmentMap,
   };
+  publishPictureInPictureLyrics();
 }
 
 export function applySegmentMapToLyrics(lyricData: LyricsData | null, lines: LineData[], segmentMap: SegmentMap) {

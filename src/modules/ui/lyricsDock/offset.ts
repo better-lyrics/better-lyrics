@@ -2,11 +2,19 @@ import { OFFSET_STORAGE_PREFIX } from "@constants";
 import { AppState } from "@core/appState";
 import { getTransientStorage, setPersistentStorage, setStorage } from "@core/storage";
 import { retickMainView } from "@modules/ui/mainLyricsView";
+import { publishPictureInPictureLyrics } from "@modules/ui/pictureInPicture/lyricsPublisher";
 
 export const OFFSET_STEP = 0.1;
 export const OFFSET_STEP_LARGE = 0.5;
 
 const OFFSET_PERSIST_DELAY = 400;
+
+// Every offset change moves the lyrics in both views, so each one re-renders the side panel and
+// hands the floating window the offsets its own tick reads.
+function renderOffsetChange(): void {
+  retickMainView();
+  publishPictureInPictureLyrics();
+}
 
 function offsetKey(videoId: string, source: string): string {
   return `${OFFSET_STORAGE_PREFIX}${videoId}_${source}`;
@@ -19,7 +27,7 @@ function round1(value: number): number {
 function applyLyricOffset(value: number): void {
   AppState.lyricOffset = round1(value);
   refreshOffsetIndicator();
-  retickMainView();
+  renderOffsetChange();
 }
 
 // Global + per-sync-type trims are user settings persisted to chrome.storage.sync; they stack
@@ -55,7 +63,7 @@ function notifyGlobalOffset(key: GlobalOffsetKey): void {
 
 export function setGlobalOffsetValue(key: GlobalOffsetKey, value: number): number {
   AppState[key] = round1(value);
-  retickMainView();
+  renderOffsetChange();
   notifyGlobalOffset(key);
   persistGlobalOffsets();
   return AppState[key];
@@ -72,7 +80,7 @@ export function applyGlobalOffsets(values: Record<GlobalOffsetKey, number>): voi
     AppState[key] = round1(values[key]);
     notifyGlobalOffset(key);
   }
-  retickMainView();
+  renderOffsetChange();
 }
 
 export function resetGlobalOffsets(): void {
@@ -80,7 +88,7 @@ export function resetGlobalOffsets(): void {
     AppState[key] = 0;
     notifyGlobalOffset(key);
   }
-  retickMainView();
+  renderOffsetChange();
   persistGlobalOffsets();
 }
 

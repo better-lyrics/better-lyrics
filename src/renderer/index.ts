@@ -3,6 +3,7 @@
 // helper can take one without pulling the engine into its bundle.
 
 export {
+  type AnimationEngineInstance,
   type AnimationTickStatus,
   clearLyrics,
   clearOnScreenLyrics,
@@ -23,7 +24,6 @@ export {
   scheduleLyricPositionUpdate,
 } from "./engine";
 export { hasNonLatinLyrics, injectRomanization, injectTranslation, type LineData, type PartData } from "./inject";
-export { getSeekTimeFromClick } from "./seek";
 export { containsNonLatin, detectNonLatinLanguage } from "./text";
 export { registerThemeSetting, setThemeSettings } from "./themeSettings";
 export type {

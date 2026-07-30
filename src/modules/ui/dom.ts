@@ -38,6 +38,7 @@ import { disconnectResizeObserver } from "@modules/lyrics/injectLyrics";
 import type { ThumbnailElement } from "@modules/lyrics/requestSniffer/NextResponse";
 import { getArtworkMetadata } from "@modules/lyrics/requestSniffer/requestSniffer";
 import { clearLyricsFromViews, lyricsElementAdded } from "@modules/ui/mainLyricsView";
+import { publishPictureInPictureLyrics } from "@modules/ui/pictureInPicture/lyricsPublisher";
 import { getResumeScrollElement } from "@modules/ui/resumeScrollButton";
 import { getRequest, setRequest } from "@modules/unison/lyricsRequestTracker";
 import { getTrustTier } from "@modules/unison/trustTier";
@@ -1524,6 +1525,7 @@ export function cleanup(): void {
   }
 
   clearLyrics();
+  publishPictureInPictureLyrics();
 }
 
 /**

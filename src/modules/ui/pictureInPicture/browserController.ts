@@ -1,6 +1,7 @@
 import {
   FONT_LINK,
   GENERAL_ERROR_LOG,
+  LOG_PREFIX,
   MINI_PLAYER_BUTTON_SELECTOR,
   NOTO_SANS_UNIVERSAL_LINK,
   PICTURE_IN_PICTURE_TOGGLE_SELECTOR,
@@ -13,6 +14,7 @@ import { getArtworkMetadata } from "@modules/lyrics/requestSniffer/requestSniffe
 import { resumeAutoscroll } from "@modules/ui/mainLyricsView";
 import { log } from "@utils";
 import { onSignal, sendInit, sendMetadata } from "./bridge";
+import { publishPictureInPictureLyrics } from "./lyricsPublisher";
 import { DEFAULT_ARTWORK_TRANSITION, DEFAULT_TEXT_TRANSITION } from "./lyricsView";
 import { createPictureInPictureHost } from "./pipHost";
 import type { PictureInPictureToggle, PictureInPictureViewDependencies } from "./types";
@@ -48,6 +50,8 @@ const isolatedViewDependencies: PictureInPictureViewDependencies = {
   translate: t,
   getArtworkMetadata,
   resetScrollResume: resumeAutoscroll,
+  // Resolved per call rather than bound once: `log` is reassigned when the logging setting loads.
+  log: (...args: unknown[]) => log(LOG_PREFIX, ...args),
 };
 
 function markPictureInPictureOpened(): void {
@@ -59,6 +63,9 @@ function markPictureInPictureOpened(): void {
     // back on while the lyrics stay loaded, so the window would mount a frozen snapshot.
     AppState.areLyricsTicking = true;
   }
+  // A window opened mid-song has to be given the lyrics that are already on screen; nothing else
+  // will publish them until the next injection.
+  publishPictureInPictureLyrics();
 }
 
 function markPictureInPictureClosed(): void {

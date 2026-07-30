@@ -1,9 +1,11 @@
 import { GENERAL_ERROR_LOG } from "@constants";
+import type { Lyric } from "@renderer/index";
 import type { PictureInPictureSongMetadata } from "./types";
 
 const PIP_INIT_EVENT = "blyrics-pip-init" as const;
 const PIP_SIGNAL_EVENT = "blyrics-pip-signal" as const;
 const PIP_METADATA_EVENT = "blyrics-pip-metadata" as const;
+const PIP_LYRICS_EVENT = "blyrics-pip-lyrics" as const;
 
 export interface PictureInPictureInitPayload {
   readonly strings: Record<string, string>;
@@ -26,6 +28,29 @@ export type PictureInPictureSignal =
 interface PictureInPictureMetadataPayload {
   readonly requestId: number;
   readonly metadata: PictureInPictureSongMetadata | null;
+}
+
+/**
+ * Everything the floating window needs to build and animate its own lyrics.
+ */
+export interface PictureInPictureLyricsPayload {
+  /**
+   * Null when there are no lyrics to show, which is the loader case.
+   */
+  readonly lyrics: readonly Lyric[] | null;
+  readonly noLyrics: boolean;
+  /**
+   * The parsed `--blyrics-*` config from the user's custom CSS. The module is bundled into both the
+   * isolated and the page world, which are separate realms with separate copies of the theme
+   * settings registry, so the window would otherwise render against defaults on Firefox while the
+   * side panel rendered against the user's theme.
+   */
+  readonly themeSettings: Readonly<Record<string, string>>;
+  readonly globalLyricOffset: number;
+  readonly lyricOffset: number;
+  readonly richsyncOffsetTrim: number;
+  readonly lineOffsetTrim: number;
+  readonly passiveScrollEnabled: boolean;
 }
 
 // Details cross as JSON strings, not objects. Gecko hands the page a dead wrapper for any object a
@@ -59,3 +84,7 @@ export const onSignal = (handler: (signal: PictureInPictureSignal) => void): voi
 export const sendMetadata = (payload: PictureInPictureMetadataPayload): void => send(PIP_METADATA_EVENT, payload);
 export const onMetadata = (handler: (payload: PictureInPictureMetadataPayload) => void): void =>
   subscribe(PIP_METADATA_EVENT, handler);
+
+export const sendLyrics = (payload: PictureInPictureLyricsPayload): void => send(PIP_LYRICS_EVENT, payload);
+export const onLyrics = (handler: (payload: PictureInPictureLyricsPayload) => void): void =>
+  subscribe(PIP_LYRICS_EVENT, handler);

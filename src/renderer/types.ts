@@ -50,9 +50,9 @@ export interface TickOptions {
    */
   passiveScrollEnabled: boolean;
   /**
-   * Temporary. One instance currently drives both the side panel and the floating window's
-   * animation mirror, so the tick has to keep running while the side panel sits on another tab.
-   * Task 5.4 gives the floating window its own instance and this field goes away.
+   * Temporary. The side panel keeps ticking behind another tab while a floating window is open, a
+   * leftover from when that window mirrored the side panel's animations rather than running its own
+   * instance. The task that makes the side panel independent takes this field with it.
    */
   tickWhileViewHidden: boolean;
 }
