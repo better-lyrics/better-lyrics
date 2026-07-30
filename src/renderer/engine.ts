@@ -2136,7 +2136,7 @@ function hasNoLyricsPlaceholder(engine: AnimationEngineInstance): boolean {
  * Unsynced lyrics that this view still has on screen. `syncType` outlives the lyrics it was derived
  * from, so the container is the term that says they are still there.
  */
-function hasUnsyncedLyrics(engine: AnimationEngineInstance): boolean {
+export function hasUnsyncedLyrics(engine: AnimationEngineInstance): boolean {
   return engine.lyricsContainer !== null && engine.syncType === "none" && !hasNoLyricsPlaceholder(engine);
 }
 
@@ -2307,7 +2307,6 @@ export function tickView(
   engine.passiveScrollEnabled = options.passiveScrollEnabled;
 
   const now = Date.now();
-  // const frameStart = performance.now();
   if (currentTime === 0 && !isPlaying) {
     return "ok";
   }
@@ -2874,7 +2873,11 @@ export function relayout(engine: AnimationEngineInstance, measureLines: boolean)
 
   const lyricsElement = engine.lyricsContainer;
   if (!lyricsElement) return;
+  // Both dimensions, because both are what a resize is compared against. The scroll padding written
+  // above lands on this container, so a measurement that records only the width leaves every later
+  // resize report looking like a new height, and each one measures again and forces a rescroll.
   engine.lyricWidth = lyricsElement.clientWidth;
+  engine.lyricHeight = lyricsElement.clientHeight;
 
   for (const line of engine.lines) {
     const bounds = getRelativeLayoutBounds(lyricsElement, line.lyricElement);
