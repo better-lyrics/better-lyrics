@@ -24,8 +24,13 @@ import type { Node, SourceFile } from "typescript";
 
 const RENDERER_DIR = dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = resolve(RENDERER_DIR, "..", "..");
+const SOURCE_ROOT = resolve(REPO_ROOT, "src");
 
 const EXTENSION_IMPORT_PREFIXES = ["@core/", "@modules/", "@constants", "@utils", "@options", "@/"];
+
+// The alias the extension reaches the module by, and the only specifier under it that is public.
+const RENDERER_ALIAS = "@renderer";
+const RENDERER_ENTRY = "@renderer/index";
 
 // Self-check files are repo infrastructure: they run under tsx, they are never bundled into the
 // extension, and typescript is already a devDependency both here and in braccato, so this stays
@@ -157,6 +162,27 @@ function collectViolations(displayPath: string, absolutePath: string, source: st
   return violations.sort((left, right) => left.line - right.line);
 }
 
+// -- The other direction: reaching into the module --------------------------------------------
+
+function collectEntryPointViolations(displayPath: string, absolutePath: string, source: string): BoundaryViolation[] {
+  const violations: BoundaryViolation[] = [];
+
+  for (const { specifier, line } of extractModuleReferences(parseSource(absolutePath, source))) {
+    if (specifier === null) continue;
+    if (specifier !== RENDERER_ALIAS && !specifier.startsWith(`${RENDERER_ALIAS}/`)) continue;
+    if (specifier === RENDERER_ENTRY) continue;
+
+    violations.push({
+      file: displayPath,
+      line,
+      rule: "no-renderer-internals",
+      detail: `imports "${specifier}"; ${RENDERER_ENTRY} is the module's only entry point`,
+    });
+  }
+
+  return violations;
+}
+
 // -- Extraction self-test --------------------------------------------
 
 const EXTRACTION_FIXTURE = [
@@ -236,6 +262,24 @@ assert.deepEqual(
   "Given a self-check file, When it imports a node builtin or typescript, Then the import is allowed"
 );
 
+const OUTSIDE_FILE = join(SOURCE_ROOT, "modules", "ui", "fixture.ts");
+
+assert.deepEqual(
+  collectEntryPointViolations(
+    "fixture.ts",
+    OUTSIDE_FILE,
+    [
+      `import { setLyrics } from "@renderer/index";`,
+      `import { runAnimationEngine } from "@renderer/engine";`,
+      `import { toMs } from "@renderer/util";`,
+      `const lazy = await import("@renderer/themeSettings");`,
+      `import { AppState } from "@core/appState";`,
+    ].join("\n")
+  ).map(violation => `${violation.line} ${violation.rule}`),
+  ["2 no-renderer-internals", "3 no-renderer-internals", "4 no-renderer-internals"],
+  "Given a file outside the module, When it imports past index.ts, Then every deep import is reported"
+);
+
 // -- Module scan --------------------------------------------
 
 const rendererFiles = readdirSync(RENDERER_DIR, { recursive: true, encoding: "utf8" })
@@ -255,4 +299,29 @@ assert.equal(
   `The renderer module boundary is broken by ${violations.length} import(s) or reference(s):\n${violations.join("\n")}\n`
 );
 
-console.log(`Renderer boundary self-check passed across ${rendererFiles.length} file(s)`);
+// -- Extension scan --------------------------------------------
+
+const extensionFiles = readdirSync(SOURCE_ROOT, { recursive: true, encoding: "utf8" })
+  .filter(entry => entry.endsWith(".ts"))
+  .map(entry => join(SOURCE_ROOT, entry))
+  .filter(file => !file.startsWith(RENDERER_DIR + sep))
+  .sort();
+
+assert.ok(
+  extensionFiles.length > 0,
+  "Given the extension outside the module, When it is walked, Then it holds at least one file"
+);
+
+const entryPointViolations = extensionFiles
+  .flatMap(file => collectEntryPointViolations(relative(REPO_ROOT, file), file, readFileSync(file, "utf8")))
+  .map(violation => `${violation.file}:${violation.line} [${violation.rule}] ${violation.detail}`);
+
+assert.equal(
+  entryPointViolations.length,
+  0,
+  `${entryPointViolations.length} import(s) reach past the renderer's entry point:\n${entryPointViolations.join("\n")}\n`
+);
+
+console.log(
+  `Renderer boundary self-check passed across ${rendererFiles.length} module file(s) and ${extensionFiles.length} extension file(s)`
+);

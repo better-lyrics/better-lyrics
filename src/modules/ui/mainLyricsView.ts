@@ -6,9 +6,13 @@ import {
   clearOnScreenLyrics,
   clearStyleCaches,
   createAnimationEngineInstance,
+  forEveryLiveView,
   getRenderedLines,
   getRenderedSyncType,
   hasRenderedLines,
+  type LineData,
+  type Lyric,
+  type LyricSyncType,
   noteContainerResize,
   noteUserScroll,
   noteVisibilityChange,
@@ -17,17 +21,12 @@ import {
   retickFromPlaybackClock,
   runAnimationEngine,
   scheduleLyricPositionUpdate,
-} from "@renderer/engine";
-import {
-  type LineData,
-  type Lyric,
-  type LyricSyncType,
   setLyrics,
   type SetLyricsOptions,
   type TickOptions,
 } from "@renderer/index";
 
-export { resetPlaybackClock } from "@renderer/engine";
+export { resetPlaybackClock } from "@renderer/index";
 
 // -- The side panel's engine instance --------------------------
 
@@ -40,14 +39,14 @@ const mainEngine = createAnimationEngineInstance(document, window, ytmHost);
  * view, so every view showing these lyrics resumes.
  */
 export function resumeAutoscroll(): void {
-  resetScrollResume(mainEngine);
+  forEveryLiveView(resetScrollResume);
 }
 
 /**
  * The song went away, so the lyrics go with it everywhere they were rendered.
  */
 export function clearLyricsFromViews(): void {
-  clearLyrics(mainEngine);
+  forEveryLiveView(clearLyrics);
 }
 
 // -- Operations addressed to the side panel --------------------------

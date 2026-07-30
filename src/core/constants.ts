@@ -11,7 +11,7 @@ export {
   ROMANIZED_LYRICS_CLASS,
   TRANSLATED_LYRICS_CLASS,
   WORD_HIGHLIGHT_CLASS,
-} from "@renderer/constants";
+} from "@renderer/index";
 
 // DOM Class Names
 export const TAB_HEADER_CLASS = "tab-header style-scope ytmusic-player-page" as const;
