@@ -1,7 +1,8 @@
 import { strict as assert } from "node:assert";
 import { LINE_CLASS, USER_SCROLLING_CLASS } from "./constants";
+import type { LineData } from "./inject";
 import { createLyricsRenderer, withHostDefaults } from "./renderer";
-import { asDocument, asElement, asFakeNode, FakeDocument, FakeNode } from "./selfcheck/fakeDom";
+import { asDocument, asElement, asFakeAnimation, asFakeNode, FakeDocument, FakeNode } from "./selfcheck/fakeDom";
 import { setThemeSettings } from "./themeSettings";
 import type { Lyric, LyricsRendererHost } from "./types";
 
@@ -60,6 +61,14 @@ const LINE_SCROLL_DELTA_PROPERTY = "--blyrics-line-scroll-delta-px";
 const ANIMATION_TIMING_LOG_SETTING = "blyrics-debug-animation-timing";
 
 const MAX_SWALLOWED_SCROLLS = 8;
+
+// A guard that fails to record one dimension re-measures on every report of it, so one repeat would
+// read as a fluke and several read as the loop it is.
+const REPEATED_RESIZE_REPORTS = 3;
+
+// Between the engine's two resume delays: past the one unsynced lyrics get, well short of the one a
+// synced song gets.
+const ELAPSED_SINCE_USER_SCROLL_MS = 10000;
 
 // Line scroll animations are the one part of the tick that hands Animation objects back to the
 // engine to read, and no fake answers those honestly, so a fixture that is not about scrolling
@@ -121,6 +130,8 @@ class FakeWindow {
   readonly overflowByElement = new WeakMap<FakeNode, string>();
   // What the view read off this document, which is how a cache that was dropped shows up.
   readonly propertyReads: string[] = [];
+  // Style resolutions, which is what an ancestor walk costs a real browser.
+  computedStyleReads = 0;
 
   constructor(readonly styleValues: Record<string, string> = SCROLL_ANIMATION_OFF) {}
 
@@ -137,6 +148,7 @@ class FakeWindow {
     translate: string;
     getPropertyValue: (property: string) => string;
   } {
+    this.computedStyleReads += 1;
     return {
       overflowY: this.overflowByElement.get(element) ?? "visible",
       paddingBottom: "0px",
@@ -327,6 +339,14 @@ function containerObserver(fixture: ViewFixture, container: HTMLElement): Resize
   return observing[0];
 }
 
+/**
+ * Every animation these render records are holding. A view that is taken down without cancelling
+ * them leaves them running against elements nobody can reach any more.
+ */
+function startedAnimations(lines: readonly LineData[]): Animation[] {
+  return lines.flatMap(line => [line, ...line.parts]).flatMap(part => part.animations);
+}
+
 // -- A host with nothing in it --------------------------------------------
 
 const bareWindow = new FakeWindow();
@@ -360,6 +380,39 @@ assert.equal(
   "Given a mount under two scroll containers, When the scroll element is resolved, Then it is the nearer one"
 );
 
+// The engine resolves this on every tick, so the walk cannot be paid for on every tick. Reading a
+// computed style is the whole cost of it, and the fake counts those.
+const styleReadsAfterFirstWalk = bareWindow.computedStyleReads;
+
+assert.equal(
+  defaultedHost.getScrollElement(),
+  asElement<HTMLElement>(innerScroller),
+  "Given a scroll element already resolved, When it is resolved again, Then the answer has not changed"
+);
+
+assert.equal(
+  bareWindow.computedStyleReads,
+  styleReadsAfterFirstWalk,
+  "Given a scroll element already resolved for this mount, When the next tick resolves it again, Then nothing is walked or read a second time"
+);
+
+// Memoising against the mount rather than for good: the renderer's mount can be replaced by a
+// setLyrics that names a different one.
+const relocatedMount = bareDocument.createElement("div");
+outerScroller.appendChild(relocatedMount);
+
+let movingMount = bareMount;
+const movingMountHost = withHostDefaults(undefined, asWindow(bareWindow), () => asElement<HTMLElement>(movingMount));
+
+movingMountHost.getScrollElement();
+movingMount = relocatedMount;
+
+assert.equal(
+  movingMountHost.getScrollElement(),
+  asElement<HTMLElement>(outerScroller),
+  "Given lyrics rebuilt into a different mount, When the scroll element is resolved, Then it is walked again from where they are now"
+);
+
 // The walk starts at the mount rather than above it, so a consumer that mounted into its own
 // scroll container is given that container. Something scrollable further up tells the two apart.
 const selfScrollingWindow = new FakeWindow();
@@ -381,18 +434,21 @@ assert.equal(
   "Given a mount that is its own scroll container, When the scroll element is resolved, Then it is the mount rather than whatever else scrolls above it"
 );
 
+// An ordinary page: every ancestor computes to `visible` and the document is what scrolls. Standing
+// the mount in for one is a scrollTop write that goes nowhere, and lyrics that never move.
 const unscrolledWindow = new FakeWindow();
 const unscrolledDocument = new FakeDocument();
 const unscrolledParent = unscrolledDocument.createElement("div");
 const unscrolledMount = unscrolledDocument.createElement("div");
 unscrolledParent.appendChild(unscrolledMount);
+unscrolledDocument.scrollingElement = unscrolledDocument.createElement("html");
 
 assert.equal(
   withHostDefaults(undefined, asWindow(unscrolledWindow), () =>
     asElement<HTMLElement>(unscrolledMount)
   ).getScrollElement(),
-  asElement<HTMLElement>(unscrolledMount),
-  "Given a mount with nothing scrollable above it, When the scroll element is resolved, Then the mount stands in for one"
+  asElement<HTMLElement>(unscrolledDocument.scrollingElement),
+  "Given a mount with nothing scrollable above it, When the scroll element is resolved, Then it is what the document scrolls by"
 );
 
 assert.equal(
@@ -547,13 +603,35 @@ assert.equal(
   "Given a resize repeating the size just measured, When it arrives, Then the measurement it triggered recorded that size"
 );
 
+// Height is the dimension the view feeds back into: a measurement writes the scroll padding, the
+// stylesheet applies it to this container, and clientHeight includes it. A guard that records only
+// the width never latches on the new height, and every later report re-measures.
+asFakeNode(panelContainer).clientHeight = 1340;
+panelObserver.reportSize(asFakeNode(panelContainer));
+
+assert.equal(
+  panel.measurements,
+  3,
+  "Given a resize reporting a height the lines were not measured against, When it arrives, Then they are measured again"
+);
+
+for (let repeat = 0; repeat < REPEATED_RESIZE_REPORTS; repeat++) {
+  panelObserver.reportSize(asFakeNode(panelContainer));
+}
+
+assert.equal(
+  panel.measurements,
+  3,
+  "Given a resize repeating the height just measured, When it arrives, Then the measurement it triggered recorded that height"
+);
+
 // -- The window and the fonts settle too --------------------------------------------
 
 panel.fakeWindow.dispatchWindowEvent("resize");
 
 assert.equal(
   panel.measurements,
-  3,
+  4,
   "Given a window that changed size, When it says so, Then the lines it re-laid out are measured again"
 );
 
@@ -562,7 +640,7 @@ await flushMicrotasks();
 
 assert.equal(
   panel.measurements,
-  4,
+  5,
   "Given lines measured at the fallback face's metrics, When the document's own faces finish loading, Then they are measured again"
 );
 
@@ -598,15 +676,80 @@ assert.equal(
   "Given a tick that named no player snapshot, When the view is asked to render that snapshot again, Then it is one that says nothing about when it was sampled"
 );
 
-// -- Clearing takes the observer with the container --------------------------------------------
+// -- A second song replaces the first, rather than joining it ----------------------------------
 
-panelRenderer.clear();
+const firstSongLines = panelRenderer.lines;
+const firstSongAnimations = startedAnimations(firstSongLines);
+const firstSongContainer = panelContainer;
+
+assert.ok(
+  firstSongAnimations.length > 0,
+  "Given a view that has ticked, When its render records are read, Then it has animations running to be cleaned up"
+);
+
+panelRenderer.setLyrics(RICHSYNC_LYRICS);
+
+assert.equal(
+  panel.mount.childNodes.length,
+  1,
+  "Given a second song built into the same mount, When the mount is read, Then it holds the new container alone"
+);
+
+assert.notEqual(
+  panelRenderer.container,
+  firstSongContainer,
+  "Given a second song, When the view is asked, Then it holds the container it built for that song"
+);
+
+assert.deepEqual(
+  firstSongLines.map(line => line.isSelected),
+  [false, false, false],
+  "Given a second song, When the first song's render records are read, Then none of them is still the line being sung"
+);
+
+assert.deepEqual(
+  firstSongAnimations.map(animation => asFakeAnimation(animation).cancelled),
+  firstSongAnimations.map(() => true),
+  "Given a second song, When the first song's animations are read, Then every one of them was cancelled rather than left running"
+);
 
 assert.equal(
   panelObserver.disconnected,
   true,
+  "Given a second song, When the observers are read, Then the one watching the container the first song built stopped"
+);
+
+// -- Clearing takes the container off the screen with it ----------------------------------------
+
+const secondSongContainer = panelRenderer.container;
+assert.ok(
+  secondSongContainer !== null,
+  "Given a second song, When the view is asked, Then it built a container for it"
+);
+
+const secondSongObserver = containerObserver(panel, secondSongContainer);
+
+panelRenderer.clear();
+
+assert.equal(
+  secondSongObserver.disconnected,
+  true,
   "Given a view whose song was dropped, When its observers are read, Then the one watching the container it dropped stopped"
 );
+
+assert.equal(
+  panel.mount.childNodes.length,
+  0,
+  "Given a view whose song was dropped, When its mount is read, Then the container it built went with the song rather than staying on screen"
+);
+
+assert.equal(
+  panelRenderer.container,
+  null,
+  "Given a view whose song was dropped, When it is asked, Then it holds no container"
+);
+
+panelRenderer.destroy();
 
 // -- Passive scroll is off unless it is asked for --------------------------------------------
 
@@ -617,16 +760,38 @@ const floatingRenderer = createLyricsRenderer({
   host: floatingHost,
 });
 
-floatingRenderer.setLyrics(UNSYNCED_LYRICS, {
-  loaderVisible: false,
-  noLyrics: false,
-  mount: asElement<HTMLElement>(floating.mount),
-});
+// A consumer that only wants to name a mount names a mount. The two flags in the same bag key CSS
+// on the container, and a caller with no opinion about them has none to give.
+floatingRenderer.setLyrics(UNSYNCED_LYRICS, { mount: asElement<HTMLElement>(floating.mount) });
 
 assert.equal(
   floatingRenderer.syncType,
   "none",
   "Given lyrics with no timings, When the view is asked, Then it reports that it has nothing to sync to"
+);
+
+// -- A mount named later takes the view with it ------------------------------------------------
+
+const relocatedFloatingMount = floating.fakeDocument.createElement("div");
+floating.scrollContainer.appendChild(relocatedFloatingMount);
+floatingRenderer.setLyrics(UNSYNCED_LYRICS, { mount: asElement<HTMLElement>(relocatedFloatingMount) });
+
+assert.equal(
+  floating.mount.childNodes.length,
+  0,
+  "Given a view rebuilt into a different mount, When the mount it was built in is read, Then the container it left there went with it"
+);
+
+const relocatedFloatingContainer = floatingRenderer.container;
+assert.ok(
+  relocatedFloatingContainer !== null,
+  "Given a view rebuilt into a different mount, When it is asked, Then it holds the container it built there"
+);
+
+assert.deepEqual(
+  relocatedFloatingMount.childNodes,
+  [asFakeNode(relocatedFloatingContainer)],
+  "Given a view rebuilt into a different mount, When that mount is read, Then it holds the container the view reports"
 );
 
 floatingRenderer.tick(PLAYBACK_TIME_S, { isPlaying: true });
@@ -682,6 +847,26 @@ assert.deepEqual(
   "Given a destroyed renderer that was drifting unsynced lyrics, When it is destroyed, Then the frame doing the drifting is cancelled"
 );
 
+// Destruction has to be at least as thorough as clearing. A consumer's DOM outlives the renderer,
+// so a container left in it is a view nobody can reach and nobody can take down.
+assert.equal(
+  relocatedFloatingMount.childNodes.length,
+  0,
+  "Given a destroyed renderer, When the mount it built into is read, Then the container it built went with it"
+);
+
+assert.equal(
+  floatingRenderer.container,
+  null,
+  "Given a destroyed renderer, When it is asked, Then it holds no container"
+);
+
+assert.equal(
+  floatingRenderer.lines.length,
+  0,
+  "Given a destroyed renderer, When it is asked, Then it holds no render records either"
+);
+
 floating.fakeWindow.dispatchWindowEvent("resize");
 
 assert.equal(
@@ -697,6 +882,69 @@ assert.equal(
   floating.measurements,
   measurementsBeforeDestroy,
   "Given a renderer destroyed before its document's faces loaded, When they finish, Then nothing measures a view that is gone"
+);
+
+// -- Destruction is final --------------------------------------------
+// Silently: the frame a consumer queued before it tore the view down arrives after it either way,
+// and an orderly shutdown should not have to be written around.
+
+const observersBeforeDestroyedCalls = floating.fakeWindow.resizeObservers.length;
+
+floatingRenderer.setLyrics(SYNCED_LYRICS, { mount: asElement<HTMLElement>(floating.mount) });
+
+assert.equal(
+  floatingRenderer.container,
+  null,
+  "Given a destroyed renderer, When it is handed a song anyway, Then it builds nothing"
+);
+
+assert.equal(
+  floating.mount.childNodes.length,
+  0,
+  "Given a destroyed renderer, When it is handed a song anyway, Then the mount it was given is left alone"
+);
+
+assert.equal(
+  floating.fakeWindow.resizeObservers.length,
+  observersBeforeDestroyedCalls,
+  "Given a destroyed renderer, When it is handed a song anyway, Then it starts no observer that nothing will ever disconnect"
+);
+
+assert.equal(
+  floatingRenderer.tick(PLAYBACK_TIME_S, { isPlaying: true }),
+  "lyrics-missing",
+  "Given a destroyed renderer, When a queued frame ticks it anyway, Then it reports that it has nothing left to render"
+);
+
+assert.equal(
+  floatingRenderer.retickFromPlaybackClock(() => ({ isPlaying: true })),
+  "lyrics-missing",
+  "Given a destroyed renderer, When it is asked to render the last snapshot again, Then it reports that it has nothing left to render"
+);
+
+assert.equal(
+  floatingRenderer.clearOnScreenLyrics(),
+  false,
+  "Given a destroyed renderer, When it is asked to take its lines off the screen, Then it reports that there were none"
+);
+
+const framesBeforeDestroyedCalls = floating.fakeWindow.requestedFrames.length;
+floatingRenderer.relayout();
+floatingRenderer.clear();
+floatingRenderer.noteUserScroll();
+floatingRenderer.noteVisibilityChange();
+floatingRenderer.resumeAutoscroll();
+floatingRenderer.clearStyleCaches();
+floatingRenderer.scheduleLyricPositionUpdate(
+  () => true,
+  () => {}
+);
+floatingRenderer.destroy();
+
+assert.deepEqual(
+  [floating.measurements, floating.fakeWindow.requestedFrames.length, floating.resumeAffordanceCalls.length],
+  [measurementsBeforeDestroy, framesBeforeDestroyedCalls, 0],
+  "Given a destroyed renderer, When every one of its entry points is called anyway, Then none of them measures, schedules or shows anything"
 );
 
 // -- A rich synced view that scrolls --------------------------------------------
@@ -823,7 +1071,7 @@ let notedScrolls = 0;
 // A view swallows the scrolls it performs itself, one at a time, so a user's only lands once those
 // are spent. How many there are is the view's business; that one of them lands is not.
 while (rich.resumeAffordanceCalls.length === affordanceCallsBeforeUserScroll && notedScrolls < MAX_SWALLOWED_SCROLLS) {
-  richRenderer.noteUserScroll(false);
+  richRenderer.noteUserScroll();
   notedScrolls += 1;
 }
 
@@ -930,15 +1178,87 @@ assert.equal(
   "Given a view asked to take its lines off the screen, When its container is read, Then it is the one it kept, emptied"
 );
 
+// -- Destroying drops the song, animations and all ---------------------------------------------
+
+const richAnimations = startedAnimations(richRenderer.lines);
+
+assert.ok(
+  richAnimations.length > 0,
+  "Given a rich synced view driven through several ticks, When its render records are read, Then it has animations running"
+);
+
 richRenderer.destroy();
+
+assert.deepEqual(
+  richAnimations.map(animation => asFakeAnimation(animation).cancelled),
+  richAnimations.map(() => true),
+  "Given a destroyed renderer, When the animations it started are read, Then every one of them was cancelled rather than left running against elements nobody can reach"
+);
+
+assert.equal(
+  rich.mount.childNodes.length,
+  0,
+  "Given a destroyed renderer, When the mount it built into is read, Then nothing of the view it built is left in it"
+);
+
+// -- Unsynced lyrics resume sooner, and the view works that out for itself ----------------------
+// Which of the two resume delays a scroll gets is the only thing that says whether the view read
+// its own lyrics or waited to be told what they are.
+
+const { fixture: unsynced, host: unsyncedHost } = newViewFixture();
+const unsyncedRenderer = createLyricsRenderer({
+  document: asDocument(unsynced.fakeDocument),
+  window: asWindow(unsynced.fakeWindow),
+  mount: asElement<HTMLElement>(unsynced.mount),
+  host: unsyncedHost,
+});
+
+unsyncedRenderer.setLyrics(UNSYNCED_LYRICS);
+unsyncedRenderer.tick(PLAYBACK_TIME_S, { isPlaying: true, passiveScrollEnabled: true });
+
+let unsyncedNotedScrolls = 0;
+while (unsynced.resumeAffordanceCalls.length === 0 && unsyncedNotedScrolls < MAX_SWALLOWED_SCROLLS) {
+  unsyncedRenderer.noteUserScroll();
+  unsyncedNotedScrolls += 1;
+}
+
+assert.deepEqual(
+  unsynced.resumeAffordanceCalls,
+  [true],
+  "Given a user who scrolled unsynced lyrics, When the view is told, Then it offers the way back"
+);
+
+// A resume delay is only observable by getting past it, and nothing in this module owns a clock.
+const realDateNow = Date.now;
+Date.now = (): number => realDateNow() + ELAPSED_SINCE_USER_SCROLL_MS;
+try {
+  const driftFrame = unsynced.fakeWindow.requestedFrames.at(-1);
+  assert.ok(
+    driftFrame,
+    "Given unsynced lyrics being drifted, When the window is read, Then it holds the frame doing the drifting"
+  );
+  driftFrame(0);
+} finally {
+  Date.now = realDateNow;
+}
+
+assert.deepEqual(
+  unsynced.resumeAffordanceCalls,
+  [true, false],
+  "Given a user who scrolled unsynced lyrics, When the shorter delay those get has passed, Then the view has taken autoscroll back rather than waiting out a synced song's delay"
+);
+
+unsyncedRenderer.destroy();
+
+const drivenFixtures = [panel, floating, rich, unsynced];
 
 assert.equal(
   ambientGlobalReads,
   0,
-  "Given three views driven from build to destruction, When they finish, Then none of them read an ambient global document or window"
+  "Given every view driven from build to destruction, When they finish, Then none of them read an ambient global document or window"
 );
 
+const totalMeasurements = drivenFixtures.reduce((total, driven) => total + driven.measurements, 0);
 console.log(
-  `Renderer facade self-check passed across ${panel.measurements + floating.measurements + rich.measurements} ` +
-    `measurement(s) of 3 view(s)`
+  `Renderer facade self-check passed across ${totalMeasurements} measurement(s) of ${drivenFixtures.length} view(s)`
 );

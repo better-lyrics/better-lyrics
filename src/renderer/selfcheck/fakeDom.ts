@@ -82,8 +82,11 @@ class FakeStyle {
 class FakeAnimation {
   currentTime: number | null = null;
   readonly playState = "idle";
+  cancelled = false;
 
-  cancel(): void {}
+  cancel(): void {
+    this.cancelled = true;
+  }
   play(): void {}
   pause(): void {}
   addEventListener(): void {}
@@ -167,6 +170,14 @@ export class FakeNode {
     return child;
   }
 
+  remove(): void {
+    const siblings = this.parentNode?.childNodes;
+    if (!siblings) return;
+    const position = siblings.indexOf(this);
+    if (position !== -1) siblings.splice(position, 1);
+    this.parentNode = null;
+  }
+
   replaceChildren(...nodes: FakeNode[]): void {
     for (const child of this.childNodes) {
       child.parentNode = null;
@@ -243,6 +254,10 @@ export class FakeNode {
 
 export class FakeDocument {
   readonly calls: FactoryCall[] = [];
+  // What a document scrolls by when nothing between the mount and the root does. Left unset rather
+  // than built here, so a self-check that never asks about it does not pay for an element in its
+  // factory call counts.
+  scrollingElement: FakeNode | null = null;
 
   createElement(name: string): FakeNode {
     return this.record("createElement", "element", name, null);
@@ -289,6 +304,10 @@ export function asElement<T extends Node>(fake: FakeNode): T {
  */
 export function asFakeNode(element: Node): FakeNode {
   return element as unknown as FakeNode;
+}
+
+export function asFakeAnimation(animation: Animation): FakeAnimation {
+  return animation as unknown as FakeAnimation;
 }
 
 export function collectTree(root: FakeNode): FakeNode[] {
