@@ -55,13 +55,24 @@ class FakeClassList {
 class FakeStyle {
   cursor = "";
   readonly properties: Record<string, string> = {};
+  private readonly priorities: Record<string, string> = {};
 
-  setProperty(name: string, value: string): void {
+  setProperty(name: string, value: string, priority = ""): void {
     this.properties[name] = value;
+    this.priorities[name] = priority;
+  }
+
+  getPropertyValue(name: string): string {
+    return this.properties[name] ?? "";
+  }
+
+  getPropertyPriority(name: string): string {
+    return this.priorities[name] ?? "";
   }
 
   removeProperty(name: string): void {
     delete this.properties[name];
+    delete this.priorities[name];
   }
 }
 

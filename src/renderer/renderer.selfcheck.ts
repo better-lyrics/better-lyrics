@@ -1,6 +1,8 @@
 import { strict as assert } from "node:assert";
+import { LINE_CLASS, USER_SCROLLING_CLASS } from "./constants";
 import { createLyricsRenderer, withHostDefaults } from "./renderer";
 import { asDocument, asElement, asFakeNode, FakeDocument, FakeNode } from "./selfcheck/fakeDom";
+import { setThemeSettings } from "./themeSettings";
 import type { Lyric, LyricsRendererHost } from "./types";
 
 // The facade exists because measurement is a lifecycle, not a call: lines are measured once, when
@@ -38,6 +40,32 @@ Object.defineProperty(globalThis, "DOMRect", { configurable: true, value: FakeDO
 
 const SCROLL_CONTAINER_HEIGHT_PX = 600;
 const PLAYBACK_TIME_S = 6;
+// Late enough that the third line is the one playing.
+const LATE_PLAYBACK_TIME_S = 11;
+
+const LINE_PITCH_PX = 200;
+const LINE_HEIGHT_PX = 100;
+const MOVED_LAST_LINE_TOP_PX = 900;
+
+// The engine's own blyrics-target-scroll-pos-ratio: how far down the view the line being sung sits,
+// and so where a scroll to the second line lands.
+const TARGET_SCROLL_POS_RATIO = 0.37;
+const SECOND_LINE_SCROLL_TOP_PX =
+  LINE_PITCH_PX + LINE_HEIGHT_PX / 2 - SCROLL_CONTAINER_HEIGHT_PX * TARGET_SCROLL_POS_RATIO;
+
+// The per line offset a scroll animation is driven by. Only a smooth scroll writes it.
+const LINE_SCROLL_DELTA_PROPERTY = "--blyrics-line-scroll-delta-px";
+
+// The theme setting a view's animation diagnostics are behind.
+const ANIMATION_TIMING_LOG_SETTING = "blyrics-debug-animation-timing";
+
+const MAX_SWALLOWED_SCROLLS = 8;
+
+// Line scroll animations are the one part of the tick that hands Animation objects back to the
+// engine to read, and no fake answers those honestly, so a fixture that is not about scrolling
+// switches them off. The rest of the theme falls back to the engine's own defaults.
+const SCROLL_ANIMATION_OFF: Record<string, string> = { "--blyrics-animate-scroll": "0" };
+const SCROLL_ANIMATION_ON: Record<string, string> = { "--blyrics-animate-scroll": "1" };
 
 class FakeCustomEvent {
   constructor(
@@ -91,6 +119,10 @@ class FakeWindow {
   readonly requestedFrames: FrameRequestCallback[] = [];
   readonly cancelledFrames: number[] = [];
   readonly overflowByElement = new WeakMap<FakeNode, string>();
+  // What the view read off this document, which is how a cache that was dropped shows up.
+  readonly propertyReads: string[] = [];
+
+  constructor(readonly styleValues: Record<string, string> = SCROLL_ANIMATION_OFF) {}
 
   matchMedia(): FakeMediaQueryList {
     return new FakeMediaQueryList();
@@ -100,16 +132,24 @@ class FakeWindow {
     overflowY: string;
     paddingBottom: string;
     transform: string;
+    transitionDuration: string;
+    transitionTimingFunction: string;
+    translate: string;
     getPropertyValue: (property: string) => string;
   } {
     return {
       overflowY: this.overflowByElement.get(element) ?? "visible",
       paddingBottom: "0px",
       transform: "none",
-      // Line scroll animations are the one part of the tick that hands Animation objects back to
-      // the engine to read, and no fake answers those honestly. The rest of the theme falls back to
-      // the engine's own defaults.
-      getPropertyValue: (property: string): string => (property === "--blyrics-animate-scroll" ? "0" : ""),
+      // The probes the line scroll planner writes and reads back. Answering nothing leaves it on
+      // the engine's own defaults, which is what a document carrying no theme resolves to.
+      transitionDuration: "",
+      transitionTimingFunction: "",
+      translate: "",
+      getPropertyValue: (property: string): string => {
+        this.propertyReads.push(property);
+        return this.styleValues[property] ?? "";
+      },
     };
   }
 
@@ -163,6 +203,8 @@ class FakeFontFaceSet {
 class RendererDocument extends FakeDocument {
   readonly fonts = new FakeFontFaceSet();
   readonly documentElement = this.createElement("html");
+  // What a backgrounded tab reports, and the only reason a view is ever told the visibility changed.
+  readonly visibilityState = "hidden";
 }
 
 // The fonts callback lands in a microtask, so a settled promise is only observable after the queue
@@ -179,6 +221,38 @@ const SYNCED_LYRICS: Lyric[] = [
   { startTimeMs: 10000, durationMs: 5000, words: "Third line" },
 ];
 
+// Timed parts, which is what makes a line rich synced rather than line synced. The tick reads a
+// different offset and a different trim for each, so both have to be driven.
+const RICHSYNC_LYRICS: Lyric[] = [
+  {
+    startTimeMs: 0,
+    durationMs: 5000,
+    words: "First line",
+    parts: [
+      { startTimeMs: 0, words: "First ", durationMs: 2500 },
+      { startTimeMs: 2500, words: "line", durationMs: 2500 },
+    ],
+  },
+  {
+    startTimeMs: 5000,
+    durationMs: 5000,
+    words: "Second line",
+    parts: [
+      { startTimeMs: 5000, words: "Second ", durationMs: 2500 },
+      { startTimeMs: 7500, words: "line", durationMs: 2500 },
+    ],
+  },
+  {
+    startTimeMs: 10000,
+    durationMs: 5000,
+    words: "Third line",
+    parts: [
+      { startTimeMs: 10000, words: "Third ", durationMs: 2500 },
+      { startTimeMs: 12500, words: "line", durationMs: 2500 },
+    ],
+  },
+];
+
 // Every line at time zero, which is what a provider with no timings gives.
 const UNSYNCED_LYRICS: Lyric[] = [
   { startTimeMs: 0, durationMs: 0, words: "One" },
@@ -188,18 +262,23 @@ const UNSYNCED_LYRICS: Lyric[] = [
 interface ViewFixture {
   fakeDocument: RendererDocument;
   fakeWindow: FakeWindow;
+  scrollContainer: FakeNode;
   mount: FakeNode;
   measurements: number;
   logs: unknown[][];
+  resumeAffordanceCalls: boolean[];
 }
 
 /**
  * A mount inside a scroll container, which is what the default `getScrollElement` walks up to find.
  * Every measurement the renderer takes ends in `debug.resize()`, so counting those counts them.
  */
-function newViewFixture(): { fixture: ViewFixture; host: Partial<LyricsRendererHost> } {
+function newViewFixture(styleValues?: Record<string, string>): {
+  fixture: ViewFixture;
+  host: Partial<LyricsRendererHost>;
+} {
   const fakeDocument = new RendererDocument();
-  const fakeWindow = new FakeWindow();
+  const fakeWindow = new FakeWindow(styleValues);
   const scrollContainer = fakeDocument.createElement("div");
   const mount = fakeDocument.createElement("div");
 
@@ -207,7 +286,15 @@ function newViewFixture(): { fixture: ViewFixture; host: Partial<LyricsRendererH
   scrollContainer.appendChild(mount);
   fakeWindow.overflowByElement.set(scrollContainer, "auto");
 
-  const fixture: ViewFixture = { fakeDocument, fakeWindow, mount, measurements: 0, logs: [] };
+  const fixture: ViewFixture = {
+    fakeDocument,
+    fakeWindow,
+    scrollContainer,
+    mount,
+    measurements: 0,
+    logs: [],
+    resumeAffordanceCalls: [],
+  };
 
   return {
     fixture,
@@ -217,6 +304,9 @@ function newViewFixture(): { fixture: ViewFixture; host: Partial<LyricsRendererH
         resize: () => {
           fixture.measurements += 1;
         },
+      },
+      setResumeAffordanceVisible: (visible: boolean) => {
+        fixture.resumeAffordanceCalls.push(visible);
       },
       log: (...args: unknown[]) => {
         fixture.logs.push(args);
@@ -268,6 +358,27 @@ assert.equal(
   defaultedHost.getScrollElement(),
   asElement<HTMLElement>(innerScroller),
   "Given a mount under two scroll containers, When the scroll element is resolved, Then it is the nearer one"
+);
+
+// The walk starts at the mount rather than above it, so a consumer that mounted into its own
+// scroll container is given that container. Something scrollable further up tells the two apart.
+const selfScrollingWindow = new FakeWindow();
+const selfScrollingDocument = new FakeDocument();
+const selfScrollingOuterScroller = selfScrollingDocument.createElement("div");
+const selfScrollingParent = selfScrollingDocument.createElement("div");
+const selfScrollingMount = selfScrollingDocument.createElement("div");
+
+selfScrollingOuterScroller.appendChild(selfScrollingParent);
+selfScrollingParent.appendChild(selfScrollingMount);
+selfScrollingWindow.overflowByElement.set(selfScrollingOuterScroller, "scroll");
+selfScrollingWindow.overflowByElement.set(selfScrollingMount, "auto");
+
+assert.equal(
+  withHostDefaults(undefined, asWindow(selfScrollingWindow), () =>
+    asElement<HTMLElement>(selfScrollingMount)
+  ).getScrollElement(),
+  asElement<HTMLElement>(selfScrollingMount),
+  "Given a mount that is its own scroll container, When the scroll element is resolved, Then it is the mount rather than whatever else scrolls above it"
 );
 
 const unscrolledWindow = new FakeWindow();
@@ -333,6 +444,44 @@ assert.equal(
   false,
   "Given a host that answers one question, When it is asked another, Then the default answers it"
 );
+
+// A host assembled from optional pieces carries members that are present and undefined, which
+// typecheck. Handing one of those to the renderer has to read as leaving it out, not as taking the
+// default away.
+const sparseHost = withHostDefaults({ isViewVisible: undefined, seek: undefined }, asWindow(bareWindow), () =>
+  asElement<HTMLElement>(bareMount)
+);
+
+assert.equal(
+  sparseHost.isViewVisible(),
+  true,
+  "Given a host member that is present and undefined, When the renderer asks it, Then the default answers rather than nothing"
+);
+
+sparseHost.seek(3.25);
+
+assert.deepEqual(
+  bareMount.dispatchedEvents.at(-1),
+  new FakeCustomEvent("braccato:seek", { detail: 3.25, bubbles: true }),
+  "Given a host whose seek is present and undefined, When a line is clicked, Then the default seek carries it rather than throwing"
+);
+
+// -- A renderer with nowhere to build --------------------------------------------
+
+const { fixture: mountless, host: mountlessHost } = newViewFixture();
+const mountlessRenderer = createLyricsRenderer({
+  document: asDocument(mountless.fakeDocument),
+  window: asWindow(mountless.fakeWindow),
+  host: mountlessHost,
+});
+
+assert.throws(
+  () => mountlessRenderer.setLyrics(SYNCED_LYRICS),
+  /mount/,
+  "Given a renderer that was never given a mount, When lyrics arrive without one either, Then it says so rather than reporting a view it never built"
+);
+
+mountlessRenderer.destroy();
 
 // -- Building lyrics measures them, and keeps measuring them ----------------------------------
 
@@ -550,12 +699,246 @@ assert.equal(
   "Given a renderer destroyed before its document's faces loaded, When they finish, Then nothing measures a view that is gone"
 );
 
+// -- A rich synced view that scrolls --------------------------------------------
+// The only fixture here that scrolls. Everything the facade forwards past `tick` reaches the engine
+// through the scroll, and so does the tick's own richsync branch.
+
+const { fixture: rich, host: richHost } = newViewFixture(SCROLL_ANIMATION_ON);
+const richRenderer = createLyricsRenderer({
+  document: asDocument(rich.fakeDocument),
+  window: asWindow(rich.fakeWindow),
+  mount: asElement<HTMLElement>(rich.mount),
+  host: richHost,
+});
+
+richRenderer.setLyrics(RICHSYNC_LYRICS);
+
+assert.equal(
+  richRenderer.syncType,
+  "richsync",
+  "Given lyrics with timed parts, When the view is asked, Then it reports that it is synced to the syllable"
+);
+
+const richContainer = richRenderer.container;
+assert.ok(
+  richContainer !== null,
+  "Given built rich synced lyrics, When the view is asked, Then it holds the container it built"
+);
+
+const richLines = asFakeNode(richContainer).childNodes.filter(child => child.classList.contains(LINE_CLASS));
+
+// Nothing here lays anything out, so the lines are given the geometry a browser would have given
+// them once the container rendered. Reading it back is the whole reason the facade exists.
+richLines.forEach((line, index) => {
+  line.offsetTop = index * LINE_PITCH_PX;
+  line.offsetHeight = LINE_HEIGHT_PX;
+});
+
+assert.deepEqual(
+  richRenderer.lines.map(line => line.position),
+  [0, 0, 0],
+  "Given lines measured before the container laid them out, When their positions are read, Then every one of them measured as nothing"
+);
+
+richRenderer.relayout(false);
+
+assert.deepEqual(
+  richRenderer.lines.map(line => line.position),
+  [0, 0, 0],
+  "Given a view whose lines are not being rendered, When it is asked to measure without them, Then it leaves them as they were rather than reading a container that answers zero"
+);
+
+richRenderer.relayout();
+
+assert.deepEqual(
+  richRenderer.lines.map(line => line.position),
+  [0, LINE_PITCH_PX, 2 * LINE_PITCH_PX],
+  "Given lines that laid out after they were built, When the view is asked to measure them again, Then it reads where they actually are"
+);
+
+// -- The tick fills in what it was not told --------------------------------------------
+
+assert.equal(
+  richRenderer.tick(PLAYBACK_TIME_S, { isPlaying: true }),
+  "ok",
+  "Given a rich synced view, When it ticks, Then it reports that it rendered"
+);
+
+assert.deepEqual(
+  richRenderer.lines.map(line => line.isSelected),
+  [false, true, false],
+  "Given a tick that named no richsync trim, When rich synced lines are matched against it, Then the line playing at that time is the one selected"
+);
+
+assert.equal(
+  rich.scrollContainer.scrollTop,
+  SECOND_LINE_SCROLL_TOP_PX,
+  "Given a line that came up, When the view scrolls to it, Then it lands where the theme asks for it"
+);
+
+assert.equal(
+  richLines[1].style.properties[LINE_SCROLL_DELTA_PROPERTY],
+  `${SECOND_LINE_SCROLL_TOP_PX}px`,
+  "Given a tick that said nothing about smooth scrolling, When the view scrolls to a new line, Then it carries the lines there rather than jumping them"
+);
+
+richRenderer.tick(LATE_PLAYBACK_TIME_S, { isPlaying: true });
+
+assert.equal(
+  rich.scrollContainer.scrollTop,
+  SECOND_LINE_SCROLL_TOP_PX,
+  "Given a scroll still being animated, When the next line comes up, Then the view lets it finish rather than jumping over it"
+);
+
+// -- What the view resolved once, it keeps --------------------------------------------
+
+const propertyReadsBeforeCachedTick = rich.fakeWindow.propertyReads.length;
+richRenderer.tick(LATE_PLAYBACK_TIME_S, { isPlaying: true });
+
+assert.equal(
+  rich.fakeWindow.propertyReads.length,
+  propertyReadsBeforeCachedTick,
+  "Given a view that already resolved its theme, When it ticks again, Then it reads none of it off the document a second time"
+);
+
+richRenderer.clearStyleCaches();
+richRenderer.tick(LATE_PLAYBACK_TIME_S, { isPlaying: true });
+
+assert.ok(
+  rich.fakeWindow.propertyReads.length > propertyReadsBeforeCachedTick,
+  "Given a theme that changed under a view, When it is told to drop what it resolved, Then the next tick resolves it again"
+);
+
+assert.deepEqual(
+  rich.logs,
+  [],
+  "Given a rich synced view driven through several ticks, When they finish, Then none of them reported anything wrong to its host"
+);
+
+// -- The user takes the scroll, and gives it back --------------------------------------------
+
+const affordanceCallsBeforeUserScroll = rich.resumeAffordanceCalls.length;
+let notedScrolls = 0;
+
+// A view swallows the scrolls it performs itself, one at a time, so a user's only lands once those
+// are spent. How many there are is the view's business; that one of them lands is not.
+while (rich.resumeAffordanceCalls.length === affordanceCallsBeforeUserScroll && notedScrolls < MAX_SWALLOWED_SCROLLS) {
+  richRenderer.noteUserScroll(false);
+  notedScrolls += 1;
+}
+
+assert.deepEqual(
+  rich.resumeAffordanceCalls.slice(affordanceCallsBeforeUserScroll),
+  [true],
+  "Given a user who scrolled away from the lyrics, When the view is told, Then it offers the way back"
+);
+
+assert.equal(
+  asFakeNode(richContainer).classList.contains(USER_SCROLLING_CLASS),
+  true,
+  "Given a user who scrolled away from the lyrics, When the container is read, Then it records that the user took over"
+);
+
+richRenderer.tick(LATE_PLAYBACK_TIME_S, { isPlaying: true });
+
+assert.deepEqual(
+  rich.resumeAffordanceCalls.slice(affordanceCallsBeforeUserScroll),
+  [true],
+  "Given autoscroll paused by a user scroll, When the view ticks, Then it stays paused"
+);
+
+richRenderer.resumeAutoscroll();
+richRenderer.tick(LATE_PLAYBACK_TIME_S, { isPlaying: true });
+
+assert.deepEqual(
+  rich.resumeAffordanceCalls.slice(affordanceCallsBeforeUserScroll),
+  [true, false],
+  "Given a user who asked for autoscroll back, When the view next ticks, Then it puts the way back away"
+);
+
+assert.equal(
+  asFakeNode(richContainer).classList.contains(USER_SCROLLING_CLASS),
+  false,
+  "Given a user who asked for autoscroll back, When the container is read, Then it no longer records the user taking over"
+);
+
+// -- A visibility change is a diagnostic, and only a theme asks for it -------------------------
+
+setThemeSettings(new Map([[ANIMATION_TIMING_LOG_SETTING, "true"]]));
+richRenderer.noteVisibilityChange();
+setThemeSettings(new Map());
+
+assert.match(
+  String(rich.logs.at(-1)?.[0]),
+  /^Visibility changed/,
+  "Given a view told the document's visibility changed, When it decides what to do about the animations it is running, Then it tells its host what it decided"
+);
+
+// -- Lines that moved are measured on a frame, not on the spot ---------------------------------
+
+const framesBeforeSchedule = rich.fakeWindow.requestedFrames.length;
+let renderingChecks = 0;
+let reticks = 0;
+
+richLines[2].offsetTop = MOVED_LAST_LINE_TOP_PX;
+richRenderer.scheduleLyricPositionUpdate(
+  () => {
+    renderingChecks += 1;
+    return true;
+  },
+  () => {
+    reticks += 1;
+  }
+);
+
+assert.equal(
+  rich.fakeWindow.requestedFrames.length,
+  framesBeforeSchedule + 1,
+  "Given a view whose lines moved, When it is asked to catch up with them, Then it takes a frame rather than measuring under whoever told it"
+);
+
+const queuedFrame = rich.fakeWindow.requestedFrames.at(-1);
+assert.ok(
+  queuedFrame,
+  "Given a scheduled position update, When the window is read, Then it holds the frame that was queued"
+);
+queuedFrame(0);
+
+assert.deepEqual(
+  [renderingChecks, reticks],
+  [1, 1],
+  "Given the frame a view queued, When it runs, Then it asks whether the view is still rendering and renders it again"
+);
+
+assert.equal(
+  richRenderer.lines[2].position,
+  MOVED_LAST_LINE_TOP_PX,
+  "Given the frame a view queued, When it runs, Then the lines are measured again before anything is rendered against them"
+);
+
+// -- Taking the lines off the screen keeps the container ---------------------------------------
+
+assert.equal(
+  richRenderer.clearOnScreenLyrics(),
+  true,
+  "Given a view with lines on screen, When it is asked to take them off, Then it reports that there were some to take"
+);
+
+assert.equal(
+  asFakeNode(richContainer).childNodes.length,
+  0,
+  "Given a view asked to take its lines off the screen, When its container is read, Then it is the one it kept, emptied"
+);
+
+richRenderer.destroy();
+
 assert.equal(
   ambientGlobalReads,
   0,
-  "Given two views driven from build to destruction, When they finish, Then neither read an ambient global document or window"
+  "Given three views driven from build to destruction, When they finish, Then none of them read an ambient global document or window"
 );
 
 console.log(
-  `Renderer facade self-check passed across ${panel.measurements + floating.measurements} measurement(s) of 2 view(s)`
+  `Renderer facade self-check passed across ${panel.measurements + floating.measurements + rich.measurements} ` +
+    `measurement(s) of 3 view(s)`
 );
