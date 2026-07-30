@@ -23,7 +23,8 @@
       "@constants": ["./src/core/constants"],
       "@utils" : ["./src/core/utils"],
       "@modules/*": ["./src/modules/*"],
-      "@options": ["./src/options/*"]
+      "@options": ["./src/options/*"],
+      "@renderer/*": ["./src/renderer/*"]
     }
   },
   "include": ["./", "extension-env.d.ts"],
