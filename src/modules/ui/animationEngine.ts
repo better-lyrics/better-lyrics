@@ -154,13 +154,21 @@ interface AnimationEngineInstance extends AnimEngineViewState {
   cachedCSSValues: Map<string, string>;
   cachedAnimationSettings: AnimationSettings | null;
   passiveRAFId: number | null;
-  pendingLyricsUpdate: boolean;
+  pendingLyricsUpdateFrame: number | null;
   learnedAnimationTimingOffsetMs: number;
   animationTimingVisibilityLogUntil: number;
+  /**
+   * Releases everything the instance holds on its window: the reduced motion listener, the tab
+   * renderer observer and any frame it still has queued.
+   */
+  destroy(): void;
 }
 
 function createAnimationEngineInstance(engineDocument: Document, engineWindow: EngineWindow): AnimationEngineInstance {
-  return {
+  const reducedMotionQuery = engineWindow.matchMedia(REDUCED_MOTION_QUERY);
+  const handleReducedMotionChange = (): void => clearStyleCaches(engine);
+
+  const engine: AnimationEngineInstance = {
     document: engineDocument,
     window: engineWindow,
     skipScrolls: 0,
@@ -191,10 +199,21 @@ function createAnimationEngineInstance(engineDocument: Document, engineWindow: E
     cachedCSSValues: new Map(),
     cachedAnimationSettings: null,
     passiveRAFId: null,
-    pendingLyricsUpdate: false,
+    pendingLyricsUpdateFrame: null,
     learnedAnimationTimingOffsetMs: 0,
     animationTimingVisibilityLogUntil: 0,
+    destroy: () => {
+      reducedMotionQuery.removeEventListener("change", handleReducedMotionChange);
+      engine.tabRendererResizeObserver?.disconnect();
+      engine.tabRendererResizeObserver = null;
+      engine.observedTabRenderer = null;
+      stopPassiveScrollLoop(engine);
+      cancelLyricPositionUpdate(engine);
+    },
   };
+
+  reducedMotionQuery.addEventListener("change", handleReducedMotionChange);
+  return engine;
 }
 
 /**
@@ -1323,10 +1342,6 @@ function clearStyleCaches(engine: AnimationEngineInstance): void {
 
 export function clearAnimationStyleCache(): void {
   clearStyleCaches(mainEngine);
-}
-
-if (typeof window !== "undefined" && window.matchMedia) {
-  window.matchMedia(REDUCED_MOTION_QUERY).addEventListener("change", clearAnimationStyleCache);
 }
 
 function getCSSValue(
@@ -2714,14 +2729,19 @@ export function animationEngine(currentTime: number, eventCreationTime: number, 
  * when translations/romanizations load (each addition would otherwise
  * trigger calculateLyricPositions on ALL lines).
  */
+function cancelLyricPositionUpdate(engine: AnimationEngineInstance): void {
+  if (engine.pendingLyricsUpdateFrame === null) return;
+  engine.window.cancelAnimationFrame(engine.pendingLyricsUpdateFrame);
+  engine.pendingLyricsUpdateFrame = null;
+}
+
 function scheduleLyricPositionUpdate(engine: AnimationEngineInstance): void {
-  if (!AppState.areLyricsTicking || engine.pendingLyricsUpdate) {
+  if (!AppState.areLyricsTicking || engine.pendingLyricsUpdateFrame !== null) {
     return;
   }
-  engine.pendingLyricsUpdate = true;
   dropPendingLineScroll(engine);
-  engine.window.requestAnimationFrame(() => {
-    engine.pendingLyricsUpdate = false;
+  engine.pendingLyricsUpdateFrame = engine.window.requestAnimationFrame(() => {
+    engine.pendingLyricsUpdateFrame = null;
     calculateLyricPositions();
     runAnimationEngine(
       engine,
