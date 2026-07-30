@@ -43,7 +43,7 @@ import { getRequest, setRequest } from "@modules/unison/lyricsRequestTracker";
 import { getTrustTier } from "@modules/unison/trustTier";
 import type { UnisonLyricsRequest } from "@modules/unison/types";
 import { requestLyrics } from "@modules/unison/unisonApi";
-import { reflow, toMs } from "@renderer/index";
+import { reflow, toMs } from "@renderer/util";
 import { log } from "@utils";
 import { generatePetName } from "@/core/keyIdentity";
 import { byId, deleteVote, type UnisonData, vote } from "../lyrics/providers/unison";

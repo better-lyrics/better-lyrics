@@ -1,15 +1,7 @@
-// index.ts is the only public entry point of the renderer module.
+// index.ts is the renderer module's API. `constants.ts`, `themeSettings.ts` and `util.ts` are
+// published alongside it: they import nothing, so a consumer that needs only a class name or a pure
+// helper can take one without pulling the engine into its bundle.
 
-export {
-  CURRENT_LYRICS_CLASS,
-  FOOTER_CLASS,
-  LINE_CLASS,
-  LYRICS_CLASS,
-  LYRICS_WRAPPER_ID,
-  ROMANIZED_LYRICS_CLASS,
-  TRANSLATED_LYRICS_CLASS,
-  WORD_HIGHLIGHT_CLASS,
-} from "./constants";
 export {
   type AnimationTickStatus,
   clearLyrics,

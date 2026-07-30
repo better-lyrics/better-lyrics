@@ -28,9 +28,17 @@ const SOURCE_ROOT = resolve(REPO_ROOT, "src");
 
 const EXTENSION_IMPORT_PREFIXES = ["@core/", "@modules/", "@constants", "@utils", "@options", "@/"];
 
-// The alias the extension reaches the module by, and the only specifier under it that is public.
+// The alias the extension reaches the module by, and the specifiers under it that are public.
+// `index` is the API. The other three are leaves with no imports of their own, published separately
+// so that a bundle needing only a class name or a pure helper does not pull the engine in with it:
+// `@constants` is imported by page world code, and routing it through `index` grew every bundle.
 const RENDERER_ALIAS = "@renderer";
-const RENDERER_ENTRY = "@renderer/index";
+const RENDERER_ENTRY_POINTS = new Set([
+  "@renderer/index",
+  "@renderer/constants",
+  "@renderer/themeSettings",
+  "@renderer/util",
+]);
 
 // Self-check files are repo infrastructure: they run under tsx, they are never bundled into the
 // extension, and typescript is already a devDependency both here and in braccato, so this stays
@@ -170,13 +178,13 @@ function collectEntryPointViolations(displayPath: string, absolutePath: string, 
   for (const { specifier, line } of extractModuleReferences(parseSource(absolutePath, source))) {
     if (specifier === null) continue;
     if (specifier !== RENDERER_ALIAS && !specifier.startsWith(`${RENDERER_ALIAS}/`)) continue;
-    if (specifier === RENDERER_ENTRY) continue;
+    if (RENDERER_ENTRY_POINTS.has(specifier)) continue;
 
     violations.push({
       file: displayPath,
       line,
       rule: "no-renderer-internals",
-      detail: `imports "${specifier}"; ${RENDERER_ENTRY} is the module's only entry point`,
+      detail: `imports "${specifier}"; the module's entry points are ${[...RENDERER_ENTRY_POINTS].join(", ")}`,
     });
   }
 
@@ -272,13 +280,26 @@ assert.deepEqual(
       `import { setLyrics } from "@renderer/index";`,
       `import { runAnimationEngine } from "@renderer/engine";`,
       `import { toMs } from "@renderer/util";`,
-      `const lazy = await import("@renderer/themeSettings");`,
+      `const lazy = await import("@renderer/view");`,
       `import { AppState } from "@core/appState";`,
     ].join("\n")
   ).map(violation => `${violation.line} ${violation.rule}`),
-  ["2 no-renderer-internals", "3 no-renderer-internals", "4 no-renderer-internals"],
-  "Given a file outside the module, When it imports past index.ts, Then every deep import is reported"
+  ["2 no-renderer-internals", "4 no-renderer-internals"],
+  "Given a file outside the module, When it imports an internal, Then only the published leaves are allowed"
 );
+
+// A leaf is only safe to publish while it stays a leaf: the moment one of them imports something
+// else in the module, importing it pulls that in too, which is the bundle growth this avoids.
+for (const leaf of [...RENDERER_ENTRY_POINTS].filter(entry => entry !== "@renderer/index")) {
+  const leafPath = join(RENDERER_DIR, `${leaf.slice("@renderer/".length)}.ts`);
+  const references = extractModuleReferences(parseSource(leafPath, readFileSync(leafPath, "utf8")));
+
+  assert.deepEqual(
+    references.map(reference => reference.specifier),
+    [],
+    `Given the published leaf ${leaf}, When it is parsed, Then it imports nothing`
+  );
+}
 
 // -- Module scan --------------------------------------------
 

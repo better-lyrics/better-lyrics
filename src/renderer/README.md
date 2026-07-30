@@ -24,8 +24,11 @@ reference drags the webext polyfill into that bundle and kills it silently. See
 
 ## Public API
 
-`index.ts` is the only entry point. Importing `./engine`, `./inject` or anything else from outside
-this directory is a violation in the other direction and is checked too.
+`index.ts` is the API. `constants.ts`, `themeSettings.ts` and `util.ts` are published beside it
+because they import nothing, so a consumer that needs one class name does not pull the engine into
+its bundle with it. Importing `./engine`, `./inject`, `./view` or anything else from outside this
+directory is a violation in the other direction and is checked too, as is a published leaf growing
+an import.
 
 Everything the module needs from its surroundings arrives through `LyricsRendererOptions`: the
 document to build in, the window to schedule against, the mount, the scroll element, and a
