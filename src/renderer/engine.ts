@@ -2766,10 +2766,6 @@ export function tickView(
     }
 
     decaySkipScrolls(engine, now);
-    // const frameTime = performance.now() - frameStart;
-    // if (frameTime > 5) {
-    //   console.warn("[BLyrics-diag] SLOW FRAME", { ms: frameTime.toFixed(1) });
-    // }
   } catch (err) {
     if (!(err as Error).message?.includes("undefined")) {
       engine.host.log(LYRICS_CHECK_INTERVAL_ERROR, err);

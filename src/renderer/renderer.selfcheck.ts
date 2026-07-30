@@ -57,6 +57,14 @@ const SECOND_LINE_SCROLL_TOP_PX =
 // The per line offset a scroll animation is driven by. Only a smooth scroll writes it.
 const LINE_SCROLL_DELTA_PROPERTY = "--blyrics-line-scroll-delta-px";
 
+// The space a measurement leaves above the first line, which is the only thing the view writes that
+// names the viewport it measured itself against.
+const SCROLL_PADDING_TOP_PROPERTY = "--blyrics-padding-top";
+
+// A viewport the walk can only reach by starting over, because the element carrying it turned
+// scrollable after the first one settled.
+const NEARER_VIEWPORT_HEIGHT_PX = 300;
+
 // The theme setting a view's animation diagnostics are behind.
 const ANIMATION_TIMING_LOG_SETTING = "blyrics-debug-animation-timing";
 
@@ -360,7 +368,9 @@ innerScroller.appendChild(bareMount);
 bareWindow.overflowByElement.set(outerScroller, "scroll");
 bareWindow.overflowByElement.set(innerScroller, "auto");
 
-const defaultedHost = withHostDefaults(undefined, asWindow(bareWindow), () => asElement<HTMLElement>(bareMount));
+const { host: defaultedHost } = withHostDefaults(undefined, asWindow(bareWindow), () =>
+  asElement<HTMLElement>(bareMount)
+);
 
 assert.deepEqual(
   [defaultedHost.isViewVisible(), defaultedHost.isLoaderActive(), defaultedHost.syncAdState()],
@@ -402,7 +412,9 @@ const relocatedMount = bareDocument.createElement("div");
 outerScroller.appendChild(relocatedMount);
 
 let movingMount = bareMount;
-const movingMountHost = withHostDefaults(undefined, asWindow(bareWindow), () => asElement<HTMLElement>(movingMount));
+const { host: movingMountHost } = withHostDefaults(undefined, asWindow(bareWindow), () =>
+  asElement<HTMLElement>(movingMount)
+);
 
 movingMountHost.getScrollElement();
 movingMount = relocatedMount;
@@ -411,6 +423,54 @@ assert.equal(
   movingMountHost.getScrollElement(),
   asElement<HTMLElement>(outerScroller),
   "Given lyrics rebuilt into a different mount, When the scroll element is resolved, Then it is walked again from where they are now"
+);
+
+// The mount is one of several things that decide where the walk ends, and the only one the memo can
+// see. An ancestor can gain a scrollbar, and the same mount can be moved under a different one:
+// neither reads as a new mount, so whoever does know the layout moved has to be able to spend it.
+const settlingWindow = new FakeWindow();
+const settlingDocument = new FakeDocument();
+const settlingScroller = settlingDocument.createElement("div");
+const settlingMount = settlingDocument.createElement("div");
+const settlingDocumentScroller = settlingDocument.createElement("html");
+
+settlingScroller.appendChild(settlingMount);
+settlingDocument.scrollingElement = settlingDocumentScroller;
+
+const settling = withHostDefaults(undefined, asWindow(settlingWindow), () => asElement<HTMLElement>(settlingMount));
+
+assert.equal(
+  settling.host.getScrollElement(),
+  asElement<HTMLElement>(settlingDocumentScroller),
+  "Given a mount with nothing scrollable above it yet, When the scroll element is resolved, Then it is what the document scrolls by"
+);
+
+settlingWindow.overflowByElement.set(settlingScroller, "auto");
+
+assert.equal(
+  settling.host.getScrollElement(),
+  asElement<HTMLElement>(settlingDocumentScroller),
+  "Given an ancestor that gained a scrollbar, When the next tick resolves the scroll element, Then the memo answers rather than walking on every tick to notice"
+);
+
+settling.forgetScrollElement();
+
+assert.equal(
+  settling.host.getScrollElement(),
+  asElement<HTMLElement>(settlingScroller),
+  "Given an ancestor that gained a scrollbar after the walk settled, When the memo is spent, Then the walk finds it rather than answering for the layout it left"
+);
+
+// The other half of it: the mount did not change, the tree above it did.
+const adoptingScroller = settlingDocument.createElement("div");
+settlingWindow.overflowByElement.set(adoptingScroller, "scroll");
+adoptingScroller.appendChild(settlingMount);
+settling.forgetScrollElement();
+
+assert.equal(
+  settling.host.getScrollElement(),
+  asElement<HTMLElement>(adoptingScroller),
+  "Given the same mount moved under a different scroll container, When the memo is spent, Then the walk finds the one it is under now"
 );
 
 // The walk starts at the mount rather than above it, so a consumer that mounted into its own
@@ -429,7 +489,7 @@ selfScrollingWindow.overflowByElement.set(selfScrollingMount, "auto");
 assert.equal(
   withHostDefaults(undefined, asWindow(selfScrollingWindow), () =>
     asElement<HTMLElement>(selfScrollingMount)
-  ).getScrollElement(),
+  ).host.getScrollElement(),
   asElement<HTMLElement>(selfScrollingMount),
   "Given a mount that is its own scroll container, When the scroll element is resolved, Then it is the mount rather than whatever else scrolls above it"
 );
@@ -446,13 +506,13 @@ unscrolledDocument.scrollingElement = unscrolledDocument.createElement("html");
 assert.equal(
   withHostDefaults(undefined, asWindow(unscrolledWindow), () =>
     asElement<HTMLElement>(unscrolledMount)
-  ).getScrollElement(),
+  ).host.getScrollElement(),
   asElement<HTMLElement>(unscrolledDocument.scrollingElement),
   "Given a mount with nothing scrollable above it, When the scroll element is resolved, Then it is what the document scrolls by"
 );
 
 assert.equal(
-  withHostDefaults(undefined, asWindow(bareWindow), () => null).getScrollElement(),
+  withHostDefaults(undefined, asWindow(bareWindow), () => null).host.getScrollElement(),
   null,
   "Given a renderer with no mount yet, When the scroll element is resolved, Then there is none to give"
 );
@@ -472,7 +532,7 @@ defaultedHost.setResumeAffordanceVisible(true);
 // -- A host with something in it --------------------------------------------
 
 const partialHostLogs: unknown[][] = [];
-const partialHost = withHostDefaults(
+const { host: partialHost } = withHostDefaults(
   {
     isViewVisible: () => false,
     log: (...args: unknown[]) => partialHostLogs.push(args),
@@ -504,7 +564,7 @@ assert.equal(
 // A host assembled from optional pieces carries members that are present and undefined, which
 // typecheck. Handing one of those to the renderer has to read as leaving it out, not as taking the
 // default away.
-const sparseHost = withHostDefaults({ isViewVisible: undefined, seek: undefined }, asWindow(bareWindow), () =>
+const { host: sparseHost } = withHostDefaults({ isViewVisible: undefined, seek: undefined }, asWindow(bareWindow), () =>
   asElement<HTMLElement>(bareMount)
 );
 
@@ -749,6 +809,20 @@ assert.equal(
   "Given a view whose song was dropped, When it is asked, Then it holds no container"
 );
 
+assert.equal(
+  panelRenderer.lines.length,
+  0,
+  "Given a view whose song was dropped, When it is asked, Then it holds no render records for it either"
+);
+
+// The timing the song was read at outlives the song, so this is the one of the three that has to be
+// told the lyrics are gone rather than being emptied along with them.
+assert.equal(
+  panelRenderer.syncType,
+  "none",
+  "Given a view whose song was dropped, When it is asked how it is synced, Then it answers for the empty view it is rather than the song it was"
+);
+
 panelRenderer.destroy();
 
 // -- Passive scroll is off unless it is asked for --------------------------------------------
@@ -896,6 +970,14 @@ assert.equal(
   floatingRenderer.container,
   null,
   "Given a destroyed renderer, When it is handed a song anyway, Then it builds nothing"
+);
+
+// Returning quietly here also swallows the throw a renderer that never had a mount would have
+// raised, so the one entry point whose silence can hide a real mistake says what it did.
+assert.match(
+  String(floating.logs.at(-1)?.[0]),
+  /destroyed/,
+  "Given a destroyed renderer, When it is handed a song anyway, Then its host is told the song went nowhere"
 );
 
 assert.equal(
@@ -1201,6 +1283,46 @@ assert.equal(
   "Given a destroyed renderer, When the mount it built into is read, Then nothing of the view it built is left in it"
 );
 
+assert.equal(
+  richRenderer.syncType,
+  "none",
+  "Given a destroyed renderer, When it is asked how it is synced, Then it answers for the view it no longer has rather than the song it last held"
+);
+
+// -- A re-measurement is where the scroll element walk is allowed to go stale --------------------
+// The scroll padding is sized against whatever the walk settled on, so it is what says which element
+// the view thinks it is scrolling. A window resize is exactly when an ancestor is most likely to
+// have gained or lost its scrollbar.
+
+const { fixture: reflowed, host: reflowedHost } = newViewFixture();
+const reflowedRenderer = createLyricsRenderer({
+  document: asDocument(reflowed.fakeDocument),
+  window: asWindow(reflowed.fakeWindow),
+  mount: asElement<HTMLElement>(reflowed.mount),
+  host: reflowedHost,
+});
+
+reflowedRenderer.setLyrics(SYNCED_LYRICS);
+
+assert.equal(
+  reflowed.fakeDocument.documentElement.style.getPropertyValue(SCROLL_PADDING_TOP_PROPERTY),
+  `${SCROLL_CONTAINER_HEIGHT_PX * TARGET_SCROLL_POS_RATIO}px`,
+  "Given a mount inside a scroll container, When the view sizes its scroll padding, Then it is sized against that container's viewport"
+);
+
+// The mount becomes its own scroll container, which is nearer than the one the walk settled on.
+reflowed.fakeWindow.overflowByElement.set(reflowed.mount, "auto");
+reflowed.mount.offsetHeight = NEARER_VIEWPORT_HEIGHT_PX;
+reflowed.fakeWindow.dispatchWindowEvent("resize");
+
+assert.equal(
+  reflowed.fakeDocument.documentElement.style.getPropertyValue(SCROLL_PADDING_TOP_PROPERTY),
+  `${NEARER_VIEWPORT_HEIGHT_PX * TARGET_SCROLL_POS_RATIO}px`,
+  "Given an element that turned scrollable under a walk already settled, When the window changed size, Then the view walks again rather than sizing itself against the container it left behind"
+);
+
+reflowedRenderer.destroy();
+
 // -- Unsynced lyrics resume sooner, and the view works that out for itself ----------------------
 // Which of the two resume delays a scroll gets is the only thing that says whether the view read
 // its own lyrics or waited to be told what they are.
@@ -1250,7 +1372,7 @@ assert.deepEqual(
 
 unsyncedRenderer.destroy();
 
-const drivenFixtures = [panel, floating, rich, unsynced];
+const drivenFixtures = [panel, floating, rich, reflowed, unsynced];
 
 assert.equal(
   ambientGlobalReads,

@@ -25,6 +25,8 @@ import { setLyrics as buildLyricsView } from "./view";
  */
 const SEEK_EVENT = "braccato:seek";
 
+const DESTROYED_SET_LYRICS_LOG = "Lyrics were handed to a renderer that has been destroyed; nothing was built";
+
 const SCROLLABLE_OVERFLOW = new Set(["auto", "scroll"]);
 
 function noop(): void {}
@@ -53,18 +55,25 @@ function findScrollElement(rendererWindow: Window, mount: HTMLElement | null): H
  * Each member is resolved on its own rather than spread over the defaults. A host assembled from
  * optional pieces carries members that are present and undefined, which typecheck, and spreading
  * one of those leaves the renderer holding nothing where it expects a function.
+ *
+ * The invalidator comes back alongside the host because the memo behind the default scroll element
+ * has no way to notice it went stale on its own.
  */
 export function withHostDefaults(
   overrides: Partial<LyricsRendererHost> | undefined,
   rendererWindow: Window & typeof globalThis,
   currentMount: () => HTMLElement | null
-): LyricsRendererHost {
+): { host: LyricsRendererHost; forgetScrollElement: () => void } {
   const given = overrides ?? {};
 
   // The engine resolves the scroll element on every tick, and the walk reads a computed style per
-  // ancestor, so an unmemoised default forces style resolution sixty times a second. Only a new
-  // mount can change where the walk ends.
-  let walkedMount: HTMLElement | null = null;
+  // ancestor, so an unmemoised default forces style resolution sixty times a second.
+  //
+  // A new mount is not the only thing that can change where the walk ends: an ancestor can turn
+  // scrollable, and the same mount can be moved under a different one. Neither is observable from
+  // here, so the memo is dropped by whoever does know the layout moved. `undefined` is the state
+  // before the first walk, because null is an answer a renderer with no mount yet keeps.
+  let walkedMount: HTMLElement | null | undefined;
   let walkedScrollElement: HTMLElement | null = null;
 
   function scrollElementForCurrentMount(): HTMLElement | null {
@@ -77,18 +86,23 @@ export function withHostDefaults(
   }
 
   return {
-    isViewVisible: given.isViewVisible ?? (() => true),
-    isLoaderActive: given.isLoaderActive ?? (() => false),
-    syncAdState: given.syncAdState ?? (() => false),
-    getScrollElement: given.getScrollElement ?? scrollElementForCurrentMount,
-    setResumeAffordanceVisible: given.setResumeAffordanceVisible ?? noop,
-    seek:
-      given.seek ??
-      (timeS => {
-        currentMount()?.dispatchEvent(new rendererWindow.CustomEvent(SEEK_EVENT, { detail: timeS, bubbles: true }));
-      }),
-    log: given.log ?? noop,
-    debug: given.debug,
+    host: {
+      isViewVisible: given.isViewVisible ?? (() => true),
+      isLoaderActive: given.isLoaderActive ?? (() => false),
+      syncAdState: given.syncAdState ?? (() => false),
+      getScrollElement: given.getScrollElement ?? scrollElementForCurrentMount,
+      setResumeAffordanceVisible: given.setResumeAffordanceVisible ?? noop,
+      seek:
+        given.seek ??
+        (timeS => {
+          currentMount()?.dispatchEvent(new rendererWindow.CustomEvent(SEEK_EVENT, { detail: timeS, bubbles: true }));
+        }),
+      log: given.log ?? noop,
+      debug: given.debug,
+    },
+    forgetScrollElement() {
+      walkedMount = undefined;
+    },
   };
 }
 
@@ -109,13 +123,18 @@ export function createLyricsRenderer(rendererOptions: LyricsRendererOptions): Ly
   let containerResizeObserver: ResizeObserver | null = null;
   let isDestroyed = false;
 
-  const engine = createAnimationEngineInstance(
-    rendererDocument,
-    rendererWindow,
-    withHostDefaults(rendererOptions.host, rendererWindow, () => mount)
-  );
+  const { host, forgetScrollElement } = withHostDefaults(rendererOptions.host, rendererWindow, () => mount);
+  const engine = createAnimationEngineInstance(rendererDocument, rendererWindow, host);
 
+  /**
+   * Every re-measurement runs through here, which makes it the one place that knows the layout may
+   * have moved under the view. The default scroll element is walked once and remembered, so this is
+   * also where that walk is allowed to go stale: a resize is exactly when an ancestor is most
+   * likely to have gained or lost its scrollbar, and it costs one walk per resize rather than one
+   * per tick.
+   */
   function measure(measureLines = true): void {
+    forgetScrollElement();
     relayout(engine, measureLines);
   }
 
@@ -167,7 +186,12 @@ export function createLyricsRenderer(rendererOptions: LyricsRendererOptions): Ly
   // The ones that answer something answer what an emptied view answers.
   return {
     setLyrics(lyrics, options) {
-      if (isDestroyed) return;
+      // The one entry point whose silence hides a real mistake: a renderer that was destroyed
+      // before it ever had a mount would otherwise swallow the throw below and look orderly.
+      if (isDestroyed) {
+        host.log(DESTROYED_SET_LYRICS_LOG);
+        return;
+      }
       const nextMount = options?.mount ?? mount;
       if (!nextMount) {
         throw new Error("A lyrics renderer needs a mount: give one to createLyricsRenderer or to setLyrics");
@@ -231,6 +255,9 @@ export function createLyricsRenderer(rendererOptions: LyricsRendererOptions): Ly
       if (isDestroyed) return "lyrics-missing";
       return retickEngineFromPlaybackClock(engine, buildOptions);
     },
+    // All three answer for an emptied view. `container` and `lines` are the state clearing drops, so
+    // they answer that way already; `syncType` is derived from lyrics that are gone and nothing
+    // resets it, so the container is the term that says they are still there.
     get container() {
       return engine.lyricsContainer;
     },
@@ -238,7 +265,7 @@ export function createLyricsRenderer(rendererOptions: LyricsRendererOptions): Ly
       return getRenderedLines(engine);
     },
     get syncType() {
-      return getRenderedSyncType(engine);
+      return engine.lyricsContainer === null ? "none" : getRenderedSyncType(engine);
     },
   };
 }
