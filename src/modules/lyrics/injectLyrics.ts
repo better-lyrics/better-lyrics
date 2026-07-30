@@ -232,12 +232,15 @@ function injectLyrics(
       continue;
     }
 
-    if (!lyricItem.parts || lyricItem.parts.length === 0 || disableRichsync.getBooleanValue()) {
-      lyricItem.parts = buildLineSyncedParts(lyricItem);
-    }
+    // Rebuilt parts stay local so the provider's lyrics survive injection intact and a second
+    // build over the same array produces the same result.
+    const parts =
+      lyricItem.parts && lyricItem.parts.length > 0 && !disableRichsync.getBooleanValue()
+        ? lyricItem.parts
+        : buildLineSyncedParts(lyricItem);
 
     applyDirection(lyricElement, lyricItem.words);
-    createLyricsLine(doc, lyricItem.parts, line, lyricElement);
+    createLyricsLine(doc, parts, line, lyricElement);
 
     lyricElement.style.setProperty("--blyrics-duration", lyricItem.durationMs + "ms");
     if (lyricItem.agent) {
