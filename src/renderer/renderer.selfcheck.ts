@@ -1323,6 +1323,81 @@ assert.equal(
 
 reflowedRenderer.destroy();
 
+// -- A container the page has hidden is not measured --------------------------------------------
+// Everything inside a hidden subtree measures as zero height at zero offset, which reads as content
+// that already runs past the last line: the padding below it is written as none, and the end of
+// every song is then stranded for as long as the view holds those measurements. A side panel is
+// hidden whenever it is showing something other than the lyrics, so this is the ordinary case
+// rather than the exotic one.
+
+const { fixture: hidden, host: hiddenHost } = newViewFixture();
+const hiddenRenderer = createLyricsRenderer({
+  document: asDocument(hidden.fakeDocument),
+  window: asWindow(hidden.fakeWindow),
+  mount: asElement<HTMLElement>(hidden.mount),
+  host: hiddenHost,
+});
+
+hiddenRenderer.setLyrics(SYNCED_LYRICS);
+
+const hiddenContainer = hiddenRenderer.container;
+assert.ok(
+  hiddenContainer !== null,
+  "Given lyrics built into a rendered mount, When the view is asked, Then it holds the container it built"
+);
+
+const hiddenLines = asFakeNode(hiddenContainer).childNodes.filter(child => child.classList.contains(LINE_CLASS));
+hiddenLines.forEach((line, index) => {
+  line.offsetTop = index * LINE_PITCH_PX;
+  line.offsetHeight = LINE_HEIGHT_PX;
+});
+
+hiddenRenderer.relayout();
+
+assert.deepEqual(
+  hiddenRenderer.lines.map(line => line.position),
+  [0, LINE_PITCH_PX, 2 * LINE_PITCH_PX],
+  "Given a container that is rendering its lines, When the view measures them, Then it reads where they are"
+);
+
+const measurementsWhileRendered = hidden.measurements;
+
+hidden.mount.isDisplayNone = true;
+hidden.fakeWindow.dispatchWindowEvent("resize");
+
+assert.deepEqual(
+  hiddenRenderer.lines.map(line => line.position),
+  [0, LINE_PITCH_PX, 2 * LINE_PITCH_PX],
+  "Given a view whose container the page has hidden, When something asks it to measure, Then the lines keep the positions they were measured at rather than being read as nothing"
+);
+
+assert.equal(
+  hidden.measurements,
+  measurementsWhileRendered,
+  "Given a view whose container the page has hidden, When something asks it to measure, Then it took no measurement of the lines at all"
+);
+
+// The padding is not measured off the lines, so it is worth rewriting whether they are on screen or
+// not: it is what reserves the room the first and last of them need, and the viewport it is sized
+// against is knowable either way.
+assert.equal(
+  hidden.fakeDocument.documentElement.style.getPropertyValue(SCROLL_PADDING_TOP_PROPERTY),
+  `${SCROLL_CONTAINER_HEIGHT_PX * TARGET_SCROLL_POS_RATIO}px`,
+  "Given a view whose container the page has hidden, When something asks it to measure, Then the scroll padding is rewritten and only the lines are held back"
+);
+
+hidden.mount.isDisplayNone = false;
+hiddenLines[2].offsetTop = MOVED_LAST_LINE_TOP_PX;
+hidden.fakeWindow.dispatchWindowEvent("resize");
+
+assert.deepEqual(
+  hiddenRenderer.lines.map(line => line.position),
+  [0, LINE_PITCH_PX, MOVED_LAST_LINE_TOP_PX],
+  "Given a container that was hidden and is rendering again, When something asks the view to measure, Then it reads the lines rather than holding back for good"
+);
+
+hiddenRenderer.destroy();
+
 // -- Unsynced lyrics resume sooner, and the view works that out for itself ----------------------
 // Which of the two resume delays a scroll gets is the only thing that says whether the view read
 // its own lyrics or waited to be told what they are.
@@ -1372,7 +1447,7 @@ assert.deepEqual(
 
 unsyncedRenderer.destroy();
 
-const drivenFixtures = [panel, floating, rich, reflowed, unsynced];
+const drivenFixtures = [panel, floating, rich, reflowed, hidden, unsynced];
 
 assert.equal(
   ambientGlobalReads,

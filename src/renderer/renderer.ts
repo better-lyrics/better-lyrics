@@ -32,6 +32,21 @@ const SCROLLABLE_OVERFLOW = new Set(["auto", "scroll"]);
 function noop(): void {}
 
 /**
+ * Whether the container generates a box, and so has anything to measure. A container the page has
+ * hidden reports every line as zero height at zero offset, which reads as content that already runs
+ * past the last line: the padding below it is then written as none, and nothing recomputes it once
+ * the container comes back.
+ *
+ * `getClientRects` rather than `offsetParent`: it answers for the boxes the element generates and
+ * nothing else, while `offsetParent` is also null for a fixed or root element, so a consumer that
+ * positions the container differently than this module's own stylesheet does would silently stop
+ * being measured at all.
+ */
+function hasLayoutBox(container: HTMLElement | null): boolean {
+  return container !== null && container.getClientRects().length > 0;
+}
+
+/**
  * The nearest element that scrolls, starting at the mount itself: a consumer that mounts straight
  * into its own scroll container means that container, not whatever else scrolls above it.
  */
@@ -132,10 +147,15 @@ export function createLyricsRenderer(rendererOptions: LyricsRendererOptions): Ly
    * also where that walk is allowed to go stale: a resize is exactly when an ancestor is most
    * likely to have gained or lost its scrollbar, and it costs one walk per resize rather than one
    * per tick.
+   *
+   * The lines are only measurable while they are on screen, and whether they are is read off the
+   * container rather than asked of the consumer: a view that is hidden while a song loads is the
+   * normal case for a side panel, and a consumer that has to know to say so is one that will forget.
+   * The padding is worth rewriting either way, so only the lines are held back.
    */
   function measure(measureLines = true): void {
     forgetScrollElement();
-    relayout(engine, measureLines);
+    relayout(engine, measureLines && hasLayoutBox(engine.lyricsContainer));
   }
 
   function stopObservingContainer(): void {

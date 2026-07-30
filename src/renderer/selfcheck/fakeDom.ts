@@ -115,6 +115,10 @@ export class FakeNode {
   scrollWidth = 0;
   scrollHeight = 0;
   scrollTop = 0;
+  // A subtree the page has hidden. Set on the node that carries the display, the way a stylesheet
+  // does: everything under it stops generating boxes, and a browser then answers nothing to every
+  // measurement taken inside it.
+  isDisplayNone = false;
   private ownText = "";
 
   constructor(
@@ -123,8 +127,15 @@ export class FakeNode {
     readonly name: string
   ) {}
 
+  get isRendered(): boolean {
+    for (let node: FakeNode | null = this; node !== null; node = node.parentNode) {
+      if (node.isDisplayNone) return false;
+    }
+    return true;
+  }
+
   get offsetParent(): FakeNode | null {
-    return this.parentNode;
+    return this.isRendered ? this.parentNode : null;
   }
 
   get parentElement(): FakeNode | null {
@@ -132,7 +143,12 @@ export class FakeNode {
   }
 
   getBoundingClientRect(): { x: number; y: number; width: number; height: number } {
+    if (!this.isRendered) return { x: 0, y: 0, width: 0, height: 0 };
     return { x: this.offsetLeft, y: this.offsetTop, width: this.offsetWidth, height: this.offsetHeight };
+  }
+
+  getClientRects(): { x: number; y: number; width: number; height: number }[] {
+    return this.isRendered ? [this.getBoundingClientRect()] : [];
   }
 
   animate(): FakeAnimation {
