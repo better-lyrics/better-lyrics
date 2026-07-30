@@ -1,6 +1,6 @@
 import { CURRENT_LYRICS_CLASS, LINE_CLASS, LYRICS_CLASS, PLAYER_BAR_SELECTOR, SEEK_EVENT } from "@constants";
 import type { PlayerDetails } from "@core/appState";
-import { getSeekTimeFromClick } from "@modules/lyrics/seekFromClick";
+import { getSeekTimeFromClick } from "@renderer/index";
 import { createHeaderLine, fillHeaderLayer, getHeaderLayers, PictureInPictureHeaderMarquee } from "./headerMarquee";
 import { MIRROR_ID_ATTR } from "./pipMirror";
 import type { PictureInPictureViewDependencies } from "./types";

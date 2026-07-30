@@ -8,12 +8,12 @@ import {
   WORD_CLASS,
   ZERO_DURATION_ANIMATION_CLASS,
 } from "@constants";
-import { testRtl } from "@modules/lyrics/lyricParseUtils";
 import type { Lyric, LyricPart } from "@modules/lyrics/providers/shared";
-import { getSeekTimeFromClick } from "@modules/lyrics/seekFromClick";
 import { registerThemeSetting } from "@modules/settings/themeOptions";
 import { animEngineState } from "@modules/ui/animationEngine";
 import { log } from "@utils";
+import { getSeekTimeFromClick } from "./seek";
+import { testRtl } from "./text";
 
 export let disableRichsync = registerThemeSetting("blyrics-disable-richsync", false, true);
 let lineSyncedAnimationDelay = registerThemeSetting("blyrics-line-synced-animation-delay", 50, true);

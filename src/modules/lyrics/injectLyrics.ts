@@ -15,23 +15,6 @@ import {
 } from "@constants";
 import { AppState } from "@core/appState";
 import { t } from "@core/i18n";
-import {
-  addSeekHandler,
-  applyDirection,
-  buildLineSyncedParts,
-  createLyricsLine,
-  disableRichsync,
-  findNearestAgent,
-  injectRomanization,
-  injectTranslation,
-  isNearestLyricRtl,
-  type LineData,
-  newLineData,
-  type PartData,
-  WORD_HIGHLIGHT_CLASS,
-} from "@modules/lyrics/buildLyricsDom";
-import { createInstrumentalElement } from "@modules/lyrics/createInstrumentalElement";
-import { containsNonLatin, detectNonLatinLanguage } from "@modules/lyrics/lyricParseUtils";
 import { applySegmentMapToLyrics, type LyricSourceResultWithMeta } from "@modules/lyrics/lyrics";
 import type { LyricPart } from "@modules/lyrics/providers/shared";
 import {
@@ -52,6 +35,24 @@ import {
   setExtraHeight,
 } from "@modules/ui/dom";
 import { disableNativeLyricsFocus } from "@modules/ui/nativeLyricsFocus";
+import {
+  addSeekHandler,
+  applyDirection,
+  buildLineSyncedParts,
+  containsNonLatin,
+  createInstrumentalElement,
+  createLyricsLine,
+  detectNonLatinLanguage,
+  disableRichsync,
+  findNearestAgent,
+  injectRomanization,
+  injectTranslation,
+  isNearestLyricRtl,
+  type LineData,
+  newLineData,
+  type PartData,
+  WORD_HIGHLIGHT_CLASS,
+} from "@renderer/index";
 import { getRelativeLayoutBounds, langCodesMatch, languageMatchesAny, log } from "@utils";
 
 export type { LineData, PartData };
