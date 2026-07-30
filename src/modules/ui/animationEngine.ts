@@ -23,6 +23,7 @@ const LYRIC_ENDING_THRESHOLD_S = registerThemeSetting("blyrics-lyric-ending-thre
 const EARLY_SCROLL_CONSIDER = registerThemeSetting("blyrics-early-scroll-consider-s", 0.62);
 const QUEUE_SCROLL_THRESHOLD = registerThemeSetting("blyrics-queue-scroll-ms", 150);
 const TIME_JUMP_THRESHOLD = 0.5;
+const REDUCED_MOTION_QUERY = "(prefers-reduced-motion: reduce)";
 const SCROLL_TIMING_RATIO_BASE_DURATION_MS = 750;
 const SCROLL_TIMING_RATIO_BASE_EARLY_SCROLL_CONSIDER_S = 0.62;
 const SCROLL_TIMING_RATIO_BASE_QUEUE_SCROLL_THRESHOLD_MS = 150;
@@ -132,7 +133,15 @@ interface PlaybackClock {
   lastEventCreationTime: number;
 }
 
+/**
+ * `Window` alone types neither `ResizeObserver` nor `DOMMatrix`: both are ambient `var`
+ * declarations, so they only appear through `typeof globalThis`.
+ */
+type EngineWindow = Window & typeof globalThis;
+
 interface AnimationEngineInstance extends AnimEngineViewState {
+  document: Document;
+  window: EngineWindow;
   cachedTabRendererHeight: number | null;
   tabRendererResizeObserver: ResizeObserver | null;
   observedTabRenderer: HTMLElement | null;
@@ -150,8 +159,10 @@ interface AnimationEngineInstance extends AnimEngineViewState {
   animationTimingVisibilityLogUntil: number;
 }
 
-function createAnimationEngineInstance(): AnimationEngineInstance {
+function createAnimationEngineInstance(engineDocument: Document, engineWindow: EngineWindow): AnimationEngineInstance {
   return {
+    document: engineDocument,
+    window: engineWindow,
     skipScrolls: 0,
     skipScrollsDecayTimes: [],
     scrollResumeTime: 0,
@@ -186,7 +197,17 @@ function createAnimationEngineInstance(): AnimationEngineInstance {
   };
 }
 
-const mainEngine = createAnimationEngineInstance();
+/**
+ * The element the engine scrolls. It is resolved per call rather than once at creation: the
+ * instance is built at import time, long before the tab renderer is mounted, and YouTube Music
+ * swaps the node out often enough that the tick compares it against `observedTabRenderer` and
+ * reinstalls the ResizeObserver whenever it changed.
+ */
+function resolveScrollElement(engine: AnimationEngineInstance): HTMLElement | null {
+  return engine.document.querySelector<HTMLElement>(TAB_RENDERER_SELECTOR);
+}
+
+const mainEngine = createAnimationEngineInstance(document, window);
 
 const playbackClock: PlaybackClock = {
   lastTime: 0,
@@ -754,10 +775,10 @@ function noteVisibilityChange(engine: AnimationEngineInstance): void {
     0
   );
 
-  if (document.visibilityState === "visible") {
+  if (engine.document.visibilityState === "visible") {
     engine.animationTimingVisibilityLogUntil = Date.now() + ANIMATION_TIMING_LOG_WINDOW_MS;
     log(LOG_PREFIX, "Visibility changed; keeping WAAPI animations for timing verification", {
-      visibilityState: document.visibilityState,
+      visibilityState: engine.document.visibilityState,
       runningAnimationCount,
       resetSkipped: true,
       timingLogWindowMs: ANIMATION_TIMING_LOG_WINDOW_MS,
@@ -766,7 +787,7 @@ function noteVisibilityChange(engine: AnimationEngineInstance): void {
   }
 
   log(LOG_PREFIX, "Visibility changed; WAAPI animations left intact", {
-    visibilityState: document.visibilityState,
+    visibilityState: engine.document.visibilityState,
     runningAnimationCount,
     resetSkipped: true,
   });
@@ -1305,7 +1326,7 @@ export function clearAnimationStyleCache(): void {
 }
 
 if (typeof window !== "undefined" && window.matchMedia) {
-  window.matchMedia("(prefers-reduced-motion: reduce)").addEventListener("change", clearAnimationStyleCache);
+  window.matchMedia(REDUCED_MOTION_QUERY).addEventListener("change", clearAnimationStyleCache);
 }
 
 function getCSSValue(
@@ -1316,7 +1337,7 @@ function getCSSValue(
 ): string {
   let value = engine.cachedCSSValues.get(property);
   if (value === undefined) {
-    value = window.getComputedStyle(lyricsElement).getPropertyValue(property).trim() || fallback;
+    value = engine.window.getComputedStyle(lyricsElement).getPropertyValue(property).trim() || fallback;
     engine.cachedCSSValues.set(property, value);
   }
   return value;
@@ -1403,7 +1424,7 @@ function resolveGlowFilter(
 }
 
 function readAnimationConfig(engine: AnimationEngineInstance, lyricsElement: HTMLElement): AnimationConfig {
-  const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const prefersReducedMotion = engine.window.matchMedia(REDUCED_MOTION_QUERY).matches;
   const scrollDurationMs = getCSSDurationWithFallback(
     engine,
     lyricsElement,
@@ -1738,6 +1759,7 @@ interface PendingLineScroll {
  * resolver semantics while reducing N style flushes to one flush per probe.
  */
 function batchResolveLineScrollProperty<T>(
+  engine: AnimationEngineInstance,
   items: PreparedLineScroll[],
   property: string,
   probeValue: (item: PreparedLineScroll) => string,
@@ -1752,7 +1774,7 @@ function batchResolveLineScrollProperty<T>(
     item.lineElement.style.setProperty(property, probeValue(item), "important");
   }
 
-  const values = items.map(item => readValue(window.getComputedStyle(item.lineElement)));
+  const values = items.map(item => readValue(engine.window.getComputedStyle(item.lineElement)));
 
   for (let index = 0; index < items.length; index++) {
     restoreInlineStyleProperty(items[index].lineElement, property, previous[index].value, previous[index].priority);
@@ -1864,6 +1886,7 @@ function prepareLineScrollOffsets(
   }
 
   const durations = batchResolveLineScrollProperty(
+    engine,
     prepared,
     "transition-duration",
     item => lineScrollDurationProperty(item.side, config.lineScroll.durationMs, config.lineScroll.differentialEffects),
@@ -1873,6 +1896,7 @@ function prepareLineScrollOffsets(
     }
   );
   const startEasings = batchResolveLineScrollProperty(
+    engine,
     prepared,
     "transition-timing-function",
     item =>
@@ -1880,18 +1904,21 @@ function prepareLineScrollOffsets(
     style => style.transitionTimingFunction.trim() || config.lineScroll.easing
   );
   const endEasings = batchResolveLineScrollProperty(
+    engine,
     prepared,
     "transition-timing-function",
     item => lineScrollEasingProperty(item.side, "end", config.lineScroll.easing, config.lineScroll.differentialEffects),
     style => style.transitionTimingFunction.trim() || config.lineScroll.easing
   );
   const startTranslates = batchResolveLineScrollProperty(
+    engine,
     prepared,
     "translate",
     item => lineScrollTranslate(item.side, "start", config.lineScroll.differentialEffects),
     style => normalizedTranslate(style.translate)
   );
   const endTranslates = batchResolveLineScrollProperty(
+    engine,
     prepared,
     "translate",
     item => lineScrollTranslate(item.side, "end", config.lineScroll.differentialEffects),
@@ -2046,14 +2073,14 @@ function decaySkipScrolls(engine: AnimationEngineInstance, now: number): void {
 
 function stopPassiveScrollLoop(engine: AnimationEngineInstance): void {
   if (engine.passiveRAFId !== null) {
-    cancelAnimationFrame(engine.passiveRAFId);
+    engine.window.cancelAnimationFrame(engine.passiveRAFId);
     engine.passiveRAFId = null;
   }
 }
 
 function startPassiveScrollLoop(engine: AnimationEngineInstance): void {
   if (engine.passiveRAFId !== null) return;
-  engine.passiveRAFId = requestAnimationFrame(() => passiveScrollRAFLoop(engine));
+  engine.passiveRAFId = engine.window.requestAnimationFrame(() => passiveScrollRAFLoop(engine));
 }
 
 function passiveScrollRAFLoop(engine: AnimationEngineInstance): void {
@@ -2066,7 +2093,7 @@ function passiveScrollRAFLoop(engine: AnimationEngineInstance): void {
     return;
 
   passiveScrollEngine(engine, playbackClock.lastPlayState);
-  engine.passiveRAFId = requestAnimationFrame(() => passiveScrollRAFLoop(engine));
+  engine.passiveRAFId = engine.window.requestAnimationFrame(() => passiveScrollRAFLoop(engine));
 }
 
 function passiveScrollEngine(engine: AnimationEngineInstance, isPlaying: boolean): void {
@@ -2078,7 +2105,7 @@ function passiveScrollEngine(engine: AnimationEngineInstance, isPlaying: boolean
 
   if (isLoaderActive()) return;
 
-  const tabRenderer = document.querySelector(TAB_RENDERER_SELECTOR) as HTMLElement;
+  const tabRenderer = resolveScrollElement(engine);
   if (!tabRenderer) return;
 
   const now = Date.now();
@@ -2161,7 +2188,7 @@ function setupTabRendererObserver(engine: AnimationEngineInstance, element: HTML
     engine.tabRendererResizeObserver.disconnect();
   }
 
-  engine.tabRendererResizeObserver = new ResizeObserver(() => {
+  engine.tabRendererResizeObserver = new engine.window.ResizeObserver(() => {
     dropPendingLineScroll(engine);
     if (element && element.isConnected) {
       engine.cachedTabRendererHeight = element.getBoundingClientRect().height;
@@ -2269,7 +2296,7 @@ function runAnimationEngine(
     const { config: animationConfig, scrollTiming } = getAnimationSettings(engine, lyricsElement);
 
     // Read layout values before the loop writes class changes, to avoid forced reflow
-    const tabRenderer = document.querySelector(TAB_RENDERER_SELECTOR) as HTMLElement | null;
+    const tabRenderer = resolveScrollElement(engine);
     if (!tabRenderer) {
       clearVisibleLyricWillChange(engine);
       return;
@@ -2495,8 +2522,8 @@ function runAnimationEngine(
       scrollPos = Math.max(0, scrollPos);
 
       if (ENABLE_DEBUG_RENDER.getBooleanValue()) {
-        let transform = window.getComputedStyle(lyricsElement).transform;
-        const matrix = new DOMMatrix(transform);
+        let transform = engine.window.getComputedStyle(lyricsElement).transform;
+        const matrix = new engine.window.DOMMatrix(transform);
         let yTransform = matrix.f;
         let yTop = scrollTop - yTransform;
         resetDebugRender(yTop);
@@ -2693,7 +2720,7 @@ function scheduleLyricPositionUpdate(engine: AnimationEngineInstance): void {
   }
   engine.pendingLyricsUpdate = true;
   dropPendingLineScroll(engine);
-  requestAnimationFrame(() => {
+  engine.window.requestAnimationFrame(() => {
     engine.pendingLyricsUpdate = false;
     calculateLyricPositions();
     runAnimationEngine(
