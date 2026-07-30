@@ -24,6 +24,7 @@ import {
   noteAnimationVisibilityChange,
 } from "@modules/ui/animationEngine";
 import { adjustLyricOffset, OFFSET_STEP, OFFSET_STEP_LARGE } from "@modules/ui/lyricsDock/offset";
+import { currentTickOptions } from "@modules/ui/mainLyricsView";
 import { preloadArtwork } from "@modules/ui/pictureInPicture/lyricsView";
 import {
   closePlayerPageIfOpenedForFullscreen,
@@ -77,7 +78,10 @@ function runAnimationEngine(now: number, force = false): void {
     : 0;
   const currentTime = Math.min(latestPlayerTime + elapsedS, latestPlayerDuration || Infinity);
   if (AppState.suppressZeroTime < wallTime || currentTime !== 0) {
-    if (animationEngine(currentTime, wallTime, latestPlayerPlaying) === "lyrics-missing") {
+    if (
+      AppState.areLyricsTicking &&
+      animationEngine(currentTime, currentTickOptions(wallTime, latestPlayerPlaying)) === "lyrics-missing"
+    ) {
       AppState.areLyricsTicking = false;
     }
   }

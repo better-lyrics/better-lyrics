@@ -8,11 +8,10 @@ import {
   PAUSED_CLASS,
   USER_SCROLLING_CLASS,
 } from "@constants";
-import { AppState } from "@core/appState";
 import { calculateLyricPositions, type LineData, type PartData } from "@modules/lyrics/injectLyrics";
 import { registerThemeSetting } from "@modules/settings/themeOptions";
 import { ytmHost } from "@modules/ui/lyricsHost";
-import type { LyricsRendererHost } from "@renderer/index";
+import type { LyricsRendererHost, LyricSyncType, TickOptions } from "@renderer/index";
 import { clamp, getRelativeLayoutBounds, log, positiveModulo, roundedMs } from "@utils";
 
 const LYRIC_ENDING_THRESHOLD_S = registerThemeSetting("blyrics-lyric-ending-threshold-s", 0.5);
@@ -105,6 +104,7 @@ interface AnimEngineViewState {
    */
   lines: LineData[];
   lyricsContainer: HTMLElement | null;
+  syncType: LyricSyncType;
   lyricWidth: number;
   lyricHeight: number;
   skipScrolls: number;
@@ -158,6 +158,11 @@ interface AnimationEngineInstance extends AnimEngineViewState {
   cachedDurations: Map<string, number>;
   cachedCSSValues: Map<string, string>;
   cachedAnimationSettings: AnimationSettings | null;
+  /**
+   * Last value the tick was given. The passive scroll loop runs from an animation frame rather than
+   * from a tick, so it has no options object to read.
+   */
+  passiveScrollEnabled: boolean;
   passiveRAFId: number | null;
   pendingLyricsUpdateFrame: number | null;
   learnedAnimationTimingOffsetMs: number;
@@ -183,6 +188,7 @@ function createAnimationEngineInstance(
     host,
     lines: [],
     lyricsContainer: null,
+    syncType: "none",
     lyricWidth: 0,
     lyricHeight: 0,
     skipScrolls: 0,
@@ -212,6 +218,7 @@ function createAnimationEngineInstance(
     cachedDurations: new Map(),
     cachedCSSValues: new Map(),
     cachedAnimationSettings: null,
+    passiveScrollEnabled: false,
     passiveRAFId: null,
     pendingLyricsUpdateFrame: null,
     learnedAnimationTimingOffsetMs: 0,
@@ -246,6 +253,7 @@ export const animEngineState: Pick<
   AnimEngineViewState,
   | "lines"
   | "lyricsContainer"
+  | "syncType"
   | "lyricWidth"
   | "lyricHeight"
   | "skipScrolls"
@@ -267,6 +275,12 @@ export const animEngineState: Pick<
   },
   set lyricsContainer(value: HTMLElement | null) {
     mainEngine.lyricsContainer = value;
+  },
+  get syncType(): LyricSyncType {
+    return mainEngine.syncType;
+  },
+  set syncType(value: LyricSyncType) {
+    mainEngine.syncType = value;
   },
   get lyricWidth(): number {
     return mainEngine.lyricWidth;
@@ -817,7 +831,7 @@ function noteVisibilityChange(engine: AnimationEngineInstance): void {
     return;
   }
 
-  if (!AppState.lyricData) return;
+  if (!engine.lyricsContainer) return;
 
   const runningAnimationCount = engine.lines.reduce(
     (count, line) => count + [line, ...line.parts].reduce((lineCount, part) => lineCount + part.animations.length, 0),
@@ -2116,6 +2130,14 @@ function decaySkipScrolls(engine: AnimationEngineInstance, now: number): void {
 
 // -- Passive Scroll Engine --------------------------
 
+/**
+ * Unsynced lyrics that this view still has on screen. `syncType` outlives the lyrics it was derived
+ * from, so the container is the term that says they are still there.
+ */
+function hasUnsyncedLyrics(engine: AnimationEngineInstance): boolean {
+  return engine.lyricsContainer !== null && engine.syncType === "none";
+}
+
 function stopPassiveScrollLoop(engine: AnimationEngineInstance): void {
   if (engine.passiveRAFId !== null) {
     engine.window.cancelAnimationFrame(engine.passiveRAFId);
@@ -2130,12 +2152,7 @@ function startPassiveScrollLoop(engine: AnimationEngineInstance): void {
 
 function passiveScrollRAFLoop(engine: AnimationEngineInstance): void {
   engine.passiveRAFId = null;
-  if (
-    !AppState.isPassiveScrollEnabled ||
-    !PASSIVE_SCROLL_ENABLED.getBooleanValue() ||
-    AppState.lyricData?.syncType !== "none"
-  )
-    return;
+  if (!engine.passiveScrollEnabled || !PASSIVE_SCROLL_ENABLED.getBooleanValue() || !hasUnsyncedLyrics(engine)) return;
 
   passiveScrollEngine(engine, playbackClock.lastPlayState);
   engine.passiveRAFId = engine.window.requestAnimationFrame(() => passiveScrollRAFLoop(engine));
@@ -2250,22 +2267,24 @@ type AnimationTickStatus = "ok" | "lyrics-missing";
 function runAnimationEngine(
   engine: AnimationEngineInstance,
   currentTime: number,
-  eventCreationTime: number,
-  isPlaying = true,
-  smoothScroll = true
+  options: TickOptions
 ): AnimationTickStatus {
+  const { eventCreationTime, isPlaying } = options;
+  const smoothScroll = options.smoothScroll ?? true;
+  engine.passiveScrollEnabled = options.passiveScrollEnabled;
+
   const now = Date.now();
   // const frameStart = performance.now();
-  if (!AppState.areLyricsTicking || (currentTime === 0 && !isPlaying)) {
+  if (currentTime === 0 && !isPlaying) {
     return "ok";
   }
 
-  if (AppState.lyricData?.syncType === "none") {
+  if (hasUnsyncedLyrics(engine)) {
     if (!playbackClock.lastPlayState && isPlaying) {
       engine.scrollResumeTime = 0;
     }
     playbackClock.lastPlayState = isPlaying;
-    if (!AppState.isPassiveScrollEnabled) return "ok";
+    if (!options.passiveScrollEnabled) return "ok";
     startPassiveScrollLoop(engine);
     return "ok";
   }
@@ -2287,16 +2306,9 @@ function runAnimationEngine(
 
   currentTime += timeOffset / 1000;
 
-  let lyricData = AppState.lyricData;
-  if (!lyricData) {
-    log("Lyrics are ticking, but lyricData are null!");
-    return "lyrics-missing";
-  }
-
   const isMainLyricsVisible = engine.host.isViewVisible();
-  // Don't tick lyrics if they're not visible anywhere. The floating window term is here because one
-  // instance still feeds both views: task 5.4 gives that window its own instance and drops it.
-  if (!isMainLyricsVisible && !AppState.isPictureInPictureOpen) {
+  // Don't tick lyrics if they're not visible anywhere.
+  if (!isMainLyricsVisible && !options.tickWhileViewHidden) {
     clearVisibleLyricWillChange(engine);
     return "ok";
   }
@@ -2315,15 +2327,15 @@ function runAnimationEngine(
 
     const lines = engine.lines;
 
-    if (lyricData.syncType === "richsync") {
+    if (engine.syncType === "richsync") {
       currentTime += getCSSDurationInMs(engine, lyricsElement, "--blyrics-richsync-timing-offset") / 1000;
-      currentTime -= AppState.richsyncOffsetTrim;
+      currentTime -= options.richsyncOffsetTrim;
     } else {
       currentTime += getCSSDurationInMs(engine, lyricsElement, "--blyrics-timing-offset") / 1000;
-      currentTime -= AppState.lineOffsetTrim;
+      currentTime -= options.lineOffsetTrim;
     }
 
-    currentTime -= AppState.globalLyricOffset + AppState.lyricOffset;
+    currentTime -= options.globalLyricOffset + options.lyricOffset;
 
     const lyricScrollTime =
       correctedScrollTimeS(engine, currentTime) +
@@ -2536,7 +2548,7 @@ function runAnimationEngine(
         })
         // We subtract selectedLyricHeight / 2 to center the selected lyric line vertically within the offset region,
         // so the lyric is not aligned at the very top of the offset but is visually centered.
-        .map(lyricData => lyricData.position + lyricData.height / 2);
+        .map(lineData => lineData.position + lineData.height / 2);
 
       let avgPos =
         lyricPositions.reduce((accumulator, currentValue) => accumulator + currentValue, 0) / lyricPositions.length;
@@ -2735,18 +2747,11 @@ function runAnimationEngine(
  * Main lyrics synchronization function that handles timing, highlighting, and scrolling.
  *
  * @param currentTime - Current playback time in seconds
- * @param eventCreationTime - Timestamp when the event was created (ms)
- * @param [isPlaying=true] - Whether audio is currently playing
- * @param [smoothScroll=true] - Whether to use smooth scrolling
+ * @param options - Player snapshot and user settings this tick renders against
  * @returns "lyrics-missing" when the tick found nothing to render, so the driver can stop ticking
  */
-export function animationEngine(
-  currentTime: number,
-  eventCreationTime: number,
-  isPlaying = true,
-  smoothScroll = true
-): AnimationTickStatus {
-  return runAnimationEngine(mainEngine, currentTime, eventCreationTime, isPlaying, smoothScroll);
+export function animationEngine(currentTime: number, options: TickOptions): AnimationTickStatus {
+  return runAnimationEngine(mainEngine, currentTime, options);
 }
 
 // -- Debounced Lyrics Update --------------------------
@@ -2762,36 +2767,33 @@ function cancelLyricPositionUpdate(engine: AnimationEngineInstance): void {
  * Debounced via requestAnimationFrame to avoid O(n²) layout thrashing
  * when translations/romanizations load (each addition would otherwise
  * trigger calculateLyricPositions on ALL lines).
+ *
+ * @param buildTickOptions - Resolved on the frame rather than now, so the re-tick reads the clock
+ *   and settings of the moment it runs. Returning null declines the frame.
  */
 function scheduleLyricPositionUpdate(
   engine: AnimationEngineInstance,
+  buildTickOptions: () => TickOptions | null,
   reportTickStatus: (status: AnimationTickStatus) => void
 ): void {
-  if (!AppState.areLyricsTicking || engine.pendingLyricsUpdateFrame !== null) {
+  if (engine.pendingLyricsUpdateFrame !== null) {
     return;
   }
   dropPendingLineScroll(engine);
   engine.pendingLyricsUpdateFrame = engine.window.requestAnimationFrame(() => {
     engine.pendingLyricsUpdateFrame = null;
     calculateLyricPositions();
-    reportTickStatus(
-      runAnimationEngine(
-        engine,
-        playbackClock.lastTime,
-        playbackClock.lastEventCreationTime,
-        playbackClock.lastPlayState,
-        false
-      )
-    );
+    const options = buildTickOptions();
+    if (!options) return;
+    reportTickStatus(runAnimationEngine(engine, playbackClock.lastTime, options));
   });
 }
 
-export function lyricsElementAdded(): void {
-  scheduleLyricPositionUpdate(mainEngine, status => {
-    if (status === "lyrics-missing") {
-      AppState.areLyricsTicking = false;
-    }
-  });
+export function scheduleMainLyricPositionUpdate(
+  buildTickOptions: () => TickOptions | null,
+  reportTickStatus: (status: AnimationTickStatus) => void
+): void {
+  scheduleLyricPositionUpdate(mainEngine, buildTickOptions, reportTickStatus);
 }
 
 /**

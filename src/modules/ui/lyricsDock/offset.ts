@@ -2,6 +2,7 @@ import { OFFSET_STORAGE_PREFIX } from "@constants";
 import { AppState } from "@core/appState";
 import { getTransientStorage, setPersistentStorage, setStorage } from "@core/storage";
 import { animationEngine, animEngineState } from "@modules/ui/animationEngine";
+import { currentTickOptions } from "@modules/ui/mainLyricsView";
 
 export const OFFSET_STEP = 0.1;
 export const OFFSET_STEP_LARGE = 0.5;
@@ -16,9 +17,7 @@ function retickLyrics(): void {
   if (AppState.areLyricsTicking) {
     const status = animationEngine(
       animEngineState.lastTime,
-      animEngineState.lastEventCreationTime,
-      animEngineState.lastPlayState,
-      false
+      currentTickOptions(animEngineState.lastEventCreationTime, animEngineState.lastPlayState, false)
     );
     if (status === "lyrics-missing") {
       AppState.areLyricsTicking = false;

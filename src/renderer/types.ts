@@ -44,6 +44,17 @@ export interface TickOptions {
   lyricOffset: number;
   richsyncOffsetTrim: number;
   lineOffsetTrim: number;
+
+  /**
+   * Whether the user has passive scrolling switched on. Only unsynced lyrics use it.
+   */
+  passiveScrollEnabled: boolean;
+  /**
+   * Temporary. One instance currently drives both the side panel and the floating window's
+   * animation mirror, so the tick has to keep running while the side panel sits on another tab.
+   * Task 5.4 gives the floating window its own instance and this field goes away.
+   */
+  tickWhileViewHidden: boolean;
 }
 
 // -- Host adapter --------------------------------------------

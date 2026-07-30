@@ -23,7 +23,7 @@ import {
   romanizeBatch,
   translateBatch,
 } from "@modules/lyrics/translation";
-import { animEngineState, lyricsElementAdded } from "@modules/ui/animationEngine";
+import { animEngineState } from "@modules/ui/animationEngine";
 import { resizeCanvas } from "@modules/ui/animationEngineDebug";
 import {
   addFooter,
@@ -34,6 +34,7 @@ import {
   renderLoader,
   setExtraHeight,
 } from "@modules/ui/dom";
+import { lyricsElementAdded } from "@modules/ui/mainLyricsView";
 import { disableNativeLyricsFocus } from "@modules/ui/nativeLyricsFocus";
 import {
   addSeekHandler,
@@ -275,6 +276,7 @@ function injectLyrics(
 
   animEngineState.lines = lines;
   animEngineState.lyricsContainer = lyricsContainer;
+  animEngineState.syncType = syncType;
   animEngineState.lyricWidth = lyricsContainer.clientWidth;
   animEngineState.lyricHeight = lyricsContainer.clientHeight;
 
