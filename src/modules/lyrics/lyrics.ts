@@ -3,7 +3,14 @@
  * Manages lyrics fetching, caching, processing, and rendering.
  */
 
-import { FETCH_LYRICS_LOG, LOG_PREFIX, LYRICS_TAB_HIDDEN_LOG, SERVER_ERROR_LOG, TAB_HEADER_CLASS } from "@constants";
+import {
+  FETCH_LYRICS_LOG,
+  LOG_PREFIX,
+  LYRICS_TAB_HIDDEN_LOG,
+  SEEK_EVENT,
+  SERVER_ERROR_LOG,
+  TAB_HEADER_CLASS,
+} from "@constants";
 import { AppState, type PlayerDetails } from "@core/appState";
 import { t } from "@core/i18n";
 import { type LyricsData, processLyrics } from "@modules/lyrics/injectLyrics";
@@ -19,6 +26,10 @@ import { clearCache as clearTranslationCache } from "./translation";
 import { animEngineState } from "@modules/ui/animationEngine";
 
 const hideInstrumentalOnly = registerThemeSetting("blyrics-hide-instrumental-only", false, true);
+
+function seekPlayer(timeS: number): void {
+  document.dispatchEvent(new CustomEvent(SEEK_EVENT, { detail: timeS }));
+}
 
 function isInstrumentalOnly(lyrics: Lyric[]): boolean {
   if (lyrics.length !== 1) return false;
@@ -204,7 +215,7 @@ export async function createLyrics(detail: PlayerDetails, signal: AbortSignal): 
             segmentMap: null,
           };
 
-          processLyrics(lyricsWithMeta, true, signal);
+          processLyrics(document, seekPlayer, lyricsWithMeta, true, signal);
         }
       }
       return lyrics;
@@ -333,7 +344,7 @@ export async function createLyrics(detail: PlayerDetails, signal: AbortSignal): 
     if (signal.aborted) {
       return;
     }
-    processLyrics(lyricsWithMeta, false, signal);
+    processLyrics(document, seekPlayer, lyricsWithMeta, false, signal);
     shouldCleanupLoader = false;
   } finally {
     if (shouldCleanupLoader) {

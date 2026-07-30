@@ -1,12 +1,14 @@
 /**
  * Creates an HTML element representing an instrumental break in the lyrics.
  *
+ * @param doc - Document the SVG nodes are created in
  * @param container - Element to place instrumental parts into
  * @param durationMs - Duration of the instrumental break in milliseconds
  * @param lineIndex - Line index for unique SVG element IDs
  * @returns HTMLDivElement representing the instrumental break
  */
 export function createInstrumentalElement(
+  doc: Document,
   container: HTMLDivElement,
   durationMs: number,
   lineIndex: number
@@ -15,60 +17,60 @@ export function createInstrumentalElement(
   container.style.setProperty("--blyrics-duration", `${durationMs}ms`);
 
   const svgNS = "http://www.w3.org/2000/svg";
-  const svg = document.createElementNS(svgNS, "svg");
+  const svg = doc.createElementNS(svgNS, "svg");
   svg.classList.add("blyrics--instrumental-icon");
   svg.setAttribute("viewBox", "0 0 24 24");
 
-  const defs = document.createElementNS(svgNS, "defs");
+  const defs = doc.createElementNS(svgNS, "defs");
 
   const filterId = `blyrics-glow-${lineIndex}`;
   const clipId = `blyrics-wave-clip-${lineIndex}`;
 
-  const filter = document.createElementNS(svgNS, "filter");
+  const filter = doc.createElementNS(svgNS, "filter");
   filter.setAttribute("id", filterId);
   filter.setAttribute("x", "-100%");
   filter.setAttribute("y", "-100%");
   filter.setAttribute("width", "300%");
   filter.setAttribute("height", "300%");
 
-  const feGaussianBlur = document.createElementNS(svgNS, "feGaussianBlur");
+  const feGaussianBlur = doc.createElementNS(svgNS, "feGaussianBlur");
   feGaussianBlur.setAttribute("in", "SourceGraphic");
   feGaussianBlur.setAttribute("stdDeviation", "5");
   feGaussianBlur.setAttribute("result", "blur");
   filter.appendChild(feGaussianBlur);
 
-  const feColorMatrix = document.createElementNS(svgNS, "feColorMatrix");
+  const feColorMatrix = doc.createElementNS(svgNS, "feColorMatrix");
   feColorMatrix.setAttribute("in", "blur");
   feColorMatrix.setAttribute("type", "matrix");
   feColorMatrix.setAttribute("values", "1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 0.6 0");
   feColorMatrix.setAttribute("result", "fadedBlur");
   filter.appendChild(feColorMatrix);
 
-  const feMerge = document.createElementNS(svgNS, "feMerge");
-  const feMergeNode1 = document.createElementNS(svgNS, "feMergeNode");
+  const feMerge = doc.createElementNS(svgNS, "feMerge");
+  const feMergeNode1 = doc.createElementNS(svgNS, "feMergeNode");
   feMergeNode1.setAttribute("in", "fadedBlur");
   feMerge.appendChild(feMergeNode1);
-  const feMergeNode2 = document.createElementNS(svgNS, "feMergeNode");
+  const feMergeNode2 = doc.createElementNS(svgNS, "feMergeNode");
   feMergeNode2.setAttribute("in", "SourceGraphic");
   feMerge.appendChild(feMergeNode2);
   filter.appendChild(feMerge);
 
   defs.appendChild(filter);
 
-  const clipPath = document.createElementNS(svgNS, "clipPath");
+  const clipPath = doc.createElementNS(svgNS, "clipPath");
   clipPath.setAttribute("id", clipId);
   clipPath.classList.add("blyrics--wave-clip");
 
   //  Create the Static Block (The deep fill)
   // This sits at y=4 (the lowest point of the wave) and extends to bottom
-  const waveRect = document.createElementNS(svgNS, "path");
+  const waveRect = doc.createElementNS(svgNS, "path");
   waveRect.classList.add("blyrics--wave-rect");
   waveRect.setAttribute("d", "M -4 3.9 L 30 3.9 L 30 30 L -4 30 Z");
   clipPath.appendChild(waveRect);
 
   // Create the Wavy Top
   // This only contains the surface water. It closes at y=4.
-  const wavePath = document.createElementNS(svgNS, "path");
+  const wavePath = doc.createElementNS(svgNS, "path");
   wavePath.classList.add("blyrics--wave-path");
 
   // Initial draw (matches the 0% keyframe below)
@@ -78,7 +80,7 @@ export function createInstrumentalElement(
   defs.appendChild(clipPath);
   svg.appendChild(defs);
 
-  const bgPath = document.createElementNS(svgNS, "path");
+  const bgPath = doc.createElementNS(svgNS, "path");
   bgPath.classList.add("blyrics--instrumental-bg");
   bgPath.setAttribute(
     "d",
@@ -86,10 +88,10 @@ export function createInstrumentalElement(
   );
   svg.appendChild(bgPath);
 
-  const g = document.createElementNS(svgNS, "g");
+  const g = doc.createElementNS(svgNS, "g");
   g.setAttribute("filter", `url(#${filterId})`);
 
-  const fillPath = document.createElementNS(svgNS, "path");
+  const fillPath = doc.createElementNS(svgNS, "path");
   fillPath.classList.add("blyrics--instrumental-fill");
   fillPath.setAttribute("clip-path", `url(#${clipId})`);
   fillPath.setAttribute(
