@@ -2120,11 +2120,20 @@ function decaySkipScrolls(engine: AnimationEngineInstance, now: number): void {
 // -- Passive Scroll Engine --------------------------
 
 /**
+ * The "no lyrics" message is one line at time zero, which is shaped exactly like unsynced lyrics.
+ * Nothing here applies to it: passive scroll would drift the message up and down for the length of
+ * the song, and there is no line to sync.
+ */
+function hasNoLyricsPlaceholder(engine: AnimationEngineInstance): boolean {
+  return engine.lyricsContainer?.dataset.noLyrics === "true";
+}
+
+/**
  * Unsynced lyrics that this view still has on screen. `syncType` outlives the lyrics it was derived
  * from, so the container is the term that says they are still there.
  */
 function hasUnsyncedLyrics(engine: AnimationEngineInstance): boolean {
-  return engine.lyricsContainer !== null && engine.syncType === "none";
+  return engine.lyricsContainer !== null && engine.syncType === "none" && !hasNoLyricsPlaceholder(engine);
 }
 
 function stopPassiveScrollLoop(engine: AnimationEngineInstance): void {
@@ -2265,6 +2274,11 @@ export function runAnimationEngine(
   const now = Date.now();
   // const frameStart = performance.now();
   if (currentTime === 0 && !isPlaying) {
+    return "ok";
+  }
+
+  if (hasNoLyricsPlaceholder(engine)) {
+    stopPassiveScrollLoop(engine);
     return "ok";
   }
 

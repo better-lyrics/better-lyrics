@@ -219,6 +219,16 @@ const LINE_SYNCED_LYRICS: Lyric[] = [
   { startTimeMs: 206000, durationMs: 3000, words: "Three" },
 ];
 
+// Every line at time zero, which is what a provider with no timings gives and also what the
+// "no lyrics" message looks like. Only the flag tells the two apart.
+const UNSYNCED_LYRICS: Lyric[] = [
+  { startTimeMs: 0, durationMs: 0, words: "One" },
+  { startTimeMs: 0, durationMs: 0, words: "Two" },
+  { startTimeMs: 0, durationMs: 0, words: "Three" },
+];
+
+const NO_LYRICS_PLACEHOLDER: Lyric[] = [{ startTimeMs: 0, durationMs: 0, words: "No lyrics found for this song" }];
+
 // The same properties, answered differently by each document. The style caches are keyed by
 // property name alone, so a cache shared between instances would hand one view the other's values.
 const SCROLL_TIMING_OFFSET_PROPERTY = "--blyrics-scroll-timing-offset";
@@ -607,6 +617,46 @@ assert.equal(
   true,
   "Given one view's song dropped, When the other is asked to clear the screen, Then it still has a container to clear"
 );
+
+// -- The "no lyrics" message is not unsynced lyrics --------------------------------------------
+// Its own instance, so the pending frame the positive control leaves behind cannot reach the
+// destroy assertions below.
+
+const placeholderDocument = new FakeDocument();
+const placeholderWindow = new FakeWindow(placeholderDocument, PANEL_STYLE);
+const placeholderEngine = createAnimationEngineInstance(
+  asDocument(placeholderDocument),
+  asWindow(placeholderWindow),
+  new FakeHost()
+);
+const placeholderMount = placeholderDocument.createElement("div");
+const passiveTickOptions: TickOptions = { ...newTickOptions(), passiveScrollEnabled: true };
+
+setLyrics(placeholderEngine, asElement<HTMLElement>(placeholderMount), UNSYNCED_LYRICS, {
+  loaderVisible: false,
+  noLyrics: false,
+});
+runAnimationEngine(placeholderEngine, PLAYBACK_TIME_S, passiveTickOptions);
+
+assert.notEqual(
+  placeholderEngine.passiveRAFId,
+  null,
+  "Given unsynced lyrics and passive scroll switched on, When the view ticks, Then it drives the passive scroll loop"
+);
+
+setLyrics(placeholderEngine, asElement<HTMLElement>(placeholderMount), NO_LYRICS_PLACEHOLDER, {
+  loaderVisible: false,
+  noLyrics: true,
+});
+runAnimationEngine(placeholderEngine, PLAYBACK_TIME_S, passiveTickOptions);
+
+assert.equal(
+  placeholderEngine.passiveRAFId,
+  null,
+  "Given the no lyrics message, When the view ticks with passive scroll switched on, Then nothing scrolls it"
+);
+
+placeholderEngine.destroy();
 
 // -- Destroying one view releases only what it held --------------------------------------------
 
