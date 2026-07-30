@@ -1,18 +1,18 @@
+import { calculateLyricPositions } from "@modules/lyrics/injectLyrics";
+import { ytmHost } from "@modules/ui/lyricsHost";
 import {
   ANIMATING_CLASS,
   CURRENT_LYRICS_CLASS,
   FOOTER_CLASS,
-  LOG_PREFIX,
-  LYRICS_CHECK_INTERVAL_ERROR,
-  NO_LYRICS_ELEMENT_LOG,
   PAUSED_CLASS,
   USER_SCROLLING_CLASS,
-} from "@constants";
-import { calculateLyricPositions, type LineData, type PartData } from "@modules/lyrics/injectLyrics";
-import { registerThemeSetting } from "@modules/settings/themeOptions";
-import { ytmHost } from "@modules/ui/lyricsHost";
-import type { LyricsRendererHost, LyricSyncType, TickOptions } from "@renderer/index";
-import { clamp, getRelativeLayoutBounds, log, positiveModulo, roundedMs } from "@utils";
+} from "@renderer/constants";
+import type { LineData, LyricsRendererHost, LyricSyncType, PartData, TickOptions } from "@renderer/index";
+import { registerThemeSetting } from "@renderer/themeSettings";
+import { clamp, getRelativeLayoutBounds, positiveModulo, roundedMs } from "@renderer/util";
+
+const NO_LYRICS_ELEMENT_LOG = "No lyrics element found on the page, skipping lyrics injection";
+const LYRICS_CHECK_INTERVAL_ERROR = "Error in lyrics check interval:";
 
 const LYRIC_ENDING_THRESHOLD_S = registerThemeSetting("blyrics-lyric-ending-threshold-s", 0.5);
 const EARLY_SCROLL_CONSIDER = registerThemeSetting("blyrics-early-scroll-consider-s", 0.62);
@@ -786,7 +786,7 @@ function logAnimationTiming(
     return;
   }
 
-  log(LOG_PREFIX, "WAAPI timing", {
+  engine.host.log("WAAPI timing", {
     reason,
     lineIndex,
     lineTimeS: roundedMs(lineData.time * 1000) / 1000,
@@ -805,6 +805,7 @@ function logAnimationTiming(
 }
 
 function logAnimationCleanup(
+  engine: AnimationEngineInstance,
   reason: string,
   lineData: LineData,
   lineIndex: number,
@@ -815,7 +816,7 @@ function logAnimationCleanup(
     return;
   }
 
-  log(LOG_PREFIX, "Animation cleanup", {
+  engine.host.log("Animation cleanup", {
     reason,
     lineIndex,
     lineTimeS: roundedMs(lineData.time * 1000) / 1000,
@@ -840,7 +841,7 @@ function noteVisibilityChange(engine: AnimationEngineInstance): void {
 
   if (engine.document.visibilityState === "visible") {
     engine.animationTimingVisibilityLogUntil = Date.now() + ANIMATION_TIMING_LOG_WINDOW_MS;
-    log(LOG_PREFIX, "Visibility changed; keeping WAAPI animations for timing verification", {
+    engine.host.log("Visibility changed; keeping WAAPI animations for timing verification", {
       visibilityState: engine.document.visibilityState,
       runningAnimationCount,
       resetSkipped: true,
@@ -849,7 +850,7 @@ function noteVisibilityChange(engine: AnimationEngineInstance): void {
     return;
   }
 
-  log(LOG_PREFIX, "Visibility changed; WAAPI animations left intact", {
+  engine.host.log("Visibility changed; WAAPI animations left intact", {
     visibilityState: engine.document.visibilityState,
     runningAnimationCount,
     resetSkipped: true,
@@ -2321,7 +2322,7 @@ function runAnimationEngine(
     const lyricsElement = engine.lyricsContainer;
     // If lyrics element doesn't exist, clear the interval and return silently
     if (!lyricsElement) {
-      log(NO_LYRICS_ELEMENT_LOG);
+      engine.host.log(NO_LYRICS_ELEMENT_LOG);
       return "lyrics-missing";
     }
 
@@ -2487,7 +2488,7 @@ function runAnimationEngine(
         if (lineData.isSelected) {
           if (isPlaying || timeJumped) {
             if (currentTime > staleAnimationEndTime) {
-              logAnimationCleanup("selected-stale-reset", lineData, index, currentTime, staleAnimationEndTime);
+              logAnimationCleanup(engine, "selected-stale-reset", lineData, index, currentTime, staleAnimationEndTime);
               resetLineAnimationState(lineData);
             } else {
               startLineExitAnimations(engine, lineData, animationConfig, currentTime);
@@ -2501,6 +2502,7 @@ function runAnimationEngine(
           clearLineStateClasses(lineData);
         } else if (hasLineAnimations(lineData) && (timeJumped || currentTime > staleAnimationEndTime)) {
           logAnimationCleanup(
+            engine,
             timeJumped ? "time-jump-reset" : "stale-reset",
             lineData,
             index,
@@ -2736,7 +2738,7 @@ function runAnimationEngine(
     // }
   } catch (err) {
     if (!(err as Error).message?.includes("undefined")) {
-      log(LYRICS_CHECK_INTERVAL_ERROR, err);
+      engine.host.log(LYRICS_CHECK_INTERVAL_ERROR, err);
     }
   }
 

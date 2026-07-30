@@ -53,11 +53,10 @@ import {
   isNearestLyricRtl,
   type LineData,
   newLineData,
-  type PartData,
 } from "@renderer/index";
 import { getRelativeLayoutBounds, langCodesMatch, languageMatchesAny, log } from "@utils";
 
-export type { LineData, PartData };
+export type { LineData };
 
 function isRomanizationDisabledForLang(lang: string): boolean {
   return languageMatchesAny(lang, AppState.romanizationDisabledLanguages);

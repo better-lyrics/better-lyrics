@@ -3,13 +3,11 @@ import type { LyricSourceKey } from "@modules/lyrics/providers/shared";
 // The renderer module owns the names it emits into the lyrics DOM. They are re-exported here so
 // existing importers keep reaching them through @constants.
 export {
-  ANIMATING_CLASS,
   CURRENT_LYRICS_CLASS,
   FOOTER_CLASS,
   LINE_CLASS,
   LYRICS_CLASS,
   LYRICS_WRAPPER_ID,
-  PAUSED_CLASS,
   ROMANIZED_LYRICS_CLASS,
   RTL_CLASS,
   TRANSLATED_LYRICS_CLASS,
@@ -171,9 +169,6 @@ export const SYNC_DISABLED_LOG =
 // Error and Storage Logs
 export const SERVER_ERROR_LOG = "[BetterLyrics] Server Error:" as const;
 export const STORAGE_TRANSIENT_SET_LOG = "[BetterLyrics] Set transient storage for key: " as const;
-export const NO_LYRICS_ELEMENT_LOG =
-  "[BetterLyrics] No lyrics element found on the page, skipping lyrics injection" as const;
-export const LYRICS_CHECK_INTERVAL_ERROR = "[BetterLyrics] Error in lyrics check interval:" as const;
 export const MUSIC_NOTES = "♪𝅘𝅥𝅮𝅘𝅥𝅯𝅘𝅥𝅰𝅘𝅥𝅱𝅘𝅥𝅲" as const;
 
 export const BLYRICS_INSTRUMENTAL_GAP_MS = 5000;

@@ -93,6 +93,10 @@ export interface LyricsRendererHost {
    */
   seek(timeS: number): void;
   translate(key: string): string;
+  /**
+   * Where the view's diagnostics go. The host owns the prefix and whether logging is on at all.
+   */
+  log(...args: unknown[]): void;
   debug?: LyricsRendererDebugSink;
 }
 
