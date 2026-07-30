@@ -1,14 +1,11 @@
 import {
-  LINE_CLASS,
   LOG_PREFIX,
-  LYRICS_CLASS,
   LYRICS_FOUND_LOG,
   LYRICS_TAB_NOT_DISABLED_LOG,
   LYRICS_WRAPPER_ID,
   NO_LYRICS_FOUND_LOG,
   NO_LYRICS_TEXT_SELECTOR,
   ROMANIZATION_LANGUAGES,
-  RTL_CLASS,
   SYNC_DISABLED_LOG,
   TAB_HEADER_CLASS,
   TRANSLATION_ENABLED_LOG,
@@ -23,27 +20,21 @@ import {
   romanizeBatch,
   translateBatch,
 } from "@modules/lyrics/translation";
-import { animEngineState } from "@modules/ui/mainLyricsView";
 import { addFooter, addNoLyricsButton, cleanup, createLyricsWrapper, flushLoader, renderLoader } from "@modules/ui/dom";
-import { calculateLyricPositions, lyricsElementAdded } from "@modules/ui/mainLyricsView";
+import {
+  animEngineState,
+  calculateLyricPositions,
+  lyricsElementAdded,
+  setMainViewLyrics,
+} from "@modules/ui/mainLyricsView";
 import { disableNativeLyricsFocus } from "@modules/ui/nativeLyricsFocus";
 import {
-  addSeekHandler,
-  applyDirection,
-  buildLineSyncedParts,
   containsNonLatin,
-  createInstrumentalElement,
-  createLyricsLine,
-  deriveSyncType,
   detectNonLatinLanguage,
-  disableRichsync,
-  findNearestAgent,
   hasNonLatinLyrics,
   injectRomanization,
   injectTranslation,
-  isNearestLyricRtl,
   type LineData,
-  newLineData,
 } from "@renderer/index";
 import { langCodesMatch, languageMatchesAny, log } from "@utils";
 
@@ -103,8 +94,7 @@ export interface LyricsData {
  * Processes lyrics data and prepares it for rendering.
  * Sets language settings, validates data, and initiates DOM injection.
  *
- * @param doc - Document the lyric nodes are created in
- * @param seek - Moves playback to the given time in seconds
+ * @param doc - Document the translation and romanization nodes are created in
  * @param data - Processed lyrics data
  * @param keepLoaderVisible
  * @param signal - AbortSignal to cancel async operations
@@ -113,7 +103,6 @@ export interface LyricsData {
  */
 export function processLyrics(
   doc: Document,
-  seek: (timeS: number) => void,
   data: LyricSourceResultWithMeta,
   keepLoaderVisible = false,
   signal?: AbortSignal
@@ -140,15 +129,14 @@ export function processLyrics(
     log(LYRICS_TAB_NOT_DISABLED_LOG);
   }
 
-  injectLyrics(doc, seek, data, keepLoaderVisible, signal);
+  injectLyrics(doc, data, keepLoaderVisible, signal);
 }
 
 /**
  * Injects lyrics into the DOM with timing, click handlers, and animations.
  * Creates the complete lyrics interface including synchronization support.
  *
- * @param doc - Document the lyric nodes are created in
- * @param seek - Moves playback to the given time in seconds
+ * @param doc - Document the translation and romanization nodes are created in
  * @param data - Complete lyrics data object
  * @param keepLoaderVisible
  * @param signal - AbortSignal to cancel async operations
@@ -158,7 +146,6 @@ export function processLyrics(
  */
 function injectLyrics(
   doc: Document,
-  seek: (timeS: number) => void,
   data: LyricSourceResultWithMeta,
   keepLoaderVisible = false,
   signal?: AbortSignal
@@ -170,13 +157,7 @@ function injectLyrics(
   cleanup();
   disableNativeLyricsFocus();
 
-  let lyricsWrapper = createLyricsWrapper();
-
-  lyricsWrapper.replaceChildren();
-  const lyricsContainer = doc.createElement("div");
-  lyricsContainer.className = LYRICS_CLASS;
-  lyricsWrapper.appendChild(lyricsContainer);
-
+  const lyricsWrapper = createLyricsWrapper();
   lyricsWrapper.removeAttribute("is-empty");
 
   if (AppState.isTranslateEnabled) {
@@ -184,96 +165,32 @@ function injectLyrics(
   }
 
   const allZero = lyrics.every(item => item.startTimeMs === 0);
+  const noLyrics = lyrics[0].words === t("lyrics_notFound");
 
   if (keepLoaderVisible) {
     renderLoader(true);
   } else {
-    flushLoader(allZero && lyrics[0].words !== t("lyrics_notFound"));
+    flushLoader(allZero && !noLyrics);
   }
 
-  let lines: LineData[] = [];
-  const syncType: SyncType = deriveSyncType(lyrics);
+  setMainViewLyrics(lyricsWrapper, lyrics, { loaderVisible: keepLoaderVisible, noLyrics });
 
-  for (const [lineIndex, lyricItem] of lyrics.entries()) {
-    let lyricElement = doc.createElement("div");
-    const line = newLineData(lyricElement, lyricItem.startTimeMs, lyricItem.durationMs);
-
-    lyricElement.dataset.time = String(line.time);
-    lyricElement.dataset.duration = String(line.duration);
-    lyricElement.dataset.lineNumber = String(lineIndex);
-    lyricElement.classList.add(LINE_CLASS);
-    lyricElement.dir = "auto";
-    addSeekHandler(seek, lyricElement, allZero);
-    lines.push(line);
-
-    if (lyricItem.isInstrumental) {
-      createInstrumentalElement(doc, lyricElement, lyricItem.durationMs, lineIndex);
-      lyricElement.dataset.instrumental = "true";
-
-      const agent = findNearestAgent(lyrics, lineIndex);
-      if (agent) {
-        lyricElement.dataset.agent = agent;
-      }
-
-      if (isNearestLyricRtl(lyrics, lineIndex)) {
-        lyricElement.classList.add(RTL_CLASS);
-        lyricElement.dataset.direction = "rtl";
-      }
-
-      lyricsContainer.appendChild(lyricElement);
-      continue;
-    }
-
-    // Rebuilt parts stay local so the provider's lyrics survive injection intact and a second
-    // build over the same array produces the same result.
-    const parts =
-      lyricItem.parts && lyricItem.parts.length > 0 && !disableRichsync.getBooleanValue()
-        ? lyricItem.parts
-        : buildLineSyncedParts(lyricItem);
-
-    applyDirection(lyricElement, lyricItem.words);
-    createLyricsLine(doc, parts, line, lyricElement);
-
-    lyricElement.style.setProperty("--blyrics-duration", lyricItem.durationMs + "ms");
-    if (lyricItem.agent) {
-      lyricElement.dataset.agent = lyricItem.agent;
-    }
-
-    lyricsContainer.appendChild(lyricElement);
-  }
-
-  animEngineState.skipScrolls = 2;
-  animEngineState.skipScrollsDecayTimes = [];
-  for (let i = 0; i < animEngineState.skipScrolls; i++) {
-    animEngineState.skipScrollsDecayTimes.push(Date.now() + 2000);
-  }
-  animEngineState.scrollResumeTime = 0;
-
-  lyricsContainer.dataset.sync = syncType;
-  lyricsContainer.dataset.loaderVisible = String(keepLoaderVisible);
-  if (lyrics[0].words === t("lyrics_notFound")) {
-    lyricsContainer.dataset.noLyrics = "true";
-  }
+  const syncType: SyncType = animEngineState.syncType;
+  const lines: LineData[] = animEngineState.lines;
 
   const tabSelector = document.getElementsByClassName(TAB_HEADER_CLASS)[1] as HTMLElement;
 
-  let lyricsData: LyricsData = {
+  const lyricsData: LyricsData = {
     syncType: syncType,
     isMusicVideoSynced: data.musicVideoSynced === true,
     tabSelector,
     hasNonLatin: hasNonLatinLyrics(lyrics),
   };
 
-  animEngineState.lines = lines;
-  animEngineState.lyricsContainer = lyricsContainer;
-  animEngineState.syncType = syncType;
-  animEngineState.lyricWidth = lyricsContainer.clientWidth;
-  animEngineState.lyricHeight = lyricsContainer.clientHeight;
-
   // Set before addFooter so the dock controls read the current song's lyric data.
   AppState.lyricData = lyricsData;
 
-  if (lyrics[0].words !== t("lyrics_notFound")) {
+  if (!noLyrics) {
     const unisonData = data.source === "Unison" && "unisonData" in data ? data.unisonData : undefined;
     addFooter(
       data.source,

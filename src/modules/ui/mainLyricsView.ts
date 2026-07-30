@@ -14,7 +14,14 @@ import {
   runAnimationEngine,
   scheduleLyricPositionUpdate,
 } from "@renderer/engine";
-import type { LineData, LyricSyncType, TickOptions } from "@renderer/index";
+import {
+  type LineData,
+  type Lyric,
+  type LyricSyncType,
+  setLyrics,
+  type SetLyricsOptions,
+  type TickOptions,
+} from "@renderer/index";
 
 // -- The side panel's engine instance --------------------------
 
@@ -139,6 +146,13 @@ export function clearAnimationStyleCache(): void {
 
 export function cancelPendingLineScroll(): void {
   dropPendingLineScroll(mainEngine);
+}
+
+/**
+ * Builds the side panel's lyrics DOM into the given mount and hands the result to its engine.
+ */
+export function setMainViewLyrics(mount: HTMLElement, lyrics: Lyric[], options: SetLyricsOptions): void {
+  setLyrics(mainEngine, mount, lyrics, options);
 }
 
 /**

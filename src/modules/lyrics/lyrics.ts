@@ -245,7 +245,7 @@ export async function createLyrics(detail: PlayerDetails, signal: AbortSignal): 
             segmentMap: null,
           };
 
-          processLyrics(document, seekPlayer, lyricsWithMeta, true, signal);
+          processLyrics(document, lyricsWithMeta, true, signal);
           retainParsedLyrics(lyricsWithMeta);
         }
       }
@@ -375,7 +375,7 @@ export async function createLyrics(detail: PlayerDetails, signal: AbortSignal): 
     if (signal.aborted) {
       return;
     }
-    processLyrics(document, seekPlayer, lyricsWithMeta, false, signal);
+    processLyrics(document, lyricsWithMeta, false, signal);
     retainParsedLyrics(lyricsWithMeta);
     shouldCleanupLoader = false;
   } finally {

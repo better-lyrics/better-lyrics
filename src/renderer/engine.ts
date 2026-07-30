@@ -142,7 +142,7 @@ export interface PlaybackClock {
  */
 type EngineWindow = Window & typeof globalThis;
 
-interface AnimationEngineInstance extends AnimEngineViewState {
+export interface AnimationEngineInstance extends AnimEngineViewState {
   document: Document;
   window: EngineWindow;
   host: LyricsRendererHost;

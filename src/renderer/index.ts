@@ -1,23 +1,6 @@
 // index.ts is the only public entry point of the renderer module.
 
-export { WORD_HIGHLIGHT_CLASS } from "./constants";
-export {
-  addSeekHandler,
-  applyDirection,
-  buildLineSyncedParts,
-  createLyricsLine,
-  deriveSyncType,
-  disableRichsync,
-  findNearestAgent,
-  hasNonLatinLyrics,
-  injectRomanization,
-  injectTranslation,
-  isNearestLyricRtl,
-  type LineData,
-  newLineData,
-  type PartData,
-} from "./inject";
-export { createInstrumentalElement } from "./instrumental";
+export { hasNonLatinLyrics, injectRomanization, injectTranslation, type LineData, type PartData } from "./inject";
 export { getSeekTimeFromClick } from "./seek";
 export { containsNonLatin, detectNonLatinLanguage } from "./text";
 export type {
@@ -30,3 +13,4 @@ export type {
   LyricSyncType,
   TickOptions,
 } from "./types";
+export { setLyrics, type SetLyricsOptions } from "./view";
