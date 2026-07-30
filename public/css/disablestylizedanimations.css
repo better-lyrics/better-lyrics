@@ -1,19 +1,17 @@
 /**
-    Effects applied when stylized animations are disabled
+    Effects switched off when stylized animations are disabled.
+
+    These are the two the setting has always meant: the gradient that sweeps across a word and the
+    wobble that lands it. Words still highlight, instantly at their start time. Everything else the
+    engine animates (line scale, glow, fade, scroll, instrumental fill) is left alone, as it always
+    was.
+
+    The engine reads these off the lyrics container in whichever document it renders into, so this
+    has to switch the effect off at the source rather than try to override an animation: the word
+    highlight is built with the Web Animations API, which no stylesheet can cancel.
  */
 
-.blyrics-container > div > span > span.blyrics--animating::after {
-    animation: none;
-}
-
-.blyrics-container > div > span > span.blyrics--animating {
-    animation: none;
-}
-
-.blyrics-container > div > div > span > span.blyrics--animating::after {
-    animation: none;
-}
-
-.blyrics-container > div > div > span > span.blyrics--animating {
-    animation: none;
+:root {
+	--blyrics-animate-highlight-swipe: 0;
+	--blyrics-animate-word-wobble: 0;
 }

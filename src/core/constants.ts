@@ -33,6 +33,7 @@ export const PICTURE_IN_PICTURE_TOGGLE_SELECTOR = "[data-blyrics-picture-in-pict
 // DOM IDs and Attributes
 export const LYRICS_LOADER_ID = "blyrics-loader" as const;
 export const LYRICS_DISABLED_ATTR = "blyrics-dfs" as const;
+export const DISABLE_EFFECTS_STYLE_ID = "blyrics-disable-effects" as const;
 export const HIDDEN_CLASS = "blyrics-hidden" as const;
 export const REPORT_MODAL = "blyrics-report-lyrics" as const;
 

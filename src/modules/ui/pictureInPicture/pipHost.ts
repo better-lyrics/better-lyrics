@@ -1,4 +1,4 @@
-import { FOOTER_CLASS } from "@constants";
+import { DISABLE_EFFECTS_STYLE_ID, FOOTER_CLASS } from "@constants";
 import {
   type AnimationEngineInstance,
   clearLyrics,
@@ -19,7 +19,9 @@ import { PictureInPictureLyricsView } from "./lyricsView";
 import { createPictureInPictureLyricsHost } from "./pipLyricsHost";
 import type { PictureInPictureHostEnvironment } from "./types";
 
-const CUSTOM_STYLE_ID = "blyrics-custom-style";
+// The theme, and the sheet that switches the stylized animations off. Both live in the opener's
+// head and both have to reach the window, which resolves its own computed styles.
+const MIRRORED_STYLE_IDS = ["blyrics-custom-style", DISABLE_EFFECTS_STYLE_ID];
 const PIP_OPEN_ATTRIBUTE = "blyrics-pip-open";
 const FOOTER_SOURCE_LINK_ID = "betterLyricsFooterLink";
 
@@ -100,16 +102,21 @@ export function createPictureInPictureHost(
 
   function mirrorCustomTheme(pipWindow: Window): void {
     stopThemeMirror();
-    const pipStyle = pipWindow.document.createElement("style");
-    pipStyle.id = CUSTOM_STYLE_ID;
-    pipWindow.document.head.appendChild(pipStyle);
+    const mirrors = MIRRORED_STYLE_IDS.map(id => {
+      const pipStyle = pipWindow.document.createElement("style");
+      pipStyle.id = id;
+      pipWindow.document.head.appendChild(pipStyle);
+      return { id, pipStyle };
+    });
 
     // Every head mutation lands here, and the page rewrites <title> on each play, pause and track
     // change. Re-assigning identical CSS is not free: the sheet is re-parsed, so every face the
     // theme imports is re-resolved and the font event that follows re-arms the header marquee.
     const sync = (): void => {
-      const next = document.getElementById(CUSTOM_STYLE_ID)?.textContent ?? "";
-      if (next !== pipStyle.textContent) pipStyle.textContent = next;
+      for (const { id, pipStyle } of mirrors) {
+        const next = document.getElementById(id)?.textContent ?? "";
+        if (next !== pipStyle.textContent) pipStyle.textContent = next;
+      }
     };
     sync();
 

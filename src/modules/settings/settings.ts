@@ -1,4 +1,5 @@
 import {
+  DISABLE_EFFECTS_STYLE_ID,
   DOCK_CLASS,
   DOCK_CONTROL_ORDER_DEFAULT,
   DOCK_DEFAULT_POSITION,
@@ -48,16 +49,13 @@ export function handleSettings(): void {
 
   onStylizedAnimationsEnabled(
     () => {
-      let styleElm = document.getElementById("blyrics-disable-effects");
-      if (styleElm) {
-        styleElm.remove();
-      }
+      document.getElementById(DISABLE_EFFECTS_STYLE_ID)?.remove();
     },
     async () => {
-      let styleElem = document.getElementById("blyrics-disable-effects");
+      let styleElem = document.getElementById(DISABLE_EFFECTS_STYLE_ID);
       if (!styleElem) {
         styleElem = document.createElement("style");
-        styleElem.id = "blyrics-disable-effects";
+        styleElem.id = DISABLE_EFFECTS_STYLE_ID;
 
         styleElem.textContent = await fetch(chrome.runtime.getURL("css/disablestylizedanimations.css")).then(res =>
           res.text()
