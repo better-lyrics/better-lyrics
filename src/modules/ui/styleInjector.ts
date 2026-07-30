@@ -4,7 +4,7 @@ import { decompressString, isCompressed } from "@core/compression";
 import { compileRicsToStyles, getLocalStorage, getSyncStorage, loadChunkedStyles } from "@core/storage";
 import { setThemeSettings } from "@modules/settings/themeOptions";
 import { log } from "@utils";
-import { clearAnimationStyleCache } from "./mainLyricsView";
+import { mainView } from "./mainLyricsView";
 import { publishPictureInPictureLyrics } from "./pictureInPicture/lyricsPublisher";
 
 let hasSubscribedToStyles = false;
@@ -55,7 +55,7 @@ export function applyCustomStyles(css: string): void {
     styleTag.textContent = css;
     document.head.appendChild(styleTag);
   }
-  clearAnimationStyleCache();
+  mainView.clearStyleCaches();
   publishPictureInPictureLyrics();
 
   if (needsLyricReload) {

@@ -34,7 +34,6 @@ import {
 } from "@constants";
 import { AppState } from "@core/appState";
 import { t } from "@core/i18n";
-import { disconnectResizeObserver } from "@modules/lyrics/injectLyrics";
 import type { ThumbnailElement } from "@modules/lyrics/requestSniffer/NextResponse";
 import { getArtworkMetadata } from "@modules/lyrics/requestSniffer/requestSniffer";
 import { clearLyricsFromViews, lyricsElementAdded } from "@modules/ui/mainLyricsView";
@@ -1488,8 +1487,6 @@ export async function injectHeadTags(): Promise<void> {
  */
 export function cleanup(): void {
   clearLyricsFromViews();
-
-  disconnectResizeObserver();
 
   if (lyricsObserver) {
     lyricsObserver.disconnect();

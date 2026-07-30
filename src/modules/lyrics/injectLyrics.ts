@@ -2,7 +2,6 @@ import {
   LOG_PREFIX,
   LYRICS_FOUND_LOG,
   LYRICS_TAB_NOT_DISABLED_LOG,
-  LYRICS_WRAPPER_ID,
   NO_LYRICS_FOUND_LOG,
   NO_LYRICS_TEXT_SELECTOR,
   ROMANIZATION_LANGUAGES,
@@ -21,15 +20,7 @@ import {
   translateBatch,
 } from "@modules/lyrics/translation";
 import { addFooter, addNoLyricsButton, cleanup, createLyricsWrapper, flushLoader, renderLoader } from "@modules/ui/dom";
-import {
-  calculateLyricPositions,
-  clearMainViewOnScreenLyrics,
-  getMainViewLines,
-  getMainViewSyncType,
-  lyricsElementAdded,
-  noteMainViewResize,
-  setMainViewLyrics,
-} from "@modules/ui/mainLyricsView";
+import { calculateLyricPositions, lyricsElementAdded, mainView } from "@modules/ui/mainLyricsView";
 import { disableNativeLyricsFocus } from "@modules/ui/nativeLyricsFocus";
 import { publishPictureInPictureLyrics } from "@modules/ui/pictureInPicture/lyricsPublisher";
 import {
@@ -71,29 +62,6 @@ function isRomanizationDisabledForLang(lang: string): boolean {
 
 function isTranslationDisabledForLang(lang: string): boolean {
   return languageMatchesAny(lang, AppState.translationDisabledLanguages);
-}
-
-let resizeObserver: ResizeObserver | null = null;
-
-function getResizeObserver(): ResizeObserver {
-  if (!resizeObserver) {
-    resizeObserver = new ResizeObserver(entries => {
-      for (const entry of entries) {
-        if (entry.target.id === LYRICS_WRAPPER_ID) {
-          if (AppState.lyricData && noteMainViewResize(entry.target.clientWidth, entry.target.clientHeight)) {
-            calculateLyricPositions();
-          }
-        }
-      }
-    });
-  }
-  return resizeObserver;
-}
-
-export function disconnectResizeObserver(): void {
-  if (resizeObserver) {
-    resizeObserver.disconnect();
-  }
 }
 
 export type SyncType = "richsync" | "synced" | "none";
@@ -142,7 +110,7 @@ export function processLyrics(
   // The previous song's container, not the one this injection builds: injectLyrics creates that
   // one later. cleanup() drops both this reference and the element together, so a null here means
   // there is nothing on screen to clear.
-  if (!clearMainViewOnScreenLyrics()) {
+  if (!mainView.clearOnScreenLyrics()) {
     log(LYRICS_TAB_NOT_DISABLED_LOG);
   }
 
@@ -190,10 +158,10 @@ function injectLyrics(
     flushLoader(allZero && !noLyrics);
   }
 
-  setMainViewLyrics(lyricsWrapper, lyrics, { loaderVisible: keepLoaderVisible, noLyrics });
+  mainView.setLyrics(lyrics, { mount: lyricsWrapper, loaderVisible: keepLoaderVisible, noLyrics });
 
-  const syncType: SyncType = getMainViewSyncType();
-  const lines: LineData[] = getMainViewLines();
+  const syncType: SyncType = mainView.syncType;
+  const lines: readonly LineData[] = mainView.lines;
 
   const tabSelector = document.getElementsByClassName(TAB_HEADER_CLASS)[1] as HTMLElement;
 
@@ -233,7 +201,6 @@ function injectLyrics(
 
   AppState.areLyricsTicking = true;
   calculateLyricPositions();
-  getResizeObserver().observe(lyricsWrapper);
   if (allZero) {
     log(SYNC_DISABLED_LOG);
   }
@@ -247,7 +214,7 @@ function injectLyrics(
 async function processBatchTranslationsAndRomanizations(
   doc: Document,
   data: LyricSourceResultWithMeta,
-  linesData: LineData[],
+  linesData: readonly LineData[],
   isStale: () => boolean,
   signal?: AbortSignal
 ): Promise<void> {

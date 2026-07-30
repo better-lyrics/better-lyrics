@@ -24,7 +24,8 @@ import { getLyrics, newSourceMap, providerPriority } from "./providers/shared";
 import type { YTLyricSourceResult } from "./providers/yt";
 import { getSongAlbum, getSongMetadata, type SegmentMap } from "./requestSniffer/requestSniffer";
 import { clearCache as clearTranslationCache } from "./translation";
-import { getMainViewLines, resetPlaybackClock, resumeAutoscroll } from "@modules/ui/mainLyricsView";
+import { mainView, resumeAutoscroll } from "@modules/ui/mainLyricsView";
+import { resetPlaybackClock } from "@renderer/index";
 
 const hideInstrumentalOnly = registerThemeSetting("blyrics-hide-instrumental-only", false, true);
 
@@ -105,7 +106,11 @@ export function getSegmentMapTimeShiftMs(segmentMap: SegmentMap, timeMs: number)
   return lastTimeChange;
 }
 
-export function applySegmentMapToLyrics(lyricData: LyricsData | null, lines: LineData[], segmentMap: SegmentMap) {
+export function applySegmentMapToLyrics(
+  lyricData: LyricsData | null,
+  lines: readonly LineData[],
+  segmentMap: SegmentMap
+) {
   if (segmentMap && lyricData) {
     lyricData.isMusicVideoSynced = !lyricData.isMusicVideoSynced;
     // We're sync lyrics using segment map
@@ -165,7 +170,7 @@ export async function createLyrics(detail: PlayerDetails, signal: AbortSignal): 
     const isSoftReload = AppState.lastLoadedVideoId === videoId && AppState.lyricData != null;
 
     if (isAVSwitch && segmentMap) {
-      applySegmentMapToLyrics(AppState.lyricData, getMainViewLines(), segmentMap);
+      applySegmentMapToLyrics(AppState.lyricData, mainView.lines, segmentMap);
       AppState.suppressZeroTime = Date.now() + 5000;
       AppState.areLyricsTicking = true; // Keep lyrics ticking while new lyrics are fetched.
       // The window keeps showing these lines through the refetch, so it needs the same deadline.
