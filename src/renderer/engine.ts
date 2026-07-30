@@ -12,6 +12,10 @@ import { clamp, getRelativeLayoutBounds, positiveModulo, roundedMs, toMs } from 
 
 const NO_LYRICS_ELEMENT_LOG = "No lyrics element found on the page, skipping lyrics injection";
 const LYRICS_CHECK_INTERVAL_ERROR = "Error in lyrics check interval:";
+const PAUSING_LYRICS_SCROLL_LOG = "Pausing Lyrics Autoscroll Due to User Scroll";
+
+const USER_SCROLL_RESUME_DELAY_MS = 25000;
+const PASSIVE_USER_SCROLL_RESUME_DELAY_MS = 5000;
 
 const LYRIC_ENDING_THRESHOLD_S = registerThemeSetting("blyrics-lyric-ending-threshold-s", 0.5);
 const EARLY_SCROLL_CONSIDER = registerThemeSetting("blyrics-early-scroll-consider-s", 0.62);
@@ -96,7 +100,7 @@ const PASSIVE_TOP_PAUSE_S = registerThemeSetting("blyrics-passive-scroll-top-pau
  * Everything that belongs to a single rendered lyrics view: one scroll container, one selection,
  * one set of pending scroll work.
  */
-export interface AnimEngineViewState {
+interface AnimEngineViewState {
   /**
    * The render records this view built, one per lyric line. They hold this view's elements and
    * this view's `Animation` objects, so a second view never shares them.
@@ -127,7 +131,7 @@ export interface AnimEngineViewState {
 /**
  * The last player snapshot. It describes the media, not a view, so every instance reads the same one.
  */
-export interface PlaybackClock {
+interface PlaybackClock {
   lastTime: number;
   lastPlayState: boolean;
   /**
@@ -236,17 +240,104 @@ export function createAnimationEngineInstance(
   return engine;
 }
 
-export const playbackClock: PlaybackClock = {
+const playbackClock: PlaybackClock = {
   lastTime: 0,
   lastPlayState: false,
   lastEventCreationTime: -1,
 };
 
 /**
- * Resets anim engine states
- * Called when song is switched or cleaned up
+ * Forgets the last player snapshot, so the next tick is treated as the first one of a new song
+ * rather than as a jump away from the previous one.
  */
-export function resetEngineState(engine: AnimationEngineInstance): void {
+export function resetPlaybackClock(): void {
+  playbackClock.lastTime = 0;
+  playbackClock.lastPlayState = false;
+  playbackClock.lastEventCreationTime = -1;
+}
+
+// -- View operations --------------------------
+
+/**
+ * The user asked for autoscroll back, now.
+ */
+export function resetScrollResume(engine: AnimationEngineInstance): void {
+  engine.scrollResumeTime = 0;
+}
+
+/**
+ * The user scrolled this view. Scrolls the engine itself performed are swallowed one at a time;
+ * a real one pauses autoscroll long enough to read where it landed, and offers the way back.
+ *
+ * @param isPassive - Whether the lyrics on screen are unsynced, and so are drifting on their own
+ *   rather than following the song. Those resume sooner.
+ */
+export function noteUserScroll(engine: AnimationEngineInstance, isPassive: boolean): void {
+  if (engine.skipScrolls > 0) {
+    engine.skipScrolls--;
+    engine.skipScrollsDecayTimes.shift();
+    return;
+  }
+
+  dropPendingLineScroll(engine);
+  if (engine.host.isLoaderActive()) return;
+
+  if (engine.scrollResumeTime < Date.now()) {
+    engine.host.log(PAUSING_LYRICS_SCROLL_LOG);
+  }
+  engine.scrollResumeTime =
+    Date.now() + (isPassive ? PASSIVE_USER_SCROLL_RESUME_DELAY_MS : USER_SCROLL_RESUME_DELAY_MS);
+  engine.wasUserScrolling = true;
+
+  engine.host.setResumeAffordanceVisible(true);
+  engine.lyricsContainer?.classList.add(USER_SCROLLING_CLASS);
+}
+
+/**
+ * Reports whether the container is a different size than the lines were last measured against, and
+ * clears the scroll cooldown when it is so the caller's re-measurement can scroll immediately. The
+ * new size is recorded by that re-measurement, not here.
+ */
+export function noteContainerResize(engine: AnimationEngineInstance, width: number, height: number): boolean {
+  if (width === engine.lyricWidth && height === engine.lyricHeight) return false;
+  engine.nextScrollAllowedTime = 0;
+  return true;
+}
+
+/**
+ * Takes the lines this view is showing off the screen, keeping the container they were in, and
+ * reports whether there was anything there to take.
+ */
+export function clearOnScreenLyrics(engine: AnimationEngineInstance): boolean {
+  if (!engine.lyricsContainer) return false;
+  engine.lyricsContainer.replaceChildren();
+  return true;
+}
+
+export function hasRenderedLines(engine: AnimationEngineInstance): boolean {
+  return engine.lines.length > 0;
+}
+
+/**
+ * The render records this view built. Handing them out is a leak: they carry this view's elements
+ * and its `Animation` objects, so a caller that rewrites line times or hangs translations off them
+ * can only ever reach one view. Phase 5 revisits it, when both of those have to reach two.
+ */
+export function getRenderedLines(engine: AnimationEngineInstance): LineData[] {
+  return engine.lines;
+}
+
+export function getRenderedSyncType(engine: AnimationEngineInstance): LyricSyncType {
+  return engine.syncType;
+}
+
+/**
+ * Drops the song this view was rendering: its selection, its pending scroll work, its animations
+ * and its render records. The records go before the caller clears the DOM, so the elements they
+ * hold are released along with it.
+ */
+export function clearLyrics(engine: AnimationEngineInstance): void {
+  engine.scrollPos = -1;
   dropPendingLineScroll(engine);
   clearLineScrollAnimations(engine);
   clearVisibleLyricWillChange(engine);
@@ -262,6 +353,8 @@ export function resetEngineState(engine: AnimationEngineInstance): void {
   engine.passiveScrollAccumulatedTime = 0;
   engine.passiveLastWallTime = 0;
   stopPassiveScrollLoop(engine);
+  engine.lines = [];
+  engine.lyricsContainer = null;
 }
 
 function resetPartAnimations(part: PartData): void {
@@ -1904,7 +1997,7 @@ function discardLineScrollPlan(engine: AnimationEngineInstance, plan: LineScroll
   }
 }
 
-export function dropPendingLineScroll(engine: AnimationEngineInstance): void {
+function dropPendingLineScroll(engine: AnimationEngineInstance): void {
   if (!engine.pendingLineScroll) return;
   discardLineScrollPlan(engine, engine.pendingLineScroll.plan);
   engine.pendingLineScroll = null;
@@ -2058,7 +2151,7 @@ function passiveScrollEngine(engine: AnimationEngineInstance, isPlaying: boolean
   }
 
   if (engine.wasUserScrolling) {
-    engine.host.hideResumeAffordance();
+    engine.host.setResumeAffordanceVisible(false);
     engine.lyricsContainer?.classList.remove(USER_SCROLLING_CLASS);
     engine.wasUserScrolling = false;
 
@@ -2602,7 +2695,7 @@ export function runAnimationEngine(
     }
 
     if (isMainLyricsVisible && engine.wasUserScrolling && engine.scrollResumeTime < Date.now()) {
-      engine.host.hideResumeAffordance();
+      engine.host.setResumeAffordanceVisible(false);
       lyricsElement.classList.remove(USER_SCROLLING_CLASS);
       engine.wasUserScrolling = false;
     }
@@ -2694,19 +2787,39 @@ function cancelLyricPositionUpdate(engine: AnimationEngineInstance): void {
 }
 
 /**
+ * Renders this view again against the last player snapshot, without moving the clock on. The
+ * options are built now rather than handed in, so a caller that reads settings at tick time still
+ * reads them at tick time.
+ *
+ * @param buildTickOptions - Given the snapshot the tick will run against, returns what to render it
+ *   with.
+ */
+export function retickFromPlaybackClock(
+  engine: AnimationEngineInstance,
+  buildTickOptions: (eventCreationTime: number, isPlaying: boolean) => TickOptions
+): AnimationTickStatus {
+  return runAnimationEngine(
+    engine,
+    playbackClock.lastTime,
+    buildTickOptions(playbackClock.lastEventCreationTime, playbackClock.lastPlayState)
+  );
+}
+
+/**
  * Called when a new lyrics element is added to trigger re-sync.
  * Debounced via requestAnimationFrame to avoid O(n²) layout thrashing
  * when translations/romanizations load (each addition would otherwise
  * re-measure ALL lines).
  *
- * @param buildTickOptions - Resolved on the frame rather than now, so the re-tick reads the clock
- *   and settings of the moment it runs. Returning null declines the frame, and with it the
- *   re-measurement: a driver that has stopped ticking is one whose lines may no longer be rendered.
+ * @param isViewRendering - Asked on the frame rather than now. A driver that has stopped ticking is
+ *   one whose lines may no longer be rendered, and an unrendered line measures as nothing, so a
+ *   false answer declines both the re-measurement and the re-tick.
+ * @param retick - Runs after the re-measurement, on the frame.
  */
 export function scheduleLyricPositionUpdate(
   engine: AnimationEngineInstance,
-  buildTickOptions: () => TickOptions | null,
-  reportTickStatus: (status: AnimationTickStatus) => void
+  isViewRendering: () => boolean,
+  retick: () => void
 ): void {
   if (engine.pendingLyricsUpdateFrame !== null) {
     return;
@@ -2714,9 +2827,9 @@ export function scheduleLyricPositionUpdate(
   dropPendingLineScroll(engine);
   engine.pendingLyricsUpdateFrame = engine.window.requestAnimationFrame(() => {
     engine.pendingLyricsUpdateFrame = null;
-    const options = buildTickOptions();
-    relayout(engine, options !== null);
-    if (!options) return;
-    reportTickStatus(runAnimationEngine(engine, playbackClock.lastTime, options));
+    const isRendering = isViewRendering();
+    relayout(engine, isRendering);
+    if (!isRendering) return;
+    retick();
   });
 }

@@ -22,9 +22,12 @@ import {
 } from "@modules/lyrics/translation";
 import { addFooter, addNoLyricsButton, cleanup, createLyricsWrapper, flushLoader, renderLoader } from "@modules/ui/dom";
 import {
-  animEngineState,
   calculateLyricPositions,
+  clearMainViewOnScreenLyrics,
+  getMainViewLines,
+  getMainViewSyncType,
   lyricsElementAdded,
+  noteMainViewResize,
   setMainViewLyrics,
 } from "@modules/ui/mainLyricsView";
 import { disableNativeLyricsFocus } from "@modules/ui/nativeLyricsFocus";
@@ -55,12 +58,7 @@ function getResizeObserver(): ResizeObserver {
     resizeObserver = new ResizeObserver(entries => {
       for (const entry of entries) {
         if (entry.target.id === LYRICS_WRAPPER_ID) {
-          if (
-            AppState.lyricData &&
-            (entry.target.clientWidth !== animEngineState.lyricWidth ||
-              entry.target.clientHeight !== animEngineState.lyricHeight)
-          ) {
-            animEngineState.nextScrollAllowedTime = 0;
+          if (AppState.lyricData && noteMainViewResize(entry.target.clientWidth, entry.target.clientHeight)) {
             calculateLyricPositions();
           }
         }
@@ -122,10 +120,7 @@ export function processLyrics(
   // The previous song's container, not the one this injection builds: injectLyrics creates that
   // one later. cleanup() drops both this reference and the element together, so a null here means
   // there is nothing on screen to clear.
-  const previousContainer = animEngineState.lyricsContainer;
-  if (previousContainer) {
-    previousContainer.replaceChildren();
-  } else {
+  if (!clearMainViewOnScreenLyrics()) {
     log(LYRICS_TAB_NOT_DISABLED_LOG);
   }
 
@@ -175,8 +170,8 @@ function injectLyrics(
 
   setMainViewLyrics(lyricsWrapper, lyrics, { loaderVisible: keepLoaderVisible, noLyrics });
 
-  const syncType: SyncType = animEngineState.syncType;
-  const lines: LineData[] = animEngineState.lines;
+  const syncType: SyncType = getMainViewSyncType();
+  const lines: LineData[] = getMainViewLines();
 
   const tabSelector = document.getElementsByClassName(TAB_HEADER_CLASS)[1] as HTMLElement;
 

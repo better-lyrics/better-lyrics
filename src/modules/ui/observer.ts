@@ -3,15 +3,12 @@ import {
   FULLSCREEN_BUTTON_SELECTOR,
   GENERAL_ERROR_LOG,
   LOG_PREFIX,
-  LYRICS_CLASS,
   LYRICS_TAB_CLICKED_LOG,
   LYRICS_WRAPPER_ID,
-  PAUSING_LYRICS_SCROLL_LOG,
   SONG_SWITCHED_LOG,
   TAB_CONTENT_CLASS,
   TAB_HEADER_CLASS,
   TAB_RENDERER_SELECTOR,
-  USER_SCROLLING_CLASS,
 } from "@constants";
 import { AppState, handleModifications, type PlayerDetails, reloadLyrics } from "@core/appState";
 import { preFetchLyrics } from "@modules/lyrics/lyrics";
@@ -20,10 +17,9 @@ import { onAutoSwitchEnabled, onFullScreenDisabled, wakeDockIdle } from "@module
 import { adjustLyricOffset, OFFSET_STEP, OFFSET_STEP_LARGE } from "@modules/ui/lyricsDock/offset";
 import {
   animationEngine,
-  animEngineState,
-  cancelPendingLineScroll,
   currentTickOptions,
   noteAnimationVisibilityChange,
+  noteMainViewUserScroll,
 } from "@modules/ui/mainLyricsView";
 import { preloadArtwork } from "@modules/ui/pictureInPicture/lyricsView";
 import {
@@ -38,7 +34,6 @@ import {
   addThumbnail,
   cleanup,
   injectSongAttributes,
-  isLoaderActive,
   preloadHighResThumbnail,
   renderLoader,
   resetThumbnailState,
@@ -451,24 +446,7 @@ export function scrollEventHandler(): void {
     return;
   }
 
-  if (animEngineState.skipScrolls > 0) {
-    animEngineState.skipScrolls--;
-    animEngineState.skipScrollsDecayTimes.shift();
-    return;
-  }
-  cancelPendingLineScroll();
-  if (!isLoaderActive()) {
-    if (animEngineState.scrollResumeTime < Date.now()) {
-      log(PAUSING_LYRICS_SCROLL_LOG);
-    }
-    const isPassive = AppState.lyricData?.syncType === "none";
-    animEngineState.scrollResumeTime = Date.now() + (isPassive ? 5000 : 25000);
-    animEngineState.wasUserScrolling = true;
-
-    getResumeScrollElement().removeAttribute("autoscroll-hidden");
-    const lyricsElement = document.getElementsByClassName(LYRICS_CLASS)[0] as HTMLElement;
-    lyricsElement.classList.add(USER_SCROLLING_CLASS);
-  }
+  noteMainViewUserScroll(AppState.lyricData?.syncType === "none");
 }
 
 /**

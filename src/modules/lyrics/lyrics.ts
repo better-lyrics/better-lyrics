@@ -23,14 +23,14 @@ import { getLyrics, newSourceMap, providerPriority } from "./providers/shared";
 import type { YTLyricSourceResult } from "./providers/yt";
 import { getSongAlbum, getSongMetadata, type SegmentMap } from "./requestSniffer/requestSniffer";
 import { clearCache as clearTranslationCache } from "./translation";
-import { animEngineState } from "@modules/ui/mainLyricsView";
+import { getMainViewLines, resetPlaybackClock, resumeAutoscroll } from "@modules/ui/mainLyricsView";
 
 const hideInstrumentalOnly = registerThemeSetting("blyrics-hide-instrumental-only", false, true);
 
 export function seekPlayer(timeS: number): void {
   log(LOG_PREFIX, `Seeking to ${timeS.toFixed(2)}s`);
   document.dispatchEvent(new CustomEvent(SEEK_EVENT, { detail: timeS }));
-  animEngineState.scrollResumeTime = 0;
+  resumeAutoscroll();
 }
 
 function isInstrumentalOnly(lyrics: Lyric[]): boolean {
@@ -150,7 +150,7 @@ export async function createLyrics(detail: PlayerDetails, signal: AbortSignal): 
     const isSoftReload = AppState.lastLoadedVideoId === videoId && AppState.lyricData != null;
 
     if (isAVSwitch && segmentMap) {
-      applySegmentMapToLyrics(AppState.lyricData, animEngineState.lines, segmentMap);
+      applySegmentMapToLyrics(AppState.lyricData, getMainViewLines(), segmentMap);
       AppState.suppressZeroTime = Date.now() + 5000;
       AppState.areLyricsTicking = true; // Keep lyrics ticking while new lyrics are fetched.
       log("Switching between audio/video: Skipping Loader", segmentMap);
@@ -170,9 +170,7 @@ export async function createLyrics(detail: PlayerDetails, signal: AbortSignal): 
       AppState.areLyricsLoaded = false;
       AppState.areLyricsTicking = false;
       AppState.suppressZeroTime = 0;
-      animEngineState.lastEventCreationTime = -1;
-      animEngineState.lastPlayState = false;
-      animEngineState.lastTime = 0;
+      resetPlaybackClock();
     }
 
     if (matchingSong) {

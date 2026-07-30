@@ -10,7 +10,6 @@ export {
   LYRICS_WRAPPER_ID,
   ROMANIZED_LYRICS_CLASS,
   TRANSLATED_LYRICS_CLASS,
-  USER_SCROLLING_CLASS,
   WORD_HIGHLIGHT_CLASS,
 } from "@renderer/constants";
 
@@ -156,7 +155,6 @@ export const LYRICS_TAB_NOT_DISABLED_LOG =
   "[BetterLyrics] (Safe to ignore) Lyrics tab is not disabled, unable to enable it" as const;
 export const SONG_SWITCHED_LOG = "[BetterLyrics] Song has been switched" as const;
 export const LOADER_TRANSITION_ENDED = "[BetterLyrics] Loader Transition Ended" as const;
-export const PAUSING_LYRICS_SCROLL_LOG = "[BetterLyrics] Pausing Lyrics Autoscroll Due to User Scroll" as const;
 
 // Feature State Logs
 export const AUTO_SWITCH_ENABLED_LOG = "[BetterLyrics] Auto switch enabled, switching to lyrics tab" as const;

@@ -1,7 +1,7 @@
 import { OFFSET_STORAGE_PREFIX } from "@constants";
 import { AppState } from "@core/appState";
 import { getTransientStorage, setPersistentStorage, setStorage } from "@core/storage";
-import { animationEngine, animEngineState, currentTickOptions } from "@modules/ui/mainLyricsView";
+import { retickMainView } from "@modules/ui/mainLyricsView";
 
 export const OFFSET_STEP = 0.1;
 export const OFFSET_STEP_LARGE = 0.5;
@@ -12,18 +12,6 @@ function offsetKey(videoId: string, source: string): string {
   return `${OFFSET_STORAGE_PREFIX}${videoId}_${source}`;
 }
 
-function retickLyrics(): void {
-  if (AppState.areLyricsTicking) {
-    const status = animationEngine(
-      animEngineState.lastTime,
-      currentTickOptions(animEngineState.lastEventCreationTime, animEngineState.lastPlayState, false)
-    );
-    if (status === "lyrics-missing") {
-      AppState.areLyricsTicking = false;
-    }
-  }
-}
-
 function round1(value: number): number {
   return Math.round(value * 10) / 10;
 }
@@ -31,7 +19,7 @@ function round1(value: number): number {
 function applyLyricOffset(value: number): void {
   AppState.lyricOffset = round1(value);
   refreshOffsetIndicator();
-  retickLyrics();
+  retickMainView();
 }
 
 // Global + per-sync-type trims are user settings persisted to chrome.storage.sync; they stack
@@ -67,7 +55,7 @@ function notifyGlobalOffset(key: GlobalOffsetKey): void {
 
 export function setGlobalOffsetValue(key: GlobalOffsetKey, value: number): number {
   AppState[key] = round1(value);
-  retickLyrics();
+  retickMainView();
   notifyGlobalOffset(key);
   persistGlobalOffsets();
   return AppState[key];
@@ -84,7 +72,7 @@ export function applyGlobalOffsets(values: Record<GlobalOffsetKey, number>): voi
     AppState[key] = round1(values[key]);
     notifyGlobalOffset(key);
   }
-  retickLyrics();
+  retickMainView();
 }
 
 export function resetGlobalOffsets(): void {
@@ -92,7 +80,7 @@ export function resetGlobalOffsets(): void {
     AppState[key] = 0;
     notifyGlobalOffset(key);
   }
-  retickLyrics();
+  retickMainView();
   persistGlobalOffsets();
 }
 

@@ -37,7 +37,7 @@ import { t } from "@core/i18n";
 import { disconnectResizeObserver } from "@modules/lyrics/injectLyrics";
 import type { ThumbnailElement } from "@modules/lyrics/requestSniffer/NextResponse";
 import { getArtworkMetadata } from "@modules/lyrics/requestSniffer/requestSniffer";
-import { animEngineState, lyricsElementAdded, resetAnimEngineState } from "@modules/ui/mainLyricsView";
+import { clearLyricsFromViews, lyricsElementAdded } from "@modules/ui/mainLyricsView";
 import { getResumeScrollElement } from "@modules/ui/resumeScrollButton";
 import { getRequest, setRequest } from "@modules/unison/lyricsRequestTracker";
 import { getTrustTier } from "@modules/unison/trustTier";
@@ -1486,8 +1486,7 @@ export async function injectHeadTags(): Promise<void> {
  * Cleans up this elements and resets state when switching songs.
  */
 export function cleanup(): void {
-  animEngineState.scrollPos = -1;
-  resetAnimEngineState();
+  clearLyricsFromViews();
 
   disconnectResizeObserver();
 
@@ -1496,9 +1495,6 @@ export function cleanup(): void {
     lyricsObserver = null;
   }
 
-  // Drop the render records BEFORE clearing DOM to release element references
-  animEngineState.lines = [];
-  animEngineState.lyricsContainer = null;
   AppState.lyricData = null;
   AppState.parsedLyrics = null;
 

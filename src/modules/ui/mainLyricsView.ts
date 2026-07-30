@@ -2,15 +2,19 @@ import { AppState } from "@core/appState";
 import { ytmHost } from "@modules/ui/lyricsHost";
 import {
   type AnimationTickStatus,
-  type AnimEngineViewState,
+  clearLyrics,
+  clearOnScreenLyrics,
   clearStyleCaches,
   createAnimationEngineInstance,
-  dropPendingLineScroll,
+  getRenderedLines,
+  getRenderedSyncType,
+  hasRenderedLines,
+  noteContainerResize,
+  noteUserScroll,
   noteVisibilityChange,
-  type PlaybackClock,
-  playbackClock,
   relayout,
-  resetEngineState,
+  resetScrollResume,
+  retickFromPlaybackClock,
   runAnimationEngine,
   scheduleLyricPositionUpdate,
 } from "@renderer/engine";
@@ -23,117 +27,53 @@ import {
   type TickOptions,
 } from "@renderer/index";
 
+export { resetPlaybackClock } from "@renderer/engine";
+
 // -- The side panel's engine instance --------------------------
 
 const mainEngine = createAnimationEngineInstance(document, window, ytmHost);
 
-/**
- * Six modules still reach into engine state directly. Until those reads and writes become
- * intent-revealing methods, this forwards the fields they touch onto the one instance.
- */
-export const animEngineState: Pick<
-  AnimEngineViewState,
-  | "lines"
-  | "lyricsContainer"
-  | "syncType"
-  | "lyricWidth"
-  | "lyricHeight"
-  | "skipScrolls"
-  | "skipScrollsDecayTimes"
-  | "scrollResumeTime"
-  | "scrollPos"
-  | "nextScrollAllowedTime"
-  | "wasUserScrolling"
-> &
-  PlaybackClock = {
-  get lines(): LineData[] {
-    return mainEngine.lines;
-  },
-  set lines(value: LineData[]) {
-    mainEngine.lines = value;
-  },
-  get lyricsContainer(): HTMLElement | null {
-    return mainEngine.lyricsContainer;
-  },
-  set lyricsContainer(value: HTMLElement | null) {
-    mainEngine.lyricsContainer = value;
-  },
-  get syncType(): LyricSyncType {
-    return mainEngine.syncType;
-  },
-  set syncType(value: LyricSyncType) {
-    mainEngine.syncType = value;
-  },
-  get lyricWidth(): number {
-    return mainEngine.lyricWidth;
-  },
-  set lyricWidth(value: number) {
-    mainEngine.lyricWidth = value;
-  },
-  get lyricHeight(): number {
-    return mainEngine.lyricHeight;
-  },
-  set lyricHeight(value: number) {
-    mainEngine.lyricHeight = value;
-  },
-  get skipScrolls(): number {
-    return mainEngine.skipScrolls;
-  },
-  set skipScrolls(value: number) {
-    mainEngine.skipScrolls = value;
-  },
-  get skipScrollsDecayTimes(): number[] {
-    return mainEngine.skipScrollsDecayTimes;
-  },
-  set skipScrollsDecayTimes(value: number[]) {
-    mainEngine.skipScrollsDecayTimes = value;
-  },
-  get scrollResumeTime(): number {
-    return mainEngine.scrollResumeTime;
-  },
-  set scrollResumeTime(value: number) {
-    mainEngine.scrollResumeTime = value;
-  },
-  get scrollPos(): number {
-    return mainEngine.scrollPos;
-  },
-  set scrollPos(value: number) {
-    mainEngine.scrollPos = value;
-  },
-  get nextScrollAllowedTime(): number {
-    return mainEngine.nextScrollAllowedTime;
-  },
-  set nextScrollAllowedTime(value: number) {
-    mainEngine.nextScrollAllowedTime = value;
-  },
-  get wasUserScrolling(): boolean {
-    return mainEngine.wasUserScrolling;
-  },
-  set wasUserScrolling(value: boolean) {
-    mainEngine.wasUserScrolling = value;
-  },
-  get lastTime(): number {
-    return playbackClock.lastTime;
-  },
-  set lastTime(value: number) {
-    playbackClock.lastTime = value;
-  },
-  get lastPlayState(): boolean {
-    return playbackClock.lastPlayState;
-  },
-  set lastPlayState(value: boolean) {
-    playbackClock.lastPlayState = value;
-  },
-  get lastEventCreationTime(): number {
-    return playbackClock.lastEventCreationTime;
-  },
-  set lastEventCreationTime(value: number) {
-    playbackClock.lastEventCreationTime = value;
-  },
-};
+// -- Operations every view answers to --------------------------
 
-export function resetAnimEngineState(): void {
-  resetEngineState(mainEngine);
+/**
+ * The user asked for autoscroll back, now. A seek is a property of playback rather than of one
+ * view, so every view showing these lyrics resumes.
+ */
+export function resumeAutoscroll(): void {
+  resetScrollResume(mainEngine);
+}
+
+/**
+ * The song went away, so the lyrics go with it everywhere they were rendered.
+ */
+export function clearLyricsFromViews(): void {
+  clearLyrics(mainEngine);
+}
+
+// -- Operations addressed to the side panel --------------------------
+
+export function noteMainViewUserScroll(isPassive: boolean): void {
+  noteUserScroll(mainEngine, isPassive);
+}
+
+export function noteMainViewResize(width: number, height: number): boolean {
+  return noteContainerResize(mainEngine, width, height);
+}
+
+export function clearMainViewOnScreenLyrics(): boolean {
+  return clearOnScreenLyrics(mainEngine);
+}
+
+export function hasMainViewLines(): boolean {
+  return hasRenderedLines(mainEngine);
+}
+
+export function getMainViewLines(): LineData[] {
+  return getRenderedLines(mainEngine);
+}
+
+export function getMainViewSyncType(): LyricSyncType {
+  return getRenderedSyncType(mainEngine);
 }
 
 export function noteAnimationVisibilityChange(): void {
@@ -142,10 +82,6 @@ export function noteAnimationVisibilityChange(): void {
 
 export function clearAnimationStyleCache(): void {
   clearStyleCaches(mainEngine);
-}
-
-export function cancelPendingLineScroll(): void {
-  dropPendingLineScroll(mainEngine);
 }
 
 /**
@@ -168,13 +104,6 @@ export function animationEngine(currentTime: number, options: TickOptions): Anim
 
 function relayoutMainLyrics(measureLines: boolean): void {
   relayout(mainEngine, measureLines);
-}
-
-function scheduleMainLyricPositionUpdate(
-  buildTickOptions: () => TickOptions | null,
-  reportTickStatus: (status: AnimationTickStatus) => void
-): void {
-  scheduleLyricPositionUpdate(mainEngine, buildTickOptions, reportTickStatus);
 }
 
 // -- Tick options --------------------------
@@ -209,20 +138,25 @@ export function calculateLyricPositions(): void {
 }
 
 /**
+ * Renders the side panel again against the last player snapshot, without smooth scrolling. Used
+ * whenever something other than the clock moved the lyrics: an offset change, a line arriving.
+ */
+export function retickMainView(): void {
+  if (!AppState.areLyricsTicking) return;
+
+  const status = retickFromPlaybackClock(mainEngine, (eventCreationTime, isPlaying) =>
+    currentTickOptions(eventCreationTime, isPlaying, false)
+  );
+  if (status === "lyrics-missing") {
+    AppState.areLyricsTicking = false;
+  }
+}
+
+/**
  * Re-measures the lines and re-ticks after something was added to the lyrics DOM.
  */
 export function lyricsElementAdded(): void {
   if (!AppState.areLyricsTicking) return;
 
-  scheduleMainLyricPositionUpdate(
-    () =>
-      AppState.areLyricsTicking
-        ? currentTickOptions(animEngineState.lastEventCreationTime, animEngineState.lastPlayState, false)
-        : null,
-    status => {
-      if (status === "lyrics-missing") {
-        AppState.areLyricsTicking = false;
-      }
-    }
-  );
+  scheduleLyricPositionUpdate(mainEngine, () => AppState.areLyricsTicking, retickMainView);
 }

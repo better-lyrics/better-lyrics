@@ -10,7 +10,7 @@ import { AppState } from "@core/appState";
 import { t } from "@core/i18n";
 import { getStorage } from "@core/storage";
 import { getArtworkMetadata } from "@modules/lyrics/requestSniffer/requestSniffer";
-import { animEngineState } from "@modules/ui/mainLyricsView";
+import { resumeAutoscroll } from "@modules/ui/mainLyricsView";
 import { log } from "@utils";
 import { onSignal, sendInit, sendMetadata } from "./bridge";
 import { DEFAULT_ARTWORK_TRANSITION, DEFAULT_TEXT_TRANSITION } from "./lyricsView";
@@ -47,9 +47,7 @@ const PIP_SETTING_DEFAULTS = {
 const isolatedViewDependencies: PictureInPictureViewDependencies = {
   translate: t,
   getArtworkMetadata,
-  resetScrollResume: () => {
-    animEngineState.scrollResumeTime = 0;
-  },
+  resetScrollResume: resumeAutoscroll,
 };
 
 function markPictureInPictureOpened(): void {
@@ -126,7 +124,7 @@ function createPageWorldDelegate(): PictureInPictureToggle {
       isOpen = false;
       markPictureInPictureClosed();
     } else if (signal.type === "reset-scroll") {
-      animEngineState.scrollResumeTime = 0;
+      resumeAutoscroll();
     } else if (signal.type === "want-metadata") {
       void getArtworkMetadata(signal.videoId, 250).then(metadata =>
         sendMetadata({ requestId: signal.requestId, metadata })

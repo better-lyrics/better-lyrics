@@ -1,5 +1,5 @@
 import { t } from "@core/i18n";
-import { animEngineState } from "@modules/ui/mainLyricsView";
+import { resumeAutoscroll } from "@modules/ui/mainLyricsView";
 
 /**
  * Gets or creates the resume autoscroll button element.
@@ -21,7 +21,7 @@ export function getResumeScrollElement(): HTMLElement {
     elem.classList.add("autoscroll-resume-button");
     elem.setAttribute("autoscroll-hidden", "true");
     elem.addEventListener("click", () => {
-      animEngineState.scrollResumeTime = 0;
+      resumeAutoscroll();
       elem!.setAttribute("autoscroll-hidden", "true");
     });
 

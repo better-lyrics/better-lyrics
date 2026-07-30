@@ -40,8 +40,13 @@ export const ytmHost: LyricsRendererHost = {
     showAdOverlay();
     return true;
   },
-  hideResumeAffordance(): void {
-    getResumeScrollElement().setAttribute("autoscroll-hidden", "true");
+  setResumeAffordanceVisible(visible: boolean): void {
+    const resumeButton = getResumeScrollElement();
+    if (visible) {
+      resumeButton.removeAttribute("autoscroll-hidden");
+    } else {
+      resumeButton.setAttribute("autoscroll-hidden", "true");
+    }
   },
   /**
    * Resolved per call rather than once at creation: the view is built at import time, long before

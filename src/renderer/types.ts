@@ -82,10 +82,10 @@ export interface LyricsRendererHost {
    */
   getScrollElement(): HTMLElement | null;
   /**
-   * Puts away whatever the host offers for resuming autoscroll. The renderer only ever dismisses it:
-   * the host decides what it looks like and when it appears.
+   * Shows or puts away whatever the host offers for resuming autoscroll. The host decides what it
+   * looks like and where it lives; the renderer only says whether it is wanted.
    */
-  hideResumeAffordance(): void;
+  setResumeAffordanceVisible(visible: boolean): void;
   /**
    * Called when a lyric line is clicked. How the seek reaches the player is the host's business:
    * this extension dispatches an event at the page world, another consumer might set
