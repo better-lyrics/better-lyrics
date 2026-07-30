@@ -4,6 +4,7 @@ import {
   type AnimationEngineInstance,
   clearLyrics,
   clearOnScreenLyrics,
+  computeScrollPadding,
   createAnimationEngineInstance,
   forEveryLiveView,
   getRenderedLines,
@@ -616,6 +617,67 @@ assert.equal(
   clearOnScreenLyrics(floatingEngine),
   true,
   "Given one view's song dropped, When the other is asked to clear the screen, Then it still has a container to clear"
+);
+
+// -- The last line can always be scrolled to its target position ------------------------------
+// The scroll stops at the end of the content, so the last line only reaches the target position if
+// the content runs far enough past it. Under-padding strands the end of every song, and the tell is
+// a viewport that grew: fullscreen asks for far more room below the last line than a side panel.
+
+const VIEWPORT_HEIGHT_FULLSCREEN = 1384;
+const TARGET_SCROLL_RATIO = 0.37;
+const TAIL_SPACE_DEMANDED = VIEWPORT_HEIGHT_FULLSCREEN * (1 - TARGET_SCROLL_RATIO);
+
+const renderedMeasurements = {
+  viewportHeight: VIEWPORT_HEIGHT_FULLSCREEN,
+  targetScrollRatio: TARGET_SCROLL_RATIO,
+  contentHeight: 5939,
+  firstLineHeight: 100,
+  lastLineCentre: 5543,
+  lastLineHeight: 120,
+  footerHeight: 38,
+};
+
+const rendered = computeScrollPadding(renderedMeasurements);
+
+assert.ok(
+  rendered.bottom + (renderedMeasurements.contentHeight - renderedMeasurements.lastLineCentre) >= TAIL_SPACE_DEMANDED,
+  "Given a rendering view, When its padding is sized, Then the last line can reach the target scroll position"
+);
+
+// Every measurement taken from a container that is not rendering comes back zero.
+const unrendered = computeScrollPadding({
+  viewportHeight: VIEWPORT_HEIGHT_FULLSCREEN,
+  targetScrollRatio: TARGET_SCROLL_RATIO,
+  contentHeight: 0,
+  firstLineHeight: 0,
+  lastLineCentre: 0,
+  lastLineHeight: 0,
+  footerHeight: 0,
+});
+
+assert.ok(
+  unrendered.bottom >= TAIL_SPACE_DEMANDED,
+  "Given a container measured while it was not rendering, When its padding is sized, Then it still reserves what the viewport demands rather than nothing"
+);
+
+assert.equal(
+  computeScrollPadding({
+    viewportHeight: VIEWPORT_HEIGHT_FULLSCREEN,
+    targetScrollRatio: TARGET_SCROLL_RATIO,
+    contentHeight: 99999,
+    firstLineHeight: 0,
+    lastLineCentre: null,
+    lastLineHeight: 0,
+    footerHeight: 0,
+  }).bottom,
+  Math.ceil(TAIL_SPACE_DEMANDED),
+  "Given no lines at all, When the padding is sized, Then the floor is what the viewport demands"
+);
+
+assert.ok(
+  computeScrollPadding({ ...renderedMeasurements, viewportHeight: 580 }).bottom < rendered.bottom,
+  "Given a smaller viewport, When the padding is sized, Then it asks for less room than fullscreen did"
 );
 
 // -- The "no lyrics" message is not unsynced lyrics --------------------------------------------

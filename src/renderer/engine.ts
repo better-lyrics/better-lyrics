@@ -2748,9 +2748,54 @@ export function runAnimationEngine(
 // -- Layout --------------------------
 
 /**
+ * What a view has to know to size its scroll padding. Split out from the element reads so the
+ * arithmetic can be checked against the degenerate cases, which is where it went wrong: an
+ * unrendered container answers zero to every measurement.
+ */
+interface ScrollPaddingMeasurements {
+  viewportHeight: number;
+  targetScrollRatio: number;
+  /** The container's own height with whatever bottom padding it currently carries taken back off. */
+  contentHeight: number;
+  firstLineHeight: number;
+  /** Distance from the top of the container to the middle of the last line, or null with no lines. */
+  lastLineCentre: number | null;
+  lastLineHeight: number;
+  footerHeight: number;
+}
+
+/**
  * Sizes the padding above the first line and below the last one so either can sit at the view's
  * target scroll position.
+ *
+ * The first two candidates are exact, and both are measured from the container. They are worth
+ * nothing while it is not rendering: every line reports zero, which reads as content that already
+ * runs past the last line and asks for no padding at all, and the last lines of the song then have
+ * nowhere to scroll to. The viewport keeps its height whether the lyrics render or not, so the
+ * space it alone demands below the last line is always knowable, and it is the floor. Over-padding
+ * costs nothing visible; under-padding strands the end of every song.
  */
+export function computeScrollPadding(measurements: ScrollPaddingMeasurements): { top: number; bottom: number } {
+  const { viewportHeight, targetScrollRatio, contentHeight, lastLineCentre } = measurements;
+
+  const top = Math.max(0, viewportHeight * targetScrollRatio - measurements.firstLineHeight / 2);
+
+  const lastLineTargetContentHeight =
+    lastLineCentre === null ? viewportHeight : lastLineCentre + viewportHeight * (1 - targetScrollRatio);
+
+  const trailingContentHeight = measurements.footerHeight + measurements.lastLineHeight / 2;
+  const viewportTailSpace = viewportHeight * (1 - targetScrollRatio) - trailingContentHeight;
+
+  const bottom = Math.max(
+    lastLineTargetContentHeight - contentHeight,
+    viewportHeight - contentHeight,
+    viewportTailSpace,
+    0
+  );
+
+  return { top, bottom: Math.ceil(bottom) };
+}
+
 function applyScrollPadding(engine: AnimationEngineInstance): void {
   const lyricsElement = engine.lyricsContainer;
   const tabRenderer = engine.host.getScrollElement();
@@ -2764,24 +2809,21 @@ function applyScrollPadding(engine: AnimationEngineInstance): void {
   const lyricLines = lyricsElement.querySelectorAll<HTMLElement>(`:scope > .${LINE_CLASS}`);
   const firstLyric = lyricLines[0] ?? null;
   const lastLyric = lyricLines[lyricLines.length - 1] ?? null;
-  const firstLyricHeight = firstLyric ? getRelativeLayoutBounds(lyricsElement, firstLyric).height : 0;
   const lastLyricBounds = lastLyric ? getRelativeLayoutBounds(lyricsElement, lastLyric) : null;
+  const footer = lyricsElement.querySelector<HTMLElement>(`:scope > .${FOOTER_CLASS}`);
 
-  const paddingTop = Math.max(0, tabRendererHeight * scrollPosOffsetRatio - firstLyricHeight / 2);
+  const { top, bottom } = computeScrollPadding({
+    viewportHeight: tabRendererHeight,
+    targetScrollRatio: scrollPosOffsetRatio,
+    contentHeight: lyricsHeightWithoutBottomPadding,
+    firstLineHeight: firstLyric ? getRelativeLayoutBounds(lyricsElement, firstLyric).height : 0,
+    lastLineCentre: lastLyricBounds ? lastLyricBounds.y + lastLyricBounds.height / 2 : null,
+    lastLineHeight: lastLyricBounds?.height ?? 0,
+    footerHeight: footer ? getRelativeLayoutBounds(lyricsElement, footer).height : 0,
+  });
 
-  engine.document.documentElement.style.setProperty("--blyrics-padding-top", paddingTop + "px");
-
-  const lastLyricTargetContentHeight = lastLyricBounds
-    ? lastLyricBounds.y + lastLyricBounds.height / 2 + tabRendererHeight * (1 - scrollPosOffsetRatio)
-    : tabRendererHeight;
-
-  const extraHeight = Math.max(
-    lastLyricTargetContentHeight - lyricsHeightWithoutBottomPadding,
-    tabRendererHeight - lyricsHeightWithoutBottomPadding,
-    0
-  );
-
-  engine.document.documentElement.style.setProperty("--blyrics-padding-bottom", Math.ceil(extraHeight) + "px");
+  engine.document.documentElement.style.setProperty("--blyrics-padding-top", top + "px");
+  engine.document.documentElement.style.setProperty("--blyrics-padding-bottom", bottom + "px");
 }
 
 /**
