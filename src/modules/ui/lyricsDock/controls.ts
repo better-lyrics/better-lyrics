@@ -4,6 +4,7 @@ import { attachHoldRepeat } from "@core/holdRepeat";
 import { t } from "@core/i18n";
 import { setStorage } from "@core/storage";
 import { providerPriority } from "@modules/lyrics/providers/shared";
+import { animEngineState } from "@modules/ui/animationEngine";
 import { pictureInPictureController } from "@modules/ui/pictureInPicture/browserController";
 import { controlIcons, parseSvgString, syncTypeColors, syncTypeIcons } from "./icons";
 import {
@@ -268,7 +269,7 @@ function toggleRomanize(): void {
 }
 
 function hasLyrics(): boolean {
-  return (AppState.lyricData?.lines?.length ?? 0) > 0;
+  return animEngineState.lines.length > 0;
 }
 
 function lyricsContainNonLatin(): boolean {

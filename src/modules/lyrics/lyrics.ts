@@ -13,7 +13,7 @@ import {
 } from "@constants";
 import { AppState, type PlayerDetails } from "@core/appState";
 import { t } from "@core/i18n";
-import { type LyricsData, processLyrics } from "@modules/lyrics/injectLyrics";
+import { type LineData, type LyricsData, processLyrics } from "@modules/lyrics/injectLyrics";
 import { stringSimilarity } from "@modules/lyrics/lyricParseUtils";
 import { registerThemeSetting } from "@modules/settings/themeOptions";
 import { flushLoader, renderLoader } from "@modules/ui/dom";
@@ -80,14 +80,14 @@ function retainParsedLyrics(data: LyricSourceResultWithMeta): void {
   };
 }
 
-export function applySegmentMapToLyrics(lyricData: LyricsData | null, segmentMap: SegmentMap) {
+export function applySegmentMapToLyrics(lyricData: LyricsData | null, lines: LineData[], segmentMap: SegmentMap) {
   if (segmentMap && lyricData) {
     lyricData.isMusicVideoSynced = !lyricData.isMusicVideoSynced;
     // We're sync lyrics using segment map
     const allZero = lyricData.syncType === "none";
 
     if (!allZero) {
-      for (let lyric of lyricData.lines) {
+      for (let lyric of lines) {
         lyric.accumulatedOffsetMs = 1000000; // Force resync by setting to a very large value
         let lastTimeChange = 0;
         for (let segment of segmentMap.segment) {
@@ -150,7 +150,7 @@ export async function createLyrics(detail: PlayerDetails, signal: AbortSignal): 
     const isSoftReload = AppState.lastLoadedVideoId === videoId && AppState.lyricData != null;
 
     if (isAVSwitch && segmentMap) {
-      applySegmentMapToLyrics(AppState.lyricData, segmentMap);
+      applySegmentMapToLyrics(AppState.lyricData, animEngineState.lines, segmentMap);
       AppState.suppressZeroTime = Date.now() + 5000;
       AppState.areLyricsTicking = true; // Keep lyrics ticking while new lyrics are fetched.
       log("Switching between audio/video: Skipping Loader", segmentMap);

@@ -75,8 +75,8 @@ function getResizeObserver(): ResizeObserver {
         if (entry.target.id === LYRICS_WRAPPER_ID) {
           if (
             AppState.lyricData &&
-            (entry.target.clientWidth !== AppState.lyricData.lyricWidth ||
-              entry.target.clientHeight !== AppState.lyricData.lyricHeight)
+            (entry.target.clientWidth !== animEngineState.lyricWidth ||
+              entry.target.clientHeight !== animEngineState.lyricHeight)
           ) {
             animEngineState.nextScrollAllowedTime = 0;
             calculateLyricPositions();
@@ -96,14 +96,15 @@ export function disconnectResizeObserver(): void {
 
 export type SyncType = "richsync" | "synced" | "none";
 
+/**
+ * What the current song's lyrics are, independent of any view that renders them. The render
+ * records, their container and its measured size belong to the animation engine instance that
+ * built them.
+ */
 export interface LyricsData {
-  lines: LineData[];
   syncType: SyncType;
-  lyricWidth: number;
-  lyricHeight: number;
   isMusicVideoSynced: boolean;
   tabSelector: HTMLElement;
-  lyricsContainer: HTMLElement;
   hasNonLatin: boolean;
 }
 
@@ -141,7 +142,7 @@ export function processLyrics(
   // The previous song's container, not the one this injection builds: injectLyrics creates that
   // one later. cleanup() drops both this reference and the element together, so a null here means
   // there is nothing on screen to clear.
-  const previousContainer = AppState.lyricData?.lyricsContainer;
+  const previousContainer = animEngineState.lyricsContainer;
   if (previousContainer) {
     previousContainer.replaceChildren();
   } else {
@@ -266,15 +267,16 @@ function injectLyrics(
   const tabSelector = document.getElementsByClassName(TAB_HEADER_CLASS)[1] as HTMLElement;
 
   let lyricsData: LyricsData = {
-    lines: lines,
     syncType: syncType,
-    lyricWidth: lyricsContainer.clientWidth,
-    lyricHeight: lyricsContainer.clientHeight,
     isMusicVideoSynced: data.musicVideoSynced === true,
     tabSelector,
-    lyricsContainer,
     hasNonLatin: hasNonLatinLyrics(lyrics),
   };
+
+  animEngineState.lines = lines;
+  animEngineState.lyricsContainer = lyricsContainer;
+  animEngineState.lyricWidth = lyricsContainer.clientWidth;
+  animEngineState.lyricHeight = lyricsContainer.clientHeight;
 
   // Set before addFooter so the dock controls read the current song's lyric data.
   AppState.lyricData = lyricsData;
@@ -300,7 +302,7 @@ function injectLyrics(
   void processBatchTranslationsAndRomanizations(doc, data, lines, isStale, signal);
 
   if (data.segmentMap) {
-    applySegmentMapToLyrics(lyricsData, data.segmentMap);
+    applySegmentMapToLyrics(lyricsData, lines, data.segmentMap);
   }
 
   AppState.areLyricsTicking = true;
@@ -469,11 +471,11 @@ async function processBatchTranslationsAndRomanizations(
 export function calculateLyricPositions() {
   setExtraHeight();
   if (AppState.lyricData && AppState.areLyricsTicking) {
-    const data = AppState.lyricData;
-    const lyricsElement = data.lyricsContainer;
-    data.lyricWidth = lyricsElement.clientWidth;
+    const lyricsElement = animEngineState.lyricsContainer;
+    if (!lyricsElement) return;
+    animEngineState.lyricWidth = lyricsElement.clientWidth;
 
-    data.lines.forEach(line => {
+    animEngineState.lines.forEach(line => {
       let bounds = getRelativeLayoutBounds(lyricsElement, line.lyricElement);
       line.position = bounds.y;
       line.height = bounds.height;

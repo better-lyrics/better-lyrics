@@ -103,6 +103,14 @@ const PASSIVE_TOP_PAUSE_S = registerThemeSetting("blyrics-passive-scroll-top-pau
  * one set of pending scroll work.
  */
 interface AnimEngineViewState {
+  /**
+   * The render records this view built, one per lyric line. They hold this view's elements and
+   * this view's `Animation` objects, so a second view never shares them.
+   */
+  lines: LineData[];
+  lyricsContainer: HTMLElement | null;
+  lyricWidth: number;
+  lyricHeight: number;
   skipScrolls: number;
   skipScrollsDecayTimes: number[];
   scrollResumeTime: number;
@@ -171,6 +179,10 @@ function createAnimationEngineInstance(engineDocument: Document, engineWindow: E
   const engine: AnimationEngineInstance = {
     document: engineDocument,
     window: engineWindow,
+    lines: [],
+    lyricsContainer: null,
+    lyricWidth: 0,
+    lyricHeight: 0,
     skipScrolls: 0,
     skipScrollsDecayTimes: [],
     scrollResumeTime: 0,
@@ -240,6 +252,10 @@ const playbackClock: PlaybackClock = {
  */
 export const animEngineState: Pick<
   AnimEngineViewState,
+  | "lines"
+  | "lyricsContainer"
+  | "lyricWidth"
+  | "lyricHeight"
   | "skipScrolls"
   | "skipScrollsDecayTimes"
   | "scrollResumeTime"
@@ -248,6 +264,30 @@ export const animEngineState: Pick<
   | "wasUserScrolling"
 > &
   PlaybackClock = {
+  get lines(): LineData[] {
+    return mainEngine.lines;
+  },
+  set lines(value: LineData[]) {
+    mainEngine.lines = value;
+  },
+  get lyricsContainer(): HTMLElement | null {
+    return mainEngine.lyricsContainer;
+  },
+  set lyricsContainer(value: HTMLElement | null) {
+    mainEngine.lyricsContainer = value;
+  },
+  get lyricWidth(): number {
+    return mainEngine.lyricWidth;
+  },
+  set lyricWidth(value: number) {
+    mainEngine.lyricWidth = value;
+  },
+  get lyricHeight(): number {
+    return mainEngine.lyricHeight;
+  },
+  set lyricHeight(value: number) {
+    mainEngine.lyricHeight = value;
+  },
   get skipScrolls(): number {
     return mainEngine.skipScrolls;
   },
@@ -312,11 +352,9 @@ function resetEngineState(engine: AnimationEngineInstance): void {
   dropPendingLineScroll(engine);
   clearLineScrollAnimations(engine);
   clearVisibleLyricWillChange(engine);
-  if (AppState.lyricData) {
-    for (const line of AppState.lyricData.lines) {
-      resetLineAnimationState(line);
-      line.isSelected = false;
-    }
+  for (const line of engine.lines) {
+    resetLineAnimationState(line);
+    line.isSelected = false;
   }
   engine.skipScrollsDecayTimes = [];
   engine.lastActiveElements = [];
@@ -789,7 +827,7 @@ function noteVisibilityChange(engine: AnimationEngineInstance): void {
 
   if (!AppState.lyricData) return;
 
-  const runningAnimationCount = AppState.lyricData.lines.reduce(
+  const runningAnimationCount = engine.lines.reduce(
     (count, line) => count + [line, ...line.parts].reduce((lineCount, part) => lineCount + part.animations.length, 0),
     0
   );
@@ -2139,21 +2177,21 @@ function passiveScrollEngine(engine: AnimationEngineInstance, isPlaying: boolean
 
   if (engine.wasUserScrolling) {
     resumeScrollElement(engine).setAttribute("autoscroll-hidden", "true");
-    lyricData.lyricsContainer.classList.remove(USER_SCROLLING_CLASS);
+    engine.lyricsContainer?.classList.remove(USER_SCROLLING_CLASS);
     engine.wasUserScrolling = false;
 
     // Re-sync accumulated time to current scroll position so scroll continues from where user left off
     const maxScroll = tabRenderer.scrollHeight - tabRenderer.clientHeight;
     if (maxScroll > 0) {
       const ratio = tabRenderer.scrollTop / maxScroll;
-      const numLines = lyricData.lines.length;
+      const numLines = engine.lines.length;
       const scrollDuration = numLines * PASSIVE_SECONDS_PER_LINE.getNumberValue();
       engine.passiveScrollAccumulatedTime = ratio * scrollDuration;
     }
   }
 
   // -- Cycle calculation --------------------------
-  const numLines = lyricData.lines.length;
+  const numLines = engine.lines.length;
   if (numLines === 0) return;
 
   const scrollDuration = numLines * PASSIVE_SECONDS_PER_LINE.getNumberValue();
@@ -2290,14 +2328,14 @@ function runAnimationEngine(
   }
 
   try {
-    const lyricsElement = lyricData.lyricsContainer;
+    const lyricsElement = engine.lyricsContainer;
     // If lyrics element doesn't exist, clear the interval and return silently
     if (!lyricsElement) {
       log(NO_LYRICS_ELEMENT_LOG);
       return "lyrics-missing";
     }
 
-    const lines = AppState.lyricData!.lines;
+    const lines = engine.lines;
 
     if (lyricData.syncType === "richsync") {
       currentTime += getCSSDurationInMs(engine, lyricsElement, "--blyrics-richsync-timing-offset") / 1000;
@@ -2498,7 +2536,7 @@ function runAnimationEngine(
 
     if (isMainLyricsVisible && (engine.scrollResumeTime < Date.now() || engine.scrollPos === -1)) {
       if (activeElems.length == 0) {
-        activeElems.push(lyricData.lines[0]);
+        activeElems.push(lines[0]);
       }
 
       engine.lastActiveElements = activeElems.filter(

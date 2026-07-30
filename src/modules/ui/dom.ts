@@ -1502,11 +1502,10 @@ export function cleanup(): void {
     lyricsObserver = null;
   }
 
-  // Clear lyricData BEFORE clearing DOM to release element references
-  if (AppState.lyricData) {
-    AppState.lyricData.lines = [];
-    AppState.lyricData = null;
-  }
+  // Drop the render records BEFORE clearing DOM to release element references
+  animEngineState.lines = [];
+  animEngineState.lyricsContainer = null;
+  AppState.lyricData = null;
   AppState.parsedLyrics = null;
 
   const ytMusicLyrics = (document.querySelector(NO_LYRICS_TEXT_SELECTOR) as HTMLElement)?.parentElement;
