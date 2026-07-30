@@ -2,6 +2,7 @@ import { FOOTER_CLASS } from "@constants";
 import {
   type AnimationEngineInstance,
   clearLyrics,
+  noteContainerResize,
   createAnimationEngineInstance,
   getRenderedLines,
   injectRomanization,
@@ -90,6 +91,7 @@ export function createPictureInPictureHost(
   let clonedFooterSource: Element | null = null;
   let syncFrame: number | null = null;
   let themeObserver: MutationObserver | null = null;
+  let lyricsResizeObserver: ResizeObserver | null = null;
 
   function stopThemeMirror(): void {
     themeObserver?.disconnect();
@@ -148,6 +150,7 @@ export function createPictureInPictureHost(
     clonedFooterSource = null;
 
     if (!lines || lines.length === 0) {
+      stopLyricsResizeObserver();
       view.showSearching();
       return;
     }
@@ -159,6 +162,7 @@ export function createPictureInPictureHost(
     applyDecorations();
     syncSourceFooter();
     measureLyrics();
+    if (engine.lyricsContainer) observeLyricsResize(engine, engine.lyricsContainer);
   }
 
   /**
@@ -220,6 +224,33 @@ export function createPictureInPictureHost(
   }
 
   /**
+   * Line positions are measured once at build time, and at that point the window's stylesheets are
+   * still loading: they arrive as `<link>` elements. Everything the engine scrolls by comes from
+   * that measurement, so a layout that settles afterwards leaves the active line parked wherever
+   * the first guess put it. A theme makes the gap enormous, because the sizes the lines are built
+   * at are nothing like the ones the window's own clamps land on.
+   *
+   * The side panel does not drift like this because it re-measures from a ResizeObserver on its
+   * wrapper. This is that observer, with the same guard: re-measuring is what records the new size,
+   * so asking whether the size actually changed is what stops this feeding itself.
+   */
+  function observeLyricsResize(engine: AnimationEngineInstance, container: HTMLElement): void {
+    stopLyricsResizeObserver();
+    const observer = new engine.window.ResizeObserver(entries => {
+      const target = entries[entries.length - 1]?.target as HTMLElement | undefined;
+      if (!target || !activeEngine) return;
+      if (noteContainerResize(activeEngine, target.clientWidth, target.clientHeight)) measureLyrics();
+    });
+    observer.observe(container);
+    lyricsResizeObserver = observer;
+  }
+
+  function stopLyricsResizeObserver(): void {
+    lyricsResizeObserver?.disconnect();
+    lyricsResizeObserver = null;
+  }
+
+  /**
    * The window's own clock, interpolated between the ~100ms player snapshots exactly as the side
    * panel's driver does. Nothing here reads the opener's document: the snapshot and the seek are
    * the only two things that still cross.
@@ -239,6 +270,9 @@ export function createPictureInPictureHost(
       ? (Math.max(0, wallTime - snapshot.wallTime) * snapshot.playbackRate) / 1000
       : 0;
     const currentTime = Math.min(snapshot.currentTimeS + elapsedS, snapshot.durationS || Infinity);
+    // A reload reports zero before it reports the real time, and taking that at face value throws
+    // the window to the first line and back. The side panel's driver drops the same frames.
+    if (currentTime === 0 && wallTime < payload.suppressZeroTimeUntil) return;
 
     runAnimationEngine(engine, currentTime, {
       eventCreationTime: wallTime,
@@ -321,6 +355,7 @@ export function createPictureInPictureHost(
     environment.onClosed();
     stopSyncLoop(pipWindow);
     stopThemeMirror();
+    stopLyricsResizeObserver();
     pipWindow.removeEventListener("resize", measureLyrics);
     activeEngine?.destroy();
     activeEngine = null;

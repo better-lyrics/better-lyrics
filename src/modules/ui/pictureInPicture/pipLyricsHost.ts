@@ -1,4 +1,4 @@
-import { SEEK_EVENT } from "@constants";
+import { AD_PLAYING_ATTR, PLAYER_BAR_SELECTOR, SEEK_EVENT } from "@constants";
 import type { LyricsRendererHost } from "@renderer/index";
 import type { PictureInPictureLyricsView } from "./lyricsView";
 import type { PictureInPictureViewDependencies } from "./types";
@@ -19,10 +19,12 @@ export function createPictureInPictureLyricsHost(
     isViewVisible: () => true,
     isLoaderActive: () => view.isLoaderActive(),
     /**
-     * The ad overlay belongs to YouTube Music's tab renderer rather than to the lyrics container,
-     * and the window has no equivalent to move into.
+     * The window has no ad overlay of its own, so there is nothing to move into a state. It still
+     * has to answer the question: an ad plays against the same clock the lyrics are timed to, so a
+     * view that says no keeps scrolling the song through the ad. The attribute lives on the
+     * opener's player bar, which both worlds can read.
      */
-    syncAdState: () => false,
+    syncAdState: () => document.querySelector(PLAYER_BAR_SELECTOR)?.hasAttribute(AD_PLAYING_ATTR) ?? false,
     getScrollElement: () => view.scrollElement,
     setResumeAffordanceVisible: () => undefined,
     /**

@@ -58,6 +58,12 @@ export interface PictureInPictureLyricsPayload {
   readonly richsyncOffsetTrim: number;
   readonly lineOffsetTrim: number;
   readonly passiveScrollEnabled: boolean;
+  /**
+   * Wall clock deadline before which a reported time of zero is a reload artefact rather than the
+   * top of the song. The side panel's driver drops those frames; without this the window would jump
+   * to the first line and back on every provider switch and audio to video swap.
+   */
+  readonly suppressZeroTimeUntil: number;
 }
 
 // Details cross as JSON strings, not objects. Gecko hands the page a dead wrapper for any object a

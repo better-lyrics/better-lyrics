@@ -168,12 +168,15 @@ export async function createLyrics(detail: PlayerDetails, signal: AbortSignal): 
       applySegmentMapToLyrics(AppState.lyricData, getMainViewLines(), segmentMap);
       AppState.suppressZeroTime = Date.now() + 5000;
       AppState.areLyricsTicking = true; // Keep lyrics ticking while new lyrics are fetched.
+      // The window keeps showing these lines through the refetch, so it needs the same deadline.
+      publishPictureInPictureLyrics();
       log("Switching between audio/video: Skipping Loader", segmentMap);
     } else if (isSoftReload) {
       // Same-song reload (provider switch or translation/romanization toggle): keep the
       // current lyrics on screen and swap them in once the new ones are ready, no loader.
       AppState.suppressZeroTime = Date.now() + 5000;
       AppState.areLyricsTicking = true;
+      publishPictureInPictureLyrics();
       log("Soft reload: keeping current lyrics, skipping loader");
     } else {
       log("Not Switching between audio/video", isAVSwitch, segmentMap);
