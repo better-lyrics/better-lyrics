@@ -112,7 +112,7 @@
     "description": "Accessible label for the next track button in the Picture-in-Picture lyrics window, used when the YouTube Music player bar exposes no label of its own"
   },
   "options_display_pipAutoRestore": {
-    "message": "Автоматично відкривати плавуче вікно текстів",
+    "message": "Автоматично відкривати вікно",
     "description": "Setting label for automatically reopening the floating lyrics window after page load"
   },
   "options_display_pipAutoRestoreTooltip": {
@@ -296,7 +296,7 @@
     "description": "Translation language setting label"
   },
   "options_sources_title": {
-    "message": "Пріоритет джерел текстів пісень",
+    "message": "Пріоритет джерел текстів",
     "description": "Sources settings section title"
   },
   "options_sources_description": {
@@ -344,7 +344,7 @@
     "description": "Theme marketplace button label"
   },
   "options_themes_installedThemes": {
-    "message": "Встановлені теми",
+    "message": "Установлені теми",
     "description": "Installed themes button label"
   },
   "options_identity_title": {
@@ -412,11 +412,11 @@
     "description": "Nickname save button label"
   },
   "options_nickname_reset": {
-    "message": "Скинути до типових",
+    "message": "Скинути",
     "description": "Nickname reset button label"
   },
   "options_nickname_modalTitle": {
-    "message": "Встановити псевдонім",
+    "message": "Установити псевдонім",
     "description": "Nickname modal title"
   },
   "options_nickname_edit": {
@@ -740,7 +740,7 @@
     "description": "Filter for compatible themes"
   },
   "marketplace_installFromUrl": {
-    "message": "Установити з URL-адреси",
+    "message": "Установити з посилання",
     "description": "Install from URL button"
   },
   "marketplace_submitTheme": {
@@ -788,7 +788,7 @@
     "description": "GitHub badge text"
   },
   "marketplace_urlModalTitle": {
-    "message": "Встановити з URL-адреси",
+    "message": "Установити з посилання",
     "description": "URL install modal title"
   },
   "marketplace_urlModalMessage": {
@@ -816,7 +816,7 @@
     "description": "URL permission explanation title"
   },
   "marketplace_urlPermissionDesc": {
-    "message": "Для встановлення тем із користувацьких URL GitHub Better Lyrics потрібні розширені дозволи. Це дає змогу:",
+    "message": "Для встановлення тем із власних GitHub-посилань Better Lyrics потрібні розширені дозволи. Це дає змогу:",
     "description": "URL permission description"
   },
   "marketplace_urlPermissionItem1": {
@@ -828,7 +828,7 @@
     "description": "URL permission list item 2"
   },
   "marketplace_urlPermissionItem3": {
-    "message": "Перевіряти структуру теми перед встановленням",
+    "message": "Перевіряти структуру теми перед установленням",
     "description": "URL permission list item 3"
   },
   "marketplace_urlPermissionNote": {
@@ -852,7 +852,7 @@
     "description": "Refresh shortcut label"
   },
   "marketplace_shortcutsInstallUrl": {
-    "message": "Встановити з URL-адреси",
+    "message": "Установити з посилання",
     "description": "Install from URL shortcut label"
   },
   "marketplace_shortcutsSort": {
@@ -976,7 +976,7 @@
     "description": "Footer link in the theme detail modal that opens the theme's discussion thread"
   },
   "marketplace_commit": {
-    "message": "Закомітити $hash$",
+    "message": "Комміт $hash$",
     "description": "Footer chip in the theme detail modal linking to the exact source commit a theme was built from",
     "placeholders": {
       "hash": {
@@ -1250,7 +1250,7 @@
     "description": "Shown in the sign-in consent popup when the connection to the extension's service worker is lost before the user can approve or cancel."
   },
   "lyrics_requestSyncedVersion": {
-    "message": "Запит синхронізованої версії",
+    "message": "Запросити синхронізовану версію",
     "description": "Button label asking the community to contribute synced lyrics for the current song"
   },
   "lyrics_requestedFirst": {
@@ -1258,11 +1258,11 @@
     "description": "Button label after a successful first-ever request for this song"
   },
   "lyrics_requestedOneOther": {
-    "message": "Запит створено · ще 1 особа хоче цього",
+    "message": "Запит створено · ще 1 користувач очікує",
     "description": "Button label after a successful request when exactly one other person has also requested"
   },
   "lyrics_requestedNOthers": {
-    "message": "Запит створено · ще $N$ осіб хочуть цього",
+    "message": "Запит створено · ще $N$ користувачів очікують",
     "description": "Button label after a successful request when N other people have also requested",
     "placeholders": {
       "n": {
