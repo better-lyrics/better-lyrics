@@ -43,23 +43,31 @@ function findScrollElement(rendererWindow: Window, mount: HTMLElement | null): H
  * Fills in every host member the consumer left out, so the host is an extension point rather than a
  * cost of entry. The mount is read at call time rather than captured: `setLyrics` may be given a
  * different one, and both defaults that use it have to follow.
+ *
+ * Each member is resolved on its own rather than spread over the defaults. A host assembled from
+ * optional pieces carries members that are present and undefined, which typecheck, and spreading
+ * one of those leaves the renderer holding nothing where it expects a function.
  */
 export function withHostDefaults(
   overrides: Partial<LyricsRendererHost> | undefined,
   rendererWindow: Window & typeof globalThis,
   currentMount: () => HTMLElement | null
 ): LyricsRendererHost {
+  const given = overrides ?? {};
+
   return {
-    isViewVisible: () => true,
-    isLoaderActive: () => false,
-    syncAdState: () => false,
-    getScrollElement: () => findScrollElement(rendererWindow, currentMount()),
-    setResumeAffordanceVisible: noop,
-    seek: timeS => {
-      currentMount()?.dispatchEvent(new rendererWindow.CustomEvent(SEEK_EVENT, { detail: timeS, bubbles: true }));
-    },
-    log: noop,
-    ...overrides,
+    isViewVisible: given.isViewVisible ?? (() => true),
+    isLoaderActive: given.isLoaderActive ?? (() => false),
+    syncAdState: given.syncAdState ?? (() => false),
+    getScrollElement: given.getScrollElement ?? (() => findScrollElement(rendererWindow, currentMount())),
+    setResumeAffordanceVisible: given.setResumeAffordanceVisible ?? noop,
+    seek:
+      given.seek ??
+      (timeS => {
+        currentMount()?.dispatchEvent(new rendererWindow.CustomEvent(SEEK_EVENT, { detail: timeS, bubbles: true }));
+      }),
+    log: given.log ?? noop,
+    debug: given.debug,
   };
 }
 
