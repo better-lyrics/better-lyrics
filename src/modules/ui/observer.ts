@@ -367,7 +367,10 @@ export function initializeLyrics(): void {
       });
     }
 
-    if (AppState.areLyricsTicking && AppState.areLyricsLoaded && !AppState.hasPreloadedNextSong) {
+    // Ticking is the side panel's business, but this warms the next song's artwork and lyrics for
+    // whichever view is on screen, and the floating window is a view the side panel cannot see.
+    const isAnyViewShowingLyrics = AppState.areLyricsTicking || AppState.isPictureInPictureOpen;
+    if (isAnyViewShowingLyrics && AppState.areLyricsLoaded && !AppState.hasPreloadedNextSong) {
       AppState.hasPreloadedNextSong = true;
       log(LOG_PREFIX, "Trying to preload next song");
       getSongMetadata(AppState.lastVideoId).then(async data => {
@@ -427,7 +430,11 @@ export function initializeLyrics(): void {
       }
     }
 
-    if (document.visibilityState === "visible") {
+    // The only path that ticks while playback is paused, so it is what lands a pause on the running
+    // word animations. The floating window term is not about the window: an opener that owns one
+    // reports "hidden" for as long as it is open, however visible it actually is, so without it the
+    // side panel would keep sweeping the current line after the user hits pause.
+    if (document.visibilityState === "visible" || AppState.isPictureInPictureOpen) {
       runAnimationEngine(performance.now(), true);
     }
   });
