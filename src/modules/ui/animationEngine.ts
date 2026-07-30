@@ -84,16 +84,6 @@ const LINE_SCROLL_STYLE_SETTINGS = [
   registerLineScrollStyleSetting("--blyrics-line-scroll-below-translate-y-end", ""),
 ] as const;
 
-let cachedTabRendererHeight: number | null = null;
-let tabRendererResizeObserver: ResizeObserver | null = null;
-let observedTabRenderer: HTMLElement | null = null;
-let lineScrollAnimations: LineScrollAnimationRecord[] = [];
-let lineScrollAnimationToken = 0;
-let pendingLineScroll: PendingLineScroll | null = null;
-const lineScrollElementTokens = new WeakMap<HTMLElement, number>();
-let visibleWillChangeElements = new Set<HTMLElement>();
-let animationTimingVisibilityLogUntil = 0;
-let learnedAnimationTimingOffsetMs = 0;
 const animationTimingLastLogTimes = new WeakMap<LineData, number>();
 
 // 0.5 means the selected lyric will be in the middle of the screen, 0 means top, 1 means bottom
@@ -105,7 +95,13 @@ const PASSIVE_BOTTOM_PAUSE_S = registerThemeSetting("blyrics-passive-scroll-bott
 const PASSIVE_RESET_DURATION_S = registerThemeSetting("blyrics-passive-scroll-reset-duration-s", 0.6);
 const PASSIVE_TOP_PAUSE_S = registerThemeSetting("blyrics-passive-scroll-top-pause-s", 0.8);
 
-interface AnimEngineState {
+// -- Engine instance --------------------------
+
+/**
+ * Everything that belongs to a single rendered lyrics view: one scroll container, one selection,
+ * one set of pending scroll work.
+ */
+interface AnimEngineViewState {
   skipScrolls: number;
   skipScrollsDecayTimes: number[];
   scrollResumeTime: number;
@@ -113,12 +109,6 @@ interface AnimEngineState {
   selectedElementIndex: number;
   nextScrollAllowedTime: number;
   wasUserScrolling: boolean;
-  lastTime: number;
-  lastPlayState: boolean;
-  /**
-   * Take "-1" to mean that we have no sensible last event
-   */
-  lastEventCreationTime: number;
   lastActiveElements: LineData[];
   queuedScroll: boolean;
   lastScrollDebugContext: {
@@ -130,50 +120,176 @@ interface AnimEngineState {
   passiveLastWallTime: number;
 }
 
-export let animEngineState: AnimEngineState = {
-  skipScrolls: 0,
-  skipScrollsDecayTimes: [],
-  scrollResumeTime: 0,
-  scrollPos: 0,
-  selectedElementIndex: 0,
-  nextScrollAllowedTime: 0,
-  wasUserScrolling: false,
+/**
+ * The last player snapshot. It describes the media, not a view, so every instance reads the same one.
+ */
+interface PlaybackClock {
+  lastTime: number;
+  lastPlayState: boolean;
+  /**
+   * Take "-1" to mean that we have no sensible last event
+   */
+  lastEventCreationTime: number;
+}
+
+interface AnimationEngineInstance extends AnimEngineViewState {
+  cachedTabRendererHeight: number | null;
+  tabRendererResizeObserver: ResizeObserver | null;
+  observedTabRenderer: HTMLElement | null;
+  lineScrollAnimations: LineScrollAnimationRecord[];
+  lineScrollAnimationToken: number;
+  pendingLineScroll: PendingLineScroll | null;
+  lineScrollElementTokens: WeakMap<HTMLElement, number>;
+  visibleWillChangeElements: Set<HTMLElement>;
+  cachedDurations: Map<string, number>;
+  cachedCSSValues: Map<string, string>;
+  cachedAnimationSettings: AnimationSettings | null;
+  passiveRAFId: number | null;
+  pendingLyricsUpdate: boolean;
+  learnedAnimationTimingOffsetMs: number;
+  animationTimingVisibilityLogUntil: number;
+}
+
+function createAnimationEngineInstance(): AnimationEngineInstance {
+  return {
+    skipScrolls: 0,
+    skipScrollsDecayTimes: [],
+    scrollResumeTime: 0,
+    scrollPos: 0,
+    selectedElementIndex: 0,
+    nextScrollAllowedTime: 0,
+    wasUserScrolling: false,
+    lastActiveElements: [],
+    queuedScroll: false,
+    lastScrollDebugContext: {
+      activeElms: [],
+      centers: [],
+      lyricScrollTime: 0,
+    },
+    passiveScrollAccumulatedTime: 0,
+    passiveLastWallTime: 0,
+    cachedTabRendererHeight: null,
+    tabRendererResizeObserver: null,
+    observedTabRenderer: null,
+    lineScrollAnimations: [],
+    lineScrollAnimationToken: 0,
+    pendingLineScroll: null,
+    lineScrollElementTokens: new WeakMap(),
+    visibleWillChangeElements: new Set(),
+    cachedDurations: new Map(),
+    cachedCSSValues: new Map(),
+    cachedAnimationSettings: null,
+    passiveRAFId: null,
+    pendingLyricsUpdate: false,
+    learnedAnimationTimingOffsetMs: 0,
+    animationTimingVisibilityLogUntil: 0,
+  };
+}
+
+const mainEngine = createAnimationEngineInstance();
+
+const playbackClock: PlaybackClock = {
   lastTime: 0,
   lastPlayState: false,
   lastEventCreationTime: -1,
-  lastActiveElements: [],
-  queuedScroll: false,
-  lastScrollDebugContext: {
-    activeElms: [],
-    centers: [],
-    lyricScrollTime: 0,
+};
+
+/**
+ * Six modules still reach into engine state directly. Until those reads and writes become
+ * intent-revealing methods, this forwards the fields they touch onto the one instance.
+ */
+export const animEngineState: Pick<
+  AnimEngineViewState,
+  | "skipScrolls"
+  | "skipScrollsDecayTimes"
+  | "scrollResumeTime"
+  | "scrollPos"
+  | "nextScrollAllowedTime"
+  | "wasUserScrolling"
+> &
+  PlaybackClock = {
+  get skipScrolls(): number {
+    return mainEngine.skipScrolls;
   },
-  passiveScrollAccumulatedTime: 0,
-  passiveLastWallTime: 0,
+  set skipScrolls(value: number) {
+    mainEngine.skipScrolls = value;
+  },
+  get skipScrollsDecayTimes(): number[] {
+    return mainEngine.skipScrollsDecayTimes;
+  },
+  set skipScrollsDecayTimes(value: number[]) {
+    mainEngine.skipScrollsDecayTimes = value;
+  },
+  get scrollResumeTime(): number {
+    return mainEngine.scrollResumeTime;
+  },
+  set scrollResumeTime(value: number) {
+    mainEngine.scrollResumeTime = value;
+  },
+  get scrollPos(): number {
+    return mainEngine.scrollPos;
+  },
+  set scrollPos(value: number) {
+    mainEngine.scrollPos = value;
+  },
+  get nextScrollAllowedTime(): number {
+    return mainEngine.nextScrollAllowedTime;
+  },
+  set nextScrollAllowedTime(value: number) {
+    mainEngine.nextScrollAllowedTime = value;
+  },
+  get wasUserScrolling(): boolean {
+    return mainEngine.wasUserScrolling;
+  },
+  set wasUserScrolling(value: boolean) {
+    mainEngine.wasUserScrolling = value;
+  },
+  get lastTime(): number {
+    return playbackClock.lastTime;
+  },
+  set lastTime(value: number) {
+    playbackClock.lastTime = value;
+  },
+  get lastPlayState(): boolean {
+    return playbackClock.lastPlayState;
+  },
+  set lastPlayState(value: boolean) {
+    playbackClock.lastPlayState = value;
+  },
+  get lastEventCreationTime(): number {
+    return playbackClock.lastEventCreationTime;
+  },
+  set lastEventCreationTime(value: number) {
+    playbackClock.lastEventCreationTime = value;
+  },
 };
 
 /**
  * Resets anim engine states
  * Called when song is switched or cleaned up
  */
-export function resetAnimEngineState(): void {
-  cancelPendingLineScroll();
-  clearLineScrollAnimations();
-  clearVisibleLyricWillChange();
+function resetEngineState(engine: AnimationEngineInstance): void {
+  dropPendingLineScroll(engine);
+  clearLineScrollAnimations(engine);
+  clearVisibleLyricWillChange(engine);
   if (AppState.lyricData) {
     for (const line of AppState.lyricData.lines) {
       resetLineAnimationState(line);
       line.isSelected = false;
     }
   }
-  animEngineState.skipScrollsDecayTimes = [];
-  animEngineState.lastActiveElements = [];
-  animEngineState.lastScrollDebugContext.activeElms = [];
-  animEngineState.lastScrollDebugContext.centers = [];
-  animEngineState.queuedScroll = false;
-  animEngineState.passiveScrollAccumulatedTime = 0;
-  animEngineState.passiveLastWallTime = 0;
-  stopPassiveScrollLoop();
+  engine.skipScrollsDecayTimes = [];
+  engine.lastActiveElements = [];
+  engine.lastScrollDebugContext.activeElms = [];
+  engine.lastScrollDebugContext.centers = [];
+  engine.queuedScroll = false;
+  engine.passiveScrollAccumulatedTime = 0;
+  engine.passiveLastWallTime = 0;
+  stopPassiveScrollLoop(engine);
+}
+
+export function resetAnimEngineState(): void {
+  resetEngineState(mainEngine);
 }
 
 function resetPartAnimations(part: PartData): void {
@@ -332,6 +448,11 @@ interface AnimationConfig {
   };
 }
 
+interface AnimationSettings {
+  config: AnimationConfig;
+  scrollTiming: { earlyScrollConsiderS: number; queueScrollMs: number };
+}
+
 interface HighlightAnimations {
   animations: Animation[];
   swipe?: Animation;
@@ -357,12 +478,13 @@ interface NativeAnimationTimingSample {
 const animationTimingTracks = new WeakMap<Animation, AnimationTimingTrack>();
 
 function trackLyricAnimationTiming(
+  engine: AnimationEngineInstance,
   animation: Animation,
   timing: Omit<AnimationTimingTrack, "appliedTimingOffsetMs"> & { appliedTimingOffsetMs?: number }
 ): Animation {
   animationTimingTracks.set(animation, {
     ...timing,
-    appliedTimingOffsetMs: timing.appliedTimingOffsetMs ?? learnedAnimationTimingOffsetMs,
+    appliedTimingOffsetMs: timing.appliedTimingOffsetMs ?? engine.learnedAnimationTimingOffsetMs,
   });
   return animation;
 }
@@ -380,8 +502,8 @@ function correctedWrappedAnimationTimeMs(
   return positiveModulo(targetTimeMs - appliedTimingOffsetMs, wrapDurationMs);
 }
 
-function correctedScrollTimeS(currentTime: number): number {
-  return currentTime - learnedAnimationTimingOffsetMs / 1000;
+function correctedScrollTimeS(engine: AnimationEngineInstance, currentTime: number): number {
+  return currentTime - engine.learnedAnimationTimingOffsetMs / 1000;
 }
 
 function timingValueToMs(value: unknown): number | null {
@@ -526,27 +648,32 @@ function canUseTimingSampleForDrift(sample: NativeAnimationTimingSample, isPlayi
   return sample.playState === "running" || sample.playState === "finished";
 }
 
-function learnAnimationTimingOffset(sample: NativeAnimationTimingSample): number {
+function learnAnimationTimingOffset(engine: AnimationEngineInstance, sample: NativeAnimationTimingSample): number {
   if (Math.abs(sample.biasOffsetMs) > ANIMATION_TIMING_LEARN_SAMPLE_LIMIT_MS) {
-    return learnedAnimationTimingOffsetMs;
+    return engine.learnedAnimationTimingOffsetMs;
   }
 
-  learnedAnimationTimingOffsetMs = clamp(
-    learnedAnimationTimingOffsetMs +
-      (sample.biasOffsetMs - learnedAnimationTimingOffsetMs) * ANIMATION_TIMING_LEARN_RATE,
+  engine.learnedAnimationTimingOffsetMs = clamp(
+    engine.learnedAnimationTimingOffsetMs +
+      (sample.biasOffsetMs - engine.learnedAnimationTimingOffsetMs) * ANIMATION_TIMING_LEARN_RATE,
     -ANIMATION_TIMING_MAX_LEARNED_OFFSET_MS,
     ANIMATION_TIMING_MAX_LEARNED_OFFSET_MS
   );
 
-  return learnedAnimationTimingOffsetMs;
+  return engine.learnedAnimationTimingOffsetMs;
 }
 
-function shouldLogAnimationTiming(lineData: LineData, sample: NativeAnimationTimingSample, now: number): boolean {
+function shouldLogAnimationTiming(
+  engine: AnimationEngineInstance,
+  lineData: LineData,
+  sample: NativeAnimationTimingSample,
+  now: number
+): boolean {
   if (!ENABLE_ANIMATION_TIMING_LOGS.getBooleanValue()) {
     return false;
   }
 
-  const isVisibilityLogWindow = now < animationTimingVisibilityLogUntil;
+  const isVisibilityLogWindow = now < engine.animationTimingVisibilityLogUntil;
   if (!isVisibilityLogWindow && Math.abs(sample.offsetMs) < ANIMATION_TIMING_LOG_THRESHOLD_MS) {
     return false;
   }
@@ -561,13 +688,14 @@ function shouldLogAnimationTiming(lineData: LineData, sample: NativeAnimationTim
 }
 
 function logAnimationTiming(
+  engine: AnimationEngineInstance,
   reason: string,
   lineData: LineData,
   lineIndex: number,
   sample: NativeAnimationTimingSample,
   currentTime: number,
   accumulatedOffsetMs: number,
-  learnedOffsetMs = learnedAnimationTimingOffsetMs,
+  learnedOffsetMs = engine.learnedAnimationTimingOffsetMs,
   residualOffsetMs = sample.offsetMs
 ): void {
   if (!ENABLE_ANIMATION_TIMING_LOGS.getBooleanValue()) {
@@ -614,7 +742,7 @@ function logAnimationCleanup(
   });
 }
 
-export function noteAnimationVisibilityChange(): void {
+function noteVisibilityChange(engine: AnimationEngineInstance): void {
   if (!ENABLE_ANIMATION_TIMING_LOGS.getBooleanValue()) {
     return;
   }
@@ -627,7 +755,7 @@ export function noteAnimationVisibilityChange(): void {
   );
 
   if (document.visibilityState === "visible") {
-    animationTimingVisibilityLogUntil = Date.now() + ANIMATION_TIMING_LOG_WINDOW_MS;
+    engine.animationTimingVisibilityLogUntil = Date.now() + ANIMATION_TIMING_LOG_WINDOW_MS;
     log(LOG_PREFIX, "Visibility changed; keeping WAAPI animations for timing verification", {
       visibilityState: document.visibilityState,
       runningAnimationCount,
@@ -642,6 +770,10 @@ export function noteAnimationVisibilityChange(): void {
     runningAnimationCount,
     resetSkipped: true,
   });
+}
+
+export function noteAnimationVisibilityChange(): void {
+  noteVisibilityChange(mainEngine);
 }
 
 function activeTextGradientKeyframes(config: AnimationConfig): Keyframe[] {
@@ -721,6 +853,7 @@ function fadeOutTextKeyframes(config: AnimationConfig): Keyframe[] {
 }
 
 function startRichSyncedHighlightAnimations(
+  engine: AnimationEngineInstance,
   part: PartData,
   config: AnimationConfig,
   swipeTimeMs: number,
@@ -735,6 +868,7 @@ function startRichSyncedHighlightAnimations(
   let swipeAnimation: Animation | undefined;
   if (config.enabled.highlightSwipe) {
     swipeAnimation = trackLyricAnimationTiming(
+      engine,
       target.element.animate(activeTextGradientKeyframes(config), {
         duration: swipeDurationMs,
         easing: config.highlight.swipeEasing,
@@ -748,6 +882,7 @@ function startRichSyncedHighlightAnimations(
   }
 
   const opacityAnimation = trackLyricAnimationTiming(
+    engine,
     target.element.animate(
       config.enabled.highlightSwipe ? activeTextVisibleKeyframes() : activeTextInstantKeyframes(config),
       {
@@ -765,6 +900,7 @@ function startRichSyncedHighlightAnimations(
   let glowAnimation: Animation | undefined;
   if (config.enabled.highlightGlow) {
     glowAnimation = trackLyricAnimationTiming(
+      engine,
       target.element.animate(activeTextGlowKeyframes(config), {
         duration: glowDurationMs,
         easing: config.highlight.glowEasing,
@@ -781,6 +917,7 @@ function startRichSyncedHighlightAnimations(
 }
 
 function startLineSyncedHighlightAnimations(
+  engine: AnimationEngineInstance,
   part: PartData,
   config: AnimationConfig,
   wordTimeMs: number,
@@ -792,6 +929,7 @@ function startLineSyncedHighlightAnimations(
   const target = highlightTarget(part);
 
   const opacityAnimation = trackLyricAnimationTiming(
+    engine,
     target.element.animate(lineSyncedTextKeyframes(config), {
       duration: fadeInDuration,
       easing: config.enabled.highlightFade ? config.highlight.fadeInEasing : "linear",
@@ -806,6 +944,7 @@ function startLineSyncedHighlightAnimations(
   let glowAnimation: Animation | undefined;
   if (config.enabled.highlightGlow) {
     glowAnimation = trackLyricAnimationTiming(
+      engine,
       target.element.animate(activeTextGlowKeyframes(config), {
         duration: glowDurationMs,
         easing: config.highlight.glowEasing,
@@ -822,6 +961,7 @@ function startLineSyncedHighlightAnimations(
 }
 
 function startLineAnimation(
+  engine: AnimationEngineInstance,
   lineData: LineData,
   config: AnimationConfig,
   currentTime: number,
@@ -837,6 +977,7 @@ function startLineAnimation(
   }
 
   const animation = trackLyricAnimationTiming(
+    engine,
     lineData.lyricElement.animate([{ transform: config.line.enterFrom }, { transform: config.line.enterTo }], {
       duration: config.line.durationMs,
       easing: config.line.enterEasing,
@@ -876,6 +1017,7 @@ function startLineExitAnimation(lineData: LineData, config: AnimationConfig): vo
 }
 
 function startWordAnimations(
+  engine: AnimationEngineInstance,
   part: PartData,
   config: AnimationConfig,
   currentTime: number,
@@ -900,6 +1042,7 @@ function startWordAnimations(
 
   const highlightAnimations = isLineSyncedWord
     ? startLineSyncedHighlightAnimations(
+        engine,
         part,
         config,
         wordTimeMs,
@@ -907,6 +1050,7 @@ function startWordAnimations(
         appliedTimingOffsetMs
       )
     : startRichSyncedHighlightAnimations(
+        engine,
         part,
         config,
         swipeTimeMs,
@@ -918,6 +1062,7 @@ function startWordAnimations(
 
   const wobbleAnimation = config.enabled.wordWobble
     ? trackLyricAnimationTiming(
+        engine,
         part.lyricElement.animate(
           [
             { transform: config.word.wobbleFrom },
@@ -957,17 +1102,22 @@ function startWordAnimations(
     : highlightAnimations.animations;
 }
 
-function startLineAnimations(lineData: LineData, config: AnimationConfig, currentTime: number): void {
-  const appliedTimingOffsetMs = learnedAnimationTimingOffsetMs;
+function startLineAnimations(
+  engine: AnimationEngineInstance,
+  lineData: LineData,
+  config: AnimationConfig,
+  currentTime: number
+): void {
+  const appliedTimingOffsetMs = engine.learnedAnimationTimingOffsetMs;
 
-  startLineAnimation(lineData, config, currentTime, appliedTimingOffsetMs);
+  startLineAnimation(engine, lineData, config, currentTime, appliedTimingOffsetMs);
   if (lineData.lyricElement.dataset.instrumental === "true") {
-    startInstrumentalAnimations(lineData, config, currentTime, appliedTimingOffsetMs);
+    startInstrumentalAnimations(engine, lineData, config, currentTime, appliedTimingOffsetMs);
     return;
   }
 
   for (const part of lineData.parts) {
-    startWordAnimations(part, config, currentTime, appliedTimingOffsetMs);
+    startWordAnimations(engine, part, config, currentTime, appliedTimingOffsetMs);
   }
 }
 
@@ -993,11 +1143,16 @@ function startWordExitAnimation(part: PartData, config: AnimationConfig): void {
   );
 }
 
-function startLineExitAnimations(lineData: LineData, config: AnimationConfig, currentTime: number): void {
+function startLineExitAnimations(
+  engine: AnimationEngineInstance,
+  lineData: LineData,
+  config: AnimationConfig,
+  currentTime: number
+): void {
   startLineExitAnimation(lineData, config);
 
   if (lineData.lyricElement.dataset.instrumental === "true") {
-    startInstrumentalExitAnimations(lineData, config, currentTime);
+    startInstrumentalExitAnimations(engine, lineData, config, currentTime);
     return;
   }
 
@@ -1011,6 +1166,7 @@ function startLineExitAnimations(lineData: LineData, config: AnimationConfig, cu
 }
 
 function animateInstrumentalChild(
+  engine: AnimationEngineInstance,
   lineData: LineData,
   selector: string,
   keyframes: Keyframe[],
@@ -1021,13 +1177,14 @@ function animateInstrumentalChild(
   if (!element) return null;
 
   const animation = timing
-    ? trackLyricAnimationTiming(element.animate(keyframes, options), timing)
+    ? trackLyricAnimationTiming(engine, element.animate(keyframes, options), timing)
     : element.animate(keyframes, options);
   lineData.animations.push(animation);
   return animation;
 }
 
 function startInstrumentalAnimations(
+  engine: AnimationEngineInstance,
   lineData: LineData,
   config: AnimationConfig,
   currentTime: number,
@@ -1038,6 +1195,7 @@ function startInstrumentalAnimations(
   const fillFadeDuration = config.enabled.instrumental ? config.instrumental.fillFadeDurationMs : 1;
 
   const fillAnimation = animateInstrumentalChild(
+    engine,
     lineData,
     INSTRUMENTAL_FILL_SELECTOR,
     [{ opacity: 0 }, { opacity: 1 }],
@@ -1054,6 +1212,7 @@ function startInstrumentalAnimations(
   let waveOscillationAnimation: Animation | null = null;
   if (config.enabled.instrumental) {
     fillTravelAnimation = animateInstrumentalChild(
+      engine,
       lineData,
       INSTRUMENTAL_WAVE_CLIP_SELECTOR,
       [{ transform: config.instrumental.fillFrom }, { transform: config.instrumental.fillTo }],
@@ -1066,6 +1225,7 @@ function startInstrumentalAnimations(
     );
 
     waveFlattenAnimation = animateInstrumentalChild(
+      engine,
       lineData,
       INSTRUMENTAL_WAVE_PATH_SELECTOR,
       [{ transform: config.instrumental.waveFrom }, { transform: config.instrumental.waveTo }],
@@ -1078,6 +1238,7 @@ function startInstrumentalAnimations(
     );
 
     waveOscillationAnimation = animateInstrumentalChild(
+      engine,
       lineData,
       INSTRUMENTAL_WAVE_PATH_SELECTOR,
       [
@@ -1115,83 +1276,111 @@ function startInstrumentalAnimations(
   }
 }
 
-function startInstrumentalExitAnimations(lineData: LineData, config: AnimationConfig, currentTime: number): void {
+function startInstrumentalExitAnimations(
+  engine: AnimationEngineInstance,
+  lineData: LineData,
+  config: AnimationConfig,
+  currentTime: number
+): void {
   if (currentTime < lineData.time) return;
 
   const fadeDuration =
     config.enabled.instrumental && config.enabled.highlightFade ? config.highlight.fadeOutDurationMs : 1;
-  animateInstrumentalChild(lineData, INSTRUMENTAL_FILL_SELECTOR, [{ opacity: 1 }, { opacity: 0 }], {
+  animateInstrumentalChild(engine, lineData, INSTRUMENTAL_FILL_SELECTOR, [{ opacity: 1 }, { opacity: 0 }], {
     duration: fadeDuration,
     easing: config.enabled.instrumental ? config.highlight.fadeOutEasing : "linear",
     fill: "none",
   });
 }
 
-let cachedDurations: Map<string, number> = new Map();
-const cachedCSSValues: Map<string, string> = new Map();
-let cachedAnimationSettings: {
-  config: AnimationConfig;
-  scrollTiming: { earlyScrollConsiderS: number; queueScrollMs: number };
-} | null = null;
+function clearStyleCaches(engine: AnimationEngineInstance): void {
+  dropPendingLineScroll(engine);
+  engine.cachedDurations.clear();
+  engine.cachedCSSValues.clear();
+  engine.cachedAnimationSettings = null;
+}
 
 export function clearAnimationStyleCache(): void {
-  cancelPendingLineScroll();
-  cachedDurations.clear();
-  cachedCSSValues.clear();
-  cachedAnimationSettings = null;
+  clearStyleCaches(mainEngine);
 }
 
 if (typeof window !== "undefined" && window.matchMedia) {
   window.matchMedia("(prefers-reduced-motion: reduce)").addEventListener("change", clearAnimationStyleCache);
 }
 
-function getCSSValue(lyricsElement: HTMLElement, property: string, fallback: string): string {
-  let value = cachedCSSValues.get(property);
+function getCSSValue(
+  engine: AnimationEngineInstance,
+  lyricsElement: HTMLElement,
+  property: string,
+  fallback: string
+): string {
+  let value = engine.cachedCSSValues.get(property);
   if (value === undefined) {
     value = window.getComputedStyle(lyricsElement).getPropertyValue(property).trim() || fallback;
-    cachedCSSValues.set(property, value);
+    engine.cachedCSSValues.set(property, value);
   }
   return value;
 }
 
 /**
  * Gets and caches a css duration.
- * Note this function does not key its cache on the element provided --
- * it assumes that it isn't relevant to the calling code
+ * The cache belongs to one engine instance, which resolves every lookup against its own lyrics
+ * container, so this function does not key its cache on the element provided -- it assumes that
+ * it isn't relevant to the calling code
  *
  * @param lyricsElement - the element to look up against
  * @param property - the css property to look up
  * @return - in ms
  */
-function getCSSDurationInMs(lyricsElement: HTMLElement, property: string): number {
-  let duration = cachedDurations.get(property);
+function getCSSDurationInMs(engine: AnimationEngineInstance, lyricsElement: HTMLElement, property: string): number {
+  let duration = engine.cachedDurations.get(property);
   if (duration === undefined) {
-    duration = toMs(getCSSValue(lyricsElement, property, "0ms"));
-    cachedDurations.set(property, duration);
+    duration = toMs(getCSSValue(engine, lyricsElement, property, "0ms"));
+    engine.cachedDurations.set(property, duration);
   }
 
   return duration;
 }
 
-function getCSSDurationWithFallback(lyricsElement: HTMLElement, property: string, fallback: string): number {
-  return Math.max(toMs(getCSSValue(lyricsElement, property, fallback)), 1);
+function getCSSDurationWithFallback(
+  engine: AnimationEngineInstance,
+  lyricsElement: HTMLElement,
+  property: string,
+  fallback: string
+): number {
+  return Math.max(toMs(getCSSValue(engine, lyricsElement, property, fallback)), 1);
 }
 
-function getCSSNumber(lyricsElement: HTMLElement, property: string, fallback: number): number {
-  const value = Number.parseFloat(getCSSValue(lyricsElement, property, `${fallback}`));
+function getCSSNumber(
+  engine: AnimationEngineInstance,
+  lyricsElement: HTMLElement,
+  property: string,
+  fallback: number
+): number {
+  const value = Number.parseFloat(getCSSValue(engine, lyricsElement, property, `${fallback}`));
   return Number.isFinite(value) ? value : fallback;
 }
 
-function getCSSBoolean(lyricsElement: HTMLElement, property: string, fallback: boolean): boolean {
-  const value = getCSSValue(lyricsElement, property, fallback ? "1" : "0").toLowerCase();
+function getCSSBoolean(
+  engine: AnimationEngineInstance,
+  lyricsElement: HTMLElement,
+  property: string,
+  fallback: boolean
+): boolean {
+  const value = getCSSValue(engine, lyricsElement, property, fallback ? "1" : "0").toLowerCase();
   if (value === "false" || value === "off" || value === "none") return false;
   const numericValue = Number.parseFloat(value);
   if (Number.isFinite(numericValue)) return numericValue > 0;
   return fallback;
 }
 
-function getCSSOffset(lyricsElement: HTMLElement, property: string, fallback: number): number {
-  return Math.max(0, Math.min(1, getCSSNumber(lyricsElement, property, fallback)));
+function getCSSOffset(
+  engine: AnimationEngineInstance,
+  lyricsElement: HTMLElement,
+  property: string,
+  fallback: number
+): number {
+  return Math.max(0, Math.min(1, getCSSNumber(engine, lyricsElement, property, fallback)));
 }
 
 // Compose the glow filter so the color stays an unresolved var(--blyrics-glow-color).
@@ -1201,17 +1390,28 @@ function getCSSOffset(lyricsElement: HTMLElement, property: string, fallback: nu
 // the color left as a literal var lets the Web Animations API resolve it against each animated
 // word instead. A theme that sets the full filter var still wins, but its color resolves once
 // at the container (globally), as before.
-function resolveGlowFilter(lyricsElement: HTMLElement, suffix: "from" | "to", radiusDefault: string): string {
-  const override = getCSSValue(lyricsElement, `--blyrics-highlight-glow-filter-${suffix}`, "");
+function resolveGlowFilter(
+  engine: AnimationEngineInstance,
+  lyricsElement: HTMLElement,
+  suffix: "from" | "to",
+  radiusDefault: string
+): string {
+  const override = getCSSValue(engine, lyricsElement, `--blyrics-highlight-glow-filter-${suffix}`, "");
   if (override) return override;
-  const radius = getCSSValue(lyricsElement, `--blyrics-highlight-glow-radius-${suffix}`, radiusDefault);
+  const radius = getCSSValue(engine, lyricsElement, `--blyrics-highlight-glow-radius-${suffix}`, radiusDefault);
   return `drop-shadow(0 0 ${radius} var(--blyrics-glow-color))`;
 }
 
-function readAnimationConfig(lyricsElement: HTMLElement): AnimationConfig {
+function readAnimationConfig(engine: AnimationEngineInstance, lyricsElement: HTMLElement): AnimationConfig {
   const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-  const scrollDurationMs = getCSSDurationWithFallback(lyricsElement, "--blyrics-lyric-scroll-duration", "650ms");
+  const scrollDurationMs = getCSSDurationWithFallback(
+    engine,
+    lyricsElement,
+    "--blyrics-lyric-scroll-duration",
+    "650ms"
+  );
   const scrollEasing = getCSSValue(
+    engine,
     lyricsElement,
     "--blyrics-lyric-scroll-timing-function",
     "cubic-bezier(0.86, 0, 0.2, 1)"
@@ -1219,82 +1419,113 @@ function readAnimationConfig(lyricsElement: HTMLElement): AnimationConfig {
 
   return {
     enabled: {
-      lineScale: getCSSBoolean(lyricsElement, "--blyrics-animate-line-scale", true),
-      wordWobble: getCSSBoolean(lyricsElement, "--blyrics-animate-word-wobble", true),
-      highlightSwipe: getCSSBoolean(lyricsElement, "--blyrics-animate-highlight-swipe", true),
-      highlightGlow: getCSSBoolean(lyricsElement, "--blyrics-animate-highlight-glow", true),
-      highlightFade: getCSSBoolean(lyricsElement, "--blyrics-animate-highlight-fade", true),
-      scroll: getCSSBoolean(lyricsElement, "--blyrics-animate-scroll", true),
-      instrumental: getCSSBoolean(lyricsElement, "--blyrics-animate-instrumental", true),
+      lineScale: getCSSBoolean(engine, lyricsElement, "--blyrics-animate-line-scale", true),
+      wordWobble: getCSSBoolean(engine, lyricsElement, "--blyrics-animate-word-wobble", true),
+      highlightSwipe: getCSSBoolean(engine, lyricsElement, "--blyrics-animate-highlight-swipe", true),
+      highlightGlow: getCSSBoolean(engine, lyricsElement, "--blyrics-animate-highlight-glow", true),
+      highlightFade: getCSSBoolean(engine, lyricsElement, "--blyrics-animate-highlight-fade", true),
+      scroll: getCSSBoolean(engine, lyricsElement, "--blyrics-animate-scroll", true),
+      instrumental: getCSSBoolean(engine, lyricsElement, "--blyrics-animate-instrumental", true),
     },
     line: {
-      durationMs: getCSSDurationWithFallback(lyricsElement, "--blyrics-scale-transition-duration", "0.166s"),
-      enterEasing: getCSSValue(lyricsElement, "--blyrics-line-enter-easing", "ease"),
-      exitEasing: getCSSValue(lyricsElement, "--blyrics-line-exit-easing", "ease"),
-      enterFrom: getCSSValue(lyricsElement, "--blyrics-line-enter-transform-from", "scale(var(--blyrics-scale))"),
-      enterTo: getCSSValue(lyricsElement, "--blyrics-line-enter-transform-to", "scale(var(--blyrics-active-scale))"),
-      exitFrom: getCSSValue(lyricsElement, "--blyrics-line-exit-transform-from", "scale(var(--blyrics-active-scale))"),
-      exitTo: getCSSValue(lyricsElement, "--blyrics-line-exit-transform-to", "scale(var(--blyrics-scale))"),
+      durationMs: getCSSDurationWithFallback(engine, lyricsElement, "--blyrics-scale-transition-duration", "0.166s"),
+      enterEasing: getCSSValue(engine, lyricsElement, "--blyrics-line-enter-easing", "ease"),
+      exitEasing: getCSSValue(engine, lyricsElement, "--blyrics-line-exit-easing", "ease"),
+      enterFrom: getCSSValue(
+        engine,
+        lyricsElement,
+        "--blyrics-line-enter-transform-from",
+        "scale(var(--blyrics-scale))"
+      ),
+      enterTo: getCSSValue(
+        engine,
+        lyricsElement,
+        "--blyrics-line-enter-transform-to",
+        "scale(var(--blyrics-active-scale))"
+      ),
+      exitFrom: getCSSValue(
+        engine,
+        lyricsElement,
+        "--blyrics-line-exit-transform-from",
+        "scale(var(--blyrics-active-scale))"
+      ),
+      exitTo: getCSSValue(engine, lyricsElement, "--blyrics-line-exit-transform-to", "scale(var(--blyrics-scale))"),
     },
     highlight: {
       fadeInDurationMs: getCSSDurationWithFallback(
+        engine,
         lyricsElement,
         "--blyrics-lyric-highlight-fade-in-duration",
         "0.33s"
       ),
       fadeOutDurationMs: getCSSDurationWithFallback(
+        engine,
         lyricsElement,
         "--blyrics-lyric-highlight-fade-out-duration",
         "0.5s"
       ),
-      fadeInEasing: getCSSValue(lyricsElement, "--blyrics-lyric-highlight-fade-in-easing", "ease"),
-      fadeOutEasing: getCSSValue(lyricsElement, "--blyrics-lyric-highlight-fade-out-easing", "ease"),
-      swipeEasing: getCSSValue(lyricsElement, "--blyrics-highlight-swipe-easing", "linear"),
-      swipeStartFrom: getCSSValue(lyricsElement, "--blyrics-highlight-swipe-start-from", "-0.2"),
-      swipeEndFrom: getCSSValue(lyricsElement, "--blyrics-highlight-swipe-end-from", "-0.1"),
-      swipeStartTo: getCSSValue(lyricsElement, "--blyrics-highlight-swipe-start-to", "1.4"),
-      swipeEndTo: getCSSValue(lyricsElement, "--blyrics-highlight-swipe-end-to", "1.5"),
-      glowFrom: resolveGlowFilter(lyricsElement, "from", "0.8rem"),
-      glowTo: resolveGlowFilter(lyricsElement, "to", "0"),
-      glowDurationRatio: getCSSNumber(lyricsElement, "--blyrics-highlight-glow-duration-ratio", 1.2),
-      glowMinDurationMs: getCSSDurationWithFallback(lyricsElement, "--blyrics-highlight-glow-min-duration", "1.2s"),
-      glowEasing: getCSSValue(lyricsElement, "--blyrics-highlight-glow-easing", "ease"),
+      fadeInEasing: getCSSValue(engine, lyricsElement, "--blyrics-lyric-highlight-fade-in-easing", "ease"),
+      fadeOutEasing: getCSSValue(engine, lyricsElement, "--blyrics-lyric-highlight-fade-out-easing", "ease"),
+      swipeEasing: getCSSValue(engine, lyricsElement, "--blyrics-highlight-swipe-easing", "linear"),
+      swipeStartFrom: getCSSValue(engine, lyricsElement, "--blyrics-highlight-swipe-start-from", "-0.2"),
+      swipeEndFrom: getCSSValue(engine, lyricsElement, "--blyrics-highlight-swipe-end-from", "-0.1"),
+      swipeStartTo: getCSSValue(engine, lyricsElement, "--blyrics-highlight-swipe-start-to", "1.4"),
+      swipeEndTo: getCSSValue(engine, lyricsElement, "--blyrics-highlight-swipe-end-to", "1.5"),
+      glowFrom: resolveGlowFilter(engine, lyricsElement, "from", "0.8rem"),
+      glowTo: resolveGlowFilter(engine, lyricsElement, "to", "0"),
+      glowDurationRatio: getCSSNumber(engine, lyricsElement, "--blyrics-highlight-glow-duration-ratio", 1.2),
+      glowMinDurationMs: getCSSDurationWithFallback(
+        engine,
+        lyricsElement,
+        "--blyrics-highlight-glow-min-duration",
+        "1.2s"
+      ),
+      glowEasing: getCSSValue(engine, lyricsElement, "--blyrics-highlight-glow-easing", "ease"),
     },
     word: {
-      wobbleDurationMs: getCSSDurationWithFallback(lyricsElement, "--blyrics-wobble-duration", "1s"),
-      wobbleEasing: getCSSValue(lyricsElement, "--blyrics-word-wobble-easing", "ease"),
-      wobblePeakEasing: getCSSValue(lyricsElement, "--blyrics-word-wobble-peak-easing", "ease-in-out"),
-      wobbleEndEasing: getCSSValue(lyricsElement, "--blyrics-word-wobble-end-easing", "ease-out"),
-      wobbleFrom: getCSSValue(lyricsElement, "--blyrics-word-wobble-transform-from", "scaleX(1)"),
+      wobbleDurationMs: getCSSDurationWithFallback(engine, lyricsElement, "--blyrics-wobble-duration", "1s"),
+      wobbleEasing: getCSSValue(engine, lyricsElement, "--blyrics-word-wobble-easing", "ease"),
+      wobblePeakEasing: getCSSValue(engine, lyricsElement, "--blyrics-word-wobble-peak-easing", "ease-in-out"),
+      wobbleEndEasing: getCSSValue(engine, lyricsElement, "--blyrics-word-wobble-end-easing", "ease-out"),
+      wobbleFrom: getCSSValue(engine, lyricsElement, "--blyrics-word-wobble-transform-from", "scaleX(1)"),
       wobblePeak: getCSSValue(
+        engine,
         lyricsElement,
         "--blyrics-word-wobble-transform-peak",
         "translateX(0.05em) scaleX(1.025)"
       ),
-      wobbleSettle: getCSSValue(lyricsElement, "--blyrics-word-wobble-transform-settle", "translateX(0) scaleX(1)"),
-      wobbleTo: getCSSValue(lyricsElement, "--blyrics-word-wobble-transform-to", "scaleX(1)"),
-      wobblePeakOffset: getCSSOffset(lyricsElement, "--blyrics-word-wobble-peak-offset", 0.125),
-      wobbleSettleOffset: getCSSOffset(lyricsElement, "--blyrics-word-wobble-settle-offset", 0.75),
+      wobbleSettle: getCSSValue(
+        engine,
+        lyricsElement,
+        "--blyrics-word-wobble-transform-settle",
+        "translateX(0) scaleX(1)"
+      ),
+      wobbleTo: getCSSValue(engine, lyricsElement, "--blyrics-word-wobble-transform-to", "scaleX(1)"),
+      wobblePeakOffset: getCSSOffset(engine, lyricsElement, "--blyrics-word-wobble-peak-offset", 0.125),
+      wobbleSettleOffset: getCSSOffset(engine, lyricsElement, "--blyrics-word-wobble-settle-offset", 0.75),
     },
     instrumental: {
       fillFadeDurationMs: getCSSDurationWithFallback(
+        engine,
         lyricsElement,
         "--blyrics-instrumental-fill-fade-duration",
         "150ms"
       ),
-      fillFadeEasing: getCSSValue(lyricsElement, "--blyrics-instrumental-fill-fade-easing", "ease"),
-      fillFrom: getCSSValue(lyricsElement, "--blyrics-instrumental-fill-transform-from", "translateY(78%)"),
-      fillTo: getCSSValue(lyricsElement, "--blyrics-instrumental-fill-transform-to", "translateY(-4%)"),
-      fillEasing: getCSSValue(lyricsElement, "--blyrics-instrumental-fill-easing", "linear"),
-      waveFrom: getCSSValue(lyricsElement, "--blyrics-instrumental-wave-transform-from", "scaleY(1.2)"),
-      waveTo: getCSSValue(lyricsElement, "--blyrics-instrumental-wave-transform-to", "scaleY(0.0001)"),
-      waveEasing: getCSSValue(lyricsElement, "--blyrics-instrumental-wave-easing", "ease-in"),
+      fillFadeEasing: getCSSValue(engine, lyricsElement, "--blyrics-instrumental-fill-fade-easing", "ease"),
+      fillFrom: getCSSValue(engine, lyricsElement, "--blyrics-instrumental-fill-transform-from", "translateY(78%)"),
+      fillTo: getCSSValue(engine, lyricsElement, "--blyrics-instrumental-fill-transform-to", "translateY(-4%)"),
+      fillEasing: getCSSValue(engine, lyricsElement, "--blyrics-instrumental-fill-easing", "linear"),
+      waveFrom: getCSSValue(engine, lyricsElement, "--blyrics-instrumental-wave-transform-from", "scaleY(1.2)"),
+      waveTo: getCSSValue(engine, lyricsElement, "--blyrics-instrumental-wave-transform-to", "scaleY(0.0001)"),
+      waveEasing: getCSSValue(engine, lyricsElement, "--blyrics-instrumental-wave-easing", "ease-in"),
       waveOscillationDurationMs: getCSSDurationWithFallback(
+        engine,
         lyricsElement,
         "--blyrics-instrumental-wave-oscillation-duration",
         "1.25s"
       ),
       waveOscillationEasing: getCSSValue(
+        engine,
         lyricsElement,
         "--blyrics-instrumental-wave-oscillation-easing",
         "ease-in-out"
@@ -1347,43 +1578,45 @@ function readScrollTiming(scrollDurationMs: number): { earlyScrollConsiderS: num
   };
 }
 
-function getAnimationSettings(lyricsElement: HTMLElement): {
-  config: AnimationConfig;
-  scrollTiming: { earlyScrollConsiderS: number; queueScrollMs: number };
-} {
-  if (!cachedAnimationSettings) {
-    const config = readAnimationConfig(lyricsElement);
-    cachedAnimationSettings = {
+function getAnimationSettings(engine: AnimationEngineInstance, lyricsElement: HTMLElement): AnimationSettings {
+  if (!engine.cachedAnimationSettings) {
+    const config = readAnimationConfig(engine, lyricsElement);
+    engine.cachedAnimationSettings = {
       config,
       scrollTiming: readScrollTiming(config.scroll.durationMs),
     };
   }
-  return cachedAnimationSettings;
+  return engine.cachedAnimationSettings;
 }
 
-function clearLineScrollAnimations(): void {
-  const records = lineScrollAnimations;
-  lineScrollAnimations = [];
+function clearLineScrollAnimations(engine: AnimationEngineInstance): void {
+  const records = engine.lineScrollAnimations;
+  engine.lineScrollAnimations = [];
   for (const record of records) {
     record.animation.cancel();
-    clearLineScrollInlineProperties(record.lineElement, record.token);
+    clearLineScrollInlineProperties(engine, record.lineElement, record.token);
   }
 }
 
-function removeLineScrollAnimation(record: LineScrollAnimationRecord): void {
-  const index = lineScrollAnimations.indexOf(record);
+function removeLineScrollAnimation(engine: AnimationEngineInstance, record: LineScrollAnimationRecord): void {
+  const index = engine.lineScrollAnimations.indexOf(record);
   if (index !== -1) {
-    lineScrollAnimations.splice(index, 1);
+    engine.lineScrollAnimations.splice(index, 1);
   }
-  clearLineScrollInlineProperties(record.lineElement, record.token);
+  clearLineScrollInlineProperties(engine, record.lineElement, record.token);
 }
 
-function trackLineScrollAnimation(animation: Animation, lineElement: HTMLElement, token: number): void {
+function trackLineScrollAnimation(
+  engine: AnimationEngineInstance,
+  animation: Animation,
+  lineElement: HTMLElement,
+  token: number
+): void {
   const record: LineScrollAnimationRecord = { animation, lineElement, token };
-  lineScrollAnimations.push(record);
+  engine.lineScrollAnimations.push(record);
 
-  animation.addEventListener("finish", () => removeLineScrollAnimation(record), { once: true });
-  animation.addEventListener("cancel", () => removeLineScrollAnimation(record), { once: true });
+  animation.addEventListener("finish", () => removeLineScrollAnimation(engine, record), { once: true });
+  animation.addEventListener("cancel", () => removeLineScrollAnimation(engine, record), { once: true });
 }
 
 function lineScrollSide(relativeIndex: number, scrollDeltaPx: number): LineScrollSide {
@@ -1448,15 +1681,19 @@ function lineScrollDurationProperty(side: LineScrollSide, fallbackMs: number, us
     : `var(--blyrics-line-scroll-duration, ${fallbackMs}ms)`;
 }
 
-function clearLineScrollInlineProperties(lineElement: HTMLElement, token?: number): void {
-  if (token !== undefined && lineScrollElementTokens.get(lineElement) !== token) {
+function clearLineScrollInlineProperties(
+  engine: AnimationEngineInstance,
+  lineElement: HTMLElement,
+  token?: number
+): void {
+  if (token !== undefined && engine.lineScrollElementTokens.get(lineElement) !== token) {
     return;
   }
 
   for (const property of LINE_SCROLL_INLINE_PROPERTIES) {
     lineElement.style.removeProperty(property);
   }
-  lineScrollElementTokens.delete(lineElement);
+  engine.lineScrollElementTokens.delete(lineElement);
 }
 
 function lineScrollEasingProperty(
@@ -1537,14 +1774,15 @@ function isLineVisibleDuringScroll(
   return lineBottom >= visibleTop && lineTop <= visibleBottom;
 }
 
-function clearVisibleLyricWillChange(): void {
-  for (const element of visibleWillChangeElements) {
+function clearVisibleLyricWillChange(engine: AnimationEngineInstance): void {
+  for (const element of engine.visibleWillChangeElements) {
     element.style.removeProperty("will-change");
   }
-  visibleWillChangeElements = new Set();
+  engine.visibleWillChangeElements = new Set();
 }
 
 function updateVisibleLyricWillChange(
+  engine: AnimationEngineInstance,
   lines: LineScrollItem[],
   fromScrollTop: number,
   toScrollTop: number,
@@ -1559,13 +1797,13 @@ function updateVisibleLyricWillChange(
     }
   }
 
-  for (const element of visibleWillChangeElements) {
+  for (const element of engine.visibleWillChangeElements) {
     if (!nextVisibleElements.has(element)) {
       element.style.removeProperty("will-change");
     }
   }
 
-  visibleWillChangeElements = nextVisibleElements;
+  engine.visibleWillChangeElements = nextVisibleElements;
 }
 
 function getLineScrollItems(lines: LineData[], lyricsElement: HTMLElement): LineScrollItem[] {
@@ -1584,6 +1822,7 @@ function getLineScrollItems(lines: LineData[], lyricsElement: HTMLElement): Line
 }
 
 function prepareLineScrollOffsets(
+  engine: AnimationEngineInstance,
   lines: LineScrollItem[],
   activeLineIndex: number,
   scrollDeltaPx: number,
@@ -1618,8 +1857,8 @@ function prepareLineScrollOffsets(
     lineElement.style.setProperty(LINE_SCROLL_DELTA_PROPERTY, `${scrollDeltaPx}px`);
     lineElement.style.setProperty(LINE_SCROLL_DISTANCE_PROPERTY, `${scrollDistancePx}px`);
     setLineScrollStyleProperties(lineElement);
-    const token = ++lineScrollAnimationToken;
-    lineScrollElementTokens.set(lineElement, token);
+    const token = ++engine.lineScrollAnimationToken;
+    engine.lineScrollElementTokens.set(lineElement, token);
 
     prepared.push({ lineElement, side, token });
   }
@@ -1671,9 +1910,9 @@ function prepareLineScrollOffsets(
   };
 }
 
-function startPreparedLineScroll(plan: LineScrollPlan): void {
+function startPreparedLineScroll(engine: AnimationEngineInstance, plan: LineScrollPlan): void {
   for (const item of plan.items) {
-    if (!item.lineElement.isConnected || lineScrollElementTokens.get(item.lineElement) !== item.token) continue;
+    if (!item.lineElement.isConnected || engine.lineScrollElementTokens.get(item.lineElement) !== item.token) continue;
 
     const animation = item.lineElement.animate(
       [
@@ -1688,32 +1927,42 @@ function startPreparedLineScroll(plan: LineScrollPlan): void {
       }
     );
 
-    trackLineScrollAnimation(animation, item.lineElement, item.token);
+    trackLineScrollAnimation(engine, animation, item.lineElement, item.token);
   }
 }
 
-function discardLineScrollPlan(plan: LineScrollPlan): void {
+function discardLineScrollPlan(engine: AnimationEngineInstance, plan: LineScrollPlan): void {
   for (const item of plan.items) {
-    clearLineScrollInlineProperties(item.lineElement, item.token);
+    clearLineScrollInlineProperties(engine, item.lineElement, item.token);
   }
+}
+
+function dropPendingLineScroll(engine: AnimationEngineInstance): void {
+  if (!engine.pendingLineScroll) return;
+  discardLineScrollPlan(engine, engine.pendingLineScroll.plan);
+  engine.pendingLineScroll = null;
 }
 
 export function cancelPendingLineScroll(): void {
-  if (!pendingLineScroll) return;
-  discardLineScrollPlan(pendingLineScroll.plan);
-  pendingLineScroll = null;
+  dropPendingLineScroll(mainEngine);
 }
 
-function pendingLineScrollMatches(activeLine: LineData, fromScrollTop: number, toScrollTop: number): boolean {
+function pendingLineScrollMatches(
+  engine: AnimationEngineInstance,
+  activeLine: LineData,
+  fromScrollTop: number,
+  toScrollTop: number
+): boolean {
   return !!(
-    pendingLineScroll &&
-    pendingLineScroll.activeLineElement === activeLine.lyricElement &&
-    Math.abs(pendingLineScroll.fromScrollTop - fromScrollTop) <= 2 &&
-    Math.abs(pendingLineScroll.toScrollTop - toScrollTop) <= 2
+    engine.pendingLineScroll &&
+    engine.pendingLineScroll.activeLineElement === activeLine.lyricElement &&
+    Math.abs(engine.pendingLineScroll.fromScrollTop - fromScrollTop) <= 2 &&
+    Math.abs(engine.pendingLineScroll.toScrollTop - toScrollTop) <= 2
   );
 }
 
 function commitOrPrepareLineScroll(
+  engine: AnimationEngineInstance,
   lines: LineScrollItem[],
   activeLine: LineData,
   scrollDeltaPx: number,
@@ -1722,15 +1971,16 @@ function commitOrPrepareLineScroll(
   viewportHeight: number,
   config: AnimationConfig
 ): void {
-  if (pendingLineScrollMatches(activeLine, fromScrollTop, toScrollTop)) {
-    const pending = pendingLineScroll!;
-    pendingLineScroll = null;
-    startPreparedLineScroll(pending.plan);
+  if (pendingLineScrollMatches(engine, activeLine, fromScrollTop, toScrollTop)) {
+    const pending = engine.pendingLineScroll!;
+    engine.pendingLineScroll = null;
+    startPreparedLineScroll(engine, pending.plan);
     return;
   }
 
-  cancelPendingLineScroll();
+  dropPendingLineScroll(engine);
   const plan = prepareLineScrollOffsets(
+    engine,
     lines,
     lines.findIndex(line => line.lyricElement === activeLine.lyricElement),
     scrollDeltaPx,
@@ -1739,10 +1989,11 @@ function commitOrPrepareLineScroll(
     viewportHeight,
     config
   );
-  if (plan) startPreparedLineScroll(plan);
+  if (plan) startPreparedLineScroll(engine, plan);
 }
 
 function prepareUpcomingLineScroll(
+  engine: AnimationEngineInstance,
   lines: LineScrollItem[],
   activeLine: LineData,
   scrollDeltaPx: number,
@@ -1751,11 +2002,12 @@ function prepareUpcomingLineScroll(
   viewportHeight: number,
   config: AnimationConfig
 ): void {
-  if (pendingLineScrollMatches(activeLine, fromScrollTop, toScrollTop)) return;
+  if (pendingLineScrollMatches(engine, activeLine, fromScrollTop, toScrollTop)) return;
 
-  cancelPendingLineScroll();
+  dropPendingLineScroll(engine);
   const activeLineIndex = lines.findIndex(line => line.lyricElement === activeLine.lyricElement);
   const plan = prepareLineScrollOffsets(
+    engine,
     lines,
     activeLineIndex,
     scrollDeltaPx,
@@ -1765,7 +2017,7 @@ function prepareUpcomingLineScroll(
     config
   );
   if (plan) {
-    pendingLineScroll = {
+    engine.pendingLineScroll = {
       plan,
       activeLineElement: activeLine.lyricElement,
       fromScrollTop,
@@ -1776,38 +2028,36 @@ function prepareUpcomingLineScroll(
 
 // -- Skip Scrolls Decay --------------------------
 
-function decaySkipScrolls(now: number): void {
+function decaySkipScrolls(engine: AnimationEngineInstance, now: number): void {
   let j = 0;
-  for (; j < animEngineState.skipScrollsDecayTimes.length; j++) {
-    if (animEngineState.skipScrollsDecayTimes[j] > now) {
+  for (; j < engine.skipScrollsDecayTimes.length; j++) {
+    if (engine.skipScrollsDecayTimes[j] > now) {
       break;
     }
   }
-  animEngineState.skipScrollsDecayTimes = animEngineState.skipScrollsDecayTimes.slice(j);
-  animEngineState.skipScrolls -= j;
-  if (animEngineState.skipScrolls < 1) {
-    animEngineState.skipScrolls = 1;
+  engine.skipScrollsDecayTimes = engine.skipScrollsDecayTimes.slice(j);
+  engine.skipScrolls -= j;
+  if (engine.skipScrolls < 1) {
+    engine.skipScrolls = 1;
   }
 }
 
 // -- Passive Scroll Engine --------------------------
 
-let passiveRAFId: number | null = null;
-
-function stopPassiveScrollLoop(): void {
-  if (passiveRAFId !== null) {
-    cancelAnimationFrame(passiveRAFId);
-    passiveRAFId = null;
+function stopPassiveScrollLoop(engine: AnimationEngineInstance): void {
+  if (engine.passiveRAFId !== null) {
+    cancelAnimationFrame(engine.passiveRAFId);
+    engine.passiveRAFId = null;
   }
 }
 
-function startPassiveScrollLoop(): void {
-  if (passiveRAFId !== null) return;
-  passiveRAFId = requestAnimationFrame(passiveScrollRAFLoop);
+function startPassiveScrollLoop(engine: AnimationEngineInstance): void {
+  if (engine.passiveRAFId !== null) return;
+  engine.passiveRAFId = requestAnimationFrame(() => passiveScrollRAFLoop(engine));
 }
 
-function passiveScrollRAFLoop(): void {
-  passiveRAFId = null;
+function passiveScrollRAFLoop(engine: AnimationEngineInstance): void {
+  engine.passiveRAFId = null;
   if (
     !AppState.isPassiveScrollEnabled ||
     !PASSIVE_SCROLL_ENABLED.getBooleanValue() ||
@@ -1815,11 +2065,11 @@ function passiveScrollRAFLoop(): void {
   )
     return;
 
-  passiveScrollEngine(animEngineState.lastPlayState);
-  passiveRAFId = requestAnimationFrame(passiveScrollRAFLoop);
+  passiveScrollEngine(engine, playbackClock.lastPlayState);
+  engine.passiveRAFId = requestAnimationFrame(() => passiveScrollRAFLoop(engine));
 }
 
-function passiveScrollEngine(isPlaying: boolean): void {
+function passiveScrollEngine(engine: AnimationEngineInstance, isPlaying: boolean): void {
   const lyricData = AppState.lyricData;
   if (!lyricData) return;
 
@@ -1834,21 +2084,21 @@ function passiveScrollEngine(isPlaying: boolean): void {
   const now = Date.now();
 
   // -- Accumulate play time --------------------------
-  if (animEngineState.passiveLastWallTime > 0 && isPlaying) {
-    const wallDelta = (now - animEngineState.passiveLastWallTime) / 1000;
-    animEngineState.passiveScrollAccumulatedTime += Math.min(wallDelta, 0.5);
+  if (engine.passiveLastWallTime > 0 && isPlaying) {
+    const wallDelta = (now - engine.passiveLastWallTime) / 1000;
+    engine.passiveScrollAccumulatedTime += Math.min(wallDelta, 0.5);
   }
-  animEngineState.passiveLastWallTime = now;
+  engine.passiveLastWallTime = now;
 
   // -- User scroll interruption --------------------------
-  if (animEngineState.scrollResumeTime > now) {
+  if (engine.scrollResumeTime > now) {
     return;
   }
 
-  if (animEngineState.wasUserScrolling) {
-    getResumeScrollElement().setAttribute("autoscroll-hidden", "true");
+  if (engine.wasUserScrolling) {
+    resumeScrollElement(engine).setAttribute("autoscroll-hidden", "true");
     lyricData.lyricsContainer.classList.remove(USER_SCROLLING_CLASS);
-    animEngineState.wasUserScrolling = false;
+    engine.wasUserScrolling = false;
 
     // Re-sync accumulated time to current scroll position so scroll continues from where user left off
     const maxScroll = tabRenderer.scrollHeight - tabRenderer.clientHeight;
@@ -1856,7 +2106,7 @@ function passiveScrollEngine(isPlaying: boolean): void {
       const ratio = tabRenderer.scrollTop / maxScroll;
       const numLines = lyricData.lines.length;
       const scrollDuration = numLines * PASSIVE_SECONDS_PER_LINE.getNumberValue();
-      animEngineState.passiveScrollAccumulatedTime = ratio * scrollDuration;
+      engine.passiveScrollAccumulatedTime = ratio * scrollDuration;
     }
   }
 
@@ -1873,7 +2123,7 @@ function passiveScrollEngine(isPlaying: boolean): void {
   const maxScroll = tabRenderer.scrollHeight - tabRenderer.clientHeight;
   if (maxScroll <= 0) return;
 
-  const cycleTime = animEngineState.passiveScrollAccumulatedTime % cycleLength;
+  const cycleTime = engine.passiveScrollAccumulatedTime % cycleLength;
 
   let targetScroll: number;
   if (cycleTime < scrollDuration) {
@@ -1898,7 +2148,7 @@ function passiveScrollEngine(isPlaying: boolean): void {
   // When it doesn't change (pause phases, sub-pixel rounding), no programmatic
   // scroll event fires, so setting skipScrolls would eat user scroll events instead.
   if (tabRenderer.scrollTop !== prevScrollTop) {
-    animEngineState.skipScrolls = 1;
+    engine.skipScrolls = 1;
   }
 }
 
@@ -1906,32 +2156,30 @@ function passiveScrollEngine(isPlaying: boolean): void {
  * Sets up a ResizeObserver on the tab renderer to cache its height.
  * Avoids calling getBoundingClientRect() every tick which causes layout thrashing.
  */
-function setupTabRendererObserver(element: HTMLElement) {
-  if (tabRendererResizeObserver) {
-    tabRendererResizeObserver.disconnect();
+function setupTabRendererObserver(engine: AnimationEngineInstance, element: HTMLElement) {
+  if (engine.tabRendererResizeObserver) {
+    engine.tabRendererResizeObserver.disconnect();
   }
 
-  tabRendererResizeObserver = new ResizeObserver(() => {
-    cancelPendingLineScroll();
+  engine.tabRendererResizeObserver = new ResizeObserver(() => {
+    dropPendingLineScroll(engine);
     if (element && element.isConnected) {
-      cachedTabRendererHeight = element.getBoundingClientRect().height;
+      engine.cachedTabRendererHeight = element.getBoundingClientRect().height;
     }
   });
 
-  tabRendererResizeObserver.observe(element);
-  observedTabRenderer = element;
-  cachedTabRendererHeight = element.getBoundingClientRect().height;
+  engine.tabRendererResizeObserver.observe(element);
+  engine.observedTabRenderer = element;
+  engine.cachedTabRendererHeight = element.getBoundingClientRect().height;
 }
 
-/**
- * Main lyrics synchronization function that handles timing, highlighting, and scrolling.
- *
- * @param currentTime - Current playback time in seconds
- * @param eventCreationTime - Timestamp when the event was created (ms)
- * @param [isPlaying=true] - Whether audio is currently playing
- * @param [smoothScroll=true] - Whether to use smooth scrolling
- */
-export function animationEngine(currentTime: number, eventCreationTime: number, isPlaying = true, smoothScroll = true) {
+function runAnimationEngine(
+  engine: AnimationEngineInstance,
+  currentTime: number,
+  eventCreationTime: number,
+  isPlaying = true,
+  smoothScroll = true
+) {
   const now = Date.now();
   // const frameStart = performance.now();
   if (!AppState.areLyricsTicking || (currentTime === 0 && !isPlaying)) {
@@ -1939,25 +2187,24 @@ export function animationEngine(currentTime: number, eventCreationTime: number, 
   }
 
   if (AppState.lyricData?.syncType === "none") {
-    if (!animEngineState.lastPlayState && isPlaying) {
-      animEngineState.scrollResumeTime = 0;
+    if (!playbackClock.lastPlayState && isPlaying) {
+      engine.scrollResumeTime = 0;
     }
-    animEngineState.lastPlayState = isPlaying;
+    playbackClock.lastPlayState = isPlaying;
     if (!AppState.isPassiveScrollEnabled) return;
-    startPassiveScrollLoop();
+    startPassiveScrollLoop(engine);
     return;
   }
 
   const timeJumped =
-    Math.abs(
-      currentTime - animEngineState.lastTime - (eventCreationTime - animEngineState.lastEventCreationTime) / 1000
-    ) > TIME_JUMP_THRESHOLD;
+    Math.abs(currentTime - playbackClock.lastTime - (eventCreationTime - playbackClock.lastEventCreationTime) / 1000) >
+    TIME_JUMP_THRESHOLD;
 
-  if (timeJumped) cancelPendingLineScroll();
+  if (timeJumped) dropPendingLineScroll(engine);
 
-  animEngineState.lastTime = currentTime;
-  animEngineState.lastPlayState = isPlaying;
-  animEngineState.lastEventCreationTime = eventCreationTime;
+  playbackClock.lastTime = currentTime;
+  playbackClock.lastPlayState = isPlaying;
+  playbackClock.lastEventCreationTime = eventCreationTime;
 
   let timeOffset = now - eventCreationTime;
   if (!isPlaying || eventCreationTime === -1) {
@@ -1984,7 +2231,7 @@ export function animationEngine(currentTime: number, eventCreationTime: number, 
   const isMainLyricsVisible = tabSelector?.getAttribute("aria-selected") === "true" && isPlayerOpen;
   // Don't tick lyrics if they're not visible anywhere
   if (!isMainLyricsVisible && !AppState.isPictureInPictureOpen) {
-    clearVisibleLyricWillChange();
+    clearVisibleLyricWillChange(engine);
     return;
   }
 
@@ -2007,36 +2254,43 @@ export function animationEngine(currentTime: number, eventCreationTime: number, 
     const lines = AppState.lyricData!.lines;
 
     if (lyricData.syncType === "richsync") {
-      currentTime += getCSSDurationInMs(lyricsElement, "--blyrics-richsync-timing-offset") / 1000;
+      currentTime += getCSSDurationInMs(engine, lyricsElement, "--blyrics-richsync-timing-offset") / 1000;
       currentTime -= AppState.richsyncOffsetTrim;
     } else {
-      currentTime += getCSSDurationInMs(lyricsElement, "--blyrics-timing-offset") / 1000;
+      currentTime += getCSSDurationInMs(engine, lyricsElement, "--blyrics-timing-offset") / 1000;
       currentTime -= AppState.lineOffsetTrim;
     }
 
     currentTime -= AppState.globalLyricOffset + AppState.lyricOffset;
 
     const lyricScrollTime =
-      correctedScrollTimeS(currentTime) + getCSSDurationInMs(lyricsElement, "--blyrics-scroll-timing-offset") / 1000;
-    const { config: animationConfig, scrollTiming } = getAnimationSettings(lyricsElement);
+      correctedScrollTimeS(engine, currentTime) +
+      getCSSDurationInMs(engine, lyricsElement, "--blyrics-scroll-timing-offset") / 1000;
+    const { config: animationConfig, scrollTiming } = getAnimationSettings(engine, lyricsElement);
 
     // Read layout values before the loop writes class changes, to avoid forced reflow
     const tabRenderer = document.querySelector(TAB_RENDERER_SELECTOR) as HTMLElement | null;
     if (!tabRenderer) {
-      clearVisibleLyricWillChange();
+      clearVisibleLyricWillChange(engine);
       return;
     }
-    if (tabRenderer !== observedTabRenderer) {
-      setupTabRendererObserver(tabRenderer);
+    if (tabRenderer !== engine.observedTabRenderer) {
+      setupTabRendererObserver(engine, tabRenderer);
     }
-    const tabRendererHeight = cachedTabRendererHeight ?? tabRenderer.getBoundingClientRect().height;
+    const tabRendererHeight = engine.cachedTabRendererHeight ?? tabRenderer.getBoundingClientRect().height;
     let scrollTop = tabRenderer.scrollTop;
     if (isMainLyricsVisible && animationConfig.enabled.scroll) {
-      updateVisibleLyricWillChange(lines, scrollTop, pendingLineScroll?.toScrollTop ?? scrollTop, tabRendererHeight);
+      updateVisibleLyricWillChange(
+        engine,
+        lines,
+        scrollTop,
+        engine.pendingLineScroll?.toScrollTop ?? scrollTop,
+        tabRendererHeight
+      );
     } else {
-      cancelPendingLineScroll();
-      clearVisibleLyricWillChange();
-      clearLineScrollAnimations();
+      dropPendingLineScroll(engine);
+      clearVisibleLyricWillChange(engine);
+      clearLineScrollAnimations(engine);
     }
 
     let activeElems = [] as LineData[];
@@ -2056,15 +2310,15 @@ export function animationEngine(currentTime: number, eventCreationTime: number, 
         (lyricScrollTime < nextTime || lyricScrollTime < time + lineData.duration)
       ) {
         activeElems.push(lineData);
-        if (!animEngineState.lastActiveElements.includes(lineData) && lyricScrollTime >= time) {
+        if (!engine.lastActiveElements.includes(lineData) && lyricScrollTime >= time) {
           newLyricSelected = true;
         }
 
         // const timeDelta = lyricScrollTime - time;
-        // if (animEngineState.selectedElementIndex !== index && timeDelta > 0.05 && index > 0) {
+        // if (engine.selectedElementIndex !== index && timeDelta > 0.05 && index > 0) {
         //   Utils.log(`[BetterLyrics] Scrolling to new lyric was late, dt: ${timeDelta.toFixed(5)}s`);
         // }
-        animEngineState.selectedElementIndex = index;
+        engine.selectedElementIndex = index;
         if (!lineData.isScrolled) {
           lineData.lyricElement.classList.add(CURRENT_LYRICS_CLASS);
           lineData.isScrolled = true;
@@ -2103,11 +2357,12 @@ export function animationEngine(currentTime: number, eventCreationTime: number, 
         lineData.accumulatedOffsetMs = lineData.accumulatedOffsetMs / ANIMATION_TIMING_ACCUMULATION_DECAY;
         if (nativeTimingSample !== null && canUseTimingSampleForDrift(nativeTimingSample, isPlaying)) {
           usedNativeTimingSampleForDrift = true;
-          const learnedOffsetMs = learnAnimationTimingOffset(nativeTimingSample);
+          const learnedOffsetMs = learnAnimationTimingOffset(engine, nativeTimingSample);
           const residualOffsetMs = nativeTimingSample.offsetMs;
           lineData.accumulatedOffsetMs += residualOffsetMs * ANIMATION_TIMING_ACCUMULATION_WEIGHT;
-          if (shouldLogAnimationTiming(lineData, nativeTimingSample, now)) {
+          if (shouldLogAnimationTiming(engine, lineData, nativeTimingSample, now)) {
             logAnimationTiming(
+              engine,
               "sample",
               lineData,
               index,
@@ -2118,8 +2373,9 @@ export function animationEngine(currentTime: number, eventCreationTime: number, 
               residualOffsetMs
             );
           }
-        } else if (nativeTimingSample !== null && shouldLogAnimationTiming(lineData, nativeTimingSample, now)) {
+        } else if (nativeTimingSample !== null && shouldLogAnimationTiming(engine, lineData, nativeTimingSample, now)) {
           logAnimationTiming(
+            engine,
             "ignored-sample",
             lineData,
             index,
@@ -2136,6 +2392,7 @@ export function animationEngine(currentTime: number, eventCreationTime: number, 
         ) {
           if (nativeTimingSample !== null) {
             logAnimationTiming(
+              engine,
               "drift-reset",
               lineData,
               index,
@@ -2159,7 +2416,7 @@ export function animationEngine(currentTime: number, eventCreationTime: number, 
               logAnimationCleanup("selected-stale-reset", lineData, index, currentTime, staleAnimationEndTime);
               resetLineAnimationState(lineData);
             } else {
-              startLineExitAnimations(lineData, animationConfig, currentTime);
+              startLineExitAnimations(engine, lineData, animationConfig, currentTime);
               markLineAnimationsStopped(lineData);
             }
           } else {
@@ -2184,7 +2441,7 @@ export function animationEngine(currentTime: number, eventCreationTime: number, 
 
     if (linesToAnimate.length > 0) {
       for (const lineData of linesToAnimate) {
-        startLineAnimations(lineData, animationConfig, currentTime);
+        startLineAnimations(engine, lineData, animationConfig, currentTime);
         lineData.isAnimating = true;
         lineData.lastAnimSetupAt = now;
         lineData.isAnimationPlayStatePlaying = isPlaying;
@@ -2193,12 +2450,12 @@ export function animationEngine(currentTime: number, eventCreationTime: number, 
       }
     }
 
-    if (isMainLyricsVisible && (animEngineState.scrollResumeTime < Date.now() || animEngineState.scrollPos === -1)) {
+    if (isMainLyricsVisible && (engine.scrollResumeTime < Date.now() || engine.scrollPos === -1)) {
       if (activeElems.length == 0) {
         activeElems.push(lyricData.lines[0]);
       }
 
-      animEngineState.lastActiveElements = activeElems.filter(
+      engine.lastActiveElements = activeElems.filter(
         elm => lyricScrollTime >= elm.time // remove elements that haven't reached their scroll time yet.
       );
 
@@ -2321,9 +2578,9 @@ export function animationEngine(currentTime: number, eventCreationTime: number, 
           debugLyrics(
             160,
             "last scroll",
-            animEngineState.lastScrollDebugContext.activeElms,
-            animEngineState.lastScrollDebugContext.centers,
-            animEngineState.lastScrollDebugContext.lyricScrollTime
+            engine.lastScrollDebugContext.activeElms,
+            engine.lastScrollDebugContext.centers,
+            engine.lastScrollDebugContext.lyricScrollTime
           );
         }
       }
@@ -2333,14 +2590,15 @@ export function animationEngine(currentTime: number, eventCreationTime: number, 
         smoothScroll &&
         animationConfig.enabled.scroll &&
         !newLyricSelected &&
-        !animEngineState.wasUserScrolling &&
+        !engine.wasUserScrolling &&
         timeUntilUpcomingScrollMs > 0 &&
         timeUntilUpcomingScrollMs <= SCROLL_PREPARE_LEAD_MS &&
-        Date.now() > animEngineState.nextScrollAllowedTime &&
+        Date.now() > engine.nextScrollAllowedTime &&
         Math.abs(scrollTop - scrollPos) > 2
       ) {
-        updateVisibleLyricWillChange(lines, scrollTop, scrollPos, tabRendererHeight);
+        updateVisibleLyricWillChange(engine, lines, scrollTop, scrollPos, tabRendererHeight);
         prepareUpcomingLineScroll(
+          engine,
           getLineScrollItems(lines, lyricsElement),
           lastActiveLyric,
           scrollPos - scrollTop,
@@ -2351,19 +2609,20 @@ export function animationEngine(currentTime: number, eventCreationTime: number, 
         );
       }
 
-      if (animEngineState.wasUserScrolling || newLyricSelected || animEngineState.queuedScroll) {
-        if (Date.now() > animEngineState.nextScrollAllowedTime) {
-          animEngineState.queuedScroll = false;
-          animEngineState.lastScrollDebugContext.lyricScrollTime = lyricScrollTime;
-          animEngineState.lastScrollDebugContext.centers = lyricPositions;
-          animEngineState.lastScrollDebugContext.activeElms = activeElems;
+      if (engine.wasUserScrolling || newLyricSelected || engine.queuedScroll) {
+        if (Date.now() > engine.nextScrollAllowedTime) {
+          engine.queuedScroll = false;
+          engine.lastScrollDebugContext.lyricScrollTime = lyricScrollTime;
+          engine.lastScrollDebugContext.centers = lyricPositions;
+          engine.lastScrollDebugContext.activeElms = activeElems;
 
           if (smoothScroll && Math.abs(scrollTop - scrollPos) > 2) {
             const scrollDeltaPx = scrollPos - scrollTop;
             if (animationConfig.enabled.scroll) {
-              updateVisibleLyricWillChange(lines, scrollTop, scrollPos, tabRendererHeight);
+              updateVisibleLyricWillChange(engine, lines, scrollTop, scrollPos, tabRendererHeight);
               const lineScrollItems = getLineScrollItems(lines, lyricsElement);
               commitOrPrepareLineScroll(
+                engine,
                 lineScrollItems,
                 lastActiveLyric,
                 scrollDeltaPx,
@@ -2372,31 +2631,31 @@ export function animationEngine(currentTime: number, eventCreationTime: number, 
                 tabRendererHeight,
                 animationConfig
               );
-              animEngineState.nextScrollAllowedTime = animationConfig.scroll.durationMs + Date.now() + 20;
+              engine.nextScrollAllowedTime = animationConfig.scroll.durationMs + Date.now() + 20;
             }
           } else {
-            cancelPendingLineScroll();
+            dropPendingLineScroll(engine);
           }
 
           scrollTop = scrollPos;
-          animEngineState.scrollPos = scrollTop;
+          engine.scrollPos = scrollTop;
           tabRenderer.scrollTop = scrollTop;
-          animEngineState.skipScrolls += 1;
-          animEngineState.skipScrollsDecayTimes.push(Date.now() + 2000);
-        } else if (animEngineState.nextScrollAllowedTime - Date.now() < scrollTiming.queueScrollMs || timeJumped) {
+          engine.skipScrolls += 1;
+          engine.skipScrollsDecayTimes.push(Date.now() + 2000);
+        } else if (engine.nextScrollAllowedTime - Date.now() < scrollTiming.queueScrollMs || timeJumped) {
           // just missed out on being able to scroll, queue this once we finish our current lyric
-          animEngineState.queuedScroll = true;
+          engine.queuedScroll = true;
         }
       }
     }
 
-    if (isMainLyricsVisible && animEngineState.wasUserScrolling && animEngineState.scrollResumeTime < Date.now()) {
-      getResumeScrollElement().setAttribute("autoscroll-hidden", "true");
+    if (isMainLyricsVisible && engine.wasUserScrolling && engine.scrollResumeTime < Date.now()) {
+      resumeScrollElement(engine).setAttribute("autoscroll-hidden", "true");
       lyricsElement.classList.remove(USER_SCROLLING_CLASS);
-      animEngineState.wasUserScrolling = false;
+      engine.wasUserScrolling = false;
     }
 
-    decaySkipScrolls(now);
+    decaySkipScrolls(engine, now);
     // const frameTime = performance.now() - frameStart;
     // if (frameTime > 5) {
     //   console.warn("[BLyrics-diag] SLOW FRAME", { ms: frameTime.toFixed(1) });
@@ -2408,9 +2667,19 @@ export function animationEngine(currentTime: number, eventCreationTime: number, 
   }
 }
 
-// -- Debounced Lyrics Update --------------------------
+/**
+ * Main lyrics synchronization function that handles timing, highlighting, and scrolling.
+ *
+ * @param currentTime - Current playback time in seconds
+ * @param eventCreationTime - Timestamp when the event was created (ms)
+ * @param [isPlaying=true] - Whether audio is currently playing
+ * @param [smoothScroll=true] - Whether to use smooth scrolling
+ */
+export function animationEngine(currentTime: number, eventCreationTime: number, isPlaying = true, smoothScroll = true) {
+  runAnimationEngine(mainEngine, currentTime, eventCreationTime, isPlaying, smoothScroll);
+}
 
-let pendingLyricsUpdate = false;
+// -- Debounced Lyrics Update --------------------------
 
 /**
  * Called when a new lyrics element is added to trigger re-sync.
@@ -2418,22 +2687,27 @@ let pendingLyricsUpdate = false;
  * when translations/romanizations load (each addition would otherwise
  * trigger calculateLyricPositions on ALL lines).
  */
-export function lyricsElementAdded(): void {
-  if (!AppState.areLyricsTicking || pendingLyricsUpdate) {
+function scheduleLyricPositionUpdate(engine: AnimationEngineInstance): void {
+  if (!AppState.areLyricsTicking || engine.pendingLyricsUpdate) {
     return;
   }
-  pendingLyricsUpdate = true;
-  cancelPendingLineScroll();
+  engine.pendingLyricsUpdate = true;
+  dropPendingLineScroll(engine);
   requestAnimationFrame(() => {
-    pendingLyricsUpdate = false;
+    engine.pendingLyricsUpdate = false;
     calculateLyricPositions();
-    animationEngine(
-      animEngineState.lastTime,
-      animEngineState.lastEventCreationTime,
-      animEngineState.lastPlayState,
+    runAnimationEngine(
+      engine,
+      playbackClock.lastTime,
+      playbackClock.lastEventCreationTime,
+      playbackClock.lastPlayState,
       false
     );
   });
+}
+
+export function lyricsElementAdded(): void {
+  scheduleLyricPositionUpdate(mainEngine);
 }
 
 /**
@@ -2441,7 +2715,7 @@ export function lyricsElementAdded(): void {
  *
  * @returns The resume scroll button element
  */
-export function getResumeScrollElement(): HTMLElement {
+function resumeScrollElement(engine: AnimationEngineInstance): HTMLElement {
   let elem = document.getElementById("autoscroll-resume-button");
   if (!elem) {
     const wrapper = document.createElement("div");
@@ -2453,7 +2727,7 @@ export function getResumeScrollElement(): HTMLElement {
     elem.classList.add("autoscroll-resume-button");
     elem.setAttribute("autoscroll-hidden", "true");
     elem.addEventListener("click", () => {
-      animEngineState.scrollResumeTime = 0;
+      engine.scrollResumeTime = 0;
       elem!.setAttribute("autoscroll-hidden", "true");
     });
 
@@ -2461,6 +2735,10 @@ export function getResumeScrollElement(): HTMLElement {
     wrapper.appendChild(elem);
   }
   return elem as HTMLElement;
+}
+
+export function getResumeScrollElement(): HTMLElement {
+  return resumeScrollElement(mainEngine);
 }
 
 /**
