@@ -223,10 +223,13 @@ export function processLyrics(data: LyricSourceResultWithMeta, keepLoaderVisible
     ytMusicLyrics.classList.add("blyrics-hidden");
   }
 
-  try {
-    const lyricsElement = document.getElementsByClassName(LYRICS_CLASS)[0] as HTMLElement;
-    lyricsElement.replaceChildren();
-  } catch (_err) {
+  // The previous song's container, not the one this injection builds: injectLyrics creates that
+  // one later. cleanup() drops both this reference and the element together, so a null here means
+  // there is nothing on screen to clear.
+  const previousContainer = AppState.lyricData?.lyricsContainer;
+  if (previousContainer) {
+    previousContainer.replaceChildren();
+  } else {
     log(LYRICS_TAB_NOT_DISABLED_LOG);
   }
 
@@ -907,9 +910,8 @@ function injectTranslation(lyricElement: HTMLElement, text: string) {
 export function calculateLyricPositions() {
   setExtraHeight();
   if (AppState.lyricData && AppState.areLyricsTicking) {
-    const lyricsElement = document.getElementsByClassName(LYRICS_CLASS)[0] as HTMLElement;
-
     const data = AppState.lyricData;
+    const lyricsElement = data.lyricsContainer;
     data.lyricWidth = lyricsElement.clientWidth;
 
     data.lines.forEach(line => {
