@@ -24,17 +24,8 @@ import {
   translateBatch,
 } from "@modules/lyrics/translation";
 import { animEngineState } from "@modules/ui/animationEngine";
-import { resizeCanvas } from "@modules/ui/animationEngineDebug";
-import {
-  addFooter,
-  addNoLyricsButton,
-  cleanup,
-  createLyricsWrapper,
-  flushLoader,
-  renderLoader,
-  setExtraHeight,
-} from "@modules/ui/dom";
-import { lyricsElementAdded } from "@modules/ui/mainLyricsView";
+import { addFooter, addNoLyricsButton, cleanup, createLyricsWrapper, flushLoader, renderLoader } from "@modules/ui/dom";
+import { calculateLyricPositions, lyricsElementAdded } from "@modules/ui/mainLyricsView";
 import { disableNativeLyricsFocus } from "@modules/ui/nativeLyricsFocus";
 import {
   addSeekHandler,
@@ -54,7 +45,7 @@ import {
   type LineData,
   newLineData,
 } from "@renderer/index";
-import { getRelativeLayoutBounds, langCodesMatch, languageMatchesAny, log } from "@utils";
+import { langCodesMatch, languageMatchesAny, log } from "@utils";
 
 export type { LineData };
 
@@ -467,23 +458,6 @@ async function processBatchTranslationsAndRomanizations(
   }
 
   await Promise.all(promises);
-}
-
-export function calculateLyricPositions() {
-  setExtraHeight();
-  if (AppState.lyricData && AppState.areLyricsTicking) {
-    const lyricsElement = animEngineState.lyricsContainer;
-    if (!lyricsElement) return;
-    animEngineState.lyricWidth = lyricsElement.clientWidth;
-
-    animEngineState.lines.forEach(line => {
-      let bounds = getRelativeLayoutBounds(lyricsElement, line.lyricElement);
-      line.position = bounds.y;
-      line.height = bounds.height;
-    });
-    animEngineState.wasUserScrolling = true; // trigger rescrolls
-    resizeCanvas();
-  }
 }
 
 /**

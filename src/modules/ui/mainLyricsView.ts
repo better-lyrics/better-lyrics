@@ -1,5 +1,5 @@
 import { AppState } from "@core/appState";
-import { animEngineState, scheduleMainLyricPositionUpdate } from "@modules/ui/animationEngine";
+import { animEngineState, relayoutMainLyrics, scheduleMainLyricPositionUpdate } from "@modules/ui/animationEngine";
 import type { TickOptions } from "@renderer/index";
 
 // -- Tick options --------------------------
@@ -23,6 +23,15 @@ export function currentTickOptions(eventCreationTime: number, isPlaying: boolean
 }
 
 // -- Re-sync on layout change --------------------------
+
+/**
+ * Re-reads the main view's layout after the stylesheet or the lyrics DOM changed. The padding is
+ * always worth rewriting; the line positions are only measurable while the side panel is rendering
+ * them, which is what the ticking flags stand in for.
+ */
+export function calculateLyricPositions(): void {
+  relayoutMainLyrics(AppState.lyricData !== null && AppState.areLyricsTicking);
+}
 
 /**
  * Re-measures the lines and re-ticks after something was added to the lyrics DOM.

@@ -1,9 +1,5 @@
 import { getStorage } from "./storage";
 
-// The renderer owns its own layout maths. Re-exported here so existing importers keep reaching it
-// through @utils.
-export { getRelativeLayoutBounds } from "@renderer/util";
-
 /**
  * Conditionally logs messages based on the isLogsEnabled setting.
  */

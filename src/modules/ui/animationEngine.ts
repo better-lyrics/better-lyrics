@@ -1,9 +1,9 @@
-import { calculateLyricPositions } from "@modules/lyrics/injectLyrics";
 import { ytmHost } from "@modules/ui/lyricsHost";
 import {
   ANIMATING_CLASS,
   CURRENT_LYRICS_CLASS,
   FOOTER_CLASS,
+  LINE_CLASS,
   PAUSED_CLASS,
   USER_SCROLLING_CLASS,
 } from "@renderer/constants";
@@ -83,7 +83,7 @@ const LINE_SCROLL_STYLE_SETTINGS = [
 const animationTimingLastLogTimes = new WeakMap<LineData, number>();
 
 // 0.5 means the selected lyric will be in the middle of the screen, 0 means top, 1 means bottom
-export const SCROLL_POS_OFFSET_RATIO = registerThemeSetting("blyrics-target-scroll-pos-ratio", 0.37);
+const SCROLL_POS_OFFSET_RATIO = registerThemeSetting("blyrics-target-scroll-pos-ratio", 0.37);
 
 const PASSIVE_SCROLL_ENABLED = registerThemeSetting("blyrics-passive-scroll-enabled", true);
 const PASSIVE_SECONDS_PER_LINE = registerThemeSetting("blyrics-passive-scroll-seconds-per-line", 3.5);
@@ -2756,6 +2756,74 @@ export function animationEngine(currentTime: number, options: TickOptions): Anim
   return runAnimationEngine(mainEngine, currentTime, options);
 }
 
+// -- Layout --------------------------
+
+/**
+ * Sizes the padding above the first line and below the last one so either can sit at the view's
+ * target scroll position.
+ */
+function applyScrollPadding(engine: AnimationEngineInstance): void {
+  const lyricsElement = engine.lyricsContainer;
+  const tabRenderer = engine.host.getScrollElement();
+  if (!lyricsElement || !tabRenderer) return;
+
+  const tabRendererHeight = tabRenderer.getBoundingClientRect().height;
+  const scrollPosOffsetRatio = SCROLL_POS_OFFSET_RATIO.getNumberValue();
+  const currentPaddingBottom = Number.parseFloat(engine.window.getComputedStyle(lyricsElement).paddingBottom) || 0;
+  const lyricsHeightWithoutBottomPadding = Math.max(0, lyricsElement.scrollHeight - currentPaddingBottom);
+
+  const lyricLines = lyricsElement.querySelectorAll<HTMLElement>(`:scope > .${LINE_CLASS}`);
+  const firstLyric = lyricLines[0] ?? null;
+  const lastLyric = lyricLines[lyricLines.length - 1] ?? null;
+  const firstLyricHeight = firstLyric ? getRelativeLayoutBounds(lyricsElement, firstLyric).height : 0;
+  const lastLyricBounds = lastLyric ? getRelativeLayoutBounds(lyricsElement, lastLyric) : null;
+
+  const paddingTop = Math.max(0, tabRendererHeight * scrollPosOffsetRatio - firstLyricHeight / 2);
+
+  engine.document.documentElement.style.setProperty("--blyrics-padding-top", paddingTop + "px");
+
+  const lastLyricTargetContentHeight = lastLyricBounds
+    ? lastLyricBounds.y + lastLyricBounds.height / 2 + tabRendererHeight * (1 - scrollPosOffsetRatio)
+    : tabRendererHeight;
+
+  const extraHeight = Math.max(
+    lastLyricTargetContentHeight - lyricsHeightWithoutBottomPadding,
+    tabRendererHeight - lyricsHeightWithoutBottomPadding,
+    0
+  );
+
+  engine.document.documentElement.style.setProperty("--blyrics-padding-bottom", Math.ceil(extraHeight) + "px");
+}
+
+/**
+ * Re-reads the view's layout: the scroll padding first, then the line positions the padding moved.
+ *
+ * @param measureLines - Pass false while the lines are not being rendered. An unrendered container
+ *   measures every line as zero height at zero offset, which would leave the scroll maths with
+ *   nothing to work from once rendering resumes.
+ */
+function relayout(engine: AnimationEngineInstance, measureLines: boolean): void {
+  applyScrollPadding(engine);
+  if (!measureLines) return;
+
+  const lyricsElement = engine.lyricsContainer;
+  if (!lyricsElement) return;
+  engine.lyricWidth = lyricsElement.clientWidth;
+
+  for (const line of engine.lines) {
+    const bounds = getRelativeLayoutBounds(lyricsElement, line.lyricElement);
+    line.position = bounds.y;
+    line.height = bounds.height;
+  }
+
+  engine.wasUserScrolling = true; // trigger rescrolls
+  engine.host.debug?.resize();
+}
+
+export function relayoutMainLyrics(measureLines: boolean): void {
+  relayout(mainEngine, measureLines);
+}
+
 // -- Debounced Lyrics Update --------------------------
 
 function cancelLyricPositionUpdate(engine: AnimationEngineInstance): void {
@@ -2768,10 +2836,11 @@ function cancelLyricPositionUpdate(engine: AnimationEngineInstance): void {
  * Called when a new lyrics element is added to trigger re-sync.
  * Debounced via requestAnimationFrame to avoid O(n²) layout thrashing
  * when translations/romanizations load (each addition would otherwise
- * trigger calculateLyricPositions on ALL lines).
+ * re-measure ALL lines).
  *
  * @param buildTickOptions - Resolved on the frame rather than now, so the re-tick reads the clock
- *   and settings of the moment it runs. Returning null declines the frame.
+ *   and settings of the moment it runs. Returning null declines the frame, and with it the
+ *   re-measurement: a driver that has stopped ticking is one whose lines may no longer be rendered.
  */
 function scheduleLyricPositionUpdate(
   engine: AnimationEngineInstance,
@@ -2784,8 +2853,8 @@ function scheduleLyricPositionUpdate(
   dropPendingLineScroll(engine);
   engine.pendingLyricsUpdateFrame = engine.window.requestAnimationFrame(() => {
     engine.pendingLyricsUpdateFrame = null;
-    calculateLyricPositions();
     const options = buildTickOptions();
+    relayout(engine, options !== null);
     if (!options) return;
     reportTickStatus(runAnimationEngine(engine, playbackClock.lastTime, options));
   });
