@@ -24,11 +24,16 @@ reference drags the webext polyfill into that bundle and kills it silently. See
 
 ## Public API
 
-The index publishes the renderer, the leaves publish the standalone pieces. `constants.ts`,
-`text.ts`, `themeSettings.ts` and `util.ts` are the leaves: they import nothing, so a consumer that
-needs one class name, one script test or one pure helper does not pull the engine into its bundle
-with it. Importing `./engine`, `./inject`, `./view` or anything else from outside this directory is a
-violation in the other direction and is checked too, as is a published leaf growing an import.
+`index.ts` and `element.ts` are the two entry points. The index publishes the renderer, the element
+wraps it in a tag, and the leaves publish the standalone pieces. Importing the element registers
+custom element names, which is a side effect nothing that only wants the renderer should pay for, so
+it is entered separately and the extension never imports it. See The custom element below.
+
+`constants.ts`, `text.ts`, `themeSettings.ts` and `util.ts` are the leaves: they import nothing, so a
+consumer that needs one class name, one script test or one pure helper does not pull the engine into
+its bundle with it. Importing `./engine`, `./inject`, `./view` or anything else from outside this
+directory is a violation in the other direction and is checked too, as is a published leaf growing an
+import.
 
 `createLyricsRenderer(options)` is the way in. It returns one `LyricsRenderer`: give it lyrics, tick
 it, and it owns the DOM it builds and every re-measurement that DOM needs. `renderer.setTheme(css)`
@@ -168,3 +173,139 @@ next frame, and is the busiest of the three: `types.ts` calls it out as the one 
 translation or romanization comes through, once each. `resetPlaybackClock` forgets that snapshot, so
 the next tick reads as the first of a new song rather than as a jump away from the end of the last
 one.
+
+## The custom element
+
+`element.ts` is the second entry point, and the way in for a page that would rather write a tag than
+a facade. Importing it registers `<braccato-lyrics>`, and `<better-lyrics>` beside it, because a
+constructor may only be registered once and the extension's own name is worth keeping. Registration
+is a side effect, so nothing in the extension imports this file and `boundary.selfcheck.ts` reports
+it as `no-side-effect-entry-point` if anything starts to.
+
+```html
+<braccato-lyrics></braccato-lyrics>
+<script type="module">
+  import "@braccato/core/element";
+
+  const view = document.querySelector("braccato-lyrics");
+  view.lyrics = lyrics;
+  view.theme = compiledCss;
+  view.addEventListener("braccato:line-click", event => {
+    audio.currentTime = event.detail.timeS;
+  });
+
+  const followPlayer = () => {
+    view.currentTime = audio.currentTime;
+    view.playing = !audio.paused;
+    requestAnimationFrame(followPlayer);
+  };
+  followPlayer();
+</script>
+```
+
+### Properties
+
+`lyrics`, `currentTime`, `playing`, `theme` and `host` are writable, `renderer` is not. All of them
+may be written before the element is in a document: the renderer is built when it connects, and
+everything it was handed by then is applied at once. That includes properties a page wrote before
+this module even loaded, which land on the instance and would shadow the accessors forever if
+`connectedCallback` did not run them through again.
+
+`currentTime` is in **seconds**, not the milliseconds braccato's component took. The module ticks in
+seconds, and an element that converted would leave itself and the renderer underneath it disagreeing
+about what a number means. Writing it renders the view again, so whoever owns the clock drives the
+lyrics by writing it. Writing `playing` renders again too, since a paused view animates differently
+from a playing one.
+
+`lyrics` is null until it is given a song, which is not the same as being given none: an element that
+was never handed lyrics leaves whatever it is mounted over alone, and an empty array clears the view,
+so a consumer between songs has a way to say so.
+
+`theme` is a compiled stylesheet, the same string `renderer.setTheme` takes, described under Theme
+settings above. If the theme changes a setting the lines are built out of, the element rebuilds them,
+because it is holding them. An empty theme puts every setting back to its default, so an element that
+was never given one does not apply one.
+
+`host` is `Partial<LyricsRendererHost>`, and every member of it still has a default, so a consumer
+with nothing to say about its surroundings says nothing. Writing it while connected rebuilds the
+view: the renderer is handed its host once, when it is created. The element wraps two of its members
+rather than replacing them, so a consumer who wrote `seek` or `setResumeAffordanceVisible` is still
+called and the matching event still fires.
+
+`renderer` is the `LyricsRenderer` underneath, for a consumer who outgrows the element: null while
+disconnected, and a different one after every reconnection.
+
+`dir` is deliberately not among them. `HTMLElement` already reflects it, and the lines this module
+builds carry `dir="auto"` and resolve their own direction from their own text, so the element's `dir`
+is the base direction everything under it inherits and nothing here has to reimplement that.
+
+There is no `longWordThreshold`, `lineSyncedDelay` or `disableRichsync` either. Those are theme
+settings (`blyrics-long-word-threshold`, `blyrics-line-synced-animation-delay`,
+`blyrics-disable-richsync`), read from the stylesheet the consumer already hands over, and a theme
+that set one while an attribute said otherwise would leave the module with two answers and no rule
+for picking between them. Configure them in the theme.
+
+### Attributes
+
+`current-time`, `playing` and `theme` are read as attributes as well, in one direction only: an
+attribute writes its property, and a property never writes back. Reflecting `current-time` would put
+the playback clock into the DOM sixty times a second, and one attribute reflecting while the others
+do not is worse than none of them doing it. `playing` is an ordinary boolean attribute, so its
+presence is what counts and `playing="false"` is playing. A `current-time` that does not parse as a
+number is ignored rather than read as zero, because a half written attribute must not send the lyrics
+back to the top of the song.
+
+### Events
+
+Every one of these bubbles and is composed, so an element a consumer put inside their own shadow root
+still reaches their listener.
+
+| Event                    | Detail                       | When                                                     |
+| ------------------------ | ---------------------------- | -------------------------------------------------------- |
+| `braccato:line-click`    | `{ timeS }`                  | A lyric line was clicked, and it asked to seek there      |
+| `braccato:lyrics-loaded` | `{ lineCount, syncType }`    | The element applied lyrics, including an empty array      |
+| `braccato:scroll-state`  | `{ userScrolling }`          | Autoscroll stopped following the song, or started again   |
+| `braccato:error`         | `{ phase, error }`           | Connecting, or applying lyrics or a theme, went wrong     |
+
+`braccato:word-click` is **not** implemented, and this is the honest reason: the renderer tells its
+host `seek(timeS)` and nothing else, so the element cannot tell a word seek from a line seek without
+re-deriving the module's own click branch off the DOM, which would be a second source of truth for
+one number. The DOM is light and its class names are published, so a consumer who wants word clicks
+listens for `click` on the element and reads `.blyrics--word` themselves, which is where that
+knowledge belongs.
+
+`braccato:seek`, which the renderer's own default host dispatches, is not dispatched by the element:
+the element supplies its own `seek`, and `braccato:line-click` is what it dispatches instead.
+
+`braccato:error` covers connecting to a document with no browsing context, a second element in a
+document that already has one, and anything thrown while lyrics or a theme are being applied. Nothing
+thrown by a tick is reported there: a tick runs sixty times a second, and an error event per frame
+would bury the one that mattered, so a bug in the tick loop still surfaces as an exception where it
+happened.
+
+### Light DOM, not shadow DOM
+
+The element builds into itself rather than into a shadow root, which is a deliberate break from the
+component this replaces. Three reasons, all of them the same reason: the theme marketplace selects on
+`.blyrics-*` at document level and a shadow root would put every published theme out of reach;
+`@property` registrations do not apply to a stylesheet inside a shadow root, which is what the
+component this replaces says in its own source; and the extension and a third party should be running
+identical code rather than one encapsulated build and one not.
+
+So the theme is adopted into the element's document rather than encapsulated: `setTheme` puts it in
+the head under `CUSTOM_THEME_STYLE_ID`, exactly as it does for the renderer. The module's own
+stylesheets under `styles/` are the consumer's to load, the way any package's CSS is; inside this
+extension they are already there.
+
+### One element per document
+
+Two renderers in one realm render against whichever theme either of them was given last, because the
+settings registry is module scope, and two in one document would be writing the same theme element as
+well. That constraint is the module's, described under Theme settings above; the element is what
+makes it easy to break, so it is the element that holds the line.
+
+The first element to connect to a document owns it. A second one builds nothing, dispatches
+`braccato:error` with `phase: "conflict"`, and waits. When the owner disconnects, the element that
+has been waiting longest takes the document over and builds, so replacing one element with another
+works whichever order the page does it in. Two elements in two documents are unaffected, which is the
+arrangement this extension already runs.
