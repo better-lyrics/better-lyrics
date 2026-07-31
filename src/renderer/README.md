@@ -182,14 +182,29 @@ constructor may only be registered once and the extension's own name is worth ke
 is a side effect, so nothing in the extension imports this file and `boundary.selfcheck.ts` reports
 it as `no-side-effect-entry-point` if anything starts to.
 
+Registration is also silent about a name that is already taken, which is worth knowing rather than
+discovering. Two copies of this package on one page means the first to load takes both names and the
+second's `customElements.define` never runs, so every element on the page is an instance of the first
+copy's class and `instanceof` against the second copy's is false. There is nobody to report that to
+at module scope, which is why it is written down here instead: load one copy.
+
 ```html
+<!-- The module's own stylesheets, in this order, however the build serves a package's CSS. -->
+<link rel="stylesheet" href="@braccato/core/styles/variables.css" />
+<link rel="stylesheet" href="@braccato/core/styles/lyrics.css" />
+<link rel="stylesheet" href="@braccato/core/styles/instrumental.css" />
+
 <braccato-lyrics></braccato-lyrics>
 <script type="module">
   import "@braccato/core/element";
 
   const view = document.querySelector("braccato-lyrics");
+  // A Lyric[], which is the consumer's to produce: see Properties below.
   view.lyrics = lyrics;
   view.theme = compiledCss;
+  view.addEventListener("braccato:error", event => {
+    console.warn(event.detail.phase, event.detail.error);
+  });
   view.addEventListener("braccato:line-click", event => {
     audio.currentTime = event.detail.timeS;
   });
@@ -202,6 +217,10 @@ it as `no-side-effect-entry-point` if anything starts to.
   followPlayer();
 </script>
 ```
+
+The stylesheets are the consumer's to load, the way any package's CSS is, and leaving them out gives
+lines that are in the document and unstyled rather than lines that are missing. Stylesheets above
+says what each of the three carries.
 
 ### Properties
 
@@ -221,10 +240,21 @@ from a playing one.
 was never handed lyrics leaves whatever it is mounted over alone, and an empty array clears the view,
 so a consumer between songs has a way to say so.
 
+`Lyric[]` is the shape `types.ts` publishes and the index re-exports: one
+`{ startTimeMs, durationMs, words }` per line, with an optional `parts` array of the same three
+fields for syllable or word timing, and optional `translation`, `romanization` and
+`timedRomanization` beside them. Nothing in this module parses a lyrics format. Turning LRC, TTML or
+an API's own JSON into that array is the consumer's job, the way this extension's providers do it,
+and it is the piece the component this replaces hid behind a `src` property.
+
 `theme` is a compiled stylesheet, the same string `renderer.setTheme` takes, described under Theme
 settings above. If the theme changes a setting the lines are built out of, the element rebuilds them,
-because it is holding them. An empty theme puts every setting back to its default, so an element that
-was never given one does not apply one.
+because it is holding them. An empty theme puts every setting back to its default, and an element
+that was never given one applies exactly that when it builds rather than applying nothing: the
+settings registry is module scope, so an element that applied nothing would inherit whatever the last
+theme in that bundle left in it. The cost is that connecting an element with no theme empties an
+existing `CUSTOM_THEME_STYLE_ID` element in that document, because the element's `theme` is the
+document's theme and an empty one is still one.
 
 `host` is `Partial<LyricsRendererHost>`, and every member of it still has a default, so a consumer
 with nothing to say about its surroundings says nothing. Writing it while connected rebuilds the
@@ -234,6 +264,13 @@ called and the matching event still fires.
 
 `renderer` is the `LyricsRenderer` underneath, for a consumer who outgrows the element: null while
 disconnected, and a different one after every reconnection.
+
+`status` is what the element is doing, asked rather than listened for, and it is the answer for a
+consumer who was not holding a listener when something went wrong. It reads `idle` when the element
+is not rendering and has nothing to report, `rendering` when it is, `no-browsing-context` when it is
+in a document with no window to schedule against, and `theme-conflict` when it is rendering but
+another element in the same document was given a different theme, described under More than one
+element in a document below. The last two are dispatched as `braccato:error` as well.
 
 `dir` is deliberately not among them. `HTMLElement` already reflects it, and the lines this module
 builds carry `dir="auto"` and resolve their own direction from their own text, so the element's `dir`
@@ -267,6 +304,10 @@ still reaches their listener.
 | `braccato:scroll-state`  | `{ userScrolling }`          | Autoscroll stopped following the song, or started again   |
 | `braccato:error`         | `{ phase, error }`           | Connecting, or applying lyrics or a theme, went wrong     |
 
+`braccato:lyrics-loaded` says the element applied lyrics, not that it was given new ones. A theme
+that changes a setting the lines are built out of rebuilds the song the element is holding, and the
+rebuild reports itself the same way, so a consumer counting songs counts a theme edit as one too.
+
 `braccato:word-click` is **not** implemented, and this is the honest reason: the renderer tells its
 host `seek(timeS)` and nothing else, so the element cannot tell a word seek from a line seek without
 re-deriving the module's own click branch off the DOM, which would be a second source of truth for
@@ -277,11 +318,24 @@ knowledge belongs.
 `braccato:seek`, which the renderer's own default host dispatches, is not dispatched by the element:
 the element supplies its own `seek`, and `braccato:line-click` is what it dispatches instead.
 
-`braccato:error` covers connecting to a document with no browsing context, a second element in a
-document that already has one, and anything thrown while lyrics or a theme are being applied. Nothing
-thrown by a tick is reported there: a tick runs sixty times a second, and an error event per frame
-would bury the one that mattered, so a bug in the tick loop still surfaces as an exception where it
-happened.
+`braccato:error` covers connecting to a document with no browsing context, a theme that disagrees
+with another element's in the same document, and anything thrown while lyrics or a theme are being
+applied. Nothing thrown by a tick is reported there: a tick runs sixty times a second, and an error
+event per frame would bury the one that mattered, so a bug in the tick loop still surfaces as an
+exception where it happened.
+
+It is dispatched a microtask after the error rather than where it happened, and that is the whole
+reason it is receivable. `connectedCallback` runs before any listener a page could have added, and
+for an element the parser built it runs before any script on the page has run at all, so a `connect`
+or `conflict` error dispatched where it happens is one nobody could ever hear: querying the element
+and then adding a listener, which is what the quickstart above does, would miss both by construction.
+A microtask still misses a listener added later than that, so `status` is the other half of the
+answer and needs no listener at all.
+
+A throw from inside the module while the element is being built is the one thing `braccato:error`
+does not cover, and deliberately: it comes out of `connectedCallback`, where the page reports it as
+an uncaught error with the stack it happened on. The element counts itself among its document's
+views only once the renderer exists, so a build that threw leaves nothing behind claiming to be one.
 
 ### Light DOM, not shadow DOM
 
@@ -297,15 +351,25 @@ the head under `CUSTOM_THEME_STYLE_ID`, exactly as it does for the renderer. The
 stylesheets under `styles/` are the consumer's to load, the way any package's CSS is; inside this
 extension they are already there.
 
-### One element per document
+### More than one element in a document
 
-Two renderers in one realm render against whichever theme either of them was given last, because the
-settings registry is module scope, and two in one document would be writing the same theme element as
-well. That constraint is the module's, described under Theme settings above; the element is what
-makes it easy to break, so it is the element that holds the line.
+Two renderers in one realm render against whichever theme either of them was applied last, because
+the settings registry is module scope, and two in one document write the same theme element as well.
+That constraint is the module's, described under Theme settings above.
 
-The first element to connect to a document owns it. A second one builds nothing, dispatches
-`braccato:error` with `phase: "conflict"`, and waits. When the owner disconnects, the element that
-has been waiting longest takes the document over and builds, so replacing one element with another
-works whichever order the page does it in. Two elements in two documents are unaffected, which is the
-arrangement this extension already runs.
+What it is not is a constraint on the number of elements. Two views handed the **same** theme are not
+affected by any of it: the settings they share are the ones both of them asked for, and the renderer
+adopts an existing `CUSTOM_THEME_STYLE_ID` element rather than adding a rival under the same id. So
+the line is drawn where the problem actually is. A second element builds, and what is reported is the
+disagreement rather than the company.
+
+When an element applies a theme that another element in its document was not given, both of them
+dispatch `braccato:error` with `phase: "conflict"` and both read `status === "theme-conflict"`. Both,
+because the element that diverged is not the one now rendering against a theme it never asked for.
+The views keep rendering: a blank view with a reason is worse than a themed one with a warning, and
+the reason is readable off `status` by a consumer who was not listening.
+
+An element that leaves a document takes its stylesheet with it if it is the one that created it, so
+whatever is still rendering there writes its own theme back into the head as it goes. Replacing one
+element with another therefore works whichever order the page does it in, and two elements in two
+documents are unaffected either way, which is the arrangement this extension already runs.
