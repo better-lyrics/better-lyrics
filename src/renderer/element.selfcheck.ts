@@ -62,13 +62,34 @@ const SCROLL_STATE_EVENT = "braccato:scroll-state";
 const ERROR_EVENT = "braccato:error";
 
 const CURRENT_TIME_ATTRIBUTE = "current-time";
+const SOURCE_ATTRIBUTE = "source";
+
+const PLAYER_SELECTOR = "#player";
+const LATE_PLAYER_SELECTOR = "#late-player";
+const NOT_A_PLAYER_SELECTOR = "#not-a-player";
+// A string a browser rejects as a selector too, so the throw this reaches is one a page can reach.
+const MALFORMED_SELECTOR = "##";
 
 const SCROLL_CONTAINER_HEIGHT_PX = 600;
 const PLAYBACK_TIME_S = 6;
 // Late enough that the third line is the one playing.
 const LATE_PLAYBACK_TIME_S = 11;
+// Inside the first line, and not its start: a tick at zero with nothing playing is the one the
+// engine has nothing to render for, so it cannot show a clock reaching the view.
+const EARLY_PLAYBACK_TIME_S = 1;
 // The second line's own start, which is where a click on it asks the player to go.
 const SECOND_LINE_TIME_S = 5;
+// The third line's, for a click that has somewhere to move the view to.
+const THIRD_LINE_TIME_S = 10;
+
+// Frame timestamps, as the platform hands them out: milliseconds since the document loaded.
+const FIRST_FRAME_MS = 1000;
+const ANCHOR_FRAME_MS = 1200;
+const CARRIED_MS = 50;
+const STALLED_MS = 500;
+const DOUBLE_RATE = 2;
+// What element.ts will carry a reading no further than.
+const MAX_CLOCK_CARRY_MS = 100;
 
 const MAX_SWALLOWED_SCROLLS = 8;
 
@@ -119,11 +140,55 @@ class FakeResizeObserver {
   disconnect(): void {}
 }
 
+// What the element reads off a media element and nothing else: the clock, whether it is running,
+// how fast, and the listeners it attaches. Nothing here synthesises an event, so a self-check that
+// wants one dispatches it, the way it decides everything else the platform would have done.
+class FakeMediaElement {
+  currentTime = 0;
+  paused = true;
+  playbackRate = 1;
+  readonly listenersByType = new Map<string, Set<() => void>>();
+
+  get listenerCount(): number {
+    let total = 0;
+    for (const listeners of this.listenersByType.values()) {
+      total += listeners.size;
+    }
+    return total;
+  }
+
+  addEventListener(type: string, listener: () => void): void {
+    const listeners = this.listenersByType.get(type) ?? new Set<() => void>();
+    this.listenersByType.set(type, listeners);
+    listeners.add(listener);
+  }
+
+  removeEventListener(type: string, listener: () => void): void {
+    this.listenersByType.get(type)?.delete(listener);
+  }
+
+  dispatch(type: string): void {
+    for (const listener of [...(this.listenersByType.get(type) ?? [])]) {
+      listener();
+    }
+  }
+}
+
+// The way across, for a fake that models four members of an interface with hundreds. `fakeDom`
+// widens at its own crossings for the same reason: the fakes stay narrow.
+function asMediaElement(fake: FakeMediaElement): HTMLMediaElement {
+  return fake as unknown as HTMLMediaElement;
+}
+
 class FakeWindow {
   readonly ResizeObserver = FakeResizeObserver;
   readonly CustomEvent = FakeCustomEvent;
+  readonly HTMLMediaElement = FakeMediaElement;
   readonly overflowByElement = new WeakMap<FakeNode, string>();
-  readonly requestedFrames: FrameRequestCallback[] = [];
+  // Handles rather than a list, because a cancelled frame has to stop being one the platform would
+  // run: whether the queue is empty is how a stray frame is caught.
+  readonly pendingFrames = new Map<number, FrameRequestCallback>();
+  frameHandleCount = 0;
 
   matchMedia(): FakeMediaQueryList {
     return new FakeMediaQueryList();
@@ -153,11 +218,14 @@ class FakeWindow {
   removeEventListener(): void {}
 
   requestAnimationFrame(callback: FrameRequestCallback): number {
-    this.requestedFrames.push(callback);
-    return this.requestedFrames.length;
+    this.frameHandleCount += 1;
+    this.pendingFrames.set(this.frameHandleCount, callback);
+    return this.frameHandleCount;
   }
 
-  cancelAnimationFrame(): void {}
+  cancelAnimationFrame(handle: number): void {
+    this.pendingFrames.delete(handle);
+  }
 }
 
 /**
@@ -182,13 +250,27 @@ class FakeFontFaceSet {
   readonly ready = new Promise<void>(() => {});
 }
 
+const ID_SELECTOR = /^#[A-Za-z][\w-]*$/u;
+
 class ElementDocument extends FakeDocument {
   readonly fonts = new FakeFontFaceSet();
   readonly documentElement = this.createElement("html");
   readonly visibilityState = "visible";
+  // What a selector finds, written by whoever is arranging the document rather than walked out of a
+  // tree: the element resolves one selector, against this document, and reads nothing else off what
+  // comes back.
+  readonly elementsBySelector = new Map<string, object>();
 
   constructor(readonly defaultView: FakeWindow | null) {
     super();
+  }
+
+  querySelector(selector: string): object | null {
+    // Anything else throws, the way a browser throws on a string that is not a selector at all.
+    if (!ID_SELECTOR.test(selector)) {
+      throw new Error(`The fake document only understands id selectors, not "${selector}"`);
+    }
+    return this.elementsBySelector.get(selector) ?? null;
   }
 }
 
@@ -271,6 +353,19 @@ function newConnectedDocument(): ElementDocument {
 // Everything else it dispatches goes out where it happened.
 function nextMicrotask(): Promise<void> {
   return Promise.resolve();
+}
+
+/**
+ * Runs every frame the window is holding, with the timestamp the platform would have handed it. A
+ * frame the element scheduled from inside one of these is left for the next call, so a loop is
+ * driven one frame at a time rather than running away.
+ */
+function runFrames(fakeWindow: FakeWindow, frameTimeMs: number): void {
+  const queued = [...fakeWindow.pendingFrames];
+  for (const [handle, callback] of queued) {
+    fakeWindow.pendingFrames.delete(handle);
+    callback(frameTimeMs);
+  }
 }
 
 // Every event the element dispatched, in order, including the ones it dispatched while it was being
@@ -937,5 +1032,409 @@ assert.deepEqual(
 );
 
 disconnectElement(aliasElement);
+
+// -- Following a media element --------------------------------------------
+
+const { fixture: bound, host: boundHost } = newElementFixture(newConnectedDocument());
+const boundMedia = new FakeMediaElement();
+
+bound.fakeDocument.elementsBySelector.set(PLAYER_SELECTOR, boundMedia);
+boundMedia.currentTime = PLAYBACK_TIME_S;
+
+const boundElement = createCustomElement(bound.fakeDocument, BraccatoLyricsElement);
+
+boundElement.host = boundHost;
+boundElement.lyrics = SYNCED_LYRICS;
+boundElement.setAttribute(SOURCE_ATTRIBUTE, PLAYER_SELECTOR);
+
+assert.equal(
+  boundElement.mediaElement,
+  null,
+  "Given a source set on an element that is not in a document, When it is asked, Then it is following nothing, because there is no view yet for a clock to drive"
+);
+
+connectElement(bound.root, boundElement);
+
+assert.equal(
+  boundElement.mediaElement,
+  boundMedia,
+  "Given a source selector, When the element connects, Then it resolved it in its own document and is following what it named"
+);
+
+assert.deepEqual(
+  [boundElement.currentTime, boundElement.playing],
+  [PLAYBACK_TIME_S, false],
+  "Given an element that has just bound, When it is asked, Then the clock and the play state it reports are the ones it read off the media element"
+);
+
+assert.deepEqual(
+  selectedLines(boundElement),
+  [false, true, false],
+  "Given an element that has just bound, When the view is read, Then it is already at the line the media element is on"
+);
+
+assert.equal(
+  bound.fakeWindow.pendingFrames.size,
+  0,
+  "Given a media element that is not playing, When an element binds to it, Then it queued no frame, because a stopped clock costs nothing"
+);
+
+// -- The clock the element reads for itself --------------------------------------------
+
+boundMedia.paused = false;
+boundMedia.dispatch("play");
+
+assert.equal(
+  boundElement.playing,
+  true,
+  "Given a media element that started, When it says so, Then the element is playing without a consumer telling it"
+);
+
+assert.equal(
+  bound.fakeWindow.pendingFrames.size,
+  1,
+  "Given a media element that started, When it says so, Then the element asked for a frame"
+);
+
+boundMedia.currentTime = LATE_PLAYBACK_TIME_S;
+runFrames(bound.fakeWindow, FIRST_FRAME_MS);
+
+assert.equal(
+  boundElement.currentTime,
+  LATE_PLAYBACK_TIME_S,
+  "Given a media clock that moved, When a frame runs, Then the element read it rather than waiting to be told"
+);
+
+assert.deepEqual(
+  selectedLines(boundElement),
+  [false, false, true],
+  "Given a media clock that moved, When a frame runs, Then the view is at the line it moved to"
+);
+
+assert.equal(
+  bound.fakeWindow.pendingFrames.size,
+  1,
+  "Given a frame that ran while the clock was running, When it is done, Then it asked for the next one"
+);
+
+// -- A song played at something other than 1x --------------------------------------------
+
+boundMedia.playbackRate = DOUBLE_RATE;
+boundMedia.dispatch("ratechange");
+// The rate belongs to the reading it was taken with, so the frame that takes one is the frame this
+// asserts nothing about; the one after it is where a carried reading shows.
+runFrames(bound.fakeWindow, ANCHOR_FRAME_MS);
+runFrames(bound.fakeWindow, ANCHOR_FRAME_MS + CARRIED_MS);
+
+assert.equal(
+  boundElement.currentTime,
+  LATE_PLAYBACK_TIME_S + (CARRIED_MS * DOUBLE_RATE) / 1000,
+  "Given a media clock the element has not seen move since its last reading, When a frame runs, Then that reading is carried forward at the rate it was taken at rather than at 1x"
+);
+
+runFrames(bound.fakeWindow, ANCHOR_FRAME_MS + STALLED_MS);
+
+assert.equal(
+  boundElement.currentTime,
+  LATE_PLAYBACK_TIME_S + (MAX_CLOCK_CARRY_MS * DOUBLE_RATE) / 1000,
+  "Given a media clock that stopped without saying so, When frames keep running, Then the reading is carried only so far rather than running away from the song"
+);
+
+// -- A clock that stopped --------------------------------------------
+
+boundMedia.paused = true;
+boundMedia.currentTime = PLAYBACK_TIME_S;
+boundMedia.dispatch("pause");
+
+assert.deepEqual(
+  [boundElement.currentTime, boundElement.playing],
+  [PLAYBACK_TIME_S, false],
+  "Given a media element that stopped, When it says so, Then the element read where it stopped and is not playing"
+);
+
+assert.equal(
+  bound.fakeWindow.pendingFrames.size,
+  0,
+  "Given a media element that stopped, When it says so, Then the frame the element had queued was called off"
+);
+
+// -- Which of the two answers about the clock wins --------------------------------------------
+
+boundElement.currentTime = 0;
+boundElement.playing = true;
+
+assert.deepEqual(
+  [boundElement.currentTime, boundElement.playing],
+  [PLAYBACK_TIME_S, false],
+  "Given an element following a media element, When a consumer writes the clock or the play state, Then what it reads back is still the binding's, because the media element is the one that owns them"
+);
+
+boundElement.setAttribute(CURRENT_TIME_ATTRIBUTE, String(LATE_PLAYBACK_TIME_S));
+
+assert.equal(
+  boundElement.currentTime,
+  PLAYBACK_TIME_S,
+  "Given an element following a media element, When a current-time attribute is set, Then the binding still owns the clock, because an attribute is the same write by another road"
+);
+
+// -- A click on a line, with somewhere to send it --------------------------------------------
+
+const boundRenderer = boundElement.renderer;
+
+assert.ok(boundRenderer !== null, "Given a connected element, When it is asked, Then it holds the renderer it built");
+
+const boundThirdLine = boundRenderer.lines[2];
+
+asFakeNode(boundThirdLine.lyricElement).dispatchClick({
+  target: asFakeNode(boundThirdLine.lyricElement),
+  altKey: false,
+  clientX: 0,
+  clientY: 0,
+});
+
+assert.equal(
+  boundMedia.currentTime,
+  THIRD_LINE_TIME_S,
+  "Given an element following a media element, When a line is clicked, Then the seek reaches that media element's own clock"
+);
+
+assert.deepEqual(
+  bound.seeks,
+  [THIRD_LINE_TIME_S],
+  "Given a host that wrote its own seek, When a line is clicked while a media element is bound, Then the binding wrapped it rather than taking it away"
+);
+
+assert.deepEqual(
+  emittedDetails<LineClickDetail>(boundElement, LINE_CLICK_EVENT).at(-1),
+  { timeS: THIRD_LINE_TIME_S },
+  "Given a seek that reached a media element, When the element's events are read, Then it still said a line was clicked"
+);
+
+boundMedia.dispatch("seeked");
+
+assert.deepEqual(
+  [boundElement.currentTime, selectedLines(boundElement)[2]],
+  [THIRD_LINE_TIME_S, true],
+  "Given a seek the media element accepted, When it says so, Then the element read where it landed and the view is on the line the click named"
+);
+
+// -- Moving to another media element --------------------------------------------
+
+boundMedia.paused = false;
+boundMedia.dispatch("play");
+
+const rebindMedia = new FakeMediaElement();
+rebindMedia.currentTime = EARLY_PLAYBACK_TIME_S;
+
+boundElement.source = asMediaElement(rebindMedia);
+
+assert.equal(
+  boundMedia.listenerCount,
+  0,
+  "Given an element moved to another media element, When the one it left is asked, Then nothing of the element's is still listening to it"
+);
+
+assert.equal(
+  bound.fakeWindow.pendingFrames.size,
+  0,
+  "Given an element moved from a media element that was playing to one that is not, When the window is asked, Then the frame queued for the first went with it"
+);
+
+assert.equal(
+  boundElement.mediaElement,
+  rebindMedia,
+  "Given a media element rather than a selector, When it is written, Then the element is following the one it was handed"
+);
+
+assert.deepEqual(
+  selectedLines(boundElement),
+  [true, false, false],
+  "Given an element moved to another media element, When the view is read, Then it is at the line that one's clock is on"
+);
+
+const listenersPerBinding = rebindMedia.listenerCount;
+
+// -- Handing the clock back --------------------------------------------
+
+boundElement.source = null;
+
+assert.deepEqual(
+  [boundElement.mediaElement, rebindMedia.listenerCount],
+  [null, 0],
+  "Given an element whose source was cleared, When it and the media element are asked, Then it is following nothing and left nothing listening"
+);
+
+boundElement.currentTime = LATE_PLAYBACK_TIME_S;
+
+assert.deepEqual(
+  selectedLines(boundElement),
+  [false, false, true],
+  "Given an element that was unbound, When a consumer writes the clock, Then it drives the view again, because the clock went back to whoever asked for it"
+);
+
+// -- Leaving the document and coming back --------------------------------------------
+
+boundElement.source = asMediaElement(rebindMedia);
+rebindMedia.paused = false;
+rebindMedia.dispatch("play");
+
+assert.equal(
+  bound.fakeWindow.pendingFrames.size,
+  1,
+  "Given an element following a media element that is playing, When the window is asked, Then a frame is queued"
+);
+
+disconnectElement(boundElement);
+
+assert.deepEqual(
+  [rebindMedia.listenerCount, bound.fakeWindow.pendingFrames.size],
+  [0, 0],
+  "Given a disconnected element, When the media element and the window are asked, Then it left neither a listener nor a frame behind"
+);
+
+assert.equal(
+  boundElement.mediaElement,
+  null,
+  "Given a disconnected element, When it is asked, Then it is following nothing, the way it holds no renderer"
+);
+
+connectElement(bound.root, boundElement);
+
+assert.equal(
+  boundElement.mediaElement,
+  rebindMedia,
+  "Given an element connected again, When it is asked, Then it is following the media element it was holding"
+);
+
+assert.equal(
+  rebindMedia.listenerCount,
+  listenersPerBinding,
+  "Given an element connected again, When the media element is asked, Then it carries what one binding costs rather than what two would"
+);
+
+disconnectElement(boundElement);
+
+// -- A source that names nothing to follow --------------------------------------------
+
+const { fixture: unmatched, host: unmatchedHost } = newElementFixture(newConnectedDocument());
+const unmatchedElement = createCustomElement(unmatched.fakeDocument, BraccatoLyricsElement);
+
+unmatchedElement.host = unmatchedHost;
+unmatchedElement.lyrics = SYNCED_LYRICS;
+connectElement(unmatched.root, unmatchedElement);
+
+assert.doesNotThrow(() => {
+  unmatchedElement.setAttribute(SOURCE_ATTRIBUTE, PLAYER_SELECTOR);
+}, "Given a source selector that matches nothing, When it is set, Then nothing comes back out of the attribute");
+
+await nextMicrotask();
+
+assert.equal(
+  unmatchedElement.mediaElement,
+  null,
+  "Given a source selector that matches nothing, When the element is asked, Then it is following nothing, which is the answer for a consumer that was not listening"
+);
+
+assert.deepEqual(
+  errorPhases(unmatchedElement),
+  ["source"],
+  "Given a source selector that matches nothing, When it is set, Then the element says the source is what went wrong"
+);
+
+unmatchedElement.currentTime = PLAYBACK_TIME_S;
+
+assert.deepEqual(
+  selectedLines(unmatchedElement),
+  [false, true, false],
+  "Given a source selector that matched nothing, When a consumer writes the clock, Then it still drives the view, because nothing took it away"
+);
+
+// -- A selector that names something later --------------------------------------------
+
+const lateMedia = new FakeMediaElement();
+lateMedia.currentTime = LATE_PLAYBACK_TIME_S;
+unmatched.fakeDocument.elementsBySelector.set(LATE_PLAYER_SELECTOR, lateMedia);
+
+unmatchedElement.setAttribute(SOURCE_ATTRIBUTE, LATE_PLAYER_SELECTOR);
+
+assert.equal(
+  unmatchedElement.mediaElement,
+  lateMedia,
+  "Given a source attribute that changed, When it is set, Then the selector is resolved again rather than the first answer being kept"
+);
+
+assert.deepEqual(
+  selectedLines(unmatchedElement),
+  [false, false, true],
+  "Given a source attribute that changed, When it resolves, Then the view follows the clock of what it named"
+);
+
+unmatchedElement.removeAttribute(SOURCE_ATTRIBUTE);
+
+assert.deepEqual(
+  [unmatchedElement.mediaElement, lateMedia.listenerCount],
+  [null, 0],
+  "Given a source attribute that was taken away, When the element and the media element are asked, Then the binding went with it"
+);
+
+// -- A source that names the wrong thing --------------------------------------------
+
+unmatched.fakeDocument.elementsBySelector.set(NOT_A_PLAYER_SELECTOR, unmatched.fakeDocument.createElement("div"));
+unmatchedElement.setAttribute(SOURCE_ATTRIBUTE, NOT_A_PLAYER_SELECTOR);
+
+await nextMicrotask();
+
+assert.equal(
+  unmatchedElement.mediaElement,
+  null,
+  "Given a source selector that matched something with no clock, When the element is asked, Then it is following nothing rather than a clock that does not exist"
+);
+
+assert.doesNotThrow(() => {
+  unmatchedElement.source = MALFORMED_SELECTOR;
+}, "Given a string that is not a selector at all, When it is written, Then the throw does not come back out of the property");
+
+await nextMicrotask();
+
+assert.deepEqual(
+  errorPhases(unmatchedElement),
+  ["source", "source", "source"],
+  "Given every way a source can name nothing to follow, When each of them is written, Then the element reports the source each time"
+);
+
+disconnectElement(unmatchedElement);
+
+// -- A source set before this module was loaded --------------------------------------------
+
+const { fixture: presetSource, host: presetSourceHost } = newElementFixture(newConnectedDocument());
+const presetMedia = new FakeMediaElement();
+presetMedia.currentTime = LATE_PLAYBACK_TIME_S;
+
+const presetElement = createCustomElement(presetSource.fakeDocument, BraccatoLyricsElement);
+
+Object.defineProperty(presetElement, "source", {
+  configurable: true,
+  enumerable: true,
+  writable: true,
+  value: presetMedia,
+});
+presetElement.host = presetSourceHost;
+presetElement.lyrics = SYNCED_LYRICS;
+
+connectElement(presetSource.root, presetElement);
+
+assert.equal(
+  Object.hasOwn(presetElement, "source"),
+  false,
+  "Given a source written before this module was loaded, When the element connects, Then the own property that was shadowing the accessor is gone"
+);
+
+assert.deepEqual(
+  [presetElement.mediaElement, selectedLines(presetElement)],
+  [presetMedia, [false, false, true]],
+  "Given a source written before this module was loaded, When the element connects, Then it is following that media element and the view is where its clock says"
+);
+
+disconnectElement(presetElement);
 
 console.log("Lyrics element self-check passed");
