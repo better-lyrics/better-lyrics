@@ -1,5 +1,5 @@
 import { strict as assert } from "node:assert";
-import { LINE_CLASS, USER_SCROLLING_CLASS } from "./constants";
+import { CUSTOM_THEME_STYLE_ID, LINE_CLASS, USER_SCROLLING_CLASS } from "./constants";
 import type { LineData } from "./inject";
 import { createLyricsRenderer, withHostDefaults } from "./renderer";
 import { asDocument, asElement, asFakeAnimation, asFakeNode, FakeDocument, FakeNode } from "./selfcheck/fakeDom";
@@ -67,6 +67,14 @@ const NEARER_VIEWPORT_HEIGHT_PX = 300;
 
 // The theme setting a view's animation diagnostics are behind.
 const ANIMATION_TIMING_LOG_SETTING = "blyrics-debug-animation-timing";
+
+// Themes, as a consumer writes them: a stylesheet with the module's settings declared in a comment.
+// Whether a rich synced line is broken into its parts is read while the lines are being built, so a
+// view that has already built them is wrong until it builds them again. Where a line sits in the
+// view is read on a tick, so nothing built has to change for it.
+const REBUILD_THEME = "/* blyrics-disable-richsync = true; */";
+const RESPELT_REBUILD_THEME = "/*blyrics-disable-richsync=true;*/";
+const NEUTRAL_THEME = "/* blyrics-target-scroll-pos-ratio = 0.5; */";
 
 const MAX_SWALLOWED_SCROLLS = 8;
 
@@ -1558,7 +1566,89 @@ assert.deepEqual(
 
 unsyncedRenderer.destroy();
 
-const drivenFixtures = [panel, floating, rich, reflowed, hidden, contents, empty, unsynced];
+// -- A theme is one call ------------------------------------------------------------------------
+// A stylesheet configures this module through comments inside it, and a consumer handing one over
+// should not have to know that. What comes back is the one part of applying a theme the view cannot
+// do: the caller holds the lyrics, so the caller is the one that can build them again.
+
+const { fixture: themed, host: themedHost } = newViewFixture(SCROLL_ANIMATION_ON);
+const themedRenderer = createLyricsRenderer({
+  document: asDocument(themed.fakeDocument),
+  window: asWindow(themed.fakeWindow),
+  mount: asElement<HTMLElement>(themed.mount),
+  host: themedHost,
+});
+
+function appliedThemeSheets(): string[] {
+  return themed.fakeDocument.head.childNodes
+    .filter(child => child.id === CUSTOM_THEME_STYLE_ID)
+    .map(child => child.textContent);
+}
+
+assert.equal(
+  themedRenderer.setTheme(NEUTRAL_THEME),
+  false,
+  "Given a theme that changes nothing the lines are built out of, When it is applied, Then the view reports that the lyrics on screen are still good"
+);
+
+assert.deepEqual(
+  appliedThemeSheets(),
+  [NEUTRAL_THEME],
+  "Given a theme applied to a view, When the document it builds in is read, Then the stylesheet is in its head"
+);
+
+themedRenderer.setLyrics(SYNCED_LYRICS);
+themedRenderer.tick(PLAYBACK_TIME_S, { isPlaying: true });
+
+const propertyReadsBeforeThemeChange = themed.fakeWindow.propertyReads.length;
+themedRenderer.tick(PLAYBACK_TIME_S, { isPlaying: true });
+
+assert.equal(
+  themed.fakeWindow.propertyReads.length,
+  propertyReadsBeforeThemeChange,
+  "Given a view that already resolved its theme, When it ticks again, Then it reads none of it off the document a second time"
+);
+
+assert.equal(
+  themedRenderer.setTheme(REBUILD_THEME),
+  true,
+  "Given a theme that changes a setting the lines are built out of, When it is applied, Then the view reports that they have to be built again"
+);
+
+assert.deepEqual(
+  appliedThemeSheets(),
+  [REBUILD_THEME],
+  "Given a view that already carries a theme, When a second one is applied, Then it replaces the first rather than stacking another sheet on top of it"
+);
+
+themedRenderer.tick(PLAYBACK_TIME_S, { isPlaying: true });
+
+assert.ok(
+  themed.fakeWindow.propertyReads.length > propertyReadsBeforeThemeChange,
+  "Given a view that resolved the theme it was rendering against, When a new one is applied, Then the next tick resolves the new one rather than rendering against what it cached off the old"
+);
+
+assert.equal(
+  themedRenderer.setTheme(RESPELT_REBUILD_THEME),
+  false,
+  "Given a theme that declares the same value in different words, When it is applied, Then the view reports on the settings that changed rather than on the text of the stylesheet"
+);
+
+assert.equal(
+  themedRenderer.setTheme(""),
+  true,
+  "Given a theme that no longer declares a setting the lines were built out of, When it is applied, Then the setting goes back to its default and the view says they have to be built again"
+);
+
+themedRenderer.destroy();
+
+assert.deepEqual(
+  appliedThemeSheets(),
+  [],
+  "Given a destroyed renderer, When the document it was building in is read, Then the theme it applied went with it rather than being left behind styling nothing"
+);
+
+const drivenFixtures = [panel, floating, rich, reflowed, hidden, contents, empty, unsynced, themed];
 
 assert.equal(
   ambientGlobalReads,

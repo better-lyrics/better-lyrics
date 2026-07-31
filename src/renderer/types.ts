@@ -142,6 +142,17 @@ export interface LyricsRenderer {
    * front of it.
    */
   setLyrics(lyrics: Lyric[], options?: Partial<SetLyricsOptions> & { mount?: HTMLElement }): void;
+  /**
+   * Applies a compiled theme. The `blyrics-*` configuration in its comments becomes the module's
+   * theme settings, and the stylesheet itself is applied to the document this renderer builds in.
+   *
+   * The settings are the module's rather than this instance's, so a second renderer in the same
+   * realm renders against the last theme any of them was given. The stylesheet is per document.
+   *
+   * @returns Whether a setting the lines are built out of changed, so the caller can hand the
+   * lyrics back. The renderer does not hold them, so it cannot rebuild them itself.
+   */
+  setTheme(css: string): boolean;
   tick(currentTimeS: number, options: TickOptions): AnimationTickStatus;
   relayout(measureLines?: boolean): void;
   /**

@@ -104,6 +104,7 @@ export class FakeNode {
   readonly dispatchedEvents: unknown[] = [];
   parentNode: FakeNode | null = null;
   dir = "";
+  id = "";
   // Nothing here lays anything out, so a self-check that needs a measurement writes what one would
   // have produced and the module reads it back the way it reads a browser's.
   clientWidth = 0;
@@ -281,6 +282,9 @@ export class FakeNode {
 
 export class FakeDocument {
   readonly calls: FactoryCall[] = [];
+  // Where a stylesheet goes. Built directly rather than through the factories, so it stays out of
+  // the factory call counts below.
+  readonly head = new FakeNode(this, "element", "head");
   // What a document scrolls by when nothing between the mount and the root does. Left unset rather
   // than built here, so a self-check that never asks about it does not pay for an element in its
   // factory call counts.

@@ -46,6 +46,34 @@ class Setting {
   }
 }
 
+// -- Parsing a theme --------------------------------------------
+
+// A theme is a stylesheet, and it configures the renderer through comments inside it, in the form
+// `blyrics-some-key = value;`. Only inside comments: everything outside one is CSS the browser is
+// going to read, and a stylesheet must not be able to configure the module by accident.
+const THEME_COMMENT_PATTERN = /\/\*([\s\S]*?)\*\//g;
+const THEME_SETTING_PATTERN = /(blyrics-[\w-]+)\s*=\s*([^;]+);/g;
+
+/**
+ * The `blyrics-*` configuration a compiled stylesheet declares, in declaration order, last one
+ * winning. Lives here rather than beside the renderer because it depends on nothing and its only
+ * consumer is `setThemeSettings`: a consumer that compiles a theme somewhere the renderer does not
+ * run can read the settings out of it without pulling the engine in.
+ */
+export function parseThemeConfig(css: string): Map<string, string> {
+  const config = new Map<string, string>();
+
+  // `matchAll` rather than `exec`: it works off a copy of the pattern, so the two shared here never
+  // carry a `lastIndex` from one stylesheet into the next.
+  for (const [, comment] of css.matchAll(THEME_COMMENT_PATTERN)) {
+    for (const [, key, value] of comment.matchAll(THEME_SETTING_PATTERN)) {
+      config.set(key, value.trim());
+    }
+  }
+
+  return config;
+}
+
 // -- Registry --------------------------------------------
 
 export function registerThemeSetting(

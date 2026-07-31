@@ -1,3 +1,4 @@
+import { CUSTOM_THEME_STYLE_ID } from "./constants";
 import {
   clearLyrics,
   clearOnScreenLyrics as clearEngineOnScreenLyrics,
@@ -17,6 +18,7 @@ import {
   tickView,
 } from "./engine";
 import type { LineData } from "./inject";
+import { parseThemeConfig, setThemeSettings } from "./themeSettings";
 import type { LyricsRenderer, LyricsRendererHost, LyricsRendererOptions } from "./types";
 import { setLyrics as buildLyricsView } from "./view";
 
@@ -146,6 +148,7 @@ export function createLyricsRenderer(rendererOptions: LyricsRendererOptions): Ly
 
   let mount: HTMLElement | null = rendererOptions.mount ?? null;
   let containerResizeObserver: ResizeObserver | null = null;
+  let themeStyleElement: HTMLStyleElement | null = null;
   let isDestroyed = false;
 
   const { host, forgetScrollElement } = withHostDefaults(rendererOptions.host, rendererWindow, () => mount);
@@ -200,6 +203,27 @@ export function createLyricsRenderer(rendererOptions: LyricsRendererOptions): Ly
     containerResizeObserver = observer;
   }
 
+  /**
+   * Puts the theme's stylesheet where the document will read it. An element in the head rather than
+   * a constructed sheet in `adoptedStyleSheets`, for two reasons: adopted sheets are ordered after
+   * every sheet the document loaded, so one would give the theme a cascade position it does not have
+   * when a consumer writes the element itself, and an element is findable, which is how a second
+   * document is handed the same theme.
+   */
+  function adoptThemeStyleSheet(css: string): void {
+    if (themeStyleElement !== null) {
+      themeStyleElement.textContent = css;
+      return;
+    }
+    const styleElement = rendererDocument.createElement("style");
+    styleElement.id = CUSTOM_THEME_STYLE_ID;
+    // Filled before it is in the document, so the first theme is parsed once rather than once empty
+    // and once full.
+    styleElement.textContent = css;
+    rendererDocument.head.appendChild(styleElement);
+    themeStyleElement = styleElement;
+  }
+
   const remeasureForViewport = (): void => measure();
   rendererWindow.addEventListener("resize", remeasureForViewport);
 
@@ -238,6 +262,17 @@ export function createLyricsRenderer(rendererOptions: LyricsRendererOptions): Ly
       measure();
       if (engine.lyricsContainer) observeContainer(engine.lyricsContainer);
     },
+    setTheme(css) {
+      if (isDestroyed) return false;
+      // Settings first, so a caller acting on the answer is acting on a module that already holds
+      // the theme it is answering about.
+      const needsLyricRebuild = setThemeSettings(parseThemeConfig(css));
+      adoptThemeStyleSheet(css);
+      // Everything the engine resolved off the document was resolved against the theme that just
+      // went away.
+      clearEngineStyleCaches(engine);
+      return needsLyricRebuild;
+    },
     tick(currentTimeS, options) {
       if (isDestroyed) return "lyrics-missing";
       return tickView(engine, currentTimeS, resolveTickOptions(options));
@@ -254,6 +289,10 @@ export function createLyricsRenderer(rendererOptions: LyricsRendererOptions): Ly
       if (isDestroyed) return;
       isDestroyed = true;
       clearBuiltView();
+      // The theme outlives a song, so only this takes it away. It is DOM this built, and leaving it
+      // behind would leave a document nothing renders into carrying a stylesheet for lyrics.
+      themeStyleElement?.remove();
+      themeStyleElement = null;
       rendererWindow.removeEventListener("resize", remeasureForViewport);
       engine.destroy();
     },

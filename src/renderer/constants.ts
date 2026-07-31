@@ -36,3 +36,10 @@ export const WORD_HIGHLIGHT_CLASS = "blyrics-word-highlight" as const;
 export const LINE_SYNCED_WORD_CLASS = "blyrics-line-synced-word" as const;
 export const BIDI_RUN_CLASS = "blyrics-bidi-run" as const;
 export const BIDI_SENSITIVE_CLASS = "blyrics-bidi-sensitive" as const;
+
+// -- Theme --------------------------------------------
+
+// The element a theme handed to `setTheme` is applied through, one per document a renderer builds
+// in. Named rather than anonymous because a consumer with a second document to style has to be able
+// to find the first one: this extension's floating window mirrors the side panel's by id.
+export const CUSTOM_THEME_STYLE_ID = "blyrics-custom-style" as const;
