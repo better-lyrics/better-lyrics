@@ -10,9 +10,9 @@ written as though it already had been.
 ## Rules
 
 Nothing here may import from `@core/*`, `@modules/*`, `@constants`, `@utils`, `@options` or `@/`,
-reach outside this directory with a relative path, reference `chrome.`, or import a package.
-`boundary.selfcheck.ts` enforces all of that and runs as part of `npm run selfcheck`. If a change
-makes it fail, the change is wrong, not the check.
+reach outside this directory with a relative path, reference `chrome.`, or import a package. Nothing
+under `styles/` may name a YouTube Music selector. `boundary.selfcheck.ts` enforces all of that and
+runs as part of `npm run selfcheck`. If a change makes it fail, the change is wrong, not the check.
 
 The one exemption: `*.selfcheck.ts` files may import `node:*` builtins and `typescript`. They are
 repo infrastructure, never bundled, and `typescript` is a devDependency here and in braccato.
@@ -86,22 +86,30 @@ lyrics' timing.
 
 ## Stylesheets
 
-The DOM and the CSS that styles it are one artifact. These belong to the module and move with it:
+The DOM and the CSS that styles it are one artifact, so the CSS lives inside the boundary too, under
+`styles/`: `lyrics.css`, `instrumental.css` and `variables.css`. These stay with the extension,
+because they style the host rather than the lyrics: `components.css`, `misc.css`, `modal.css`,
+`responsive.css`, `picture-in-picture.css`.
 
-- `public/css/blyrics/lyrics.css`
-- `public/css/blyrics/instrumental.css`
-- the `--blyrics-*` declarations in `public/css/blyrics/variables.css`
+The build emits `styles/*.css` at `css/blyrics/<name>`, the paths `css/blyrics/index.css` already
+imports, so nothing outside the module knows the sources moved: the two injection sites and the
+manifest's web accessible resources are untouched. `emitRendererStyles` in `extension.config.cjs`
+does it, from the emit hook rather than a processAssets stage, so the CSS minimizer leaves them
+exactly as authored, the way the copies under `public/` arrive.
 
-These belong to the extension, because they style the host rather than the lyrics:
-`components.css`, `misc.css`, `modal.css`, `responsive.css`, `picture-in-picture.css`.
+`boundary.selfcheck.ts` holds the stylesheets to the same rule as the code: none of them may name
+`ytmusic`, `#tab-renderer`, `#main-panel`, `player-fullscreened`, `#layout` or `blyrics-dfs`. A
+violation is reported with its file, its line and the name it reached for.
 
-They stay physically in `public/css/blyrics/` for now. Moving them under `src/renderer/` means
-teaching the build to emit them from a new location, which is deferred to the lift.
+One tie remains. `--blyrics-font-family` reads `var(--noto-sans-universal)`, and that stack stays
+with the extension, in `misc.css`, because the extension is what loads those families and two
+published themes select on it by name. Inside the extension it resolves as it always did; a
+standalone consumer would need to define it or the declaration resolves to nothing.
 
-One misfiling to fix when they are split: `responsive.css` paints
-`.blyrics-container::before/::after` below 615px, which is a host decoration living in a lyric
-selector. The floating window is always narrower than that, so it currently has to neutralise the
-rule.
+The misfiling this section used to record is fixed: the album art backdrop `responsive.css` paints
+below 615px is anchored on `ytmusic-app-layout` now, wrapped in `:where()` so it weighs what the bare
+`.blyrics-container:before` a theme overrides weighs. The floating window no longer needs its
+`display: none` counter-rule and no longer carries one.
 
 ## Theme settings
 
