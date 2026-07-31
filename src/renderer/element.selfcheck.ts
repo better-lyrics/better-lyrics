@@ -93,6 +93,9 @@ const MAX_CLOCK_CARRY_MS = 100;
 // MEDIA_ERR_NETWORK, which a truncated stream leaves behind mid-song without touching `paused`.
 const NETWORK_ERROR_CODE = 2;
 
+// Enough to move the song back a whole line, so the offset shows in which line is selected.
+const LYRIC_OFFSET_S = 5;
+
 const MAX_SWALLOWED_SCROLLS = 8;
 
 // A theme, as a consumer writes one: a stylesheet with the module's settings declared in a comment.
@@ -121,6 +124,10 @@ const SYNCED_LYRICS: Lyric[] = [
   { startTimeMs: 5000, durationMs: 5000, words: "Second line" },
   { startTimeMs: 10000, durationMs: 5000, words: "Third line" },
 ];
+
+// What a consumer with nothing to show puts on the screen: one untimed line, which is the shape
+// passive scrolling would drift for the length of the song if nothing said it was a message.
+const NO_LYRICS_PLACEHOLDER: Lyric[] = [{ startTimeMs: 0, durationMs: 0, words: "No lyrics found" }];
 
 class FakeCustomEvent<Detail> {
   constructor(
@@ -402,6 +409,13 @@ function hasRenderer(element: BraccatoLyricsElement): boolean {
 
 function selectedLines(element: BraccatoLyricsElement): boolean[] {
   return (element.renderer?.lines ?? []).map(line => line.isSelected);
+}
+
+// What the build recorded on the container it made, which is where the flags a consumer hands to
+// `lyricsOptions` land.
+function containerDataset(element: BraccatoLyricsElement): Record<string, string> {
+  const container = element.renderer?.container;
+  return container == null ? {} : asFakeNode(container).dataset;
 }
 
 // -- Registration --------------------------------------------
@@ -1564,5 +1578,79 @@ assert.deepEqual(
 );
 
 disconnectElement(rebuiltElement);
+
+// -- The rest of a tick --------------------------------------------
+
+const { fixture: offset, host: offsetHost } = newElementFixture(newConnectedDocument());
+const offsetElement = createCustomElement(offset.fakeDocument, BraccatoLyricsElement);
+
+offsetElement.host = offsetHost;
+offsetElement.lyrics = SYNCED_LYRICS;
+offsetElement.tickOptions = { globalLyricOffset: LYRIC_OFFSET_S };
+connectElement(offset.root, offsetElement);
+
+offsetElement.currentTime = LATE_PLAYBACK_TIME_S;
+
+assert.deepEqual(
+  selectedLines(offsetElement),
+  [false, true, false],
+  "Given an offset written beside the lyrics, When the clock is written, Then the view is at the line that offset puts the song on rather than at the one the raw clock names"
+);
+
+const visibilityChecksBeforeTickOptions = offset.visibilityChecks;
+
+offsetElement.tickOptions = {};
+
+assert.equal(
+  offset.visibilityChecks,
+  visibilityChecksBeforeTickOptions,
+  "Given tick options written to a connected element, When they are set, Then the view was not rendered again, because they are read by the next tick rather than causing one"
+);
+
+offsetElement.currentTime = LATE_PLAYBACK_TIME_S;
+
+assert.deepEqual(
+  selectedLines(offsetElement),
+  [false, false, true],
+  "Given tick options that no longer offset the clock, When the next tick runs, Then it read the ones the element is holding now rather than the ones the last tick was given"
+);
+
+disconnectElement(offsetElement);
+
+// -- Lyrics that are a message rather than a song --------------------------------------------
+
+const { fixture: placeholder, host: placeholderHost } = newElementFixture(newConnectedDocument());
+const placeholderElement = createCustomElement(placeholder.fakeDocument, BraccatoLyricsElement);
+
+placeholderElement.host = placeholderHost;
+placeholderElement.lyricsOptions = { noLyrics: true };
+placeholderElement.lyrics = NO_LYRICS_PLACEHOLDER;
+connectElement(placeholder.root, placeholderElement);
+
+const placeholderContainer = placeholderElement.renderer?.container ?? null;
+
+assert.equal(
+  containerDataset(placeholderElement).noLyrics,
+  "true",
+  "Given lyrics the consumer said are a message rather than a song, When they are built, Then the container says so, which is what keeps passive scrolling off a one line message"
+);
+
+placeholderElement.lyricsOptions = {};
+
+assert.equal(
+  placeholderElement.renderer?.container,
+  placeholderContainer,
+  "Given lyrics options written to a connected element, When they are set, Then the lines were not built again, because they are read by the next build rather than causing one"
+);
+
+placeholderElement.lyrics = NO_LYRICS_PLACEHOLDER;
+
+assert.equal(
+  containerDataset(placeholderElement).noLyrics,
+  undefined,
+  "Given lyrics options that no longer say the song is missing, When the lyrics are given again, Then the build read the ones the element is holding now rather than the ones the last build was given"
+);
+
+disconnectElement(placeholderElement);
 
 console.log("Lyrics element self-check passed");

@@ -10,7 +10,8 @@
 // `setTheme`; the module's stylesheets are the consumer's to load, the way any package's CSS is.
 
 import { createLyricsRenderer } from "./renderer";
-import type { Lyric, LyricsRenderer, LyricsRendererHost, LyricSyncType } from "./types";
+import type { Lyric, LyricsRenderer, LyricsRendererHost, LyricSyncType, TickOptions } from "./types";
+import type { SetLyricsOptions } from "./view";
 
 // -- Names --------------------------------------------
 
@@ -57,6 +58,24 @@ const THEME_DISAGREEMENT_MESSAGE =
   "Another lyrics element in this document was given a different theme, and the module's theme settings are shared, so both views render against whichever theme was applied last";
 const NON_MEDIA_SOURCE_MESSAGE =
   "The source given is not a media element in this element's document, so the lyrics have no clock to follow";
+
+// -- What the next tick and the next build read --------------------------------------------
+
+/**
+ * What a tick carries beyond the clock. `isPlaying` is not among them: `playing` is the property
+ * that says so, and one question with two answers has no rule for choosing between them.
+ *
+ * @public
+ */
+export type ElementTickOptions = Omit<TickOptions, "isPlaying">;
+
+/**
+ * How the lines are built, beyond the lines themselves. The mount is not among them: the element is
+ * the mount.
+ *
+ * @public
+ */
+export type ElementLyricsOptions = Partial<SetLyricsOptions>;
 
 // -- Event details --------------------------------------------
 
@@ -157,8 +176,10 @@ export class BraccatoLyricsElement extends HTMLElement {
   // Null until a consumer gives lyrics, which is not the same as being given none: an element that
   // was never given any leaves whatever it is mounted over alone.
   #lyrics: Lyric[] | null = null;
+  #lyricsOptions: ElementLyricsOptions = {};
   #currentTimeS = 0;
   #playing = false;
+  #tickOptions: ElementTickOptions = {};
   #theme = "";
   #hostOverrides: Partial<LyricsRendererHost> = {};
   #source: HTMLMediaElement | string | null = null;
@@ -185,6 +206,23 @@ export class BraccatoLyricsElement extends HTMLElement {
   set lyrics(lyrics: Lyric[] | null) {
     this.#lyrics = lyrics;
     this.#applyLyrics();
+  }
+
+  /**
+   * How the lines are built, beyond the lines themselves: whether a loader is still covering the
+   * view, and whether these lyrics are a "not found" placeholder rather than a song. The second one
+   * is what keeps passive scrolling off a one line message it would otherwise drift for the length
+   * of the song.
+   *
+   * Read by the next build rather than causing one, so a consumer writes it beside `lyrics` rather
+   * than instead of it, and writing both renders once.
+   */
+  get lyricsOptions(): ElementLyricsOptions {
+    return this.#lyricsOptions;
+  }
+
+  set lyricsOptions(options: ElementLyricsOptions) {
+    this.#lyricsOptions = options;
   }
 
   /**
@@ -243,6 +281,25 @@ export class BraccatoLyricsElement extends HTMLElement {
   }
 
   /**
+   * The rest of a tick: the user offsets the clock is matched against, whether passive scrolling is
+   * switched on for unsynced lyrics, and the timestamp of the player snapshot the clock came from.
+   *
+   * That last one matters beyond this element. The playback clock the module compares a tick
+   * against is module scope, so an element sharing a realm with another view has to be given the
+   * same snapshot timestamps that view is, or every tick reads as a jump away from the other one.
+   *
+   * Read by the next tick rather than causing one, so a consumer that writes these and the clock on
+   * the same frame renders the view once rather than twice.
+   */
+  get tickOptions(): ElementTickOptions {
+    return this.#tickOptions;
+  }
+
+  set tickOptions(options: ElementTickOptions) {
+    this.#tickOptions = options;
+  }
+
+  /**
    * A compiled stylesheet. Its `blyrics-*` comments configure the module and the sheet itself goes
    * into this element's document. An empty one puts every setting back to its default, and is
    * applied like any other: the settings are module scope, so an element that applied nothing would
@@ -297,7 +354,9 @@ export class BraccatoLyricsElement extends HTMLElement {
   connectedCallback(): void {
     // A page that set a property before this module loaded set it on the instance, where it shadows
     // the accessor above for the rest of that element's life unless it is run through it again.
+    this.#upgradeProperty("lyricsOptions");
     this.#upgradeProperty("lyrics");
+    this.#upgradeProperty("tickOptions");
     this.#upgradeProperty("currentTime");
     this.#upgradeProperty("playing");
     this.#upgradeProperty("theme");
@@ -406,7 +465,7 @@ export class BraccatoLyricsElement extends HTMLElement {
       if (lyrics.length === 0) {
         renderer.clear();
       } else {
-        renderer.setLyrics(lyrics);
+        renderer.setLyrics(lyrics, this.#lyricsOptions);
       }
     } catch (thrown) {
       this.#emitError("lyrics", toError(thrown));
@@ -445,10 +504,13 @@ export class BraccatoLyricsElement extends HTMLElement {
     // A view with nothing built reports a missing container to the host on every tick, and a
     // consumer whose clock runs before the lyrics arrive is the ordinary case rather than a fault.
     if (renderer === null || renderer.container === null) return;
-    renderer.tick(this.#currentTimeS, { isPlaying: this.#playing });
+    // The play state last, so a consumer writing plain JavaScript cannot answer that question twice.
+    renderer.tick(this.#currentTimeS, { ...this.#tickOptions, isPlaying: this.#playing });
   }
 
-  #upgradeProperty<Key extends "lyrics" | "currentTime" | "playing" | "theme" | "host" | "source">(name: Key): void {
+  #upgradeProperty<
+    Key extends "lyrics" | "lyricsOptions" | "currentTime" | "playing" | "tickOptions" | "theme" | "host" | "source",
+  >(name: Key): void {
     // Written through the class rather than `this`: TypeScript refuses an indexed write to a
     // polymorphic `this`, since a subclass may have narrowed the accessor it would land on.
     const element: BraccatoLyricsElement = this;
