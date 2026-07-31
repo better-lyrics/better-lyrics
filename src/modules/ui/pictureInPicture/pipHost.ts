@@ -197,7 +197,10 @@ export function createPictureInPictureHost(
    */
   function applyDecorations(): void {
     const renderer = activeRenderer;
-    const pipDocument = activeWindow?.document;
+    // The container is built out of the renderer's own document, so it names it. Reading it off
+    // `activeWindow` instead makes this depend on two variables, assigned in two other functions,
+    // staying in step.
+    const pipDocument = renderer?.container?.ownerDocument;
     const decorations = lyricsPayload?.decorations;
     if (!renderer || !pipDocument || !decorations) return;
 

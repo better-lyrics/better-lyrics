@@ -1486,8 +1486,10 @@ export async function injectHeadTags(): Promise<void> {
  * Cleans up this elements and resets state when switching songs.
  */
 export function cleanup(): void {
-  // Only the side panel's view is reachable from here: the floating window holds its own renderer,
-  // in its own realm on Gecko, and drops the song off the lyrics publish this function ends with.
+  // The side panel's view only, even though on Chromium the floating window's is in the same
+  // registry: clearing it from here would go around its own renderer and leave the container it
+  // built standing in the floating document. It drops the song off the publish this function ends
+  // with instead.
   mainView.clear();
 
   if (lyricsObserver) {
