@@ -30,10 +30,35 @@ its bundle with it. Importing `./engine`, `./inject`, `./view` or anything else 
 directory is a violation in the other direction and is checked too, as is a published leaf growing
 an import.
 
-Everything the module needs from its surroundings arrives through `LyricsRendererOptions`: the
-document to build in, the window to schedule against, the mount, the scroll element, and a
-`LyricsRendererHost`. The host is the only extension point. It answers questions the module cannot
-(is this view on screen, is a loader up) and performs actions it must not own (seek the player).
+`createLyricsRenderer(options)` is the way in. It returns one `LyricsRenderer`: give it lyrics, tick
+it, and it owns the DOM it builds and every re-measurement that DOM needs. Everything else published
+is something one instance cannot answer for on its own. `resetPlaybackClock` and
+`resumeAllAutoscroll` describe the song rather than one view, so they address every live instance and
+no caller gets to name a particular one. `injectRomanization`, `injectTranslation` and
+`hasNonLatinLyrics`, with the `containsNonLatin` and `detectNonLatinLanguage` behind them, decorate
+lines that are already built, for text that arrives after the song does.
+
+`LyricsRendererOptions` still carries everything the module needs from its surroundings, but only the
+document to build in and the window to schedule against are required. The mount may be given here or
+to `setLyrics` later, for a consumer whose mount does not exist until there is something to put in
+it, and the scroll element is not an option here at all: it is one of the host's answers, because
+YouTube Music swaps its scroll container out under a view that already exists.
+
+Every member of the `LyricsRendererHost` has a default, so a consumer with nothing to say about its
+surroundings says nothing at all:
+
+- `isViewVisible` answers that the view is on screen, `isLoaderActive` that nothing is covering it,
+  and `syncAdState` that no ad is playing
+- `getScrollElement` walks up from the mount to the nearest ancestor that scrolls, and falls back to
+  the document's own scrolling element. Memoised, and re-walked whenever the layout moves, because
+  it is resolved per tick
+- `setResumeAffordanceVisible` and `log` do nothing
+- `seek` dispatches a bubbling `braccato:seek` at the mount, carrying the time in seconds as its
+  detail, so a consumer that gave the renderer no way to reach its player can listen for that instead
+
+The host is still the extension point, and the defaults are what a consumer overrides one at a time
+rather than a substitute for writing one. It answers questions the module cannot (is this view on
+screen, is a loader up) and performs actions it must not own (seek the player).
 
 `host.seek(timeS)` deliberately takes a number, not a document. How a seek reaches the player is the
 host's business: this extension dispatches `blyrics-seek-to` at the page world, another consumer
@@ -82,7 +107,16 @@ defaults while the other renders against the theme.
 
 ## Ticking
 
-The module does not own a clock. `tick(currentTimeS, options)` is called by whoever has one. In this
-extension that is the interpolated player snapshot from `blyrics-send-player-time`; in braccato it
-would be an audio element's `currentTime`. A wrapper that owns its own animation frame loop can be
-added on top later without touching this.
+The module does not own a clock. `renderer.tick(currentTimeS, options)` is called by whoever has one.
+In this extension that is the interpolated player snapshot from `blyrics-send-player-time`; in
+braccato it would be an audio element's `currentTime`. A wrapper that owns its own animation frame
+loop can be added on top later without touching this.
+
+`options.isPlaying` is the one thing a tick cannot be given a sensible default for. The rest of
+`TickOptions` describes a setting the consumer may not have, so all of it may be left out.
+
+Everything that moves the lyrics without the song moving goes through
+`renderer.retickFromPlaybackClock`, which renders again against the last snapshot the module saw
+without advancing the clock: an offset nudge, a translation arriving, a line growing.
+`resetPlaybackClock` forgets that snapshot, so the next tick reads as the first of a new song rather
+than as a jump away from the end of the last one.
