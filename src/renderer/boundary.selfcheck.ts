@@ -30,18 +30,19 @@ const STYLES_DIR = resolve(RENDERER_DIR, "styles");
 const EXTENSION_IMPORT_PREFIXES = ["@core/", "@modules/", "@constants", "@utils", "@options", "@/"];
 
 // The alias the extension reaches the module by, and the specifiers under it that are public.
-// `index` publishes the renderer. The other four are leaves with no imports of their own, published
-// separately so that a bundle needing only a class name or a pure helper does not pull the engine in
-// with it: `@constants` is imported by page world code, and routing it through `index` grew every
-// bundle.
+// `index` publishes the renderer. The leaves have no imports of their own, published separately so
+// that a bundle needing only a class name or a pure helper does not pull the engine in with it:
+// `@constants` is imported by page world code, and routing it through `index` grew every bundle.
 const RENDERER_ALIAS = "@renderer";
-const RENDERER_ENTRY_POINTS = new Set([
-  "@renderer/index",
-  "@renderer/constants",
-  "@renderer/text",
-  "@renderer/themeSettings",
-  "@renderer/util",
-]);
+const RENDERER_LEAVES = ["@renderer/constants", "@renderer/text", "@renderer/themeSettings", "@renderer/util"];
+
+// `element` registers two custom element names when it is imported, which is a side effect no
+// consumer that only wants the renderer should pay for. It is an entry point of the package and not
+// of this extension: the extension mounts the renderer itself, and importing this from any of its
+// bundles would register `braccato-lyrics` in YouTube Music's page.
+const SIDE_EFFECT_ENTRY_POINT = "@renderer/element";
+
+const RENDERER_ENTRY_POINTS = new Set(["@renderer/index", SIDE_EFFECT_ENTRY_POINT, ...RENDERER_LEAVES]);
 
 // Self-check files are repo infrastructure: they run under tsx, they are never bundled into the
 // extension, and typescript is already a devDependency both here and in braccato, so this stays
@@ -187,6 +188,17 @@ function collectEntryPointViolations(displayPath: string, absolutePath: string, 
   for (const { specifier, line } of extractModuleReferences(parseSource(absolutePath, source))) {
     if (specifier === null) continue;
     if (specifier !== RENDERER_ALIAS && !specifier.startsWith(`${RENDERER_ALIAS}/`)) continue;
+
+    if (specifier === SIDE_EFFECT_ENTRY_POINT) {
+      violations.push({
+        file: displayPath,
+        line,
+        rule: "no-side-effect-entry-point",
+        detail: `imports "${specifier}", which registers custom elements; the extension mounts the renderer itself`,
+      });
+      continue;
+    }
+
     if (RENDERER_ENTRY_POINTS.has(specifier)) continue;
 
     violations.push({
@@ -314,10 +326,11 @@ assert.deepEqual(
       `import { toMs } from "@renderer/util";`,
       `const lazy = await import("@renderer/view");`,
       `import { AppState } from "@core/appState";`,
+      `import "@renderer/element";`,
     ].join("\n")
   ).map(violation => `${violation.line} ${violation.rule}`),
-  ["2 no-renderer-internals", "4 no-renderer-internals"],
-  "Given a file outside the module, When it imports an internal, Then only the published leaves are allowed"
+  ["2 no-renderer-internals", "4 no-renderer-internals", "6 no-side-effect-entry-point"],
+  "Given a file outside the module, When it imports an internal or the element, Then only the published leaves and the renderer are allowed"
 );
 
 const VIOLATING_STYLESHEET = [
@@ -346,7 +359,7 @@ assert.deepEqual(
 
 // A leaf is only safe to publish while it stays a leaf: the moment one of them imports something
 // else in the module, importing it pulls that in too, which is the bundle growth this avoids.
-for (const leaf of [...RENDERER_ENTRY_POINTS].filter(entry => entry !== "@renderer/index")) {
+for (const leaf of RENDERER_LEAVES) {
   const leafPath = join(RENDERER_DIR, `${leaf.slice("@renderer/".length)}.ts`);
   const references = extractModuleReferences(parseSource(leafPath, readFileSync(leafPath, "utf8")));
 

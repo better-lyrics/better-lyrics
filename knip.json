@@ -13,6 +13,7 @@
     "public/script.js",
     "src/core/generated/locales.ts",
     "src/renderer/index.ts",
+    "src/renderer/element.ts",
     "src/**/*.selfcheck.ts"
   ],
   "project": ["src/**/*.ts", "public/**/*.js"],
