@@ -1,3 +1,39 @@
+const { readdirSync, readFileSync } = require("node:fs");
+const { join } = require("node:path");
+
+// The renderer's stylesheets live inside its package boundary, but they ship at the paths
+// css/blyrics/index.css already imports, so the manifest and the two injection sites never learn
+// that the sources moved.
+const RENDERER_STYLES_DIR = join(__dirname, "src", "renderer", "styles");
+const RENDERER_STYLES_OUTPUT_DIR = "css/blyrics";
+
+const rendererStylesheets = () =>
+  readdirSync(RENDERER_STYLES_DIR)
+    .filter((name) => name.endsWith(".css"))
+    .map((name) => ({ name, path: join(RENDERER_STYLES_DIR, name) }));
+
+// Emitted from the emit hook rather than from a processAssets stage so the CSS minimizer leaves
+// them byte for byte as authored, which is how the copies under public/ arrive too.
+const emitRendererStyles = {
+  apply: (compiler) => {
+    compiler.hooks.thisCompilation.tap("EmitRendererStyles", (compilation) => {
+      for (const { path } of rendererStylesheets()) {
+        compilation.fileDependencies.add(path);
+      }
+    });
+
+    compiler.hooks.emit.tap("EmitRendererStyles", (compilation) => {
+      for (const { name, path } of rendererStylesheets()) {
+        const contents = readFileSync(path);
+        compilation.emitAsset(`${RENDERER_STYLES_OUTPUT_DIR}/${name}`, {
+          source: () => contents,
+          size: () => contents.length,
+        });
+      }
+    });
+  },
+};
+
 module.exports = {
   dev: {
     browser: "chrome",
@@ -36,6 +72,8 @@ module.exports = {
   config: (config) => {
     const isCanaryRelease = process.env.RELEASE_TYPE === "canary";
     const isDevelopment = config.mode !== "production";
+
+    config.plugins.push(emitRendererStyles);
 
     if (!isDevelopment) {
       console.log("\x1b[31m[BetterLyrics]\x1b[0m Building for", isCanaryRelease ? "canary release" : "standard release");
