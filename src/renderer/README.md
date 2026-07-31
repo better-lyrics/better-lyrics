@@ -24,19 +24,23 @@ reference drags the webext polyfill into that bundle and kills it silently. See
 
 ## Public API
 
-`index.ts` is the API. `constants.ts`, `themeSettings.ts` and `util.ts` are published beside it
-because they import nothing, so a consumer that needs one class name does not pull the engine into
-its bundle with it. Importing `./engine`, `./inject`, `./view` or anything else from outside this
-directory is a violation in the other direction and is checked too, as is a published leaf growing
-an import.
+The index publishes the renderer, the leaves publish the standalone pieces. `constants.ts`,
+`text.ts`, `themeSettings.ts` and `util.ts` are the leaves: they import nothing, so a consumer that
+needs one class name, one script test or one pure helper does not pull the engine into its bundle
+with it. Importing `./engine`, `./inject`, `./view` or anything else from outside this directory is a
+violation in the other direction and is checked too, as is a published leaf growing an import.
 
 `createLyricsRenderer(options)` is the way in. It returns one `LyricsRenderer`: give it lyrics, tick
-it, and it owns the DOM it builds and every re-measurement that DOM needs. Everything else published
-is something one instance cannot answer for on its own. `resetPlaybackClock` and
-`resumeAllAutoscroll` describe the song rather than one view, so they address every live instance and
-no caller gets to name a particular one. `injectRomanization`, `injectTranslation` and
-`hasNonLatinLyrics`, with the `containsNonLatin` and `detectNonLatinLanguage` behind them, decorate
-lines that are already built, for text that arrives after the song does.
+it, and it owns the DOM it builds and every re-measurement that DOM needs. The four values published
+beside it are what one instance cannot answer for on its own. `resetPlaybackClock` and
+`resumeAllAutoscroll` describe the song rather than one view, so no caller gets to name a particular
+one, but they reach the views differently: `resumeAllAutoscroll` walks the registry of live
+instances, while `resetPlaybackClock` forgets a snapshot the module keeps once for all of them, which
+each view then reads on its next tick. `injectRomanization` and `injectTranslation` decorate lines
+that are already built, for text that arrives after the song does.
+
+Only the `LyricsRenderer` members with something to say beyond their signature are described below.
+The interface in `types.ts` is the full list, and documents the rest where they need it.
 
 `LyricsRendererOptions` still carries everything the module needs from its surroundings, but only the
 document to build in and the window to schedule against are required. The mount may be given here or
@@ -44,17 +48,21 @@ to `setLyrics` later, for a consumer whose mount does not exist until there is s
 it, and the scroll element is not an option here at all: it is one of the host's answers, because
 YouTube Music swaps its scroll container out under a view that already exists.
 
-Every member of the `LyricsRendererHost` has a default, so a consumer with nothing to say about its
-surroundings says nothing at all:
+Every member of the `LyricsRendererHost` but `debug` has a default, so a consumer with nothing to say
+about its surroundings says nothing at all:
 
 - `isViewVisible` answers that the view is on screen, `isLoaderActive` that nothing is covering it,
   and `syncAdState` that no ad is playing
-- `getScrollElement` walks up from the mount to the nearest ancestor that scrolls, and falls back to
-  the document's own scrolling element. Memoised, and re-walked whenever the layout moves, because
-  it is resolved per tick
+- `getScrollElement` starts at the mount itself and walks up to the nearest element that scrolls, so
+  a consumer that mounts straight into its own scroll container means that container rather than
+  whatever else scrolls above it, and falls back to the document's own scrolling element. Memoised,
+  and re-walked whenever the layout moves, because it is resolved per tick
 - `setResumeAffordanceVisible` and `log` do nothing
 - `seek` dispatches a bubbling `braccato:seek` at the mount, carrying the time in seconds as its
   detail, so a consumer that gave the renderer no way to reach its player can listen for that instead
+- `debug` is the one with nothing to default to: it is optional on the host and handed through as it
+  was given, so a consumer that wants the diagnostic overlay supplies the sink and one that says
+  nothing draws nothing
 
 The host is still the extension point, and the defaults are what a consumer overrides one at a time
 rather than a substitute for writing one. It answers questions the module cannot (is this view on
@@ -115,8 +123,11 @@ loop can be added on top later without touching this.
 `options.isPlaying` is the one thing a tick cannot be given a sensible default for. The rest of
 `TickOptions` describes a setting the consumer may not have, so all of it may be left out.
 
-Everything that moves the lyrics without the song moving goes through
-`renderer.retickFromPlaybackClock`, which renders again against the last snapshot the module saw
-without advancing the clock: an offset nudge, a translation arriving, a line growing.
-`resetPlaybackClock` forgets that snapshot, so the next tick reads as the first of a new song rather
-than as a jump away from the end of the last one.
+Three doors move the lyrics without the song moving, and they differ in what they measure.
+`renderer.retickFromPlaybackClock` renders again against the last snapshot the module saw and
+measures nothing, which is what an offset nudge needs. `relayout` measures and renders nothing,
+leaving the lines it just re-read to the next tick. `scheduleLyricPositionUpdate` does both, on the
+next frame, and is the busiest of the three: `types.ts` calls it out as the one a streamed
+translation or romanization comes through, once each. `resetPlaybackClock` forgets that snapshot, so
+the next tick reads as the first of a new song rather than as a jump away from the end of the last
+one.
