@@ -24,7 +24,21 @@ const ALIAS_TAG_NAME = "better-lyrics";
 // none of them doing it.
 const CURRENT_TIME_ATTRIBUTE = "current-time";
 const PLAYING_ATTRIBUTE = "playing";
+const SOURCE_ATTRIBUTE = "source";
 const THEME_ATTRIBUTE = "theme";
+
+// -- Following a media element --------------------------------------------
+
+// Every moment the clock moved, changed speed or stopped while no frame of this element's was
+// looking. Each one means the same thing here, so they share a handler. `ended`, `emptied` and
+// `loadedmetadata` are deliberately not among them: the README says why.
+const MEDIA_CLOCK_EVENTS: readonly string[] = ["play", "pause", "seeking", "seeked", "ratechange"];
+
+// How far past its last reading the media clock may be carried, in milliseconds. `currentTime` is
+// only as fresh as the media element chose to make it, which for video is once per presented frame,
+// so a view rendering the raw reading steps where the song runs. The ceiling is what keeps a clock
+// that stopped without saying so, buffering mid-song, from running away from it.
+const MAX_CLOCK_CARRY_MS = 100;
 
 // The names the component this replaces dispatched, kept so its consumers port by changing an
 // import. `braccato:word-click` is not among them: the renderer tells its host a seek happened and
@@ -43,7 +57,7 @@ const THEME_DISAGREEMENT_MESSAGE =
 // -- Event details --------------------------------------------
 
 /** @public */
-export type ElementErrorPhase = "connect" | "conflict" | "lyrics" | "theme";
+export type ElementErrorPhase = "connect" | "conflict" | "lyrics" | "source" | "theme";
 
 /** @public */
 export interface ElementErrorDetail {
@@ -92,6 +106,10 @@ function toError(thrown: unknown): Error {
   return thrown instanceof Error ? thrown : new Error(String(thrown), { cause: thrown });
 }
 
+function unresolvedSourceMessage(selector: string): string {
+  return `The source selector "${selector}" does not name a media element in this element's document, so the lyrics have no clock to follow`;
+}
+
 /**
  * Registers a name only if it is free. A page that loads this module twice would otherwise throw out
  * of an import and take the rest of that script with it, and the second registration could not have
@@ -115,7 +133,7 @@ function defineOnce(tagName: string, elementConstructor: CustomElementConstructo
  * property here would be a second opinion about a question the platform has already answered.
  */
 export class BraccatoLyricsElement extends HTMLElement {
-  static readonly observedAttributes = [CURRENT_TIME_ATTRIBUTE, PLAYING_ATTRIBUTE, THEME_ATTRIBUTE];
+  static readonly observedAttributes = [CURRENT_TIME_ATTRIBUTE, PLAYING_ATTRIBUTE, SOURCE_ATTRIBUTE, THEME_ATTRIBUTE];
 
   #renderer: LyricsRenderer | null = null;
   // The document this element registered itself in, rather than whatever it is in now: adopting an
@@ -130,6 +148,17 @@ export class BraccatoLyricsElement extends HTMLElement {
   #playing = false;
   #theme = "";
   #hostOverrides: Partial<LyricsRendererHost> = {};
+  #source: HTMLMediaElement | string | null = null;
+  // Non-null exactly while the element is listening to a media element, so there is no state where
+  // one is remembered and its listeners are not.
+  #media: HTMLMediaElement | null = null;
+  // The last reading of the media clock, the frame it was taken on, and the rate it was taken at.
+  // Null means the next frame takes a new one, which is what a seek or a rate change leaves behind.
+  #clockAnchor: { mediaTimeS: number; frameTimeMs: number; rate: number } | null = null;
+  #frameHandle: number | null = null;
+  // The window the pending frame was scheduled against rather than whatever the element is in now:
+  // adopting an element into another document would leave the cancellation aimed at the wrong one.
+  #frameWindow: Window | null = null;
 
   // -- Properties --------------------------------------------
 
@@ -146,24 +175,56 @@ export class BraccatoLyricsElement extends HTMLElement {
   }
 
   /**
+   * The media element the lyrics follow, as a CSS selector resolved in this element's own document
+   * or as the element itself. Setting it binds and null unbinds, and while it is bound the element
+   * reads the clock rather than being told it: `currentTime` and `playing` become what it reports.
+   *
+   * Bound only while connected, the way the renderer is built only while connected, and a selector
+   * is resolved again every time it is written and every time the element connects.
+   */
+  get source(): HTMLMediaElement | string | null {
+    return this.#source;
+  }
+
+  set source(source: HTMLMediaElement | string | null) {
+    this.#source = source;
+    this.#bindSource();
+  }
+
+  /**
+   * The media element `source` resolved to. Null whenever nothing is being followed, which is the
+   * answer for a selector that matched nothing and for an element that is not connected.
+   */
+  get mediaElement(): HTMLMediaElement | null {
+    return this.#media;
+  }
+
+  /**
    * Playback position in seconds, not milliseconds: the module ticks in seconds, and converting here
    * would leave the element and the renderer underneath it disagreeing about what a number means.
    * Writing it renders the view again, so whoever owns the clock drives the lyrics by writing this.
+   *
+   * While a media element is bound it is the one that owns the clock, so a write is dropped and this
+   * keeps reporting what the binding last read. Dropped rather than reported: a consumer who left
+   * their own frame loop running would otherwise be told about it sixty times a second.
    */
   get currentTime(): number {
     return this.#currentTimeS;
   }
 
   set currentTime(currentTimeS: number) {
+    if (this.#media !== null) return;
     this.#currentTimeS = currentTimeS;
     this.#tick();
   }
 
+  /** An output rather than an input while a media element is bound, exactly as `currentTime` is. */
   get playing(): boolean {
     return this.#playing;
   }
 
   set playing(playing: boolean) {
+    if (this.#media !== null) return;
     this.#playing = playing;
     this.#tick();
   }
@@ -228,11 +289,16 @@ export class BraccatoLyricsElement extends HTMLElement {
     this.#upgradeProperty("playing");
     this.#upgradeProperty("theme");
     this.#upgradeProperty("host");
+    this.#upgradeProperty("source");
     this.#build();
+    // After the view exists, so a build that threw on the way up leaves no listener on a media
+    // element and no frame queued for a view that was never there.
+    this.#bindSource();
   }
 
   disconnectedCallback(): void {
     const peers = this.#peers();
+    this.#unbindMedia();
     this.#destroyRenderer();
     this.#missingBrowsingContext = false;
     // Destroying a renderer takes the theme element with it when that renderer is the one that
@@ -251,6 +317,10 @@ export class BraccatoLyricsElement extends HTMLElement {
     }
     if (name === PLAYING_ATTRIBUTE) {
       this.playing = newValue !== null;
+      return;
+    }
+    if (name === SOURCE_ATTRIBUTE) {
+      this.source = newValue;
       return;
     }
     if (name === THEME_ATTRIBUTE) {
@@ -300,6 +370,11 @@ export class BraccatoLyricsElement extends HTMLElement {
       ...overrides,
       seek: timeS => {
         overrides.seek?.(timeS);
+        // A bound media element is the player, so a click on a line reaches it here rather than
+        // through a consumer who would otherwise have to write the other half of their own binding.
+        // Before the event, so a listener reading the media element back sees where the click sent
+        // it.
+        if (this.#media !== null) this.#media.currentTime = timeS;
         this.#emit<LineClickDetail>(LINE_CLICK_EVENT, { timeS });
       },
       setResumeAffordanceVisible: visible => {
@@ -360,7 +435,7 @@ export class BraccatoLyricsElement extends HTMLElement {
     renderer.tick(this.#currentTimeS, { isPlaying: this.#playing });
   }
 
-  #upgradeProperty<Key extends "lyrics" | "currentTime" | "playing" | "theme" | "host">(name: Key): void {
+  #upgradeProperty<Key extends "lyrics" | "currentTime" | "playing" | "theme" | "host" | "source">(name: Key): void {
     // Written through the class rather than `this`: TypeScript refuses an indexed write to a
     // polymorphic `this`, since a subclass may have narrowed the accessor it would land on.
     const element: BraccatoLyricsElement = this;
@@ -368,6 +443,145 @@ export class BraccatoLyricsElement extends HTMLElement {
     const value = element[name];
     Reflect.deleteProperty(element, name);
     element[name] = value;
+  }
+
+  // -- Following a media element --------------------------------------------
+
+  /**
+   * Binds whatever `source` names now, unbinding first, so one call is also how the element moves
+   * from one media element to another and leaves nothing behind on the first.
+   *
+   * Bound only while there is a view to drive. A disconnected element holds no renderer, and a
+   * clock feeding nothing is a listener and a frame that nobody asked for.
+   */
+  #bindSource(): void {
+    this.#unbindMedia();
+    if (this.#renderer === null) return;
+
+    const media = this.#resolveSource();
+    if (media === null) return;
+
+    this.#media = media;
+    for (const type of MEDIA_CLOCK_EVENTS) {
+      media.addEventListener(type, this.#handleMediaClockEvent);
+    }
+    // Read now rather than waited for: a media element that was already playing when it was bound
+    // has no `play` event left to fire.
+    this.#driveFromMedia();
+    this.#syncFrameLoop();
+  }
+
+  #unbindMedia(): void {
+    this.#cancelFrame();
+    const media = this.#media;
+    this.#media = null;
+    this.#clockAnchor = null;
+    if (media === null) return;
+    for (const type of MEDIA_CLOCK_EVENTS) {
+      media.removeEventListener(type, this.#handleMediaClockEvent);
+    }
+  }
+
+  #resolveSource(): HTMLMediaElement | null {
+    const source = this.#source;
+    if (source === null) return null;
+    if (typeof source !== "string") return source;
+
+    let matched: Element | null;
+    try {
+      matched = this.ownerDocument.querySelector(source);
+    } catch (thrown) {
+      // A string that is not a selector throws, and a property setter is not where a consumer
+      // expects to catch that.
+      this.#emitError("source", toError(thrown));
+      return null;
+    }
+
+    // The element's own realm rather than this one, so a selector resolved in another document is
+    // judged against that document's constructor rather than against a foreign one it can never be.
+    const view = this.ownerDocument.defaultView;
+    if (view === null || !(matched instanceof view.HTMLMediaElement)) {
+      this.#emitError("source", new Error(unresolvedSourceMessage(source)));
+      return null;
+    }
+    return matched;
+  }
+
+  // One handler for all of them, because what each event means to this element is the same thing:
+  // the clock moved, changed speed or stopped, and the reading being carried forward is stale.
+  readonly #handleMediaClockEvent = (): void => {
+    this.#driveFromMedia();
+    this.#syncFrameLoop();
+  };
+
+  #driveFromMedia(): void {
+    const media = this.#media;
+    if (media === null) return;
+    this.#clockAnchor = null;
+    this.#drive(media.currentTime, !media.paused);
+  }
+
+  #drive(currentTimeS: number, playing: boolean): void {
+    this.#currentTimeS = currentTimeS;
+    this.#playing = playing;
+    this.#tick();
+  }
+
+  /** A frame runs only while a bound clock is running, so a stopped one costs nothing. */
+  #syncFrameLoop(): void {
+    if (this.#media !== null && this.#playing) {
+      this.#scheduleFrame();
+      return;
+    }
+    this.#cancelFrame();
+  }
+
+  #scheduleFrame(): void {
+    if (this.#frameHandle !== null) return;
+    const view = this.ownerDocument.defaultView;
+    if (view === null) return;
+    this.#frameWindow = view;
+    this.#frameHandle = view.requestAnimationFrame(this.#renderFrame);
+  }
+
+  #cancelFrame(): void {
+    if (this.#frameHandle === null) return;
+    this.#frameWindow?.cancelAnimationFrame(this.#frameHandle);
+    this.#frameHandle = null;
+    this.#frameWindow = null;
+  }
+
+  readonly #renderFrame = (frameTimeMs: number): void => {
+    this.#frameHandle = null;
+    this.#frameWindow = null;
+    const media = this.#media;
+    if (media === null) return;
+
+    // The loop asks rather than trusting the pause event, so a clock that stopped without one, at
+    // the end of a song or when its resource went away, still stops the frames.
+    if (media.paused) {
+      this.#driveFromMedia();
+    } else {
+      this.#drive(this.#carriedClock(media, frameTimeMs), true);
+    }
+    this.#syncFrameLoop();
+  };
+
+  /**
+   * Where the song is on this frame. A reading the media element has not refreshed is carried
+   * forward at the rate it was taken at, which is what keeps a binding honest at any playback rate
+   * rather than only at 1x, and what turns a clock that only updates once per presented frame into
+   * one the lyrics can run against.
+   */
+  #carriedClock(media: HTMLMediaElement, frameTimeMs: number): number {
+    const mediaTimeS = media.currentTime;
+    const anchor = this.#clockAnchor;
+    if (anchor === null || anchor.mediaTimeS !== mediaTimeS) {
+      this.#clockAnchor = { mediaTimeS, frameTimeMs, rate: media.playbackRate };
+      return mediaTimeS;
+    }
+    const carriedMs = Math.min(Math.max(frameTimeMs - anchor.frameTimeMs, 0), MAX_CLOCK_CARRY_MS);
+    return anchor.mediaTimeS + (carriedMs * anchor.rate) / 1000;
   }
 
   // -- More than one view in a document --------------------------------------------
