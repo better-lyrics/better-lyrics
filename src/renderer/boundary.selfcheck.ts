@@ -29,13 +29,15 @@ const SOURCE_ROOT = resolve(REPO_ROOT, "src");
 const EXTENSION_IMPORT_PREFIXES = ["@core/", "@modules/", "@constants", "@utils", "@options", "@/"];
 
 // The alias the extension reaches the module by, and the specifiers under it that are public.
-// `index` is the API. The other three are leaves with no imports of their own, published separately
-// so that a bundle needing only a class name or a pure helper does not pull the engine in with it:
-// `@constants` is imported by page world code, and routing it through `index` grew every bundle.
+// `index` publishes the renderer. The other four are leaves with no imports of their own, published
+// separately so that a bundle needing only a class name or a pure helper does not pull the engine in
+// with it: `@constants` is imported by page world code, and routing it through `index` grew every
+// bundle.
 const RENDERER_ALIAS = "@renderer";
 const RENDERER_ENTRY_POINTS = new Set([
   "@renderer/index",
   "@renderer/constants",
+  "@renderer/text",
   "@renderer/themeSettings",
   "@renderer/util",
 ]);

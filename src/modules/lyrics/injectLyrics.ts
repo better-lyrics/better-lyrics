@@ -23,14 +23,8 @@ import { addFooter, addNoLyricsButton, cleanup, createLyricsWrapper, flushLoader
 import { lyricsElementAdded, mainView } from "@modules/ui/mainLyricsView";
 import { disableNativeLyricsFocus } from "@modules/ui/nativeLyricsFocus";
 import { publishPictureInPictureLyrics } from "@modules/ui/pictureInPicture/lyricsPublisher";
-import {
-  containsNonLatin,
-  detectNonLatinLanguage,
-  hasNonLatinLyrics,
-  injectRomanization,
-  injectTranslation,
-  type LineData,
-} from "@renderer/index";
+import { injectRomanization, injectTranslation, type LineData } from "@renderer/index";
+import { containsNonLatin, detectNonLatinLanguage } from "@renderer/text";
 import { langCodesMatch, languageMatchesAny, log } from "@utils";
 
 export type { LineData };
@@ -169,7 +163,7 @@ function injectLyrics(
     syncType: syncType,
     isMusicVideoSynced: data.musicVideoSynced === true,
     tabSelector,
-    hasNonLatin: hasNonLatinLyrics(lyrics),
+    hasNonLatin: lyrics.some(item => !!item.words && containsNonLatin(item.words)),
   };
 
   // Set before addFooter so the dock controls read the current song's lyric data.

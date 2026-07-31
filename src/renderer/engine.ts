@@ -6,9 +6,9 @@ import {
   PAUSED_CLASS,
   USER_SCROLLING_CLASS,
 } from "./constants";
-import type { LineData, LyricsRendererHost, LyricSyncType, PartData, TickOptions } from "./index";
+import type { LineData, PartData } from "./inject";
 import { registerThemeSetting } from "./themeSettings";
-import type { ResolvedTickOptions } from "./types";
+import type { LyricsRendererHost, LyricSyncType, ResolvedTickOptions, TickOptions } from "./types";
 import { clamp, getRelativeLayoutBounds, positiveModulo, roundedMs, toMs } from "./util";
 
 const NO_LYRICS_ELEMENT_LOG = "No lyrics element found on the page, skipping lyrics injection";

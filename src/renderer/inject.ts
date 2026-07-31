@@ -17,7 +17,7 @@ import {
   ZERO_DURATION_ANIMATION_CLASS,
 } from "./constants";
 import { getSeekTimeFromClick } from "./seek";
-import { containsNonLatin, testRtl } from "./text";
+import { testRtl } from "./text";
 import { registerThemeSetting } from "./themeSettings";
 import type { Lyric, LyricPart, LyricSyncType } from "./types";
 
@@ -72,10 +72,6 @@ export function deriveSyncType(lyrics: Lyric[]): LyricSyncType {
 
   if (hasTimedParts) return "richsync";
   return lyrics.every(item => item.startTimeMs === 0) ? "none" : "synced";
-}
-
-export function hasNonLatinLyrics(lyrics: Lyric[]): boolean {
-  return lyrics.some(item => !!item.words && containsNonLatin(item.words));
 }
 
 export interface PartData {
