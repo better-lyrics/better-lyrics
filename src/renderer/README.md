@@ -189,6 +189,13 @@ second's `customElements.define` never runs, so every element on the page is an 
 copy's class and `instanceof` against the second copy's is false. There is nobody to report that to
 at module scope, which is why it is written down here instead: load one copy.
 
+The other thing worth knowing before importing it: **this entry point requires the main world.** A
+browser extension's isolated world has no custom element registry at all, so `window.customElements`
+is null there, and importing this file throws where it registers rather than degrading. An extension
+that wants the tag has to run this module in the page's own world; one that stays in its isolated
+world calls `createLyricsRenderer` directly, which is what this extension does and why nothing in it
+imports this file.
+
 ```html
 <!-- The module's own stylesheets, in this order, however the build serves a package's CSS. -->
 <link rel="stylesheet" href="@braccato/core/styles/variables.css" />
@@ -201,9 +208,15 @@ at module scope, which is why it is written down here instead: load one copy.
   import "@braccato/core/element";
 
   const view = document.querySelector("braccato-lyrics");
-  // A Lyric[], which is the consumer's to produce: see Properties below.
-  view.lyrics = lyrics;
-  view.theme = compiledCss;
+  // A Lyric[], which is the consumer's to produce: nothing here parses a lyrics format, so a real
+  // page builds this out of its own LRC, TTML or API response. See Properties below.
+  view.lyrics = [
+    { startTimeMs: 0, durationMs: 4200, words: "The first line" },
+    { startTimeMs: 4200, durationMs: 3800, words: "The second" },
+    { startTimeMs: 8000, durationMs: 4000, words: "And the third" },
+  ];
+  // A compiled stylesheet, which may be nothing but the module's own settings. See Theme settings.
+  view.theme = "/* blyrics-line-synced-animation-delay = 0.2; */";
   view.addEventListener("braccato:error", event => {
     console.warn(event.detail.phase, event.detail.error);
   });
@@ -221,17 +234,34 @@ says what each of the three carries.
 
 ### Properties
 
-`lyrics`, `currentTime`, `playing`, `theme`, `host` and `source` are writable, `renderer` and
-`mediaElement` are not. All of them may be written before the element is in a document: the renderer
-is built when it connects, and everything it was handed by then is applied at once. That includes
-properties a page wrote before this module even loaded, which land on the instance and would shadow
-the accessors forever if `connectedCallback` did not run them through again.
+`lyrics`, `lyricsOptions`, `currentTime`, `playing`, `tickOptions`, `theme`, `host` and `source` are
+writable, `renderer` and `mediaElement` are not. All of them may be written before the element is in
+a document: the renderer is built when it connects, and everything it was handed by then is applied
+at once. That includes properties a page wrote before this module even loaded, which land on the
+instance and would shadow the accessors forever if `connectedCallback` did not run them through
+again.
 
 `currentTime` is in **seconds**, not the milliseconds braccato's component took. The module ticks in
 seconds, and an element that converted would leave itself and the renderer underneath it disagreeing
 about what a number means. Writing it renders the view again, so whoever owns the clock drives the
 lyrics by writing it. Writing `playing` renders again too, since a paused view animates differently
 from a playing one. Both become outputs the moment a `source` is bound, described below.
+
+`tickOptions` is the rest of a tick: everything in `TickOptions` except `isPlaying`, which `playing`
+already answers. The user offsets (`globalLyricOffset`, `lyricOffset`, `richsyncOffsetTrim`,
+`lineOffsetTrim`) are subtracted from the clock before it is matched against the lines,
+`passiveScrollEnabled` is what lets unsynced lyrics drift with the song rather than sitting still,
+and `eventCreationTime` is the wall clock timestamp of the player snapshot the time came from.
+
+Writing it stores and nothing more: it is read by the next tick rather than causing one, so a
+consumer that writes options and the clock on the same frame renders once. Writing `lyricsOptions` is
+the same bargain against the next build.
+
+`eventCreationTime` is worth a sentence of its own, because it reaches past this element. The
+playback clock a tick is compared against is module scope, shared by every view in the realm, and it
+defaults here to the sentinel that means the time was not sampled from a live player. An element
+sharing a realm with a view that does pass real timestamps has to pass them too, or the difference
+between the two reads as a jump on every tick and neither view keeps a scroll.
 
 `source` is the media element the lyrics follow, and `mediaElement` is what it resolved to. Following
 a media element says what they do.
@@ -246,6 +276,13 @@ fields for syllable or word timing, and optional `translation`, `romanization` a
 `timedRomanization` beside them. Nothing in this module parses a lyrics format. Turning LRC, TTML or
 an API's own JSON into that array is the consumer's job, the way this extension's providers do it,
 and it is the piece the component this replaces hid behind a `src` property.
+
+`lyricsOptions` is how the lines are built, beyond the lines themselves: `loaderVisible`, which
+records on the container that something is still covering the view, and `noLyrics`, which says these
+lyrics are a "not found" message rather than a song. The second one matters more than it reads.
+Without it a one line placeholder is an unsynced song as far as the module can tell, so passive
+scrolling drifts the message across the view for the length of the track. The mount is not among the
+options the renderer takes here: the element is the mount.
 
 `theme` is a compiled stylesheet, the same string `renderer.setTheme` takes, described under Theme
 settings above. If the theme changes a setting the lines are built out of, the element rebuilds them,
@@ -310,9 +347,17 @@ is playing, so a paused or ended song costs nothing. Every frame reads the clock
 the media element has not refreshed yet is carried forward at the `playbackRate` it was taken at:
 `currentTime` is only as fresh as the media element chose to make it, once per presented frame for
 video, so a view rendering the raw reading steps where the song runs, and a carry that assumed 1x
-would drift on anything else. The carry is capped at 100ms, which is what stops a clock that stalled
-mid-song from running away from it. The frame also asks whether the media element is still playing,
-so a clock that stopped without an event still stops the loop.
+would drift on anything else. The frame also asks whether the media element is still playing, so a
+clock that stopped without an event still stops the loop.
+
+The carry is capped at 100ms **of frame time, not of song time**, and both halves of that are worth
+knowing. Frame time is where the cap belongs because the gap it fills is spaced there: the media
+element refreshes its clock about once per presented frame whatever the rate is, so a cap measured
+in song time would shrink below one frame at a high rate and the carry would stop doing its job on
+exactly the songs that need it most. What that costs is the other half. A clock that stalls
+overshoots by up to 100ms times the playback rate, and when it starts moving again the view steps
+back by however far it overshot: 100ms at 1x, 400ms at 4x. Nothing is lost, but the step backwards
+is real and it is visible, and it scales with the rate.
 
 Five events are listened to on the media element, and they all mean one thing to the element, that
 the clock moved or changed speed while no frame of its own was looking, so they share a handler that
@@ -321,12 +366,28 @@ happens, since the position is already the requested one when it fires, and `see
 where the media element actually landed, which is not always the same number. `ratechange` retakes
 the reading with the rate it will be carried at.
 
-Three are deliberately not listened to. `ended` is covered by `pause`, which a non-looping media
-element fires first, and by the frame loop's own check that playback is still running. `emptied` says
-the resource went away rather than that the clock moved, and it leaves the media element paused at
-zero, which the same check reports. `loadedmetadata` carries `duration` and the intrinsic dimensions,
-none of which this element reads. `timeupdate` is not among them either: while playing it is a
-coarser copy of the frame loop, and while paused it is a 4Hz version of the seek events.
+The rest are deliberately not listened to, and the frame loop is what covers most of them: it asks
+the media element whether its clock is still going rather than trusting that something said so.
+
+- `ended` is covered by `pause`, which a non-looping media element fires first, and by that same
+  check
+- `emptied` says the resource went away rather than that the clock moved, and it leaves the media
+  element paused at zero, which the check reports on the next frame. The gap is `emptied` **while
+  already paused**: no loop is running to notice, no `pause` follows, so an element whose consumer
+  swaps `audio.src` between songs without playing goes on reporting the old song's position until
+  the next `play`. Write `currentTime` on the media element, or start playback, and it corrects
+  itself
+- `error` is the one that would otherwise spin. A fatal decode or network failure mid-song sets
+  `error` and fires it and **never touches `paused`**, and never runs the pause steps, so a loop
+  whose only stop condition was `paused` would tick against a frozen clock for the life of the
+  element. The frame reads `media.error` alongside `media.paused` for exactly that, and a media
+  element in that state reports `playing === false`
+- `waiting` and `stalled` are what the carry cap is for. Both say the clock has stopped advancing
+  without stopping, and a capped carry means the view runs at most 100ms of frame time past the last
+  real reading and then waits with it
+- `loadedmetadata` carries `duration` and the intrinsic dimensions, none of which this element reads
+- `timeupdate` is a coarser copy of the frame loop while playing, and a 4Hz version of the seek
+  events while paused
 
 The binding lives exactly as long as the renderer does, so `mediaElement` is null while the element
 is disconnected, the way `renderer` is, and a selector is resolved again every time it is written and
@@ -334,7 +395,10 @@ every time the element connects. Disconnecting, unbinding, rebinding and reconne
 listener on a media element and no frame queued.
 
 A selector that matches nothing, matches something that is not a media element, or is not a selector
-at all leaves `mediaElement` null and dispatches `braccato:error` with `phase: "source"`. Nothing is
+at all leaves `mediaElement` null and dispatches `braccato:error` with `phase: "source"`. So does a
+`source` written as an object that is not a media element, which is a thing a consumer writing plain
+JavaScript can do and which would otherwise bind without complaint and feed `undefined` to every tick
+for the length of the song. Nothing is
 bound, so `currentTime` and `playing` still work: the element falls back to being told rather than
 going quiet. Because the selector is resolved when the element connects, a media element that the
 parser has not reached yet will not be found, which is why the quickstart puts the `<audio>` first; a
