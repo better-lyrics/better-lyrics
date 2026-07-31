@@ -75,8 +75,8 @@ rather than a substitute for writing one. It answers questions the module cannot
 screen, is a loader up) and performs actions it must not own (seek the player).
 
 `host.seek(timeS)` deliberately takes a number, not a document. How a seek reaches the player is the
-host's business: this extension dispatches `blyrics-seek-to` at the page world, another consumer
-would set `currentTime` on a media element.
+host's business: this extension dispatches `blyrics-seek-to` at the page world, and the custom
+element sets `currentTime` on the media element it is bound to.
 
 ## The DOM is a contract
 
@@ -158,9 +158,10 @@ while the other renders against the theme.
 ## Ticking
 
 The module does not own a clock. `renderer.tick(currentTimeS, options)` is called by whoever has one.
-In this extension that is the interpolated player snapshot from `blyrics-send-player-time`; in
-braccato it would be an audio element's `currentTime`. A wrapper that owns its own animation frame
-loop can be added on top later without touching this.
+In this extension that is the interpolated player snapshot from `blyrics-send-player-time`; in the
+floating window it is a second interpolation of the same snapshot. Neither is a media element, which
+is why this stays true: the custom element owns an animation frame loop over a media element's clock,
+described under Following a media element below, and the renderer underneath it still owns none.
 
 `options.isPlaying` is the one thing a tick cannot be given a sensible default for. The rest of
 `TickOptions` describes a setting the consumer may not have, so all of it may be left out.
@@ -194,7 +195,8 @@ at module scope, which is why it is written down here instead: load one copy.
 <link rel="stylesheet" href="@braccato/core/styles/lyrics.css" />
 <link rel="stylesheet" href="@braccato/core/styles/instrumental.css" />
 
-<braccato-lyrics></braccato-lyrics>
+<audio id="player" src="song.mp3" controls></audio>
+<braccato-lyrics source="#player"></braccato-lyrics>
 <script type="module">
   import "@braccato/core/element";
 
@@ -205,18 +207,13 @@ at module scope, which is why it is written down here instead: load one copy.
   view.addEventListener("braccato:error", event => {
     console.warn(event.detail.phase, event.detail.error);
   });
-  view.addEventListener("braccato:line-click", event => {
-    audio.currentTime = event.detail.timeS;
-  });
-
-  const followPlayer = () => {
-    view.currentTime = audio.currentTime;
-    view.playing = !audio.paused;
-    requestAnimationFrame(followPlayer);
-  };
-  followPlayer();
 </script>
 ```
+
+`source` is the whole of following a player: the element reads the clock, drives itself while the
+audio plays, and sends a click on a lyric line back to `audio.currentTime`. A consumer whose clock is
+not a media element leaves it out and writes `currentTime` and `playing` instead, which is what this
+extension does.
 
 The stylesheets are the consumer's to load, the way any package's CSS is, and leaving them out gives
 lines that are in the document and unstyled rather than lines that are missing. Stylesheets above
@@ -224,17 +221,20 @@ says what each of the three carries.
 
 ### Properties
 
-`lyrics`, `currentTime`, `playing`, `theme` and `host` are writable, `renderer` is not. All of them
-may be written before the element is in a document: the renderer is built when it connects, and
-everything it was handed by then is applied at once. That includes properties a page wrote before
-this module even loaded, which land on the instance and would shadow the accessors forever if
-`connectedCallback` did not run them through again.
+`lyrics`, `currentTime`, `playing`, `theme`, `host` and `source` are writable, `renderer` and
+`mediaElement` are not. All of them may be written before the element is in a document: the renderer
+is built when it connects, and everything it was handed by then is applied at once. That includes
+properties a page wrote before this module even loaded, which land on the instance and would shadow
+the accessors forever if `connectedCallback` did not run them through again.
 
 `currentTime` is in **seconds**, not the milliseconds braccato's component took. The module ticks in
 seconds, and an element that converted would leave itself and the renderer underneath it disagreeing
 about what a number means. Writing it renders the view again, so whoever owns the clock drives the
 lyrics by writing it. Writing `playing` renders again too, since a paused view animates differently
-from a playing one.
+from a playing one. Both become outputs the moment a `source` is bound, described below.
+
+`source` is the media element the lyrics follow, and `mediaElement` is what it resolved to. Following
+a media element says what they do.
 
 `lyrics` is null until it is given a song, which is not the same as being given none: an element that
 was never handed lyrics leaves whatever it is mounted over alone, and an empty array clears the view,
@@ -272,6 +272,11 @@ in a document with no window to schedule against, and `theme-conflict` when it i
 another element in the same document was given a different theme, described under More than one
 element in a document below. The last two are dispatched as `braccato:error` as well.
 
+A `source` that named nothing to follow is not one of its values, and that is deliberate: the element
+is still rendering, so a status that said otherwise would trade one true answer for another. What a
+consumer who was not listening reads instead is `mediaElement`, which is null while `source` still
+holds the selector it could not resolve.
+
 `dir` is deliberately not among them. `HTMLElement` already reflects it, and the lines this module
 builds carry `dir="auto"` and resolve their own direction from their own text, so the element's `dir`
 is the base direction everything under it inherits and nothing here has to reimplement that.
@@ -282,15 +287,69 @@ settings (`blyrics-long-word-threshold`, `blyrics-line-synced-animation-delay`,
 that set one while an attribute said otherwise would leave the module with two answers and no rule
 for picking between them. Configure them in the theme.
 
+### Following a media element
+
+`source` takes either a CSS selector, resolved with `querySelector` in the element's own document, or
+an `HTMLMediaElement` itself. The selector is the attribute form and both are the property form.
+Setting it binds, setting it to null unbinds, and setting it to a second media element moves the
+whole binding across.
+
+While it is bound the element drives itself. It reads `currentTime` and `paused` off the media
+element and ticks the renderer with them, so **`currentTime` and `playing` become outputs**: a write
+to either is dropped and the getter keeps reporting what the binding last read. Dropped rather than
+reported, because a consumer who bound a `source` and left their own frame loop running would
+otherwise be told about it sixty times a second. Attributes are the same write by another road, so
+`current-time` and `playing` are dropped too. Unbind and the clock goes back to whoever asked for it.
+
+A click on a lyric line sets `currentTime` on the bound media element. The element wraps `host.seek`
+rather than replacing it, so a consumer who wrote their own is still called and
+`braccato:line-click` still fires; the seek reaches the media element between the two.
+
+The loop is `requestAnimationFrame` on the element's own window, running only while the media element
+is playing, so a paused or ended song costs nothing. Every frame reads the clock afresh. A reading
+the media element has not refreshed yet is carried forward at the `playbackRate` it was taken at:
+`currentTime` is only as fresh as the media element chose to make it, once per presented frame for
+video, so a view rendering the raw reading steps where the song runs, and a carry that assumed 1x
+would drift on anything else. The carry is capped at 100ms, which is what stops a clock that stalled
+mid-song from running away from it. The frame also asks whether the media element is still playing,
+so a clock that stopped without an event still stops the loop.
+
+Five events are listened to on the media element, and they all mean one thing to the element, that
+the clock moved or changed speed while no frame of its own was looking, so they share a handler that
+re-reads it. `play` and `pause` are the loop's start and stop. `seeking` moves the view as a scrub
+happens, since the position is already the requested one when it fires, and `seeked` corrects it to
+where the media element actually landed, which is not always the same number. `ratechange` retakes
+the reading with the rate it will be carried at.
+
+Three are deliberately not listened to. `ended` is covered by `pause`, which a non-looping media
+element fires first, and by the frame loop's own check that playback is still running. `emptied` says
+the resource went away rather than that the clock moved, and it leaves the media element paused at
+zero, which the same check reports. `loadedmetadata` carries `duration` and the intrinsic dimensions,
+none of which this element reads. `timeupdate` is not among them either: while playing it is a
+coarser copy of the frame loop, and while paused it is a 4Hz version of the seek events.
+
+The binding lives exactly as long as the renderer does, so `mediaElement` is null while the element
+is disconnected, the way `renderer` is, and a selector is resolved again every time it is written and
+every time the element connects. Disconnecting, unbinding, rebinding and reconnecting each leave no
+listener on a media element and no frame queued.
+
+A selector that matches nothing, matches something that is not a media element, or is not a selector
+at all leaves `mediaElement` null and dispatches `braccato:error` with `phase: "source"`. Nothing is
+bound, so `currentTime` and `playing` still work: the element falls back to being told rather than
+going quiet. Because the selector is resolved when the element connects, a media element that the
+parser has not reached yet will not be found, which is why the quickstart puts the `<audio>` first; a
+page that cannot promise that order writes the property from script instead.
+
 ### Attributes
 
-`current-time`, `playing` and `theme` are read as attributes as well, in one direction only: an
-attribute writes its property, and a property never writes back. Reflecting `current-time` would put
-the playback clock into the DOM sixty times a second, and one attribute reflecting while the others
-do not is worse than none of them doing it. `playing` is an ordinary boolean attribute, so its
+`current-time`, `playing`, `source` and `theme` are read as attributes as well, in one direction only:
+an attribute writes its property, and a property never writes back. Reflecting `current-time` would
+put the playback clock into the DOM sixty times a second, and one attribute reflecting while the
+others do not is worse than none of them doing it. `playing` is an ordinary boolean attribute, so its
 presence is what counts and `playing="false"` is playing. A `current-time` that does not parse as a
 number is ignored rather than read as zero, because a half written attribute must not send the lyrics
-back to the top of the song.
+back to the top of the song. `source` is the selector form only, and changing it resolves again:
+setting it to another selector moves the binding and removing it unbinds.
 
 ### Events
 
@@ -302,7 +361,7 @@ still reaches their listener.
 | `braccato:line-click`    | `{ timeS }`                  | A lyric line was clicked, and it asked to seek there      |
 | `braccato:lyrics-loaded` | `{ lineCount, syncType }`    | The element applied lyrics, including an empty array      |
 | `braccato:scroll-state`  | `{ userScrolling }`          | Autoscroll stopped following the song, or started again   |
-| `braccato:error`         | `{ phase, error }`           | Connecting, or applying lyrics or a theme, went wrong     |
+| `braccato:error`         | `{ phase, error }`           | Connecting, resolving a source, or applying lyrics or a theme, went wrong |
 
 `braccato:lyrics-loaded` says the element applied lyrics, not that it was given new ones. A theme
 that changes a setting the lines are built out of rebuilds the song the element is holding, and the
@@ -319,10 +378,12 @@ knowledge belongs.
 the element supplies its own `seek`, and `braccato:line-click` is what it dispatches instead.
 
 `braccato:error` covers connecting to a document with no browsing context, a theme that disagrees
-with another element's in the same document, and anything thrown while lyrics or a theme are being
-applied. Nothing thrown by a tick is reported there: a tick runs sixty times a second, and an error
-event per frame would bury the one that mattered, so a bug in the tick loop still surfaces as an
-exception where it happened.
+with another element's in the same document, a `source` that named nothing to follow, and anything
+thrown while lyrics or a theme are being applied. Its `phase` is `connect`, `conflict`, `source`,
+`lyrics` or `theme`. Nothing thrown by a tick is reported there: a tick runs sixty times a second,
+and an error event per frame would bury the one that mattered, so a bug in the tick loop still
+surfaces as an exception where it happened. A write to `currentTime` or `playing` while a source is
+bound is not reported either, for the same reason and described under Following a media element.
 
 It is dispatched a microtask after the error rather than where it happened, and that is the whole
 reason it is receivable. `connectedCallback` runs before any listener a page could have added, and
