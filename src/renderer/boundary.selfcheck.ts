@@ -25,6 +25,7 @@ import type { Node, SourceFile } from "typescript";
 const RENDERER_DIR = dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = resolve(RENDERER_DIR, "..", "..");
 const SOURCE_ROOT = resolve(REPO_ROOT, "src");
+const STYLES_DIR = resolve(RENDERER_DIR, "styles");
 
 const EXTENSION_IMPORT_PREFIXES = ["@core/", "@modules/", "@constants", "@utils", "@options", "@/"];
 
@@ -49,6 +50,12 @@ const SELF_CHECK_PACKAGES = ["typescript"];
 
 // Concatenated so this file does not match its own raw text scan.
 const EXTENSION_GLOBAL = "chrome" + ".";
+
+// The DOM the module builds and the CSS that styles it are one artifact, so the stylesheets under
+// styles/ answer to the same boundary as the code. These are the names YouTube Music's own markup
+// goes by: a rule that reaches for one of them is styling the page around the lyrics, which is the
+// extension's business, not this module's.
+const HOST_SELECTORS = ["ytmusic", "#tab-renderer", "#main-panel", "player-fullscreened", "#layout", "blyrics-dfs"];
 
 // -- Module specifier extraction --------------------------------------------
 
@@ -193,6 +200,29 @@ function collectEntryPointViolations(displayPath: string, absolutePath: string, 
   return violations;
 }
 
+// -- Stylesheet rules --------------------------------------------
+
+// Raw text rather than parsed selectors, for the same reason the extension global scan above is
+// raw: a host name in a comment is a rule waiting to be written, and a stylesheet that has to
+// mention one is a stylesheet on the wrong side of the boundary.
+function collectStylesheetViolations(displayPath: string, source: string): BoundaryViolation[] {
+  const violations: BoundaryViolation[] = [];
+
+  source.split("\n").forEach((text, index) => {
+    for (const selector of HOST_SELECTORS) {
+      if (!text.includes(selector)) continue;
+      violations.push({
+        file: displayPath,
+        line: index + 1,
+        rule: "no-host-selectors",
+        detail: `names "${selector}", which belongs to the page around the lyrics; style it from public/css/blyrics/ instead`,
+      });
+    }
+  });
+
+  return violations;
+}
+
 // -- Extraction self-test --------------------------------------------
 
 const EXTRACTION_FIXTURE = [
@@ -290,6 +320,30 @@ assert.deepEqual(
   "Given a file outside the module, When it imports an internal, Then only the published leaves are allowed"
 );
 
+const VIOLATING_STYLESHEET = [
+  `.blyrics-container { z-index: 1; }`,
+  `ytmusic-app-layout[player-fullscreened] .blyrics--line { text-align: center; }`,
+  `#tab-renderer { container-type: size; }`,
+  `#layout[blyrics-dfs] #blyrics-wrapper { margin-top: 0; }`,
+].join("\n");
+
+assert.deepEqual(
+  collectStylesheetViolations("fixture.css", VIOLATING_STYLESHEET).map(
+    violation => `${violation.line} ${violation.rule}`
+  ),
+  ["2 no-host-selectors", "2 no-host-selectors", "3 no-host-selectors", "4 no-host-selectors", "4 no-host-selectors"],
+  "Given a stylesheet that reaches for the page around the lyrics, When it is checked, Then every host name is reported with its line"
+);
+
+assert.deepEqual(
+  collectStylesheetViolations(
+    "fixture.css",
+    [`.blyrics-container > div { cursor: pointer; }`, `#blyrics-wrapper { margin-top: 0; }`].join("\n")
+  ),
+  [],
+  "Given a stylesheet that only selects what the module builds, When it is checked, Then nothing is reported"
+);
+
 // A leaf is only safe to publish while it stays a leaf: the moment one of them imports something
 // else in the module, importing it pulls that in too, which is the bundle growth this avoids.
 for (const leaf of [...RENDERER_ENTRY_POINTS].filter(entry => entry !== "@renderer/index")) {
@@ -322,6 +376,28 @@ assert.equal(
   `The renderer module boundary is broken by ${violations.length} import(s) or reference(s):\n${violations.join("\n")}\n`
 );
 
+// -- Stylesheet scan --------------------------------------------
+
+const rendererStylesheets = readdirSync(STYLES_DIR, { recursive: true, encoding: "utf8" })
+  .filter(entry => entry.endsWith(".css"))
+  .map(entry => join(STYLES_DIR, entry))
+  .sort();
+
+assert.ok(
+  rendererStylesheets.length > 0,
+  "Given the renderer module, When its styles directory is walked, Then it holds at least one stylesheet"
+);
+
+const stylesheetViolations = rendererStylesheets
+  .flatMap(file => collectStylesheetViolations(relative(REPO_ROOT, file), readFileSync(file, "utf8")))
+  .map(violation => `${violation.file}:${violation.line} [${violation.rule}] ${violation.detail}`);
+
+assert.equal(
+  stylesheetViolations.length,
+  0,
+  `The renderer module's stylesheets reach for the host in ${stylesheetViolations.length} place(s):\n${stylesheetViolations.join("\n")}\n`
+);
+
 // -- Extension scan --------------------------------------------
 
 const extensionFiles = readdirSync(SOURCE_ROOT, { recursive: true, encoding: "utf8" })
@@ -346,5 +422,5 @@ assert.equal(
 );
 
 console.log(
-  `Renderer boundary self-check passed across ${rendererFiles.length} module file(s) and ${extensionFiles.length} extension file(s)`
+  `Renderer boundary self-check passed across ${rendererFiles.length} module file(s), ${rendererStylesheets.length} module stylesheet(s) and ${extensionFiles.length} extension file(s)`
 );
