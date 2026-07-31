@@ -289,6 +289,16 @@ export function resetScrollResume(engine: AnimationEngineInstance): void {
 }
 
 /**
+ * The user asked for autoscroll back, now. Resuming is a property of playback rather than of one
+ * view, so every live instance resumes. Published in this shape rather than as the registry walk
+ * and the per view operation it is built from, so that nothing outside the module gets to name a
+ * particular view.
+ */
+export function resumeAllAutoscroll(): void {
+  forEveryLiveView(resetScrollResume);
+}
+
+/**
  * The user scrolled this view. Scrolls the engine itself performed are swallowed one at a time;
  * a real one pauses autoscroll long enough to read where it landed, and offers the way back.
  *
@@ -2285,17 +2295,6 @@ export function resolveTickOptions(options: TickOptions): ResolvedTickOptions {
 }
 
 /**
- * Takes a tick as the public type allows one, partly filled in, and resolves it before rendering.
- */
-export function runAnimationEngine(
-  engine: AnimationEngineInstance,
-  currentTime: number,
-  options: TickOptions
-): AnimationTickStatus {
-  return tickView(engine, currentTime, resolveTickOptions(options));
-}
-
-/**
  * Renders one view against a tick with nothing left out.
  */
 export function tickView(
@@ -2905,10 +2904,10 @@ export function retickFromPlaybackClock(
   engine: AnimationEngineInstance,
   buildTickOptions: (eventCreationTime: number, isPlaying: boolean) => TickOptions
 ): AnimationTickStatus {
-  return runAnimationEngine(
+  return tickView(
     engine,
     playbackClock.lastTime,
-    buildTickOptions(playbackClock.lastEventCreationTime, playbackClock.lastPlayState)
+    resolveTickOptions(buildTickOptions(playbackClock.lastEventCreationTime, playbackClock.lastPlayState))
   );
 }
 

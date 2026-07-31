@@ -1,29 +1,25 @@
 import { AppState } from "@core/appState";
 import { ytmHost } from "@modules/ui/lyricsHost";
-import {
-  createLyricsRenderer,
-  forEveryLiveView,
-  type LyricsRenderer,
-  resetScrollResume,
-  type TickOptions,
-} from "@renderer/index";
+import { createLyricsRenderer, type LyricsRenderer, resumeAllAutoscroll, type TickOptions } from "@renderer/index";
 
 // -- The side panel's view --------------------------
 
 /**
  * The side panel's lyrics view. Created at import time, long before YouTube Music has rendered a
  * lyrics tab, so it is given no mount: the injection names one once it has built the wrapper.
+ *
+ * Handed out without `destroy`, because destruction is final and there is no path back: this view
+ * lives for as long as the tab does, and seven modules can reach it.
  */
-export const mainView: LyricsRenderer = createLyricsRenderer({ document, window, host: ytmHost });
+export const mainView: Omit<LyricsRenderer, "destroy"> = createLyricsRenderer({ document, window, host: ytmHost });
 
 // -- Operations every view answers to --------------------------
 
 /**
- * The user asked for autoscroll back, now. A seek is a property of playback rather than of one
- * view, so every view showing these lyrics resumes.
+ * The user asked for autoscroll back, now.
  */
 export function resumeAutoscroll(): void {
-  forEveryLiveView(resetScrollResume);
+  resumeAllAutoscroll();
 }
 
 // -- Tick options --------------------------

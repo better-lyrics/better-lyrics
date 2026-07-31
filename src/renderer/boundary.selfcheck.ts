@@ -277,8 +277,8 @@ assert.deepEqual(
     "fixture.ts",
     OUTSIDE_FILE,
     [
-      `import { setLyrics } from "@renderer/index";`,
-      `import { runAnimationEngine } from "@renderer/engine";`,
+      `import { createLyricsRenderer } from "@renderer/index";`,
+      `import { tickView } from "@renderer/engine";`,
       `import { toMs } from "@renderer/util";`,
       `const lazy = await import("@renderer/view");`,
       `import { AppState } from "@core/appState";`,

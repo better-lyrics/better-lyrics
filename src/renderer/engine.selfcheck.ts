@@ -11,8 +11,9 @@ import {
   getRenderedSyncType,
   hasRenderedLines,
   noteUserScroll,
-  runAnimationEngine,
+  resolveTickOptions,
   scheduleLyricPositionUpdate,
+  tickView,
 } from "./engine";
 import { asDocument, asElement, collectTree, FakeDocument, type FakeNode } from "./selfcheck/fakeDom";
 import type { Lyric, LyricsRendererHost, TickOptions } from "./types";
@@ -461,13 +462,13 @@ const panelLogsBeforeTick = panelHost.logs.length;
 // The tick swallows its own exceptions, so a fake too thin to reach the style reads would leave
 // every assertion below reading an empty cache rather than reporting the real failure.
 assert.equal(
-  runAnimationEngine(panelEngine, PLAYBACK_TIME_S, newTickOptions()),
+  tickView(panelEngine, PLAYBACK_TIME_S, resolveTickOptions(newTickOptions())),
   "ok",
   "Given a built view, When it ticks, Then it reports that it rendered"
 );
 
 assert.equal(
-  runAnimationEngine(floatingEngine, PLAYBACK_TIME_S, newTickOptions()),
+  tickView(floatingEngine, PLAYBACK_TIME_S, resolveTickOptions(newTickOptions())),
   "ok",
   "Given a second built view, When it ticks, Then it reports that it rendered"
 );
@@ -698,7 +699,7 @@ setLyrics(placeholderEngine, asElement<HTMLElement>(placeholderMount), UNSYNCED_
   loaderVisible: false,
   noLyrics: false,
 });
-runAnimationEngine(placeholderEngine, PLAYBACK_TIME_S, passiveTickOptions);
+tickView(placeholderEngine, PLAYBACK_TIME_S, resolveTickOptions(passiveTickOptions));
 
 assert.notEqual(
   placeholderEngine.passiveRAFId,
@@ -710,7 +711,7 @@ setLyrics(placeholderEngine, asElement<HTMLElement>(placeholderMount), NO_LYRICS
   loaderVisible: false,
   noLyrics: true,
 });
-runAnimationEngine(placeholderEngine, PLAYBACK_TIME_S, passiveTickOptions);
+tickView(placeholderEngine, PLAYBACK_TIME_S, resolveTickOptions(passiveTickOptions));
 
 assert.equal(
   placeholderEngine.passiveRAFId,
