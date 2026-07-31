@@ -37,8 +37,8 @@ const ERROR_EVENT = "braccato:error";
 
 const NO_BROWSING_CONTEXT_MESSAGE =
   "This element is in a document with no window, so there is nothing to build lyrics against";
-const SECOND_ELEMENT_MESSAGE =
-  "Another lyrics element is already rendering in this document; this one stays empty until that one is disconnected";
+const THEME_DISAGREEMENT_MESSAGE =
+  "Another lyrics element in this document was given a different theme, and the module's theme settings are shared, so both views render against whichever theme was applied last";
 
 // -- Event details --------------------------------------------
 
@@ -51,6 +51,16 @@ export interface ElementErrorDetail {
   phase: ElementErrorPhase;
   error: Error;
 }
+
+/**
+ * What the element is doing, and why it is not doing what it was asked. Every `braccato:error` is
+ * dispatched a microtask after the fact so that a listener added straight after the element was
+ * inserted still hears it; this is the answer for a consumer that added one later than that, or
+ * never.
+ *
+ * @public
+ */
+export type ElementStatus = "idle" | "rendering" | "theme-conflict" | "no-browsing-context";
 
 /** @public */
 export interface LyricsLoadedDetail {
@@ -70,14 +80,11 @@ export interface ScrollStateDetail {
   userScrolling: boolean;
 }
 
-// -- One element per document --------------------------------------------
+// -- The views a document is rendering --------------------------------------------
 
-interface DocumentOwnership {
-  owner: BraccatoLyricsElement | null;
-  waiting: BraccatoLyricsElement[];
-}
-
-const ownershipByDocument = new WeakMap<Document, DocumentOwnership>();
+// Membership means rendering, so an element that threw on the way up or has been disconnected is
+// not in here and is not one of the views a theme has to agree with.
+const renderingElementsByDocument = new WeakMap<Document, Set<BraccatoLyricsElement>>();
 
 // -- Helpers --------------------------------------------
 
@@ -88,7 +95,8 @@ function toError(thrown: unknown): Error {
 /**
  * Registers a name only if it is free. A page that loads this module twice would otherwise throw out
  * of an import and take the rest of that script with it, and the second registration could not have
- * won anyway.
+ * won anyway. Silently, because there is no consumer to tell at module scope: the README says what
+ * two copies on one page costs.
  */
 function defineOnce(tagName: string, elementConstructor: CustomElementConstructor): void {
   if (customElements.get(tagName) !== undefined) return;
@@ -110,10 +118,11 @@ export class BraccatoLyricsElement extends HTMLElement {
   static readonly observedAttributes = [CURRENT_TIME_ATTRIBUTE, PLAYING_ATTRIBUTE, THEME_ATTRIBUTE];
 
   #renderer: LyricsRenderer | null = null;
-  // The document this element is registered against, rather than whatever it owns now: adopting an
-  // element into another document changes `ownerDocument` under the callback that has to give the
-  // first document back.
-  #registeredDocument: Document | null = null;
+  // The document this element registered itself in, rather than whatever it is in now: adopting an
+  // element into another document changes `ownerDocument` under the callback that has to take it
+  // back out of the first one.
+  #renderingDocument: Document | null = null;
+  #missingBrowsingContext = false;
   // Null until a consumer gives lyrics, which is not the same as being given none: an element that
   // was never given any leaves whatever it is mounted over alone.
   #lyrics: Lyric[] | null = null;
@@ -161,8 +170,9 @@ export class BraccatoLyricsElement extends HTMLElement {
 
   /**
    * A compiled stylesheet. Its `blyrics-*` comments configure the module and the sheet itself goes
-   * into this element's document. An empty one puts every setting back to its default, so an element
-   * that was never given a theme does not apply one.
+   * into this element's document. An empty one puts every setting back to its default, and is
+   * applied like any other: the settings are module scope, so an element that applied nothing would
+   * render against whatever the last theme in that bundle left behind.
    */
   get theme(): string {
     return this.#theme;
@@ -185,8 +195,6 @@ export class BraccatoLyricsElement extends HTMLElement {
   set host(overrides: Partial<LyricsRendererHost>) {
     this.#hostOverrides = overrides;
     if (this.#renderer === null) return;
-    // The document stays claimed across the swap, so an element waiting for it cannot take it in
-    // between.
     this.#destroyRenderer();
     this.#build();
   }
@@ -197,6 +205,17 @@ export class BraccatoLyricsElement extends HTMLElement {
    */
   get renderer(): LyricsRenderer | null {
     return this.#renderer;
+  }
+
+  /**
+   * What the element is doing, asked rather than listened for. `theme-conflict` is the one that says
+   * the view is on the screen but not necessarily the way it was asked for: the theme settings are
+   * module scope, so a document with two elements holding different themes renders both against
+   * whichever was applied last.
+   */
+  get status(): ElementStatus {
+    if (this.#renderer === null) return this.#missingBrowsingContext ? "no-browsing-context" : "idle";
+    return this.#disagreeingPeers().length > 0 ? "theme-conflict" : "rendering";
   }
 
   // -- Lifecycle --------------------------------------------
@@ -213,8 +232,14 @@ export class BraccatoLyricsElement extends HTMLElement {
   }
 
   disconnectedCallback(): void {
+    const peers = this.#peers();
     this.#destroyRenderer();
-    this.#releaseDocument();
+    this.#missingBrowsingContext = false;
+    // Destroying a renderer takes the theme element with it when that renderer is the one that
+    // created it, so whatever is still rendering in that document writes its own theme back in.
+    for (const peer of peers) {
+      peer.#applyTheme();
+    }
   }
 
   attributeChangedCallback(name: string, _oldValue: string | null, newValue: string | null): void {
@@ -239,11 +264,11 @@ export class BraccatoLyricsElement extends HTMLElement {
     if (this.#renderer !== null) return;
 
     const view = this.ownerDocument.defaultView;
+    this.#missingBrowsingContext = view === null;
     if (view === null) {
       this.#emitError("connect", new Error(NO_BROWSING_CONTEXT_MESSAGE));
       return;
     }
-    if (!this.#claimDocument()) return;
 
     this.#renderer = createLyricsRenderer({
       document: this.ownerDocument,
@@ -251,14 +276,18 @@ export class BraccatoLyricsElement extends HTMLElement {
       mount: this,
       host: this.#hostForRenderer(),
     });
+    // After the renderer exists and never before, so that a build which threw on the way up leaves
+    // nothing behind claiming to be one of the document's views.
+    this.#joinDocument();
 
-    if (this.#theme !== "") this.#applyTheme();
+    this.#applyTheme();
     this.#applyLyrics();
   }
 
   #destroyRenderer(): void {
     this.#renderer?.destroy();
     this.#renderer = null;
+    this.#leaveDocument();
   }
 
   /**
@@ -316,6 +345,8 @@ export class BraccatoLyricsElement extends HTMLElement {
       return;
     }
 
+    this.#reportThemeDisagreement();
+
     // Only when there are lines to rebuild. A theme applied while the view is being built is applied
     // before the lyrics are, and the build itself is what puts them there.
     if (needsLyricRebuild && renderer.container !== null) this.#applyLyrics();
@@ -339,48 +370,54 @@ export class BraccatoLyricsElement extends HTMLElement {
     element[name] = value;
   }
 
-  // -- One element per document --------------------------------------------
+  // -- More than one view in a document --------------------------------------------
 
   /**
    * The module's theme settings are module scope, so two views in one realm render against whichever
-   * theme either of them was given last, and two in one document would be writing the same theme
-   * element as well. The constraint is the module's; the element is what makes it easy to break. So
-   * the second element to connect renders nothing, says so, and takes the document over if the first
-   * one leaves.
+   * theme either of them was applied last, and two in one document write the same theme element as
+   * well. Two views handed the same theme are not affected by any of that and render correctly, so
+   * that is the line: a second element builds, and what is reported is the disagreement rather than
+   * the company.
+   *
+   * Both sides are told, because the element that diverged is not the one that is now rendering
+   * against a theme it never asked for.
    */
-  #claimDocument(): boolean {
-    const elementDocument = this.ownerDocument;
-    const ownership = ownershipByDocument.get(elementDocument) ?? { owner: null, waiting: [] };
-    ownershipByDocument.set(elementDocument, ownership);
-    this.#registeredDocument = elementDocument;
+  #reportThemeDisagreement(): void {
+    const disagreeing = this.#disagreeingPeers();
+    if (disagreeing.length === 0) return;
 
-    if (ownership.owner === null || ownership.owner === this) {
-      ownership.owner = this;
-      return true;
+    const error = new Error(THEME_DISAGREEMENT_MESSAGE);
+    this.#emitError("conflict", error);
+    for (const peer of disagreeing) {
+      peer.#emitError("conflict", error);
     }
-
-    if (!ownership.waiting.includes(this)) ownership.waiting.push(this);
-    this.#emitError("conflict", new Error(SECOND_ELEMENT_MESSAGE));
-    return false;
   }
 
-  #releaseDocument(): void {
-    const elementDocument = this.#registeredDocument;
+  #peers(): BraccatoLyricsElement[] {
+    const elementDocument = this.#renderingDocument;
+    if (elementDocument === null) return [];
+    const rendering = renderingElementsByDocument.get(elementDocument);
+    if (rendering === undefined) return [];
+    return [...rendering].filter(element => element !== this);
+  }
+
+  #disagreeingPeers(): BraccatoLyricsElement[] {
+    return this.#peers().filter(element => element.#theme !== this.#theme);
+  }
+
+  #joinDocument(): void {
+    const elementDocument = this.ownerDocument;
+    const rendering = renderingElementsByDocument.get(elementDocument) ?? new Set<BraccatoLyricsElement>();
+    renderingElementsByDocument.set(elementDocument, rendering);
+    rendering.add(this);
+    this.#renderingDocument = elementDocument;
+  }
+
+  #leaveDocument(): void {
+    const elementDocument = this.#renderingDocument;
     if (elementDocument === null) return;
-    this.#registeredDocument = null;
-
-    const ownership = ownershipByDocument.get(elementDocument);
-    if (ownership === undefined) return;
-
-    const waitingIndex = ownership.waiting.indexOf(this);
-    if (waitingIndex !== -1) ownership.waiting.splice(waitingIndex, 1);
-    if (ownership.owner !== this) return;
-
-    ownership.owner = null;
-    // Everything on that list is connected and waiting, because an element that is disconnected
-    // takes itself off it above. The one that has waited longest gets the document.
-    const next = ownership.waiting.shift();
-    if (next !== undefined) next.#build();
+    this.#renderingDocument = null;
+    renderingElementsByDocument.get(elementDocument)?.delete(this);
   }
 
   // -- Events --------------------------------------------
@@ -395,7 +432,13 @@ export class BraccatoLyricsElement extends HTMLElement {
   }
 
   #emitError(phase: ElementErrorPhase, error: Error): void {
-    this.#emit<ElementErrorDetail>(ERROR_EVENT, { phase, error });
+    // A microtask later rather than where it happened. `connectedCallback` runs before any listener
+    // a page could have added, and for an element the parser built it runs before any script at all,
+    // so an error reported from a build is one nobody could ever have heard. `status` is the answer
+    // for a consumer that was not listening even then.
+    queueMicrotask(() => {
+      this.#emit<ElementErrorDetail>(ERROR_EVENT, { phase, error });
+    });
   }
 }
 

@@ -11,7 +11,7 @@ import {
   installCustomElementPlatform,
 } from "./selfcheck/fakeCustomElements";
 import { asFakeNode, FakeDocument, FakeNode } from "./selfcheck/fakeDom";
-import { setThemeSettings } from "./themeSettings";
+import { registerThemeSetting } from "./themeSettings";
 import type { Lyric, LyricsRendererHost } from "./types";
 
 // The element is a class extending HTMLElement and two calls into customElements, so the platform
@@ -61,6 +61,8 @@ const LYRICS_LOADED_EVENT = "braccato:lyrics-loaded";
 const SCROLL_STATE_EVENT = "braccato:scroll-state";
 const ERROR_EVENT = "braccato:error";
 
+const CURRENT_TIME_ATTRIBUTE = "current-time";
+
 const SCROLL_CONTAINER_HEIGHT_PX = 600;
 const PLAYBACK_TIME_S = 6;
 // Late enough that the third line is the one playing.
@@ -74,12 +76,22 @@ const MAX_SWALLOWED_SCROLLS = 8;
 // This one is read while the lines are being built, so a view that has already built them is wrong
 // until it builds them again.
 const REBUILD_THEME = "/* blyrics-disable-richsync = true; */";
+// A second theme, so that two elements in one document can be handed different ones.
+const ALTERNATE_THEME = "/* blyrics-long-word-threshold = 900; */";
+
+// A setting of this file's own, so that what the module scope registry is holding can be read back
+// rather than inferred from the lines it built.
+const MARKER_DEFAULT = "default";
+const MARKER_APPLIED = "applied";
+const markerSetting = registerThemeSetting("blyrics-fixture-marker", MARKER_DEFAULT);
+const MARKER_THEME = `/* blyrics-fixture-marker = ${MARKER_APPLIED}; */`;
 
 // Line scroll animations hand Animation objects back to the engine to read, and no fake answers
 // those honestly, so a fixture that is not about scrolling switches them off.
 const SCROLL_ANIMATION_OFF: Record<string, string> = { "--blyrics-animate-scroll": "0" };
 
 const BUILD_FAILURE_MESSAGE = "This document refuses to build anything";
+const RENDERER_FAILURE_MESSAGE = "This window refuses to carry a renderer";
 
 const SYNCED_LYRICS: Lyric[] = [
   { startTimeMs: 0, durationMs: 5000, words: "First line" },
@@ -146,6 +158,22 @@ class FakeWindow {
   }
 
   cancelAnimationFrame(): void {}
+}
+
+/**
+ * A window that refuses to carry the next renderer built against it. It stands in for every way
+ * `createLyricsRenderer` can throw on the way up, which is the one moment an element has told the
+ * document it is a view before there is a view to be.
+ */
+class RefusingWindow extends FakeWindow {
+  refuseNextRenderer = false;
+
+  addEventListener(): void {
+    if (this.refuseNextRenderer) {
+      this.refuseNextRenderer = false;
+      throw new Error(RENDERER_FAILURE_MESSAGE);
+    }
+  }
 }
 
 // The renderer measures again once the document's faces have loaded. Nothing here loads any, so this
@@ -238,14 +266,25 @@ function newConnectedDocument(): ElementDocument {
   return new ElementDocument(new FakeWindow());
 }
 
-// Every event the element dispatches, in the order it dispatched them. Read off the node rather than
-// through a listener, because a listener would only see the ones added before it was.
+// The element dispatches `braccato:error` a microtask after the error happened, so that a listener
+// a page adds once the element is in the document still hears one reported while it was connecting.
+// Everything else it dispatches goes out where it happened.
+function nextMicrotask(): Promise<void> {
+  return Promise.resolve();
+}
+
+// Every event the element dispatched, in order, including the ones it dispatched while it was being
+// built, which is the whole history rather than the tail a listener sees.
 function emittedDetails<Detail>(element: BraccatoLyricsElement, type: string): Detail[] {
   return asFakeNode(element)
     .dispatchedEvents.filter(
       (event): event is FakeCustomEvent<Detail> => event instanceof FakeCustomEvent && event.type === type
     )
     .map(event => event.init.detail);
+}
+
+function errorPhases(element: BraccatoLyricsElement): string[] {
+  return emittedDetails<ElementErrorDetail>(element, ERROR_EVENT).map(detail => detail.phase);
 }
 
 // Asked as a question rather than by comparing the renderer itself: a failed comparison of two
@@ -267,7 +306,7 @@ assert.equal(
   "Given the module imported, When the registry is read, Then the element is registered under braccato's own name"
 );
 
-const aliasConstructor = definedConstructor(ALIAS_TAG_NAME);
+const aliasConstructor = definedConstructor<BraccatoLyricsElement>(ALIAS_TAG_NAME);
 
 assert.ok(
   aliasConstructor !== undefined,
@@ -304,6 +343,12 @@ assert.equal(
   "Given properties written to an element that is not in a document, When it is asked, Then it has built nothing to write them to"
 );
 
+assert.equal(
+  panelElement.status,
+  "idle",
+  "Given an element that is not in a document, When it is asked what it is doing, Then it is doing nothing and has no reason to give"
+);
+
 assert.deepEqual(
   emittedDetails<LyricsLoadedDetail>(panelElement, LYRICS_LOADED_EVENT),
   [],
@@ -317,6 +362,12 @@ const panelRenderer = panelElement.renderer;
 assert.ok(
   panelRenderer !== null,
   "Given an element that is connected, When it is asked, Then it holds the renderer it built"
+);
+
+assert.equal(
+  panelElement.status,
+  "rendering",
+  "Given an element that is connected, When it is asked what it is doing, Then it says it is rendering"
 );
 
 assert.deepEqual(
@@ -368,7 +419,7 @@ assert.deepEqual(
 
 // -- Attributes are the other way in --------------------------------------------
 
-panelElement.setAttribute("current-time", String(PLAYBACK_TIME_S));
+panelElement.setAttribute(CURRENT_TIME_ATTRIBUTE, String(PLAYBACK_TIME_S));
 
 assert.equal(
   panelElement.currentTime,
@@ -382,7 +433,7 @@ assert.deepEqual(
   "Given a current-time attribute, When it is set, Then it drives the view the way the property does"
 );
 
-panelElement.setAttribute("current-time", "halfway");
+panelElement.setAttribute(CURRENT_TIME_ATTRIBUTE, "halfway");
 
 assert.equal(
   panelElement.currentTime,
@@ -490,6 +541,12 @@ assert.equal(
 );
 
 assert.equal(
+  panelElement.status,
+  "idle",
+  "Given a disconnected element, When it is asked what it is doing, Then it is doing nothing again"
+);
+
+assert.equal(
   asFakeNode(panelElement).childNodes.length,
   0,
   "Given a disconnected element, When its children are read, Then the view it built went with it"
@@ -528,9 +585,33 @@ assert.deepEqual(
   "Given an element connected again, When it is read, Then the lyrics and the clock it was holding are on the screen again"
 );
 
-// The settings registry is module scope, so a theme this file applied outlives the element that
-// applied it. Everything below is written against the module's defaults.
-setThemeSettings(new Map());
+// -- A host written while it is connected --------------------------------------------
+
+const { fixture: rewired, host: rewiredHost } = newElementFixture(panel.fakeDocument);
+
+panelElement.host = rewiredHost;
+
+assert.ok(
+  panelElement.renderer !== null && panelElement.renderer !== reconnectedRenderer,
+  "Given a connected element, When its host is written, Then it built a renderer against the new one rather than keeping the one it was created with"
+);
+
+assert.ok(
+  rewired.visibilityChecks > 0,
+  "Given a host written while the element was connected, When the view ticks, Then it is the written host the renderer asks"
+);
+
+assert.deepEqual(
+  selectedLines(panelElement),
+  [false, true, false],
+  "Given a host written while the element was connected, When the view is read, Then the lyrics and the clock it was holding survived the rebuild"
+);
+
+assert.equal(
+  panel.fakeDocument.getElementById(CUSTOM_THEME_STYLE_ID)?.textContent,
+  REBUILD_THEME,
+  "Given a host written while the element was connected, When its document is read, Then the theme it was holding went back in with the rest"
+);
 
 // -- Lyrics that were set before this module was loaded ---------------------------------------
 
@@ -543,6 +624,7 @@ for (const [name, value] of [
   ["lyrics", SYNCED_LYRICS],
   ["currentTime", LATE_PLAYBACK_TIME_S],
   ["playing", true],
+  ["theme", REBUILD_THEME],
   ["host", upgradedHost],
 ] as const) {
   Object.defineProperty(upgradedElement, name, { configurable: true, enumerable: true, writable: true, value });
@@ -550,16 +632,24 @@ for (const [name, value] of [
 
 connectElement(upgraded.root, upgradedElement);
 
-assert.equal(
-  Object.hasOwn(upgradedElement, "lyrics"),
-  false,
-  "Given a property written before this module was loaded, When the element connects, Then the own property that was shadowing the accessor is gone"
-);
+for (const name of ["lyrics", "theme"]) {
+  assert.equal(
+    Object.hasOwn(upgradedElement, name),
+    false,
+    `Given ${name} written before this module was loaded, When the element connects, Then the own property that was shadowing the accessor is gone`
+  );
+}
 
 assert.deepEqual(
   selectedLines(upgradedElement),
   [false, false, true],
   "Given properties written before this module was loaded, When the element connects, Then they reach the view it builds"
+);
+
+assert.equal(
+  upgraded.fakeDocument.getElementById(CUSTOM_THEME_STYLE_ID)?.textContent,
+  REBUILD_THEME,
+  "Given a theme written before this module was loaded, When the element connects, Then it is the stylesheet the document is given"
 );
 
 assert.ok(
@@ -570,44 +660,150 @@ assert.ok(
 // -- Two elements in one document --------------------------------------------
 
 const secondElement = createCustomElement(upgraded.fakeDocument, BraccatoLyricsElement);
+secondElement.theme = REBUILD_THEME;
 secondElement.lyrics = SYNCED_LYRICS;
 secondElement.currentTime = PLAYBACK_TIME_S;
 secondElement.playing = true;
 
 connectElement(upgraded.root, secondElement);
+await nextMicrotask();
 
 assert.equal(
   hasRenderer(secondElement),
-  false,
-  "Given a document that already has a lyrics element rendering in it, When a second one connects, Then it builds nothing rather than rendering against the first one's theme"
-);
-
-assert.deepEqual(
-  emittedDetails<ElementErrorDetail>(secondElement, ERROR_EVENT).map(detail => detail.phase),
-  ["conflict"],
-  "Given a second element in one document, When it connects, Then it says why it is empty rather than being silently wrong"
-);
-
-assert.equal(
-  asFakeNode(secondElement).childNodes.length,
-  0,
-  "Given a second element in one document, When its children are read, Then it left the document alone"
-);
-
-disconnectElement(upgradedElement);
-
-assert.ok(
-  secondElement.renderer !== null,
-  "Given a second element waiting for the document, When the first one is disconnected, Then the waiting one takes it over"
+  true,
+  "Given a document already rendering the theme this element was handed, When it connects, Then it builds, because one theme is one theme however many views read it"
 );
 
 assert.deepEqual(
   selectedLines(secondElement),
   [false, true, false],
-  "Given a second element that took the document over, When it is read, Then the lyrics and the clock it was holding are on the screen"
+  "Given a second element in one document, When it builds, Then it renders the lyrics and the clock it was holding"
+);
+
+assert.deepEqual(
+  [upgradedElement.status, secondElement.status],
+  ["rendering", "rendering"],
+  "Given two elements in one document holding the same theme, When they are asked, Then neither has anything to disagree with"
+);
+
+assert.deepEqual(
+  errorPhases(secondElement),
+  [],
+  "Given a second element handed the theme the first one applied, When it connects, Then it has nothing to report"
+);
+
+secondElement.theme = ALTERNATE_THEME;
+
+assert.deepEqual(
+  [errorPhases(secondElement), errorPhases(upgradedElement)],
+  [[], []],
+  "Given a theme that diverged from the document's, When the events are read before the page has yielded, Then neither report has gone out yet, because the element defers every one of them"
+);
+
+await nextMicrotask();
+
+assert.deepEqual(
+  [upgradedElement.status, secondElement.status],
+  ["theme-conflict", "theme-conflict"],
+  "Given two elements in one document, When one of them is given a different theme, Then both say the document is rendering a theme only one of them asked for"
+);
+
+assert.deepEqual(
+  [errorPhases(secondElement), errorPhases(upgradedElement)],
+  [["conflict"], ["conflict"]],
+  "Given a theme that diverged from the document's, When it is applied, Then the element that diverged and the one it left behind are both told"
+);
+
+disconnectElement(upgradedElement);
+await nextMicrotask();
+
+assert.equal(
+  upgraded.fakeDocument.getElementById(CUSTOM_THEME_STYLE_ID)?.textContent,
+  ALTERNATE_THEME,
+  "Given two elements in one document, When the one that created the stylesheet leaves and takes it with it, Then the one still rendering puts its own theme back in the head"
+);
+
+assert.equal(
+  secondElement.status,
+  "rendering",
+  "Given the element it disagreed with gone, When the survivor is asked, Then there is nothing left to disagree with"
+);
+
+assert.deepEqual(
+  selectedLines(secondElement),
+  [false, true, false],
+  "Given the element it disagreed with gone, When the survivor is read, Then its own view is untouched by the departure"
 );
 
 disconnectElement(secondElement);
+
+// -- An element that was given no theme --------------------------------------------
+
+const { fixture: marked } = newElementFixture(newConnectedDocument());
+const markedElement = createCustomElement(marked.fakeDocument, BraccatoLyricsElement);
+
+markedElement.theme = MARKER_THEME;
+connectElement(marked.root, markedElement);
+
+assert.equal(
+  markerSetting.getStringValue(),
+  MARKER_APPLIED,
+  "Given a theme that declares a setting, When the element holding it connects, Then the module reads the theme's value for it"
+);
+
+disconnectElement(markedElement);
+
+const unthemedElement = createCustomElement(marked.fakeDocument, BraccatoLyricsElement);
+connectElement(marked.root, unthemedElement);
+
+assert.equal(
+  markerSetting.getStringValue(),
+  MARKER_DEFAULT,
+  "Given a registry still holding the theme another element applied, When an element that was given none connects, Then it applies an empty theme rather than inheriting that one"
+);
+
+assert.equal(
+  marked.fakeDocument.getElementById(CUSTOM_THEME_STYLE_ID)?.textContent,
+  "",
+  "Given an element that was given no theme, When it connects, Then the stylesheet it puts in its document is an empty one rather than none at all"
+);
+
+disconnectElement(unthemedElement);
+
+// -- A renderer that throws on the way up --------------------------------------------
+
+const refusingWindow = new RefusingWindow();
+const { fixture: refusingRenderer } = newElementFixture(new ElementDocument(refusingWindow));
+const survivingElement = createCustomElement(refusingRenderer.fakeDocument, BraccatoLyricsElement);
+
+survivingElement.theme = REBUILD_THEME;
+connectElement(refusingRenderer.root, survivingElement);
+
+const failedElement = createCustomElement(refusingRenderer.fakeDocument, BraccatoLyricsElement);
+failedElement.theme = ALTERNATE_THEME;
+refusingWindow.refuseNextRenderer = true;
+
+assert.throws(
+  () => connectElement(refusingRenderer.root, failedElement),
+  new RegExp(RENDERER_FAILURE_MESSAGE),
+  "Given a renderer that throws on the way up, When an element connects, Then the throw reaches the page rather than being swallowed into an empty view"
+);
+
+await nextMicrotask();
+
+assert.equal(
+  failedElement.status,
+  "idle",
+  "Given a renderer that threw on the way up, When the element is asked, Then it is not rendering and knows it"
+);
+
+assert.equal(
+  survivingElement.status,
+  "rendering",
+  "Given a renderer that threw on the way up, When the element already rendering is asked, Then the one that never built is not counted as a view it has to agree with"
+);
+
+disconnectElement(survivingElement);
 
 // -- A document with no window --------------------------------------------
 
@@ -624,10 +820,30 @@ assert.equal(
   "Given a document with no window, When an element connects to it, Then it builds nothing, because there is nothing to schedule against"
 );
 
+assert.equal(
+  detachedElement.status,
+  "no-browsing-context",
+  "Given a document with no window, When the element is asked, Then it says why it is empty to a consumer that was never listening"
+);
+
+assert.deepEqual(
+  asFakeNode(detachedElement).dispatchedEvents,
+  [],
+  "Given an element that reported an error while it was connecting, When its events are read before the page has yielded, Then nothing has gone out yet, because a listener could not have been added while a callback the page did not call was running"
+);
+
+await nextMicrotask();
+
 // The one event this file reads off the node rather than through the fake window: with no window
 // there is no constructor on one either, so the element falls back to its own realm's and dispatches
 // a real CustomEvent.
 const detachedError = asFakeNode(detachedElement).dispatchedEvents.at(-1);
+
+assert.equal(
+  asFakeNode(detachedElement).dispatchedEvents.length,
+  1,
+  "Given an error reported while the element was connecting, When the page yields, Then it goes out, in time for a listener added once the element was in the document"
+);
 
 assert.ok(
   detachedError instanceof CustomEvent && detachedError.type === ERROR_EVENT,
@@ -654,6 +870,8 @@ refusingDocument.refuseNextElement = true;
 assert.doesNotThrow(() => {
   refusingElement.lyrics = SYNCED_LYRICS;
 }, "Given a build that throws, When lyrics are written, Then the throw does not come back out of the property");
+
+await nextMicrotask();
 
 assert.deepEqual(
   emittedDetails<ElementErrorDetail>(refusingElement, ERROR_EVENT).map(
@@ -694,5 +912,30 @@ assert.deepEqual(
 );
 
 disconnectElement(refusingElement);
+
+// -- The extension's own name --------------------------------------------
+
+const { fixture: alias, host: aliasHost } = newElementFixture(newConnectedDocument());
+const aliasElement = createCustomElement(alias.fakeDocument, aliasConstructor);
+
+aliasElement.host = aliasHost;
+aliasElement.lyrics = SYNCED_LYRICS;
+connectElement(alias.root, aliasElement);
+
+assert.equal(
+  hasRenderer(aliasElement),
+  true,
+  "Given the name this extension publishes the element under, When one of those is connected, Then it builds a view the way braccato's own name does"
+);
+
+aliasElement.setAttribute(CURRENT_TIME_ATTRIBUTE, String(PLAYBACK_TIME_S));
+
+assert.deepEqual(
+  selectedLines(aliasElement),
+  [false, true, false],
+  "Given the alias, When a current-time attribute is set on it, Then the subclass observes the attributes the class it extends declared"
+);
+
+disconnectElement(aliasElement);
 
 console.log("Lyrics element self-check passed");

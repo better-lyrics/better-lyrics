@@ -80,8 +80,15 @@ export function installCustomElementPlatform(): void {
   Object.defineProperty(globalThis, "customElements", { configurable: true, value: registry });
 }
 
-export function definedConstructor(name: string): FakeElementConstructor | undefined {
-  return registry.get(name);
+/**
+ * The constructor a name is registered under, typed as the class the caller expects. The registry
+ * answers in the fake platform's own terms, and a subclass registered under a second name is only
+ * reachable through it, so the widening happens here the way `fakeDom` widens at its crossings.
+ */
+export function definedConstructor<Element extends object = FakeHTMLElement>(
+  name: string
+): (new () => Element) | undefined {
+  return registry.get(name) as unknown as (new () => Element) | undefined;
 }
 
 /**
