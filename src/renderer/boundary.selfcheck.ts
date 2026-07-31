@@ -1,6 +1,6 @@
 import { strict as assert } from "node:assert";
 import { readFileSync, readdirSync } from "node:fs";
-import { dirname, join, relative, resolve, sep } from "node:path";
+import { dirname, extname, join, relative, resolve, sep } from "node:path";
 import { fileURLToPath } from "node:url";
 import {
   createSourceFile,
@@ -43,6 +43,11 @@ const RENDERER_LEAVES = ["@renderer/constants", "@renderer/text", "@renderer/the
 const SIDE_EFFECT_ENTRY_POINT = "@renderer/element";
 
 const RENDERER_ENTRY_POINTS = new Set(["@renderer/index", SIDE_EFFECT_ENTRY_POINT, ...RENDERER_LEAVES]);
+
+// What a specifier may end in and still name the same module. `@renderer/element`,
+// `@renderer/element.js` and `../renderer/element` are one import as far as these rules go, so they
+// are judged as one.
+const MODULE_FILE_EXTENSIONS = [".ts", ".js"];
 
 // Self-check files are repo infrastructure: they run under tsx, they are never bundled into the
 // extension, and typescript is already a devDependency both here and in braccato, so this stays
@@ -182,30 +187,64 @@ function collectViolations(displayPath: string, absolutePath: string, source: st
 
 // -- The other direction: reaching into the module --------------------------------------------
 
+/**
+ * The path a specifier names, for the two ways a file outside the module can reach into it: the
+ * alias, and a relative path from wherever the file sits. Anything else is not a route in.
+ */
+function resolveModuleTarget(absolutePath: string, specifier: string): string | null {
+  if (specifier === RENDERER_ALIAS) return RENDERER_DIR;
+  if (specifier.startsWith(`${RENDERER_ALIAS}/`)) {
+    return resolve(RENDERER_DIR, specifier.slice(RENDERER_ALIAS.length + 1));
+  }
+  if (specifier.startsWith(".")) return resolve(dirname(absolutePath), specifier);
+  return null;
+}
+
+/**
+ * The entry point a resolved path names, spelled the way `RENDERER_ENTRY_POINTS` spells it, or null
+ * when the path is outside the module. Specifiers are resolved before they are classified rather
+ * than matched as text: a relative path into the module is the same import as the alias, and a rule
+ * that only reads the alias is one a relative path walks straight past.
+ */
+function entryPointFor(target: string): string | null {
+  if (target !== RENDERER_DIR && !target.startsWith(RENDERER_DIR + sep)) return null;
+
+  const extension = extname(target);
+  const withoutExtension = MODULE_FILE_EXTENSIONS.includes(extension) ? target.slice(0, -extension.length) : target;
+  const inside = relative(RENDERER_DIR, withoutExtension);
+
+  return `${RENDERER_ALIAS}/${inside === "" ? "index" : inside.split(sep).join("/")}`;
+}
+
 function collectEntryPointViolations(displayPath: string, absolutePath: string, source: string): BoundaryViolation[] {
   const violations: BoundaryViolation[] = [];
 
   for (const { specifier, line } of extractModuleReferences(parseSource(absolutePath, source))) {
     if (specifier === null) continue;
-    if (specifier !== RENDERER_ALIAS && !specifier.startsWith(`${RENDERER_ALIAS}/`)) continue;
 
-    if (specifier === SIDE_EFFECT_ENTRY_POINT) {
+    const target = resolveModuleTarget(absolutePath, specifier);
+    if (target === null) continue;
+
+    const entryPoint = entryPointFor(target);
+    if (entryPoint === null) continue;
+
+    if (entryPoint === SIDE_EFFECT_ENTRY_POINT) {
       violations.push({
         file: displayPath,
         line,
         rule: "no-side-effect-entry-point",
-        detail: `imports "${specifier}", which registers custom elements; the extension mounts the renderer itself`,
+        detail: `imports "${specifier}", which reaches ${entryPoint} and registers custom elements; the extension mounts the renderer itself`,
       });
       continue;
     }
 
-    if (RENDERER_ENTRY_POINTS.has(specifier)) continue;
+    if (RENDERER_ENTRY_POINTS.has(entryPoint)) continue;
 
     violations.push({
       file: displayPath,
       line,
       rule: "no-renderer-internals",
-      detail: `imports "${specifier}"; the module's entry points are ${[...RENDERER_ENTRY_POINTS].join(", ")}`,
+      detail: `imports "${specifier}", which reaches ${entryPoint}; the module's entry points are ${[...RENDERER_ENTRY_POINTS].join(", ")}`,
     });
   }
 
@@ -327,10 +366,28 @@ assert.deepEqual(
       `const lazy = await import("@renderer/view");`,
       `import { AppState } from "@core/appState";`,
       `import "@renderer/element";`,
+      `import "@renderer/element.js";`,
+      // The same four routes in again, spelled relatively. The alias is a convenience, not a gate:
+      // a rule that only reads it is one a relative path walks straight past.
+      `import { relayout } from "../../renderer/engine";`,
+      `import { setLyrics } from "../../renderer/view.js";`,
+      `const alsoLazy = await import("../../renderer/inject");`,
+      `import "../../renderer/element";`,
+      `import { CUSTOM_THEME_STYLE_ID } from "../../renderer/constants";`,
+      `import { measure } from "../layout/measure";`,
     ].join("\n")
   ).map(violation => `${violation.line} ${violation.rule}`),
-  ["2 no-renderer-internals", "4 no-renderer-internals", "6 no-side-effect-entry-point"],
-  "Given a file outside the module, When it imports an internal or the element, Then only the published leaves and the renderer are allowed"
+  [
+    "2 no-renderer-internals",
+    "4 no-renderer-internals",
+    "6 no-side-effect-entry-point",
+    "7 no-side-effect-entry-point",
+    "8 no-renderer-internals",
+    "9 no-renderer-internals",
+    "10 no-renderer-internals",
+    "11 no-side-effect-entry-point",
+  ],
+  "Given a file outside the module, When it imports an internal or the element by any spelling, Then only the published leaves and the renderer are allowed"
 );
 
 const VIOLATING_STYLESHEET = [
