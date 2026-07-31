@@ -112,11 +112,16 @@ export function createPictureInPictureHost(
     const syncTheme = (): boolean => {
       const css = document.getElementById(CUSTOM_THEME_STYLE_ID)?.textContent ?? "";
       if (css === appliedThemeCss) return false;
+      // Recorded only once it is applied. A guard written first would go on claiming a theme that
+      // threw on the way in, and nothing else in the window's life reads that stylesheet again.
+      const needsLyricRebuild = renderer.setTheme(css);
       appliedThemeCss = css;
-      return renderer.setTheme(css);
+      return needsLyricRebuild;
     };
-    // Before the effects sheet is appended, so the window's head keeps the opener's order, and
-    // before the caller's own first build, which is why the answer goes nowhere here.
+    // The theme goes in ahead of the effects sheet, which is the order that decides anything: the
+    // effects sheet switches off what the theme declares. The marquee's own sheet is ahead of both,
+    // because the view is constructed first, and carries nothing but uniquely numbered generated
+    // keyframes. Run before the caller's first build, which is why the answer goes nowhere here.
     syncTheme();
 
     const effectsStyle = pipWindow.document.createElement("style");
