@@ -90,6 +90,8 @@ const STALLED_MS = 500;
 const DOUBLE_RATE = 2;
 // What element.ts will carry a reading no further than.
 const MAX_CLOCK_CARRY_MS = 100;
+// MEDIA_ERR_NETWORK, which a truncated stream leaves behind mid-song without touching `paused`.
+const NETWORK_ERROR_CODE = 2;
 
 const MAX_SWALLOWED_SCROLLS = 8;
 
@@ -141,12 +143,14 @@ class FakeResizeObserver {
 }
 
 // What the element reads off a media element and nothing else: the clock, whether it is running,
-// how fast, and the listeners it attaches. Nothing here synthesises an event, so a self-check that
-// wants one dispatches it, the way it decides everything else the platform would have done.
+// how fast, what stopped it for good, and the listeners it attaches. Nothing here synthesises an
+// event, so a self-check that wants one dispatches it, the way it decides everything else the
+// platform would have done.
 class FakeMediaElement {
   currentTime = 0;
   paused = true;
   playbackRate = 1;
+  error: { code: number } | null = null;
   readonly listenersByType = new Map<string, Set<() => void>>();
 
   get listenerCount(): number {
@@ -174,10 +178,17 @@ class FakeMediaElement {
   }
 }
 
-// The way across, for a fake that models four members of an interface with hundreds. `fakeDom`
+// The way across, for a fake that models five members of an interface with hundreds. `fakeDom`
 // widens at its own crossings for the same reason: the fakes stay narrow.
 function asMediaElement(fake: FakeMediaElement): HTMLMediaElement {
   return fake as unknown as HTMLMediaElement;
+}
+
+// The way across for something that is not a media element at all, which is the whole point of the
+// crossing: a consumer writing plain JavaScript can hand the property anything, and the element is
+// what has to answer for it.
+function asImposterMediaElement(imposter: object): HTMLMediaElement {
+  return imposter as unknown as HTMLMediaElement;
 }
 
 class FakeWindow {
@@ -1158,6 +1169,54 @@ assert.equal(
   "Given a media element that stopped, When it says so, Then the frame the element had queued was called off"
 );
 
+// -- A clock that stopped without saying so --------------------------------------------
+
+boundMedia.paused = false;
+boundMedia.dispatch("play");
+// No event this time. The loop's own reading of the media element is the whole of what stops it,
+// which is what makes it the invariant rather than the events being one.
+boundMedia.paused = true;
+runFrames(bound.fakeWindow, ANCHOR_FRAME_MS + STALLED_MS);
+
+assert.equal(
+  boundElement.playing,
+  false,
+  "Given a media element that stopped without an event, When a frame runs, Then the element read that rather than reporting a song that is still playing"
+);
+
+assert.equal(
+  bound.fakeWindow.pendingFrames.size,
+  0,
+  "Given a media element that stopped without an event, When a frame runs, Then it asked for no next one, because the clock it would tick against is not moving"
+);
+
+// -- A clock the stream stopped feeding --------------------------------------------
+
+boundMedia.paused = false;
+boundMedia.dispatch("play");
+// What a truncated stream leaves behind mid-song: `error` is set and an event fires, and `paused`
+// is never touched, so a loop that only asked about that one would spin against a frozen clock for
+// the life of the element.
+boundMedia.error = { code: NETWORK_ERROR_CODE };
+runFrames(bound.fakeWindow, ANCHOR_FRAME_MS + STALLED_MS);
+
+assert.equal(
+  boundElement.playing,
+  false,
+  "Given a media element whose stream failed, When a frame runs, Then the element is not playing, because a clock nothing is feeding is a stopped one"
+);
+
+assert.equal(
+  bound.fakeWindow.pendingFrames.size,
+  0,
+  "Given a media element whose stream failed, When a frame runs, Then it asked for no next one rather than ticking sixty times a second against a frozen clock"
+);
+
+// The sections below go on using this media element, and neither a stream that failed nor a clock
+// still running is the subject of any of them.
+boundMedia.error = null;
+boundMedia.paused = true;
+
 // -- Which of the two answers about the clock wins --------------------------------------------
 
 boundElement.currentTime = 0;
@@ -1175,6 +1234,17 @@ assert.equal(
   boundElement.currentTime,
   PLAYBACK_TIME_S,
   "Given an element following a media element, When a current-time attribute is set, Then the binding still owns the clock, because an attribute is the same write by another road"
+);
+
+// -- A scrub, while it is still happening --------------------------------------------
+
+boundMedia.currentTime = LATE_PLAYBACK_TIME_S;
+boundMedia.dispatch("seeking");
+
+assert.deepEqual(
+  [boundElement.currentTime, selectedLines(boundElement)],
+  [LATE_PLAYBACK_TIME_S, [false, false, true]],
+  "Given a scrub that has started, When the media element says so, Then the view is already where it is being dragged to rather than waiting for it to land"
 );
 
 // -- A click on a line, with somewhere to send it --------------------------------------------
@@ -1390,6 +1460,21 @@ assert.equal(
   "Given a source selector that matched something with no clock, When the element is asked, Then it is following nothing rather than a clock that does not exist"
 );
 
+// Everything a binding asks of a media element and nothing it reads off one, which is what makes it
+// the source a consumer writing plain JavaScript hands over and never hears about again.
+const imposterMedia = {
+  addEventListener(): void {},
+  removeEventListener(): void {},
+};
+
+unmatchedElement.source = asImposterMediaElement(imposterMedia);
+
+assert.equal(
+  unmatchedElement.mediaElement,
+  null,
+  "Given a source that is not a media element at all, When it is written, Then the element is following nothing rather than ticking the view with a clock that reads undefined"
+);
+
 assert.doesNotThrow(() => {
   unmatchedElement.source = MALFORMED_SELECTOR;
 }, "Given a string that is not a selector at all, When it is written, Then the throw does not come back out of the property");
@@ -1398,7 +1483,7 @@ await nextMicrotask();
 
 assert.deepEqual(
   errorPhases(unmatchedElement),
-  ["source", "source", "source"],
+  ["source", "source", "source", "source"],
   "Given every way a source can name nothing to follow, When each of them is written, Then the element reports the source each time"
 );
 
@@ -1436,5 +1521,48 @@ assert.deepEqual(
 );
 
 disconnectElement(presetElement);
+
+// -- A host rewrite that throws, while a media element is bound --------------------------------
+
+const rebuildWindow = new RefusingWindow();
+const { fixture: rebuilt, host: rebuiltHost } = newElementFixture(new ElementDocument(rebuildWindow));
+const rebuiltMedia = new FakeMediaElement();
+rebuiltMedia.currentTime = PLAYBACK_TIME_S;
+
+const rebuiltElement = createCustomElement(rebuilt.fakeDocument, BraccatoLyricsElement);
+
+rebuiltElement.host = rebuiltHost;
+rebuiltElement.lyrics = SYNCED_LYRICS;
+rebuiltElement.source = asMediaElement(rebuiltMedia);
+connectElement(rebuilt.root, rebuiltElement);
+
+rebuiltMedia.paused = false;
+rebuiltMedia.dispatch("play");
+
+assert.equal(
+  rebuilt.fakeWindow.pendingFrames.size,
+  1,
+  "Given an element following a media element that is playing, When the window is asked, Then a frame is queued"
+);
+
+rebuildWindow.refuseNextRenderer = true;
+
+assert.throws(
+  () => {
+    rebuiltElement.host = {};
+  },
+  new RegExp(RENDERER_FAILURE_MESSAGE),
+  "Given a host whose rebuild throws, When it is written, Then the throw reaches the page rather than being swallowed into an empty view"
+);
+
+runFrames(rebuilt.fakeWindow, FIRST_FRAME_MS);
+
+assert.deepEqual(
+  [hasRenderer(rebuiltElement), rebuilt.fakeWindow.pendingFrames.size],
+  [false, 0],
+  "Given a host whose rebuild threw, When the frame it had already queued runs, Then the loop stopped rather than running on against a binding with no view left to drive"
+);
+
+disconnectElement(rebuiltElement);
 
 console.log("Lyrics element self-check passed");

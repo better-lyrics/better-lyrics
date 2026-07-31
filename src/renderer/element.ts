@@ -30,14 +30,16 @@ const THEME_ATTRIBUTE = "theme";
 // -- Following a media element --------------------------------------------
 
 // Every moment the clock moved, changed speed or stopped while no frame of this element's was
-// looking. Each one means the same thing here, so they share a handler. `ended`, `emptied` and
-// `loadedmetadata` are deliberately not among them: the README says why.
+// looking. Each one means the same thing here, so they share a handler. `ended`, `emptied`,
+// `loadedmetadata` and `error` are deliberately not among them: the README says why, and the frame
+// loop's own reading of the media element is what covers the ones that stop a clock.
 const MEDIA_CLOCK_EVENTS: readonly string[] = ["play", "pause", "seeking", "seeked", "ratechange"];
 
-// How far past its last reading the media clock may be carried, in milliseconds. `currentTime` is
-// only as fresh as the media element chose to make it, which for video is once per presented frame,
-// so a view rendering the raw reading steps where the song runs. The ceiling is what keeps a clock
-// that stopped without saying so, buffering mid-song, from running away from it.
+// How far past its last reading the media clock may be carried, in milliseconds of frame time
+// rather than of song time. `currentTime` is only as fresh as the media element chose to make it,
+// which for video is once per presented frame, so a view rendering the raw reading steps where the
+// song runs. The gap to fill is spaced in frame time whatever the playback rate is, which is why
+// the ceiling is measured there; the README says what that costs at a rate above 1x.
 const MAX_CLOCK_CARRY_MS = 100;
 
 // The names the component this replaces dispatched, kept so its consumers port by changing an
@@ -53,6 +55,8 @@ const NO_BROWSING_CONTEXT_MESSAGE =
   "This element is in a document with no window, so there is nothing to build lyrics against";
 const THEME_DISAGREEMENT_MESSAGE =
   "Another lyrics element in this document was given a different theme, and the module's theme settings are shared, so both views render against whichever theme was applied last";
+const NON_MEDIA_SOURCE_MESSAGE =
+  "The source given is not a media element in this element's document, so the lyrics have no clock to follow";
 
 // -- Event details --------------------------------------------
 
@@ -108,6 +112,15 @@ function toError(thrown: unknown): Error {
 
 function unresolvedSourceMessage(selector: string): string {
   return `The source selector "${selector}" does not name a media element in this element's document, so the lyrics have no clock to follow`;
+}
+
+/**
+ * Whether the media element's clock is still going. A fatal decode or network failure mid-song sets
+ * `error` and fires one, and leaves `paused` alone: nothing runs the pause steps, so a loop that
+ * only asked about `paused` would spin against a stopped clock for the life of the element.
+ */
+function isClockRunning(media: HTMLMediaElement): boolean {
+  return !media.paused && media.error === null;
 }
 
 /**
@@ -485,7 +498,19 @@ export class BraccatoLyricsElement extends HTMLElement {
   #resolveSource(): HTMLMediaElement | null {
     const source = this.#source;
     if (source === null) return null;
-    if (typeof source !== "string") return source;
+
+    // The element's own realm rather than this one, so a source belonging to another document is
+    // judged against that document's constructor rather than against a foreign one it can never be.
+    const view = this.ownerDocument.defaultView;
+
+    // Held to the same test as a selector's answer. A consumer writing plain JavaScript can hand
+    // this property anything, and something with the two listener methods binds without complaint
+    // and then feeds `undefined` to every tick for the length of the song.
+    if (typeof source !== "string") {
+      if (view !== null && source instanceof view.HTMLMediaElement) return source;
+      this.#emitError("source", new Error(NON_MEDIA_SOURCE_MESSAGE));
+      return null;
+    }
 
     let matched: Element | null;
     try {
@@ -497,9 +522,6 @@ export class BraccatoLyricsElement extends HTMLElement {
       return null;
     }
 
-    // The element's own realm rather than this one, so a selector resolved in another document is
-    // judged against that document's constructor rather than against a foreign one it can never be.
-    const view = this.ownerDocument.defaultView;
     if (view === null || !(matched instanceof view.HTMLMediaElement)) {
       this.#emitError("source", new Error(unresolvedSourceMessage(source)));
       return null;
@@ -518,7 +540,7 @@ export class BraccatoLyricsElement extends HTMLElement {
     const media = this.#media;
     if (media === null) return;
     this.#clockAnchor = null;
-    this.#drive(media.currentTime, !media.paused);
+    this.#drive(media.currentTime, isClockRunning(media));
   }
 
   #drive(currentTimeS: number, playing: boolean): void {
@@ -527,9 +549,14 @@ export class BraccatoLyricsElement extends HTMLElement {
     this.#tick();
   }
 
-  /** A frame runs only while a bound clock is running, so a stopped one costs nothing. */
+  /**
+   * A frame runs only while a bound clock is running against a view, so a stopped one costs
+   * nothing. The view is a term of that rather than an assumption: `connectedCallback` orders its
+   * build before its bind so a build that threw leaves no loop behind, and a `host` rewrite whose
+   * rebuild throws is the one road left to a live binding with no renderer under it.
+   */
   #syncFrameLoop(): void {
-    if (this.#media !== null && this.#playing) {
+    if (this.#renderer !== null && this.#media !== null && this.#playing) {
       this.#scheduleFrame();
       return;
     }
@@ -558,11 +585,12 @@ export class BraccatoLyricsElement extends HTMLElement {
     if (media === null) return;
 
     // The loop asks rather than trusting the pause event, so a clock that stopped without one, at
-    // the end of a song or when its resource went away, still stops the frames.
-    if (media.paused) {
-      this.#driveFromMedia();
-    } else {
+    // the end of a song, when its resource went away or when the stream feeding it failed, still
+    // stops the frames.
+    if (isClockRunning(media)) {
       this.#drive(this.#carriedClock(media, frameTimeMs), true);
+    } else {
+      this.#driveFromMedia();
     }
     this.#syncFrameLoop();
   };
