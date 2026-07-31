@@ -46,13 +46,6 @@ export interface PictureInPictureLyricsPayload {
    * rebuilds whenever the theme demands it, and the decorations have to survive that.
    */
   readonly decorations: LyricDecorations;
-  /**
-   * The parsed `--blyrics-*` config from the user's custom CSS. The module is bundled into both the
-   * isolated and the page world, which are separate realms with separate copies of the theme
-   * settings registry, so the window would otherwise render against defaults on Firefox while the
-   * side panel rendered against the user's theme.
-   */
-  readonly themeSettings: Readonly<Record<string, string>>;
   readonly globalLyricOffset: number;
   readonly lyricOffset: number;
   readonly richsyncOffsetTrim: number;

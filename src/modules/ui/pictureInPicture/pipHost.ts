@@ -1,4 +1,5 @@
 import { DISABLE_EFFECTS_STYLE_ID, FOOTER_CLASS } from "@constants";
+import { CUSTOM_THEME_STYLE_ID } from "@renderer/constants";
 import {
   createLyricsRenderer,
   injectRomanization,
@@ -6,16 +7,12 @@ import {
   type Lyric,
   type LyricsRenderer,
 } from "@renderer/index";
-import { setThemeSettings } from "@renderer/themeSettings";
 import { onLyrics, type PictureInPictureLyricsPayload } from "./bridge";
 import { PictureInPictureController } from "./controller";
 import { PictureInPictureLyricsView } from "./lyricsView";
 import { createPictureInPictureLyricsHost } from "./pipLyricsHost";
 import type { PictureInPictureHostEnvironment } from "./types";
 
-// The theme, and the sheet that switches the stylized animations off. Both live in the opener's
-// head and both have to reach the window, which resolves its own computed styles.
-const MIRRORED_STYLE_IDS = ["blyrics-custom-style", DISABLE_EFFECTS_STYLE_ID];
 const PIP_OPEN_ATTRIBUTE = "blyrics-pip-open";
 const FOOTER_SOURCE_LINK_ID = "betterLyricsFooterLink";
 
@@ -86,35 +83,56 @@ export function createPictureInPictureHost(
   let builtLines: readonly Lyric[] | null = null;
   let clonedFooterSource: Element | null = null;
   let syncFrame: number | null = null;
-  let themeObserver: MutationObserver | null = null;
+  let styleObserver: MutationObserver | null = null;
 
-  function stopThemeMirror(): void {
-    themeObserver?.disconnect();
-    themeObserver = null;
+  function stopStyleMirror(): void {
+    styleObserver?.disconnect();
+    styleObserver = null;
   }
 
-  function mirrorCustomTheme(pipWindow: Window): void {
-    stopThemeMirror();
-    const mirrors = MIRRORED_STYLE_IDS.map(id => {
-      const pipStyle = pipWindow.document.createElement("style");
-      pipStyle.id = id;
-      pipWindow.document.head.appendChild(pipStyle);
-      return { id, pipStyle };
-    });
+  /**
+   * Brings the two stylesheets that live in the opener's head into the window, which resolves its
+   * own computed styles.
+   *
+   * The theme goes through the renderer rather than being copied across as an element: the renderer
+   * owns the sheet it applies a theme through, and the settings declared in that sheet's comments
+   * are parsed as it goes, which is how this realm's copy of the settings registry gets filled at
+   * all. On Gecko the window runs in the page world, and nothing else here fills it.
+   *
+   * The sheet that switches stylized animations off is the extension's own, so it is still an
+   * element copy.
+   */
+  function mirrorOpenerStyles(pipWindow: Window, renderer: LyricsRenderer): void {
+    stopStyleMirror();
 
     // Every head mutation lands here, and the page rewrites <title> on each play, pause and track
-    // change. Re-assigning identical CSS is not free: the sheet is re-parsed, so every face the
-    // theme imports is re-resolved and the font event that follows re-arms the header marquee.
-    const sync = (): void => {
-      for (const { id, pipStyle } of mirrors) {
-        const next = document.getElementById(id)?.textContent ?? "";
-        if (next !== pipStyle.textContent) pipStyle.textContent = next;
-      }
+    // change. Re-applying identical CSS is not free: the sheet is re-parsed, so every face the theme
+    // imports is re-resolved and the font event that follows re-arms the header marquee.
+    let appliedThemeCss: string | null = null;
+    const syncTheme = (): boolean => {
+      const css = document.getElementById(CUSTOM_THEME_STYLE_ID)?.textContent ?? "";
+      if (css === appliedThemeCss) return false;
+      appliedThemeCss = css;
+      return renderer.setTheme(css);
     };
-    sync();
+    // Before the effects sheet is appended, so the window's head keeps the opener's order, and
+    // before the caller's own first build, which is why the answer goes nowhere here.
+    syncTheme();
 
-    themeObserver = new MutationObserver(sync);
-    themeObserver.observe(document.head, { childList: true, subtree: true, characterData: true });
+    const effectsStyle = pipWindow.document.createElement("style");
+    effectsStyle.id = DISABLE_EFFECTS_STYLE_ID;
+    const syncEffects = (): void => {
+      const next = document.getElementById(DISABLE_EFFECTS_STYLE_ID)?.textContent ?? "";
+      if (next !== effectsStyle.textContent) effectsStyle.textContent = next;
+    };
+    syncEffects();
+    pipWindow.document.head.appendChild(effectsStyle);
+
+    styleObserver = new MutationObserver(() => {
+      if (syncTheme()) buildLyrics();
+      syncEffects();
+    });
+    styleObserver.observe(document.head, { childList: true, subtree: true, characterData: true });
   }
 
   function injectLyricStyles(pipWindow: Window): void {
@@ -287,12 +305,10 @@ export function createPictureInPictureHost(
   // told the window opened, which is before the view that renders them exists.
   onLyrics(payload => {
     lyricsPayload = payload;
-    // Applied before the rebuild decision because the build reads them, and because on Gecko this
-    // realm's copy of the registry is filled in from nowhere else.
-    const themeNeedsRebuild = setThemeSettings(new Map(Object.entries(payload.themeSettings)));
     // An offset nudge republishes the same lines. Rebuilding on one would throw away the DOM the
-    // window is animating and restart the line it is part way through.
-    if (themeNeedsRebuild || !hasSameLines(builtLines, payload.lyrics)) {
+    // window is animating and restart the line it is part way through. A theme change republishes
+    // them too, and the rebuild that one wants is decided where the theme arrives instead.
+    if (!hasSameLines(builtLines, payload.lyrics)) {
       buildLyrics();
       return;
     }
@@ -309,13 +325,15 @@ export function createPictureInPictureHost(
     pipWindow.document.title = environment.windowTitle();
     registerAnimatableProperties(pipWindow);
     injectLyricStyles(pipWindow);
-    mirrorCustomTheme(pipWindow);
     activeView = new PictureInPictureLyricsView(pipWindow, document, environment.view);
     activeRenderer = createLyricsRenderer({
       document: pipWindow.document,
       window: pipWindow,
       host: createPictureInPictureLyricsHost(activeView, environment.view),
     });
+    // After the renderer, because the theme is applied through it, and before the build below,
+    // which reads the settings that theme declares.
+    mirrorOpenerStyles(pipWindow, activeRenderer);
     applySettings(activeView);
     buildLyrics();
     startSyncLoop(pipWindow);
@@ -327,7 +345,7 @@ export function createPictureInPictureHost(
     document.documentElement.removeAttribute(PIP_OPEN_ATTRIBUTE);
     environment.onClosed();
     stopSyncLoop(pipWindow);
-    stopThemeMirror();
+    stopStyleMirror();
     activeRenderer?.destroy();
     activeRenderer = null;
     activeView = null;
