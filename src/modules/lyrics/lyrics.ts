@@ -24,15 +24,15 @@ import { getLyrics, newSourceMap, providerPriority } from "./providers/shared";
 import type { YTLyricSourceResult } from "./providers/yt";
 import { getSongAlbum, getSongMetadata, type SegmentMap } from "./requestSniffer/requestSniffer";
 import { clearCache as clearTranslationCache } from "./translation";
-import { mainView, resumeAutoscroll } from "@modules/ui/mainLyricsView";
-import { resetPlaybackClock } from "@renderer/index";
+import { mainView } from "@modules/ui/mainLyricsView";
+import { resetPlaybackClock, resumeAllAutoscroll } from "@renderer/index";
 
 const hideInstrumentalOnly = registerThemeSetting("blyrics-hide-instrumental-only", false, true);
 
 export function seekPlayer(timeS: number): void {
   log(LOG_PREFIX, `Seeking to ${timeS.toFixed(2)}s`);
   document.dispatchEvent(new CustomEvent(SEEK_EVENT, { detail: timeS }));
-  resumeAutoscroll();
+  resumeAllAutoscroll();
 }
 
 function isInstrumentalOnly(lyrics: Lyric[]): boolean {

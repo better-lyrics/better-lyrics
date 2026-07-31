@@ -10,7 +10,7 @@ import { AppState } from "@core/appState";
 import { t } from "@core/i18n";
 import { getStorage } from "@core/storage";
 import { getArtworkMetadata } from "@modules/lyrics/requestSniffer/requestSniffer";
-import { resumeAutoscroll } from "@modules/ui/mainLyricsView";
+import { resumeAllAutoscroll } from "@renderer/index";
 import { log } from "@utils";
 import { onSignal, sendInit, sendMetadata } from "./bridge";
 import { publishPictureInPictureLyrics } from "./lyricsPublisher";
@@ -48,7 +48,7 @@ const PIP_SETTING_DEFAULTS = {
 const isolatedViewDependencies: PictureInPictureViewDependencies = {
   translate: t,
   getArtworkMetadata,
-  resetScrollResume: resumeAutoscroll,
+  resetScrollResume: resumeAllAutoscroll,
   // Resolved per call rather than bound once: `log` is reassigned when the logging setting loads.
   log: (...args: unknown[]) => log(LOG_PREFIX, ...args),
 };
@@ -124,7 +124,7 @@ function createPageWorldDelegate(): PictureInPictureToggle {
       isOpen = false;
       markPictureInPictureClosed();
     } else if (signal.type === "reset-scroll") {
-      resumeAutoscroll();
+      resumeAllAutoscroll();
     } else if (signal.type === "want-metadata") {
       void getArtworkMetadata(signal.videoId, 250).then(metadata =>
         sendMetadata({ requestId: signal.requestId, metadata })
