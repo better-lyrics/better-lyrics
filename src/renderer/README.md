@@ -31,8 +31,9 @@ with it. Importing `./engine`, `./inject`, `./view` or anything else from outsid
 violation in the other direction and is checked too, as is a published leaf growing an import.
 
 `createLyricsRenderer(options)` is the way in. It returns one `LyricsRenderer`: give it lyrics, tick
-it, and it owns the DOM it builds and every re-measurement that DOM needs. The four values published
-beside it are what one instance cannot answer for on its own. `resetPlaybackClock` and
+it, and it owns the DOM it builds and every re-measurement that DOM needs. `renderer.setTheme(css)`
+is where a theme reaches it, described under Theme settings below. The four values published beside
+it are what one instance cannot answer for on its own. `resetPlaybackClock` and
 `resumeAllAutoscroll` describe the song rather than one view, so no caller gets to name a particular
 one, but they reach the views differently: `resumeAllAutoscroll` walks the registry of live
 instances, while `resetPlaybackClock` forgets a snapshot the module keeps once for all of them, which
@@ -104,14 +105,35 @@ rule.
 
 ## Theme settings
 
-`themeSettings.ts` owns the registry. Settings are parsed once from the compiled stylesheet, so they
-are global rather than per instance: one theme means one set of values for every view.
-`registerThemeSetting` runs at module scope, which evaluates once per bundle regardless of how many
-instances exist.
+A theme is a stylesheet, and it configures this module through comments inside it, in the form
+`blyrics-some-key = value;`. Only inside comments: everything else is CSS the browser is going to
+read, and a stylesheet must not be able to configure the module by accident.
+
+`renderer.setTheme(css)` is the whole of getting one in. It parses that configuration out of the
+comments, applies it to the registry, puts the stylesheet in the head of the document the renderer
+builds in, and drops what the engine had resolved off the old one. It returns whether a setting the
+lines are built out of changed, which is the one part it cannot do itself: the consumer holds the
+lyrics, so the consumer is the one that can hand them back.
+
+The stylesheet goes in as a `<style>` element carrying `CUSTOM_THEME_STYLE_ID` rather than into
+`document.adoptedStyleSheets`, because adopted sheets are ordered after every sheet the document
+loaded, which is not the cascade position a consumer writing the element itself would get, and
+because an element is findable: this extension's floating window is handed the side panel's theme by
+reading it off that id.
+
+The CSS is compiled CSS, not theme source. Better Lyrics themes are written in RICS and compiled
+with the `rics` package first, which is the consumer's dependency rather than this module's: the
+module ships with none. `parseThemeConfig` is published on the `themeSettings.ts` leaf for a
+consumer that wants the configuration out of a stylesheet somewhere no renderer is running.
+
+`themeSettings.ts` owns the registry. `registerThemeSetting` runs at module scope, which evaluates
+once per bundle regardless of how many instances exist, so the values are global rather than per
+instance: one theme means one set of values for every view. The stylesheet is the other way round,
+one per document, so two views in two documents are each given their own.
 
 The module is bundled into both the isolated and the page-world bundles, which are separate realms
-with separate registries. Each needs the parsed config fed to it, or one view renders against
-defaults while the other renders against the theme.
+with separate registries. Each needs its own `setTheme` call, or one view renders against defaults
+while the other renders against the theme.
 
 ## Ticking
 
