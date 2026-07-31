@@ -171,7 +171,6 @@ export interface LyricsRenderer {
   noteUserScroll(): void;
   noteVisibilityChange(): void;
   resumeAutoscroll(): void;
-  clearStyleCaches(): void;
   clearOnScreenLyrics(): boolean;
   /**
    * Re-measures the lines on the next frame and renders the view again against them. The predicate

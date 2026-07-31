@@ -42,4 +42,11 @@ export const BIDI_SENSITIVE_CLASS = "blyrics-bidi-sensitive" as const;
 // The element a theme handed to `setTheme` is applied through, one per document a renderer builds
 // in. Named rather than anonymous because a consumer with a second document to style has to be able
 // to find the first one: this extension's floating window mirrors the side panel's by id.
+//
+// One renderer per document owns it. Two renderers in one document render against one theme
+// whatever they are given, because the settings registry is module scope, so this is a constraint
+// stated rather than a configuration supported. A renderer that finds the id already in its
+// document writes into that element rather than adding a rival, so the id stays unique and a
+// consumer reading it by id gets the sheet in force, and `destroy` takes the element away only if
+// this renderer is what put it there.
 export const CUSTOM_THEME_STYLE_ID = "blyrics-custom-style" as const;

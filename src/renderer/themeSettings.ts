@@ -63,8 +63,10 @@ const THEME_SETTING_PATTERN = /(blyrics-[\w-]+)\s*=\s*([^;]+);/g;
 export function parseThemeConfig(css: string): Map<string, string> {
   const config = new Map<string, string>();
 
-  // `matchAll` rather than `exec`: it works off a copy of the pattern, so the two shared here never
-  // carry a `lastIndex` from one stylesheet into the next.
+  // `matchAll` works off a copy of the pattern, so neither of the two shared at module scope can
+  // carry a `lastIndex` out of one stylesheet and into the next however these loops are nested.
+  // Driving them with `exec` is correct too, as long as every loop is left running to exhaustion:
+  // this is written not to depend on that.
   for (const [, comment] of css.matchAll(THEME_COMMENT_PATTERN)) {
     for (const [, key, value] of comment.matchAll(THEME_SETTING_PATTERN)) {
       config.set(key, value.trim());

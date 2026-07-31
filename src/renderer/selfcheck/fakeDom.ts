@@ -116,6 +116,10 @@ export class FakeNode {
   scrollWidth = 0;
   scrollHeight = 0;
   scrollTop = 0;
+  // What a rewrite of this node's text costs a browser, which is the whole reason a module writing
+  // one it did not have to is worth catching: a `<style>` written with the text it already holds is
+  // re-parsed, and every face it imports is re-resolved.
+  textContentWrites = 0;
   // A subtree the page has hidden. Set on the node that carries the display, the way a stylesheet
   // does: everything under it stops generating boxes, and a browser then answers nothing to every
   // measurement taken inside it.
@@ -172,6 +176,7 @@ export class FakeNode {
   }
 
   set textContent(value: string) {
+    this.textContentWrites += 1;
     this.childNodes.length = 0;
     this.ownText = value;
   }
@@ -306,6 +311,12 @@ export class FakeDocument {
 
   createDocumentFragment(): FakeNode {
     return this.record("createDocumentFragment", "fragment", "#fragment", null);
+  }
+
+  // Only the head is searched, because it is the only tree this fake attaches anything to and the
+  // only one the module looks in for an element carrying an id.
+  getElementById(id: string): FakeNode | null {
+    return collectTree(this.head).find(node => node.id === id) ?? null;
   }
 
   countOf(factory: FactoryName): number {

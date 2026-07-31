@@ -42,8 +42,8 @@ assert.deepEqual(
   "Given settings written in the stylesheet rather than in a comment, When it is read, Then only what a browser ignores configures the module"
 );
 
-// Each comment is scanned from its own start. A pattern that carried a position from one comment
-// into the next would read the second from part way in and lose whatever was declared before there.
+// Every comment is scanned, and the last declaration of a key is the one that stands. This pins the
+// behaviour rather than the construction behind it: an `exec` loop run to exhaustion passes it too.
 const TWO_COMMENT_THEME = [
   `/* blyrics-swipe-lead-ratio = 0.2; */`,
   `.blyrics--word { color: red; }`,

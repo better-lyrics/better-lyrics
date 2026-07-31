@@ -1024,7 +1024,6 @@ floatingRenderer.clear();
 floatingRenderer.noteUserScroll();
 floatingRenderer.noteVisibilityChange();
 floatingRenderer.resumeAutoscroll();
-floatingRenderer.clearStyleCaches();
 floatingRenderer.scheduleLyricPositionUpdate(
   () => true,
   () => {}
@@ -1137,14 +1136,6 @@ assert.equal(
   rich.fakeWindow.propertyReads.length,
   propertyReadsBeforeCachedTick,
   "Given a view that already resolved its theme, When it ticks again, Then it reads none of it off the document a second time"
-);
-
-richRenderer.clearStyleCaches();
-richRenderer.tick(LATE_PLAYBACK_TIME_S, { isPlaying: true });
-
-assert.ok(
-  rich.fakeWindow.propertyReads.length > propertyReadsBeforeCachedTick,
-  "Given a theme that changed under a view, When it is told to drop what it resolved, Then the next tick resolves it again"
 );
 
 assert.deepEqual(
@@ -1628,10 +1619,40 @@ assert.ok(
   "Given a view that resolved the theme it was rendering against, When a new one is applied, Then the next tick resolves the new one rather than rendering against what it cached off the old"
 );
 
+// The theme a view already carries arriving again is the ordinary case rather than the odd one: one
+// editor save reaches this extension twice, once as a message and once as a storage change. A
+// `<style>` rewritten with the text it already holds is re-parsed all the same, so every face the
+// theme imports is re-resolved and whatever waits on the font event that follows re-arms.
+const themeSheetElement = themed.fakeDocument.head.childNodes.find(child => child.id === CUSTOM_THEME_STYLE_ID);
+assert.ok(
+  themeSheetElement,
+  "Given a theme applied to a view, When its document's head is read, Then it holds the element the stylesheet went into"
+);
+
+const sheetWritesBeforeSameTheme = themeSheetElement.textContentWrites;
+
+assert.equal(
+  themedRenderer.setTheme(REBUILD_THEME),
+  false,
+  "Given the theme a view is already rendering against, When it is applied a second time, Then nothing the lines are built out of changed"
+);
+
+assert.equal(
+  themeSheetElement.textContentWrites,
+  sheetWritesBeforeSameTheme,
+  "Given the theme a view is already rendering against, When it is applied a second time, Then the stylesheet is left alone rather than rewritten with the text it already holds"
+);
+
 assert.equal(
   themedRenderer.setTheme(RESPELT_REBUILD_THEME),
   false,
   "Given a theme that declares the same value in different words, When it is applied, Then the view reports on the settings that changed rather than on the text of the stylesheet"
+);
+
+assert.equal(
+  themeSheetElement.textContentWrites,
+  sheetWritesBeforeSameTheme + 1,
+  "Given a theme spelt differently to the one the document is carrying, When it is applied, Then the stylesheet is rewritten, because what is held back is a rewrite that would change nothing rather than one that changes only settings"
 );
 
 assert.equal(
@@ -1648,7 +1669,65 @@ assert.deepEqual(
   "Given a destroyed renderer, When the document it was building in is read, Then the theme it applied went with it rather than being left behind styling nothing"
 );
 
-const drivenFixtures = [panel, floating, rich, reflowed, hidden, contents, empty, unsynced, themed];
+// -- Two views in one document share the element the theme goes in ------------------------------
+// One renderer per document owns that element, and the id is how a consumer finds the sheet in
+// force: this extension's floating window is handed the side panel's theme by reading it off the id.
+// Two elements carrying it is invalid, and leaves `getElementById` answering with whichever of them
+// came first rather than with the theme that was applied last.
+
+const { fixture: shared, host: sharedHost } = newViewFixture();
+const secondSharedMount = shared.fakeDocument.createElement("div");
+shared.scrollContainer.appendChild(secondSharedMount);
+
+const firstSharedRenderer = createLyricsRenderer({
+  document: asDocument(shared.fakeDocument),
+  window: asWindow(shared.fakeWindow),
+  mount: asElement<HTMLElement>(shared.mount),
+  host: sharedHost,
+});
+const secondSharedRenderer = createLyricsRenderer({
+  document: asDocument(shared.fakeDocument),
+  window: asWindow(shared.fakeWindow),
+  mount: asElement<HTMLElement>(secondSharedMount),
+  host: sharedHost,
+});
+
+function sharedThemeSheets(): FakeNode[] {
+  return shared.fakeDocument.head.childNodes.filter(child => child.id === CUSTOM_THEME_STYLE_ID);
+}
+
+firstSharedRenderer.setTheme(NEUTRAL_THEME);
+secondSharedRenderer.setTheme(REBUILD_THEME);
+
+assert.equal(
+  sharedThemeSheets().length,
+  1,
+  "Given two views building in one document, When both are given a theme, Then one element carries the id rather than two"
+);
+
+assert.equal(
+  shared.fakeDocument.getElementById(CUSTOM_THEME_STYLE_ID)?.textContent,
+  REBUILD_THEME,
+  "Given a view that adopted the element another one created, When the document is read by that id, Then it answers with the theme applied last"
+);
+
+secondSharedRenderer.destroy();
+
+assert.equal(
+  sharedThemeSheets().length,
+  1,
+  "Given a destroyed view that had adopted another's stylesheet, When the document is read, Then the element is still there for the view still rendering against it"
+);
+
+firstSharedRenderer.destroy();
+
+assert.deepEqual(
+  sharedThemeSheets(),
+  [],
+  "Given a destroyed view that created the stylesheet, When the document is read, Then it took the element with it"
+);
+
+const drivenFixtures = [panel, floating, rich, reflowed, hidden, contents, empty, unsynced, themed, shared];
 
 assert.equal(
   ambientGlobalReads,

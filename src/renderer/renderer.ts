@@ -148,7 +148,8 @@ export function createLyricsRenderer(rendererOptions: LyricsRendererOptions): Ly
 
   let mount: HTMLElement | null = rendererOptions.mount ?? null;
   let containerResizeObserver: ResizeObserver | null = null;
-  let themeStyleElement: HTMLStyleElement | null = null;
+  // Only the theme element this renderer created, which is the only one it may take away again.
+  let createdThemeStyleElement: HTMLElement | null = null;
   let isDestroyed = false;
 
   const { host, forgetScrollElement } = withHostDefaults(rendererOptions.host, rendererWindow, () => mount);
@@ -209,10 +210,21 @@ export function createLyricsRenderer(rendererOptions: LyricsRendererOptions): Ly
    * every sheet the document loaded, so one would give the theme a cascade position it does not have
    * when a consumer writes the element itself, and an element is findable, which is how a second
    * document is handed the same theme.
+   *
+   * Findable is why the element is resolved by id before one is created. A second renderer in the
+   * same document writes into the element that is already there rather than adding a rival under the
+   * same id, which would be invalid and would leave `getElementById` answering with whichever of the
+   * two came first. Only the element this renderer created is remembered, and only that one is taken
+   * away again: an adopted element belongs to whoever put it in the document.
+   *
+   * Rewriting a `<style>` with the text it already holds is not free. The sheet is re-parsed, so
+   * every face the theme imports is re-resolved and whatever is waiting on the font event that
+   * follows re-arms. This extension reaches a theme twice per edit, so that is the ordinary case.
    */
   function adoptThemeStyleSheet(css: string): void {
-    if (themeStyleElement !== null) {
-      themeStyleElement.textContent = css;
+    const existingElement = createdThemeStyleElement ?? rendererDocument.getElementById(CUSTOM_THEME_STYLE_ID);
+    if (existingElement !== null) {
+      if (existingElement.textContent !== css) existingElement.textContent = css;
       return;
     }
     const styleElement = rendererDocument.createElement("style");
@@ -221,7 +233,7 @@ export function createLyricsRenderer(rendererOptions: LyricsRendererOptions): Ly
     // and once full.
     styleElement.textContent = css;
     rendererDocument.head.appendChild(styleElement);
-    themeStyleElement = styleElement;
+    createdThemeStyleElement = styleElement;
   }
 
   const remeasureForViewport = (): void => measure();
@@ -289,10 +301,12 @@ export function createLyricsRenderer(rendererOptions: LyricsRendererOptions): Ly
       if (isDestroyed) return;
       isDestroyed = true;
       clearBuiltView();
-      // The theme outlives a song, so only this takes it away. It is DOM this built, and leaving it
-      // behind would leave a document nothing renders into carrying a stylesheet for lyrics.
-      themeStyleElement?.remove();
-      themeStyleElement = null;
+      // The theme outlives a song, so only this takes it away, and only the element this renderer
+      // created: leaving that one behind would leave a document nothing renders into carrying a
+      // stylesheet for lyrics, while taking away an adopted one would strip the renderer that owns
+      // it. Nothing was adopted in the one renderer per document this module supports.
+      createdThemeStyleElement?.remove();
+      createdThemeStyleElement = null;
       rendererWindow.removeEventListener("resize", remeasureForViewport);
       engine.destroy();
     },
@@ -307,10 +321,6 @@ export function createLyricsRenderer(rendererOptions: LyricsRendererOptions): Ly
     resumeAutoscroll() {
       if (isDestroyed) return;
       resetScrollResume(engine);
-    },
-    clearStyleCaches() {
-      if (isDestroyed) return;
-      clearEngineStyleCaches(engine);
     },
     clearOnScreenLyrics() {
       if (isDestroyed) return false;

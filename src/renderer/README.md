@@ -121,6 +121,13 @@ loaded, which is not the cascade position a consumer writing the element itself 
 because an element is findable: this extension's floating window is handed the side panel's theme by
 reading it off that id.
 
+One renderer per document owns that element. Two renderers in one document render against one theme
+whatever either of them is given, because the settings registry below is module scope, so this is a
+constraint rather than a configuration to support. It is stated rather than enforced, and the
+behaviour is defined either way: a renderer that finds the id already in its document writes into
+the element it finds rather than adding a rival under the same id, and `destroy` removes the element
+only if that renderer is the one that created it.
+
 The CSS is compiled CSS, not theme source. Better Lyrics themes are written in RICS and compiled
 with the `rics` package first, which is the consumer's dependency rather than this module's: the
 module ships with none. `parseThemeConfig` is published on the `themeSettings.ts` leaf for a
