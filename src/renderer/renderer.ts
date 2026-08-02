@@ -30,6 +30,8 @@ const SEEK_EVENT = "braccato:seek";
 
 const DESTROYED_SET_LYRICS_LOG = "Lyrics were handed to a renderer that has been destroyed; nothing was built";
 
+const FONT_MEASURE_LOG = "The lines could not be re-measured after the document's faces loaded";
+
 const SCROLLABLE_OVERFLOW = new Set(["auto", "scroll"]);
 
 function noop(): void {}
@@ -241,10 +243,17 @@ export function createLyricsRenderer(rendererOptions: LyricsRendererOptions): Ly
 
   // Lines measured before the theme's faces have loaded are measured at the fallback face's
   // metrics, which leaves every scroll target a little off for the rest of the song.
-  void rendererDocument.fonts.ready.then(() => {
-    if (isDestroyed) return;
-    measure();
-  });
+  //
+  // The catch is what makes this measurement reportable. Every other door into `measure` is a call
+  // the consumer made or a platform callback it registered, so a throw comes back where it can be
+  // seen; this one is a promise nobody is holding, and without the catch a throw inside it is an
+  // unhandled rejection with no view attached to it.
+  void rendererDocument.fonts.ready
+    .then(() => {
+      if (isDestroyed) return;
+      measure();
+    })
+    .catch(error => host.log(FONT_MEASURE_LOG, error));
 
   // Destruction is final, and every entry point below says so by doing nothing. Silently, because
   // the frame a consumer already queued arriving one tick after it tore the view down is the normal

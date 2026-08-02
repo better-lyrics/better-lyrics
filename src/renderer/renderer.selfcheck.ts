@@ -67,6 +67,9 @@ const NEUTRAL_THEME = "/* blyrics-target-scroll-pos-ratio = 0.5; */";
 
 const MAX_SWALLOWED_SCROLLS = 8;
 
+// What a layout read against a page that has been torn down under the view throws.
+const MEASUREMENT_FAILURE_MESSAGE = "This view refuses to be measured";
+
 // A guard that fails to record one dimension re-measures on every report of it, so one repeat would
 // read as a fluke and several read as the loop it is.
 const REPEATED_RESIZE_REPORTS = 3;
@@ -161,6 +164,8 @@ interface ViewFixture {
   measurements: number;
   logs: unknown[][];
   resumeAffordanceCalls: boolean[];
+  /** Set to make the next measurement throw, the way a layout read against a torn down page would. */
+  failNextMeasurement: Error | null;
 }
 
 /**
@@ -188,6 +193,7 @@ function newViewFixture(styleValues: Record<string, string> = SCROLL_ANIMATION_O
     measurements: 0,
     logs: [],
     resumeAffordanceCalls: [],
+    failNextMeasurement: null,
   };
 
   return {
@@ -196,6 +202,11 @@ function newViewFixture(styleValues: Record<string, string> = SCROLL_ANIMATION_O
       debug: {
         beginFrame: () => null,
         resize: () => {
+          const failure = fixture.failNextMeasurement;
+          if (failure !== null) {
+            fixture.failNextMeasurement = null;
+            throw failure;
+          }
           fixture.measurements += 1;
         },
       },
@@ -577,6 +588,32 @@ assert.equal(
   5,
   "Given lines measured at the fallback face's metrics, When the document's own faces finish loading, Then they are measured again"
 );
+
+// -- The measurement nobody is standing under ---------------------------------------------------
+// Every other door into a measurement is a call the consumer made or a platform callback it
+// registered, so a throw comes back where it can be seen. This one is a promise nobody is holding.
+
+const { fixture: faceless, host: facelessHost } = newViewFixture();
+const facelessRenderer = createLyricsRenderer({
+  document: asDocument(faceless.fakeDocument),
+  window: asWindow(faceless.fakeWindow),
+  mount: asElement<HTMLElement>(faceless.mount),
+  host: facelessHost,
+});
+
+facelessRenderer.setLyrics(SYNCED_LYRICS);
+faceless.failNextMeasurement = new Error(MEASUREMENT_FAILURE_MESSAGE);
+
+await faceless.fakeDocument.fonts.finishLoading();
+await flushMicrotasks();
+
+assert.deepEqual(
+  faceless.logs.map(entry => String((entry[1] as Error | undefined)?.message)),
+  [MEASUREMENT_FAILURE_MESSAGE],
+  "Given a measurement that throws once the document's faces load, When it does, Then the host is told rather than the page reporting a rejection nobody can trace to a view"
+);
+
+facelessRenderer.destroy();
 
 // -- A tick needs nothing but the play state --------------------------------------------
 
@@ -1593,7 +1630,19 @@ assert.deepEqual(
   "Given a destroyed view that created the stylesheet, When the document is read, Then it took the element with it"
 );
 
-const drivenFixtures = [panel, floating, rich, reflowed, hidden, contents, empty, unsynced, themed, shared];
+const drivenFixtures = [
+  panel,
+  faceless,
+  floating,
+  rich,
+  reflowed,
+  hidden,
+  contents,
+  empty,
+  unsynced,
+  themed,
+  shared,
+];
 
 assert.equal(
   ambientGlobals.reads,
