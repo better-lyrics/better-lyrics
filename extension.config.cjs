@@ -1,4 +1,4 @@
-const { readdirSync, readFileSync } = require("node:fs");
+const { existsSync, readdirSync, readFileSync } = require("node:fs");
 const { join } = require("node:path");
 
 // The renderer's stylesheets live inside its package boundary, but they ship at the paths
@@ -6,17 +6,46 @@ const { join } = require("node:path");
 // that the sources moved.
 const RENDERER_STYLES_DIR = join(__dirname, "src", "renderer", "styles");
 const RENDERER_STYLES_OUTPUT_DIR = "css/blyrics";
+const EXTENSION_STYLES_DIR = join(__dirname, "public", "css", "blyrics");
 
-const rendererStylesheets = () =>
-  readdirSync(RENDERER_STYLES_DIR)
-    .filter((name) => name.endsWith(".css"))
-    .map((name) => ({ name, path: join(RENDERER_STYLES_DIR, name) }));
+// Flat, and asserted flat: the output directory is flat, boundary.selfcheck.ts reads this one flat
+// too, and a stylesheet in a subdirectory would answer to the boundary without ever shipping.
+const rendererStylesheets = () => {
+  const entries = readdirSync(RENDERER_STYLES_DIR, { withFileTypes: true });
+
+  const nested = entries.filter((entry) => entry.isDirectory()).map((entry) => entry.name);
+  if (nested.length > 0) {
+    throw new Error(
+      `[BetterLyrics] src/renderer/styles/ ships flat at ${RENDERER_STYLES_OUTPUT_DIR}/, so nothing may nest under it: ${nested.join(", ")}`
+    );
+  }
+
+  const stylesheets = entries
+    .filter((entry) => entry.isFile() && entry.name.endsWith(".css"))
+    .map((entry) => ({ name: entry.name, path: join(RENDERER_STYLES_DIR, entry.name) }));
+
+  // Both halves emit into one flat directory, so a shared basename is one asset overwriting the
+  // other: the build report describes the file that lost and the artifact is the file that won.
+  const shadowed = stylesheets
+    .filter(({ name }) => existsSync(join(EXTENSION_STYLES_DIR, name)))
+    .map(({ name }) => name);
+  if (shadowed.length > 0) {
+    throw new Error(
+      `[BetterLyrics] ${shadowed.join(", ")} exists in both src/renderer/styles/ and public/${RENDERER_STYLES_OUTPUT_DIR}/, and both emit to ${RENDERER_STYLES_OUTPUT_DIR}/; rename one`
+    );
+  }
+
+  return stylesheets;
+};
 
 // Emitted from the emit hook rather than from a processAssets stage so the CSS minimizer leaves
 // them byte for byte as authored, which is how the copies under public/ arrive too.
 const emitRendererStyles = {
   apply: (compiler) => {
     compiler.hooks.thisCompilation.tap("EmitRendererStyles", (compilation) => {
+      // A stylesheet added or removed is a change to the directory, not to any file watch already
+      // holds, so without this a new one never reaches a running watch.
+      compilation.contextDependencies.add(RENDERER_STYLES_DIR);
       for (const { path } of rendererStylesheets()) {
         compilation.fileDependencies.add(path);
       }
