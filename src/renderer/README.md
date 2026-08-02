@@ -11,8 +11,9 @@ written as though it already had been.
 
 Nothing here may import from `@core/*`, `@modules/*`, `@constants`, `@utils`, `@options` or `@/`,
 reach outside this directory with a relative path, reference `chrome.`, or import a package. Nothing
-under `styles/` may name a YouTube Music selector. `boundary.selfcheck.ts` enforces all of that and
-runs as part of `npm run selfcheck`. If a change makes it fail, the change is wrong, not the check.
+under `styles/` may name a YouTube Music selector, or read a custom property the module neither owns
+nor declares. `boundary.selfcheck.ts` enforces all of that and runs as part of `npm run selfcheck`.
+If a change makes it fail, the change is wrong, not the check.
 
 The one exemption: `*.selfcheck.ts` files may import `node:*` builtins and `typescript`. They are
 repo infrastructure, never bundled, and `typescript` is a devDependency here and in braccato.
@@ -96,20 +97,44 @@ The DOM and the CSS that styles it are one artifact, so the CSS lives inside the
 because they style the host rather than the lyrics: `components.css`, `misc.css`, `modal.css`,
 `responsive.css`, `picture-in-picture.css`.
 
+`index.css` stays with them, and it is the one worth naming, because it is not a stylesheet: it is
+the `@import` list both injection sites load, and it names the module's three sheets alongside the
+extension's own. It is where the two halves are stitched together, so a sheet added or renamed on
+either side is a change to that file.
+
 The build emits `styles/*.css` at `css/blyrics/<name>`, the paths `css/blyrics/index.css` already
 imports, so nothing outside the module knows the sources moved: the two injection sites and the
 manifest's web accessible resources are untouched. `emitRendererStyles` in `extension.config.cjs`
 does it, from the emit hook rather than a processAssets stage, so the CSS minimizer leaves them
 exactly as authored, the way the copies under `public/` arrive.
 
-`boundary.selfcheck.ts` holds the stylesheets to the same rule as the code: none of them may name
-`ytmusic`, `#tab-renderer`, `#main-panel`, `player-fullscreened`, `#layout` or `blyrics-dfs`. A
-violation is reported with its file, its line and the name it reached for.
+`boundary.selfcheck.ts` holds the stylesheets to the same rule as the code, and reports a violation
+with its file, its line and the name it reached for. Two rules:
 
-One tie remains. `--blyrics-font-family` reads `var(--noto-sans-universal)`, and that stack stays
-with the extension, in `misc.css`, because the extension is what loads those families and two
-published themes select on it by name. Inside the extension it resolves as it always did; a
-standalone consumer would need to define it or the declaration resolves to nothing.
+- **No host selectors.** `HOST_SELECTORS` is the list, drawn from `public/css/ytmusic/`, which is
+  where the extension styles the page around the lyrics: YouTube Music's own element names, ids and
+  attributes, plus the attributes the extension sets on them. Identifier escapes are undone and the
+  text is lower cased first, because `#tab\-renderer`, `#\74 ab-renderer` and `#TAB-RENDERER` all
+  select what `#tab-renderer` selects
+- **No undeclared custom properties.** A `var()` under `styles/` has to name a `--blyrics-*`
+  property, or one declared under `styles/`, or carry a fallback. The first is the module's own
+  namespace, the second is a declaration the module ships, and the third is a dependency written
+  down rather than assumed
+
+The second rule exists because a host selector is visible in a rule's text and a dependency on an
+outside declaration is not, which is how `--blyrics-font-family` went on reading the extension's
+`--noto-sans-universal` for a while with nothing in the rule to say so.
+
+What neither rule catches, so nobody reads them as more than they are: a rule that reaches the host
+without naming it (`body > *`, an inherited property, or a host name the extension never styled and
+so never put on the list), an `@import` pulling in a stylesheet the scan never opens, and a selector
+built as a string in TypeScript rather than written in CSS.
+
+`--noto-sans-universal` is still declared extension side, in `misc.css`, because the extension is
+what loads those 32 families and two published themes select on the stack by name. What changed is
+that `--blyrics-font-family` names a fallback now, so a standalone consumer gets one real family and
+the rest of the stack behind it rather than a `font-family` that is invalid at computed value time
+and silently inherits the host page's font. Inside the extension the fallback is unreachable.
 
 The misfiling this section used to record is fixed: the album art backdrop `responsive.css` paints
 below 615px is anchored on `ytmusic-app-layout` now, wrapped in `:where()` so it weighs what the bare
