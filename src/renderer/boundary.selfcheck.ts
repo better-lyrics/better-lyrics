@@ -59,9 +59,52 @@ const EXTENSION_GLOBAL = "chrome" + ".";
 
 // The DOM the module builds and the CSS that styles it are one artifact, so the stylesheets under
 // styles/ answer to the same boundary as the code. These are the names YouTube Music's own markup
-// goes by: a rule that reaches for one of them is styling the page around the lyrics, which is the
-// extension's business, not this module's.
-const HOST_SELECTORS = ["ytmusic", "#tab-renderer", "#main-panel", "player-fullscreened", "#layout", "blyrics-dfs"];
+// goes by, and the attributes the extension sets on that markup: a rule that reaches for one of
+// them is styling the page around the lyrics, which is the extension's business, not this module's.
+// Drawn from public/css/ytmusic/, which is where the extension does that styling, so the list is as
+// wide as the surface the extension is known to reach for. Lower case, because the scan lower cases
+// what it reads.
+const HOST_SELECTORS = [
+  // Element names. `ytmusic` covers the page's --ytmusic-* custom properties as well.
+  "ytmusic",
+  "tp-yt-",
+  "yt-formatted-string",
+  "yt-icon",
+  // Ids. `#player` covers #player-bar-background, #player-controls and #player-page with it.
+  "#layout",
+  "#main-panel",
+  "#side-panel",
+  "#tab-renderer",
+  "#tabscontent",
+  "#player",
+  "#movie_player",
+  "#contents",
+  "#guide-wrapper",
+  "#mini-guide-background",
+  "#nav-bar-background",
+  "#song-image",
+  "#song-media-window",
+  "#thumbnail",
+  "#play-pause-button",
+  "#av-id",
+  // Attributes. `video-mode` covers the extension's own blyrics-video-mode with it.
+  "player-fullscreened",
+  "player-ui-state",
+  "page-type",
+  "show-fullscreen-controls",
+  "is-mweb-modernization-enabled",
+  "is-empty",
+  "video-mode",
+  "cursor-hidden",
+  "slot",
+  "blyrics-dfs",
+  "blyrics-stylized",
+];
+
+// `--blyrics-*` is the module's own namespace: `constants.ts` publishes those names, themes
+// configure the module through them, and the engine writes several of them per line. Everything
+// else a stylesheet reads has to come from inside the module or carry a fallback.
+const OWNED_CUSTOM_PROPERTY_PREFIX = "--blyrics-";
 
 // -- Module specifier extraction --------------------------------------------
 
@@ -253,23 +296,92 @@ function collectEntryPointViolations(displayPath: string, absolutePath: string, 
 
 // -- Stylesheet rules --------------------------------------------
 
+// A CSS identifier escape stands for the character it encodes, and type and attribute names are
+// ASCII case insensitive in HTML, so `#tab\-renderer`, `#\74 ab-renderer` and `#TAB-RENDERER` all
+// select what `#tab-renderer` selects. Both are undone before the scan reads anything, or every one
+// of those spellings walks past a list of plain lower case names.
+//
+// The one cost is that a hex escape may swallow the newline that terminates it, which is legal and
+// joins two lines into one. A violation written that way is reported one line late for every escape
+// like it above the violation. Reported late beats not reported.
+const CSS_IDENTIFIER_ESCAPE = /\\(?:([0-9a-fA-F]{1,6})[ \t\r\n\f]?|([^\n]))/g;
+
+function normalizeStylesheet(source: string): string {
+  return source
+    .replace(CSS_IDENTIFIER_ESCAPE, (_match: string, hex: string | undefined, literal: string | undefined) => {
+      if (hex === undefined) return literal ?? "";
+      const codePoint = Number.parseInt(hex, 16);
+      return codePoint === 0 || codePoint > 0x10ffff ? "\ufffd" : String.fromCodePoint(codePoint);
+    })
+    .toLowerCase();
+}
+
 // Raw text rather than parsed selectors, for the same reason the extension global scan above is
 // raw: a host name in a comment is a rule waiting to be written, and a stylesheet that has to
 // mention one is a stylesheet on the wrong side of the boundary.
+//
+// What this still does not catch, so nobody reads it as more than it is: a rule that reaches the
+// host without naming it (`body > *`, an inherited property, or a host name the extension never
+// styled and so never put on the list above), an `@import` pulling in a stylesheet this scan never
+// opens, and a selector built as a string in TypeScript rather than written in CSS.
 function collectStylesheetViolations(displayPath: string, source: string): BoundaryViolation[] {
   const violations: BoundaryViolation[] = [];
 
-  source.split("\n").forEach((text, index) => {
-    for (const selector of HOST_SELECTORS) {
-      if (!text.includes(selector)) continue;
-      violations.push({
-        file: displayPath,
-        line: index + 1,
-        rule: "no-host-selectors",
-        detail: `names "${selector}", which belongs to the page around the lyrics; style it from public/css/blyrics/ instead`,
-      });
-    }
-  });
+  normalizeStylesheet(source)
+    .split("\n")
+    .forEach((text, index) => {
+      for (const selector of HOST_SELECTORS) {
+        if (!text.includes(selector)) continue;
+        violations.push({
+          file: displayPath,
+          line: index + 1,
+          rule: "no-host-selectors",
+          detail: `names "${selector}", which belongs to the page around the lyrics; style it from public/css/blyrics/ instead`,
+        });
+      }
+    });
+
+  return violations;
+}
+
+// A host selector is visible in the text of a rule. A dependency on a custom property declared
+// outside the module is not, and that is how the module's `--blyrics-font-family` went on reading
+// the extension's `--noto-sans-universal` with nothing in the rule to say so. So the properties a
+// stylesheet reads answer to the boundary too.
+//
+// A fallback is what takes a reference out of scope, because it is the dependency written down: a
+// missing declaration degrades to something the sheet itself named, rather than making the whole
+// declaration invalid at computed value time, which for an inherited property like `font-family`
+// is silent.
+const CUSTOM_PROPERTY_DECLARATION = /(?:^|[;{}])\s*(--[A-Za-z0-9_-]+)\s*:/g;
+const CUSTOM_PROPERTY_REGISTRATION = /@property\s+(--[A-Za-z0-9_-]+)/g;
+const CUSTOM_PROPERTY_REFERENCE = /var\(\s*(--[A-Za-z0-9_-]+)\s*(,?)/g;
+
+function collectDeclaredCustomProperties(source: string): string[] {
+  return [...source.matchAll(CUSTOM_PROPERTY_DECLARATION), ...source.matchAll(CUSTOM_PROPERTY_REGISTRATION)].map(
+    match => match[1]
+  );
+}
+
+function collectCustomPropertyViolations(
+  displayPath: string,
+  source: string,
+  declared: ReadonlySet<string>
+): BoundaryViolation[] {
+  const violations: BoundaryViolation[] = [];
+
+  for (const match of source.matchAll(CUSTOM_PROPERTY_REFERENCE)) {
+    const property = match[1];
+    const hasFallback = match[2] === ",";
+    if (hasFallback || property.startsWith(OWNED_CUSTOM_PROPERTY_PREFIX) || declared.has(property)) continue;
+
+    violations.push({
+      file: displayPath,
+      line: source.slice(0, match.index).split("\n").length,
+      rule: "no-undeclared-custom-properties",
+      detail: `reads "${property}", which the module neither owns nor declares; declare it under styles/, give it a fallback, or leave the rule in public/css/blyrics/`,
+    });
+  }
 
   return violations;
 }
@@ -414,6 +526,54 @@ assert.deepEqual(
   "Given a stylesheet that only selects what the module builds, When it is checked, Then nothing is reported"
 );
 
+const EVASIVE_STYLESHEET = [
+  `YTMUSIC-APP-LAYOUT[PLAYER-FULLSCREENED] .blyrics--line { text-align: center; }`,
+  String.raw`#tab\-renderer { container-type: size; }`,
+  String.raw`#\6c ayout[blyrics\-dfs] .blyrics-container { padding: 0; }`,
+  `#side-panel .blyrics-container { min-width: 33em; }`,
+  `[slot="player-page"] .blyrics--line { color: red; }`,
+  `[is-mweb-modernization-enabled] #player-bar-background { opacity: 0; }`,
+].join("\n");
+
+assert.deepEqual(
+  collectStylesheetViolations("fixture.css", EVASIVE_STYLESHEET).map(
+    violation => `${violation.line} ${violation.detail}`
+  ),
+  [
+    `1 names "ytmusic", which belongs to the page around the lyrics; style it from public/css/blyrics/ instead`,
+    `1 names "player-fullscreened", which belongs to the page around the lyrics; style it from public/css/blyrics/ instead`,
+    `2 names "#tab-renderer", which belongs to the page around the lyrics; style it from public/css/blyrics/ instead`,
+    `3 names "#layout", which belongs to the page around the lyrics; style it from public/css/blyrics/ instead`,
+    `3 names "blyrics-dfs", which belongs to the page around the lyrics; style it from public/css/blyrics/ instead`,
+    `4 names "#side-panel", which belongs to the page around the lyrics; style it from public/css/blyrics/ instead`,
+    `5 names "slot", which belongs to the page around the lyrics; style it from public/css/blyrics/ instead`,
+    `6 names "#player", which belongs to the page around the lyrics; style it from public/css/blyrics/ instead`,
+    `6 names "is-mweb-modernization-enabled", which belongs to the page around the lyrics; style it from public/css/blyrics/ instead`,
+  ],
+  "Given host names spelled in upper case, behind identifier escapes, or reached for past the six the check started with, When they are scanned, Then each one is still named"
+);
+
+const CUSTOM_PROPERTY_FIXTURE = [
+  `@property --fixture-registered { syntax: "<number>"; inherits: false; initial-value: 0; }`,
+  `:root { --fixture-declared: 1rem; }`,
+  `.blyrics--line { padding: var(--fixture-declared); scale: var(--fixture-registered); }`,
+  `.blyrics--word { color: var(--blyrics-lyric-active-color); }`,
+  `.blyrics-container { font-family: var(--noto-sans-universal, sans-serif); }`,
+  `.blyrics--romanized { font-family: var(--noto-sans-universal); }`,
+].join("\n");
+
+assert.deepEqual(
+  collectCustomPropertyViolations(
+    "fixture.css",
+    CUSTOM_PROPERTY_FIXTURE,
+    new Set(collectDeclaredCustomProperties(CUSTOM_PROPERTY_FIXTURE))
+  ).map(violation => `${violation.line} ${violation.rule} ${violation.detail}`),
+  [
+    `6 no-undeclared-custom-properties reads "--noto-sans-universal", which the module neither owns nor declares; declare it under styles/, give it a fallback, or leave the rule in public/css/blyrics/`,
+  ],
+  "Given a stylesheet reading custom properties, When they are scanned, Then only one declared nowhere in the module and standing on no fallback is reported"
+);
+
 // A leaf is only safe to publish while it stays a leaf: the moment one of them imports something
 // else in the module, importing it pulls that in too, which is the bundle growth this avoids.
 for (const leaf of RENDERER_LEAVES) {
@@ -458,14 +618,29 @@ assert.ok(
   "Given the renderer module, When its styles directory is walked, Then it holds at least one stylesheet"
 );
 
-const stylesheetViolations = rendererStylesheets
-  .flatMap(file => collectStylesheetViolations(relative(REPO_ROOT, file), readFileSync(file, "utf8")))
+// Declarations are gathered across every sheet before any of them is checked, because they are one
+// artifact: `variables.css` declares what `lyrics.css` reads, and a per file rule would call that a
+// violation.
+const rendererStylesheetSources = rendererStylesheets.map(file => ({
+  displayPath: relative(REPO_ROOT, file),
+  source: readFileSync(file, "utf8"),
+}));
+
+const declaredCustomProperties = new Set(
+  rendererStylesheetSources.flatMap(({ source }) => collectDeclaredCustomProperties(source))
+);
+
+const stylesheetViolations = rendererStylesheetSources
+  .flatMap(({ displayPath, source }) => [
+    ...collectStylesheetViolations(displayPath, source),
+    ...collectCustomPropertyViolations(displayPath, source, declaredCustomProperties),
+  ])
   .map(violation => `${violation.file}:${violation.line} [${violation.rule}] ${violation.detail}`);
 
 assert.equal(
   stylesheetViolations.length,
   0,
-  `The renderer module's stylesheets reach for the host in ${stylesheetViolations.length} place(s):\n${stylesheetViolations.join("\n")}\n`
+  `The renderer module's stylesheets break the boundary in ${stylesheetViolations.length} place(s):\n${stylesheetViolations.join("\n")}\n`
 );
 
 // -- Extension scan --------------------------------------------
