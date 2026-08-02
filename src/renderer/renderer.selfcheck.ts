@@ -3,6 +3,14 @@ import { CUSTOM_THEME_STYLE_ID, LINE_CLASS, USER_SCROLLING_CLASS } from "./const
 import type { LineData } from "./inject";
 import { createLyricsRenderer, withHostDefaults } from "./renderer";
 import { asDocument, asElement, asFakeAnimation, asFakeNode, FakeDocument, FakeNode } from "./selfcheck/fakeDom";
+import {
+  asWindow,
+  FakeCustomEvent,
+  FakeWindow,
+  installFakeDOMRect,
+  poisonAmbientGlobals,
+  type ResizeObserverRecord,
+} from "./selfcheck/fakeWindow";
 import { setThemeSettings } from "./themeSettings";
 import type { Lyric, LyricsRendererHost } from "./types";
 
@@ -12,32 +20,13 @@ import type { Lyric, LyricsRendererHost } from "./types";
 
 // -- Ambient global poison --------------------------------------------
 
-let ambientGlobalReads = 0;
+const ambientGlobals = poisonAmbientGlobals(
+  name => `The renderer read the ambient global ${name} instead of the one it was handed`
+);
 
-for (const name of ["document", "window"]) {
-  Object.defineProperty(globalThis, name, {
-    configurable: true,
-    get(): never {
-      ambientGlobalReads += 1;
-      throw new Error(`The renderer read the ambient global ${name} instead of the one it was handed`);
-    },
-  });
-}
+installFakeDOMRect();
 
-// A layout measurement comes back as a DOMRect, which node has no constructor for. The module reads
-// nothing off one but these four numbers.
-class FakeDOMRect {
-  constructor(
-    readonly x: number,
-    readonly y: number,
-    readonly width: number,
-    readonly height: number
-  ) {}
-}
-
-Object.defineProperty(globalThis, "DOMRect", { configurable: true, value: FakeDOMRect });
-
-// -- Fake window --------------------------------------------
+// -- Fixture constants --------------------------------------------
 
 const SCROLL_CONTAINER_HEIGHT_PX = 600;
 const PLAYBACK_TIME_S = 6;
@@ -91,129 +80,6 @@ const ELAPSED_SINCE_USER_SCROLL_MS = 10000;
 // switches them off. The rest of the theme falls back to the engine's own defaults.
 const SCROLL_ANIMATION_OFF: Record<string, string> = { "--blyrics-animate-scroll": "0" };
 const SCROLL_ANIMATION_ON: Record<string, string> = { "--blyrics-animate-scroll": "1" };
-
-class FakeCustomEvent {
-  constructor(
-    readonly type: string,
-    readonly init: { detail: number; bubbles: boolean }
-  ) {}
-}
-
-class FakeMediaQueryList {
-  readonly matches = false;
-  addEventListener(): void {}
-  removeEventListener(): void {}
-}
-
-interface ResizeObserverRecord {
-  disconnected: boolean;
-  readonly targets: FakeNode[];
-  reportSize(target: FakeNode): void;
-}
-
-// Each window needs its own constructor, so an observer can be traced back to the window that made
-// it. The module only ever reaches it as `window.ResizeObserver`.
-function newResizeObserverClass(created: ResizeObserverRecord[]) {
-  return class FakeResizeObserver implements ResizeObserverRecord {
-    disconnected = false;
-    readonly targets: FakeNode[] = [];
-
-    constructor(readonly notifyResize: (entries: { target: FakeNode }[]) => void) {
-      created.push(this);
-    }
-
-    observe(target: FakeNode): void {
-      this.targets.push(target);
-    }
-
-    disconnect(): void {
-      this.disconnected = true;
-    }
-
-    reportSize(target: FakeNode): void {
-      this.notifyResize([{ target }]);
-    }
-  };
-}
-
-class FakeWindow {
-  readonly resizeObservers: ResizeObserverRecord[] = [];
-  readonly ResizeObserver = newResizeObserverClass(this.resizeObservers);
-  readonly CustomEvent = FakeCustomEvent;
-  readonly listeners = new Map<string, Set<() => void>>();
-  readonly requestedFrames: FrameRequestCallback[] = [];
-  readonly cancelledFrames: number[] = [];
-  readonly overflowByElement = new WeakMap<FakeNode, string>();
-  // What the view read off this document, which is how a cache that was dropped shows up.
-  readonly propertyReads: string[] = [];
-  // Style resolutions, which is what an ancestor walk costs a real browser.
-  computedStyleReads = 0;
-
-  constructor(readonly styleValues: Record<string, string> = SCROLL_ANIMATION_OFF) {}
-
-  matchMedia(): FakeMediaQueryList {
-    return new FakeMediaQueryList();
-  }
-
-  getComputedStyle(element: FakeNode): {
-    overflowY: string;
-    paddingBottom: string;
-    transform: string;
-    transitionDuration: string;
-    transitionTimingFunction: string;
-    translate: string;
-    getPropertyValue: (property: string) => string;
-  } {
-    this.computedStyleReads += 1;
-    return {
-      overflowY: this.overflowByElement.get(element) ?? "visible",
-      paddingBottom: "0px",
-      transform: "none",
-      // The probes the line scroll planner writes and reads back. Answering nothing leaves it on
-      // the engine's own defaults, which is what a document carrying no theme resolves to.
-      transitionDuration: "",
-      transitionTimingFunction: "",
-      translate: "",
-      getPropertyValue: (property: string): string => {
-        this.propertyReads.push(property);
-        return this.styleValues[property] ?? "";
-      },
-    };
-  }
-
-  addEventListener(type: string, listener: () => void): void {
-    const registered = this.listeners.get(type) ?? new Set<() => void>();
-    registered.add(listener);
-    this.listeners.set(type, registered);
-  }
-
-  removeEventListener(type: string, listener: () => void): void {
-    this.listeners.get(type)?.delete(listener);
-  }
-
-  countListeners(type: string): number {
-    return this.listeners.get(type)?.size ?? 0;
-  }
-
-  dispatchWindowEvent(type: string): void {
-    for (const listener of [...(this.listeners.get(type) ?? [])]) {
-      listener();
-    }
-  }
-
-  requestAnimationFrame(callback: FrameRequestCallback): number {
-    this.requestedFrames.push(callback);
-    return this.requestedFrames.length;
-  }
-
-  cancelAnimationFrame(handle: number): void {
-    this.cancelledFrames.push(handle);
-  }
-}
-
-function asWindow(fake: FakeWindow): Window & typeof globalThis {
-  return fake as unknown as Window & typeof globalThis;
-}
 
 // -- Fake document --------------------------------------------
 
@@ -301,7 +167,7 @@ interface ViewFixture {
  * A mount inside a scroll container, which is what the default `getScrollElement` walks up to find.
  * Every measurement the renderer takes ends in `debug.resize()`, so counting those counts them.
  */
-function newViewFixture(styleValues?: Record<string, string>): {
+function newViewFixture(styleValues: Record<string, string> = SCROLL_ANIMATION_OFF): {
   fixture: ViewFixture;
   host: Partial<LyricsRendererHost>;
 } {
@@ -1730,7 +1596,7 @@ assert.deepEqual(
 const drivenFixtures = [panel, floating, rich, reflowed, hidden, contents, empty, unsynced, themed, shared];
 
 assert.equal(
-  ambientGlobalReads,
+  ambientGlobals.reads,
   0,
   "Given every view driven from build to destruction, When they finish, Then none of them read an ambient global document or window"
 );

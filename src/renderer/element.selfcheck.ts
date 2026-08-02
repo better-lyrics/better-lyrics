@@ -11,6 +11,7 @@ import {
   installCustomElementPlatform,
 } from "./selfcheck/fakeCustomElements";
 import { asFakeNode, FakeDocument, FakeNode } from "./selfcheck/fakeDom";
+import { FakeCustomEvent, FakeWindow, installFakeDOMRect, poisonAmbientGlobals } from "./selfcheck/fakeWindow";
 import { registerThemeSetting } from "./themeSettings";
 import type { Lyric, LyricsRendererHost } from "./types";
 
@@ -24,28 +25,9 @@ import type { Lyric, LyricsRendererHost } from "./types";
 
 // -- Ambient global poison --------------------------------------------
 
-for (const name of ["document", "window"]) {
-  Object.defineProperty(globalThis, name, {
-    configurable: true,
-    get(): never {
-      throw new Error(`The element read the ambient global ${name} instead of the document it is in`);
-    },
-  });
-}
+poisonAmbientGlobals(name => `The element read the ambient global ${name} instead of the document it is in`);
 
-// A layout measurement comes back as a DOMRect, which node has no constructor for. The module reads
-// nothing off one but these four numbers.
-class FakeDOMRect {
-  constructor(
-    readonly x: number,
-    readonly y: number,
-    readonly width: number,
-    readonly height: number
-  ) {}
-}
-
-Object.defineProperty(globalThis, "DOMRect", { configurable: true, value: FakeDOMRect });
-
+installFakeDOMRect();
 installCustomElementPlatform();
 
 const { BraccatoLyricsElement } = await import("./element");
@@ -129,26 +111,6 @@ const SYNCED_LYRICS: Lyric[] = [
 // passive scrolling would drift for the length of the song if nothing said it was a message.
 const NO_LYRICS_PLACEHOLDER: Lyric[] = [{ startTimeMs: 0, durationMs: 0, words: "No lyrics found" }];
 
-class FakeCustomEvent<Detail> {
-  constructor(
-    readonly type: string,
-    readonly init: { detail: Detail; bubbles: boolean; composed: boolean }
-  ) {}
-}
-
-class FakeMediaQueryList {
-  readonly matches = false;
-  addEventListener(): void {}
-  removeEventListener(): void {}
-}
-
-// Resizes are the renderer's own subject and are covered there. Here the observer only has to exist
-// and be quiet, so that building a view neither throws nor measures anything on its own.
-class FakeResizeObserver {
-  observe(): void {}
-  disconnect(): void {}
-}
-
 // What the element reads off a media element and nothing else: the clock, whether it is running,
 // how fast, what stopped it for good, and the listeners it attaches. Nothing here synthesises an
 // event, so a self-check that wants one dispatches it, the way it decides everything else the
@@ -198,51 +160,17 @@ function asImposterMediaElement(imposter: object): HTMLMediaElement {
   return imposter as unknown as HTMLMediaElement;
 }
 
-class FakeWindow {
-  readonly ResizeObserver = FakeResizeObserver;
-  readonly CustomEvent = FakeCustomEvent;
+/**
+ * The shared window with the one thing only the element needs: the media element constructor it
+ * resolves a `source` against. Resizes are the renderer's own subject and are covered there, so the
+ * observer this inherits only has to exist and stay quiet, which it does until something reports a
+ * size to it.
+ */
+class ElementWindow extends FakeWindow {
   readonly HTMLMediaElement = FakeMediaElement;
-  readonly overflowByElement = new WeakMap<FakeNode, string>();
-  // Handles rather than a list, because a cancelled frame has to stop being one the platform would
-  // run: whether the queue is empty is how a stray frame is caught.
-  readonly pendingFrames = new Map<number, FrameRequestCallback>();
-  frameHandleCount = 0;
 
-  matchMedia(): FakeMediaQueryList {
-    return new FakeMediaQueryList();
-  }
-
-  getComputedStyle(element: FakeNode): {
-    overflowY: string;
-    paddingBottom: string;
-    transform: string;
-    transitionDuration: string;
-    transitionTimingFunction: string;
-    translate: string;
-    getPropertyValue: (property: string) => string;
-  } {
-    return {
-      overflowY: this.overflowByElement.get(element) ?? "visible",
-      paddingBottom: "0px",
-      transform: "none",
-      transitionDuration: "",
-      transitionTimingFunction: "",
-      translate: "",
-      getPropertyValue: (property: string): string => SCROLL_ANIMATION_OFF[property] ?? "",
-    };
-  }
-
-  addEventListener(): void {}
-  removeEventListener(): void {}
-
-  requestAnimationFrame(callback: FrameRequestCallback): number {
-    this.frameHandleCount += 1;
-    this.pendingFrames.set(this.frameHandleCount, callback);
-    return this.frameHandleCount;
-  }
-
-  cancelAnimationFrame(handle: number): void {
-    this.pendingFrames.delete(handle);
+  constructor() {
+    super(SCROLL_ANIMATION_OFF);
   }
 }
 
@@ -251,14 +179,15 @@ class FakeWindow {
  * `createLyricsRenderer` can throw on the way up, which is the one moment an element has told the
  * document it is a view before there is a view to be.
  */
-class RefusingWindow extends FakeWindow {
+class RefusingWindow extends ElementWindow {
   refuseNextRenderer = false;
 
-  addEventListener(): void {
+  addEventListener(type: string, listener: () => void): void {
     if (this.refuseNextRenderer) {
       this.refuseNextRenderer = false;
       throw new Error(RENDERER_FAILURE_MESSAGE);
     }
+    super.addEventListener(type, listener);
   }
 }
 
@@ -326,7 +255,7 @@ function newElementFixture(fakeDocument: ElementDocument): {
   fixture: ElementFixture;
   host: Partial<LyricsRendererHost>;
 } {
-  const fakeWindow = fakeDocument.defaultView ?? new FakeWindow();
+  const fakeWindow = fakeDocument.defaultView ?? new ElementWindow();
   const root = fakeDocument.createElement("div");
 
   root.offsetHeight = SCROLL_CONTAINER_HEIGHT_PX;
@@ -363,7 +292,7 @@ function newElementFixture(fakeDocument: ElementDocument): {
 }
 
 function newConnectedDocument(): ElementDocument {
-  return new ElementDocument(new FakeWindow());
+  return new ElementDocument(new ElementWindow());
 }
 
 // The element dispatches `braccato:error` a microtask after the error happened, so that a listener
@@ -980,7 +909,7 @@ assert.equal(
 
 // -- A build that throws --------------------------------------------
 
-const refusingDocument = new RefusingDocument(new FakeWindow());
+const refusingDocument = new RefusingDocument(new ElementWindow());
 const { fixture: refusing } = newElementFixture(refusingDocument);
 const refusingElement = createCustomElement(refusingDocument, BraccatoLyricsElement);
 
