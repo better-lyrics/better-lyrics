@@ -331,6 +331,8 @@ export function initializeLyrics(): void {
     latestPlayerSnapshotTime = detail.browserTime;
     latestPlayerDuration = Number(detail.duration);
     latestPlaybackRate = detail.playbackRate ?? 1;
+    AppState.currentSong = detail.song;
+    AppState.currentArtist = detail.artist;
 
     const currentVideoId = detail.videoId;
     const currentVideoDetails = detail.song + " " + detail.artist;

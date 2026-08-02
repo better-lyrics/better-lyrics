@@ -226,6 +226,10 @@
     "message": "Floating window",
     "description": "Toggle label for showing the control that opens the floating lyrics window in the dock"
   },
+  "options_unisonModal_controlDownloadLrc": {
+    "message": "Download lyrics",
+    "description": "Toggle label for showing the LRC download control in the dock"
+  },
   "options_unisonModal_controlOffset": {
     "message": "Sync offset",
     "description": "Toggle label for showing the sync offset control in the dock"
@@ -253,6 +257,22 @@
   "lyricsDock_offsetGlobal": {
     "message": "Global",
     "description": "Label in the lyrics dock offset menu for the global offset applied to all songs and sync types"
+  },
+  "lyricsDock_downloadLrc": {
+    "message": "Download lyrics",
+    "description": "Accessible label for the lyrics dock button that opens the LRC download menu"
+  },
+  "lyricsDock_downloadLineByLine": {
+    "message": "Line-by-Line",
+    "description": "Menu item that downloads the current lyrics as a standard line-synced LRC file"
+  },
+  "lyricsDock_downloadWordByWord": {
+    "message": "Word-by-word",
+    "description": "Menu item that downloads the current lyrics as a word-synced (enhanced LRC) file"
+  },
+  "lyricsDock_downloadWordByWordUnavailable": {
+    "message": "Word-by-word timing isn't available for this source",
+    "description": "Tooltip explaining why the word-by-word download option is disabled when the current lyrics aren't richsync"
   },
   "options_offsetModal_perSong": {
     "message": "Per-song offsets",

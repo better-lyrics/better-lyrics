@@ -19,6 +19,7 @@ import {
   setGlobalOffsetValue,
 } from "./offset";
 import { cycleProvider, selectProvider } from "./providerCycle";
+import { downloadLrc } from "./downloadLrc";
 
 const CONTROL_ACTIVE_CLASS = `${DOCK_CLASS}__control--active`;
 const MENU_OPEN_CLASS = `${DOCK_CLASS}__menu--open`;
@@ -236,6 +237,71 @@ function buildPictureInPictureControl(): HTMLButtonElement | null {
   if (icon) btn.appendChild(icon);
 
   btn.addEventListener("click", () => pictureInPictureController.toggle());
+  return btn;
+}
+
+// -- Download control --------------------------
+function showDownloadMenu(trigger: HTMLElement): void {
+  showDockMenu(trigger, buildDownloadMenu());
+}
+
+function buildDownloadMenu(): HTMLElement {
+  const menu = document.createElement("div");
+  menu.className = `${DOCK_CLASS}__menu`;
+
+  const provider = currentProviderConfig();
+  if (provider) menu.style.setProperty("--dock-accent", syncTypeColors[provider.syncType]);
+
+  const isRichsync = AppState.lyricData?.syncType === "richsync";
+
+  const buildItem = (label: string, mode: "synced" | "richsync", disabled: boolean, disabledTitle?: string) => {
+    const item = document.createElement("button");
+    item.type = "button";
+    item.className = `${DOCK_CLASS}__menu-item`;
+    item.disabled = disabled;
+    if (disabled && disabledTitle) item.title = disabledTitle;
+    const buttonContent = document.createElement("span");
+    buttonContent.className = `${DOCK_CLASS}__menu-item-label`;
+    buttonContent.textContent = label;
+
+    item.appendChild(buttonContent);
+    item.addEventListener("click", event => {
+      event.stopPropagation();
+      closeSourceMenu();
+      downloadLrc(mode);
+    });
+    return item;
+  };
+
+  menu.append(
+    buildItem(t("lyricsDock_downloadLineByLine"), "synced", false),
+    buildItem(
+      t("lyricsDock_downloadWordByWord"),
+      "richsync",
+      !isRichsync,
+      t("lyricsDock_downloadWordByWordUnavailable")
+    )
+  );
+
+  return menu;
+}
+
+function buildDownloadLRC(): HTMLButtonElement {
+  const label = t("lyricsDock_downloadLrc");
+  const btn = document.createElement("button");
+  btn.type = "button";
+  btn.className = `${DOCK_CLASS}__control`;
+  btn.setAttribute("aria-label", label);
+  btn.title = label;
+
+  const icon = parseSvgString(controlIcons.download);
+  if (icon) btn.appendChild(icon);
+
+  btn.addEventListener("click", event => {
+    event.stopPropagation();
+    if (openSourceMenu) closeSourceMenu();
+    else showDownloadMenu(btn);
+  });
   return btn;
 }
 
@@ -469,6 +535,7 @@ const controlBuilders: Record<string, () => HTMLElement | null> = {
         )
       : null,
   offset: () => (isSynced() && AppState.isDockOffsetEnabled ? buildOffsetControl() : null),
+  download: () => (isSynced() && AppState.isDockDownloadLRCEnabled ? buildDownloadLRC() : null),
   pictureInPicture: () => (AppState.isDockPictureInPictureEnabled ? buildPictureInPictureControl() : null),
 };
 

@@ -44,6 +44,7 @@ interface Options {
   isDockRomanizeEnabled: boolean;
   isDockOffsetEnabled: boolean;
   isDockPictureInPictureEnabled: boolean;
+  isDockDownloadLRCEnabled: boolean;
   dockControlsOrder: string[];
   globalLyricOffset: number;
   richsyncOffsetTrim: number;
@@ -108,6 +109,7 @@ const getOptionsFromForm = (): Options => {
     isDockOffsetEnabled: (document.getElementById("isDockOffsetEnabled") as HTMLInputElement).checked,
     isDockPictureInPictureEnabled: (document.getElementById("isDockPictureInPictureEnabled") as HTMLInputElement)
       .checked,
+    isDockDownloadLRCEnabled: (document.getElementById("isDockDownloadLRCEnabled") as HTMLInputElement).checked,
     dockControlsOrder: getDockControlsOrder(),
     globalLyricOffset: parseFloat((document.getElementById("globalLyricOffset") as HTMLInputElement).value) || 0,
     richsyncOffsetTrim: parseFloat((document.getElementById("richsyncOffsetTrim") as HTMLInputElement).value) || 0,
@@ -306,6 +308,7 @@ const restoreOptions = (): void => {
     isDockRomanizeEnabled: true,
     isDockOffsetEnabled: true,
     isDockPictureInPictureEnabled: true,
+    isDockDownloadLRCEnabled: true,
     dockControlsOrder: [...DOCK_CONTROL_ORDER_DEFAULT],
     globalLyricOffset: 0,
     richsyncOffsetTrim: 0,
@@ -370,6 +373,7 @@ const setOptionsInForm = (items: Options): void => {
   (document.getElementById("isDockOffsetEnabled") as HTMLInputElement).checked = items.isDockOffsetEnabled;
   (document.getElementById("isDockPictureInPictureEnabled") as HTMLInputElement).checked =
     items.isDockPictureInPictureEnabled;
+  (document.getElementById("isDockDownloadLRCEnabled") as HTMLInputElement).checked = items.isDockDownloadLRCEnabled;
   setOffsetDisplay("globalLyricOffset", items.globalLyricOffset);
   setOffsetDisplay("richsyncOffsetTrim", items.richsyncOffsetTrim);
   setOffsetDisplay("lineOffsetTrim", items.lineOffsetTrim);
@@ -1502,6 +1506,7 @@ function resetDockSettings(): void {
   (document.getElementById("isDockRomanizeEnabled") as HTMLInputElement).checked = true;
   (document.getElementById("isDockOffsetEnabled") as HTMLInputElement).checked = true;
   (document.getElementById("isDockPictureInPictureEnabled") as HTMLInputElement).checked = true;
+  (document.getElementById("isDockDownloadLRCEnabled") as HTMLInputElement).checked = true;
   setUnisonPositionInForm(DOCK_DEFAULT_POSITION);
   setDockControlsOrderInForm([...DOCK_CONTROL_ORDER_DEFAULT]);
   syncUnisonModalDependentState(true);
@@ -1551,6 +1556,7 @@ function setupUnisonActionsModal(): void {
     "isDockRomanizeEnabled",
     "isDockOffsetEnabled",
     "isDockPictureInPictureEnabled",
+    "isDockDownloadLRCEnabled",
   ]) {
     document.getElementById(id)?.addEventListener("change", debouncedSaveOptions);
   }

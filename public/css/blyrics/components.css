@@ -755,6 +755,20 @@ ytmusic-player-page:not([is-mweb-modernization-enabled]) #side-panel:has(.blyric
 	background-color: color-mix(in srgb, var(--dock-accent, hsl(45, 95%, 60%)) 15%, transparent);
 }
 
+.blyrics-dock__menu-item:disabled {
+	color: hsla(0, 0%, 100%, 0.32);
+	cursor: not-allowed;
+}
+
+.blyrics-dock__menu-item-label {
+	font-size: 10px;
+	font-weight: 600;
+}
+
+.blyrics-dock__menu-item:disabled:hover {
+	background-color: transparent;
+}
+
 .blyrics-dock__menu-icon {
 	display: inline-flex;
 	align-items: center;
