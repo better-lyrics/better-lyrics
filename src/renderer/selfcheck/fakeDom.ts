@@ -39,12 +39,16 @@ class FakeClassList {
     }
   }
 
-  toggle(name: string, force: boolean): void {
-    if (force) {
+  // The real signature toggles when `force` is left out, so answering the one argument call by
+  // always removing would be a silent wrong answer rather than a missing feature.
+  toggle(name: string, force?: boolean): boolean {
+    const present = force ?? !this.tokens.has(name);
+    if (present) {
       this.tokens.add(name);
     } else {
       this.tokens.delete(name);
     }
+    return present;
   }
 
   contains(name: string): boolean {
@@ -79,6 +83,12 @@ class FakeStyle {
 // The engine keeps every Animation it starts and later asks it where it got to. "idle" is what a
 // browser reports before one has a start time, and reporting it is what keeps the engine's timing
 // sampler out of a fake that has no honest answer for it.
+//
+// The ceiling that comes with that, stated rather than left to be discovered: the sampler is dark
+// in every self-check here. Nothing exercises the drift correction the engine learns from a running
+// animation, and a fixture whose subject is not scrolling switches scroll animation off in its
+// theme for the same reason. Covering any of that needs an animation that reports a real
+// `playState` and a `currentTime` that moves, which is a fake of a different size.
 class FakeAnimation {
   currentTime: number | null = null;
   readonly playState = "idle";
@@ -146,6 +156,17 @@ export class FakeNode {
     return this.isRendered && !this.isDisplayContents;
   }
 
+  /**
+   * The nearest ancestor that generates a box, which is the least faithful answer in this file and
+   * the one most is read off: `getRelativeLayoutBounds` walks this chain, so every line position a
+   * self-check asserts on comes back through here.
+   *
+   * A browser answers with the nearest *positioned* ancestor. The two agree only because
+   * `lyrics.css` gives `.blyrics-container` `position: relative !important`, which makes the
+   * container the real answer for the lines inside it. A consumer whose container is not positioned
+   * would have the real walk run past it and fall back to comparing bounding rectangles, and
+   * nothing here would show it.
+   */
   get offsetParent(): FakeNode | null {
     if (!this.generatesBox) return null;
     for (let node = this.parentNode; node !== null; node = node.parentNode) {
