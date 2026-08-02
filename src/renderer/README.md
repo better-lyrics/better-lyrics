@@ -7,6 +7,9 @@ but parsed lyric data and a playback clock.
 This directory is a package boundary. It is meant to be lifted out into `../braccato` later, so it is
 written as though it already had been.
 
+It is licensed MIT, in the `LICENSE` beside this file. The rest of the repository is GPL-3.0, and
+`@braccato/core` is published from here.
+
 ## Rules
 
 Nothing here may import from `@core/*`, `@modules/*`, `@constants`, `@utils`, `@options` or `@/`,

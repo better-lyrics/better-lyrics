@@ -13,7 +13,10 @@ import {
   isImportEqualsDeclaration,
   isImportTypeNode,
   isLiteralTypeNode,
+  isObjectLiteralExpression,
+  isPropertyAssignment,
   isStringLiteral,
+  isVariableDeclaration,
   ScriptKind,
   ScriptTarget,
   SyntaxKind,
@@ -43,6 +46,14 @@ const RENDERER_LEAVES = ["@renderer/constants", "@renderer/text", "@renderer/the
 const SIDE_EFFECT_ENTRY_POINT = "@renderer/element";
 
 const RENDERER_ENTRY_POINTS = new Set(["@renderer/index", SIDE_EFFECT_ENTRY_POINT, ...RENDERER_LEAVES]);
+
+// The package build writes the same set out again as an exports map, and neither file can import
+// the other to share one list: importing this one runs every assertion in it, and importing that
+// one runs the build. So the two are compared instead, below. Without that, a subpath published
+// there and forgotten here would ship as a leaf with nothing ever asserting that it imports
+// nothing, which is the only thing making a leaf safe to publish.
+const PACKAGE_BUILD = join(REPO_ROOT, "tooling", "build-package.ts");
+const PACKAGE_EXPORTS_BINDING = "EXPORTS";
 
 // What a specifier may end in and still name the same module. `@renderer/element`,
 // `@renderer/element.js` and `../renderer/element` are one import as far as these rules go, so they
@@ -386,6 +397,35 @@ function collectCustomPropertyViolations(
   return violations;
 }
 
+// The subpaths the package build publishes as modules, which is every key in its `EXPORTS` map that
+// resolves to an entry point rather than to a file it copies verbatim.
+function collectPublishedSubpaths(sourceFile: SourceFile): string[] {
+  const subpaths: string[] = [];
+
+  const visit = (node: Node): void => {
+    if (
+      isVariableDeclaration(node) &&
+      node.name.getText() === PACKAGE_EXPORTS_BINDING &&
+      node.initializer &&
+      isObjectLiteralExpression(node.initializer)
+    ) {
+      for (const property of node.initializer.properties) {
+        if (
+          isPropertyAssignment(property) &&
+          isStringLiteral(property.name) &&
+          !isStringLiteral(property.initializer)
+        ) {
+          subpaths.push(property.name.text);
+        }
+      }
+    }
+    forEachChild(node, visit);
+  };
+
+  forEachChild(sourceFile, visit);
+  return subpaths;
+}
+
 // -- Extraction self-test --------------------------------------------
 
 const EXTRACTION_FIXTURE = [
@@ -572,6 +612,28 @@ assert.deepEqual(
     `6 no-undeclared-custom-properties reads "--noto-sans-universal", which the module neither owns nor declares; declare it under styles/, give it a fallback, or leave the rule in public/css/blyrics/`,
   ],
   "Given a stylesheet reading custom properties, When they are scanned, Then only one declared nowhere in the module and standing on no fallback is reported"
+);
+
+// -- Published surface --------------------------------------------
+
+const publishedSpecifiers = collectPublishedSubpaths(
+  parseSource(PACKAGE_BUILD, readFileSync(PACKAGE_BUILD, "utf8"))
+).map(subpath => (subpath === "." ? `${RENDERER_ALIAS}/index` : `${RENDERER_ALIAS}/${subpath.slice("./".length)}`));
+
+assert.ok(
+  publishedSpecifiers.length > 0,
+  `Given ${relative(REPO_ROOT, PACKAGE_BUILD)}, When its ${PACKAGE_EXPORTS_BINDING} map is parsed, Then it publishes at least one module`
+);
+
+assert.deepEqual(
+  {
+    publishedButNotDeclaredHere: publishedSpecifiers.filter(specifier => !RENDERER_ENTRY_POINTS.has(specifier)),
+    declaredHereButNotPublished: [...RENDERER_ENTRY_POINTS].filter(
+      specifier => !publishedSpecifiers.includes(specifier)
+    ),
+  },
+  { publishedButNotDeclaredHere: [], declaredHereButNotPublished: [] },
+  "Given the package exports map and the public specifiers declared above, When they are compared, Then neither names a module the other does not"
 );
 
 // A leaf is only safe to publish while it stays a leaf: the moment one of them imports something

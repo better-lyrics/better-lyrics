@@ -6,7 +6,10 @@ let keyToSettingMap: Map<string, Setting> = new Map();
 
 // -- Setting --------------------------------------------
 
-class Setting {
+// `registerThemeSetting` returns one of these, so a consumer of this leaf has to be able to spell
+// it. `@public` keeps knip off an export this repo only ever names through inference.
+/** @public */
+export class Setting {
   readonly type: "number" | "boolean" | "string";
   value: number | boolean | string;
   readonly defaultValue: number | boolean | string;
