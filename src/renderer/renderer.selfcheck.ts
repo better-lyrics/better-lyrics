@@ -37,6 +37,13 @@ const LINE_PITCH_PX = 200;
 const LINE_HEIGHT_PX = 100;
 const MOVED_LAST_LINE_TOP_PX = 900;
 
+// A seek that lands well past the engine's half second jump threshold while staying inside the line
+// that was already playing, and a step small enough to read as the clock simply moving on.
+const SEEKED_TIME_S = 7.5;
+const NUDGED_TIME_S = 7.7;
+// Where the page left the scroll after moving it out from under the view.
+const STRANDED_SCROLL_TOP_PX = 0;
+
 // The engine's own blyrics-target-scroll-pos-ratio: how far down the view the line being sung sits,
 // and so where a scroll to the second line lands.
 const TARGET_SCROLL_POS_RATIO = 0.37;
@@ -1191,6 +1198,70 @@ assert.equal(
   "Given a destroyed renderer, When it is asked how it is synced, Then it answers for the view it no longer has rather than the song it last held"
 );
 
+// -- A clock that jumped scrolls again, to the line already playing -----------------------------
+// A seek that lands inside the line being sung selects nothing new, so nothing about the selection
+// asks the view to move. The jump itself is what asks: the page may have moved the scroll while the
+// song was somewhere else, and a view that only moves for a new line sits at whatever it finds
+// until the next one comes up. The nudge afterwards is the control: the same stranded scroll, the
+// same line, and no jump, so nothing moves.
+
+const { fixture: jumped, host: jumpedHost } = newViewFixture();
+const jumpedRenderer = createLyricsRenderer({
+  document: asDocument(jumped.fakeDocument),
+  window: asWindow(jumped.fakeWindow),
+  mount: asElement<HTMLElement>(jumped.mount),
+  host: jumpedHost,
+});
+
+jumpedRenderer.setLyrics(SYNCED_LYRICS);
+
+const jumpedContainer = jumpedRenderer.container;
+assert.ok(jumpedContainer !== null, "Given built lyrics, When the view is asked, Then it holds the container it built");
+
+asFakeNode(jumpedContainer)
+  .childNodes.filter(child => child.classList.contains(LINE_CLASS))
+  .forEach((line, index) => {
+    line.offsetTop = index * LINE_PITCH_PX;
+    line.offsetHeight = LINE_HEIGHT_PX;
+  });
+jumpedRenderer.relayout();
+
+jumpedRenderer.tick(PLAYBACK_TIME_S, { isPlaying: true });
+
+assert.equal(
+  jumped.scrollContainer.scrollTop,
+  SECOND_LINE_SCROLL_TOP_PX,
+  "Given a line that came up, When the view scrolls to it, Then it lands where the theme asks for it"
+);
+
+// The page moved the scroll out from under the view without telling it, which is what a panel
+// rebuilt around the lyrics does.
+jumped.scrollContainer.scrollTop = STRANDED_SCROLL_TOP_PX;
+jumpedRenderer.tick(SEEKED_TIME_S, { isPlaying: true });
+
+assert.deepEqual(
+  jumpedRenderer.lines.map(line => line.isSelected),
+  [false, true, false],
+  "Given a clock that jumped inside the line being sung, When the view ticks, Then that same line is still the one selected"
+);
+
+assert.equal(
+  jumped.scrollContainer.scrollTop,
+  SECOND_LINE_SCROLL_TOP_PX,
+  "Given a clock that jumped while the page had moved the scroll, When the view ticks, Then it scrolls back to the line being sung rather than waiting for the next one"
+);
+
+jumped.scrollContainer.scrollTop = STRANDED_SCROLL_TOP_PX;
+jumpedRenderer.tick(NUDGED_TIME_S, { isPlaying: true });
+
+assert.equal(
+  jumped.scrollContainer.scrollTop,
+  STRANDED_SCROLL_TOP_PX,
+  "Given a clock that moved on by itself while the page had moved the scroll, When the view ticks, Then it leaves the scroll where it is until it has a reason to move"
+);
+
+jumpedRenderer.destroy();
+
 // -- A re-measurement is where the scroll element walk is allowed to go stale --------------------
 // The scroll padding is sized against whatever the walk settled on, so it is what says which element
 // the view thinks it is scrolling. A window resize is exactly when an ancestor is most likely to
@@ -1635,6 +1706,7 @@ const drivenFixtures = [
   faceless,
   floating,
   rich,
+  jumped,
   reflowed,
   hidden,
   contents,
