@@ -87,6 +87,10 @@ function findScrollElement(rendererWindow: Window, mount: HTMLElement | null): H
  *
  * The invalidator comes back alongside the host because the memo behind the default scroll element
  * has no way to notice it went stale on its own.
+ *
+ * Exported for `renderer.selfcheck.ts` and not published from `index.ts`. A consumer reaches these
+ * defaults by leaving host members out, so nothing outside needs to name them; what does need to is
+ * the check that every one of them is still here and still answering.
  */
 export function withHostDefaults(
   overrides: Partial<LyricsRendererHost> | undefined,

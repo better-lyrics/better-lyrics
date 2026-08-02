@@ -2825,6 +2825,20 @@ export function computeScrollPadding(measurements: ScrollPaddingMeasurements): {
   return { top, bottom: Math.ceil(bottom) };
 }
 
+/**
+ * Sizes the padding this view needs and writes it where the stylesheet reads it, which is the
+ * document's root element. That makes it the second thing a view writes per document rather than
+ * per view, alongside the theme's `<style>`, so it is the same one renderer per document constraint
+ * the README states under Theme settings and not a new one: a second renderer in this document
+ * overwrites these two properties with the padding its own viewport needs, and the first view is
+ * then padded for a viewport it is not in.
+ *
+ * The root rather than the container because these are published names. Both readers in this repo
+ * select `.blyrics-container`, but the extension's own `mobile.css` is one of them, from outside
+ * the module, and a theme is free to read them anywhere: narrowing where they resolve would break
+ * such a theme silently, the way any custom property that stops resolving does. That is a real cost
+ * against a corruption the module already forbids.
+ */
 function applyScrollPadding(engine: AnimationEngineInstance): void {
   const lyricsElement = engine.lyricsContainer;
   const tabRenderer = engine.host.getScrollElement();

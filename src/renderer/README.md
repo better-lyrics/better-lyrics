@@ -159,12 +159,8 @@ loaded, which is not the cascade position a consumer writing the element itself 
 because an element is findable: this extension's floating window is handed the side panel's theme by
 reading it off that id.
 
-One renderer per document owns that element. Two renderers in one document render against one theme
-whatever either of them is given, because the settings registry below is module scope, so this is a
-constraint rather than a configuration to support. It is stated rather than enforced, and the
-behaviour is defined either way: a renderer that finds the id already in its document writes into
-the element it finds rather than adding a rival under the same id, and `destroy` removes the element
-only if that renderer is the one that created it.
+One renderer per document owns that element, which is the constraint the next section states once
+for everything it covers.
 
 The CSS is compiled CSS, not theme source. Better Lyrics themes are written in RICS and compiled
 with the `rics` package first, which is the consumer's dependency rather than this module's: the
@@ -173,12 +169,36 @@ consumer that wants the configuration out of a stylesheet somewhere no renderer 
 
 `themeSettings.ts` owns the registry. `registerThemeSetting` runs at module scope, which evaluates
 once per bundle regardless of how many instances exist, so the values are global rather than per
-instance: one theme means one set of values for every view. The stylesheet is the other way round,
-one per document, so two views in two documents are each given their own.
+instance: one theme means one set of values for every view.
+
+### One renderer per document
+
+Two renderers in one document write over each other, so the module supports one. It is a constraint
+rather than a configuration to support, and it is stated rather than enforced: the behaviour is
+defined at every point where two of them would collide, and none of those points is a crash.
+
+Two things are written per document, and each belongs to whichever renderer wrote it last:
+
+- **The theme's `<style>` element.** A renderer that finds `CUSTOM_THEME_STYLE_ID` already in its
+  document writes into the element it finds rather than adding a rival under the same id, and
+  `destroy` removes the element only if that renderer is the one that created it
+- **The scroll padding.** `--blyrics-padding-top` and `--blyrics-padding-bottom` reserve the room the
+  first and last lines need to reach the view's target scroll position, so they are sized against the
+  viewport the view is in, and they are written on the document's root element. A second view with a
+  taller viewport rewrites them, and the first view is then padded for a viewport it is not in. They
+  are written on the root rather than on the container because they are published names a theme may
+  read anywhere, and the extension's own `mobile.css` already reads one from outside this module:
+  narrowing where they resolve would break such a theme silently
+
+Two more are per realm, which is wider still, because a realm is a bundle rather than a document: the
+settings registry above, so one theme means one set of values for every view, and the playback clock
+that `retickFromPlaybackClock` replays and `resetPlaybackClock` forgets, which is written by whichever
+view ticked last. Two renderers in one realm therefore replay each other's clock, whatever documents
+they are in.
 
 The module is bundled into both the isolated and the page-world bundles, which are separate realms
-with separate registries. Each needs its own `setTheme` call, or one view renders against defaults
-while the other renders against the theme.
+with separate registries and separate clocks. Each needs its own `setTheme` call, or one view renders
+against defaults while the other renders against the theme.
 
 ## Ticking
 
@@ -192,7 +212,8 @@ described under Following a media element below, and the renderer underneath it 
 `TickOptions` describes a setting the consumer may not have, so all of it may be left out.
 
 Three doors move the lyrics without the song moving, and they differ in what they measure.
-`renderer.retickFromPlaybackClock` renders again against the last snapshot the module saw and
+`renderer.retickFromPlaybackClock` renders again against the last snapshot the module saw, which is
+the realm's rather than that renderer's, described under One renderer per document above, and
 measures nothing, which is what an offset nudge needs. `relayout` measures and renders nothing,
 leaving the lines it just re-read to the next tick. `scheduleLyricPositionUpdate` does both, on the
 next frame, and is the busiest of the three: `types.ts` calls it out as the one a streamed
@@ -503,9 +524,9 @@ extension they are already there.
 
 ### More than one element in a document
 
-Two renderers in one realm render against whichever theme either of them was applied last, because
-the settings registry is module scope, and two in one document write the same theme element as well.
-That constraint is the module's, described under Theme settings above.
+Two renderers in one realm render against whichever theme either of them was applied last, and two in
+one document write the same theme element and the same scroll padding as well. That constraint is the
+module's, described under One renderer per document above.
 
 What it is not is a constraint on the number of elements. Two views handed the **same** theme are not
 affected by any of it: the settings they share are the ones both of them asked for, and the renderer

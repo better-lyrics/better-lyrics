@@ -153,7 +153,19 @@ export interface LyricsRenderer {
    * lyrics back. The renderer does not hold them, so it cannot rebuild them itself.
    */
   setTheme(css: string): boolean;
+  /**
+   * Renders the view at a playback time, in seconds. The module owns no clock, so this is the whole
+   * of how the song reaches it, and the answer says whether there was a view here to render.
+   */
   tick(currentTimeS: number, options: TickOptions): AnimationTickStatus;
+  /**
+   * Re-reads the layout and renders nothing, leaving the lines it just re-read to the next tick.
+   *
+   * @param measureLines - Defaults to true, and asking is not the same as getting: lines the page is
+   *   not rendering measure as zero height at zero offset, so the renderer holds the line
+   *   measurement back itself while they are off the screen. Pass false to rewrite only the padding,
+   *   which is sized against the viewport and so is knowable either way.
+   */
   relayout(measureLines?: boolean): void;
   /**
    * Drops the song and the DOM built for it. The renderer built that DOM, so it takes it away again.
@@ -169,19 +181,61 @@ export interface LyricsRenderer {
    * renderer's own reading of what it has on screen, not something the caller has to supply.
    */
   noteUserScroll(): void;
+  /**
+   * The document this view is in was shown or hidden. Nothing is reset either way, and a view told
+   * nothing goes on rendering: this is where the view records what it decided about the animations
+   * it is running, and only when a theme has asked for the timing diagnostics.
+   */
   noteVisibilityChange(): void;
   resumeAutoscroll(): void;
+  /**
+   * Takes this view's lines off the screen, keeping the container they were in, and reports whether
+   * there were any there to take. For a consumer that is about to build the next song into the same
+   * place and wants the last one gone in the meantime: `clear` is the one that drops the song, and
+   * this one drops only what is on the screen.
+   */
   clearOnScreenLyrics(): boolean;
   /**
    * Re-measures the lines on the next frame and renders the view again against them. The predicate
    * is the caller's half of whether that frame does anything, and only that half: whether the lines
    * are on the screen to be measured at all is the renderer's own question, and it asks it itself.
+   *
+   * @param isTicking - Whether whoever drives this view is still driving it, asked on the frame
+   *   rather than now. A driver that has stopped is one whose lines may no longer be rendered, and
+   *   an unrendered line measures as zero height at zero offset, which is what every scroll target
+   *   for the rest of the song would then be read off. A false answer declines both the
+   *   re-measurement and the render.
+   * @param retick - Runs after the re-measurement, on the frame.
    */
   scheduleLyricPositionUpdate(isTicking: () => boolean, retick: () => void): void;
+  /**
+   * Renders this view again against the last player snapshot, measuring nothing, which is what an
+   * offset nudge needs.
+   *
+   * The snapshot is the module's rather than this renderer's: whichever view in this bundle ticked
+   * last is the one that wrote it, so two renderers in one realm replay each other's clock here.
+   * That is the same constraint the theme settings are under, and `resetPlaybackClock` is what
+   * forgets the snapshot.
+   *
+   * @param buildOptions - Given the snapshot the tick will run against, returns what to render it
+   *   with. Built here rather than handed in, so a caller that reads its settings at tick time still
+   *   reads them at tick time.
+   */
   retickFromPlaybackClock(
     buildOptions: (eventCreationTime: number, isPlaying: boolean) => TickOptions
   ): AnimationTickStatus;
+  /** The element this view built its lines into, and null before it has built any. */
   readonly container: HTMLElement | null;
+  /**
+   * The render records this view built, which are the view's own live state rather than a copy of
+   * it: each one holds the line's element and the `Animation` objects running against it.
+   *
+   * `readonly` freezes the array and nothing else. The records are writable, deliberately, because
+   * rewriting a line's time or hanging a translation off its element is how a consumer decorates a
+   * song that is already built. What it does not do is reach a second view: these elements belong
+   * to this renderer, so a consumer with two of them decorates each one.
+   */
   readonly lines: readonly LineData[];
+  /** How the loaded lyrics are timed, and `"none"` once there are none loaded. */
   readonly syncType: LyricSyncType;
 }
