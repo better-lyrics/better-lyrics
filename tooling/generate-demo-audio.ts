@@ -1,6 +1,7 @@
-// Synthesizes the demo's audio track, because the demo needs a real clock to follow and a repository
-// is no place for someone else's recording. The notes come from `demo/song.js`, the same rows the
-// browser builds its `Lyric[]` out of, so what you hear is what the lyrics claim is happening.
+// Synthesizes the demo's audio tracks, because the demo needs a real clock to follow and a
+// repository is no place for someone else's recording. The notes come from `demo/song.js`, the same
+// rows the browser builds its `Lyric[]` out of, so what you hear is what the lyrics claim is
+// happening.
 //
 // A RIFF wave written by hand: it is the only audio container Node can produce without a dependency,
 // and the demo is served from disk over localhost, where the size costs nothing.
@@ -8,10 +9,10 @@
 import { mkdirSync, writeFileSync } from "fs";
 import { dirname, join } from "path";
 import { fileURLToPath } from "url";
-import { buildScore, CHORD_VOICINGS } from "../demo/song.js";
+import { buildScore, CHORD_VOICINGS, SONGS } from "../demo/song.js";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
-const outPath = join(__dirname, "..", "demo", "generated", "song.wav");
+const outDir = join(__dirname, "..", "demo", "generated");
 
 // High enough that the third harmonic of the top note stays well under Nyquist, low enough that the
 // whole track is a couple of megabytes.
@@ -176,32 +177,39 @@ function toWave(track: Float64Array): Buffer {
 
 // -- Render --------------------------------------------
 
-const { notes, bars, durationMs } = buildScore();
-const track = new Float64Array(Math.ceil(((durationMs / 1000 + TAIL_S) * SAMPLE_RATE) / 1) + 1);
+function renderSong(songId: string): { wave: Buffer; noteCount: number; durationMs: number } {
+  const { notes, bars, durationMs } = buildScore(songId);
+  const track = new Float64Array(Math.ceil((durationMs / 1000 + TAIL_S) * SAMPLE_RATE) + 1);
 
-for (const bar of bars) {
-  const voicing = CHORD_VOICINGS[bar.chord as keyof typeof CHORD_VOICINGS];
-  renderNote(track, bar.startMs, bar.durationMs * 0.92, voicing.bass, VOICE_GAIN.bass, BASS);
-  for (const pitch of voicing.pad) {
-    renderNote(track, bar.startMs, bar.durationMs * 0.96, pitch, VOICE_GAIN.pad, PAD);
+  for (const bar of bars) {
+    const voicing = CHORD_VOICINGS[bar.chord as keyof typeof CHORD_VOICINGS];
+    renderNote(track, bar.startMs, bar.durationMs * 0.92, voicing.bass, VOICE_GAIN.bass, BASS);
+    for (const pitch of voicing.pad) {
+      renderNote(track, bar.startMs, bar.durationMs * 0.96, pitch, VOICE_GAIN.pad, PAD);
+    }
   }
+
+  for (const note of notes) {
+    const voice = note.voice === "echo" ? ECHO : LEAD;
+    const gain = note.voice === "echo" ? VOICE_GAIN.echo : VOICE_GAIN.lead;
+    renderNote(track, note.startMs, note.durationMs * 0.88, note.pitch, gain, voice);
+  }
+
+  addReflections(track);
+  normalize(track);
+
+  return { wave: toWave(track), noteCount: notes.length, durationMs };
 }
 
-for (const note of notes) {
-  const voice = note.voice === "echo" ? ECHO : LEAD;
-  const gain = note.voice === "echo" ? VOICE_GAIN.echo : VOICE_GAIN.lead;
-  renderNote(track, note.startMs, note.durationMs * 0.88, note.pitch, gain, voice);
+mkdirSync(outDir, { recursive: true });
+
+for (const song of SONGS) {
+  const { wave, noteCount, durationMs } = renderSong(song.id);
+  writeFileSync(join(outDir, `${song.id}.wav`), wave);
+
+  const seconds = (durationMs / 1000).toFixed(1);
+  const megabytes = (wave.length / 1024 / 1024).toFixed(2);
+  console.log(
+    `Wrote demo/generated/${song.id}.wav: ${seconds}s, ${noteCount} notes, mono ${SAMPLE_RATE}Hz, ${megabytes} MB`
+  );
 }
-
-addReflections(track);
-normalize(track);
-
-const wave = toWave(track);
-mkdirSync(dirname(outPath), { recursive: true });
-writeFileSync(outPath, wave);
-
-const seconds = (durationMs / 1000).toFixed(1);
-const megabytes = (wave.length / 1024 / 1024).toFixed(2);
-console.log(
-  `Wrote demo/generated/song.wav: ${seconds}s, ${notes.length} notes, mono ${SAMPLE_RATE}Hz, ${megabytes} MB`
-);
