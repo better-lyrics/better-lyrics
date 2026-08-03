@@ -1,6 +1,6 @@
 // What this page tells a reader about @braccato/core, in one place so there is one place to change
 // it. The page renders its reference and its code samples out of this file, and
-// `tooling/check-demo-api.ts` reads the same file and holds every name in it against what
+// `tooling/check-api-docs.ts` reads the same file and holds every name in it against what
 // `npm run package` actually emitted. A property renamed in the module fails the package build
 // rather than quietly leaving a wrong page on the screen.
 //
