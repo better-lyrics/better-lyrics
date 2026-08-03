@@ -75,20 +75,26 @@ export const THEMES = [
 }
 
 /* Colour cannot say how far a line is from the one being sung, because every inactive line reads
-   the same variable. The structure can. \`blyrics--active\` marks the line the song is on, and
-   stepping one sibling off it in either direction is what makes a line a neighbour. */
-.blyrics--line {
+   the same variable. The structure can.
+
+   \`blyrics--active\` leads the voice rather than tracking it, so two lines carry it through every
+   handoff. Each tier has to say which lines it is not about, or the neighbour rules outrank a bare
+   \`.blyrics--active\` on the line still being sung and the light goes out. */
+.blyrics-container:not(.blyrics-user-scrolling) > .blyrics--line:not(.blyrics--active) {
 	opacity: 0.13;
-	transition: opacity 420ms cubic-bezier(0.2, 0, 0, 1);
+	/* Late leaving, immediate arriving: a line holds its light through the handoff rather than
+	   trading it away before the voice has got there. */
+	transition: opacity 420ms cubic-bezier(0.2, 0, 0, 1) 340ms;
 }
 
-.blyrics--line:has(+ .blyrics--active),
-.blyrics--active + .blyrics--line {
+.blyrics-container:not(.blyrics-user-scrolling) > .blyrics--line:not(.blyrics--active):has(+ .blyrics--active),
+.blyrics-container:not(.blyrics-user-scrolling) > .blyrics--active + .blyrics--line:not(.blyrics--active) {
 	opacity: 0.36;
 }
 
-.blyrics--active {
+.blyrics-container > .blyrics--active {
 	opacity: 1;
+	transition: opacity 420ms cubic-bezier(0.2, 0, 0, 1);
 }
 
 /* The answering voice is set in from the line it answers rather than sitting square under it. The
