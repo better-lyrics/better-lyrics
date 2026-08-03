@@ -6,6 +6,9 @@
 :root {
 	--bg: oklch(0.152 0.008 264);
 	--bg-sunken: oklch(0.126 0.008 264);
+	/* The floor the hero copy sits on. Pure black rather than near black, because the ramp the view
+	   fades down through is the module's own `--blyrics-gradient-stops`, and that one ends at #000. */
+	--bg-floor: oklch(0 0 0);
 	--surface: oklch(0.207 0.009 264);
 	--surface-raised: oklch(0.248 0.01 264);
 	--hairline: oklch(1 0 0 / 0.09);
@@ -180,27 +183,17 @@ a:hover {
 	overflow-y: auto;
 }
 
-/* The module publishes the gradient it fades its own view with, so the page fades with the same one
-   rather than inventing a second set of stops. */
-.stage::before,
-.stage::after {
-	content: "";
-	height: 104px;
-	left: 0;
-	pointer-events: none;
-	position: absolute;
-	right: 0;
-	z-index: 2;
-}
-
+/* Only the top edge is the stage's to fade. It meets the top bar, so it fades into the page's own
+   colour. The bottom edge meets the black the copy sits on, and that fade has to travel with the
+   copy rather than stay where the stage stops, so the hero owns it instead. */
 .stage::before {
 	background: linear-gradient(to top, transparent, var(--bg) 78%);
-	top: 0;
-}
-
-.stage::after {
-	background: linear-gradient(to bottom, transparent, var(--bg) 78%);
-	bottom: 0;
+	content: "";
+	height: 104px;
+	inset: 0 0 auto;
+	pointer-events: none;
+	position: absolute;
+	z-index: 2;
 }
 
 .stage__status {
@@ -341,6 +334,38 @@ main {
 	display: grid;
 	min-block-size: calc(100svh - var(--chrome-top) - var(--chrome-bottom));
 	pointer-events: none;
+	position: relative;
+}
+
+/* The copy reads on black rather than on the page colour, and the view falls into that black inside
+   the lines rather than meeting it at the first word of the headline.
+
+   Painted from `.hero` because that is the full width of the page. `.hero__band` is capped at the
+   width of a column of text, so a backdrop anchored to it would leave the right of the screen
+   unpainted. Both rules are sized off the same `--hero-band` the stage is inset by, so the fade and
+   the edge it lands on agree at every width without either being told the number twice.
+   `z-index: -1` puts them behind the copy without leaving main's stacking context, which keeps them
+   in front of the view and out of the way of the transport bar and the panel. */
+.hero::before {
+	background: linear-gradient(to bottom, var(--blyrics-gradient-stops));
+	block-size: clamp(120px, 17vh, 224px);
+	content: "";
+	inset: auto 0 var(--hero-band, 220px);
+	pointer-events: none;
+	position: absolute;
+	z-index: -1;
+}
+
+/* Runs on under the transport bar, so the bar has the same black behind it as the copy above rather
+   than the leading edge of the docs slab. */
+.hero::after {
+	background: var(--bg-floor);
+	block-size: calc(var(--hero-band, 220px) + var(--chrome-bottom));
+	content: "";
+	inset: auto 0 calc(var(--chrome-bottom) * -1);
+	pointer-events: none;
+	position: absolute;
+	z-index: -1;
 }
 
 /* One column at every width, capped short of where the panel floats. Two columns would fit at 1440
