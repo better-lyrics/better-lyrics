@@ -1498,8 +1498,10 @@ main {
 	color: var(--text-2);
 }
 
+/* Round rather than the squircle the top bar's copy of this mark wears: this one sits inside a
+   999px pill, so a circle is what stays concentric with the shape around it. */
 .ecosystem img {
-	border-radius: 4px;
+	border-radius: 1000rem;
 	outline: 1px solid oklch(1 0 0 / 0.1);
 	outline-offset: -1px;
 }
