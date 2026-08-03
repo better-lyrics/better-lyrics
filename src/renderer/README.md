@@ -272,6 +272,11 @@ imports this file.
 </script>
 ```
 
+That quickstart runs. `npm run demo` emits the package, synthesizes a track for it to follow, and
+serves `demo/` against the emitted artifact, with a control for most of what this section describes.
+The page's own API reference is held to the emitted types by `tooling/check-demo-api.ts`, so renaming
+something here fails the build that emitted it rather than leaving a wrong page up.
+
 `source` is the whole of following a player: the element reads the clock, drives itself while the
 audio plays, and sends a click on a lyric line back to `audio.currentTime`. A consumer whose clock is
 not a media element leaves it out and writes `currentTime` and `playing` instead, which is what this

@@ -10,6 +10,7 @@ import { execFileSync } from "child_process";
 import { cpSync, mkdirSync, readdirSync, readFileSync, rmSync, writeFileSync } from "fs";
 import { dirname, join } from "path";
 import { fileURLToPath } from "url";
+import { checkDemoApi } from "./check-demo-api.js";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const root = join(__dirname, "..");
@@ -128,6 +129,12 @@ writeFileSync(
     2
   )}\n`
 );
+
+// -- What the demo page promises --------------------------------------------
+
+// Same shape as the exports check above, one consumer further out: the page in demo/ documents this
+// API by name, so the emit is the moment to find out whether it still describes it.
+checkDemoApi(outDir);
 
 console.log(
   `Emitted @braccato/core ${VERSION} to dist/package: ${emitted.length} files, ${stylesheets.length} stylesheets`

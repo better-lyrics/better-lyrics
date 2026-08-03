@@ -23,8 +23,11 @@ const CONTENT_TYPES: Record<string, string> = {
   ".js": "text/javascript; charset=utf-8",
   ".json": "application/json; charset=utf-8",
   ".map": "application/json; charset=utf-8",
-  ".md": "text/markdown; charset=utf-8",
+  // Plain text rather than text/markdown, which browsers download instead of showing. The demo
+  // links to the package notes, and a link that saves a file is not one anybody follows twice.
+  ".md": "text/plain; charset=utf-8",
   ".mjs": "text/javascript; charset=utf-8",
+  ".png": "image/png",
   ".svg": "image/svg+xml",
   ".wav": "audio/wav",
 };

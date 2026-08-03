@@ -160,6 +160,33 @@ a:hover {
 	max-width: 52ch;
 }
 
+.byline {
+	align-items: center;
+	color: var(--text-3);
+	display: inline-flex;
+	font-size: 13px;
+	gap: 7px;
+	margin-top: 18px;
+	text-decoration: none;
+}
+
+.byline img {
+	border-radius: 3px;
+	outline: 1px solid oklch(1 0 0 / 0.1);
+	outline-offset: -1px;
+}
+
+.byline span {
+	color: var(--text-2);
+	text-decoration: underline;
+	text-decoration-color: oklch(0.855 0.132 84 / 0.4);
+	text-underline-offset: 0.2em;
+}
+
+.byline:hover span {
+	color: var(--accent);
+}
+
 .masthead__facts {
 	display: flex;
 	gap: clamp(20px, 3vw, 40px);
@@ -190,23 +217,23 @@ a:hover {
 	max-width: var(--page);
 }
 
-/* The event log sits under the stage rather than at the foot of the rail, because the two columns
-   are close to the same height that way and neither ends in a void. */
+/* The controls go under the thing they drive, and everything that only reports goes down the side.
+   It also keeps the two columns close to the same height, so neither ends in a void. */
 @media (min-width: 1080px) {
 	.stage-region {
-		grid-template-columns: minmax(0, 1fr) 340px;
+		grid-template-columns: minmax(0, 1fr) 344px;
 	}
 
 	.stage-region > .stage {
 		grid-area: 1 / 1;
 	}
 
-	.stage-region > .rail {
-		grid-area: 1 / 2 / 3 / 3;
+	.stage-region > .console {
+		grid-area: 2 / 1;
 	}
 
-	.stage-region > .panel--log {
-		grid-area: 2 / 1;
+	.stage-region > .rail {
+		grid-area: 1 / 2 / 3 / 3;
 	}
 }
 
@@ -328,16 +355,27 @@ a:hover {
 	scale: 0.96;
 }
 
-.transport__seek {
+/* One range control, two sizes. Both fill their track from `--seek-progress`, which WebKit needs
+   because it has no equivalent of Gecko's `::-moz-range-progress`. */
+.transport__seek,
+.slider {
 	appearance: none;
 	background: transparent;
 	cursor: pointer;
-	height: 42px;
 	margin: 0;
 	width: 100%;
 }
 
-.transport__seek::-webkit-slider-runnable-track {
+.transport__seek {
+	height: 42px;
+}
+
+.slider {
+	height: 32px;
+}
+
+.transport__seek::-webkit-slider-runnable-track,
+.slider::-webkit-slider-runnable-track {
 	background: linear-gradient(
 		to right,
 		var(--accent) calc(var(--seek-progress, 0) * 100%),
@@ -347,7 +385,8 @@ a:hover {
 	height: 4px;
 }
 
-.transport__seek::-webkit-slider-thumb {
+.transport__seek::-webkit-slider-thumb,
+.slider::-webkit-slider-thumb {
 	appearance: none;
 	background: var(--text);
 	border-radius: 50%;
@@ -359,23 +398,27 @@ a:hover {
 	width: 14px;
 }
 
-.transport__seek:active::-webkit-slider-thumb {
+.transport__seek:active::-webkit-slider-thumb,
+.slider:active::-webkit-slider-thumb {
 	scale: 1.2;
 }
 
-.transport__seek::-moz-range-track {
+.transport__seek::-moz-range-track,
+.slider::-moz-range-track {
 	background: oklch(1 0 0 / 0.14);
 	border-radius: 999px;
 	height: 4px;
 }
 
-.transport__seek::-moz-range-progress {
+.transport__seek::-moz-range-progress,
+.slider::-moz-range-progress {
 	background: var(--accent);
 	border-radius: 999px;
 	height: 4px;
 }
 
-.transport__seek::-moz-range-thumb {
+.transport__seek::-moz-range-thumb,
+.slider::-moz-range-thumb {
 	background: var(--text);
 	border: 0;
 	border-radius: 50%;
@@ -392,6 +435,276 @@ a:hover {
 
 .transport__clock span:first-child {
 	color: var(--text);
+}
+
+/* -- Buttons -------------------------------------------- */
+
+.button {
+	background: var(--surface-raised);
+	border: 0;
+	border-radius: var(--r-md);
+	box-shadow: var(--ring);
+	color: var(--text);
+	cursor: pointer;
+	font: inherit;
+	font-size: 13px;
+	font-weight: 500;
+	min-height: 40px;
+	padding: 0 16px;
+	transition-duration: 150ms;
+	transition-property: scale, background-color, color;
+	transition-timing-function: var(--ease);
+}
+
+.button:hover {
+	background: oklch(0.284 0.011 264);
+}
+
+.button:active {
+	scale: 0.96;
+}
+
+.button--quiet {
+	background: transparent;
+	color: var(--text-2);
+	padding: 0 14px;
+}
+
+.button--quiet:hover {
+	background: oklch(1 0 0 / 0.06);
+	color: var(--text);
+}
+
+/* -- Console -------------------------------------------- */
+
+.console__head {
+	align-items: baseline;
+	display: flex;
+	gap: 12px 20px;
+	justify-content: space-between;
+	padding: 4px 2px 0;
+}
+
+.console h2 {
+	font-size: 14px;
+	font-weight: 600;
+	letter-spacing: -0.005em;
+}
+
+.console__note {
+	color: var(--text-3);
+	font-size: 13px;
+	margin-top: 6px;
+	max-width: 62ch;
+	padding-inline: 2px;
+}
+
+.console__cards {
+	align-items: start;
+	display: grid;
+	gap: 20px;
+	grid-template-columns: repeat(auto-fit, minmax(268px, 1fr));
+	margin-top: 18px;
+}
+
+/* Three cards in two columns leave the last one beside a hole. An odd card at the end takes the
+   whole row instead, which is also the right answer for any other odd number of them. */
+@media (min-width: 620px) and (max-width: 1079px) {
+	.console__cards > :last-child:nth-child(odd) {
+		grid-column: 1 / -1;
+	}
+}
+
+.card {
+	display: grid;
+	gap: 18px;
+}
+
+.card > h3,
+.card > .panel__note {
+	margin: 0;
+}
+
+.card > .panel__note {
+	margin-top: -12px;
+}
+
+/* -- Fields -------------------------------------------- */
+
+.field__row {
+	align-items: baseline;
+	display: flex;
+	gap: 12px;
+	justify-content: space-between;
+}
+
+.field__row label {
+	color: var(--text-2);
+	font-size: 13px;
+}
+
+.field__value {
+	color: var(--accent);
+	font-family: var(--font-mono);
+	font-size: 12.5px;
+	font-variant-numeric: tabular-nums;
+}
+
+.field__hint {
+	color: var(--text-3);
+	font-size: 12px;
+	line-height: 1.45;
+	margin-top: 8px;
+}
+
+.field .slider {
+	margin-top: 2px;
+}
+
+.field .switch {
+	margin: 0 -8px;
+}
+
+.field .switch + .field__hint {
+	margin-top: 4px;
+	padding-inline-start: 8px;
+}
+
+/* -- Segmented control -------------------------------------------- */
+
+.segmented {
+	border: 0;
+	display: grid;
+	gap: 4px;
+	grid-template-columns: repeat(2, minmax(0, 1fr));
+	margin: 0;
+	padding: 0;
+}
+
+.segmented label {
+	cursor: pointer;
+	display: block;
+}
+
+.segmented input {
+	clip-path: inset(50%);
+	height: 1px;
+	position: absolute;
+	width: 1px;
+}
+
+.segmented span {
+	align-items: center;
+	background: var(--surface-raised);
+	border-radius: var(--r-sm);
+	color: var(--text-2);
+	display: flex;
+	font-size: 12.5px;
+	justify-content: center;
+	min-height: 40px;
+	padding: 0 8px;
+	text-align: center;
+	transition-duration: 150ms;
+	transition-property: background-color, color;
+	transition-timing-function: var(--ease);
+}
+
+.segmented label:hover span {
+	color: var(--text);
+}
+
+.segmented input:checked + span {
+	background: var(--accent-quiet);
+	color: var(--accent);
+}
+
+.segmented input:focus-visible + span {
+	outline: 2px solid var(--accent);
+	outline-offset: 2px;
+}
+
+/* -- Lyrics editor -------------------------------------------- */
+
+.editor summary {
+	border-radius: var(--r-sm);
+	color: var(--text-2);
+	cursor: pointer;
+	font-size: 13px;
+	list-style-position: inside;
+	padding: 9px 8px;
+	margin-inline: -8px;
+	transition-duration: 150ms;
+	transition-property: color;
+	transition-timing-function: var(--ease);
+}
+
+.editor summary:hover {
+	color: var(--text);
+}
+
+.editor summary::marker {
+	color: var(--text-3);
+}
+
+.editor > .field__hint {
+	margin-top: 4px;
+}
+
+.editor textarea {
+	background: var(--bg-sunken);
+	border: 0;
+	border-radius: var(--r-sm);
+	box-shadow: var(--ring);
+	color: var(--text-2);
+	display: block;
+	font-family: var(--font-mono);
+	font-size: 12px;
+	line-height: 1.55;
+	margin-top: 12px;
+	overflow: auto;
+	padding: 12px;
+	resize: vertical;
+	scrollbar-width: thin;
+	tab-size: 2;
+	width: 100%;
+}
+
+.editor textarea:focus-visible {
+	outline: 2px solid var(--accent);
+	outline-offset: 2px;
+}
+
+.editor__error:empty {
+	display: none;
+}
+
+.editor__error {
+	color: var(--bad);
+	font-size: 12px;
+	line-height: 1.45;
+	margin-top: 10px;
+}
+
+.editor__actions {
+	display: flex;
+	gap: 8px;
+	margin-top: 12px;
+}
+
+/* -- Theme preview -------------------------------------------- */
+
+.theme-preview {
+	background: var(--bg-sunken);
+	border-radius: var(--r-sm);
+	box-shadow: var(--ring);
+	color: var(--text-3);
+	font-family: var(--font-mono);
+	font-size: 11.5px;
+	line-height: 1.7;
+	margin: 0;
+	overflow-wrap: break-word;
+	padding: 12px;
+	white-space: pre-wrap;
 }
 
 /* -- Rail -------------------------------------------- */
@@ -424,6 +737,14 @@ a:hover {
 	color: var(--text-3);
 	font-size: 13px;
 	margin-top: 6px;
+}
+
+.panel__footnote {
+	color: var(--text-3);
+	font-size: 12px;
+	line-height: 1.45;
+	margin-top: 16px;
+	opacity: 0.8;
 }
 
 #upgrade-verdict[data-state="pass"] {
@@ -665,44 +986,97 @@ a:hover {
 	color: var(--text-3);
 }
 
-/* -- Surface reference -------------------------------------------- */
+/* -- Reference -------------------------------------------- */
 
-.surface {
+.reference {
 	margin: clamp(56px, 10vh, 104px) auto 0;
 	max-width: var(--page);
 }
 
-.surface h2 {
+.reference h2 {
 	font-size: clamp(1.25rem, 2vw, 1.5rem);
 	font-weight: 600;
 	letter-spacing: -0.018em;
 }
 
-.surface__columns {
-	display: grid;
-	gap: clamp(28px, 4vw, 56px);
-	margin-top: 28px;
+.reference__head p {
+	color: var(--text-2);
+	margin-top: 14px;
+	max-width: 62ch;
 }
 
-@media (min-width: 760px) {
-	.surface__columns {
+.reference__link {
+	font-size: 14px;
+}
+
+.reference__grid {
+	align-items: start;
+	display: grid;
+	gap: clamp(34px, 4vw, 56px);
+	margin-top: clamp(30px, 4vh, 44px);
+}
+
+.reference__column {
+	display: grid;
+	gap: 0;
+}
+
+@media (min-width: 900px) {
+	.reference__grid {
 		grid-template-columns: repeat(2, minmax(0, 1fr));
 	}
 }
 
-.surface h3 {
-	color: var(--text-2);
+.reference h3 {
+	color: var(--text);
 	font-size: 13px;
 	font-weight: 600;
 }
 
+.reference__subhead {
+	margin-top: 34px;
+	position: relative;
+	padding-top: 28px;
+}
+
+.reference__subhead::before {
+	background: var(--hairline);
+	content: "";
+	height: 1px;
+	inset-inline: 0;
+	position: absolute;
+	top: 0;
+}
+
+.reference__note {
+	color: var(--text-3);
+	font-size: 13px;
+	margin-top: 8px;
+	max-width: 56ch;
+}
+
+/* An identifier is one word however many hyphens are in it, and a break after one reads as a
+   different name. */
+.reference__note code,
+.terms dd code {
+	white-space: nowrap;
+}
+
+.reference__note code {
+	color: var(--text-2);
+}
+
 .terms {
-	margin: 16px 0 0;
+	margin: 18px 0 0;
 }
 
 .terms dt {
+	align-items: baseline;
 	color: var(--accent);
-	margin-top: 20px;
+	display: flex;
+	flex-wrap: wrap;
+	gap: 3px 10px;
+	margin-top: 22px;
 }
 
 .terms dt:first-child {
@@ -711,6 +1085,12 @@ a:hover {
 
 .terms dt code {
 	font-size: 13px;
+}
+
+.terms__meta {
+	color: var(--text-3);
+	font-family: var(--font-mono);
+	font-size: 11.5px;
 }
 
 .terms dd {
@@ -724,16 +1104,18 @@ a:hover {
 	color: var(--text);
 }
 
-.surface__aside {
-	color: var(--text-3);
+.terms--tight dt {
+	margin-top: 16px;
+}
+
+.terms--tight dd {
 	font-size: 13px;
-	margin-top: 26px;
-	max-width: 52ch;
 }
 
 /* -- Colophon -------------------------------------------- */
 
 .colophon {
+	align-items: center;
 	color: var(--text-3);
 	display: flex;
 	flex-wrap: wrap;
@@ -757,6 +1139,44 @@ a:hover {
 .colophon p {
 	font-size: 13px;
 	max-width: 62ch;
+}
+
+/* The pill the rest of the ecosystem carries, in this page's tokens. */
+.ecosystem {
+	align-items: center;
+	background: var(--surface);
+	border-radius: 999px;
+	box-shadow: var(--ring);
+	color: var(--text-3);
+	display: inline-flex;
+	flex: none;
+	font-size: 13px;
+	gap: 9px;
+	padding: 7px 15px 7px 8px;
+	text-decoration: none;
+	transition-duration: 150ms;
+	transition-property: background-color, color;
+	transition-timing-function: var(--ease);
+}
+
+.ecosystem:hover {
+	background: var(--surface-raised);
+	color: var(--text-2);
+}
+
+.ecosystem img {
+	border-radius: 4px;
+	outline: 1px solid oklch(1 0 0 / 0.1);
+	outline-offset: -1px;
+}
+
+.ecosystem strong {
+	color: var(--text-2);
+	font-weight: 600;
+}
+
+.ecosystem:hover strong {
+	color: var(--text);
 }
 
 /* -- The page reaching into the element's light DOM --------------------------------------------
@@ -796,14 +1216,19 @@ braccato-lyrics {
 @media (prefers-reduced-motion: no-preference) {
 	.masthead,
 	.rail,
+	.console,
 	.api,
-	.surface,
+	.reference,
 	.colophon {
 		animation: rise 460ms var(--ease) both;
 	}
 
 	.rail {
 		animation-delay: 140ms;
+	}
+
+	.console {
+		animation-delay: 200ms;
 	}
 
 	/* Opacity only: the renderer measures the lines it just built, and a transform or a filter on

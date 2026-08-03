@@ -4,10 +4,10 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>@braccato/core: synchronized lyrics, written as a tag</title>
-    <link rel="icon" href="data:," />
+    <link rel="icon" href="../images/icons/icon-48.png" />
     <meta
       name="description"
-      content="A live demo of the @braccato/core custom element: word-by-word lyric timing against real audio, rendered into light DOM."
+      content="A live demo of the @braccato/core custom element: word-by-word lyric timing against real audio, rendered into light DOM, with the controls to change it while it runs."
     />
 
     <!-- The package's three stylesheets, loaded from the emitted artifact the way a consumer would
@@ -24,9 +24,14 @@
         <p class="wordmark">@braccato/core</p>
         <h1>Synchronized lyrics, written as a tag.</h1>
         <p class="lede">
-          Syllable-level timing, autoscroll and theming, built into light DOM so a stylesheet at document level still
-          reaches the lines.
+          Syllable timing and autoscroll, built into light DOM so a stylesheet at document level still reaches the
+          lines. Everything below is running the package as npm would install it.
         </p>
+        <a class="byline" href="https://better-lyrics.boidu.dev" target="_blank" rel="noopener noreferrer">
+          by
+          <img src="../images/icons/icon-512.png" alt="" width="16" height="16" decoding="async" />
+          <span>Better Lyrics</span>
+        </a>
       </div>
 
       <dl class="masthead__facts">
@@ -62,7 +67,7 @@
                 theme="/* blyrics-target-scroll-pos-ratio = 0.42; */"
               ></braccato-lyrics>
             </div>
-            <p class="stage__status" id="stage-status" role="status">Loading @braccato/core from dist/package…</p>
+            <p class="stage__status" id="stage-status" role="status">Loading @braccato/core from dist/package.</p>
           </div>
 
           <div class="transport">
@@ -82,11 +87,106 @@
           </p>
         </div>
 
+        <div class="console" aria-labelledby="console-heading">
+          <div class="console__head">
+            <h2 id="console-heading">Change something</h2>
+            <button class="button button--quiet" id="copy-link" type="button">Copy link</button>
+          </div>
+          <p class="console__note">
+            Every control here writes a property on the tag above and nothing else. The address bar keeps up, so a
+            setting you like is a link you can send.
+          </p>
+
+          <div class="console__cards">
+            <section class="panel card" aria-labelledby="clock-heading">
+              <h3 id="clock-heading">Clock</h3>
+              <p class="panel__note">What the next tick is handed, beyond the time itself.</p>
+
+              <div class="field">
+                <div class="field__row">
+                  <label for="offset">Offset</label>
+                  <output class="field__value" id="offset-value" for="offset">0 ms</output>
+                </div>
+                <input class="slider" id="offset" type="range" min="-2000" max="2000" step="25" value="0" />
+                <p class="field__hint">
+                  Taken off the clock before it is matched against the lines. Push it negative and the words arrive
+                  early.
+                </p>
+              </div>
+
+              <div class="field">
+                <label class="switch">
+                  <input id="passive-scroll" type="checkbox" />
+                  <span>Passive scroll</span>
+                </label>
+                <p class="field__hint">Only unsynced lines read it. Pick Plain in the next card and it starts drifting them.</p>
+              </div>
+            </section>
+
+            <section class="panel card" aria-labelledby="lines-heading">
+              <h3 id="lines-heading">Lines</h3>
+              <p class="panel__note">The array the element is handed, and what the module makes of its timing.</p>
+
+              <fieldset class="segmented" id="score">
+                <legend class="visually-hidden">Which lyrics to render</legend>
+                <label><input type="radio" name="score" value="syllables" checked /><span>Syllables</span></label>
+                <label><input type="radio" name="score" value="lines" /><span>Lines</span></label>
+                <label><input type="radio" name="score" value="plain" /><span>Plain</span></label>
+                <label><input type="radio" name="score" value="none" /><span>Not found</span></label>
+              </fieldset>
+              <p class="field__hint" id="score-hint"></p>
+
+              <details class="editor">
+                <summary>Write your own</summary>
+                <p class="field__hint">
+                  A <code>Lyric[]</code>, which is what the element takes and the only thing it takes. The audio does
+                  not know about your lines, so the song carries on regardless and the timings are yours to match.
+                </p>
+                <label class="visually-hidden" for="lyrics-json">Lyrics as JSON</label>
+                <textarea id="lyrics-json" spellcheck="false" rows="9" aria-describedby="lyrics-error"></textarea>
+                <p class="editor__error" id="lyrics-error" role="status"></p>
+                <div class="editor__actions">
+                  <button class="button" id="apply-lyrics" type="button">Apply</button>
+                  <button class="button button--quiet" id="reset-lyrics" type="button">Put it back</button>
+                </div>
+              </details>
+            </section>
+
+            <section class="panel card" aria-labelledby="theme-heading">
+              <h3 id="theme-heading">Theme</h3>
+              <p class="panel__note">
+                A theme is a stylesheet, and it configures the module from inside its comments. Anything the browser
+                would read as CSS stays CSS.
+              </p>
+
+              <div class="field">
+                <div class="field__row">
+                  <label for="scroll-ratio">Active line sits at</label>
+                  <output class="field__value" id="scroll-ratio-value" for="scroll-ratio">42%</output>
+                </div>
+                <input class="slider" id="scroll-ratio" type="range" min="0.1" max="0.9" step="0.01" value="0.42" />
+                <p class="field__hint">Measured down from the top of the view.</p>
+              </div>
+
+              <div class="field">
+                <label class="switch">
+                  <input id="rich-sync" type="checkbox" checked />
+                  <span>Word by word</span>
+                </label>
+                <p class="field__hint">Turn it off and the lines are rebuilt without their syllable timing. The events panel says so.</p>
+              </div>
+
+              <pre class="theme-preview" id="theme-preview" aria-live="off"></pre>
+            </section>
+          </div>
+        </div>
+
         <div class="rail">
           <section class="panel" aria-labelledby="upgrade-heading">
             <h3 id="upgrade-heading">Upgrade</h3>
             <p class="panel__note" id="upgrade-verdict">Waiting for the module.</p>
             <dl class="readout" id="upgrade-readout"></dl>
+            <p class="panel__footnote">Read once, on load. The theme row is what the markup asked for, before anything on this page touched it.</p>
           </section>
 
           <section class="panel" aria-labelledby="cascade-heading">
@@ -102,21 +202,21 @@
 
             <dl class="readout" id="cascade-readout"></dl>
           </section>
-        </div>
 
-        <section class="panel panel--log" aria-labelledby="events-heading">
-          <h3 id="events-heading">Events</h3>
-          <p class="panel__note">Everything the element dispatched, newest first.</p>
-          <ol class="log" id="event-log"></ol>
-        </section>
+          <section class="panel panel--log" aria-labelledby="events-heading">
+            <h3 id="events-heading">Events</h3>
+            <p class="panel__note">Everything the element dispatched, newest first.</p>
+            <ol class="log" id="event-log"></ol>
+          </section>
+        </div>
       </section>
 
       <section class="api" aria-labelledby="markup-heading">
         <div class="api__prose">
           <h2 id="markup-heading">What produced the view above</h2>
           <p>
-            Two stylesheets, one tag and an array. The element reads the clock off the media element it is bound to,
-            drives its own frame loop while that clock runs, and sends a click on a line back to
+            Three stylesheets, one tag, and an array you build yourself. The element reads the clock off the media
+            element it is bound to, drives its own frame loop while that clock runs, and sends a click on a line back to
             <code>audio.currentTime</code>.
           </p>
           <p class="api__aside">
@@ -150,68 +250,95 @@
 <span class="c-t">&lt;/script&gt;</span></code></pre>
       </section>
 
-      <section class="surface" aria-labelledby="surface-heading">
-        <h2 id="surface-heading">The rest of the surface</h2>
+      <section class="reference" aria-labelledby="reference-heading">
+        <div class="reference__head">
+          <h2 id="reference-heading">The whole surface</h2>
+          <p>
+            Eleven properties, four attributes, four events, and a DOM that themes are allowed to select. What follows
+            is enough to write the tag. The reasoning behind each decision is in the package notes, which are long on
+            purpose.
+          </p>
+          <p class="reference__link"><a id="readme-link" href="#">Read the package notes</a></p>
+        </div>
 
-        <div class="surface__columns">
-          <div>
-            <h3>Properties you write</h3>
-            <dl class="terms">
-              <dt><code>lyrics</code></dt>
-              <dd>
-                A <code>Lyric[]</code>. Optional <code>parts</code> carry syllable timing; an empty array clears the
-                view, and null means the element was never given a song.
-              </dd>
+        <!-- Two stacks rather than a flowing grid: the left one is everything you write in script,
+             the right one everything you write in CSS, and stacking them keeps each topic together
+             when the columns collapse. -->
+        <div class="reference__grid">
+          <div class="reference__column">
+            <section aria-labelledby="properties-heading">
+              <h3 id="properties-heading">Properties</h3>
+              <p class="reference__note">
+                All of them may be written before the element reaches a document. The renderer is built when it
+                connects, and everything it was handed by then is applied at once.
+              </p>
+              <dl class="terms" id="properties-list"></dl>
+            </section>
 
-              <dt><code>source</code></dt>
-              <dd>
-                A selector or a media element. While it is bound, <code>currentTime</code> and <code>playing</code>
-                become outputs and a write to either is dropped.
-              </dd>
+            <section aria-labelledby="attributes-heading">
+              <h3 class="reference__subhead" id="attributes-heading">Attributes</h3>
+              <p class="reference__note">
+                An attribute writes its property and a property never writes back. Reflecting <code>current-time</code>
+                would put the playback clock into the DOM sixty times a second, and one attribute reflecting while the
+                rest do not is worse than none of them doing it.
+              </p>
+              <dl class="terms" id="attributes-list"></dl>
+            </section>
 
-              <dt><code>theme</code></dt>
-              <dd>
-                A compiled stylesheet. Its <code>blyrics-*</code> comments configure the module; the sheet itself goes
-                into the document head.
-              </dd>
-
-              <dt><code>tickOptions</code></dt>
-              <dd>
-                The rest of a tick: user offsets, passive scrolling, and the timestamp of the snapshot the clock came
-                from. Read by the next tick rather than causing one.
-              </dd>
-
-              <dt><code>renderer</code>, <code>mediaElement</code>, <code>status</code></dt>
-              <dd>Read-only. <code>status</code> is the answer for a consumer who was not holding a listener.</dd>
-            </dl>
+            <section aria-labelledby="events-heading-ref">
+              <h3 class="reference__subhead" id="events-heading-ref">Events</h3>
+              <p class="reference__note">
+                All four bubble and are composed, so an element you put inside your own shadow root still reaches your
+                listener.
+              </p>
+              <dl class="terms" id="events-list"></dl>
+            </section>
           </div>
 
-          <div>
-            <h3>Events you get back</h3>
-            <dl class="terms">
-              <dt><code>braccato:lyrics-loaded</code></dt>
-              <dd>
-                <code>{ lineCount, syncType }</code>. Fires when lyrics are applied, including the rebuild a theme
-                change forces.
-              </dd>
+          <div class="reference__column">
+            <section aria-labelledby="dom-heading">
+              <h3 id="dom-heading">The DOM is a contract</h3>
+              <p class="reference__note">
+                These class names are published API, not implementation. Every theme in the Better Lyrics marketplace
+                selects on them, so renaming one costs a migration rather than a refactor. Import them from
+                <code>@braccato/core/constants</code> instead of typing them out.
+              </p>
+              <dl class="terms terms--tight" id="class-names-list"></dl>
+            </section>
 
-              <dt><code>braccato:line-click</code></dt>
-              <dd><code>{ timeS }</code>. The seek has already reached the bound media element by the time it fires.</dd>
+            <section aria-labelledby="custom-properties-heading">
+              <h3 class="reference__subhead" id="custom-properties-heading">Custom properties</h3>
+              <p class="reference__note">
+                The ones a theme reaches for first. <code>variables.css</code> declares the rest.
+              </p>
+              <dl class="terms terms--tight" id="custom-properties-list"></dl>
+            </section>
 
-              <dt><code>braccato:scroll-state</code></dt>
-              <dd><code>{ userScrolling }</code>. Autoscroll stopped following the song, or started again.</dd>
+            <section aria-labelledby="stylesheets-heading">
+              <h3 class="reference__subhead" id="stylesheets-heading">Stylesheets</h3>
+              <p class="reference__note">
+                Yours to load, the way any package's CSS is. Leave them out and you get lines that are in the document
+                and unstyled, rather than lines that are missing.
+              </p>
+              <dl class="terms terms--tight" id="stylesheets-list"></dl>
+              <p class="reference__note">
+                One thing they do not do for you: the module measures the room the first and last lines need and
+                publishes it as <code>--blyrics-padding-top</code> and <code>--blyrics-padding-bottom</code> on the
+                root, but <code>lyrics.css</code> only spends the bottom one. This page supplies the top rule itself.
+              </p>
+            </section>
 
-              <dt><code>braccato:error</code></dt>
-              <dd>
-                <code>{ phase, error }</code>. Connecting, resolving a source, or applying lyrics or a theme went wrong.
-                Dispatched a microtask late so a listener added right after insertion still hears it.
-              </dd>
-            </dl>
-
-            <p class="surface__aside">
-              All four bubble and are composed, so an element placed inside your own shadow root still reaches your
-              listener.
-            </p>
+            <section aria-labelledby="one-renderer-heading">
+              <h3 class="reference__subhead" id="one-renderer-heading">One renderer per document</h3>
+              <p class="reference__note">
+                Two views in one document write the same theme element and the same scroll padding, and two in one
+                bundle share the settings registry and the playback clock, so the second one wins both. Two elements
+                handed the <em>same</em> theme are fine, and that is the whole line: the module reports the
+                disagreement, not the company. Both dispatch <code>braccato:error</code> with
+                <code>phase: "conflict"</code> and both read <code>status === "theme-conflict"</code>, and neither
+                stops rendering.
+              </p>
+            </section>
           </div>
         </div>
       </section>
@@ -222,7 +349,11 @@
         The song is synthesized by <code>tooling/generate-demo-audio.ts</code> from the same score the lyrics are built
         from, so a syllable cannot drift from the note it lands on.
       </p>
-      <p><a href="../dist/package/README.md">Read the package notes</a></p>
+
+      <a class="ecosystem" href="https://better-lyrics.boidu.dev" target="_blank" rel="noopener noreferrer">
+        <img src="../images/icons/icon-512.png" alt="" width="20" height="20" loading="lazy" decoding="async" />
+        <span>Part of the <strong>Better Lyrics</strong> ecosystem</span>
+      </a>
     </footer>
 
     <script type="module" src="./demo.js"></script>
