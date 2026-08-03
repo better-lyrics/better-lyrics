@@ -343,7 +343,11 @@ export const CUSTOM_PROPERTIES = [
   },
   { property: "--blyrics-lyric-active-color", summary: "The line being sung." },
   { property: "--blyrics-lyric-inactive-color", summary: "Every other line." },
-  { property: "--blyrics-glow-color", summary: "The bloom under a word that is held long enough to earn one." },
+  {
+    property: "--blyrics-glow-color",
+    summary:
+      "The bloom under a word. Every word is given it, so a theme that wants it to mean something selects on data-long-word, which the module sets on any part held past blyrics-long-word-threshold. This page does that.",
+  },
 ];
 
 // -- Stylesheets --------------------------------------------

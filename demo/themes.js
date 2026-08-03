@@ -9,7 +9,7 @@ export const THEMES = [
   {
     id: "amber",
     title: "Amber",
-    summary: "Colour and where the active line sits.",
+    summary: "Colour, the bloom on a held word, and where the active line sits.",
     css: `/* Settings live in comments. Everything outside one is CSS the browser reads, so a
    stylesheet cannot configure the module by accident. */
 /* blyrics-target-scroll-pos-ratio = 0.42; */
@@ -18,7 +18,9 @@ export const THEMES = [
 	--blyrics-font-weight: 700;
 	--blyrics-lyric-active-color: oklch(0.87 0.14 84);
 	--blyrics-lyric-inactive-color: oklch(0.87 0.14 84 / 0.26);
-	--blyrics-glow-color: oklch(0.87 0.14 84 / 0.45);
+	/* Only the words held past blyrics-long-word-threshold spend this, so it can afford to be
+	   nearly opaque. */
+	--blyrics-glow-color: oklch(0.92 0.14 84 / 0.92);
 }
 
 .blyrics-background-lyric {

@@ -43,6 +43,15 @@
 	--blyrics-font-size: clamp(1.75rem, 4.4vw, 3.25rem);
 	--blyrics-line-height: 1.2;
 	--blyrics-padding: 0.8rem;
+
+	/* The word animation the package defaults to is a scaleX nudge, and at this size that reads as
+	   the letters stretching rather than as anything being sung. A syllable that lifts a fraction of
+	   its own height and stays lifted reads as the line rising into the voice instead. Four values,
+	   all of them switches the engine already publishes, so this stays a theme rather than a fork. */
+	--blyrics-word-wobble-transform-from: translateY(0);
+	--blyrics-word-wobble-transform-peak: translateY(-0.005em);
+	--blyrics-word-wobble-transform-settle: translateY(-0.028em);
+	--blyrics-word-wobble-transform-to: translateY(-0.0375em);
 }
 
 @media (max-width: 640px) {
@@ -1418,6 +1427,19 @@ braccato-lyrics {
 
 [data-page-rules="on"] .blyrics-container {
 	letter-spacing: -0.045em;
+}
+
+/* `--blyrics-glow-color` is documented as the bloom a word earns by being held, but the package
+   hands it to every word alike, so nothing on the screen distinguishes the held ones. The engine
+   already marks them: `data-long-word` goes on any part past `blyrics-long-word-threshold`. So the
+   rest give their glow up and the held ones keep whatever colour the theme chose.
+
+   Two selectors because there are two targets. A word short enough to stay whole is animated
+   through its own `::after`; one past `blyrics-long-word-wrap-threshold` is split, and the sweep
+   moves to the `.blyrics-word-highlight` span inside it. */
+.blyrics--word:not([data-long-word])::after,
+.blyrics--word:not([data-long-word]) .blyrics-word-highlight {
+	--blyrics-glow-color: transparent;
 }
 
 /* -- Entrances -------------------------------------------- */
