@@ -31,12 +31,9 @@ export const THEMES = [
   {
     id: "centre",
     title: "Centre",
-    summary: "Bigger and centred, with a slower sweep across each word.",
+    summary: "Bigger and centred, and the glow reaches shorter words.",
     css: `/* Half way down the view rather than the default 0.37. */
 /* blyrics-target-scroll-pos-ratio = 0.5; */
-/* The sweep runs this many times the word's own length, so it is still moving when the
-   next word starts. */
-/* blyrics-swipe-duration-ratio = 2.4; */
 /* Words held past this many milliseconds get the glow. */
 /* blyrics-long-word-threshold = 900; */
 
