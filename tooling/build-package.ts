@@ -98,9 +98,9 @@ for (const name of stylesheets) {
   cpSync(join(rendererDir, "styles", name), join(outDir, "styles", name));
 }
 
-// README.md is the npm package page and is written for a consumer. NOTES.md beside it is the design
-// record, which names this repository's own surfaces throughout, so it stays behind and the README
-// links to it on GitHub.
+// README.md is the npm package page and is written for a consumer, so it is the one document that
+// travels with the artifact. Everything a contributor to this repository needs instead lives in the
+// module's own file headers, which the emit carries along with the code they annotate.
 cpSync(join(rendererDir, "README.md"), join(outDir, "README.md"));
 cpSync(join(rendererDir, "LICENSE"), join(outDir, "LICENSE"));
 

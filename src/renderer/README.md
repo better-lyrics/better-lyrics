@@ -293,10 +293,6 @@ The demo page lives at [`demo/`](https://github.com/better-lyrics/better-lyrics/
 the repository and runs against the emitted package, with a control for most of what is above. Clone
 the repository and run `npm run demo`, then open `http://127.0.0.1:4319/demo/`.
 
-The reasoning behind these decisions is in
-[NOTES.md](https://github.com/better-lyrics/better-lyrics/blob/master/src/renderer/NOTES.md), beside
-the source.
-
 ## Licence
 
 MIT. See `LICENSE`.

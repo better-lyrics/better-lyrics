@@ -4,10 +4,10 @@
 // `npm run package` actually emitted. A property renamed in the module fails the package build
 // rather than quietly leaving a wrong page on the screen.
 //
-// The prose here is the short answer. `src/renderer/README.md` is the package page and
-// `src/renderer/NOTES.md` is the reasoning behind it, and the page links to both rather than copying
-// them: this file carries what a consumer needs to write the tag, and stops where the reasoning
-// starts.
+// The prose here is the short answer. `src/renderer/README.md` is the package page, and the page
+// links to it rather than copying it: this file carries what a consumer needs to write the tag, and
+// stops where the reasoning starts. The reasoning lives beside the code it explains, in the module's
+// own file headers.
 
 // -- The package --------------------------------------------
 

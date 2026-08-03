@@ -1,4 +1,6 @@
 // The rules that keep src/renderer/ publishable as @braccato/core, and the check that enforces them.
+// The directory is written as though it already lived on its own, and it is licensed that way too:
+// MIT, in the LICENSE beside this file, while the rest of the repository is GPL-3.0.
 //
 // Nothing under this directory may import from `@core/*`, `@modules/*`, `@constants`, `@utils`,
 // `@options` or `@/`, reach outside the directory with a relative path, reference the extension
@@ -13,8 +15,7 @@
 // The extension global rule is not stylistic. On Firefox this module runs in the PAGE world, because
 // Gecko hands content scripts a cross-origin wrapper on the Picture-in-Picture window. A single
 // reference drags the webext polyfill into that bundle and kills it silently. See
-// `.claude/rules/pitfalls.md`, and `NOTES.md` beside this file for the rest of the module's design
-// record.
+// `.claude/rules/pitfalls.md`.
 
 import { strict as assert } from "node:assert";
 import { readFileSync, readdirSync } from "node:fs";
@@ -87,9 +88,14 @@ const SELF_CHECK_PACKAGES = ["typescript"];
 const EXTENSION_GLOBAL = "chrome" + ".";
 
 // The DOM the module builds and the CSS that styles it are one artifact, so the stylesheets under
-// styles/ answer to the same boundary as the code. These are the names YouTube Music's own markup
-// goes by, and the attributes the extension sets on that markup: a rule that reaches for one of
-// them is styling the page around the lyrics, which is the extension's business, not this module's.
+// styles/ answer to the same boundary as the code. What stayed in public/css/blyrics/ is the CSS
+// that styles the host rather than the lyrics, and the `@import` list in index.css there is where
+// the two halves are stitched back together: both injection sites load that one file, so a
+// stylesheet added or renamed on either side is a change to it.
+//
+// Below are the names YouTube Music's own markup goes by, and the attributes the extension sets on
+// that markup: a rule that reaches for one of them is styling the page around the lyrics, which is
+// the extension's business, not this module's.
 // Drawn from public/css/ytmusic/, which is where the extension does that styling, so the list is as
 // wide as the surface the extension is known to reach for. Lower case, because the scan lower cases
 // what it reads.
