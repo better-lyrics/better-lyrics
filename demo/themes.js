@@ -97,12 +97,11 @@ export const THEMES = [
 	transition: opacity 420ms cubic-bezier(0.2, 0, 0, 1);
 }
 
-/* The answering voice is set in from the line it answers rather than sitting square under it. The
-   module already prints it at three quarters of the size and mixes its colour down, so the only
-   thing left to say is where it sits. */
+/* The answering voice sits square under the line it answers. The module already prints it at three
+   quarters of the size and mixes its colour down, so the only thing left to say is that it gets a
+   little air above it. An inline indent here reads as a failed attempt to centre it. */
 .blyrics-background-line {
 	margin-top: 0.22em;
-	padding-inline-start: 1.75em;
 }
 
 /* Even while it is sung it stays behind the lead. Written through the module's own variable, so the
