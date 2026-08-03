@@ -39,6 +39,10 @@ const COPIED_LABEL_MS = 1600;
 const THEME_APPLY_DELAY_MS = 250;
 const ARRAY_PREVIEW_LIMIT = 12000;
 const AUDIO_EXTENSIONS = /\.(mp3|wav|ogg|oga|m4a|aac|flac|opus|weba|webm)$/i;
+// A typed URL becomes the player's `src`, and parsing one only says it is well formed. `javascript:`
+// and `data:` both parse, so the scheme is checked separately against what can carry audio here.
+// Object URLs are not in the list: those are minted from a picked file rather than typed.
+const AUDIO_URL_SCHEMES = new Set(["http:", "https:"]);
 const PANEL_OPEN_WIDTH = "(min-width: 1080px)";
 
 const view = document.querySelector(TAG_NAME);
@@ -1195,17 +1199,23 @@ function wireControls(lineClass, lyricsClass) {
   lyricsFileButton.addEventListener("click", () => pickFile(".ttml,.xml,.lrc,.srt,.qrc,.txt,text/*", acceptFile));
 
   songUrlButton.addEventListener("click", () => {
-    const url = songUrlInput.value.trim();
-    if (url === "") return;
+    const typed = songUrlInput.value.trim();
+    if (typed === "") return;
 
-    let label = url;
+    let parsed;
     try {
-      label = new URL(url, location.href).pathname.split("/").pop() || url;
+      parsed = new URL(typed, location.href);
     } catch {
       report(songStatus, "That is not a URL the browser will accept.", "bad");
       return;
     }
-    loadAudio(url, label);
+
+    if (!AUDIO_URL_SCHEMES.has(parsed.protocol)) {
+      report(songStatus, `${parsed.protocol} is not something this can play. Use http or https.`, "bad");
+      return;
+    }
+
+    loadAudio(parsed.href, parsed.pathname.split("/").pop() || typed);
   });
 
   songUrlInput.addEventListener("keydown", event => {
