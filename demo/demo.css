@@ -1140,12 +1140,17 @@ main {
 
 /* -- Disclosure and array view -------------------------------------------- */
 
+/* The native marker is dropped in both spellings: `list-style` covers Gecko and the standards path,
+   and WebKit still needs its own pseudo-element told, or the triangle sits beside the chevron. */
 .disclosure summary {
+	align-items: center;
 	border-radius: var(--r-control);
 	color: var(--text-2);
 	cursor: pointer;
+	display: flex;
 	font-size: 12.5px;
-	list-style-position: inside;
+	gap: 8px;
+	list-style: none;
 	margin: 14px -8px 0;
 	padding: 9px 8px;
 	transition-duration: 150ms;
@@ -1153,12 +1158,31 @@ main {
 	transition-timing-function: var(--ease);
 }
 
+.disclosure summary::-webkit-details-marker {
+	display: none;
+}
+
 .disclosure summary:hover {
 	color: var(--text);
 }
 
-.disclosure summary::marker {
-	color: var(--text-3);
+.chevron {
+	flex: none;
+	rotate: -90deg;
+}
+
+.disclosure[open] .chevron {
+	rotate: 0deg;
+}
+
+/* The rotation is the state, so it stays either way. Only the travel between the two states is worth
+   taking away, which is what the rest of this page does with movement as well. */
+@media (prefers-reduced-motion: no-preference) {
+	.chevron {
+		transition-duration: 180ms;
+		transition-property: rotate;
+		transition-timing-function: var(--ease);
+	}
 }
 
 .array {
