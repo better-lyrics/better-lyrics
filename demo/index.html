@@ -3,11 +3,11 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>@braccato/core: word by word lyric timing, in one tag</title>
+    <title>braccato: a custom element for synchronized lyrics</title>
     <link rel="icon" href="../images/icons/icon-48.png" />
     <meta
       name="description"
-      content="A custom element that renders word by word synchronized lyrics into light DOM. Bring your own audio and your own TTML, LRC, SRT or QRC file and watch it run."
+      content="A custom element that renders syllable-timed lyrics into light DOM. Bring an audio file and a TTML, LRC, SRT or QRC file."
     />
 
     <!-- The package's three stylesheets, loaded from the emitted artifact the way a consumer would
@@ -56,8 +56,11 @@
       <section class="hero" aria-labelledby="hero-heading">
         <div class="hero__band" id="hero-band">
           <div class="hero__lede">
-            <h1 id="hero-heading">Word by word lyric timing, in one tag.</h1>
-            <p>No dependencies, and no shadow root, so the stylesheet you already have reaches every line.</p>
+            <h1 id="hero-heading">Each syllable lights up as it is sung.</h1>
+            <p>
+              One custom element, no dependencies. The lines go into light DOM rather than a shadow root, so the CSS
+              already on the page reaches them.
+            </p>
           </div>
 
           <div class="install">
