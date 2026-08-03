@@ -75,6 +75,14 @@
         </div>
       </section>
 
+      <!-- Raised and put away by the renderer through `host.setResumeAffordanceVisible`, so what is
+           on the screen is the module's own reading of whether the reader has scrolled away. It is
+           inside main because that is the only way to be layered against the hero's backdrops, which
+           is what makes the hero and then the docs cover it as the page goes by. It comes after the
+           hero and before the reference for the same reason: it belongs to the view above it, and
+           reaching it should not mean tabbing through the whole reference first. -->
+      <button class="resume" id="resume" type="button">Resume autoscroll</button>
+
       <div class="docs" id="docs">
         <section class="doc" aria-labelledby="quickstart-heading">
           <h2 id="quickstart-heading">Quick start</h2>
@@ -264,11 +272,6 @@
     </footer>
 
     <!-- -- Chrome ------------------------------------------------------ -->
-
-    <!-- Raised and put away by the renderer through `host.setResumeAffordanceVisible`, so what is on
-         the screen is the module's own reading of whether the reader has scrolled away. It sits at the
-         foot of the view and behind the panel. -->
-    <button class="resume" id="resume" type="button">Resume autoscroll</button>
 
     <div class="transport">
       <button class="transport__play" id="play" type="button">Play</button>

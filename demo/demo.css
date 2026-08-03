@@ -344,8 +344,11 @@ main {
    width of a column of text, so a backdrop anchored to it would leave the right of the screen
    unpainted. Both rules are sized off the same `--hero-band` the stage is inset by, so the fade and
    the edge it lands on agree at every width without either being told the number twice.
-   `z-index: -1` puts them behind the copy without leaving main's stacking context, which keeps them
-   in front of the view and out of the way of the transport bar and the panel. */
+
+   A negative `z-index` puts them behind the copy without leaving main's stacking context, which
+   keeps them in front of the view and out of the way of the transport bar and the panel. They are
+   two rungs rather than one because `.resume` sits between them at -2, so the numbers here are the
+   whole ladder and none of it is left to document order. */
 .hero::before {
 	background: linear-gradient(to bottom, var(--blyrics-gradient-stops));
 	block-size: clamp(120px, 17vh, 224px);
@@ -353,7 +356,7 @@ main {
 	inset: auto 0 var(--hero-band, 220px);
 	pointer-events: none;
 	position: absolute;
-	z-index: -1;
+	z-index: -3;
 }
 
 /* Runs on under the transport bar, so the bar has the same black behind it as the copy above rather
@@ -687,8 +690,15 @@ main {
 /* Centred at the foot of the view rather than docked to a corner: it answers a scroll the reader
    just made, so it belongs where they are looking. It rides the same `--hero-band` measurement the
    stage stops at, which is what keeps it off the hero copy at 390, where that copy is four lines
-   deep. `z-index` matches the transport bar and stays under the panel, which on a narrow screen is
-   the thing the reader opened last. */
+   deep.
+
+   The button is fixed and the page is not, so its layer is what decides what happens to it once the
+   reader scrolls on. It lives in main and sits between the hero's two backdrops: over the fade,
+   because the fade's own bottom stop is black and a button under it cannot be read, and under the
+   floor, so the hero and then the docs slab cover it on the way past instead of leaving it stranded
+   over the reference. Main is under the transport bar and the panel whatever it does inside itself,
+   so the reader's own controls stay clear either way. `pointer-events` is main's, off by default and
+   opted back into here. */
 .resume {
 	-webkit-backdrop-filter: blur(20px);
 	backdrop-filter: blur(20px);
@@ -706,10 +716,11 @@ main {
 	min-height: 38px;
 	opacity: 0;
 	padding: 0 18px;
+	pointer-events: auto;
 	position: fixed;
 	visibility: hidden;
 	width: fit-content;
-	z-index: 3;
+	z-index: -2;
 
 	/* The exit is the half worth spelling out: `visibility` waits for the fade rather than running
 	   with it, so the button is still on the screen while it leaves and gone the moment it has. The
