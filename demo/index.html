@@ -266,6 +266,11 @@
 
     <!-- -- Chrome ------------------------------------------------------ -->
 
+    <!-- Raised and put away by the renderer through `host.setResumeAffordanceVisible`, so what is on
+         the screen is the module's own reading of whether the reader has scrolled away. It sits at the
+         foot of the view and behind the panel. -->
+    <button class="resume" id="resume" type="button">Resume autoscroll</button>
+
     <div class="transport">
       <button class="transport__play" id="play" type="button">Play</button>
 
@@ -390,9 +395,10 @@
             <span>Let the view be scrolled</span>
           </label>
           <p class="group__hint">
-            Wires <code>renderer.noteUserScroll()</code>, which the element never calls, so autoscroll waits while you
-            read ahead. It also means the wheel moves the lyrics rather than the page. The first scroll after the view
-            moved itself is swallowed, so it takes two.
+            Hands the wheel to the lyrics rather than to the page, which is the only way
+            <code>renderer.noteUserScroll()</code> has anything to report. Autoscroll then waits while you read ahead,
+            and the renderer asks for the button at the foot of the view. Pause the song first. A view that is
+            rendering discounts one scroll a frame against the ones it makes itself, and yours go on that.
           </p>
         </section>
 

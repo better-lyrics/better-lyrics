@@ -47,6 +47,7 @@ const installText = document.getElementById("install-text");
 const installCopy = document.getElementById("install-copy");
 
 const playButton = document.getElementById("play");
+const resumeButton = document.getElementById("resume");
 const seekInput = document.getElementById("seek");
 const elapsedOutput = document.getElementById("elapsed");
 const durationOutput = document.getElementById("duration");
@@ -1039,6 +1040,10 @@ function wireTransport() {
 
   player.addEventListener("play", () => {
     playButton.textContent = "Pause";
+    // Pressing play after reading ahead is the same request the button at the foot of the view
+    // makes, so it is answered the same way. The module does this itself for unsynced lyrics and
+    // only for those, so a timed song needs saying.
+    resumeAutoscroll();
     followClock();
   });
   player.addEventListener("pause", () => {
@@ -1060,6 +1065,30 @@ function wireTransport() {
     player.currentTime = Number(seekInput.value);
     paintTransport();
   });
+}
+
+// -- Autoscroll --------------------------------------------
+
+/**
+ * Whether the module wants the way back offered. This page keeps no opinion of its own about whether
+ * the reader has scrolled away: the renderer already tracks it, and `setResumeAffordanceVisible` is
+ * how it says so.
+ *
+ * Written rather than toggled, because the call is not edge triggered. One gesture asks for the
+ * button several times over.
+ */
+function showResumeAffordance(visible) {
+  resumeButton.toggleAttribute("data-shown", visible);
+}
+
+/**
+ * Autoscroll follows the song again. Putting the button away and pulling the view back to the active
+ * line both happen inside a tick, and a paused page has no frame loop to deliver one, so the retick
+ * is what makes this visible while the clock is stopped.
+ */
+function resumeAutoscroll() {
+  view.renderer?.resumeAutoscroll();
+  retick();
 }
 
 // -- The room the view gets --------------------------------------------
@@ -1236,7 +1265,7 @@ async function boot() {
   // renderer looks for the nearest scrolling ancestor and, finding none, would take the document
   // and scroll the whole page to follow the song. `host` is the published way to answer that
   // question directly, and the element keeps its own seek and scroll-state wiring around it.
-  view.host = { getScrollElement: () => frame };
+  view.host = { getScrollElement: () => frame, setResumeAffordanceVisible: showResumeAffordance };
 
   readStateFromUrl();
   renderReference();
@@ -1270,6 +1299,7 @@ async function boot() {
   // pulling the song back under anyone reading ahead. `renderer` is published for reaching past the
   // element exactly like this.
   frame.addEventListener("scroll", () => view.renderer?.noteUserScroll(), { passive: true });
+  resumeButton.addEventListener("click", resumeAutoscroll);
 }
 
 boot().catch(error => {

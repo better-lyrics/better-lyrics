@@ -146,14 +146,14 @@ export const PROPERTIES = [
     type: "Partial<LyricsRendererHost>",
     writable: true,
     summary:
-      "Overrides for what the renderer asks of its surroundings: is the view on screen, where does it scroll, where does a seek go. Every member has a default. Writing it while connected rebuilds the view.",
+      "Overrides for what the renderer asks of its surroundings: is the view on screen, where does it scroll, where does a seek go, and whether to offer the reader a way back to the song. Every member has a default. Writing it while connected rebuilds the view.",
   },
   {
     member: "renderer",
     type: "LyricsRenderer | null",
     writable: false,
     summary:
-      "The renderer underneath, for the day the tag runs out. noteUserScroll and relayout live there, and the element reaches neither on its own, so a page that lets people scroll or restyle the view calls them itself.",
+      "The renderer underneath, for the day the tag runs out. noteUserScroll, resumeAutoscroll and relayout live there, and the element reaches none of them on its own, so a page that lets people scroll or restyle the view calls them itself.",
   },
   {
     member: "status",
@@ -211,7 +211,7 @@ export const EVENTS = [
     event: "braccato:scroll-state",
     detail: "{ userScrolling }",
     summary:
-      "Autoscroll stopped following the song, or started again. The element never tells the renderer that someone scrolled, so this stays quiet until you wire renderer.noteUserScroll yourself.",
+      "Autoscroll stopped following the song, or started again. The same news host.setResumeAffordanceVisible carries, so take whichever suits. Both stay quiet until you wire renderer.noteUserScroll yourself, which the element never does.",
   },
   {
     event: "braccato:error",

@@ -682,6 +682,61 @@ main {
 	}
 }
 
+/* -- Resume autoscroll -------------------------------------------- */
+
+/* Centred at the foot of the view rather than docked to a corner: it answers a scroll the reader
+   just made, so it belongs where they are looking. It rides the same `--hero-band` measurement the
+   stage stops at, which is what keeps it off the hero copy at 390, where that copy is four lines
+   deep. `z-index` matches the transport bar and stays under the panel, which on a narrow screen is
+   the thing the reader opened last. */
+.resume {
+	-webkit-backdrop-filter: blur(20px);
+	backdrop-filter: blur(20px);
+	background: var(--glass);
+	border: 0;
+	border-radius: 999px;
+	box-shadow: var(--ring), var(--lift);
+	color: var(--text);
+	cursor: pointer;
+	font: inherit;
+	font-size: 13px;
+	font-weight: 500;
+	inset: auto 0 calc(var(--chrome-bottom) + var(--hero-band, 220px) + 14px);
+	margin-inline: auto;
+	min-height: 38px;
+	opacity: 0;
+	padding: 0 18px;
+	position: fixed;
+	visibility: hidden;
+	width: fit-content;
+	z-index: 3;
+
+	/* The exit is the half worth spelling out: `visibility` waits for the fade rather than running
+	   with it, so the button is still on the screen while it leaves and gone the moment it has. The
+	   shown rule takes that delay back off, so arriving is immediate. */
+	transition-delay: 0s, 0s, 0s, 0s, 0s, 220ms;
+	transition-duration: 150ms, 150ms, 150ms, 220ms, 220ms, 0s;
+	transition-property: background-color, color, scale, opacity, translate, visibility;
+	transition-timing-function: var(--ease);
+}
+
+/* Hidden is hidden: `visibility` is what keeps a button nobody can see out of the tab order and out
+   of the accessibility tree, which opacity alone would not do. */
+.resume[data-shown] {
+	opacity: 1;
+	transition-delay: 0s;
+	visibility: visible;
+}
+
+.resume:hover {
+	background: oklch(0.29 0.011 264 / 0.86);
+	color: var(--accent);
+}
+
+.resume:active {
+	scale: 0.96;
+}
+
 /* -- Sliders -------------------------------------------- */
 
 /* One range control, two sizes. Both fill their track from `--seek-progress`, which WebKit needs
@@ -1578,6 +1633,16 @@ braccato-lyrics {
 
 	.panel:not([hidden]) {
 		animation: fly 180ms var(--ease) both;
+	}
+
+	/* The travel only. The fade underneath it is declared unconditionally, because a cross fade is
+	   what reduced motion asks for in place of movement rather than something to take away as well. */
+	.resume {
+		translate: 0 10px;
+	}
+
+	.resume[data-shown] {
+		translate: 0 0;
 	}
 
 	.log li {
