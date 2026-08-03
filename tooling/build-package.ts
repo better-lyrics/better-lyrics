@@ -20,7 +20,7 @@ const rendererDir = join(root, "src", "renderer");
 // The package's own line, not the extension's. Breaking against @braccato/core 0.1.x: light DOM
 // instead of shadow DOM, seconds instead of milliseconds, and three attributes that are now theme
 // settings read from CSS.
-const VERSION = "0.2.0";
+const VERSION = "1.0.0";
 
 const entryPoint = (name: string) => ({ types: `./${name}.d.ts`, import: `./${name}.js` });
 

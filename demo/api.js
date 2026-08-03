@@ -14,7 +14,7 @@
 // the number in the artifact.
 export const PACKAGE = {
   name: "@braccato/core",
-  version: "0.2.0",
+  version: "1.0.0",
   npmHref: "https://www.npmjs.com/package/@braccato/core",
   repoHref: "https://github.com/better-lyrics/better-lyrics/tree/master/src/renderer",
   // The copy that shipped inside the artifact this page is running, rather than a URL on a branch
