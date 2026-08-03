@@ -1274,7 +1274,6 @@ main {
 
 .switch + .group__hint {
 	margin-top: 4px;
-	padding-inline-start: 8px;
 }
 
 /* -- Event log -------------------------------------------- */
