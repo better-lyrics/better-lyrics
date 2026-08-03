@@ -27,3 +27,5 @@ Thumbs.db
 .claude
 
 sourcemaps_for_upload/*
+
+demo/generated/

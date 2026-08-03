@@ -15,6 +15,7 @@
         "build:release": "npm run generate:locales && tsx tooling/build-release-zip.ts",
         "preview": "npm run generate:locales && extension preview --polyfill",
         "package": "tsx tooling/build-package.ts",
+        "demo": "npm run package && tsx tooling/generate-demo-audio.ts && tsx tooling/serve-demo.ts",
         "lint": "biome lint --write . && biome format --write .",
         "update-version": "tsx tooling/update-version.ts",
         "typecheck": "npm run generate:locales && tsc --noEmit",

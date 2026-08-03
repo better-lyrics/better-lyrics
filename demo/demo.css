@@ -1,0 +1,829 @@
+/* The demo page's own chrome, plus the handful of rules that reach into the element. Loaded after
+   the package's three stylesheets, so anything here that names the same property wins. */
+
+/* -- Tokens -------------------------------------------- */
+
+:root {
+	--bg: oklch(0.16 0.008 264);
+	--bg-sunken: oklch(0.132 0.008 264);
+	--surface: oklch(0.204 0.009 264);
+	--surface-raised: oklch(0.242 0.01 264);
+	--hairline: oklch(1 0 0 / 0.08);
+
+	--text: oklch(0.965 0.003 264);
+	--text-2: oklch(0.758 0.008 264);
+	--text-3: oklch(0.6 0.009 264);
+
+	--accent: oklch(0.855 0.132 84);
+	--accent-quiet: oklch(0.855 0.132 84 / 0.14);
+	--bad: oklch(0.735 0.175 26);
+
+	--ring: 0 0 0 1px oklch(1 0 0 / 0.08);
+	--lift: 0 18px 44px oklch(0 0 0 / 0.4);
+
+	--r-lg: 18px;
+	--r-md: 10px;
+	--r-sm: 8px;
+
+	--font-ui: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+	--font-mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
+
+	--gutter: clamp(20px, 4vw, 48px);
+	--page: 1280px;
+
+	--ease: cubic-bezier(0.2, 0, 0, 1);
+
+	/* The module's own tokens, sized for this page rather than for a music player's side panel. */
+	--blyrics-font-size: clamp(1.5rem, 3.2vw, 2.375rem);
+	--blyrics-line-height: 1.24;
+	--blyrics-padding: 0.85rem;
+}
+
+/* -- Base -------------------------------------------- */
+
+*,
+*::before,
+*::after {
+	box-sizing: border-box;
+}
+
+html {
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
+	color-scheme: dark;
+}
+
+body {
+	background: var(--bg);
+	color: var(--text);
+	font-family: var(--font-ui);
+	font-size: 16px;
+	line-height: 1.55;
+	margin: 0;
+	padding: 0 var(--gutter) clamp(48px, 8vh, 96px);
+	text-rendering: optimizeLegibility;
+}
+
+h1,
+h2,
+h3 {
+	margin: 0;
+	text-wrap: balance;
+}
+
+p {
+	margin: 0;
+	text-wrap: pretty;
+}
+
+code,
+kbd {
+	font-family: var(--font-mono);
+	font-size: 0.875em;
+}
+
+kbd {
+	background: var(--surface-raised);
+	border-radius: 5px;
+	box-shadow: var(--ring);
+	padding: 1px 5px;
+}
+
+a {
+	color: var(--text);
+	text-decoration-color: oklch(0.855 0.132 84 / 0.5);
+	text-decoration-thickness: from-font;
+	text-underline-offset: 0.2em;
+	transition-duration: 150ms;
+	transition-property: color;
+	transition-timing-function: var(--ease);
+}
+
+a:hover {
+	color: var(--accent);
+}
+
+:focus-visible {
+	border-radius: 4px;
+	outline: 2px solid var(--accent);
+	outline-offset: 3px;
+}
+
+::selection {
+	background: var(--accent-quiet);
+}
+
+.visually-hidden {
+	clip-path: inset(50%);
+	height: 1px;
+	overflow: hidden;
+	position: absolute;
+	white-space: nowrap;
+	width: 1px;
+}
+
+/* -- Masthead -------------------------------------------- */
+
+.masthead {
+	align-items: end;
+	display: flex;
+	flex-wrap: wrap;
+	gap: 24px clamp(24px, 5vw, 64px);
+	justify-content: space-between;
+	margin: 0 auto;
+	max-width: var(--page);
+	padding: clamp(40px, 7vh, 76px) 0 clamp(24px, 4vh, 40px);
+}
+
+.masthead__lede {
+	max-width: 44ch;
+}
+
+.wordmark {
+	color: var(--accent);
+	font-family: var(--font-mono);
+	font-size: 13px;
+	margin-bottom: 14px;
+}
+
+.masthead h1 {
+	font-size: clamp(1.75rem, 3.4vw, 2.625rem);
+	font-weight: 600;
+	letter-spacing: -0.024em;
+	line-height: 1.08;
+}
+
+.lede {
+	color: var(--text-2);
+	font-size: 1rem;
+	margin-top: 14px;
+	max-width: 52ch;
+}
+
+.masthead__facts {
+	display: flex;
+	gap: clamp(20px, 3vw, 40px);
+	margin: 0;
+}
+
+.masthead__facts dt {
+	color: var(--text-3);
+	font-size: 12px;
+	letter-spacing: 0.01em;
+}
+
+.masthead__facts dd {
+	color: var(--text);
+	font-family: var(--font-mono);
+	font-size: 13px;
+	font-variant-numeric: tabular-nums;
+	margin: 4px 0 0;
+}
+
+/* -- Stage and rail -------------------------------------------- */
+
+.stage-region {
+	align-items: start;
+	display: grid;
+	gap: 20px;
+	margin: 0 auto;
+	max-width: var(--page);
+}
+
+/* The event log sits under the stage rather than at the foot of the rail, because the two columns
+   are close to the same height that way and neither ends in a void. */
+@media (min-width: 1080px) {
+	.stage-region {
+		grid-template-columns: minmax(0, 1fr) 340px;
+	}
+
+	.stage-region > .stage {
+		grid-area: 1 / 1;
+	}
+
+	.stage-region > .rail {
+		grid-area: 1 / 2 / 3 / 3;
+	}
+
+	.stage-region > .panel--log {
+		grid-area: 2 / 1;
+	}
+}
+
+.stage {
+	background: var(--surface);
+	border-radius: var(--r-lg);
+	box-shadow: var(--ring), var(--lift);
+	display: flex;
+	flex-direction: column;
+	padding: 10px;
+}
+
+/* A definite height rather than a bare `flex: 1`: the frame inside resolves its own against this
+   one, and a viewport sized by its content would be as tall as the whole song. */
+.stage__viewport {
+	background: var(--bg-sunken);
+	block-size: clamp(296px, 46vh, 552px);
+	border-radius: var(--r-sm);
+	flex: 1 1 auto;
+	overflow: hidden;
+	position: relative;
+}
+
+/* The module publishes the gradient it fades its own view with, so the demo fades with the same
+   one rather than inventing a second set of stops. */
+.stage__viewport::before,
+.stage__viewport::after {
+	content: "";
+	height: 56px;
+	left: 0;
+	pointer-events: none;
+	position: absolute;
+	right: 0;
+	z-index: 2;
+}
+
+.stage__viewport::before {
+	background: linear-gradient(to top, transparent, var(--bg-sunken) 92%);
+	top: 0;
+}
+
+.stage__viewport::after {
+	background: linear-gradient(to bottom, transparent, var(--bg-sunken) 92%);
+	bottom: 0;
+}
+
+.stage__frame {
+	block-size: 100%;
+	overflow-x: hidden;
+	overflow-y: auto;
+	padding-inline: clamp(18px, 2.6vw, 34px);
+	scrollbar-width: thin;
+}
+
+.stage__status {
+	align-items: center;
+	background: oklch(0.132 0.008 264 / 0.92);
+	color: var(--text-2);
+	display: flex;
+	font-size: 14px;
+	inset: 0;
+	justify-content: center;
+	padding: 24px;
+	position: absolute;
+	text-align: center;
+	white-space: pre-wrap;
+	z-index: 3;
+}
+
+.stage__status[hidden] {
+	display: none;
+}
+
+.stage__status[data-failed] {
+	color: var(--bad);
+	font-family: var(--font-mono);
+	font-size: 13px;
+	text-align: start;
+}
+
+.stage__hint {
+	color: var(--text-3);
+	font-size: 13px;
+	padding: 2px 4px 2px;
+}
+
+/* -- Transport -------------------------------------------- */
+
+.transport {
+	align-items: center;
+	display: grid;
+	gap: 16px;
+	grid-template-columns: auto minmax(0, 1fr) auto;
+	padding: 12px 4px 10px;
+}
+
+.transport__play {
+	background: var(--text);
+	border: 0;
+	border-radius: var(--r-md);
+	color: var(--bg);
+	cursor: pointer;
+	font: inherit;
+	font-size: 14px;
+	font-weight: 600;
+	min-height: 42px;
+	min-width: 88px;
+	padding: 0 18px;
+	transition-duration: 150ms;
+	transition-property: scale, background-color;
+	transition-timing-function: var(--ease);
+}
+
+.transport__play:hover {
+	background: var(--accent);
+}
+
+.transport__play:active {
+	scale: 0.96;
+}
+
+.transport__seek {
+	appearance: none;
+	background: transparent;
+	cursor: pointer;
+	height: 42px;
+	margin: 0;
+	width: 100%;
+}
+
+.transport__seek::-webkit-slider-runnable-track {
+	background: linear-gradient(
+		to right,
+		var(--accent) calc(var(--seek-progress, 0) * 100%),
+		oklch(1 0 0 / 0.14) calc(var(--seek-progress, 0) * 100%)
+	);
+	border-radius: 999px;
+	height: 4px;
+}
+
+.transport__seek::-webkit-slider-thumb {
+	appearance: none;
+	background: var(--text);
+	border-radius: 50%;
+	height: 14px;
+	margin-top: -5px;
+	transition-duration: 150ms;
+	transition-property: scale;
+	transition-timing-function: var(--ease);
+	width: 14px;
+}
+
+.transport__seek:active::-webkit-slider-thumb {
+	scale: 1.2;
+}
+
+.transport__seek::-moz-range-track {
+	background: oklch(1 0 0 / 0.14);
+	border-radius: 999px;
+	height: 4px;
+}
+
+.transport__seek::-moz-range-progress {
+	background: var(--accent);
+	border-radius: 999px;
+	height: 4px;
+}
+
+.transport__seek::-moz-range-thumb {
+	background: var(--text);
+	border: 0;
+	border-radius: 50%;
+	height: 14px;
+	width: 14px;
+}
+
+.transport__clock {
+	color: var(--text-2);
+	font-family: var(--font-mono);
+	font-size: 13px;
+	font-variant-numeric: tabular-nums;
+}
+
+.transport__clock span:first-child {
+	color: var(--text);
+}
+
+/* -- Rail -------------------------------------------- */
+
+.rail {
+	display: grid;
+	gap: 20px;
+}
+
+@media (min-width: 620px) and (max-width: 1079px) {
+	.rail {
+		grid-template-columns: repeat(auto-fit, minmax(268px, 1fr));
+	}
+}
+
+.panel {
+	background: var(--surface);
+	border-radius: var(--r-lg);
+	box-shadow: var(--ring);
+	padding: 18px;
+}
+
+.panel h3 {
+	font-size: 14px;
+	font-weight: 600;
+	letter-spacing: -0.005em;
+}
+
+.panel__note {
+	color: var(--text-3);
+	font-size: 13px;
+	margin-top: 6px;
+}
+
+#upgrade-verdict[data-state="pass"] {
+	color: var(--text-2);
+}
+
+#upgrade-verdict[data-state="fail"] {
+	color: var(--bad);
+}
+
+/* -- Readouts -------------------------------------------- */
+
+.readout {
+	display: grid;
+	gap: 13px;
+	margin: 18px 0 0;
+}
+
+.readout dt {
+	color: var(--text-3);
+	font-size: 12px;
+	line-height: 1.4;
+}
+
+.readout dd {
+	color: var(--accent);
+	font-family: var(--font-mono);
+	font-size: 12.5px;
+	font-variant-numeric: tabular-nums;
+	line-height: 1.45;
+	margin: 3px 0 0;
+	overflow-wrap: anywhere;
+}
+
+.readout dd[data-state="fail"] {
+	color: var(--bad);
+}
+
+.readout dd[data-state="off"] {
+	color: var(--text-3);
+}
+
+/* -- Switch -------------------------------------------- */
+
+.switch {
+	align-items: center;
+	border-radius: var(--r-sm);
+	cursor: pointer;
+	display: flex;
+	font-size: 13px;
+	gap: 11px;
+	margin: 16px -8px -4px;
+	min-height: 40px;
+	padding: 0 8px;
+}
+
+.switch input {
+	appearance: none;
+	background: oklch(1 0 0 / 0.13);
+	border-radius: 999px;
+	cursor: pointer;
+	flex: none;
+	height: 22px;
+	margin: 0;
+	position: relative;
+	transition-duration: 180ms;
+	transition-property: background-color;
+	transition-timing-function: var(--ease);
+	width: 38px;
+}
+
+.switch input::before {
+	background: var(--text-2);
+	border-radius: 50%;
+	content: "";
+	height: 16px;
+	inset-block-start: 3px;
+	inset-inline-start: 3px;
+	position: absolute;
+	transition-duration: 180ms;
+	transition-property: translate, background-color;
+	transition-timing-function: var(--ease);
+	width: 16px;
+}
+
+.switch input:checked {
+	background: var(--accent);
+}
+
+.switch input:checked::before {
+	background: var(--bg);
+	translate: 16px 0;
+}
+
+/* -- Event log -------------------------------------------- */
+
+.panel--log {
+	display: flex;
+	flex-direction: column;
+}
+
+.log {
+	display: grid;
+	gap: 9px;
+	list-style: none;
+	margin: 16px 0 0;
+	max-height: 208px;
+	overflow-y: auto;
+	padding: 0;
+	scrollbar-width: thin;
+}
+
+.log:empty::after {
+	color: var(--text-3);
+	content: "Nothing yet.";
+	font-size: 13px;
+}
+
+.log li {
+	align-items: baseline;
+	display: flex;
+	flex-wrap: wrap;
+	font-family: var(--font-mono);
+	font-size: 12px;
+	gap: 0 8px;
+	line-height: 1.45;
+}
+
+.log__at {
+	color: var(--text-3);
+	font-variant-numeric: tabular-nums;
+}
+
+.log b {
+	color: var(--accent);
+	font-weight: 400;
+}
+
+.log__detail {
+	color: var(--text-2);
+	overflow-wrap: anywhere;
+}
+
+.log li[data-phase="error"] b {
+	color: var(--bad);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+	.log li {
+		animation: log-enter 260ms var(--ease) both;
+	}
+}
+
+@keyframes log-enter {
+	from {
+		opacity: 0;
+		translate: 0 -5px;
+	}
+}
+
+/* -- API section -------------------------------------------- */
+
+.api {
+	align-items: start;
+	display: grid;
+	gap: clamp(26px, 3.5vw, 52px);
+	margin: clamp(56px, 10vh, 104px) auto 0;
+	max-width: var(--page);
+}
+
+@media (min-width: 1080px) {
+	.api {
+		grid-template-columns: minmax(0, 360px) minmax(0, 1fr);
+	}
+}
+
+.api__prose {
+	max-width: 62ch;
+}
+
+.api h2 {
+	font-size: clamp(1.25rem, 2vw, 1.5rem);
+	font-weight: 600;
+	letter-spacing: -0.018em;
+}
+
+.api__prose p {
+	color: var(--text-2);
+	margin-top: 14px;
+}
+
+.api__aside {
+	color: var(--text-3);
+	font-size: 14px;
+}
+
+.code {
+	background: var(--bg-sunken);
+	border-radius: var(--r-lg);
+	box-shadow: var(--ring);
+	font-family: var(--font-mono);
+	font-size: 12.5px;
+	line-height: 1.7;
+	margin: 0;
+	overflow-x: auto;
+	padding: clamp(18px, 2.4vw, 28px);
+	tab-size: 2;
+}
+
+.code code {
+	font-size: inherit;
+}
+
+.c-t {
+	color: var(--text-2);
+}
+
+.c-a {
+	color: oklch(0.78 0.06 264);
+}
+
+.c-s {
+	color: var(--accent);
+}
+
+.c-k {
+	color: oklch(0.8 0.1 330);
+}
+
+.c-b {
+	color: oklch(0.82 0.08 200);
+}
+
+.c-n {
+	color: oklch(0.85 0.09 150);
+}
+
+.c-c {
+	color: var(--text-3);
+}
+
+/* -- Surface reference -------------------------------------------- */
+
+.surface {
+	margin: clamp(56px, 10vh, 104px) auto 0;
+	max-width: var(--page);
+}
+
+.surface h2 {
+	font-size: clamp(1.25rem, 2vw, 1.5rem);
+	font-weight: 600;
+	letter-spacing: -0.018em;
+}
+
+.surface__columns {
+	display: grid;
+	gap: clamp(28px, 4vw, 56px);
+	margin-top: 28px;
+}
+
+@media (min-width: 760px) {
+	.surface__columns {
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+	}
+}
+
+.surface h3 {
+	color: var(--text-2);
+	font-size: 13px;
+	font-weight: 600;
+}
+
+.terms {
+	margin: 16px 0 0;
+}
+
+.terms dt {
+	color: var(--accent);
+	margin-top: 20px;
+}
+
+.terms dt:first-child {
+	margin-top: 0;
+}
+
+.terms dt code {
+	font-size: 13px;
+}
+
+.terms dd {
+	color: var(--text-2);
+	font-size: 14px;
+	margin: 5px 0 0;
+	max-width: 56ch;
+}
+
+.terms dd code {
+	color: var(--text);
+}
+
+.surface__aside {
+	color: var(--text-3);
+	font-size: 13px;
+	margin-top: 26px;
+	max-width: 52ch;
+}
+
+/* -- Colophon -------------------------------------------- */
+
+.colophon {
+	color: var(--text-3);
+	display: flex;
+	flex-wrap: wrap;
+	gap: 12px 32px;
+	justify-content: space-between;
+	margin: clamp(56px, 10vh, 104px) auto 0;
+	max-width: var(--page);
+	padding-top: 24px;
+	position: relative;
+}
+
+.colophon::before {
+	background: var(--hairline);
+	content: "";
+	height: 1px;
+	inset-inline: 0;
+	position: absolute;
+	top: 0;
+}
+
+.colophon p {
+	font-size: 13px;
+	max-width: 62ch;
+}
+
+/* -- The page reaching into the element's light DOM --------------------------------------------
+
+   Everything below selects a class name @braccato/core emits, from this page's own stylesheet, at
+   document level. In a shadow root not one of these rules would land, and neither would the
+   `@property` registrations in the package's lyrics.css. That is the whole reason the element
+   builds into itself. */
+
+braccato-lyrics {
+	display: block;
+}
+
+/* The module computes this and writes it on the root, but its own stylesheet only reads the bottom
+   half of the pair, so a standalone consumer supplies the top one. Without it the opening lines
+   cannot reach the view's target scroll position. */
+.blyrics-container {
+	padding-top: var(--blyrics-padding-top, 2rem);
+}
+
+[data-page-theme="on"] .blyrics-container {
+	letter-spacing: -0.02em;
+}
+
+[data-page-theme="on"] .blyrics--line {
+	--blyrics-lyric-active-color: var(--accent);
+	--blyrics-lyric-inactive-color: oklch(0.855 0.132 84 / 0.38);
+	--blyrics-glow-color: oklch(0.855 0.132 84 / 0.45);
+}
+
+[data-page-theme="on"] .blyrics-background-lyric {
+	--blyrics-lyric-inactive-color: oklch(0.855 0.132 84 / 0.26);
+}
+
+/* -- Entrances -------------------------------------------- */
+
+@media (prefers-reduced-motion: no-preference) {
+	.masthead,
+	.rail,
+	.api,
+	.surface,
+	.colophon {
+		animation: rise 460ms var(--ease) both;
+	}
+
+	.rail {
+		animation-delay: 140ms;
+	}
+
+	/* Opacity only: the renderer measures the lines it just built, and a transform or a filter on
+	   an ancestor is not something to hand it mid-measurement. */
+	.stage {
+		animation: appear 460ms var(--ease) both;
+		animation-delay: 70ms;
+	}
+}
+
+@keyframes rise {
+	from {
+		filter: blur(4px);
+		opacity: 0;
+		translate: 0 10px;
+	}
+}
+
+@keyframes appear {
+	from {
+		opacity: 0;
+	}
+}

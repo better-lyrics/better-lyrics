@@ -1,0 +1,230 @@
+<!doctype html>
+<html lang="en" data-page-theme="on">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>@braccato/core: synchronized lyrics, written as a tag</title>
+    <link rel="icon" href="data:," />
+    <meta
+      name="description"
+      content="A live demo of the @braccato/core custom element: word-by-word lyric timing against real audio, rendered into light DOM."
+    />
+
+    <!-- The package's three stylesheets, loaded from the emitted artifact the way a consumer would
+         load any package's CSS. They come first so this page's own sheet can override them. -->
+    <link rel="stylesheet" href="../dist/package/styles/variables.css" />
+    <link rel="stylesheet" href="../dist/package/styles/lyrics.css" />
+    <link rel="stylesheet" href="../dist/package/styles/instrumental.css" />
+    <link rel="stylesheet" href="./demo.css" />
+  </head>
+
+  <body>
+    <header class="masthead">
+      <div class="masthead__lede">
+        <p class="wordmark">@braccato/core</p>
+        <h1>Synchronized lyrics, written as a tag.</h1>
+        <p class="lede">
+          Syllable-level timing, autoscroll and theming, built into light DOM so a stylesheet at document level still
+          reaches the lines.
+        </p>
+      </div>
+
+      <dl class="masthead__facts">
+        <div>
+          <dt>Version</dt>
+          <dd>0.2.0</dd>
+        </div>
+        <div>
+          <dt>Licence</dt>
+          <dd>MIT</dd>
+        </div>
+        <div>
+          <dt>Dependencies</dt>
+          <dd>None</dd>
+        </div>
+      </dl>
+    </header>
+
+    <main>
+      <section class="stage-region" aria-labelledby="stage-heading">
+        <h2 class="visually-hidden" id="stage-heading">The running element</h2>
+
+        <div class="stage">
+          <!-- The audio comes first on purpose. `source` is resolved with querySelector when the
+               element connects, so a media element the parser has not reached yet is not found. -->
+          <audio id="demo-audio" src="./generated/song.wav" preload="auto"></audio>
+
+          <div class="stage__viewport">
+            <div class="stage__frame" id="stage-frame">
+              <braccato-lyrics
+                id="view"
+                source="#demo-audio"
+                theme="/* blyrics-target-scroll-pos-ratio = 0.42; */"
+              ></braccato-lyrics>
+            </div>
+            <p class="stage__status" id="stage-status" role="status">Loading @braccato/core from dist/package…</p>
+          </div>
+
+          <div class="transport">
+            <button class="transport__play" id="play" type="button">Play</button>
+
+            <label class="visually-hidden" for="seek">Seek</label>
+            <input class="transport__seek" id="seek" type="range" min="0" max="45" step="0.01" value="0" />
+
+            <p class="transport__clock">
+              <span id="elapsed">0:00</span><span class="visually-hidden"> of </span
+              ><span aria-hidden="true"> / </span><span id="duration">0:00</span>
+            </p>
+          </div>
+
+          <p class="stage__hint">
+            Click a line to seek there. Hold <kbd>Alt</kbd> while clicking to seek to the word under the pointer.
+          </p>
+        </div>
+
+        <div class="rail">
+          <section class="panel" aria-labelledby="upgrade-heading">
+            <h3 id="upgrade-heading">Upgrade</h3>
+            <p class="panel__note" id="upgrade-verdict">Waiting for the module.</p>
+            <dl class="readout" id="upgrade-readout"></dl>
+          </section>
+
+          <section class="panel" aria-labelledby="cascade-heading">
+            <h3 id="cascade-heading">Light DOM cascade</h3>
+            <p class="panel__note">
+              This page's stylesheet selects the module's own class names. A shadow root would put them out of reach.
+            </p>
+
+            <label class="switch">
+              <input id="page-theme" type="checkbox" checked />
+              <span>Apply this page's rules</span>
+            </label>
+
+            <dl class="readout" id="cascade-readout"></dl>
+          </section>
+        </div>
+
+        <section class="panel panel--log" aria-labelledby="events-heading">
+          <h3 id="events-heading">Events</h3>
+          <p class="panel__note">Everything the element dispatched, newest first.</p>
+          <ol class="log" id="event-log"></ol>
+        </section>
+      </section>
+
+      <section class="api" aria-labelledby="markup-heading">
+        <div class="api__prose">
+          <h2 id="markup-heading">What produced the view above</h2>
+          <p>
+            Two stylesheets, one tag and an array. The element reads the clock off the media element it is bound to,
+            drives its own frame loop while that clock runs, and sends a click on a line back to
+            <code>audio.currentTime</code>.
+          </p>
+          <p class="api__aside">
+            This page imports <code>../dist/package/element.js</code> rather than the bare specifier below, because it
+            loads the emitted artifact straight off disk with no bundler and no import map.
+          </p>
+        </div>
+
+        <pre class="code"><code><span class="c-t">&lt;link</span> <span class="c-a">rel</span>=<span class="c-s">"stylesheet"</span> <span class="c-a">href</span>=<span class="c-s">"@braccato/core/styles/variables.css"</span><span class="c-t">&gt;</span>
+<span class="c-t">&lt;link</span> <span class="c-a">rel</span>=<span class="c-s">"stylesheet"</span> <span class="c-a">href</span>=<span class="c-s">"@braccato/core/styles/lyrics.css"</span><span class="c-t">&gt;</span>
+<span class="c-t">&lt;link</span> <span class="c-a">rel</span>=<span class="c-s">"stylesheet"</span> <span class="c-a">href</span>=<span class="c-s">"@braccato/core/styles/instrumental.css"</span><span class="c-t">&gt;</span>
+
+<span class="c-t">&lt;audio</span> <span class="c-a">id</span>=<span class="c-s">"demo-audio"</span> <span class="c-a">src</span>=<span class="c-s">"song.wav"</span><span class="c-t">&gt;&lt;/audio&gt;</span>
+<span class="c-t">&lt;braccato-lyrics</span> <span class="c-a">source</span>=<span class="c-s">"#demo-audio"</span>
+                 <span class="c-a">theme</span>=<span class="c-s">"/* blyrics-target-scroll-pos-ratio = 0.42; */"</span><span class="c-t">&gt;&lt;/braccato-lyrics&gt;</span>
+
+<span class="c-t">&lt;script</span> <span class="c-a">type</span>=<span class="c-s">"module"</span><span class="c-t">&gt;</span>
+  <span class="c-k">import</span> <span class="c-s">"@braccato/core/element"</span>;
+
+  <span class="c-c">// Nothing here parses a lyrics format, so the array is yours to produce.</span>
+  <span class="c-b">document</span>.querySelector(<span class="c-s">"braccato-lyrics"</span>).lyrics = [
+    {
+      startTimeMs: <span class="c-n">3000</span>, durationMs: <span class="c-n">3000</span>, words: <span class="c-s">"The kettle starts at six"</span>,
+      parts: [
+        { startTimeMs: <span class="c-n">3000</span>, durationMs: <span class="c-n">375</span>, words: <span class="c-s">"The "</span> },
+        { startTimeMs: <span class="c-n">3375</span>, durationMs: <span class="c-n">375</span>, words: <span class="c-s">"ket"</span> },
+        { startTimeMs: <span class="c-n">3750</span>, durationMs: <span class="c-n">375</span>, words: <span class="c-s">"tle "</span> },
+      ],
+    },
+  ];
+<span class="c-t">&lt;/script&gt;</span></code></pre>
+      </section>
+
+      <section class="surface" aria-labelledby="surface-heading">
+        <h2 id="surface-heading">The rest of the surface</h2>
+
+        <div class="surface__columns">
+          <div>
+            <h3>Properties you write</h3>
+            <dl class="terms">
+              <dt><code>lyrics</code></dt>
+              <dd>
+                A <code>Lyric[]</code>. Optional <code>parts</code> carry syllable timing; an empty array clears the
+                view, and null means the element was never given a song.
+              </dd>
+
+              <dt><code>source</code></dt>
+              <dd>
+                A selector or a media element. While it is bound, <code>currentTime</code> and <code>playing</code>
+                become outputs and a write to either is dropped.
+              </dd>
+
+              <dt><code>theme</code></dt>
+              <dd>
+                A compiled stylesheet. Its <code>blyrics-*</code> comments configure the module; the sheet itself goes
+                into the document head.
+              </dd>
+
+              <dt><code>tickOptions</code></dt>
+              <dd>
+                The rest of a tick: user offsets, passive scrolling, and the timestamp of the snapshot the clock came
+                from. Read by the next tick rather than causing one.
+              </dd>
+
+              <dt><code>renderer</code>, <code>mediaElement</code>, <code>status</code></dt>
+              <dd>Read-only. <code>status</code> is the answer for a consumer who was not holding a listener.</dd>
+            </dl>
+          </div>
+
+          <div>
+            <h3>Events you get back</h3>
+            <dl class="terms">
+              <dt><code>braccato:lyrics-loaded</code></dt>
+              <dd>
+                <code>{ lineCount, syncType }</code>. Fires when lyrics are applied, including the rebuild a theme
+                change forces.
+              </dd>
+
+              <dt><code>braccato:line-click</code></dt>
+              <dd><code>{ timeS }</code>. The seek has already reached the bound media element by the time it fires.</dd>
+
+              <dt><code>braccato:scroll-state</code></dt>
+              <dd><code>{ userScrolling }</code>. Autoscroll stopped following the song, or started again.</dd>
+
+              <dt><code>braccato:error</code></dt>
+              <dd>
+                <code>{ phase, error }</code>. Connecting, resolving a source, or applying lyrics or a theme went wrong.
+                Dispatched a microtask late so a listener added right after insertion still hears it.
+              </dd>
+            </dl>
+
+            <p class="surface__aside">
+              All four bubble and are composed, so an element placed inside your own shadow root still reaches your
+              listener.
+            </p>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="colophon">
+      <p>
+        The song is synthesized by <code>tooling/generate-demo-audio.ts</code> from the same score the lyrics are built
+        from, so a syllable cannot drift from the note it lands on.
+      </p>
+      <p><a href="../dist/package/README.md">Read the package notes</a></p>
+    </footer>
+
+    <script type="module" src="./demo.js"></script>
+  </body>
+</html>
