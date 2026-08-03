@@ -1,3 +1,22 @@
+// The animation engine: one instance per rendered view, holding that view's lines, its selection,
+// its scroll state and the per frame work that keeps the three in step. `renderer.ts` is what a
+// consumer holds; this is what it is holding.
+//
+// An instance per rendered surface rather than a singleton, because this extension runs two: the
+// YouTube Music side panel and the floating window. The two share parsed lyric data and a playback
+// clock and nothing else, so anything one view can disagree with another about lives on the
+// instance.
+//
+// The module owns no clock. A tick arrives from outside with the time already on it, which here is
+// the interpolated player snapshot behind `blyrics-send-player-time`, and in the floating window a
+// second interpolation of that same snapshot. Neither is a media element, which is why the custom
+// element can own an animation frame loop over one while nothing under here owns a loop at all.
+//
+// Two things are module scope rather than instance scope: the set of live instances, and the
+// playback clock the last tick wrote. Their unit is a bundle rather than a document, and this
+// module is bundled into the isolated world and the page world separately, so those are two clocks
+// that never meet. `themeSettings.ts` holds the third thing under that rule.
+
 import {
   ANIMATING_CLASS,
   CURRENT_LYRICS_CLASS,
@@ -6,8 +25,9 @@ import {
   PAUSED_CLASS,
   USER_SCROLLING_CLASS,
 } from "./constants";
-import type { LineData, LyricsRendererHost, LyricSyncType, PartData, TickOptions } from "./index";
+import type { LineData, PartData } from "./inject";
 import { registerThemeSetting } from "./themeSettings";
+import type { LyricsRendererHost, LyricSyncType, ResolvedTickOptions, TickOptions } from "./types";
 import { clamp, getRelativeLayoutBounds, positiveModulo, roundedMs, toMs } from "./util";
 
 const NO_LYRICS_ELEMENT_LOG = "No lyrics element found on the page, skipping lyrics injection";
@@ -129,14 +149,17 @@ interface AnimEngineViewState {
 }
 
 /**
+ * Stands where a snapshot's wall clock timestamp would be when the time did not come from a live
+ * player, and so says nothing about how long ago it was sampled.
+ */
+const NO_PLAYER_SNAPSHOT = -1;
+
+/**
  * The last player snapshot. It describes the media, not a view, so every instance reads the same one.
  */
 interface PlaybackClock {
   lastTime: number;
   lastPlayState: boolean;
-  /**
-   * Take "-1" to mean that we have no sensible last event
-   */
   lastEventCreationTime: number;
 }
 
@@ -262,7 +285,7 @@ export function createAnimationEngineInstance(
 const playbackClock: PlaybackClock = {
   lastTime: 0,
   lastPlayState: false,
-  lastEventCreationTime: -1,
+  lastEventCreationTime: NO_PLAYER_SNAPSHOT,
 };
 
 /**
@@ -272,7 +295,7 @@ const playbackClock: PlaybackClock = {
 export function resetPlaybackClock(): void {
   playbackClock.lastTime = 0;
   playbackClock.lastPlayState = false;
-  playbackClock.lastEventCreationTime = -1;
+  playbackClock.lastEventCreationTime = NO_PLAYER_SNAPSHOT;
 }
 
 // -- View operations --------------------------
@@ -282,6 +305,16 @@ export function resetPlaybackClock(): void {
  */
 export function resetScrollResume(engine: AnimationEngineInstance): void {
   engine.scrollResumeTime = 0;
+}
+
+/**
+ * The user asked for autoscroll back, now. Resuming is a property of playback rather than of one
+ * view, so every live instance resumes. Published in this shape rather than as the registry walk
+ * and the per view operation it is built from, so that nothing outside the module gets to name a
+ * particular view.
+ */
+export function resumeAllAutoscroll(): void {
+  forEveryLiveView(resetScrollResume);
 }
 
 /**
@@ -2132,7 +2165,7 @@ function hasNoLyricsPlaceholder(engine: AnimationEngineInstance): boolean {
  * Unsynced lyrics that this view still has on screen. `syncType` outlives the lyrics it was derived
  * from, so the container is the term that says they are still there.
  */
-function hasUnsyncedLyrics(engine: AnimationEngineInstance): boolean {
+export function hasUnsyncedLyrics(engine: AnimationEngineInstance): boolean {
   return engine.lyricsContainer !== null && engine.syncType === "none" && !hasNoLyricsPlaceholder(engine);
 }
 
@@ -2262,17 +2295,36 @@ function setupTabRendererObserver(engine: AnimationEngineInstance, element: HTML
  */
 export type AnimationTickStatus = "ok" | "lyrics-missing";
 
-export function runAnimationEngine(
+/**
+ * Fills in everything a caller left out of a tick. The tick reads each of these arithmetically, so
+ * a missing one would not fail: it would quietly turn the playback time into NaN and leave the view
+ * matching no line at all.
+ */
+export function resolveTickOptions(options: TickOptions): ResolvedTickOptions {
+  return {
+    isPlaying: options.isPlaying,
+    eventCreationTime: options.eventCreationTime ?? NO_PLAYER_SNAPSHOT,
+    smoothScroll: options.smoothScroll ?? true,
+    globalLyricOffset: options.globalLyricOffset ?? 0,
+    lyricOffset: options.lyricOffset ?? 0,
+    richsyncOffsetTrim: options.richsyncOffsetTrim ?? 0,
+    lineOffsetTrim: options.lineOffsetTrim ?? 0,
+    passiveScrollEnabled: options.passiveScrollEnabled ?? false,
+  };
+}
+
+/**
+ * Renders one view against a tick with nothing left out.
+ */
+export function tickView(
   engine: AnimationEngineInstance,
   currentTime: number,
-  options: TickOptions
+  options: ResolvedTickOptions
 ): AnimationTickStatus {
-  const { eventCreationTime, isPlaying } = options;
-  const smoothScroll = options.smoothScroll ?? true;
+  const { eventCreationTime, isPlaying, smoothScroll } = options;
   engine.passiveScrollEnabled = options.passiveScrollEnabled;
 
   const now = Date.now();
-  // const frameStart = performance.now();
   if (currentTime === 0 && !isPlaying) {
     return "ok";
   }
@@ -2303,7 +2355,7 @@ export function runAnimationEngine(
   playbackClock.lastEventCreationTime = eventCreationTime;
 
   let timeOffset = now - eventCreationTime;
-  if (!isPlaying || eventCreationTime === -1) {
+  if (!isPlaying || eventCreationTime === NO_PLAYER_SNAPSHOT) {
     timeOffset = 0;
   }
 
@@ -2732,10 +2784,6 @@ export function runAnimationEngine(
     }
 
     decaySkipScrolls(engine, now);
-    // const frameTime = performance.now() - frameStart;
-    // if (frameTime > 5) {
-    //   console.warn("[BLyrics-diag] SLOW FRAME", { ms: frameTime.toFixed(1) });
-    // }
   } catch (err) {
     if (!(err as Error).message?.includes("undefined")) {
       engine.host.log(LYRICS_CHECK_INTERVAL_ERROR, err);
@@ -2796,6 +2844,20 @@ export function computeScrollPadding(measurements: ScrollPaddingMeasurements): {
   return { top, bottom: Math.ceil(bottom) };
 }
 
+/**
+ * Sizes the padding this view needs and writes it where the stylesheet reads it, which is the
+ * document's root element. That makes it the second thing a view writes per document rather than
+ * per view, alongside the theme's `<style>`, so it is the same one renderer per document constraint
+ * the README states under Theme settings and not a new one: a second renderer in this document
+ * overwrites these two properties with the padding its own viewport needs, and the first view is
+ * then padded for a viewport it is not in.
+ *
+ * The root rather than the container because these are published names. Both readers in this repo
+ * select `.blyrics-container`, but the extension's own `mobile.css` is one of them, from outside
+ * the module, and a theme is free to read them anywhere: narrowing where they resolve would break
+ * such a theme silently, the way any custom property that stops resolving does. That is a real cost
+ * against a corruption the module already forbids.
+ */
 function applyScrollPadding(engine: AnimationEngineInstance): void {
   const lyricsElement = engine.lyricsContainer;
   const tabRenderer = engine.host.getScrollElement();
@@ -2839,7 +2901,11 @@ export function relayout(engine: AnimationEngineInstance, measureLines: boolean)
 
   const lyricsElement = engine.lyricsContainer;
   if (!lyricsElement) return;
+  // Both dimensions, because both are what a resize is compared against. The scroll padding written
+  // above lands on this container, so a measurement that records only the width leaves every later
+  // resize report looking like a new height, and each one measures again and forces a rescroll.
   engine.lyricWidth = lyricsElement.clientWidth;
+  engine.lyricHeight = lyricsElement.clientHeight;
 
   for (const line of engine.lines) {
     const bounds = getRelativeLayoutBounds(lyricsElement, line.lyricElement);
@@ -2871,10 +2937,10 @@ export function retickFromPlaybackClock(
   engine: AnimationEngineInstance,
   buildTickOptions: (eventCreationTime: number, isPlaying: boolean) => TickOptions
 ): AnimationTickStatus {
-  return runAnimationEngine(
+  return tickView(
     engine,
     playbackClock.lastTime,
-    buildTickOptions(playbackClock.lastEventCreationTime, playbackClock.lastPlayState)
+    resolveTickOptions(buildTickOptions(playbackClock.lastEventCreationTime, playbackClock.lastPlayState))
   );
 }
 

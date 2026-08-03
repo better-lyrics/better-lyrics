@@ -50,6 +50,9 @@ jobs:
       - name: Run self-checks
         run: npm run selfcheck
 
+      - name: Emit renderer package
+        run: npm run package
+
       - name: Update version in files
         run: npm run update-version -- "${{ env.NIGHTLY_VERSION }}"
 

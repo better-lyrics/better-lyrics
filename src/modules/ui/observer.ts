@@ -15,12 +15,7 @@ import { preFetchLyrics } from "@modules/lyrics/lyrics";
 import { getArtworkMetadata, getSongMetadata } from "@modules/lyrics/requestSniffer/requestSniffer";
 import { onAutoSwitchEnabled, onFullScreenDisabled, wakeDockIdle } from "@modules/settings/settings";
 import { adjustLyricOffset, OFFSET_STEP, OFFSET_STEP_LARGE } from "@modules/ui/lyricsDock/offset";
-import {
-  animationEngine,
-  currentTickOptions,
-  noteAnimationVisibilityChange,
-  noteMainViewUserScroll,
-} from "@modules/ui/mainLyricsView";
+import { currentTickOptions, mainView } from "@modules/ui/mainLyricsView";
 import { preloadArtwork } from "@modules/ui/pictureInPicture/lyricsView";
 import {
   closePlayerPageIfOpenedForFullscreen,
@@ -75,7 +70,7 @@ function runAnimationEngine(now: number, force = false): void {
   if (AppState.suppressZeroTime < wallTime || currentTime !== 0) {
     if (
       AppState.areLyricsTicking &&
-      animationEngine(currentTime, currentTickOptions(wallTime, latestPlayerPlaying)) === "lyrics-missing"
+      mainView.tick(currentTime, currentTickOptions(wallTime, latestPlayerPlaying)) === "lyrics-missing"
     ) {
       AppState.areLyricsTicking = false;
     }
@@ -316,7 +311,7 @@ export function initializeLyrics(): void {
   hasInitializedLyrics = true;
 
   document.addEventListener("visibilitychange", () => {
-    noteAnimationVisibilityChange();
+    mainView.noteVisibilityChange();
     if (document.visibilityState === "visible") {
       runAnimationEngine(performance.now(), true);
     }
@@ -450,7 +445,7 @@ export function scrollEventHandler(): void {
     return;
   }
 
-  noteMainViewUserScroll(AppState.lyricData?.syncType === "none");
+  mainView.noteUserScroll();
 }
 
 /**

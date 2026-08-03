@@ -3,7 +3,6 @@ import { t } from "@core/i18n";
 import type { LyricDecorations } from "@modules/lyrics/injectLyrics";
 import { getSegmentMapTimeShiftMs } from "@modules/lyrics/lyrics";
 import type { SegmentMap } from "@modules/lyrics/requestSniffer/requestSniffer";
-import { getThemeConfig } from "@modules/ui/styleInjector";
 import type { Lyric } from "@renderer/index";
 import { sendLyrics } from "./bridge";
 
@@ -75,7 +74,6 @@ export function publishPictureInPictureLyrics(): void {
     lyrics: retimed?.lyrics ?? lyrics,
     noLyrics: lyrics !== null && lyrics.length > 0 && lyrics[0].words === t("lyrics_notFound"),
     decorations: retimed?.decorations ?? AppState.lyricDecorations,
-    themeSettings: Object.fromEntries(getThemeConfig()),
     globalLyricOffset: AppState.globalLyricOffset,
     lyricOffset: AppState.lyricOffset,
     richsyncOffsetTrim: AppState.richsyncOffsetTrim,

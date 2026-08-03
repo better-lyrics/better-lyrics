@@ -34,10 +34,9 @@ import {
 } from "@constants";
 import { AppState } from "@core/appState";
 import { t } from "@core/i18n";
-import { disconnectResizeObserver } from "@modules/lyrics/injectLyrics";
 import type { ThumbnailElement } from "@modules/lyrics/requestSniffer/NextResponse";
 import { getArtworkMetadata } from "@modules/lyrics/requestSniffer/requestSniffer";
-import { clearLyricsFromViews, lyricsElementAdded } from "@modules/ui/mainLyricsView";
+import { lyricsElementAdded, mainView } from "@modules/ui/mainLyricsView";
 import { publishPictureInPictureLyrics } from "@modules/ui/pictureInPicture/lyricsPublisher";
 import { getResumeScrollElement } from "@modules/ui/resumeScrollButton";
 import { getRequest, setRequest } from "@modules/unison/lyricsRequestTracker";
@@ -1487,9 +1486,11 @@ export async function injectHeadTags(): Promise<void> {
  * Cleans up this elements and resets state when switching songs.
  */
 export function cleanup(): void {
-  clearLyricsFromViews();
-
-  disconnectResizeObserver();
+  // The side panel's view only, even though on Chromium the floating window's is in the same
+  // registry: clearing it from here would go around its own renderer and leave the container it
+  // built standing in the floating document. It drops the song off the publish this function ends
+  // with instead.
+  mainView.clear();
 
   if (lyricsObserver) {
     lyricsObserver.disconnect();

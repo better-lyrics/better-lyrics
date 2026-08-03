@@ -11,10 +11,12 @@ import {
   getRenderedSyncType,
   hasRenderedLines,
   noteUserScroll,
-  runAnimationEngine,
+  resolveTickOptions,
   scheduleLyricPositionUpdate,
+  tickView,
 } from "./engine";
 import { asDocument, asElement, collectTree, FakeDocument, type FakeNode } from "./selfcheck/fakeDom";
+import { asWindow, FakeMediaQueryList, FakeWindow, poisonAmbientGlobals } from "./selfcheck/fakeWindow";
 import type { Lyric, LyricsRendererHost, TickOptions } from "./types";
 import { setLyrics } from "./view";
 
@@ -30,116 +32,15 @@ import { setLyrics } from "./view";
 
 // -- Ambient global poison --------------------------------------------
 
-let ambientGlobalReads = 0;
-
-for (const name of ["document", "window"]) {
-  Object.defineProperty(globalThis, name, {
-    configurable: true,
-    get(): never {
-      ambientGlobalReads += 1;
-      throw new Error(`The renderer read the ambient global ${name} instead of the one its instance was handed`);
-    },
-  });
-}
+const ambientGlobals = poisonAmbientGlobals(
+  name => `The renderer read the ambient global ${name} instead of the one its instance was handed`
+);
 
 // -- Measurements the host owns --------------------------------------------
 
 const VIEWPORT_HEIGHT_PX = 400;
 const LINE_HEIGHT_PX = 60;
 const PLAYBACK_TIME_S = 0.2;
-
-// -- Fake window --------------------------------------------
-
-class FakeMediaQueryList {
-  readonly listeners = new Set<() => void>();
-  readonly matches = false;
-
-  constructor(readonly media: string) {}
-
-  addEventListener(type: string, listener: () => void): void {
-    if (type !== "change") {
-      throw new Error(`The fake media query only records change listeners, not "${type}"`);
-    }
-    this.listeners.add(listener);
-  }
-
-  removeEventListener(type: string, listener: () => void): void {
-    this.listeners.delete(listener);
-  }
-
-  dispatchChange(): void {
-    for (const listener of [...this.listeners]) {
-      listener();
-    }
-  }
-}
-
-interface ResizeObserverRecord {
-  disconnected: boolean;
-  observedCount: number;
-}
-
-// Each window needs its own constructor, so an observer can be traced back to the instance that
-// made it. The engine only ever reaches it as `engine.window.ResizeObserver`.
-function newResizeObserverClass(created: ResizeObserverRecord[]) {
-  return class FakeResizeObserver implements ResizeObserverRecord {
-    disconnected = false;
-    observedCount = 0;
-
-    constructor(readonly notifyResize: () => void) {
-      created.push(this);
-    }
-
-    observe(): void {
-      this.observedCount += 1;
-    }
-
-    disconnect(): void {
-      this.disconnected = true;
-    }
-  };
-}
-
-class FakeWindow {
-  readonly mediaQueryLists = new Map<string, FakeMediaQueryList>();
-  readonly resizeObservers: ResizeObserverRecord[] = [];
-  readonly computedStyleTargets: FakeNode[] = [];
-  readonly requestedFrames: FrameRequestCallback[] = [];
-  readonly cancelledFrames: number[] = [];
-  readonly ResizeObserver = newResizeObserverClass(this.resizeObservers);
-
-  constructor(
-    readonly ownDocument: FakeDocument,
-    readonly computedValues: Record<string, string>
-  ) {}
-
-  matchMedia(query: string): FakeMediaQueryList {
-    const existing = this.mediaQueryLists.get(query);
-    if (existing) return existing;
-
-    const list = new FakeMediaQueryList(query);
-    this.mediaQueryLists.set(query, list);
-    return list;
-  }
-
-  getComputedStyle(element: FakeNode): { getPropertyValue: (property: string) => string } {
-    this.computedStyleTargets.push(element);
-    return { getPropertyValue: (property: string): string => this.computedValues[property] ?? "" };
-  }
-
-  requestAnimationFrame(callback: FrameRequestCallback): number {
-    this.requestedFrames.push(callback);
-    return this.requestedFrames.length;
-  }
-
-  cancelAnimationFrame(handle: number): void {
-    this.cancelledFrames.push(handle);
-  }
-}
-
-function asWindow(fake: FakeWindow): Window & typeof globalThis {
-  return fake as unknown as Window & typeof globalThis;
-}
 
 // -- Fake host --------------------------------------------
 
@@ -294,13 +195,13 @@ function soleMediaQuery(fakeWindow: FakeWindow): FakeMediaQueryList {
 // -- Two instances --------------------------------------------
 
 const panelDocument = new FakeDocument();
-const panelWindow = new FakeWindow(panelDocument, PANEL_STYLE);
+const panelWindow = new FakeWindow(PANEL_STYLE);
 const panelHost = new FakeHost();
 const panelMount = panelDocument.createElement("div");
 const panelEngine = createAnimationEngineInstance(asDocument(panelDocument), asWindow(panelWindow), panelHost);
 
 const floatingDocument = new FakeDocument();
-const floatingWindow = new FakeWindow(floatingDocument, FLOATING_STYLE);
+const floatingWindow = new FakeWindow(FLOATING_STYLE);
 const floatingHost = new FakeHost();
 const floatingMount = floatingDocument.createElement("div");
 const floatingEngine = createAnimationEngineInstance(
@@ -461,13 +362,13 @@ const panelLogsBeforeTick = panelHost.logs.length;
 // The tick swallows its own exceptions, so a fake too thin to reach the style reads would leave
 // every assertion below reading an empty cache rather than reporting the real failure.
 assert.equal(
-  runAnimationEngine(panelEngine, PLAYBACK_TIME_S, newTickOptions()),
+  tickView(panelEngine, PLAYBACK_TIME_S, resolveTickOptions(newTickOptions())),
   "ok",
   "Given a built view, When it ticks, Then it reports that it rendered"
 );
 
 assert.equal(
-  runAnimationEngine(floatingEngine, PLAYBACK_TIME_S, newTickOptions()),
+  tickView(floatingEngine, PLAYBACK_TIME_S, resolveTickOptions(newTickOptions())),
   "ok",
   "Given a second built view, When it ticks, Then it reports that it rendered"
 );
@@ -685,7 +586,7 @@ assert.ok(
 // destroy assertions below.
 
 const placeholderDocument = new FakeDocument();
-const placeholderWindow = new FakeWindow(placeholderDocument, PANEL_STYLE);
+const placeholderWindow = new FakeWindow(PANEL_STYLE);
 const placeholderEngine = createAnimationEngineInstance(
   asDocument(placeholderDocument),
   asWindow(placeholderWindow),
@@ -698,7 +599,7 @@ setLyrics(placeholderEngine, asElement<HTMLElement>(placeholderMount), UNSYNCED_
   loaderVisible: false,
   noLyrics: false,
 });
-runAnimationEngine(placeholderEngine, PLAYBACK_TIME_S, passiveTickOptions);
+tickView(placeholderEngine, PLAYBACK_TIME_S, resolveTickOptions(passiveTickOptions));
 
 assert.notEqual(
   placeholderEngine.passiveRAFId,
@@ -710,7 +611,7 @@ setLyrics(placeholderEngine, asElement<HTMLElement>(placeholderMount), NO_LYRICS
   loaderVisible: false,
   noLyrics: true,
 });
-runAnimationEngine(placeholderEngine, PLAYBACK_TIME_S, passiveTickOptions);
+tickView(placeholderEngine, PLAYBACK_TIME_S, resolveTickOptions(passiveTickOptions));
 
 assert.equal(
   placeholderEngine.passiveRAFId,
@@ -778,7 +679,7 @@ assert.deepEqual(
 // The tick swallows exceptions, so a read of an ambient global inside it would throw where nobody
 // can see. The count is what carries that failure out.
 assert.equal(
-  ambientGlobalReads,
+  ambientGlobals.reads,
   0,
   "Given two views driven from build to destruction, When they finish, Then neither read an ambient global document or window"
 );

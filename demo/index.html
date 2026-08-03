@@ -1,0 +1,433 @@
+<!doctype html>
+<html lang="en" data-page-rules="on">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>braccato: a custom element for synchronized lyrics</title>
+    <link rel="icon" href="../images/icons/icon-48.png" />
+    <meta
+      name="description"
+      content="The lyrics renderer behind Better Lyrics, published as one custom element with no dependencies. Bring an audio file and a TTML, LRC, SRT or QRC file."
+    />
+
+    <!-- The package's three stylesheets, loaded from the emitted artifact the way a consumer would
+         load any package's CSS. They come first so this page's own sheet can override them. -->
+    <link rel="stylesheet" href="../dist/package/styles/variables.css" />
+    <link rel="stylesheet" href="../dist/package/styles/lyrics.css" />
+    <link rel="stylesheet" href="../dist/package/styles/instrumental.css" />
+    <link rel="stylesheet" href="./demo.css" />
+  </head>
+
+  <body>
+    <a class="skip" href="#docs">Skip to the documentation</a>
+
+    <!-- The element runs as the page's background rather than inside a box, so what is on the screen
+         for the whole scroll is the package doing its job. The audio comes first on purpose:
+         `source` is resolved with querySelector when the element connects, so a media element the
+         parser has not reached yet is not found. -->
+    <div class="stage" id="stage">
+      <audio id="player" src="./generated/kettle.wav" preload="auto"></audio>
+      <div class="stage__frame" id="stage-frame">
+        <braccato-lyrics
+          id="view"
+          source="#player"
+          theme="/* blyrics-target-scroll-pos-ratio = 0.42; */"
+        ></braccato-lyrics>
+      </div>
+      <p class="stage__status" id="stage-status" role="status">Loading @braccato/core from dist/package.</p>
+    </div>
+
+    <header class="topbar">
+      <p class="topbar__mark">
+        <span class="wordmark">
+          <img src="../images/icons/icon-512.png" alt="" width="22" height="22" decoding="async" />
+          <b>braccato</b>
+        </span>
+        <span class="topbar__version" id="package-version">0.0.0</span>
+      </p>
+      <nav class="topbar__links" aria-label="Package">
+        <a id="npm-link" href="https://www.npmjs.com/package/@braccato/core">npm</a>
+        <a id="repo-link" href="https://github.com/better-lyrics/better-lyrics">GitHub</a>
+      </nav>
+    </header>
+
+    <main>
+      <section class="hero" aria-labelledby="hero-heading">
+        <div class="hero__band" id="hero-band">
+          <div class="hero__lede">
+            <h1 id="hero-heading">braccato makes it dead simple to show synced lyrics.</h1>
+            <p>
+              It is the renderer behind Better Lyrics, one of the most used extensions on YouTube Music, published on
+              its own. One custom element, no dependencies.
+            </p>
+          </div>
+
+          <div class="install">
+            <fieldset class="segmented segmented--install" id="install-tabs">
+              <legend class="visually-hidden">Package manager</legend>
+            </fieldset>
+
+            <div class="install__command">
+              <code><span class="install__prompt" aria-hidden="true">$</span> <span id="install-text"></span></code>
+              <button class="copy" id="install-copy" type="button">Copy</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Raised and put away by the renderer through `host.setResumeAffordanceVisible`, so what is
+           on the screen is the module's own reading of whether the reader has scrolled away. It is
+           inside main because that is the only way to be layered against the hero's backdrops, which
+           is what makes the hero and then the docs cover it as the page goes by. It comes after the
+           hero and before the reference for the same reason: it belongs to the view above it, and
+           reaching it should not mean tabbing through the whole reference first. -->
+      <button class="resume" id="resume" type="button">Resume autoscroll</button>
+
+      <div class="docs" id="docs">
+        <section class="doc" aria-labelledby="quickstart-heading">
+          <h2 id="quickstart-heading">Quick start</h2>
+          <p>
+            Load the element, load the three stylesheets, point it at a media element and hand it an array. It reads
+            the clock off whatever it is bound to, drives its own frame loop while that clock runs, and sends a click
+            on a line back to <code>currentTime</code>.
+          </p>
+          <p class="doc__aside">
+            Without a bundler the stylesheets are three <code>&lt;link&gt;</code> tags at whatever path you serve the
+            package from. That is what this page does.
+          </p>
+          <div class="code" data-snippet="quickstart"></div>
+          <p class="doc__aside">
+            Autoscroll writes <code>scrollTop</code> on the nearest ancestor that scrolls, and on a page where nothing
+            does, that is the document. If the element is not inside its own scroller, say which one it is:
+            <code>view.host = { getScrollElement: () =&gt; frame }</code>. This page does, because the view fills the
+            background and taking the wheel there would trap the reader above the docs.
+          </p>
+        </section>
+
+        <section class="doc" aria-labelledby="parsers-heading">
+          <h2 id="parsers-heading">Bring your own lyrics</h2>
+          <p>
+            The array is the whole input, and nothing in this package produces one. Formats are
+            <a id="parsers-npm-link" href="https://www.npmjs.com/package/@braccato/parsers"><code>@braccato/parsers</code></a>,
+            which reads TTML, LRC, SRT, QRC and plain text and picks between them by looking at the file.
+          </p>
+          <div class="code" data-snippet="parsers"></div>
+          <p class="doc__aside">
+            This page loads that package straight off a CDN, since it has no build step. Drop a lyrics file anywhere on
+            this page to see it go through.
+          </p>
+        </section>
+
+        <section class="doc" aria-labelledby="theme-heading">
+          <h2 id="theme-heading">A theme is a stylesheet</h2>
+          <p>
+            Write CSS against the class names below and the module stays out of it. What the module does read is the
+            <code>blyrics-*</code> lines inside the comments, which is how a theme changes behaviour without a second
+            configuration format. An empty theme puts every setting back to its default.
+          </p>
+          <div class="code" data-snippet="theme"></div>
+          <p class="doc__aside">
+            The <strong>Theme</strong> panel is a text box wired to this property. Edit it and the view changes under
+            you, paused or playing.
+          </p>
+          <dl class="terms terms--tight" id="theme-settings-list"></dl>
+        </section>
+
+        <section class="doc" aria-labelledby="reference-heading">
+          <h2 id="reference-heading">The whole surface</h2>
+          <p>
+            Eleven properties, four attributes, four events, and a DOM that themes are allowed to select. This is
+            enough to write the tag. The reasoning behind each decision is in the package notes.
+          </p>
+
+          <!-- Two stacks rather than a flowing grid: the left one is everything you write in script,
+               the right one everything you write in CSS, and stacking them keeps each topic together
+               when the columns collapse. -->
+          <div class="reference">
+            <div class="reference__column">
+              <section aria-labelledby="properties-heading">
+                <h3 id="properties-heading">Properties</h3>
+                <p class="reference__note">
+                  All of them may be written before the element reaches a document. The renderer is built when it
+                  connects, and everything it was handed by then is applied at once.
+                </p>
+                <dl class="terms" id="properties-list"></dl>
+              </section>
+
+              <section aria-labelledby="attributes-heading">
+                <h3 class="reference__subhead" id="attributes-heading">Attributes</h3>
+                <p class="reference__note">
+                  An attribute writes its property and a property never writes back. Reflecting
+                  <code>current-time</code> would put the playback clock into the DOM sixty times a second, and one
+                  attribute reflecting while the rest do not is worse than none of them doing it.
+                </p>
+                <dl class="terms" id="attributes-list"></dl>
+              </section>
+
+              <section aria-labelledby="events-heading">
+                <h3 class="reference__subhead" id="events-heading">Events</h3>
+                <p class="reference__note">
+                  All four bubble and are composed, so an element you put inside your own shadow root still reaches
+                  your listener.
+                </p>
+                <dl class="terms" id="events-list"></dl>
+              </section>
+            </div>
+
+            <div class="reference__column">
+              <section aria-labelledby="dom-heading">
+                <h3 id="dom-heading">The DOM is a contract</h3>
+                <p class="reference__note">
+                  These class names are published API, not implementation. Renaming one costs a migration rather than
+                  a refactor. Import them from <code>@braccato/core/constants</code> instead of typing them out.
+                </p>
+                <dl class="terms terms--tight" id="class-names-list"></dl>
+              </section>
+
+              <section aria-labelledby="custom-properties-heading">
+                <h3 class="reference__subhead" id="custom-properties-heading">Custom properties</h3>
+                <p class="reference__note">
+                  The ones a theme reaches for first. <code>variables.css</code> declares the rest.
+                </p>
+                <dl class="terms terms--tight" id="custom-properties-list"></dl>
+              </section>
+
+              <section aria-labelledby="stylesheets-heading">
+                <h3 class="reference__subhead" id="stylesheets-heading">Stylesheets</h3>
+                <p class="reference__note">
+                  Yours to load, the way any package's CSS is. Leave them out and you get lines that are in the
+                  document and unstyled, rather than lines that are missing.
+                </p>
+                <dl class="terms terms--tight" id="stylesheets-list"></dl>
+                <p class="reference__note">
+                  One thing they do not do for you: the module measures the room the first and last lines need and
+                  publishes it as <code>--blyrics-padding-top</code> and <code>--blyrics-padding-bottom</code> on the
+                  root, but <code>lyrics.css</code> only spends the bottom one. This page supplies the top rule itself.
+                </p>
+              </section>
+            </div>
+          </div>
+        </section>
+
+        <section class="doc" aria-labelledby="light-dom-heading">
+          <h2 id="light-dom-heading">Light DOM, so your CSS reaches it</h2>
+          <p>
+            The element builds its lines into itself rather than into a shadow root, which is what lets a stylesheet at
+            document level select them and lets the package's own <code>@property</code> registrations apply. Two
+            things worth checking in a real browser rather than taking on trust, so this page checked them while it
+            loaded and printed what it saw.
+          </p>
+
+          <div class="proof">
+            <section class="proof__card" aria-labelledby="upgrade-heading">
+              <h3 id="upgrade-heading">The tag upgraded</h3>
+              <p class="proof__note" id="upgrade-verdict">Waiting for the module.</p>
+              <dl class="readout" id="upgrade-readout"></dl>
+              <p class="proof__foot">
+                Read once, on load. The theme row is what the markup asked for, before anything on this page touched
+                it.
+              </p>
+            </section>
+
+            <section class="proof__card" aria-labelledby="cascade-heading">
+              <h3 id="cascade-heading">The cascade reached in</h3>
+              <p class="proof__note">
+                This page's own stylesheet tightens the tracking on the module's container class. A shadow root would
+                put it out of reach.
+              </p>
+
+              <label class="switch">
+                <input id="page-rules" type="checkbox" checked />
+                <span>Apply this page's rules</span>
+              </label>
+
+              <dl class="readout" id="cascade-readout"></dl>
+            </section>
+          </div>
+        </section>
+
+        <section class="doc" aria-labelledby="one-view-heading">
+          <h2 id="one-view-heading">One view per document</h2>
+          <p>
+            Two views in one document write the same theme element and the same scroll padding, and two in one bundle
+            share the settings registry and the playback clock, so the second one wins both. Two elements handed the
+            <em>same</em> theme are fine, and that is the whole line: the module reports the disagreement, not the
+            company. Both dispatch <code>braccato:error</code> with <code>phase: "conflict"</code> and both read
+            <code>status === "theme-conflict"</code>, and neither stops rendering.
+          </p>
+        </section>
+      </div>
+    </main>
+
+    <footer class="colophon">
+      <p>
+        Every song here is synthesized by <code>tooling/generate-demo-audio.ts</code> from the same score the lyrics
+        are built from, so a syllable cannot drift from the note it lands on.
+      </p>
+
+      <a class="ecosystem" href="https://better-lyrics.boidu.dev" target="_blank" rel="noopener noreferrer">
+        <img src="../images/icons/icon-512.png" alt="" width="20" height="20" loading="lazy" decoding="async" />
+        <span>Part of the <strong>Better Lyrics</strong> ecosystem</span>
+      </a>
+    </footer>
+
+    <!-- -- Chrome ------------------------------------------------------ -->
+
+    <div class="transport">
+      <button class="transport__play" id="play" type="button">Play</button>
+
+      <p class="transport__title" id="now-playing"></p>
+
+      <label class="visually-hidden" for="seek">Seek</label>
+      <input class="transport__seek" id="seek" type="range" min="0" max="45" step="0.01" value="0" />
+
+      <p class="transport__clock">
+        <span id="elapsed">0:00</span><span class="visually-hidden"> of </span><span aria-hidden="true"> / </span
+        ><span id="duration">0:00</span>
+      </p>
+
+      <button class="button" id="panel-toggle" type="button" aria-expanded="false" aria-controls="panel">
+        Controls
+      </button>
+    </div>
+
+    <aside class="panel" id="panel" aria-labelledby="panel-heading" hidden>
+      <div class="panel__head">
+        <h2 id="panel-heading">Controls</h2>
+        <button class="button button--quiet" id="panel-close" type="button">Close</button>
+      </div>
+
+      <div class="panel__body">
+        <section class="group" aria-labelledby="song-heading">
+          <h3 id="song-heading">Song</h3>
+          <div class="picker" id="song-list"></div>
+
+          <p class="group__note">Or drop an audio file anywhere on this page.</p>
+          <div class="row">
+            <button class="button" id="song-file" type="button">Choose a file</button>
+          </div>
+          <div class="row">
+            <label class="visually-hidden" for="song-url">Audio URL</label>
+            <input class="input" id="song-url" type="url" placeholder="https://example.com/song.mp3" />
+            <button class="button" id="song-url-load" type="button">Load</button>
+          </div>
+          <p class="status" id="song-status" role="status"></p>
+        </section>
+
+        <section class="group" aria-labelledby="lyrics-heading">
+          <h3 id="lyrics-heading">Lyrics</h3>
+
+          <fieldset class="segmented" id="timing">
+            <legend class="visually-hidden">How the built-in lyrics are timed</legend>
+            <label><input type="radio" name="timing" value="syllables" checked /><span>Syllable</span></label>
+            <label><input type="radio" name="timing" value="lines" /><span>Line</span></label>
+            <label><input type="radio" name="timing" value="plain" /><span>None</span></label>
+            <label><input type="radio" name="timing" value="empty" /><span>Not found</span></label>
+          </fieldset>
+          <p class="group__hint" id="timing-hint"></p>
+
+          <p class="group__note">Or import a file. TTML, LRC, SRT, QRC and plain text, recognised by reading it.</p>
+          <div class="row">
+            <button class="button" id="lyrics-file" type="button">Choose a file</button>
+          </div>
+          <label class="visually-hidden" for="lyrics-text">Paste lyrics</label>
+          <textarea
+            class="textarea"
+            id="lyrics-text"
+            rows="4"
+            spellcheck="false"
+            placeholder="Or paste the file here"
+            aria-describedby="lyrics-status"
+          ></textarea>
+          <div class="row">
+            <button class="button" id="lyrics-import" type="button">Import</button>
+          </div>
+          <p class="status" id="lyrics-status" role="status"></p>
+          <p class="group__hint" id="parsers-note"></p>
+
+          <details class="disclosure">
+            <summary>
+              <svg class="chevron" viewBox="0 0 24 24" width="13" height="13" aria-hidden="true" focusable="false">
+                <path
+                  d="m6 9 6 6 6-6"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                />
+              </svg>
+              Show the array the element was handed
+            </summary>
+            <pre class="array" id="lyrics-array"></pre>
+          </details>
+        </section>
+
+        <section class="group" aria-labelledby="theme-panel-heading">
+          <h3 id="theme-panel-heading">Theme</h3>
+          <div class="picker" id="theme-list"></div>
+          <label class="visually-hidden" for="theme-text">Theme stylesheet</label>
+
+          <!-- A textarea cannot colour its own text, so the colours are painted by the <pre> and the
+               input sits transparent on top of it. The paint comes first in the document so the
+               caret and the selection, which are drawn in the input's own layer, stay above it. -->
+          <div class="editor">
+            <pre class="editor__paint" id="theme-paint" aria-hidden="true"></pre>
+            <textarea
+              class="textarea textarea--tall"
+              id="theme-text"
+              rows="14"
+              spellcheck="false"
+              aria-describedby="theme-status"
+            ></textarea>
+          </div>
+          <p class="status" id="theme-status" role="status"></p>
+        </section>
+
+        <section class="group" aria-labelledby="timing-panel-heading">
+          <h3 id="timing-panel-heading">Playback</h3>
+
+          <div class="field">
+            <div class="field__row">
+              <label for="offset">Offset</label>
+              <output class="field__value" id="offset-value" for="offset">0 ms</output>
+            </div>
+            <input class="slider" id="offset" type="range" min="-2000" max="2000" step="25" value="0" />
+            <p class="group__hint">
+              Taken off the clock before it is matched against the lines. Push it negative and the words arrive early.
+            </p>
+          </div>
+
+          <label class="switch">
+            <input id="passive-scroll" type="checkbox" />
+            <span>Passive scroll</span>
+          </label>
+          <p class="group__hint">Only unsynced lines read it. Pick None above and it starts drifting them.</p>
+
+          <label class="switch">
+            <input id="scrollable-view" type="checkbox" />
+            <span>Let the view be scrolled</span>
+          </label>
+          <p class="group__hint">
+            Hands the wheel to the lyrics rather than to the page, which is the only way
+            <code>renderer.noteUserScroll()</code> has anything to report. Autoscroll then waits while you read ahead,
+            and the renderer asks for the button at the foot of the view. Pause the song first. A view that is
+            rendering discounts one scroll a frame against the ones it makes itself, and yours go on that.
+          </p>
+        </section>
+
+        <section class="group" aria-labelledby="events-panel-heading">
+          <h3 id="events-panel-heading">Events</h3>
+          <p class="group__note">Everything the element dispatched, newest first.</p>
+          <ol class="log" id="event-log"></ol>
+        </section>
+      </div>
+    </aside>
+
+    <div class="dropzone" id="dropzone" hidden>
+      <p>Drop an audio file or a lyrics file.</p>
+    </div>
+
+    <script type="module" src="./demo.js"></script>
+  </body>
+</html>

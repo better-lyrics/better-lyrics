@@ -1,3 +1,15 @@
+// Builds the view: one container under the mount, one element per lyric line, and the render
+// records the engine animates them through. `inject.ts` builds what goes inside a line; this builds
+// the line and everything around it.
+//
+// A song replaces the whole view rather than being diffed into the last one. Every record the
+// engine holds points at an element built here and carries the `Animation` objects running against
+// it, so a partial update would leave the engine holding pieces of the song before.
+//
+// This is also the one place outside the engine that writes engine view state, because building the
+// lines is where those values are first knowable: the container, the records, the sync type, the
+// size they were measured at, and the scrolls to swallow before the view has settled.
+
 import { LINE_CLASS, LYRICS_CLASS, RTL_CLASS } from "./constants";
 import type { AnimationEngineInstance } from "./engine";
 import {

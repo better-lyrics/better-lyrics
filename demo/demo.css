@@ -1,0 +1,1714 @@
+/* The page's own chrome, plus the handful of rules that reach into the element. Loaded after the
+   package's three stylesheets, so anything here that names the same property wins. */
+
+/* -- Tokens -------------------------------------------- */
+
+:root {
+	--bg: oklch(0.152 0.008 264);
+	--bg-sunken: oklch(0.126 0.008 264);
+	/* The floor the hero copy sits on. Pure black rather than near black, because the ramp the view
+	   fades down through is the module's own `--blyrics-gradient-stops`, and that one ends at #000. */
+	--bg-floor: oklch(0 0 0);
+	--surface: oklch(0.207 0.009 264);
+	--surface-raised: oklch(0.248 0.01 264);
+	--hairline: oklch(1 0 0 / 0.09);
+	--glass: oklch(0.152 0.008 264 / 0.78);
+
+	--text: oklch(0.965 0.003 264);
+	--text-2: oklch(0.762 0.008 264);
+	--text-3: oklch(0.605 0.009 264);
+
+	--accent: oklch(0.855 0.132 84);
+	--accent-quiet: oklch(0.855 0.132 84 / 0.14);
+	--bad: oklch(0.735 0.175 26);
+
+	--ring: 0 0 0 1px oklch(1 0 0 / 0.09);
+	--lift: 0 24px 60px oklch(0 0 0 / 0.5);
+
+	/* One radius scale, kept concentric: a control inside a surface with 12px of padding sits 12px
+	   inside its corner, so the surface is 8 + 12. */
+	--r-panel: 20px;
+	--r-card: 12px;
+	--r-control: 8px;
+
+	--font-ui: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+	--font-mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
+
+	--gutter: clamp(20px, 5vw, 56px);
+	--doc: 58rem;
+
+	--ease: cubic-bezier(0.2, 0, 0, 1);
+
+	--chrome-top: 56px;
+	--chrome-bottom: 68px;
+
+	/* The module's own tokens, sized for a full page rather than for a music player's side panel. */
+	--blyrics-font-size: clamp(1.75rem, 4.4vw, 3.25rem);
+	--blyrics-line-height: 1.2;
+	--blyrics-padding: 0.8rem;
+
+	/* The word animation the package defaults to is a scaleX nudge, and at this size that reads as
+	   the letters stretching rather than as anything being sung. A syllable that lifts a fraction of
+	   its own height and stays lifted reads as the line rising into the voice instead. Four values,
+	   all of them switches the engine already publishes, so this stays a theme rather than a fork. */
+	--blyrics-word-wobble-transform-from: translateY(0);
+	--blyrics-word-wobble-transform-peak: translateY(-0.005em);
+	--blyrics-word-wobble-transform-settle: translateY(-0.028em);
+	--blyrics-word-wobble-transform-to: translateY(-0.0375em);
+}
+
+@media (max-width: 640px) {
+	:root {
+		--chrome-bottom: 60px;
+	}
+}
+
+/* -- Base -------------------------------------------- */
+
+*,
+*::before,
+*::after {
+	box-sizing: border-box;
+}
+
+html {
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
+	color-scheme: dark;
+}
+
+body {
+	background: var(--bg);
+	color: var(--text);
+	font-family: var(--font-ui);
+	font-size: 16px;
+	line-height: 1.55;
+	margin: 0;
+	padding: var(--chrome-top) 0 var(--chrome-bottom);
+	text-rendering: optimizeLegibility;
+}
+
+h1,
+h2,
+h3 {
+	margin: 0;
+	text-wrap: balance;
+}
+
+p {
+	margin: 0;
+	text-wrap: pretty;
+}
+
+code,
+kbd {
+	font-family: var(--font-mono);
+	font-size: 0.875em;
+}
+
+a {
+	color: var(--text);
+	text-decoration-color: oklch(0.855 0.132 84 / 0.5);
+	text-decoration-thickness: from-font;
+	text-underline-offset: 0.2em;
+	transition-duration: 150ms;
+	transition-property: color;
+	transition-timing-function: var(--ease);
+}
+
+a:hover {
+	color: var(--accent);
+}
+
+:focus-visible {
+	border-radius: 4px;
+	outline: 2px solid var(--accent);
+	outline-offset: 3px;
+}
+
+::selection {
+	background: var(--accent-quiet);
+}
+
+.visually-hidden {
+	clip-path: inset(50%);
+	height: 1px;
+	overflow: hidden;
+	position: absolute;
+	white-space: nowrap;
+	width: 1px;
+}
+
+.skip {
+	background: var(--surface-raised);
+	border-radius: var(--r-control);
+	box-shadow: var(--ring);
+	inset-block-start: 8px;
+	inset-inline-start: 8px;
+	padding: 10px 16px;
+	position: fixed;
+	text-decoration: none;
+	translate: 0 -200%;
+	z-index: 9;
+}
+
+.skip:focus-visible {
+	translate: 0 0;
+}
+
+/* -- The stage -------------------------------------------- */
+
+/* The element runs as the page's background for the whole scroll, so the thing on the screen is the
+   package rather than a picture of it. It stops above the hero copy rather than running under it:
+   the view is a column of large left aligned text and so is the copy, and the two on top of each
+   other are unreadable however the scrim is drawn. `--hero-band` is measured rather than guessed,
+   because the copy is one line at 1440 and four at 390. */
+.stage {
+	inset: var(--chrome-top) 0 calc(var(--chrome-bottom) + var(--hero-band, 220px));
+	position: fixed;
+	z-index: 0;
+}
+
+/* Hidden rather than auto, because a scroller under the pointer at the top of a page eats the wheel
+   and the reader cannot get to anything below. The engine scrolls with `scrollTop`, which still
+   works, and the Playback panel hands the wheel back for anyone who wants to read ahead. */
+.stage__frame {
+	block-size: 100%;
+	overflow: hidden;
+	padding-inline: var(--gutter);
+	scrollbar-width: thin;
+}
+
+[data-view-scroll="on"] .stage__frame {
+	overflow-y: auto;
+}
+
+/* Only the top edge is the stage's to fade. It meets the top bar, so it fades into the page's own
+   colour. The bottom edge meets the black the copy sits on, and that fade has to travel with the
+   copy rather than stay where the stage stops, so the hero owns it instead. */
+.stage::before {
+	background: linear-gradient(to top, transparent, var(--bg) 78%);
+	content: "";
+	height: 104px;
+	inset: 0 0 auto;
+	pointer-events: none;
+	position: absolute;
+	z-index: 2;
+}
+
+.stage__status {
+	align-items: center;
+	background: oklch(0.126 0.008 264 / 0.94);
+	color: var(--text-2);
+	display: flex;
+	font-size: 14px;
+	inset: 0;
+	justify-content: center;
+	padding: 24px;
+	position: absolute;
+	text-align: center;
+	white-space: pre-wrap;
+	z-index: 3;
+}
+
+.stage__status[hidden] {
+	display: none;
+}
+
+.stage__status[data-failed] {
+	color: var(--bad);
+	font-family: var(--font-mono);
+	font-size: 13px;
+	text-align: start;
+}
+
+/* -- Top bar -------------------------------------------- */
+
+.topbar {
+	align-items: center;
+	-webkit-backdrop-filter: blur(20px);
+	backdrop-filter: blur(20px);
+	background: linear-gradient(to bottom, oklch(0.152 0.008 264 / 0.86), oklch(0.152 0.008 264 / 0.4));
+	block-size: var(--chrome-top);
+	display: flex;
+	gap: 16px;
+	inset: 0 0 auto;
+	justify-content: space-between;
+	padding-inline: var(--gutter);
+	position: fixed;
+	z-index: 3;
+}
+
+.topbar__mark {
+	align-items: center;
+	display: flex;
+	gap: 10px;
+	min-width: 0;
+}
+
+.wordmark {
+	align-items: center;
+	display: flex;
+	gap: 9px;
+	white-space: nowrap;
+}
+
+/* The name of the thing, not the name of the package: the mono face and the accent stay with
+   `@braccato/core` where it appears as a specifier. */
+.wordmark b {
+	font-size: 14.5px;
+	font-weight: 600;
+	letter-spacing: -0.012em;
+}
+
+.wordmark img {
+	border-radius: 5px;
+	outline: 1px solid oklch(1 0 0 / 0.1);
+	outline-offset: -1px;
+}
+
+.topbar__version {
+	border-radius: 999px;
+	box-shadow: var(--ring);
+	color: var(--text-3);
+	font-family: var(--font-mono);
+	font-size: 11px;
+	font-variant-numeric: tabular-nums;
+	padding: 2px 8px;
+}
+
+.topbar__links {
+	display: flex;
+	gap: 4px;
+}
+
+.topbar__links a {
+	align-items: center;
+	border-radius: var(--r-control);
+	color: var(--text-2);
+	display: inline-flex;
+	font-size: 13px;
+	min-height: 40px;
+	padding-inline: 12px;
+	text-decoration: none;
+	transition-duration: 150ms;
+	transition-property: background-color, color;
+	transition-timing-function: var(--ease);
+}
+
+.topbar__links a:hover {
+	background: oklch(1 0 0 / 0.07);
+	color: var(--text);
+}
+
+/* The version is the first thing to go: it is on the page twice over, once here and once in the
+   install command, and the three links are the ones a reader came for. */
+@media (max-width: 620px) {
+	.topbar {
+		gap: 8px;
+	}
+
+	.topbar__version {
+		display: none;
+	}
+
+	.topbar__links a {
+		font-size: 12.5px;
+		padding-inline: 8px;
+	}
+}
+
+/* -- Hero -------------------------------------------- */
+
+/* The hero is a caption over a running element, not a card in front of it, so the whole column has
+   to be transparent to the pointer and each thing a reader can actually use opts back in. An
+   element with no background is still a hit target, which is why `main` is named here at all. */
+main {
+	pointer-events: none;
+	position: relative;
+	z-index: 1;
+}
+
+.hero {
+	align-content: end;
+	display: grid;
+	min-block-size: calc(100svh - var(--chrome-top) - var(--chrome-bottom));
+	pointer-events: none;
+	position: relative;
+}
+
+/* The copy reads on black rather than on the page colour, and the view falls into that black inside
+   the lines rather than meeting it at the first word of the headline.
+
+   Painted from `.hero` because that is the full width of the page. `.hero__band` is capped at the
+   width of a column of text, so a backdrop anchored to it would leave the right of the screen
+   unpainted. Both rules are sized off the same `--hero-band` the stage is inset by, so the fade and
+   the edge it lands on agree at every width without either being told the number twice.
+
+   A negative `z-index` puts them behind the copy without leaving main's stacking context, which
+   keeps them in front of the view and out of the way of the transport bar and the panel. They are
+   two rungs rather than one because `.resume` sits between them at -2, so the numbers here are the
+   whole ladder and none of it is left to document order. */
+.hero::before {
+	background: linear-gradient(to bottom, var(--blyrics-gradient-stops));
+	block-size: clamp(120px, 17vh, 224px);
+	content: "";
+	inset: auto 0 var(--hero-band, 220px);
+	pointer-events: none;
+	position: absolute;
+	z-index: -3;
+}
+
+/* Runs on under the transport bar, so the bar has the same black behind it as the copy above rather
+   than the leading edge of the docs slab. */
+.hero::after {
+	background: var(--bg-floor);
+	block-size: calc(var(--hero-band, 220px) + var(--chrome-bottom));
+	content: "";
+	inset: auto 0 calc(var(--chrome-bottom) * -1);
+	pointer-events: none;
+	position: absolute;
+	z-index: -1;
+}
+
+/* One column at every width, capped short of where the panel floats. Two columns would fit at 1440
+   and nowhere else, and a hero that reflows under its own controls is worse than a taller one. */
+.hero__band {
+	display: grid;
+	gap: clamp(18px, 2.6vh, 28px);
+	justify-items: start;
+	max-inline-size: calc(34rem + var(--gutter) * 2);
+	padding: clamp(16px, 2.5vh, 28px) var(--gutter) clamp(24px, 4vh, 40px);
+	pointer-events: auto;
+}
+
+.hero__lede {
+	max-width: 46ch;
+}
+
+.hero h1 {
+	font-size: clamp(1.625rem, 3.2vw, 2.5rem);
+	font-weight: 600;
+	letter-spacing: -0.026em;
+	line-height: 1.06;
+}
+
+.hero__lede p {
+	color: var(--text-2);
+	font-size: 0.9375rem;
+	margin-top: 12px;
+	max-width: 52ch;
+}
+
+/* -- Install -------------------------------------------- */
+
+.install {
+	max-width: min(100%, 26rem);
+	width: 100%;
+}
+
+.install__command {
+	align-items: center;
+	-webkit-backdrop-filter: blur(20px);
+	backdrop-filter: blur(20px);
+	background: oklch(0.126 0.008 264 / 0.82);
+	border-radius: var(--r-card);
+	box-shadow: var(--ring);
+	display: flex;
+	gap: 12px;
+	margin-top: 10px;
+	padding: 6px 6px 6px 14px;
+}
+
+.install__command code {
+	flex: 1 1 auto;
+	font-size: 13.5px;
+	overflow-x: auto;
+	scrollbar-width: none;
+	white-space: nowrap;
+}
+
+.install__prompt {
+	color: var(--text-3);
+}
+
+.install__package {
+	color: var(--accent);
+}
+
+/* -- Docs -------------------------------------------- */
+
+/* An opaque enough slab over a fixed element: crossing this edge is what tells a reader they have
+   left the demonstration and arrived at the reference. */
+.docs,
+.colophon {
+	-webkit-backdrop-filter: blur(28px);
+	backdrop-filter: blur(28px);
+	background: oklch(0.152 0.008 264 / 0.92);
+	border-top: 1px solid var(--hairline);
+	pointer-events: auto;
+	position: relative;
+	z-index: 1;
+}
+
+.docs {
+	padding: clamp(48px, 9vh, 96px) var(--gutter);
+	scroll-margin-top: var(--chrome-top);
+}
+
+.doc h2,
+.doc h3 {
+	scroll-margin-top: calc(var(--chrome-top) + 16px);
+}
+
+.doc {
+	margin-inline: auto;
+	max-width: var(--doc);
+}
+
+.doc + .doc {
+	margin-top: clamp(56px, 9vh, 96px);
+}
+
+.doc h2 {
+	font-size: clamp(1.25rem, 2.2vw, 1.625rem);
+	font-weight: 600;
+	letter-spacing: -0.02em;
+}
+
+.doc > p {
+	color: var(--text-2);
+	margin-top: 14px;
+	max-width: 68ch;
+}
+
+.doc__aside {
+	color: var(--text-3);
+	font-size: 14px;
+}
+
+.doc__aside strong {
+	color: var(--text-2);
+	font-weight: 600;
+}
+
+/* -- Code -------------------------------------------- */
+
+.code {
+	margin-top: 20px;
+	position: relative;
+}
+
+.code pre {
+	background: var(--bg-sunken);
+	border-radius: var(--r-card);
+	box-shadow: var(--ring);
+	font-family: var(--font-mono);
+	font-size: 12.5px;
+	line-height: 1.7;
+	margin: 0;
+	overflow-x: auto;
+	padding: 16px 16px 16px 18px;
+	tab-size: 2;
+}
+
+.code__bar {
+	display: flex;
+	justify-content: flex-end;
+	margin-bottom: 8px;
+}
+
+.c-t {
+	color: oklch(0.78 0.06 264);
+}
+
+.c-s {
+	color: var(--accent);
+}
+
+.c-k {
+	color: oklch(0.8 0.1 330);
+}
+
+.c-b {
+	color: oklch(0.82 0.08 200);
+}
+
+.c-n {
+	color: oklch(0.85 0.09 150);
+}
+
+.c-c {
+	color: var(--text-3);
+}
+
+/* The `blyrics-*` lines inside a comment, which are the only comments the module reads. Weight as
+   well as colour, because "this comment is load-bearing" is the one thing on the page that should
+   not be carried by hue alone. */
+.c-a {
+	color: var(--accent);
+	font-weight: 600;
+}
+
+/* -- Buttons -------------------------------------------- */
+
+.button,
+.copy {
+	background: var(--surface-raised);
+	border: 0;
+	border-radius: var(--r-control);
+	box-shadow: var(--ring);
+	color: var(--text);
+	cursor: pointer;
+	flex: none;
+	font: inherit;
+	font-size: 13px;
+	font-weight: 500;
+	min-height: 40px;
+	padding: 0 16px;
+	transition-duration: 150ms;
+	transition-property: scale, background-color, color;
+	transition-timing-function: var(--ease);
+}
+
+.button:hover,
+.copy:hover {
+	background: oklch(0.29 0.011 264);
+}
+
+.button:active,
+.copy:active {
+	scale: 0.96;
+}
+
+.copy[data-copied] {
+	color: var(--accent);
+}
+
+.button--quiet {
+	background: transparent;
+	box-shadow: none;
+	color: var(--text-2);
+	padding: 0 12px;
+}
+
+.button--quiet:hover {
+	background: oklch(1 0 0 / 0.07);
+	color: var(--text);
+}
+
+.button[aria-pressed="true"] {
+	background: var(--accent-quiet);
+	color: var(--accent);
+}
+
+/* -- Transport -------------------------------------------- */
+
+.transport {
+	align-items: center;
+	-webkit-backdrop-filter: blur(20px);
+	backdrop-filter: blur(20px);
+	background: linear-gradient(to top, oklch(0.152 0.008 264 / 0.9), oklch(0.152 0.008 264 / 0.55));
+	block-size: var(--chrome-bottom);
+	border-top: 1px solid var(--hairline);
+	display: grid;
+	gap: 14px;
+	grid-template-columns: auto minmax(0, 10rem) minmax(0, 1fr) auto auto;
+	inset: auto 0 0;
+	padding-inline: var(--gutter);
+	position: fixed;
+	z-index: 3;
+}
+
+.transport__play {
+	background: var(--text);
+	border: 0;
+	border-radius: var(--r-control);
+	color: var(--bg);
+	cursor: pointer;
+	font: inherit;
+	font-size: 13px;
+	font-weight: 600;
+	min-height: 40px;
+	min-width: 76px;
+	padding: 0 16px;
+	transition-duration: 150ms;
+	transition-property: scale, background-color;
+	transition-timing-function: var(--ease);
+}
+
+.transport__play:hover {
+	background: var(--accent);
+}
+
+.transport__play:active {
+	scale: 0.96;
+}
+
+.transport__title {
+	color: var(--text-2);
+	font-size: 13px;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+.transport__clock {
+	color: var(--text-2);
+	font-family: var(--font-mono);
+	font-size: 12.5px;
+	font-variant-numeric: tabular-nums;
+	white-space: nowrap;
+}
+
+.transport__clock span:first-child {
+	color: var(--text);
+}
+
+@media (max-width: 860px) {
+	.transport {
+		grid-template-columns: auto minmax(0, 1fr) auto auto;
+	}
+
+	.transport__title {
+		display: none;
+	}
+}
+
+@media (max-width: 560px) {
+	.transport {
+		grid-template-columns: auto minmax(0, 1fr) auto;
+	}
+
+	.transport__clock {
+		display: none;
+	}
+}
+
+/* -- Resume autoscroll -------------------------------------------- */
+
+/* Centred at the foot of the view rather than docked to a corner: it answers a scroll the reader
+   just made, so it belongs where they are looking. It rides the same `--hero-band` measurement the
+   stage stops at, which is what keeps it off the hero copy at 390, where that copy is four lines
+   deep.
+
+   The button is fixed and the page is not, so its layer is what decides what happens to it once the
+   reader scrolls on. It lives in main and sits between the hero's two backdrops: over the fade,
+   because the fade's own bottom stop is black and a button under it cannot be read, and under the
+   floor, so the hero and then the docs slab cover it on the way past instead of leaving it stranded
+   over the reference. Main is under the transport bar and the panel whatever it does inside itself,
+   so the reader's own controls stay clear either way. `pointer-events` is main's, off by default and
+   opted back into here. */
+.resume {
+	-webkit-backdrop-filter: blur(20px);
+	backdrop-filter: blur(20px);
+	background: var(--glass);
+	border: 0;
+	border-radius: 999px;
+	box-shadow: var(--ring), var(--lift);
+	color: var(--text);
+	cursor: pointer;
+	font: inherit;
+	font-size: 13px;
+	font-weight: 500;
+	inset: auto 0 calc(var(--chrome-bottom) + var(--hero-band, 220px) + 14px);
+	margin-inline: auto;
+	min-height: 38px;
+	opacity: 0;
+	padding: 0 18px;
+	pointer-events: auto;
+	position: fixed;
+	visibility: hidden;
+	width: fit-content;
+	z-index: -2;
+
+	/* The exit is the half worth spelling out: `visibility` waits for the fade rather than running
+	   with it, so the button is still on the screen while it leaves and gone the moment it has. The
+	   shown rule takes that delay back off, so arriving is immediate. */
+	transition-delay: 0s, 0s, 0s, 0s, 0s, 220ms;
+	transition-duration: 150ms, 150ms, 150ms, 220ms, 220ms, 0s;
+	transition-property: background-color, color, scale, opacity, translate, visibility;
+	transition-timing-function: var(--ease);
+}
+
+/* Hidden is hidden: `visibility` is what keeps a button nobody can see out of the tab order and out
+   of the accessibility tree, which opacity alone would not do. */
+.resume[data-shown] {
+	opacity: 1;
+	transition-delay: 0s;
+	visibility: visible;
+}
+
+.resume:hover {
+	background: oklch(0.29 0.011 264 / 0.86);
+	color: var(--accent);
+}
+
+.resume:active {
+	scale: 0.96;
+}
+
+/* -- Sliders -------------------------------------------- */
+
+/* One range control, two sizes. Both fill their track from `--seek-progress`, which WebKit needs
+   because it has no equivalent of Gecko's `::-moz-range-progress`. */
+.transport__seek,
+.slider {
+	appearance: none;
+	background: transparent;
+	cursor: pointer;
+	margin: 0;
+	width: 100%;
+}
+
+.transport__seek {
+	height: 40px;
+}
+
+.slider {
+	height: 32px;
+}
+
+.transport__seek::-webkit-slider-runnable-track,
+.slider::-webkit-slider-runnable-track {
+	background: linear-gradient(
+		to right,
+		var(--accent) calc(var(--seek-progress, 0) * 100%),
+		oklch(1 0 0 / 0.16) calc(var(--seek-progress, 0) * 100%)
+	);
+	border-radius: 999px;
+	height: 4px;
+}
+
+.transport__seek::-webkit-slider-thumb,
+.slider::-webkit-slider-thumb {
+	appearance: none;
+	background: var(--text);
+	border-radius: 50%;
+	height: 13px;
+	margin-top: -4.5px;
+	transition-duration: 150ms;
+	transition-property: scale;
+	transition-timing-function: var(--ease);
+	width: 13px;
+}
+
+.transport__seek:active::-webkit-slider-thumb,
+.slider:active::-webkit-slider-thumb {
+	scale: 1.2;
+}
+
+.transport__seek::-moz-range-track,
+.slider::-moz-range-track {
+	background: oklch(1 0 0 / 0.16);
+	border-radius: 999px;
+	height: 4px;
+}
+
+.transport__seek::-moz-range-progress,
+.slider::-moz-range-progress {
+	background: var(--accent);
+	border-radius: 999px;
+	height: 4px;
+}
+
+.transport__seek::-moz-range-thumb,
+.slider::-moz-range-thumb {
+	background: var(--text);
+	border: 0;
+	border-radius: 50%;
+	height: 13px;
+	width: 13px;
+}
+
+/* -- Panel -------------------------------------------- */
+
+.panel {
+	-webkit-backdrop-filter: blur(24px);
+	backdrop-filter: blur(24px);
+	background: var(--glass);
+	border-radius: var(--r-panel);
+	box-shadow: var(--ring), var(--lift);
+	display: flex;
+	flex-direction: column;
+	inset: auto 16px calc(var(--chrome-bottom) + 12px) auto;
+	max-block-size: min(78svh, 46rem);
+	padding: 12px;
+	position: fixed;
+	width: min(24rem, calc(100vw - 32px));
+	z-index: 4;
+}
+
+.panel[hidden] {
+	display: none;
+}
+
+.panel__head {
+	align-items: center;
+	display: flex;
+	justify-content: space-between;
+	padding: 2px 2px 10px 8px;
+}
+
+.panel h2 {
+	font-size: 13px;
+	font-weight: 600;
+	letter-spacing: 0.01em;
+}
+
+.panel__body {
+	display: grid;
+	gap: 24px;
+	overflow-y: auto;
+	padding: 2px 8px 6px;
+	scrollbar-width: thin;
+}
+
+.group h3 {
+	color: var(--text-2);
+	font-size: 12px;
+	font-weight: 600;
+	letter-spacing: 0.02em;
+	margin-bottom: 10px;
+}
+
+.group + .group {
+	border-top: 1px solid var(--hairline);
+	padding-top: 20px;
+}
+
+.group__note {
+	color: var(--text-3);
+	font-size: 12.5px;
+	margin-top: 14px;
+}
+
+.group__hint {
+	color: var(--text-3);
+	font-size: 12px;
+	line-height: 1.45;
+	margin-top: 8px;
+}
+
+.group__hint code {
+	color: var(--text-2);
+	white-space: nowrap;
+}
+
+.row {
+	align-items: center;
+	display: flex;
+	gap: 8px;
+	margin-top: 10px;
+}
+
+.input {
+	background: var(--bg-sunken);
+	border: 0;
+	border-radius: var(--r-control);
+	box-shadow: var(--ring);
+	color: var(--text);
+	flex: 1 1 auto;
+	font: inherit;
+	font-size: 13px;
+	min-height: 40px;
+	min-width: 0;
+	padding: 0 12px;
+}
+
+.input::placeholder {
+	color: var(--text-3);
+}
+
+.textarea {
+	background: var(--bg-sunken);
+	border: 0;
+	border-radius: var(--r-control);
+	box-shadow: var(--ring);
+	color: var(--text-2);
+	display: block;
+	font-family: var(--font-mono);
+	font-size: 12px;
+	line-height: 1.6;
+	margin-top: 10px;
+	overflow: auto;
+	padding: 10px 12px;
+	resize: vertical;
+	scrollbar-width: thin;
+	tab-size: 2;
+	width: 100%;
+}
+
+.textarea--tall {
+	line-height: 1.65;
+	min-height: 15rem;
+}
+
+.textarea::placeholder {
+	color: var(--text-3);
+}
+
+/* -- Theme editor -------------------------------------------- */
+
+/* The input and the layer painting its colours are the same box twice over, and they only stay
+   aligned while every property that decides where a glyph lands is identical. So the metrics are
+   declared once here and both of them read them from this element rather than each carrying its own
+   copy to drift. */
+.editor {
+	--editor-pad-block: 10px;
+	--editor-pad-inline: 12px;
+	background: var(--bg-sunken);
+	border-radius: var(--r-control);
+	box-shadow: var(--ring);
+	display: grid;
+	font-family: var(--font-mono);
+	font-size: 12px;
+	letter-spacing: normal;
+	line-height: 1.65;
+	margin-top: 10px;
+	position: relative;
+	tab-size: 2;
+}
+
+.editor__paint,
+.editor .textarea {
+	background: transparent;
+	box-shadow: none;
+	font: inherit;
+	letter-spacing: inherit;
+	margin: 0;
+	overflow-wrap: break-word;
+	padding: var(--editor-pad-block) var(--editor-pad-inline);
+	tab-size: inherit;
+	white-space: pre-wrap;
+}
+
+/* Scrolled with the input rather than clipped to it: an `overflow: hidden` box still has a scroll
+   position, and writing it is what keeps the colours under the text once the sheet is taller than
+   the box. */
+.editor__paint {
+	color: var(--text-2);
+	inset: 0;
+	overflow: hidden;
+	pointer-events: none;
+	position: absolute;
+	/* The input's scrollbar takes width off its content box and not off this one, which on its own
+	   is enough to wrap the two differently. Measured rather than assumed: it is zero where the
+	   platform draws scrollbars over the content, and zero again on a sheet short enough not to
+	   overflow. */
+	padding-inline-end: calc(var(--editor-pad-inline) + var(--editor-gutter, 0px));
+}
+
+.editor .textarea {
+	caret-color: var(--text);
+	position: relative;
+}
+
+/* Only once the layer behind it is being painted. A page whose script never ran keeps a text box
+   that can be read. */
+.editor .textarea[data-painted] {
+	color: transparent;
+}
+
+.status {
+	color: var(--text-2);
+	font-size: 12px;
+	line-height: 1.45;
+	margin-top: 10px;
+}
+
+/* Left in the document rather than removed from it. A live region that only exists once it has
+   something to say is a live region a screen reader may not have been watching. */
+.status:empty {
+	margin-top: 0;
+}
+
+.status[data-tone="bad"] {
+	color: var(--bad);
+}
+
+.status[data-tone="good"] {
+	color: var(--accent);
+}
+
+/* -- Pickers -------------------------------------------- */
+
+.picker {
+	display: grid;
+	gap: 6px;
+}
+
+.pick {
+	background: transparent;
+	border: 0;
+	border-radius: var(--r-control);
+	box-shadow: var(--ring);
+	color: var(--text-2);
+	cursor: pointer;
+	display: grid;
+	font: inherit;
+	gap: 2px;
+	justify-items: start;
+	min-height: 40px;
+	padding: 9px 12px;
+	text-align: start;
+	transition-duration: 150ms;
+	transition-property: background-color, color;
+	transition-timing-function: var(--ease);
+}
+
+.pick:hover {
+	background: oklch(1 0 0 / 0.06);
+	color: var(--text);
+}
+
+.pick b {
+	font-size: 13px;
+	font-weight: 600;
+}
+
+.pick span {
+	color: var(--text-3);
+	font-size: 11.5px;
+	line-height: 1.4;
+	text-wrap: pretty;
+}
+
+.pick[aria-pressed="true"] {
+	background: var(--accent-quiet);
+	box-shadow: 0 0 0 1px oklch(0.855 0.132 84 / 0.4);
+	color: var(--accent);
+}
+
+.pick[aria-pressed="true"] span {
+	color: oklch(0.855 0.132 84 / 0.72);
+}
+
+/* -- Segmented control -------------------------------------------- */
+
+.segmented {
+	border: 0;
+	display: grid;
+	gap: 4px;
+	grid-template-columns: repeat(2, minmax(0, 1fr));
+	margin: 0;
+	padding: 0;
+}
+
+.segmented--install {
+	grid-template-columns: repeat(4, minmax(0, 1fr));
+	max-width: 20rem;
+}
+
+.segmented label {
+	cursor: pointer;
+	display: block;
+}
+
+.segmented input {
+	clip-path: inset(50%);
+	height: 1px;
+	position: absolute;
+	width: 1px;
+}
+
+.segmented span {
+	align-items: center;
+	background: var(--surface-raised);
+	border-radius: var(--r-control);
+	color: var(--text-2);
+	display: flex;
+	font-size: 12.5px;
+	justify-content: center;
+	min-height: 40px;
+	padding: 0 8px;
+	text-align: center;
+	transition-duration: 150ms;
+	transition-property: background-color, color;
+	transition-timing-function: var(--ease);
+}
+
+.segmented--install span {
+	-webkit-backdrop-filter: blur(20px);
+	backdrop-filter: blur(20px);
+	background: oklch(0.126 0.008 264 / 0.7);
+	box-shadow: var(--ring);
+}
+
+.segmented label:hover span {
+	color: var(--text);
+}
+
+.segmented input:checked + span {
+	background: var(--accent-quiet);
+	color: var(--accent);
+}
+
+.segmented input:focus-visible + span {
+	outline: 2px solid var(--accent);
+	outline-offset: 2px;
+}
+
+/* -- Disclosure and array view -------------------------------------------- */
+
+/* The native marker is dropped in both spellings: `list-style` covers Gecko and the standards path,
+   and WebKit still needs its own pseudo-element told, or the triangle sits beside the chevron. */
+.disclosure summary {
+	align-items: center;
+	border-radius: var(--r-control);
+	color: var(--text-2);
+	cursor: pointer;
+	display: flex;
+	font-size: 12.5px;
+	gap: 8px;
+	list-style: none;
+	margin: 14px -8px 0;
+	padding: 9px 8px;
+	transition-duration: 150ms;
+	transition-property: color;
+	transition-timing-function: var(--ease);
+}
+
+.disclosure summary::-webkit-details-marker {
+	display: none;
+}
+
+.disclosure summary:hover {
+	color: var(--text);
+}
+
+.chevron {
+	flex: none;
+	rotate: -90deg;
+}
+
+.disclosure[open] .chevron {
+	rotate: 0deg;
+}
+
+/* The rotation is the state, so it stays either way. Only the travel between the two states is worth
+   taking away, which is what the rest of this page does with movement as well. */
+@media (prefers-reduced-motion: no-preference) {
+	.chevron {
+		transition-duration: 180ms;
+		transition-property: rotate;
+		transition-timing-function: var(--ease);
+	}
+}
+
+.array {
+	background: var(--bg-sunken);
+	border-radius: var(--r-control);
+	box-shadow: var(--ring);
+	color: var(--text-3);
+	font-family: var(--font-mono);
+	font-size: 11.5px;
+	line-height: 1.6;
+	margin: 6px 0 0;
+	max-height: 16rem;
+	overflow: auto;
+	padding: 10px 12px;
+	scrollbar-width: thin;
+	tab-size: 2;
+}
+
+/* -- Fields and switches -------------------------------------------- */
+
+.field__row {
+	align-items: baseline;
+	display: flex;
+	gap: 12px;
+	justify-content: space-between;
+}
+
+.field__row label {
+	color: var(--text-2);
+	font-size: 13px;
+}
+
+.field__value {
+	color: var(--accent);
+	font-family: var(--font-mono);
+	font-size: 12.5px;
+	font-variant-numeric: tabular-nums;
+}
+
+.switch {
+	align-items: center;
+	border-radius: var(--r-control);
+	cursor: pointer;
+	display: flex;
+	font-size: 13px;
+	gap: 11px;
+	margin: 16px -8px 0;
+	min-height: 40px;
+	padding: 0 8px;
+}
+
+.switch input {
+	appearance: none;
+	background: oklch(1 0 0 / 0.14);
+	border-radius: 999px;
+	cursor: pointer;
+	flex: none;
+	height: 22px;
+	margin: 0;
+	position: relative;
+	transition-duration: 180ms;
+	transition-property: background-color;
+	transition-timing-function: var(--ease);
+	width: 38px;
+}
+
+.switch input::before {
+	background: var(--text-2);
+	border-radius: 50%;
+	content: "";
+	height: 16px;
+	inset-block-start: 3px;
+	inset-inline-start: 3px;
+	position: absolute;
+	transition-duration: 180ms;
+	transition-property: translate, background-color;
+	transition-timing-function: var(--ease);
+	width: 16px;
+}
+
+.switch input:checked {
+	background: var(--accent);
+}
+
+.switch input:checked::before {
+	background: var(--bg);
+	translate: 16px 0;
+}
+
+.switch + .group__hint {
+	margin-top: 4px;
+}
+
+/* -- Event log -------------------------------------------- */
+
+.log {
+	display: grid;
+	gap: 9px;
+	list-style: none;
+	margin: 12px 0 0;
+	max-height: 13rem;
+	overflow-y: auto;
+	padding: 0;
+	scrollbar-width: thin;
+}
+
+.log:empty::after {
+	color: var(--text-3);
+	content: "Nothing yet.";
+	font-size: 12.5px;
+}
+
+.log li {
+	align-items: baseline;
+	display: flex;
+	flex-wrap: wrap;
+	font-family: var(--font-mono);
+	font-size: 11.5px;
+	gap: 0 8px;
+	line-height: 1.45;
+}
+
+.log__at {
+	color: var(--text-3);
+	font-variant-numeric: tabular-nums;
+}
+
+.log b {
+	color: var(--accent);
+	font-weight: 400;
+}
+
+.log__detail {
+	color: var(--text-2);
+	overflow-wrap: anywhere;
+}
+
+.log li[data-phase="error"] b {
+	color: var(--bad);
+}
+
+/* -- Drop zone -------------------------------------------- */
+
+.dropzone {
+	align-items: center;
+	-webkit-backdrop-filter: blur(8px);
+	backdrop-filter: blur(8px);
+	background: oklch(0.126 0.008 264 / 0.82);
+	display: flex;
+	inset: 0;
+	justify-content: center;
+	padding: var(--gutter);
+	position: fixed;
+	z-index: 8;
+}
+
+.dropzone[hidden] {
+	display: none;
+}
+
+.dropzone p {
+	border: 2px dashed oklch(0.855 0.132 84 / 0.5);
+	border-radius: var(--r-panel);
+	color: var(--text);
+	font-size: clamp(1rem, 2.4vw, 1.25rem);
+	padding: clamp(32px, 6vh, 56px) clamp(28px, 6vw, 72px);
+	text-align: center;
+}
+
+/* -- Reference -------------------------------------------- */
+
+.reference {
+	align-items: start;
+	display: grid;
+	gap: clamp(30px, 4vw, 52px);
+	margin-top: clamp(26px, 4vh, 40px);
+}
+
+.reference__column {
+	display: grid;
+	gap: 0;
+}
+
+@media (min-width: 900px) {
+	.reference {
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+	}
+}
+
+.reference h3 {
+	color: var(--text);
+	font-size: 13px;
+	font-weight: 600;
+}
+
+.reference__subhead {
+	margin-top: 32px;
+	padding-top: 26px;
+	position: relative;
+}
+
+.reference__subhead::before {
+	background: var(--hairline);
+	content: "";
+	height: 1px;
+	inset-inline: 0;
+	position: absolute;
+	top: 0;
+}
+
+.reference__note {
+	color: var(--text-3);
+	font-size: 13px;
+	margin-top: 8px;
+	max-width: 58ch;
+}
+
+/* An identifier is one word however many hyphens are in it, and a break after one reads as a
+   different name. */
+.reference__note code,
+.terms dd code,
+.doc > p code {
+	white-space: nowrap;
+}
+
+.reference__note code {
+	color: var(--text-2);
+}
+
+.terms {
+	margin: 18px 0 0;
+}
+
+.terms dt {
+	align-items: baseline;
+	color: var(--accent);
+	display: flex;
+	flex-wrap: wrap;
+	gap: 3px 10px;
+	margin-top: 22px;
+}
+
+.terms dt:first-child {
+	margin-top: 0;
+}
+
+.terms dt code {
+	font-size: 13px;
+}
+
+.terms__meta {
+	color: var(--text-3);
+	font-family: var(--font-mono);
+	font-size: 11.5px;
+}
+
+.terms dd {
+	color: var(--text-2);
+	font-size: 14px;
+	margin: 5px 0 0;
+	max-width: 58ch;
+}
+
+.terms dd code {
+	color: var(--text);
+}
+
+.terms--tight dt {
+	margin-top: 16px;
+}
+
+.terms--tight dd {
+	font-size: 13px;
+}
+
+#theme-settings-list {
+	margin-top: 26px;
+}
+
+/* -- The two proofs -------------------------------------------- */
+
+.proof {
+	align-items: start;
+	display: grid;
+	gap: 16px;
+	grid-template-columns: repeat(auto-fit, minmax(17rem, 1fr));
+	margin-top: 24px;
+}
+
+.proof__card {
+	background: var(--surface);
+	border-radius: var(--r-card);
+	box-shadow: var(--ring);
+	padding: 18px;
+}
+
+.proof h3 {
+	font-size: 13px;
+	font-weight: 600;
+}
+
+.proof__note {
+	color: var(--text-3);
+	font-size: 13px;
+	margin-top: 6px;
+}
+
+.proof__foot {
+	color: var(--text-3);
+	font-size: 12px;
+	line-height: 1.45;
+	margin-top: 16px;
+	opacity: 0.8;
+}
+
+#upgrade-verdict[data-state="pass"] {
+	color: var(--text-2);
+}
+
+#upgrade-verdict[data-state="fail"] {
+	color: var(--bad);
+}
+
+.readout {
+	display: grid;
+	gap: 13px;
+	margin: 16px 0 0;
+}
+
+.readout dt {
+	color: var(--text-3);
+	font-size: 12px;
+	line-height: 1.4;
+}
+
+.readout dd {
+	color: var(--accent);
+	font-family: var(--font-mono);
+	font-size: 12.5px;
+	font-variant-numeric: tabular-nums;
+	line-height: 1.45;
+	margin: 3px 0 0;
+	overflow-wrap: anywhere;
+}
+
+.readout dd[data-state="fail"] {
+	color: var(--bad);
+}
+
+.readout dd[data-state="off"] {
+	color: var(--text-3);
+}
+
+/* -- Colophon -------------------------------------------- */
+
+.colophon {
+	align-items: center;
+	color: var(--text-3);
+	display: flex;
+	flex-wrap: wrap;
+	gap: 14px 32px;
+	justify-content: space-between;
+	padding: 28px var(--gutter) 40px;
+}
+
+.colophon p {
+	font-size: 13px;
+	max-width: 62ch;
+}
+
+/* The pill the rest of the ecosystem carries, in this page's tokens. */
+.ecosystem {
+	align-items: center;
+	background: var(--surface);
+	border-radius: 999px;
+	box-shadow: var(--ring);
+	color: var(--text-3);
+	display: inline-flex;
+	flex: none;
+	font-size: 13px;
+	gap: 9px;
+	padding: 7px 15px 7px 8px;
+	text-decoration: none;
+	transition-duration: 150ms;
+	transition-property: background-color, color;
+	transition-timing-function: var(--ease);
+}
+
+.ecosystem:hover {
+	background: var(--surface-raised);
+	color: var(--text-2);
+}
+
+/* Round rather than the squircle the top bar's copy of this mark wears: this one sits inside a
+   999px pill, so a circle is what stays concentric with the shape around it. */
+.ecosystem img {
+	border-radius: 1000rem;
+	outline: 1px solid oklch(1 0 0 / 0.1);
+	outline-offset: -1px;
+}
+
+.ecosystem strong {
+	color: var(--text-2);
+	font-weight: 600;
+}
+
+.ecosystem:hover strong {
+	color: var(--text);
+}
+
+/* -- The page reaching into the element's light DOM --------------------------------------------
+
+   Everything below selects a class name @braccato/core emits, from this page's own stylesheet, at
+   document level. In a shadow root not one of these rules would land, and neither would the
+   `@property` registrations in the package's lyrics.css. That is the whole reason the element
+   builds into itself.
+
+   Colour is left to the theme, so the theme box in the panel owns every visible colour and nothing
+   here quietly outranks it. */
+
+braccato-lyrics {
+	display: block;
+}
+
+/* The module computes this and writes it on the root, but its own stylesheet only reads the bottom
+   half of the pair, so a standalone consumer supplies the top one. Without it the opening lines
+   cannot reach the view's target scroll position. */
+.blyrics-container {
+	padding-top: var(--blyrics-padding-top, 2rem);
+}
+
+[data-page-rules="on"] .blyrics-container {
+	letter-spacing: -0.045em;
+}
+
+/* `--blyrics-glow-color` is documented as the bloom a word earns by being held, but the package
+   hands it to every word alike, so nothing on the screen distinguishes the held ones. The engine
+   already marks them: `data-long-word` goes on any part past `blyrics-long-word-threshold`. So the
+   rest give their glow up and the held ones keep whatever colour the theme chose.
+
+   Two selectors because there are two targets. A word short enough to stay whole is animated
+   through its own `::after`; one past `blyrics-long-word-wrap-threshold` is split, and the sweep
+   moves to the `.blyrics-word-highlight` span inside it. */
+.blyrics--word:not([data-long-word])::after,
+.blyrics--word:not([data-long-word]) .blyrics-word-highlight {
+	--blyrics-glow-color: transparent;
+}
+
+/* -- Entrances -------------------------------------------- */
+
+@media (prefers-reduced-motion: no-preference) {
+	.topbar,
+	.hero__lede,
+	.install {
+		animation: rise 460ms var(--ease) both;
+	}
+
+	.hero__lede {
+		animation-delay: 120ms;
+	}
+
+	.install {
+		animation-delay: 200ms;
+	}
+
+	/* Opacity only: the renderer measures the lines it just built, and a transform or a filter on an
+	   ancestor is not something to hand it mid-measurement. */
+	.stage {
+		animation: appear 700ms var(--ease) both;
+	}
+
+	.panel:not([hidden]) {
+		animation: fly 180ms var(--ease) both;
+	}
+
+	/* The travel only. The fade underneath it is declared unconditionally, because a cross fade is
+	   what reduced motion asks for in place of movement rather than something to take away as well. */
+	.resume {
+		translate: 0 10px;
+	}
+
+	.resume[data-shown] {
+		translate: 0 0;
+	}
+
+	.log li {
+		animation: slip 240ms var(--ease) both;
+	}
+}
+
+@keyframes rise {
+	from {
+		filter: blur(4px);
+		opacity: 0;
+		translate: 0 10px;
+	}
+}
+
+@keyframes slip {
+	from {
+		opacity: 0;
+		translate: 0 -5px;
+	}
+}
+
+@keyframes appear {
+	from {
+		opacity: 0;
+	}
+}
+
+@keyframes fly {
+	from {
+		opacity: 0;
+		scale: 0.98;
+		translate: 0 8px;
+	}
+}

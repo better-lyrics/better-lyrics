@@ -1,3 +1,17 @@
+// Builds what goes inside a lyric line: the main and background content lines, the bidi runs inside
+// them, the word groups and the timed word spans the sweep animates, and the two decorators that
+// hang a translation or a romanization off a line that is already built. `view.ts` builds the line
+// and the container around it.
+//
+// The structure emitted here is as much published contract as the names written into it.
+// `constants.ts` says why a class name cannot be renamed; the nesting is under the same rule,
+// because a marketplace theme selects on the shape as well as on the names.
+//
+// A part is not a word. Providers hand over parts that run to several words, and the unit the sweep
+// animates is one word, so every part is split on whitespace with its timing pro-rated across the
+// split by character count. A line that arrives with no timed parts at all is rebuilt the same way
+// into zero duration words, so line synced lyrics reach the DOM the sweep already knows.
+
 import {
   BACKGROUND_LINE_CLASS,
   BACKGROUND_LYRIC_CLASS,
@@ -17,7 +31,7 @@ import {
   ZERO_DURATION_ANIMATION_CLASS,
 } from "./constants";
 import { getSeekTimeFromClick } from "./seek";
-import { containsNonLatin, testRtl } from "./text";
+import { testRtl } from "./text";
 import { registerThemeSetting } from "./themeSettings";
 import type { Lyric, LyricPart, LyricSyncType } from "./types";
 
@@ -72,10 +86,6 @@ export function deriveSyncType(lyrics: Lyric[]): LyricSyncType {
 
   if (hasTimedParts) return "richsync";
   return lyrics.every(item => item.startTimeMs === 0) ? "none" : "synced";
-}
-
-export function hasNonLatinLyrics(lyrics: Lyric[]): boolean {
-  return lyrics.some(item => !!item.words && containsNonLatin(item.words));
 }
 
 export interface PartData {

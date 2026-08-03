@@ -464,11 +464,6 @@ body {
   padding-inline: 0 !important;
 }
 
-.blyrics-pip-lyrics .blyrics-container::before,
-.blyrics-pip-lyrics .blyrics-container::after {
-  display: none !important;
-}
-
 /* Romanization is otherwise sized at the translated size over 1.25; here both secondary lines
    share one size so the variable above is the only knob. */
 .blyrics-pip-lyrics .blyrics--romanized {

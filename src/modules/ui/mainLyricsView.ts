@@ -1,109 +1,17 @@
 import { AppState } from "@core/appState";
 import { ytmHost } from "@modules/ui/lyricsHost";
-import {
-  type AnimationTickStatus,
-  clearLyrics,
-  clearOnScreenLyrics,
-  clearStyleCaches,
-  createAnimationEngineInstance,
-  forEveryLiveView,
-  getRenderedLines,
-  getRenderedSyncType,
-  hasRenderedLines,
-  type LineData,
-  type Lyric,
-  type LyricSyncType,
-  noteContainerResize,
-  noteUserScroll,
-  noteVisibilityChange,
-  relayout,
-  resetScrollResume,
-  retickFromPlaybackClock,
-  runAnimationEngine,
-  scheduleLyricPositionUpdate,
-  setLyrics,
-  type SetLyricsOptions,
-  type TickOptions,
-} from "@renderer/index";
+import { createLyricsRenderer, type LyricsRenderer, type TickOptions } from "@renderer/index";
 
-export { resetPlaybackClock } from "@renderer/index";
-
-// -- The side panel's engine instance --------------------------
-
-const mainEngine = createAnimationEngineInstance(document, window, ytmHost);
-
-// -- Operations every view answers to --------------------------
+// -- The side panel's view --------------------------
 
 /**
- * The user asked for autoscroll back, now. A seek is a property of playback rather than of one
- * view, so every view showing these lyrics resumes.
- */
-export function resumeAutoscroll(): void {
-  forEveryLiveView(resetScrollResume);
-}
-
-/**
- * The song went away, so the lyrics go with it everywhere they were rendered.
- */
-export function clearLyricsFromViews(): void {
-  forEveryLiveView(clearLyrics);
-}
-
-// -- Operations addressed to the side panel --------------------------
-
-export function noteMainViewUserScroll(isPassive: boolean): void {
-  noteUserScroll(mainEngine, isPassive);
-}
-
-export function noteMainViewResize(width: number, height: number): boolean {
-  return noteContainerResize(mainEngine, width, height);
-}
-
-export function clearMainViewOnScreenLyrics(): boolean {
-  return clearOnScreenLyrics(mainEngine);
-}
-
-export function hasMainViewLines(): boolean {
-  return hasRenderedLines(mainEngine);
-}
-
-export function getMainViewLines(): LineData[] {
-  return getRenderedLines(mainEngine);
-}
-
-export function getMainViewSyncType(): LyricSyncType {
-  return getRenderedSyncType(mainEngine);
-}
-
-export function noteAnimationVisibilityChange(): void {
-  noteVisibilityChange(mainEngine);
-}
-
-export function clearAnimationStyleCache(): void {
-  clearStyleCaches(mainEngine);
-}
-
-/**
- * Builds the side panel's lyrics DOM into the given mount and hands the result to its engine.
- */
-export function setMainViewLyrics(mount: HTMLElement, lyrics: Lyric[], options: SetLyricsOptions): void {
-  setLyrics(mainEngine, mount, lyrics, options);
-}
-
-/**
- * Main lyrics synchronization function that handles timing, highlighting, and scrolling.
+ * The side panel's lyrics view. Created at import time, long before YouTube Music has rendered a
+ * lyrics tab, so it is given no mount: the injection names one once it has built the wrapper.
  *
- * @param currentTime - Current playback time in seconds
- * @param options - Player snapshot and user settings this tick renders against
- * @returns "lyrics-missing" when the tick found nothing to render, so the driver can stop ticking
+ * Handed out without `destroy`, because destruction is final and there is no path back: this view
+ * lives for as long as the tab does, and seven modules can reach it.
  */
-export function animationEngine(currentTime: number, options: TickOptions): AnimationTickStatus {
-  return runAnimationEngine(mainEngine, currentTime, options);
-}
-
-function relayoutMainLyrics(measureLines: boolean): void {
-  relayout(mainEngine, measureLines);
-}
+export const mainView: Omit<LyricsRenderer, "destroy"> = createLyricsRenderer({ document, window, host: ytmHost });
 
 // -- Tick options --------------------------
 
@@ -127,22 +35,13 @@ export function currentTickOptions(eventCreationTime: number, isPlaying: boolean
 // -- Re-sync on layout change --------------------------
 
 /**
- * Re-reads the main view's layout after the stylesheet or the lyrics DOM changed. The padding is
- * always worth rewriting; the line positions are only measurable while the side panel is rendering
- * them, which is what the ticking flags stand in for.
- */
-export function calculateLyricPositions(): void {
-  relayoutMainLyrics(AppState.lyricData !== null && AppState.areLyricsTicking);
-}
-
-/**
  * Renders the side panel again against the last player snapshot, without smooth scrolling. Used
  * whenever something other than the clock moved the lyrics: an offset change, a line arriving.
  */
 export function retickMainView(): void {
   if (!AppState.areLyricsTicking) return;
 
-  const status = retickFromPlaybackClock(mainEngine, (eventCreationTime, isPlaying) =>
+  const status = mainView.retickFromPlaybackClock((eventCreationTime, isPlaying) =>
     currentTickOptions(eventCreationTime, isPlaying, false)
   );
   if (status === "lyrics-missing") {
@@ -156,5 +55,5 @@ export function retickMainView(): void {
 export function lyricsElementAdded(): void {
   if (!AppState.areLyricsTicking) return;
 
-  scheduleLyricPositionUpdate(mainEngine, () => AppState.areLyricsTicking, retickMainView);
+  mainView.scheduleLyricPositionUpdate(() => AppState.areLyricsTicking, retickMainView);
 }
