@@ -31,9 +31,21 @@ const THEME_ATTRIBUTE = "theme";
 // -- Following a media element --------------------------------------------
 
 // Every moment the clock moved, changed speed or stopped while no frame of this element's was
-// looking. Each one means the same thing here, so they share a handler. `ended`, `emptied`,
-// `loadedmetadata` and `error` are deliberately not among them: the README says why, and the frame
-// loop's own reading of the media element is what covers the ones that stop a clock.
+// looking. Each one means the same thing here, so they share a handler. `play` and `pause` are the
+// loop's start and stop. `seeking` moves the view as a scrub happens, since the position is already
+// the requested one by the time it fires, and `seeked` corrects it to where the media element
+// actually landed, which is not always the same number. `ratechange` retakes the reading with the
+// rate it will be carried at.
+//
+// The rest are deliberately not listened to, because the frame loop covers them by asking the media
+// element whether its clock is still going rather than trusting that something said so. `ended` is
+// covered by the `pause` a non-looping media element fires first and by that same question.
+// `emptied` says the resource went away rather than that the clock moved, and leaves the media
+// element paused at zero for the next frame to report; the README describes the one gap, which is
+// `emptied` while already paused. `error` is the one that would otherwise spin, and `isClockRunning`
+// below is what stops it. `waiting` and `stalled` are what the carry cap is for: both say the clock
+// stopped advancing without stopping. `loadedmetadata` carries nothing this element reads, and
+// `timeupdate` is a coarser copy of the frame loop while playing and of the seek events while not.
 const MEDIA_CLOCK_EVENTS: readonly string[] = ["play", "pause", "seeking", "seeked", "ratechange"];
 
 // How far past its last reading the media clock may be carried, in milliseconds of frame time
@@ -303,7 +315,8 @@ export class BraccatoLyricsElement extends HTMLElement {
    * A compiled stylesheet. Its `blyrics-*` comments configure the module and the sheet itself goes
    * into this element's document. An empty one puts every setting back to its default, and is
    * applied like any other: the settings are module scope, so an element that applied nothing would
-   * render against whatever the last theme in that bundle left behind.
+   * render against whatever the last theme in that bundle left behind. What that costs is that
+   * connecting an element nobody gave a theme empties the theme element already in its document.
    */
   get theme(): string {
     return this.#theme;
@@ -343,6 +356,11 @@ export class BraccatoLyricsElement extends HTMLElement {
    * the view is on the screen but not necessarily the way it was asked for: the theme settings are
    * module scope, so a document with two elements holding different themes renders both against
    * whichever was applied last.
+   *
+   * A `source` that named nothing to follow is deliberately not one of these. The element is still
+   * rendering, and a status saying otherwise would trade one true answer for another. What a
+   * consumer who was not listening for the error reads instead is `mediaElement`, which is null
+   * while `source` still holds the selector it could not resolve.
    */
   get status(): ElementStatus {
     if (this.#renderer === null) return this.#missingBrowsingContext ? "no-browsing-context" : "idle";
@@ -402,6 +420,12 @@ export class BraccatoLyricsElement extends HTMLElement {
 
   // -- Building --------------------------------------------
 
+  /**
+   * A throw from inside the module while the view is being built is the one thing `braccato:error`
+   * deliberately does not cover. Nothing here catches it, so it comes out of `connectedCallback` and
+   * the page reports it as an uncaught error with the stack it happened on, which is worth more to
+   * whoever has to fix it than an event carrying the same error second hand.
+   */
   #build(): void {
     if (this.#renderer !== null) return;
 

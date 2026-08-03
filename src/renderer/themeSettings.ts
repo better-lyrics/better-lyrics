@@ -1,6 +1,10 @@
 // The renderer declares the theme settings its own code reads, so a setting and the code that
 // consumes it stay together. Applying settings reports whether the lyrics need reloading; the host
 // decides what to do about it.
+//
+// What arrives here is compiled CSS rather than theme source. Better Lyrics themes are written in
+// RICS and compiled with the `rics` package first, which is the consumer's dependency and not this
+// module's: nothing under this directory ships with any.
 
 let keyToSettingMap: Map<string, Setting> = new Map();
 
@@ -81,6 +85,11 @@ export function parseThemeConfig(css: string): Map<string, string> {
 
 // -- Registry --------------------------------------------
 
+// Registration runs at module scope, which evaluates once per bundle however many views that bundle
+// is rendering, so a setting's value is shared by all of them rather than held per instance. The
+// unit is a bundle rather than a document: this extension bundles the module into the isolated world
+// and the page world separately, and each of those registries needs its own theme applied to it or
+// one view renders against defaults while the other renders against the theme.
 export function registerThemeSetting(
   key: string,
   defaultValue: number | boolean | string,
