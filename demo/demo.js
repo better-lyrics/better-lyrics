@@ -28,6 +28,11 @@ import { loadParsers, parseLyrics, PARSERS_SPECIFIER } from "./parsers.js";
 import { buildScore, SONGS } from "./song.js";
 import { THEMES } from "./themes.js";
 
+// Where the emitted package sits beside this page. It is the only line on the page that names that
+// path, so `npm run site` rewrites this one string when it copies the page out to a directory a
+// static host can serve, and the imports and the failure message both follow it.
+const PACKAGE_BASE = "../dist/package";
+
 const TAG_NAME = "braccato-lyrics";
 const LOG_LIMIT = 24;
 const COPIED_LABEL_MS = 1600;
@@ -1256,9 +1261,9 @@ function wireControls(lineClass, lyricsClass) {
 
 async function boot() {
   const [, { CUSTOM_THEME_STYLE_ID, LINE_CLASS, LYRICS_CLASS }, themeSettings] = await Promise.all([
-    import("../dist/package/element.js"),
-    import("../dist/package/constants.js"),
-    import("../dist/package/themeSettings.js"),
+    import(`${PACKAGE_BASE}/element.js`),
+    import(`${PACKAGE_BASE}/constants.js`),
+    import(`${PACKAGE_BASE}/themeSettings.js`),
   ]);
   parseThemeConfig = themeSettings.parseThemeConfig;
 
@@ -1317,5 +1322,5 @@ async function boot() {
 boot().catch(error => {
   stageStatus.hidden = false;
   stageStatus.dataset.failed = "";
-  stageStatus.textContent = `Could not load @braccato/core from dist/package. Run npm run demo, which emits it first.\n\n${error.message}`;
+  stageStatus.textContent = `Could not load @braccato/core from ${PACKAGE_BASE}.\n\n${error.message}`;
 });
