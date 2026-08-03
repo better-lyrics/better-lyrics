@@ -539,6 +539,14 @@ main {
 	color: var(--text-3);
 }
 
+/* The `blyrics-*` lines inside a comment, which are the only comments the module reads. Weight as
+   well as colour, because "this comment is load-bearing" is the one thing on the page that should
+   not be carried by hue alone. */
+.c-a {
+	color: var(--accent);
+	font-weight: 600;
+}
+
 /* -- Buttons -------------------------------------------- */
 
 .button,
@@ -872,6 +880,68 @@ main {
 
 .textarea::placeholder {
 	color: var(--text-3);
+}
+
+/* -- Theme editor -------------------------------------------- */
+
+/* The input and the layer painting its colours are the same box twice over, and they only stay
+   aligned while every property that decides where a glyph lands is identical. So the metrics are
+   declared once here and both of them read them from this element rather than each carrying its own
+   copy to drift. */
+.editor {
+	--editor-pad-block: 10px;
+	--editor-pad-inline: 12px;
+	background: var(--bg-sunken);
+	border-radius: var(--r-control);
+	box-shadow: var(--ring);
+	display: grid;
+	font-family: var(--font-mono);
+	font-size: 12px;
+	letter-spacing: normal;
+	line-height: 1.65;
+	margin-top: 10px;
+	position: relative;
+	tab-size: 2;
+}
+
+.editor__paint,
+.editor .textarea {
+	background: transparent;
+	box-shadow: none;
+	font: inherit;
+	letter-spacing: inherit;
+	margin: 0;
+	overflow-wrap: break-word;
+	padding: var(--editor-pad-block) var(--editor-pad-inline);
+	tab-size: inherit;
+	white-space: pre-wrap;
+}
+
+/* Scrolled with the input rather than clipped to it: an `overflow: hidden` box still has a scroll
+   position, and writing it is what keeps the colours under the text once the sheet is taller than
+   the box. */
+.editor__paint {
+	color: var(--text-2);
+	inset: 0;
+	overflow: hidden;
+	pointer-events: none;
+	position: absolute;
+	/* The input's scrollbar takes width off its content box and not off this one, which on its own
+	   is enough to wrap the two differently. Measured rather than assumed: it is zero where the
+	   platform draws scrollbars over the content, and zero again on a sheet short enough not to
+	   overflow. */
+	padding-inline-end: calc(var(--editor-pad-inline) + var(--editor-gutter, 0px));
+}
+
+.editor .textarea {
+	caret-color: var(--text);
+	position: relative;
+}
+
+/* Only once the layer behind it is being painted. A page whose script never ran keeps a text box
+   that can be read. */
+.editor .textarea[data-painted] {
+	color: transparent;
 }
 
 .status {

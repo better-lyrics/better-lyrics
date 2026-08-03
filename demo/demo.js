@@ -73,6 +73,7 @@ const parsersNote = document.getElementById("parsers-note");
 
 const themeList = document.getElementById("theme-list");
 const themeEditor = document.getElementById("theme-text");
+const themePaint = document.getElementById("theme-paint");
 const themeStatus = document.getElementById("theme-status");
 
 const offsetInput = document.getElementById("offset");
@@ -158,6 +159,17 @@ function wireCopy(button, label, read) {
 
 // -- Code samples --------------------------------------------
 
+// Two passes over the same shape, one for script and one for CSS. Everything a pass does not name is
+// collected and appended as a single text node, so a page of code costs a handful of elements rather
+// than one per character.
+
+function token(className, text) {
+  const span = document.createElement("span");
+  span.className = className;
+  span.textContent = text;
+  return span;
+}
+
 // One pass, six named things and everything else. The identifiers picked out are the package's own,
 // which is the point: what a reader's eye should land on in a sample is the API, not the syntax.
 const TOKEN_PATTERN = new RegExp(
@@ -169,24 +181,24 @@ const TOKEN_PATTERN = new RegExp(
     String.raw`\b(import|from|const|let|await|async|function|return|export|new|document|querySelector|fetch|then)\b`,
     String.raw`\b(braccato-lyrics|startTimeMs|durationMs|lyricsOptions|tickOptions|mediaElement|currentTime|detectParser|renderer|playing|lyrics|source|status|theme|parts|words|host|parse)\b`,
     String.raw`\b(\d+(?:\.\d+)?)\b`,
+    // A template literal in these samples is a stylesheet, because a theme is written as one. Its
+    // contents go through the CSS pass instead of this one.
+    String.raw`\`([\s\S]*?)\``,
     String.raw`([\s\S])`,
   ].join("|"),
   "g"
 );
 
 const TOKEN_CLASSES = ["c-c", "c-s", "c-t", "c-k", "c-b", "c-n"];
+const STYLES_GROUP = TOKEN_CLASSES.length + 1;
 
-/**
- * The sample as coloured nodes. Everything that is not one of the six is collected and appended as a
- * single text node, so a page of code costs a handful of elements rather than one per character.
- */
 function highlight(code) {
   const fragment = document.createDocumentFragment();
   let plain = "";
 
   for (const match of code.matchAll(TOKEN_PATTERN)) {
     const index = TOKEN_CLASSES.findIndex((_, group) => match[group + 1] !== undefined);
-    if (index === -1) {
+    if (index === -1 && match[STYLES_GROUP] === undefined) {
       plain += match[0];
       continue;
     }
@@ -196,13 +208,111 @@ function highlight(code) {
       plain = "";
     }
 
-    const span = document.createElement("span");
-    span.className = TOKEN_CLASSES[index];
-    span.textContent = match[0];
-    fragment.append(span);
+    if (index === -1) fragment.append("`", highlightStyles(match[STYLES_GROUP]), "`");
+    else fragment.append(token(TOKEN_CLASSES[index], match[0]));
   }
 
   if (plain !== "") fragment.append(plain);
+  return fragment;
+}
+
+// -- The CSS pass --------------------------------------------
+
+// A string and a comment are consumed whole whether or not they are coloured, because a brace or a
+// semicolon inside either one would otherwise be read as structure.
+const STYLE_TOKEN_PATTERN = new RegExp(
+  [
+    String.raw`(\/\*[\s\S]*?\*\/)`,
+    String.raw`("[^"\n]*"|'[^'\n]*')`,
+    String.raw`(@[\w-]+|!\s*important)`,
+    String.raw`([\w-]*blyrics[\w-]*)`,
+    String.raw`(-?(?:\d*\.)?\d+[a-z%]*)`,
+    String.raw`([A-Za-z_-][\w-]*)`,
+    String.raw`([\s\S])`,
+  ].join("|"),
+  "g"
+);
+
+// The only comments the module reads, in the same shape `parseThemeConfig` looks for. Written out
+// here because colouring wants the positions and that function returns the values, and a highlighter
+// that disagreed with the parser about what a setting is would be worse than no colour at all.
+const STYLE_SETTING_PATTERN = /blyrics-[\w-]+\s*=\s*[^;]+;/g;
+
+/** Prose grey, and the `blyrics-*` lines the module reads picked out of it. */
+function appendComment(fragment, comment) {
+  let at = 0;
+
+  for (const match of comment.matchAll(STYLE_SETTING_PATTERN)) {
+    if (match.index > at) fragment.append(token("c-c", comment.slice(at, match.index)));
+    fragment.append(token("c-a", match[0]));
+    at = match.index + match[0].length;
+  }
+
+  if (at < comment.length) fragment.append(token("c-c", comment.slice(at)));
+}
+
+/**
+ * The stylesheet as coloured nodes. Whether a name is a property or part of a selector is the one
+ * thing CSS cannot be tokenised without tracking, so the braces are counted, and each one remembers
+ * whether an at-rule opened it: the rules inside `@media` are still rules.
+ */
+function highlightStyles(css) {
+  const fragment = document.createDocumentFragment();
+  const openedByAtRule = [];
+  let atRulePending = false;
+  let inValue = false;
+  let plain = "";
+
+  const flush = () => {
+    if (plain === "") return;
+    fragment.append(plain);
+    plain = "";
+  };
+
+  const inDeclarations = () => openedByAtRule.length > 0 && !openedByAtRule[openedByAtRule.length - 1];
+
+  for (const [, comment, string, keyword, name, number, word, other] of css.matchAll(STYLE_TOKEN_PATTERN)) {
+    if (comment !== undefined) {
+      flush();
+      appendComment(fragment, comment);
+    } else if (string !== undefined) {
+      plain += string;
+    } else if (keyword !== undefined) {
+      flush();
+      if (keyword.startsWith("@")) atRulePending = true;
+      fragment.append(token("c-k", keyword));
+    } else if (name !== undefined) {
+      flush();
+      fragment.append(token("c-b", name));
+    } else if (number !== undefined) {
+      flush();
+      fragment.append(token("c-n", number));
+    } else if (word !== undefined) {
+      if (!inDeclarations() || inValue) {
+        plain += word;
+      } else {
+        flush();
+        fragment.append(token("c-k", word));
+      }
+    } else {
+      if (other === "{") {
+        openedByAtRule.push(atRulePending);
+        atRulePending = false;
+        inValue = false;
+      } else if (other === "}") {
+        openedByAtRule.pop();
+        inValue = false;
+      } else if (other === ":" && inDeclarations()) {
+        inValue = true;
+      } else if (other === ";") {
+        atRulePending = false;
+        inValue = false;
+      }
+      plain += other;
+    }
+  }
+
+  flush();
   return fragment;
 }
 
@@ -502,7 +612,10 @@ function paintControls() {
 
   // Never while the caret might be in it: the editor is the only control whose value a reader is
   // mid-way through typing.
-  if (themeEditor.value !== state.themeText) themeEditor.value = state.themeText;
+  if (themeEditor.value !== state.themeText) {
+    themeEditor.value = state.themeText;
+    paintThemeEditor();
+  }
 }
 
 function commit() {
@@ -660,8 +773,35 @@ function describeTheme(css) {
 let parseThemeConfig = () => new Map();
 let themeTimer = 0;
 
+/** Whatever the input is doing to its own box, the layer behind it does too. */
+function matchThemeEditor() {
+  themePaint.style.setProperty("--editor-gutter", `${themeEditor.offsetWidth - themeEditor.clientWidth}px`);
+  themePaint.scrollTop = themeEditor.scrollTop;
+  themePaint.scrollLeft = themeEditor.scrollLeft;
+}
+
+/**
+ * Repainted on every keystroke rather than debounced with the apply: putting a stylesheet into the
+ * document is worth waiting a moment for, and the text a reader is looking at while they type is
+ * not.
+ */
+function paintThemeEditor() {
+  // The trailing newline belongs to the layer rather than to the sheet. A textarea gives its final
+  // one a line and a <pre> does not, and a sheet that ends in one would scroll a line short.
+  themePaint.replaceChildren(highlightStyles(`${themeEditor.value}\n`));
+  themeEditor.dataset.painted = "";
+  matchThemeEditor();
+}
+
 function wireThemeEditor() {
+  themeEditor.addEventListener("scroll", matchThemeEditor, { passive: true });
+
+  // The drag handle and a change of width both decide whether the input overflows, and neither of
+  // them raises input.
+  new ResizeObserver(matchThemeEditor).observe(themeEditor);
+
   themeEditor.addEventListener("input", () => {
+    paintThemeEditor();
     state.themeText = themeEditor.value;
     state.themeId = THEMES.find(theme => theme.css === themeEditor.value)?.id ?? null;
 

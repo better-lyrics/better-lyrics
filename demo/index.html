@@ -348,13 +348,20 @@
           <h3 id="theme-panel-heading">Theme</h3>
           <div class="picker" id="theme-list"></div>
           <label class="visually-hidden" for="theme-text">Theme stylesheet</label>
-          <textarea
-            class="textarea textarea--tall"
-            id="theme-text"
-            rows="14"
-            spellcheck="false"
-            aria-describedby="theme-status"
-          ></textarea>
+
+          <!-- A textarea cannot colour its own text, so the colours are painted by the <pre> and the
+               input sits transparent on top of it. The paint comes first in the document so the
+               caret and the selection, which are drawn in the input's own layer, stay above it. -->
+          <div class="editor">
+            <pre class="editor__paint" id="theme-paint" aria-hidden="true"></pre>
+            <textarea
+              class="textarea textarea--tall"
+              id="theme-text"
+              rows="14"
+              spellcheck="false"
+              aria-describedby="theme-status"
+            ></textarea>
+          </div>
           <p class="status" id="theme-status" role="status"></p>
         </section>
 
