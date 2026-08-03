@@ -1,3 +1,21 @@
+// The rules that keep src/renderer/ publishable as @braccato/core, and the check that enforces them.
+//
+// Nothing under this directory may import from `@core/*`, `@modules/*`, `@constants`, `@utils`,
+// `@options` or `@/`, reach outside the directory with a relative path, reference the extension
+// global, or import a package. Nothing under `styles/` may name a YouTube Music selector, or read a
+// custom property the module neither owns nor declares. Nothing outside the directory may import
+// past its published entry points. This file runs as part of `npm run selfcheck`, and if a change
+// makes it fail, the change is wrong, not the check.
+//
+// The one exemption: `*.selfcheck.ts` files may import `node:*` builtins and `typescript`. They are
+// repo infrastructure, never bundled, and `typescript` is a devDependency here and in braccato.
+//
+// The extension global rule is not stylistic. On Firefox this module runs in the PAGE world, because
+// Gecko hands content scripts a cross-origin wrapper on the Picture-in-Picture window. A single
+// reference drags the webext polyfill into that bundle and kills it silently. See
+// `.claude/rules/pitfalls.md`, and `NOTES.md` beside this file for the rest of the module's design
+// record.
+
 import { strict as assert } from "node:assert";
 import { readFileSync, readdirSync } from "node:fs";
 import { dirname, extname, join, relative, resolve, sep } from "node:path";
