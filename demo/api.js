@@ -1,5 +1,5 @@
-// What the demo page tells a reader about @braccato/core, in one place so there is one place to
-// change it. The page renders the reference section out of this file, and
+// What this page tells a reader about @braccato/core, in one place so there is one place to change
+// it. The page renders its reference and its code samples out of this file, and
 // `tooling/check-demo-api.ts` reads the same file and holds every name in it against what
 // `npm run package` actually emitted. A property renamed in the module fails the package build
 // rather than quietly leaving a wrong page on the screen.
@@ -8,9 +8,77 @@
 // to it rather than copying it: this file carries what a consumer needs to write the tag, and stops
 // where the reasoning starts.
 
-// The copy that shipped inside the artifact this page is running, rather than a URL on a branch
-// that may not have merged yet. `npm run package` copies it out of src/renderer verbatim.
-export const README_URL = "../dist/package/README.md";
+// -- The package --------------------------------------------
+
+// `version` is checked against the emitted package.json, so the number on the page cannot drift from
+// the number in the artifact.
+export const PACKAGE = {
+  name: "@braccato/core",
+  version: "0.2.0",
+  npmHref: "https://www.npmjs.com/package/@braccato/core",
+  repoHref: "https://github.com/better-lyrics/better-lyrics/tree/master/src/renderer",
+  // The copy that shipped inside the artifact this page is running, rather than a URL on a branch
+  // that may not have merged yet. `npm run package` copies it out of src/renderer verbatim.
+  readmeHref: "../dist/package/README.md",
+};
+
+export const INSTALLERS = [
+  { id: "npm", label: "npm", command: "npm install" },
+  { id: "pnpm", label: "pnpm", command: "pnpm add" },
+  { id: "yarn", label: "yarn", command: "yarn add" },
+  { id: "bun", label: "bun", command: "bun add" },
+];
+
+// -- Code samples --------------------------------------------
+
+export const SNIPPETS = {
+  quickstart: `<audio id="player" src="song.mp3" controls></audio>
+<braccato-lyrics source="#player"></braccato-lyrics>
+
+<script type="module">
+  import "@braccato/core/element";
+  import "@braccato/core/styles/variables.css";
+  import "@braccato/core/styles/lyrics.css";
+  import "@braccato/core/styles/instrumental.css";
+
+  // The array is the interface. Nothing in the package produces one for you.
+  document.querySelector("braccato-lyrics").lyrics = [
+    {
+      startTimeMs: 3000,
+      durationMs: 3000,
+      words: "The kettle starts at six",
+      parts: [
+        { startTimeMs: 3000, durationMs: 375, words: "The " },
+        { startTimeMs: 3375, durationMs: 375, words: "ket" },
+        { startTimeMs: 3750, durationMs: 375, words: "tle " },
+      ],
+    },
+  ];
+</script>`,
+
+  parsers: `// npm install @braccato/parsers
+import { detectParser } from "@braccato/parsers";
+
+const view = document.querySelector("braccato-lyrics");
+const player = document.querySelector("#player");
+
+const text = await fetch("song.ttml").then(response => response.text());
+
+// TTML, LRC, SRT, QRC and plain text, picked by reading the file.
+const parser = detectParser(text);
+view.lyrics = parser.parse(text, player.duration * 1000);`,
+
+  theme: `view.theme = \`
+  /* blyrics-target-scroll-pos-ratio = 0.5; */
+  /* blyrics-long-word-threshold = 900; */
+
+  .blyrics-container {
+    --blyrics-font-size: 3.5rem;
+    --blyrics-lyric-active-color: white;
+    --blyrics-lyric-inactive-color: rgb(255 255 255 / 0.25);
+  }
+\`;`,
+};
 
 // -- Properties --------------------------------------------
 
@@ -84,7 +152,7 @@ export const PROPERTIES = [
     type: "LyricsRenderer | null",
     writable: false,
     summary:
-      "The renderer underneath, for the day the tag runs out. This page uses it for noteUserScroll and relayout, neither of which the element reaches on its own.",
+      "The renderer underneath, for the day the tag runs out. noteUserScroll and relayout live there, and the element reaches neither on its own, so a page that lets people scroll or restyle the view calls them itself.",
   },
   {
     member: "status",
@@ -180,7 +248,82 @@ export const CLASS_NAMES = [
     constant: "CUSTOM_THEME_STYLE_ID",
     value: "blyrics-custom-style",
     summary:
-      "The id of the <style> the theme lands in. Findable on purpose: this extension reads one view's theme off it to hand to another.",
+      "The id of the <style> the theme lands in. Findable on purpose, so a second view can be handed the stylesheet the first one is running.",
+  },
+];
+
+// -- Theme settings --------------------------------------------
+
+// The keys a theme declares in its comments. `key` is checked against the emitted module: every one
+// of these is registered somewhere in the engine, and a setting renamed there fails this build.
+// `rebuilds` marks the ones the lines are built out of rather than ticked against, which is why
+// writing one of those reports braccato:lyrics-loaded again.
+export const THEME_SETTINGS = [
+  {
+    key: "blyrics-target-scroll-pos-ratio",
+    fallback: "0.37",
+    rebuilds: false,
+    summary: "Where the active line sits, measured down from the top of the view. 0 is the top, 1 the bottom.",
+  },
+  {
+    key: "blyrics-disable-richsync",
+    fallback: "false",
+    rebuilds: true,
+    summary: "Drops syllable timing and lights whole lines instead, however finely timed the array was.",
+  },
+  {
+    key: "blyrics-long-word-threshold",
+    fallback: "1500",
+    rebuilds: true,
+    summary: "Milliseconds a word has to be held before it earns the glow.",
+  },
+  {
+    key: "blyrics-long-word-wrap-threshold",
+    fallback: "10",
+    rebuilds: true,
+    summary: "Characters past which a held word is split, so the glow follows the letters rather than the whole word.",
+  },
+  {
+    key: "blyrics-line-synced-animation-delay",
+    fallback: "50",
+    rebuilds: true,
+    summary: "Milliseconds a line-synced line takes to light up, since there is no word timing to follow.",
+  },
+  {
+    key: "blyrics-swipe-lead-ratio",
+    fallback: "0.1",
+    rebuilds: false,
+    summary: "How far into a word the sweep starts, as a fraction of that word's length.",
+  },
+  {
+    key: "blyrics-swipe-duration-ratio",
+    fallback: "1.6",
+    rebuilds: false,
+    summary: "How long the sweep runs, in multiples of the word's own length. Above 1 it overruns into the next word.",
+  },
+  {
+    key: "blyrics-lyric-ending-threshold-s",
+    fallback: "0.5",
+    rebuilds: false,
+    summary: "Seconds before a line ends at which it starts handing over to the next one.",
+  },
+  {
+    key: "blyrics-passive-scroll-enabled",
+    fallback: "true",
+    rebuilds: false,
+    summary: "Whether unsynced lyrics drift at all. Only they read it; a timed song ignores it.",
+  },
+  {
+    key: "blyrics-passive-scroll-seconds-per-line",
+    fallback: "3.5",
+    rebuilds: false,
+    summary: "How long a drifting view spends on each line.",
+  },
+  {
+    key: "blyrics-line-scroll-duration",
+    fallback: "a calc() off the line's distance from the active one",
+    rebuilds: false,
+    summary: "A CSS time rather than a number. Lines further from the active one take longer, and this is that curve.",
   },
 ];
 

@@ -12,9 +12,23 @@ import { readFileSync } from "fs";
 import { join } from "path";
 import { createSourceFile, forEachChild, isClassDeclaration, isVariableStatement, ScriptTarget } from "typescript";
 import type { Node } from "typescript";
-import { ATTRIBUTES, CLASS_NAMES, CUSTOM_PROPERTIES, EVENTS, PROPERTIES, STYLESHEETS } from "../demo/api.js";
+import {
+  ATTRIBUTES,
+  CLASS_NAMES,
+  CUSTOM_PROPERTIES,
+  EVENTS,
+  PACKAGE,
+  PROPERTIES,
+  STYLESHEETS,
+  THEME_SETTINGS,
+} from "../demo/api.js";
 
 const ELEMENT_CLASS = "BraccatoLyricsElement";
+
+// Where `registerThemeSetting` is called. Both are read whole rather than scanned for the call,
+// because a key built from a custom property name arrives as `--the-key` and only the string is
+// looked for.
+const SETTING_SOURCES = ["engine.js", "inject.js"];
 
 /** Members of the element's class, as `element.d.ts` declares them. */
 function readElementMembers(packageDir: string): Set<string> {
@@ -68,6 +82,20 @@ function quotesEvery(names: string[], text: string): string[] {
 export function checkDemoApi(packageDir: string): void {
   const failures: string[] = [];
 
+  const emittedVersion = JSON.parse(readFileSync(join(packageDir, "package.json"), "utf8")).version;
+  if (emittedVersion !== PACKAGE.version) {
+    failures.push(`the page says version ${PACKAGE.version}, the artifact says ${emittedVersion}`);
+  }
+
+  const settingSources = SETTING_SOURCES.map(file => readFileSync(join(packageDir, file), "utf8")).join("\n");
+  for (const { key } of THEME_SETTINGS) {
+    // Most keys are written out whole; the line scroll ones are derived from a custom property name,
+    // so the literal in the source carries the leading dashes.
+    if (!settingSources.includes(`"${key}"`) && !settingSources.includes(`"--${key}"`)) {
+      failures.push(`nothing registers the \`${key}\` theme setting`);
+    }
+  }
+
   const members = readElementMembers(packageDir);
   for (const { member } of PROPERTIES) {
     if (!members.has(member)) failures.push(`${ELEMENT_CLASS} has no member \`${member}\``);
@@ -118,6 +146,7 @@ export function checkDemoApi(packageDir: string): void {
     ATTRIBUTES.length +
     EVENTS.length +
     CLASS_NAMES.length +
+    THEME_SETTINGS.length +
     CUSTOM_PROPERTIES.length +
     STYLESHEETS.length;
   console.log(`demo/api.js checks out: ${counted} documented names found in dist/package`);
