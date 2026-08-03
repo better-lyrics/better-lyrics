@@ -1,6 +1,6 @@
-// Boots the demo against the emitted package in dist/package, reports what it observed while doing
-// it, and then hands the controls over. Two things here cannot be checked anywhere but a real
-// browser, so they are checked here and shown on the page rather than asserted in prose:
+// Runs @braccato/core straight off the artifact `npm run package` emitted, wires every control on
+// the page to a property on the tag, and reports two things that can only be checked in a real
+// browser:
 //
 //   1. The element upgrades. The parser builds <braccato-lyrics> with its attributes already on it,
 //      before the module that defines it exists, so the attribute reactions are delivered during the
@@ -12,45 +12,77 @@
 // The package is imported dynamically rather than at the top of this module so that the state before
 // it loaded can be read at all: a static import is hoisted above every statement in the file.
 
-import { ATTRIBUTES, CLASS_NAMES, CUSTOM_PROPERTIES, EVENTS, PROPERTIES, README_URL, STYLESHEETS } from "./api.js";
-import { buildScore } from "./song.js";
+import {
+  ATTRIBUTES,
+  CLASS_NAMES,
+  CUSTOM_PROPERTIES,
+  EVENTS,
+  INSTALLERS,
+  PACKAGE,
+  PROPERTIES,
+  SNIPPETS,
+  STYLESHEETS,
+  THEME_SETTINGS,
+} from "./api.js";
+import { loadParsers, parseLyrics, PARSERS_SPECIFIER } from "./parsers.js";
+import { buildScore, SONGS } from "./song.js";
+import { THEMES } from "./themes.js";
 
 const TAG_NAME = "braccato-lyrics";
 const LOG_LIMIT = 24;
 const COPIED_LABEL_MS = 1600;
-
-// The scroll ratio the markup asks for. The control starts here so that the theme this page writes
-// agrees with the theme the upgrade delivered, and the Upgrade panel keeps meaning what it says.
-const MARKUP_SCROLL_RATIO = 0.42;
+const THEME_APPLY_DELAY_MS = 250;
+const ARRAY_PREVIEW_LIMIT = 12000;
+const AUDIO_EXTENSIONS = /\.(mp3|wav|ogg|oga|m4a|aac|flac|opus|weba|webm)$/i;
+const PANEL_OPEN_WIDTH = "(min-width: 1080px)";
 
 const view = document.querySelector(TAG_NAME);
-const audio = document.getElementById("demo-audio");
+const player = document.getElementById("player");
 const frame = document.getElementById("stage-frame");
 const stageStatus = document.getElementById("stage-status");
+const heroBand = document.getElementById("hero-band");
+
+const installTabs = document.getElementById("install-tabs");
+const installText = document.getElementById("install-text");
+const installCopy = document.getElementById("install-copy");
+
 const playButton = document.getElementById("play");
 const seekInput = document.getElementById("seek");
 const elapsedOutput = document.getElementById("elapsed");
 const durationOutput = document.getElementById("duration");
-const pageThemeInput = document.getElementById("page-theme");
-const upgradeVerdict = document.getElementById("upgrade-verdict");
-const upgradeReadout = document.getElementById("upgrade-readout");
-const cascadeReadout = document.getElementById("cascade-readout");
-const eventLog = document.getElementById("event-log");
+const nowPlaying = document.getElementById("now-playing");
 
-const copyLinkButton = document.getElementById("copy-link");
+const panel = document.getElementById("panel");
+const panelToggle = document.getElementById("panel-toggle");
+const panelClose = document.getElementById("panel-close");
+
+const songList = document.getElementById("song-list");
+const songFileButton = document.getElementById("song-file");
+const songUrlInput = document.getElementById("song-url");
+const songUrlButton = document.getElementById("song-url-load");
+const songStatus = document.getElementById("song-status");
+
+const timingFieldset = document.getElementById("timing");
+const timingHint = document.getElementById("timing-hint");
+const lyricsFileButton = document.getElementById("lyrics-file");
+const lyricsTextArea = document.getElementById("lyrics-text");
+const lyricsImportButton = document.getElementById("lyrics-import");
+const lyricsStatus = document.getElementById("lyrics-status");
+const lyricsArray = document.getElementById("lyrics-array");
+const parsersNote = document.getElementById("parsers-note");
+
+const themeList = document.getElementById("theme-list");
+const themeEditor = document.getElementById("theme-text");
+const themeStatus = document.getElementById("theme-status");
+
 const offsetInput = document.getElementById("offset");
 const offsetValue = document.getElementById("offset-value");
 const passiveScrollInput = document.getElementById("passive-scroll");
-const scoreFieldset = document.getElementById("score");
-const scoreHint = document.getElementById("score-hint");
-const lyricsEditor = document.getElementById("lyrics-json");
-const lyricsError = document.getElementById("lyrics-error");
-const applyLyricsButton = document.getElementById("apply-lyrics");
-const resetLyricsButton = document.getElementById("reset-lyrics");
-const scrollRatioInput = document.getElementById("scroll-ratio");
-const scrollRatioValue = document.getElementById("scroll-ratio-value");
-const richSyncInput = document.getElementById("rich-sync");
-const themePreview = document.getElementById("theme-preview");
+const viewScrollInput = document.getElementById("scrollable-view");
+const pageRulesInput = document.getElementById("page-rules");
+
+const eventLog = document.getElementById("event-log");
+const dropzone = document.getElementById("dropzone");
 
 // -- Before the module exists --------------------------------------------
 
@@ -62,7 +94,7 @@ const beforeUpgrade = {
   themeAttribute: view.getAttribute("theme") ?? "",
 };
 
-// -- Rendering the panels --------------------------------------------
+// -- Small DOM helpers --------------------------------------------
 
 function renderReadout(list, rows) {
   list.replaceChildren(
@@ -78,201 +110,6 @@ function renderReadout(list, rows) {
     })
   );
 }
-
-function describeElement(element) {
-  if (element === null) return "null";
-  const id = element.id ? `#${element.id}` : "";
-  return `<${element.localName}${id}>`;
-}
-
-function describeSettings(settings) {
-  if (settings.size === 0) return "nothing";
-  return [...settings].map(([key, value]) => `${key} = ${value}`).join(", ");
-}
-
-// -- Upgrade --------------------------------------------
-
-function reportUpgrade(parseThemeConfig, themeStyleId) {
-  const askedFor = parseThemeConfig(beforeUpgrade.themeAttribute);
-  const themeStyleElement = document.getElementById(themeStyleId);
-  const inForce = parseThemeConfig(themeStyleElement?.textContent ?? "");
-
-  const themeArrived = askedFor.size > 0 && [...askedFor].every(([key, value]) => inForce.get(key) === value);
-  const upgraded = view.constructor.name !== beforeUpgrade.constructorName;
-  const sourceArrived = view.mediaElement === audio;
-  const startedUndefined = !beforeUpgrade.registered && !beforeUpgrade.hasAccessors;
-
-  renderReadout(upgradeReadout, [
-    {
-      label: "Registry, while the parser built the tag",
-      value: beforeUpgrade.registered ? "already defined" : "undefined",
-      state: startedUndefined ? undefined : "fail",
-    },
-    {
-      label: "Constructor, before and after the import",
-      value: `${beforeUpgrade.constructorName} -> ${view.constructor.name}`,
-      state: upgraded ? undefined : "fail",
-    },
-    {
-      label: "source attribute, resolved on upgrade",
-      value: `${beforeUpgrade.sourceAttribute} -> ${describeElement(view.mediaElement)}`,
-      state: sourceArrived ? undefined : "fail",
-    },
-    {
-      label: `theme attribute, read off #${themeStyleId}`,
-      value: describeSettings(inForce),
-      state: themeArrived ? undefined : "fail",
-    },
-    { label: "view.status", value: view.status, state: view.status === "rendering" ? undefined : "fail" },
-  ]);
-
-  const held = startedUndefined && upgraded && sourceArrived && themeArrived;
-  upgradeVerdict.dataset.state = held ? "pass" : "fail";
-  upgradeVerdict.textContent = held
-    ? "Built by the parser, defined afterwards. Both markup attributes arrived with the upgrade."
-    : "Something did not line up. The rows below are what was observed.";
-}
-
-// -- Light DOM cascade --------------------------------------------
-
-function reportCascade(lineClass, lyricsClass) {
-  const pageRulesApply = document.documentElement.dataset.pageTheme === "on";
-  const container = view.querySelector(`.${lyricsClass}`);
-  const line = view.querySelector(`.${lineClass}`);
-
-  // A registered custom property has a computed value on every element, whatever the element sets.
-  // An unregistered one computes to nothing. So the initial value coming back off <body> is the
-  // @property registration in the package's lyrics.css answering from document level.
-  const registration = getComputedStyle(document.body).getPropertyValue("--lyric-transition-amount-start").trim();
-
-  renderReadout(cascadeReadout, [
-    { label: "view.shadowRoot", value: String(view.shadowRoot), state: view.shadowRoot === null ? undefined : "fail" },
-    {
-      label: "Lines reachable from document scope",
-      value: String(document.querySelectorAll(`.${lineClass}`).length),
-    },
-    {
-      label: "@property registration, computed on <body>",
-      value: registration === "" ? "not registered" : registration,
-      state: registration === "" ? "fail" : undefined,
-    },
-    {
-      label: `letter-spacing on .${lyricsClass}`,
-      value: container === null ? "no container" : getComputedStyle(container).letterSpacing,
-      state: pageRulesApply ? undefined : "off",
-    },
-    {
-      label: `--blyrics-lyric-active-color on .${lineClass}`,
-      value:
-        line === null ? "no lines" : getComputedStyle(line).getPropertyValue("--blyrics-lyric-active-color").trim(),
-      state: pageRulesApply ? undefined : "off",
-    },
-  ]);
-}
-
-// -- Events --------------------------------------------
-
-function describeDetail(type, detail) {
-  if (type === "braccato:lyrics-loaded") return `lineCount ${detail.lineCount}, syncType "${detail.syncType}"`;
-  if (type === "braccato:line-click") return `timeS ${detail.timeS.toFixed(2)}`;
-  if (type === "braccato:scroll-state") return `userScrolling ${detail.userScrolling}`;
-  return `phase "${detail.phase}": ${detail.error.message}`;
-}
-
-function logEvent(event) {
-  const entry = document.createElement("li");
-  if (event.type === "braccato:error") entry.dataset.phase = "error";
-
-  const stamp = document.createElement("span");
-  stamp.className = "log__at";
-  stamp.textContent = formatClock(audio.currentTime);
-
-  const name = document.createElement("b");
-  name.textContent = event.type.slice("braccato:".length);
-
-  const detail = document.createElement("span");
-  detail.className = "log__detail";
-  detail.textContent = describeDetail(event.type, event.detail);
-
-  entry.append(stamp, name, detail);
-  eventLog.prepend(entry);
-  while (eventLog.childElementCount > LOG_LIMIT) eventLog.lastElementChild.remove();
-}
-
-// -- Transport --------------------------------------------
-
-function formatClock(seconds) {
-  const whole = Number.isFinite(seconds) ? Math.max(0, Math.floor(seconds)) : 0;
-  return `${Math.floor(whole / 60)}:${String(whole % 60).padStart(2, "0")}`;
-}
-
-let scrubbing = false;
-
-function paintTransport() {
-  const duration = Number.isFinite(audio.duration) ? audio.duration : 0;
-  const progress = duration === 0 ? 0 : audio.currentTime / duration;
-
-  elapsedOutput.textContent = formatClock(audio.currentTime);
-  seekInput.style.setProperty("--seek-progress", String(progress));
-  if (!scrubbing) {
-    seekInput.value = String(audio.currentTime);
-    seekInput.setAttribute("aria-valuetext", formatClock(audio.currentTime));
-  }
-}
-
-function followClock() {
-  paintTransport();
-  if (!audio.paused) requestAnimationFrame(followClock);
-}
-
-function adoptDuration() {
-  if (!Number.isFinite(audio.duration)) return;
-  seekInput.max = String(audio.duration);
-  durationOutput.textContent = formatClock(audio.duration);
-  paintTransport();
-}
-
-function wireTransport() {
-  // Read now as well as waited for: the track is preloaded from the markup, so its metadata is
-  // often already in by the time this module has finished importing the package.
-  audio.addEventListener("loadedmetadata", adoptDuration);
-  adoptDuration();
-
-  playButton.addEventListener("click", () => {
-    if (!audio.paused) {
-      audio.pause();
-      return;
-    }
-    audio.play().catch(error => {
-      stageStatus.hidden = false;
-      stageStatus.dataset.failed = "";
-      stageStatus.textContent = `The browser would not start playback: ${error.message}`;
-    });
-  });
-
-  audio.addEventListener("play", () => {
-    playButton.textContent = "Pause";
-    followClock();
-  });
-  audio.addEventListener("pause", () => {
-    playButton.textContent = "Play";
-    paintTransport();
-  });
-  audio.addEventListener("seeked", paintTransport);
-
-  seekInput.addEventListener("pointerdown", () => {
-    scrubbing = true;
-  });
-  seekInput.addEventListener("pointerup", () => {
-    scrubbing = false;
-  });
-  seekInput.addEventListener("input", () => {
-    audio.currentTime = Number(seekInput.value);
-    paintTransport();
-  });
-}
-
-// -- The reference --------------------------------------------
 
 function renderTerms(list, rows) {
   list.replaceChildren(
@@ -296,8 +133,556 @@ function renderTerms(list, rows) {
   );
 }
 
+function report(element, message, tone) {
+  element.textContent = message;
+  if (tone === undefined) element.removeAttribute("data-tone");
+  else element.dataset.tone = tone;
+}
+
+function wireCopy(button, label, read) {
+  button.setAttribute("aria-label", label);
+  button.addEventListener("click", async () => {
+    try {
+      await navigator.clipboard.writeText(read());
+      button.textContent = "Copied";
+      button.dataset.copied = "";
+    } catch {
+      button.textContent = "Clipboard blocked";
+    }
+    setTimeout(() => {
+      button.textContent = "Copy";
+      button.removeAttribute("data-copied");
+    }, COPIED_LABEL_MS);
+  });
+}
+
+// -- Code samples --------------------------------------------
+
+// One pass, six named things and everything else. The identifiers picked out are the package's own,
+// which is the point: what a reader's eye should land on in a sample is the API, not the syntax.
+const TOKEN_PATTERN = new RegExp(
+  [
+    String.raw`(\/\*[\s\S]*?\*\/|\/\/[^\n]*|<!--[\s\S]*?-->)`,
+    String.raw`("[^"]*"|'[^']*')`,
+    // An arrow, a comparison and a dash are not a closing tag, whatever they end with.
+    String.raw`(<\/?[A-Za-z][\w-]*|\/>|(?<![=!<>-])>)`,
+    String.raw`\b(import|from|const|let|await|async|function|return|export|new|document|querySelector|fetch|then)\b`,
+    String.raw`\b(braccato-lyrics|startTimeMs|durationMs|lyricsOptions|tickOptions|mediaElement|currentTime|detectParser|renderer|playing|lyrics|source|status|theme|parts|words|host|parse)\b`,
+    String.raw`\b(\d+(?:\.\d+)?)\b`,
+    String.raw`([\s\S])`,
+  ].join("|"),
+  "g"
+);
+
+const TOKEN_CLASSES = ["c-c", "c-s", "c-t", "c-k", "c-b", "c-n"];
+
+/**
+ * The sample as coloured nodes. Everything that is not one of the six is collected and appended as a
+ * single text node, so a page of code costs a handful of elements rather than one per character.
+ */
+function highlight(code) {
+  const fragment = document.createDocumentFragment();
+  let plain = "";
+
+  for (const match of code.matchAll(TOKEN_PATTERN)) {
+    const index = TOKEN_CLASSES.findIndex((_, group) => match[group + 1] !== undefined);
+    if (index === -1) {
+      plain += match[0];
+      continue;
+    }
+
+    if (plain !== "") {
+      fragment.append(plain);
+      plain = "";
+    }
+
+    const span = document.createElement("span");
+    span.className = TOKEN_CLASSES[index];
+    span.textContent = match[0];
+    fragment.append(span);
+  }
+
+  if (plain !== "") fragment.append(plain);
+  return fragment;
+}
+
+function renderSnippets() {
+  for (const block of document.querySelectorAll(".code[data-snippet]")) {
+    const name = block.dataset.snippet;
+    const source = SNIPPETS[name];
+
+    const bar = document.createElement("div");
+    bar.className = "code__bar";
+    const button = document.createElement("button");
+    button.className = "copy";
+    button.type = "button";
+    button.textContent = "Copy";
+    wireCopy(button, `Copy the ${name} example`, () => source);
+    bar.append(button);
+
+    const pre = document.createElement("pre");
+    const code = document.createElement("code");
+    code.append(highlight(source));
+    pre.append(code);
+
+    block.replaceChildren(bar, pre);
+  }
+}
+
+// -- Install --------------------------------------------
+
+function renderInstall() {
+  const legend = installTabs.querySelector("legend");
+
+  installTabs.replaceChildren(
+    legend,
+    ...INSTALLERS.map(installer => {
+      const label = document.createElement("label");
+      const input = document.createElement("input");
+      input.type = "radio";
+      input.name = "installer";
+      input.value = installer.id;
+      input.checked = installer.id === state.installer;
+      const text = document.createElement("span");
+      text.textContent = installer.label;
+      label.append(input, text);
+      return label;
+    })
+  );
+
+  installTabs.addEventListener("change", event => {
+    state.installer = event.target.value;
+    paintInstall();
+  });
+
+  wireCopy(installCopy, "Copy the install command", installCommand);
+}
+
+function installCommand() {
+  const installer = INSTALLERS.find(candidate => candidate.id === state.installer);
+  return `${installer.command} ${PACKAGE.name}`;
+}
+
+function paintInstall() {
+  const installer = INSTALLERS.find(candidate => candidate.id === state.installer);
+  const name = document.createElement("span");
+  name.className = "install__package";
+  name.textContent = PACKAGE.name;
+  installText.replaceChildren(`${installer.command} `, name);
+}
+
+// -- The song, in four shapes --------------------------------------------
+
+const scores = new Map();
+const shapes = new Map();
+
+function scoreFor(songId) {
+  if (!scores.has(songId)) scores.set(songId, buildScore(songId).lyrics);
+  return scores.get(songId);
+}
+
+// The same song told four ways, because `deriveSyncType` reads the timing rather than being told
+// about it: parts with a duration make it richsync, a non-zero start makes it synced, and lines that
+// all start at zero are how a consumer says these came with no timing at all.
+const TIMINGS = {
+  syllables: {
+    hint: "Every line carries parts, so the module reads it as richsync and animates inside the line.",
+    shape: score => score,
+  },
+  lines: {
+    hint: "The same lines with their parts dropped. The line lights up, the words inside it do not.",
+    shape: score =>
+      score.map(line => ({
+        startTimeMs: line.startTimeMs,
+        durationMs: line.durationMs,
+        words: line.words,
+        isInstrumental: line.isInstrumental,
+      })),
+  },
+  plain: {
+    hint: "Every start time at zero, which is how the module tells that nothing was synchronised. Passive scroll is the only thing that moves these.",
+    shape: score =>
+      score.filter(line => !line.isInstrumental).map(line => ({ startTimeMs: 0, durationMs: 0, words: line.words })),
+  },
+  empty: {
+    hint: "One line, flagged noLyrics, which is what stops passive scrolling from drifting a message across the view for the length of the track.",
+    shape: () => [{ startTimeMs: 0, durationMs: 0, words: "No lyrics for this one." }],
+  },
+};
+
+/**
+ * Cached per song and shape, because the element compares what it is handed against what it already
+ * has, and a fresh array on every commit would rebuild the view every time a slider moved.
+ */
+function builtInLyrics() {
+  const key = `${state.songId}|${state.timing}`;
+  if (!shapes.has(key)) shapes.set(key, TIMINGS[state.timing].shape(scoreFor(state.songId)));
+  return shapes.get(key);
+}
+
+// -- State --------------------------------------------
+
+const DEFAULTS = {
+  songId: SONGS[0].id,
+  timing: "syllables",
+  themeId: THEMES[0].id,
+  offsetMs: 0,
+  passiveScroll: false,
+  viewScroll: false,
+  pageRules: true,
+};
+
+const state = {
+  ...DEFAULTS,
+  installer: INSTALLERS[0].id,
+  themeText: THEMES[0].css,
+  importedLyrics: null,
+  importedName: "",
+  audio: null,
+};
+
+const applied = { lyrics: null, theme: null, audioUrl: null };
+
+function clamp(value, min, max) {
+  return Math.min(max, Math.max(min, value));
+}
+
+function readStateFromUrl() {
+  const params = new URLSearchParams(location.search);
+
+  const song = params.get("song");
+  if (song !== null && SONGS.some(candidate => candidate.id === song)) state.songId = song;
+
+  const lines = params.get("lines");
+  if (lines !== null && lines in TIMINGS) state.timing = lines;
+
+  const theme = params.get("theme");
+  const starter = THEMES.find(candidate => candidate.id === theme);
+  if (starter !== undefined) {
+    state.themeId = starter.id;
+    state.themeText = starter.css;
+  }
+
+  const offset = Number(params.get("offset"));
+  if (Number.isFinite(offset) && params.has("offset")) {
+    state.offsetMs = Math.round(clamp(offset, -2000, 2000) / 25) * 25;
+  }
+
+  if (params.has("passive")) state.passiveScroll = params.get("passive") === "1";
+  if (params.has("scroll")) state.viewScroll = params.get("scroll") === "1";
+  if (params.has("page")) state.pageRules = params.get("page") === "1";
+}
+
+/**
+ * The address bar as the one copy of the state worth sharing. Imported lyrics, a dropped file and a
+ * hand written theme are all left out: they are kilobytes each, and a link nobody can send is worse
+ * than a link that carries less than everything.
+ */
+function writeStateToUrl() {
+  const params = new URLSearchParams();
+  if (state.audio === null && state.songId !== DEFAULTS.songId) params.set("song", state.songId);
+  if (state.importedLyrics === null && state.timing !== DEFAULTS.timing) params.set("lines", state.timing);
+  if (state.themeId !== null && state.themeId !== DEFAULTS.themeId) params.set("theme", state.themeId);
+  if (state.offsetMs !== DEFAULTS.offsetMs) params.set("offset", String(state.offsetMs));
+  if (state.passiveScroll !== DEFAULTS.passiveScroll) params.set("passive", state.passiveScroll ? "1" : "0");
+  if (state.viewScroll !== DEFAULTS.viewScroll) params.set("scroll", state.viewScroll ? "1" : "0");
+  if (state.pageRules !== DEFAULTS.pageRules) params.set("page", state.pageRules ? "1" : "0");
+
+  const query = params.toString();
+  history.replaceState(null, "", query === "" ? location.pathname : `${location.pathname}?${query}`);
+}
+
+// -- Applying it --------------------------------------------
+
+/**
+ * Renders the view again against the last player snapshot. `tickOptions` and most theme settings are
+ * read by the next tick rather than causing one, and the element only ticks while the media element
+ * is playing, so a control moved during a pause would otherwise do nothing visible until playback
+ * resumed. This is the door the module publishes for exactly that, and the element does not carry
+ * it: `renderer` is why it is reachable.
+ */
+function retick() {
+  view.renderer?.retickFromPlaybackClock((eventCreationTime, isPlaying) => ({
+    ...view.tickOptions,
+    eventCreationTime,
+    isPlaying,
+  }));
+}
+
+function applyAudio() {
+  const url = state.audio?.url ?? `./generated/${state.songId}.wav`;
+  if (url === applied.audioUrl) return;
+
+  const wasPlaying = !player.paused;
+  applied.audioUrl = url;
+  player.src = url;
+  player.load();
+  if (wasPlaying) player.play().catch(error => report(songStatus, error.message, "bad"));
+}
+
+function applyLyrics() {
+  const lyrics = state.importedLyrics ?? builtInLyrics();
+  if (lyrics === applied.lyrics) return;
+
+  // Options first: they are read by the next build, and writing lyrics is what builds.
+  view.lyricsOptions = { noLyrics: state.importedLyrics === null && state.timing === "empty" };
+  view.lyrics = lyrics;
+  applied.lyrics = lyrics;
+
+  const json = JSON.stringify(lyrics, null, 2);
+  lyricsArray.textContent =
+    json.length > ARRAY_PREVIEW_LIMIT
+      ? `${json.slice(0, ARRAY_PREVIEW_LIMIT)}\n\nCut here. ${lyrics.length} lines in total.`
+      : json;
+}
+
+function applyTheme() {
+  if (state.themeText === applied.theme) return;
+  view.theme = state.themeText;
+  applied.theme = state.themeText;
+  // Where the active line sits is read while the view measures itself, and a theme write does not
+  // re-measure: most settings do not move anything. So the measurement is asked for here.
+  view.renderer?.relayout();
+}
+
+function applyState() {
+  applyAudio();
+  applyLyrics();
+  applyTheme();
+
+  view.tickOptions = {
+    lyricOffset: state.offsetMs / 1000,
+    passiveScrollEnabled: state.passiveScroll,
+  };
+
+  document.documentElement.dataset.pageRules = state.pageRules ? "on" : "off";
+  document.documentElement.dataset.viewScroll = state.viewScroll ? "on" : "off";
+  retick();
+}
+
+/**
+ * WebKit has no `::-moz-range-progress`, so the filled half of a track is a gradient stop. The
+ * spoken value comes along for the ride: "0.42" is not what the control means, and the label beside
+ * it is the sighted answer to the same question.
+ */
+function paintSlider(input, spoken) {
+  const min = Number(input.min);
+  input.style.setProperty("--seek-progress", String((Number(input.value) - min) / (Number(input.max) - min)));
+  input.setAttribute("aria-valuetext", spoken);
+}
+
+function paintControls() {
+  const offsetLabel = `${state.offsetMs > 0 ? "+" : ""}${state.offsetMs} ms`;
+  offsetInput.value = String(state.offsetMs);
+  offsetValue.textContent = offsetLabel;
+  paintSlider(offsetInput, offsetLabel);
+
+  passiveScrollInput.checked = state.passiveScroll;
+  viewScrollInput.checked = state.viewScroll;
+  pageRulesInput.checked = state.pageRules;
+
+  for (const button of songList.querySelectorAll("button")) {
+    button.setAttribute("aria-pressed", String(state.audio === null && button.value === state.songId));
+  }
+
+  for (const button of themeList.querySelectorAll("button")) {
+    button.setAttribute("aria-pressed", String(button.value === state.themeId));
+  }
+
+  for (const radio of timingFieldset.querySelectorAll("input[type=radio]")) {
+    radio.checked = state.importedLyrics === null && radio.value === state.timing;
+  }
+
+  timingHint.textContent =
+    state.importedLyrics === null
+      ? TIMINGS[state.timing].hint
+      : `${state.importedName} is what the element is holding. Pick one of these to put the built-in song back.`;
+
+  nowPlaying.textContent = state.audio?.label ?? SONGS.find(candidate => candidate.id === state.songId).title;
+
+  // Never while the caret might be in it: the editor is the only control whose value a reader is
+  // mid-way through typing.
+  if (themeEditor.value !== state.themeText) themeEditor.value = state.themeText;
+}
+
+function commit() {
+  paintControls();
+  applyState();
+  writeStateToUrl();
+}
+
+// -- Songs --------------------------------------------
+
+function renderSongs() {
+  songList.replaceChildren(
+    ...SONGS.map(song => {
+      const button = document.createElement("button");
+      button.className = "pick";
+      button.type = "button";
+      button.value = song.id;
+
+      const title = document.createElement("b");
+      title.textContent = song.title;
+      const summary = document.createElement("span");
+      summary.textContent = song.summary;
+
+      button.append(title, summary);
+      button.addEventListener("click", () => {
+        releaseAudio();
+        state.songId = song.id;
+        report(songStatus, "");
+        commit();
+      });
+      return button;
+    })
+  );
+}
+
+function releaseAudio() {
+  if (state.audio?.objectUrl) URL.revokeObjectURL(state.audio.objectUrl);
+  state.audio = null;
+}
+
+function loadAudio(url, label, objectUrl) {
+  releaseAudio();
+  state.audio = { url, label, objectUrl };
+  report(
+    songStatus,
+    state.importedLyrics === null
+      ? `Playing ${label}. The lines are still the built-in song, so import a lyrics file to go with it.`
+      : `Playing ${label}.`,
+    "good"
+  );
+  commit();
+}
+
+// -- Lyrics --------------------------------------------
+
+async function importLyrics(text, label) {
+  const parsers = await loadParsers();
+  if (parsers === null) {
+    report(
+      lyricsStatus,
+      `${PARSERS_SPECIFIER} could not be fetched, so there is nothing here to read a file with. Everything else on the page still works.`,
+      "bad"
+    );
+    return;
+  }
+
+  let read;
+  try {
+    read = parseLyrics(parsers, text, player.duration * 1000);
+  } catch (error) {
+    report(lyricsStatus, error.message, "bad");
+    return;
+  }
+
+  state.importedLyrics = read.lyrics;
+  state.importedName = label;
+  report(lyricsStatus, `Read ${label} as ${read.format}. ${read.lyrics.length} lines.`, "good");
+  commit();
+}
+
+function readAsText(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(String(reader.result));
+    reader.onerror = () => reject(reader.error ?? new Error(`${file.name} could not be read.`));
+    reader.readAsText(file);
+  });
+}
+
+function isAudio(file) {
+  return file.type.startsWith("audio/") || AUDIO_EXTENSIONS.test(file.name);
+}
+
+async function acceptFile(file) {
+  if (isAudio(file)) {
+    const objectUrl = URL.createObjectURL(file);
+    loadAudio(objectUrl, file.name, objectUrl);
+    return;
+  }
+
+  try {
+    await importLyrics(await readAsText(file), file.name);
+  } catch (error) {
+    report(lyricsStatus, error.message, "bad");
+  }
+}
+
+function pickFile(accept, onPicked) {
+  const input = document.createElement("input");
+  input.type = "file";
+  input.accept = accept;
+  input.addEventListener("change", () => {
+    const file = input.files?.[0];
+    if (file !== undefined) onPicked(file);
+  });
+  input.click();
+}
+
+// -- Theme --------------------------------------------
+
+function renderThemes() {
+  themeList.replaceChildren(
+    ...THEMES.map(theme => {
+      const button = document.createElement("button");
+      button.className = "pick";
+      button.type = "button";
+      button.value = theme.id;
+
+      const title = document.createElement("b");
+      title.textContent = theme.title;
+      const summary = document.createElement("span");
+      summary.textContent = theme.summary;
+
+      button.append(title, summary);
+      button.addEventListener("click", () => {
+        state.themeId = theme.id;
+        state.themeText = theme.css;
+        commit();
+        describeTheme(theme.css);
+      });
+      return button;
+    })
+  );
+}
+
+function describeTheme(css) {
+  const settings = [...parseThemeConfig(css).keys()];
+  if (settings.length === 0) {
+    report(themeStatus, "No blyrics-* settings in here, so every one of them is at its default.");
+    return;
+  }
+  report(themeStatus, `${settings.length} setting${settings.length === 1 ? "" : "s"}: ${settings.join(", ")}.`);
+}
+
+let parseThemeConfig = () => new Map();
+let themeTimer = 0;
+
+function wireThemeEditor() {
+  themeEditor.addEventListener("input", () => {
+    state.themeText = themeEditor.value;
+    state.themeId = THEMES.find(theme => theme.css === themeEditor.value)?.id ?? null;
+
+    // Debounced, because a theme write puts a whole stylesheet into the document and re-measures the
+    // view, and doing that on every keystroke is felt.
+    clearTimeout(themeTimer);
+    themeTimer = setTimeout(() => {
+      commit();
+      describeTheme(state.themeText);
+    }, THEME_APPLY_DELAY_MS);
+  });
+}
+
+// -- The reference --------------------------------------------
+
 function renderReference() {
-  document.getElementById("readme-link").href = README_URL;
+  document.getElementById("package-version").textContent = PACKAGE.version;
+  document.getElementById("npm-link").href = PACKAGE.npmHref;
+  document.getElementById("repo-link").href = PACKAGE.repoHref;
+  document.getElementById("readme-link").href = PACKAGE.readmeHref;
+  parsersNote.textContent = `Parsing is ${PARSERS_SPECIFIER}, fetched from jsDelivr when the first file arrives.`;
 
   renderTerms(
     document.getElementById("properties-list"),
@@ -324,6 +709,15 @@ function renderReference() {
   );
 
   renderTerms(
+    document.getElementById("theme-settings-list"),
+    THEME_SETTINGS.map(row => ({
+      term: row.key,
+      meta: row.rebuilds ? `${row.fallback}, rebuilds the lines` : row.fallback,
+      definition: row.summary,
+    }))
+  );
+
+  renderTerms(
     document.getElementById("custom-properties-list"),
     CUSTOM_PROPERTIES.map(row => ({ term: row.property, definition: row.summary }))
   );
@@ -334,253 +728,327 @@ function renderReference() {
   );
 }
 
-// -- The song, in four shapes --------------------------------------------
+// -- The two proofs --------------------------------------------
 
-const score = buildScore().lyrics;
-
-// The same song told four ways, because `deriveSyncType` reads the timing rather than being told
-// about it: parts with a duration make it richsync, a non-zero start makes it synced, and lines that
-// all start at zero are how a consumer says these came with no timing at all.
-const SCORES = {
-  syllables: {
-    lyrics: score,
-    noLyrics: false,
-    hint: "Every line carries parts, so the module reads it as richsync and animates inside the line.",
-  },
-  lines: {
-    lyrics: score.map(line => ({
-      startTimeMs: line.startTimeMs,
-      durationMs: line.durationMs,
-      words: line.words,
-      isInstrumental: line.isInstrumental,
-    })),
-    noLyrics: false,
-    hint: "The same lines with their parts dropped. The line lights up, the words inside it do not.",
-  },
-  plain: {
-    lyrics: score
-      .filter(line => !line.isInstrumental)
-      .map(line => ({ startTimeMs: 0, durationMs: 0, words: line.words })),
-    noLyrics: false,
-    hint: "Every start time at zero, which is how the module tells that nothing was synchronised. Passive scroll is the only thing that moves these.",
-  },
-  none: {
-    lyrics: [{ startTimeMs: 0, durationMs: 0, words: "No lyrics for this one." }],
-    noLyrics: true,
-    hint: "One line, flagged noLyrics, which is what stops passive scrolling from drifting a message across the view for the length of the track.",
-  },
-};
-
-const CUSTOM_HINT = "Your lines. The audio is still the clock, and it has never heard of them.";
-
-// -- Playground state --------------------------------------------
-
-const DEFAULTS = {
-  score: "syllables",
-  offsetMs: 0,
-  passiveScroll: false,
-  scrollRatio: MARKUP_SCROLL_RATIO,
-  richSync: true,
-  pageRules: true,
-};
-
-const state = { ...DEFAULTS, customLyrics: null };
-
-function clamp(value, min, max) {
-  return Math.min(max, Math.max(min, value));
+function describeElement(element) {
+  if (element === null) return "null";
+  const id = element.id ? `#${element.id}` : "";
+  return `<${element.localName}${id}>`;
 }
 
-function readNumberParam(params, key, fallback, min, max) {
-  const raw = params.get(key);
-  if (raw === null) return fallback;
-  const parsed = Number(raw);
-  return Number.isFinite(parsed) ? clamp(parsed, min, max) : fallback;
+function describeSettings(settings) {
+  if (settings.size === 0) return "nothing";
+  return [...settings].map(([key, value]) => `${key} = ${value}`).join(", ");
 }
 
-function readStateFromUrl() {
-  const params = new URLSearchParams(location.search);
-  const lines = params.get("lines");
+function reportUpgrade(themeStyleId) {
+  const askedFor = parseThemeConfig(beforeUpgrade.themeAttribute);
+  const themeStyleElement = document.getElementById(themeStyleId);
+  const inForce = parseThemeConfig(themeStyleElement?.textContent ?? "");
 
-  if (lines !== null && lines in SCORES) state.score = lines;
-  state.offsetMs = Math.round(readNumberParam(params, "offset", DEFAULTS.offsetMs, -2000, 2000) / 25) * 25;
-  state.scrollRatio = Number(readNumberParam(params, "at", DEFAULTS.scrollRatio, 0.1, 0.9).toFixed(2));
-  if (params.has("passive")) state.passiveScroll = params.get("passive") === "1";
-  if (params.has("words")) state.richSync = params.get("words") === "1";
-  if (params.has("page")) state.pageRules = params.get("page") === "1";
+  const themeArrived = askedFor.size > 0 && [...askedFor].every(([key, value]) => inForce.get(key) === value);
+  const upgraded = view.constructor.name !== beforeUpgrade.constructorName;
+  const sourceArrived = view.mediaElement === player;
+  const startedUndefined = !beforeUpgrade.registered && !beforeUpgrade.hasAccessors;
+
+  renderReadout(document.getElementById("upgrade-readout"), [
+    {
+      label: "Registry, while the parser built the tag",
+      value: beforeUpgrade.registered ? "already defined" : "undefined",
+      state: startedUndefined ? undefined : "fail",
+    },
+    {
+      label: "Constructor, before and after the import",
+      value: `${beforeUpgrade.constructorName} -> ${view.constructor.name}`,
+      state: upgraded ? undefined : "fail",
+    },
+    {
+      label: "source attribute, resolved on upgrade",
+      value: `${beforeUpgrade.sourceAttribute} -> ${describeElement(view.mediaElement)}`,
+      state: sourceArrived ? undefined : "fail",
+    },
+    {
+      label: `theme attribute, read off #${themeStyleId}`,
+      value: describeSettings(inForce),
+      state: themeArrived ? undefined : "fail",
+    },
+    { label: "view.status", value: view.status, state: view.status === "rendering" ? undefined : "fail" },
+  ]);
+
+  const held = startedUndefined && upgraded && sourceArrived && themeArrived;
+  const verdict = document.getElementById("upgrade-verdict");
+  verdict.dataset.state = held ? "pass" : "fail";
+  verdict.textContent = held
+    ? "Built by the parser, defined afterwards. Both markup attributes arrived with the upgrade."
+    : "Something did not line up. The rows below are what was observed.";
 }
 
-/**
- * The address bar as the one copy of the state worth sharing. Custom lines are left out on purpose:
- * a song is kilobytes of JSON, and a link nobody can send is worse than a link that admits what it
- * carries.
- */
-function writeStateToUrl() {
-  const params = new URLSearchParams();
-  if (state.customLyrics === null && state.score !== DEFAULTS.score) params.set("lines", state.score);
-  if (state.offsetMs !== DEFAULTS.offsetMs) params.set("offset", String(state.offsetMs));
-  if (state.passiveScroll !== DEFAULTS.passiveScroll) params.set("passive", state.passiveScroll ? "1" : "0");
-  if (state.scrollRatio !== DEFAULTS.scrollRatio) params.set("at", String(state.scrollRatio));
-  if (state.richSync !== DEFAULTS.richSync) params.set("words", state.richSync ? "1" : "0");
-  if (state.pageRules !== DEFAULTS.pageRules) params.set("page", state.pageRules ? "1" : "0");
+function reportCascade(lineClass, lyricsClass) {
+  const pageRulesApply = document.documentElement.dataset.pageRules === "on";
+  const container = view.querySelector(`.${lyricsClass}`);
 
-  const query = params.toString();
-  history.replaceState(null, "", query === "" ? location.pathname : `${location.pathname}?${query}`);
+  // A registered custom property has a computed value on every element, whatever the element sets.
+  // An unregistered one computes to nothing. So the initial value coming back off <body> is the
+  // @property registration in the package's lyrics.css answering from document level.
+  const registration = getComputedStyle(document.body).getPropertyValue("--lyric-transition-amount-start").trim();
+
+  renderReadout(document.getElementById("cascade-readout"), [
+    { label: "view.shadowRoot", value: String(view.shadowRoot), state: view.shadowRoot === null ? undefined : "fail" },
+    {
+      label: "Lines reachable from document scope",
+      value: String(document.querySelectorAll(`.${lineClass}`).length),
+    },
+    {
+      label: "@property registration, computed on <body>",
+      value: registration === "" ? "not registered" : registration,
+      state: registration === "" ? "fail" : undefined,
+    },
+    {
+      label: `letter-spacing on .${lyricsClass}`,
+      value: container === null ? "no container" : getComputedStyle(container).letterSpacing,
+      state: pageRulesApply ? undefined : "off",
+    },
+  ]);
 }
 
-// -- Applying it --------------------------------------------
+// -- Events --------------------------------------------
 
-function compileTheme() {
-  return [
-    `/* blyrics-target-scroll-pos-ratio = ${state.scrollRatio}; */`,
-    `/* blyrics-disable-richsync = ${!state.richSync}; */`,
-  ].join("\n");
+function describeDetail(type, detail) {
+  if (type === "braccato:lyrics-loaded") return `lineCount ${detail.lineCount}, syncType "${detail.syncType}"`;
+  if (type === "braccato:line-click") return `timeS ${detail.timeS.toFixed(2)}`;
+  if (type === "braccato:scroll-state") return `userScrolling ${detail.userScrolling}`;
+  return `phase "${detail.phase}": ${detail.error.message}`;
 }
 
-/**
- * Renders the view again against the last player snapshot. `tickOptions` and most theme settings are
- * read by the next tick rather than causing one, and the element only ticks while the media element
- * is playing, so a control moved during a pause would otherwise do nothing visible until playback
- * resumed. This is the door the module publishes for exactly that, and the element does not carry
- * it: `renderer` is why it is reachable.
- */
-function retick() {
-  view.renderer?.retickFromPlaybackClock((eventCreationTime, isPlaying) => ({
-    ...view.tickOptions,
-    eventCreationTime,
-    isPlaying,
-  }));
-}
+function logEvent(event) {
+  const entry = document.createElement("li");
+  if (event.type === "braccato:error") entry.dataset.phase = "error";
 
-const applied = { lyrics: null, theme: null };
+  const stamp = document.createElement("span");
+  stamp.className = "log__at";
+  stamp.textContent = formatClock(player.currentTime);
 
-function applyLyrics() {
-  const preset = SCORES[state.score];
-  const lyrics = state.customLyrics ?? preset.lyrics;
-  if (lyrics === applied.lyrics) return;
+  const name = document.createElement("b");
+  name.textContent = event.type.slice("braccato:".length);
 
-  // Options first: they are read by the next build, and writing lyrics is what builds.
-  view.lyricsOptions = { noLyrics: state.customLyrics === null && preset.noLyrics };
-  view.lyrics = lyrics;
-  applied.lyrics = lyrics;
-}
+  const detail = document.createElement("span");
+  detail.className = "log__detail";
+  detail.textContent = describeDetail(event.type, event.detail);
 
-function applyState() {
-  applyLyrics();
+  entry.append(stamp, name, detail);
+  eventLog.prepend(entry);
+  while (eventLog.childElementCount > LOG_LIMIT) eventLog.lastElementChild.remove();
 
-  const theme = compileTheme();
-  if (theme !== applied.theme) {
-    view.theme = theme;
-    applied.theme = theme;
-    themePreview.textContent = theme;
-    // Where the active line sits is read while the view measures itself, and a theme write does not
-    // re-measure: most settings do not move anything. So the measurement is asked for here.
-    view.renderer?.relayout();
+  // A theme that will not apply is the one error a reader of this page can cause, so it is answered
+  // where they caused it rather than only in the log.
+  if (event.type === "braccato:error" && event.detail.phase === "theme") {
+    report(themeStatus, event.detail.error.message, "bad");
   }
-
-  view.tickOptions = {
-    lyricOffset: state.offsetMs / 1000,
-    passiveScrollEnabled: state.passiveScroll,
-  };
-
-  document.documentElement.dataset.pageTheme = state.pageRules ? "on" : "off";
-  retick();
 }
 
-/**
- * WebKit has no `::-moz-range-progress`, so the filled half of a track is a gradient stop. The
- * spoken value comes along for the ride: "0.42" is not what the control means, and the label beside
- * it is the sighted answer to the same question.
- */
-function paintSlider(input, spoken) {
-  const min = Number(input.min);
-  input.style.setProperty("--seek-progress", String((Number(input.value) - min) / (Number(input.max) - min)));
-  input.setAttribute("aria-valuetext", spoken);
+// -- Transport --------------------------------------------
+
+function formatClock(seconds) {
+  const whole = Number.isFinite(seconds) ? Math.max(0, Math.floor(seconds)) : 0;
+  return `${Math.floor(whole / 60)}:${String(whole % 60).padStart(2, "0")}`;
 }
 
-function paintControls() {
-  const offsetLabel = `${state.offsetMs > 0 ? "+" : ""}${state.offsetMs} ms`;
-  const ratioLabel = `${Math.round(state.scrollRatio * 100)}%`;
+let scrubbing = false;
 
-  offsetInput.value = String(state.offsetMs);
-  offsetValue.textContent = offsetLabel;
-  passiveScrollInput.checked = state.passiveScroll;
-  scrollRatioInput.value = String(state.scrollRatio);
-  scrollRatioValue.textContent = ratioLabel;
-  richSyncInput.checked = state.richSync;
-  pageThemeInput.checked = state.pageRules;
-  paintSlider(offsetInput, offsetLabel);
-  paintSlider(scrollRatioInput, ratioLabel);
+function paintTransport() {
+  const duration = Number.isFinite(player.duration) ? player.duration : 0;
+  const progress = duration === 0 ? 0 : player.currentTime / duration;
 
-  for (const radio of scoreFieldset.querySelectorAll("input[type=radio]")) {
-    radio.checked = state.customLyrics === null && radio.value === state.score;
+  elapsedOutput.textContent = formatClock(player.currentTime);
+  seekInput.style.setProperty("--seek-progress", String(progress));
+  if (!scrubbing) {
+    seekInput.value = String(player.currentTime);
+    seekInput.setAttribute("aria-valuetext", formatClock(player.currentTime));
   }
-  scoreHint.textContent = state.customLyrics === null ? SCORES[state.score].hint : CUSTOM_HINT;
 }
 
-function commit() {
-  paintControls();
-  applyState();
-  writeStateToUrl();
+function followClock() {
+  paintTransport();
+  if (!player.paused) requestAnimationFrame(followClock);
 }
 
-// -- The editor --------------------------------------------
-
-function seedEditor() {
-  lyricsEditor.value = JSON.stringify(state.customLyrics ?? SCORES[state.score].lyrics, null, 2);
+function adoptDuration() {
+  if (!Number.isFinite(player.duration)) return;
+  seekInput.max = String(player.duration);
+  durationOutput.textContent = formatClock(player.duration);
+  paintTransport();
 }
 
-function reportEditor(message) {
-  lyricsError.textContent = message;
-  lyricsEditor.setAttribute("aria-invalid", message === "" ? "false" : "true");
-}
+function wireTransport() {
+  // Read now as well as waited for: the track is preloaded from the markup, so its metadata is
+  // often already in by the time this module has finished importing the package.
+  player.addEventListener("loadedmetadata", adoptDuration);
+  adoptDuration();
 
-/**
- * What the element accepts, checked before it gets there. Handing it something else throws inside
- * the module, which is reported as `braccato:error` and leaves the view holding the last song that
- * parsed, and "nothing happened" is a poor answer to a typo.
- */
-function readLyrics(text) {
-  const parsed = JSON.parse(text);
-  if (!Array.isArray(parsed)) throw new TypeError("The top level has to be an array of lines.");
-  if (parsed.length === 0) throw new TypeError("An empty array clears the view. Pick Not found instead.");
-
-  for (const [index, line] of parsed.entries()) {
-    const where = `Line ${index + 1}`;
-    if (line === null || typeof line !== "object") throw new TypeError(`${where} is not an object.`);
-    if (typeof line.words !== "string") throw new TypeError(`${where} needs a words string.`);
-    if (!Number.isFinite(line.startTimeMs)) throw new TypeError(`${where} needs a numeric startTimeMs.`);
-    if (!Number.isFinite(line.durationMs)) throw new TypeError(`${where} needs a numeric durationMs.`);
-  }
-
-  return parsed;
-}
-
-function wireEditor() {
-  applyLyricsButton.addEventListener("click", () => {
-    let lyrics;
-    try {
-      lyrics = readLyrics(lyricsEditor.value);
-    } catch (error) {
-      reportEditor(error.message);
+  playButton.addEventListener("click", () => {
+    if (!player.paused) {
+      player.pause();
       return;
     }
-
-    reportEditor("");
-    state.customLyrics = lyrics;
-    commit();
+    player.play().catch(error => {
+      stageStatus.hidden = false;
+      stageStatus.dataset.failed = "";
+      stageStatus.textContent = `The browser would not start playback: ${error.message}`;
+    });
   });
 
-  resetLyricsButton.addEventListener("click", () => {
-    reportEditor("");
-    state.customLyrics = null;
-    seedEditor();
-    commit();
+  player.addEventListener("play", () => {
+    playButton.textContent = "Pause";
+    followClock();
+  });
+  player.addEventListener("pause", () => {
+    playButton.textContent = "Play";
+    paintTransport();
+  });
+  player.addEventListener("seeked", paintTransport);
+  player.addEventListener("error", () => {
+    report(songStatus, `That did not load. ${player.error?.message ?? "The browser gave no reason."}`, "bad");
+  });
+
+  seekInput.addEventListener("pointerdown", () => {
+    scrubbing = true;
+  });
+  seekInput.addEventListener("pointerup", () => {
+    scrubbing = false;
+  });
+  seekInput.addEventListener("input", () => {
+    player.currentTime = Number(seekInput.value);
+    paintTransport();
+  });
+}
+
+// -- The room the view gets --------------------------------------------
+
+/**
+ * The view stops above the hero copy, and how much copy that is depends on the width: one line of
+ * headline at 1440, four at 390. Measured rather than guessed, and the view is told each time,
+ * because where the active line sits is worked out from the height of the frame.
+ */
+function watchHeroBand() {
+  const observer = new ResizeObserver(() => {
+    document.documentElement.style.setProperty("--hero-band", `${heroBand.offsetHeight}px`);
+    view.renderer?.relayout();
+  });
+  observer.observe(heroBand);
+}
+
+// -- The panel --------------------------------------------
+
+// The label stays put. It sits in a grid track sized to its content, and a button that renames
+// itself moves the clock and the scrubber every time it is pressed.
+function setPanel(open) {
+  panel.hidden = !open;
+  panelToggle.setAttribute("aria-expanded", String(open));
+}
+
+function wirePanel() {
+  panelToggle.addEventListener("click", () => setPanel(panel.hidden));
+  panelClose.addEventListener("click", () => {
+    setPanel(false);
+    panelToggle.focus();
+  });
+
+  document.addEventListener("keydown", event => {
+    if (event.key !== "Escape" || panel.hidden) return;
+    setPanel(false);
+    panelToggle.focus();
+  });
+
+  setPanel(window.matchMedia(PANEL_OPEN_WIDTH).matches);
+}
+
+// -- Files arriving from outside --------------------------------------------
+
+function carriesFiles(event) {
+  return [...(event.dataTransfer?.types ?? [])].includes("Files");
+}
+
+function wireDropAndPaste() {
+  // A counter rather than a flag: dragleave fires every time the pointer crosses a child boundary,
+  // and a flag makes the overlay flicker over anything with children in it.
+  let depth = 0;
+
+  document.addEventListener("dragenter", event => {
+    if (!carriesFiles(event)) return;
+    depth += 1;
+    dropzone.hidden = false;
+  });
+
+  document.addEventListener("dragleave", () => {
+    depth = Math.max(0, depth - 1);
+    if (depth === 0) dropzone.hidden = true;
+  });
+
+  document.addEventListener("dragover", event => {
+    if (carriesFiles(event)) event.preventDefault();
+  });
+
+  document.addEventListener("drop", event => {
+    if (!carriesFiles(event)) return;
+    event.preventDefault();
+    depth = 0;
+    dropzone.hidden = true;
+    setPanel(true);
+    for (const file of event.dataTransfer.files) acceptFile(file);
+  });
+
+  document.addEventListener("paste", event => {
+    // Somewhere a caret could be is somewhere the paste already belongs.
+    if (event.target instanceof Element && event.target.closest("input, textarea, [contenteditable]")) return;
+    const text = event.clipboardData?.getData("text/plain") ?? "";
+    if (text.trim().length < 8) return;
+    event.preventDefault();
+    setPanel(true);
+    importLyrics(text, "the clipboard");
   });
 }
 
 // -- Wiring the rest --------------------------------------------
 
 function wireControls(lineClass, lyricsClass) {
+  songFileButton.addEventListener("click", () => pickFile("audio/*", acceptFile));
+  lyricsFileButton.addEventListener("click", () => pickFile(".ttml,.xml,.lrc,.srt,.qrc,.txt,text/*", acceptFile));
+
+  songUrlButton.addEventListener("click", () => {
+    const url = songUrlInput.value.trim();
+    if (url === "") return;
+
+    let label = url;
+    try {
+      label = new URL(url, location.href).pathname.split("/").pop() || url;
+    } catch {
+      report(songStatus, "That is not a URL the browser will accept.", "bad");
+      return;
+    }
+    loadAudio(url, label);
+  });
+
+  songUrlInput.addEventListener("keydown", event => {
+    if (event.key === "Enter") songUrlButton.click();
+  });
+
+  lyricsImportButton.addEventListener("click", () => {
+    const text = lyricsTextArea.value;
+    if (text.trim() === "") {
+      report(lyricsStatus, "Nothing pasted yet.", "bad");
+      return;
+    }
+    importLyrics(text, "what you pasted");
+  });
+
+  timingFieldset.addEventListener("change", event => {
+    state.timing = event.target.value;
+    state.importedLyrics = null;
+    state.importedName = "";
+    report(lyricsStatus, "");
+    commit();
+  });
+
   offsetInput.addEventListener("input", () => {
     state.offsetMs = Number(offsetInput.value);
     commit();
@@ -591,62 +1059,52 @@ function wireControls(lineClass, lyricsClass) {
     commit();
   });
 
-  scoreFieldset.addEventListener("change", event => {
-    state.score = event.target.value;
-    state.customLyrics = null;
-    reportEditor("");
-    seedEditor();
+  viewScrollInput.addEventListener("change", () => {
+    state.viewScroll = viewScrollInput.checked;
     commit();
+    // A scrollbar appearing takes width off every line, so the view re-reads a layout that just
+    // moved under it.
+    view.renderer?.relayout();
   });
 
-  scrollRatioInput.addEventListener("input", () => {
-    state.scrollRatio = Number(scrollRatioInput.value);
-    commit();
-  });
-
-  richSyncInput.addEventListener("change", () => {
-    state.richSync = richSyncInput.checked;
-    commit();
-  });
-
-  pageThemeInput.addEventListener("change", () => {
-    state.pageRules = pageThemeInput.checked;
+  pageRulesInput.addEventListener("change", () => {
+    state.pageRules = pageRulesInput.checked;
     commit();
     reportCascade(lineClass, lyricsClass);
     // Tightening the tracking changes how wide every line is, so the view re-reads the layout that
     // this page just moved under it.
     view.renderer?.relayout();
   });
-
-  copyLinkButton.addEventListener("click", async () => {
-    const restore = () => {
-      copyLinkButton.textContent = "Copy link";
-    };
-    try {
-      await navigator.clipboard.writeText(location.href);
-      copyLinkButton.textContent = "Copied";
-    } catch {
-      copyLinkButton.textContent = "Copy it from the address bar";
-    }
-    setTimeout(restore, COPIED_LABEL_MS);
-  });
 }
 
 // -- Boot --------------------------------------------
 
 async function boot() {
-  const [, { CUSTOM_THEME_STYLE_ID, LINE_CLASS, LYRICS_CLASS }, { parseThemeConfig }] = await Promise.all([
+  const [, { CUSTOM_THEME_STYLE_ID, LINE_CLASS, LYRICS_CLASS }, themeSettings] = await Promise.all([
     import("../dist/package/element.js"),
     import("../dist/package/constants.js"),
     import("../dist/package/themeSettings.js"),
   ]);
+  parseThemeConfig = themeSettings.parseThemeConfig;
 
   for (const type of ["braccato:lyrics-loaded", "braccato:line-click", "braccato:scroll-state", "braccato:error"]) {
     view.addEventListener(type, logEvent);
   }
 
-  renderReference();
+  // The view is the page's background, and its frame is deliberately not a scroller: a scroll
+  // container under the pointer at the top of a page eats the wheel and nobody reaches the docs. The
+  // renderer looks for the nearest scrolling ancestor and, finding none, would take the document
+  // and scroll the whole page to follow the song. `host` is the published way to answer that
+  // question directly, and the element keeps its own seek and scroll-state wiring around it.
+  view.host = { getScrollElement: () => frame };
+
   readStateFromUrl();
+  renderReference();
+  renderSnippets();
+  renderInstall();
+  paintInstall();
+  renderSongs();
+  renderThemes();
 
   // Lyrics before the report, because the cascade panel has nothing to measure without lines, and
   // the theme after it, because the Upgrade panel is reading the theme the markup delivered and this
@@ -654,22 +1112,24 @@ async function boot() {
   applyLyrics();
   stageStatus.hidden = true;
 
-  reportUpgrade(parseThemeConfig, CUSTOM_THEME_STYLE_ID);
+  reportUpgrade(CUSTOM_THEME_STYLE_ID);
 
-  seedEditor();
   commit();
+  describeTheme(state.themeText);
   reportCascade(LINE_CLASS, LYRICS_CLASS);
 
   wireControls(LINE_CLASS, LYRICS_CLASS);
-  wireEditor();
+  wireThemeEditor();
+  watchHeroBand();
+  wirePanel();
+  wireDropAndPaste();
+  wireTransport();
+  paintTransport();
 
   // The element never tells its renderer that someone scrolled the view, so autoscroll would keep
   // pulling the song back under anyone reading ahead. `renderer` is published for reaching past the
   // element exactly like this.
   frame.addEventListener("scroll", () => view.renderer?.noteUserScroll(), { passive: true });
-
-  wireTransport();
-  paintTransport();
 }
 
 boot().catch(error => {

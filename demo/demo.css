@@ -1,42 +1,54 @@
-/* The demo page's own chrome, plus the handful of rules that reach into the element. Loaded after
-   the package's three stylesheets, so anything here that names the same property wins. */
+/* The page's own chrome, plus the handful of rules that reach into the element. Loaded after the
+   package's three stylesheets, so anything here that names the same property wins. */
 
 /* -- Tokens -------------------------------------------- */
 
 :root {
-	--bg: oklch(0.16 0.008 264);
-	--bg-sunken: oklch(0.132 0.008 264);
-	--surface: oklch(0.204 0.009 264);
-	--surface-raised: oklch(0.242 0.01 264);
-	--hairline: oklch(1 0 0 / 0.08);
+	--bg: oklch(0.152 0.008 264);
+	--bg-sunken: oklch(0.126 0.008 264);
+	--surface: oklch(0.207 0.009 264);
+	--surface-raised: oklch(0.248 0.01 264);
+	--hairline: oklch(1 0 0 / 0.09);
+	--glass: oklch(0.152 0.008 264 / 0.78);
 
 	--text: oklch(0.965 0.003 264);
-	--text-2: oklch(0.758 0.008 264);
-	--text-3: oklch(0.6 0.009 264);
+	--text-2: oklch(0.762 0.008 264);
+	--text-3: oklch(0.605 0.009 264);
 
 	--accent: oklch(0.855 0.132 84);
 	--accent-quiet: oklch(0.855 0.132 84 / 0.14);
 	--bad: oklch(0.735 0.175 26);
 
-	--ring: 0 0 0 1px oklch(1 0 0 / 0.08);
-	--lift: 0 18px 44px oklch(0 0 0 / 0.4);
+	--ring: 0 0 0 1px oklch(1 0 0 / 0.09);
+	--lift: 0 24px 60px oklch(0 0 0 / 0.5);
 
-	--r-lg: 18px;
-	--r-md: 10px;
-	--r-sm: 8px;
+	/* One radius scale, kept concentric: a control inside a surface with 12px of padding sits 12px
+	   inside its corner, so the surface is 8 + 12. */
+	--r-panel: 20px;
+	--r-card: 12px;
+	--r-control: 8px;
 
 	--font-ui: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
 	--font-mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
 
-	--gutter: clamp(20px, 4vw, 48px);
-	--page: 1280px;
+	--gutter: clamp(20px, 5vw, 56px);
+	--doc: 58rem;
 
 	--ease: cubic-bezier(0.2, 0, 0, 1);
 
-	/* The module's own tokens, sized for this page rather than for a music player's side panel. */
-	--blyrics-font-size: clamp(1.5rem, 3.2vw, 2.375rem);
-	--blyrics-line-height: 1.24;
-	--blyrics-padding: 0.85rem;
+	--chrome-top: 56px;
+	--chrome-bottom: 68px;
+
+	/* The module's own tokens, sized for a full page rather than for a music player's side panel. */
+	--blyrics-font-size: clamp(1.75rem, 4.4vw, 3.25rem);
+	--blyrics-line-height: 1.2;
+	--blyrics-padding: 0.8rem;
+}
+
+@media (max-width: 640px) {
+	:root {
+		--chrome-bottom: 60px;
+	}
 }
 
 /* -- Base -------------------------------------------- */
@@ -60,7 +72,7 @@ body {
 	font-size: 16px;
 	line-height: 1.55;
 	margin: 0;
-	padding: 0 var(--gutter) clamp(48px, 8vh, 96px);
+	padding: var(--chrome-top) 0 var(--chrome-bottom);
 	text-rendering: optimizeLegibility;
 }
 
@@ -80,13 +92,6 @@ code,
 kbd {
 	font-family: var(--font-mono);
 	font-size: 0.875em;
-}
-
-kbd {
-	background: var(--surface-raised);
-	border-radius: 5px;
-	box-shadow: var(--ring);
-	padding: 1px 5px;
 }
 
 a {
@@ -122,147 +127,56 @@ a:hover {
 	width: 1px;
 }
 
-/* -- Masthead -------------------------------------------- */
-
-.masthead {
-	align-items: end;
-	display: flex;
-	flex-wrap: wrap;
-	gap: 24px clamp(24px, 5vw, 64px);
-	justify-content: space-between;
-	margin: 0 auto;
-	max-width: var(--page);
-	padding: clamp(40px, 7vh, 76px) 0 clamp(24px, 4vh, 40px);
-}
-
-.masthead__lede {
-	max-width: 44ch;
-}
-
-.wordmark {
-	color: var(--accent);
-	font-family: var(--font-mono);
-	font-size: 13px;
-	margin-bottom: 14px;
-}
-
-.masthead h1 {
-	font-size: clamp(1.75rem, 3.4vw, 2.625rem);
-	font-weight: 600;
-	letter-spacing: -0.024em;
-	line-height: 1.08;
-}
-
-.lede {
-	color: var(--text-2);
-	font-size: 1rem;
-	margin-top: 14px;
-	max-width: 52ch;
-}
-
-.byline {
-	align-items: center;
-	color: var(--text-3);
-	display: inline-flex;
-	font-size: 13px;
-	gap: 7px;
-	margin-top: 18px;
+.skip {
+	background: var(--surface-raised);
+	border-radius: var(--r-control);
+	box-shadow: var(--ring);
+	inset-block-start: 8px;
+	inset-inline-start: 8px;
+	padding: 10px 16px;
+	position: fixed;
 	text-decoration: none;
+	translate: 0 -200%;
+	z-index: 9;
 }
 
-.byline img {
-	border-radius: 3px;
-	outline: 1px solid oklch(1 0 0 / 0.1);
-	outline-offset: -1px;
+.skip:focus-visible {
+	translate: 0 0;
 }
 
-.byline span {
-	color: var(--text-2);
-	text-decoration: underline;
-	text-decoration-color: oklch(0.855 0.132 84 / 0.4);
-	text-underline-offset: 0.2em;
-}
+/* -- The stage -------------------------------------------- */
 
-.byline:hover span {
-	color: var(--accent);
-}
-
-.masthead__facts {
-	display: flex;
-	gap: clamp(20px, 3vw, 40px);
-	margin: 0;
-}
-
-.masthead__facts dt {
-	color: var(--text-3);
-	font-size: 12px;
-	letter-spacing: 0.01em;
-}
-
-.masthead__facts dd {
-	color: var(--text);
-	font-family: var(--font-mono);
-	font-size: 13px;
-	font-variant-numeric: tabular-nums;
-	margin: 4px 0 0;
-}
-
-/* -- Stage and rail -------------------------------------------- */
-
-.stage-region {
-	align-items: start;
-	display: grid;
-	gap: 20px;
-	margin: 0 auto;
-	max-width: var(--page);
-}
-
-/* The controls go under the thing they drive, and everything that only reports goes down the side.
-   It also keeps the two columns close to the same height, so neither ends in a void. */
-@media (min-width: 1080px) {
-	.stage-region {
-		grid-template-columns: minmax(0, 1fr) 344px;
-	}
-
-	.stage-region > .stage {
-		grid-area: 1 / 1;
-	}
-
-	.stage-region > .console {
-		grid-area: 2 / 1;
-	}
-
-	.stage-region > .rail {
-		grid-area: 1 / 2 / 3 / 3;
-	}
-}
-
+/* The element runs as the page's background for the whole scroll, so the thing on the screen is the
+   package rather than a picture of it. It stops above the hero copy rather than running under it:
+   the view is a column of large left aligned text and so is the copy, and the two on top of each
+   other are unreadable however the scrim is drawn. `--hero-band` is measured rather than guessed,
+   because the copy is one line at 1440 and four at 390. */
 .stage {
-	background: var(--surface);
-	border-radius: var(--r-lg);
-	box-shadow: var(--ring), var(--lift);
-	display: flex;
-	flex-direction: column;
-	padding: 10px;
+	inset: var(--chrome-top) 0 calc(var(--chrome-bottom) + var(--hero-band, 220px));
+	position: fixed;
+	z-index: 0;
 }
 
-/* A definite height rather than a bare `flex: 1`: the frame inside resolves its own against this
-   one, and a viewport sized by its content would be as tall as the whole song. */
-.stage__viewport {
-	background: var(--bg-sunken);
-	block-size: clamp(296px, 46vh, 552px);
-	border-radius: var(--r-sm);
-	flex: 1 1 auto;
+/* Hidden rather than auto, because a scroller under the pointer at the top of a page eats the wheel
+   and the reader cannot get to anything below. The engine scrolls with `scrollTop`, which still
+   works, and the Playback panel hands the wheel back for anyone who wants to read ahead. */
+.stage__frame {
+	block-size: 100%;
 	overflow: hidden;
-	position: relative;
+	padding-inline: var(--gutter);
+	scrollbar-width: thin;
 }
 
-/* The module publishes the gradient it fades its own view with, so the demo fades with the same
-   one rather than inventing a second set of stops. */
-.stage__viewport::before,
-.stage__viewport::after {
+[data-view-scroll="on"] .stage__frame {
+	overflow-y: auto;
+}
+
+/* The module publishes the gradient it fades its own view with, so the page fades with the same one
+   rather than inventing a second set of stops. */
+.stage::before,
+.stage::after {
 	content: "";
-	height: 56px;
+	height: 104px;
 	left: 0;
 	pointer-events: none;
 	position: absolute;
@@ -270,27 +184,19 @@ a:hover {
 	z-index: 2;
 }
 
-.stage__viewport::before {
-	background: linear-gradient(to top, transparent, var(--bg-sunken) 92%);
+.stage::before {
+	background: linear-gradient(to top, transparent, var(--bg) 78%);
 	top: 0;
 }
 
-.stage__viewport::after {
-	background: linear-gradient(to bottom, transparent, var(--bg-sunken) 92%);
+.stage::after {
+	background: linear-gradient(to bottom, transparent, var(--bg) 78%);
 	bottom: 0;
-}
-
-.stage__frame {
-	block-size: 100%;
-	overflow-x: hidden;
-	overflow-y: auto;
-	padding-inline: clamp(18px, 2.6vw, 34px);
-	scrollbar-width: thin;
 }
 
 .stage__status {
 	align-items: center;
-	background: oklch(0.132 0.008 264 / 0.92);
+	background: oklch(0.126 0.008 264 / 0.94);
 	color: var(--text-2);
 	display: flex;
 	font-size: 14px;
@@ -314,34 +220,359 @@ a:hover {
 	text-align: start;
 }
 
-.stage__hint {
-	color: var(--text-3);
+/* -- Top bar -------------------------------------------- */
+
+.topbar {
+	align-items: center;
+	-webkit-backdrop-filter: blur(20px);
+	backdrop-filter: blur(20px);
+	background: linear-gradient(to bottom, oklch(0.152 0.008 264 / 0.86), oklch(0.152 0.008 264 / 0.4));
+	block-size: var(--chrome-top);
+	display: flex;
+	gap: 16px;
+	inset: 0 0 auto;
+	justify-content: space-between;
+	padding-inline: var(--gutter);
+	position: fixed;
+	z-index: 3;
+}
+
+.topbar__mark {
+	align-items: center;
+	display: flex;
+	gap: 10px;
+	min-width: 0;
+}
+
+.wordmark {
+	color: var(--accent);
+	font-family: var(--font-mono);
 	font-size: 13px;
-	padding: 2px 4px 2px;
+	white-space: nowrap;
+}
+
+.topbar__version {
+	border-radius: 999px;
+	box-shadow: var(--ring);
+	color: var(--text-3);
+	font-family: var(--font-mono);
+	font-size: 11px;
+	font-variant-numeric: tabular-nums;
+	padding: 2px 8px;
+}
+
+.topbar__links {
+	display: flex;
+	gap: 4px;
+}
+
+.topbar__links a {
+	align-items: center;
+	border-radius: var(--r-control);
+	color: var(--text-2);
+	display: inline-flex;
+	font-size: 13px;
+	min-height: 40px;
+	padding-inline: 12px;
+	text-decoration: none;
+	transition-duration: 150ms;
+	transition-property: background-color, color;
+	transition-timing-function: var(--ease);
+}
+
+.topbar__links a:hover {
+	background: oklch(1 0 0 / 0.07);
+	color: var(--text);
+}
+
+/* The version is the first thing to go: it is on the page twice over, once here and once in the
+   install command, and the three links are the ones a reader came for. */
+@media (max-width: 620px) {
+	.topbar {
+		gap: 8px;
+	}
+
+	.topbar__version {
+		display: none;
+	}
+
+	.topbar__links a {
+		font-size: 12.5px;
+		padding-inline: 8px;
+	}
+}
+
+/* -- Hero -------------------------------------------- */
+
+/* The hero is a caption over a running element, not a card in front of it, so the whole column has
+   to be transparent to the pointer and each thing a reader can actually use opts back in. An
+   element with no background is still a hit target, which is why `main` is named here at all. */
+main {
+	pointer-events: none;
+	position: relative;
+	z-index: 1;
+}
+
+.hero {
+	align-content: end;
+	display: grid;
+	min-block-size: calc(100svh - var(--chrome-top) - var(--chrome-bottom));
+	pointer-events: none;
+}
+
+/* One column at every width, capped short of where the panel floats. Two columns would fit at 1440
+   and nowhere else, and a hero that reflows under its own controls is worse than a taller one. */
+.hero__band {
+	display: grid;
+	gap: clamp(18px, 2.6vh, 28px);
+	justify-items: start;
+	max-inline-size: calc(34rem + var(--gutter) * 2);
+	padding: clamp(16px, 2.5vh, 28px) var(--gutter) clamp(24px, 4vh, 40px);
+	pointer-events: auto;
+}
+
+.hero__lede {
+	max-width: 46ch;
+}
+
+.hero h1 {
+	font-size: clamp(1.625rem, 3.2vw, 2.5rem);
+	font-weight: 600;
+	letter-spacing: -0.026em;
+	line-height: 1.06;
+}
+
+.hero__lede p {
+	color: var(--text-2);
+	font-size: 0.9375rem;
+	margin-top: 12px;
+	max-width: 52ch;
+}
+
+/* -- Install -------------------------------------------- */
+
+.install {
+	max-width: min(100%, 26rem);
+	width: 100%;
+}
+
+.install__command {
+	align-items: center;
+	-webkit-backdrop-filter: blur(20px);
+	backdrop-filter: blur(20px);
+	background: oklch(0.126 0.008 264 / 0.82);
+	border-radius: var(--r-card);
+	box-shadow: var(--ring);
+	display: flex;
+	gap: 12px;
+	margin-top: 10px;
+	padding: 6px 6px 6px 14px;
+}
+
+.install__command code {
+	flex: 1 1 auto;
+	font-size: 13.5px;
+	overflow-x: auto;
+	scrollbar-width: none;
+	white-space: nowrap;
+}
+
+.install__prompt {
+	color: var(--text-3);
+}
+
+.install__package {
+	color: var(--accent);
+}
+
+/* -- Docs -------------------------------------------- */
+
+/* An opaque enough slab over a fixed element: crossing this edge is what tells a reader they have
+   left the demonstration and arrived at the reference. */
+.docs,
+.colophon {
+	-webkit-backdrop-filter: blur(28px);
+	backdrop-filter: blur(28px);
+	background: oklch(0.152 0.008 264 / 0.92);
+	border-top: 1px solid var(--hairline);
+	pointer-events: auto;
+	position: relative;
+	z-index: 1;
+}
+
+.docs {
+	padding: clamp(48px, 9vh, 96px) var(--gutter);
+	scroll-margin-top: var(--chrome-top);
+}
+
+.doc h2,
+.doc h3 {
+	scroll-margin-top: calc(var(--chrome-top) + 16px);
+}
+
+.doc {
+	margin-inline: auto;
+	max-width: var(--doc);
+}
+
+.doc + .doc {
+	margin-top: clamp(56px, 9vh, 96px);
+}
+
+.doc h2 {
+	font-size: clamp(1.25rem, 2.2vw, 1.625rem);
+	font-weight: 600;
+	letter-spacing: -0.02em;
+}
+
+.doc > p {
+	color: var(--text-2);
+	margin-top: 14px;
+	max-width: 68ch;
+}
+
+.doc__aside {
+	color: var(--text-3);
+	font-size: 14px;
+}
+
+.doc__aside strong {
+	color: var(--text-2);
+	font-weight: 600;
+}
+
+/* -- Code -------------------------------------------- */
+
+.code {
+	margin-top: 20px;
+	position: relative;
+}
+
+.code pre {
+	background: var(--bg-sunken);
+	border-radius: var(--r-card);
+	box-shadow: var(--ring);
+	font-family: var(--font-mono);
+	font-size: 12.5px;
+	line-height: 1.7;
+	margin: 0;
+	overflow-x: auto;
+	padding: 16px 16px 16px 18px;
+	tab-size: 2;
+}
+
+.code__bar {
+	display: flex;
+	justify-content: flex-end;
+	margin-bottom: 8px;
+}
+
+.c-t {
+	color: oklch(0.78 0.06 264);
+}
+
+.c-s {
+	color: var(--accent);
+}
+
+.c-k {
+	color: oklch(0.8 0.1 330);
+}
+
+.c-b {
+	color: oklch(0.82 0.08 200);
+}
+
+.c-n {
+	color: oklch(0.85 0.09 150);
+}
+
+.c-c {
+	color: var(--text-3);
+}
+
+/* -- Buttons -------------------------------------------- */
+
+.button,
+.copy {
+	background: var(--surface-raised);
+	border: 0;
+	border-radius: var(--r-control);
+	box-shadow: var(--ring);
+	color: var(--text);
+	cursor: pointer;
+	flex: none;
+	font: inherit;
+	font-size: 13px;
+	font-weight: 500;
+	min-height: 40px;
+	padding: 0 16px;
+	transition-duration: 150ms;
+	transition-property: scale, background-color, color;
+	transition-timing-function: var(--ease);
+}
+
+.button:hover,
+.copy:hover {
+	background: oklch(0.29 0.011 264);
+}
+
+.button:active,
+.copy:active {
+	scale: 0.96;
+}
+
+.copy[data-copied] {
+	color: var(--accent);
+}
+
+.button--quiet {
+	background: transparent;
+	box-shadow: none;
+	color: var(--text-2);
+	padding: 0 12px;
+}
+
+.button--quiet:hover {
+	background: oklch(1 0 0 / 0.07);
+	color: var(--text);
+}
+
+.button[aria-pressed="true"] {
+	background: var(--accent-quiet);
+	color: var(--accent);
 }
 
 /* -- Transport -------------------------------------------- */
 
 .transport {
 	align-items: center;
+	-webkit-backdrop-filter: blur(20px);
+	backdrop-filter: blur(20px);
+	background: linear-gradient(to top, oklch(0.152 0.008 264 / 0.9), oklch(0.152 0.008 264 / 0.55));
+	block-size: var(--chrome-bottom);
+	border-top: 1px solid var(--hairline);
 	display: grid;
-	gap: 16px;
-	grid-template-columns: auto minmax(0, 1fr) auto;
-	padding: 12px 4px 10px;
+	gap: 14px;
+	grid-template-columns: auto minmax(0, 10rem) minmax(0, 1fr) auto auto;
+	inset: auto 0 0;
+	padding-inline: var(--gutter);
+	position: fixed;
+	z-index: 3;
 }
 
 .transport__play {
 	background: var(--text);
 	border: 0;
-	border-radius: var(--r-md);
+	border-radius: var(--r-control);
 	color: var(--bg);
 	cursor: pointer;
 	font: inherit;
-	font-size: 14px;
+	font-size: 13px;
 	font-weight: 600;
-	min-height: 42px;
-	min-width: 88px;
-	padding: 0 18px;
+	min-height: 40px;
+	min-width: 76px;
+	padding: 0 16px;
 	transition-duration: 150ms;
 	transition-property: scale, background-color;
 	transition-timing-function: var(--ease);
@@ -355,6 +586,48 @@ a:hover {
 	scale: 0.96;
 }
 
+.transport__title {
+	color: var(--text-2);
+	font-size: 13px;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+.transport__clock {
+	color: var(--text-2);
+	font-family: var(--font-mono);
+	font-size: 12.5px;
+	font-variant-numeric: tabular-nums;
+	white-space: nowrap;
+}
+
+.transport__clock span:first-child {
+	color: var(--text);
+}
+
+@media (max-width: 860px) {
+	.transport {
+		grid-template-columns: auto minmax(0, 1fr) auto auto;
+	}
+
+	.transport__title {
+		display: none;
+	}
+}
+
+@media (max-width: 560px) {
+	.transport {
+		grid-template-columns: auto minmax(0, 1fr) auto;
+	}
+
+	.transport__clock {
+		display: none;
+	}
+}
+
+/* -- Sliders -------------------------------------------- */
+
 /* One range control, two sizes. Both fill their track from `--seek-progress`, which WebKit needs
    because it has no equivalent of Gecko's `::-moz-range-progress`. */
 .transport__seek,
@@ -367,7 +640,7 @@ a:hover {
 }
 
 .transport__seek {
-	height: 42px;
+	height: 40px;
 }
 
 .slider {
@@ -379,7 +652,7 @@ a:hover {
 	background: linear-gradient(
 		to right,
 		var(--accent) calc(var(--seek-progress, 0) * 100%),
-		oklch(1 0 0 / 0.14) calc(var(--seek-progress, 0) * 100%)
+		oklch(1 0 0 / 0.16) calc(var(--seek-progress, 0) * 100%)
 	);
 	border-radius: 999px;
 	height: 4px;
@@ -390,12 +663,12 @@ a:hover {
 	appearance: none;
 	background: var(--text);
 	border-radius: 50%;
-	height: 14px;
-	margin-top: -5px;
+	height: 13px;
+	margin-top: -4.5px;
 	transition-duration: 150ms;
 	transition-property: scale;
 	transition-timing-function: var(--ease);
-	width: 14px;
+	width: 13px;
 }
 
 .transport__seek:active::-webkit-slider-thumb,
@@ -405,7 +678,7 @@ a:hover {
 
 .transport__seek::-moz-range-track,
 .slider::-moz-range-track {
-	background: oklch(1 0 0 / 0.14);
+	background: oklch(1 0 0 / 0.16);
 	border-radius: 999px;
 	height: 4px;
 }
@@ -422,114 +695,316 @@ a:hover {
 	background: var(--text);
 	border: 0;
 	border-radius: 50%;
-	height: 14px;
-	width: 14px;
+	height: 13px;
+	width: 13px;
 }
 
-.transport__clock {
-	color: var(--text-2);
-	font-family: var(--font-mono);
+/* -- Panel -------------------------------------------- */
+
+.panel {
+	-webkit-backdrop-filter: blur(24px);
+	backdrop-filter: blur(24px);
+	background: var(--glass);
+	border-radius: var(--r-panel);
+	box-shadow: var(--ring), var(--lift);
+	display: flex;
+	flex-direction: column;
+	inset: auto 16px calc(var(--chrome-bottom) + 12px) auto;
+	max-block-size: min(78svh, 46rem);
+	padding: 12px;
+	position: fixed;
+	width: min(24rem, calc(100vw - 32px));
+	z-index: 4;
+}
+
+.panel[hidden] {
+	display: none;
+}
+
+.panel__head {
+	align-items: center;
+	display: flex;
+	justify-content: space-between;
+	padding: 2px 2px 10px 8px;
+}
+
+.panel h2 {
 	font-size: 13px;
-	font-variant-numeric: tabular-nums;
+	font-weight: 600;
+	letter-spacing: 0.01em;
 }
 
-.transport__clock span:first-child {
-	color: var(--text);
+.panel__body {
+	display: grid;
+	gap: 24px;
+	overflow-y: auto;
+	padding: 2px 8px 6px;
+	scrollbar-width: thin;
 }
 
-/* -- Buttons -------------------------------------------- */
+.group h3 {
+	color: var(--text-2);
+	font-size: 12px;
+	font-weight: 600;
+	letter-spacing: 0.02em;
+	margin-bottom: 10px;
+}
 
-.button {
-	background: var(--surface-raised);
+.group + .group {
+	border-top: 1px solid var(--hairline);
+	padding-top: 20px;
+}
+
+.group__note {
+	color: var(--text-3);
+	font-size: 12.5px;
+	margin-top: 14px;
+}
+
+.group__hint {
+	color: var(--text-3);
+	font-size: 12px;
+	line-height: 1.45;
+	margin-top: 8px;
+}
+
+.group__hint code {
+	color: var(--text-2);
+	white-space: nowrap;
+}
+
+.row {
+	align-items: center;
+	display: flex;
+	gap: 8px;
+	margin-top: 10px;
+}
+
+.input {
+	background: var(--bg-sunken);
 	border: 0;
-	border-radius: var(--r-md);
+	border-radius: var(--r-control);
 	box-shadow: var(--ring);
 	color: var(--text);
-	cursor: pointer;
+	flex: 1 1 auto;
 	font: inherit;
 	font-size: 13px;
-	font-weight: 500;
 	min-height: 40px;
-	padding: 0 16px;
+	min-width: 0;
+	padding: 0 12px;
+}
+
+.input::placeholder {
+	color: var(--text-3);
+}
+
+.textarea {
+	background: var(--bg-sunken);
+	border: 0;
+	border-radius: var(--r-control);
+	box-shadow: var(--ring);
+	color: var(--text-2);
+	display: block;
+	font-family: var(--font-mono);
+	font-size: 12px;
+	line-height: 1.6;
+	margin-top: 10px;
+	overflow: auto;
+	padding: 10px 12px;
+	resize: vertical;
+	scrollbar-width: thin;
+	tab-size: 2;
+	width: 100%;
+}
+
+.textarea--tall {
+	line-height: 1.65;
+	min-height: 15rem;
+}
+
+.textarea::placeholder {
+	color: var(--text-3);
+}
+
+.status {
+	color: var(--text-2);
+	font-size: 12px;
+	line-height: 1.45;
+	margin-top: 10px;
+}
+
+/* Left in the document rather than removed from it. A live region that only exists once it has
+   something to say is a live region a screen reader may not have been watching. */
+.status:empty {
+	margin-top: 0;
+}
+
+.status[data-tone="bad"] {
+	color: var(--bad);
+}
+
+.status[data-tone="good"] {
+	color: var(--accent);
+}
+
+/* -- Pickers -------------------------------------------- */
+
+.picker {
+	display: grid;
+	gap: 6px;
+}
+
+.pick {
+	background: transparent;
+	border: 0;
+	border-radius: var(--r-control);
+	box-shadow: var(--ring);
+	color: var(--text-2);
+	cursor: pointer;
+	display: grid;
+	font: inherit;
+	gap: 2px;
+	justify-items: start;
+	min-height: 40px;
+	padding: 9px 12px;
+	text-align: start;
 	transition-duration: 150ms;
-	transition-property: scale, background-color, color;
+	transition-property: background-color, color;
 	transition-timing-function: var(--ease);
 }
 
-.button:hover {
-	background: oklch(0.284 0.011 264);
-}
-
-.button:active {
-	scale: 0.96;
-}
-
-.button--quiet {
-	background: transparent;
-	color: var(--text-2);
-	padding: 0 14px;
-}
-
-.button--quiet:hover {
+.pick:hover {
 	background: oklch(1 0 0 / 0.06);
 	color: var(--text);
 }
 
-/* -- Console -------------------------------------------- */
-
-.console__head {
-	align-items: baseline;
-	display: flex;
-	gap: 12px 20px;
-	justify-content: space-between;
-	padding: 4px 2px 0;
-}
-
-.console h2 {
-	font-size: 14px;
-	font-weight: 600;
-	letter-spacing: -0.005em;
-}
-
-.console__note {
-	color: var(--text-3);
+.pick b {
 	font-size: 13px;
-	margin-top: 6px;
-	max-width: 62ch;
-	padding-inline: 2px;
+	font-weight: 600;
 }
 
-.console__cards {
-	align-items: start;
+.pick span {
+	color: var(--text-3);
+	font-size: 11.5px;
+	line-height: 1.4;
+	text-wrap: pretty;
+}
+
+.pick[aria-pressed="true"] {
+	background: var(--accent-quiet);
+	box-shadow: 0 0 0 1px oklch(0.855 0.132 84 / 0.4);
+	color: var(--accent);
+}
+
+.pick[aria-pressed="true"] span {
+	color: oklch(0.855 0.132 84 / 0.72);
+}
+
+/* -- Segmented control -------------------------------------------- */
+
+.segmented {
+	border: 0;
 	display: grid;
-	gap: 20px;
-	grid-template-columns: repeat(auto-fit, minmax(268px, 1fr));
-	margin-top: 18px;
-}
-
-/* Three cards in two columns leave the last one beside a hole. An odd card at the end takes the
-   whole row instead, which is also the right answer for any other odd number of them. */
-@media (min-width: 620px) and (max-width: 1079px) {
-	.console__cards > :last-child:nth-child(odd) {
-		grid-column: 1 / -1;
-	}
-}
-
-.card {
-	display: grid;
-	gap: 18px;
-}
-
-.card > h3,
-.card > .panel__note {
+	gap: 4px;
+	grid-template-columns: repeat(2, minmax(0, 1fr));
 	margin: 0;
+	padding: 0;
 }
 
-.card > .panel__note {
-	margin-top: -12px;
+.segmented--install {
+	grid-template-columns: repeat(4, minmax(0, 1fr));
+	max-width: 20rem;
 }
 
-/* -- Fields -------------------------------------------- */
+.segmented label {
+	cursor: pointer;
+	display: block;
+}
+
+.segmented input {
+	clip-path: inset(50%);
+	height: 1px;
+	position: absolute;
+	width: 1px;
+}
+
+.segmented span {
+	align-items: center;
+	background: var(--surface-raised);
+	border-radius: var(--r-control);
+	color: var(--text-2);
+	display: flex;
+	font-size: 12.5px;
+	justify-content: center;
+	min-height: 40px;
+	padding: 0 8px;
+	text-align: center;
+	transition-duration: 150ms;
+	transition-property: background-color, color;
+	transition-timing-function: var(--ease);
+}
+
+.segmented--install span {
+	-webkit-backdrop-filter: blur(20px);
+	backdrop-filter: blur(20px);
+	background: oklch(0.126 0.008 264 / 0.7);
+	box-shadow: var(--ring);
+}
+
+.segmented label:hover span {
+	color: var(--text);
+}
+
+.segmented input:checked + span {
+	background: var(--accent-quiet);
+	color: var(--accent);
+}
+
+.segmented input:focus-visible + span {
+	outline: 2px solid var(--accent);
+	outline-offset: 2px;
+}
+
+/* -- Disclosure and array view -------------------------------------------- */
+
+.disclosure summary {
+	border-radius: var(--r-control);
+	color: var(--text-2);
+	cursor: pointer;
+	font-size: 12.5px;
+	list-style-position: inside;
+	margin: 14px -8px 0;
+	padding: 9px 8px;
+	transition-duration: 150ms;
+	transition-property: color;
+	transition-timing-function: var(--ease);
+}
+
+.disclosure summary:hover {
+	color: var(--text);
+}
+
+.disclosure summary::marker {
+	color: var(--text-3);
+}
+
+.array {
+	background: var(--bg-sunken);
+	border-radius: var(--r-control);
+	box-shadow: var(--ring);
+	color: var(--text-3);
+	font-family: var(--font-mono);
+	font-size: 11.5px;
+	line-height: 1.6;
+	margin: 6px 0 0;
+	max-height: 16rem;
+	overflow: auto;
+	padding: 10px 12px;
+	scrollbar-width: thin;
+	tab-size: 2;
+}
+
+/* -- Fields and switches -------------------------------------------- */
 
 .field__row {
 	align-items: baseline;
@@ -550,260 +1025,21 @@ a:hover {
 	font-variant-numeric: tabular-nums;
 }
 
-.field__hint {
-	color: var(--text-3);
-	font-size: 12px;
-	line-height: 1.45;
-	margin-top: 8px;
-}
-
-.field .slider {
-	margin-top: 2px;
-}
-
-.field .switch {
-	margin: 0 -8px;
-}
-
-.field .switch + .field__hint {
-	margin-top: 4px;
-	padding-inline-start: 8px;
-}
-
-/* -- Segmented control -------------------------------------------- */
-
-.segmented {
-	border: 0;
-	display: grid;
-	gap: 4px;
-	grid-template-columns: repeat(2, minmax(0, 1fr));
-	margin: 0;
-	padding: 0;
-}
-
-.segmented label {
-	cursor: pointer;
-	display: block;
-}
-
-.segmented input {
-	clip-path: inset(50%);
-	height: 1px;
-	position: absolute;
-	width: 1px;
-}
-
-.segmented span {
-	align-items: center;
-	background: var(--surface-raised);
-	border-radius: var(--r-sm);
-	color: var(--text-2);
-	display: flex;
-	font-size: 12.5px;
-	justify-content: center;
-	min-height: 40px;
-	padding: 0 8px;
-	text-align: center;
-	transition-duration: 150ms;
-	transition-property: background-color, color;
-	transition-timing-function: var(--ease);
-}
-
-.segmented label:hover span {
-	color: var(--text);
-}
-
-.segmented input:checked + span {
-	background: var(--accent-quiet);
-	color: var(--accent);
-}
-
-.segmented input:focus-visible + span {
-	outline: 2px solid var(--accent);
-	outline-offset: 2px;
-}
-
-/* -- Lyrics editor -------------------------------------------- */
-
-.editor summary {
-	border-radius: var(--r-sm);
-	color: var(--text-2);
-	cursor: pointer;
-	font-size: 13px;
-	list-style-position: inside;
-	padding: 9px 8px;
-	margin-inline: -8px;
-	transition-duration: 150ms;
-	transition-property: color;
-	transition-timing-function: var(--ease);
-}
-
-.editor summary:hover {
-	color: var(--text);
-}
-
-.editor summary::marker {
-	color: var(--text-3);
-}
-
-.editor > .field__hint {
-	margin-top: 4px;
-}
-
-.editor textarea {
-	background: var(--bg-sunken);
-	border: 0;
-	border-radius: var(--r-sm);
-	box-shadow: var(--ring);
-	color: var(--text-2);
-	display: block;
-	font-family: var(--font-mono);
-	font-size: 12px;
-	line-height: 1.55;
-	margin-top: 12px;
-	overflow: auto;
-	padding: 12px;
-	resize: vertical;
-	scrollbar-width: thin;
-	tab-size: 2;
-	width: 100%;
-}
-
-.editor textarea:focus-visible {
-	outline: 2px solid var(--accent);
-	outline-offset: 2px;
-}
-
-.editor__error:empty {
-	display: none;
-}
-
-.editor__error {
-	color: var(--bad);
-	font-size: 12px;
-	line-height: 1.45;
-	margin-top: 10px;
-}
-
-.editor__actions {
-	display: flex;
-	gap: 8px;
-	margin-top: 12px;
-}
-
-/* -- Theme preview -------------------------------------------- */
-
-.theme-preview {
-	background: var(--bg-sunken);
-	border-radius: var(--r-sm);
-	box-shadow: var(--ring);
-	color: var(--text-3);
-	font-family: var(--font-mono);
-	font-size: 11.5px;
-	line-height: 1.7;
-	margin: 0;
-	overflow-wrap: break-word;
-	padding: 12px;
-	white-space: pre-wrap;
-}
-
-/* -- Rail -------------------------------------------- */
-
-.rail {
-	display: grid;
-	gap: 20px;
-}
-
-@media (min-width: 620px) and (max-width: 1079px) {
-	.rail {
-		grid-template-columns: repeat(auto-fit, minmax(268px, 1fr));
-	}
-}
-
-.panel {
-	background: var(--surface);
-	border-radius: var(--r-lg);
-	box-shadow: var(--ring);
-	padding: 18px;
-}
-
-.panel h3 {
-	font-size: 14px;
-	font-weight: 600;
-	letter-spacing: -0.005em;
-}
-
-.panel__note {
-	color: var(--text-3);
-	font-size: 13px;
-	margin-top: 6px;
-}
-
-.panel__footnote {
-	color: var(--text-3);
-	font-size: 12px;
-	line-height: 1.45;
-	margin-top: 16px;
-	opacity: 0.8;
-}
-
-#upgrade-verdict[data-state="pass"] {
-	color: var(--text-2);
-}
-
-#upgrade-verdict[data-state="fail"] {
-	color: var(--bad);
-}
-
-/* -- Readouts -------------------------------------------- */
-
-.readout {
-	display: grid;
-	gap: 13px;
-	margin: 18px 0 0;
-}
-
-.readout dt {
-	color: var(--text-3);
-	font-size: 12px;
-	line-height: 1.4;
-}
-
-.readout dd {
-	color: var(--accent);
-	font-family: var(--font-mono);
-	font-size: 12.5px;
-	font-variant-numeric: tabular-nums;
-	line-height: 1.45;
-	margin: 3px 0 0;
-	overflow-wrap: anywhere;
-}
-
-.readout dd[data-state="fail"] {
-	color: var(--bad);
-}
-
-.readout dd[data-state="off"] {
-	color: var(--text-3);
-}
-
-/* -- Switch -------------------------------------------- */
-
 .switch {
 	align-items: center;
-	border-radius: var(--r-sm);
+	border-radius: var(--r-control);
 	cursor: pointer;
 	display: flex;
 	font-size: 13px;
 	gap: 11px;
-	margin: 16px -8px -4px;
+	margin: 16px -8px 0;
 	min-height: 40px;
 	padding: 0 8px;
 }
 
 .switch input {
 	appearance: none;
-	background: oklch(1 0 0 / 0.13);
+	background: oklch(1 0 0 / 0.14);
 	border-radius: 999px;
 	cursor: pointer;
 	flex: none;
@@ -839,19 +1075,19 @@ a:hover {
 	translate: 16px 0;
 }
 
-/* -- Event log -------------------------------------------- */
-
-.panel--log {
-	display: flex;
-	flex-direction: column;
+.switch + .group__hint {
+	margin-top: 4px;
+	padding-inline-start: 8px;
 }
+
+/* -- Event log -------------------------------------------- */
 
 .log {
 	display: grid;
 	gap: 9px;
 	list-style: none;
-	margin: 16px 0 0;
-	max-height: 208px;
+	margin: 12px 0 0;
+	max-height: 13rem;
 	overflow-y: auto;
 	padding: 0;
 	scrollbar-width: thin;
@@ -860,7 +1096,7 @@ a:hover {
 .log:empty::after {
 	color: var(--text-3);
 	content: "Nothing yet.";
-	font-size: 13px;
+	font-size: 12.5px;
 }
 
 .log li {
@@ -868,7 +1104,7 @@ a:hover {
 	display: flex;
 	flex-wrap: wrap;
 	font-family: var(--font-mono);
-	font-size: 12px;
+	font-size: 11.5px;
 	gap: 0 8px;
 	line-height: 1.45;
 }
@@ -892,128 +1128,41 @@ a:hover {
 	color: var(--bad);
 }
 
-@media (prefers-reduced-motion: no-preference) {
-	.log li {
-		animation: log-enter 260ms var(--ease) both;
-	}
+/* -- Drop zone -------------------------------------------- */
+
+.dropzone {
+	align-items: center;
+	-webkit-backdrop-filter: blur(8px);
+	backdrop-filter: blur(8px);
+	background: oklch(0.126 0.008 264 / 0.82);
+	display: flex;
+	inset: 0;
+	justify-content: center;
+	padding: var(--gutter);
+	position: fixed;
+	z-index: 8;
 }
 
-@keyframes log-enter {
-	from {
-		opacity: 0;
-		translate: 0 -5px;
-	}
+.dropzone[hidden] {
+	display: none;
 }
 
-/* -- API section -------------------------------------------- */
-
-.api {
-	align-items: start;
-	display: grid;
-	gap: clamp(26px, 3.5vw, 52px);
-	margin: clamp(56px, 10vh, 104px) auto 0;
-	max-width: var(--page);
-}
-
-@media (min-width: 1080px) {
-	.api {
-		grid-template-columns: minmax(0, 360px) minmax(0, 1fr);
-	}
-}
-
-.api__prose {
-	max-width: 62ch;
-}
-
-.api h2 {
-	font-size: clamp(1.25rem, 2vw, 1.5rem);
-	font-weight: 600;
-	letter-spacing: -0.018em;
-}
-
-.api__prose p {
-	color: var(--text-2);
-	margin-top: 14px;
-}
-
-.api__aside {
-	color: var(--text-3);
-	font-size: 14px;
-}
-
-.code {
-	background: var(--bg-sunken);
-	border-radius: var(--r-lg);
-	box-shadow: var(--ring);
-	font-family: var(--font-mono);
-	font-size: 12.5px;
-	line-height: 1.7;
-	margin: 0;
-	overflow-x: auto;
-	padding: clamp(18px, 2.4vw, 28px);
-	tab-size: 2;
-}
-
-.code code {
-	font-size: inherit;
-}
-
-.c-t {
-	color: var(--text-2);
-}
-
-.c-a {
-	color: oklch(0.78 0.06 264);
-}
-
-.c-s {
-	color: var(--accent);
-}
-
-.c-k {
-	color: oklch(0.8 0.1 330);
-}
-
-.c-b {
-	color: oklch(0.82 0.08 200);
-}
-
-.c-n {
-	color: oklch(0.85 0.09 150);
-}
-
-.c-c {
-	color: var(--text-3);
+.dropzone p {
+	border: 2px dashed oklch(0.855 0.132 84 / 0.5);
+	border-radius: var(--r-panel);
+	color: var(--text);
+	font-size: clamp(1rem, 2.4vw, 1.25rem);
+	padding: clamp(32px, 6vh, 56px) clamp(28px, 6vw, 72px);
+	text-align: center;
 }
 
 /* -- Reference -------------------------------------------- */
 
 .reference {
-	margin: clamp(56px, 10vh, 104px) auto 0;
-	max-width: var(--page);
-}
-
-.reference h2 {
-	font-size: clamp(1.25rem, 2vw, 1.5rem);
-	font-weight: 600;
-	letter-spacing: -0.018em;
-}
-
-.reference__head p {
-	color: var(--text-2);
-	margin-top: 14px;
-	max-width: 62ch;
-}
-
-.reference__link {
-	font-size: 14px;
-}
-
-.reference__grid {
 	align-items: start;
 	display: grid;
-	gap: clamp(34px, 4vw, 56px);
-	margin-top: clamp(30px, 4vh, 44px);
+	gap: clamp(30px, 4vw, 52px);
+	margin-top: clamp(26px, 4vh, 40px);
 }
 
 .reference__column {
@@ -1022,7 +1171,7 @@ a:hover {
 }
 
 @media (min-width: 900px) {
-	.reference__grid {
+	.reference {
 		grid-template-columns: repeat(2, minmax(0, 1fr));
 	}
 }
@@ -1034,9 +1183,9 @@ a:hover {
 }
 
 .reference__subhead {
-	margin-top: 34px;
+	margin-top: 32px;
+	padding-top: 26px;
 	position: relative;
-	padding-top: 28px;
 }
 
 .reference__subhead::before {
@@ -1052,13 +1201,14 @@ a:hover {
 	color: var(--text-3);
 	font-size: 13px;
 	margin-top: 8px;
-	max-width: 56ch;
+	max-width: 58ch;
 }
 
 /* An identifier is one word however many hyphens are in it, and a break after one reads as a
    different name. */
 .reference__note code,
-.terms dd code {
+.terms dd code,
+.doc > p code {
 	white-space: nowrap;
 }
 
@@ -1097,7 +1247,7 @@ a:hover {
 	color: var(--text-2);
 	font-size: 14px;
 	margin: 5px 0 0;
-	max-width: 56ch;
+	max-width: 58ch;
 }
 
 .terms dd code {
@@ -1112,6 +1262,84 @@ a:hover {
 	font-size: 13px;
 }
 
+#theme-settings-list {
+	margin-top: 26px;
+}
+
+/* -- The two proofs -------------------------------------------- */
+
+.proof {
+	align-items: start;
+	display: grid;
+	gap: 16px;
+	grid-template-columns: repeat(auto-fit, minmax(17rem, 1fr));
+	margin-top: 24px;
+}
+
+.proof__card {
+	background: var(--surface);
+	border-radius: var(--r-card);
+	box-shadow: var(--ring);
+	padding: 18px;
+}
+
+.proof h3 {
+	font-size: 13px;
+	font-weight: 600;
+}
+
+.proof__note {
+	color: var(--text-3);
+	font-size: 13px;
+	margin-top: 6px;
+}
+
+.proof__foot {
+	color: var(--text-3);
+	font-size: 12px;
+	line-height: 1.45;
+	margin-top: 16px;
+	opacity: 0.8;
+}
+
+#upgrade-verdict[data-state="pass"] {
+	color: var(--text-2);
+}
+
+#upgrade-verdict[data-state="fail"] {
+	color: var(--bad);
+}
+
+.readout {
+	display: grid;
+	gap: 13px;
+	margin: 16px 0 0;
+}
+
+.readout dt {
+	color: var(--text-3);
+	font-size: 12px;
+	line-height: 1.4;
+}
+
+.readout dd {
+	color: var(--accent);
+	font-family: var(--font-mono);
+	font-size: 12.5px;
+	font-variant-numeric: tabular-nums;
+	line-height: 1.45;
+	margin: 3px 0 0;
+	overflow-wrap: anywhere;
+}
+
+.readout dd[data-state="fail"] {
+	color: var(--bad);
+}
+
+.readout dd[data-state="off"] {
+	color: var(--text-3);
+}
+
 /* -- Colophon -------------------------------------------- */
 
 .colophon {
@@ -1119,21 +1347,9 @@ a:hover {
 	color: var(--text-3);
 	display: flex;
 	flex-wrap: wrap;
-	gap: 12px 32px;
+	gap: 14px 32px;
 	justify-content: space-between;
-	margin: clamp(56px, 10vh, 104px) auto 0;
-	max-width: var(--page);
-	padding-top: 24px;
-	position: relative;
-}
-
-.colophon::before {
-	background: var(--hairline);
-	content: "";
-	height: 1px;
-	inset-inline: 0;
-	position: absolute;
-	top: 0;
+	padding: 28px var(--gutter) 40px;
 }
 
 .colophon p {
@@ -1184,7 +1400,10 @@ a:hover {
    Everything below selects a class name @braccato/core emits, from this page's own stylesheet, at
    document level. In a shadow root not one of these rules would land, and neither would the
    `@property` registrations in the package's lyrics.css. That is the whole reason the element
-   builds into itself. */
+   builds into itself.
+
+   Colour is left to the theme, so the theme box in the panel owns every visible colour and nothing
+   here quietly outranks it. */
 
 braccato-lyrics {
 	display: block;
@@ -1197,45 +1416,39 @@ braccato-lyrics {
 	padding-top: var(--blyrics-padding-top, 2rem);
 }
 
-[data-page-theme="on"] .blyrics-container {
-	letter-spacing: -0.02em;
-}
-
-[data-page-theme="on"] .blyrics--line {
-	--blyrics-lyric-active-color: var(--accent);
-	--blyrics-lyric-inactive-color: oklch(0.855 0.132 84 / 0.38);
-	--blyrics-glow-color: oklch(0.855 0.132 84 / 0.45);
-}
-
-[data-page-theme="on"] .blyrics-background-lyric {
-	--blyrics-lyric-inactive-color: oklch(0.855 0.132 84 / 0.26);
+[data-page-rules="on"] .blyrics-container {
+	letter-spacing: -0.045em;
 }
 
 /* -- Entrances -------------------------------------------- */
 
 @media (prefers-reduced-motion: no-preference) {
-	.masthead,
-	.rail,
-	.console,
-	.api,
-	.reference,
-	.colophon {
+	.topbar,
+	.hero__lede,
+	.install {
 		animation: rise 460ms var(--ease) both;
 	}
 
-	.rail {
-		animation-delay: 140ms;
+	.hero__lede {
+		animation-delay: 120ms;
 	}
 
-	.console {
+	.install {
 		animation-delay: 200ms;
 	}
 
-	/* Opacity only: the renderer measures the lines it just built, and a transform or a filter on
-	   an ancestor is not something to hand it mid-measurement. */
+	/* Opacity only: the renderer measures the lines it just built, and a transform or a filter on an
+	   ancestor is not something to hand it mid-measurement. */
 	.stage {
-		animation: appear 460ms var(--ease) both;
-		animation-delay: 70ms;
+		animation: appear 700ms var(--ease) both;
+	}
+
+	.panel:not([hidden]) {
+		animation: fly 180ms var(--ease) both;
+	}
+
+	.log li {
+		animation: slip 240ms var(--ease) both;
 	}
 }
 
@@ -1247,8 +1460,23 @@ braccato-lyrics {
 	}
 }
 
+@keyframes slip {
+	from {
+		opacity: 0;
+		translate: 0 -5px;
+	}
+}
+
 @keyframes appear {
 	from {
 		opacity: 0;
+	}
+}
+
+@keyframes fly {
+	from {
+		opacity: 0;
+		scale: 0.98;
+		translate: 0 8px;
 	}
 }
