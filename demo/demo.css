@@ -254,10 +254,24 @@ a:hover {
 }
 
 .wordmark {
-	color: var(--accent);
-	font-family: var(--font-mono);
-	font-size: 13px;
+	align-items: center;
+	display: flex;
+	gap: 9px;
 	white-space: nowrap;
+}
+
+/* The name of the thing, not the name of the package: the mono face and the accent stay with
+   `@braccato/core` where it appears as a specifier. */
+.wordmark b {
+	font-size: 14.5px;
+	font-weight: 600;
+	letter-spacing: -0.012em;
+}
+
+.wordmark img {
+	border-radius: 5px;
+	outline: 1px solid oklch(1 0 0 / 0.1);
+	outline-offset: -1px;
 }
 
 .topbar__version {
