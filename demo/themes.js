@@ -55,28 +55,54 @@ export const THEMES = [
 `,
   },
   {
-    id: "plain",
-    title: "Plain",
-    summary: "Syllable timing switched off, which rebuilds the lines.",
-    css: `/* This one is read while the lines are built rather than while they are ticked, so
-   writing the theme rebuilds the song and the events log says so. */
-/* blyrics-disable-richsync = true; */
-/* How long a line takes to light up once there is no word timing left to follow. */
-/* blyrics-line-synced-animation-delay = 140; */
-/* blyrics-target-scroll-pos-ratio = 0.3; */
-/* Unsynced lyrics drift at this rate when passive scroll is on. */
-/* blyrics-passive-scroll-seconds-per-line = 2.6; */
+    id: "spotlight",
+    title: "Spotlight",
+    summary: "A hard falloff either side of the line being sung, written against the class names.",
+    css: `/* Half way down, so the lit line has room above and below it rather than sitting at an
+   edge. */
+/* blyrics-target-scroll-pos-ratio = 0.46; */
+/* Low enough that the words this song holds at the end of a line earn the bloom. */
+/* blyrics-long-word-threshold = 1000; */
 
 .blyrics-container {
-	--blyrics-font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-	--blyrics-font-size: clamp(1.05rem, 2.1vw, 1.5rem);
-	--blyrics-font-weight: 500;
-	--blyrics-line-height: 1.55;
-	--blyrics-padding: 0.5rem;
-	--blyrics-lyric-active-color: oklch(0.92 0.15 150);
-	--blyrics-lyric-inactive-color: oklch(0.92 0.15 150 / 0.28);
-	--blyrics-scale: 1;
-	--blyrics-active-scale: 1;
+	--blyrics-font-weight: 600;
+	--blyrics-padding: 1rem;
+	--blyrics-scale: 0.94;
+	/* The sung syllable is warm and everything else is cool. That is the whole palette. */
+	--blyrics-lyric-active-color: oklch(0.99 0.014 96);
+	--blyrics-lyric-inactive-color: oklch(0.74 0.016 248);
+	--blyrics-glow-color: oklch(0.97 0.03 96 / 0.85);
+}
+
+/* Colour cannot say how far a line is from the one being sung, because every inactive line reads
+   the same variable. The structure can. \`blyrics--active\` marks the line the song is on, and
+   stepping one sibling off it in either direction is what makes a line a neighbour. */
+.blyrics--line {
+	opacity: 0.13;
+	transition: opacity 420ms cubic-bezier(0.2, 0, 0, 1);
+}
+
+.blyrics--line:has(+ .blyrics--active),
+.blyrics--active + .blyrics--line {
+	opacity: 0.36;
+}
+
+.blyrics--active {
+	opacity: 1;
+}
+
+/* The answering voice is set in from the line it answers rather than sitting square under it. The
+   module already prints it at three quarters of the size and mixes its colour down, so the only
+   thing left to say is where it sits. */
+.blyrics-background-line {
+	margin-top: 0.22em;
+	padding-inline-start: 1.75em;
+}
+
+/* Even while it is sung it stays behind the lead. Written through the module's own variable, so the
+   mix it already applies to a background vocal still runs on top. */
+.blyrics-background-lyric {
+	--blyrics-lyric-active-color: oklch(0.93 0.012 96 / 0.7);
 }
 `,
   },
