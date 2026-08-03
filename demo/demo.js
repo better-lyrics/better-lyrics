@@ -1020,6 +1020,20 @@ function adoptDuration() {
   paintTransport();
 }
 
+/**
+ * The one way this page starts the song, so the transport button and a click on a line fail the same
+ * way and paint the same label. The label is not written here: `play` is what paints it, and a
+ * request the browser refuses never fires one.
+ */
+function startPlayback() {
+  if (!player.paused) return;
+  player.play().catch(error => {
+    stageStatus.hidden = false;
+    stageStatus.dataset.failed = "";
+    stageStatus.textContent = `The browser would not start playback: ${error.message}`;
+  });
+}
+
 function wireTransport() {
   // Read now as well as waited for: the track is preloaded from the markup, so its metadata is
   // often already in by the time this module has finished importing the package.
@@ -1027,15 +1041,8 @@ function wireTransport() {
   adoptDuration();
 
   playButton.addEventListener("click", () => {
-    if (!player.paused) {
-      player.pause();
-      return;
-    }
-    player.play().catch(error => {
-      stageStatus.hidden = false;
-      stageStatus.dataset.failed = "";
-      stageStatus.textContent = `The browser would not start playback: ${error.message}`;
-    });
+    if (player.paused) startPlayback();
+    else player.pause();
   });
 
   player.addEventListener("play", () => {
@@ -1259,6 +1266,12 @@ async function boot() {
   for (const type of ["braccato:lyrics-loaded", "braccato:line-click", "braccato:scroll-state", "braccato:error"]) {
     view.addEventListener(type, logEvent);
   }
+
+  // The clock has already moved by the time this fires, so the song starts from the line rather than
+  // from where it was. Listened for rather than hooked onto `host.seek`, which runs before the seek
+  // lands. An alt-clicked word arrives here too: the module tells its host that a seek happened and
+  // nothing about which kind it was.
+  view.addEventListener("braccato:line-click", startPlayback);
 
   // The view is the page's background, and its frame is deliberately not a scroller: a scroll
   // container under the pointer at the top of a page eats the wheel and nobody reaches the docs. The
