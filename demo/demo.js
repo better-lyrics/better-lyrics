@@ -822,7 +822,6 @@ function renderReference() {
   document.getElementById("package-version").textContent = PACKAGE.version;
   document.getElementById("npm-link").href = PACKAGE.npmHref;
   document.getElementById("repo-link").href = PACKAGE.repoHref;
-  document.getElementById("readme-link").href = PACKAGE.readmeHref;
   parsersNote.textContent = `Parsing is ${PARSERS_SPECIFIER}, fetched from jsDelivr when the first file arrives.`;
 
   renderTerms(

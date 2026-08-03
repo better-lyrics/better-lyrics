@@ -12,15 +12,13 @@
 // -- The package --------------------------------------------
 
 // `version` is checked against the emitted package.json, so the number on the page cannot drift from
-// the number in the artifact.
+// the number in the artifact. There is no separate README link, because both of these already land
+// on it: npm renders the README as the package page, and GitHub renders it under the directory.
 export const PACKAGE = {
   name: "@braccato/core",
   version: "1.0.0",
   npmHref: "https://www.npmjs.com/package/@braccato/core",
   repoHref: "https://github.com/better-lyrics/better-lyrics/tree/master/src/renderer",
-  // The copy that shipped inside the artifact this page is running, rather than a URL on a branch
-  // that may not have merged yet. `npm run package` copies it out of src/renderer verbatim.
-  readmeHref: "../dist/package/README.md",
 };
 
 export const INSTALLERS = [
