@@ -1,3 +1,15 @@
+// What a consumer holds: one object per view, composing the engine that animates the lines, the
+// builder that makes them and the theme settings both read. Nothing under here reaches for its
+// surroundings on its own, so everything the module needs from outside arrives through
+// `LyricsRendererOptions`, and everything it cannot do itself goes back out through the host.
+//
+// Only the document to build in and the window to schedule against are required. Every host member
+// but `debug` has a default, which is what makes the host an extension point a consumer overrides
+// one member at a time rather than a cost of entry: it answers the questions the module cannot (is
+// this view on screen, is a loader up) and performs the actions it must not own (seek the player).
+// `debug` is the exception because there is nothing to default it to. A consumer that wants the
+// diagnostic overlay supplies the sink, and one that says nothing draws nothing.
+
 import { CUSTOM_THEME_STYLE_ID } from "./constants";
 import {
   clearLyrics,

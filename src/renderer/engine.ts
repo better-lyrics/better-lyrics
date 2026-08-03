@@ -1,3 +1,22 @@
+// The animation engine: one instance per rendered view, holding that view's lines, its selection,
+// its scroll state and the per frame work that keeps the three in step. `renderer.ts` is what a
+// consumer holds; this is what it is holding.
+//
+// An instance per rendered surface rather than a singleton, because this extension runs two: the
+// YouTube Music side panel and the floating window. The two share parsed lyric data and a playback
+// clock and nothing else, so anything one view can disagree with another about lives on the
+// instance.
+//
+// The module owns no clock. A tick arrives from outside with the time already on it, which here is
+// the interpolated player snapshot behind `blyrics-send-player-time`, and in the floating window a
+// second interpolation of that same snapshot. Neither is a media element, which is why the custom
+// element can own an animation frame loop over one while nothing under here owns a loop at all.
+//
+// Two things are module scope rather than instance scope: the set of live instances, and the
+// playback clock the last tick wrote. Their unit is a bundle rather than a document, and this
+// module is bundled into the isolated world and the page world separately, so those are two clocks
+// that never meet. `themeSettings.ts` holds the third thing under that rule.
+
 import {
   ANIMATING_CLASS,
   CURRENT_LYRICS_CLASS,
