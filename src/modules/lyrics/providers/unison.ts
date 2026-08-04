@@ -1,8 +1,8 @@
 import { LOG_PREFIX_UNISON, UNISON_API_URL } from "@/core/constants";
 import { getIdentity, signPayload } from "@/core/keyIdentity";
-import { parseLRC, parsePlainLyrics } from "./lrcUtils";
+import { parseLRC, PlainParser } from "@braccato/parsers";
 import type { LyricSourceResult, ProviderParameters } from "./shared";
-import { fillTtml } from "./ttmlUtils";
+import { fillTtml } from "@modules/lyrics/providers/ttmlSource";
 
 interface SubmitterInfo {
   keyId: string;
@@ -163,7 +163,7 @@ export default async function unison(providerParameters: ProviderParameters): Pr
 
   switch (responseData.format) {
     case "ttml":
-      await fillTtml(responseData.lyrics, providerParameters, {
+      fillTtml(responseData.lyrics, providerParameters, {
         richsyncKey: "unison-richsynced",
         syncedKey: "unison-synced",
         ...result,
@@ -182,7 +182,7 @@ export default async function unison(providerParameters: ProviderParameters): Pr
       providerParameters.sourceMap["unison-plain"].lyricSourceResult = null;
       break;
     case "plain":
-      const plain = parsePlainLyrics(responseData.lyrics);
+      const plain = PlainParser.parse(responseData.lyrics);
       providerParameters.sourceMap["unison-richsynced"].lyricSourceResult = null;
       providerParameters.sourceMap["unison-synced"].lyricSourceResult = null;
       providerParameters.sourceMap["unison-plain"].lyricSourceResult = plain

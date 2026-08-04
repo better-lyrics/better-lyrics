@@ -39,6 +39,7 @@
     "homepage": "https://github.com/better-lyrics/better-lyrics#readme",
     "dependencies": {
         "@braccato/core": "1.0.0",
+        "@braccato/parsers": "0.2.0",
         "@codemirror/autocomplete": "^6.20.3",
         "@codemirror/commands": "^6.10.4",
         "@codemirror/lint": "^6.9.7",
