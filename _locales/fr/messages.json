@@ -1178,11 +1178,11 @@
     "description": "Badge text on non-symlinked built-in theme cards"
   },
   "deprecation_builtin_title": {
-    "message": "Attention, ces thèmes ne seront bientôt plus pris en charge !",
+    "message": "Attention, ces thèmes se font la malle !",
     "description": "Title for the built-in themes deprecation banner in theme modal"
   },
   "deprecation_builtin_body": {
-    "message": "Nous transférons les thèmes intégrés vers le Marketplace de thèmes. Certains y sont déjà, repérez le badge Marketplace. Les autres suivront dans une prochaine mise à jour, avec des sauvegardes CSS disponibles sur GitHub et Discord.",
+    "message": "Nous migrons les thèmes intégrés vers le Marketplace de thèmes. Certains y sont déjà, repérez le badge Marketplace. Les autres suivront dans une prochaine mise à jour, avec des sauvegardes CSS disponibles sur GitHub et Discord.",
     "description": "Body text for the built-in themes deprecation banner"
   },
   "deprecation_builtin_cta": {
