@@ -1,10 +1,9 @@
 import { CUBEY_LYRICS_API_URL, CUBEY_LYRICS_API_URL_TURNSTILE, HOMEPAGE_URL, LOG_PREFIX } from "@constants";
 import { getLocalStorage } from "@core/storage";
 import { log } from "@core/utils";
-import { lrcFixers, parseLRC, parsePlainLyrics } from "./lrcUtils";
-import { parseQRC } from "./qrcUtils";
+import { lrcFixers, parseLRC, parseQRC, PlainParser } from "@braccato/parsers";
 import { type LyricSourceKey, type LyricSourceResult, type ProviderParameters, saveLyricsToCache } from "./shared";
-import { fillTtml } from "@modules/lyrics/providers/ttmlUtils";
+import { fillTtml } from "@modules/lyrics/providers/ttmlSource";
 
 const JWT_RENEWAL_THRESHOLD_SECONDS = 60 * 60;
 
@@ -403,7 +402,8 @@ async function parseSSEMessage(message: string, params: ProviderParameters) {
 }
 
 async function processStreamData(event: string, data: any, params: ProviderParameters) {
-  const { sourceMap, duration } = params;
+  const { sourceMap } = params;
+  const durationMs = params.duration * 1000;
 
   if (event === "metadata") {
     if (data.album && !params.album) params.album = data.album;
@@ -435,7 +435,7 @@ async function processStreamData(event: string, data: any, params: ProviderParam
     // Musixmatch
     if (provider === "musixmatch") {
       if (results.wordByWord) {
-        const lyrics = parseLRC(results.wordByWord, duration);
+        const lyrics = parseLRC(results.wordByWord, durationMs);
         lrcFixers(lyrics);
         sourceMap["musixmatch-richsync"].lyricSourceResult = {
           lyrics,
@@ -453,7 +453,7 @@ async function processStreamData(event: string, data: any, params: ProviderParam
       }
 
       if (results.synced) {
-        const lyrics = parseLRC(results.synced, duration);
+        const lyrics = parseLRC(results.synced, durationMs);
         sourceMap["musixmatch-synced"].lyricSourceResult = {
           lyrics,
           source: "Musixmatch",
@@ -468,7 +468,7 @@ async function processStreamData(event: string, data: any, params: ProviderParam
     // LRCLib
     if (provider === "lrclib") {
       if (results.synced) {
-        const lyrics = parseLRC(results.synced, duration);
+        const lyrics = parseLRC(results.synced, durationMs);
         sourceMap["lrclib-synced"].lyricSourceResult = {
           lyrics,
           source: "LRCLib",
@@ -480,7 +480,7 @@ async function processStreamData(event: string, data: any, params: ProviderParam
       }
 
       if (results.plain) {
-        const lyrics = parsePlainLyrics(results.plain);
+        const lyrics = PlainParser.parse(results.plain);
         sourceMap["lrclib-plain"].lyricSourceResult = {
           lyrics,
           source: "LRCLib",
@@ -497,7 +497,7 @@ async function processStreamData(event: string, data: any, params: ProviderParam
     if (provider === "kugou") {
       if (results.lyrics) {
         let decodedLyrics = JSON.parse(results.lyrics);
-        const lyrics = parseLRC(decodedLyrics.lyrics, duration * 1000);
+        const lyrics = parseLRC(decodedLyrics.lyrics, durationMs);
         sourceMap["legato-synced"].lyricSourceResult = {
           lyrics,
           source: "Better Lyrics Legato",
@@ -513,7 +513,7 @@ async function processStreamData(event: string, data: any, params: ProviderParam
     if (provider === "qq") {
       if (results.lyrics) {
         let decodedLyrics = JSON.parse(results.lyrics);
-        const lyrics = parseQRC(decodedLyrics.lyrics, duration * 1000, {
+        const lyrics = parseQRC(decodedLyrics.lyrics, durationMs, {
           title: params.song,
           artist: params.artist,
         });
@@ -542,7 +542,7 @@ async function processStreamData(event: string, data: any, params: ProviderParam
         } catch (_e) {
           // Not double-encoded, use as is
         }
-        await fillTtml(ttml, params);
+        fillTtml(ttml, params);
         // fillTtml marks filled and updates sourceMap directly
         resolveWaiter(params, "bLyrics-synced");
         resolveWaiter(params, "bLyrics-richsynced");
@@ -552,7 +552,7 @@ async function processStreamData(event: string, data: any, params: ProviderParam
     // Binimum (TTML via BiniLyrics)
     if (provider === "binimum") {
       if (results.lyrics) {
-        await fillTtml(results.lyrics, params, {
+        fillTtml(results.lyrics, params, {
           richsyncKey: "binimum-richsynced",
           syncedKey: "binimum-synced",
           source: "BiniLyrics",

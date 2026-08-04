@@ -168,8 +168,6 @@ export const SERVER_ERROR_LOG = "[BetterLyrics] Server Error:" as const;
 export const STORAGE_TRANSIENT_SET_LOG = "[BetterLyrics] Set transient storage for key: " as const;
 export const MUSIC_NOTES = "♪𝅘𝅥𝅮𝅘𝅥𝅯𝅘𝅥𝅰𝅘𝅥𝅱𝅘𝅥𝅲" as const;
 
-export const BLYRICS_INSTRUMENTAL_GAP_MS = 5000;
-
 export const LYRICS_CACHE_TTL_MS = 7 * 24 * 60 * 60 * 1000;
 export const LYRICS_NEGATIVE_CACHE_TTL_MS = 30 * 60 * 1000;
 
