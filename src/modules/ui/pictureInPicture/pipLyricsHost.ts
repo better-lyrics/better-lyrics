@@ -1,5 +1,5 @@
 import { AD_PLAYING_ATTR, PLAYER_BAR_SELECTOR, SEEK_EVENT } from "@constants";
-import type { LyricsRendererHost } from "@renderer/index";
+import type { LyricsRendererHost } from "@braccato/core";
 import type { PictureInPictureLyricsView } from "./lyricsView";
 import type { PictureInPictureViewDependencies } from "./types";
 

@@ -1,22 +1,29 @@
 const { existsSync, readdirSync, readFileSync } = require("node:fs");
-const { join } = require("node:path");
+const { dirname, join } = require("node:path");
 
-// The renderer's stylesheets live inside its package boundary, but they ship at the paths
+// The renderer's stylesheets ship inside @braccato/core, but they emit at the paths
 // css/blyrics/index.css already imports, so the manifest and the two injection sites never learn
 // that the sources moved.
-const RENDERER_STYLES_DIR = join(__dirname, "src", "renderer", "styles");
+//
+// Copied rather than imported, because both injection sites fetch them by extension URL at runtime
+// and css/blyrics/index.css imports them by name. A bundler import would inline them into a chunk,
+// where nothing that consumes them can reach them.
+// Resolved through the package's own `./styles/*.css` subpath rather than by appending `dist/styles`
+// to its root, so this reads the contract the package publishes instead of the layout behind it.
+const RENDERER_STYLES_DIR = dirname(require.resolve("@braccato/core/styles/lyrics.css"));
 const RENDERER_STYLES_OUTPUT_DIR = "css/blyrics";
 const EXTENSION_STYLES_DIR = join(__dirname, "public", "css", "blyrics");
 
-// Flat, and asserted flat: the output directory is flat, boundary.selfcheck.ts reads this one flat
-// too, and a stylesheet in a subdirectory would answer to the boundary without ever shipping.
+// Asserted flat because the emit is flat and css/blyrics/index.css imports by bare name. A subpath
+// pattern matches across a slash, so the package may legally nest a stylesheet; this reads one level,
+// so nesting one would drop it from the build. Failing loudly beats shipping lyrics with no styles.
 const rendererStylesheets = () => {
   const entries = readdirSync(RENDERER_STYLES_DIR, { withFileTypes: true });
 
   const nested = entries.filter((entry) => entry.isDirectory()).map((entry) => entry.name);
   if (nested.length > 0) {
     throw new Error(
-      `[BetterLyrics] src/renderer/styles/ ships flat at ${RENDERER_STYLES_OUTPUT_DIR}/, so nothing may nest under it: ${nested.join(", ")}`
+      `[BetterLyrics] @braccato/core/dist/styles/ ships flat at ${RENDERER_STYLES_OUTPUT_DIR}/, so nothing may nest under it: ${nested.join(", ")}`
     );
   }
 
@@ -31,7 +38,7 @@ const rendererStylesheets = () => {
     .map(({ name }) => name);
   if (shadowed.length > 0) {
     throw new Error(
-      `[BetterLyrics] ${shadowed.join(", ")} exists in both src/renderer/styles/ and public/${RENDERER_STYLES_OUTPUT_DIR}/, and both emit to ${RENDERER_STYLES_OUTPUT_DIR}/; rename one`
+      `[BetterLyrics] ${shadowed.join(", ")} exists in both @braccato/core/dist/styles/ and public/${RENDERER_STYLES_OUTPUT_DIR}/, and both emit to ${RENDERER_STYLES_OUTPUT_DIR}/; rename one`
     );
   }
 

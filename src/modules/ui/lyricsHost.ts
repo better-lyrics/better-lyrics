@@ -2,7 +2,7 @@ import { LOG_PREFIX, TAB_HEADER_CLASS, TAB_RENDERER_SELECTOR } from "@constants"
 import { seekPlayer } from "@modules/lyrics/lyrics";
 import { hideAdOverlay, isAdPlaying, isLoaderActive, showAdOverlay } from "@modules/ui/dom";
 import { getResumeScrollElement } from "@modules/ui/resumeScrollButton";
-import type { LyricsRendererHost } from "@renderer/index";
+import type { LyricsRendererHost } from "@braccato/core";
 import { log } from "@utils";
 import { resetDebugRender, resizeCanvas } from "./animationEngineDebug";
 

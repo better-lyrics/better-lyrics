@@ -1,12 +1,12 @@
 import { DISABLE_EFFECTS_STYLE_ID, FOOTER_CLASS } from "@constants";
-import { CUSTOM_THEME_STYLE_ID } from "@renderer/constants";
+import { CUSTOM_THEME_STYLE_ID } from "@braccato/core/constants";
 import {
   createLyricsRenderer,
   injectRomanization,
   injectTranslation,
   type Lyric,
   type LyricsRenderer,
-} from "@renderer/index";
+} from "@braccato/core";
 import { onLyrics, type PictureInPictureLyricsPayload } from "./bridge";
 import { PictureInPictureController } from "./controller";
 import { PictureInPictureLyricsView } from "./lyricsView";
