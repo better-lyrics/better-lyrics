@@ -1,6 +1,6 @@
 import { GENERAL_ERROR_LOG } from "@constants";
 import type { LyricDecorations } from "@modules/lyrics/injectLyrics";
-import type { Lyric } from "@renderer/index";
+import type { Lyric } from "@braccato/core";
 import type { PictureInPictureSongMetadata } from "./types";
 
 const PIP_INIT_EVENT = "blyrics-pip-init" as const;

@@ -12,8 +12,6 @@
     "public/earlyInject.js",
     "public/script.js",
     "src/core/generated/locales.ts",
-    "src/renderer/index.ts",
-    "src/renderer/element.ts",
     "src/**/*.selfcheck.ts"
   ],
   "project": ["src/**/*.ts", "public/**/*.js"],
@@ -25,6 +23,5 @@
     "src/modules/lyrics/providers/blyrics/blyrics-types.ts": ["exports", "types"],
     "src/core/generated/locales.ts": ["types"]
   },
-  "includeEntryExports": true,
-  "tags": ["-public"]
+  "includeEntryExports": true
 }

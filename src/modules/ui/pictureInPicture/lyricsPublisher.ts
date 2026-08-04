@@ -3,7 +3,7 @@ import { t } from "@core/i18n";
 import type { LyricDecorations } from "@modules/lyrics/injectLyrics";
 import { getSegmentMapTimeShiftMs } from "@modules/lyrics/lyrics";
 import type { SegmentMap } from "@modules/lyrics/requestSniffer/requestSniffer";
-import type { Lyric } from "@renderer/index";
+import type { Lyric } from "@braccato/core";
 import { sendLyrics } from "./bridge";
 
 interface RetimedLyrics {

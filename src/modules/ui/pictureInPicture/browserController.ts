@@ -10,7 +10,7 @@ import { AppState } from "@core/appState";
 import { t } from "@core/i18n";
 import { getStorage } from "@core/storage";
 import { getArtworkMetadata } from "@modules/lyrics/requestSniffer/requestSniffer";
-import { resumeAllAutoscroll } from "@renderer/index";
+import { resumeAllAutoscroll } from "@braccato/core";
 import { log } from "@utils";
 import { onSignal, sendInit, sendMetadata } from "./bridge";
 import { publishPictureInPictureLyrics } from "./lyricsPublisher";

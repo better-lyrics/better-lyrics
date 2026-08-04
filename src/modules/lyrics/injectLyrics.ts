@@ -23,8 +23,8 @@ import { addFooter, addNoLyricsButton, cleanup, createLyricsWrapper, flushLoader
 import { lyricsElementAdded, mainView } from "@modules/ui/mainLyricsView";
 import { disableNativeLyricsFocus } from "@modules/ui/nativeLyricsFocus";
 import { publishPictureInPictureLyrics } from "@modules/ui/pictureInPicture/lyricsPublisher";
-import { injectRomanization, injectTranslation, type LineData } from "@renderer/index";
-import { containsNonLatin, detectNonLatinLanguage } from "@renderer/text";
+import { injectRomanization, injectTranslation, type LineData } from "@braccato/core";
+import { containsNonLatin, detectNonLatinLanguage } from "@braccato/core/text";
 import { langCodesMatch, languageMatchesAny, log } from "@utils";
 
 export type { LineData };

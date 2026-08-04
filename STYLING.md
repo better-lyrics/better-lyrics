@@ -99,9 +99,10 @@ The Better Lyrics styling system consists of several modular CSS files, organize
 3. **themesong.css** - Compatibility styles for the ThemeSong browser extension
 
 Three of those are build outputs rather than source files. `variables.css`, `lyrics.css` and
-`instrumental.css` are authored in `src/renderer/styles/` and copied to `blyrics/` when the
+`instrumental.css` ship inside the `@braccato/core` package and are copied to `blyrics/` when the
 extension is built, because they style the lyrics the renderer draws rather than the page around
-them. Edit them there; everything else under `blyrics/` and `ytmusic/` is source, in `public/css/`.
+them. Edit them in that package; everything else under `blyrics/` and `ytmusic/` is source, in
+`public/css/`.
 
 None of this changes anything a theme selects on. The class names, the custom properties and the
 served paths are all the same as before, so a theme written against the old layout keeps working.
@@ -120,7 +121,7 @@ Each section uses CSS selectors to target specific HTML elements and apply style
 
 ## 3. Custom Properties (CSS Variables)
 
-In `blyrics/variables.css` (authored at `src/renderer/styles/variables.css`), you'll see a `:root` selector with custom properties that define the visual theme and behavior of Better Lyrics:
+In `blyrics/variables.css` (shipped by `@braccato/core`), you'll see a `:root` selector with custom properties that define the visual theme and behavior of Better Lyrics:
 
 ```css
 :root {
