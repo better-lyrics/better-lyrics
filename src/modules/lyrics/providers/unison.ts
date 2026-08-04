@@ -15,7 +15,6 @@ interface UnisonResponse {
   videoId: string;
   song: string;
   artist: string;
-  duration: number;
   lyrics: string;
   format: "ttml" | "lrc" | "plain";
   syncType: "richsync" | "linesync" | "plain";
@@ -172,7 +171,7 @@ export default async function unison(providerParameters: ProviderParameters): Pr
       providerParameters.sourceMap["unison-plain"].lyricSourceResult = null;
       break;
     case "lrc":
-      const lrc = parseLRC(responseData.lyrics, responseData.duration);
+      const lrc = parseLRC(responseData.lyrics, providerParameters.duration * 1000);
       const res = {
         ...result,
         lyrics: lrc,

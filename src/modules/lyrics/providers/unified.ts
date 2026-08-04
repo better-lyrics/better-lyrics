@@ -403,7 +403,8 @@ async function parseSSEMessage(message: string, params: ProviderParameters) {
 }
 
 async function processStreamData(event: string, data: any, params: ProviderParameters) {
-  const { sourceMap, duration } = params;
+  const { sourceMap } = params;
+  const durationMs = params.duration * 1000;
 
   if (event === "metadata") {
     if (data.album && !params.album) params.album = data.album;
@@ -435,7 +436,7 @@ async function processStreamData(event: string, data: any, params: ProviderParam
     // Musixmatch
     if (provider === "musixmatch") {
       if (results.wordByWord) {
-        const lyrics = parseLRC(results.wordByWord, duration);
+        const lyrics = parseLRC(results.wordByWord, durationMs);
         lrcFixers(lyrics);
         sourceMap["musixmatch-richsync"].lyricSourceResult = {
           lyrics,
@@ -453,7 +454,7 @@ async function processStreamData(event: string, data: any, params: ProviderParam
       }
 
       if (results.synced) {
-        const lyrics = parseLRC(results.synced, duration);
+        const lyrics = parseLRC(results.synced, durationMs);
         sourceMap["musixmatch-synced"].lyricSourceResult = {
           lyrics,
           source: "Musixmatch",
@@ -468,7 +469,7 @@ async function processStreamData(event: string, data: any, params: ProviderParam
     // LRCLib
     if (provider === "lrclib") {
       if (results.synced) {
-        const lyrics = parseLRC(results.synced, duration);
+        const lyrics = parseLRC(results.synced, durationMs);
         sourceMap["lrclib-synced"].lyricSourceResult = {
           lyrics,
           source: "LRCLib",
@@ -497,7 +498,7 @@ async function processStreamData(event: string, data: any, params: ProviderParam
     if (provider === "kugou") {
       if (results.lyrics) {
         let decodedLyrics = JSON.parse(results.lyrics);
-        const lyrics = parseLRC(decodedLyrics.lyrics, duration * 1000);
+        const lyrics = parseLRC(decodedLyrics.lyrics, durationMs);
         sourceMap["legato-synced"].lyricSourceResult = {
           lyrics,
           source: "Better Lyrics Legato",
@@ -513,7 +514,7 @@ async function processStreamData(event: string, data: any, params: ProviderParam
     if (provider === "qq") {
       if (results.lyrics) {
         let decodedLyrics = JSON.parse(results.lyrics);
-        const lyrics = parseQRC(decodedLyrics.lyrics, duration * 1000, {
+        const lyrics = parseQRC(decodedLyrics.lyrics, durationMs, {
           title: params.song,
           artist: params.artist,
         });
