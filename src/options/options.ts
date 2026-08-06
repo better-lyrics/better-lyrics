@@ -49,6 +49,7 @@ interface Options {
   globalLyricOffset: number;
   richsyncOffsetTrim: number;
   lineOffsetTrim: number;
+  lyricDefaultDownloadFormat: string;
 }
 
 const saveOptions = (): void => {
@@ -92,6 +93,7 @@ const getOptionsFromForm = (): Options => {
     pipMarqueeEnabled: (document.getElementById("pipMarqueeEnabled") as HTMLInputElement).checked,
     isTranslateEnabled: (document.getElementById("translate") as HTMLInputElement).checked,
     translationLanguage: (document.getElementById("translationLanguage") as HTMLInputElement).value,
+    lyricDefaultDownloadFormat: (document.getElementById("lyric-default-download-format") as HTMLInputElement).value,
     isCursorAutoHideEnabled: (document.getElementById("cursorAutoHide") as HTMLInputElement).checked,
     isRomanizationEnabled: (document.getElementById("isRomanizationEnabled") as HTMLInputElement).checked,
     preferredProviderList: preferredProviderList,
@@ -313,6 +315,7 @@ const restoreOptions = (): void => {
     globalLyricOffset: 0,
     richsyncOffsetTrim: 0,
     lineOffsetTrim: 0,
+    lyricDefaultDownloadFormat: "ttml",
   };
 
   const readKeys = [
@@ -349,6 +352,8 @@ const setOptionsInForm = (items: Options): void => {
   (document.getElementById("albumArt") as HTMLInputElement).checked = items.isAlbumArtEnabled;
   (document.getElementById("isShadersPromoEnabled") as HTMLInputElement).checked = items.isShadersPromoEnabled;
   (document.getElementById("autoSwitch") as HTMLInputElement).checked = items.isAutoSwitchEnabled;
+  (document.getElementById("lyric-default-download-format") as HTMLInputElement).value =
+    items.lyricDefaultDownloadFormat;
   (document.getElementById("cursorAutoHide") as HTMLInputElement).checked = items.isCursorAutoHideEnabled;
   (document.getElementById("isFullScreenDisabled") as HTMLInputElement).checked = items.isFullScreenDisabled;
   (document.getElementById("isStylizedAnimationsEnabled") as HTMLInputElement).checked =
@@ -1557,6 +1562,7 @@ function setupUnisonActionsModal(): void {
     "isDockOffsetEnabled",
     "isDockPictureInPictureEnabled",
     "isDockDownloadLRCEnabled",
+    "lyric-default-download-format",
   ]) {
     document.getElementById(id)?.addEventListener("change", debouncedSaveOptions);
   }

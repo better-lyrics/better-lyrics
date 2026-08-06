@@ -594,6 +594,19 @@
 							<span class="checkmark"></span>
 						</label>
 					</div>
+					<div class="container unison-modal-row unison-modal-row--dependent">
+						<div class="unison-modal-row__text">
+							<span>__MSG_options_general_download_lyrics_format__</span>
+							<p class="modal-row-hint">__MSG_options_general_download_lyrics_format_hint__</p>
+						</div>
+						<div class="select">
+							<select id="lyric-default-download-format">
+								<option value="ttml">TTML</option>
+								<option value="lrc-line">Line-by-Line (LRC)</option>
+								<option value="lrc-word">Word-by-Word (LRC)</option>
+							</select>
+						</div>
+					</div>
 					<div class="position-section unison-modal-row--dependent">
 						<span class="position-section__label">__MSG_options_unisonModal_controlsShown__</span>
 						<div class="controls-shown-picker">
@@ -617,7 +630,7 @@
 								<input type="checkbox" id="isDockPictureInPictureEnabled">
 								<span class="control-cell__icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" d="M11 21h-1c-3.771 0-5.657 0-6.828-1.172S2 16.771 2 13v-2c0-3.771 0-5.657 1.172-6.828S6.229 3 10 3h4c3.771 0 5.657 0 6.828 1.172S22 7.229 22 11"></path><path d="M13 17c0-1.886 0-2.828.586-3.414S15.114 13 17 13h1c1.886 0 2.828 0 3.414.586S22 15.114 22 17s0 2.828-.586 3.414S19.886 21 18 21h-1c-1.886 0-2.828 0-3.414-.586S13 18.886 13 17Z"></path><path stroke-linecap="round" stroke-linejoin="round" d="M11.5 11.5v-3m0 3h-3m3 0l-4-4"></path></g></svg></span>
 							</label>
-							<label class="control-cell" data-control="downloadLRC" title="__MSG_options_unisonModal_controlDownloadLrc__">
+							<label class="control-cell" data-control="download" title="__MSG_options_unisonModal_controlDownloadLrc__">
 								<input type="checkbox" id="isDockDownloadLRCEnabled">
 								<span class="control-cell__icon"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-download-icon lucide-download"><path d="M12 15V3"/><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="m7 10 5 5 5-5"/></svg></span>
 							</label>

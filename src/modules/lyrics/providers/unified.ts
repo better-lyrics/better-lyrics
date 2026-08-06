@@ -447,6 +447,8 @@ async function processStreamData(event: string, data: any, params: ProviderParam
           song: params.song,
           duration: params.duration,
           cacheAllowed: true,
+          rawText: results.wordByWord,
+          rawFormat: "lrc",
         };
         sourceMap["musixmatch-richsync"].filled = true;
         resolveWaiter(params, "musixmatch-richsync");
@@ -459,6 +461,8 @@ async function processStreamData(event: string, data: any, params: ProviderParam
           source: "Musixmatch",
           sourceHref: "https://www.musixmatch.com",
           musicVideoSynced: false,
+          rawText: results.synced,
+          rawFormat: "lrc",
         };
         sourceMap["musixmatch-synced"].filled = true;
         resolveWaiter(params, "musixmatch-synced");
@@ -474,6 +478,8 @@ async function processStreamData(event: string, data: any, params: ProviderParam
           source: "LRCLib",
           sourceHref: "https://lrclib.net",
           musicVideoSynced: false,
+          rawText: results.synced,
+          rawFormat: "lrc",
         };
         sourceMap["lrclib-synced"].filled = true;
         resolveWaiter(params, "lrclib-synced");
@@ -503,6 +509,8 @@ async function processStreamData(event: string, data: any, params: ProviderParam
           source: "Better Lyrics Legato",
           sourceHref: HOMEPAGE_URL,
           musicVideoSynced: false,
+          rawText: decodedLyrics.lyrics,
+          rawFormat: "lrc",
         };
         sourceMap["legato-synced"].filled = true;
         resolveWaiter(params, "legato-synced");

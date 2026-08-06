@@ -68,9 +68,13 @@ function parseTime(timeStr: string | number | undefined): number {
   }
 }
 
-function extractAgentMapping(metadataElements: MetadataElement[]): Map<string, string> {
-  const mapping = new Map<string, string>();
-  if (!metadataElements || metadataElements.length === 0) return mapping;
+function extractAgentMapping(metadataElements: MetadataElement[]): {
+  codes: Map<string, string>;
+  names: Map<string, string>;
+} {
+  const codes = new Map<string, string>();
+  const names = new Map<string, string>();
+  if (!metadataElements || metadataElements.length === 0) return { codes, names };
 
   const agentElements = metadataElements.filter(e => "agent" in e && e[":@"]);
 
@@ -82,12 +86,45 @@ function extractAgentMapping(metadataElements: MetadataElement[]): Map<string, s
 
     if (agentType === "person" || agentType === "character") {
       voiceIndex++;
-      mapping.set(originalId, `v${voiceIndex}`);
+      codes.set(originalId, `v${voiceIndex}`);
     } else {
-      mapping.set(originalId, "v1000");
+      codes.set(originalId, "v1000");
     }
+
+    const agentChild = agent.agent?.[0] as { name?: { "#text"?: string }[] } | undefined;
+    const nameText = agentChild?.name?.[0]?.["#text"]?.trim();
+    if (nameText) names.set(originalId, nameText);
   });
-  return mapping;
+  return { codes, names };
+}
+
+// Pull inline x-translation/x-roman spans out before word parsing sees them, or they'd be read as lyric words.
+function extractInlineRoleSpans(p: ParagraphElementOrBackground[]): {
+  content: ParagraphElementOrBackground[];
+  translations: Record<string, string>;
+  romanization?: string;
+} {
+  const content: ParagraphElementOrBackground[] = [];
+  const translations: Record<string, string> = {};
+  let romanization: string | undefined;
+
+  for (const el of p) {
+    const role = el[":@"]?.["@_role"];
+    if (role === "x-translation") {
+      const lang = el[":@"]?.["@_lang"];
+      const text = el.span?.[0]?.["#text"] ?? el["#text"];
+      if (lang && text) translations[lang] = text;
+      continue;
+    }
+    if (role === "x-roman") {
+      const text = el.span?.[0]?.["#text"] ?? el["#text"];
+      if (text) romanization = text;
+      continue;
+    }
+    content.push(el);
+  }
+
+  return { content, translations, romanization };
 }
 
 function parseLyricPart(p: ParagraphElementOrBackground[], beginTime: number, ignoreSpanSpace = false) {
@@ -276,7 +313,7 @@ export async function fillTtml(
 
   const metadataElements = ttHead?.find(e => "metadata" in e)?.metadata ?? [];
 
-  const agentMapping = extractAgentMapping(metadataElements);
+  const { codes: agentMapping, names: agentNameMapping } = extractAgentMapping(metadataElements);
 
   const lines = ttBody.flatMap(e => e.div ?? []).filter(e => e != null && "p" in e);
 
@@ -297,13 +334,17 @@ export async function fillTtml(
     let beginTimeMs = parseTime(meta?.["@_begin"]);
     let endTimeMs = parseTime(meta?.["@_end"]);
 
-    let partParse = parseLyricPart(line.p, beginTimeMs);
+    const { content, translations: inlineTranslations, romanization: inlineRomanization } = extractInlineRoleSpans(
+      line.p
+    );
+    let partParse = parseLyricPart(content, beginTimeMs);
     if (partParse.isWordSynced) {
       isWordSynced = true;
     }
 
     const rawAgent = meta?.["@_agent"];
     const normalizedAgent = rawAgent ? (agentMapping.get(rawAgent) ?? rawAgent) : undefined;
+    const agentName = rawAgent ? agentNameMapping.get(rawAgent) : undefined;
 
     let lyric = lyricIds[meta?.["@_key"] || ""];
     if (meta?.["@_key"]) {
@@ -318,12 +359,13 @@ export async function fillTtml(
 
     lyrics.set(lyric ? meta["@_key"] + `_${lyric.length}` : lyrics.size.toString(), {
       agent: normalizedAgent,
+      agentName,
       durationMs: endTimeMs - beginTimeMs,
       parts: partParse.parts,
       startTimeMs: beginTimeMs,
       words: partParse.text,
-      translations: undefined,
-      romanization: undefined,
+      translations: Object.keys(inlineTranslations).length > 0 ? inlineTranslations : undefined,
+      romanization: inlineRomanization,
       timedRomanization: undefined,
     });
   });
@@ -414,6 +456,8 @@ export async function fillTtml(
     source,
     sourceHref,
     unisonData,
+    rawText: responseString,
+    rawFormat: "ttml",
   };
 
   if (isWordSynced) {

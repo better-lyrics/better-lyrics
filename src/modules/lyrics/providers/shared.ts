@@ -64,6 +64,9 @@ export interface LyricSourceResult {
   song?: string;
   duration?: number;
   unisonData?: UnisonData;
+  // Original fetched text, when it's already in a downloadable lyric-file syntax (TTML/LRC).
+  rawText?: string;
+  rawFormat?: "ttml" | "lrc";
 }
 
 export type LyricsArray = Lyric[];
@@ -75,6 +78,8 @@ export interface Lyric {
   key?: string;
   parts?: LyricPart[];
   agent?: string;
+  // Real performer name behind `agent`, when the source names singers. Most providers don't have this.
+  agentName?: string;
   translations?: { [lang: string]: string };
   translation?: { text: string; lang: string }; // old property
   romanization?: string;

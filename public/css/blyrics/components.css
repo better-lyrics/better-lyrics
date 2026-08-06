@@ -760,11 +760,6 @@ ytmusic-player-page:not([is-mweb-modernization-enabled]) #side-panel:has(.blyric
 	cursor: not-allowed;
 }
 
-.blyrics-dock__menu-item-label {
-	font-size: 10px;
-	font-weight: 600;
-}
-
 .blyrics-dock__menu-item:disabled:hover {
 	background-color: transparent;
 }

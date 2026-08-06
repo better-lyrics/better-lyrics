@@ -45,6 +45,7 @@ interface ParagraphAttributes {
   "@_key": string;
   "@_agent": string;
   "@_role": string;
+  "@_lang"?: string; // xml:lang on inline x-translation/x-roman role spans
   "@_explicit"?: string;
   "@_obscene"?: string; // AMLL explicit content flag
 }

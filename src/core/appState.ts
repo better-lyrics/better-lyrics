@@ -67,6 +67,7 @@ interface AppStateType {
   isPictureInPictureOpen: boolean;
   currentSong: string;
   currentArtist: string;
+  defaultLyricDownloadFormat: string;
 }
 
 export const AppState: AppStateType = {
@@ -113,6 +114,7 @@ export const AppState: AppStateType = {
   isPictureInPictureOpen: false,
   currentSong: "",
   currentArtist: "",
+  defaultLyricDownloadFormat: "ttml",
 };
 
 export function reloadLyrics(): void {

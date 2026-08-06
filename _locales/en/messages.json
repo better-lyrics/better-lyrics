@@ -49,6 +49,14 @@
     "message": "Auto switch to lyrics tab",
     "description": "Auto switch to lyrics tab setting label"
   },
+  "options_general_download_lyrics_format": {
+    "message": "Lyric Download Format",
+    "description": "The format in which you need the lyrics to be downloaded"
+  },
+  "options_general_download_lyrics_format_hint": {
+    "message": "LRC: Defaults to Line-by-line when w/w is absent.",
+    "description": "The format in which you need the lyrics to be downloaded"
+  },
   "options_general_cache": {
     "message": "Cache",
     "description": "Cache section label"
@@ -261,6 +269,10 @@
   "lyricsDock_downloadLrc": {
     "message": "Download lyrics",
     "description": "Accessible label for the lyrics dock button that opens the LRC download menu"
+  },
+  "lyricsDock_downloadTtml": {
+    "message": "TTML",
+    "description": "Menu item that downloads the current lyrics as a TTML file, word-synced when available"
   },
   "lyricsDock_downloadLineByLine": {
     "message": "Line-by-Line",
