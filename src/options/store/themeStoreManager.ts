@@ -297,7 +297,7 @@ async function syncAppliedThemeCss(theme: InstalledStoreTheme): Promise<void> {
 }
 
 export async function performSilentUpdates(storeThemes: StoreTheme[]): Promise<string[]> {
-  const installed = await getInstalledStoreThemes();
+  const installed = (await getInstalledStoreThemes()).filter(theme => theme.source !== "url");
   const updates = await checkForThemeUpdates(installed, storeThemes);
   const updatedIds: string[] = [];
 
@@ -361,12 +361,14 @@ export async function refreshUrlThemesMetadata(): Promise<number> {
   for (const theme of urlThemesNeedingRefresh) {
     try {
       const fullTheme = await fetchFullTheme(theme.repo, theme.branch);
-      await installTheme(fullTheme, {
+      const updated = await installTheme(fullTheme, {
         source: "url",
         sourceUrl: theme.sourceUrl,
         branch: theme.branch,
       });
       refreshedCount++;
+
+      await syncAppliedThemeCss(updated);
     } catch (err) {
       console.warn(LOG_PREFIX_STORE, `Failed to refresh URL theme ${theme.id}:`, err);
     }

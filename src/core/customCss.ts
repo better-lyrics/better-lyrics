@@ -22,8 +22,13 @@ interface ChunkMetadata {
   customCSS_chunkCount?: number;
 }
 
-export function buildStoreThemeContent(title: string, creators: string[], css: string): string {
-  return `/* ${title}, a marketplace theme by ${creators.join(", ")} */\n\n${css}\n`;
+/** Theme records come from unvalidated metadata.json, so creators may be absent or not an array. */
+export function formatCreators(creators: string[] | undefined): string {
+  return Array.isArray(creators) && creators.length > 0 ? creators.join(", ") : "Unknown";
+}
+
+export function buildStoreThemeContent(title: string, creators: string[] | undefined, css: string): string {
+  return `/* ${title}, a marketplace theme by ${formatCreators(creators)} */\n\n${css}\n`;
 }
 
 // -- Space Reclamation --------------------------

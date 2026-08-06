@@ -286,11 +286,10 @@ class StorageManager {
     }
 
     const themeVersion = newTheme.version || "unknown";
-    const themeCreators = Array.isArray(newTheme.creators) ? newTheme.creators : ["Unknown"];
 
     console.log(LOG_PREFIX_EDITOR, `Store theme updated: ${newTheme.title} v${themeVersion}`);
 
-    const themeContent = buildStoreThemeContent(newTheme.title, themeCreators, newTheme.css);
+    const themeContent = buildStoreThemeContent(newTheme.title, newTheme.creators, newTheme.css);
     const displayName = newTheme.version ? `${newTheme.title} (v${newTheme.version})` : newTheme.title;
 
     await editorStateManager.queueOperation("storage", async () => {

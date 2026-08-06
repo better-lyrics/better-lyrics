@@ -1,7 +1,7 @@
 import { LOG_PREFIX_EDITOR } from "@constants";
 import { t } from "@core/i18n";
 import { getSyncStorage } from "@core/storage";
-import { saveCustomCss } from "@core/customCss";
+import { formatCreators, saveCustomCss } from "@core/customCss";
 import { STORE_THEME_PREFIX } from "@core/storage";
 import {
   getInstalledStoreThemes,
@@ -519,8 +519,7 @@ export async function updateThemeSelectorButton(): Promise<void> {
       const storeThemeId = storedThemeName.slice(STORE_THEME_PREFIX.length);
       const installedTheme = await getInstalledTheme(storeThemeId);
       if (installedTheme) {
-        const author = installedTheme.creators?.join(", ");
-        if (author) authorText = t("theme_author_prefix", author);
+        authorText = t("theme_author_prefix", formatCreators(installedTheme.creators));
         badgeIcon = installedTheme.source === "url" ? createGitHubIcon() : createMarketplaceIcon();
         badgeLabel = installedTheme.source === "url" ? "GitHub" : "Marketplace";
         bgUrl = installedTheme.imageUrls?.[0] ?? installedTheme.coverUrl ?? "";
