@@ -58,7 +58,7 @@
     },
     "devDependencies": {
         "@biomejs/biome": "2.0.4",
-        "@types/chrome": "^0.2.2",
+        "@types/chrome": "^0.2.5",
         "@types/jsdom": "^28.0.3",
         "@types/node": "^26.1.2",
         "@types/sortablejs": "^1.15.9",
