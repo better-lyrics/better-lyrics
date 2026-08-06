@@ -1,6 +1,12 @@
 import { GENERAL_ERROR_LOG, LOG_PREFIX } from "@constants";
 import { decompressString, isCompressed } from "@core/compression";
-import { compileRicsToStyles, getLocalStorage, getSyncStorage, loadChunkedStyles } from "@core/storage";
+import {
+  compileRicsToStyles,
+  getAppliedStoreThemeId,
+  getLocalStorage,
+  getSyncStorage,
+  loadChunkedStyles,
+} from "@core/storage";
 import { setThemeSettings } from "@modules/settings/themeOptions";
 import { log } from "@utils";
 import { clearAnimationStyleCache } from "./animationEngine";
@@ -120,9 +126,8 @@ export async function getAndApplyCustomStyles(): Promise<void> {
 
 async function handleStoreThemeChange(key: string, change: { oldValue?: any; newValue?: any }): Promise<void> {
   const themeId = key.replace("storeTheme:", "");
-  const { activeStoreTheme } = await getSyncStorage<{ activeStoreTheme?: string }>(["activeStoreTheme"]);
 
-  if (activeStoreTheme !== themeId) return;
+  if ((await getAppliedStoreThemeId()) !== themeId) return;
 
   const theme = change.newValue;
   if (!theme?.css) return;

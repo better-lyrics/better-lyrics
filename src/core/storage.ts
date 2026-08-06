@@ -28,6 +28,15 @@ export async function getSyncStorage<T>(keys: string | string[] | null): Promise
   return (await chrome.storage.sync.get(keys as string[])) as unknown as T;
 }
 
+export const STORE_THEME_PREFIX = "store:";
+
+/** Null once edited: editing drops themeName but leaves activeStoreTheme set. */
+export async function getAppliedStoreThemeId(): Promise<string | null> {
+  const { themeName } = await getSyncStorage<{ themeName?: string }>(["themeName"]);
+  if (!themeName?.startsWith(STORE_THEME_PREFIX)) return null;
+  return themeName.slice(STORE_THEME_PREFIX.length) || null;
+}
+
 interface TransientStorageItem {
   type: "transient";
   value: any;

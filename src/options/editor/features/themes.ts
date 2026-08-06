@@ -1,6 +1,8 @@
 import { LOG_PREFIX_EDITOR } from "@constants";
 import { t } from "@core/i18n";
 import { getSyncStorage } from "@core/storage";
+import { saveCustomCss } from "@core/customCss";
+import { STORE_THEME_PREFIX } from "@core/storage";
 import {
   getInstalledStoreThemes,
   getInstalledTheme,
@@ -28,15 +30,8 @@ import {
   themeSourceBadge,
 } from "../ui/dom";
 import { showAlert, showConfirm, showPrompt } from "../ui/feedback";
-import {
-  applyStoreThemeComplete,
-  broadcastRICSToTabs,
-  saveToStorageWithFallback,
-  showSyncError,
-  showSyncSuccess,
-} from "./storage";
+import { applyStoreThemeComplete, broadcastRICSToTabs, showSyncError, showSyncSuccess } from "./storage";
 
-const STORE_THEME_PREFIX = "store:";
 const preloadedImages = new Set<string>();
 
 function documentLoaded(): Promise<void> {
@@ -261,7 +256,7 @@ class ThemeManager {
     editorStateManager.setIsSaving(true);
 
     try {
-      const result = await saveToStorageWithFallback(css, true);
+      const result = await saveCustomCss(css);
 
       if (!result.success || !result.strategy) {
         throw new Error(`Failed to save theme: ${result.error?.message || "Unknown error"}`);
@@ -459,9 +454,9 @@ export function saveToStorage(isTheme = false) {
     editorStateManager.setCurrentThemeName(null);
   }
 
-  saveToStorageWithFallback(css, isTheme)
+  saveCustomCss(css)
     .then(result => {
-      console.log(LOG_PREFIX_EDITOR, "saveToStorageWithFallback result:", result);
+      console.log(LOG_PREFIX_EDITOR, "saveCustomCss result:", result);
       if (result.success && result.strategy) {
         showSyncSuccess(result.strategy, result.wasRetry);
         broadcastRICSToTabs(css, result.strategy);
