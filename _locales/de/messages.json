@@ -92,43 +92,43 @@
     "description": "Auto-scroll unsynced lyrics setting label"
   },
   "picture_in_picture_open": {
-    "message": "Open Picture-in-Picture lyrics",
+    "message": "Öffne Songtexte in Picture-in-Picture",
     "description": "Accessible label for the dock action that opens the floating lyrics window"
   },
   "picture_in_picture_previous": {
-    "message": "Previous",
+    "message": "Vorherige",
     "description": "Accessible label for the previous track button in the Picture-in-Picture lyrics window, used when the YouTube Music player bar exposes no label of its own"
   },
   "picture_in_picture_play": {
-    "message": "Play",
+    "message": "Abspielen",
     "description": "Accessible label for the play button in the Picture-in-Picture lyrics window, used when the YouTube Music player bar exposes no label of its own"
   },
   "picture_in_picture_pause": {
-    "message": "Pause",
+    "message": "Pausieren",
     "description": "Accessible label for the pause button in the Picture-in-Picture lyrics window, used when the YouTube Music player bar exposes no label of its own"
   },
   "picture_in_picture_next": {
-    "message": "Next",
+    "message": "Nächste",
     "description": "Accessible label for the next track button in the Picture-in-Picture lyrics window, used when the YouTube Music player bar exposes no label of its own"
   },
   "options_display_pipAutoRestore": {
-    "message": "Reopen floating lyrics automatically",
+    "message": "Öffne fliegende Songtexte automatisch",
     "description": "Setting label for automatically reopening the floating lyrics window after page load"
   },
   "options_display_pipAutoRestoreTooltip": {
-    "message": "Keeps the floating lyrics window from closing for good when you reload or move between songs and pages. Browsers only let a floating window open right after you interact with the page, so it reopens on your first click or key press instead of instantly.",
+    "message": "Hält das schwebende Songtext-Fenster vor dem Schließen, wenn Sie zwischen Liedern und Seiten neu laden oder bewegen. Browser lassen ein schwebendes Fenster nur öffnen, nachdem Sie mit der Seite interagieren so öffnet es sich wieder auf Ihren ersten Klick oder Tastendruck statt sofort.",
     "description": "Help tooltip explaining what automatic floating-lyrics reopening does and why it waits for the first interaction"
   },
   "options_display_pipArtworkTransition": {
-    "message": "Album art transition",
+    "message": "Albumcover-Übergang",
     "description": "Setting label, shown inside the floating lyrics window settings, for choosing how album art changes between songs"
   },
   "options_pipTransition_shuffle": {
-    "message": "Shuffle",
+    "message": "Zufällige Wiedergabe",
     "description": "Name of an album art transition where the artwork tilts back and the new cover is dealt in like a playing card"
   },
   "options_pipTransition_flip": {
-    "message": "Flip",
+    "message": "Spiegeln",
     "description": "Name of an album art transition where the artwork rotates like a card to reveal the new cover on its other side"
   },
   "options_pipTransition_push": {
@@ -136,23 +136,23 @@
     "description": "Name of a transition, offered for both album art and song titles, where the new content slides in from the side and pushes the old out"
   },
   "options_pipTransition_crossfade": {
-    "message": "Crossfade",
+    "message": "Überblenden",
     "description": "Name of a transition, offered for both album art and song titles, where the new content fades in over the old"
   },
   "options_pipTransition_spring": {
-    "message": "Spring",
+    "message": "Feder",
     "description": "Name of a song title transition where the words of the new title bounce up into place one after another"
   },
   "options_display_pipWindow": {
-    "message": "Floating lyrics window",
+    "message": "Schwebendes Songtext-Fenster",
     "description": "Label for the row that opens the settings for the floating lyrics window"
   },
   "options_display_pipTextTransition": {
-    "message": "Title transition",
+    "message": "Titelübergang",
     "description": "Setting label, shown inside the floating lyrics window settings, for choosing how the song title and artist change between songs"
   },
   "options_display_pipMarquee": {
-    "message": "Scroll long titles",
+    "message": "Lange Titel Scrollen",
     "description": "Toggle label for whether a song title too long for the floating lyrics window scrolls across so it can be read in full"
   },
   "options_display_shadersPromo": {
@@ -220,7 +220,7 @@
     "description": "Toggle label for showing the lyrics source switcher control in the dock"
   },
   "options_unisonModal_controlPictureInPicture": {
-    "message": "Floating window",
+    "message": "Schwebendes Fenster",
     "description": "Toggle label for showing the control that opens the floating lyrics window in the dock"
   },
   "options_unisonModal_controlOffset": {
@@ -252,11 +252,11 @@
     "description": "Label in the lyrics dock offset menu for the global offset applied to all songs and sync types"
   },
   "options_offsetModal_perSong": {
-    "message": "Per-song offsets",
+    "message": "Versatz pro Song",
     "description": "Heading in the offset settings modal for the section that manages saved per-song sync offsets"
   },
   "options_offsetModal_perSongClear": {
-    "message": "Clear all",
+    "message": "Alle entfernen",
     "description": "Button in the offset settings modal that deletes every saved per-song sync offset"
   },
   "options_offsetModal_perSongCount": {
@@ -264,7 +264,7 @@
     "description": "Label in the offset settings modal showing how many per-song sync offsets are stored"
   },
   "options_offsetModal_appliesTo": {
-    "message": "Applies to",
+    "message": "Gilt für",
     "description": "Label in the offset settings modal preceding the list of sync types a given offset affects"
   },
   "options_language_displayLanguage": {
@@ -976,7 +976,7 @@
     "description": "Footer link in the theme detail modal that opens the theme's discussion thread"
   },
   "marketplace_commit": {
-    "message": "Commit $hash$",
+    "message": "$hash$ Commit",
     "description": "Footer chip in the theme detail modal linking to the exact source commit a theme was built from",
     "placeholders": {
       "hash": {
