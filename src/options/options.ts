@@ -784,12 +784,10 @@ export async function fillThemeSettings() {
 
   for (const field in themeSettings.fields) {
     const setting = themeSettings.fields[field];
-    if (typeof setting.pos === "number") {
-      mapped[setting.pos] = { id: field, ...setting };
-    } else {
-      mapped[Object.keys(themeSettings.fields).length] = { id: field, ...setting };
-    }
+    mapped.push({ id: field, ...setting });
   }
+
+  mapped.sort((a, b) => a.pos! - b.pos!);
 
   for (const field of mapped) {
     if (

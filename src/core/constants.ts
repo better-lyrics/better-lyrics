@@ -139,8 +139,8 @@ export const THEME_SETTINGS_RANGE = {
 };
 
 export const THEME_SETTINGS_DROPDOWN = {
-  options: { type: "list", label: "Choosable options" },
-  default: { type: "number", label: "Default option" },
+  options: { type: "list", label: "Choosable options", desc: "The options that can be chosen from the dropdown" },
+  default: { type: "options", label: "Default option", desc: "The default option of the dropdown" },
 };
 
 export const THEME_SETTINGS_COLOR = {
