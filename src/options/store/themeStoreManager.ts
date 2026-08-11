@@ -11,6 +11,7 @@ import {
   resolveRegistryInstallUrls,
 } from "./themeStoreService";
 import type { InstalledStoreTheme, StoreTheme, ThemeSource } from "./types";
+import { logStore } from "@core/logger";
 
 async function fetchCssFromUrl(url: string): Promise<string> {
   const response = await fetch(url);
@@ -55,7 +56,7 @@ async function migrateFromLegacyStorage(): Promise<void> {
 
   if (!legacyThemes || legacyThemes.length === 0) return;
 
-  console.log(LOG_PREFIX_STORE, `Migrating ${legacyThemes.length} themes from legacy storage`);
+  logStore(`Migrating ${legacyThemes.length} themes from legacy storage`);
 
   const themeIds: string[] = [];
 
@@ -71,7 +72,7 @@ async function migrateFromLegacyStorage(): Promise<void> {
   await setThemeIndex({ themeIds });
   await chrome.storage.local.remove(LEGACY_STORAGE_KEY);
 
-  console.log(LOG_PREFIX_STORE, `Migration complete: ${themeIds.length} themes migrated`);
+  logStore(`Migration complete: ${themeIds.length} themes migrated`);
 }
 
 let migrationPromise: Promise<void> | null = null;
@@ -231,11 +232,11 @@ export async function applyStoreTheme(themeId: string): Promise<string> {
 // -- Symlinked Theme Installs --------------------------
 
 export async function installSymlinkedThemeFromMarketplace(storeId: string): Promise<InstalledStoreTheme | null> {
-  console.log(LOG_PREFIX_STORE, `Installing symlinked theme from marketplace: ${storeId}`);
+  logStore(`Installing symlinked theme from marketplace: ${storeId}`);
 
   const existing = await getInstalledTheme(storeId);
   if (existing) {
-    console.log(LOG_PREFIX_STORE, `Symlinked theme already installed: ${storeId} v${existing.version}`);
+    logStore(`Symlinked theme already installed: ${storeId} v${existing.version}`);
     return existing;
   }
 
@@ -247,7 +248,7 @@ export async function installSymlinkedThemeFromMarketplace(storeId: string): Pro
     }
 
     const installed = await installTheme(storeTheme, { source: "marketplace" });
-    console.log(LOG_PREFIX_STORE, `Installed symlinked theme: ${storeId} v${installed.version}`);
+    logStore(`Installed symlinked theme: ${storeId} v${installed.version}`);
     return installed;
   } catch (err) {
     console.warn(LOG_PREFIX_STORE, `Failed to install symlinked theme from marketplace: ${storeId}`, err);
@@ -293,7 +294,7 @@ async function syncAppliedThemeCss(theme: InstalledStoreTheme): Promise<void> {
     return;
   }
 
-  console.log(LOG_PREFIX_STORE, `Re-applied active theme after update: ${theme.title}`);
+  logStore(`Re-applied active theme after update: ${theme.title}`);
 }
 
 export async function performSilentUpdates(storeThemes: StoreTheme[]): Promise<string[]> {
@@ -312,7 +313,7 @@ export async function performSilentUpdates(storeThemes: StoreTheme[]): Promise<s
 
       const updated = await updateTheme(storeTheme, previous);
       updatedIds.push(themeId);
-      console.log(LOG_PREFIX_STORE, `Auto-updated theme: ${storeTheme.title} to v${storeTheme.version}`);
+      logStore(`Auto-updated theme: ${storeTheme.title} to v${storeTheme.version}`);
 
       await syncAppliedThemeCss(updated);
     } catch (err) {

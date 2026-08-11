@@ -21,6 +21,7 @@ import {
   setActiveStoreTheme,
 } from "./store/themeStoreManager";
 import { fetchAllStoreThemes } from "./store/themeStoreService";
+import { logBackground } from "@core/logger";
 
 const THEME_UPDATE_ALARM = "theme-update-check";
 const UPDATE_INTERVAL_MINUTES = 360; // 6 hours
@@ -47,7 +48,7 @@ async function migrateSymlinkedThemes(): Promise<void> {
     if (themeName && !themeName.startsWith("store:")) {
       const storeId = SYMLINKED_THEME_MAP[themeName];
       if (storeId) {
-        console.log(LOG_PREFIX_BACKGROUND, `Migrating symlinked theme: ${themeName} → store:${storeId}`);
+        logBackground(`Migrating symlinked theme: ${themeName} → store:${storeId}`);
         await chrome.storage.sync.set({ themeName: `store:${storeId}` });
         await setActiveStoreTheme(storeId);
         const installed = await installSymlinkedThemeFromMarketplace(storeId);
@@ -57,7 +58,7 @@ async function migrateSymlinkedThemes(): Promise<void> {
           return;
         }
         await saveCustomCss(buildStoreThemeContent(installed.title, installed.creators, installed.css));
-        console.log(LOG_PREFIX_BACKGROUND, `Migrated active theme: ${themeName} → store:${storeId}`);
+        logBackground(`Migrated active theme: ${themeName} → store:${storeId}`);
       }
     }
 
@@ -87,7 +88,7 @@ async function resyncAppliedThemeCss(): Promise<void> {
         console.warn(LOG_PREFIX_BACKGROUND, `Failed to resync applied theme: ${theme.title}`, result.error);
         return;
       }
-      console.log(LOG_PREFIX_BACKGROUND, `Resynced applied theme: ${theme.title} v${theme.version}`);
+      logBackground(`Resynced applied theme: ${theme.title} v${theme.version}`);
     }
 
     await chrome.storage.local.set({ [THEME_CSS_RESYNC_KEY]: THEME_CSS_RESYNC_VERSION });
@@ -101,14 +102,14 @@ async function checkAndApplyThemeUpdates(): Promise<void> {
     const installed = await getInstalledStoreThemes();
     if (installed.length === 0) return;
 
-    console.log(LOG_PREFIX_BACKGROUND, "Checking for theme updates...");
+    logBackground("Checking for theme updates...");
     const storeThemes = await fetchAllStoreThemes();
     const marketplaceUpdatedIds = await performSilentUpdates(storeThemes);
     const urlUpdatedIds = await performUrlThemeUpdates();
     const updatedIds = [...marketplaceUpdatedIds, ...urlUpdatedIds];
 
     if (updatedIds.length > 0) {
-      console.log(LOG_PREFIX_BACKGROUND, `Updated ${updatedIds.length} theme(s):`, updatedIds.join(", "));
+      logBackground(`Updated ${updatedIds.length} theme(s):`, updatedIds.join(", "));
     }
   } catch (err) {
     console.warn(LOG_PREFIX_BACKGROUND, "Theme update check failed:", err);
@@ -122,7 +123,7 @@ function setupThemeUpdateAlarm(): void {
         delayInMinutes: 1,
         periodInMinutes: UPDATE_INTERVAL_MINUTES,
       });
-      console.log(LOG_PREFIX_BACKGROUND, "Theme update alarm created");
+      logBackground("Theme update alarm created");
     }
   });
 }

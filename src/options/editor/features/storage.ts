@@ -8,6 +8,7 @@ import { editorStateManager } from "../core/state";
 import { syncIndicator } from "../ui/dom";
 import { ricsCompiler } from "./compiler";
 import { setThemeName, showThemeName, themeSourceToEditorSource } from "./themes";
+import { logEditor } from "@core/logger";
 
 interface CSSStorageData {
   cssStorageType?: "sync" | "local" | "chunked";
@@ -100,10 +101,7 @@ export function showSyncError(error: any): void {
 }
 
 export async function broadcastRICSToTabs(ricsSource: string, strategy: "local" | "sync" | "chunked"): Promise<void> {
-  console.log(
-    LOG_PREFIX_EDITOR,
-    `Broadcasting RICS to tabs, source length: ${ricsSource.length}, strategy: ${strategy}`
-  );
+  logEditor(`Broadcasting RICS to tabs, source length: ${ricsSource.length}, strategy: ${strategy}`);
 
   if (!ricsCompiler.isValidRics(ricsSource)) {
     const state = ricsCompiler.getLastCompilationState();
@@ -118,13 +116,13 @@ export async function broadcastRICSToTabs(ricsSource: string, strategy: "local" 
         storageType: strategy,
       })
       .then(() => {
-        console.log(LOG_PREFIX_EDITOR, "Broadcast sent to background successfully");
+        logEditor("Broadcast sent to background successfully");
       })
       .catch(error => {
-        console.log(LOG_PREFIX_EDITOR, "Error broadcasting to background:", error);
+        logEditor("Error broadcasting to background:", error);
       });
   } catch (err) {
-    console.log(LOG_PREFIX_EDITOR, "broadcastRICSToTabs exception:", err);
+    logEditor("broadcastRICSToTabs exception:", err);
   }
 }
 
@@ -174,10 +172,10 @@ class StorageManager {
       return;
     }
 
-    console.log(LOG_PREFIX_EDITOR, "Initializing storage listeners");
+    logEditor("Initializing storage listeners");
 
     chrome.storage.onChanged.addListener(async (changes, namespace) => {
-      console.log(LOG_PREFIX_EDITOR, `Storage changed in ${namespace}:`, Object.keys(changes));
+      logEditor(`Storage changed in ${namespace}:`, Object.keys(changes));
 
       if (Object.hasOwn(changes, "customCSS")) {
         await this.handleCSSChange(changes.customCSS);
@@ -188,7 +186,7 @@ class StorageManager {
       }
 
       if (Object.hasOwn(changes, "customCSS_chunk_0")) {
-        console.log(LOG_PREFIX_EDITOR, "Chunked CSS detected, handling as CSS change");
+        logEditor("Chunked CSS detected, handling as CSS change");
         await this.handleCSSChange(changes.customCSS_chunk_0);
       }
 
@@ -206,34 +204,34 @@ class StorageManager {
     });
 
     this.isInitialized = true;
-    console.log(LOG_PREFIX_EDITOR, "Storage listeners initialized");
+    logEditor("Storage listeners initialized");
   }
 
   private async handleCSSChange(_change: any): Promise<void> {
     if (editorStateManager.getIsSaving()) {
-      console.log(LOG_PREFIX_EDITOR, "Skipping CSS reload (save in progress)");
+      logEditor("Skipping CSS reload (save in progress)");
       return;
     }
 
     if (editorStateManager.getIsUserTyping()) {
-      console.log(LOG_PREFIX_EDITOR, "Skipping CSS reload (user is typing)");
+      logEditor("Skipping CSS reload (user is typing)");
       return;
     }
 
     const saveCount = editorStateManager.getSaveCount();
-    console.log(LOG_PREFIX_EDITOR, `CSS change detected, saveCount: ${saveCount}`);
+    logEditor(`CSS change detected, saveCount: ${saveCount}`);
 
     if (saveCount > 0) {
-      console.log(LOG_PREFIX_EDITOR, "Skipping CSS reload (saveCount > 0)");
+      logEditor("Skipping CSS reload (saveCount > 0)");
       editorStateManager.decrementSaveCount();
       return;
     }
 
-    console.log(LOG_PREFIX_EDITOR, "Loading CSS from storage");
+    logEditor("Loading CSS from storage");
 
     await editorStateManager.queueOperation("storage", async () => {
       const css = await loadCustomCSS();
-      console.log(LOG_PREFIX_EDITOR, `CSS loaded from storage: ${css.length} bytes`);
+      logEditor(`CSS loaded from storage: ${css.length} bytes`);
 
       await editorStateManager.setEditorContent(css, "storage-change");
     });
@@ -241,22 +239,22 @@ class StorageManager {
 
   private async handleThemeNameChange(): Promise<void> {
     if (editorStateManager.getIsSaving()) {
-      console.log(LOG_PREFIX_EDITOR, "Skipping theme reload (save in progress)");
+      logEditor("Skipping theme reload (save in progress)");
       return;
     }
 
     if (editorStateManager.getIsUserTyping()) {
-      console.log(LOG_PREFIX_EDITOR, "Skipping theme reload (user is typing)");
+      logEditor("Skipping theme reload (user is typing)");
       await setThemeName();
       return;
     }
 
-    console.log(LOG_PREFIX_EDITOR, "Theme name changed, reloading CSS");
+    logEditor("Theme name changed, reloading CSS");
     await setThemeName();
 
     await editorStateManager.queueOperation("storage", async () => {
       const css = await loadCustomCSS();
-      console.log(LOG_PREFIX_EDITOR, `CSS loaded from theme change: ${css.length} bytes`);
+      logEditor(`CSS loaded from theme change: ${css.length} bytes`);
       await editorStateManager.setEditorContent(css, "theme-name-change", false);
     });
   }
@@ -266,12 +264,12 @@ class StorageManager {
     change: { oldValue?: InstalledStoreTheme; newValue?: InstalledStoreTheme }
   ): Promise<void> {
     if (editorStateManager.getIsSaving()) {
-      console.log(LOG_PREFIX_EDITOR, "Skipping store theme reload (save in progress)");
+      logEditor("Skipping store theme reload (save in progress)");
       return;
     }
 
     if (editorStateManager.getIsUserTyping()) {
-      console.log(LOG_PREFIX_EDITOR, "Skipping store theme reload (user is typing)");
+      logEditor("Skipping store theme reload (user is typing)");
       return;
     }
 
@@ -281,13 +279,13 @@ class StorageManager {
     if (!newTheme?.css || !newTheme?.title) return;
 
     if (change.oldValue?.version === newTheme.version && change.oldValue?.css === newTheme.css) {
-      console.log(LOG_PREFIX_EDITOR, "Store theme unchanged, skipping");
+      logEditor("Store theme unchanged, skipping");
       return;
     }
 
     const themeVersion = newTheme.version || "unknown";
 
-    console.log(LOG_PREFIX_EDITOR, `Store theme updated: ${newTheme.title} v${themeVersion}`);
+    logEditor(`Store theme updated: ${newTheme.title} v${themeVersion}`);
 
     const themeContent = buildStoreThemeContent(newTheme.title, newTheme.creators, newTheme.css);
     const displayName = newTheme.version ? `${newTheme.title} (v${newTheme.version})` : newTheme.title;
@@ -303,17 +301,17 @@ class StorageManager {
       if (result.success && result.strategy) {
         showSyncSuccess(result.strategy, result.wasRetry);
         await broadcastRICSToTabs(themeContent, result.strategy);
-        console.log(LOG_PREFIX_EDITOR, "Store theme update synced to customCSS");
+        logEditor("Store theme update synced to customCSS");
       }
     });
   }
 
   async loadInitialCSS(): Promise<void> {
-    console.log(LOG_PREFIX_EDITOR, "Loading initial CSS");
+    logEditor("Loading initial CSS");
 
     await editorStateManager.queueOperation("init", async () => {
       const css = await loadCustomCSS();
-      console.log(LOG_PREFIX_EDITOR, `Initial CSS loaded: ${css.length} bytes`);
+      logEditor(`Initial CSS loaded: ${css.length} bytes`);
 
       await editorStateManager.setEditorContent(css, "initial-load", false);
     });

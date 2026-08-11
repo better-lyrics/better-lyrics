@@ -8,7 +8,7 @@ import {
 } from "@constants";
 import { AppState, reloadLyrics } from "@core/appState";
 import { clearCache, compileRicsToStyles, getStorage } from "@core/storage";
-import { log, setUpLog } from "@core/utils";
+import { configureLogging } from "@core/logger";
 import { clearCache as clearTranslationCache } from "@modules/lyrics/translation";
 import { mountDock, mountVotingSegment, reloadAlbumArt, unmountDock, updateDockPosition } from "@modules/ui/dom";
 import { applyGlobalOffsets } from "@modules/ui/lyricsDock/offset";
@@ -16,6 +16,7 @@ import { mainView } from "@modules/ui/mainLyricsView";
 import { isPlayerFullscreened, onFullscreenChange } from "@modules/ui/observer";
 import { publishPictureInPictureLyrics } from "@modules/ui/pictureInPicture/lyricsPublisher";
 import { applyCustomStyles, getAndApplyCustomStyles } from "@modules/ui/styleInjector";
+import { logContent } from "@core/logger";
 
 let hasInitializedMessageListener = false;
 
@@ -25,6 +26,12 @@ type EnableDisableCallback = () => void;
  * Handles settings initialization and applies user preferences.
  * Sets up fullscreen behavior, animations, and other settings.
  */
+export function applyLoggingSetting(): void {
+  getStorage({ isLogsEnabled: true }, items => {
+    configureLogging(items.isLogsEnabled !== false);
+  });
+}
+
 export function handleSettings(): void {
   onFullScreenDisabled(
     () => {
@@ -205,25 +212,25 @@ export function listenForPopupMessages(): void {
   hasInitializedMessageListener = true;
 
   chrome.runtime.onMessage.addListener((request, _, sendResponse) => {
-    log(LOG_PREFIX_CONTENT, "Received message:", request.action);
+    logContent("Received message:", request.action);
     if (request.action === "applyStyles") {
-      log(LOG_PREFIX_CONTENT, "Processing applyStyles, RICS length:", request.ricsSource?.length);
+      logContent("Processing applyStyles, RICS length:", request.ricsSource?.length);
       if (request.ricsSource) {
-        log(LOG_PREFIX_CONTENT, "Compiling RICS and applying styles");
+        logContent("Compiling RICS and applying styles");
         const compiledCSS = compileRicsToStyles(request.ricsSource);
         applyCustomStyles(compiledCSS);
         mainView.relayout();
-        log(LOG_PREFIX_CONTENT, "Styles applied successfully");
+        logContent("Styles applied successfully");
       } else {
-        log(LOG_PREFIX_CONTENT, "Loading styles from storage");
+        logContent("Loading styles from storage");
         getAndApplyCustomStyles().then(() => {
           mainView.relayout();
-          log(LOG_PREFIX_CONTENT, "Styles loaded from storage and applied");
+          logContent("Styles loaded from storage and applied");
         });
       }
     } else if (request.action === "updateSettings") {
       clearTranslationCache();
-      setUpLog();
+      applyLoggingSetting();
       hideCursorOnIdle();
       handleSettings();
       loadTranslationSettings();

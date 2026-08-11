@@ -1,4 +1,5 @@
 import { LOG_PREFIX_STORE, THEME_STORE_TURNSTILE_URL } from "@constants";
+import { logStore } from "@core/logger";
 
 // -- Types ------------------------------------
 
@@ -89,7 +90,7 @@ function handleMessage(event: MessageEvent): void {
   if (!data || typeof data !== "object") return;
 
   if (data.type === "turnstile-token" && data.token) {
-    console.log(LOG_PREFIX_STORE, "Received Turnstile token");
+    logStore("Received Turnstile token");
     if (pendingResolve) {
       pendingResolve(data.token);
     }

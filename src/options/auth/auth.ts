@@ -2,6 +2,7 @@ import { AUTH_PORT_NAME_PREFIX, LOG_PREFIX_AUTH } from "@constants";
 import { initI18n, loadLocaleOverride, t } from "@core/i18n";
 import { getDisplayName } from "@core/keyIdentity";
 import { type AuthPartner, getAuthPartnerByOrigin } from "@modules/auth/partners";
+import { logAuth } from "@core/logger";
 
 interface RequestParams {
   requestId: string;
@@ -135,8 +136,8 @@ function wireActions(port: chrome.runtime.Port): void {
 function wireDevActions(): void {
   const approve = document.getElementById("auth-approve") as HTMLButtonElement | null;
   const cancel = document.getElementById("auth-cancel") as HTMLButtonElement | null;
-  approve?.addEventListener("click", () => console.log(LOG_PREFIX_AUTH, "[dev] approve clicked"));
-  cancel?.addEventListener("click", () => console.log(LOG_PREFIX_AUTH, "[dev] cancel clicked"));
+  approve?.addEventListener("click", () => logAuth("[dev] approve clicked"));
+  cancel?.addEventListener("click", () => logAuth("[dev] cancel clicked"));
 }
 
 async function main(): Promise<void> {

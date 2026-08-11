@@ -8,9 +8,9 @@ import {
   getSyncStorage,
   loadChunkedStyles,
 } from "@core/storage";
-import { log } from "@utils";
 import { mainView } from "./mainLyricsView";
 import { publishPictureInPictureLyrics } from "./pictureInPicture/lyricsPublisher";
+import { logCore, logError } from "@core/logger";
 
 let hasSubscribedToStyles = false;
 
@@ -65,7 +65,7 @@ export async function getAndApplyCustomStyles(): Promise<void> {
       applyCustomStyles(compileRicsToStyles(css));
     }
   } catch (error) {
-    log(GENERAL_ERROR_LOG, error);
+    logError(error);
     try {
       const chunkedStyles = await loadChunkedStyles();
       if (chunkedStyles) {
@@ -97,7 +97,7 @@ export async function getAndApplyCustomStyles(): Promise<void> {
         applyCustomStyles(compileRicsToStyles(css));
       }
     } catch (fallbackError) {
-      log(GENERAL_ERROR_LOG, fallbackError);
+      logError(fallbackError);
     }
   }
 }
@@ -112,7 +112,7 @@ async function handleStoreThemeChange(key: string, change: { oldValue?: any; new
 
   if (change.oldValue?.css === theme.css && change.oldValue?.version === theme.version) return;
 
-  log(LOG_PREFIX, "Store theme updated:", theme.title || themeId);
+  logCore("Store theme updated:", theme.title || themeId);
   applyCustomStyles(compileRicsToStyles(theme.css));
 }
 

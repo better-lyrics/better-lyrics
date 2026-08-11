@@ -1,9 +1,9 @@
 import { CUBEY_LYRICS_API_URL, CUBEY_LYRICS_API_URL_TURNSTILE, HOMEPAGE_URL, LOG_PREFIX } from "@constants";
 import { getLocalStorage } from "@core/storage";
-import { log } from "@core/utils";
 import { lrcFixers, parseLRC, parseQRC, PlainParser } from "@braccato/parsers";
 import { type LyricSourceKey, type LyricSourceResult, type ProviderParameters, saveLyricsToCache } from "./shared";
 import { fillTtml } from "@modules/lyrics/providers/ttmlSource";
+import { logCore } from "@core/logger";
 
 const JWT_RENEWAL_THRESHOLD_SECONDS = 60 * 60;
 
@@ -39,7 +39,7 @@ function handleTurnstile(): Promise<string> {
 
       switch (event.data.type) {
         case "turnstile-token":
-          log(LOG_PREFIX, "Received Success Token:", event.data.token);
+          logCore("Received Success Token:", event.data.token);
           cleanup();
           resolve(event.data.token);
           break;
@@ -104,13 +104,13 @@ function getJwtMetadata(token: string): JwtMetadata | null {
 
 function requestNewAuthenticationToken(reason: string): Promise<string | null> {
   if (authenticationTokenPromise) {
-    log(LOG_PREFIX, "Authentication token request already in progress; reusing it.");
+    logCore("Authentication token request already in progress; reusing it.");
     return authenticationTokenPromise;
   }
 
   const promise = (async () => {
     try {
-      log(LOG_PREFIX, `Requesting new JWT (${reason})...`);
+      logCore(`Requesting new JWT (${reason})...`);
       const turnstileToken = await handleTurnstile();
 
       const response = await fetch(CUBEY_LYRICS_API_URL + "verify-turnstile", {
@@ -128,7 +128,7 @@ function requestNewAuthenticationToken(reason: string): Promise<string | null> {
       if (typeof newJwt !== "string" || !newJwt) throw new Error("No JWT returned from API after verification.");
 
       await chrome.storage.local.set({ jwtToken: newJwt });
-      log(LOG_PREFIX, "New JWT received and stored.");
+      logCore("New JWT received and stored.");
       return newJwt;
     } catch (error) {
       console.error(LOG_PREFIX, "Authentication process failed:", error);
@@ -151,30 +151,30 @@ function requestNewAuthenticationToken(reason: string): Promise<string | null> {
  */
 async function getAuthenticationToken(forceNew = false): Promise<string | null> {
   if (forceNew) {
-    log(LOG_PREFIX, "Forcing new token refresh.");
+    logCore("Forcing new token refresh.");
     return requestNewAuthenticationToken("forced refresh");
   }
 
   const storedData = await getLocalStorage<{ jwtToken?: string }>(["jwtToken"]);
   const storedJwt = storedData.jwtToken;
   if (!storedJwt) {
-    log(LOG_PREFIX, "No local JWT found, initiating Turnstile challenge...");
+    logCore("No local JWT found, initiating Turnstile challenge...");
     return requestNewAuthenticationToken("missing token");
   }
 
   const metadata = getJwtMetadata(storedJwt);
   if (!metadata) {
-    log(LOG_PREFIX, "Local JWT is invalid, requesting a new one.");
+    logCore("Local JWT is invalid, requesting a new one.");
     return requestNewAuthenticationToken("invalid token");
   }
 
   if (metadata.isExpired) {
-    log(LOG_PREFIX, "Local JWT has expired, requesting a new one.");
+    logCore("Local JWT has expired, requesting a new one.");
     return requestNewAuthenticationToken("expired token");
   }
 
   if (metadata.shouldRenew) {
-    log(LOG_PREFIX, `Local JWT expires in ${Math.round(metadata.secondsUntilExpiry)} seconds; renewing in background.`);
+    logCore(`Local JWT expires in ${Math.round(metadata.secondsUntilExpiry)} seconds; renewing in background.`);
     void requestNewAuthenticationToken("near-expiry token").then(newJwt => {
       if (!newJwt) {
         console.warn(LOG_PREFIX, "Background JWT renewal failed; keeping the existing token.");
@@ -183,7 +183,7 @@ async function getAuthenticationToken(forceNew = false): Promise<string | null> 
     return storedJwt;
   }
 
-  log(LOG_PREFIX, "Using valid JWT for bypass.");
+  logCore("Using valid JWT for bypass.");
   return storedJwt;
 }
 
@@ -357,7 +357,7 @@ async function startStream(providerParameters: ProviderParameters, retryCount = 
     }
   } catch (err) {
     if (signal.aborted) {
-      log(LOG_PREFIX, "Stream aborted.");
+      logCore("Stream aborted.");
     } else {
       console.error(LOG_PREFIX, "Stream error:", err);
     }

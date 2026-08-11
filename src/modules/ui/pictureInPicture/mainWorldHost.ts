@@ -11,6 +11,7 @@ import {
   sendSignal,
   type PictureInPictureSignal,
 } from "./bridge";
+import { createLogSink, type LogSink } from "@core/logger";
 import type { PictureInPictureController } from "./controller";
 import { createPictureInPictureHost } from "./pipHost";
 import type { PictureInPictureSongMetadata } from "./types";
@@ -18,6 +19,7 @@ import type { PictureInPictureSongMetadata } from "./types";
 const IGNORED_AUTO_RESTORE_KEYS = new Set(["Escape", "Alt", "Control", "Meta", "Shift"]);
 
 let resources: PictureInPictureInitPayload | null = null;
+let pageLog: LogSink = createLogSink(LOG_PREFIX, true);
 let controller: PictureInPictureController<Window> | null = null;
 let nextRequestId = 0;
 let hasAttemptedAutoRestore = false;
@@ -54,9 +56,9 @@ function createController(): PictureInPictureController<Window> {
       translate: key => resources?.strings[key] ?? "",
       getArtworkMetadata: requestSongMetadata,
       resetScrollResume: () => sendSignal({ type: "reset-scroll" }),
-      // The extension's logger lives in the isolated world, so the page world writes straight to
-      // the console under the same prefix rather than paying a bridge round trip per line.
-      log: resources?.logsEnabled ? console.log.bind(console, LOG_PREFIX) : () => {},
+      get log() {
+        return pageLog;
+      },
     },
     artworkTransition: () => resources?.artworkTransition,
     textTransition: () => resources?.textTransition,
@@ -137,6 +139,7 @@ export function startPictureInPicturePageHost(): void {
 
   onInit(payload => {
     resources = payload;
+    pageLog = createLogSink(LOG_PREFIX, payload.logsEnabled);
     if (!controller) {
       controller = createController();
       observeToggleClicks();

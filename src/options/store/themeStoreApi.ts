@@ -11,6 +11,7 @@ import {
 import { UnisonErrorCode } from "@modules/unison/errorCodes";
 import { fetchWithTimeout } from "./themeStoreService";
 import type { AllThemeStats, ApiResult, RatingResult, ResolvedBuild } from "./types";
+import { logStore } from "@core/logger";
 
 const RESOLVE_TIMEOUT_MS = 3000;
 
@@ -222,7 +223,7 @@ export async function submitRating(
 
     if (data.certificate && typeof data.certificate === "string") {
       await setCertificate(data.certificate);
-      console.log(LOG_PREFIX_STORE, "Certificate received and stored");
+      logStore("Certificate received and stored");
     }
 
     return { success: true, data };

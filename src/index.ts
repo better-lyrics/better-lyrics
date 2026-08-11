@@ -33,7 +33,8 @@ import {
   publishPictureInPictureResources,
 } from "@modules/ui/pictureInPicture/browserController";
 import { subscribeToCustomStyles } from "@modules/ui/styleInjector";
-import { log, setUpLog } from "@utils";
+import { applyLoggingSetting } from "@modules/settings/settings";
+import { logCore } from "@core/logger";
 
 /**
  * Initializes the BetterLyrics extension by setting up all required components.
@@ -41,7 +42,7 @@ import { log, setUpLog } from "@utils";
  * storage, and lyric providers.
  */
 async function modify(): Promise<void> {
-  setUpLog();
+  applyLoggingSetting();
   await injectHeadTags();
   await loadLocaleOverride();
   injectI18nCssVars();
@@ -68,7 +69,7 @@ async function modify(): Promise<void> {
   initProviders();
   prewarmAuthenticationToken();
   setUpAvButtonListener();
-  log(
+  logCore(
     INITIALIZE_LOG,
     "background: rgba(10,11,12,1) ; color: rgba(214, 250, 214,1) ; padding: 0.5rem 0.75rem; border-radius: 0.5rem; font-size: 1rem; "
   );

@@ -1,5 +1,5 @@
 import { TRANSLATE_IN_ROMAJI, TRANSLATE_LYRICS_URL, TRANSLATION_ERROR_LOG } from "@constants";
-import { log } from "@utils";
+import { logCore } from "@core/logger";
 
 interface TranslationResult {
   originalLanguage: string;
@@ -121,7 +121,7 @@ export async function translateBatch(request: BatchRequest): Promise<BatchTransl
           if (singleNewlineSplit.length === chunk.length) {
             translatedLines = singleNewlineSplit;
           } else if (translatedLines.length === 1 && chunk.length > 1) {
-            log(TRANSLATION_ERROR_LOG, `Batch translation failed to split: expected ${chunk.length} lines, got 1.`);
+            logCore(TRANSLATION_ERROR_LOG, `Batch translation failed to split: expected ${chunk.length} lines, got 1.`);
             translatedLines = [];
           }
         }
@@ -137,7 +137,7 @@ export async function translateBatch(request: BatchRequest): Promise<BatchTransl
       });
     } catch (error) {
       if ((error as Error).name !== "AbortError") {
-        log(TRANSLATION_ERROR_LOG, error);
+        logCore(TRANSLATION_ERROR_LOG, error);
       }
     }
   }
@@ -232,7 +232,10 @@ export async function romanizeBatch(request: BatchRequest): Promise<BatchRomaniz
           if (singleNewlineSplit.length === chunk.length) {
             romanizedLines = singleNewlineSplit;
           } else if (romanizedLines.length === 1 && chunk.length > 1) {
-            log(TRANSLATION_ERROR_LOG, `Batch romanization failed to split: expected ${chunk.length} lines, got 1.`);
+            logCore(
+              TRANSLATION_ERROR_LOG,
+              `Batch romanization failed to split: expected ${chunk.length} lines, got 1.`
+            );
             romanizedLines = [];
           }
         }
@@ -247,7 +250,7 @@ export async function romanizeBatch(request: BatchRequest): Promise<BatchRomaniz
       });
     } catch (error) {
       if ((error as Error).name !== "AbortError") {
-        log(TRANSLATION_ERROR_LOG, error);
+        logCore(TRANSLATION_ERROR_LOG, error);
       }
     }
   }
