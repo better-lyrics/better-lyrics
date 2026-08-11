@@ -76,8 +76,9 @@
   "browser_specific_settings": {
     "gecko": {
       "id": "betterlyrics@boidu.dev",
-      "strict_min_version": "100.0"
-    }
+      "strict_min_version": "128.0"
+    },
+    "gecko_android": {}
   },
   "chrome:update_url": "https://clients2.google.com/service/update2/crx",
   "edge:key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAmNspBNCi4WHoRlH/rRPneLNqtWHzsEsK+Z4a7qmose6afikym7/5A/7I/OuXeJFqJXLc7YfWVUtdBWfHRSjT9Earq0wdOfElHyWnHQ1/cn55xbCdMJRSsVKEg3NRHWKbwpBFlt6XUog5sl48Gf+v6aZrv069MWEnXA13BEWqRX9hALG6WswyxaZXKokwH2AvnDDaWHrBghti6kmSNuXWCJj4c02YwZ5LgOJ3m5cI7bq/Mi7RtVuK+Odsj2/iESXAwNvLcMiOTW8vrioj/KfySjXpi16HCZIm0e6EvTq08CQUvIEpxV7Gaiq5w2j2TFKPMQ4aaHTiEgWMSZ0DeihLNQIDAQAB",
