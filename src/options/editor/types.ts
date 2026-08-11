@@ -9,13 +9,6 @@ export interface ModalOptions {
   showInput?: boolean;
 }
 
-export interface SaveResult {
-  success: boolean;
-  strategy?: "local" | "sync" | "chunked";
-  wasRetry?: boolean;
-  error?: any;
-}
-
 export interface BracketStackItem {
   type: string;
   from: number;

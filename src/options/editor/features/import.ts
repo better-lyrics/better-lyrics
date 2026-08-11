@@ -1,7 +1,8 @@
 import { LOG_PREFIX_EDITOR } from "@constants";
+import { saveCustomCss } from "@core/customCss";
 import { editorStateManager } from "../core/state";
 import { showAlert } from "../ui/feedback";
-import { broadcastRICSToTabs, saveToStorageWithFallback, showSyncSuccess } from "./storage";
+import { broadcastRICSToTabs, showSyncSuccess } from "./storage";
 import { hideThemeName, updateThemeSelectorButton } from "./themes";
 
 export const generateDefaultFilename = (): string => {
@@ -123,7 +124,7 @@ class ImportManager {
         await editorStateManager.setEditorContent(css, `file-import:${filename}`, false);
 
         console.log(LOG_PREFIX_EDITOR, ` Step 4: Saving to storage`);
-        const result = await saveToStorageWithFallback(css);
+        const result = await saveCustomCss(css);
 
         if (!result.success || !result.strategy) {
           throw new Error(`Storage save failed: ${result.error?.message || "Unknown error"}`);

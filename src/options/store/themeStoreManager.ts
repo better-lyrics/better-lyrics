@@ -1,5 +1,6 @@
 import { LOG_PREFIX_STORE } from "@constants";
-import { getLocalStorage, getSyncStorage } from "@core/storage";
+import { buildStoreThemeContent, saveCustomCss } from "@core/customCss";
+import { getAppliedStoreThemeId, getLocalStorage, getSyncStorage } from "@core/storage";
 import {
   fetchFullTheme,
   fetchRegistryShaderConfig,
@@ -272,29 +273,48 @@ async function checkForThemeUpdates(
   return updates;
 }
 
-async function updateTheme(theme: StoreTheme): Promise<InstalledStoreTheme> {
-  return installTheme(theme);
+async function updateTheme(theme: StoreTheme, previous: InstalledStoreTheme): Promise<InstalledStoreTheme> {
+  return installTheme(theme, {
+    source: previous.source,
+    sourceUrl: previous.sourceUrl,
+    branch: previous.branch,
+  });
+}
+
+/** Without this an update lands only in the record, so old CSS keeps rendering. */
+async function syncAppliedThemeCss(theme: InstalledStoreTheme): Promise<void> {
+  if ((await getAppliedStoreThemeId()) !== theme.id) return;
+
+  await setActiveStoreTheme(theme.id);
+
+  const result = await saveCustomCss(buildStoreThemeContent(theme.title, theme.creators, theme.css));
+  if (!result.success) {
+    console.warn(LOG_PREFIX_STORE, `Failed to re-apply theme after update: ${theme.title}`, result.error);
+    return;
+  }
+
+  console.log(LOG_PREFIX_STORE, `Re-applied active theme after update: ${theme.title}`);
 }
 
 export async function performSilentUpdates(storeThemes: StoreTheme[]): Promise<string[]> {
-  const installed = await getInstalledStoreThemes();
+  const installed = (await getInstalledStoreThemes()).filter(theme => theme.source !== "url");
   const updates = await checkForThemeUpdates(installed, storeThemes);
   const updatedIds: string[] = [];
 
   if (updates.size === 0) return updatedIds;
 
-  const activeThemeId = await getActiveStoreTheme();
+  const installedById = new Map(installed.map(theme => [theme.id, theme]));
 
   for (const [themeId, storeTheme] of updates) {
     try {
-      await updateTheme(storeTheme);
+      const previous = installedById.get(themeId);
+      if (!previous) continue;
+
+      const updated = await updateTheme(storeTheme, previous);
       updatedIds.push(themeId);
       console.log(LOG_PREFIX_STORE, `Auto-updated theme: ${storeTheme.title} to v${storeTheme.version}`);
 
-      if (activeThemeId === themeId) {
-        await applyStoreTheme(themeId);
-        console.log(LOG_PREFIX_STORE, `Re-applied active theme after update: ${storeTheme.title}`);
-      }
+      await syncAppliedThemeCss(updated);
     } catch (err) {
       console.warn(LOG_PREFIX_STORE, `Failed to auto-update theme ${themeId}:`, err);
     }
@@ -310,15 +330,13 @@ export async function performUrlThemeUpdates(): Promise<string[]> {
 
   if (urlThemes.length === 0) return updatedIds;
 
-  const activeThemeId = await getActiveStoreTheme();
-
   for (const theme of urlThemes) {
     try {
       const metadata = await fetchThemeMetadata(theme.repo, theme.branch);
       if (metadata.version === theme.version) continue;
 
       const fullTheme = await fetchFullTheme(theme.repo, theme.branch);
-      await installTheme(fullTheme, {
+      const updated = await installTheme(fullTheme, {
         source: "url",
         sourceUrl: theme.sourceUrl,
         branch: theme.branch,
@@ -326,9 +344,7 @@ export async function performUrlThemeUpdates(): Promise<string[]> {
 
       updatedIds.push(theme.id);
 
-      if (activeThemeId === theme.id) {
-        await applyStoreTheme(theme.id);
-      }
+      await syncAppliedThemeCss(updated);
     } catch (err) {
       console.warn(LOG_PREFIX_STORE, `Failed to check/update URL theme ${theme.id}:`, err);
     }
@@ -345,12 +361,14 @@ export async function refreshUrlThemesMetadata(): Promise<number> {
   for (const theme of urlThemesNeedingRefresh) {
     try {
       const fullTheme = await fetchFullTheme(theme.repo, theme.branch);
-      await installTheme(fullTheme, {
+      const updated = await installTheme(fullTheme, {
         source: "url",
         sourceUrl: theme.sourceUrl,
         branch: theme.branch,
       });
       refreshedCount++;
+
+      await syncAppliedThemeCss(updated);
     } catch (err) {
       console.warn(LOG_PREFIX_STORE, `Failed to refresh URL theme ${theme.id}:`, err);
     }

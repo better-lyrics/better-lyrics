@@ -9,10 +9,12 @@
  * @returns {boolean} Returns true to indicate asynchronous response
  */
 import { LOG_PREFIX_BACKGROUND } from "@constants";
-import { getLocalStorage, getSyncStorage } from "@core/storage";
+import { buildStoreThemeContent, saveCustomCss } from "@core/customCss";
+import { getAppliedStoreThemeId, getLocalStorage, getSyncStorage } from "@core/storage";
 import { initBackgroundAuth } from "@modules/auth/backgroundAuth";
 import {
   getInstalledStoreThemes,
+  getInstalledTheme,
   installSymlinkedThemeFromMarketplace,
   performSilentUpdates,
   performUrlThemeUpdates,
@@ -34,21 +36,6 @@ const SYMLINKED_THEME_MAP: Record<string, string> = {
   "Apple Music": "apple-music",
 };
 
-const SYNC_STORAGE_LIMIT = 7000;
-
-async function saveThemeCSS(css: string, title: string, creators: string[]): Promise<void> {
-  const themeContent = `/* ${title}, a marketplace theme by ${creators.join(", ")} */\n\n${css}\n`;
-  const cssSize = new Blob([themeContent]).size;
-
-  if (cssSize <= SYNC_STORAGE_LIMIT) {
-    await chrome.storage.sync.set({ customCSS: themeContent, cssStorageType: "sync", cssCompressed: false });
-  } else {
-    await chrome.storage.local.set({ customCSS: themeContent, cssCompressed: false });
-    await chrome.storage.sync.set({ cssStorageType: "local", cssCompressed: false });
-    await chrome.storage.sync.remove("customCSS");
-  }
-}
-
 async function migrateSymlinkedThemes(): Promise<void> {
   try {
     const result = await getLocalStorage<{ [SYMLINKED_MIGRATION_KEY]?: number }>([SYMLINKED_MIGRATION_KEY]);
@@ -69,7 +56,7 @@ async function migrateSymlinkedThemes(): Promise<void> {
           await chrome.storage.sync.remove("activeStoreTheme");
           return;
         }
-        await saveThemeCSS(installed.css, installed.title, installed.creators);
+        await saveCustomCss(buildStoreThemeContent(installed.title, installed.creators, installed.css));
         console.log(LOG_PREFIX_BACKGROUND, `Migrated active theme: ${themeName} → store:${storeId}`);
       }
     }
@@ -77,6 +64,35 @@ async function migrateSymlinkedThemes(): Promise<void> {
     await chrome.storage.local.set({ [SYMLINKED_MIGRATION_KEY]: SYMLINKED_MIGRATION_VERSION });
   } catch (err) {
     console.warn(LOG_PREFIX_BACKGROUND, "Symlinked themes migration failed:", err);
+  }
+}
+
+// -- Applied Theme CSS Resync --------------------------
+
+const THEME_CSS_RESYNC_KEY = "appliedThemeCssResyncVersion";
+const THEME_CSS_RESYNC_VERSION = 1;
+
+/** Heals installs that auto-updated before the write path was fixed. */
+async function resyncAppliedThemeCss(): Promise<void> {
+  try {
+    const stored = await getLocalStorage<{ [THEME_CSS_RESYNC_KEY]?: number }>([THEME_CSS_RESYNC_KEY]);
+    if ((stored[THEME_CSS_RESYNC_KEY] ?? 0) >= THEME_CSS_RESYNC_VERSION) return;
+
+    const themeId = await getAppliedStoreThemeId();
+    const theme = themeId ? await getInstalledTheme(themeId) : null;
+
+    if (theme?.css) {
+      const result = await saveCustomCss(buildStoreThemeContent(theme.title, theme.creators, theme.css));
+      if (!result.success) {
+        console.warn(LOG_PREFIX_BACKGROUND, `Failed to resync applied theme: ${theme.title}`, result.error);
+        return;
+      }
+      console.log(LOG_PREFIX_BACKGROUND, `Resynced applied theme: ${theme.title} v${theme.version}`);
+    }
+
+    await chrome.storage.local.set({ [THEME_CSS_RESYNC_KEY]: THEME_CSS_RESYNC_VERSION });
+  } catch (err) {
+    console.warn(LOG_PREFIX_BACKGROUND, "Applied theme resync failed:", err);
   }
 }
 
@@ -114,12 +130,14 @@ function setupThemeUpdateAlarm(): void {
 chrome.runtime.onInstalled.addListener(async () => {
   setupThemeUpdateAlarm();
   await migrateSymlinkedThemes();
+  await resyncAppliedThemeCss();
   checkAndApplyThemeUpdates();
 });
 
 chrome.runtime.onStartup.addListener(async () => {
   setupThemeUpdateAlarm();
   await migrateSymlinkedThemes();
+  await resyncAppliedThemeCss();
   checkAndApplyThemeUpdates();
 });
 

@@ -1,7 +1,13 @@
 import { GENERAL_ERROR_LOG, LOG_PREFIX } from "@constants";
 import { reloadLyrics } from "@core/appState";
 import { decompressString, isCompressed } from "@core/compression";
-import { compileRicsToStyles, getLocalStorage, getSyncStorage, loadChunkedStyles } from "@core/storage";
+import {
+  compileRicsToStyles,
+  getAppliedStoreThemeId,
+  getLocalStorage,
+  getSyncStorage,
+  loadChunkedStyles,
+} from "@core/storage";
 import { log } from "@utils";
 import { mainView } from "./mainLyricsView";
 import { publishPictureInPictureLyrics } from "./pictureInPicture/lyricsPublisher";
@@ -98,9 +104,8 @@ export async function getAndApplyCustomStyles(): Promise<void> {
 
 async function handleStoreThemeChange(key: string, change: { oldValue?: any; newValue?: any }): Promise<void> {
   const themeId = key.replace("storeTheme:", "");
-  const { activeStoreTheme } = await getSyncStorage<{ activeStoreTheme?: string }>(["activeStoreTheme"]);
 
-  if (activeStoreTheme !== themeId) return;
+  if ((await getAppliedStoreThemeId()) !== themeId) return;
 
   const theme = change.newValue;
   if (!theme?.css) return;
