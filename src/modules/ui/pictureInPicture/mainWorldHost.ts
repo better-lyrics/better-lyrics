@@ -56,7 +56,7 @@ function createController(): PictureInPictureController<Window> {
       resetScrollResume: () => sendSignal({ type: "reset-scroll" }),
       // The extension's logger lives in the isolated world, so the page world writes straight to
       // the console under the same prefix rather than paying a bridge round trip per line.
-      log: (...args: unknown[]) => console.log(LOG_PREFIX, ...args),
+      log: resources?.logsEnabled ? console.log.bind(console, LOG_PREFIX) : () => {},
     },
     artworkTransition: () => resources?.artworkTransition,
     textTransition: () => resources?.textTransition,

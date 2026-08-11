@@ -43,6 +43,7 @@ const PIP_SETTING_DEFAULTS = {
   pipArtworkTransition: DEFAULT_ARTWORK_TRANSITION,
   pipTextTransition: DEFAULT_TEXT_TRANSITION,
   pipMarqueeEnabled: true,
+  isLogsEnabled: true,
 } as const;
 
 const isolatedViewDependencies: PictureInPictureViewDependencies = {
@@ -155,6 +156,7 @@ export function publishPictureInPictureResources(): void {
       artworkTransition: String(items.pipArtworkTransition),
       textTransition: String(items.pipTextTransition),
       marqueeEnabled: items.pipMarqueeEnabled !== false,
+      logsEnabled: items.isLogsEnabled !== false,
     });
   });
 }
