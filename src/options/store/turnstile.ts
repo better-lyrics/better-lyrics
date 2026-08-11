@@ -1,5 +1,5 @@
-import { LOG_PREFIX_STORE, THEME_STORE_TURNSTILE_URL } from "@constants";
-import { logStore } from "@core/logger";
+import { THEME_STORE_TURNSTILE_URL } from "@constants";
+import { errorStore, logStore } from "@core/logger";
 
 // -- Types ------------------------------------
 
@@ -96,7 +96,7 @@ function handleMessage(event: MessageEvent): void {
     }
     cleanupTurnstile();
   } else if (data.type === "turnstile-error") {
-    console.error(LOG_PREFIX_STORE, "Turnstile error:", data.error);
+    errorStore("Turnstile error:", data.error);
     if (pendingReject) {
       pendingReject(new Error(data.error ?? "Turnstile verification failed"));
     }

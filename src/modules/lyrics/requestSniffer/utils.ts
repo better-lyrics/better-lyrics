@@ -1,4 +1,4 @@
-import { GENERAL_ERROR_LOG } from "@constants";
+import { errorGeneral } from "@core/logger";
 export function parseTime(timeStr: string | number | undefined): number {
   if (!timeStr) return 0;
 
@@ -30,7 +30,7 @@ export function parseTime(timeStr: string | number | undefined): number {
     // Return a rounded integer
     return Math.round(totalMs);
   } catch (e) {
-    console.error(GENERAL_ERROR_LOG, `Error parsing time string: ${timeStr}`, e);
+    errorGeneral(`Error parsing time string: ${timeStr}`, e);
     return 0;
   }
 }

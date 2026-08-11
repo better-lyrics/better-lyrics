@@ -1,7 +1,5 @@
 import {
   FONT_LINK,
-  GENERAL_ERROR_LOG,
-  LOG_PREFIX,
   MINI_PLAYER_BUTTON_SELECTOR,
   NOTO_SANS_UNIVERSAL_LINK,
   PICTURE_IN_PICTURE_TOGGLE_SELECTOR,
@@ -50,7 +48,6 @@ const isolatedViewDependencies: PictureInPictureViewDependencies = {
   translate: t,
   getArtworkMetadata,
   resetScrollResume: resumeAllAutoscroll,
-  // Resolved per call rather than bound once: `log` is reassigned when the logging setting loads.
   get log(): LogSink {
     return logCore;
   },

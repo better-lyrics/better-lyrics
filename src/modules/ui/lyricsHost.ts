@@ -1,4 +1,4 @@
-import { LOG_PREFIX, TAB_HEADER_CLASS, TAB_RENDERER_SELECTOR } from "@constants";
+import { TAB_HEADER_CLASS, TAB_RENDERER_SELECTOR } from "@constants";
 import { seekPlayer } from "@modules/lyrics/lyrics";
 import { hideAdOverlay, isAdPlaying, isLoaderActive, showAdOverlay } from "@modules/ui/dom";
 import { getResumeScrollElement } from "@modules/ui/resumeScrollButton";

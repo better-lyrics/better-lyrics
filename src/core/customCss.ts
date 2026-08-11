@@ -1,7 +1,6 @@
-import { LOG_PREFIX } from "@constants";
 import { compressString } from "./compression";
 import { getLocalStorage } from "./storage";
-import { logCore } from "@core/logger";
+import { errorCore, logCore } from "@core/logger";
 
 const SYNC_STORAGE_LIMIT = 7000;
 const LOCAL_STORAGE_SAFE_LIMIT = 500 * 1024;
@@ -93,7 +92,7 @@ async function saveChunkedCSS(css: string): Promise<void> {
       await chrome.storage.local.set({ [`customCSS_chunk_${i}`]: chunks[i] });
       logCore(`Saved chunk ${i + 1}/${chunks.length} (${chunks[i].length} bytes)`);
     } catch (error) {
-      console.error(LOG_PREFIX, `Failed to save chunk ${i}:`, error);
+      errorCore(`Failed to save chunk ${i}:`, error);
       throw error;
     }
   }
@@ -169,7 +168,7 @@ export async function saveCustomCss(css: string, retryCount = 0): Promise<SaveRe
 
     return { success: true, strategy };
   } catch (error: any) {
-    console.error(LOG_PREFIX, "Storage save attempt failed:", error);
+    errorCore("Storage save attempt failed:", error);
 
     if (error.message?.includes("quota") && retryCount < MAX_RETRY_ATTEMPTS) {
       try {
@@ -182,7 +181,7 @@ export async function saveCustomCss(css: string, retryCount = 0): Promise<SaveRe
         await chrome.storage.sync.set({ cssCompressed: shouldCompress });
         return { success: true, strategy: "chunked", wasRetry: true };
       } catch (chunkError) {
-        console.error(LOG_PREFIX, "Chunked storage fallback failed:", chunkError);
+        errorCore("Chunked storage fallback failed:", chunkError);
         return { success: false, error: chunkError };
       }
     }

@@ -1,4 +1,3 @@
-import { GENERAL_ERROR_LOG, LOG_PREFIX } from "@constants";
 import { reloadLyrics } from "@core/appState";
 import { decompressString, isCompressed } from "@core/compression";
 import {

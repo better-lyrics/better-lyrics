@@ -3,14 +3,7 @@
  * Manages lyrics fetching, caching, processing, and rendering.
  */
 
-import {
-  FETCH_LYRICS_LOG,
-  LOG_PREFIX,
-  LYRICS_TAB_HIDDEN_LOG,
-  SEEK_EVENT,
-  SERVER_ERROR_LOG,
-  TAB_HEADER_CLASS,
-} from "@constants";
+import { FETCH_LYRICS_LOG, LYRICS_TAB_HIDDEN_LOG, SEEK_EVENT, SERVER_ERROR_LOG, TAB_HEADER_CLASS } from "@constants";
 import { AppState, type PlayerDetails } from "@core/appState";
 import { t } from "@core/i18n";
 import { type LineData, type LyricsData, processLyrics } from "@modules/lyrics/injectLyrics";

@@ -1,5 +1,6 @@
-import { IDENTITY_ACTIONS, IDENTITY_ADJECTIVES, IDENTITY_NOUNS, LOG_PREFIX, UNISON_API_BASE_URL } from "@constants";
+import { IDENTITY_ACTIONS, IDENTITY_ADJECTIVES, IDENTITY_NOUNS, UNISON_API_BASE_URL } from "@constants";
 import { getLocalStorage } from "./storage";
+import { warnCore } from "@core/logger";
 
 // -- Types ------------------------------------
 
@@ -231,7 +232,7 @@ async function fetchResolvedDisplayName(): Promise<string | null> {
       }
     }
   } catch (err) {
-    console.warn(`${LOG_PREFIX} resolveDisplayName fallback`, err);
+    warnCore(`resolveDisplayName fallback`, err);
   }
   return null;
 }

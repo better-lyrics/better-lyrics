@@ -3,7 +3,7 @@ import { getLocalStorage } from "@core/storage";
 import { lrcFixers, parseLRC, parseQRC, PlainParser } from "@braccato/parsers";
 import { type LyricSourceKey, type LyricSourceResult, type ProviderParameters, saveLyricsToCache } from "./shared";
 import { fillTtml } from "@modules/lyrics/providers/ttmlSource";
-import { logCore } from "@core/logger";
+import { errorCore, logCore, warnCore } from "@core/logger";
 
 const JWT_RENEWAL_THRESHOLD_SECONDS = 60 * 60;
 
@@ -45,18 +45,18 @@ function handleTurnstile(): Promise<string> {
           break;
 
         case "turnstile-error":
-          console.error(LOG_PREFIX, "Received Challenge Error:", event.data.error);
+          errorCore("Received Challenge Error:", event.data.error);
           cleanup();
           reject(new Error(`${LOG_PREFIX} Turnstile challenge error: ${event.data.error}`));
           break;
 
         case "turnstile-expired":
-          console.warn(LOG_PREFIX, "Token expired. Resetting challenge.");
+          warnCore("Token expired. Resetting challenge.");
           iframe.contentWindow!.postMessage({ type: "reset-turnstile" }, "*");
           break;
 
         case "turnstile-timeout":
-          console.warn(LOG_PREFIX, "Challenge timed out.");
+          warnCore("Challenge timed out.");
           cleanup();
           reject(new Error(`${LOG_PREFIX} Turnstile challenge timed out.`));
           break;
@@ -97,7 +97,7 @@ function getJwtMetadata(token: string): JwtMetadata | null {
       shouldRenew: secondsUntilExpiry <= JWT_RENEWAL_THRESHOLD_SECONDS,
     };
   } catch (e) {
-    console.error(LOG_PREFIX, "Error decoding JWT on client-side:", e);
+    errorCore("Error decoding JWT on client-side:", e);
     return null;
   }
 }
@@ -131,7 +131,7 @@ function requestNewAuthenticationToken(reason: string): Promise<string | null> {
       logCore("New JWT received and stored.");
       return newJwt;
     } catch (error) {
-      console.error(LOG_PREFIX, "Authentication process failed:", error);
+      errorCore("Authentication process failed:", error);
       return null;
     }
   })();
@@ -177,7 +177,7 @@ async function getAuthenticationToken(forceNew = false): Promise<string | null> 
     logCore(`Local JWT expires in ${Math.round(metadata.secondsUntilExpiry)} seconds; renewing in background.`);
     void requestNewAuthenticationToken("near-expiry token").then(newJwt => {
       if (!newJwt) {
-        console.warn(LOG_PREFIX, "Background JWT renewal failed; keeping the existing token.");
+        warnCore("Background JWT renewal failed; keeping the existing token.");
       }
     });
     return storedJwt;
@@ -191,11 +191,11 @@ export function prewarmAuthenticationToken(): void {
   void getAuthenticationToken()
     .then(token => {
       if (!token) {
-        console.warn(LOG_PREFIX, "Authentication prewarm did not obtain a JWT.");
+        warnCore("Authentication prewarm did not obtain a JWT.");
       }
     })
     .catch(error => {
-      console.warn(LOG_PREFIX, "Authentication prewarm failed:", error);
+      warnCore("Authentication prewarm failed:", error);
     });
 }
 
@@ -285,7 +285,7 @@ async function startStream(providerParameters: ProviderParameters, retryCount = 
 
   let jwt = await getAuthenticationToken(retryCount > 0);
   if (!jwt) {
-    console.error(LOG_PREFIX, "Could not obtain authentication token. Aborting stream.");
+    errorCore("Could not obtain authentication token. Aborting stream.");
     resolveAllWaiters(videoId);
     return;
   }
@@ -310,20 +310,20 @@ async function startStream(providerParameters: ProviderParameters, retryCount = 
     });
 
     if (response.status === 403 && retryCount < 1) {
-      console.warn(LOG_PREFIX, "Request blocked (403), retrying with new token.");
+      warnCore("Request blocked (403), retrying with new token.");
       await startStream(providerParameters, retryCount + 1);
       return;
     }
 
     if (!response.ok) {
-      console.error(LOG_PREFIX, `Stream API request failed: ${response.status}`);
+      errorCore(`Stream API request failed: ${response.status}`);
       resolveAllWaiters(videoId);
       return;
     }
 
     const reader = response.body?.getReader();
     if (!reader) {
-      console.error(LOG_PREFIX, "No response body reader available.");
+      errorCore("No response body reader available.");
       resolveAllWaiters(videoId);
       return;
     }
@@ -359,7 +359,7 @@ async function startStream(providerParameters: ProviderParameters, retryCount = 
     if (signal.aborted) {
       logCore("Stream aborted.");
     } else {
-      console.error(LOG_PREFIX, "Stream error:", err);
+      errorCore("Stream error:", err);
     }
   } finally {
     // Ensure all waiters are resolved (cleared) when stream ends
@@ -396,7 +396,7 @@ async function parseSSEMessage(message: string, params: ProviderParameters) {
       const data = JSON.parse(dataBuffer);
       await processStreamData(currentEvent, data, params);
     } catch (e) {
-      console.error(LOG_PREFIX, "Error parsing stream JSON:", e, "Event:", currentEvent, "Data:", dataBuffer);
+      errorCore("Error parsing stream JSON:", e, "Event:", currentEvent, "Data:", dataBuffer);
     }
   }
 }

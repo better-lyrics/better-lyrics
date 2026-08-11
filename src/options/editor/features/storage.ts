@@ -1,4 +1,3 @@
-import { LOG_PREFIX_EDITOR } from "@constants";
 import { decompressString, isCompressed } from "@core/compression";
 import { buildStoreThemeContent, saveCustomCss } from "@core/customCss";
 import { getAppliedStoreThemeId, getLocalStorage, getSyncStorage, loadChunkedStyles } from "@core/storage";
@@ -8,7 +7,7 @@ import { editorStateManager } from "../core/state";
 import { syncIndicator } from "../ui/dom";
 import { ricsCompiler } from "./compiler";
 import { setThemeName, showThemeName, themeSourceToEditorSource } from "./themes";
-import { logEditor } from "@core/logger";
+import { errorEditor, logEditor, warnEditor } from "@core/logger";
 
 interface CSSStorageData {
   cssStorageType?: "sync" | "local" | "chunked";
@@ -105,7 +104,7 @@ export async function broadcastRICSToTabs(ricsSource: string, strategy: "local" 
 
   if (!ricsCompiler.isValidRics(ricsSource)) {
     const state = ricsCompiler.getLastCompilationState();
-    console.warn(LOG_PREFIX_EDITOR, "RICS validation failed, broadcasting anyway:", state?.errors);
+    warnEditor("RICS validation failed, broadcasting anyway:", state?.errors);
   }
 
   try {
@@ -158,7 +157,7 @@ export async function applyStoreThemeComplete(options: ApplyStoreThemeOptions): 
 
     return true;
   } catch (err) {
-    console.error(LOG_PREFIX_EDITOR, "Failed to apply store theme:", err);
+    errorEditor("Failed to apply store theme:", err);
     return false;
   }
 }
@@ -168,7 +167,7 @@ class StorageManager {
 
   initialize(): void {
     if (this.isInitialized) {
-      console.warn(LOG_PREFIX_EDITOR, "StorageManager already initialized");
+      warnEditor("StorageManager already initialized");
       return;
     }
 

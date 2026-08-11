@@ -1,5 +1,5 @@
 import { parseTTMLContent } from "@braccato/parsers";
-import { HOMEPAGE_DOMAIN, HOMEPAGE_URL, LOG_PREFIX } from "@constants";
+import { HOMEPAGE_DOMAIN, HOMEPAGE_URL } from "@constants";
 import type { LyricSourceKey, LyricSourceResult, ProviderParameters } from "@modules/lyrics/providers/shared";
 import type { UnisonData } from "@modules/lyrics/providers/unison";
 import { logCore } from "@core/logger";

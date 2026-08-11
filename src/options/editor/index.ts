@@ -1,5 +1,5 @@
 import { openSearchPanel } from "@codemirror/search";
-import { LOG_PREFIX_EDITOR } from "@constants";
+
 import { initI18n, loadLocaleOverride } from "@core/i18n";
 import { createEditorState, createEditorView } from "./core/editor";
 import { editorStateManager } from "./core/state";
@@ -27,7 +27,7 @@ import {
   themeSelectorBtn,
 } from "./ui/dom";
 import { showAlert, showModal } from "./ui/feedback";
-import { logEditor } from "@core/logger";
+import { errorEditor, logEditor } from "@core/logger";
 
 function initializeNavigation() {
   document.getElementById("edit-css-btn")?.addEventListener("click", openEditCSS);
@@ -122,7 +122,7 @@ function initializeFileOperations() {
       try {
         await importManager.importCSSFile(file);
       } catch (err) {
-        console.error(LOG_PREFIX_EDITOR, "File import error:", err);
+        errorEditor("File import error:", err);
       }
     };
     input.click();

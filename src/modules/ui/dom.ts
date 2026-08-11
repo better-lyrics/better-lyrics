@@ -13,7 +13,6 @@ import {
   HOMEPAGE_URL,
   LINE_CLASS,
   LOADER_TRANSITION_ENDED,
-  LOG_PREFIX_UNISON,
   LYRICS_AD_OVERLAY_ID,
   LYRICS_CLASS,
   LYRICS_LOADER_ID,
@@ -51,7 +50,7 @@ import { parseSvgString, syncTypeColors, syncTypeIcons } from "./lyricsDock/icon
 import { loadSavedOffset } from "./lyricsDock/offset";
 import { scrollEventHandler } from "./observer";
 import { showReportModal } from "./reportLyrics";
-import { logCore } from "@core/logger";
+import { logCore, warnUnison } from "@core/logger";
 
 const voteIcons = {
   upvote: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20"><g fill="none"><path fill="currentColor" fill-opacity=".16" d="M7.895 7.69c-.294.3-.598.534-.895.71v12.334l8.509 1.223a4.1 4.1 0 0 0 2.82-.616a4.26 4.26 0 0 0 1.756-2.335l1.763-5.753a3.48 3.48 0 0 0-.497-3.04a3.36 3.36 0 0 0-1.183-1.023a3.3 3.3 0 0 0-1.509-.367h-3.633a9.7 9.7 0 0 0 .496-1.706a9 9 0 0 0 .164-1.706c0-.904-.352-1.772-.979-2.412C14.081 2.36 13.231 2 12.345 2s-1.736.36-2.362 1a3.45 3.45 0 0 0-.979 2.411c0 .597-.324 1.478-1.109 2.28"/><path stroke="currentColor" stroke-linejoin="round" stroke-miterlimit="10" stroke-width="1.5" d="M7.895 7.69c-.294.3-.598.534-.895.71v12.334l8.509 1.223a4.1 4.1 0 0 0 2.82-.616a4.26 4.26 0 0 0 1.756-2.335l1.763-5.753a3.48 3.48 0 0 0-.497-3.04a3.36 3.36 0 0 0-1.183-1.023a3.3 3.3 0 0 0-1.509-.367h-3.633a9.7 9.7 0 0 0 .496-1.706a9 9 0 0 0 .164-1.706c0-.904-.352-1.772-.979-2.412C14.081 2.36 13.231 2 12.345 2s-1.736.36-2.362 1a3.45 3.45 0 0 0-.979 2.411c0 .597-.324 1.478-1.109 2.28ZM6.2 7H2.8a.8.8 0 0 0-.8.8v13.4a.8.8 0 0 0 .8.8h3.4a.8.8 0 0 0 .8-.8V7.8a.8.8 0 0 0-.8-.8Z"/></g></svg>`,
@@ -218,7 +217,7 @@ function createRequestSyncedButton(meta: RequestButtonMeta): HTMLElement {
     const result = await requestLyrics(submission);
 
     if (!result.success || !result.data) {
-      console.warn(LOG_PREFIX_UNISON, "requestLyrics failed", {
+      warnUnison("requestLyrics failed", {
         videoId: meta.videoId,
         status: result.status,
         error: result.error,

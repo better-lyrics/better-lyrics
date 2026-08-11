@@ -1,9 +1,4 @@
-import {
-  GENERAL_ERROR_LOG,
-  LOG_PREFIX,
-  MINI_PLAYER_BUTTON_SELECTOR,
-  PICTURE_IN_PICTURE_TOGGLE_SELECTOR,
-} from "@constants";
+import { LOG_PREFIX, MINI_PLAYER_BUTTON_SELECTOR, PICTURE_IN_PICTURE_TOGGLE_SELECTOR } from "@constants";
 import {
   onInit,
   onMetadata,
@@ -11,7 +6,7 @@ import {
   sendSignal,
   type PictureInPictureSignal,
 } from "./bridge";
-import { createLogSink, type LogSink } from "@core/logger";
+import { createLogSink, type LogSink, warnGeneral } from "@core/logger";
 import type { PictureInPictureController } from "./controller";
 import { createPictureInPictureHost } from "./pipHost";
 import type { PictureInPictureSongMetadata } from "./types";
@@ -47,7 +42,7 @@ function requestSongMetadata(
 
 function reportFailure(message: string, error: unknown): void {
   const detail = error instanceof Error ? error.message : String(error);
-  console.warn(`${GENERAL_ERROR_LOG} ${message}: ${detail}`);
+  warnGeneral(`${message}: ${detail}`);
 }
 
 function createController(): PictureInPictureController<Window> {

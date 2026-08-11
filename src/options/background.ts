@@ -8,7 +8,7 @@
  * @param {Object} [request.settings] - Settings object for updateSettings action
  * @returns {boolean} Returns true to indicate asynchronous response
  */
-import { LOG_PREFIX_BACKGROUND } from "@constants";
+
 import { buildStoreThemeContent, saveCustomCss } from "@core/customCss";
 import { getAppliedStoreThemeId, getLocalStorage, getSyncStorage } from "@core/storage";
 import { initBackgroundAuth } from "@modules/auth/backgroundAuth";
@@ -21,7 +21,7 @@ import {
   setActiveStoreTheme,
 } from "./store/themeStoreManager";
 import { fetchAllStoreThemes } from "./store/themeStoreService";
-import { logBackground } from "@core/logger";
+import { logBackground, warnBackground } from "@core/logger";
 
 const THEME_UPDATE_ALARM = "theme-update-check";
 const UPDATE_INTERVAL_MINUTES = 360; // 6 hours
@@ -64,7 +64,7 @@ async function migrateSymlinkedThemes(): Promise<void> {
 
     await chrome.storage.local.set({ [SYMLINKED_MIGRATION_KEY]: SYMLINKED_MIGRATION_VERSION });
   } catch (err) {
-    console.warn(LOG_PREFIX_BACKGROUND, "Symlinked themes migration failed:", err);
+    warnBackground("Symlinked themes migration failed:", err);
   }
 }
 
@@ -85,7 +85,7 @@ async function resyncAppliedThemeCss(): Promise<void> {
     if (theme?.css) {
       const result = await saveCustomCss(buildStoreThemeContent(theme.title, theme.creators, theme.css));
       if (!result.success) {
-        console.warn(LOG_PREFIX_BACKGROUND, `Failed to resync applied theme: ${theme.title}`, result.error);
+        warnBackground(`Failed to resync applied theme: ${theme.title}`, result.error);
         return;
       }
       logBackground(`Resynced applied theme: ${theme.title} v${theme.version}`);
@@ -93,7 +93,7 @@ async function resyncAppliedThemeCss(): Promise<void> {
 
     await chrome.storage.local.set({ [THEME_CSS_RESYNC_KEY]: THEME_CSS_RESYNC_VERSION });
   } catch (err) {
-    console.warn(LOG_PREFIX_BACKGROUND, "Applied theme resync failed:", err);
+    warnBackground("Applied theme resync failed:", err);
   }
 }
 
@@ -112,7 +112,7 @@ async function checkAndApplyThemeUpdates(): Promise<void> {
       logBackground(`Updated ${updatedIds.length} theme(s):`, updatedIds.join(", "));
     }
   } catch (err) {
-    console.warn(LOG_PREFIX_BACKGROUND, "Theme update check failed:", err);
+    warnBackground("Theme update check failed:", err);
   }
 }
 
@@ -154,7 +154,7 @@ chrome.runtime.onMessage.addListener(request => {
       tabs.forEach(tab => {
         if (tab.id != null) {
           chrome.tabs.sendMessage(tab.id, { action: "applyStyles", ricsSource: request.ricsSource }).catch(err => {
-            console.warn(LOG_PREFIX_BACKGROUND, `Failed to send message to tab ${tab.id}:`, err);
+            warnBackground(`Failed to send message to tab ${tab.id}:`, err);
           });
         }
       });

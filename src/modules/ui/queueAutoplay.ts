@@ -1,4 +1,3 @@
-import { LOG_PREFIX } from "@constants";
 import { logCore } from "@core/logger";
 
 const AUTOPLAY_SECTION_SELECTOR = "#tab-renderer .autoplay.ytmusic-tab-renderer";

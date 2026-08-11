@@ -1,4 +1,4 @@
-import { GENERAL_ERROR_LOG, LYRIC_SOURCE_KEYS, OFFSET_STORAGE_PREFIX, STORAGE_TRANSIENT_SET_LOG } from "@constants";
+import { LYRIC_SOURCE_KEYS, OFFSET_STORAGE_PREFIX, STORAGE_TRANSIENT_SET_LOG } from "@constants";
 import { truncateSource } from "@utils";
 import { compileWithDetails } from "rics";
 import { compressString, decompressString, isCompressed } from "./compression";

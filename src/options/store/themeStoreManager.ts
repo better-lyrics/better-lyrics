@@ -1,4 +1,3 @@
-import { LOG_PREFIX_STORE } from "@constants";
 import { buildStoreThemeContent, saveCustomCss } from "@core/customCss";
 import { getAppliedStoreThemeId, getLocalStorage, getSyncStorage } from "@core/storage";
 import {
@@ -11,7 +10,7 @@ import {
   resolveRegistryInstallUrls,
 } from "./themeStoreService";
 import type { InstalledStoreTheme, StoreTheme, ThemeSource } from "./types";
-import { logStore } from "@core/logger";
+import { logStore, warnStore } from "@core/logger";
 
 async function fetchCssFromUrl(url: string): Promise<string> {
   const response = await fetch(url);
@@ -65,7 +64,7 @@ async function migrateFromLegacyStorage(): Promise<void> {
       await chrome.storage.local.set({ [getThemeStorageKey(theme.id)]: theme });
       themeIds.push(theme.id);
     } catch (err) {
-      console.warn(LOG_PREFIX_STORE, `Failed to migrate theme ${theme.id}:`, err);
+      warnStore(`Failed to migrate theme ${theme.id}:`, err);
     }
   }
 
@@ -243,7 +242,7 @@ export async function installSymlinkedThemeFromMarketplace(storeId: string): Pro
   try {
     const storeTheme = await fetchSingleStoreTheme(storeId);
     if (!storeTheme) {
-      console.warn(LOG_PREFIX_STORE, `Symlinked theme not found in marketplace: ${storeId}`);
+      warnStore(`Symlinked theme not found in marketplace: ${storeId}`);
       return null;
     }
 
@@ -251,7 +250,7 @@ export async function installSymlinkedThemeFromMarketplace(storeId: string): Pro
     logStore(`Installed symlinked theme: ${storeId} v${installed.version}`);
     return installed;
   } catch (err) {
-    console.warn(LOG_PREFIX_STORE, `Failed to install symlinked theme from marketplace: ${storeId}`, err);
+    warnStore(`Failed to install symlinked theme from marketplace: ${storeId}`, err);
     return null;
   }
 }
@@ -290,7 +289,7 @@ async function syncAppliedThemeCss(theme: InstalledStoreTheme): Promise<void> {
 
   const result = await saveCustomCss(buildStoreThemeContent(theme.title, theme.creators, theme.css));
   if (!result.success) {
-    console.warn(LOG_PREFIX_STORE, `Failed to re-apply theme after update: ${theme.title}`, result.error);
+    warnStore(`Failed to re-apply theme after update: ${theme.title}`, result.error);
     return;
   }
 
@@ -317,7 +316,7 @@ export async function performSilentUpdates(storeThemes: StoreTheme[]): Promise<s
 
       await syncAppliedThemeCss(updated);
     } catch (err) {
-      console.warn(LOG_PREFIX_STORE, `Failed to auto-update theme ${themeId}:`, err);
+      warnStore(`Failed to auto-update theme ${themeId}:`, err);
     }
   }
 
@@ -347,7 +346,7 @@ export async function performUrlThemeUpdates(): Promise<string[]> {
 
       await syncAppliedThemeCss(updated);
     } catch (err) {
-      console.warn(LOG_PREFIX_STORE, `Failed to check/update URL theme ${theme.id}:`, err);
+      warnStore(`Failed to check/update URL theme ${theme.id}:`, err);
     }
   }
 
@@ -371,7 +370,7 @@ export async function refreshUrlThemesMetadata(): Promise<number> {
 
       await syncAppliedThemeCss(updated);
     } catch (err) {
-      console.warn(LOG_PREFIX_STORE, `Failed to refresh URL theme ${theme.id}:`, err);
+      warnStore(`Failed to refresh URL theme ${theme.id}:`, err);
     }
   }
 

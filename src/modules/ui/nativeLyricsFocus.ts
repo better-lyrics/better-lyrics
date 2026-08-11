@@ -1,4 +1,3 @@
-import { LOG_PREFIX } from "@constants";
 import { logCore } from "@core/logger";
 
 const NATIVE_LYRICS_SHELF_SELECTOR = "#tab-renderer ytmusic-description-shelf-renderer";

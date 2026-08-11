@@ -1,10 +1,9 @@
-import { LOG_PREFIX_EDITOR } from "@constants";
 import { saveCustomCss } from "@core/customCss";
 import { editorStateManager } from "../core/state";
 import { showAlert } from "../ui/feedback";
 import { broadcastRICSToTabs, showSyncSuccess } from "./storage";
 import { hideThemeName, updateThemeSelectorButton } from "./themes";
-import { logEditor } from "@core/logger";
+import { errorEditor, logEditor } from "@core/logger";
 
 export const generateDefaultFilename = (): string => {
   const date = new Date();
@@ -80,7 +79,7 @@ class ImportManager {
 
       await this.performImport(css, file.name);
     } catch (error) {
-      console.error(LOG_PREFIX_EDITOR, "Import failed:", error);
+      errorEditor("Import failed:", error);
       showAlert("Error importing theme file! Please try again.");
       throw error;
     }

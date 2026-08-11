@@ -1,8 +1,8 @@
-import { AUTH_PORT_NAME_PREFIX, LOG_PREFIX_AUTH } from "@constants";
+import { AUTH_PORT_NAME_PREFIX } from "@constants";
 import { initI18n, loadLocaleOverride, t } from "@core/i18n";
 import { getDisplayName } from "@core/keyIdentity";
 import { type AuthPartner, getAuthPartnerByOrigin } from "@modules/auth/partners";
-import { logAuth } from "@core/logger";
+import { logAuth, warnAuth } from "@core/logger";
 
 interface RequestParams {
   requestId: string;
@@ -98,7 +98,7 @@ async function bindDynamicText(params: RequestParams): Promise<void> {
       const displayName = await getDisplayName();
       subtitle.textContent = t("auth_consentSubheading", displayName);
     } catch (err) {
-      console.warn(LOG_PREFIX_AUTH, "identity load failed", err);
+      warnAuth("identity load failed", err);
       subtitle.textContent = t("auth_consentSubheading", "");
     }
     subtitle.dataset.ready = "true";
@@ -116,7 +116,7 @@ function wireActions(port: chrome.runtime.Port): void {
     try {
       port.postMessage({ result: "approve", remember: remember?.checked === true });
     } catch (err) {
-      console.warn(LOG_PREFIX_AUTH, "approve post failed", err);
+      warnAuth("approve post failed", err);
       showError("auth_sessionExpired");
     }
   });
@@ -127,7 +127,7 @@ function wireActions(port: chrome.runtime.Port): void {
     try {
       port.postMessage({ result: "cancel" });
     } catch (err) {
-      console.warn(LOG_PREFIX_AUTH, "cancel post failed", err);
+      warnAuth("cancel post failed", err);
       showError("auth_sessionExpired");
     }
   });

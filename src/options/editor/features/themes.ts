@@ -1,4 +1,3 @@
-import { LOG_PREFIX_EDITOR } from "@constants";
 import { t } from "@core/i18n";
 import { getSyncStorage } from "@core/storage";
 import { formatCreators, saveCustomCss } from "@core/customCss";
@@ -31,7 +30,7 @@ import {
 } from "../ui/dom";
 import { showAlert, showConfirm, showPrompt } from "../ui/feedback";
 import { applyStoreThemeComplete, broadcastRICSToTabs, showSyncError, showSyncSuccess } from "./storage";
-import { logEditor } from "@core/logger";
+import { errorEditor, logEditor, warnEditor } from "@core/logger";
 
 const preloadedImages = new Set<string>();
 
@@ -150,7 +149,7 @@ class ThemeManager {
         await this.applyBuiltInTheme(index);
       }
     } catch (error) {
-      console.error(LOG_PREFIX_EDITOR, "Failed to apply theme:", error);
+      errorEditor("Failed to apply theme:", error);
       showAlert("Error applying theme! Please try again.");
       throw error;
     }
@@ -222,7 +221,7 @@ class ThemeManager {
       }
     }
 
-    console.warn(LOG_PREFIX_EDITOR, `Marketplace install failed for ${theme.storeId}`);
+    warnEditor(`Marketplace install failed for ${theme.storeId}`);
     showAlert(t("symlink_installFailed"));
   }
 
@@ -296,7 +295,7 @@ async function applyStoreThemeToEditor(
       updateThemeSelectorButton();
     });
   } catch (error) {
-    console.error(LOG_PREFIX_EDITOR, "Failed to apply marketplace theme:", error);
+    errorEditor("Failed to apply marketplace theme:", error);
     showAlert("Error applying marketplace theme! Please try again.");
   }
 }
@@ -430,7 +429,7 @@ export function saveToStorage(isTheme = false) {
   logEditor("saveToStorage called, isTheme:", isTheme);
   const currentEditor = editorStateManager.getEditor();
   if (!currentEditor) {
-    console.error(LOG_PREFIX_EDITOR, "Cannot save: editor not initialized");
+    errorEditor("Cannot save: editor not initialized");
     return;
   }
 
@@ -702,7 +701,7 @@ async function selectTheme(isCustom: boolean, index: number, themeName: string) 
   try {
     await themeManager.applyTheme(isCustom, index, themeName);
   } catch (error) {
-    console.error(LOG_PREFIX_EDITOR, "Error selecting theme:", error);
+    errorEditor("Error selecting theme:", error);
   }
 }
 

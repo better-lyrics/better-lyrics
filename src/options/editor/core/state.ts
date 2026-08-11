@@ -1,6 +1,6 @@
 import type { EditorView } from "@codemirror/view";
-import { LOG_PREFIX_EDITOR } from "@constants";
-import { logEditor } from "@core/logger";
+
+import { errorEditor, logEditor } from "@core/logger";
 
 type OperationType = "import" | "theme" | "storage" | "init";
 
@@ -145,7 +145,7 @@ class EditorStateManager {
           await operation.execute();
           logEditor(`Operation completed: ${operation.type} (${operation.id})`);
         } catch (error) {
-          console.error(LOG_PREFIX_EDITOR, `Operation failed: ${operation.type} (${operation.id})`, error);
+          errorEditor(`Operation failed: ${operation.type} (${operation.id})`, error);
         }
       }
     } finally {

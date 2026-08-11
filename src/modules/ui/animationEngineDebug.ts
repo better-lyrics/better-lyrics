@@ -1,4 +1,4 @@
-import { GENERAL_ERROR_LOG } from "@constants";
+import { errorGeneral } from "@core/logger";
 
 const CANVAS_ID = "blyrics-lyric-debug-canvas";
 
@@ -8,7 +8,7 @@ let canvas: HTMLCanvasElement | null = null;
 function createDebugCanvas() {
   let tabRenderer = document.querySelector("#tab-renderer") as HTMLElement;
   if (!tabRenderer) {
-    console.error(GENERAL_ERROR_LOG, "Can't find tab renderer");
+    errorGeneral("Can't find tab renderer");
     return;
   }
 
@@ -30,7 +30,7 @@ function createDebugCanvas() {
 
   ctx = canvas.getContext("2d");
   if (!ctx) {
-    console.error(GENERAL_ERROR_LOG, "Can't find canvas context");
+    errorGeneral("Can't find canvas context");
     return;
   }
   resizeCanvas();

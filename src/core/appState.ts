@@ -1,4 +1,4 @@
-import { DOCK_CONTROL_ORDER_DEFAULT, DOCK_DEFAULT_POSITION, GENERAL_ERROR_LOG } from "@constants";
+import { DOCK_CONTROL_ORDER_DEFAULT, DOCK_DEFAULT_POSITION } from "@constants";
 import type { LyricDecorations, LyricsData } from "@modules/lyrics/injectLyrics";
 import { createLyrics, type ParsedLyrics } from "@modules/lyrics/lyrics";
 import type { LyricSourceKey } from "@modules/lyrics/providers/shared";

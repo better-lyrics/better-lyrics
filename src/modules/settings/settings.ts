@@ -3,12 +3,11 @@ import {
   DOCK_CLASS,
   DOCK_CONTROL_ORDER_DEFAULT,
   DOCK_DEFAULT_POSITION,
-  LOG_PREFIX_CONTENT,
   LYRICS_DISABLED_ATTR,
 } from "@constants";
 import { AppState, reloadLyrics } from "@core/appState";
 import { clearCache, compileRicsToStyles, getStorage } from "@core/storage";
-import { configureLogging } from "@core/logger";
+import { configureLogging, logContent } from "@core/logger";
 import { clearCache as clearTranslationCache } from "@modules/lyrics/translation";
 import { mountDock, mountVotingSegment, reloadAlbumArt, unmountDock, updateDockPosition } from "@modules/ui/dom";
 import { applyGlobalOffsets } from "@modules/ui/lyricsDock/offset";
@@ -16,7 +15,6 @@ import { mainView } from "@modules/ui/mainLyricsView";
 import { isPlayerFullscreened, onFullscreenChange } from "@modules/ui/observer";
 import { publishPictureInPictureLyrics } from "@modules/ui/pictureInPicture/lyricsPublisher";
 import { applyCustomStyles, getAndApplyCustomStyles } from "@modules/ui/styleInjector";
-import { logContent } from "@core/logger";
 
 let hasInitializedMessageListener = false;
 
