@@ -1,3 +1,20 @@
+/* The extension loads these families from Google Fonts, and published themes select on the stack by
+   name, so it stays on this side of the renderer boundary. */
+:root {
+	--noto-sans-universal:
+		"Noto Sans", "Noto Sans HK", "Noto Sans JP", "Noto Sans KR", "Noto Sans SC",
+		"Noto Sans TC", "Noto Sans Arabic", "Noto Sans Armenian",
+		"Noto Sans Bengali", "Noto Sans Devanagari", "Noto Sans Georgian",
+		"Noto Sans Gujarati", "Noto Sans Hebrew", "Noto Sans Kannada",
+		"Noto Sans Khmer", "Noto Sans Lao Looped", "Noto Sans Lao",
+		"Noto Sans Malayalam", "Noto Sans Marchen", "Noto Sans Meetei Mayek",
+		"Noto Sans Multani", "Noto Sans NKo", "Noto Sans Old Permic",
+		"Noto Sans Shavian", "Noto Sans Sinhala", "Noto Sans Sunuwar",
+		"Noto Sans Takri", "Noto Sans Tamil", "Noto Sans Telugu",
+		"Noto Sans Thai Looped", "Noto Sans Thai", "Noto Sans Vithkuqi",
+		"Noto Sans Warang Citi";
+}
+
 .blyrics-hidden {
 	display: none !important;
 }

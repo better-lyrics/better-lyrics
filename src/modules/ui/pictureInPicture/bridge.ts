@@ -1,9 +1,12 @@
 import { GENERAL_ERROR_LOG } from "@constants";
+import type { LyricDecorations } from "@modules/lyrics/injectLyrics";
+import type { Lyric } from "@braccato/core";
 import type { PictureInPictureSongMetadata } from "./types";
 
 const PIP_INIT_EVENT = "blyrics-pip-init" as const;
 const PIP_SIGNAL_EVENT = "blyrics-pip-signal" as const;
 const PIP_METADATA_EVENT = "blyrics-pip-metadata" as const;
+const PIP_LYRICS_EVENT = "blyrics-pip-lyrics" as const;
 
 export interface PictureInPictureInitPayload {
   readonly strings: Record<string, string>;
@@ -14,6 +17,7 @@ export interface PictureInPictureInitPayload {
   readonly artworkTransition: string;
   readonly textTransition: string;
   readonly marqueeEnabled: boolean;
+  readonly logsEnabled: boolean;
 }
 
 export type PictureInPictureSignal =
@@ -26,6 +30,34 @@ export type PictureInPictureSignal =
 interface PictureInPictureMetadataPayload {
   readonly requestId: number;
   readonly metadata: PictureInPictureSongMetadata | null;
+}
+
+/**
+ * Everything the floating window needs to build and animate its own lyrics.
+ */
+export interface PictureInPictureLyricsPayload {
+  /**
+   * Null when there are no lyrics to show, which is the loader case.
+   */
+  readonly lyrics: readonly Lyric[] | null;
+  readonly noLyrics: boolean;
+  /**
+   * The translated and romanized text the isolated world injected into the side panel, per line
+   * index. It rides on the payload rather than arriving as its own message because the window
+   * rebuilds whenever the theme demands it, and the decorations have to survive that.
+   */
+  readonly decorations: LyricDecorations;
+  readonly globalLyricOffset: number;
+  readonly lyricOffset: number;
+  readonly richsyncOffsetTrim: number;
+  readonly lineOffsetTrim: number;
+  readonly passiveScrollEnabled: boolean;
+  /**
+   * Wall clock deadline before which a reported time of zero is a reload artefact rather than the
+   * top of the song. The side panel's driver drops those frames; without this the window would jump
+   * to the first line and back on every provider switch and audio to video swap.
+   */
+  readonly suppressZeroTimeUntil: number;
 }
 
 // Details cross as JSON strings, not objects. Gecko hands the page a dead wrapper for any object a
@@ -59,3 +91,7 @@ export const onSignal = (handler: (signal: PictureInPictureSignal) => void): voi
 export const sendMetadata = (payload: PictureInPictureMetadataPayload): void => send(PIP_METADATA_EVENT, payload);
 export const onMetadata = (handler: (payload: PictureInPictureMetadataPayload) => void): void =>
   subscribe(PIP_METADATA_EVENT, handler);
+
+export const sendLyrics = (payload: PictureInPictureLyricsPayload): void => send(PIP_LYRICS_EVENT, payload);
+export const onLyrics = (handler: (payload: PictureInPictureLyricsPayload) => void): void =>
+  subscribe(PIP_LYRICS_EVENT, handler);

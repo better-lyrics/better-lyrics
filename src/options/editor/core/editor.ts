@@ -48,11 +48,7 @@ interface EditorOptions {
 
 export const SAVE_DEBOUNCE_DELAY = 1000;
 export const SAVE_CUSTOM_THEME_DEBOUNCE = 2000;
-export const SYNC_STORAGE_LIMIT = 7000;
-export const MAX_RETRY_ATTEMPTS = 3;
 export const BRACKET_NESTING_LEVELS = 7;
-export const CHUNK_SIZE = 100 * 1024;
-export const LOCAL_STORAGE_SAFE_LIMIT = 500 * 1024;
 
 const RICS_LINTER_DELAY = 150;
 

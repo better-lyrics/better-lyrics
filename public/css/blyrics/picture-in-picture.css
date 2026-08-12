@@ -444,12 +444,12 @@ body {
   mask-image: linear-gradient(to bottom, transparent, #000 12%, #000 84%, transparent);
 }
 
+/* The renderer scrolls this element by writing scrollTop, so it has to be a scroll container.
+   Hidden rather than auto: there is no room for a scrollbar, and the lines are only ever moved
+   programmatically. */
 .blyrics-pip-scroller {
-  transform: translateY(0);
-  transform-origin: top left;
-  transition: transform var(--blyrics-lyric-scroll-duration, 0.5s)
-    var(--blyrics-lyric-scroll-timing-function, ease);
-  will-change: transform;
+  height: 100%;
+  overflow: hidden;
 }
 
 .blyrics-pip-lyrics .blyrics-container {
@@ -462,11 +462,6 @@ body {
   padding: 0.5rem 0 60cqh !important;
   padding-block: 0.5rem 60cqh !important;
   padding-inline: 0 !important;
-}
-
-.blyrics-pip-lyrics .blyrics-container::before,
-.blyrics-pip-lyrics .blyrics-container::after {
-  display: none !important;
 }
 
 /* Romanization is otherwise sized at the translated size over 1.25; here both secondary lines

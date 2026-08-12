@@ -3,22 +3,37 @@
  * Manages lyrics fetching, caching, processing, and rendering.
  */
 
-import { FETCH_LYRICS_LOG, LOG_PREFIX, LYRICS_TAB_HIDDEN_LOG, SERVER_ERROR_LOG, TAB_HEADER_CLASS } from "@constants";
+import {
+  FETCH_LYRICS_LOG,
+  LOG_PREFIX,
+  LYRICS_TAB_HIDDEN_LOG,
+  SEEK_EVENT,
+  SERVER_ERROR_LOG,
+  TAB_HEADER_CLASS,
+} from "@constants";
 import { AppState, type PlayerDetails } from "@core/appState";
 import { t } from "@core/i18n";
-import { type LyricsData, processLyrics } from "@modules/lyrics/injectLyrics";
+import { type LineData, type LyricsData, processLyrics } from "@modules/lyrics/injectLyrics";
 import { stringSimilarity } from "@modules/lyrics/lyricParseUtils";
-import { registerThemeSetting } from "@modules/settings/themeOptions";
 import { flushLoader, renderLoader } from "@modules/ui/dom";
+import { publishPictureInPictureLyrics } from "@modules/ui/pictureInPicture/lyricsPublisher";
 import { log } from "@utils";
 import type { Lyric, LyricSourceResult, ProviderParameters } from "./providers/shared";
 import { getLyrics, newSourceMap, providerPriority } from "./providers/shared";
 import type { YTLyricSourceResult } from "./providers/yt";
 import { getSongAlbum, getSongMetadata, type SegmentMap } from "./requestSniffer/requestSniffer";
 import { clearCache as clearTranslationCache } from "./translation";
-import { animEngineState } from "@modules/ui/animationEngine";
+import { mainView } from "@modules/ui/mainLyricsView";
+import { resetPlaybackClock, resumeAllAutoscroll } from "@braccato/core";
+import { registerThemeSetting } from "@braccato/core/themeSettings";
 
 const hideInstrumentalOnly = registerThemeSetting("blyrics-hide-instrumental-only", false, true);
+
+export function seekPlayer(timeS: number): void {
+  log(LOG_PREFIX, `Seeking to ${timeS.toFixed(2)}s`);
+  document.dispatchEvent(new CustomEvent(SEEK_EVENT, { detail: timeS }));
+  resumeAllAutoscroll();
+}
 
 function isInstrumentalOnly(lyrics: Lyric[]): boolean {
   if (lyrics.length !== 1) return false;
@@ -39,27 +54,73 @@ export type LyricSourceResultWithMeta = LyricSourceResult & {
   providerKey?: string;
 };
 
-export function applySegmentMapToLyrics(lyricData: LyricsData | null, segmentMap: SegmentMap) {
+/**
+ * What a view needs to build its own lyric DOM from scratch: the parsed lines, the language the
+ * translation and romanization passes key off, and the timing context. The attribution and dock
+ * fields of {@link LyricSourceResultWithMeta} stay out; those are host chrome, not lyrics.
+ */
+export interface ParsedLyrics {
+  lyrics: Lyric[];
+  language?: string | null;
+  musicVideoSynced?: boolean | null;
+  segmentMap: SegmentMap | null;
+}
+
+/**
+ * Holds onto the parsed lyrics after injection has consumed them, so a second view can build from
+ * the same lines. Runs after {@link processLyrics} because injection calls cleanup(), which clears
+ * this alongside the render records. That ordering is also why the floating window is told from
+ * here rather than from injectLyrics: the lines it builds from do not exist until now.
+ */
+function retainParsedLyrics(data: LyricSourceResultWithMeta): void {
+  if (!data.lyrics) return;
+
+  AppState.parsedLyrics = {
+    lyrics: data.lyrics,
+    language: data.language,
+    musicVideoSynced: data.musicVideoSynced,
+    segmentMap: data.segmentMap,
+  };
+  publishPictureInPictureLyrics();
+}
+
+/**
+ * How far a time recorded against the counterpart video moves when the same song is played back as
+ * its other version. Pure, so a view that renders the lyrics somewhere other than the side panel can
+ * shift a copy of them instead of the records the side panel is animating.
+ *
+ * @param segmentMap - Segment map pairing the two versions of the song
+ * @param timeMs - Time on the counterpart video's timeline, in milliseconds
+ * @returns The shift to add, in milliseconds
+ */
+export function getSegmentMapTimeShiftMs(segmentMap: SegmentMap, timeMs: number): number {
+  let lastTimeChange = 0;
+  for (let segment of segmentMap.segment) {
+    if (timeMs >= segment.counterpartVideoStartTimeMilliseconds) {
+      lastTimeChange = segment.primaryVideoStartTimeMilliseconds - segment.counterpartVideoStartTimeMilliseconds;
+      if (timeMs <= segment.counterpartVideoStartTimeMilliseconds + segment.durationMilliseconds) {
+        break;
+      }
+    }
+  }
+  return lastTimeChange;
+}
+
+export function applySegmentMapToLyrics(
+  lyricData: LyricsData | null,
+  lines: readonly LineData[],
+  segmentMap: SegmentMap
+) {
   if (segmentMap && lyricData) {
     lyricData.isMusicVideoSynced = !lyricData.isMusicVideoSynced;
     // We're sync lyrics using segment map
     const allZero = lyricData.syncType === "none";
 
     if (!allZero) {
-      for (let lyric of lyricData.lines) {
+      for (let lyric of lines) {
         lyric.accumulatedOffsetMs = 1000000; // Force resync by setting to a very large value
-        let lastTimeChange = 0;
-        for (let segment of segmentMap.segment) {
-          let lyricTimeMs = lyric.time * 1000;
-          if (lyricTimeMs >= segment.counterpartVideoStartTimeMilliseconds) {
-            lastTimeChange = segment.primaryVideoStartTimeMilliseconds - segment.counterpartVideoStartTimeMilliseconds;
-            if (lyricTimeMs <= segment.counterpartVideoStartTimeMilliseconds + segment.durationMilliseconds) {
-              break;
-            }
-          }
-        }
 
-        let changeS = lastTimeChange / 1000;
+        let changeS = getSegmentMapTimeShiftMs(segmentMap, lyric.time * 1000) / 1000;
         lyric.time = lyric.time + changeS;
         lyric.lyricElement.dataset.time = String(lyric.time);
         lyric.parts.forEach(part => {
@@ -109,15 +170,18 @@ export async function createLyrics(detail: PlayerDetails, signal: AbortSignal): 
     const isSoftReload = AppState.lastLoadedVideoId === videoId && AppState.lyricData != null;
 
     if (isAVSwitch && segmentMap) {
-      applySegmentMapToLyrics(AppState.lyricData, segmentMap);
+      applySegmentMapToLyrics(AppState.lyricData, mainView.lines, segmentMap);
       AppState.suppressZeroTime = Date.now() + 5000;
       AppState.areLyricsTicking = true; // Keep lyrics ticking while new lyrics are fetched.
+      // The window keeps showing these lines through the refetch, so it needs the same deadline.
+      publishPictureInPictureLyrics();
       log("Switching between audio/video: Skipping Loader", segmentMap);
     } else if (isSoftReload) {
       // Same-song reload (provider switch or translation/romanization toggle): keep the
       // current lyrics on screen and swap them in once the new ones are ready, no loader.
       AppState.suppressZeroTime = Date.now() + 5000;
       AppState.areLyricsTicking = true;
+      publishPictureInPictureLyrics();
       log("Soft reload: keeping current lyrics, skipping loader");
     } else {
       log("Not Switching between audio/video", isAVSwitch, segmentMap);
@@ -129,9 +193,7 @@ export async function createLyrics(detail: PlayerDetails, signal: AbortSignal): 
       AppState.areLyricsLoaded = false;
       AppState.areLyricsTicking = false;
       AppState.suppressZeroTime = 0;
-      animEngineState.lastEventCreationTime = -1;
-      animEngineState.lastPlayState = false;
-      animEngineState.lastTime = 0;
+      resetPlaybackClock();
     }
 
     if (matchingSong) {
@@ -204,7 +266,8 @@ export async function createLyrics(detail: PlayerDetails, signal: AbortSignal): 
             segmentMap: null,
           };
 
-          processLyrics(lyricsWithMeta, true, signal);
+          processLyrics(document, lyricsWithMeta, true, signal);
+          retainParsedLyrics(lyricsWithMeta);
         }
       }
       return lyrics;
@@ -333,7 +396,8 @@ export async function createLyrics(detail: PlayerDetails, signal: AbortSignal): 
     if (signal.aborted) {
       return;
     }
-    processLyrics(lyricsWithMeta, false, signal);
+    processLyrics(document, lyricsWithMeta, false, signal);
+    retainParsedLyrics(lyricsWithMeta);
     shouldCleanupLoader = false;
   } finally {
     if (shouldCleanupLoader) {

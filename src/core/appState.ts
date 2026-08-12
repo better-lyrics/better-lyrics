@@ -1,6 +1,6 @@
 import { DOCK_CONTROL_ORDER_DEFAULT, DOCK_DEFAULT_POSITION, GENERAL_ERROR_LOG } from "@constants";
-import type { LyricsData } from "@modules/lyrics/injectLyrics";
-import { createLyrics } from "@modules/lyrics/lyrics";
+import type { LyricDecorations, LyricsData } from "@modules/lyrics/injectLyrics";
+import { createLyrics, type ParsedLyrics } from "@modules/lyrics/lyrics";
 import type { LyricSourceKey } from "@modules/lyrics/providers/shared";
 import type { UnisonData } from "@modules/lyrics/providers/unison";
 import { flushLoader } from "@modules/ui/dom";
@@ -27,6 +27,8 @@ interface AppStateType {
   suppressZeroTime: number;
   areLyricsTicking: boolean;
   lyricData: LyricsData | null;
+  parsedLyrics: ParsedLyrics | null;
+  lyricDecorations: LyricDecorations;
   areLyricsLoaded: boolean;
   lyricInjectionFailed: boolean;
   lastVideoId: string | null;
@@ -70,6 +72,8 @@ export const AppState: AppStateType = {
   suppressZeroTime: 0,
   areLyricsTicking: false,
   lyricData: null,
+  parsedLyrics: null,
+  lyricDecorations: {},
   areLyricsLoaded: false,
   lyricInjectionFailed: false,
   lastVideoId: null,

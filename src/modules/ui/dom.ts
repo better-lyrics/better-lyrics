@@ -30,26 +30,21 @@ import {
   type SyncType,
   TAB_RENDERER_SELECTOR,
   TRANSLATED_LYRICS_CLASS,
+  WORD_HIGHLIGHT_CLASS,
 } from "@constants";
 import { AppState } from "@core/appState";
 import { t } from "@core/i18n";
-import { disconnectResizeObserver, WORD_HIGHLIGHT_CLASS } from "@modules/lyrics/injectLyrics";
 import type { ThumbnailElement } from "@modules/lyrics/requestSniffer/NextResponse";
 import { getArtworkMetadata } from "@modules/lyrics/requestSniffer/requestSniffer";
-import {
-  animEngineState,
-  getResumeScrollElement,
-  lyricsElementAdded,
-  reflow,
-  resetAnimEngineState,
-  SCROLL_POS_OFFSET_RATIO,
-  toMs,
-} from "@modules/ui/animationEngine";
+import { lyricsElementAdded, mainView } from "@modules/ui/mainLyricsView";
+import { publishPictureInPictureLyrics } from "@modules/ui/pictureInPicture/lyricsPublisher";
+import { getResumeScrollElement } from "@modules/ui/resumeScrollButton";
 import { getRequest, setRequest } from "@modules/unison/lyricsRequestTracker";
 import { getTrustTier } from "@modules/unison/trustTier";
 import type { UnisonLyricsRequest } from "@modules/unison/types";
 import { requestLyrics } from "@modules/unison/unisonApi";
-import { getRelativeLayoutBounds, log } from "@utils";
+import { reflow, toMs } from "@braccato/core/util";
+import { log } from "@utils";
 import { generatePetName } from "@/core/keyIdentity";
 import { byId, deleteVote, type UnisonData, vote } from "../lyrics/providers/unison";
 import { buildControlsSegment, closeSourceMenu } from "./lyricsDock/controls";
@@ -1491,21 +1486,20 @@ export async function injectHeadTags(): Promise<void> {
  * Cleans up this elements and resets state when switching songs.
  */
 export function cleanup(): void {
-  animEngineState.scrollPos = -1;
-  resetAnimEngineState();
-
-  disconnectResizeObserver();
+  // The side panel's view only, even though on Chromium the floating window's is in the same
+  // registry: clearing it from here would go around its own renderer and leave the container it
+  // built standing in the floating document. It drops the song off the publish this function ends
+  // with instead.
+  mainView.clear();
 
   if (lyricsObserver) {
     lyricsObserver.disconnect();
     lyricsObserver = null;
   }
 
-  // Clear lyricData BEFORE clearing DOM to release element references
-  if (AppState.lyricData) {
-    AppState.lyricData.lines = [];
-    AppState.lyricData = null;
-  }
+  AppState.lyricData = null;
+  AppState.parsedLyrics = null;
+  AppState.lyricDecorations = {};
 
   const ytMusicLyrics = (document.querySelector(NO_LYRICS_TEXT_SELECTOR) as HTMLElement)?.parentElement;
   if (ytMusicLyrics) {
@@ -1533,6 +1527,7 @@ export function cleanup(): void {
   }
 
   clearLyrics();
+  publishPictureInPictureLyrics();
 }
 
 /**
@@ -1586,37 +1581,4 @@ function observeFooterForRecalc(footer: HTMLElement): void {
     lyricsElementAdded();
   });
   footerResizeObserver.observe(footer);
-}
-
-export function setExtraHeight() {
-  const lyricsElement = document.getElementsByClassName(LYRICS_CLASS)[0] as HTMLElement | undefined;
-  const tabRenderer = document.querySelector(TAB_RENDERER_SELECTOR) as HTMLElement | null;
-  if (!lyricsElement || !tabRenderer) return;
-
-  const tabRendererHeight = tabRenderer.getBoundingClientRect().height;
-  const scrollPosOffsetRatio = SCROLL_POS_OFFSET_RATIO.getNumberValue();
-  const currentPaddingBottom = Number.parseFloat(window.getComputedStyle(lyricsElement).paddingBottom) || 0;
-  const lyricsHeightWithoutBottomPadding = Math.max(0, lyricsElement.scrollHeight - currentPaddingBottom);
-
-  const lyricLines = lyricsElement.querySelectorAll<HTMLElement>(`:scope > .${LINE_CLASS}`);
-  const firstLyric = lyricLines[0] ?? null;
-  const lastLyric = lyricLines[lyricLines.length - 1] ?? null;
-  const firstLyricHeight = firstLyric ? getRelativeLayoutBounds(lyricsElement, firstLyric).height : 0;
-  const lastLyricBounds = lastLyric ? getRelativeLayoutBounds(lyricsElement, lastLyric) : null;
-
-  const paddingTop = Math.max(0, tabRendererHeight * scrollPosOffsetRatio - firstLyricHeight / 2);
-
-  document.documentElement.style.setProperty("--blyrics-padding-top", paddingTop + "px");
-
-  const lastLyricTargetContentHeight = lastLyricBounds
-    ? lastLyricBounds.y + lastLyricBounds.height / 2 + tabRendererHeight * (1 - scrollPosOffsetRatio)
-    : tabRendererHeight;
-
-  const extraHeight = Math.max(
-    lastLyricTargetContentHeight - lyricsHeightWithoutBottomPadding,
-    tabRendererHeight - lyricsHeightWithoutBottomPadding,
-    0
-  );
-
-  document.documentElement.style.setProperty("--blyrics-padding-bottom", Math.ceil(extraHeight) + "px");
 }

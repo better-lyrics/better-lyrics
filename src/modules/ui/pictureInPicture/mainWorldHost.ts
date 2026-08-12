@@ -1,4 +1,9 @@
-import { GENERAL_ERROR_LOG, MINI_PLAYER_BUTTON_SELECTOR, PICTURE_IN_PICTURE_TOGGLE_SELECTOR } from "@constants";
+import {
+  GENERAL_ERROR_LOG,
+  LOG_PREFIX,
+  MINI_PLAYER_BUTTON_SELECTOR,
+  PICTURE_IN_PICTURE_TOGGLE_SELECTOR,
+} from "@constants";
 import {
   onInit,
   onMetadata,
@@ -49,6 +54,9 @@ function createController(): PictureInPictureController<Window> {
       translate: key => resources?.strings[key] ?? "",
       getArtworkMetadata: requestSongMetadata,
       resetScrollResume: () => sendSignal({ type: "reset-scroll" }),
+      // The extension's logger lives in the isolated world, so the page world writes straight to
+      // the console under the same prefix rather than paying a bridge round trip per line.
+      log: resources?.logsEnabled ? console.log.bind(console, LOG_PREFIX) : () => {},
     },
     artworkTransition: () => resources?.artworkTransition,
     textTransition: () => resources?.textTransition,

@@ -1,18 +1,19 @@
 import {
   FONT_LINK,
   GENERAL_ERROR_LOG,
+  LOG_PREFIX,
   MINI_PLAYER_BUTTON_SELECTOR,
   NOTO_SANS_UNIVERSAL_LINK,
   PICTURE_IN_PICTURE_TOGGLE_SELECTOR,
-  TAB_HEADER_CLASS,
 } from "@constants";
 import { AppState } from "@core/appState";
 import { t } from "@core/i18n";
 import { getStorage } from "@core/storage";
 import { getArtworkMetadata } from "@modules/lyrics/requestSniffer/requestSniffer";
-import { animEngineState } from "@modules/ui/animationEngine";
+import { resumeAllAutoscroll } from "@braccato/core";
 import { log } from "@utils";
 import { onSignal, sendInit, sendMetadata } from "./bridge";
+import { publishPictureInPictureLyrics } from "./lyricsPublisher";
 import { DEFAULT_ARTWORK_TRANSITION, DEFAULT_TEXT_TRANSITION } from "./lyricsView";
 import { createPictureInPictureHost } from "./pipHost";
 import type { PictureInPictureToggle, PictureInPictureViewDependencies } from "./types";
@@ -42,33 +43,31 @@ const PIP_SETTING_DEFAULTS = {
   pipArtworkTransition: DEFAULT_ARTWORK_TRANSITION,
   pipTextTransition: DEFAULT_TEXT_TRANSITION,
   pipMarqueeEnabled: true,
+  isLogsEnabled: true,
 } as const;
 
 const isolatedViewDependencies: PictureInPictureViewDependencies = {
   translate: t,
   getArtworkMetadata,
-  resetScrollResume: () => {
-    animEngineState.scrollResumeTime = 0;
-  },
+  resetScrollResume: resumeAllAutoscroll,
+  // Resolved per call rather than bound once: `log` is reassigned when the logging setting loads.
+  log: (...args: unknown[]) => log(LOG_PREFIX, ...args),
 };
 
 function markPictureInPictureOpened(): void {
   AppState.isPictureInPictureOpen = true;
+  // The window builds from the lyrics the fetch retains, so a song that never got as far as an
+  // injection has to be asked for now, whichever side panel tab the user is on.
   if (!AppState.areLyricsLoaded || AppState.lastLoadedVideoId !== AppState.lastVideoId) {
     AppState.queueLyricInjection = true;
-  } else {
-    // Opening from a non-lyrics side panel tab leaves ticking off, and nothing else turns it
-    // back on while the lyrics stay loaded, so the window would mount a frozen snapshot.
-    AppState.areLyricsTicking = true;
   }
+  // A window opened mid-song has to be given the lyrics that are already on screen; nothing else
+  // will publish them until the next injection.
+  publishPictureInPictureLyrics();
 }
 
 function markPictureInPictureClosed(): void {
   AppState.isPictureInPictureOpen = false;
-  const tabSelector = document.getElementsByClassName(TAB_HEADER_CLASS)[1];
-  if (tabSelector?.getAttribute("aria-selected") !== "true") {
-    AppState.areLyricsTicking = false;
-  }
 }
 
 function injectStylesheet(pipWindow: Window, stylesheet: string): void {
@@ -126,7 +125,7 @@ function createPageWorldDelegate(): PictureInPictureToggle {
       isOpen = false;
       markPictureInPictureClosed();
     } else if (signal.type === "reset-scroll") {
-      animEngineState.scrollResumeTime = 0;
+      resumeAllAutoscroll();
     } else if (signal.type === "want-metadata") {
       void getArtworkMetadata(signal.videoId, 250).then(metadata =>
         sendMetadata({ requestId: signal.requestId, metadata })
@@ -157,6 +156,7 @@ export function publishPictureInPictureResources(): void {
       artworkTransition: String(items.pipArtworkTransition),
       textTransition: String(items.pipTextTransition),
       marqueeEnabled: items.pipMarqueeEnabled !== false,
+      logsEnabled: items.isLogsEnabled !== false,
     });
   });
 }

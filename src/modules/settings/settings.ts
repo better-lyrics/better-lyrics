@@ -1,4 +1,5 @@
 import {
+  DISABLE_EFFECTS_STYLE_ID,
   DOCK_CLASS,
   DOCK_CONTROL_ORDER_DEFAULT,
   DOCK_DEFAULT_POSITION,
@@ -8,11 +9,12 @@ import {
 import { AppState, reloadLyrics } from "@core/appState";
 import { clearCache, compileRicsToStyles, getStorage } from "@core/storage";
 import { log, setUpLog } from "@core/utils";
-import { calculateLyricPositions } from "@modules/lyrics/injectLyrics";
 import { clearCache as clearTranslationCache } from "@modules/lyrics/translation";
 import { mountDock, mountVotingSegment, reloadAlbumArt, unmountDock, updateDockPosition } from "@modules/ui/dom";
 import { applyGlobalOffsets } from "@modules/ui/lyricsDock/offset";
+import { mainView } from "@modules/ui/mainLyricsView";
 import { isPlayerFullscreened, onFullscreenChange } from "@modules/ui/observer";
+import { publishPictureInPictureLyrics } from "@modules/ui/pictureInPicture/lyricsPublisher";
 import { applyCustomStyles, getAndApplyCustomStyles } from "@modules/ui/styleInjector";
 
 let hasInitializedMessageListener = false;
@@ -47,16 +49,13 @@ export function handleSettings(): void {
 
   onStylizedAnimationsEnabled(
     () => {
-      let styleElm = document.getElementById("blyrics-disable-effects");
-      if (styleElm) {
-        styleElm.remove();
-      }
+      document.getElementById(DISABLE_EFFECTS_STYLE_ID)?.remove();
     },
     async () => {
-      let styleElem = document.getElementById("blyrics-disable-effects");
+      let styleElem = document.getElementById(DISABLE_EFFECTS_STYLE_ID);
       if (!styleElem) {
         styleElem = document.createElement("style");
-        styleElem.id = "blyrics-disable-effects";
+        styleElem.id = DISABLE_EFFECTS_STYLE_ID;
 
         styleElem.textContent = await fetch(chrome.runtime.getURL("css/disablestylizedanimations.css")).then(res =>
           res.text()
@@ -213,12 +212,12 @@ export function listenForPopupMessages(): void {
         log(LOG_PREFIX_CONTENT, "Compiling RICS and applying styles");
         const compiledCSS = compileRicsToStyles(request.ricsSource);
         applyCustomStyles(compiledCSS);
-        calculateLyricPositions();
+        mainView.relayout();
         log(LOG_PREFIX_CONTENT, "Styles applied successfully");
       } else {
         log(LOG_PREFIX_CONTENT, "Loading styles from storage");
         getAndApplyCustomStyles().then(() => {
-          calculateLyricPositions();
+          mainView.relayout();
           log(LOG_PREFIX_CONTENT, "Styles loaded from storage and applied");
         });
       }
@@ -262,6 +261,9 @@ export function listenForPopupMessages(): void {
 export function loadPassiveScrollSetting(): void {
   getStorage({ isPassiveScrollEnabled: true }, items => {
     AppState.isPassiveScrollEnabled = items.isPassiveScrollEnabled;
+    // The side panel reads this off AppState every tick. The floating window only sees the copy
+    // that rode over on the last payload, so a change reaches it on a republish or not at all.
+    publishPictureInPictureLyrics();
   });
 }
 

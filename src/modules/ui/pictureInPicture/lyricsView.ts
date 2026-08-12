@@ -1,9 +1,7 @@
-import { CURRENT_LYRICS_CLASS, LINE_CLASS, LYRICS_CLASS, PLAYER_BAR_SELECTOR, SEEK_EVENT } from "@constants";
+import { PLAYER_BAR_SELECTOR } from "@constants";
 import type { PlayerDetails } from "@core/appState";
-import { getSeekTimeFromClick } from "@modules/lyrics/seekFromClick";
 import { createHeaderLine, fillHeaderLayer, getHeaderLayers, PictureInPictureHeaderMarquee } from "./headerMarquee";
-import { MIRROR_ID_ATTR } from "./pipMirror";
-import type { PictureInPictureViewDependencies } from "./types";
+import type { PictureInPicturePlaybackSnapshot, PictureInPictureViewDependencies } from "./types";
 
 interface DisplayMetadata {
   readonly title: string;
@@ -29,7 +27,6 @@ const PLAYER_CONTROL_EVENT = "blyrics-player-control";
 const ARTWORK_SIZE = 512;
 const VISIBLE_METADATA_CHECK_INTERVAL = 250;
 const PLAYER_CONTROLS_IDLE_DELAY = 2000;
-const SCROLL_ANCHOR_RATIO = 0.4;
 
 // Durations mirror the keyframes in picture-in-picture.css; they only gate the
 // rapid-skip guard, so drift shows up as a guard that releases early or late.
@@ -201,6 +198,7 @@ export class PictureInPictureLyricsView {
   private lastPointerMoveTime = 0;
   private fallbackArtworkUrl = "";
   private isSearching = false;
+  private lastPlaybackSnapshot: PictureInPicturePlaybackSnapshot | null = null;
   private artworkTransition: ArtworkTransition = DEFAULT_ARTWORK_TRANSITION;
   private artworkIndex = 0;
   private artworkBusyUntil = 0;
@@ -301,9 +299,6 @@ export class PictureInPictureLyricsView {
 
     this.lyricsScroller = pipDocument.createElement("div");
     this.lyricsScroller.className = "blyrics-pip-scroller";
-    this.lyricsScroller.addEventListener("click", this.handleLyricClick, {
-      signal: this.lifecycleController.signal,
-    });
 
     this.showSearching();
 
@@ -321,15 +316,31 @@ export class PictureInPictureLyricsView {
     pipWindow.addEventListener("pagehide", this.destroy, { once: true });
   }
 
-  get pipDocument(): Document {
-    return this.pipWindow.document;
+  /**
+   * The element the renderer scrolls. Its own scroll container, so the engine moves the lines by
+   * writing scrollTop the same way it does in the side panel.
+   */
+  get scrollElement(): HTMLElement {
+    return this.lyricsScroller;
   }
 
-  mountLyrics(twinRoot: HTMLElement): void {
+  get playbackSnapshot(): PictureInPicturePlaybackSnapshot | null {
+    return this.lastPlaybackSnapshot;
+  }
+
+  isLoaderActive(): boolean {
+    return this.isSearching;
+  }
+
+  /**
+   * Puts the scroller back on screen in place of the loader, and hands back the element the built
+   * lyrics container mounts into.
+   */
+  prepareLyricsMount(): HTMLElement {
     this.isSearching = false;
-    this.lyricsScroller.replaceChildren(twinRoot);
     this.lyricsViewport.replaceChildren(this.lyricsScroller);
     this.shell.setAttribute("aria-busy", "false");
+    return this.lyricsScroller;
   }
 
   // Called from the sync loop, so it has to no-op once the loader is already up.
@@ -355,27 +366,19 @@ export class PictureInPictureLyricsView {
     this.shell.setAttribute("aria-busy", "true");
   }
 
-  hasTwinMounted(): boolean {
-    return this.lyricsScroller.firstElementChild?.hasAttribute(MIRROR_ID_ATTR) ?? false;
-  }
-
-  updateScroll(): void {
-    const twin = this.lyricsScroller.firstElementChild as HTMLElement | null;
-    if (!twin) return;
-    const active = twin.querySelector<HTMLElement>(`.${CURRENT_LYRICS_CLASS}`);
-    if (!active) return;
-    const viewportHeight = this.lyricsViewport.clientHeight;
-    if (viewportHeight <= 0) return;
-    const activeCenter = active.offsetTop + active.offsetHeight / 2;
-    const maxScroll = Math.max(0, this.lyricsScroller.scrollHeight - viewportHeight);
-    const translateY = Math.max(-maxScroll, Math.min(0, viewportHeight * SCROLL_ANCHOR_RATIO - activeCenter));
-    const transform = `translateY(${translateY}px)`;
-    if (this.lyricsScroller.style.transform !== transform) this.lyricsScroller.style.transform = transform;
-  }
-
   private readonly handlePlayerTime = (event: Event): void => {
     const detail = (event as CustomEvent<PlayerDetails>).detail;
     if (!detail) return;
+
+    // `playing` rather than `isPlaying`: it also clears while the player buffers or seeks, which is
+    // what the animation clock has to follow.
+    this.lastPlaybackSnapshot = {
+      currentTimeS: detail.currentTime,
+      durationS: Number(detail.duration),
+      playbackRate: detail.playbackRate ?? 1,
+      isPlaying: detail.playing,
+      wallTime: detail.browserTime,
+    };
 
     this.updatePlayPauseButton(detail.isPlaying);
 
@@ -389,17 +392,6 @@ export class PictureInPictureLyricsView {
       this.refreshVisibleMetadata(detail.videoId);
       this.refreshAnimatedArtwork(detail.isPlaying);
     }
-  };
-
-  private readonly handleLyricClick = (event: MouseEvent): void => {
-    const line = (event.target as Element | null)?.closest<HTMLElement>(`.${LINE_CLASS}`);
-    if (!line) return;
-    const sync = line.closest<HTMLElement>(`.${LYRICS_CLASS}`)?.dataset.sync;
-    if (sync !== "synced" && sync !== "richsync") return;
-    const seekTime = getSeekTimeFromClick(event, line);
-    if (seekTime === null) return;
-    this.sourceDocument.dispatchEvent(new CustomEvent(SEEK_EVENT, { detail: seekTime }));
-    this.dependencies.resetScrollResume();
   };
 
   private readonly handlePointerMove = (): void => {
