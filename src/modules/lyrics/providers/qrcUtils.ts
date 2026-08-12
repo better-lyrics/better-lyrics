@@ -90,6 +90,7 @@ interface AgentsCtx {
   aliases: Record<string, string>;
   nextVoiceId: number;
   currentSinger: string | null;
+  currentSingerName: string | null;
 }
 
 interface ParsedLine {
@@ -98,6 +99,7 @@ interface ParsedLine {
   text: string;
   syllables: ParsedWord[];
   agent: string | null;
+  agentName: string | null;
 }
 
 function assignAgent(singerName: string, parsedLine: ParsedLine, ctx: AgentsCtx): void {
@@ -107,6 +109,7 @@ function assignAgent(singerName: string, parsedLine: ParsedLine, ctx: AgentsCtx)
     ctx.aliases[singerName] = type === "group" ? "v1000" : `v${ctx.nextVoiceId++}`;
   }
   parsedLine.agent = ctx.aliases[singerName];
+  parsedLine.agentName = singerName;
 }
 
 function updateLineTiming(parsedLine: ParsedLine): void {
@@ -130,7 +133,10 @@ function extractSinger(
   metadata?: QrcMetadata
 ): boolean {
   if (!parsedLine.syllables.length) {
-    if (ctx.currentSinger) parsedLine.agent = ctx.currentSinger;
+    if (ctx.currentSinger) {
+      parsedLine.agent = ctx.currentSinger;
+      parsedLine.agentName = ctx.currentSingerName;
+    }
     return true;
   }
 
@@ -158,7 +164,10 @@ function extractSinger(
     if (allSameDuration) return false;
   }
 
-  if (ctx.currentSinger) parsedLine.agent = ctx.currentSinger;
+  if (ctx.currentSinger) {
+    parsedLine.agent = ctx.currentSinger;
+    parsedLine.agentName = ctx.currentSingerName;
+  }
 
   let accText = "";
   let syllablesToRemove = 0;
@@ -180,6 +189,7 @@ function extractSinger(
     parsedLine.text = parsedLine.text.substring(accText.length);
     assignAgent(singerName, parsedLine, ctx);
     ctx.currentSinger = ctx.aliases[singerName];
+    ctx.currentSingerName = singerName;
     updateLineTiming(parsedLine);
     return true;
   }
@@ -207,6 +217,7 @@ function extractSinger(
 
   assignAgent(singerName, parsedLine, ctx);
   ctx.currentSinger = ctx.aliases[singerName];
+  ctx.currentSingerName = singerName;
   parsedLine.text = afterColon;
   updateLineTiming(parsedLine);
 
@@ -224,7 +235,7 @@ export function parseQRC(qrcXml: string, songDurationMs: number, metadata?: QrcM
   const lyricContent = attrMatch ? attrMatch[1].replace(/&quot;/g, '"').replace(/&amp;/g, "&") : qrcXml;
 
   const parsedLines: ParsedLine[] = [];
-  const agentsCtx: AgentsCtx = { aliases: {}, nextVoiceId: 1, currentSinger: null };
+  const agentsCtx: AgentsCtx = { aliases: {}, nextVoiceId: 1, currentSinger: null, currentSingerName: null };
 
   for (const raw of lyricContent.split("\n")) {
     const trimmed = raw.trim();
@@ -245,6 +256,7 @@ export function parseQRC(qrcXml: string, songDurationMs: number, metadata?: QrcM
       text,
       syllables: syllabus,
       agent: null,
+      agentName: null,
     };
 
     if (extractSinger(parsed, agentsCtx, parsedLines.length < 5, metadata)) {
@@ -288,6 +300,7 @@ export function parseQRC(qrcXml: string, songDurationMs: number, metadata?: QrcM
       durationMs: duration,
       parts: parts.length > 0 ? parts : undefined,
       agent: line.agent ?? undefined,
+      agentName: line.agentName ?? undefined,
     };
   });
 

@@ -170,6 +170,11 @@ export interface LyricsData {
   tabSelector: HTMLElement;
   lyricsContainer: HTMLElement;
   hasNonLatin: boolean;
+  // Plain parsed lyrics, index-aligned with `lines`, untouched by rendering - lyrics-dock download reads from here.
+  sourceLyrics: Lyric[];
+  // Original fetched text/format, when the source has one (see LyricSourceResult.rawText).
+  rawLyricsText?: string;
+  rawLyricsFormat?: "ttml" | "lrc";
 }
 
 type SpaceToken = {
@@ -681,6 +686,9 @@ function injectLyrics(data: LyricSourceResultWithMeta, keepLoaderVisible = false
     tabSelector,
     lyricsContainer,
     hasNonLatin: lyrics.some(item => !!item.words && containsNonLatin(item.words)),
+    sourceLyrics: lyrics,
+    rawLyricsText: data.rawText,
+    rawLyricsFormat: data.rawFormat,
   };
 
   // Set before addFooter so the dock controls read the current song's lyric data.

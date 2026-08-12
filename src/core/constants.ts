@@ -19,7 +19,7 @@ export const ROMANIZED_LYRICS_CLASS = "blyrics--romanized" as const;
 export const FOOTER_CLASS = "blyrics-footer" as const;
 export const DOCK_CLASS = "blyrics-dock" as const;
 export const DOCK_DEFAULT_POSITION = "bottom-right" as const;
-export const DOCK_CONTROL_ORDER_DEFAULT = ["source", "translate", "romanize", "offset", "pictureInPicture"] as const;
+export const DOCK_CONTROL_ORDER_DEFAULT = ["source", "translate", "romanize", "offset", "download", "pictureInPicture"] as const;
 export const MODAL_OVERLAY_CLASS = "blyrics-modal-overlay" as const;
 export const MODAL_CLASS = "blyrics-modal" as const;
 

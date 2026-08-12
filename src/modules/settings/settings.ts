@@ -291,7 +291,9 @@ export function loadDockSettings(callback?: () => void): void {
       "isDockRomanizeEnabled",
       "isDockOffsetEnabled",
       "isDockPictureInPictureEnabled",
+      "isDockDownloadLRCEnabled",
       "dockControlsOrder",
+      "lyricDefaultDownloadFormat",
     ],
     items => {
       AppState.isControlsDockEnabled = items.isControlsDockEnabled ?? items.isUnisonPinnedDockEnabled ?? true;
@@ -304,7 +306,9 @@ export function loadDockSettings(callback?: () => void): void {
       AppState.isDockRomanizeEnabled = items.isDockRomanizeEnabled ?? true;
       AppState.isDockOffsetEnabled = items.isDockOffsetEnabled ?? true;
       AppState.isDockPictureInPictureEnabled = items.isDockPictureInPictureEnabled ?? true;
+      AppState.isDockDownloadLRCEnabled = items.isDockDownloadLRCEnabled ?? true;
       AppState.dockControlsOrder = normalizeDockControlsOrder(items.dockControlsOrder);
+      AppState.defaultLyricDownloadFormat = items.lyricDefaultDownloadFormat ?? "ttml";
       callback?.();
     }
   );

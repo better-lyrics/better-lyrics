@@ -19,6 +19,7 @@ import {
   setGlobalOffsetValue,
 } from "./offset";
 import { cycleProvider, selectProvider } from "./providerCycle";
+import { downloadLrc, type DownloadFormat } from "./downloadLrc";
 
 const CONTROL_ACTIVE_CLASS = `${DOCK_CLASS}__control--active`;
 const MENU_OPEN_CLASS = `${DOCK_CLASS}__menu--open`;
@@ -236,6 +237,109 @@ function buildPictureInPictureControl(): HTMLButtonElement | null {
   if (icon) btn.appendChild(icon);
 
   btn.addEventListener("click", () => pictureInPictureController.toggle());
+  return btn;
+}
+
+// -- Download control --------------------------
+function showDownloadMenu(trigger: HTMLElement): void {
+  showDockMenu(trigger, buildDownloadMenu());
+}
+
+function buildDownloadMenu(): HTMLElement {
+  const menu = document.createElement("div");
+  menu.className = `${DOCK_CLASS}__menu`;
+
+  const provider = currentProviderConfig();
+  if (provider) menu.style.setProperty("--dock-accent", syncTypeColors[provider.syncType]);
+
+  const isRichsync = AppState.lyricData?.syncType === "richsync";
+
+  // TTML falls back to line-level timing without richsync; LRC Word-by-Word disables instead.
+  const buildItem = (
+    label: string,
+    mode: "synced" | "richsync",
+    format: DownloadFormat,
+    disabled = false,
+    disabledTitle?: string
+  ) => {
+    const item = document.createElement("button");
+    item.type = "button";
+    item.className = `${DOCK_CLASS}__menu-item`;
+    item.disabled = disabled;
+    if (disabled && disabledTitle) item.title = disabledTitle;
+    // Bare span, no -label class: matches the source menu's items' inherited font.
+    const buttonContent = document.createElement("span");
+    buttonContent.textContent = label;
+
+    item.appendChild(buttonContent);
+    item.addEventListener("click", event => {
+      event.stopPropagation();
+      closeSourceMenu();
+      downloadLrc(mode, format);
+    });
+    return item;
+  };
+
+  menu.append(
+    buildItem(t("lyricsDock_downloadTtml"), "richsync", "ttml"),
+    buildItem(t("lyricsDock_downloadLineByLine"), "synced", "lrc"),
+    buildItem(
+      t("lyricsDock_downloadWordByWord"),
+      "richsync",
+      "lrc",
+      !isRichsync,
+      t("lyricsDock_downloadWordByWordUnavailable")
+    )
+  );
+
+  return menu;
+}
+
+function downloadDefaultFormat(): void {
+  switch (AppState.defaultLyricDownloadFormat) {
+    case "ttml":
+      downloadLrc("richsync", "ttml");
+      break;
+    case "lrc-word":
+      downloadLrc("richsync", "lrc");
+      break;
+    default:
+      downloadLrc("synced", "lrc");
+  }
+}
+
+function buildDownloadLRC(): HTMLButtonElement {
+  const label = t("lyricsDock_downloadLrc");
+  const btn = document.createElement("button");
+  btn.type = "button";
+  btn.className = `${DOCK_CLASS}__control`;
+  btn.setAttribute("aria-label", label);
+  btn.title = label;
+
+  const icon = parseSvgString(controlIcons.download);
+  if (icon) btn.appendChild(icon);
+
+  // Delayed click so double click doesn't also fire the single-click menu open - see offset icon.
+  let clickTimer: ReturnType<typeof setTimeout> | null = null;
+  btn.addEventListener("click", event => {
+    event.stopPropagation();
+    if (clickTimer) return;
+    clickTimer = setTimeout(() => {
+      clickTimer = null;
+      if (openSourceMenu) closeSourceMenu();
+      else showDownloadMenu(btn);
+    }, OFFSET_CLICK_DELAY);
+  });
+  btn.addEventListener("dblclick", event => {
+    event.preventDefault();
+    event.stopPropagation();
+    if (clickTimer) {
+      clearTimeout(clickTimer);
+      clickTimer = null;
+    }
+    closeSourceMenu();
+    downloadDefaultFormat();
+  });
   return btn;
 }
 
@@ -469,6 +573,7 @@ const controlBuilders: Record<string, () => HTMLElement | null> = {
         )
       : null,
   offset: () => (isSynced() && AppState.isDockOffsetEnabled ? buildOffsetControl() : null),
+  download: () => (isSynced() && AppState.isDockDownloadLRCEnabled ? buildDownloadLRC() : null),
   pictureInPicture: () => (AppState.isDockPictureInPictureEnabled ? buildPictureInPictureControl() : null),
 };
 
