@@ -486,7 +486,7 @@ async function updateCreateEditButton(): Promise<void> {
   const hasContent = customCSS && customCSS.trim().length > 0;
 
   const showEdit = !isDefaultTheme && hasContent;
-  textSpan.textContent = showEdit ? "Edit" : "Create";
+  textSpan.textContent = showEdit ? t("options_themes_edit") : t("options_themes_create");
 }
 
 export async function updateThemeSelectorButton(): Promise<void> {
