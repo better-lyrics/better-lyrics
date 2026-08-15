@@ -1,12 +1,7 @@
-import {
-  AUTH_MESSAGE_TYPES,
-  AUTH_PORT_NAME_PREFIX,
-  BL_AUTH_SITE_PORT_NAME,
-  isAllowedAuthOrigin,
-  LOG_PREFIX_AUTH,
-} from "@constants";
+import { AUTH_MESSAGE_TYPES, AUTH_PORT_NAME_PREFIX, BL_AUTH_SITE_PORT_NAME, LOG_PREFIX_AUTH } from "@constants";
 import { signPayload } from "@core/keyIdentity";
 import { isApproved, pruneExpired, rememberApproval } from "@modules/auth/approvedOrigins";
+import { isAllowedAuthOrigin } from "@modules/auth/partners";
 
 interface AuthRequest {
   type: typeof AUTH_MESSAGE_TYPES.REQUEST;

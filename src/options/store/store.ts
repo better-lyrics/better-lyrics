@@ -1,4 +1,5 @@
 import { LOG_PREFIX_STORE } from "@constants";
+import { formatCreators } from "@core/customCss";
 import { t } from "@core/i18n";
 import { getLocalStorage, getSyncStorage } from "@core/storage";
 import autoAnimate, { type AnimationController } from "@formkit/auto-animate";
@@ -1347,7 +1348,7 @@ function renderNextBatch(batchSize: number): void {
 function matchesSearchQuery(theme: StoreTheme, query: string): boolean {
   if (!query) return true;
 
-  const searchableText = [theme.title, theme.description, ...theme.creators].join(" ").toLowerCase();
+  const searchableText = [theme.title, theme.description, formatCreators(theme.creators)].join(" ").toLowerCase();
 
   return searchableText.includes(query);
 }
@@ -1492,7 +1493,7 @@ function createStoreThemeCard(
 
   const author = document.createElement("div");
   author.className = "store-card-author";
-  author.textContent = `By ${theme.creators.join(", ")}`;
+  author.textContent = `By ${formatCreators(theme.creators)}`;
 
   const actionBtn = document.createElement("button");
   actionBtn.className = `store-card-btn ${isInstalled ? "store-card-btn-remove" : "store-card-btn-install"}`;
@@ -1763,7 +1764,7 @@ async function openDetailModal(theme: StoreTheme, urlThemeInfo?: UrlThemeInfo): 
       titleEl.appendChild(createGitHubBadge("detail-url-badge", title));
     }
   }
-  if (authorEl) authorEl.textContent = `By ${theme.creators.join(", ")} · v${theme.version}`;
+  if (authorEl) authorEl.textContent = `By ${formatCreators(theme.creators)} · v${theme.version}`;
   if (descEl) descEl.replaceChildren(parseMarkdown(theme.description));
 
   const statsEl = document.getElementById("detail-stats");
@@ -2431,7 +2432,7 @@ async function updateYourThemesDropdown(): Promise<void> {
 
     const meta = document.createElement("span");
     meta.className = "your-themes-item-meta";
-    meta.textContent = `By ${theme.creators.join(", ")} · v${theme.version}`;
+    meta.textContent = `By ${formatCreators(theme.creators)} · v${theme.version}`;
 
     info.appendChild(titleRow);
     info.appendChild(meta);

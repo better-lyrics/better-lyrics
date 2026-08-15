@@ -8,7 +8,7 @@ Better Lyrics upgrades your YouTube Music™ experience by providing beautiful t
 
 <p align="left">
  <a aria-label="License" href="https://www.gnu.org/licenses/gpl-3.0.en.html"><img src="https://img.shields.io/badge/license-GPL_v3-blue.svg" alt=""/></a>
- <img src="https://img.shields.io/badge/version-2.4.0 1-blue.svg" alt=""/>
+ <img src="https://img.shields.io/badge/version-2.4.0 2-blue.svg" alt=""/>
 
  <img src="https://img.shields.io/badge/status-active-brightgreen.svg" alt=""/>
  <a aria-label="Better Stack Badge" href="https://better-lyrics-status.boidu.dev"><img height="20" src="https://uptime.betterstack.com/status-badges/v2/monitor/1dqoz.svg" alt="Better Stack Badge" /></a>
@@ -303,7 +303,7 @@ Right now, Better Lyrics is available for Chrome, Firefox, and Edge (and other C
 No, Better Lyrics is specifically designed for YouTube Music™. If you want something similar for other streaming services, check out these extensions. If you have suggestions for others, open a PR to add them to this list:
 
 - [Spicy Lyrics](https://github.com/Spikerko/spicy-lyrics) - Spotify
-- [Beautiful Lyrics](https://github.com/surfbryce/beautiful-lyrics) - Spotify
+- [Radiant Lyrics](https://radiant-lyrics.org/) - Tidal & Mobile
 - [YouLy+](https://github.com/ibratabian17/YouLyPlus) - Apple Music, Tidal
 
 ## Funding
@@ -356,12 +356,12 @@ YouTube Music™, YouTube™, Google™, and Chrome™ are trademarks of Google 
 
 ## Star History
 
-<a href="https://www.star-history.com/#better-lyrics/better-lyrics&type=date&legend=top-left">
-  <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=better-lyrics/better-lyrics&type=date&theme=dark&legend=top-left" />
-    <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/svg?repos=better-lyrics/better-lyrics&type=date&legend=top-left" />
-    <img alt="Star History Chart" src="https://api.star-history.com/svg?repos=better-lyrics/better-lyrics&type=date&legend=top-left" />
-  </picture>
+<a href="https://www.star-history.com/?type=date&legend=top-left&repos=better-lyrics%2Fbetter-lyrics">
+ <picture>
+   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/chart?repos=better-lyrics/better-lyrics&type=date&theme=dark&legend=top-left&sealed_token=J9IwYlZ-HGwqs7dxJCnowQ3wlZ0Fk1M57QbNY8fPYlGhkJCr00lCXEeFvKJ3NegBZikDzmT-5Z2zMrYhV00rhRYZLalwZOe09JI38lDIvk3iJd0MQDWR7Wc00peRdRtQXrXa23fbkUZTxnlCmlh38ZotjrpAAXoHGqhwAlLO0iQXEC0iOUGVM0p6u0TB" />
+   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/chart?repos=better-lyrics/better-lyrics&type=date&legend=top-left&sealed_token=J9IwYlZ-HGwqs7dxJCnowQ3wlZ0Fk1M57QbNY8fPYlGhkJCr00lCXEeFvKJ3NegBZikDzmT-5Z2zMrYhV00rhRYZLalwZOe09JI38lDIvk3iJd0MQDWR7Wc00peRdRtQXrXa23fbkUZTxnlCmlh38ZotjrpAAXoHGqhwAlLO0iQXEC0iOUGVM0p6u0TB" />
+   <img alt="Star History Chart" src="https://api.star-history.com/chart?repos=better-lyrics/better-lyrics&type=date&legend=top-left&sealed_token=J9IwYlZ-HGwqs7dxJCnowQ3wlZ0Fk1M57QbNY8fPYlGhkJCr00lCXEeFvKJ3NegBZikDzmT-5Z2zMrYhV00rhRYZLalwZOe09JI38lDIvk3iJd0MQDWR7Wc00peRdRtQXrXa23fbkUZTxnlCmlh38ZotjrpAAXoHGqhwAlLO0iQXEC0iOUGVM0p6u0TB" />
+ </picture>
 </a>
 
 ## Contributors ✨

@@ -82,18 +82,30 @@ If you're new to CSS, don't worry! This guide will walk you through the main com
 The Better Lyrics styling system consists of several modular CSS files, organized into directories:
 
 1. **blyrics/** - Core lyrics styling, animations, and visual effects
+    - `index.css`: The `@import` list the extension loads; everything below reaches the page through it
     - `variables.css`: Global custom properties
     - `lyrics.css`: Main lyrics container and line styles, translations, romanization
-    - `components.css`: UI components like the loader, footer, and buttons
     - `instrumental.css`: Instrumental break styles
-    - `misc.css`: Utility classes
+    - `components.css`: UI components like the loader, footer, and buttons
+    - `misc.css`: Utility classes, and the `--noto-sans-universal` font stack
+    - `modal.css`: In-page modal dialogs
     - `responsive.css`: Media queries for responsive design
+    - `picture-in-picture.css`: The floating lyrics window
 2. **ytmusic/** - YouTube Music interface modifications and layout adjustments
     - `variables.css`: YouTube Music specific variables
     - `general.css`: General interface overrides
     - `fullscreen.css`: Fullscreen mode styles
     - `mobile.css`: Mobile-specific adjustments
 3. **themesong.css** - Compatibility styles for the ThemeSong browser extension
+
+Three of those are build outputs rather than source files. `variables.css`, `lyrics.css` and
+`instrumental.css` ship inside the `@braccato/core` package and are copied to `blyrics/` when the
+extension is built, because they style the lyrics the renderer draws rather than the page around
+them. Edit them in that package; everything else under `blyrics/` and `ytmusic/` is source, in
+`public/css/`.
+
+None of this changes anything a theme selects on. The class names, the custom properties and the
+served paths are all the same as before, so a theme written against the old layout keeps working.
 
 Each file is organized into logical sections:
 
@@ -109,13 +121,13 @@ Each section uses CSS selectors to target specific HTML elements and apply style
 
 ## 3. Custom Properties (CSS Variables)
 
-In `blyrics/variables.css`, you'll see a `:root` selector with custom properties that define the visual theme and behavior of Better Lyrics:
+In `blyrics/variables.css` (shipped by `@braccato/core`), you'll see a `:root` selector with custom properties that define the visual theme and behavior of Better Lyrics:
 
 ```css
 :root {
   --blyrics-ui-text-color: var(--blyrics-text-color, color(display-p3 1 1 1 / 1));
   --blyrics-glow-color: var(--blyrics-highlight-color, color(display-p3 1 1 1 / 0.5));
-  --blyrics-font-family: Satoshi, Avenir, -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, Cantarell, Open Sans, Helvetica Neue, sans-serif;
+  --blyrics-font-family: Satoshi, var(--noto-sans-universal, "Noto Sans"), Avenir, -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, Cantarell, Open Sans, Helvetica Neue, sans-serif;
   /* ... more variables ... */
 }
 ```
@@ -141,7 +153,7 @@ These custom properties allow for easy customization of colors, sizes, and other
 
 | Variable                           | Default Value                                                                                                                                                        | Description                                                              |
 | ---------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------ |
-| `--blyrics-font-family`¹           | `Satoshi, var(--noto-sans-universal), Avenir, -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, Cantarell, Open Sans, Helvetica Neue, sans-serif` | Font family for lyrics                                                 |
+| `--blyrics-font-family`¹           | `Satoshi, var(--noto-sans-universal, "Noto Sans"), Avenir, -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, Cantarell, Open Sans, Helvetica Neue, sans-serif` | Font family for lyrics                                                 |
 | `--blyrics-font-size`              | `3rem`                                                                                                                                                               | Font size for lyrics                                                     |
 | `--blyrics-font-weight`            | `700`                                                                                                                                                                | Font weight for lyrics                                                   |
 | `--blyrics-line-height`            | `1.333`                                                                                                                                                              | Line height for lyrics                                                   |

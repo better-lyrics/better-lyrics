@@ -10,7 +10,7 @@
 		<nav id="navbar">
 			<h1>
 				<img src="/images/icons/icon-48.png" alt="Better Lyrics" width="24" height="24">
-				<div class="heading">Better Lyrics <span>2.4.0 1</span></div>
+				<div class="heading">Better Lyrics <span>2.4.0 2</span></div>
 			</h1>
 			<div class="nav-container">
 				<a href="https://github.com/better-lyrics/better-lyrics" target="_blank">
@@ -150,23 +150,18 @@
 						</label>
 					</div>
 					<div class="container">
-						<div class="setting-row__text">
-							<div class="setting-row__title-line">
-								<span>__MSG_options_display_pipAutoRestore__</span>
-								<span class="setting-help" tabindex="0" data-tooltip="__MSG_options_display_pipAutoRestoreTooltip__" aria-label="__MSG_options_display_pipAutoRestoreTooltip__">?</span>
-							</div>
-						</div>
-						<label>
-							<input type="checkbox" id="isPictureInPictureAutoRestoreEnabled">
-							<span class="checkmark"></span>
-						</label>
-					</div>
-					<div class="container">
 						<span>__MSG_options_display_shadersPromo__</span>
 						<label>
 							<input type="checkbox" id="isShadersPromoEnabled">
 							<span class="checkmark"></span>
 						</label>
+					</div>
+					<div class="container">
+						<span>__MSG_options_display_pipWindow__</span>
+						<button class="small-btn" id="pip-settings-btn">
+							<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><!-- Icon from Solar by 480 Design - https://creativecommons.org/licenses/by/4.0/ --><path d="M13 17c0-1.886 0-2.828.586-3.414S15.114 13 17 13h1c1.886 0 2.828 0 3.414.586S22 15.114 22 17s0 2.828-.586 3.414S19.886 21 18 21h-1c-1.886 0-2.828 0-3.414-.586S13 18.886 13 17"></path><path fill-rule="evenodd" d="M10 3h4c3.771 0 5.657 0 6.828 1.172c.95.949 1.13 2.694 1.164 5.328c.012.937.018 1.405-.275 1.703c-.294.297-.768.297-1.717.297h-2.5c-2.828 0-4.243 0-5.121.879c-.879.878-.879 2.293-.879 5.121v2c0 .466 0 .699-.076.883a1 1 0 0 1-.541.54C10.699 21 10.466 21 10 21c-3.771 0-5.657 0-6.828-1.172S2 16.771 2 13v-2c0-3.771 0-5.657 1.172-6.828S6.229 3 10 3M8.03 6.97a.75.75 0 0 0-1.06 1.06l2.72 2.72H8.5a.75.75 0 0 0 0 1.5h3a.75.75 0 0 0 .75-.75v-3a.75.75 0 0 0-1.5 0v1.19z" clip-rule="evenodd"></path></svg>
+							<span>__MSG_options_manage__</span>
+						</button>
 					</div>
 					<div class="container">
 						<span>__MSG_options_display_unisonActions__</span>
@@ -645,6 +640,61 @@
 				</div>
 				<div class="modal-footer">
 					<button id="dock-settings-reset" class="modal-btn modal-btn-secondary">__MSG_options_reset__</button>
+				</div>
+			</div>
+		</div>
+
+		<div id="pip-modal-overlay" class="modal-overlay">
+			<div class="modal">
+				<div class="modal-header">
+					<h3 class="modal-title">__MSG_options_display_pipWindow__</h3>
+					<button id="pip-modal-close" class="modal-close-btn" aria-label="Close">
+						<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+							<path d="M6.28 5.22a.75.75 0 0 0-1.06 1.06L8.94 10l-3.72 3.72a.75.75 0 1 0 1.06 1.06L10 11.06l3.72 3.72a.75.75 0 1 0 1.06-1.06L11.06 10l3.72-3.72a.75.75 0 0 0-1.06-1.06L10 8.94 6.28 5.22Z"></path>
+						</svg>
+					</button>
+				</div>
+				<div class="modal-body">
+					<div class="container">
+						<div class="setting-row__text">
+							<div class="setting-row__title-line">
+								<span>__MSG_options_display_pipAutoRestore__</span>
+								<span class="setting-help" tabindex="0" data-tooltip="__MSG_options_display_pipAutoRestoreTooltip__" aria-label="__MSG_options_display_pipAutoRestoreTooltip__">?</span>
+							</div>
+						</div>
+						<label>
+							<input type="checkbox" id="isPictureInPictureAutoRestoreEnabled">
+							<span class="checkmark"></span>
+						</label>
+					</div>
+					<div class="container">
+						<span>__MSG_options_display_pipArtworkTransition__</span>
+						<div class="select">
+							<select id="pipArtworkTransition">
+								<option value="shuffle">__MSG_options_pipTransition_shuffle__</option>
+								<option value="flip">__MSG_options_pipTransition_flip__</option>
+								<option value="push">__MSG_options_pipTransition_push__</option>
+								<option value="crossfade">__MSG_options_pipTransition_crossfade__</option>
+							</select>
+						</div>
+					</div>
+					<div class="container">
+						<span>__MSG_options_display_pipTextTransition__</span>
+						<div class="select">
+							<select id="pipTextTransition">
+								<option value="spring">__MSG_options_pipTransition_spring__</option>
+								<option value="push">__MSG_options_pipTransition_push__</option>
+								<option value="crossfade">__MSG_options_pipTransition_crossfade__</option>
+							</select>
+						</div>
+					</div>
+					<div class="container">
+						<span>__MSG_options_display_pipMarquee__</span>
+						<label>
+							<input type="checkbox" id="pipMarqueeEnabled">
+							<span class="checkmark"></span>
+						</label>
+					</div>
 				</div>
 			</div>
 		</div>

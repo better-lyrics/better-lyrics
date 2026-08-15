@@ -1,6 +1,7 @@
-import { type AuthPartner, AUTH_PORT_NAME_PREFIX, getAuthPartnerByOrigin, LOG_PREFIX_AUTH } from "@constants";
+import { AUTH_PORT_NAME_PREFIX, LOG_PREFIX_AUTH } from "@constants";
 import { initI18n, loadLocaleOverride, t } from "@core/i18n";
 import { getDisplayName } from "@core/keyIdentity";
+import { type AuthPartner, getAuthPartnerByOrigin } from "@modules/auth/partners";
 
 interface RequestParams {
   requestId: string;

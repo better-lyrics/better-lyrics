@@ -1,14 +1,13 @@
 import { LOG_PREFIX_EDITOR, THEME_SETTINGS_ATTRIBUTE_TYPE, THEME_SETTINGS_TYPES } from "@constants";
-import { compressString, decompressString, isCompressed } from "@core/compression";
-import { getLocalStorage, getSyncStorage, loadChunkedStyles } from "@core/storage";
+import { decompressString, isCompressed } from "@core/compression";
+import { buildStoreThemeContent, saveCustomCss } from "@core/customCss";
+import { getAppliedStoreThemeId, getLocalStorage, getSyncStorage, loadChunkedStyles } from "@core/storage";
 import { hexToRgbSum, invertRegExp } from "@/core/utils";
 import { setActiveStoreTheme } from "@/options/store/themeStoreManager";
 import type { InstalledStoreTheme } from "@/options/store/types";
 import type { ThemeSettingField } from "@/options/themes";
 import { fillThemeSettings } from "@/options/options";
-import { CHUNK_SIZE, LOCAL_STORAGE_SAFE_LIMIT, MAX_RETRY_ATTEMPTS, SYNC_STORAGE_LIMIT } from "../core/editor";
 import { editorStateManager } from "../core/state";
-import type { SaveResult } from "../types";
 import { syncIndicator } from "../ui/dom";
 import { ricsCompiler } from "./compiler";
 import { setThemeName, showThemeName, themeSourceToEditorSource } from "./themes";
@@ -22,186 +21,6 @@ interface CSSStorageData {
     saved?: Record<string, any>;
   } | null;
 }
-
-interface ChunkMetadata {
-  customCSS_chunked?: boolean;
-  customCSS_chunkCount?: number;
-}
-
-async function getStorageUsage(): Promise<{ used: number; total: number }> {
-  const bytesInUse = await chrome.storage.local.getBytesInUse();
-  return {
-    used: bytesInUse,
-    total: 5 * 1024 * 1024,
-  };
-}
-
-async function clearCSSChunks(): Promise<void> {
-  const allData = await chrome.storage.local.get(null);
-  const chunkKeys = Object.keys(allData).filter(key => key.startsWith("customCSS_chunk_"));
-  if (chunkKeys.length > 0) {
-    await chrome.storage.local.remove(chunkKeys);
-  }
-}
-
-async function clearLyricsCacheIfNeeded(requiredSpace: number): Promise<void> {
-  const usage = await getStorageUsage();
-  const availableSpace = usage.total - usage.used;
-
-  console.log(LOG_PREFIX_EDITOR, `Available space: ${availableSpace} bytes, Required: ${requiredSpace} bytes`);
-
-  if (availableSpace < requiredSpace) {
-    console.log(LOG_PREFIX_EDITOR, "Not enough space, clearing lyrics cache...");
-    const allData = await chrome.storage.local.get(null);
-    const lyricsKeys = Object.keys(allData).filter(key => key.startsWith("blyrics_"));
-
-    if (lyricsKeys.length > 0) {
-      console.log(LOG_PREFIX_EDITOR, `Removing ${lyricsKeys.length} cached lyrics entries`);
-      await chrome.storage.local.remove(lyricsKeys);
-
-      const newUsage = await getStorageUsage();
-      console.log(LOG_PREFIX_EDITOR, `Storage after cache clear: ${newUsage.used} / ${newUsage.total} bytes`);
-    }
-  }
-}
-
-async function saveChunkedCSS(css: string): Promise<void> {
-  console.log(LOG_PREFIX_EDITOR, `Saving CSS in chunks. Total size: ${css.length} bytes`);
-
-  const storageUsage = await getStorageUsage();
-  console.log(LOG_PREFIX_EDITOR, `Storage usage before save: ${storageUsage.used} / ${storageUsage.total} bytes`);
-
-  const estimatedSize = css.length * 1.2;
-  await clearLyricsCacheIfNeeded(estimatedSize);
-
-  const chunks: string[] = [];
-  for (let i = 0; i < css.length; i += CHUNK_SIZE) {
-    chunks.push(css.substring(i, i + CHUNK_SIZE));
-  }
-
-  console.log(LOG_PREFIX_EDITOR, `Splitting into ${chunks.length} chunks of ~${CHUNK_SIZE} bytes each`);
-
-  const oldMetadata = await getLocalStorage<ChunkMetadata>(["customCSS_chunkCount"]);
-  const oldChunkCount = oldMetadata.customCSS_chunkCount || 0;
-
-  for (let i = 0; i < chunks.length; i++) {
-    try {
-      await chrome.storage.local.set({ [`customCSS_chunk_${i}`]: chunks[i] });
-      console.log(LOG_PREFIX_EDITOR, `Saved chunk ${i + 1}/${chunks.length} (${chunks[i].length} bytes)`);
-    } catch (error) {
-      console.error(LOG_PREFIX_EDITOR, `Failed to save chunk ${i}:`, error);
-      throw error;
-    }
-  }
-
-  await chrome.storage.local.set({
-    customCSS_chunked: true,
-    customCSS_chunkCount: chunks.length,
-  });
-  await chrome.storage.sync.set({
-    cssStorageType: "chunked",
-    customCSS_chunkCount: chunks.length,
-  });
-
-  await chrome.storage.local.remove(["customCSS", "cssCompressed"]);
-  await chrome.storage.sync.remove("customCSS");
-
-  if (oldChunkCount > chunks.length) {
-    const extraChunkKeys = Array.from(
-      { length: oldChunkCount - chunks.length },
-      (_, i) => `customCSS_chunk_${chunks.length + i}`
-    );
-    await chrome.storage.local.remove(extraChunkKeys);
-  }
-
-  const finalUsage = await getStorageUsage();
-  console.log(LOG_PREFIX_EDITOR, `Storage usage after save: ${finalUsage.used} / ${finalUsage.total} bytes`);
-}
-
-export const getStorageStrategy = (css: string): "local" | "sync" | "chunked" => {
-  const cssSize = new Blob([css]).size;
-  if (cssSize > LOCAL_STORAGE_SAFE_LIMIT) {
-    return "chunked";
-  }
-  return cssSize > SYNC_STORAGE_LIMIT ? "local" : "sync";
-};
-
-export const saveToStorageWithFallback = async (
-  css?: string,
-  themeSettings?: {
-    fields?: Record<string, ThemeSettingField>;
-    saved?: Record<string, any>;
-  } | null,
-  _isTheme = false,
-  retryCount = 0
-): Promise<SaveResult> => {
-  if (!css) css = await loadCustomCSS(true);
-  if (!themeSettings) themeSettings = await loadThemeSettings();
-  try {
-    const cssSize = new Blob([css]).size;
-    console.log(LOG_PREFIX_EDITOR, `Saving CSS: ${cssSize} bytes (${(cssSize / 1024).toFixed(2)} KB)`);
-
-    const shouldCompress = cssSize > 50000;
-    const cssToStore = shouldCompress ? compressString(css) : css;
-    const compressedSize = new Blob([cssToStore]).size;
-
-    if (shouldCompress) {
-      const ratio = ((1 - compressedSize / cssSize) * 100).toFixed(1);
-      console.log(LOG_PREFIX_EDITOR, `Compressed: ${compressedSize} bytes (${ratio}% reduction)`);
-    }
-
-    const strategy = getStorageStrategy(cssToStore);
-    console.log(LOG_PREFIX_EDITOR, `Selected strategy: ${strategy}`);
-
-    if (strategy === "chunked") {
-      await saveChunkedCSS(cssToStore);
-      await chrome.storage.sync.set({ cssCompressed: shouldCompress, themeSettings });
-      return { success: true, strategy: "chunked" };
-    }
-
-    if (strategy === "local") {
-      const estimatedSize = compressedSize * 1.2;
-      await clearLyricsCacheIfNeeded(estimatedSize);
-      await chrome.storage.local.set({ customCSS: cssToStore, cssCompressed: shouldCompress, themeSettings });
-      await chrome.storage.sync.set({ cssStorageType: "local", cssCompressed: shouldCompress });
-      await clearCSSChunks();
-      await chrome.storage.sync.remove(["customCSS", "themeSettings"]);
-      console.log(LOG_PREFIX_EDITOR, "Saved to local storage");
-    } else {
-      await chrome.storage.sync.set({
-        customCSS: cssToStore,
-        cssStorageType: "sync",
-        cssCompressed: shouldCompress,
-        themeSettings,
-      });
-      await clearCSSChunks();
-      await chrome.storage.local.remove(["customCSS", "cssCompressed", "themeSettings"]);
-      console.log(LOG_PREFIX_EDITOR, "Saved to sync storage");
-    }
-
-    return { success: true, strategy };
-  } catch (error: any) {
-    console.error(LOG_PREFIX_EDITOR, "Storage save attempt failed:", error);
-
-    if (error.message?.includes("quota") && retryCount < MAX_RETRY_ATTEMPTS) {
-      try {
-        console.log(LOG_PREFIX_EDITOR, "Attempting chunked storage fallback...");
-        const cssSize = new Blob([css]).size;
-        const shouldCompress = cssSize > 50000;
-        const cssToStore = shouldCompress ? compressString(css) : css;
-
-        await saveChunkedCSS(cssToStore);
-        await chrome.storage.sync.set({ cssCompressed: shouldCompress, themeSettings });
-        return { success: true, strategy: "chunked", wasRetry: true };
-      } catch (chunkError) {
-        console.error(LOG_PREFIX_EDITOR, "Chunked storage fallback failed:", chunkError);
-        return { success: false, error: chunkError };
-      }
-    }
-
-    return { success: false, error };
-  }
-};
 
 export function getFieldValueOnAvailable(
   field: string,
@@ -562,9 +381,8 @@ interface ApplyStoreThemeOptions {
 export async function applyStoreThemeComplete(options: ApplyStoreThemeOptions): Promise<boolean> {
   const { themeId, css, title, creators, settings, source } = options;
   const cssModified = applyThemeSettingsToCSS(css, settings?.fields, settings?.saved);
-  const credit = `/* ${title}, a marketplace theme by ${creators.join(", ")} */\n\n`;
-  const themeContent = `${credit}${css}\n`;
-  const modThemeContent = `${credit}${cssModified}\n`;
+  const themeContent = buildStoreThemeContent(title, creators, css);
+  const modThemeContent = buildStoreThemeContent(title, creators, cssModified);
 
   try {
     editorStateManager.incrementSaveCount();
@@ -572,7 +390,7 @@ export async function applyStoreThemeComplete(options: ApplyStoreThemeOptions): 
     await chrome.storage.sync.set({ themeName: `store:${themeId}` });
     await setActiveStoreTheme(themeId);
 
-    const saveResult = await saveToStorageWithFallback(themeContent, settings, true);
+    const saveResult = await saveCustomCss(themeContent);
     if (!saveResult.success) {
       throw new Error("Failed to save theme to storage");
     }
@@ -726,13 +544,7 @@ class StorageManager {
       return;
     }
 
-    const syncData = await getSyncStorage<{ themeName?: string }>(["themeName"]);
-    const currentThemeName = syncData.themeName;
-
-    if (!currentThemeName?.startsWith("store:")) return;
-
-    const activeThemeId = currentThemeName.slice(6);
-    if (activeThemeId !== themeId) return;
+    if ((await getAppliedStoreThemeId()) !== themeId) return;
 
     const newTheme = change.newValue;
     if (!newTheme?.css || !newTheme?.title) return;
@@ -743,14 +555,12 @@ class StorageManager {
     }
 
     const themeVersion = newTheme.version || "unknown";
-    const themeCreators = Array.isArray(newTheme.creators) ? newTheme.creators.join(", ") : "Unknown";
     const cssModified = applyThemeSettingsToCSS(newTheme.css, newTheme.settings, newTheme.savedSettings);
 
     console.log(LOG_PREFIX_EDITOR, `Store theme updated: ${newTheme.title} v${themeVersion}`);
 
-    const credit = `/* ${newTheme.title}, a marketplace theme by ${themeCreators} */\n\n`;
-    const themeContent = `${credit}${newTheme.css}\n`;
-    const modThemeContent = `${credit}${cssModified}\n`;
+    const themeContent = buildStoreThemeContent(newTheme.title, newTheme.creators, newTheme.css);
+    const modThemeContent = buildStoreThemeContent(newTheme.title, newTheme.creators, cssModified);
     const displayName = newTheme.version ? `${newTheme.title} (v${newTheme.version})` : newTheme.title;
 
     await editorStateManager.queueOperation("storage", async () => {
@@ -760,7 +570,7 @@ class StorageManager {
       const editorSource = themeSourceToEditorSource(newTheme.source);
       showThemeName(displayName, editorSource);
 
-      const result = await saveToStorageWithFallback(themeContent, null, true);
+      const result = await saveCustomCss(themeContent);
       if (result.success && result.strategy) {
         showSyncSuccess(result.strategy, result.wasRetry);
         await broadcastRICSToTabs(modThemeContent, result.strategy);

@@ -1,13 +1,8 @@
 import { LOG_PREFIX_EDITOR } from "@constants";
+import { saveCustomCss } from "@core/customCss";
 import { editorStateManager } from "../core/state";
 import { showAlert } from "../ui/feedback";
-import {
-  applyThemeSettingsToCSS,
-  broadcastRICSToTabs,
-  loadCustomCSS,
-  saveToStorageWithFallback,
-  showSyncSuccess,
-} from "./storage";
+import { applyThemeSettingsToCSS, broadcastRICSToTabs, loadCustomCSS, showSyncSuccess } from "./storage";
 import { hideThemeName, updateThemeSelectorButton } from "./themes";
 import type { ThemeSettingField } from "@/options/themes";
 
@@ -146,18 +141,15 @@ class ImportManager {
         await editorStateManager.setEditorContent(css, `file-import:${filename}`, false);
 
         console.log(LOG_PREFIX_EDITOR, ` Step 4: Saving to storage`);
-        let result;
-        if (!skipSave) {
-          result = await saveToStorageWithFallback(css);
+        const result = await saveCustomCss(css);
 
-          if (!result.success || !result.strategy) {
-            throw new Error(`Storage save failed: ${result.error?.message || "Unknown error"}`);
-          }
+        if (!result.success || !result.strategy) {
+          throw new Error(`Storage save failed: ${result.error?.message || "Unknown error"}`);
         }
 
         console.log(LOG_PREFIX_EDITOR, ` Step 5: Sending update message`);
-        showSyncSuccess(result?.strategy || "local", result?.wasRetry);
-        await broadcastRICSToTabs(css, result?.strategy || "local");
+        showSyncSuccess(result.strategy, result.wasRetry);
+        await broadcastRICSToTabs(css, result.strategy);
 
         console.log(LOG_PREFIX_EDITOR, ` Import completed successfully`);
         showAlert(`Theme file "${filename}" imported successfully!`);

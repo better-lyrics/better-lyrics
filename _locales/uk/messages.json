@@ -91,6 +91,70 @@
     "message": "Автопрокрутка текстів пісень",
     "description": "Auto-scroll unsynced lyrics setting label"
   },
+  "picture_in_picture_open": {
+    "message": "Картинка в картинці",
+    "description": "Accessible label for the dock action that opens the floating lyrics window"
+  },
+  "picture_in_picture_previous": {
+    "message": "Назад",
+    "description": "Accessible label for the previous track button in the Picture-in-Picture lyrics window, used when the YouTube Music player bar exposes no label of its own"
+  },
+  "picture_in_picture_play": {
+    "message": "Відтворити",
+    "description": "Accessible label for the play button in the Picture-in-Picture lyrics window, used when the YouTube Music player bar exposes no label of its own"
+  },
+  "picture_in_picture_pause": {
+    "message": "Призупинити",
+    "description": "Accessible label for the pause button in the Picture-in-Picture lyrics window, used when the YouTube Music player bar exposes no label of its own"
+  },
+  "picture_in_picture_next": {
+    "message": "Далі",
+    "description": "Accessible label for the next track button in the Picture-in-Picture lyrics window, used when the YouTube Music player bar exposes no label of its own"
+  },
+  "options_display_pipAutoRestore": {
+    "message": "Автоматично відкривати вікно",
+    "description": "Setting label for automatically reopening the floating lyrics window after page load"
+  },
+  "options_display_pipAutoRestoreTooltip": {
+    "message": "Запобігає закриттю плавучого вікна текстів при перезавантаженні чи переходу між піснями й сторінками. Браузери дозволяють відкривати плавуче вікно лише після взаємодії зі сторінкою, тому воно відкриватиметься не миттєво, а при першому натисканні.",
+    "description": "Help tooltip explaining what automatic floating-lyrics reopening does and why it waits for the first interaction"
+  },
+  "options_display_pipArtworkTransition": {
+    "message": "Перехід обкладинки",
+    "description": "Setting label, shown inside the floating lyrics window settings, for choosing how album art changes between songs"
+  },
+  "options_pipTransition_shuffle": {
+    "message": "Тасування",
+    "description": "Name of an album art transition where the artwork tilts back and the new cover is dealt in like a playing card"
+  },
+  "options_pipTransition_flip": {
+    "message": "Перегортання",
+    "description": "Name of an album art transition where the artwork rotates like a card to reveal the new cover on its other side"
+  },
+  "options_pipTransition_push": {
+    "message": "Виштовхування",
+    "description": "Name of a transition, offered for both album art and song titles, where the new content slides in from the side and pushes the old out"
+  },
+  "options_pipTransition_crossfade": {
+    "message": "Плавна заміна",
+    "description": "Name of a transition, offered for both album art and song titles, where the new content fades in over the old"
+  },
+  "options_pipTransition_spring": {
+    "message": "Пружина",
+    "description": "Name of a song title transition where the words of the new title bounce up into place one after another"
+  },
+  "options_display_pipWindow": {
+    "message": "Плавуче вікно текстів",
+    "description": "Label for the row that opens the settings for the floating lyrics window"
+  },
+  "options_display_pipTextTransition": {
+    "message": "Перехід назви",
+    "description": "Setting label, shown inside the floating lyrics window settings, for choosing how the song title and artist change between songs"
+  },
+  "options_display_pipMarquee": {
+    "message": "Прогортувати довгі назви",
+    "description": "Toggle label for whether a song title too long for the floating lyrics window scrolls across so it can be read in full"
+  },
   "options_display_shadersPromo": {
     "message": "Показати посилання на Better Lyrics Shaders",
     "description": "Toggle label for the Shaders companion link shown in the lyrics footer"
@@ -154,6 +218,10 @@
   "options_unisonModal_controlSource": {
     "message": "Перемикач джерел",
     "description": "Toggle label for showing the lyrics source switcher control in the dock"
+  },
+  "options_unisonModal_controlPictureInPicture": {
+    "message": "Плавуче вікно текстів",
+    "description": "Toggle label for showing the control that opens the floating lyrics window in the dock"
   },
   "options_unisonModal_controlOffset": {
     "message": "Зсув синхронізації",
@@ -228,7 +296,7 @@
     "description": "Translation language setting label"
   },
   "options_sources_title": {
-    "message": "Пріоритет джерел текстів пісень",
+    "message": "Пріоритет джерел текстів",
     "description": "Sources settings section title"
   },
   "options_sources_description": {
@@ -276,7 +344,7 @@
     "description": "Theme marketplace button label"
   },
   "options_themes_installedThemes": {
-    "message": "Встановлені теми",
+    "message": "Установлені теми",
     "description": "Installed themes button label"
   },
   "options_identity_title": {
@@ -344,11 +412,11 @@
     "description": "Nickname save button label"
   },
   "options_nickname_reset": {
-    "message": "Скинути до типових",
+    "message": "Скинути",
     "description": "Nickname reset button label"
   },
   "options_nickname_modalTitle": {
-    "message": "Встановити псевдонім",
+    "message": "Установити псевдонім",
     "description": "Nickname modal title"
   },
   "options_nickname_edit": {
@@ -672,7 +740,7 @@
     "description": "Filter for compatible themes"
   },
   "marketplace_installFromUrl": {
-    "message": "Установити з URL-адреси",
+    "message": "Установити з посилання",
     "description": "Install from URL button"
   },
   "marketplace_submitTheme": {
@@ -720,7 +788,7 @@
     "description": "GitHub badge text"
   },
   "marketplace_urlModalTitle": {
-    "message": "Встановити з URL-адреси",
+    "message": "Установити з посилання",
     "description": "URL install modal title"
   },
   "marketplace_urlModalMessage": {
@@ -748,7 +816,7 @@
     "description": "URL permission explanation title"
   },
   "marketplace_urlPermissionDesc": {
-    "message": "Для встановлення тем із користувацьких URL GitHub Better Lyrics потрібні розширені дозволи. Це дає змогу:",
+    "message": "Для встановлення тем із власних GitHub-посилань Better Lyrics потрібні розширені дозволи. Це дає змогу:",
     "description": "URL permission description"
   },
   "marketplace_urlPermissionItem1": {
@@ -760,7 +828,7 @@
     "description": "URL permission list item 2"
   },
   "marketplace_urlPermissionItem3": {
-    "message": "Перевіряти структуру теми перед встановленням",
+    "message": "Перевіряти структуру теми перед установленням",
     "description": "URL permission list item 3"
   },
   "marketplace_urlPermissionNote": {
@@ -784,7 +852,7 @@
     "description": "Refresh shortcut label"
   },
   "marketplace_shortcutsInstallUrl": {
-    "message": "Встановити з URL-адреси",
+    "message": "Установити з посилання",
     "description": "Install from URL shortcut label"
   },
   "marketplace_shortcutsSort": {
@@ -908,7 +976,7 @@
     "description": "Footer link in the theme detail modal that opens the theme's discussion thread"
   },
   "marketplace_commit": {
-    "message": "Закомітити $hash$",
+    "message": "Комміт $hash$",
     "description": "Footer chip in the theme detail modal linking to the exact source commit a theme was built from",
     "placeholders": {
       "hash": {
@@ -1182,7 +1250,7 @@
     "description": "Shown in the sign-in consent popup when the connection to the extension's service worker is lost before the user can approve or cancel."
   },
   "lyrics_requestSyncedVersion": {
-    "message": "Запит синхронізованої версії",
+    "message": "Запросити синхронізовану версію",
     "description": "Button label asking the community to contribute synced lyrics for the current song"
   },
   "lyrics_requestedFirst": {
@@ -1190,11 +1258,11 @@
     "description": "Button label after a successful first-ever request for this song"
   },
   "lyrics_requestedOneOther": {
-    "message": "Запит створено · ще 1 особа хоче цього",
+    "message": "Запит створено · ще 1 користувач очікує",
     "description": "Button label after a successful request when exactly one other person has also requested"
   },
   "lyrics_requestedNOthers": {
-    "message": "Запит створено · ще $N$ осіб хочуть цього",
+    "message": "Запит створено · ще $N$ користувачів очікують",
     "description": "Button label after a successful request when N other people have also requested",
     "placeholders": {
       "n": {

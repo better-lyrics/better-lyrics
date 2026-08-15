@@ -91,6 +91,70 @@
     "message": "Asenkron sözleri otomatik kaydır",
     "description": "Auto-scroll unsynced lyrics setting label"
   },
+  "picture_in_picture_open": {
+    "message": "Resim içinde resim şarkı sözlerini aç",
+    "description": "Accessible label for the dock action that opens the floating lyrics window"
+  },
+  "picture_in_picture_previous": {
+    "message": "Önceki",
+    "description": "Accessible label for the previous track button in the Picture-in-Picture lyrics window, used when the YouTube Music player bar exposes no label of its own"
+  },
+  "picture_in_picture_play": {
+    "message": "Oynat",
+    "description": "Accessible label for the play button in the Picture-in-Picture lyrics window, used when the YouTube Music player bar exposes no label of its own"
+  },
+  "picture_in_picture_pause": {
+    "message": "Duraklat",
+    "description": "Accessible label for the pause button in the Picture-in-Picture lyrics window, used when the YouTube Music player bar exposes no label of its own"
+  },
+  "picture_in_picture_next": {
+    "message": "Sonraki",
+    "description": "Accessible label for the next track button in the Picture-in-Picture lyrics window, used when the YouTube Music player bar exposes no label of its own"
+  },
+  "options_display_pipAutoRestore": {
+    "message": "Süzülen şarkı sözlerini otomatik olarak yeniden aç",
+    "description": "Setting label for automatically reopening the floating lyrics window after page load"
+  },
+  "options_display_pipAutoRestoreTooltip": {
+    "message": "Şarkıları yeniden yüklediğinizde veya şarkılar ve sayfalar arasında geçiş yaptığınızda kayan şarkı sözü penceresinin tamamen kapanmasını önler. Tarayıcılar, yalnızca sayfayla etkileşime girdikten hemen sonra kayan bir pencerenin açılmasına izin verir, böylece anında değil, ilk tıklamanızda veya tuşa bastığınızda yeniden açılır.",
+    "description": "Help tooltip explaining what automatic floating-lyrics reopening does and why it waits for the first interaction"
+  },
+  "options_display_pipArtworkTransition": {
+    "message": "Albüm kapağı geçişi",
+    "description": "Setting label, shown inside the floating lyrics window settings, for choosing how album art changes between songs"
+  },
+  "options_pipTransition_shuffle": {
+    "message": "Karıştır",
+    "description": "Name of an album art transition where the artwork tilts back and the new cover is dealt in like a playing card"
+  },
+  "options_pipTransition_flip": {
+    "message": "Çevir",
+    "description": "Name of an album art transition where the artwork rotates like a card to reveal the new cover on its other side"
+  },
+  "options_pipTransition_push": {
+    "message": "İt",
+    "description": "Name of a transition, offered for both album art and song titles, where the new content slides in from the side and pushes the old out"
+  },
+  "options_pipTransition_crossfade": {
+    "message": "Çaprazgeçiş",
+    "description": "Name of a transition, offered for both album art and song titles, where the new content fades in over the old"
+  },
+  "options_pipTransition_spring": {
+    "message": "Sıçrama",
+    "description": "Name of a song title transition where the words of the new title bounce up into place one after another"
+  },
+  "options_display_pipWindow": {
+    "message": "Süzülen şarkı sözü penceresi",
+    "description": "Label for the row that opens the settings for the floating lyrics window"
+  },
+  "options_display_pipTextTransition": {
+    "message": "Başlık geçişi",
+    "description": "Setting label, shown inside the floating lyrics window settings, for choosing how the song title and artist change between songs"
+  },
+  "options_display_pipMarquee": {
+    "message": "Uzun başlıkları kaydır",
+    "description": "Toggle label for whether a song title too long for the floating lyrics window scrolls across so it can be read in full"
+  },
   "options_display_shadersPromo": {
     "message": "Better Lyrics Gölgelendiricileri bağlantısını göster",
     "description": "Toggle label for the Shaders companion link shown in the lyrics footer"
@@ -155,8 +219,12 @@
     "message": "Kaynak seçici",
     "description": "Toggle label for showing the lyrics source switcher control in the dock"
   },
+  "options_unisonModal_controlPictureInPicture": {
+    "message": "Yüzer pencere",
+    "description": "Toggle label for showing the control that opens the floating lyrics window in the dock"
+  },
   "options_unisonModal_controlOffset": {
-    "message": "Senkronizasyon kayması",
+    "message": "Senkronizasyon kaydırma",
     "description": "Toggle label for showing the sync offset control in the dock"
   },
   "lyricsDock_chooseSource": {
@@ -288,7 +356,7 @@
     "description": "Identity settings section description"
   },
   "options_identity_warning": {
-    "message": "Bunu bir şifre gibi düşünün. Asla paylaşmayın. Bir yedek oluşturun. Kaybolmuş bir kimliği, yöneticiler dahil kimse geri getiremez.",
+    "message": "Bunu bir şifre gibi düşünün. Asla paylaşmayın. Bir yedek oluşturun. Kaybolmuş bir kimliği, yöneticiler dahil kimse kurtaramaz.",
     "description": "Security warning in the Identity settings tab: keep the identity private and back it up because it is unrecoverable"
   },
   "options_identity_yourIdentity": {

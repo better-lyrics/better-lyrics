@@ -2,6 +2,7 @@
   "$schema": "https://unpkg.com/knip@5/schema.json",
   "entry": [
     "src/index.ts",
+    "src/pageWorld.ts",
     "src/options/background.ts",
     "src/options/options.ts",
     "src/options/editor.ts",

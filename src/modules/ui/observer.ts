@@ -3,40 +3,33 @@ import {
   FULLSCREEN_BUTTON_SELECTOR,
   GENERAL_ERROR_LOG,
   LOG_PREFIX,
-  LYRICS_CLASS,
   LYRICS_TAB_CLICKED_LOG,
   LYRICS_WRAPPER_ID,
-  PAUSING_LYRICS_SCROLL_LOG,
   SONG_SWITCHED_LOG,
   TAB_CONTENT_CLASS,
   TAB_HEADER_CLASS,
   TAB_RENDERER_SELECTOR,
-  USER_SCROLLING_CLASS,
 } from "@constants";
 import { AppState, handleModifications, type PlayerDetails, reloadLyrics } from "@core/appState";
 import { preFetchLyrics } from "@modules/lyrics/lyrics";
-import { getSongMetadata } from "@modules/lyrics/requestSniffer/requestSniffer";
+import { getArtworkMetadata, getSongMetadata } from "@modules/lyrics/requestSniffer/requestSniffer";
 import { onAutoSwitchEnabled, onFullScreenDisabled, wakeDockIdle } from "@modules/settings/settings";
-import {
-  animationEngine,
-  animEngineState,
-  cancelPendingLineScroll,
-  getResumeScrollElement,
-  noteAnimationVisibilityChange,
-} from "@modules/ui/animationEngine";
 import { adjustLyricOffset, OFFSET_STEP, OFFSET_STEP_LARGE } from "@modules/ui/lyricsDock/offset";
+import { currentTickOptions, mainView } from "@modules/ui/mainLyricsView";
+import { preloadArtwork } from "@modules/ui/pictureInPicture/lyricsView";
+import { revealQueueAutoplaySection } from "@modules/ui/queueAutoplay";
 import {
   closePlayerPageIfOpenedForFullscreen,
   isNavigating,
   isPlayerPageOpen,
   openPlayerPageForFullscreen,
 } from "@modules/ui/navigation";
+import { getResumeScrollElement } from "@modules/ui/resumeScrollButton";
 import { log } from "@utils";
 import {
   addThumbnail,
   cleanup,
   injectSongAttributes,
-  isLoaderActive,
   preloadHighResThumbnail,
   renderLoader,
   resetThumbnailState,
@@ -76,7 +69,12 @@ function runAnimationEngine(now: number, force = false): void {
     : 0;
   const currentTime = Math.min(latestPlayerTime + elapsedS, latestPlayerDuration || Infinity);
   if (AppState.suppressZeroTime < wallTime || currentTime !== 0) {
-    animationEngine(currentTime, wallTime, latestPlayerPlaying);
+    if (
+      AppState.areLyricsTicking &&
+      mainView.tick(currentTime, currentTickOptions(wallTime, latestPlayerPlaying)) === "lyrics-missing"
+    ) {
+      AppState.areLyricsTicking = false;
+    }
   }
 }
 
@@ -271,11 +269,11 @@ export function lyricReloader(): void {
         setTimeout(() => {
           tabRenderer.scrollTop = scrollPositions[i];
           // Don't start ticking until we set the height
-          AppState.areLyricsTicking = AppState.areLyricsLoaded && (i === 1 || AppState.isPictureInPictureOpen);
+          AppState.areLyricsTicking = AppState.areLyricsLoaded && i === 1;
         }, 0);
         currentTab = i;
 
-        if (i !== 1 && !AppState.isPictureInPictureOpen) {
+        if (i !== 1) {
           // stop ticking immediately
           AppState.areLyricsTicking = false;
         }
@@ -297,6 +295,7 @@ export function lyricReloader(): void {
     };
 
     tab1.addEventListener("click", onNonLyricTabClick);
+    tab1.addEventListener("click", revealQueueAutoplaySection);
     tab3.addEventListener("click", onNonLyricTabClick);
   } else {
     setTimeout(() => lyricReloader(), 1000);
@@ -314,7 +313,7 @@ export function initializeLyrics(): void {
   hasInitializedLyrics = true;
 
   document.addEventListener("visibilitychange", () => {
-    noteAnimationVisibilityChange();
+    mainView.noteVisibilityChange();
     if (document.visibilityState === "visible") {
       runAnimationEngine(performance.now(), true);
     }
@@ -354,13 +353,8 @@ export function initializeLyrics(): void {
       metadataAbortController = abortController;
 
       const videoIdAtStart = detail.videoId;
-      getSongMetadata(detail.videoId, 250, abortController.signal).then(async songMetadata => {
+      getArtworkMetadata(detail.videoId, 250, abortController.signal).then(songMetadata => {
         if (AppState.lastVideoId !== videoIdAtStart) return;
-
-        if (songMetadata?.isVideo && songMetadata.counterpartVideoId) {
-          songMetadata = await getSongMetadata(songMetadata.counterpartVideoId, 10, abortController.signal);
-          if (AppState.lastVideoId !== videoIdAtStart) return;
-        }
 
         if (songMetadata) {
           addThumbnail(songMetadata.smallThumbnail);
@@ -370,7 +364,10 @@ export function initializeLyrics(): void {
       });
     }
 
-    if (AppState.areLyricsTicking && AppState.areLyricsLoaded && !AppState.hasPreloadedNextSong) {
+    // Ticking is the side panel's business, but this warms the next song's artwork and lyrics for
+    // whichever view is on screen, and the floating window is a view the side panel cannot see.
+    const isAnyViewShowingLyrics = AppState.areLyricsTicking || AppState.isPictureInPictureOpen;
+    if (isAnyViewShowingLyrics && AppState.areLyricsLoaded && !AppState.hasPreloadedNextSong) {
       AppState.hasPreloadedNextSong = true;
       log(LOG_PREFIX, "Trying to preload next song");
       getSongMetadata(AppState.lastVideoId).then(async data => {
@@ -385,6 +382,9 @@ export function initializeLyrics(): void {
 
           if (next) {
             preloadHighResThumbnail(next.smallThumbnail);
+            // The floating window asks for a square crop, which is a different
+            // cache entry from the one above, so it needs warming separately.
+            if (AppState.isPictureInPictureOpen && next.thumbnail?.url) preloadArtwork(next.thumbnail.url);
             await preFetchLyrics(
               {
                 song: next.title,
@@ -427,7 +427,11 @@ export function initializeLyrics(): void {
       }
     }
 
-    if (document.visibilityState === "visible") {
+    // The only path that ticks while playback is paused, so it is what lands a pause on the running
+    // word animations. The floating window term is not about the window: an opener that owns one
+    // reports "hidden" for as long as it is open, however visible it actually is, so without it the
+    // side panel would keep sweeping the current line after the user hits pause.
+    if (document.visibilityState === "visible" || AppState.isPictureInPictureOpen) {
       runAnimationEngine(performance.now(), true);
     }
   });
@@ -443,24 +447,7 @@ export function scrollEventHandler(): void {
     return;
   }
 
-  if (animEngineState.skipScrolls > 0) {
-    animEngineState.skipScrolls--;
-    animEngineState.skipScrollsDecayTimes.shift();
-    return;
-  }
-  cancelPendingLineScroll();
-  if (!isLoaderActive()) {
-    if (animEngineState.scrollResumeTime < Date.now()) {
-      log(PAUSING_LYRICS_SCROLL_LOG);
-    }
-    const isPassive = AppState.lyricData?.syncType === "none";
-    animEngineState.scrollResumeTime = Date.now() + (isPassive ? 5000 : 25000);
-    animEngineState.wasUserScrolling = true;
-
-    getResumeScrollElement().removeAttribute("autoscroll-hidden");
-    const lyricsElement = document.getElementsByClassName(LYRICS_CLASS)[0] as HTMLElement;
-    lyricsElement.classList.add(USER_SCROLLING_CLASS);
-  }
+  mainView.noteUserScroll();
 }
 
 /**

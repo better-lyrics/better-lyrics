@@ -1,6 +1,6 @@
 {
   "manifest_version": 3,
-  "version": "2.4.0.1",
+  "version": "2.4.0.2",
   "default_locale": "en",
   "name": "Better Lyrics (Lyrics for YouTube Music)",
   "description": "__MSG_extensionDescription__",
@@ -41,6 +41,7 @@
         "*://music.youtube.com/*"
       ],
       "resources": [
+        "_locales/*/messages.json",
         "css/blyrics/*.css",
         "css/ytmusic/*.css",
         "css/disablestylizedanimations.css",
@@ -75,8 +76,9 @@
   "browser_specific_settings": {
     "gecko": {
       "id": "betterlyrics@boidu.dev",
-      "strict_min_version": "100.0"
-    }
+      "strict_min_version": "128.0"
+    },
+    "gecko_android": {}
   },
   "chrome:update_url": "https://clients2.google.com/service/update2/crx",
   "edge:key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAmNspBNCi4WHoRlH/rRPneLNqtWHzsEsK+Z4a7qmose6afikym7/5A/7I/OuXeJFqJXLc7YfWVUtdBWfHRSjT9Earq0wdOfElHyWnHQ1/cn55xbCdMJRSsVKEg3NRHWKbwpBFlt6XUog5sl48Gf+v6aZrv069MWEnXA13BEWqRX9hALG6WswyxaZXKokwH2AvnDDaWHrBghti6kmSNuXWCJj4c02YwZ5LgOJ3m5cI7bq/Mi7RtVuK+Odsj2/iESXAwNvLcMiOTW8vrioj/KfySjXpi16HCZIm0e6EvTq08CQUvIEpxV7Gaiq5w2j2TFKPMQ4aaHTiEgWMSZ0DeihLNQIDAQAB",
@@ -110,10 +112,20 @@
       ],
       "run_at": "document_end",
       "world": "MAIN"
+    },
+    {
+      "matches": [
+        "*://music.youtube.com/*"
+      ],
+      "js": [
+        "src/pageWorld.ts"
+      ],
+      "run_at": "document_end",
+      "world": "MAIN"
     }
   ],
   "action": {
     "default_popup": "src/options/options.html"
   },
-  "version_name": "2.4.0 1"
+  "version_name": "2.4.0 2"
 }

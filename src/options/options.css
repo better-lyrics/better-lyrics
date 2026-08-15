@@ -184,6 +184,12 @@ body {
     z-index: 100;
 }
 
+.setting-help[data-tooltip-placement="bottom"]::after {
+    top: calc(100% + 8px);
+    bottom: auto;
+    transform: translateX(-50%) translateY(-4px);
+}
+
 .setting-help:hover::after,
 .setting-help:focus-visible::after {
     opacity: 1;
@@ -2485,6 +2491,10 @@ input.cm-textfield:focus-visible {
 
 .unison-modal-row:first-of-type {
     margin-top: 0;
+}
+
+#pip-modal-overlay .container:first-of-type {
+	margin-top: 0;
 }
 
 .unison-modal-row__text {

@@ -221,6 +221,27 @@ export function getSongMetadata(
 }
 
 /**
+ * Resolves the metadata whose thumbnail is the square album art. A music video's own thumbnail is a
+ * 16:9 frame, so its audio counterpart is preferred whenever the queue exposes one.
+ *
+ * @param videoId
+ * @param maxCheckCount
+ * @param signal - AbortSignal to cancel polling
+ * @return
+ */
+export async function getArtworkMetadata(
+  videoId: string,
+  maxCheckCount = 250,
+  signal?: AbortSignal
+): Promise<VideoMetadata | null> {
+  const metadata = await getSongMetadata(videoId, maxCheckCount, signal);
+  if (metadata?.isVideo && metadata.counterpartVideoId) {
+    return getSongMetadata(metadata.counterpartVideoId, 10, signal);
+  }
+  return metadata;
+}
+
+/**
  * @param videoId
  * @param signal - AbortSignal to cancel polling
  * @return
