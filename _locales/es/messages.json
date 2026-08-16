@@ -340,7 +340,7 @@
     "description": "Button to open the style editor if there are no styles"
   },
   "options_themes_edit": {
-    "message": "Edit",
+    "message": "Editar",
     "description": "Button to open the style editor"
   },
   "options_themes_marketplace": {
