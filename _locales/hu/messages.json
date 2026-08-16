@@ -8,43 +8,43 @@
     "description": "The description of the extension"
   },
   "options_tab_general": {
-    "message": "General",
+    "message": "Általános",
     "description": "General settings tab label"
   },
   "options_tab_display": {
-    "message": "Display",
+    "message": "Megjelenés",
     "description": "Display settings tab label"
   },
   "options_tab_language": {
-    "message": "Language",
+    "message": "Nyelv",
     "description": "Language settings tab label"
   },
   "options_tab_sources": {
-    "message": "Sources",
+    "message": "Források",
     "description": "Sources settings tab label"
   },
   "options_tab_identity": {
-    "message": "Identity",
+    "message": "Azonosítás",
     "description": "Identity settings tab label"
   },
   "options_tab_themes": {
-    "message": "Themes",
+    "message": "Témák",
     "description": "Themes settings tab label"
   },
   "options_general_title": {
-    "message": "General Settings",
+    "message": "Általános Beállítások",
     "description": "General settings section title"
   },
   "options_general_description": {
-    "message": "Settings that affect the general behavior of Better Lyrics.",
+    "message": "A Better Lyrics általános működését befolyásoló beállítások.",
     "description": "General settings section description"
   },
   "options_general_showLogs": {
-    "message": "Show logs",
+    "message": "Naplózás megjelenítése",
     "description": "Show logs setting label"
   },
   "options_general_autoSwitch": {
-    "message": "Auto switch to lyrics tab",
+    "message": "Automatiku váltás a Dalszöveg nézetre",
     "description": "Auto switch to lyrics tab setting label"
   },
   "options_general_cache": {
@@ -52,15 +52,15 @@
     "description": "Cache section label"
   },
   "options_general_clearCache": {
-    "message": "Clear Cache",
+    "message": "Cache Törlése",
     "description": "Clear cache button label"
   },
   "options_general_totalLyrics": {
-    "message": "Total lyrics in cache",
+    "message": "A cache-ben lévő dalszövegek darabszáma",
     "description": "Total lyrics in cache label"
   },
   "options_general_cacheSize": {
-    "message": "Cache size",
+    "message": "A cache mérete",
     "description": "Cache size label"
   },
   "options_display_title": {
@@ -276,23 +276,23 @@
     "description": "Option label for automatic language detection based on browser settings"
   },
   "options_language_title": {
-    "message": "Language Settings",
+    "message": "Nyelvi Beállítások",
     "description": "Language settings section title"
   },
   "options_language_description": {
-    "message": "Language and translation settings for Better Lyrics.",
+    "message": "A Better Lyrics nyelvhez és fordításhoz kapcsolódó beállításai.",
     "description": "Language settings section description"
   },
   "options_language_romanization": {
-    "message": "Romanization",
+    "message": "Romanizáció",
     "description": "Romanization setting label"
   },
   "options_language_translate": {
-    "message": "Translate song lyrics",
+    "message": "Dalszövegek fordítása",
     "description": "Translate song lyrics setting label"
   },
   "options_language_translationLanguage": {
-    "message": "Translation language",
+    "message": "Fordítás nyelve",
     "description": "Translation language setting label"
   },
   "options_sources_title": {
@@ -352,11 +352,11 @@
     "description": "Installed themes button label"
   },
   "options_identity_title": {
-    "message": "Identity",
+    "message": "Azonosítás",
     "description": "Identity settings section title"
   },
   "options_identity_description": {
-    "message": "Your unique anonymous identity for Better Lyrics.",
+    "message": "Az egyedi Better Lyrics azonosítód.",
     "description": "Identity settings section description"
   },
   "options_identity_warning": {
@@ -364,7 +364,7 @@
     "description": "Security warning in the Identity settings tab: keep the identity private and back it up because it is unrecoverable"
   },
   "options_identity_yourIdentity": {
-    "message": "Your identity",
+    "message": "Az azonosítód",
     "description": "Your identity label"
   },
   "options_identity_loading": {
@@ -372,15 +372,15 @@
     "description": "Loading identity placeholder"
   },
   "options_identity_exportImport": {
-    "message": "Export/Import",
+    "message": "Exportálás/Importálás",
     "description": "Export/Import section label"
   },
   "options_identity_exportKey": {
-    "message": "Export Key",
+    "message": "Kulcs Exportálása",
     "description": "Export key button label"
   },
   "options_identity_importKey": {
-    "message": "Import Key",
+    "message": "Kulcs Importálása",
     "description": "Import key button label"
   },
   "options_identityImport_title": {
@@ -544,19 +544,19 @@
     "description": "Open in new tab tooltip"
   },
   "options_editor_backToSettings": {
-    "message": "Back to Settings",
+    "message": "Vissza a Beállításokhoz",
     "description": "Back to settings button label"
   },
   "options_editor_fullExperienceNote": {
-    "message": "For the full editor experience, ",
+    "message": "A teljes szerkesztőélményhez, ",
     "description": "Full editor experience note prefix"
   },
   "options_editor_openInNewTabLink": {
-    "message": "open this editor in a new tab",
+    "message": "nyisd meg a szerkesztőt új lapon",
     "description": "Open in new tab link text"
   },
   "options_editor_stylingGuide": {
-    "message": "Styling Guide",
+    "message": "Stílusútmutató",
     "description": "Styling guide link text"
   },
   "options_editor_renameTheme": {
@@ -624,7 +624,7 @@
     "description": "Word sync type tooltip"
   },
   "options_syncType_line": {
-    "message": "Line",
+    "message": "Sor",
     "description": "Line sync type label"
   },
   "options_syncType_line_tooltip": {
@@ -632,7 +632,7 @@
     "description": "Line sync type tooltip"
   },
   "options_syncType_unsynced": {
-    "message": "Unsynced",
+    "message": "Időzítetlen",
     "description": "Unsynced sync type label"
   },
   "options_syncType_unsynced_tooltip": {
@@ -768,7 +768,7 @@
     "description": "Grant permission button"
   },
   "marketplace_install": {
-    "message": "Install",
+    "message": "Telepítés",
     "description": "Install button"
   },
   "marketplace_remove": {
@@ -792,15 +792,15 @@
     "description": "GitHub badge text"
   },
   "marketplace_urlModalTitle": {
-    "message": "Install from URL",
+    "message": "Telepítés URL-ből",
     "description": "URL install modal title"
   },
   "marketplace_urlModalMessage": {
-    "message": "Enter a GitHub repository URL to install a theme directly:",
+    "message": "Adj meg egy GitHub URL-t, hogy telepítesd a témát:",
     "description": "URL install modal message"
   },
   "marketplace_urlModalPlaceholder": {
-    "message": "github.com/user/repo or github.com/user/repo/tree/branch",
+    "message": "github.com/user/repo vagy github.com/user/repo/tree/branch",
     "description": "URL input placeholder"
   },
   "marketplace_urlModalError": {
@@ -808,7 +808,7 @@
     "description": "URL validation error"
   },
   "marketplace_cancel": {
-    "message": "Cancel",
+    "message": "Mégse",
     "description": "Cancel button"
   },
   "marketplace_urlPermissionTitle": {
@@ -1014,15 +1014,15 @@
     "description": "Editor tip text"
   },
   "editor_poweredBy": {
-    "message": "Powered by",
+    "message": "Működteti",
     "description": "Powered by label"
   },
   "editor_playground": {
-    "message": "Playground",
+    "message": "Játszótér",
     "description": "Playground link text"
   },
   "editor_docs": {
-    "message": "Docs",
+    "message": "Segítség",
     "description": "Docs link text"
   },
   "lyrics_source": {
@@ -1062,11 +1062,11 @@
     "description": "Resume Autoscroll button label"
   },
   "options_language_exclusions": {
-    "message": "Language exclusions",
+    "message": "Kivételek",
     "description": "Label for language exclusions setting"
   },
   "options_manage": {
-    "message": "Manage",
+    "message": "Kezelés",
     "description": "Manage button label"
   },
   "options_language_exclusionsTitle": {
