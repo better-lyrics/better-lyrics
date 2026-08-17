@@ -1,10 +1,10 @@
 {
   "extensionName": {
-    "message": "Better Lyrics (Lyrics for YouTube Music)",
+    "message": "Better Lyrics (Dalszövegek a YouTube Music-hez)",
     "description": "The name of the extension"
   },
   "extensionDescription": {
-    "message": "Enhance YouTube Music with beautiful time-synced lyrics, multilingual support, real-time translations and more",
+    "message": "Fejleszd tovább a YouTube Music-et gyönyörű időzített dalszövegekkel, többnyelvű támogatással, valós idejű fordítással és még sok mással",
     "description": "The description of the extension"
   },
   "options_tab_general": {
@@ -64,55 +64,55 @@
     "description": "Cache size label"
   },
   "options_display_title": {
-    "message": "Display Settings",
+    "message": "Megjelenési Beállítások",
     "description": "Display settings section title"
   },
   "options_display_description": {
-    "message": "Fine-tune the appearance of Better Lyrics.",
+    "message": "Finomhangold a Better Lyrics megjelenését.",
     "description": "Display settings section description"
   },
   "options_display_disableFullscreen": {
-    "message": "Disable fullscreen mode",
+    "message": "Teljesképernyős mód letiltása",
     "description": "Disable fullscreen mode setting label"
   },
   "options_display_autoHideCursor": {
-    "message": "Auto-hide cursor in fullscreen mode",
+    "message": "Kurzor elrejtése teljesképernyős módban",
     "description": "Auto-hide cursor setting label"
   },
   "options_display_albumArt": {
-    "message": "Show blurred album art background",
+    "message": "Homályosított albumborító megjelenítése a háttérben",
     "description": "Show album art background setting label"
   },
   "options_display_stylizedAnimations": {
-    "message": "Show stylized animations",
+    "message": "Stilizált animációk megjelenítése",
     "description": "Show stylized animations setting label"
   },
   "options_display_passiveScroll": {
-    "message": "Auto-scroll unsynced lyrics",
+    "message": "Automatikus görgetés időzítetlen dalszövegeknél",
     "description": "Auto-scroll unsynced lyrics setting label"
   },
   "picture_in_picture_open": {
-    "message": "Open Picture-in-Picture lyrics",
+    "message": "Kép a képben dalszöveg megnyitása",
     "description": "Accessible label for the dock action that opens the floating lyrics window"
   },
   "picture_in_picture_previous": {
-    "message": "Previous",
+    "message": "Előző",
     "description": "Accessible label for the previous track button in the Picture-in-Picture lyrics window, used when the YouTube Music player bar exposes no label of its own"
   },
   "picture_in_picture_play": {
-    "message": "Play",
+    "message": "Lejátszás",
     "description": "Accessible label for the play button in the Picture-in-Picture lyrics window, used when the YouTube Music player bar exposes no label of its own"
   },
   "picture_in_picture_pause": {
-    "message": "Pause",
+    "message": "Szünet",
     "description": "Accessible label for the pause button in the Picture-in-Picture lyrics window, used when the YouTube Music player bar exposes no label of its own"
   },
   "picture_in_picture_next": {
-    "message": "Next",
+    "message": "Következő",
     "description": "Accessible label for the next track button in the Picture-in-Picture lyrics window, used when the YouTube Music player bar exposes no label of its own"
   },
   "options_display_pipAutoRestore": {
-    "message": "Reopen floating lyrics automatically",
+    "message": "Kép a képben dalszöveg automatikus újranyitása",
     "description": "Setting label for automatically reopening the floating lyrics window after page load"
   },
   "options_display_pipAutoRestoreTooltip": {
@@ -120,55 +120,55 @@
     "description": "Help tooltip explaining what automatic floating-lyrics reopening does and why it waits for the first interaction"
   },
   "options_display_pipArtworkTransition": {
-    "message": "Album art transition",
+    "message": "Albumborítő áttűnés",
     "description": "Setting label, shown inside the floating lyrics window settings, for choosing how album art changes between songs"
   },
   "options_pipTransition_shuffle": {
-    "message": "Shuffle",
+    "message": "Véletlenszerű lejátszás",
     "description": "Name of an album art transition where the artwork tilts back and the new cover is dealt in like a playing card"
   },
   "options_pipTransition_flip": {
-    "message": "Flip",
+    "message": "Átfordulás",
     "description": "Name of an album art transition where the artwork rotates like a card to reveal the new cover on its other side"
   },
   "options_pipTransition_push": {
-    "message": "Push",
+    "message": "Eltolás",
     "description": "Name of a transition, offered for both album art and song titles, where the new content slides in from the side and pushes the old out"
   },
   "options_pipTransition_crossfade": {
-    "message": "Crossfade",
+    "message": "Átfedés",
     "description": "Name of a transition, offered for both album art and song titles, where the new content fades in over the old"
   },
   "options_pipTransition_spring": {
-    "message": "Spring",
+    "message": "Rugózás",
     "description": "Name of a song title transition where the words of the new title bounce up into place one after another"
   },
   "options_display_pipWindow": {
-    "message": "Floating lyrics window",
+    "message": "Kép a képben dalszöveg ablak",
     "description": "Label for the row that opens the settings for the floating lyrics window"
   },
   "options_display_pipTextTransition": {
-    "message": "Title transition",
+    "message": "Cím áttűnés",
     "description": "Setting label, shown inside the floating lyrics window settings, for choosing how the song title and artist change between songs"
   },
   "options_display_pipMarquee": {
-    "message": "Scroll long titles",
+    "message": "Hosszú címek görgetése",
     "description": "Toggle label for whether a song title too long for the floating lyrics window scrolls across so it can be read in full"
   },
   "options_display_shadersPromo": {
-    "message": "Show link to Better Lyrics Shaders",
+    "message": "Better Lyrics Shaders link mutatása",
     "description": "Toggle label for the Shaders companion link shown in the lyrics footer"
   },
   "options_display_unisonActions": {
-    "message": "Lyrics controls dock",
+    "message": "Dalszövegirányító dokk",
     "description": "Display-section row label for the lyrics controls dock modal trigger"
   },
   "options_unisonModal_title": {
-    "message": "Lyrics controls dock",
+    "message": "Dalszövegirányító dokk",
     "description": "Title of the lyrics controls dock settings modal"
   },
   "options_unisonModal_showPinned": {
-    "message": "Show controls dock",
+    "message": "Irányító dokk megjelenítése",
     "description": "Toggle label inside the lyrics controls dock modal for showing the floating dock"
   },
   "options_unisonModal_showPinned_hint": {
@@ -176,103 +176,103 @@
     "description": "Hint text under the Show controls dock toggle"
   },
   "options_unisonModal_autoHide": {
-    "message": "Auto-hide in fullscreen",
+    "message": "Automatikus elrejtés teljesképernyős módban",
     "description": "Toggle label inside the Unison Actions modal for auto-hiding the dock when idle in fullscreen"
   },
   "options_unisonModal_autoHide_hint": {
-    "message": "Hide the floating control when you are idle in fullscreen mode",
+    "message": "A lebegő vezérlő elrejtése amikor inaktív vagy teljesképernyős módban",
     "description": "Hint text under the Auto-hide in fullscreen toggle"
   },
   "options_unisonModal_position": {
-    "message": "Position",
+    "message": "Pozíció",
     "description": "Label above the visual position picker in the Unison Actions modal"
   },
   "options_unisonModal_position_topLeft": {
-    "message": "Top left",
+    "message": "Bal felső",
     "description": "Tooltip for the top-left cell in the Unison position picker"
   },
   "options_unisonModal_position_topCenter": {
-    "message": "Top center",
+    "message": "Középen felül",
     "description": "Tooltip for the top-center cell in the Unison position picker"
   },
   "options_unisonModal_position_topRight": {
-    "message": "Top right",
+    "message": "Jobb felső",
     "description": "Tooltip for the top-right cell in the Unison position picker"
   },
   "options_unisonModal_position_bottomLeft": {
-    "message": "Bottom left",
+    "message": "Bal alsó",
     "description": "Tooltip for the bottom-left cell in the Unison position picker"
   },
   "options_unisonModal_position_bottomCenter": {
-    "message": "Bottom center",
+    "message": "Középen alul",
     "description": "Tooltip for the bottom-center cell in the Unison position picker"
   },
   "options_unisonModal_position_bottomRight": {
-    "message": "Bottom right",
+    "message": "Jobb alsó",
     "description": "Tooltip for the bottom-right cell in the Unison position picker"
   },
   "options_unisonModal_controlsShown": {
-    "message": "Controls shown",
+    "message": "Megjelenített vezérlők",
     "description": "Label above the toggles that pick which controls appear in the lyrics dock"
   },
   "options_unisonModal_controlSource": {
-    "message": "Source switcher",
+    "message": "Forrásváltó",
     "description": "Toggle label for showing the lyrics source switcher control in the dock"
   },
   "options_unisonModal_controlPictureInPicture": {
-    "message": "Floating window",
+    "message": "Kép a képben ablak",
     "description": "Toggle label for showing the control that opens the floating lyrics window in the dock"
   },
   "options_unisonModal_controlOffset": {
-    "message": "Sync offset",
+    "message": "Időzítés eltolása",
     "description": "Toggle label for showing the sync offset control in the dock"
   },
   "lyricsDock_chooseSource": {
-    "message": "Choose lyrics source",
+    "message": "Dalszövegforrás kiválasztása",
     "description": "Accessible label for the lyrics dock button that opens the source provider dropdown"
   },
   "lyricsDock_previousSource": {
-    "message": "Previous source",
+    "message": "Előző forrás",
     "description": "Accessible label for the lyrics dock button that switches to the previous lyrics provider"
   },
   "lyricsDock_nextSource": {
-    "message": "Next source",
+    "message": "Következő forrás",
     "description": "Accessible label for the lyrics dock button that switches to the next lyrics provider"
   },
   "lyricsDock_offsetEarlier": {
-    "message": "Shift lyrics earlier",
+    "message": "Dalszöveg előbbre tolása",
     "description": "Accessible label for the lyrics dock button that nudges sync timing earlier"
   },
   "lyricsDock_offsetLater": {
-    "message": "Shift lyrics later",
+    "message": "Dalszöveg későbbre tolása",
     "description": "Accessible label for the lyrics dock button that nudges sync timing later"
   },
   "lyricsDock_offsetGlobal": {
-    "message": "Global",
+    "message": "Globális",
     "description": "Label in the lyrics dock offset menu for the global offset applied to all songs and sync types"
   },
   "options_offsetModal_perSong": {
-    "message": "Per-song offsets",
+    "message": "Zenénkénti eltolás",
     "description": "Heading in the offset settings modal for the section that manages saved per-song sync offsets"
   },
   "options_offsetModal_perSongClear": {
-    "message": "Clear all",
+    "message": "Összes törlése",
     "description": "Button in the offset settings modal that deletes every saved per-song sync offset"
   },
   "options_offsetModal_perSongCount": {
-    "message": "Saved offsets",
+    "message": "Mentett eltolások",
     "description": "Label in the offset settings modal showing how many per-song sync offsets are stored"
   },
   "options_offsetModal_appliesTo": {
-    "message": "Applies to",
+    "message": "Vonatkozik:",
     "description": "Label in the offset settings modal preceding the list of sync types a given offset affects"
   },
   "options_language_displayLanguage": {
-    "message": "Display Language",
+    "message": "Megjelenítési nyelv",
     "description": "Label for the UI language selector dropdown"
   },
   "options_language_displayLanguageAuto": {
-    "message": "Auto",
+    "message": "Automatikus",
     "description": "Option label for automatic language detection based on browser settings"
   },
   "options_language_title": {
@@ -296,11 +296,11 @@
     "description": "Translation language setting label"
   },
   "options_sources_title": {
-    "message": "Lyric Source Preference",
+    "message": "Dalszöveg-forrás Beállítások",
     "description": "Sources settings section title"
   },
   "options_sources_description": {
-    "message": "Drag to reorder priority. Higher sources are tried first. Uncheck to disable.",
+    "message": "Húzd az elemeket a prioritás megváltoztatásához. A magasabban lévő forrásokat próbáljuk ki először. Kapcsolja ki az elemeket a letiltásukhoz.",
     "description": "Sources settings section description"
   },
   "options_sources_openUnison": {
@@ -308,47 +308,47 @@
     "description": "Label on the small button in the Sources section header that opens the Unison page"
   },
   "options_themes_title": {
-    "message": "Theme Settings",
+    "message": "Témabeállítások",
     "description": "Theme settings section title"
   },
   "options_themes_description": {
-    "message": "Customize the appearance of Better Lyrics.",
+    "message": "Szabd testre a Better Lyrics megjelenését.",
     "description": "Theme settings section description"
   },
   "options_themes_theme": {
-    "message": "Theme",
+    "message": "Téma",
     "description": "Theme label"
   },
   "options_themes_chooseTheme": {
-    "message": "Choose a theme",
+    "message": "Téma kiválasztása",
     "description": "Choose a theme button label"
   },
   "options_themes_change": {
-    "message": "Change",
+    "message": "Csere",
     "description": "Change theme button label"
   },
   "options_themes_customTheme": {
-    "message": "Custom Theme",
+    "message": "Egyéni Téma",
     "description": "Display name for unnamed custom themes"
   },
   "options_themes_customStyles": {
-    "message": "Custom Styles",
+    "message": "Saját Stílusok",
     "description": "Custom styles label"
   },
   "options_themes_create": {
-    "message": "Create",
+    "message": "Létrehozás",
     "description": "Button to open the style editor if there are no styles"
   },
   "options_themes_edit": {
-    "message": "Edit",
+    "message": "Szerkesztés",
     "description": "Button to open the style editor"
   },
   "options_themes_marketplace": {
-    "message": "Theme Marketplace",
+    "message": "Téma Piactér",
     "description": "Theme marketplace button label"
   },
   "options_themes_installedThemes": {
-    "message": "Installed Themes",
+    "message": "Telepített Témák",
     "description": "Installed themes button label"
   },
   "options_identity_title": {
@@ -360,7 +360,7 @@
     "description": "Identity settings section description"
   },
   "options_identity_warning": {
-    "message": "Treat this like your password. Never share it. Export a backup. No one can recover a lost identity, not even admins.",
+    "message": "Ezt kezeld úgy, mint a jelszavad. Soha ne oszd meg. Exportálj biztonsági mentést. Senki nem tud visszaállítani egy elvesztett azonosítót, még a rendszergazdák sem.",
     "description": "Security warning in the Identity settings tab: keep the identity private and back it up because it is unrecoverable"
   },
   "options_identity_yourIdentity": {
@@ -368,7 +368,7 @@
     "description": "Your identity label"
   },
   "options_identity_loading": {
-    "message": "Loading...",
+    "message": "Betöltés...",
     "description": "Loading identity placeholder"
   },
   "options_identity_exportImport": {
@@ -384,119 +384,119 @@
     "description": "Import key button label"
   },
   "options_identityImport_title": {
-    "message": "Import Identity",
+    "message": "Azonosító Importálása",
     "description": "Title of the import identity modal"
   },
   "options_identityImport_chooseFile": {
-    "message": "Choose File",
+    "message": "File Kiválasztása",
     "description": "Label for the file picker button in the import identity modal"
   },
   "options_identityImport_or": {
-    "message": "or",
+    "message": "vagy",
     "description": "Divider between file picker and paste textarea in the import identity modal"
   },
   "options_identityImport_pastePlaceholder": {
-    "message": "Paste identity JSON here...",
+    "message": "Illeszd be az azonosító JSON-t ide...",
     "description": "Placeholder for the identity JSON textarea"
   },
   "options_identityImport_import": {
-    "message": "Import",
+    "message": "Importálás",
     "description": "Confirm button label inside the import identity modal"
   },
   "options_nickname_description": {
-    "message": "Pick a name for yourself across Better Lyrics. Letters, numbers, and underscore, 3 to 20 characters.",
+    "message": "Válassz egy becenevet magadnak, amit a Better Lyrics-en használhatsz. Betűk (angol ábécé), számok és alsóvonal, 3 és 20 karakter között.",
     "description": "Nickname subsection description"
   },
   "options_nickname_placeholder": {
-    "message": "Pick a nickname",
+    "message": "Válassz becenevet",
     "description": "Nickname input placeholder"
   },
   "options_nickname_save": {
-    "message": "Save",
+    "message": "Mentés",
     "description": "Nickname save button label"
   },
   "options_nickname_reset": {
-    "message": "Reset to default",
+    "message": "Visszaállítás",
     "description": "Nickname reset button label"
   },
   "options_nickname_modalTitle": {
-    "message": "Set your nickname",
+    "message": "Becenév beállítása",
     "description": "Nickname modal title"
   },
   "options_nickname_edit": {
-    "message": "Edit",
+    "message": "Szerkesztés",
     "description": "Nickname edit button label"
   },
   "options_nickname_editLabel": {
-    "message": "Edit nickname",
+    "message": "Becenév szerkesztése",
     "description": "Accessible label for the nickname edit button"
   },
   "options_nickname_status_checking": {
-    "message": "Checking...",
+    "message": "Ellenőrzés...",
     "description": "Status while checking nickname availability"
   },
   "options_nickname_status_available": {
-    "message": "Available",
+    "message": "Szabad",
     "description": "Status when nickname is available"
   },
   "options_nickname_status_taken": {
-    "message": "Already taken",
+    "message": "Már foglalt",
     "description": "Status when nickname is already taken"
   },
   "options_nickname_status_invalid": {
-    "message": "3 to 20 letters, numbers, or underscores",
+    "message": "Betűk (angol ábécé), számok és alsóvonal, 3 és 20 karakter között.",
     "description": "Status when nickname format is invalid"
   },
   "options_nickname_status_profane": {
-    "message": "Not allowed, try another",
+    "message": "Nem megengedett, próbálj másikat",
     "description": "Status when nickname is flagged as inappropriate by the server"
   },
   "options_nickname_status_self": {
-    "message": "This is your current nickname",
+    "message": "Ez a jelenlegi beceneved",
     "description": "Status when entered nickname matches current"
   },
   "options_nickname_status_saved": {
-    "message": "Saved",
+    "message": "Mentve",
     "description": "Status when nickname is saved"
   },
   "options_nickname_status_submitting": {
-    "message": "Saving...",
+    "message": "Mentés...",
     "description": "Status while nickname save is in flight"
   },
   "options_nickname_status_rateLimited": {
-    "message": "Slow down, try again in a moment",
+    "message": "Lassíts, próbáld újra egy perc múlva",
     "description": "Status when nickname checks are rate limited"
   },
   "options_nickname_status_error": {
-    "message": "Could not reach the server",
+    "message": "A szerver nem érhető el",
     "description": "Status when nickname request fails"
   },
   "options_alert_importEmpty": {
-    "message": "Paste identity JSON or choose a file first.",
+    "message": "Először illeszd be az azonosító JSON-t vagy válassz egy file-t.",
     "description": "Shown when the user clicks Import with no JSON provided"
   },
   "options_modal_selectTheme": {
-    "message": "Select a Theme",
+    "message": "Téma Kiválasztása",
     "description": "Theme modal title"
   },
   "options_modal_cancel": {
-    "message": "Cancel",
+    "message": "Mégse",
     "description": "Cancel button label"
   },
   "options_modal_confirm": {
-    "message": "Confirm",
+    "message": "Megerősítés",
     "description": "Confirm button label"
   },
   "options_alert_cacheCleared": {
-    "message": "Cache cleared successfully!",
+    "message": "A cache sikeresen törölve!",
     "description": "Cache cleared success message"
   },
   "options_alert_cacheClearFailed": {
-    "message": "Failed to clear cache!",
+    "message": "A cache törlése sikertelen!",
     "description": "Cache clear failed message"
   },
   "options_alert_nothingToClear": {
-    "message": "Nothing to clear!",
+    "message": "Nincs mit törölni!",
     "description": "Nothing to clear message"
   },
   "options_alert_exportFailed": {
@@ -528,11 +528,11 @@
     "description": "Saving indicator text"
   },
   "options_editor_importFile": {
-    "message": "Import from file",
+    "message": "Importálás file-ból",
     "description": "Import from file tooltip"
   },
   "options_editor_exportFile": {
-    "message": "Export to file",
+    "message": "Exportálás file-ba",
     "description": "Export to file tooltip"
   },
   "options_editor_saveAsTheme": {
@@ -668,15 +668,15 @@
     "description": "Page title"
   },
   "marketplace_title": {
-    "message": "Theme Marketplace",
+    "message": "Téma Piactér",
     "description": "Header title"
   },
   "marketplace_subtitle": {
-    "message": "Discover and install community themes",
+    "message": "Fedezz fel és telepíts a közösség által készített témákat",
     "description": "Header subtitle"
   },
   "marketplace_searchPlaceholder": {
-    "message": "Search themes...",
+    "message": "Témák keresése...",
     "description": "Search input placeholder"
   },
   "marketplace_refresh": {
@@ -688,11 +688,11 @@
     "description": "Keyboard shortcuts button label"
   },
   "marketplace_sortBy": {
-    "message": "Sort by",
+    "message": "Rendezési szempontok",
     "description": "Sort filter group label"
   },
   "marketplace_sortRatingDesc": {
-    "message": "Highest rated",
+    "message": "Legmagasabban értékelt",
     "description": "Sort by highest rating"
   },
   "marketplace_sortRatingAsc": {
@@ -700,7 +700,7 @@
     "description": "Sort by lowest rating"
   },
   "marketplace_sortDownloadsDesc": {
-    "message": "Most downloaded",
+    "message": "Legtöbbet letöltött",
     "description": "Sort by most downloads"
   },
   "marketplace_sortDownloadsAsc": {
@@ -708,7 +708,7 @@
     "description": "Sort by least downloads"
   },
   "marketplace_sortNewest": {
-    "message": "Newest",
+    "message": "Legújabb",
     "description": "Sort by newest"
   },
   "marketplace_sortOldest": {
@@ -720,15 +720,15 @@
     "description": "Show filter group label"
   },
   "marketplace_showAll": {
-    "message": "All",
+    "message": "Mind",
     "description": "Show all themes"
   },
   "marketplace_showInstalled": {
-    "message": "Installed",
+    "message": "Telepített",
     "description": "Show installed themes"
   },
   "marketplace_showNotInstalled": {
-    "message": "Not installed",
+    "message": "Nem telepített",
     "description": "Show not installed themes"
   },
   "marketplace_options": {
@@ -736,19 +736,19 @@
     "description": "Options filter group label"
   },
   "marketplace_hasShaders": {
-    "message": "Has shaders",
+    "message": "Shader-hez kötött",
     "description": "Filter for themes with shaders"
   },
   "marketplace_compatibleOnly": {
-    "message": "Compatible only",
+    "message": "Csak kompatibilis",
     "description": "Filter for compatible themes"
   },
   "marketplace_installFromUrl": {
-    "message": "Install from URL",
+    "message": "Telepítés URL-ből",
     "description": "Install from URL button"
   },
   "marketplace_submitTheme": {
-    "message": "Submit a theme",
+    "message": "Téma beküldése",
     "description": "Submit a theme link"
   },
   "marketplace_loading": {
@@ -764,7 +764,7 @@
     "description": "Empty state message"
   },
   "marketplace_grantPermission": {
-    "message": "Grant Permission",
+    "message": "Hozzáférés Megadása",
     "description": "Grant permission button"
   },
   "marketplace_install": {
@@ -772,11 +772,11 @@
     "description": "Install button"
   },
   "marketplace_remove": {
-    "message": "Remove",
+    "message": "Törlés",
     "description": "Remove button"
   },
   "marketplace_apply": {
-    "message": "Apply",
+    "message": "Alkalmaz",
     "description": "Apply button"
   },
   "marketplace_active": {
@@ -784,7 +784,7 @@
     "description": "Active theme indicator"
   },
   "marketplace_shadersBadge": {
-    "message": "Shaders",
+    "message": "Shader-ek",
     "description": "Shaders badge text"
   },
   "marketplace_githubBadge": {
@@ -1002,7 +1002,7 @@
     "description": "Export to file button"
   },
   "editor_saveAsTheme": {
-    "message": "Save as theme",
+    "message": "Mentés témaként",
     "description": "Save as theme button"
   },
   "editor_stylingGuide": {
@@ -1010,7 +1010,7 @@
     "description": "Styling guide button"
   },
   "editor_tip": {
-    "message": "Tip: This is a standalone tab, you can move this editor to a separate window or use split-screen view alongside YouTube Music to see your changes in real-time. For more info, visit the",
+    "message": "Tipp: Ez egy önálló lap, át tudod helyezni ezt a szerkesztőt külön ablakba vagy osztottképernyős módba a YouTube Music mellé, hogy valós időben lásd a változtatásaidat. Több információért látogass el a",
     "description": "Editor tip text"
   },
   "editor_poweredBy": {
@@ -1038,11 +1038,11 @@
     "description": "Footer button text linking to the Better Lyrics Shaders companion extension"
   },
   "lyrics_searching": {
-    "message": "Better Lyrics is searching for lyrics...",
+    "message": "A Better Lyrics dalszövegeket keres...",
     "description": "Loading message while searching for lyrics"
   },
   "lyrics_stillSearching": {
-    "message": "Still searching for synced lyrics...",
+    "message": "Még mindig keressük az időzített dalszöveget...",
     "description": "Loading message while still searching"
   },
   "lyrics_noSyncedLyrics": {
