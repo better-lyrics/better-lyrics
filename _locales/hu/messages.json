@@ -116,7 +116,7 @@
     "description": "Setting label for automatically reopening the floating lyrics window after page load"
   },
   "options_display_pipAutoRestoreTooltip": {
-    "message": "Keeps the floating lyrics window from closing for good when you reload or move between songs and pages. Browsers only let a floating window open right after you interact with the page, so it reopens on your first click or key press instead of instantly.",
+    "message": "Megakadályozza, hogy a kép a képben dalszövegablak végleg bezáródjon, amikor az oldalt újratöltöd, vagy dalok és oldalak között váltasz. A böngészők csak az oldallal való interakciót követően engedélyezik a lebegő ablak megnyitását, ezért az nem azonnal, hanem az első kattintás vagy billentyűleütéskor nyílik meg újra.",
     "description": "Help tooltip explaining what automatic floating-lyrics reopening does and why it waits for the first interaction"
   },
   "options_display_pipArtworkTransition": {
@@ -172,7 +172,7 @@
     "description": "Toggle label inside the lyrics controls dock modal for showing the floating dock"
   },
   "options_unisonModal_showPinned_hint": {
-    "message": "A floating dock to switch source, toggle translation and romanization, nudge sync, and vote on Unison lyrics",
+    "message": "Egy lebegő dokk a forrás váltására, a fordítás és romanizáció ki-be kapcsolására, az időzítés eltolására és a Unison forrású dalszövegek értékelésére",
     "description": "Hint text under the Show controls dock toggle"
   },
   "options_unisonModal_autoHide": {
@@ -500,31 +500,31 @@
     "description": "Nothing to clear message"
   },
   "options_alert_exportFailed": {
-    "message": "Failed to export identity",
+    "message": "Az azonosító exportálása sikertelen",
     "description": "Export identity failed message"
   },
   "options_alert_fileSaveDialogOpened": {
-    "message": "Identity file save dialog opened.",
+    "message": "Azonosító file mentése ablak megnyitva.",
     "description": "File save dialog opened message"
   },
   "options_alert_fileSaveFailed": {
-    "message": "Error saving file. Please try again.",
+    "message": "Hiba a fájl mentésekor. Próbáld újra.",
     "description": "File save failed message"
   },
   "options_alert_downloadInitiated": {
-    "message": "Identity file download initiated.",
+    "message": "Az azonosító file letöltése elkezdődött.",
     "description": "Download initiated message"
   },
   "options_alert_importSuccess": {
-    "message": "Identity imported successfully!",
+    "message": "Azonosító sikeresen importálva!",
     "description": "Import success message"
   },
   "options_alert_identityLoadError": {
-    "message": "Error loading identity",
+    "message": "Hiba az azonosító betöltése közben",
     "description": "Identity load error message"
   },
   "options_editor_saving": {
-    "message": "Saving...",
+    "message": "Mentés...",
     "description": "Saving indicator text"
   },
   "options_editor_importFile": {
@@ -536,11 +536,11 @@
     "description": "Export to file tooltip"
   },
   "options_editor_saveAsTheme": {
-    "message": "Save as theme",
+    "message": "Mentés témaként",
     "description": "Save as theme tooltip"
   },
   "options_editor_openInNewTab": {
-    "message": "Open in new tab",
+    "message": "Megnyitás új lapon",
     "description": "Open in new tab tooltip"
   },
   "options_editor_backToSettings": {
@@ -560,15 +560,15 @@
     "description": "Styling guide link text"
   },
   "options_editor_renameTheme": {
-    "message": "Rename custom theme",
+    "message": "Egyéni téma átnevezése",
     "description": "Rename theme button title"
   },
   "options_editor_deleteTheme": {
-    "message": "Delete custom theme",
+    "message": "Egyéni téma törlése",
     "description": "Delete theme button title"
   },
   "options_editor_doubleClickRename": {
-    "message": "Double-click to rename",
+    "message": "Dupla-katt az átnevezéshez",
     "description": "Double-click to rename tooltip"
   },
   "options_provider_betterLyrics": {
@@ -600,7 +600,7 @@
     "description": "YouTube provider name"
   },
   "options_provider_youtubeCaptions": {
-    "message": "YouTube Captions",
+    "message": "YouTube Feliratok",
     "description": "YouTube Captions provider name"
   },
   "options_provider_binilyrics": {
@@ -608,19 +608,19 @@
     "description": "BiniLyrics provider name"
   },
   "options_syncType_syllable": {
-    "message": "Syllable",
+    "message": "Szótag",
     "description": "Syllable sync type label"
   },
   "options_syncType_syllable_tooltip": {
-    "message": "Highlights individual syllables as they're sung. Syllable syncing provides the best experience.",
+    "message": "Minden szótagot akkor emel ki amikor azt éneklik. Ez nyújtja a legjobb élményt.",
     "description": "Syllable sync type tooltip"
   },
   "options_syncType_word": {
-    "message": "Word",
+    "message": "Szó",
     "description": "Word sync type label"
   },
   "options_syncType_word_tooltip": {
-    "message": "Highlights individual words as they're sung. Word syncing provides a good experience.",
+    "message": "Minden szót akkor emel ki amikor azt éneklik. Ez jó élményt nyújt.",
     "description": "Word sync type tooltip"
   },
   "options_syncType_line": {
@@ -628,7 +628,7 @@
     "description": "Line sync type label"
   },
   "options_syncType_line_tooltip": {
-    "message": "Highlights entire lines as they're sung. Line syncing provides a basic experience.",
+    "message": "Egész sorokat emel ki amikor azokat éneklik. Ez egy átlagos élményt nyújt.",
     "description": "Line sync type tooltip"
   },
   "options_syncType_unsynced": {
@@ -636,35 +636,35 @@
     "description": "Unsynced sync type label"
   },
   "options_syncType_unsynced_tooltip": {
-    "message": "Lyrics without timing information. Unsynced lyrics provide a minimal experience.",
+    "message": "Időzítési információ nélküli dalszöveg. Ez egy minimális lményt ad.",
     "description": "Unsynced sync type tooltip"
   },
   "options_detail_rateTheme": {
-    "message": "Rate this theme",
+    "message": "Értékeld ezt a témát",
     "description": "Rate theme label"
   },
   "options_detail_install": {
-    "message": "Install",
+    "message": "Telepítés",
     "description": "Install button label"
   },
   "options_detail_viewOnGitHub": {
-    "message": "View on GitHub",
+    "message": "Megtekintés GitHubon",
     "description": "View on GitHub link text"
   },
   "options_detail_shaderInfo": {
-    "message": "This theme includes a shader config.",
+    "message": "Ez a téma tartalmaz egy shader beállításcsomagot.",
     "description": "Shader info text prefix"
   },
   "options_detail_downloadShader": {
-    "message": "Download shader.json",
+    "message": "Töltsd le a shader.json-t",
     "description": "Download shader link text"
   },
   "options_detail_shaderImportSuffix": {
-    "message": "and import it in",
+    "message": "és importáld a",
     "description": "Shader import suffix text before Better Lyrics Shaders link"
   },
   "marketplace_pageTitle": {
-    "message": "Better Lyrics Theme Marketplace",
+    "message": "Better Lyrics Téma Piactér",
     "description": "Page title"
   },
   "marketplace_title": {
@@ -680,11 +680,11 @@
     "description": "Search input placeholder"
   },
   "marketplace_refresh": {
-    "message": "Refresh",
+    "message": "Frissítés",
     "description": "Refresh button label"
   },
   "marketplace_keyboardShortcuts": {
-    "message": "Keyboard shortcuts",
+    "message": "Billentyűkombinációk",
     "description": "Keyboard shortcuts button label"
   },
   "marketplace_sortBy": {
@@ -696,7 +696,7 @@
     "description": "Sort by highest rating"
   },
   "marketplace_sortRatingAsc": {
-    "message": "Lowest rated",
+    "message": "Legalacsonyabb értékelésű",
     "description": "Sort by lowest rating"
   },
   "marketplace_sortDownloadsDesc": {
@@ -704,7 +704,7 @@
     "description": "Sort by most downloads"
   },
   "marketplace_sortDownloadsAsc": {
-    "message": "Least downloaded",
+    "message": "Legkevesebbet letöltött",
     "description": "Sort by least downloads"
   },
   "marketplace_sortNewest": {
@@ -712,11 +712,11 @@
     "description": "Sort by newest"
   },
   "marketplace_sortOldest": {
-    "message": "Oldest",
+    "message": "Legrégebbi",
     "description": "Sort by oldest"
   },
   "marketplace_show": {
-    "message": "Show",
+    "message": "Mutatás",
     "description": "Show filter group label"
   },
   "marketplace_showAll": {
@@ -732,7 +732,7 @@
     "description": "Show not installed themes"
   },
   "marketplace_options": {
-    "message": "Options",
+    "message": "Opciók",
     "description": "Options filter group label"
   },
   "marketplace_hasShaders": {
@@ -752,15 +752,15 @@
     "description": "Submit a theme link"
   },
   "marketplace_loading": {
-    "message": "Loading themes...",
+    "message": "Témák betöltése...",
     "description": "Loading message"
   },
   "marketplace_retry": {
-    "message": "Retry",
+    "message": "Újra",
     "description": "Retry button"
   },
   "marketplace_noThemesMatch": {
-    "message": "No themes match your filters",
+    "message": "Egyik téma sem felel meg a szűrőidnek",
     "description": "Empty state message"
   },
   "marketplace_grantPermission": {
@@ -780,7 +780,7 @@
     "description": "Apply button"
   },
   "marketplace_active": {
-    "message": "Active",
+    "message": "Aktív",
     "description": "Active theme indicator"
   },
   "marketplace_shadersBadge": {
@@ -804,7 +804,7 @@
     "description": "URL input placeholder"
   },
   "marketplace_urlModalError": {
-    "message": "Please enter a GitHub repository URL",
+    "message": "Kérlek adj meg egy GitHub URL-t",
     "description": "URL validation error"
   },
   "marketplace_cancel": {
@@ -812,91 +812,91 @@
     "description": "Cancel button"
   },
   "marketplace_urlPermissionTitle": {
-    "message": "Additional Permission Required",
+    "message": "További hozzáférés szükséges",
     "description": "URL permission modal title"
   },
   "marketplace_urlPermissionWhy": {
-    "message": "Why is this needed?",
+    "message": "Miért kell ez?",
     "description": "URL permission explanation title"
   },
   "marketplace_urlPermissionDesc": {
-    "message": "Installing themes from custom GitHub URLs requires broader access than the marketplace. This allows Better Lyrics to:",
+    "message": "Témák telepítése GitHub URL-ből csak szélesebb körű jogosultsáágokkal lehet. Ez engedélyezi a Better Lyrics-nek, hogy",
     "description": "URL permission description"
   },
   "marketplace_urlPermissionItem1": {
-    "message": "Fetch theme files from any GitHub repository",
+    "message": "Kinyerjen témát bármely GitHub projektből",
     "description": "URL permission list item 1"
   },
   "marketplace_urlPermissionItem2": {
-    "message": "Detect the default branch of the repository",
+    "message": "Felismerje a projekt alapértelmezett ágazatát",
     "description": "URL permission list item 2"
   },
   "marketplace_urlPermissionItem3": {
-    "message": "Validate the theme structure before installation",
+    "message": "Ellenőrizze a témastruktúrát telepítés előtt",
     "description": "URL permission list item 3"
   },
   "marketplace_urlPermissionNote": {
-    "message": "This permission is only used when you install themes via URL. Marketplace themes don't require this.",
+    "message": "Ezt a jogosultságot csak akkor haszáljuk amikor URL-ből telepítesz témákat. Piactéren lévő témáknál ez nem kötelező.",
     "description": "URL permission note"
   },
   "marketplace_shortcutsTitle": {
-    "message": "Keyboard Shortcuts",
+    "message": "Billentyűkombinációk",
     "description": "Shortcuts modal title"
   },
   "marketplace_shortcutsNavigation": {
-    "message": "Navigation",
+    "message": "Navigáció",
     "description": "Navigation shortcuts group"
   },
   "marketplace_shortcutsSearch": {
-    "message": "Search themes",
+    "message": "Témák keresése",
     "description": "Search shortcut label"
   },
   "marketplace_shortcutsRefresh": {
-    "message": "Refresh marketplace",
+    "message": "Piactér újratöltése",
     "description": "Refresh shortcut label"
   },
   "marketplace_shortcutsInstallUrl": {
-    "message": "Install from URL",
+    "message": "Telepítés URL-ből",
     "description": "Install from URL shortcut label"
   },
   "marketplace_shortcutsSort": {
-    "message": "Sort",
+    "message": "Rendezés",
     "description": "Sort shortcuts group"
   },
   "marketplace_shortcutsSortHint": {
-    "message": "press again to toggle direction",
+    "message": "nyomd meg újra, hogy irányt változtass",
     "description": "Sort toggle hint"
   },
   "marketplace_shortcutsByRating": {
-    "message": "By rating",
+    "message": "Értékelés szerint",
     "description": "Sort by rating shortcut"
   },
   "marketplace_shortcutsByDownloads": {
-    "message": "By downloads",
+    "message": "Letöltések szerint",
     "description": "Sort by downloads shortcut"
   },
   "marketplace_shortcutsByDate": {
-    "message": "By date",
+    "message": "Dátum szerint",
     "description": "Sort by date shortcut"
   },
   "marketplace_shortcutsFilters": {
-    "message": "Filters",
+    "message": "Szűrők",
     "description": "Filters shortcuts group"
   },
   "marketplace_shortcutsShowAll": {
-    "message": "Show all",
+    "message": "Összes mutatása",
     "description": "Show all shortcut"
   },
   "marketplace_shortcutsShowInstalled": {
-    "message": "Show installed",
+    "message": "Telepített mutatása",
     "description": "Show installed shortcut"
   },
   "marketplace_shortcutsShowNotInstalled": {
-    "message": "Show not installed",
+    "message": "Nem telepített mutatása",
     "description": "Show not installed shortcut"
   },
   "marketplace_shortcutsToggleShaders": {
-    "message": "Toggle shaders",
+    "message": "Shader ki/be",
     "description": "Toggle shaders shortcut"
   },
   "marketplace_shortcutsToggleCompatible": {
@@ -1186,7 +1186,7 @@
     "description": "Title for the built-in themes deprecation banner in theme modal"
   },
   "deprecation_builtin_body": {
-    "message": "We're migrating built-in themes to the Theme Marketplace. Some already have, look for the Marketplace badge. The rest will follow in a future update, with CSS backups on GitHub and Discord.",
+    "message": "Épp áthelyezzük a beépített témákat a Téme Piactérre. Néhányat már áttettünk, keresd a Piactér jelvényt. A többit egy következő frissítésben helyezzük át CSS biztonsági mentésekkel a GitHub-on és a Discord-on.",
     "description": "Body text for the built-in themes deprecation banner"
   },
   "deprecation_builtin_cta": {
