@@ -932,15 +932,15 @@
     "description": "Close modal shortcut"
   },
   "marketplace_shortcutsShowShortcuts": {
-    "message": "Show shortcuts",
+    "message": "Billentyűkombinációk mutatása",
     "description": "Show shortcuts shortcut"
   },
   "marketplace_shortcutsApplyTheme": {
-    "message": "Apply theme (after install)",
+    "message": "Téma alkalmazása (telepítés után)",
     "description": "Apply theme shortcut"
   },
   "marketplace_ratingFailed": {
-    "message": "Failed to submit rating",
+    "message": "Az értékelés beküldése sikertelen",
     "description": "Rating submission error"
   },
   "marketplace_shaderFetchFailed": {
@@ -980,7 +980,7 @@
     "description": "Footer link in the theme detail modal that opens the theme's discussion thread"
   },
   "marketplace_commit": {
-    "message": "Commit $hash$",
+    "message": "$hash$ commit",
     "description": "Footer chip in the theme detail modal linking to the exact source commit a theme was built from",
     "placeholders": {
       "hash": {
@@ -1054,7 +1054,7 @@
     "description": "Message shown during ad playback"
   },
   "lyrics_notFound": {
-    "message": "No lyrics found for this song",
+    "message": "Nem találtunk dalszöveget ehhez a dalhoz",
     "description": "Message when no lyrics are available"
   },
   "lyrics_resumeAutoscroll": {
@@ -1062,7 +1062,7 @@
     "description": "Resume Autoscroll button label"
   },
   "options_language_exclusions": {
-    "message": "Kivételek",
+    "message": "Nyelvi kivételek",
     "description": "Label for language exclusions setting"
   },
   "options_manage": {
@@ -1070,7 +1070,7 @@
     "description": "Manage button label"
   },
   "options_language_exclusionsTitle": {
-    "message": "Language Exclusions",
+    "message": "Nyelvi Kivételek",
     "description": "Modal title for language exclusions"
   },
   "options_romanization_tab": {
@@ -1210,7 +1210,7 @@
     "description": "Browser tab title for the auth consent popup"
   },
   "auth_consentHeading": {
-    "message": "Sign in to $ORIGIN$",
+    "message": "Bejelentkezés ide: $ORIGIN$",
     "description": "Consent prompt heading. $ORIGIN$ is replaced with the requesting site, e.g. unison.boidu.dev",
     "placeholders": {
       "origin": {
@@ -1238,15 +1238,15 @@
     "description": "Checkbox label allowing the user to remember this approval"
   },
   "auth_approve": {
-    "message": "Approve",
+    "message": "Jóváhagyás",
     "description": "Primary button: approve the sign-in request"
   },
   "auth_cancel": {
-    "message": "Cancel",
+    "message": "Mégse",
     "description": "Secondary button: reject the sign-in request"
   },
   "auth_invalidRequest": {
-    "message": "Invalid sign-in request.",
+    "message": "Érvénytelen bejelentkezési kérelem.",
     "description": "Error state shown when the popup receives malformed parameters"
   },
   "auth_sessionExpired": {
@@ -1254,19 +1254,19 @@
     "description": "Shown in the sign-in consent popup when the connection to the extension's service worker is lost before the user can approve or cancel."
   },
   "lyrics_requestSyncedVersion": {
-    "message": "Request a synced version",
+    "message": "Időzített verzió kérelmezése",
     "description": "Button label asking the community to contribute synced lyrics for the current song"
   },
   "lyrics_requestedFirst": {
-    "message": "Requested · you're the first",
+    "message": "Kérelmezve - te vagy az első",
     "description": "Button label after a successful first-ever request for this song"
   },
   "lyrics_requestedOneOther": {
-    "message": "Requested · 1 other wants this",
+    "message": "Kérelmezve · 1 másik emberrel együtt",
     "description": "Button label after a successful request when exactly one other person has also requested"
   },
   "lyrics_requestedNOthers": {
-    "message": "Requested · $N$ others want this",
+    "message": "Kérelmezve · $N$ másik emberrel együtt",
     "description": "Button label after a successful request when N other people have also requested",
     "placeholders": {
       "n": {
@@ -1276,23 +1276,23 @@
     }
   },
   "lyrics_requestErrorRateLimit": {
-    "message": "Try again in a minute",
+    "message": "Próbáld újra egy perc múlva",
     "description": "Button label shown briefly when the request is rate-limited"
   },
   "lyrics_requestErrorNetwork": {
-    "message": "Couldn't reach Unison",
+    "message": "A Unison nem elérhető",
     "description": "Button label shown briefly when the request fails for a transport/network reason (no HTTP response received)"
   },
   "lyrics_requestErrorServer": {
-    "message": "Unison is having trouble",
+    "message": "A Unison problémába ütközött",
     "description": "Button label shown briefly when the request fails with a 5xx server error"
   },
   "lyrics_requestErrorGeneric": {
-    "message": "Couldn't send the request",
+    "message": "A kérelem nem került elküldésre",
     "description": "Button label shown briefly when the request fails for any other reason (catch-all)"
   },
   "lyrics_requestSyncedLanded": {
-    "message": "Synced version available. Refresh.",
+    "message": "Időzített verzió elérhető. Újratöltés.",
     "description": "Button label when the server reports a synced version already exists; clicking reloads the page"
   },
   "unison_pageTitle": {
@@ -1312,7 +1312,7 @@
     "description": "Search button label"
   },
   "unison_searchPlaceholder": {
-    "message": "Search songs, artists, or lyrics...",
+    "message": "Keress dalokat, előadókat vagy dalszövegeket...",
     "description": "Search input placeholder"
   },
   "unison_submit": {
@@ -1320,67 +1320,67 @@
     "description": "Submit lyrics button text"
   },
   "unison_submitSuccess": {
-    "message": "Lyrics submitted!",
+    "message": "Dalszöveg beküldve!",
     "description": "Success message after submitting lyrics"
   },
   "unison_submitDescription": {
-    "message": "Submit community lyrics for any YouTube Music track. Paste LRC (timestamped), TTML (XML), or plain text. Synced formats are prioritized.",
+    "message": "Küldj be közösségi dalszövegeket bármely YouTube Music dalhoz. Illessz be LRC (időzített), TTML (XML) vagy sima szöveg formátumú dalszöveget. Az időzített formátumok prioritizálva vannak.",
     "description": "Description text for the submission form"
   },
   "unison_composerHintPrefix": {
-    "message": "Use",
+    "message": "Használd a",
     "description": "Text before Composer link in submit hint"
   },
   "unison_composerHintSuffix": {
-    "message": "to create word-synced lyrics from scratch.",
+    "message": "oldalt, hogy szó alapú időzített dalszövegeket készíthess.",
     "description": "Text after Composer link in submit hint"
   },
   "unison_upvote": {
-    "message": "Upvote",
+    "message": "Tetszik",
     "description": "Upvote button tooltip"
   },
   "unison_downvote": {
-    "message": "Downvote",
+    "message": "Nem tetszik",
     "description": "Downvote button tooltip"
   },
   "unison_report": {
-    "message": "Report",
+    "message": "Bejelentés",
     "description": "Report button tooltip"
   },
   "unison_reportSuccess": {
-    "message": "Reported",
+    "message": "Bejelentve",
     "description": "Report success tooltip text"
   },
   "unison_delete": {
-    "message": "Delete",
+    "message": "Törlés",
     "description": "Delete button label on a user's own Unison submission card"
   },
   "unison_deleteConfirm": {
-    "message": "Confirm delete?",
+    "message": "Biztos törlöd?",
     "description": "Delete button label after first click, asking the user to confirm before sending the request"
   },
   "unison_deleteSuccess": {
-    "message": "Deleted",
+    "message": "Törölve",
     "description": "Transient label shown on the delete button after a successful delete"
   },
   "unison_deleteForbidden": {
-    "message": "Not your submission",
+    "message": "Nem a te beküldésed",
     "description": "Error message shown on the delete button when the server rejects the request because the caller is not the submitter"
   },
   "unison_deleteFailed": {
-    "message": "Delete failed",
+    "message": "Törlés sikertelen",
     "description": "Generic error message shown on the delete button when the request fails for any other reason"
   },
   "unison_report_wrong_song": {
-    "message": "Wrong song",
+    "message": "Rossz dal",
     "description": "Report reason: wrong song"
   },
   "unison_report_bad_sync": {
-    "message": "Bad sync",
+    "message": "Rossz időzítés",
     "description": "Report reason: bad synchronization"
   },
   "unison_report_offensive": {
-    "message": "Offensive",
+    "message": "Offenzív",
     "description": "Report reason: offensive content"
   },
   "unison_report_spam": {
@@ -1388,59 +1388,59 @@
     "description": "Report reason: spam"
   },
   "unison_report_other": {
-    "message": "Other",
+    "message": "Egyéb",
     "description": "Report reason: other"
   },
   "unison_confidence_low": {
-    "message": "Unverified",
+    "message": "Ellenőrizetlen",
     "description": "Tier label for entries with fewer than the minimum votes for confidence"
   },
   "unison_confidence_medium": {
-    "message": "Trusted",
+    "message": "Megbízható",
     "description": "Tier label for entries the community has accepted (the baseline 'good enough' tier)"
   },
   "unison_confidence_high": {
-    "message": "Top-Rated",
+    "message": "Magas Értékelésű",
     "description": "Tier label for entries with diverse community approval (rare, top tier)"
   },
   "unison_sortTopRated": {
-    "message": "Top-Rated",
+    "message": "Legmagasabb étékelésű",
     "description": "Sort by effective score, highest first"
   },
   "unison_sortBottomRated": {
-    "message": "Bottom-Rated",
+    "message": "Legalacsonyabb értékelésű",
     "description": "Sort by effective score, lowest first"
   },
   "unison_sortMostVoted": {
-    "message": "Most-Voted",
+    "message": "Legtöbb Szavazattal",
     "description": "Sort by vote count, most first"
   },
   "unison_sortLeastVoted": {
-    "message": "Least-Voted",
+    "message": "Legkevesebb Szavazattal",
     "description": "Sort by vote count, fewest first"
   },
   "unison_syncRichsync": {
-    "message": "Richsync",
+    "message": "Prémiumidőzítés",
     "description": "Sync type: word/syllable-level timing. Reused by the sync badge on cards and the sync filter chip"
   },
   "unison_syncLinesync": {
-    "message": "Linesync",
+    "message": "Soridőzítés",
     "description": "Sync type: line-level timing. Reused by the sync badge on cards and the sync filter chip"
   },
   "unison_syncPlain": {
-    "message": "Plain",
+    "message": "Időzítetlen",
     "description": "Sync type: unsynced lyrics. Reused by the sync badge on cards and the sync filter chip"
   },
   "unison_tier": {
-    "message": "Tier",
+    "message": "Megbízhatóság",
     "description": "Filter bar group label for confidence tier"
   },
   "unison_tierTrustedPlus": {
-    "message": "Trusted+",
+    "message": "Megbízható+",
     "description": "Tier filter chip hiding Unverified entries (shows Trusted and above)"
   },
   "unison_languageAll": {
-    "message": "All languages",
+    "message": "Minden nyelv",
     "description": "Language dropdown default option"
   },
   "unison_format_lrc": {
@@ -1452,39 +1452,39 @@
     "description": "TTML format badge"
   },
   "unison_format_plain": {
-    "message": "Plain",
+    "message": "Sima",
     "description": "Plain text format badge"
   },
   "unison_autoDetect": {
-    "message": "Auto-detect",
+    "message": "Automatikus felismerés",
     "description": "Auto-detect format option"
   },
   "unison_noResults": {
-    "message": "No lyrics found. Try a different search.",
+    "message": "Nem találtunk dalszöveget. Próbálj meg mást keresni.",
     "description": "No search results message"
   },
   "unison_interactingAs": {
-    "message": "Interacting as",
+    "message": "Az azonosítód:",
     "description": "Identity label prefix"
   },
   "unison_loadMore": {
-    "message": "Loading more...",
+    "message": "Továbbiak betöltése...",
     "description": "Auto-loading indicator shown at the bottom of the feed while the next page is being fetched"
   },
   "unison_votes": {
-    "message": "votes",
+    "message": "szavazat",
     "description": "Vote count label"
   },
   "unison_createInComposer": {
-    "message": "Create synced lyrics",
+    "message": "Időzített dalszöveg készítése",
     "description": "Create in Composer link text in dashboard"
   },
   "unison_song": {
-    "message": "Song",
+    "message": "Dal",
     "description": "Song field label"
   },
   "unison_artist": {
-    "message": "Artist",
+    "message": "Előadó",
     "description": "Artist field label"
   },
   "unison_album": {
@@ -1492,39 +1492,39 @@
     "description": "Album field label"
   },
   "unison_duration": {
-    "message": "Duration",
+    "message": "Időtartam",
     "description": "Duration field label"
   },
   "unison_videoId": {
-    "message": "Video ID",
+    "message": "Videó Azonosító",
     "description": "Video ID field label"
   },
   "unison_lyrics": {
-    "message": "Lyrics",
+    "message": "Dalszöveg",
     "description": "Lyrics textarea label"
   },
   "unison_format": {
-    "message": "Format",
+    "message": "Formátum",
     "description": "Format selector label"
   },
   "unison_openInYTMusic": {
-    "message": "Open in YouTube Music",
+    "message": "Megníitás YouTube Music-ben",
     "description": "Link text to open song in YouTube Music"
   },
   "unison_back": {
-    "message": "Back",
+    "message": "Vissza",
     "description": "Back button text in detail view"
   },
   "unison_noPreview": {
-    "message": "Paste or drop lyrics to see a preview",
+    "message": "Illessz be vagy húzz ide dalszöveget, hogy lásd az előnézetét",
     "description": "Empty state text shown in submit preview before lyrics are entered"
   },
   "unison_preview": {
-    "message": "Preview",
+    "message": "Előnézet",
     "description": "Column title for parsed lyrics preview in detail view"
   },
   "unison_rawLyrics": {
-    "message": "Raw Lyrics",
+    "message": "Nyers Dalszöveg",
     "description": "Column title for raw lyrics source in detail view"
   },
   "unison_isrc": {
@@ -1532,95 +1532,95 @@
     "description": "ISRC field label"
   },
   "unison_placeholder_song": {
-    "message": "e.g. Bohemian Rhapsody",
+    "message": "pl.: Az Éjjel Soha Nem Érhet Véget",
     "description": "Placeholder for song input"
   },
   "unison_placeholder_artist": {
-    "message": "e.g. Queen",
+    "message": "pl.: Beton.Hofi",
     "description": "Placeholder for artist input"
   },
   "unison_placeholder_album": {
-    "message": "e.g. A Night at the Opera",
+    "message": "pl.: Purgatórium",
     "description": "Placeholder for album input"
   },
   "unison_placeholder_duration": {
-    "message": "e.g. 354",
+    "message": "pl.: 895",
     "description": "Placeholder for duration input"
   },
   "unison_placeholder_videoId": {
-    "message": "e.g. dQw4w9WgXcQ",
+    "message": "pl.: cfMJfLBIl00",
     "description": "Placeholder for video ID input"
   },
   "unison_placeholder_isrc": {
-    "message": "e.g. GBAYE0601498",
+    "message": "pl.: GBAYE0601498",
     "description": "Placeholder for ISRC input"
   },
   "unison_placeholder_lyrics": {
-    "message": "Paste LRC, TTML, or plain text lyrics here. You can also drag & drop a file.",
+    "message": "Illeszd be ide az LRC, TTML vagy szöveges dalszöveget. Ide is húzhatsz egy file-t.",
     "description": "Placeholder for lyrics textarea"
   },
   "unison_durationHint": {
-    "message": "Song length in seconds",
+    "message": "A dal hossza másodpercekben",
     "description": "Hint text below duration field label"
   },
   "unison_videoIdHint": {
-    "message": "11-character ID from the YouTube Music URL",
+    "message": "11 karakter hosszú azonosító a YouTube Music URL-ből",
     "description": "Hint text below video ID field label"
   },
   "unison_formatHint": {
-    "message": "Auto-detected from lyrics content",
+    "message": "Automatikusan felismerve a dalszöveg tartalmából",
     "description": "Hint text below format field label"
   },
   "unison_isrcHintPrefix": {
-    "message": "Find it using an",
+    "message": "Találd meg",
     "description": "Text before ISRC finder link"
   },
   "unison_isrcHintLinkText": {
-    "message": "ISRC lookup tool",
+    "message": "egy ISRC kereső használatvával",
     "description": "Link text for ISRC finder"
   },
   "unison_tabFeed": {
-    "message": "Feed",
+    "message": "Összes",
     "description": "Feed tab label for recent submissions"
   },
   "unison_tabMySubmissions": {
-    "message": "My Submissions",
+    "message": "Beküldéseim",
     "description": "Feed tab label for user's own submissions"
   },
   "unison_noSubmissions": {
-    "message": "You haven't submitted any lyrics yet.",
+    "message": "Még nem küldtél be egy dalszöveget sem.",
     "description": "Empty state for my submissions tab"
   },
   "unison_noFilterResults": {
-    "message": "No lyrics match your filters",
+    "message": "Egyik dalszöveg sem felel meg a szűrőidnek",
     "description": "Empty state shown when the active sort/filter combination returns no entries"
   },
   "unison_noFeedYet": {
-    "message": "No lyrics here yet",
+    "message": "Itt még nincsenek dalszövegek",
     "description": "Empty state shown when the recent feed is empty with no filters applied"
   },
   "unison_sync": {
-    "message": "Sync",
+    "message": "Időzítés",
     "description": "Sync type label in detail view"
   },
   "unison_language": {
-    "message": "Language",
+    "message": "Nyelv",
     "description": "Language label in detail view"
   },
   "unison_uploadedBy": {
-    "message": "Uploaded by",
+    "message": "Feltöltötte",
     "description": "Metadata row label in the Unison detail sidebar, before the uploader's name which links to their curator page"
   },
   "unison_languageUnspecified": {
-    "message": "Not specified",
+    "message": "Nem megadva",
     "description": "Default option in the submission form's language dropdown, used when the submitter has not chosen a language"
   },
   "unison_fulfilledBadge": {
-    "message": "Requested & fulfilled",
+    "message": "Kérelmezve és teljesítve",
     "description": "Badge on the Unison detail page shown when this lyric answered a community request"
   },
   "unison_fulfilledNote": {
-    "message": "Someone wanted this on Better Lyrics, and $name$ came through with it.",
+    "message": "Valaki kérelmezte ezt a Better Lyrics-en, és $name$ meg is csinálta.",
     "description": "Sentence on the Unison detail page explaining that the lyric fulfilled a community request. $name$ is the uploader's display name",
     "placeholders": {
       "name": {
@@ -1630,103 +1630,103 @@
     }
   },
   "unison_fulfilledBoardLink": {
-    "message": "See the requests board",
+    "message": "Kérelmek mutatása",
     "description": "Link on the Unison detail page that opens the community requests board (queue of most-wanted songs)"
   },
   "unison_validationRequired": {
-    "message": "Please fill in song, artist, video ID, and lyrics.",
+    "message": "Kérlek töltsd ki a dal, előadó, videó azonosító és dalszöveg rublikákat.",
     "description": "Validation error when required fields are missing"
   },
   "unison_submitFailed": {
-    "message": "Submission failed",
+    "message": "Beküldés skertelen",
     "description": "Fallback error message when submission fails"
   },
   "report_lyrics_title": {
-    "message": "Report Lyrics",
+    "message": "Dalszöveg Bejelentése",
     "description": "Title for the report lyrics modal"
   },
   "report_lyrics_info": {
-    "message": "Specify the reason why the lyrics for this song are not compatible",
+    "message": "Pontosítsd, hogy miért nem kompatibilis a dalszöveg ezzel a zenével",
     "description": "Information about using the report lyrics modal"
   },
   "report_lyrics_wrong_song": {
-    "message": "Wrong song or version",
+    "message": "Rossz dal vagy verzió",
     "description": "Reason for the report that the lyrics are for the wrong song or version"
   },
   "report_lyrics_bad_sync": {
-    "message": "Bad synchronization",
+    "message": "Rossz időzítés",
     "description": "Reason for the report that the lyrics are too off on the part synchronization"
   },
   "report_lyrics_offensive": {
-    "message": "Offensive",
+    "message": "Offenzív",
     "description": "Reason for the report that the lyrics are offensive or too offensive"
   },
   "report_lyrics_spam": {
-    "message": "Spam or lyrics are irrelevant to the song",
+    "message": "Spam vagy a dalszöveg nem kötődik a dalhoz",
     "description": "Reason for the report that the lyrics are a spam attempt and/or irrelevant with the sung parts"
   },
   "report_lyrics_other": {
-    "message": "Other reason",
+    "message": "Egyéb ok",
     "description": "Reason for the report that the lyrics is bad in other reasons"
   },
   "report_lyrics_details_placeholder": {
-    "message": "Additional details about this report",
+    "message": "Egyéb részletek a bejelentésről",
     "description": "Placeholder for report lyrics details input"
   },
   "report_lyrics_submit": {
-    "message": "Submit",
+    "message": "Beküldés",
     "description": "Submit button for reporting lyrics"
   },
   "report_lyrics_cancel": {
-    "message": "Cancel",
+    "message": "Mégse",
     "description": "Cancel button for reporting lyrics"
   },
   "report_lyrics_reporting": {
-    "message": "Reporting lyrics...",
+    "message": "Dalszöveg bejelentése...",
     "description": "Report lyrics on a reporting process"
   },
   "report_lyrics_success": {
-    "message": "Thanks for the heads up! We'll take a look soon.",
+    "message": "Köszönjük a bejelentést! Hamarosan mewgnézzük.",
     "description": "Shown after a lyrics report is successfully submitted"
   },
   "report_lyrics_already": {
-    "message": "We've got this one already. Thanks though!",
+    "message": "Ezt már bejelentetted. Azért köszi!",
     "description": "Shown when the user tries to report the same lyrics twice"
   },
   "report_lyrics_error": {
-    "message": "That didn't go through. Mind trying again?",
+    "message": "Ajjaj, ez nem ment át. Újrapróbálnád?",
     "description": "Shown when a lyrics report fails to submit"
   },
   "unison_tier_new": {
-    "message": "new",
+    "message": "új",
     "description": "Trust tier badge for low-reputation Unison submitters"
   },
   "unison_tier_trusted": {
-    "message": "trusted",
+    "message": "megbízható",
     "description": "Trust tier badge for mid-reputation Unison submitters"
   },
   "unison_tier_veteran": {
-    "message": "veteran",
+    "message": "veterán",
     "description": "Trust tier badge for high-reputation Unison submitters"
   },
   "unison_tier_expert": {
-    "message": "expert",
+    "message": "szakértő",
     "description": "Trust tier badge for top-reputation Unison submitters"
   },
   "unison_submitted_this": {
-    "message": "submitted this lyric",
+    "message": "küldte be ezt a dalszöveget",
     "description": "Sub-label under the submitter name in the Unison footer card"
   },
   "unison_score_label": {
-    "message": "score",
+    "message": "pont",
     "description": "Noun shown after the numeric score in the Unison footer (e.g. the 'score' in '4.85 score · 12 votes')"
   },
   "unison_vote_singular": {
-    "message": "vote",
+    "message": "szavazat",
     "description": "Singular noun used after the number 1 in the Unison vote count (e.g. '1 vote')"
   },
   "unison_vote_plural": {
-    "message": "votes",
+    "message": "szavazat",
     "description": "Plural noun used after numbers other than 1 in the Unison vote count (e.g. '5 votes')"
   }
 }
