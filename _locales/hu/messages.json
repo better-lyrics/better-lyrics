@@ -900,35 +900,35 @@
     "description": "Toggle shaders shortcut"
   },
   "marketplace_shortcutsToggleCompatible": {
-    "message": "Toggle compatible",
+    "message": "Csak kompatibilis ki/be",
     "description": "Toggle compatible shortcut"
   },
   "marketplace_shortcutsDetails": {
-    "message": "Theme Details",
+    "message": "Téma Részeletek",
     "description": "Theme details shortcuts group"
   },
   "marketplace_shortcutsInstallRemove": {
-    "message": "Install / Remove",
+    "message": "Telepítés / Törlés",
     "description": "Install/remove shortcut"
   },
   "marketplace_shortcutsApply": {
-    "message": "Apply theme",
+    "message": "Téma alkalmazása",
     "description": "Apply theme shortcut label"
   },
   "marketplace_shortcutsPrevImage": {
-    "message": "Previous image",
+    "message": "Előző kép",
     "description": "Previous image shortcut"
   },
   "marketplace_shortcutsNextImage": {
-    "message": "Next image",
+    "message": "Következő kép",
     "description": "Next image shortcut"
   },
   "marketplace_shortcutsGeneral": {
-    "message": "General",
+    "message": "Általános",
     "description": "General shortcuts group"
   },
   "marketplace_shortcutsCloseModal": {
-    "message": "Close modal",
+    "message": "Felugró ablak bezárása",
     "description": "Close modal shortcut"
   },
   "marketplace_shortcutsShowShortcuts": {
@@ -966,7 +966,7 @@
     }
   },
   "marketplace_requiresVersion": {
-    "message": "Requires v$version$+",
+    "message": "$version$+ verzió szükséges",
     "description": "Footer chip in the theme detail modal showing the minimum Better Lyrics version a theme needs",
     "placeholders": {
       "version": {
@@ -976,7 +976,7 @@
     }
   },
   "marketplace_discussion": {
-    "message": "Discussion",
+    "message": "Hozzászólások",
     "description": "Footer link in the theme detail modal that opens the theme's discussion thread"
   },
   "marketplace_commit": {
