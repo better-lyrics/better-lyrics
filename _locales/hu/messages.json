@@ -944,19 +944,19 @@
     "description": "Rating submission error"
   },
   "marketplace_shaderFetchFailed": {
-    "message": "Failed to fetch shader config",
+    "message": "A shader beállításcsomag telepítése sikertelen",
     "description": "Shader fetch error"
   },
   "marketplace_applyFailed": {
-    "message": "Failed to apply theme",
+    "message": "A téma alkalmazás sikertelen",
     "description": "Theme apply error"
   },
   "marketplace_noThemesInstalled": {
-    "message": "No themes installed yet",
+    "message": "Még nincs telepített téma",
     "description": "Empty installed themes message"
   },
   "marketplace_lastUpdatedOn": {
-    "message": "Last updated on $date$",
+    "message": "Útóljára frissítve: $date$",
     "description": "Tooltip showing full date when a theme was last updated",
     "placeholders": {
       "date": {
@@ -990,15 +990,15 @@
     }
   },
   "editor_pageTitle": {
-    "message": "Better Lyrics Styles Editor",
+    "message": "Better Lyrics stílusszerkesztő",
     "description": "Standalone editor page title"
   },
   "editor_importFromFile": {
-    "message": "Import from file",
+    "message": "Importálás file-ból",
     "description": "Import from file button"
   },
   "editor_exportToFile": {
-    "message": "Export to file",
+    "message": "Exportálás file-ba",
     "description": "Export to file button"
   },
   "editor_saveAsTheme": {
@@ -1006,7 +1006,7 @@
     "description": "Save as theme button"
   },
   "editor_stylingGuide": {
-    "message": "Styling guide",
+    "message": "Stílusútmutató",
     "description": "Styling guide button"
   },
   "editor_tip": {
@@ -1026,15 +1026,15 @@
     "description": "Docs link text"
   },
   "lyrics_source": {
-    "message": "Source: ",
+    "message": "Forrás: ",
     "description": "Lyrics source label"
   },
   "lyrics_searchOnGenius": {
-    "message": "Search on Genius",
+    "message": "Keresés Genius-on",
     "description": "Search on Genius button text"
   },
   "lyrics_getShaders": {
-    "message": "Get Better Lyrics Shaders",
+    "message": "Szerezd be a Better Lyrics Shaders-t",
     "description": "Footer button text linking to the Better Lyrics Shaders companion extension"
   },
   "lyrics_searching": {
@@ -1046,11 +1046,11 @@
     "description": "Loading message while still searching"
   },
   "lyrics_noSyncedLyrics": {
-    "message": "Better Lyrics could not find synced lyrics",
+    "message": "A Better Lyrics nem talált időzített dalszöveget",
     "description": "Message when no synced lyrics found"
   },
   "lyrics_adPlaying": {
-    "message": "[elevator music]",
+    "message": "[lift zene]",
     "description": "Message shown during ad playback"
   },
   "lyrics_notFound": {
@@ -1058,7 +1058,7 @@
     "description": "Message when no lyrics are available"
   },
   "lyrics_resumeAutoscroll": {
-    "message": "Resume Autoscroll",
+    "message": "Automatikus görgetés folytatása",
     "description": "Resume Autoscroll button label"
   },
   "options_language_exclusions": {
@@ -1074,27 +1074,27 @@
     "description": "Modal title for language exclusions"
   },
   "options_romanization_tab": {
-    "message": "Romanization",
+    "message": "Romanizáció",
     "description": "Romanization tab label"
   },
   "options_translation_tab": {
-    "message": "Translation",
+    "message": "Fordítás",
     "description": "Translation tab label"
   },
   "options_searchLanguages": {
-    "message": "Search languages...",
+    "message": "Nyelvek keresése...",
     "description": "Search input placeholder"
   },
   "options_romanization_hint": {
-    "message": "Click to toggle. Excluded languages will not be romanized.",
+    "message": "Kattints, hogy ki/be kapcsold. A kivételbe rakott nyelvek nem lesznek romanizálva.",
     "description": "Hint text for romanization exclusions"
   },
   "options_translation_hint": {
-    "message": "Click to toggle. Excluded source languages will not be translated.",
+    "message": "Kattints, hogy ki/be kapcsold. A kivételbe rakott forrásnyelvek nem lesznek lefordítva.",
     "description": "Hint text for translation exclusions"
   },
   "options_resetToDefault": {
-    "message": "Reset $TYPE$ to Default",
+    "message": "$TYPE$ alaphelyzetbe állítása",
     "description": "Reset to default button label",
     "placeholders": {
       "type": {
@@ -1104,7 +1104,7 @@
     }
   },
   "options_romanization_resetTitle": {
-    "message": "Reset $TYPE$ Exclusions",
+    "message": "$TYPE$ kivételek visszaállítása",
     "description": "Modal title for resetting exclusions",
     "placeholders": {
       "type": {
@@ -1114,19 +1114,19 @@
     }
   },
   "options_romanization_resetMessage": {
-    "message": "This will clear all excluded languages. Continue?",
+    "message": "Ez minden kivételbe rakott nyelvet töröl. Folytassuk?",
     "description": "Confirmation message for resetting exclusions"
   },
   "options_reset": {
-    "message": "Reset",
+    "message": "Visszaállítás",
     "description": "Reset button label"
   },
   "options_cancel": {
-    "message": "Cancel",
+    "message": "Mégse",
     "description": "Cancel button label"
   },
   "options_romanization_resetSuccess": {
-    "message": "$TYPE$ exclusions reset to default",
+    "message": "$TYPE$ kivételek visszaállítva",
     "description": "Success message after resetting exclusions",
     "placeholders": {
       "type": {
@@ -1136,7 +1136,7 @@
     }
   },
   "symlink_applied": {
-    "message": "Applied theme: $NAME$ (Marketplace)",
+    "message": "Téma beállítva: $NAME$ (Piactér)",
     "description": "Alert after successfully applying a symlinked theme from marketplace",
     "placeholders": {
       "name": {
@@ -1146,7 +1146,7 @@
     }
   },
   "builtin_applied": {
-    "message": "Applied theme: $NAME$",
+    "message": "Téma beállítva: $NAME$",
     "description": "Alert after successfully applying a bundled built-in theme",
     "placeholders": {
       "name": {
@@ -1156,7 +1156,7 @@
     }
   },
   "theme_author_prefix": {
-    "message": "by $AUTHOR$",
+    "message": "készítette: $AUTHOR$",
     "description": "Author prefix shown on theme selector button",
     "placeholders": {
       "author": {
@@ -1166,23 +1166,23 @@
     }
   },
   "theme_author_you": {
-    "message": "by You",
+    "message": "készítette: Te",
     "description": "Author label for custom user themes on theme selector button"
   },
   "symlink_installFailed": {
-    "message": "Couldn't install theme. Check your connection and try again.",
+    "message": "A téma telepítése sikeretelen. Ellenőrizd az internetkapcsolatod és próbáld újra.",
     "description": "Alert when a symlinked theme fails to install from marketplace"
   },
   "symlink_badge_marketplace": {
-    "message": "Marketplace",
+    "message": "Piactér",
     "description": "Badge text on symlinked theme cards"
   },
   "symlink_badge_bundled": {
-    "message": "Bundled",
+    "message": "Beépített",
     "description": "Badge text on non-symlinked built-in theme cards"
   },
   "deprecation_builtin_title": {
-    "message": "Heads up, these themes are moving!",
+    "message": "Fontos: ezek a témák költöznek!",
     "description": "Title for the built-in themes deprecation banner in theme modal"
   },
   "deprecation_builtin_body": {
@@ -1190,23 +1190,23 @@
     "description": "Body text for the built-in themes deprecation banner"
   },
   "deprecation_builtin_cta": {
-    "message": "Browse Marketplace",
+    "message": "Piactér Felfedezése",
     "description": "CTA button text in the deprecation banner to open the marketplace"
   },
   "theme_modal_section_builtin": {
-    "message": "Built-in Themes",
+    "message": "Beépített Témák",
     "description": "Section title for built-in themes in the theme chooser modal"
   },
   "theme_modal_section_custom": {
-    "message": "Custom Themes",
+    "message": "Egyéni Témák",
     "description": "Section title for custom themes in the theme chooser modal"
   },
   "lyrics_submitToUnison": {
-    "message": "Submit lyrics with Unison",
+    "message": "Dalszöveg beküldése Unison-on",
     "description": "Button text for submitting lyrics to Unison"
   },
   "auth_pageTitle": {
-    "message": "Sign in with Better Lyrics",
+    "message": "Bejelentkezés Better Lyrics-szel",
     "description": "Browser tab title for the auth consent popup"
   },
   "auth_consentHeading": {
@@ -1220,7 +1220,7 @@
     }
   },
   "auth_consentSubheading": {
-    "message": "You will sign in as $NAME$.",
+    "message": "Bejelentkezés mint $NAME$.",
     "description": "Identifies the current BL identity. $NAME$ is the deterministic display name.",
     "placeholders": {
       "name": {
@@ -1230,11 +1230,11 @@
     }
   },
   "auth_consentExplainer": {
-    "message": "Better Lyrics will sign a one-time message proving you control this identity. The site never sees your private key.",
+    "message": "A Better Lyrics érvényesít egy egyszeri üzenetet, ami bizonyítja, hogy ez a te azonosítód. Az oldal soha nem látja a privát kulcsod.",
     "description": "Short explainer body in the consent popup"
   },
   "auth_rememberLabel": {
-    "message": "Don't ask again for 24 hours",
+    "message": "Ne kérdezd meg 24 óráig",
     "description": "Checkbox label allowing the user to remember this approval"
   },
   "auth_approve": {
@@ -1250,7 +1250,7 @@
     "description": "Error state shown when the popup receives malformed parameters"
   },
   "auth_sessionExpired": {
-    "message": "Sign-in expired. Please close this window and try again.",
+    "message": "Bejelentekés lejárt. Zárd be ezt az ablakot és próbáld újra.",
     "description": "Shown in the sign-in consent popup when the connection to the extension's service worker is lost before the user can approve or cancel."
   },
   "lyrics_requestSyncedVersion": {
@@ -1304,11 +1304,11 @@
     "description": "Unison branding title"
   },
   "unison_subtitle": {
-    "message": "Community Lyrics",
+    "message": "Közösségi Dalszövegek",
     "description": "Unison subtitle text"
   },
   "unison_search": {
-    "message": "Search lyrics",
+    "message": "Dalszövegek keresése",
     "description": "Search button label"
   },
   "unison_searchPlaceholder": {
@@ -1316,7 +1316,7 @@
     "description": "Search input placeholder"
   },
   "unison_submit": {
-    "message": "Submit Lyrics",
+    "message": "Dalszöveg beküldése",
     "description": "Submit lyrics button text"
   },
   "unison_submitSuccess": {
