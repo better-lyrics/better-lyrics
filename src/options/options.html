@@ -649,8 +649,15 @@
 						</svg>
 					</button>
 				</div>
-				<div class="modal-body">
+				<div class="modal-body" id="pip-modal-body">
 					<div class="container">
+						<span>__MSG_options_display_pipEnabled__</span>
+						<label>
+							<input type="checkbox" id="isPictureInPictureEnabled">
+							<span class="checkmark"></span>
+						</label>
+					</div>
+					<div class="container pip-modal-row--dependent">
 						<div class="setting-row__text">
 							<div class="setting-row__title-line">
 								<span>__MSG_options_display_pipAutoRestore__</span>
@@ -662,7 +669,7 @@
 							<span class="checkmark"></span>
 						</label>
 					</div>
-					<div class="container">
+					<div class="container pip-modal-row--dependent">
 						<span>__MSG_options_display_pipArtworkTransition__</span>
 						<div class="select">
 							<select id="pipArtworkTransition">
@@ -673,7 +680,7 @@
 							</select>
 						</div>
 					</div>
-					<div class="container">
+					<div class="container pip-modal-row--dependent">
 						<span>__MSG_options_display_pipTextTransition__</span>
 						<div class="select">
 							<select id="pipTextTransition">
@@ -683,7 +690,7 @@
 							</select>
 						</div>
 					</div>
-					<div class="container">
+					<div class="container pip-modal-row--dependent">
 						<span>__MSG_options_display_pipMarquee__</span>
 						<label>
 							<input type="checkbox" id="pipMarqueeEnabled">
