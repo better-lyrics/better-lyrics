@@ -5,10 +5,10 @@
     "description": "Enhance YouTube Music with beautiful time-synced lyrics, multilingual support, real-time translations and more",
     "scripts": {
         "generate:locales": "tsx tooling/generate-locales.ts",
-        "dev": "npm run generate:locales && extension dev",
+        "dev": "npm run generate:locales && extension dev --browser chrome",
         "dev:firefox": "npm run generate:locales && extension dev --browser firefox",
         "dev:brave": "npm run generate:locales && extension dev --chromium-binary \"/Applications/Brave Browser.app/Contents/MacOS/Brave Browser\"",
-        "start": "npm run generate:locales && extension start",
+        "start": "npm run generate:locales && extension start --browser chrome",
         "build": "npm run generate:locales && extension build --browser all",
         "build:ci": "npm run generate:locales && tsx tooling/build-and-patch.ts",
         "build:zip": "npm run generate:locales && extension build --browser all --zip",

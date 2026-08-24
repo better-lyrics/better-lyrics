@@ -73,6 +73,13 @@ const emitRendererStyles = {
   },
 };
 
+const linuxChromeSandbox = "/opt/google/chrome/chrome-sandbox";
+if (process.platform === "linux" && existsSync(linuxChromeSandbox)) {
+  process.env.CHROME_DEVEL_SANDBOX ??= linuxChromeSandbox;
+}
+
+const chromiumDevelopmentProfile = "dist/extension-js/profiles/chrome-profile/dev";
+
 const chromiumBrowser = {
   preferences: { theme: "dark" },
   persistProfile: true,
@@ -99,6 +106,10 @@ const config = {
       polyfill: true,
     },
     start: {
+      // Google rejects new sign-ins while `dev` has Chrome's remote-debugging transport enabled.
+      // `start` has no CDP transport, so use it once to authenticate this same persistent profile.
+      browser: "chrome",
+      profile: chromiumDevelopmentProfile,
       polyfill: true,
     },
     build: {
