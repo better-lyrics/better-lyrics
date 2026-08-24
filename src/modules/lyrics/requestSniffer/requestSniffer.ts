@@ -257,13 +257,13 @@ export async function getSongAlbum(videoId: string, signal?: AbortSignal): Promi
   log("Song album information didn't come in time for: ", videoId);
 }
 
-export function setupRequestSniffer(): void {
+export function setupRequestSniffer(): () => void {
   let url = new URL(window.location.href);
   if (url.searchParams.has("v")) {
     firstRequestMissedVideoId = url.searchParams.get("v");
   }
 
-  document.addEventListener("blyrics-send-response", (event: Event) => {
+  const handleSniffResponse = (event: Event): void => {
     if (!(event instanceof CustomEvent)) return;
     let { /** @type string */ url, requestJson, responseJson, localizedResponseJson } = event.detail;
     if (matchesPath(url, "/youtubei/v1/next")) {
@@ -559,7 +559,10 @@ export function setupRequestSniffer(): void {
         }
       }
     }
-  });
+  };
+
+  document.addEventListener("blyrics-send-response", handleSniffResponse);
+  return () => document.removeEventListener("blyrics-send-response", handleSniffResponse);
 }
 
 function matchesPath(urlString: string, path: string) {

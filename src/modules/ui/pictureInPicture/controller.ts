@@ -35,6 +35,11 @@ export class PictureInPictureController<TWindow> {
     this.open();
   }
 
+  destroy(): void {
+    this.closeActiveWindow();
+    this.dependencies.dispose?.();
+  }
+
   private open(): void {
     const capability = getPictureInPictureCapability<TWindow>(this.dependencies.host);
     if (capability.kind === "supported") this.requestWindow(capability.api);
