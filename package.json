@@ -56,13 +56,13 @@
         "dompurify": "^3.4.13",
         "fast-xml-parser": "^5.10.1",
         "fflate": "^0.8.3",
-        "marked": "^18.0.7",
+        "marked": "^18.0.9",
         "rics": "^0.3.21",
         "sortablejs": "^1.15.7"
     },
     "devDependencies": {
         "@biomejs/biome": "2.0.4",
-        "@types/chrome": "^0.2.5",
+        "@types/chrome": "^0.2.6",
         "@types/jsdom": "^28.0.3",
         "@types/node": "^26.2.0",
         "@types/sortablejs": "^1.15.9",
@@ -70,7 +70,7 @@
         "extension": "^4.1.5",
         "jsdom": "^29.1.1",
         "knip": "^5.88.1",
-        "tsx": "^4.23.11",
+        "tsx": "^4.23.12",
         "typescript": "^6.0.3"
     }
 }
