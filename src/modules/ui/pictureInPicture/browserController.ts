@@ -10,6 +10,7 @@ import { getStorage } from "@core/storage";
 import { getArtworkMetadata } from "@modules/lyrics/requestSniffer/requestSniffer";
 import { resumeAllAutoscroll } from "@braccato/core";
 import { onSignal, sendInit, sendMetadata } from "./bridge";
+import { createGatedToggle } from "./controller";
 import { publishPictureInPictureLyrics } from "./lyricsPublisher";
 import { DEFAULT_ARTWORK_TRANSITION, DEFAULT_TEXT_TRANSITION } from "./lyricsView";
 import { createPictureInPictureHost } from "./pipHost";
@@ -38,8 +39,10 @@ let disposePageWorldDelegate: (() => void) | null = null;
 let storedArtworkTransition: unknown = DEFAULT_ARTWORK_TRANSITION;
 let storedTextTransition: unknown = DEFAULT_TEXT_TRANSITION;
 let storedMarqueeEnabled: unknown = true;
+let isPictureInPictureEnabled = true;
 
 const PIP_SETTING_DEFAULTS = {
+  isPictureInPictureEnabled: true,
   isPictureInPictureAutoRestoreEnabled: false,
   pipArtworkTransition: DEFAULT_ARTWORK_TRANSITION,
   pipTextTransition: DEFAULT_TEXT_TRANSITION,
@@ -95,7 +98,7 @@ function reportFailure(message: string, error: unknown): void {
 // `wrappedJSObject` is the Xray marker that identifies the sandbox with the restriction.
 const delegatesToPageWorld = "wrappedJSObject" in window;
 
-export const pictureInPictureController: PictureInPictureToggle = delegatesToPageWorld
+const activeController: PictureInPictureToggle = delegatesToPageWorld
   ? createPageWorldDelegate()
   : createPictureInPictureHost({
       view: isolatedViewDependencies,
@@ -113,6 +116,8 @@ export const pictureInPictureController: PictureInPictureToggle = delegatesToPag
       onClosed: markPictureInPictureClosed,
       reportFailure,
     });
+
+export const pictureInPictureController = createGatedToggle(activeController, () => isPictureInPictureEnabled);
 
 // The page world owns the window and already acted on the same click via its own capture listener,
 // so toggling here would open a second one. This exists to keep the dock button rendering and to
@@ -154,6 +159,7 @@ export function publishPictureInPictureResources(): void {
       lyricsStylesheetUrl: chrome.runtime.getURL(LYRIC_STYLESHEET_PATH),
       pipStylesheetUrl: chrome.runtime.getURL(STYLESHEET_PATH),
       fontUrls: [FONT_LINK, NOTO_SANS_UNIVERSAL_LINK],
+      enabled: items.isPictureInPictureEnabled !== false,
       autoRestoreEnabled: Boolean(items.isPictureInPictureAutoRestoreEnabled),
       artworkTransition: String(items.pipArtworkTransition),
       textTransition: String(items.pipTextTransition),
@@ -210,8 +216,16 @@ export function initializePictureInPictureAutoRestore(): void {
   hasInitializedAutoRestore = true;
 
   if (delegatesToPageWorld) {
+    getStorage(PIP_SETTING_DEFAULTS, items => {
+      isPictureInPictureEnabled = items.isPictureInPictureEnabled !== false;
+    });
+
     storageChangeListener = (changes, areaName) => {
-      if (areaName === "sync" && Object.keys(PIP_SETTING_DEFAULTS).some(key => changes[key])) {
+      if (areaName !== "sync") return;
+      if (changes.isPictureInPictureEnabled) {
+        isPictureInPictureEnabled = changes.isPictureInPictureEnabled.newValue !== false;
+      }
+      if (Object.keys(PIP_SETTING_DEFAULTS).some(key => changes[key])) {
         publishPictureInPictureResources();
       }
     };
@@ -220,6 +234,7 @@ export function initializePictureInPictureAutoRestore(): void {
   }
 
   getStorage(PIP_SETTING_DEFAULTS, items => {
+    isPictureInPictureEnabled = items.isPictureInPictureEnabled !== false;
     if (items.isPictureInPictureAutoRestoreEnabled) armAutoRestore();
     storedArtworkTransition = items.pipArtworkTransition;
     storedTextTransition = items.pipTextTransition;
@@ -228,6 +243,14 @@ export function initializePictureInPictureAutoRestore(): void {
 
   storageChangeListener = (changes, areaName) => {
     if (areaName !== "sync") return;
+
+    if (changes.isPictureInPictureEnabled) {
+      isPictureInPictureEnabled = changes.isPictureInPictureEnabled.newValue !== false;
+      if (!isPictureInPictureEnabled) {
+        disarmAutoRestore();
+        if (activeController.isOpen()) activeController.toggle();
+      }
+    }
 
     if (changes.pipArtworkTransition) {
       storedArtworkTransition = changes.pipArtworkTransition.newValue ?? DEFAULT_ARTWORK_TRANSITION;

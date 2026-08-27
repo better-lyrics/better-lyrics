@@ -13,6 +13,7 @@ export interface PictureInPictureInitPayload {
   readonly lyricsStylesheetUrl: string;
   readonly pipStylesheetUrl: string;
   readonly fontUrls: readonly string[];
+  readonly enabled: boolean;
   readonly autoRestoreEnabled: boolean;
   readonly artworkTransition: string;
   readonly textTransition: string;
