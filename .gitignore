@@ -27,3 +27,6 @@ Thumbs.db
 .claude
 
 sourcemaps_for_upload/*
+
+# extension.js local session state
+.extension-js

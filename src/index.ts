@@ -16,7 +16,13 @@ import {
   loadTranslationSettings,
   onAlbumArtEnabled,
 } from "@modules/settings/settings";
-import { injectHeadTags, reloadAlbumArt, setupAdObserver } from "@modules/ui/dom";
+import {
+  cleanup as cleanupLyrics,
+  injectHeadTags,
+  reloadAlbumArt,
+  setupAdObserver,
+  unmountDock,
+} from "@modules/ui/dom";
 import {
   disableInertWhenFullscreen,
   enableLyricsTab,
@@ -28,6 +34,7 @@ import {
   setupWakeLockForFullscreen,
 } from "@modules/ui/observer";
 import {
+  disposePictureInPictureBrowserController,
   initializePictureInPictureAutoRestore,
   mirrorNativeMiniPlayerButton,
   publishPictureInPictureResources,
@@ -40,10 +47,12 @@ import { log, setUpLog } from "@utils";
  * This method orchestrates the setup of logging, DOM injection, observers, settings,
  * storage, and lyric providers.
  */
-async function modify(): Promise<void> {
+async function modify(isDisposed: () => boolean): Promise<void> {
   setUpLog();
   await injectHeadTags();
+  if (isDisposed()) return;
   await loadLocaleOverride();
+  if (isDisposed()) return;
   injectI18nCssVars();
   subscribeToLocaleChanges(publishPictureInPictureResources);
   publishPictureInPictureResources();
@@ -89,13 +98,38 @@ async function modify(): Promise<void> {
  * Initializes the application by setting up the DOM content loaded event listener.
  * Entry point for the BetterLyrics extension.
  */
-function init(): void {
+function init(): () => void {
+  let disposed = false;
+  let modifyStarted = false;
+  const runModify = (): void => {
+    if (modifyStarted || disposed) return;
+    modifyStarted = true;
+    void modify(() => disposed);
+  };
+
   initializePictureInPictureAutoRestore();
   mirrorNativeMiniPlayerButton();
-  document.addEventListener("DOMContentLoaded", modify);
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", runModify, { once: true });
+  } else {
+    runModify();
+  }
+
+  const cleanupRequestSniffer = setupRequestSniffer();
+  return () => {
+    disposed = true;
+    document.removeEventListener("DOMContentLoaded", runModify);
+    cleanupRequestSniffer();
+    disposePictureInPictureBrowserController();
+    if (document.querySelector('[data-extension-root="true"]')) cleanupLyrics();
+    unmountDock();
+  };
 }
 
-// Initialize the application
-init();
-
-setupRequestSniffer();
+/**
+ * Extension.js content-script entrypoint. The framework invokes this function
+ * and runs the returned cleanup before reinjecting an updated build.
+ */
+export default function initializeBetterLyrics(): () => void {
+  return init();
+}
