@@ -308,7 +308,7 @@ export function createPictureInPictureHost(
 
   // Subscribed once rather than per window: the opener publishes the current lyrics as soon as it is
   // told the window opened, which is before the view that renders them exists.
-  onLyrics(payload => {
+  const unsubscribeLyrics = onLyrics(payload => {
     lyricsPayload = payload;
     // An offset nudge republishes the same lines. Rebuilding on one would throw away the DOM the
     // window is animating and restart the line it is part way through. A theme change republishes
@@ -379,5 +379,6 @@ export function createPictureInPictureHost(
         { once: true }
       ),
     reportFailure: environment.reportFailure,
+    dispose: unsubscribeLyrics,
   });
 }

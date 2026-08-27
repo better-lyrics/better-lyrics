@@ -22,6 +22,5 @@
   "ignoreIssues": {
     "src/modules/lyrics/providers/blyrics/blyrics-types.ts": ["exports", "types"],
     "src/core/generated/locales.ts": ["types"]
-  },
-  "includeEntryExports": true
+  }
 }
