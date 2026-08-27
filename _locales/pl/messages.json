@@ -111,6 +111,10 @@
     "message": "Następny",
     "description": "Accessible label for the next track button in the Picture-in-Picture lyrics window, used when the YouTube Music player bar exposes no label of its own"
   },
+  "options_display_pipEnabled": {
+    "message": "Enable floating window",
+    "description": "Master toggle for the floating lyrics window feature, which turns it off everywhere including the YouTube Music minimize button"
+  },
   "options_display_pipAutoRestore": {
     "message": "Automatyczne ponowne wyświetlanie pływającego tekstu piosenki",
     "description": "Setting label for automatically reopening the floating lyrics window after page load"
