@@ -82,6 +82,8 @@ Essential reference for creating custom themes. For deep dives, see [STYLING.md]
   --blyrics-instrumental-wave-transform-from: scaleY(1.2);
   --blyrics-instrumental-wave-transform-to: scaleY(0.0001);
   --blyrics-instrumental-wave-easing: ease-in;
+  --blyrics-instrumental-wave-path-high: path("M -4 3 Q 1 2 5 3 Q 10 4 14 3 Q 18 2 22 3 Q 26 4 30 3 L 30 4 L -4 4 Z");
+  --blyrics-instrumental-wave-path-low: path("M -4 3 Q 1 4 5 3 Q 10 2 14 3 Q 18 4 22 3 Q 26 2 30 3 L 30 4 L -4 4 Z");
   --blyrics-instrumental-wave-oscillation-duration: 1.25s;
   --blyrics-instrumental-wave-oscillation-easing: ease-in-out;
   --blyrics-timing-offset: 0.115s;
@@ -298,6 +300,7 @@ Timing uses the Web Animations API:
 - Scroll smoothing uses per-line `translate`, not container `transform`; JS automatically animates lines visible in the previous or current viewport and provides relative index, absolute relative index, signed scroll delta, and absolute scroll distance as CSS variables
 - Visible lyric lines receive inline `will-change: transform, translate` before scroll animations start
 - Per-line scroll effects can overlap with additive Web Animations (`composite: "add"`); custom line durations are visual only, and the next autoscroll is gated by `--blyrics-lyric-scroll-duration`
+- The instrumental wave morphs between `--blyrics-instrumental-wave-path-high` and `--blyrics-instrumental-wave-path-low`; both must use the same path commands in the same order with the same argument counts, or the ripple snaps at the halfway point instead of morphing
 - Visual keyframe values, effect enable flags, durations, and easing are CSS variables; JS still owns scheduling, pause/resume, seeking, and cancellation
 - `prefers-reduced-motion: reduce` keeps smooth scroll enabled but disables side-specific line-scroll differential effects
 

@@ -33,6 +33,9 @@ let hasInitializedAutoRestore = false;
 let hasAttemptedAutoRestore = false;
 let hasMirroredMiniPlayer = false;
 let autoRestoreInteractionController: AbortController | null = null;
+let miniPlayerInteractionController: AbortController | null = null;
+let storageChangeListener: Parameters<typeof chrome.storage.onChanged.addListener>[0] | null = null;
+let disposePageWorldDelegate: (() => void) | null = null;
 // Held raw rather than resolved: the view is the one place that validates them,
 // and a window may not exist yet when a setting changes.
 let storedArtworkTransition: unknown = DEFAULT_ARTWORK_TRANSITION;
@@ -122,7 +125,7 @@ export const pictureInPictureController = createGatedToggle(activeController, ()
 // report the state the page world reports back.
 function createPageWorldDelegate(): PictureInPictureToggle {
   let isOpen = false;
-  onSignal(signal => {
+  disposePageWorldDelegate = onSignal(signal => {
     if (signal.type === "opened") {
       isOpen = true;
       markPictureInPictureOpened();
@@ -218,7 +221,7 @@ export function initializePictureInPictureAutoRestore(): void {
       isPictureInPictureEnabled = items.isPictureInPictureEnabled !== false;
     });
 
-    chrome.storage.onChanged.addListener((changes, areaName) => {
+    storageChangeListener = (changes, areaName) => {
       if (areaName !== "sync") return;
       if (changes.isPictureInPictureEnabled) {
         isPictureInPictureEnabled = changes.isPictureInPictureEnabled.newValue !== false;
@@ -226,7 +229,8 @@ export function initializePictureInPictureAutoRestore(): void {
       if (Object.keys(PIP_SETTING_DEFAULTS).some(key => changes[key])) {
         publishPictureInPictureResources();
       }
-    });
+    };
+    chrome.storage.onChanged.addListener(storageChangeListener);
     return;
   }
 
@@ -238,7 +242,7 @@ export function initializePictureInPictureAutoRestore(): void {
     storedMarqueeEnabled = items.pipMarqueeEnabled;
   });
 
-  chrome.storage.onChanged.addListener((changes, areaName) => {
+  storageChangeListener = (changes, areaName) => {
     if (areaName !== "sync") return;
 
     if (changes.isPictureInPictureEnabled) {
@@ -267,13 +271,15 @@ export function initializePictureInPictureAutoRestore(): void {
     } else {
       disarmAutoRestore();
     }
-  });
+  };
+  chrome.storage.onChanged.addListener(storageChangeListener);
 }
 
 // The page world runs its own copy of this against the same button when it owns the window.
 export function mirrorNativeMiniPlayerButton(): void {
   if (hasMirroredMiniPlayer || delegatesToPageWorld) return;
   hasMirroredMiniPlayer = true;
+  miniPlayerInteractionController = new AbortController();
 
   document.addEventListener(
     "click",
@@ -283,6 +289,21 @@ export function mirrorNativeMiniPlayerButton(): void {
       if (!(target instanceof Element) || !target.closest(MINI_PLAYER_BUTTON_SELECTOR)) return;
       pictureInPictureController.toggle();
     },
-    { capture: true }
+    { capture: true, signal: miniPlayerInteractionController.signal }
   );
+}
+
+export function disposePictureInPictureBrowserController(): void {
+  disarmAutoRestore();
+  miniPlayerInteractionController?.abort();
+  miniPlayerInteractionController = null;
+  if (storageChangeListener) chrome.storage.onChanged.removeListener(storageChangeListener);
+  storageChangeListener = null;
+  disposePageWorldDelegate?.();
+  disposePageWorldDelegate = null;
+  const controller = pictureInPictureController as PictureInPictureToggle & { destroy?: () => void };
+  controller.destroy?.();
+  hasInitializedAutoRestore = false;
+  hasAttemptedAutoRestore = false;
+  hasMirroredMiniPlayer = false;
 }

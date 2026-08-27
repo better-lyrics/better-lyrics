@@ -337,7 +337,11 @@
   },
   "options_themes_create": {
     "message": "Crear",
-    "description": "Create button label"
+    "description": "Button to open the style editor if there are no styles"
+  },
+  "options_themes_edit": {
+    "message": "Editar",
+    "description": "Button to open the style editor"
   },
   "options_themes_marketplace": {
     "message": "Tienda de temas",

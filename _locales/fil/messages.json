@@ -20,7 +20,7 @@
     "description": "Language settings tab label"
   },
   "options_tab_sources": {
-    "message": "Sources",
+    "message": "Pinagmulan",
     "description": "Sources settings tab label"
   },
   "options_tab_identity": {
@@ -337,7 +337,11 @@
   },
   "options_themes_create": {
     "message": "Create",
-    "description": "Create button label"
+    "description": "Button to open the style editor if there are no styles"
+  },
+  "options_themes_edit": {
+    "message": "Edit",
+    "description": "Button to open the style editor"
   },
   "options_themes_marketplace": {
     "message": "Theme Marketplace",

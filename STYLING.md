@@ -219,6 +219,8 @@ JavaScript controls animation timing with the Web Animations API, but the visual
 | `--blyrics-instrumental-wave-transform-from`  | `scaleY(1.2)`                     | Instrumental wave start transform                                                            |
 | `--blyrics-instrumental-wave-transform-to`    | `scaleY(0.0001)`                  | Instrumental wave end transform                                                              |
 | `--blyrics-instrumental-wave-easing`          | `ease-in`                         | Instrumental wave easing                                                                     |
+| `--blyrics-instrumental-wave-path-high`       | `path("M -4 3 Q 1 2 5 3 ...")`    | Wave surface at the top of its oscillation                                                   |
+| `--blyrics-instrumental-wave-path-low`        | `path("M -4 3 Q 1 4 5 3 ...")`    | Wave surface at the bottom of its oscillation                                                |
 | `--blyrics-instrumental-wave-oscillation-duration` | `1.25s`                    | Duration of each instrumental wave surface oscillation loop                                   |
 | `--blyrics-instrumental-wave-oscillation-easing` | `ease-in-out`                  | Easing for the instrumental wave surface oscillation                                          |
 | `--blyrics-line-scroll-duration`              | `750ms`                          | Per-line scroll-triggered translate animation duration                              |
@@ -1288,6 +1290,21 @@ Better Lyrics detects instrumental breaks (intros, outros, and mid-song gaps) an
 When the note becomes active, the engine fades in `.blyrics--instrumental-fill`, moves `.blyrics--wave-clip` upward to fill the note, flattens `.blyrics--wave-path` over the break duration, and runs a looping wave-surface `d` path animation on `.blyrics--wave-path`.
 
 Use `--blyrics-instrumental-fill-transform-*` for the fill travel, `--blyrics-instrumental-wave-transform-*` for the wave flattening, and `--blyrics-instrumental-wave-oscillation-duration` / `--blyrics-instrumental-wave-oscillation-easing` for the visible wave loop.
+
+The shape of that loop is `--blyrics-instrumental-wave-path-high` and `--blyrics-instrumental-wave-path-low`, the two `path()` values the surface morphs between. Redraw them to change the wave's amplitude or how many crests it has:
+
+```css
+/* A taller, slower swell with two bumps instead of five */
+.blyrics-container {
+  --blyrics-instrumental-wave-path-high: path("M -4 3 Q 4 1.5 13 3 Q 22 4.5 30 3 L 30 4 L -4 4 Z");
+  --blyrics-instrumental-wave-path-low: path("M -4 3 Q 4 4.5 13 3 Q 22 1.5 30 3 L 30 4 L -4 4 Z");
+  --blyrics-instrumental-wave-oscillation-duration: 2s;
+}
+```
+
+Both paths must use the same commands in the same order with the same number of arguments, as in the pair above where each is `M Q Q L L Z`. A browser only interpolates two paths smoothly when their command sequences match; a mismatched pair falls back to discrete interpolation and the wave snaps at the halfway point instead of flowing.
+
+Two things constrain the geometry. The paths close along `L 30 4 L -4 4 Z` so the surface overlaps the static block below it, which `.blyrics--wave-rect` draws from `y = 3.9` down. And a quadratic sits a quarter of the way from its endpoints to its control point, so a control at `y = 4.5` peaks at `3.75` and stays clear of that edge, while a control at `y = 5` would peak at exactly `4` and pinch the surface shut.
 
 ### Styling Instrumental Breaks
 

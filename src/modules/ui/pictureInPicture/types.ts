@@ -80,6 +80,7 @@ export interface PictureInPictureControllerDependencies<TWindow> {
   readonly closeWindow: (pipWindow: TWindow) => void;
   readonly observePageHide: (pipWindow: TWindow, listener: () => void) => void;
   readonly reportFailure: (message: string, error: unknown) => void;
+  readonly dispose?: () => void;
 }
 
 export type PictureInPictureCapability<TWindow = Window> =
