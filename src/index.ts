@@ -99,7 +99,7 @@ async function modify(isDisposed: () => boolean): Promise<void> {
  * Entry point for the BetterLyrics extension.
  */
 function init(): () => void {
-  console.log("hello!")
+  console.log("hello!");
   let disposed = false;
   let modifyStarted = false;
   const runModify = (): void => {
@@ -131,6 +131,6 @@ function init(): () => void {
  * Extension.js content-script entrypoint. The framework invokes this function
  * and runs the returned cleanup before reinjecting an updated build.
  */
-export default function initializeBetterLyrics(): () => void {
+function initializeBetterLyrics(): () => void {
   return init();
 }

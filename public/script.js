@@ -8,7 +8,7 @@
  * Extension.js content-script entrypoint. The framework mounts this function and
  * calls the returned cleanup before reinjecting an updated build.
  */
-export default function initializePlayerBridge() {
+function initializePlayerBridge() {
   const PLAYER_SNAPSHOT_INTERVAL_MS = 1000;
   const VIDEO_STATE_EVENTS = [
     "loadedmetadata",
