@@ -117,7 +117,7 @@ function observeToggleClicks(): void {
   document.addEventListener(
     "click",
     event => {
-      if (!controller) return;
+      if (!controller || !resources?.enabled) return;
       const target = event.target;
       if (!(target instanceof Element)) return;
       if (target.closest(PICTURE_IN_PICTURE_TOGGLE_SELECTOR)) {
@@ -144,8 +144,14 @@ export function startPictureInPicturePageHost(): () => void {
       controller = createController();
       observeToggleClicks();
     }
-    if (payload.autoRestoreEnabled) armAutoRestore();
-    else disarmAutoRestore();
+    if (!payload.enabled) {
+      disarmAutoRestore();
+      if (controller.isOpen()) controller.toggle();
+    } else if (payload.autoRestoreEnabled) {
+      armAutoRestore();
+    } else {
+      disarmAutoRestore();
+    }
   });
 
   // The isolated world also announces itself on startup; asking covers the case where this script

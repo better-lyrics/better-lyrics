@@ -1,6 +1,6 @@
 import { strict as assert } from "node:assert";
 import { getPictureInPictureCapability } from "./capability";
-import { PictureInPictureController } from "./controller";
+import { createGatedToggle, PictureInPictureController } from "./controller";
 import type {
   DocumentPictureInPicture,
   DocumentPictureInPictureWindowOptions,
@@ -217,6 +217,36 @@ assert.equal(
   unscriptableController.isOpen(),
   false,
   "Given a window this world cannot script, When observing it throws, Then state resets so the next click retries"
+);
+
+let gateToggleCount = 0;
+let isGateEnabled = true;
+const gated = createGatedToggle(
+  {
+    isSupported: () => true,
+    isOpen: () => false,
+    toggle: () => {
+      gateToggleCount += 1;
+    },
+  },
+  () => isGateEnabled
+);
+
+assert.equal(gated.isSupported(), true, "Given the feature is enabled, When support is checked, Then it is supported");
+gated.toggle();
+assert.equal(gateToggleCount, 1, "Given the feature is enabled, When toggled, Then the window opens");
+
+isGateEnabled = false;
+assert.equal(
+  gated.isSupported(),
+  false,
+  "Given the feature is disabled, When support is checked, Then every caller that gates on it stands down"
+);
+gated.toggle();
+assert.equal(
+  gateToggleCount,
+  1,
+  "Given the feature is disabled, When a stale control is clicked, Then no window opens"
 );
 
 console.log("Picture-in-Picture controller selfcheck passed");

@@ -24,6 +24,7 @@ interface Options {
   isFullScreenDisabled: boolean;
   isStylizedAnimationsEnabled: boolean;
   isPassiveScrollEnabled: boolean;
+  isPictureInPictureEnabled: boolean;
   isPictureInPictureAutoRestoreEnabled: boolean;
   pipArtworkTransition: string;
   pipTextTransition: string;
@@ -83,6 +84,7 @@ const getOptionsFromForm = (): Options => {
     isFullScreenDisabled: (document.getElementById("isFullScreenDisabled") as HTMLInputElement).checked,
     isStylizedAnimationsEnabled: (document.getElementById("isStylizedAnimationsEnabled") as HTMLInputElement).checked,
     isPassiveScrollEnabled: (document.getElementById("isPassiveScrollEnabled") as HTMLInputElement).checked,
+    isPictureInPictureEnabled: (document.getElementById("isPictureInPictureEnabled") as HTMLInputElement).checked,
     isPictureInPictureAutoRestoreEnabled: (
       document.getElementById("isPictureInPictureAutoRestoreEnabled") as HTMLInputElement
     ).checked,
@@ -271,6 +273,7 @@ const restoreOptions = (): void => {
     isFullScreenDisabled: false,
     isStylizedAnimationsEnabled: true,
     isPassiveScrollEnabled: true,
+    isPictureInPictureEnabled: true,
     isPictureInPictureAutoRestoreEnabled: false,
     pipArtworkTransition: "shuffle",
     pipTextTransition: "spring",
@@ -351,6 +354,7 @@ const setOptionsInForm = (items: Options): void => {
   (document.getElementById("isStylizedAnimationsEnabled") as HTMLInputElement).checked =
     items.isStylizedAnimationsEnabled;
   (document.getElementById("isPassiveScrollEnabled") as HTMLInputElement).checked = items.isPassiveScrollEnabled;
+  (document.getElementById("isPictureInPictureEnabled") as HTMLInputElement).checked = items.isPictureInPictureEnabled;
   (document.getElementById("isPictureInPictureAutoRestoreEnabled") as HTMLInputElement).checked =
     items.isPictureInPictureAutoRestoreEnabled;
   (document.getElementById("pipArtworkTransition") as HTMLSelectElement).value = items.pipArtworkTransition;
@@ -375,6 +379,7 @@ const setOptionsInForm = (items: Options): void => {
   setOffsetDisplay("lineOffsetTrim", items.lineOffsetTrim);
   setDockControlsOrderInForm(items.dockControlsOrder);
   syncUnisonModalDependentState(items.isControlsDockEnabled);
+  syncPictureInPictureModalDependentState(items.isPictureInPictureEnabled);
   romanizationDisabledLanguages = items.romanizationDisabledLanguages || [];
   translationDisabledLanguages = items.translationDisabledLanguages || [];
   updateExclusionsConfigVisibility();
@@ -1601,6 +1606,15 @@ function initPictureInPictureModal(): void {
   for (const control of overlay.querySelectorAll("input, select")) {
     control.addEventListener("change", saveOptions);
   }
+
+  const enabledToggle = document.getElementById("isPictureInPictureEnabled") as HTMLInputElement | null;
+  enabledToggle?.addEventListener("change", () => syncPictureInPictureModalDependentState(enabledToggle.checked));
+}
+
+function syncPictureInPictureModalDependentState(enabled: boolean): void {
+  const body = document.getElementById("pip-modal-body");
+  if (!body) return;
+  body.dataset.pipDisabled = enabled ? "false" : "true";
 }
 
 function initOffsetModal(): void {

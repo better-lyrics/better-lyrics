@@ -2375,7 +2375,8 @@ input.cm-textfield:focus-visible {
 	color: hsl(232, 84%, 78%);
 }
 
-#unison-actions-modal-body[data-pinned-disabled="true"] .unison-modal-row--dependent {
+#unison-actions-modal-body[data-pinned-disabled="true"] .unison-modal-row--dependent,
+#pip-modal-body[data-pip-disabled="true"] .pip-modal-row--dependent {
 	opacity: 0.45;
 	pointer-events: none;
 }
