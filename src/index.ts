@@ -130,6 +130,6 @@ function init(): () => void {
  * Extension.js content-script entrypoint. The framework invokes this function
  * and runs the returned cleanup before reinjecting an updated build.
  */
-function initializeBetterLyrics(): () => void {
+export default function initializeBetterLyrics(): () => void {
   return init();
 }
