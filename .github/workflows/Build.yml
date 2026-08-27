@@ -29,7 +29,7 @@ jobs:
       - name: Use Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: "20.x"
+          node-version: "22.x"
           cache: 'npm'
 
       - name: Get version and hash
@@ -57,7 +57,7 @@ jobs:
         if: ${{ env.HAS_CF_SECRETS == 'true' }}
         env:
           SOURCEMAPS_API_KEY: ${{ secrets.SOURCEMAPS_API_KEY }}
-          SOURCEMAPS_BASE_URL: ${{ env.SOURCEMAPS_API_URL }}
+          SOURCEMAPS_BASE_URL: ${{ vars.SOURCEMAPS_API_URL }}
         run: npm run build:ci
 
       - name: Build extension (without sourcemap uplaod)

@@ -230,8 +230,13 @@ async function processBatchTranslationsAndRomanizations(
     const lineData = linesData[index];
     const lyricElement = lineData.lyricElement;
 
+    // Authoring tools stamp a default xml:lang on every file, so a language the script contradicts cannot veto.
+    const scriptLanguage = detectNonLatinLanguage(item.words);
+    const trustedLanguage =
+      sourceLanguage && scriptLanguage && !langCodesMatch(sourceLanguage, scriptLanguage) ? undefined : sourceLanguage;
+
     // --- Romanization ---
-    const isLanguageDisabledForRomanization = !!sourceLanguage && isRomanizationDisabledForLang(sourceLanguage);
+    const isLanguageDisabledForRomanization = !!trustedLanguage && isRomanizationDisabledForLang(trustedLanguage);
     if (isRomanizationEnabled && !isLanguageDisabledForRomanization) {
       let romanizedResult: string | null = null;
       let timedRomanization: LyricPart[] | null = null;
@@ -266,7 +271,7 @@ async function processBatchTranslationsAndRomanizations(
     }
 
     // --- Translation ---
-    const isSourceLangDisabled = !!sourceLanguage && isTranslationDisabledForLang(sourceLanguage);
+    const isSourceLangDisabled = !!trustedLanguage && isTranslationDisabledForLang(trustedLanguage);
 
     if (isTranslateEnabled && !isSourceLangDisabled) {
       let translationResult: string | null = null;

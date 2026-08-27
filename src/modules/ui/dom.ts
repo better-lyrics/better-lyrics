@@ -258,12 +258,14 @@ export function createLyricsWrapper(): HTMLElement {
   const existingWrapper = document.getElementById(LYRICS_WRAPPER_ID);
 
   if (existingWrapper) {
+    existingWrapper.dataset.extensionRoot = "true";
     existingWrapper.replaceChildren();
     return existingWrapper;
   }
 
   const wrapper = document.createElement("div");
   wrapper.id = LYRICS_WRAPPER_ID;
+  wrapper.dataset.extensionRoot = "true";
   tabRenderer.appendChild(wrapper);
 
   wrapper.addEventListener("copy", (e: ClipboardEvent) => {
@@ -782,6 +784,7 @@ export function mountDock(position: string): void {
 
     dock = document.createElement("div");
     dock.className = DOCK_CLASS;
+    dock.dataset.extensionRoot = "true";
 
     inner = document.createElement("div");
     inner.className = `${DOCK_CLASS}__inner`;
@@ -1454,30 +1457,31 @@ function buildUnisonSubmitUrl(song: string, artist: string, album: string, durat
 export async function injectHeadTags(): Promise<void> {
   const imgURL = HOMEPAGE_ICON_URL;
 
-  const imagePreload = document.createElement("link");
-  imagePreload.rel = "preload";
-  imagePreload.as = "image";
-  imagePreload.href = imgURL;
+  if (!document.head.querySelector(`link[rel="preload"][href="${imgURL}"]`)) {
+    const imagePreload = document.createElement("link");
+    imagePreload.rel = "preload";
+    imagePreload.as = "image";
+    imagePreload.href = imgURL;
+    document.head.appendChild(imagePreload);
+  }
 
-  document.head.appendChild(imagePreload);
-
-  const fontLink = document.createElement("link");
-  fontLink.href = FONT_LINK;
-  fontLink.rel = "stylesheet";
-  document.head.appendChild(fontLink);
-
-  const notoFontLink = document.createElement("link");
-  notoFontLink.href = NOTO_SANS_UNIVERSAL_LINK;
-  notoFontLink.rel = "stylesheet";
-  document.head.appendChild(notoFontLink);
+  for (const href of [FONT_LINK, NOTO_SANS_UNIVERSAL_LINK]) {
+    if (document.head.querySelector(`link[rel="stylesheet"][href="${href}"]`)) continue;
+    const fontLink = document.createElement("link");
+    fontLink.href = href;
+    fontLink.rel = "stylesheet";
+    document.head.appendChild(fontLink);
+  }
 
   const cssFiles = ["css/ytmusic/index.css", "css/blyrics/index.css", "css/themesong.css"];
 
   for (const file of cssFiles) {
+    const id = `blyrics-style-${file.replace(/(\/index)?\.css$/, "")}`;
+    if (document.getElementById(id)) continue;
     const link = document.createElement("link");
     link.rel = "stylesheet";
     link.href = chrome.runtime.getURL(file);
-    link.id = `blyrics-style-${file.replace(/(\/index)?\.css$/, "")}`;
+    link.id = id;
     document.head.appendChild(link);
   }
 }
