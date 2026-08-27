@@ -8,16 +8,95 @@
  * calls the returned cleanup before reinjecting an updated build.
  */
 export default function initializeRequestInterceptor() {
+  const REQUEST_REPLAY_EVENT = "blyrics-request-sniff-replay";
+  const RESPONSE_EVENT = "blyrics-send-response";
+  const REPLAY_CACHE_KEY = Symbol.for("better-lyrics.request-sniffer-replay-cache");
+  const REPLAY_CACHE_VERSION = 1;
+  const MAX_BROWSE_REPLAY_ENTRIES = 32;
+
   /** Store reference to original fetch function */
   const originalFetch = window.fetch;
 
+  function getLyricsBrowseId(responseJson) {
+    return (
+      responseJson?.contents?.singleColumnMusicWatchNextResultsRenderer?.tabbedRenderer?.watchNextTabbedResultsRenderer
+        ?.tabs?.[1]?.tabRenderer?.endpoint?.browseEndpoint?.browseId ?? null
+    );
+  }
+
+  // The isolated-world content script is replaced during hot reload, including all of its
+  // module-scoped Maps. Keep the raw responses in the page world, whose `window` survives that
+  // reinjection, so the next content-script generation can rebuild its parsed caches.
+  const existingReplayCache = window[REPLAY_CACHE_KEY];
+  const replayCache =
+    existingReplayCache?.version === REPLAY_CACHE_VERSION && existingReplayCache.browseResponses instanceof Map
+      ? existingReplayCache
+      : {
+          version: REPLAY_CACHE_VERSION,
+          lastNextResponse: null,
+          lyricsBrowseId: null,
+          browseResponses: new Map(),
+        };
+  replayCache.lyricsBrowseId = getLyricsBrowseId(replayCache.lastNextResponse?.responseJson);
+  if (replayCache.lastNextResponse) {
+    for (const browseId of replayCache.browseResponses.keys()) {
+      if (browseId !== replayCache.lyricsBrowseId) replayCache.browseResponses.delete(browseId);
+    }
+  }
+  window[REPLAY_CACHE_KEY] = replayCache;
+
+  function emitSniffResponse(detail) {
+    document.dispatchEvent(new CustomEvent(RESPONSE_EVENT, { detail }));
+  }
+
+  function rememberSniffResponse(detail) {
+    let path;
+    try {
+      path = new URL(detail.url).pathname;
+    } catch (_error) {
+      return;
+    }
+
+    if (path.startsWith("/youtubei/v1/next")) {
+      replayCache.lastNextResponse = detail;
+      replayCache.lyricsBrowseId = getLyricsBrowseId(detail.responseJson);
+      for (const browseId of replayCache.browseResponses.keys()) {
+        if (browseId !== replayCache.lyricsBrowseId) replayCache.browseResponses.delete(browseId);
+      }
+      return;
+    }
+
+    if (!path.startsWith("/youtubei/v1/browse")) return;
+    const browseId = detail.requestJson?.browseId;
+    if (typeof browseId !== "string" || browseId.length === 0) return;
+    // Once `/next` identifies the lyrics endpoint, unrelated browse payloads (home, artist,
+    // album, etc.) are intentionally not retained. Some of those responses are very large.
+    if (replayCache.lastNextResponse && browseId !== replayCache.lyricsBrowseId) return;
+
+    // Refresh insertion order so the bounded cache retains the most recently used responses.
+    replayCache.browseResponses.delete(browseId);
+    replayCache.browseResponses.set(browseId, detail);
+    while (replayCache.browseResponses.size > MAX_BROWSE_REPLAY_ENTRIES) {
+      const oldestBrowseId = replayCache.browseResponses.keys().next().value;
+      replayCache.browseResponses.delete(oldestBrowseId);
+    }
+  }
+
+  function replaySniffResponses() {
+    // `/next` establishes browseId -> videoId associations, so it must be replayed before the
+    // corresponding `/browse` responses that contain the lyrics.
+    if (replayCache.lastNextResponse) emitSniffResponse(replayCache.lastNextResponse);
+    for (const detail of replayCache.browseResponses.values()) emitSniffResponse(detail);
+  }
+
+  const handleReplayRequest = () => replaySniffResponses();
+  document.addEventListener(REQUEST_REPLAY_EVENT, handleReplayRequest);
+
   // -- English byline override --------------------------
   function dispatchSniffResponse(url, requestJson, responseJson, status, localizedResponseJson) {
-    document.dispatchEvent(
-      new CustomEvent("blyrics-send-response", {
-        detail: { url, requestJson, responseJson, localizedResponseJson, status, timestamp: Date.now() },
-      })
-    );
+    const detail = { url, requestJson, responseJson, localizedResponseJson, status, timestamp: Date.now() };
+    rememberSniffResponse(detail);
+    emitSniffResponse(detail);
   }
 
   /**
@@ -177,5 +256,6 @@ export default function initializeRequestInterceptor() {
   return () => {
     // Do not overwrite a newer interceptor if another build mounted first.
     if (window.fetch === interceptedFetch) window.fetch = originalFetch;
+    document.removeEventListener(REQUEST_REPLAY_EVENT, handleReplayRequest);
   };
 }

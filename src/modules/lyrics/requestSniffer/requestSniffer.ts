@@ -43,6 +43,9 @@ const browseIdToVideoIdMap = new Map<string, string>();
 const videoIdToLyricsMap = new Map<string, LyricsInfo>();
 const videoMetaDataMap = new Map<string, VideoMetadata>();
 const videoIdToAlbumMap = new Map<string, string | null>();
+const REQUEST_REPLAY_EVENT = "blyrics-request-sniff-replay";
+const RESPONSE_EVENT = "blyrics-send-response";
+const REPLAY_RETRY_DELAY_MS = 100;
 
 interface LocalizedDisplayMetadata {
   title: string;
@@ -561,8 +564,20 @@ export function setupRequestSniffer(): () => void {
     }
   };
 
-  document.addEventListener("blyrics-send-response", handleSniffResponse);
-  return () => document.removeEventListener("blyrics-send-response", handleSniffResponse);
+  document.addEventListener(RESPONSE_EVENT, handleSniffResponse);
+
+  const requestReplay = (): void => {
+    document.dispatchEvent(new Event(REQUEST_REPLAY_EVENT));
+  };
+  requestReplay();
+  // Extension.js injects the MAIN and ISOLATED entries independently. The immediate request is
+  // normally handled by the old or new interceptor; one retry covers the brief handoff between them.
+  const replayRetry = window.setTimeout(requestReplay, REPLAY_RETRY_DELAY_MS);
+
+  return () => {
+    window.clearTimeout(replayRetry);
+    document.removeEventListener(RESPONSE_EVENT, handleSniffResponse);
+  };
 }
 
 function matchesPath(urlString: string, path: string) {

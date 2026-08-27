@@ -14,7 +14,7 @@ export function getResumeScrollElement(): HTMLElement {
   if (!elem) {
     const wrapper = document.createElement("div");
     wrapper.id = "autoscroll-resume-wrapper";
-    wrapper.className = "autoscroll-resume-wrapper" + "!";
+    wrapper.className = "autoscroll-resume-wrapper";
     elem = document.createElement("button");
     elem.id = "autoscroll-resume-button";
     elem.innerText = t("lyrics_resumeAutoscroll");
