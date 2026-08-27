@@ -22,6 +22,7 @@ let controller: PictureInPictureController<Window> | null = null;
 let nextRequestId = 0;
 let hasAttemptedAutoRestore = false;
 let autoRestoreController: AbortController | null = null;
+let toggleClickController: AbortController | null = null;
 const pendingMetadata = new Map<number, (metadata: PictureInPictureSongMetadata | null) => void>();
 
 function requestSongMetadata(
@@ -111,6 +112,8 @@ function armAutoRestore(): void {
 // A capture listener on the real button, rather than a forwarded signal, is what keeps the
 // transient user activation that requestWindow() demands.
 function observeToggleClicks(): void {
+  toggleClickController?.abort();
+  toggleClickController = new AbortController();
   document.addEventListener(
     "click",
     event => {
@@ -123,19 +126,19 @@ function observeToggleClicks(): void {
       }
       if (!controller.isOpen() && target.closest(MINI_PLAYER_BUTTON_SELECTOR)) controller.toggle();
     },
-    { capture: true }
+    { capture: true, signal: toggleClickController.signal }
   );
 }
 
-export function startPictureInPicturePageHost(): void {
-  onMetadata(({ requestId, metadata }) => {
+export function startPictureInPicturePageHost(): () => void {
+  const unsubscribeMetadata = onMetadata(({ requestId, metadata }) => {
     const resolve = pendingMetadata.get(requestId);
     if (!resolve) return;
     pendingMetadata.delete(requestId);
     resolve(metadata);
   });
 
-  onInit(payload => {
+  const unsubscribeInit = onInit(payload => {
     resources = payload;
     if (!controller) {
       controller = createController();
@@ -148,4 +151,18 @@ export function startPictureInPicturePageHost(): void {
   // The isolated world also announces itself on startup; asking covers the case where this script
   // finished loading after that announcement.
   sendSignal({ type: "ready" } satisfies PictureInPictureSignal);
+
+  return () => {
+    unsubscribeMetadata();
+    unsubscribeInit();
+    disarmAutoRestore();
+    toggleClickController?.abort();
+    toggleClickController = null;
+    controller?.destroy();
+    controller = null;
+    resources = null;
+    hasAttemptedAutoRestore = false;
+    for (const resolve of pendingMetadata.values()) resolve(null);
+    pendingMetadata.clear();
+  };
 }

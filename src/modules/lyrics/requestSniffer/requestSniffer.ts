@@ -43,6 +43,9 @@ const browseIdToVideoIdMap = new Map<string, string>();
 const videoIdToLyricsMap = new Map<string, LyricsInfo>();
 const videoMetaDataMap = new Map<string, VideoMetadata>();
 const videoIdToAlbumMap = new Map<string, string | null>();
+const REQUEST_REPLAY_EVENT = "blyrics-request-sniff-replay";
+const RESPONSE_EVENT = "blyrics-send-response";
+const REPLAY_RETRY_DELAY_MS = 100;
 
 interface LocalizedDisplayMetadata {
   title: string;
@@ -257,13 +260,13 @@ export async function getSongAlbum(videoId: string, signal?: AbortSignal): Promi
   log("Song album information didn't come in time for: ", videoId);
 }
 
-export function setupRequestSniffer(): void {
+export function setupRequestSniffer(): () => void {
   let url = new URL(window.location.href);
   if (url.searchParams.has("v")) {
     firstRequestMissedVideoId = url.searchParams.get("v");
   }
 
-  document.addEventListener("blyrics-send-response", (event: Event) => {
+  const handleSniffResponse = (event: Event): void => {
     if (!(event instanceof CustomEvent)) return;
     let { /** @type string */ url, requestJson, responseJson, localizedResponseJson } = event.detail;
     if (matchesPath(url, "/youtubei/v1/next")) {
@@ -559,7 +562,22 @@ export function setupRequestSniffer(): void {
         }
       }
     }
-  });
+  };
+
+  document.addEventListener(RESPONSE_EVENT, handleSniffResponse);
+
+  const requestReplay = (): void => {
+    document.dispatchEvent(new Event(REQUEST_REPLAY_EVENT));
+  };
+  requestReplay();
+  // Extension.js injects the MAIN and ISOLATED entries independently. The immediate request is
+  // normally handled by the old or new interceptor; one retry covers the brief handoff between them.
+  const replayRetry = window.setTimeout(requestReplay, REPLAY_RETRY_DELAY_MS);
+
+  return () => {
+    window.clearTimeout(replayRetry);
+    document.removeEventListener(RESPONSE_EVENT, handleSniffResponse);
+  };
 }
 
 function matchesPath(urlString: string, path: string) {

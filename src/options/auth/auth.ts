@@ -42,7 +42,7 @@ function originLabel(origin: string): string {
 
 function renderLogos(partner: AuthPartner | undefined): void {
   const logo = document.getElementById("auth-logo") as HTMLImageElement | null;
-  if (logo) logo.src = chrome.runtime.getURL("icons/icon-512.png");
+  if (logo) logo.src = chrome.runtime.getURL("images/icons/icon-512.png");
 
   const pulse = document.getElementById("auth-pulse");
   const partnerLogo = document.getElementById("auth-partner-logo") as HTMLImageElement | null;
