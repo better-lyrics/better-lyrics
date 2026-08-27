@@ -99,7 +99,6 @@ async function modify(isDisposed: () => boolean): Promise<void> {
  * Entry point for the BetterLyrics extension.
  */
 function init(): () => void {
-  console.log("hello!");
   let disposed = false;
   let modifyStarted = false;
   const runModify = (): void => {
