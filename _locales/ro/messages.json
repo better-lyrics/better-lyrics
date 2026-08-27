@@ -111,6 +111,10 @@
     "message": "Next",
     "description": "Accessible label for the next track button in the Picture-in-Picture lyrics window, used when the YouTube Music player bar exposes no label of its own"
   },
+  "options_display_pipEnabled": {
+    "message": "Enable floating window",
+    "description": "Master toggle for the floating lyrics window feature, which turns it off everywhere including the YouTube Music minimize button"
+  },
   "options_display_pipAutoRestore": {
     "message": "Reopen floating lyrics automatically",
     "description": "Setting label for automatically reopening the floating lyrics window after page load"
@@ -337,7 +341,11 @@
   },
   "options_themes_create": {
     "message": "Creează",
-    "description": "Create button label"
+    "description": "Button to open the style editor if there are no styles"
+  },
+  "options_themes_edit": {
+    "message": "Edit",
+    "description": "Button to open the style editor"
   },
   "options_themes_marketplace": {
     "message": "Bazar de Teme",
