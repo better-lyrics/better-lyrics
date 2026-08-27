@@ -18,7 +18,15 @@ import {
   romanizeBatch,
   translateBatch,
 } from "@modules/lyrics/translation";
-import { addFooter, addNoLyricsButton, cleanup, createLyricsWrapper, flushLoader, renderLoader } from "@modules/ui/dom";
+import {
+  addFooter,
+  addNoLyricsButton,
+  cleanup,
+  createLyricsWrapper,
+  flushLoader,
+  renderLoader,
+  updateTranslationSource,
+} from "@modules/ui/dom";
 import { lyricsElementAdded, mainView } from "@modules/ui/mainLyricsView";
 import { disableNativeLyricsFocus } from "@modules/ui/nativeLyricsFocus";
 import { publishPictureInPictureLyrics } from "@modules/ui/pictureInPicture/lyricsPublisher";
@@ -226,6 +234,7 @@ async function processBatchTranslationsAndRomanizations(
   // 1. Identify what needs to be translated/romanized
   lyrics.forEach((item, index) => {
     if (item.isInstrumental) return;
+    if (item.words === t("lyrics_notFound")) return;
 
     const lineData = linesData[index];
     const lyricElement = lineData.lyricElement;
@@ -346,6 +355,12 @@ async function processBatchTranslationsAndRomanizations(
         });
         if (isStale()) return;
 
+        if (response.translationSource) {
+          updateTranslationSource(response.translationSource);
+        } else if (response.translationError) {
+          updateTranslationSource("error");
+        }
+
         if (!sourceLanguage && response.detectedLanguage) {
           sourceLanguage = response.detectedLanguage;
           logCore("Determined language via translation batch: " + sourceLanguage);
@@ -356,8 +371,11 @@ async function processBatchTranslationsAndRomanizations(
         response.results.forEach((result, i) => {
           if (result) {
             const originalIndex = translationBatch[i].index;
-            injectTranslation(doc, linesData[originalIndex].lyricElement, result.translatedText);
-            recordLyricDecoration(originalIndex, { translation: result.translatedText });
+            const originalText = translationBatch[i].text;
+            if (!isSameText(result.translatedText, originalText)) {
+              injectTranslation(doc, linesData[originalIndex].lyricElement, result.translatedText);
+              recordLyricDecoration(originalIndex, { translation: result.translatedText });
+            }
           }
         });
         lyricsElementAdded();

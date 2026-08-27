@@ -308,6 +308,62 @@
     "message": "Translation language",
     "description": "Translation language setting label"
   },
+  "options_language_translationProvider": {
+    "message": "Translation service",
+    "description": "Dropdown label to select which translation engine to use"
+  },
+  "options_language_googleTranslate": {
+    "message": "Google Translate",
+    "description": "Google Translate provider option"
+  },
+  "options_language_geminiApi": {
+    "message": "Gemini API",
+    "description": "Gemini API translation provider option"
+  },
+  "options_language_geminiApiSettings": {
+    "message": "Gemini API Settings",
+    "description": "Label for Gemini API settings button or collapsible container"
+  },
+  "options_language_geminiApiKeyPlaceholder": {
+    "message": "Enter your Gemini API key...",
+    "description": "Placeholder in the input field for Gemini API key"
+  },
+  "options_language_manageModelFallback": {
+    "message": "Manage Model Fallback",
+    "description": "Label for the settings trigger/modal to manage fallback options for Gemini models"
+  },
+  "options_language_clearTranslationCache": {
+    "message": "Clear Translation Cache",
+    "description": "Button label to clear cached Gemini/API translations"
+  },
+  "options_language_modelFallbackSequence": {
+    "message": "Model Fallback Sequence",
+    "description": "Title of the fallback sequence configuration popup or section"
+  },
+  "options_language_dragToReorder": {
+    "message": "Drag to reorder model preference. Topmost available model will be attempted first.",
+    "description": "Instruction label inside the model fallback modal"
+  },
+  "options_language_translationCacheCleared": {
+    "message": "Translation cache cleared successfully",
+    "description": "Success message when user clears local translation cache"
+  },
+  "options_language_sequence": {
+    "message": "Sequence",
+    "description": "Label prefix displaying the order of attempted models"
+  },
+  "options_language_translationMode": {
+    "message": "Translation mode",
+    "description": "Setting label to choose between translation modes"
+  },
+  "options_language_translationModeSpeed": {
+    "message": "Speed",
+    "description": "Speed mode translation option description"
+  },
+  "options_language_translationModeQuality": {
+    "message": "Quality",
+    "description": "Quality mode translation option description"
+  },
 
   "options_sources_title": {
     "message": "Lyric Source Preference",
@@ -1069,6 +1125,14 @@
   "lyrics_source": {
     "message": "Source: ",
     "description": "Lyrics source label"
+  },
+  "lyrics_translationSource": {
+    "message": "Translation: ",
+    "description": "Label for translation source in footer (e.g. Translation: )"
+  },
+  "lyrics_translationErrorGemini": {
+    "message": "Gemini API translation error, please try again later",
+    "description": "Error message shown in the translation source capsule when all Gemini models fail"
   },
   "lyrics_searchOnGenius": {
     "message": "Search on Genius",

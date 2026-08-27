@@ -211,6 +211,25 @@
 							<span class="checkmark"></span>
 						</label>
 					</div>
+					<div class="container" id="translationProviderContainer" style="display: none;">
+						<span>__MSG_options_language_translationProvider__</span>
+						<div class="select">
+							<select id="translationProvider">
+								<option value="google">__MSG_options_language_googleTranslate__</option>
+								<option value="gemini">__MSG_options_language_geminiApi__</option>
+							</select>
+						</div>
+					</div>
+					<div class="container container--small" id="geminiApiContainer" style="display: none;">
+						<p>__MSG_options_language_geminiApiSettings__</p>
+						<input type="password" id="geminiApiKey" placeholder="__MSG_options_language_geminiApiKeyPlaceholder__" style="margin-bottom: 0.5rem; width: 100%; box-sizing: border-box; background: var(--bg-1); border: 1px solid var(--border); color: var(--fg); padding: 0.4rem; border-radius: 4px;">
+						<button class="small-btn" id="gemini-models-btn">
+							__MSG_options_language_manageModelFallback__
+						</button>
+						<button class="small-btn btn-danger" id="clear-translation-cache-btn" style="margin-top: 0.5rem;">
+							__MSG_options_language_clearTranslationCache__
+						</button>
+					</div>
 					<div class="container">
 						<span>__MSG_options_language_translationLanguage__</span>
 						<div class="select">
@@ -558,6 +577,35 @@
 
 				<div class="modal-footer">
 					<button id="lang-exclusions-reset-btn" class="modal-btn modal-btn-secondary">__MSG_options_resetToDefault__</button>
+				</div>
+			</div>
+		</div>
+
+		<div id="gemini-models-modal-overlay" class="modal-overlay">
+			<div class="modal unison-actions-modal">
+				<div class="modal-header">
+					<h3 class="modal-title">__MSG_options_language_modelFallbackSequence__</h3>
+					<button id="gemini-models-modal-close" class="modal-close-btn" aria-label="Close">
+						<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+							<path d="M6.28 5.22a.75.75 0 0 0-1.06 1.06L8.94 10l-3.72 3.72a.75.75 0 1 0 1.06 1.06L10 11.06l3.72 3.72a.75.75 0 1 0 1.06-1.06L11.06 10l3.72-3.72a.75.75 0 0 0-1.06-1.06L10 8.94 6.28 5.22Z"></path>
+						</svg>
+					</button>
+				</div>
+				<div class="modal-body">
+					<p style="margin-bottom:1rem; opacity:0.8; font-size:0.9rem;">__MSG_options_language_dragToReorder__</p>
+					<ul id="geminiModelFallbackList" class="sortable-list" style="padding:0; margin:0; list-style:none;"></ul>
+					<div class="container" style="margin-top:1.5rem;">
+						<span>__MSG_options_language_translationMode__</span>
+						<div class="select">
+							<select id="geminiTranslationMode">
+								<option value="speed">__MSG_options_language_translationModeSpeed__</option>
+								<option value="quality">__MSG_options_language_translationModeQuality__</option>
+							</select>
+						</div>
+					</div>
+				</div>
+				<div class="modal-footer">
+					<button id="gemini-models-reset-btn" class="modal-btn modal-btn-secondary"></button>
 				</div>
 			</div>
 		</div>

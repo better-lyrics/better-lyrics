@@ -1638,3 +1638,29 @@ function observeFooterForRecalc(footer: HTMLElement): void {
   });
   footerResizeObserver.observe(footer);
 }
+
+export function updateTranslationSource(source: string | null): void {
+  const footerRoot = document.querySelector(".blyrics-footer") || document.querySelector(".blyrics-footer__container");
+  if (!footerRoot) return;
+
+  let capsule = document.getElementById("translation-source-capsule");
+
+  if (!source) {
+    capsule?.remove();
+    return;
+  }
+
+  if (!capsule) {
+    capsule = document.createElement("div");
+    capsule.id = "translation-source-capsule";
+    capsule.className = `${FOOTER_CLASS}__container translation-source-capsule`;
+    footerRoot.appendChild(capsule);
+  }
+
+  if (source === "error") {
+    capsule.textContent = t("lyrics_translationErrorGemini");
+  } else {
+    capsule.textContent = `${t("lyrics_translationSource")}${source}`;
+  }
+}
+

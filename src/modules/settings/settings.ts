@@ -226,6 +226,9 @@ export function listenForPopupMessages(): void {
           logContent("Styles loaded from storage and applied");
         });
       }
+    } else if (request.action === "clearTranslationCache") {
+      clearTranslationCache();
+      sendResponse({ success: true });
     } else if (request.action === "updateSettings") {
       clearTranslationCache();
       applyLoggingSetting();
@@ -397,22 +400,35 @@ export function hideDockOnIdleInFullscreen(): void {
  * Loads translation and romanization settings from storage and updates AppState.
  */
 export function loadTranslationSettings(): void {
-  getStorage(
-    {
-      isTranslateEnabled: false,
-      isRomanizationEnabled: false,
-      translationLanguage: "en",
-      romanizationDisabledLanguages: [],
-      translationDisabledLanguages: [],
-    },
-    items => {
-      AppState.isTranslateEnabled = items.isTranslateEnabled;
-      AppState.isRomanizationEnabled = items.isRomanizationEnabled;
-      AppState.translationLanguage = items.translationLanguage || "en";
-      AppState.romanizationDisabledLanguages = items.romanizationDisabledLanguages || [];
-      AppState.translationDisabledLanguages = items.translationDisabledLanguages || [];
-    }
-  );
+  chrome.storage.local.get({ geminiApiKey: "" }, localItems => {
+    getStorage(
+      {
+        isTranslateEnabled: false,
+        translationProvider: "google",
+        geminiModelFallback: ["gemini-3.1-flash-lite", "gemini-3.5-flash-lite", "gemini-3.6-flash"],
+        geminiTranslationMode: "speed",
+        isRomanizationEnabled: false,
+        translationLanguage: "en",
+        romanizationDisabledLanguages: [],
+        translationDisabledLanguages: [],
+      },
+      items => {
+        AppState.isTranslateEnabled = items.isTranslateEnabled;
+        AppState.translationProvider = items.translationProvider || "google";
+        AppState.geminiApiKey = (localItems as any).geminiApiKey || "";
+        AppState.geminiModelFallback = items.geminiModelFallback || [
+          "gemini-3.1-flash-lite",
+          "gemini-3.5-flash-lite",
+          "gemini-3.6-flash",
+        ];
+        AppState.geminiTranslationMode = (items.geminiTranslationMode as "speed" | "quality") || "speed";
+        AppState.isRomanizationEnabled = items.isRomanizationEnabled;
+        AppState.translationLanguage = items.translationLanguage || "en";
+        AppState.romanizationDisabledLanguages = items.romanizationDisabledLanguages || [];
+        AppState.translationDisabledLanguages = items.translationDisabledLanguages || [];
+      }
+    );
+  });
 }
 
 /**
