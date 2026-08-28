@@ -78,12 +78,10 @@ if (process.platform === "linux" && existsSync(linuxChromeSandbox)) {
   process.env.CHROME_DEVEL_SANDBOX ??= linuxChromeSandbox;
 }
 
-const chromiumDevelopmentProfile = "dist/extension-js/profiles/chrome-profile/dev";
-
 const chromiumBrowser = {
   preferences: { theme: "dark" },
   persistProfile: true,
-  excludeBrowserFlags: ["--hide-scrollbars", "--mute-audio", "--disable-component-extensions-with-background-pages"],
+  excludeBrowserFlags: ["--hide-scrollbars", "--disable-component-extensions-with-background-pages"],
   startingUrl: "https://music.youtube.com/",
 };
 
@@ -106,10 +104,10 @@ const config = {
       polyfill: true,
     },
     start: {
-      // Google rejects new sign-ins while `dev` has Chrome's remote-debugging transport enabled.
-      // `start` has no CDP transport, so use it once to authenticate this same persistent profile.
-      browser: "chrome",
-      profile: chromiumDevelopmentProfile,
+      // Google rejects new sign-ins while `dev` holds the remote-debugging transport. `start` has no
+      // CDP transport, so run it once per browser to authenticate that browser's persistent profile,
+      // which `dev` then reuses. Target and profile stay unset here so `--browser` / `--chromium-binary`
+      // pick the target and its matching managed profile (chrome-profile/dev, chromium-profile/dev).
       polyfill: true,
     },
     build: {
