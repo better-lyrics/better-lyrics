@@ -204,11 +204,15 @@ Lyric timing is driven by `element.animate()`.
 .blyrics-container [data-sync] [data-loader-visible] [data-no-lyrics]
 ├── .blyrics--line (div) [data-agent] [data-time] [data-duration] [data-line-number]
 │   ├── .blyrics-line-main (div)
+│   │   ├── .blyrics-bidi-run.blyrics-highlight-run (span, aria-hidden overlay)
+│   │   │   └── .blyrics-word-group (span)
+│   │   │       └── .blyrics--word.blyrics-word-highlight (span) [data-content] [data-time] [data-duration] [data-long-word]
 │   │   └── .blyrics-bidi-run (span)
 │   │       └── .blyrics-word-group (span)
 │   │           └── .blyrics--word (span) [data-content] [data-time] [data-duration] [data-long-word]
-│   │               └── .blyrics-word-highlight (span, only for long wrapped words)
 │   ├── .blyrics-background-line (div, only when primary background vocals are present)
+│   │   ├── .blyrics-bidi-run.blyrics-highlight-run (span, aria-hidden overlay)
+│   │   │   └── .blyrics-word-group.blyrics-background-lyric
 │   │   └── .blyrics-bidi-run (span)
 │   │       └── .blyrics-word-group.blyrics-background-lyric
 │   ├── .blyrics--romanized.blyrics-content-line
@@ -233,7 +237,7 @@ Lyric timing is driven by `element.animate()`.
 
 | Attribute | Description |
 |-----------|-------------|
-| `data-content` | Word text (used by generated highlight overlay when no real overlay is needed) |
+| `data-content` | Word text |
 | `data-time` | Start time in seconds |
 | `data-duration` | Duration in seconds |
 | `data-long-word` | `"true"` or absent - present when duration exceeds threshold |
@@ -255,10 +259,11 @@ Lyric timing is driven by `element.animate()`.
 | `.blyrics-line-main` | Main lyric text row |
 | `.blyrics-background-line` | Primary background vocal row |
 | `.blyrics-bidi-run` | Inline text-flow wrapper for native browser bidi ordering |
+| `.blyrics-highlight-run` | `aria-hidden` layer over a text row that holds the word overlays |
 | `.blyrics-bidi-sensitive` | Applied to rows containing RTL script; makes word wrappers inline-flow for correct bidi wrapping |
 | `.blyrics-word-group` | Word/syllable group; `inline-block` for LTR-only rows and `display: contents` inside `.blyrics-bidi-sensitive` |
 | `.blyrics--word` | Word span |
-| `.blyrics-word-highlight` | Real highlight overlay for long wrapped words |
+| `.blyrics-word-highlight` | Real active-color overlay; every timed word has one |
 | `.blyrics-line-synced-word` | Zero-duration line-synced word; fades in without rich-sync swipe |
 | `.blyrics--active` | Line is selected for scrolling. Runs on the **scroll clock**, which leads audio by `--blyrics-scroll-timing-offset` (0.5s default) |
 | `.blyrics--animating` | Line's animations are live. Runs on the **audio clock**, so it survives until the line's last word actually finishes |
@@ -276,12 +281,10 @@ Lyric timing is driven by `element.animate()`.
 
 ## Animation System
 
-Karaoke effect uses `::after` with `background-clip: text`; long wrapped words use `.blyrics-word-highlight` instead so the highlight can wrap at inserted `<wbr>` points:
+Every timed word has a real `.blyrics-word-highlight` overlay with `background-clip: text`. A row's overlays sit in `.blyrics-highlight-run`, an `aria-hidden` copy laid over the visible text so both share one layout and wrap the same way:
 
 ```css
-.blyrics--word::after,
-.blyrics-word-highlight {
-  content: attr(data-content);
+.blyrics--word.blyrics-word-highlight {
   color: transparent;
   background-image: linear-gradient(90deg, var(--blyrics-lyric-active-color) ..., transparent ...);
   background-clip: text;
@@ -590,8 +593,7 @@ Target sustained notes for special effects:
 /* Set threshold in knobs */
 /* blyrics-long-word-threshold = 1500; */
 
-.blyrics--word[data-long-word]::after,
-.blyrics--word[data-long-word] > .blyrics-word-highlight {
+.blyrics-word-highlight[data-long-word] {
   --blyrics-glow-color: color(display-p3 1 0.8 0.3 / 1);
 }
 ```
