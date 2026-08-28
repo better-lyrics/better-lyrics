@@ -320,19 +320,6 @@ export function getRomanizationFromCache(text: string): string | null {
   return cache.romanization.get(text.trim()) || null;
 }
 
-export async function clearTranslationCache(): Promise<void> {
-  cache.translation.clear();
-  try {
-    const items = await chrome.storage.local.get(null);
-    const keysToRemove = Object.keys(items).filter(key => key.startsWith("gemini_"));
-    if (keysToRemove.length > 0) {
-      await chrome.storage.local.remove(keysToRemove);
-    }
-  } catch (e) {
-    logCore(TRANSLATION_ERROR_LOG, "Error clearing local cache", e);
-  }
-}
-
 export function clearMemoryTranslationCache(): void {
   cache.romanization.clear();
   cache.translation.clear();
