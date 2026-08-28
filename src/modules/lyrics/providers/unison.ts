@@ -3,6 +3,7 @@ import { getIdentity, signPayload } from "@/core/keyIdentity";
 import { parseLRC, PlainParser } from "@braccato/parsers";
 import type { LyricSourceResult, ProviderParameters } from "./shared";
 import { fillTtml } from "@modules/lyrics/providers/ttmlSource";
+import { warnUnison } from "@core/logger";
 
 interface SubmitterInfo {
   keyId: string;
@@ -51,7 +52,7 @@ export async function vote(lyricsId: number, upvote: boolean) {
     });
     return { ok: response.ok, status: response.status };
   } catch (err) {
-    console.warn(`${LOG_PREFIX_UNISON} vote failed`, err);
+    warnUnison(`vote failed`, err);
     return { ok: false, status: 0 };
   }
 }
@@ -66,7 +67,7 @@ export async function deleteVote(lyricsId: number) {
     });
     return { ok: response.ok, status: response.status };
   } catch (err) {
-    console.warn(`${LOG_PREFIX_UNISON} deleteVote failed`, err);
+    warnUnison(`deleteVote failed`, err);
     return { ok: false, status: 0 };
   }
 }
@@ -81,7 +82,7 @@ export async function report(lyricsId: number, reason: UnisonReportReason | stri
     });
     return { ok: response.ok, status: response.status };
   } catch (err) {
-    console.warn(`${LOG_PREFIX_UNISON} report failed`, err);
+    warnUnison(`report failed`, err);
     return { ok: false, status: 0 };
   }
 }
@@ -98,7 +99,7 @@ export async function byId(lyricsId: number): Promise<UnisonResponse | null> {
     }
     return response.json().then(json => json.data);
   } catch (err) {
-    console.warn(`${LOG_PREFIX_UNISON} byId failed`, err);
+    warnUnison(`byId failed`, err);
     return null;
   }
 }

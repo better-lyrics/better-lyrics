@@ -1,7 +1,7 @@
-import { GENERAL_ERROR_LOG } from "@constants";
 import type { LyricDecorations } from "@modules/lyrics/injectLyrics";
 import type { Lyric } from "@braccato/core";
 import type { PictureInPictureSongMetadata } from "./types";
+import { warnGeneral } from "@core/logger";
 
 const PIP_INIT_EVENT = "blyrics-pip-init" as const;
 const PIP_SIGNAL_EVENT = "blyrics-pip-signal" as const;
@@ -76,7 +76,7 @@ function subscribe<TPayload>(eventName: string, handler: (payload: TPayload) => 
       handler(JSON.parse(detail) as TPayload);
     } catch (error) {
       const reason = error instanceof Error ? error.message : String(error);
-      console.warn(`${GENERAL_ERROR_LOG} Picture-in-Picture bridge payload: ${reason}`);
+      warnGeneral(`Picture-in-Picture bridge payload: ${reason}`);
     }
   };
   document.addEventListener(eventName, listener);

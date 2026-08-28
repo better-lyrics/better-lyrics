@@ -1,12 +1,12 @@
-import { LOG_PREFIX_STORE } from "@constants";
 import type { ThemeBuild } from "./types";
+import { warnStore } from "@core/logger";
 
 function parseVersion(version: string): number[] {
   const cleanVersion = version.replace(/-.*$/, "");
   return cleanVersion.split(".").map(part => {
     const num = parseInt(part, 10);
     if (isNaN(num)) {
-      console.warn(LOG_PREFIX_STORE, `Non-numeric version part "${part}" in "${version}", treating as 0`);
+      warnStore(`Non-numeric version part "${part}" in "${version}", treating as 0`);
       return 0;
     }
     return num;

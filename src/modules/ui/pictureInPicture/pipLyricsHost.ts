@@ -35,6 +35,8 @@ export function createPictureInPictureLyricsHost(
       document.dispatchEvent(new CustomEvent(SEEK_EVENT, { detail: timeS }));
       dependencies.resetScrollResume();
     },
-    log: dependencies.log,
+    get log() {
+      return dependencies.log;
+    },
   };
 }

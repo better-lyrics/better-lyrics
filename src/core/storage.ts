@@ -1,7 +1,8 @@
-import { GENERAL_ERROR_LOG, LYRIC_SOURCE_KEYS, OFFSET_STORAGE_PREFIX, STORAGE_TRANSIENT_SET_LOG } from "@constants";
-import { log, truncateSource } from "@utils";
+import { LYRIC_SOURCE_KEYS, OFFSET_STORAGE_PREFIX, STORAGE_TRANSIENT_SET_LOG } from "@constants";
+import { truncateSource } from "@utils";
 import { compileWithDetails } from "rics";
 import { compressString, decompressString, isCompressed } from "./compression";
+import { logCore, logError } from "@core/logger";
 
 /**
  * Keys that should NEVER be deleted by clearCache or any bulk delete operation.
@@ -57,24 +58,18 @@ export function compileRicsToStyles(sourceCode: string): string {
     const elapsed = performance.now() - startTime;
 
     if (elapsed > HARD_TIMEOUT) {
-      log(
-        GENERAL_ERROR_LOG,
-        `rics compilation timeout: took ${elapsed.toFixed(0)}ms\nSource:\n${truncateSource(sourceCode)}`
-      );
+      logError(`rics compilation timeout: took ${elapsed.toFixed(0)}ms\nSource:\n${truncateSource(sourceCode)}`);
       return sourceCode;
     }
 
     if (result.errors.length > 0) {
-      log(
-        GENERAL_ERROR_LOG,
-        `rics compilation errors: ${JSON.stringify(result.errors)}\nSource:\n${truncateSource(sourceCode)}`
-      );
+      logError(`rics compilation errors: ${JSON.stringify(result.errors)}\nSource:\n${truncateSource(sourceCode)}`);
       return sourceCode;
     }
     return result.css;
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error);
-    log(GENERAL_ERROR_LOG, `rics compilation failed: ${message}\nSource:\n${truncateSource(sourceCode)}`);
+    logError(`rics compilation failed: ${message}\nSource:\n${truncateSource(sourceCode)}`);
     return sourceCode;
   }
 }
@@ -96,7 +91,7 @@ export async function loadChunkedStyles(): Promise<string | null> {
   for (let i = 0; i < metadata.customCSS_chunkCount; i++) {
     const chunk = chunksData[`customCSS_chunk_${i}`];
     if (!chunk) {
-      log(GENERAL_ERROR_LOG, `Missing CSS chunk ${i}`);
+      logError(`Missing CSS chunk ${i}`);
       return null;
     }
     chunks.push(chunk);
@@ -153,7 +148,7 @@ export async function getTransientStorage(key: string): Promise<any | null> {
 
     return value;
   } catch (error) {
-    log(GENERAL_ERROR_LOG, error);
+    logError(error);
     return null;
   }
 }
@@ -178,10 +173,10 @@ export async function setTransientStorage(key: string, value: any, ttl: number):
         expiry,
       },
     });
-    log(STORAGE_TRANSIENT_SET_LOG, key);
+    logCore(STORAGE_TRANSIENT_SET_LOG, key);
     await saveCacheInfo();
   } catch (error) {
-    log(GENERAL_ERROR_LOG, error);
+    logError(error);
   }
 }
 
@@ -199,7 +194,7 @@ export async function setPersistentStorage(key: string, value: any): Promise<voi
       [key]: { type: "transient", value: storedValue, expiry: 0 },
     });
   } catch (error) {
-    log(GENERAL_ERROR_LOG, error);
+    logError(error);
   }
 }
 
@@ -243,7 +238,7 @@ async function getUpdatedCacheInfo(): Promise<{ count: number; size: number }> {
       size: totalSize,
     };
   } catch (error) {
-    log(GENERAL_ERROR_LOG, error);
+    logError(error);
     return { count: 0, size: 0 };
   }
 }
@@ -270,7 +265,7 @@ export async function clearCache(): Promise<void> {
     await chrome.storage.local.remove(lyricsKeys);
     await saveCacheInfo();
   } catch (error) {
-    log(GENERAL_ERROR_LOG, error);
+    logError(error);
   }
 }
 
@@ -297,7 +292,7 @@ export async function purgeExpiredKeys(): Promise<void> {
       await chrome.storage.local.remove(keysToRemove);
     }
   } catch (error) {
-    log(GENERAL_ERROR_LOG, error);
+    logError(error);
   }
 }
 
@@ -312,7 +307,7 @@ export async function getOffsetInfo(): Promise<{ count: number }> {
     const offsetKeys = Object.keys(result).filter(key => key.startsWith(OFFSET_STORAGE_PREFIX));
     return { count: offsetKeys.length };
   } catch (error) {
-    log(GENERAL_ERROR_LOG, error);
+    logError(error);
     return { count: 0 };
   }
 }
@@ -329,7 +324,7 @@ export async function clearAllOffsets(): Promise<number> {
     await chrome.storage.local.remove(offsetKeys);
     return offsetKeys.length;
   } catch (error) {
-    log(GENERAL_ERROR_LOG, error);
+    logError(error);
     return 0;
   }
 }

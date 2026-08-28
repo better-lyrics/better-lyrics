@@ -1,10 +1,10 @@
-import { LOG_PREFIX, TAB_HEADER_CLASS, TAB_RENDERER_SELECTOR } from "@constants";
+import { TAB_HEADER_CLASS, TAB_RENDERER_SELECTOR } from "@constants";
 import { seekPlayer } from "@modules/lyrics/lyrics";
 import { hideAdOverlay, isAdPlaying, isLoaderActive, showAdOverlay } from "@modules/ui/dom";
 import { getResumeScrollElement } from "@modules/ui/resumeScrollButton";
 import type { LyricsRendererHost } from "@braccato/core";
-import { log } from "@utils";
 import { resetDebugRender, resizeCanvas } from "./animationEngineDebug";
+import { type LogSink, logCore } from "@core/logger";
 
 const PLAYER_PAGE_ID = "player-page";
 const PLAYER_UI_STATE_ATTRIBUTE = "player-ui-state";
@@ -56,11 +56,8 @@ export const ytmHost: LyricsRendererHost = {
     return document.querySelector<HTMLElement>(TAB_RENDERER_SELECTOR);
   },
   seek: seekPlayer,
-  /**
-   * Resolved per call rather than bound once: `log` is reassigned when the logging setting loads.
-   */
-  log(...args: unknown[]): void {
-    log(LOG_PREFIX, ...args);
+  get log(): LogSink {
+    return logCore;
   },
   debug: { beginFrame: resetDebugRender, resize: resizeCanvas },
 };

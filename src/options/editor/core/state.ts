@@ -1,5 +1,6 @@
 import type { EditorView } from "@codemirror/view";
-import { LOG_PREFIX_EDITOR } from "@constants";
+
+import { errorEditor, logEditor } from "@core/logger";
 
 type OperationType = "import" | "theme" | "storage" | "init";
 
@@ -25,7 +26,7 @@ class EditorStateManager {
 
   setEditor(editor: EditorView): void {
     this.editor = editor;
-    console.log(LOG_PREFIX_EDITOR, "Editor instance registered");
+    logEditor("Editor instance registered");
   }
 
   getEditor(): EditorView | null {
@@ -38,7 +39,7 @@ class EditorStateManager {
 
   setCurrentThemeName(name: string | null): void {
     this.currentThemeName = name;
-    console.log(LOG_PREFIX_EDITOR, `Theme name set to: ${name}`);
+    logEditor(`Theme name set to: ${name}`);
   }
 
   getIsCustomTheme(): boolean {
@@ -59,12 +60,12 @@ class EditorStateManager {
 
   incrementSaveCount(): void {
     this.saveCount++;
-    console.log(LOG_PREFIX_EDITOR, `Save count incremented to: ${this.saveCount}`);
+    logEditor(`Save count incremented to: ${this.saveCount}`);
   }
 
   decrementSaveCount(): void {
     this.saveCount = Math.max(0, this.saveCount - 1);
-    console.log(LOG_PREFIX_EDITOR, `Save count decremented to: ${this.saveCount}`);
+    logEditor(`Save count decremented to: ${this.saveCount}`);
   }
 
   getSaveCount(): number {
@@ -73,7 +74,7 @@ class EditorStateManager {
 
   resetSaveCount(): void {
     this.saveCount = 0;
-    console.log(LOG_PREFIX_EDITOR, "Save count reset to 0");
+    logEditor("Save count reset to 0");
   }
 
   getIsUserTyping(): boolean {
@@ -94,7 +95,7 @@ class EditorStateManager {
 
   setIsSaving(value: boolean): void {
     this.isSaving = value;
-    console.log(LOG_PREFIX_EDITOR, `isSaving set to: ${value}`);
+    logEditor(`isSaving set to: ${value}`);
   }
 
   getSaveTimeout(): number | null {
@@ -133,29 +134,29 @@ class EditorStateManager {
     }
 
     this.isProcessing = true;
-    console.log(LOG_PREFIX_EDITOR, `Processing queue (${this.operationQueue.length} operations)`);
+    logEditor(`Processing queue (${this.operationQueue.length} operations)`);
 
     try {
       while (this.operationQueue.length > 0) {
         const operation = this.operationQueue.shift()!;
-        console.log(LOG_PREFIX_EDITOR, `Executing operation: ${operation.type} (${operation.id})`);
+        logEditor(`Executing operation: ${operation.type} (${operation.id})`);
 
         try {
           await operation.execute();
-          console.log(LOG_PREFIX_EDITOR, `Operation completed: ${operation.type} (${operation.id})`);
+          logEditor(`Operation completed: ${operation.type} (${operation.id})`);
         } catch (error) {
-          console.error(LOG_PREFIX_EDITOR, `Operation failed: ${operation.type} (${operation.id})`, error);
+          errorEditor(`Operation failed: ${operation.type} (${operation.id})`, error);
         }
       }
     } finally {
       this.isProcessing = false;
-      console.log(LOG_PREFIX_EDITOR, "Queue processing complete");
+      logEditor("Queue processing complete");
     }
   }
 
   async queueOperation(type: OperationType, execute: () => Promise<void>): Promise<void> {
     const id = `${type}-${Date.now()}-${Math.random().toString(36).slice(2, 11)}`;
-    console.log(LOG_PREFIX_EDITOR, `Queuing operation: ${type} (${id})`);
+    logEditor(`Queuing operation: ${type} (${id})`);
 
     return new Promise((resolve, reject) => {
       this.operationQueue.push({
@@ -183,11 +184,11 @@ class EditorStateManager {
     const currentContent = this.editor.state.doc.toString();
 
     if (currentContent === css) {
-      console.log(LOG_PREFIX_EDITOR, `Content unchanged from: ${source}, skipping update`);
+      logEditor(`Content unchanged from: ${source}, skipping update`);
       return;
     }
 
-    console.log(LOG_PREFIX_EDITOR, `Setting editor content from: ${source} (${css.length} bytes)`);
+    logEditor(`Setting editor content from: ${source} (${css.length} bytes)`);
 
     const selection = this.editor.state.selection;
     const mainCursorPos = selection.main.head;
@@ -210,16 +211,16 @@ class EditorStateManager {
 
     this.isProgrammaticChange = false;
 
-    console.log(LOG_PREFIX_EDITOR, `Editor content set successfully from: ${source}`);
+    logEditor(`Editor content set successfully from: ${source}`);
   }
 
   async clearThemeState(): Promise<void> {
-    console.log(LOG_PREFIX_EDITOR, "Clearing theme state");
+    logEditor("Clearing theme state");
     await chrome.storage.sync.remove("themeName");
     this.currentThemeName = null;
     this.isCustomTheme = false;
     this.isStoreTheme = false;
-    console.log(LOG_PREFIX_EDITOR, "Theme state cleared");
+    logEditor("Theme state cleared");
   }
 }
 

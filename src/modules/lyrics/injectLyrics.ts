@@ -1,5 +1,4 @@
 import {
-  LOG_PREFIX,
   LYRICS_FOUND_LOG,
   LYRICS_TAB_NOT_DISABLED_LOG,
   NO_LYRICS_FOUND_LOG,
@@ -25,7 +24,8 @@ import { disableNativeLyricsFocus } from "@modules/ui/nativeLyricsFocus";
 import { publishPictureInPictureLyrics } from "@modules/ui/pictureInPicture/lyricsPublisher";
 import { injectRomanization, injectTranslation, type LineData } from "@braccato/core";
 import { containsNonLatin, detectNonLatinLanguage } from "@braccato/core/text";
-import { langCodesMatch, languageMatchesAny, log } from "@utils";
+import { langCodesMatch, languageMatchesAny } from "@utils";
+import { logCore } from "@core/logger";
 
 export type { LineData };
 
@@ -94,7 +94,7 @@ export function processLyrics(
     throw new Error(NO_LYRICS_FOUND_LOG);
   }
 
-  log(LYRICS_FOUND_LOG);
+  logCore(LYRICS_FOUND_LOG);
 
   const ytMusicLyrics = document.querySelector(NO_LYRICS_TEXT_SELECTOR)?.parentElement;
   if (ytMusicLyrics) {
@@ -105,7 +105,7 @@ export function processLyrics(
   // one later. cleanup() drops both this reference and the element together, so a null here means
   // there is nothing on screen to clear.
   if (!mainView.clearOnScreenLyrics()) {
-    log(LYRICS_TAB_NOT_DISABLED_LOG);
+    logCore(LYRICS_TAB_NOT_DISABLED_LOG);
   }
 
   injectLyrics(doc, data, keepLoaderVisible, signal);
@@ -140,7 +140,7 @@ function injectLyrics(
   lyricsWrapper.removeAttribute("is-empty");
 
   if (AppState.isTranslateEnabled) {
-    log(TRANSLATION_ENABLED_LOG, AppState.translationLanguage);
+    logCore(TRANSLATION_ENABLED_LOG, AppState.translationLanguage);
   }
 
   const allZero = lyrics.every(item => item.startTimeMs === 0);
@@ -196,7 +196,7 @@ function injectLyrics(
   AppState.areLyricsTicking = true;
   mainView.relayout();
   if (allZero) {
-    log(SYNC_DISABLED_LOG);
+    logCore(SYNC_DISABLED_LOG);
   }
 
   AppState.areLyricsLoaded = true;
@@ -318,7 +318,7 @@ async function processBatchTranslationsAndRomanizations(
 
         if (!sourceLanguage && response.detectedLanguage) {
           sourceLanguage = response.detectedLanguage;
-          log(LOG_PREFIX, "Determined language via romanization batch: " + sourceLanguage);
+          logCore("Determined language via romanization batch: " + sourceLanguage);
         }
 
         if (isRomanizationDisabledForLang(sourceLanguage || "")) return;
@@ -348,7 +348,7 @@ async function processBatchTranslationsAndRomanizations(
 
         if (!sourceLanguage && response.detectedLanguage) {
           sourceLanguage = response.detectedLanguage;
-          log(LOG_PREFIX, "Determined language via translation batch: " + sourceLanguage);
+          logCore("Determined language via translation batch: " + sourceLanguage);
         }
 
         if (isTranslationDisabledForLang(sourceLanguage || "")) return;

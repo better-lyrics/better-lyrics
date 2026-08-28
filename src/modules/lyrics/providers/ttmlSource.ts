@@ -1,8 +1,8 @@
 import { parseTTMLContent } from "@braccato/parsers";
-import { HOMEPAGE_DOMAIN, HOMEPAGE_URL, LOG_PREFIX } from "@constants";
-import { log } from "@core/utils";
+import { HOMEPAGE_DOMAIN, HOMEPAGE_URL } from "@constants";
 import type { LyricSourceKey, LyricSourceResult, ProviderParameters } from "@modules/lyrics/providers/shared";
 import type { UnisonData } from "@modules/lyrics/providers/unison";
+import { logCore } from "@core/logger";
 
 interface FillTtmlOptions {
   richsyncKey: LyricSourceKey;
@@ -32,7 +32,7 @@ export function fillTtml(
   });
 
   if (lyrics.length === 0) {
-    log(LOG_PREFIX, `No timed lines parsed from ${source} TTML (${responseString.length} chars)`);
+    logCore(`No timed lines parsed from ${source} TTML (${responseString.length} chars)`);
     providerParameters.sourceMap[richsyncKey].lyricSourceResult = null;
     providerParameters.sourceMap[richsyncKey].filled = true;
     providerParameters.sourceMap[syncedKey].lyricSourceResult = null;

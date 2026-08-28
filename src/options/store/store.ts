@@ -1,4 +1,3 @@
-import { LOG_PREFIX_STORE } from "@constants";
 import { formatCreators } from "@core/customCss";
 import { t } from "@core/i18n";
 import { getLocalStorage, getSyncStorage } from "@core/storage";
@@ -41,6 +40,7 @@ import {
   validateThemeRepo,
 } from "./themeStoreService";
 import { cleanupTurnstile, getTurnstileToken } from "./turnstile";
+import { errorStore, warnStore } from "@core/logger";
 
 let detailModalOverlay: HTMLElement | null = null;
 let urlModalOverlay: HTMLElement | null = null;
@@ -1063,7 +1063,7 @@ async function loadMarketplace(): Promise<void> {
 
     openThemeFromUrlParam();
   } catch (err) {
-    console.error(LOG_PREFIX_STORE, "Failed to load themes:", err);
+    errorStore("Failed to load themes:", err);
     if (loading) loading.style.display = "none";
     if (error) {
       error.style.display = "flex";
@@ -1120,7 +1120,7 @@ async function checkForThemeUpdatesIfDue(): Promise<void> {
 
     await chrome.storage.local.set({ [THEME_UPDATE_CHECK_KEY]: Date.now() });
   } catch (err) {
-    console.warn(LOG_PREFIX_STORE, "Update check throttle failed:", err);
+    warnStore("Update check throttle failed:", err);
     return;
   }
 
@@ -1139,7 +1139,7 @@ async function checkForThemeUpdates(): Promise<void> {
       updateYourThemesDropdown();
     }
   } catch (err) {
-    console.warn(LOG_PREFIX_STORE, "Update check failed:", err);
+    warnStore("Update check failed:", err);
   }
 }
 
@@ -1525,7 +1525,7 @@ function createStoreThemeCard(
       const applied = await handleApplyTheme(installedTheme);
       if (!applied) applyBtn.disabled = false;
     } catch (err) {
-      console.error(LOG_PREFIX_STORE, "Failed to apply theme:", err);
+      errorStore("Failed to apply theme:", err);
       applyBtn.disabled = false;
     }
   });
@@ -1713,13 +1713,13 @@ async function handleThemeAction(theme: StoreTheme, button: HTMLButtonElement): 
               }
             }
           })
-          .catch(err => console.error(LOG_PREFIX_STORE, "Failed to track install:", err));
+          .catch(err => errorStore("Failed to track install:", err));
       }
     }
 
     updateYourThemesDropdown();
   } catch (err) {
-    console.error(LOG_PREFIX_STORE, "Action failed:", err);
+    errorStore("Action failed:", err);
     button.className = `store-card-btn ${isRemoveButton ? "store-card-btn-remove" : "store-card-btn-install"}`;
     button.textContent = isRemoveButton ? t("marketplace_remove") : t("marketplace_install");
     showAlert(`Failed: ${err}`);
@@ -1943,7 +1943,7 @@ async function openDetailModal(theme: StoreTheme, urlThemeInfo?: UrlThemeInfo): 
             turnstileToken = await getTurnstileToken();
           }
         } catch (turnstileError) {
-          console.error(LOG_PREFIX_STORE, "Turnstile verification failed:", turnstileError);
+          errorStore("Turnstile verification failed:", turnstileError);
           currentRating = previousRating;
           updateStarDisplay(previousRating, false);
           ratingStatusEl.textContent = "Verification failed. Please try again.";
@@ -2030,7 +2030,7 @@ async function openDetailModal(theme: StoreTheme, urlThemeInfo?: UrlThemeInfo): 
         const applied = await handleApplyTheme(installedTheme);
         if (!applied) detailApplyBtn.disabled = false;
       } catch (err) {
-        console.error(LOG_PREFIX_STORE, "Failed to apply theme:", err);
+        errorStore("Failed to apply theme:", err);
         detailApplyBtn.disabled = false;
         showAlert(`${t("marketplace_applyFailed")}: ${err}`);
       }
@@ -2082,7 +2082,7 @@ async function openDetailModal(theme: StoreTheme, urlThemeInfo?: UrlThemeInfo): 
                     }
                   }
                 })
-                .catch(err => console.error(LOG_PREFIX_STORE, "Failed to track install:", err));
+                .catch(err => errorStore("Failed to track install:", err));
             }
           }
         }
@@ -2358,7 +2358,7 @@ async function handleUrlInstall(): Promise<void> {
     await applyFiltersToGrid();
     await refreshStoreCards();
   } catch (err) {
-    console.error(LOG_PREFIX_STORE, "URL install failed:", err);
+    errorStore("URL install failed:", err);
     if (error) {
       error.textContent = `${err}`;
       error.style.display = "block";
@@ -2475,7 +2475,7 @@ async function handleApplyTheme(theme: InstalledStoreTheme): Promise<boolean> {
 
     return true;
   } catch (err) {
-    console.error(LOG_PREFIX_STORE, "Failed to apply theme:", err);
+    errorStore("Failed to apply theme:", err);
     showAlert(`${t("marketplace_applyFailed")}: ${err}`);
     return false;
   }

@@ -1,7 +1,5 @@
 import {
   FONT_LINK,
-  GENERAL_ERROR_LOG,
-  LOG_PREFIX,
   MINI_PLAYER_BUTTON_SELECTOR,
   NOTO_SANS_UNIVERSAL_LINK,
   PICTURE_IN_PICTURE_TOGGLE_SELECTOR,
@@ -11,13 +9,13 @@ import { t } from "@core/i18n";
 import { getStorage } from "@core/storage";
 import { getArtworkMetadata } from "@modules/lyrics/requestSniffer/requestSniffer";
 import { resumeAllAutoscroll } from "@braccato/core";
-import { log } from "@utils";
 import { onSignal, sendInit, sendMetadata } from "./bridge";
 import { createGatedToggle } from "./controller";
 import { publishPictureInPictureLyrics } from "./lyricsPublisher";
 import { DEFAULT_ARTWORK_TRANSITION, DEFAULT_TEXT_TRANSITION } from "./lyricsView";
 import { createPictureInPictureHost } from "./pipHost";
 import type { PictureInPictureToggle, PictureInPictureViewDependencies } from "./types";
+import { type LogSink, logCore, logError } from "@core/logger";
 
 const STYLESHEET_PATH = "css/blyrics/picture-in-picture.css";
 const LYRIC_STYLESHEET_PATH = "css/blyrics/index.css";
@@ -56,8 +54,9 @@ const isolatedViewDependencies: PictureInPictureViewDependencies = {
   translate: t,
   getArtworkMetadata,
   resetScrollResume: resumeAllAutoscroll,
-  // Resolved per call rather than bound once: `log` is reassigned when the logging setting loads.
-  log: (...args: unknown[]) => log(LOG_PREFIX, ...args),
+  get log(): LogSink {
+    return logCore;
+  },
 };
 
 function markPictureInPictureOpened(): void {
@@ -90,7 +89,7 @@ async function loadStylesheet(): Promise<string> {
 
 function reportFailure(message: string, error: unknown): void {
   const detail = error instanceof Error ? error.message : String(error);
-  log(GENERAL_ERROR_LOG, `${message}: ${detail}`);
+  logError(`${message}: ${detail}`);
 }
 
 // Gecko hands a content script a cross-origin wrapper on the Picture-in-Picture window, so nothing

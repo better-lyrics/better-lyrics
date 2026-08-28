@@ -1,6 +1,6 @@
-import { LOG_PREFIX } from "@constants";
 import { compressString } from "./compression";
 import { getLocalStorage } from "./storage";
+import { errorCore, logCore } from "@core/logger";
 
 const SYNC_STORAGE_LIMIT = 7000;
 const LOCAL_STORAGE_SAFE_LIMIT = 500 * 1024;
@@ -50,19 +50,19 @@ async function clearLyricsCacheIfNeeded(requiredSpace: number): Promise<void> {
   const usage = await getStorageUsage();
   const availableSpace = usage.total - usage.used;
 
-  console.log(LOG_PREFIX, `Available space: ${availableSpace} bytes, Required: ${requiredSpace} bytes`);
+  logCore(`Available space: ${availableSpace} bytes, Required: ${requiredSpace} bytes`);
 
   if (availableSpace < requiredSpace) {
-    console.log(LOG_PREFIX, "Not enough space, clearing lyrics cache...");
+    logCore("Not enough space, clearing lyrics cache...");
     const allData = await chrome.storage.local.get(null);
     const lyricsKeys = Object.keys(allData).filter(key => key.startsWith("blyrics_"));
 
     if (lyricsKeys.length > 0) {
-      console.log(LOG_PREFIX, `Removing ${lyricsKeys.length} cached lyrics entries`);
+      logCore(`Removing ${lyricsKeys.length} cached lyrics entries`);
       await chrome.storage.local.remove(lyricsKeys);
 
       const newUsage = await getStorageUsage();
-      console.log(LOG_PREFIX, `Storage after cache clear: ${newUsage.used} / ${newUsage.total} bytes`);
+      logCore(`Storage after cache clear: ${newUsage.used} / ${newUsage.total} bytes`);
     }
   }
 }
@@ -70,10 +70,10 @@ async function clearLyricsCacheIfNeeded(requiredSpace: number): Promise<void> {
 // -- Write Strategies --------------------------
 
 async function saveChunkedCSS(css: string): Promise<void> {
-  console.log(LOG_PREFIX, `Saving CSS in chunks. Total size: ${css.length} bytes`);
+  logCore(`Saving CSS in chunks. Total size: ${css.length} bytes`);
 
   const storageUsage = await getStorageUsage();
-  console.log(LOG_PREFIX, `Storage usage before save: ${storageUsage.used} / ${storageUsage.total} bytes`);
+  logCore(`Storage usage before save: ${storageUsage.used} / ${storageUsage.total} bytes`);
 
   await clearLyricsCacheIfNeeded(css.length * SPACE_HEADROOM);
 
@@ -82,7 +82,7 @@ async function saveChunkedCSS(css: string): Promise<void> {
     chunks.push(css.substring(i, i + CHUNK_SIZE));
   }
 
-  console.log(LOG_PREFIX, `Splitting into ${chunks.length} chunks of ~${CHUNK_SIZE} bytes each`);
+  logCore(`Splitting into ${chunks.length} chunks of ~${CHUNK_SIZE} bytes each`);
 
   const oldMetadata = await getLocalStorage<ChunkMetadata>(["customCSS_chunkCount"]);
   const oldChunkCount = oldMetadata.customCSS_chunkCount || 0;
@@ -90,9 +90,9 @@ async function saveChunkedCSS(css: string): Promise<void> {
   for (let i = 0; i < chunks.length; i++) {
     try {
       await chrome.storage.local.set({ [`customCSS_chunk_${i}`]: chunks[i] });
-      console.log(LOG_PREFIX, `Saved chunk ${i + 1}/${chunks.length} (${chunks[i].length} bytes)`);
+      logCore(`Saved chunk ${i + 1}/${chunks.length} (${chunks[i].length} bytes)`);
     } catch (error) {
-      console.error(LOG_PREFIX, `Failed to save chunk ${i}:`, error);
+      errorCore(`Failed to save chunk ${i}:`, error);
       throw error;
     }
   }
@@ -118,7 +118,7 @@ async function saveChunkedCSS(css: string): Promise<void> {
   }
 
   const finalUsage = await getStorageUsage();
-  console.log(LOG_PREFIX, `Storage usage after save: ${finalUsage.used} / ${finalUsage.total} bytes`);
+  logCore(`Storage usage after save: ${finalUsage.used} / ${finalUsage.total} bytes`);
 }
 
 function getStorageStrategy(css: string): "local" | "sync" | "chunked" {
@@ -132,7 +132,7 @@ function getStorageStrategy(css: string): "local" | "sync" | "chunked" {
 export async function saveCustomCss(css: string, retryCount = 0): Promise<SaveResult> {
   try {
     const cssSize = new Blob([css]).size;
-    console.log(LOG_PREFIX, `Saving CSS: ${cssSize} bytes (${(cssSize / 1024).toFixed(2)} KB)`);
+    logCore(`Saving CSS: ${cssSize} bytes (${(cssSize / 1024).toFixed(2)} KB)`);
 
     const shouldCompress = cssSize > COMPRESSION_THRESHOLD;
     const cssToStore = shouldCompress ? compressString(css) : css;
@@ -140,11 +140,11 @@ export async function saveCustomCss(css: string, retryCount = 0): Promise<SaveRe
 
     if (shouldCompress) {
       const ratio = ((1 - compressedSize / cssSize) * 100).toFixed(1);
-      console.log(LOG_PREFIX, `Compressed: ${compressedSize} bytes (${ratio}% reduction)`);
+      logCore(`Compressed: ${compressedSize} bytes (${ratio}% reduction)`);
     }
 
     const strategy = getStorageStrategy(cssToStore);
-    console.log(LOG_PREFIX, `Selected strategy: ${strategy}`);
+    logCore(`Selected strategy: ${strategy}`);
 
     if (strategy === "chunked") {
       await saveChunkedCSS(cssToStore);
@@ -158,21 +158,21 @@ export async function saveCustomCss(css: string, retryCount = 0): Promise<SaveRe
       await chrome.storage.sync.set({ cssStorageType: "local", cssCompressed: shouldCompress });
       await clearCSSChunks();
       await chrome.storage.sync.remove("customCSS");
-      console.log(LOG_PREFIX, "Saved to local storage");
+      logCore("Saved to local storage");
     } else {
       await chrome.storage.sync.set({ customCSS: cssToStore, cssStorageType: "sync", cssCompressed: shouldCompress });
       await clearCSSChunks();
       await chrome.storage.local.remove(["customCSS", "cssCompressed"]);
-      console.log(LOG_PREFIX, "Saved to sync storage");
+      logCore("Saved to sync storage");
     }
 
     return { success: true, strategy };
   } catch (error: any) {
-    console.error(LOG_PREFIX, "Storage save attempt failed:", error);
+    errorCore("Storage save attempt failed:", error);
 
     if (error.message?.includes("quota") && retryCount < MAX_RETRY_ATTEMPTS) {
       try {
-        console.log(LOG_PREFIX, "Attempting chunked storage fallback...");
+        logCore("Attempting chunked storage fallback...");
         const cssSize = new Blob([css]).size;
         const shouldCompress = cssSize > COMPRESSION_THRESHOLD;
         const cssToStore = shouldCompress ? compressString(css) : css;
@@ -181,7 +181,7 @@ export async function saveCustomCss(css: string, retryCount = 0): Promise<SaveRe
         await chrome.storage.sync.set({ cssCompressed: shouldCompress });
         return { success: true, strategy: "chunked", wasRetry: true };
       } catch (chunkError) {
-        console.error(LOG_PREFIX, "Chunked storage fallback failed:", chunkError);
+        errorCore("Chunked storage fallback failed:", chunkError);
         return { success: false, error: chunkError };
       }
     }

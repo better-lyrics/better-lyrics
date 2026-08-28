@@ -1,29 +1,3 @@
-import { getStorage } from "./storage";
-
-/**
- * Conditionally logs messages based on the isLogsEnabled setting.
- */
-export let log = (...args: any[]) => {
-  getStorage({ isLogsEnabled: true }, items => {
-    if (items.isLogsEnabled) {
-      console.log(args);
-    }
-  });
-};
-
-/**
- * Configures the logging function based on user settings.
- */
-export function setUpLog() {
-  getStorage({ isLogsEnabled: true }, items => {
-    if (items.isLogsEnabled) {
-      log = console.log.bind(window.console);
-    } else {
-      log = function () {};
-    }
-  });
-}
-
 const LOG_SOURCE_MAX_LENGTH = 500;
 
 export function truncateSource(source: string): string {

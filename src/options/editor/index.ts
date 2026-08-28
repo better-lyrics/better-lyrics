@@ -1,5 +1,5 @@
 import { openSearchPanel } from "@codemirror/search";
-import { LOG_PREFIX_EDITOR } from "@constants";
+
 import { initI18n, loadLocaleOverride } from "@core/i18n";
 import { createEditorState, createEditorView } from "./core/editor";
 import { editorStateManager } from "./core/state";
@@ -27,6 +27,7 @@ import {
   themeSelectorBtn,
 } from "./ui/dom";
 import { showAlert, showModal } from "./ui/feedback";
+import { errorEditor, logEditor } from "@core/logger";
 
 function initializeNavigation() {
   document.getElementById("edit-css-btn")?.addEventListener("click", openEditCSS);
@@ -121,7 +122,7 @@ function initializeFileOperations() {
       try {
         await importManager.importCSSFile(file);
       } catch (err) {
-        console.error(LOG_PREFIX_EDITOR, "File import error:", err);
+        errorEditor("File import error:", err);
       }
     };
     input.click();
@@ -154,7 +155,7 @@ function initializeStorageListeners() {
 }
 
 async function initializeEditor() {
-  console.log(LOG_PREFIX_EDITOR, "DOM loaded, initializing editor");
+  logEditor("DOM loaded, initializing editor");
 
   const editorElement = document.getElementById("editor")!;
   const isStandalone = document.querySelector(".theme-name-display.standalone") !== null;
@@ -177,7 +178,7 @@ async function initializeEditor() {
     openStandaloneEditor();
   });
 
-  console.log(LOG_PREFIX_EDITOR, "Loading theme name and initial CSS");
+  logEditor("Loading theme name and initial CSS");
 
   const setSelectedThemePromise = setThemeName();
   const loadCustomCssPromise = storageManager.loadInitialCSS();
@@ -186,7 +187,7 @@ async function initializeEditor() {
 
   preloadInstalledThemeImages();
 
-  console.log(LOG_PREFIX_EDITOR, "Editor initialization complete");
+  logEditor("Editor initialization complete");
 }
 
 export function initialize() {

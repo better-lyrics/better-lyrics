@@ -3,7 +3,6 @@
 import {
   DOCK_CONTROL_ORDER_DEFAULT,
   DOCK_DEFAULT_POSITION,
-  LOG_PREFIX,
   ROMANIZATION_LANGUAGES,
   UNISON_API_BASE_URL,
 } from "@constants";
@@ -15,6 +14,7 @@ import { parseSvgString, syncTypeColors } from "@modules/ui/lyricsDock/icons";
 import Sortable from "sortablejs";
 import { showModal } from "./editor/ui/feedback";
 import { initStoreUI, setupYourThemesButton } from "./store/store";
+import { errorCore, warnCore } from "@core/logger";
 
 interface Options {
   isLogsEnabled: boolean;
@@ -738,7 +738,7 @@ async function initIdentityUI(): Promise<void> {
   try {
     displayNameEl.textContent = await getDisplayName();
   } catch (error) {
-    console.error(LOG_PREFIX, "Failed to load identity:", error);
+    errorCore("Failed to load identity:", error);
     displayNameEl.textContent = t("options_alert_identityLoadError");
   }
 
@@ -913,7 +913,7 @@ function initNicknameModal(): void {
       setStatus(mapCheckResult(json.data));
     } catch (error) {
       if (seq !== checkSeq) return;
-      console.warn(LOG_PREFIX, "Nickname availability check failed:", error);
+      warnCore("Nickname availability check failed:", error);
       setStatus("error");
     }
   };
@@ -962,7 +962,7 @@ function initNicknameModal(): void {
           const errJson = (await response.clone().json()) as { error?: string };
           if (errJson.error === "NICKNAME_PROFANE") conflict = "profane";
         } catch (err) {
-          console.warn(LOG_PREFIX, "Nickname conflict body parse failed:", err);
+          warnCore("Nickname conflict body parse failed:", err);
         }
         setStatus(conflict);
         resetBtn.disabled = false;
@@ -986,7 +986,7 @@ function initNicknameModal(): void {
       resetBtn.disabled = false;
       closeNicknameModal();
     } catch (error) {
-      console.warn(LOG_PREFIX, "Nickname save failed:", error);
+      warnCore("Nickname save failed:", error);
       setStatus("error");
       resetBtn.disabled = false;
     }
@@ -1030,7 +1030,7 @@ function initNicknameModal(): void {
       resetBtn.disabled = false;
       closeNicknameModal();
     } catch (error) {
-      console.warn(LOG_PREFIX, "Nickname reset failed:", error);
+      warnCore("Nickname reset failed:", error);
       setStatus("error");
       resetBtn.disabled = false;
     }
@@ -1057,7 +1057,7 @@ async function handleExportIdentity(): Promise<void> {
       }
     });
   } catch (error) {
-    console.error(LOG_PREFIX, "Failed to export identity:", error);
+    errorCore("Failed to export identity:", error);
     showAlert(t("options_alert_exportFailed"));
   }
 }

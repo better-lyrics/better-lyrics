@@ -1,4 +1,3 @@
-import { LOG_PREFIX_EDITOR } from "@constants";
 import { t } from "@core/i18n";
 import { getSyncStorage } from "@core/storage";
 import { formatCreators, saveCustomCss } from "@core/customCss";
@@ -31,6 +30,7 @@ import {
 } from "../ui/dom";
 import { showAlert, showConfirm, showPrompt } from "../ui/feedback";
 import { applyStoreThemeComplete, broadcastRICSToTabs, showSyncError, showSyncSuccess } from "./storage";
+import { errorEditor, logEditor, warnEditor } from "@core/logger";
 
 const preloadedImages = new Set<string>();
 
@@ -140,7 +140,7 @@ export function themeSourceToEditorSource(source: ThemeSource | undefined): Edit
 
 class ThemeManager {
   async applyTheme(isCustom: boolean, index: number, themeName: string): Promise<void> {
-    console.log(LOG_PREFIX_EDITOR, `Applying ${isCustom ? "custom" : "built-in"} theme: ${themeName}`);
+    logEditor(`Applying ${isCustom ? "custom" : "built-in"} theme: ${themeName}`);
 
     try {
       if (isCustom) {
@@ -149,7 +149,7 @@ class ThemeManager {
         await this.applyBuiltInTheme(index);
       }
     } catch (error) {
-      console.error(LOG_PREFIX_EDITOR, "Failed to apply theme:", error);
+      errorEditor("Failed to apply theme:", error);
       showAlert("Error applying theme! Please try again.");
       throw error;
     }
@@ -166,7 +166,7 @@ class ThemeManager {
     const themeContent = `/* ${selectedTheme.name}, a custom theme for BetterLyrics */\n\n${selectedTheme.css}\n`;
 
     await editorStateManager.queueOperation("theme", async () => {
-      console.log(LOG_PREFIX_EDITOR, `Setting custom theme: ${selectedTheme.name}`);
+      logEditor(`Setting custom theme: ${selectedTheme.name}`);
 
       await editorStateManager.setEditorContent(themeContent, `custom-theme:${selectedTheme.name}`, false);
 
@@ -198,7 +198,7 @@ class ThemeManager {
   }
 
   private async applySymlinkedTheme(theme: Theme & { storeId: string }): Promise<void> {
-    console.log(LOG_PREFIX_EDITOR, `Applying symlinked theme: ${theme.name} → ${theme.storeId}`);
+    logEditor(`Applying symlinked theme: ${theme.name} → ${theme.storeId}`);
 
     let installed = await installSymlinkedThemeFromMarketplace(theme.storeId);
 
@@ -221,12 +221,12 @@ class ThemeManager {
       }
     }
 
-    console.warn(LOG_PREFIX_EDITOR, `Marketplace install failed for ${theme.storeId}`);
+    warnEditor(`Marketplace install failed for ${theme.storeId}`);
     showAlert(t("symlink_installFailed"));
   }
 
   private async applyBundledFallback(selectedTheme: Theme): Promise<void> {
-    console.log(LOG_PREFIX_EDITOR, `Using bundled fallback for: ${selectedTheme.name}`);
+    logEditor(`Using bundled fallback for: ${selectedTheme.name}`);
 
     const response = await fetch(chrome.runtime.getURL(`css/themes/${selectedTheme.path}`));
     const css = await response.text();
@@ -234,7 +234,7 @@ class ThemeManager {
     const themeContent = `/* ${selectedTheme.name}, a theme for BetterLyrics by ${selectedTheme.author} ${selectedTheme.link && `(${selectedTheme.link})`} */\n\n${css}\n`;
 
     await editorStateManager.queueOperation("theme", async () => {
-      console.log(LOG_PREFIX_EDITOR, `Setting built-in theme: ${selectedTheme.name}`);
+      logEditor(`Setting built-in theme: ${selectedTheme.name}`);
 
       await editorStateManager.setEditorContent(themeContent, `builtin-theme:${selectedTheme.name}`, false);
 
@@ -279,14 +279,11 @@ async function applyStoreThemeToEditor(
   title: string,
   source: EditorThemeSource = "marketplace"
 ): Promise<void> {
-  console.log(
-    LOG_PREFIX_EDITOR,
-    `applyStoreThemeToEditor called: ${title}, CSS length: ${css.length}, source: ${source}`
-  );
+  logEditor(`applyStoreThemeToEditor called: ${title}, CSS length: ${css.length}, source: ${source}`);
 
   try {
     await editorStateManager.queueOperation("theme", async () => {
-      console.log(LOG_PREFIX_EDITOR, `Setting marketplace theme: ${title}, content length: ${css.length}`);
+      logEditor(`Setting marketplace theme: ${title}, content length: ${css.length}`);
 
       await editorStateManager.setEditorContent(css, `store-theme:${themeId}`, false);
 
@@ -298,7 +295,7 @@ async function applyStoreThemeToEditor(
       updateThemeSelectorButton();
     });
   } catch (error) {
-    console.error(LOG_PREFIX_EDITOR, "Failed to apply marketplace theme:", error);
+    errorEditor("Failed to apply marketplace theme:", error);
     showAlert("Error applying marketplace theme! Please try again.");
   }
 }
@@ -309,10 +306,10 @@ export function initStoreThemeListener(): void {
   if (storeThemeListenerInitialized) return;
   storeThemeListenerInitialized = true;
 
-  console.log(LOG_PREFIX_EDITOR, "initStoreThemeListener registered");
+  logEditor("initStoreThemeListener registered");
 
   document.addEventListener("store-theme-applied", async (event: Event) => {
-    console.log(LOG_PREFIX_EDITOR, "store-theme-applied event received");
+    logEditor("store-theme-applied event received");
     const customEvent = event as CustomEvent<{
       themeId: string;
       css: string;
@@ -321,10 +318,7 @@ export function initStoreThemeListener(): void {
     }>;
     const { themeId, css, title, source } = customEvent.detail;
     const editorSource: EditorThemeSource = source === "url" ? "github" : "marketplace";
-    console.log(
-      LOG_PREFIX_EDITOR,
-      `Event detail: themeId=${themeId}, title=${title}, source=${source}, CSS length=${css.length}`
-    );
+    logEditor(`Event detail: themeId=${themeId}, title=${title}, source=${source}, CSS length=${css.length}`);
     await applyStoreThemeToEditor(themeId, css, title, editorSource);
   });
 }
@@ -372,11 +366,7 @@ export function hideThemeName(): void {
 }
 
 export function onChange(_state: string) {
-  console.log(
-    LOG_PREFIX_EDITOR,
-    "onChange triggered, isProgrammaticChange:",
-    editorStateManager.getIsProgrammaticChange()
-  );
+  logEditor("onChange triggered, isProgrammaticChange:", editorStateManager.getIsProgrammaticChange());
   if (editorStateManager.getIsProgrammaticChange()) {
     return;
   }
@@ -400,7 +390,7 @@ export function onChange(_state: string) {
   } else if (isCustom && themeName) {
     debounceSaveCustomTheme();
   }
-  console.log(LOG_PREFIX_EDITOR, "onChange calling debounceSave");
+  logEditor("onChange calling debounceSave");
   debounceSave();
 }
 
@@ -436,17 +426,17 @@ function debounceSave() {
 }
 
 export function saveToStorage(isTheme = false) {
-  console.log(LOG_PREFIX_EDITOR, "saveToStorage called, isTheme:", isTheme);
+  logEditor("saveToStorage called, isTheme:", isTheme);
   const currentEditor = editorStateManager.getEditor();
   if (!currentEditor) {
-    console.error(LOG_PREFIX_EDITOR, "Cannot save: editor not initialized");
+    errorEditor("Cannot save: editor not initialized");
     return;
   }
 
   editorStateManager.incrementSaveCount();
   editorStateManager.setIsSaving(true);
   const css = currentEditor.state.doc.toString();
-  console.log(LOG_PREFIX_EDITOR, "saveToStorage CSS length:", css.length);
+  logEditor("saveToStorage CSS length:", css.length);
 
   const isCustom = editorStateManager.getIsCustomTheme();
   if (!isTheme && editorStateManager.getIsUserTyping() && !isCustom) {
@@ -456,7 +446,7 @@ export function saveToStorage(isTheme = false) {
 
   saveCustomCss(css)
     .then(result => {
-      console.log(LOG_PREFIX_EDITOR, "saveCustomCss result:", result);
+      logEditor("saveCustomCss result:", result);
       if (result.success && result.strategy) {
         showSyncSuccess(result.strategy, result.wasRetry);
         broadcastRICSToTabs(css, result.strategy);
@@ -711,7 +701,7 @@ async function selectTheme(isCustom: boolean, index: number, themeName: string) 
   try {
     await themeManager.applyTheme(isCustom, index, themeName);
   } catch (error) {
-    console.error(LOG_PREFIX_EDITOR, "Error selecting theme:", error);
+    errorEditor("Error selecting theme:", error);
   }
 }
 
