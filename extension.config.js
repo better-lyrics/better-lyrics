@@ -119,6 +119,7 @@ const config = {
   config: rspackConfig => {
     const isCanaryRelease = process.env.RELEASE_TYPE === "canary";
     const isDevelopment = rspackConfig.mode !== "production";
+    const shouldBuildSourcemaps = isDevelopment || process.env.SOURCEMAPS_ENABLED === "true";
 
     rspackConfig.plugins.push(emitRendererStyles);
 
@@ -146,7 +147,7 @@ const config = {
       });
     }
 
-    rspackConfig.devtool = isDevelopment || isCanaryRelease ? "source-map" : false;
+    rspackConfig.devtool = shouldBuildSourcemaps ? "source-map" : false;
     return rspackConfig;
   },
 };

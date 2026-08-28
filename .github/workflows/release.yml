@@ -48,13 +48,6 @@ jobs:
           app-id: ${{ secrets.APP_ID }}
           private-key: ${{ secrets.APP_PRIVATE_KEY }}
 
-      - name: Bypass Cloudflare for GitHub Action
-        uses: xiaotianxt/bypass-cloudflare-for-github-action@v2.0.1
-        with:
-          cf_account_id: ${{ secrets.CF_ACCOUNT_ID }}
-          cf_zone_id: ${{ secrets.CF_ZONE_ID }}
-          cf_api_token: ${{ secrets.CF_API_TOKEN }}
-
       - name: Checkout code
         uses: actions/checkout@v4
         with:
@@ -80,8 +73,11 @@ jobs:
       - name: Build extension
         env:
           RELEASE_TYPE: ${{ github.event.inputs.is_canary == 'true' && 'canary' || '' }}
-          SOURCEMAPS_API_KEY: ${{ secrets.SOURCEMAPS_API_KEY }}
           SOURCEMAPS_BASE_URL: ${{ vars.SOURCEMAPS_API_URL }}
+          R2_ENDPOINT: ${{ vars.R2_SOURCEMAPS_ENDPOINT }}
+          R2_BUCKET: ${{ vars.R2_SOURCEMAPS_BUCKET }}
+          R2_ACCESS_KEY_ID: ${{ secrets.R2_SOURCEMAPS_ACCESS_KEY_ID }}
+          R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SOURCEMAPS_SECRET_ACCESS_KEY }}
         run: npm run build:ci
 
       # https://github.com/planetscale/ghcommit-action/issues/43#issuecomment-2313129696

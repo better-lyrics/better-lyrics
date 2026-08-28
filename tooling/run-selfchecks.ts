@@ -5,11 +5,14 @@ import { fileURLToPath } from "url";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const repoRoot = join(__dirname, "..");
-const srcDir = join(repoRoot, "src");
+const selfcheckDirs = [join(repoRoot, "src"), join(repoRoot, "tooling")];
 
-const files = readdirSync(srcDir, { recursive: true, encoding: "utf8" })
-  .filter(entry => entry.endsWith(".selfcheck.ts"))
-  .map(entry => join(srcDir, entry))
+const files = selfcheckDirs
+  .flatMap(dir =>
+    readdirSync(dir, { recursive: true, encoding: "utf8" })
+      .filter(entry => entry.endsWith(".selfcheck.ts"))
+      .map(entry => join(dir, entry))
+  )
   .sort();
 
 if (files.length === 0) {

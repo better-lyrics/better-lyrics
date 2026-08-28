@@ -61,6 +61,7 @@
         "sortablejs": "^1.15.7"
     },
     "devDependencies": {
+        "@aws-sdk/client-s3": "^3.1121.0",
         "@biomejs/biome": "2.0.4",
         "@types/chrome": "^0.2.7",
         "@types/jsdom": "^28.0.3",

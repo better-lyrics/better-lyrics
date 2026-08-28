@@ -12,9 +12,10 @@
     "public/earlyInject.js",
     "public/script.js",
     "src/core/generated/locales.ts",
-    "src/**/*.selfcheck.ts"
+    "src/**/*.selfcheck.ts",
+    "tooling/**/*.ts"
   ],
-  "project": ["src/**/*.ts", "public/**/*.js"],
+  "project": ["src/**/*.ts", "public/**/*.js", "tooling/**/*.ts"],
   "ignoreDependencies": [
     "@codemirror/language",
     "@typescript/lib-dom"
