@@ -17,7 +17,14 @@ export const TAB_HEADER_CLASS = "tab-header style-scope ytmusic-player-page" as 
 export const TAB_CONTENT_CLASS = "tab-content style-scope tp-yt-paper-tab" as const;
 export const DOCK_CLASS = "blyrics-dock" as const;
 export const DOCK_DEFAULT_POSITION = "bottom-right" as const;
-export const DOCK_CONTROL_ORDER_DEFAULT = ["source", "translate", "romanize", "offset", "pictureInPicture"] as const;
+export const DOCK_CONTROL_ORDER_DEFAULT = [
+  "source",
+  "translate",
+  "romanize",
+  "offset",
+  "refresh",
+  "pictureInPicture",
+] as const;
 export const MODAL_OVERLAY_CLASS = "blyrics-modal-overlay" as const;
 export const MODAL_CLASS = "blyrics-modal" as const;
 
@@ -386,6 +393,7 @@ interface ProviderConfig {
   displayName: string;
   syncType: SyncType;
   priority: number;
+  volatile?: boolean;
 }
 
 export const PROVIDER_CONFIGS: ProviderConfig[] = [
@@ -395,6 +403,7 @@ export const PROVIDER_CONFIGS: ProviderConfig[] = [
     displayName: "Unison",
     syncType: "syllable",
     priority: 1,
+    volatile: true,
   },
   { key: "binimum-richsynced", displayName: "BiniLyrics", syncType: "syllable", priority: 2 },
   { key: "portato-richsynced", displayName: "Better Lyrics Portato", syncType: "word", priority: 3 },
@@ -405,6 +414,7 @@ export const PROVIDER_CONFIGS: ProviderConfig[] = [
     displayName: "Unison",
     syncType: "line",
     priority: 6,
+    volatile: true,
   },
   { key: "yt-captions", displayName: "YouTube Captions", syncType: "line", priority: 7 },
   { key: "binimum-synced", displayName: "BiniLyrics", syncType: "line", priority: 8 },
@@ -417,8 +427,11 @@ export const PROVIDER_CONFIGS: ProviderConfig[] = [
     displayName: "Unison",
     syncType: "unsynced",
     priority: 13,
+    volatile: true,
   },
   { key: "lrclib-plain", displayName: "LRCLib", syncType: "unsynced", priority: 14 },
 ] as const;
 
 export const LYRIC_SOURCE_KEYS = PROVIDER_CONFIGS.map(p => p.key);
+
+export const VOLATILE_PROVIDER_KEYS = PROVIDER_CONFIGS.filter(p => p.volatile).map(p => p.key);

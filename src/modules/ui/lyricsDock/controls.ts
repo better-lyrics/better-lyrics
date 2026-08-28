@@ -1,9 +1,8 @@
 import { DOCK_CLASS, PROVIDER_CONFIGS } from "@constants";
-import { AppState, reloadLyrics } from "@core/appState";
+import { AppState, refreshCurrentSong, reloadLyrics } from "@core/appState";
 import { attachHoldRepeat } from "@core/holdRepeat";
 import { t } from "@core/i18n";
 import { setStorage } from "@core/storage";
-import { providerPriority } from "@modules/lyrics/providers/shared";
 import { mainView } from "@modules/ui/mainLyricsView";
 import { pictureInPictureController } from "@modules/ui/pictureInPicture/browserController";
 import { controlIcons, parseSvgString, syncTypeColors, syncTypeIcons } from "./icons";
@@ -123,10 +122,8 @@ function currentProviderConfig() {
   return PROVIDER_CONFIGS.find(config => config.key === key) ?? null;
 }
 
-// The providers offered by the dock are only the ones that actually returned lyrics for
-// this song; falls back to the full priority list before the first load resolves.
 function dockSourceList() {
-  return AppState.availableProviderKeys.length > 0 ? AppState.availableProviderKeys : providerPriority;
+  return AppState.availableProviderKeys;
 }
 
 function buildCycleArrow(direction: 1 | -1): HTMLButtonElement {
@@ -146,7 +143,7 @@ function buildCycleArrow(direction: 1 | -1): HTMLButtonElement {
   return btn;
 }
 
-function buildSourceSlot(): HTMLElement | null {
+export function buildSourceSlot(): HTMLElement | null {
   const provider = currentProviderConfig();
   if (!provider) return null;
 
@@ -237,6 +234,24 @@ function buildPictureInPictureControl(): HTMLButtonElement | null {
   if (icon) btn.appendChild(icon);
 
   btn.addEventListener("click", () => pictureInPictureController.toggle());
+  return btn;
+}
+
+function buildRefreshControl(): HTMLButtonElement {
+  const label = t("lyricsDock_refresh");
+  const btn = document.createElement("button");
+  btn.type = "button";
+  btn.className = `${DOCK_CLASS}__control ${DOCK_CLASS}__refresh`;
+  btn.setAttribute("aria-label", label);
+  btn.title = label;
+
+  const icon = parseSvgString(controlIcons.refresh);
+  if (icon) btn.appendChild(icon);
+
+  btn.addEventListener("click", () => {
+    btn.classList.add(`${DOCK_CLASS}__refresh--busy`);
+    void refreshCurrentSong();
+  });
   return btn;
 }
 
@@ -470,6 +485,7 @@ const controlBuilders: Record<string, () => HTMLElement | null> = {
         )
       : null,
   offset: () => (isSynced() && AppState.isDockOffsetEnabled ? buildOffsetControl() : null),
+  refresh: () => (hasLyrics() && AppState.isDockRefreshEnabled ? buildRefreshControl() : null),
   pictureInPicture: () => (AppState.isDockPictureInPictureEnabled ? buildPictureInPictureControl() : null),
 };
 

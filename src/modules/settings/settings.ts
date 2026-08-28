@@ -297,6 +297,7 @@ export function loadDockSettings(callback?: () => void): void {
       "isDockTranslateEnabled",
       "isDockRomanizeEnabled",
       "isDockOffsetEnabled",
+      "isDockRefreshEnabled",
       "isDockPictureInPictureEnabled",
       "dockControlsOrder",
     ],
@@ -310,6 +311,7 @@ export function loadDockSettings(callback?: () => void): void {
       AppState.isDockTranslateEnabled = items.isDockTranslateEnabled ?? true;
       AppState.isDockRomanizeEnabled = items.isDockRomanizeEnabled ?? true;
       AppState.isDockOffsetEnabled = items.isDockOffsetEnabled ?? true;
+      AppState.isDockRefreshEnabled = items.isDockRefreshEnabled ?? false;
       AppState.isDockPictureInPictureEnabled = items.isDockPictureInPictureEnabled ?? true;
       AppState.dockControlsOrder = normalizeDockControlsOrder(items.dockControlsOrder);
       callback?.();

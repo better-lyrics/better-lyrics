@@ -44,6 +44,7 @@ interface Options {
   isDockTranslateEnabled: boolean;
   isDockRomanizeEnabled: boolean;
   isDockOffsetEnabled: boolean;
+  isDockRefreshEnabled: boolean;
   isDockPictureInPictureEnabled: boolean;
   dockControlsOrder: string[];
   globalLyricOffset: number;
@@ -108,6 +109,7 @@ const getOptionsFromForm = (): Options => {
     isDockTranslateEnabled: (document.getElementById("isDockTranslateEnabled") as HTMLInputElement).checked,
     isDockRomanizeEnabled: (document.getElementById("isDockRomanizeEnabled") as HTMLInputElement).checked,
     isDockOffsetEnabled: (document.getElementById("isDockOffsetEnabled") as HTMLInputElement).checked,
+    isDockRefreshEnabled: (document.getElementById("isDockRefreshEnabled") as HTMLInputElement).checked,
     isDockPictureInPictureEnabled: (document.getElementById("isDockPictureInPictureEnabled") as HTMLInputElement)
       .checked,
     dockControlsOrder: getDockControlsOrder(),
@@ -308,6 +310,7 @@ const restoreOptions = (): void => {
     isDockTranslateEnabled: true,
     isDockRomanizeEnabled: true,
     isDockOffsetEnabled: true,
+    isDockRefreshEnabled: false,
     isDockPictureInPictureEnabled: true,
     dockControlsOrder: [...DOCK_CONTROL_ORDER_DEFAULT],
     globalLyricOffset: 0,
@@ -372,6 +375,7 @@ const setOptionsInForm = (items: Options): void => {
   (document.getElementById("isDockTranslateEnabled") as HTMLInputElement).checked = items.isDockTranslateEnabled;
   (document.getElementById("isDockRomanizeEnabled") as HTMLInputElement).checked = items.isDockRomanizeEnabled;
   (document.getElementById("isDockOffsetEnabled") as HTMLInputElement).checked = items.isDockOffsetEnabled;
+  (document.getElementById("isDockRefreshEnabled") as HTMLInputElement).checked = items.isDockRefreshEnabled;
   (document.getElementById("isDockPictureInPictureEnabled") as HTMLInputElement).checked =
     items.isDockPictureInPictureEnabled;
   setOffsetDisplay("globalLyricOffset", items.globalLyricOffset);
@@ -1506,6 +1510,7 @@ function resetDockSettings(): void {
   (document.getElementById("isDockTranslateEnabled") as HTMLInputElement).checked = true;
   (document.getElementById("isDockRomanizeEnabled") as HTMLInputElement).checked = true;
   (document.getElementById("isDockOffsetEnabled") as HTMLInputElement).checked = true;
+  (document.getElementById("isDockRefreshEnabled") as HTMLInputElement).checked = false;
   (document.getElementById("isDockPictureInPictureEnabled") as HTMLInputElement).checked = true;
   setUnisonPositionInForm(DOCK_DEFAULT_POSITION);
   setDockControlsOrderInForm([...DOCK_CONTROL_ORDER_DEFAULT]);
@@ -1555,6 +1560,7 @@ function setupUnisonActionsModal(): void {
     "isDockTranslateEnabled",
     "isDockRomanizeEnabled",
     "isDockOffsetEnabled",
+    "isDockRefreshEnabled",
     "isDockPictureInPictureEnabled",
   ]) {
     document.getElementById(id)?.addEventListener("change", debouncedSaveOptions);

@@ -4,6 +4,7 @@ import {
   LYRICS_NEGATIVE_CACHE_TTL_MS,
   PROVIDER_CONFIGS,
   PROVIDER_SWITCHED_LOG,
+  VOLATILE_PROVIDER_KEYS,
 } from "@constants";
 import { getTransientStorage, setTransientStorage } from "@core/storage";
 import unified from "./unified";
@@ -191,7 +192,13 @@ export function newSourceMap(): SourceMapType {
 
 export async function saveLyricsToCache(providerParameters: ProviderParameters, provider: LyricSourceKey) {
   let source = providerParameters.sourceMap[provider];
-  if (source.filled && !source.resultCached && !source.lyricSourceResult && provider !== "metadata") {
+  if (
+    source.filled &&
+    !source.resultCached &&
+    !source.lyricSourceResult &&
+    provider !== "metadata" &&
+    !VOLATILE_PROVIDER_KEYS.includes(provider)
+  ) {
     source.resultCached = true;
     const cacheKey = `blyrics_${providerParameters.videoId}_${provider}`;
     await setTransientStorage(

@@ -625,6 +625,10 @@ ytmusic-player-page:not([is-mweb-modernization-enabled]) #side-panel:has(.blyric
 		inset color-mix(in srgb, var(--dock-pill-accent, hsl(45, 100%, 56%)) 24%, transparent) 0px 1px 0px 0px;
 }
 
+.blyrics-dock__refresh--busy svg {
+	animation: blyrics-spin 700ms linear infinite;
+}
+
 .blyrics-dock__fx {
 	overflow: hidden;
 	transition:

@@ -45,7 +45,7 @@ import { requestLyrics } from "@modules/unison/unisonApi";
 import { reflow, toMs } from "@braccato/core/util";
 import { generatePetName } from "@/core/keyIdentity";
 import { byId, deleteVote, type UnisonData, vote } from "../lyrics/providers/unison";
-import { buildControlsSegment, closeSourceMenu } from "./lyricsDock/controls";
+import { buildControlsSegment, buildSourceSlot, closeSourceMenu } from "./lyricsDock/controls";
 import { parseSvgString, syncTypeColors, syncTypeIcons } from "./lyricsDock/icons";
 import { loadSavedOffset } from "./lyricsDock/offset";
 import { scrollEventHandler } from "./observer";
@@ -820,6 +820,32 @@ export function mountDock(position: string): void {
   }
 
   applyDockSuppression();
+}
+
+export function refreshDockSources(): void {
+  if (!AppState.isControlsDockEnabled) return;
+  if (!document.getElementsByClassName(DOCK_CLASS)[0]) return;
+
+  const oldSlot = document.querySelector(`.${DOCK_CLASS}__source`) as HTMLElement | null;
+  const newSlot = buildSourceSlot();
+  if (!oldSlot || !newSlot) {
+    mountDock(AppState.controlsDockPosition);
+    return;
+  }
+
+  closeSourceMenu();
+  const widthFrom = oldSlot.offsetWidth;
+  oldSlot.replaceWith(newSlot);
+  const widthTo = newSlot.offsetWidth;
+  newSlot.classList.add(DOCK_FX_CLASS, DOCK_FX_OUT_CLASS);
+  newSlot.style.width = `${widthFrom}px`;
+  void newSlot.offsetWidth;
+  newSlot.classList.remove(DOCK_FX_OUT_CLASS);
+  newSlot.style.width = `${widthTo}px`;
+  setTimeout(() => {
+    newSlot.classList.remove(DOCK_FX_CLASS);
+    newSlot.style.width = "";
+  }, DOCK_FX_MS + 40);
 }
 
 export function mountVotingSegment(unisonData: UnisonData): void {
