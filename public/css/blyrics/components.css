@@ -534,6 +534,13 @@ ytmusic-player-page:not([is-mweb-modernization-enabled]) #side-panel:has(.blyric
 	pointer-events: none;
 }
 
+/* Song changes hide the stale dock immediately. Once loading finishes, removing this
+   modifier restores the normal transition so the current song's controls ease back in. */
+.blyrics-dock--loading .blyrics-dock__inner {
+	visibility: hidden;
+	transition: none;
+}
+
 /* -- Lyrics dock controls -------------------------------------------------- */
 .blyrics-dock__controls,
 .blyrics-dock__voting {

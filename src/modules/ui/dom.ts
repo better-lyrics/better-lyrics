@@ -432,7 +432,7 @@ function hidePlayerBarOnDockLeave(): void {
   document.getElementById("layout")?.removeAttribute("show-fullscreen-controls");
 }
 
-type DockSuppressionReason = "ad" | "noLyrics";
+type DockSuppressionReason = "ad" | "loading" | "noLyrics";
 const dockSuppressionReasons = new Set<DockSuppressionReason>();
 
 function setVotingSegmentHidden(hidden: boolean): void {
@@ -452,6 +452,7 @@ function applyDockSuppression(): void {
   const dock = document.getElementsByClassName(DOCK_CLASS)[0] as HTMLElement | undefined;
   if (!dock) return;
   dock.classList.toggle(`${DOCK_CLASS}--hidden`, dockSuppressionReasons.size > 0);
+  dock.classList.toggle(`${DOCK_CLASS}--loading`, dockSuppressionReasons.has("loading"));
 }
 
 function setDockSuppression(reason: DockSuppressionReason, suppressed: boolean): void {
@@ -1111,6 +1112,8 @@ export function renderLoader(small = false): void {
   if (isAdPlaying()) {
     return;
   }
+  closeSourceMenu();
+  setDockSuppression("loading", true);
   if (!small) {
     cleanup();
   }
@@ -1150,6 +1153,7 @@ export function renderLoader(small = false): void {
  */
 export function flushLoader(showNoSyncAvailable = false): void {
   try {
+    setDockSuppression("loading", false);
     const loaderWrapper = document.getElementById(LYRICS_LOADER_ID);
     if (!loaderWrapper) return;
 
