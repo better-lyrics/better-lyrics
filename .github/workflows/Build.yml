@@ -7,7 +7,7 @@ on:
   pull_request:
 
 env:
-  HAS_CF_SECRETS: ${{ secrets.CF_ACCOUNT_ID != '' && secrets.CF_ZONE_ID != '' && secrets.CF_API_TOKEN != '' && secrets.SOURCEMAPS_API_KEY != '' && vars.SOURCEMAPS_API_URL != '' }}
+  HAS_R2_SECRETS: ${{ secrets.R2_SOURCEMAPS_ACCESS_KEY_ID != '' && secrets.R2_SOURCEMAPS_SECRET_ACCESS_KEY != '' && vars.R2_SOURCEMAPS_ENDPOINT != '' && vars.R2_SOURCEMAPS_BUCKET != '' && vars.SOURCEMAPS_API_URL != '' }}
   
 jobs:
   build:
@@ -17,14 +17,6 @@ jobs:
       - uses: actions/checkout@v3
         with:
           fetch-depth: 0
-
-      - name: Bypass Cloudflare for GitHub Action
-        uses: xiaotianxt/bypass-cloudflare-for-github-action@v2.0.1
-        if: ${{ env.HAS_CF_SECRETS == 'true' }}
-        with:
-          cf_account_id: ${{ secrets.CF_ACCOUNT_ID }}
-          cf_zone_id: ${{ secrets.CF_ZONE_ID }}
-          cf_api_token: ${{ secrets.CF_API_TOKEN }}
 
       - name: Use Node.js
         uses: actions/setup-node@v3
@@ -53,15 +45,18 @@ jobs:
       - name: Update version in files
         run: npm run update-version -- "${{ env.NIGHTLY_VERSION }}"
 
-      - name: Build extension (with sourcemap uplaod)
-        if: ${{ env.HAS_CF_SECRETS == 'true' }}
+      - name: Build extension (with sourcemap upload)
+        if: ${{ env.HAS_R2_SECRETS == 'true' }}
         env:
-          SOURCEMAPS_API_KEY: ${{ secrets.SOURCEMAPS_API_KEY }}
           SOURCEMAPS_BASE_URL: ${{ vars.SOURCEMAPS_API_URL }}
+          R2_ENDPOINT: ${{ vars.R2_SOURCEMAPS_ENDPOINT }}
+          R2_BUCKET: ${{ vars.R2_SOURCEMAPS_BUCKET }}
+          R2_ACCESS_KEY_ID: ${{ secrets.R2_SOURCEMAPS_ACCESS_KEY_ID }}
+          R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SOURCEMAPS_SECRET_ACCESS_KEY }}
         run: npm run build:ci
 
-      - name: Build extension (without sourcemap uplaod)
-        if: ${{ env.HAS_CF_SECRETS == 'false' }}
+      - name: Build extension (without sourcemap upload)
+        if: ${{ env.HAS_R2_SECRETS == 'false' }}
         run: npm run build
 
       - name: Upload Chrome artifact

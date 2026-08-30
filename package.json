@@ -1,7 +1,7 @@
 {
     "type": "module",
     "name": "better-lyrics",
-    "version": "2.4.0.2",
+    "version": "2.4.0.3",
     "description": "Enhance YouTube Music with beautiful time-synced lyrics, multilingual support, real-time translations and more",
     "scripts": {
         "generate:locales": "tsx tooling/generate-locales.ts",
@@ -62,6 +62,7 @@
         "sortablejs": "^1.15.7"
     },
     "devDependencies": {
+        "@aws-sdk/client-s3": "^3.1121.0",
         "@biomejs/biome": "2.0.4",
         "@types/chrome": "^0.2.7",
         "@types/jsdom": "^28.0.3",

@@ -78,8 +78,11 @@ jobs:
         if: steps.download.outcome != 'success'
         env:
           RELEASE_TYPE: ${{ steps.meta.outputs.release_type }}
-          SOURCEMAPS_API_KEY: ${{ secrets.SOURCEMAPS_API_KEY }}
           SOURCEMAPS_BASE_URL: ${{ vars.SOURCEMAPS_API_URL }}
+          R2_ENDPOINT: ${{ vars.R2_SOURCEMAPS_ENDPOINT }}
+          R2_BUCKET: ${{ vars.R2_SOURCEMAPS_BUCKET }}
+          R2_ACCESS_KEY_ID: ${{ secrets.R2_SOURCEMAPS_ACCESS_KEY_ID }}
+          R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SOURCEMAPS_SECRET_ACCESS_KEY }}
         run: |
           echo "Rebuilding from tag v${{ inputs.version }} (no artifact available)."
           rm -rf "dist/${{ inputs.platform }}"
