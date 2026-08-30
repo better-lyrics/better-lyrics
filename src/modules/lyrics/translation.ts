@@ -1,4 +1,4 @@
-import { TRANSLATE_IN_ROMAJI, TRANSLATE_LYRICS_URL, TRANSLATION_ERROR_LOG } from "@constants";
+import { TRANSLATE_IN_ROMAJI, TRANSLATE_LYRICS_URL, TRANSLATION_ERROR_LOG, UNISON_TRANSLATE_URL } from "@constants";
 import { logCore } from "@core/logger";
 
 interface TranslationResult {
@@ -20,6 +20,7 @@ interface BatchRequest {
   lines: string[];
   targetLanguage?: string; // For translations
   sourceLanguage?: string; // For romanizations
+  videoId?: string;
   signal?: AbortSignal;
 }
 
@@ -36,6 +37,52 @@ interface BatchRomanizationResponse {
 const BATCH_SEPARATOR = "\n\n;\n\n";
 const MAX_URL_LENGTH = 15000;
 
+interface UnisonTranslateLine {
+  translation: string | null;
+  romanization: string | null;
+  needsTranslation: boolean;
+}
+
+async function enrichViaUnison(
+  items: { index: number; text: string }[],
+  to: string,
+  from: string | undefined,
+  videoId: string | undefined,
+  signal?: AbortSignal
+): Promise<string | undefined> {
+  if (items.length === 0) return;
+  try {
+    const response = await fetch(UNISON_TRANSLATE_URL, {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ lines: items.map(item => item.text), to, from, videoId }),
+      signal,
+    });
+    if (!response.ok) return;
+    const data = (await response.json()) as { lines: UnisonTranslateLine[]; detectedLang: string };
+    if (!Array.isArray(data.lines) || data.lines.length !== items.length) return;
+
+    items.forEach((item, i) => {
+      const line = data.lines[i];
+      const lower = item.text.toLowerCase();
+      if (line?.translation && line.needsTranslation && line.translation.toLowerCase() !== lower) {
+        cache.translation.set(`${to}_${item.text}`, {
+          originalLanguage: data.detectedLang || "",
+          translatedText: line.translation,
+        });
+      }
+      if (line?.romanization && line.romanization.toLowerCase() !== lower) {
+        cache.romanization.set(item.text, line.romanization);
+      }
+    });
+    return data.detectedLang || undefined;
+  } catch (error) {
+    if ((error as Error).name !== "AbortError") {
+      logCore(TRANSLATION_ERROR_LOG, error);
+    }
+  }
+}
+
 /**
  * Translates a batch of lyric lines in a single request, chunked if necessary.
  */
@@ -46,7 +93,7 @@ export async function translateBatch(request: BatchRequest): Promise<BatchTransl
   }
 
   const results: (TranslationResult | null)[] = new Array(lines.length).fill(null);
-  const toTranslate: { index: number; text: string }[] = [];
+  let toTranslate: { index: number; text: string }[] = [];
 
   // Check cache first
   lines.forEach((line, index) => {
@@ -63,6 +110,25 @@ export async function translateBatch(request: BatchRequest): Promise<BatchTransl
 
   if (toTranslate.length === 0) {
     return { results, detectedLanguage: results.find(r => r !== null)?.originalLanguage || "" };
+  }
+
+  const unisonLang = await enrichViaUnison(
+    toTranslate,
+    targetLanguage,
+    request.sourceLanguage,
+    request.videoId,
+    signal
+  );
+  toTranslate = toTranslate.filter(({ index, text }) => {
+    const hit = cache.translation.get(`${targetLanguage}_${text}`);
+    if (hit) {
+      results[index] = hit;
+      return false;
+    }
+    return true;
+  });
+  if (toTranslate.length === 0) {
+    return { results, detectedLanguage: results.find(r => r !== null)?.originalLanguage || unisonLang || "" };
   }
 
   let detectedLanguage = "";
@@ -155,7 +221,7 @@ export async function romanizeBatch(request: BatchRequest): Promise<BatchRomaniz
   }
 
   const results: (string | null)[] = new Array(lines.length).fill(null);
-  const toRomanize: { index: number; text: string }[] = [];
+  let toRomanize: { index: number; text: string }[] = [];
 
   // Check cache first
   lines.forEach((line, index) => {
@@ -174,6 +240,22 @@ export async function romanizeBatch(request: BatchRequest): Promise<BatchRomaniz
   }
 
   let detectedLanguage = sourceLanguage || "auto";
+
+  const unisonLang = await enrichViaUnison(toRomanize, "en", sourceLanguage, request.videoId, signal);
+  if (unisonLang) {
+    detectedLanguage = unisonLang;
+  }
+  toRomanize = toRomanize.filter(({ index, text }) => {
+    const hit = cache.romanization.get(text);
+    if (hit) {
+      results[index] = hit;
+      return false;
+    }
+    return true;
+  });
+  if (toRomanize.length === 0) {
+    return { results, detectedLanguage };
+  }
 
   // Chunk toRomanize based on URL length limits
   const chunks: { index: number; text: string }[][] = [];
