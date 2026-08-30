@@ -590,44 +590,73 @@ function createUnisonFooterCard(unisonData: UnisonData): HTMLElement {
 
 const DOCK_PROXIMITY = 104;
 const DOCK_LEAVE_GRACE = 120;
+const BOTTOM_REVEAL_ZONE = 100;
+const PLAYER_BAR_HIDE_DELAY = 2000;
 let dockProximityAttached = false;
 let dockProximityListener: ((event: MouseEvent) => void) | null = null;
 let dockProximityRaf: number | null = null;
 let dockLeaveTimer: ReturnType<typeof setTimeout> | null = null;
+let playerBarHideTimer: ReturnType<typeof setTimeout> | null = null;
 const DOCK_EXPANDED_CLASS = `${DOCK_CLASS}__inner--expanded`;
 
-// Activates immediately, but defers deactivation by a short grace window (cancelled if the
-// cursor returns), so brief excursions across a divider or during a layout shift do not drop
-// the player bar.
 function setDockNear(inner: HTMLElement, near: boolean): void {
   if (near) {
     if (dockLeaveTimer) {
       clearTimeout(dockLeaveTimer);
       dockLeaveTimer = null;
     }
-    if (!inner.classList.contains(DOCK_EXPANDED_CLASS)) {
-      inner.classList.add(DOCK_EXPANDED_CLASS);
-      showPlayerBarOnDockHover();
-    }
+    inner.classList.add(DOCK_EXPANDED_CLASS);
   } else if (inner.classList.contains(DOCK_EXPANDED_CLASS) && !dockLeaveTimer) {
     dockLeaveTimer = setTimeout(() => {
       dockLeaveTimer = null;
       inner.classList.remove(DOCK_EXPANDED_CLASS);
-      hidePlayerBarOnDockLeave();
     }, DOCK_LEAVE_GRACE);
   }
+}
+
+function setPlayerBarShown(shown: boolean): void {
+  if (shown) {
+    if (playerBarHideTimer) {
+      clearTimeout(playerBarHideTimer);
+      playerBarHideTimer = null;
+    }
+    showPlayerBarOnDockHover();
+  } else if (dockHoverActive && !playerBarHideTimer) {
+    playerBarHideTimer = setTimeout(() => {
+      playerBarHideTimer = null;
+      hidePlayerBarOnDockLeave();
+    }, PLAYER_BAR_HIDE_DELAY);
+  }
+}
+
+function isCursorNearBottom(event: MouseEvent): boolean {
+  const layout = document.getElementById("layout");
+  if (!layout?.hasAttribute("player-fullscreened")) return false;
+  let threshold = window.innerHeight - BOTTOM_REVEAL_ZONE;
+  if (layout.hasAttribute("show-fullscreen-controls")) {
+    const bar = document.querySelector(PLAYER_BAR_SELECTOR)?.getBoundingClientRect();
+    if (bar && bar.height > 0) threshold = Math.min(threshold, bar.top);
+  }
+  return event.clientY >= threshold;
 }
 
 function evaluateDockProximity(event: MouseEvent): void {
   const inner = document.getElementsByClassName(`${DOCK_CLASS}__inner`)[0] as HTMLElement | undefined;
   if (!inner) return;
-  const rect = inner.getBoundingClientRect();
-  if (rect.width === 0) return;
 
+  const barNear = isCursorNearBottom(event);
+  const rect = inner.getBoundingClientRect();
   const dock = inner.parentElement as HTMLElement | null;
-  if (dock?.classList.contains(`${DOCK_CLASS}--hidden`) || dock?.classList.contains(`${DOCK_CLASS}--idle-hidden`)) {
+  const dockActive =
+    rect.width > 0 &&
+    !dock?.classList.contains(`${DOCK_CLASS}--hidden`) &&
+    !dock?.classList.contains(`${DOCK_CLASS}--idle-hidden`);
+
+  if (!dockActive) {
+    setPlayerBarShown(barNear);
     return;
   }
+
   const position = dock?.dataset.position ?? "";
   let { left, right, top, bottom } = rect;
   if (position.includes("right")) left -= DOCK_PROXIMITY;
@@ -645,16 +674,16 @@ function evaluateDockProximity(event: MouseEvent): void {
     bottom -= shiftY;
   }
 
-  let near = event.clientX >= left && event.clientX <= right && event.clientY >= top && event.clientY <= bottom;
+  let dockNear = event.clientX >= left && event.clientX <= right && event.clientY >= top && event.clientY <= bottom;
 
   // While the source dropdown is open, treat its bounds (plus a bridging margin) as
   // part of the dock so moving onto it does not collapse the dock or drop the player bar.
-  if (!near) {
+  if (!dockNear) {
     const menu = document.querySelector(`.${DOCK_CLASS}__menu--open`);
     if (menu) {
       const m = menu.getBoundingClientRect();
       const pad = 32;
-      near =
+      dockNear =
         event.clientX >= m.left - pad &&
         event.clientX <= m.right + pad &&
         event.clientY >= m.top - pad &&
@@ -662,18 +691,8 @@ function evaluateDockProximity(event: MouseEvent): void {
     }
   }
 
-  // The dock is what keeps the fullscreen controls shown, so while they are up, the cursor
-  // being anywhere over the player bar must hold the dock open: collapsing here would pull
-  // the bar out from under the pointer.
-  if (!near && document.getElementById("layout")?.hasAttribute("show-fullscreen-controls")) {
-    const bar = document.querySelector(PLAYER_BAR_SELECTOR);
-    if (bar) {
-      const b = bar.getBoundingClientRect();
-      near = event.clientX >= b.left && event.clientX <= b.right && event.clientY >= b.top && event.clientY <= b.bottom;
-    }
-  }
-
-  setDockNear(inner, near);
+  setDockNear(inner, dockNear);
+  setPlayerBarShown(dockNear || barNear);
 }
 
 // Pre-expands the dock when the cursor comes near, so the controls have settled into
@@ -708,6 +727,10 @@ function removeDockProximityListener(): void {
   if (dockLeaveTimer) {
     clearTimeout(dockLeaveTimer);
     dockLeaveTimer = null;
+  }
+  if (playerBarHideTimer) {
+    clearTimeout(playerBarHideTimer);
+    playerBarHideTimer = null;
   }
 }
 
