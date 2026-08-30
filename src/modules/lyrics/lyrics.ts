@@ -8,10 +8,11 @@ import { AppState, type PlayerDetails } from "@core/appState";
 import { t } from "@core/i18n";
 import { type LineData, type LyricsData, processLyrics } from "@modules/lyrics/injectLyrics";
 import { stringSimilarity } from "@modules/lyrics/lyricParseUtils";
-import { flushLoader, renderLoader } from "@modules/ui/dom";
+import { flushLoader, refreshDockSources, renderLoader } from "@modules/ui/dom";
 import { publishPictureInPictureLyrics } from "@modules/ui/pictureInPicture/lyricsPublisher";
-import type { Lyric, LyricSourceResult, ProviderParameters } from "./providers/shared";
+import type { Lyric, LyricSourceResult, ProviderParameters, SourceMapType } from "./providers/shared";
 import { getLyrics, newSourceMap, providerPriority } from "./providers/shared";
+import { awaitUnifiedStream } from "./providers/unified";
 import type { YTLyricSourceResult } from "./providers/yt";
 import { getSongAlbum, getSongMetadata, type SegmentMap } from "./requestSniffer/requestSniffer";
 import { clearCache as clearTranslationCache } from "./translation";
@@ -122,6 +123,40 @@ export function applySegmentMapToLyrics(
         });
       }
     }
+  }
+}
+
+function recordAvailableProviders(sourceMap: SourceMapType): boolean {
+  const collected = providerPriority.filter(key => {
+    const result = sourceMap[key]?.lyricSourceResult;
+    return !!result && "lyrics" in result && Array.isArray(result.lyrics) && result.lyrics.length > 0;
+  });
+  const known = new Set([...AppState.availableProviderKeys, ...collected]);
+  const next = providerPriority.filter(key => known.has(key));
+  const changed = next.length !== AppState.availableProviderKeys.length;
+  AppState.availableProviderKeys = next;
+  return changed;
+}
+
+async function completeSourceProbe(providerParameters: ProviderParameters, signal: AbortSignal): Promise<void> {
+  if (!AppState.isControlsDockEnabled || !AppState.isDockSourceEnabled) return;
+  try {
+    await awaitUnifiedStream(providerParameters.videoId);
+    for (const provider of providerPriority) {
+      if (signal.aborted) return;
+      if (providerParameters.sourceMap[provider].filled) continue;
+      try {
+        await getLyrics(providerParameters, provider);
+      } catch (err) {
+        logCore(err);
+      }
+    }
+  } catch (err) {
+    logCore(err);
+  }
+  if (signal.aborted) return;
+  if (recordAvailableProviders(providerParameters.sourceMap)) {
+    refreshDockSources();
   }
 }
 
@@ -374,16 +409,7 @@ export async function createLyrics(detail: PlayerDetails, signal: AbortSignal): 
       ...lyrics,
     };
 
-    // Record which providers actually returned lyrics for this song so the dock's source
-    // dropdown and cycling only offer real choices instead of empties that fall back.
-    // Union with what is already known: pinning a provider wins the loop early before the
-    // rest of the stream lands, so a fresh filter alone would shrink the list each switch.
-    const collected = providerPriority.filter(key => {
-      const result = sourceMap[key]?.lyricSourceResult;
-      return !!result && "lyrics" in result && Array.isArray(result.lyrics) && result.lyrics.length > 0;
-    });
-    const known = new Set([...AppState.availableProviderKeys, ...collected]);
-    AppState.availableProviderKeys = providerPriority.filter(key => known.has(key));
+    recordAvailableProviders(sourceMap);
 
     AppState.lastLoadedVideoId = detail.videoId;
     if (signal.aborted) {
@@ -392,6 +418,7 @@ export async function createLyrics(detail: PlayerDetails, signal: AbortSignal): 
     processLyrics(document, lyricsWithMeta, false, signal);
     retainParsedLyrics(lyricsWithMeta);
     shouldCleanupLoader = false;
+    void completeSourceProbe(providerParameters, signal);
   } finally {
     if (shouldCleanupLoader) {
       flushLoader();

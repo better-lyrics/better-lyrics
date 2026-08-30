@@ -17,7 +17,14 @@ export const TAB_HEADER_CLASS = "tab-header style-scope ytmusic-player-page" as 
 export const TAB_CONTENT_CLASS = "tab-content style-scope tp-yt-paper-tab" as const;
 export const DOCK_CLASS = "blyrics-dock" as const;
 export const DOCK_DEFAULT_POSITION = "bottom-right" as const;
-export const DOCK_CONTROL_ORDER_DEFAULT = ["source", "translate", "romanize", "offset", "pictureInPicture"] as const;
+export const DOCK_CONTROL_ORDER_DEFAULT = [
+  "source",
+  "translate",
+  "romanize",
+  "offset",
+  "refresh",
+  "pictureInPicture",
+] as const;
 export const MODAL_OVERLAY_CLASS = "blyrics-modal-overlay" as const;
 export const MODAL_CLASS = "blyrics-modal" as const;
 

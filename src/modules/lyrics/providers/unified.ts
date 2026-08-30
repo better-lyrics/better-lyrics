@@ -257,6 +257,15 @@ const activeStreams = new Map<string, Promise<void>>();
 // Waiters map: videoId -> sourceKey -> resolve function
 const waiters = new Map<string, Map<string, () => void>>();
 
+export function awaitUnifiedStream(videoId: string): Promise<void> {
+  return activeStreams.get(videoId) ?? Promise.resolve();
+}
+
+export function resetUnifiedStream(videoId: string): void {
+  activeStreams.delete(videoId);
+  waiters.delete(videoId);
+}
+
 function resolveWaiter(params: ProviderParameters, sourceKey: LyricSourceKey) {
   saveLyricsToCache(params, sourceKey).then(() => {
     const videoWaiters = waiters.get(params.videoId);

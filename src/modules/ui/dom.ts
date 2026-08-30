@@ -45,7 +45,7 @@ import { requestLyrics } from "@modules/unison/unisonApi";
 import { reflow, toMs } from "@braccato/core/util";
 import { generatePetName } from "@/core/keyIdentity";
 import { byId, deleteVote, type UnisonData, vote } from "../lyrics/providers/unison";
-import { buildControlsSegment, closeSourceMenu } from "./lyricsDock/controls";
+import { buildControlsSegment, buildSourceSlot, closeSourceMenu } from "./lyricsDock/controls";
 import { parseSvgString, syncTypeColors, syncTypeIcons } from "./lyricsDock/icons";
 import { loadSavedOffset } from "./lyricsDock/offset";
 import { scrollEventHandler } from "./observer";
@@ -432,7 +432,7 @@ function hidePlayerBarOnDockLeave(): void {
   document.getElementById("layout")?.removeAttribute("show-fullscreen-controls");
 }
 
-type DockSuppressionReason = "ad" | "noLyrics";
+type DockSuppressionReason = "ad" | "loading" | "noLyrics";
 const dockSuppressionReasons = new Set<DockSuppressionReason>();
 
 function setVotingSegmentHidden(hidden: boolean): void {
@@ -452,6 +452,7 @@ function applyDockSuppression(): void {
   const dock = document.getElementsByClassName(DOCK_CLASS)[0] as HTMLElement | undefined;
   if (!dock) return;
   dock.classList.toggle(`${DOCK_CLASS}--hidden`, dockSuppressionReasons.size > 0);
+  dock.classList.toggle(`${DOCK_CLASS}--loading`, dockSuppressionReasons.has("loading"));
 }
 
 function setDockSuppression(reason: DockSuppressionReason, suppressed: boolean): void {
@@ -822,6 +823,32 @@ export function mountDock(position: string): void {
   applyDockSuppression();
 }
 
+export function refreshDockSources(): void {
+  if (!AppState.isControlsDockEnabled) return;
+  if (!document.getElementsByClassName(DOCK_CLASS)[0]) return;
+
+  const oldSlot = document.querySelector(`.${DOCK_CLASS}__source`) as HTMLElement | null;
+  const newSlot = buildSourceSlot();
+  if (!oldSlot || !newSlot) {
+    mountDock(AppState.controlsDockPosition);
+    return;
+  }
+
+  closeSourceMenu();
+  const widthFrom = oldSlot.offsetWidth;
+  oldSlot.replaceWith(newSlot);
+  const widthTo = newSlot.offsetWidth;
+  newSlot.classList.add(DOCK_FX_CLASS, DOCK_FX_OUT_CLASS);
+  newSlot.style.width = `${widthFrom}px`;
+  void newSlot.offsetWidth;
+  newSlot.classList.remove(DOCK_FX_OUT_CLASS);
+  newSlot.style.width = `${widthTo}px`;
+  setTimeout(() => {
+    newSlot.classList.remove(DOCK_FX_CLASS);
+    newSlot.style.width = "";
+  }, DOCK_FX_MS + 40);
+}
+
 export function mountVotingSegment(unisonData: UnisonData): void {
   const inner = document.querySelector(`.${DOCK_CLASS}__inner`);
   if (!inner) return;
@@ -1085,6 +1112,8 @@ export function renderLoader(small = false): void {
   if (isAdPlaying()) {
     return;
   }
+  closeSourceMenu();
+  setDockSuppression("loading", true);
   if (!small) {
     cleanup();
   }
@@ -1124,6 +1153,7 @@ export function renderLoader(small = false): void {
  */
 export function flushLoader(showNoSyncAvailable = false): void {
   try {
+    setDockSuppression("loading", false);
     const loaderWrapper = document.getElementById(LYRICS_LOADER_ID);
     if (!loaderWrapper) return;
 

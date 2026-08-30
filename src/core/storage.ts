@@ -269,6 +269,21 @@ export async function clearCache(): Promise<void> {
   }
 }
 
+export async function clearSongCache(videoId: string): Promise<void> {
+  if (!videoId) return;
+  try {
+    const prefix = `blyrics_${videoId}_`;
+    const result = await chrome.storage.local.get(null);
+    const songKeys = Object.keys(result).filter(
+      key => key.startsWith(prefix) && !PROTECTED_STORAGE_KEYS.includes(key as (typeof PROTECTED_STORAGE_KEYS)[number])
+    );
+    await chrome.storage.local.remove(songKeys);
+    await saveCacheInfo();
+  } catch (error) {
+    logError(error);
+  }
+}
+
 /**
  * Removes expired cache entries from local storage.
  * Scans all BetterLyrics cache keys and removes those past their expiry time.
