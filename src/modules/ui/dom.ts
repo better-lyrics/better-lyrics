@@ -591,7 +591,7 @@ function createUnisonFooterCard(unisonData: UnisonData): HTMLElement {
 const DOCK_PROXIMITY = 104;
 const DOCK_LEAVE_GRACE = 120;
 const BOTTOM_REVEAL_ZONE = 100;
-const PLAYER_BAR_HIDE_DELAY = 2000;
+const PLAYER_BAR_HIDE_DELAY = 800;
 let dockProximityAttached = false;
 let dockProximityListener: ((event: MouseEvent) => void) | null = null;
 let dockProximityRaf: number | null = null;
