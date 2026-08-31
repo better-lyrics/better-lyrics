@@ -311,6 +311,7 @@ async function processBatchTranslationsAndRomanizations(
       (async () => {
         const response = await romanizeBatch({
           lines: romanizationBatch.map(b => b.text),
+          targetLanguage: targetTranslationLang,
           sourceLanguage: sourceLanguage || undefined,
           videoId: data.videoId,
           signal,
