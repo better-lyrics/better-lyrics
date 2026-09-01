@@ -55,7 +55,7 @@
         "@plasmohq/edge-addons-api": "^2.0.0",
         "codemirror-lang-rics": "^0.3.22",
         "dompurify": "^3.4.14",
-        "fast-xml-parser": "^5.10.1",
+        "fast-xml-parser": "^5.11.1",
         "fflate": "^0.8.3",
         "marked": "^18.0.10",
         "rics": "^0.3.22",
