@@ -1,7 +1,10 @@
 import { TRANSLATE_IN_ROMAJI, TRANSLATE_LYRICS_URL, TRANSLATION_ERROR_LOG } from "@constants";
+import { AppState } from "@core/appState";
 import { logCore } from "@core/logger";
+import { langCodesMatch } from "@utils";
+import { translateBatchGemini } from "./geminiTranslation";
 
-interface TranslationResult {
+export interface TranslationResult {
   originalLanguage: string;
   translatedText: string;
 }
@@ -16,16 +19,18 @@ const cache: TranslationCache = {
   translation: new Map(),
 };
 
-interface BatchRequest {
+export interface BatchRequest {
   lines: string[];
   targetLanguage?: string; // For translations
   sourceLanguage?: string; // For romanizations
   signal?: AbortSignal;
 }
 
-interface BatchTranslationResponse {
+export interface BatchTranslationResponse {
   results: (TranslationResult | null)[];
   detectedLanguage: string;
+  translationSource?: string;
+  translationError?: boolean;
 }
 
 interface BatchRomanizationResponse {
@@ -43,6 +48,39 @@ export async function translateBatch(request: BatchRequest): Promise<BatchTransl
   const { lines, targetLanguage, signal } = request;
   if (!targetLanguage || lines.length === 0) {
     return { results: lines.map(() => null), detectedLanguage: "" };
+  }
+
+  if (typeof chrome !== "undefined" && chrome.i18n && typeof chrome.i18n.detectLanguage === "function") {
+    const sampleText = lines
+      .map(line => line.trim())
+      .filter(line => line.length > 0 && line !== "♪")
+      .slice(0, 10)
+      .join(" ");
+
+    if (sampleText.length > 0) {
+      try {
+        const detection: any = await new Promise(resolve => {
+          chrome.i18n.detectLanguage(sampleText, resolve);
+        });
+
+        if (detection && detection.isReliable && detection.languages && detection.languages.length > 0) {
+          const detectedLang = detection.languages[0].language;
+          if (langCodesMatch(detectedLang, targetLanguage)) {
+            const results = lines.map(line => ({
+              originalLanguage: detectedLang,
+              translatedText: line,
+            }));
+            return { results, detectedLanguage: detectedLang };
+          }
+        }
+      } catch (e) {
+        logCore(TRANSLATION_ERROR_LOG, "Error detecting language with chrome.i18n.detectLanguage", e);
+      }
+    }
+  }
+
+  if (AppState.translationProvider === "gemini") {
+    return await translateBatchGemini(request);
   }
 
   const results: (TranslationResult | null)[] = new Array(lines.length).fill(null);
@@ -261,6 +299,16 @@ export async function romanizeBatch(request: BatchRequest): Promise<BatchRomaniz
 export function clearCache(): void {
   cache.romanization.clear();
   cache.translation.clear();
+  try {
+    chrome.storage.local.get(null).then(items => {
+      const keysToRemove = Object.keys(items).filter(key => key.startsWith("gemini_"));
+      if (keysToRemove.length > 0) {
+        chrome.storage.local.remove(keysToRemove);
+      }
+    });
+  } catch (e) {
+    logCore(TRANSLATION_ERROR_LOG, "Error clearing local cache", e);
+  }
 }
 
 export function getTranslationFromCache(text: string, targetLanguage: string): TranslationResult | null {
@@ -270,4 +318,9 @@ export function getTranslationFromCache(text: string, targetLanguage: string): T
 
 export function getRomanizationFromCache(text: string): string | null {
   return cache.romanization.get(text.trim()) || null;
+}
+
+export function clearMemoryTranslationCache(): void {
+  cache.romanization.clear();
+  cache.translation.clear();
 }

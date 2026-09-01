@@ -18,7 +18,15 @@ import {
   romanizeBatch,
   translateBatch,
 } from "@modules/lyrics/translation";
-import { addFooter, addNoLyricsButton, cleanup, createLyricsWrapper, flushLoader, renderLoader } from "@modules/ui/dom";
+import {
+  addFooter,
+  addNoLyricsButton,
+  cleanup,
+  createLyricsWrapper,
+  flushLoader,
+  renderLoader,
+  updateTranslationSource,
+} from "@modules/ui/dom";
 import { lyricsElementAdded, mainView } from "@modules/ui/mainLyricsView";
 import { disableNativeLyricsFocus } from "@modules/ui/nativeLyricsFocus";
 import { publishPictureInPictureLyrics } from "@modules/ui/pictureInPicture/lyricsPublisher";
@@ -187,7 +195,7 @@ function injectLyrics(
     addNoLyricsButton(data.song, data.artist, data.album, data.duration, data.videoId);
   }
 
-  void processBatchTranslationsAndRomanizations(doc, data, lines, isStale, signal);
+  void processBatchTranslationsAndRomanizations(doc, data, lines, isStale, keepLoaderVisible, signal);
 
   if (data.segmentMap) {
     applySegmentMapToLyrics(lyricsData, lines, data.segmentMap);
@@ -210,12 +218,15 @@ async function processBatchTranslationsAndRomanizations(
   data: LyricSourceResultWithMeta,
   linesData: readonly LineData[],
   isStale: () => boolean,
+  keepLoaderVisible = false,
   signal?: AbortSignal
 ): Promise<void> {
   const lyrics = data.lyrics!;
   const targetTranslationLang = AppState.translationLanguage;
   const isRomanizationEnabled = AppState.isRomanizationEnabled;
   const isTranslateEnabled = AppState.isTranslateEnabled;
+  const isGeminiProvider = AppState.translationProvider === "gemini";
+  const skipTranslationBatch = keepLoaderVisible && isGeminiProvider;
 
   const romanizationBatch: { index: number; text: string }[] = [];
   const translationBatch: { index: number; text: string }[] = [];
@@ -226,6 +237,7 @@ async function processBatchTranslationsAndRomanizations(
   // 1. Identify what needs to be translated/romanized
   lyrics.forEach((item, index) => {
     if (item.isInstrumental) return;
+    if (item.words === t("lyrics_notFound")) return;
 
     const lineData = linesData[index];
     const lyricElement = lineData.lyricElement;
@@ -291,7 +303,7 @@ async function processBatchTranslationsAndRomanizations(
         injectTranslation(doc, lyricElement, translationResult);
         recordLyricDecoration(index, { translation: translationResult });
         didInjectCachedContent = true;
-      } else if (sourceLanguage !== targetTranslationLang || containsNonLatin(item.words) || !sourceLanguage) {
+      } else if (!skipTranslationBatch && (sourceLanguage !== targetTranslationLang || containsNonLatin(item.words) || !sourceLanguage)) {
         translationBatch.push({ index, text: item.words });
       }
     }
@@ -346,6 +358,12 @@ async function processBatchTranslationsAndRomanizations(
         });
         if (isStale()) return;
 
+        if (response.translationSource) {
+          updateTranslationSource(response.translationSource);
+        } else if (response.translationError) {
+          updateTranslationSource("error");
+        }
+
         if (!sourceLanguage && response.detectedLanguage) {
           sourceLanguage = response.detectedLanguage;
           logCore("Determined language via translation batch: " + sourceLanguage);
@@ -356,8 +374,11 @@ async function processBatchTranslationsAndRomanizations(
         response.results.forEach((result, i) => {
           if (result) {
             const originalIndex = translationBatch[i].index;
-            injectTranslation(doc, linesData[originalIndex].lyricElement, result.translatedText);
-            recordLyricDecoration(originalIndex, { translation: result.translatedText });
+            const originalText = translationBatch[i].text;
+            if (!isSameText(result.translatedText, originalText)) {
+              injectTranslation(doc, linesData[originalIndex].lyricElement, result.translatedText);
+              recordLyricDecoration(originalIndex, { translation: result.translatedText });
+            }
           }
         });
         lyricsElementAdded();
