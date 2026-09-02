@@ -624,9 +624,9 @@ On by default. Each letter of a word floats in turn as it is sung, on top of the
 
 ```css
 .blyrics-container {
-  --blyrics-letter-wave-transform: translateY(-0.06em); /* crest lift */
+  --blyrics-letter-wave-transform: translateY(-0.05em); /* crest lift */
   --blyrics-letter-wave-settle: translateY(-0.02em); /* rest it eases back to */
-  --blyrics-letter-wave-emphasis-scale: 1.12; /* long-word letter swell, 1 turns it off */
+  --blyrics-letter-wave-emphasis-scale: 1.11; /* long-word letter swell, 1 turns it off */
 }
 ```
 
