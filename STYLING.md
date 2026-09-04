@@ -211,6 +211,12 @@ JavaScript controls animation timing with the Web Animations API, but the visual
 | `--blyrics-word-wobble-easing`                | `ease`                            | Word wobble animation easing                                                                 |
 | `--blyrics-word-wobble-peak-easing`           | `ease-in-out`                     | Word wobble peak keyframe easing                                                             |
 | `--blyrics-word-wobble-end-easing`            | `ease-out`                        | Word wobble end keyframe easing                                                              |
+| `--blyrics-letter-wave-transform`             | `translateY(-0.05em)`             | Letter-wave crest lift (experimental, on by default; disable with `blyrics-letter-wave = false`) |
+| `--blyrics-letter-wave-settle`                | `translateY(-0.02em)`             | Resting lift the letter eases back to after the crest                                        |
+| `--blyrics-letter-wave-emphasis-scale`        | `1.11`                            | Per-letter scale swell on `data-long-word` words at the crest; `1` disables it               |
+| `--blyrics-letter-wave-duration`              | `0.9s`                            | Per-letter float duration                                                                    |
+| `--blyrics-letter-wave-rise-easing`           | `ease-in-out`                     | Easing on the rise to the crest                                                              |
+| `--blyrics-letter-wave-fall-easing`           | `ease-out`                        | Easing on the settle back to the resting lift                                                |
 | `--blyrics-instrumental-fill-fade-duration`   | `150ms`                           | Instrumental note fill opacity duration                                                      |
 | `--blyrics-instrumental-fill-fade-easing`     | `ease`                            | Instrumental note fill opacity easing                                                        |
 | `--blyrics-instrumental-fill-transform-from`  | `translateY(78%)`                 | Instrumental fill travel start                                                               |
@@ -374,6 +380,7 @@ The following options are avalible:
 | `blyrics-swipe-lead-ratio`            | `0.1`         | Rich-sync swipe starts this fraction of word duration before the word time.                                                                |
 | `blyrics-swipe-duration-ratio`        | `1.6`         | Rich-sync swipe lasts this multiple of word duration.                                                                                      |
 | `blyrics-long-word-threshold`         | `1500`        | Duration threshold (in ms) above which words get `data-long-word="true"`. Useful for glow effects on held notes.                           |
+| `blyrics-letter-wave`                 | `true`        | Experimental, on by default. Split every word into per-letter spans and float each letter up as it is sung, layered on top of the word wobble. Tune with the `--blyrics-letter-wave-*` variables; words past `blyrics-long-word-threshold` also get a per-letter scale swell. Disable with `blyrics-letter-wave = false`. |
 | `blyrics-hide-instrumental-only`      | `false`       | Treat "[Instrumental Only]" as no lyrics (enables fullscreen effect).                                                                      |
 | `blyrics-passive-scroll-enabled`          | `true`    | Enable/disable unsynced lyrics auto-scroll entirely. Overrides the user setting when set to `false`.                                       |
 | `blyrics-passive-scroll-seconds-per-line` | `3.5`     | For unsynced lyrics auto-scroll: seconds spent scrolling per lyric line. Controls overall scroll speed.                                    |

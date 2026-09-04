@@ -74,6 +74,13 @@ Essential reference for creating custom themes. For deep dives, see [STYLING.md]
   --blyrics-word-wobble-easing: ease;
   --blyrics-word-wobble-peak-easing: ease-in-out;
   --blyrics-word-wobble-end-easing: ease-out;
+  /* Letter wave (experimental, on by default; disable with blyrics-letter-wave = false) */
+  --blyrics-letter-wave-transform: translateY(-0.05em);
+  --blyrics-letter-wave-settle: translateY(-0.02em);
+  --blyrics-letter-wave-emphasis-scale: 1.11;
+  --blyrics-letter-wave-duration: 0.9s;
+  --blyrics-letter-wave-rise-easing: ease-in-out;
+  --blyrics-letter-wave-fall-easing: ease-out;
   --blyrics-instrumental-fill-fade-duration: 150ms;
   --blyrics-instrumental-fill-fade-easing: ease;
   --blyrics-instrumental-fill-transform-from: translateY(78%);
@@ -165,6 +172,7 @@ blyrics-line-scroll-above-duration = calc(750ms + log(var(--blyrics-line-scroll-
 | `blyrics-swipe-lead-ratio` | `0.1` | Rich-sync swipe lead as a fraction of word duration |
 | `blyrics-swipe-duration-ratio` | `1.6` | Rich-sync swipe duration as a multiple of word duration |
 | `blyrics-long-word-threshold` | `1500` | Duration (ms) above which `data-long-word` is set |
+| `blyrics-letter-wave` | `true` | Experimental, on by default. Split words into per-letter spans and float each letter as it is sung, over the word wobble. Tune with `--blyrics-letter-wave-*`; long words also get a per-letter scale swell. Disable with `blyrics-letter-wave = false` |
 | `blyrics-hide-instrumental-only` | `false` | Treat "[Instrumental Only]" as no lyrics (enables fullscreen effect) |
 | `blyrics-passive-scroll-enabled` | `true` | Unsynced auto-scroll: enable/disable entirely (overrides user setting) |
 | `blyrics-passive-scroll-seconds-per-line` | `3.5` | Unsynced auto-scroll: seconds per line (scroll speed) |
@@ -609,6 +617,20 @@ Playback pause is handled by pausing the active Web Animations API animations in
   animation-play-state: paused;
 }
 ```
+
+### 16. Per-Letter Wave (Experimental)
+
+On by default. Each letter of a word floats in turn as it is sung, on top of the word wobble. Disable it with `blyrics-letter-wave = false`, or tune it:
+
+```css
+.blyrics-container {
+  --blyrics-letter-wave-transform: translateY(-0.05em); /* crest lift */
+  --blyrics-letter-wave-settle: translateY(-0.02em); /* rest it eases back to */
+  --blyrics-letter-wave-emphasis-scale: 1.11; /* long-word letter swell, 1 turns it off */
+}
+```
+
+It layers on the word wobble rather than replacing it, so the default `scaleX` pop stays. To make the letters carry all the motion instead, set the word wobble to identity (`--blyrics-word-wobble-transform-*: translateY(0)`). It follows `--blyrics-animate-word-wobble`, so reduced motion turns it off. The split multiplies the DOM per character and reruns the karaoke sweep per letter, so a theme that does not want the cost turns it off with `blyrics-letter-wave = false`.
 
 ## Best Practices
 
