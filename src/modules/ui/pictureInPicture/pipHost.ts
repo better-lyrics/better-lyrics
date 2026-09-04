@@ -26,8 +26,8 @@ const ANIMATABLE_PROPERTIES: readonly PropertyDefinition[] = [
   { name: "--blyrics-pip-marquee-fade-start", syntax: "<length>", inherits: true, initialValue: "0px" },
   { name: "--blyrics-pip-marquee-fade-end", syntax: "<length>", inherits: true, initialValue: "0px" },
   { name: "--blyrics-pip-marquee-alpha", syntax: "<number>", inherits: true, initialValue: "1" },
-  { name: "--lyric-transition-amount-start", syntax: "<number>", inherits: false, initialValue: "-0.2" },
-  { name: "--lyric-transition-amount-end", syntax: "<number>", inherits: false, initialValue: "-0.1" },
+  { name: "--lyric-transition-amount-start", syntax: "<number>", inherits: true, initialValue: "-0.2" },
+  { name: "--lyric-transition-amount-end", syntax: "<number>", inherits: true, initialValue: "-0.1" },
 ];
 
 // Lines cross the bridge as JSON, so the array is new every time and only its contents can say
