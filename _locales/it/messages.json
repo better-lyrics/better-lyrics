@@ -235,6 +235,10 @@
     "message": "Scegli fonte testi",
     "description": "Accessible label for the lyrics dock button that opens the source provider dropdown"
   },
+  "lyricsDock_refresh": {
+    "message": "Refresh lyrics",
+    "description": "Accessible label for the lyrics dock button that re-fetches lyrics for the current song, bypassing the cache"
+  },
   "lyricsDock_previousSource": {
     "message": "Fonte precedente",
     "description": "Accessible label for the lyrics dock button that switches to the previous lyrics provider"

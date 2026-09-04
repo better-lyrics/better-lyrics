@@ -311,7 +311,9 @@ async function processBatchTranslationsAndRomanizations(
       (async () => {
         const response = await romanizeBatch({
           lines: romanizationBatch.map(b => b.text),
-          sourceLanguage: sourceLanguage || "auto",
+          targetLanguage: targetTranslationLang,
+          sourceLanguage: sourceLanguage || undefined,
+          videoId: data.videoId,
           signal,
         });
         if (isStale()) return;
@@ -342,6 +344,8 @@ async function processBatchTranslationsAndRomanizations(
         const response = await translateBatch({
           lines: translationBatch.map(b => b.text),
           targetLanguage: targetTranslationLang,
+          sourceLanguage: sourceLanguage || undefined,
+          videoId: data.videoId,
           signal,
         });
         if (isStale()) return;

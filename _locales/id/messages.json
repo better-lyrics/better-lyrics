@@ -235,6 +235,10 @@
     "message": "Pilih sumber lirik",
     "description": "Accessible label for the lyrics dock button that opens the source provider dropdown"
   },
+  "lyricsDock_refresh": {
+    "message": "Segarkan Lirik",
+    "description": "Accessible label for the lyrics dock button that re-fetches lyrics for the current song, bypassing the cache"
+  },
   "lyricsDock_previousSource": {
     "message": "Sumber sebelumnya",
     "description": "Accessible label for the lyrics dock button that switches to the previous lyrics provider"
