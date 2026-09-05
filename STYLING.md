@@ -211,6 +211,12 @@ JavaScript controls animation timing with the Web Animations API, but the visual
 | `--blyrics-word-wobble-easing`                | `ease`                            | Word wobble animation easing                                                                 |
 | `--blyrics-word-wobble-peak-easing`           | `ease-in-out`                     | Word wobble peak keyframe easing                                                             |
 | `--blyrics-word-wobble-end-easing`            | `ease-out`                        | Word wobble end keyframe easing                                                              |
+| `--blyrics-letter-wave-transform`             | `translateY(-0.05em)`             | Letter-wave crest lift (experimental, on by default; disable with `blyrics-letter-wave = false`) |
+| `--blyrics-letter-wave-settle`                | `translateY(-0.02em)`             | Resting lift the letter eases back to after the crest                                        |
+| `--blyrics-letter-wave-emphasis-scale`        | `1.11`                            | Per-letter scale swell on `data-long-word` words at the crest; `1` disables it               |
+| `--blyrics-letter-wave-duration`              | `0.9s`                            | Per-letter float duration                                                                    |
+| `--blyrics-letter-wave-rise-easing`           | `ease-in-out`                     | Easing on the rise to the crest                                                              |
+| `--blyrics-letter-wave-fall-easing`           | `ease-out`                        | Easing on the settle back to the resting lift                                                |
 | `--blyrics-instrumental-fill-fade-duration`   | `150ms`                           | Instrumental note fill opacity duration                                                      |
 | `--blyrics-instrumental-fill-fade-easing`     | `ease`                            | Instrumental note fill opacity easing                                                        |
 | `--blyrics-instrumental-fill-transform-from`  | `translateY(78%)`                 | Instrumental fill travel start                                                               |
@@ -219,6 +225,8 @@ JavaScript controls animation timing with the Web Animations API, but the visual
 | `--blyrics-instrumental-wave-transform-from`  | `scaleY(1.2)`                     | Instrumental wave start transform                                                            |
 | `--blyrics-instrumental-wave-transform-to`    | `scaleY(0.0001)`                  | Instrumental wave end transform                                                              |
 | `--blyrics-instrumental-wave-easing`          | `ease-in`                         | Instrumental wave easing                                                                     |
+| `--blyrics-instrumental-wave-path-high`       | `path("M -4 3 Q 1 2 5 3 ...")`    | Wave surface at the top of its oscillation                                                   |
+| `--blyrics-instrumental-wave-path-low`        | `path("M -4 3 Q 1 4 5 3 ...")`    | Wave surface at the bottom of its oscillation                                                |
 | `--blyrics-instrumental-wave-oscillation-duration` | `1.25s`                    | Duration of each instrumental wave surface oscillation loop                                   |
 | `--blyrics-instrumental-wave-oscillation-easing` | `ease-in-out`                  | Easing for the instrumental wave surface oscillation                                          |
 | `--blyrics-line-scroll-duration`              | `750ms`                          | Per-line scroll-triggered translate animation duration                              |
@@ -372,6 +380,7 @@ The following options are avalible:
 | `blyrics-swipe-lead-ratio`            | `0.1`         | Rich-sync swipe starts this fraction of word duration before the word time.                                                                |
 | `blyrics-swipe-duration-ratio`        | `1.6`         | Rich-sync swipe lasts this multiple of word duration.                                                                                      |
 | `blyrics-long-word-threshold`         | `1500`        | Duration threshold (in ms) above which words get `data-long-word="true"`. Useful for glow effects on held notes.                           |
+| `blyrics-letter-wave`                 | `true`        | Experimental, on by default. Split every word into per-letter spans and float each letter up as it is sung, layered on top of the word wobble. Tune with the `--blyrics-letter-wave-*` variables; words past `blyrics-long-word-threshold` also get a per-letter scale swell. Disable with `blyrics-letter-wave = false`. |
 | `blyrics-hide-instrumental-only`      | `false`       | Treat "[Instrumental Only]" as no lyrics (enables fullscreen effect).                                                                      |
 | `blyrics-passive-scroll-enabled`          | `true`    | Enable/disable unsynced lyrics auto-scroll entirely. Overrides the user setting when set to `false`.                                       |
 | `blyrics-passive-scroll-seconds-per-line` | `3.5`     | For unsynced lyrics auto-scroll: seconds spent scrolling per lyric line. Controls overall scroll speed.                                    |
@@ -500,10 +509,11 @@ The lyrics use a hierarchical structure with specific class names:
 - `.blyrics-line-main` - Main lyric text row inside a line
 - `.blyrics-background-line` - Background vocal row, shown below the main row when background vocals are present
 - `.blyrics-bidi-run` - Inline text-flow wrapper that lets the browser apply native bidi ordering across timed word spans
+- `.blyrics-highlight-run` - An `aria-hidden` copy of a text row's runs, positioned over the visible text; it holds the `.blyrics-word-highlight` overlays
 - `.blyrics-bidi-sensitive` - Applied to lyric text rows that contain RTL script; changes word wrappers to inline text flow for correct browser bidi and wrapping
 - `.blyrics-word-group` - Word group; syllable-synced parts for one word stay together. It is `inline-block` for LTR-only rows and `display: contents` inside `.blyrics-bidi-sensitive`
 - `.blyrics--word` - Each word within a line (a `<span>`)
-- `.blyrics-word-highlight` - Real highlight overlay used when a long word contains inserted `<wbr>` wrap points
+- `.blyrics-word-highlight` - Real active-color overlay for a timed word; every timed word has one
 - `.blyrics-background-lyric` - Background vocal word group or timed word
 
 Example:
@@ -511,6 +521,12 @@ Example:
 ```html
 <div class="blyrics--line" data-agent="v1" data-time="10.259" data-duration="10.291">
   <div class="blyrics-line-main" dir="auto">
+    <span class="blyrics-bidi-run blyrics-highlight-run" dir="auto" aria-hidden="true">
+      <span class="blyrics-word-group">
+        <span class="blyrics--word blyrics-word-highlight" data-time="10.259" data-duration="0.42" data-content="Hello">Hello</span>
+      </span>
+      text
+    </span>
     <span class="blyrics-bidi-run" dir="auto">
       <span class="blyrics-word-group">
         <span class="blyrics--word" data-time="10.259" data-duration="0.42" data-content="Hello">Hello</span>
@@ -519,6 +535,9 @@ Example:
     </span>
   </div>
   <div class="blyrics-background-line">
+    <span class="blyrics-bidi-run blyrics-highlight-run" dir="auto" aria-hidden="true">
+      <span class="blyrics-word-group blyrics-background-lyric">...</span>
+    </span>
     <span class="blyrics-bidi-run" dir="auto">
       <span class="blyrics-word-group blyrics-background-lyric">...</span>
     </span>
@@ -626,8 +645,8 @@ Every word uses the `.blyrics--word` class:
 ```
 
 - **Color**: Set to inactive color initially
-- **Generated Highlight**: Most words use `.blyrics--word::after` for the active overlay
-- **Long Wrapped Words**: Words that need internal `<wbr>` breakpoints use `.blyrics-word-highlight` as a real child overlay so the highlight wraps exactly like the visible text
+- **Active Overlay**: Every timed word has a real `.blyrics-word-highlight`. A row's overlays sit in a `.blyrics-highlight-run`, an `aria-hidden` copy of the run laid over the visible text so both share one layout
+- **Wrapped Words**: A word past the wrap threshold carries `<wbr>` points in both copies, so the overlay wraps exactly like the visible text
 - **Line-Synced Words**: Zero-duration line-synced words get `.blyrics-line-synced-word` and fade in without the rich-sync swipe
 - **RTL-Sensitive Words**: Rows containing RTL script use `.blyrics-bidi-sensitive`; their `.blyrics--word` spans compute to `display: inline` and their `.blyrics-word-group` wrappers compute to `display: contents`
 
@@ -639,7 +658,7 @@ Each word span has the following data attributes:
 | ---------------- | --------------------------------------------------------------------------- |
 | `data-time`      | Start time of the word in seconds                                           |
 | `data-duration`  | Duration of the word in seconds                                             |
-| `data-content`   | The word text (used by the generated highlight overlay when no real overlay is needed) |
+| `data-content`   | The word text |
 | `data-long-word` | Present (with value `"true"`) when word duration exceeds the threshold      |
 
 #### Targeting Long Words
@@ -651,18 +670,12 @@ Words with duration exceeding `blyrics-long-word-threshold` (default: 1500ms) ge
 /* blyrics-long-word-threshold = 1500; */
 
 /* Add glow effect to long words */
-.blyrics--word[data-long-word]::after {
+.blyrics-word-highlight[data-long-word] {
   --blyrics-glow-color: color(display-p3 1 1 1 / 1);
 }
 ```
 
-For very long unbroken text, the visible word may contain `<wbr>` and a `.blyrics-word-highlight` child:
-
-```css
-.blyrics-word-highlight {
-  /* real overlay for long wrapped words */
-}
-```
+`--blyrics-glow-color` resolves per word against each `.blyrics-word-highlight`, so different long words can glow different colors.
 
 Changing the threshold triggers a lyric reload automatically.
 
@@ -704,30 +717,21 @@ Two custom properties control the swipe transition:
 }
 ```
 
-#### The `::after` Pseudo-element
+#### The highlight overlay
 
-The swipe effect uses each word's `::after` pseudo-element with `background-clip: text`:
+The swipe effect runs on each word's `.blyrics-word-highlight` overlay with `background-clip: text`. A row's overlays sit in a `.blyrics-highlight-run`, an `aria-hidden` layer that is `position: absolute` over the visible text, so the active copy and the inactive text share one layout:
 
 ```css
-.blyrics--word::after,
-.blyrics-word-highlight {
-  position: absolute;
-  top: -2rem;
-  left: -2rem;
-  white-space: inherit;
-  padding: 2rem;
+.blyrics--word.blyrics-word-highlight {
   color: transparent;
-  box-sizing: content-box;
-  width: 100%;
   background-image: linear-gradient(
     90deg,
-    var(--blyrics-lyric-active-color)
-      calc(100% * var(--lyric-transition-amount-start) - 4rem * var(--lyric-transition-amount-start) + 2rem),
-    #00000000
-      calc(100% * var(--lyric-transition-amount-end) - 4rem * var(--lyric-transition-amount-end) + 2rem + 1px)
+    var(--blyrics-lyric-active-color) calc(100% * var(--lyric-transition-amount-start)),
+    #00000000 calc(100% * var(--lyric-transition-amount-end) + 1px)
   );
   background-clip: text;
   opacity: 0;
+  pointer-events: none;
   --lyric-transition-amount-start: var(--blyrics-highlight-swipe-start-from, -0.2);
   --lyric-transition-amount-end: var(--blyrics-highlight-swipe-end-from, -0.1);
 }
@@ -1288,6 +1292,21 @@ Better Lyrics detects instrumental breaks (intros, outros, and mid-song gaps) an
 When the note becomes active, the engine fades in `.blyrics--instrumental-fill`, moves `.blyrics--wave-clip` upward to fill the note, flattens `.blyrics--wave-path` over the break duration, and runs a looping wave-surface `d` path animation on `.blyrics--wave-path`.
 
 Use `--blyrics-instrumental-fill-transform-*` for the fill travel, `--blyrics-instrumental-wave-transform-*` for the wave flattening, and `--blyrics-instrumental-wave-oscillation-duration` / `--blyrics-instrumental-wave-oscillation-easing` for the visible wave loop.
+
+The shape of that loop is `--blyrics-instrumental-wave-path-high` and `--blyrics-instrumental-wave-path-low`, the two `path()` values the surface morphs between. Redraw them to change the wave's amplitude or how many crests it has:
+
+```css
+/* A taller, slower swell with two bumps instead of five */
+.blyrics-container {
+  --blyrics-instrumental-wave-path-high: path("M -4 3 Q 4 1.5 13 3 Q 22 4.5 30 3 L 30 4 L -4 4 Z");
+  --blyrics-instrumental-wave-path-low: path("M -4 3 Q 4 4.5 13 3 Q 22 1.5 30 3 L 30 4 L -4 4 Z");
+  --blyrics-instrumental-wave-oscillation-duration: 2s;
+}
+```
+
+Both paths must use the same commands in the same order with the same number of arguments, as in the pair above where each is `M Q Q L L Z`. A browser only interpolates two paths smoothly when their command sequences match; a mismatched pair falls back to discrete interpolation and the wave snaps at the halfway point instead of flowing.
+
+Two things constrain the geometry. The paths close along `L 30 4 L -4 4 Z` so the surface overlaps the static block below it, which `.blyrics--wave-rect` draws from `y = 3.9` down. And a quadratic sits a quarter of the way from its endpoints to its control point, so a control at `y = 4.5` peaks at `3.75` and stays clear of that edge, while a control at `y = 5` would peak at exactly `4` and pinch the surface shut.
 
 ### Styling Instrumental Breaks
 

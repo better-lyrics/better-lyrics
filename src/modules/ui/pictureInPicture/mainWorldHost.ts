@@ -1,9 +1,4 @@
-import {
-  GENERAL_ERROR_LOG,
-  LOG_PREFIX,
-  MINI_PLAYER_BUTTON_SELECTOR,
-  PICTURE_IN_PICTURE_TOGGLE_SELECTOR,
-} from "@constants";
+import { LOG_PREFIX, MINI_PLAYER_BUTTON_SELECTOR, PICTURE_IN_PICTURE_TOGGLE_SELECTOR } from "@constants";
 import {
   onInit,
   onMetadata,
@@ -11,6 +6,7 @@ import {
   sendSignal,
   type PictureInPictureSignal,
 } from "./bridge";
+import { createLogSink, type LogSink, warnGeneral } from "@core/logger";
 import type { PictureInPictureController } from "./controller";
 import { createPictureInPictureHost } from "./pipHost";
 import type { PictureInPictureSongMetadata } from "./types";
@@ -18,10 +14,12 @@ import type { PictureInPictureSongMetadata } from "./types";
 const IGNORED_AUTO_RESTORE_KEYS = new Set(["Escape", "Alt", "Control", "Meta", "Shift"]);
 
 let resources: PictureInPictureInitPayload | null = null;
+let pageLog: LogSink = createLogSink(LOG_PREFIX, true);
 let controller: PictureInPictureController<Window> | null = null;
 let nextRequestId = 0;
 let hasAttemptedAutoRestore = false;
 let autoRestoreController: AbortController | null = null;
+let toggleClickController: AbortController | null = null;
 const pendingMetadata = new Map<number, (metadata: PictureInPictureSongMetadata | null) => void>();
 
 function requestSongMetadata(
@@ -45,7 +43,7 @@ function requestSongMetadata(
 
 function reportFailure(message: string, error: unknown): void {
   const detail = error instanceof Error ? error.message : String(error);
-  console.warn(`${GENERAL_ERROR_LOG} ${message}: ${detail}`);
+  warnGeneral(`${message}: ${detail}`);
 }
 
 function createController(): PictureInPictureController<Window> {
@@ -54,9 +52,9 @@ function createController(): PictureInPictureController<Window> {
       translate: key => resources?.strings[key] ?? "",
       getArtworkMetadata: requestSongMetadata,
       resetScrollResume: () => sendSignal({ type: "reset-scroll" }),
-      // The extension's logger lives in the isolated world, so the page world writes straight to
-      // the console under the same prefix rather than paying a bridge round trip per line.
-      log: resources?.logsEnabled ? console.log.bind(console, LOG_PREFIX) : () => {},
+      get log() {
+        return pageLog;
+      },
     },
     artworkTransition: () => resources?.artworkTransition,
     textTransition: () => resources?.textTransition,
@@ -111,10 +109,12 @@ function armAutoRestore(): void {
 // A capture listener on the real button, rather than a forwarded signal, is what keeps the
 // transient user activation that requestWindow() demands.
 function observeToggleClicks(): void {
+  toggleClickController?.abort();
+  toggleClickController = new AbortController();
   document.addEventListener(
     "click",
     event => {
-      if (!controller) return;
+      if (!controller || !resources?.enabled) return;
       const target = event.target;
       if (!(target instanceof Element)) return;
       if (target.closest(PICTURE_IN_PICTURE_TOGGLE_SELECTOR)) {
@@ -123,29 +123,50 @@ function observeToggleClicks(): void {
       }
       if (!controller.isOpen() && target.closest(MINI_PLAYER_BUTTON_SELECTOR)) controller.toggle();
     },
-    { capture: true }
+    { capture: true, signal: toggleClickController.signal }
   );
 }
 
-export function startPictureInPicturePageHost(): void {
-  onMetadata(({ requestId, metadata }) => {
+export function startPictureInPicturePageHost(): () => void {
+  const unsubscribeMetadata = onMetadata(({ requestId, metadata }) => {
     const resolve = pendingMetadata.get(requestId);
     if (!resolve) return;
     pendingMetadata.delete(requestId);
     resolve(metadata);
   });
 
-  onInit(payload => {
+  const unsubscribeInit = onInit(payload => {
     resources = payload;
+    pageLog = createLogSink(LOG_PREFIX, payload.logsEnabled);
     if (!controller) {
       controller = createController();
       observeToggleClicks();
     }
-    if (payload.autoRestoreEnabled) armAutoRestore();
-    else disarmAutoRestore();
+    if (!payload.enabled) {
+      disarmAutoRestore();
+      if (controller.isOpen()) controller.toggle();
+    } else if (payload.autoRestoreEnabled) {
+      armAutoRestore();
+    } else {
+      disarmAutoRestore();
+    }
   });
 
   // The isolated world also announces itself on startup; asking covers the case where this script
   // finished loading after that announcement.
   sendSignal({ type: "ready" } satisfies PictureInPictureSignal);
+
+  return () => {
+    unsubscribeMetadata();
+    unsubscribeInit();
+    disarmAutoRestore();
+    toggleClickController?.abort();
+    toggleClickController = null;
+    controller?.destroy();
+    controller = null;
+    resources = null;
+    hasAttemptedAutoRestore = false;
+    for (const resolve of pendingMetadata.values()) resolve(null);
+    pendingMetadata.clear();
+  };
 }

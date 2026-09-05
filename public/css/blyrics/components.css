@@ -534,6 +534,13 @@ ytmusic-player-page:not([is-mweb-modernization-enabled]) #side-panel:has(.blyric
 	pointer-events: none;
 }
 
+/* Song changes hide the stale dock immediately. Once loading finishes, removing this
+   modifier restores the normal transition so the current song's controls ease back in. */
+.blyrics-dock--loading .blyrics-dock__inner {
+	visibility: hidden;
+	transition: none;
+}
+
 /* -- Lyrics dock controls -------------------------------------------------- */
 .blyrics-dock__controls,
 .blyrics-dock__voting {
@@ -623,6 +630,10 @@ ytmusic-player-page:not([is-mweb-modernization-enabled]) #side-panel:has(.blyric
 	box-shadow: rgba(0, 0, 0, 0.05) 0px 10px 15px -3px,
 		rgba(0, 0, 0, 0.025) 0px 4px 6px -2px,
 		inset color-mix(in srgb, var(--dock-pill-accent, hsl(45, 100%, 56%)) 24%, transparent) 0px 1px 0px 0px;
+}
+
+.blyrics-dock__refresh--busy svg {
+	animation: blyrics-spin 700ms linear infinite;
 }
 
 .blyrics-dock__fx {

@@ -3,7 +3,6 @@
 import {
   DOCK_CONTROL_ORDER_DEFAULT,
   DOCK_DEFAULT_POSITION,
-  LOG_PREFIX,
   ROMANIZATION_LANGUAGES,
   THEME_SETTINGS_TYPES,
   UNISON_API_BASE_URL,
@@ -23,6 +22,7 @@ import {
   loadThemeSettings,
 } from "./editor/features/storage";
 import { initStoreUI, setupYourThemesButton } from "./store/store";
+import { errorCore, warnCore } from "@core/logger";
 import {
   themeSettingsApplyBtn,
   themeSettingsBtn,
@@ -43,6 +43,7 @@ interface Options {
   isFullScreenDisabled: boolean;
   isStylizedAnimationsEnabled: boolean;
   isPassiveScrollEnabled: boolean;
+  isPictureInPictureEnabled: boolean;
   isPictureInPictureAutoRestoreEnabled: boolean;
   pipArtworkTransition: string;
   pipTextTransition: string;
@@ -63,6 +64,7 @@ interface Options {
   isDockTranslateEnabled: boolean;
   isDockRomanizeEnabled: boolean;
   isDockOffsetEnabled: boolean;
+  isDockRefreshEnabled: boolean;
   isDockPictureInPictureEnabled: boolean;
   dockControlsOrder: string[];
   globalLyricOffset: number;
@@ -103,6 +105,7 @@ const getOptionsFromForm = (): Options => {
     isFullScreenDisabled: (document.getElementById("isFullScreenDisabled") as HTMLInputElement).checked,
     isStylizedAnimationsEnabled: (document.getElementById("isStylizedAnimationsEnabled") as HTMLInputElement).checked,
     isPassiveScrollEnabled: (document.getElementById("isPassiveScrollEnabled") as HTMLInputElement).checked,
+    isPictureInPictureEnabled: (document.getElementById("isPictureInPictureEnabled") as HTMLInputElement).checked,
     isPictureInPictureAutoRestoreEnabled: (
       document.getElementById("isPictureInPictureAutoRestoreEnabled") as HTMLInputElement
     ).checked,
@@ -127,6 +130,7 @@ const getOptionsFromForm = (): Options => {
     isDockTranslateEnabled: (document.getElementById("isDockTranslateEnabled") as HTMLInputElement).checked,
     isDockRomanizeEnabled: (document.getElementById("isDockRomanizeEnabled") as HTMLInputElement).checked,
     isDockOffsetEnabled: (document.getElementById("isDockOffsetEnabled") as HTMLInputElement).checked,
+    isDockRefreshEnabled: (document.getElementById("isDockRefreshEnabled") as HTMLInputElement).checked,
     isDockPictureInPictureEnabled: (document.getElementById("isDockPictureInPictureEnabled") as HTMLInputElement)
       .checked,
     dockControlsOrder: getDockControlsOrder(),
@@ -292,6 +296,7 @@ const restoreOptions = (): void => {
     isFullScreenDisabled: false,
     isStylizedAnimationsEnabled: true,
     isPassiveScrollEnabled: true,
+    isPictureInPictureEnabled: true,
     isPictureInPictureAutoRestoreEnabled: false,
     pipArtworkTransition: "shuffle",
     pipTextTransition: "spring",
@@ -327,6 +332,7 @@ const restoreOptions = (): void => {
     isDockTranslateEnabled: true,
     isDockRomanizeEnabled: true,
     isDockOffsetEnabled: true,
+    isDockRefreshEnabled: false,
     isDockPictureInPictureEnabled: true,
     dockControlsOrder: [...DOCK_CONTROL_ORDER_DEFAULT],
     globalLyricOffset: 0,
@@ -373,6 +379,7 @@ const setOptionsInForm = (items: Options): void => {
   (document.getElementById("isStylizedAnimationsEnabled") as HTMLInputElement).checked =
     items.isStylizedAnimationsEnabled;
   (document.getElementById("isPassiveScrollEnabled") as HTMLInputElement).checked = items.isPassiveScrollEnabled;
+  (document.getElementById("isPictureInPictureEnabled") as HTMLInputElement).checked = items.isPictureInPictureEnabled;
   (document.getElementById("isPictureInPictureAutoRestoreEnabled") as HTMLInputElement).checked =
     items.isPictureInPictureAutoRestoreEnabled;
   (document.getElementById("pipArtworkTransition") as HTMLSelectElement).value = items.pipArtworkTransition;
@@ -391,6 +398,7 @@ const setOptionsInForm = (items: Options): void => {
   (document.getElementById("isDockTranslateEnabled") as HTMLInputElement).checked = items.isDockTranslateEnabled;
   (document.getElementById("isDockRomanizeEnabled") as HTMLInputElement).checked = items.isDockRomanizeEnabled;
   (document.getElementById("isDockOffsetEnabled") as HTMLInputElement).checked = items.isDockOffsetEnabled;
+  (document.getElementById("isDockRefreshEnabled") as HTMLInputElement).checked = items.isDockRefreshEnabled;
   (document.getElementById("isDockPictureInPictureEnabled") as HTMLInputElement).checked =
     items.isDockPictureInPictureEnabled;
   setOffsetDisplay("globalLyricOffset", items.globalLyricOffset);
@@ -398,6 +406,7 @@ const setOptionsInForm = (items: Options): void => {
   setOffsetDisplay("lineOffsetTrim", items.lineOffsetTrim);
   setDockControlsOrderInForm(items.dockControlsOrder);
   syncUnisonModalDependentState(items.isControlsDockEnabled);
+  syncPictureInPictureModalDependentState(items.isPictureInPictureEnabled);
   romanizationDisabledLanguages = items.romanizationDisabledLanguages || [];
   translationDisabledLanguages = items.translationDisabledLanguages || [];
   updateExclusionsConfigVisibility();
@@ -1053,7 +1062,7 @@ async function initIdentityUI(): Promise<void> {
   try {
     displayNameEl.textContent = await getDisplayName();
   } catch (error) {
-    console.error(LOG_PREFIX, "Failed to load identity:", error);
+    errorCore("Failed to load identity:", error);
     displayNameEl.textContent = t("options_alert_identityLoadError");
   }
 
@@ -1228,7 +1237,7 @@ function initNicknameModal(): void {
       setStatus(mapCheckResult(json.data));
     } catch (error) {
       if (seq !== checkSeq) return;
-      console.warn(LOG_PREFIX, "Nickname availability check failed:", error);
+      warnCore("Nickname availability check failed:", error);
       setStatus("error");
     }
   };
@@ -1277,7 +1286,7 @@ function initNicknameModal(): void {
           const errJson = (await response.clone().json()) as { error?: string };
           if (errJson.error === "NICKNAME_PROFANE") conflict = "profane";
         } catch (err) {
-          console.warn(LOG_PREFIX, "Nickname conflict body parse failed:", err);
+          warnCore("Nickname conflict body parse failed:", err);
         }
         setStatus(conflict);
         resetBtn.disabled = false;
@@ -1301,7 +1310,7 @@ function initNicknameModal(): void {
       resetBtn.disabled = false;
       closeNicknameModal();
     } catch (error) {
-      console.warn(LOG_PREFIX, "Nickname save failed:", error);
+      warnCore("Nickname save failed:", error);
       setStatus("error");
       resetBtn.disabled = false;
     }
@@ -1345,7 +1354,7 @@ function initNicknameModal(): void {
       resetBtn.disabled = false;
       closeNicknameModal();
     } catch (error) {
-      console.warn(LOG_PREFIX, "Nickname reset failed:", error);
+      warnCore("Nickname reset failed:", error);
       setStatus("error");
       resetBtn.disabled = false;
     }
@@ -1372,7 +1381,7 @@ async function handleExportIdentity(): Promise<void> {
       }
     });
   } catch (error) {
-    console.error(LOG_PREFIX, "Failed to export identity:", error);
+    errorCore("Failed to export identity:", error);
     showAlert(t("options_alert_exportFailed"));
   }
 }
@@ -1821,6 +1830,7 @@ function resetDockSettings(): void {
   (document.getElementById("isDockTranslateEnabled") as HTMLInputElement).checked = true;
   (document.getElementById("isDockRomanizeEnabled") as HTMLInputElement).checked = true;
   (document.getElementById("isDockOffsetEnabled") as HTMLInputElement).checked = true;
+  (document.getElementById("isDockRefreshEnabled") as HTMLInputElement).checked = false;
   (document.getElementById("isDockPictureInPictureEnabled") as HTMLInputElement).checked = true;
   setUnisonPositionInForm(DOCK_DEFAULT_POSITION);
   setDockControlsOrderInForm([...DOCK_CONTROL_ORDER_DEFAULT]);
@@ -1870,6 +1880,7 @@ function setupUnisonActionsModal(): void {
     "isDockTranslateEnabled",
     "isDockRomanizeEnabled",
     "isDockOffsetEnabled",
+    "isDockRefreshEnabled",
     "isDockPictureInPictureEnabled",
   ]) {
     document.getElementById(id)?.addEventListener("change", debouncedSaveOptions);
@@ -1921,6 +1932,15 @@ function initPictureInPictureModal(): void {
   for (const control of overlay.querySelectorAll("input, select")) {
     control.addEventListener("change", saveOptions);
   }
+
+  const enabledToggle = document.getElementById("isPictureInPictureEnabled") as HTMLInputElement | null;
+  enabledToggle?.addEventListener("change", () => syncPictureInPictureModalDependentState(enabledToggle.checked));
+}
+
+function syncPictureInPictureModalDependentState(enabled: boolean): void {
+  const body = document.getElementById("pip-modal-body");
+  if (!body) return;
+  body.dataset.pipDisabled = enabled ? "false" : "true";
 }
 
 function initOffsetModal(): void {

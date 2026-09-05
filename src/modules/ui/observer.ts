@@ -1,8 +1,6 @@
 import {
   AUTO_SWITCH_ENABLED_LOG,
   FULLSCREEN_BUTTON_SELECTOR,
-  GENERAL_ERROR_LOG,
-  LOG_PREFIX,
   LYRICS_TAB_CLICKED_LOG,
   LYRICS_WRAPPER_ID,
   SONG_SWITCHED_LOG,
@@ -25,7 +23,7 @@ import {
   openPlayerPageForFullscreen,
 } from "@modules/ui/navigation";
 import { getResumeScrollElement } from "@modules/ui/resumeScrollButton";
-import { log } from "@utils";
+import { logCore, logError } from "@core/logger";
 import {
   addThumbnail,
   cleanup,
@@ -90,7 +88,7 @@ function startAnimationFrameLoop(): void {
 
 async function requestWakeLock(): Promise<void> {
   if (!("wakeLock" in navigator)) {
-    log(GENERAL_ERROR_LOG, "Wake Lock API not supported in this browser.");
+    logError("Wake Lock API not supported in this browser.");
     return;
   }
 
@@ -100,7 +98,7 @@ async function requestWakeLock(): Promise<void> {
       wakeLock = null;
     });
   } catch (err) {
-    log(GENERAL_ERROR_LOG, "Wake Lock request failed:", err);
+    logError("Wake Lock request failed:", err);
   }
 }
 
@@ -283,7 +281,7 @@ export function lyricReloader(): void {
     tab2.addEventListener("click", () => {
       getResumeScrollElement().classList.remove("blyrics-hidden");
       if (!AppState.areLyricsLoaded) {
-        log(LYRICS_TAB_CLICKED_LOG);
+        logCore(LYRICS_TAB_CLICKED_LOG);
         cleanup();
         renderLoader();
         reloadLyrics();
@@ -339,10 +337,10 @@ export function initializeLyrics(): void {
       AppState.lastVideoDetails = currentVideoDetails;
       resetThumbnailState();
       if (!detail.song || !detail.artist) {
-        log("Lyrics switched: Still waiting for metadata ", detail.videoId);
+        logCore("Lyrics switched: Still waiting for metadata ", detail.videoId);
         return;
       }
-      log(SONG_SWITCHED_LOG, detail.videoId);
+      logCore(SONG_SWITCHED_LOG, detail.videoId);
 
       AppState.queueLyricInjection = true;
       AppState.queueSongDetailsInjection = true;
@@ -369,7 +367,7 @@ export function initializeLyrics(): void {
     const isAnyViewShowingLyrics = AppState.areLyricsTicking || AppState.isPictureInPictureOpen;
     if (isAnyViewShowingLyrics && AppState.areLyricsLoaded && !AppState.hasPreloadedNextSong) {
       AppState.hasPreloadedNextSong = true;
-      log(LOG_PREFIX, "Trying to preload next song");
+      logCore("Trying to preload next song");
       getSongMetadata(AppState.lastVideoId).then(async data => {
         if (data && data.nextVideoId) {
           let next = await getSongMetadata(data.nextVideoId);
@@ -419,7 +417,7 @@ export function initializeLyrics(): void {
         if (tabSelector.getAttribute("aria-selected") !== "true") {
           onAutoSwitchEnabled(() => {
             tabSelector.click();
-            log(AUTO_SWITCH_ENABLED_LOG);
+            logCore(AUTO_SWITCH_ENABLED_LOG);
             getResumeScrollElement().classList.remove("blyrics-hidden");
           });
         }
@@ -653,5 +651,5 @@ export function setUpAvButtonListener(): void {
     attributeFilter: ["is-video-playback-mode-selected"],
   });
   handleAVSwitch(avToggle.getAttribute("is-video-playback-mode-selected") === "true");
-  log(LOG_PREFIX, "Set up a/v toggle observer");
+  logCore("Set up a/v toggle observer");
 }

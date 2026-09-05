@@ -3,34 +3,28 @@
  * Manages lyrics fetching, caching, processing, and rendering.
  */
 
-import {
-  FETCH_LYRICS_LOG,
-  LOG_PREFIX,
-  LYRICS_TAB_HIDDEN_LOG,
-  SEEK_EVENT,
-  SERVER_ERROR_LOG,
-  TAB_HEADER_CLASS,
-} from "@constants";
+import { FETCH_LYRICS_LOG, LYRICS_TAB_HIDDEN_LOG, SEEK_EVENT, SERVER_ERROR_LOG, TAB_HEADER_CLASS } from "@constants";
 import { AppState, type PlayerDetails } from "@core/appState";
 import { t } from "@core/i18n";
 import { type LineData, type LyricsData, processLyrics } from "@modules/lyrics/injectLyrics";
 import { stringSimilarity } from "@modules/lyrics/lyricParseUtils";
-import { flushLoader, renderLoader } from "@modules/ui/dom";
+import { flushLoader, refreshDockSources, renderLoader } from "@modules/ui/dom";
 import { publishPictureInPictureLyrics } from "@modules/ui/pictureInPicture/lyricsPublisher";
-import { log } from "@utils";
-import type { Lyric, LyricSourceResult, ProviderParameters } from "./providers/shared";
+import type { Lyric, LyricSourceResult, ProviderParameters, SourceMapType } from "./providers/shared";
 import { getLyrics, newSourceMap, providerPriority } from "./providers/shared";
+import { awaitUnifiedStream } from "./providers/unified";
 import type { YTLyricSourceResult } from "./providers/yt";
 import { getSongAlbum, getSongMetadata, type SegmentMap } from "./requestSniffer/requestSniffer";
 import { clearCache as clearTranslationCache } from "./translation";
 import { mainView } from "@modules/ui/mainLyricsView";
 import { resetPlaybackClock, resumeAllAutoscroll } from "@braccato/core";
 import { registerThemeSetting } from "@braccato/core/themeSettings";
+import { logCore } from "@core/logger";
 
 const hideInstrumentalOnly = registerThemeSetting("blyrics-hide-instrumental-only", false, true);
 
 export function seekPlayer(timeS: number): void {
-  log(LOG_PREFIX, `Seeking to ${timeS.toFixed(2)}s`);
+  logCore(`Seeking to ${timeS.toFixed(2)}s`);
   document.dispatchEvent(new CustomEvent(SEEK_EVENT, { detail: timeS }));
   resumeAllAutoscroll();
 }
@@ -132,6 +126,40 @@ export function applySegmentMapToLyrics(
   }
 }
 
+function recordAvailableProviders(sourceMap: SourceMapType): boolean {
+  const collected = providerPriority.filter(key => {
+    const result = sourceMap[key]?.lyricSourceResult;
+    return !!result && "lyrics" in result && Array.isArray(result.lyrics) && result.lyrics.length > 0;
+  });
+  const known = new Set([...AppState.availableProviderKeys, ...collected]);
+  const next = providerPriority.filter(key => known.has(key));
+  const changed = next.length !== AppState.availableProviderKeys.length;
+  AppState.availableProviderKeys = next;
+  return changed;
+}
+
+async function completeSourceProbe(providerParameters: ProviderParameters, signal: AbortSignal): Promise<void> {
+  if (!AppState.isControlsDockEnabled || !AppState.isDockSourceEnabled) return;
+  try {
+    await awaitUnifiedStream(providerParameters.videoId);
+    for (const provider of providerPriority) {
+      if (signal.aborted) return;
+      if (providerParameters.sourceMap[provider].filled) continue;
+      try {
+        await getLyrics(providerParameters, provider);
+      } catch (err) {
+        logCore(err);
+      }
+    }
+  } catch (err) {
+    logCore(err);
+  }
+  if (signal.aborted) return;
+  if (recordAvailableProviders(providerParameters.sourceMap)) {
+    refreshDockSources();
+  }
+}
+
 /**
  * Main function to create and inject lyrics for the current song.
  * Handles caching, API requests, and fallback mechanisms.
@@ -148,7 +176,7 @@ export async function createLyrics(detail: PlayerDetails, signal: AbortSignal): 
   const isMusicVideo = detail.contentRect.width !== 0 && detail.contentRect.height !== 0;
 
   if (!videoId) {
-    log(SERVER_ERROR_LOG, "Invalid video id");
+    logCore(SERVER_ERROR_LOG, "Invalid video id");
     return;
   }
 
@@ -175,16 +203,16 @@ export async function createLyrics(detail: PlayerDetails, signal: AbortSignal): 
       AppState.areLyricsTicking = true; // Keep lyrics ticking while new lyrics are fetched.
       // The window keeps showing these lines through the refetch, so it needs the same deadline.
       publishPictureInPictureLyrics();
-      log("Switching between audio/video: Skipping Loader", segmentMap);
+      logCore("Switching between audio/video: Skipping Loader", segmentMap);
     } else if (isSoftReload) {
       // Same-song reload (provider switch or translation/romanization toggle): keep the
       // current lyrics on screen and swap them in once the new ones are ready, no loader.
       AppState.suppressZeroTime = Date.now() + 5000;
       AppState.areLyricsTicking = true;
       publishPictureInPictureLyrics();
-      log("Soft reload: keeping current lyrics, skipping loader");
+      logCore("Soft reload: keeping current lyrics, skipping loader");
     } else {
-      log("Not Switching between audio/video", isAVSwitch, segmentMap);
+      logCore("Not Switching between audio/video", isAVSwitch, segmentMap);
       renderLoader();
       shouldCleanupLoader = true;
       clearTranslationCache();
@@ -201,7 +229,7 @@ export async function createLyrics(detail: PlayerDetails, signal: AbortSignal): 
       artist = matchingSong.artist || artist;
 
       if (isMusicVideo && matchingSong.counterpartVideoId && matchingSong.segmentMap) {
-        log("Switching VideoId to Audio Id");
+        logCore("Switching VideoId to Audio Id");
         swappedVideoId = true;
         videoId = matchingSong.counterpartVideoId;
       }
@@ -212,7 +240,7 @@ export async function createLyrics(detail: PlayerDetails, signal: AbortSignal): 
       AppState.areLyricsLoaded = false;
       AppState.areLyricsTicking = false;
       AppState.lyricInjectionFailed = true;
-      log(LYRICS_TAB_HIDDEN_LOG);
+      logCore(LYRICS_TAB_HIDDEN_LOG);
       return;
     }
 
@@ -225,7 +253,7 @@ export async function createLyrics(detail: PlayerDetails, signal: AbortSignal): 
 
     // Check for empty strings after trimming
     if (!song || !artist) {
-      log(SERVER_ERROR_LOG, "Empty song or artist name");
+      logCore(SERVER_ERROR_LOG, "Empty song or artist name");
       return;
     }
 
@@ -233,7 +261,7 @@ export async function createLyrics(detail: PlayerDetails, signal: AbortSignal): 
       return;
     }
 
-    log(FETCH_LYRICS_LOG, song, artist);
+    logCore(FETCH_LYRICS_LOG, song, artist);
 
     let lyrics: LyricSourceResult | null = null;
     let sourceMap = newSourceMap();
@@ -255,7 +283,7 @@ export async function createLyrics(detail: PlayerDetails, signal: AbortSignal): 
     let ytLyricsPromise = getLyrics(providerParameters, "yt-lyrics").then(lyrics => {
       if (!AppState.areLyricsLoaded && lyrics && !signal.aborted) {
         if (!ytLyricsEarlyInjectAbortController.signal.aborted) {
-          log(LOG_PREFIX, "Temporarily Using YT Music Lyrics while we wait for synced lyrics to load");
+          logCore("Temporarily Using YT Music Lyrics while we wait for synced lyrics to load");
           let lyricsWithMeta = {
             ...lyrics,
             song: providerParameters.song,
@@ -279,21 +307,21 @@ export async function createLyrics(detail: PlayerDetails, signal: AbortSignal): 
         providerParameters.album = meta.album;
       }
       if (meta && meta.song && meta.song.length > 0 && song !== meta.song) {
-        log("Using '" + meta.song + "' for song instead of '" + song + "'");
+        logCore("Using '" + meta.song + "' for song instead of '" + song + "'");
         providerParameters.song = meta.song;
       }
 
       if (meta && meta.artist && meta.artist.length > 0 && artist !== meta.artist) {
-        log("Using '" + meta.artist + "' for artist instead of '" + artist + "'");
+        logCore("Using '" + meta.artist + "' for artist instead of '" + artist + "'");
         providerParameters.artist = meta.artist;
       }
 
       if (meta && meta.duration && duration !== meta.duration) {
-        log("Using '" + meta.duration + "' for duration instead of '" + duration + "'");
+        logCore("Using '" + meta.duration + "' for duration instead of '" + duration + "'");
         providerParameters.duration = meta.duration;
       }
     } catch (err) {
-      log(err);
+      logCore(err);
     }
 
     let selectedProvider: string | undefined;
@@ -327,7 +355,7 @@ export async function createLyrics(detail: PlayerDetails, signal: AbortSignal): 
 
             let matchAmount = stringSimilarity(lyricText.toLowerCase(), ytLyrics.text.toLowerCase());
             if (matchAmount < 0.5) {
-              log(
+              logCore(
                 `Got lyrics from ${sourceLyrics.source}, but they don't match YT lyrics. Rejecting: Match: ${matchAmount}%`
               );
               continue;
@@ -338,7 +366,7 @@ export async function createLyrics(detail: PlayerDetails, signal: AbortSignal): 
           break;
         }
       } catch (err) {
-        log(err);
+        logCore(err);
       }
     }
 
@@ -366,7 +394,7 @@ export async function createLyrics(detail: PlayerDetails, signal: AbortSignal): 
       segmentMap = null; // The timing matches, we don't need to apply a segment map!
     }
 
-    log("Got Lyrics from " + lyrics.source);
+    logCore("Got Lyrics from " + lyrics.source);
 
     // Preserve song and artist information in the lyrics data for the "Add Lyrics" button
 
@@ -381,16 +409,7 @@ export async function createLyrics(detail: PlayerDetails, signal: AbortSignal): 
       ...lyrics,
     };
 
-    // Record which providers actually returned lyrics for this song so the dock's source
-    // dropdown and cycling only offer real choices instead of empties that fall back.
-    // Union with what is already known: pinning a provider wins the loop early before the
-    // rest of the stream lands, so a fresh filter alone would shrink the list each switch.
-    const collected = providerPriority.filter(key => {
-      const result = sourceMap[key]?.lyricSourceResult;
-      return !!result && "lyrics" in result && Array.isArray(result.lyrics) && result.lyrics.length > 0;
-    });
-    const known = new Set([...AppState.availableProviderKeys, ...collected]);
-    AppState.availableProviderKeys = providerPriority.filter(key => known.has(key));
+    recordAvailableProviders(sourceMap);
 
     AppState.lastLoadedVideoId = detail.videoId;
     if (signal.aborted) {
@@ -399,6 +418,7 @@ export async function createLyrics(detail: PlayerDetails, signal: AbortSignal): 
     processLyrics(document, lyricsWithMeta, false, signal);
     retainParsedLyrics(lyricsWithMeta);
     shouldCleanupLoader = false;
+    void completeSourceProbe(providerParameters, signal);
   } finally {
     if (shouldCleanupLoader) {
       flushLoader();
@@ -416,7 +436,7 @@ export async function preFetchLyrics(
   detail: Pick<PlayerDetails, "song" | "artist" | "videoId" | "duration">,
   isMusicVideo: boolean
 ): Promise<void> {
-  log(LOG_PREFIX, "Prefetching next song", detail, isMusicVideo);
+  logCore("Prefetching next song", detail, isMusicVideo);
   let song = detail.song;
   let artist = detail.artist;
   let videoId = detail.videoId;
@@ -443,7 +463,7 @@ export async function preFetchLyrics(
     album = "";
   }
 
-  log("Prefetching for: ", song, artist);
+  logCore("Prefetching for: ", song, artist);
 
   let sourceMap = newSourceMap();
   // We depend on the cubey lyrics to fetch certain metadata, so we always call it even if it isn't the top priority
@@ -476,7 +496,7 @@ export async function preFetchLyrics(
       providerParameters.duration = meta.duration;
     }
   } catch (err) {
-    log(err);
+    logCore(err);
   }
 
   for (let provider of providerPriority) {
@@ -491,7 +511,7 @@ export async function preFetchLyrics(
         break;
       }
     } catch (err) {
-      log(err);
+      logCore(err);
     }
   }
 }

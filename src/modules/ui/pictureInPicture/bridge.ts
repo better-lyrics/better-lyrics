@@ -1,7 +1,7 @@
-import { GENERAL_ERROR_LOG } from "@constants";
 import type { LyricDecorations } from "@modules/lyrics/injectLyrics";
 import type { Lyric } from "@braccato/core";
 import type { PictureInPictureSongMetadata } from "./types";
+import { warnGeneral } from "@core/logger";
 
 const PIP_INIT_EVENT = "blyrics-pip-init" as const;
 const PIP_SIGNAL_EVENT = "blyrics-pip-signal" as const;
@@ -13,6 +13,7 @@ export interface PictureInPictureInitPayload {
   readonly lyricsStylesheetUrl: string;
   readonly pipStylesheetUrl: string;
   readonly fontUrls: readonly string[];
+  readonly enabled: boolean;
   readonly autoRestoreEnabled: boolean;
   readonly artworkTransition: string;
   readonly textTransition: string;
@@ -67,31 +68,33 @@ function send(eventName: string, payload: unknown): void {
   document.dispatchEvent(new CustomEvent(eventName, { detail: JSON.stringify(payload) }));
 }
 
-function subscribe<TPayload>(eventName: string, handler: (payload: TPayload) => void): void {
-  document.addEventListener(eventName, event => {
+function subscribe<TPayload>(eventName: string, handler: (payload: TPayload) => void): () => void {
+  const listener = (event: Event): void => {
     const detail = (event as CustomEvent<string>).detail;
     if (typeof detail !== "string") return;
     try {
       handler(JSON.parse(detail) as TPayload);
     } catch (error) {
       const reason = error instanceof Error ? error.message : String(error);
-      console.warn(`${GENERAL_ERROR_LOG} Picture-in-Picture bridge payload: ${reason}`);
+      warnGeneral(`Picture-in-Picture bridge payload: ${reason}`);
     }
-  });
+  };
+  document.addEventListener(eventName, listener);
+  return () => document.removeEventListener(eventName, listener);
 }
 
 export const sendInit = (payload: PictureInPictureInitPayload): void => send(PIP_INIT_EVENT, payload);
-export const onInit = (handler: (payload: PictureInPictureInitPayload) => void): void =>
+export const onInit = (handler: (payload: PictureInPictureInitPayload) => void): (() => void) =>
   subscribe(PIP_INIT_EVENT, handler);
 
 export const sendSignal = (signal: PictureInPictureSignal): void => send(PIP_SIGNAL_EVENT, signal);
-export const onSignal = (handler: (signal: PictureInPictureSignal) => void): void =>
+export const onSignal = (handler: (signal: PictureInPictureSignal) => void): (() => void) =>
   subscribe(PIP_SIGNAL_EVENT, handler);
 
 export const sendMetadata = (payload: PictureInPictureMetadataPayload): void => send(PIP_METADATA_EVENT, payload);
-export const onMetadata = (handler: (payload: PictureInPictureMetadataPayload) => void): void =>
+export const onMetadata = (handler: (payload: PictureInPictureMetadataPayload) => void): (() => void) =>
   subscribe(PIP_METADATA_EVENT, handler);
 
 export const sendLyrics = (payload: PictureInPictureLyricsPayload): void => send(PIP_LYRICS_EVENT, payload);
-export const onLyrics = (handler: (payload: PictureInPictureLyricsPayload) => void): void =>
+export const onLyrics = (handler: (payload: PictureInPictureLyricsPayload) => void): (() => void) =>
   subscribe(PIP_LYRICS_EVENT, handler);

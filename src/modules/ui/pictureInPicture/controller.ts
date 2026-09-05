@@ -3,6 +3,7 @@ import type {
   DocumentPictureInPicture,
   DocumentPictureInPictureWindowOptions,
   PictureInPictureControllerDependencies,
+  PictureInPictureToggle,
 } from "./types";
 
 const REQUEST_OPTIONS = {
@@ -10,6 +11,16 @@ const REQUEST_OPTIONS = {
   height: 200,
   disallowReturnToOpener: true,
 } as const satisfies DocumentPictureInPictureWindowOptions;
+
+export function createGatedToggle(inner: PictureInPictureToggle, isEnabled: () => boolean): PictureInPictureToggle {
+  return {
+    isSupported: () => isEnabled() && inner.isSupported(),
+    isOpen: () => inner.isOpen(),
+    toggle: () => {
+      if (isEnabled()) inner.toggle();
+    },
+  };
+}
 
 export class PictureInPictureController<TWindow> {
   private activeWindow: TWindow | null = null;
@@ -33,6 +44,11 @@ export class PictureInPictureController<TWindow> {
 
     if (this.isOpening) return;
     this.open();
+  }
+
+  destroy(): void {
+    this.closeActiveWindow();
+    this.dependencies.dispose?.();
   }
 
   private open(): void {

@@ -1,7 +1,5 @@
 import {
   FONT_LINK,
-  GENERAL_ERROR_LOG,
-  LOG_PREFIX,
   MINI_PLAYER_BUTTON_SELECTOR,
   NOTO_SANS_UNIVERSAL_LINK,
   PICTURE_IN_PICTURE_TOGGLE_SELECTOR,
@@ -11,12 +9,13 @@ import { t } from "@core/i18n";
 import { getStorage } from "@core/storage";
 import { getArtworkMetadata } from "@modules/lyrics/requestSniffer/requestSniffer";
 import { resumeAllAutoscroll } from "@braccato/core";
-import { log } from "@utils";
 import { onSignal, sendInit, sendMetadata } from "./bridge";
+import { createGatedToggle } from "./controller";
 import { publishPictureInPictureLyrics } from "./lyricsPublisher";
 import { DEFAULT_ARTWORK_TRANSITION, DEFAULT_TEXT_TRANSITION } from "./lyricsView";
 import { createPictureInPictureHost } from "./pipHost";
 import type { PictureInPictureToggle, PictureInPictureViewDependencies } from "./types";
+import { type LogSink, logCore, logError } from "@core/logger";
 
 const STYLESHEET_PATH = "css/blyrics/picture-in-picture.css";
 const LYRIC_STYLESHEET_PATH = "css/blyrics/index.css";
@@ -32,13 +31,18 @@ let hasInitializedAutoRestore = false;
 let hasAttemptedAutoRestore = false;
 let hasMirroredMiniPlayer = false;
 let autoRestoreInteractionController: AbortController | null = null;
+let miniPlayerInteractionController: AbortController | null = null;
+let storageChangeListener: Parameters<typeof chrome.storage.onChanged.addListener>[0] | null = null;
+let disposePageWorldDelegate: (() => void) | null = null;
 // Held raw rather than resolved: the view is the one place that validates them,
 // and a window may not exist yet when a setting changes.
 let storedArtworkTransition: unknown = DEFAULT_ARTWORK_TRANSITION;
 let storedTextTransition: unknown = DEFAULT_TEXT_TRANSITION;
 let storedMarqueeEnabled: unknown = true;
+let isPictureInPictureEnabled = true;
 
 const PIP_SETTING_DEFAULTS = {
+  isPictureInPictureEnabled: true,
   isPictureInPictureAutoRestoreEnabled: false,
   pipArtworkTransition: DEFAULT_ARTWORK_TRANSITION,
   pipTextTransition: DEFAULT_TEXT_TRANSITION,
@@ -50,8 +54,9 @@ const isolatedViewDependencies: PictureInPictureViewDependencies = {
   translate: t,
   getArtworkMetadata,
   resetScrollResume: resumeAllAutoscroll,
-  // Resolved per call rather than bound once: `log` is reassigned when the logging setting loads.
-  log: (...args: unknown[]) => log(LOG_PREFIX, ...args),
+  get log(): LogSink {
+    return logCore;
+  },
 };
 
 function markPictureInPictureOpened(): void {
@@ -84,7 +89,7 @@ async function loadStylesheet(): Promise<string> {
 
 function reportFailure(message: string, error: unknown): void {
   const detail = error instanceof Error ? error.message : String(error);
-  log(GENERAL_ERROR_LOG, `${message}: ${detail}`);
+  logError(`${message}: ${detail}`);
 }
 
 // Gecko hands a content script a cross-origin wrapper on the Picture-in-Picture window, so nothing
@@ -93,7 +98,7 @@ function reportFailure(message: string, error: unknown): void {
 // `wrappedJSObject` is the Xray marker that identifies the sandbox with the restriction.
 const delegatesToPageWorld = "wrappedJSObject" in window;
 
-export const pictureInPictureController: PictureInPictureToggle = delegatesToPageWorld
+const activeController: PictureInPictureToggle = delegatesToPageWorld
   ? createPageWorldDelegate()
   : createPictureInPictureHost({
       view: isolatedViewDependencies,
@@ -112,12 +117,14 @@ export const pictureInPictureController: PictureInPictureToggle = delegatesToPag
       reportFailure,
     });
 
+export const pictureInPictureController = createGatedToggle(activeController, () => isPictureInPictureEnabled);
+
 // The page world owns the window and already acted on the same click via its own capture listener,
 // so toggling here would open a second one. This exists to keep the dock button rendering and to
 // report the state the page world reports back.
 function createPageWorldDelegate(): PictureInPictureToggle {
   let isOpen = false;
-  onSignal(signal => {
+  disposePageWorldDelegate = onSignal(signal => {
     if (signal.type === "opened") {
       isOpen = true;
       markPictureInPictureOpened();
@@ -152,6 +159,7 @@ export function publishPictureInPictureResources(): void {
       lyricsStylesheetUrl: chrome.runtime.getURL(LYRIC_STYLESHEET_PATH),
       pipStylesheetUrl: chrome.runtime.getURL(STYLESHEET_PATH),
       fontUrls: [FONT_LINK, NOTO_SANS_UNIVERSAL_LINK],
+      enabled: items.isPictureInPictureEnabled !== false,
       autoRestoreEnabled: Boolean(items.isPictureInPictureAutoRestoreEnabled),
       artworkTransition: String(items.pipArtworkTransition),
       textTransition: String(items.pipTextTransition),
@@ -208,23 +216,41 @@ export function initializePictureInPictureAutoRestore(): void {
   hasInitializedAutoRestore = true;
 
   if (delegatesToPageWorld) {
-    chrome.storage.onChanged.addListener((changes, areaName) => {
-      if (areaName === "sync" && Object.keys(PIP_SETTING_DEFAULTS).some(key => changes[key])) {
+    getStorage(PIP_SETTING_DEFAULTS, items => {
+      isPictureInPictureEnabled = items.isPictureInPictureEnabled !== false;
+    });
+
+    storageChangeListener = (changes, areaName) => {
+      if (areaName !== "sync") return;
+      if (changes.isPictureInPictureEnabled) {
+        isPictureInPictureEnabled = changes.isPictureInPictureEnabled.newValue !== false;
+      }
+      if (Object.keys(PIP_SETTING_DEFAULTS).some(key => changes[key])) {
         publishPictureInPictureResources();
       }
-    });
+    };
+    chrome.storage.onChanged.addListener(storageChangeListener);
     return;
   }
 
   getStorage(PIP_SETTING_DEFAULTS, items => {
+    isPictureInPictureEnabled = items.isPictureInPictureEnabled !== false;
     if (items.isPictureInPictureAutoRestoreEnabled) armAutoRestore();
     storedArtworkTransition = items.pipArtworkTransition;
     storedTextTransition = items.pipTextTransition;
     storedMarqueeEnabled = items.pipMarqueeEnabled;
   });
 
-  chrome.storage.onChanged.addListener((changes, areaName) => {
+  storageChangeListener = (changes, areaName) => {
     if (areaName !== "sync") return;
+
+    if (changes.isPictureInPictureEnabled) {
+      isPictureInPictureEnabled = changes.isPictureInPictureEnabled.newValue !== false;
+      if (!isPictureInPictureEnabled) {
+        disarmAutoRestore();
+        if (activeController.isOpen()) activeController.toggle();
+      }
+    }
 
     if (changes.pipArtworkTransition) {
       storedArtworkTransition = changes.pipArtworkTransition.newValue ?? DEFAULT_ARTWORK_TRANSITION;
@@ -244,13 +270,15 @@ export function initializePictureInPictureAutoRestore(): void {
     } else {
       disarmAutoRestore();
     }
-  });
+  };
+  chrome.storage.onChanged.addListener(storageChangeListener);
 }
 
 // The page world runs its own copy of this against the same button when it owns the window.
 export function mirrorNativeMiniPlayerButton(): void {
   if (hasMirroredMiniPlayer || delegatesToPageWorld) return;
   hasMirroredMiniPlayer = true;
+  miniPlayerInteractionController = new AbortController();
 
   document.addEventListener(
     "click",
@@ -260,6 +288,21 @@ export function mirrorNativeMiniPlayerButton(): void {
       if (!(target instanceof Element) || !target.closest(MINI_PLAYER_BUTTON_SELECTOR)) return;
       pictureInPictureController.toggle();
     },
-    { capture: true }
+    { capture: true, signal: miniPlayerInteractionController.signal }
   );
+}
+
+export function disposePictureInPictureBrowserController(): void {
+  disarmAutoRestore();
+  miniPlayerInteractionController?.abort();
+  miniPlayerInteractionController = null;
+  if (storageChangeListener) chrome.storage.onChanged.removeListener(storageChangeListener);
+  storageChangeListener = null;
+  disposePageWorldDelegate?.();
+  disposePageWorldDelegate = null;
+  const controller = pictureInPictureController as PictureInPictureToggle & { destroy?: () => void };
+  controller.destroy?.();
+  hasInitializedAutoRestore = false;
+  hasAttemptedAutoRestore = false;
+  hasMirroredMiniPlayer = false;
 }

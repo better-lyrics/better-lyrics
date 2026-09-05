@@ -1,9 +1,9 @@
-import { LOG_PREFIX_EDITOR } from "@constants";
 import { saveCustomCss } from "@core/customCss";
 import { editorStateManager } from "../core/state";
 import { showAlert } from "../ui/feedback";
 import { applyThemeSettingsToCSS, broadcastRICSToTabs, loadCustomCSS, showSyncSuccess } from "./storage";
 import { hideThemeName, updateThemeSelectorButton } from "./themes";
+import { errorEditor, logEditor } from "@core/logger";
 import type { ThemeSettingField } from "@/options/themes";
 
 export const generateDefaultFilename = (filetype: string): string => {
@@ -83,11 +83,11 @@ const fallbackSaveMethod = (content: string, defaultFilename: string): void => {
 
 class ImportManager {
   async importFile(type: "css" | "settings" = "css", file: File): Promise<void> {
-    console.log(LOG_PREFIX_EDITOR, ` Starting import of file: ${file.name}`);
+    logEditor(` Starting import of file: ${file.name}`);
 
     try {
       const content = await this.readFileContent(file);
-      console.log(LOG_PREFIX_EDITOR, ` File read successfully: ${content.length} bytes`);
+      logEditor(` File read successfully: ${content.length} bytes`);
 
       if (type === "css") {
         await this.performImportCSS(content, file.name);
@@ -96,7 +96,7 @@ class ImportManager {
         await this.performImportThemeSettings(content, file.name);
       }
     } catch (error) {
-      console.error(LOG_PREFIX_EDITOR, "Import failed:", error);
+      errorEditor("Import failed:", error);
       showAlert("Error importing theme file! Please try again.");
       throw error;
     }
@@ -124,34 +124,34 @@ class ImportManager {
   }
 
   private async performImportCSS(css: string, filename: string, skipSave: boolean = false): Promise<void> {
-    console.log(LOG_PREFIX_EDITOR, ` Performing import operation`);
+    logEditor(` Performing import operation`);
 
     await editorStateManager.queueOperation("import", async () => {
-      console.log(LOG_PREFIX_EDITOR, ` Step 1: Clearing theme state`);
+      logEditor(` Step 1: Clearing theme state`);
       await editorStateManager.clearThemeState();
       hideThemeName();
       updateThemeSelectorButton();
 
-      console.log(LOG_PREFIX_EDITOR, ` Step 2: Incrementing save count`);
+      logEditor(` Step 2: Incrementing save count`);
       editorStateManager.incrementSaveCount();
       editorStateManager.setIsSaving(true);
 
       try {
-        console.log(LOG_PREFIX_EDITOR, ` Step 3: Setting editor content`);
+        logEditor(` Step 3: Setting editor content`);
         await editorStateManager.setEditorContent(css, `file-import:${filename}`, false);
 
-        console.log(LOG_PREFIX_EDITOR, ` Step 4: Saving to storage`);
+        logEditor(` Step 4: Saving to storage`);
         const result = await saveCustomCss(css);
 
         if (!result.success || !result.strategy) {
           throw new Error(`Storage save failed: ${result.error?.message || "Unknown error"}`);
         }
 
-        console.log(LOG_PREFIX_EDITOR, ` Step 5: Sending update message`);
+        logEditor(` Step 5: Sending update message`);
         showSyncSuccess(result.strategy, result.wasRetry);
         await broadcastRICSToTabs(css, result.strategy);
 
-        console.log(LOG_PREFIX_EDITOR, ` Import completed successfully`);
+        logEditor(` Import completed successfully`);
         showAlert(`Theme file "${filename}" imported successfully!`);
       } finally {
         editorStateManager.setIsSaving(false);
@@ -161,7 +161,7 @@ class ImportManager {
   }
 
   private async performImportThemeSettings(themeSettings: string, filename: string): Promise<void> {
-    console.log(LOG_PREFIX_EDITOR, ` Importing theme settings`);
+    logEditor(` Importing theme settings`);
 
     try {
       const parsedSettings = JSON.parse(themeSettings);

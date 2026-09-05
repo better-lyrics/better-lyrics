@@ -13,7 +13,6 @@ import {
   HOMEPAGE_URL,
   LINE_CLASS,
   LOADER_TRANSITION_ENDED,
-  LOG_PREFIX_UNISON,
   LYRICS_AD_OVERLAY_ID,
   LYRICS_CLASS,
   LYRICS_LOADER_ID,
@@ -44,14 +43,14 @@ import { getTrustTier } from "@modules/unison/trustTier";
 import type { UnisonLyricsRequest } from "@modules/unison/types";
 import { requestLyrics } from "@modules/unison/unisonApi";
 import { reflow, toMs } from "@braccato/core/util";
-import { log } from "@utils";
 import { generatePetName } from "@/core/keyIdentity";
 import { byId, deleteVote, type UnisonData, vote } from "../lyrics/providers/unison";
-import { buildControlsSegment, closeSourceMenu } from "./lyricsDock/controls";
+import { buildControlsSegment, buildSourceSlot, closeSourceMenu } from "./lyricsDock/controls";
 import { parseSvgString, syncTypeColors, syncTypeIcons } from "./lyricsDock/icons";
 import { loadSavedOffset } from "./lyricsDock/offset";
 import { scrollEventHandler } from "./observer";
 import { showReportModal } from "./reportLyrics";
+import { logCore, warnUnison } from "@core/logger";
 
 const voteIcons = {
   upvote: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20"><g fill="none"><path fill="currentColor" fill-opacity=".16" d="M7.895 7.69c-.294.3-.598.534-.895.71v12.334l8.509 1.223a4.1 4.1 0 0 0 2.82-.616a4.26 4.26 0 0 0 1.756-2.335l1.763-5.753a3.48 3.48 0 0 0-.497-3.04a3.36 3.36 0 0 0-1.183-1.023a3.3 3.3 0 0 0-1.509-.367h-3.633a9.7 9.7 0 0 0 .496-1.706a9 9 0 0 0 .164-1.706c0-.904-.352-1.772-.979-2.412C14.081 2.36 13.231 2 12.345 2s-1.736.36-2.362 1a3.45 3.45 0 0 0-.979 2.411c0 .597-.324 1.478-1.109 2.28"/><path stroke="currentColor" stroke-linejoin="round" stroke-miterlimit="10" stroke-width="1.5" d="M7.895 7.69c-.294.3-.598.534-.895.71v12.334l8.509 1.223a4.1 4.1 0 0 0 2.82-.616a4.26 4.26 0 0 0 1.756-2.335l1.763-5.753a3.48 3.48 0 0 0-.497-3.04a3.36 3.36 0 0 0-1.183-1.023a3.3 3.3 0 0 0-1.509-.367h-3.633a9.7 9.7 0 0 0 .496-1.706a9 9 0 0 0 .164-1.706c0-.904-.352-1.772-.979-2.412C14.081 2.36 13.231 2 12.345 2s-1.736.36-2.362 1a3.45 3.45 0 0 0-.979 2.411c0 .597-.324 1.478-1.109 2.28ZM6.2 7H2.8a.8.8 0 0 0-.8.8v13.4a.8.8 0 0 0 .8.8h3.4a.8.8 0 0 0 .8-.8V7.8a.8.8 0 0 0-.8-.8Z"/></g></svg>`,
@@ -218,7 +217,7 @@ function createRequestSyncedButton(meta: RequestButtonMeta): HTMLElement {
     const result = await requestLyrics(submission);
 
     if (!result.success || !result.data) {
-      console.warn(LOG_PREFIX_UNISON, "requestLyrics failed", {
+      warnUnison("requestLyrics failed", {
         videoId: meta.videoId,
         status: result.status,
         error: result.error,
@@ -258,12 +257,14 @@ export function createLyricsWrapper(): HTMLElement {
   const existingWrapper = document.getElementById(LYRICS_WRAPPER_ID);
 
   if (existingWrapper) {
+    existingWrapper.dataset.extensionRoot = "true";
     existingWrapper.replaceChildren();
     return existingWrapper;
   }
 
   const wrapper = document.createElement("div");
   wrapper.id = LYRICS_WRAPPER_ID;
+  wrapper.dataset.extensionRoot = "true";
   tabRenderer.appendChild(wrapper);
 
   wrapper.addEventListener("copy", (e: ClipboardEvent) => {
@@ -305,7 +306,7 @@ export function createLyricsWrapper(): HTMLElement {
     }
   });
 
-  log(LYRICS_WRAPPER_CREATED_LOG);
+  logCore(LYRICS_WRAPPER_CREATED_LOG);
   return wrapper;
 }
 
@@ -431,7 +432,7 @@ function hidePlayerBarOnDockLeave(): void {
   document.getElementById("layout")?.removeAttribute("show-fullscreen-controls");
 }
 
-type DockSuppressionReason = "ad" | "noLyrics";
+type DockSuppressionReason = "ad" | "loading" | "noLyrics";
 const dockSuppressionReasons = new Set<DockSuppressionReason>();
 
 function setVotingSegmentHidden(hidden: boolean): void {
@@ -451,6 +452,7 @@ function applyDockSuppression(): void {
   const dock = document.getElementsByClassName(DOCK_CLASS)[0] as HTMLElement | undefined;
   if (!dock) return;
   dock.classList.toggle(`${DOCK_CLASS}--hidden`, dockSuppressionReasons.size > 0);
+  dock.classList.toggle(`${DOCK_CLASS}--loading`, dockSuppressionReasons.has("loading"));
 }
 
 function setDockSuppression(reason: DockSuppressionReason, suppressed: boolean): void {
@@ -588,44 +590,73 @@ function createUnisonFooterCard(unisonData: UnisonData): HTMLElement {
 
 const DOCK_PROXIMITY = 104;
 const DOCK_LEAVE_GRACE = 120;
+const BOTTOM_REVEAL_ZONE = 100;
+const PLAYER_BAR_HIDE_DELAY = 800;
 let dockProximityAttached = false;
 let dockProximityListener: ((event: MouseEvent) => void) | null = null;
 let dockProximityRaf: number | null = null;
 let dockLeaveTimer: ReturnType<typeof setTimeout> | null = null;
+let playerBarHideTimer: ReturnType<typeof setTimeout> | null = null;
 const DOCK_EXPANDED_CLASS = `${DOCK_CLASS}__inner--expanded`;
 
-// Activates immediately, but defers deactivation by a short grace window (cancelled if the
-// cursor returns), so brief excursions across a divider or during a layout shift do not drop
-// the player bar.
 function setDockNear(inner: HTMLElement, near: boolean): void {
   if (near) {
     if (dockLeaveTimer) {
       clearTimeout(dockLeaveTimer);
       dockLeaveTimer = null;
     }
-    if (!inner.classList.contains(DOCK_EXPANDED_CLASS)) {
-      inner.classList.add(DOCK_EXPANDED_CLASS);
-      showPlayerBarOnDockHover();
-    }
+    inner.classList.add(DOCK_EXPANDED_CLASS);
   } else if (inner.classList.contains(DOCK_EXPANDED_CLASS) && !dockLeaveTimer) {
     dockLeaveTimer = setTimeout(() => {
       dockLeaveTimer = null;
       inner.classList.remove(DOCK_EXPANDED_CLASS);
-      hidePlayerBarOnDockLeave();
     }, DOCK_LEAVE_GRACE);
   }
+}
+
+function setPlayerBarShown(shown: boolean): void {
+  if (shown) {
+    if (playerBarHideTimer) {
+      clearTimeout(playerBarHideTimer);
+      playerBarHideTimer = null;
+    }
+    showPlayerBarOnDockHover();
+  } else if (dockHoverActive && !playerBarHideTimer) {
+    playerBarHideTimer = setTimeout(() => {
+      playerBarHideTimer = null;
+      hidePlayerBarOnDockLeave();
+    }, PLAYER_BAR_HIDE_DELAY);
+  }
+}
+
+function isCursorNearBottom(event: MouseEvent): boolean {
+  const layout = document.getElementById("layout");
+  if (!layout?.hasAttribute("player-fullscreened")) return false;
+  let threshold = window.innerHeight - BOTTOM_REVEAL_ZONE;
+  if (layout.hasAttribute("show-fullscreen-controls")) {
+    const bar = document.querySelector(PLAYER_BAR_SELECTOR)?.getBoundingClientRect();
+    if (bar && bar.height > 0) threshold = Math.min(threshold, bar.top);
+  }
+  return event.clientY >= threshold;
 }
 
 function evaluateDockProximity(event: MouseEvent): void {
   const inner = document.getElementsByClassName(`${DOCK_CLASS}__inner`)[0] as HTMLElement | undefined;
   if (!inner) return;
-  const rect = inner.getBoundingClientRect();
-  if (rect.width === 0) return;
 
+  const barNear = isCursorNearBottom(event);
+  const rect = inner.getBoundingClientRect();
   const dock = inner.parentElement as HTMLElement | null;
-  if (dock?.classList.contains(`${DOCK_CLASS}--hidden`) || dock?.classList.contains(`${DOCK_CLASS}--idle-hidden`)) {
+  const dockActive =
+    rect.width > 0 &&
+    !dock?.classList.contains(`${DOCK_CLASS}--hidden`) &&
+    !dock?.classList.contains(`${DOCK_CLASS}--idle-hidden`);
+
+  if (!dockActive) {
+    setPlayerBarShown(barNear);
     return;
   }
+
   const position = dock?.dataset.position ?? "";
   let { left, right, top, bottom } = rect;
   if (position.includes("right")) left -= DOCK_PROXIMITY;
@@ -643,16 +674,16 @@ function evaluateDockProximity(event: MouseEvent): void {
     bottom -= shiftY;
   }
 
-  let near = event.clientX >= left && event.clientX <= right && event.clientY >= top && event.clientY <= bottom;
+  let dockNear = event.clientX >= left && event.clientX <= right && event.clientY >= top && event.clientY <= bottom;
 
   // While the source dropdown is open, treat its bounds (plus a bridging margin) as
   // part of the dock so moving onto it does not collapse the dock or drop the player bar.
-  if (!near) {
+  if (!dockNear) {
     const menu = document.querySelector(`.${DOCK_CLASS}__menu--open`);
     if (menu) {
       const m = menu.getBoundingClientRect();
       const pad = 32;
-      near =
+      dockNear =
         event.clientX >= m.left - pad &&
         event.clientX <= m.right + pad &&
         event.clientY >= m.top - pad &&
@@ -660,18 +691,8 @@ function evaluateDockProximity(event: MouseEvent): void {
     }
   }
 
-  // The dock is what keeps the fullscreen controls shown, so while they are up, the cursor
-  // being anywhere over the player bar must hold the dock open: collapsing here would pull
-  // the bar out from under the pointer.
-  if (!near && document.getElementById("layout")?.hasAttribute("show-fullscreen-controls")) {
-    const bar = document.querySelector(PLAYER_BAR_SELECTOR);
-    if (bar) {
-      const b = bar.getBoundingClientRect();
-      near = event.clientX >= b.left && event.clientX <= b.right && event.clientY >= b.top && event.clientY <= b.bottom;
-    }
-  }
-
-  setDockNear(inner, near);
+  setDockNear(inner, dockNear);
+  setPlayerBarShown(dockNear || barNear);
 }
 
 // Pre-expands the dock when the cursor comes near, so the controls have settled into
@@ -706,6 +727,10 @@ function removeDockProximityListener(): void {
   if (dockLeaveTimer) {
     clearTimeout(dockLeaveTimer);
     dockLeaveTimer = null;
+  }
+  if (playerBarHideTimer) {
+    clearTimeout(playerBarHideTimer);
+    playerBarHideTimer = null;
   }
 }
 
@@ -782,6 +807,7 @@ export function mountDock(position: string): void {
 
     dock = document.createElement("div");
     dock.className = DOCK_CLASS;
+    dock.dataset.extensionRoot = "true";
 
     inner = document.createElement("div");
     inner.className = `${DOCK_CLASS}__inner`;
@@ -818,6 +844,32 @@ export function mountDock(position: string): void {
   }
 
   applyDockSuppression();
+}
+
+export function refreshDockSources(): void {
+  if (!AppState.isControlsDockEnabled) return;
+  if (!document.getElementsByClassName(DOCK_CLASS)[0]) return;
+
+  const oldSlot = document.querySelector(`.${DOCK_CLASS}__source`) as HTMLElement | null;
+  const newSlot = buildSourceSlot();
+  if (!oldSlot || !newSlot) {
+    mountDock(AppState.controlsDockPosition);
+    return;
+  }
+
+  closeSourceMenu();
+  const widthFrom = oldSlot.offsetWidth;
+  oldSlot.replaceWith(newSlot);
+  const widthTo = newSlot.offsetWidth;
+  newSlot.classList.add(DOCK_FX_CLASS, DOCK_FX_OUT_CLASS);
+  newSlot.style.width = `${widthFrom}px`;
+  void newSlot.offsetWidth;
+  newSlot.classList.remove(DOCK_FX_OUT_CLASS);
+  newSlot.style.width = `${widthTo}px`;
+  setTimeout(() => {
+    newSlot.classList.remove(DOCK_FX_CLASS);
+    newSlot.style.width = "";
+  }, DOCK_FX_MS + 40);
 }
 
 export function mountVotingSegment(unisonData: UnisonData): void {
@@ -1058,7 +1110,7 @@ function createFooter(
 
     footer.removeAttribute("is-empty");
   } catch (_err) {
-    log(FOOTER_NOT_VISIBLE_LOG);
+    logCore(FOOTER_NOT_VISIBLE_LOG);
   }
 }
 
@@ -1083,6 +1135,8 @@ export function renderLoader(small = false): void {
   if (isAdPlaying()) {
     return;
   }
+  closeSourceMenu();
+  setDockSuppression("loading", true);
   if (!small) {
     cleanup();
   }
@@ -1113,7 +1167,7 @@ export function renderLoader(small = false): void {
       setLoaderState("full-loader", t("lyrics_searching"));
     }
   } catch (err) {
-    log(err);
+    logCore(err);
   }
 }
 
@@ -1122,6 +1176,7 @@ export function renderLoader(small = false): void {
  */
 export function flushLoader(showNoSyncAvailable = false): void {
   try {
+    setDockSuppression("loading", false);
     const loaderWrapper = document.getElementById(LYRICS_LOADER_ID);
     if (!loaderWrapper) return;
 
@@ -1137,7 +1192,7 @@ export function flushLoader(showNoSyncAvailable = false): void {
       AppState.loaderAnimationEndTimeout = window.setTimeout(() => {
         setLoaderState("hidden");
         loaderWrapper.hidden = true;
-        log(LOADER_TRANSITION_ENDED);
+        logCore(LOADER_TRANSITION_ENDED);
       }, duration * 2); // Make longer than css duration
     };
 
@@ -1153,7 +1208,7 @@ export function flushLoader(showNoSyncAvailable = false): void {
       performExit(loaderWrapper.getAttribute("state") === "showing-message");
     }
   } catch (err) {
-    log(err);
+    logCore(err);
   }
 }
 
@@ -1170,7 +1225,7 @@ export function isLoaderActive(): boolean {
       return state !== "hidden" && state !== null;
     }
   } catch (err) {
-    log(err);
+    logCore(err);
   }
   return false;
 }
@@ -1269,7 +1324,7 @@ function clearLyrics(): void {
       lyricsWrapper.replaceChildren();
     }
   } catch (err) {
-    log(err);
+    logCore(err);
   }
 }
 
@@ -1454,30 +1509,31 @@ function buildUnisonSubmitUrl(song: string, artist: string, album: string, durat
 export async function injectHeadTags(): Promise<void> {
   const imgURL = HOMEPAGE_ICON_URL;
 
-  const imagePreload = document.createElement("link");
-  imagePreload.rel = "preload";
-  imagePreload.as = "image";
-  imagePreload.href = imgURL;
+  if (!document.head.querySelector(`link[rel="preload"][href="${imgURL}"]`)) {
+    const imagePreload = document.createElement("link");
+    imagePreload.rel = "preload";
+    imagePreload.as = "image";
+    imagePreload.href = imgURL;
+    document.head.appendChild(imagePreload);
+  }
 
-  document.head.appendChild(imagePreload);
-
-  const fontLink = document.createElement("link");
-  fontLink.href = FONT_LINK;
-  fontLink.rel = "stylesheet";
-  document.head.appendChild(fontLink);
-
-  const notoFontLink = document.createElement("link");
-  notoFontLink.href = NOTO_SANS_UNIVERSAL_LINK;
-  notoFontLink.rel = "stylesheet";
-  document.head.appendChild(notoFontLink);
+  for (const href of [FONT_LINK, NOTO_SANS_UNIVERSAL_LINK]) {
+    if (document.head.querySelector(`link[rel="stylesheet"][href="${href}"]`)) continue;
+    const fontLink = document.createElement("link");
+    fontLink.href = href;
+    fontLink.rel = "stylesheet";
+    document.head.appendChild(fontLink);
+  }
 
   const cssFiles = ["css/ytmusic/index.css", "css/blyrics/index.css", "css/themesong.css"];
 
   for (const file of cssFiles) {
+    const id = `blyrics-style-${file.replace(/(\/index)?\.css$/, "")}`;
+    if (document.getElementById(id)) continue;
     const link = document.createElement("link");
     link.rel = "stylesheet";
     link.href = chrome.runtime.getURL(file);
-    link.id = `blyrics-style-${file.replace(/(\/index)?\.css$/, "")}`;
+    link.id = id;
     document.head.appendChild(link);
   }
 }

@@ -1,5 +1,4 @@
-import { LOG_PREFIX } from "@constants";
-import { log } from "@utils";
+import { logCore } from "@core/logger";
 
 const AUTOPLAY_SECTION_SELECTOR = "#tab-renderer .autoplay.ytmusic-tab-renderer";
 const AUTOMIX_CONTENTS_SELECTOR = "#tab-renderer #automix-contents";
@@ -16,5 +15,5 @@ export function revealQueueAutoplaySection(): void {
   }
 
   section.removeAttribute("hidden");
-  log(LOG_PREFIX, "Restored the queue autoplay toggle hidden by a tab switch");
+  logCore("Restored the queue autoplay toggle hidden by a tab switch");
 }

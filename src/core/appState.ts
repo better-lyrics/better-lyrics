@@ -1,10 +1,12 @@
-import { DOCK_CONTROL_ORDER_DEFAULT, DOCK_DEFAULT_POSITION, GENERAL_ERROR_LOG } from "@constants";
+import { DOCK_CONTROL_ORDER_DEFAULT, DOCK_DEFAULT_POSITION } from "@constants";
 import type { LyricDecorations, LyricsData } from "@modules/lyrics/injectLyrics";
 import { createLyrics, type ParsedLyrics } from "@modules/lyrics/lyrics";
 import type { LyricSourceKey } from "@modules/lyrics/providers/shared";
+import { resetUnifiedStream } from "@modules/lyrics/providers/unified";
 import type { UnisonData } from "@modules/lyrics/providers/unison";
 import { flushLoader } from "@modules/ui/dom";
-import { log } from "@utils";
+import { clearSongCache } from "@core/storage";
+import { logError } from "@core/logger";
 
 export interface PlayerDetails {
   currentTime: number;
@@ -62,6 +64,7 @@ interface AppStateType {
   isDockTranslateEnabled: boolean;
   isDockRomanizeEnabled: boolean;
   isDockOffsetEnabled: boolean;
+  isDockRefreshEnabled: boolean;
   isDockPictureInPictureEnabled: boolean;
   dockControlsOrder: string[];
   currentUnisonData: UnisonData | null;
@@ -107,6 +110,7 @@ export const AppState: AppStateType = {
   isDockTranslateEnabled: true,
   isDockRomanizeEnabled: true,
   isDockOffsetEnabled: true,
+  isDockRefreshEnabled: false,
   isDockPictureInPictureEnabled: true,
   dockControlsOrder: [...DOCK_CONTROL_ORDER_DEFAULT],
   currentUnisonData: null,
@@ -116,6 +120,16 @@ export const AppState: AppStateType = {
 export function reloadLyrics(): void {
   AppState.lyricAbortController?.abort("Reloading lyrics");
   AppState.lastVideoId = null;
+}
+
+export async function refreshCurrentSong(): Promise<void> {
+  const videoId = AppState.lastLoadedVideoId;
+  AppState.availableProviderKeys = [];
+  if (videoId) {
+    resetUnifiedStream(videoId);
+    await clearSongCache(videoId);
+  }
+  reloadLyrics();
 }
 
 export function handleModifications(detail: PlayerDetails): void {
@@ -135,7 +149,7 @@ export function handleModifications(detail: PlayerDetails): void {
   AppState.currentInjectionId++;
   AppState.lyricAbortController = new AbortController();
   AppState.lyricInjectionPromise = createLyrics(detail, AppState.lyricAbortController.signal).catch(err => {
-    log(GENERAL_ERROR_LOG, err);
+    logError(err);
     AppState.areLyricsLoaded = false;
     AppState.lyricInjectionFailed = true;
   });
