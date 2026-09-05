@@ -19,10 +19,8 @@ import {
   applyThemeSettingsToCSS,
   broadcastRICSToTabs,
   getFieldValueOnAvailable,
-  getStorageStrategy,
   loadCustomCSS,
   loadThemeSettings,
-  saveToStorageWithFallback,
 } from "./editor/features/storage";
 import { initStoreUI, setupYourThemesButton } from "./store/store";
 import {
@@ -35,6 +33,7 @@ import {
 } from "./editor/ui/dom";
 import { handleSlider, registerSlider } from "./editor/ui/slider";
 import type { ThemeSettingField } from "./themes";
+import { getStorageStrategy, saveCustomCss } from "@/core/customCss";
 
 interface Options {
   isLogsEnabled: boolean;
@@ -801,11 +800,11 @@ function initThemeSettings() {
   themeSettingsModalClose?.addEventListener("click", () => closeThemeSettings());
 
   themeSettingsApplyBtn?.addEventListener("click", async () =>
-    saveToStorageWithFallback(undefined, { ...(await loadThemeSettings()), saved: changedFields })
+    await saveCustomCss(undefined, { ...(await loadThemeSettings()), saved: changedFields })
   );
 
   themeSettingsOkBtn?.addEventListener("click", async () => {
-    saveToStorageWithFallback(undefined, { ...(await loadThemeSettings()), saved: changedFields });
+    await saveCustomCss(undefined, { ...(await loadThemeSettings()), saved: changedFields });
     closeThemeSettings();
   });
 

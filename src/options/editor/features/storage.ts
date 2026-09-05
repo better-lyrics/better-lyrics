@@ -1,8 +1,8 @@
 import { LOG_PREFIX_EDITOR, THEME_SETTINGS_ATTRIBUTE_TYPE, THEME_SETTINGS_TYPES } from "@constants";
 import { decompressString, isCompressed } from "@core/compression";
-import { buildStoreThemeContent, saveCustomCss } from "@core/customCss";
+import { buildStoreThemeContent, saveCustomCss, type ThemeSavedSettingFields } from "@core/customCss";
 import { getAppliedStoreThemeId, getLocalStorage, getSyncStorage, loadChunkedStyles } from "@core/storage";
-import { hexToRgbSum, invertRegExp } from "@/core/utils";
+import { invertRegExp } from "@/core/utils";
 import { setActiveStoreTheme } from "@/options/store/themeStoreManager";
 import type { InstalledStoreTheme } from "@/options/store/types";
 import type { ThemeSettingField } from "@/options/themes";
@@ -16,10 +16,7 @@ interface CSSStorageData {
   cssStorageType?: "sync" | "local" | "chunked";
   customCSS?: string | null;
   cssCompressed?: boolean;
-  themeSettings?: {
-    fields?: Record<string, ThemeSettingField>;
-    saved?: Record<string, any>;
-  } | null;
+  themeSettings?: ThemeSavedSettingFields | null;
 }
 
 export function getFieldValueOnAvailable(
@@ -288,10 +285,7 @@ export async function loadCustomCSS(raw?: boolean): Promise<string> {
   return cssModified;
 }
 
-export async function loadThemeSettings(): Promise<{
-  fields?: Record<string, ThemeSettingField>;
-  saved?: Record<string, any>;
-}> {
+export async function loadThemeSettings(): Promise<ThemeSavedSettingFields> {
   try {
     const syncData = await getSyncStorage<CSSStorageData>(["cssStorageType", "themeSettings"]);
     if (syncData.cssStorageType === "local") {

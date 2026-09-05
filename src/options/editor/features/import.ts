@@ -166,7 +166,7 @@ class ImportManager {
     try {
       const parsedSettings = JSON.parse(themeSettings);
 
-      await saveToStorageWithFallback(undefined, { fields: parsedSettings });
+      await saveCustomCss(undefined, { fields: parsedSettings });
       this.performImportCSS(applyThemeSettingsToCSS(await loadCustomCSS(true), parsedSettings), filename, true);
     } catch (err) {
       showAlert("Unable to import theme settings");
