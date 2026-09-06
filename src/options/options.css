@@ -442,7 +442,8 @@ body {
     opacity: 1;
 }
 
-.options-page :where(select) {
+.options-page :where(select),
+.editor-page :where(select) {
     appearance: none;
     background-color: transparent;
     border: none;
@@ -457,7 +458,8 @@ body {
     color: white;
 }
 
-.options-page :where(select option) {
+.options-page :where(select option),
+.editor-page :where(select option) {
     color: black;
 }
 
