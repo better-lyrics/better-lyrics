@@ -363,7 +363,7 @@ async function syncAppliedThemeCss(theme: InstalledStoreTheme): Promise<void> {
 
   await setActiveStoreTheme(theme.id);
 
-  const result = await saveCustomCss(buildStoreThemeContent(theme.title, theme.creators, theme.css));
+  const result = await saveCustomCss(buildStoreThemeContent(theme.title, theme.creators, theme.css), theme.hasSettings ? { fields: theme.settings, saved: theme.savedSettings } : undefined);
   if (!result.success) {
     warnStore(`Failed to re-apply theme after update: ${theme.title}`, result.error);
     return;

@@ -562,7 +562,7 @@ class StorageManager {
       const editorSource = themeSourceToEditorSource(newTheme.source);
       showThemeName(displayName, editorSource);
 
-      const result = await saveCustomCss(themeContent);
+      const result = await saveCustomCss(themeContent, { fields: newTheme.settings, saved: newTheme.savedSettings });
       if (result.success && result.strategy) {
         showSyncSuccess(result.strategy, result.wasRetry);
         await broadcastRICSToTabs(modThemeContent, result.strategy);

@@ -9,7 +9,7 @@ import {
 } from "@constants";
 import { t } from "@core/i18n";
 import { getSyncStorage } from "@core/storage";
-import { formatCreators, saveCustomCss } from "@core/customCss";
+import { formatCreators, saveCustomCss, type ThemeSavedSettingFields } from "@core/customCss";
 import { STORE_THEME_PREFIX } from "@core/storage";
 import Sortable from "sortablejs";
 import {
@@ -945,13 +945,13 @@ class ThemeManager {
 
   private async saveTheme(
     css: string,
-    settings: { fields?: Record<string, ThemeSettingField>; saved?: Record<string, any> } = {}
+    settings: ThemeSavedSettingFields = {}
   ): Promise<void> {
     editorStateManager.incrementSaveCount();
     editorStateManager.setIsSaving(true);
 
     try {
-      const result = await saveCustomCss(css);
+      const result = await saveCustomCss(css, settings);
 
       if (!result.success || !result.strategy) {
         throw new Error(`Failed to save theme: ${result.error?.message || "Unknown error"}`);
