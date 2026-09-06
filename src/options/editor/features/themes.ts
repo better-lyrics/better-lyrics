@@ -175,7 +175,7 @@ export function themeSourceToEditorSource(source: ThemeSource | undefined): Edit
 
 // Theme settings
 let themeSettingsVisible = false;
-let themeSettingsEVisible = true;
+let themeSettingsEditorVisible = true;
 
 let storedFields: Record<string, ThemeSettingField> = {};
 let fieldElementId: Record<string, string> = {};
@@ -380,7 +380,12 @@ export async function renderThemeSettings(): Promise<void> {
   });
 }
 
-export function promptRemoveConditionGroups() {}
+export function promptRemoveConditionGroups(conditionGroups: string[]) {
+  showModal({
+    title: `Remove ${conditionGroups.length} Condition Groups`,
+    message: t("editor.themeSettings.removeConditionGroups.message"),
+  })
+}
 
 function generateListThemeSettings(fieldId: string) {
   const listElement = document.createElement("div");
@@ -519,12 +524,18 @@ interface FieldEditorInput {
   id: string;
   label: string;
   desc?: string;
+  /** Input based property */
   placeholder?: string;
+  /** Input based property */
   pattern?: string | RegExp;
+  /** Range-input based property */
   min?: number;
+  /** Range-input based property */
   max?: number;
   optional?: boolean;
+  /** Dropdown based property */
   options?: Record<string, string> | string[];
+  /** Dropdown based property */
   default?: number;
 }
 
@@ -734,9 +745,7 @@ function fillThemeSettingsFieldEditor(): void {
           () => {}
         );
 
-        if (!Array.isArray(fieldEditorData.available)) {
-          fieldEditorData.available = [];
-        }
+        if (!Array.isArray(fieldEditorData.available)) fieldEditorData.available = [];
         fieldEditorData.available.push([]);
       },
       optional: true,
@@ -747,13 +756,24 @@ function fillThemeSettingsFieldEditor(): void {
     const inputs = fieldTypeInputs[fieldType];
     for (const property in inputs) {
       const data = inputs[property];
-      addFieldEditorInput({
+      const fieldInput: FieldEditorInput = {
         id: `${fieldType}-${property}`,
         type: data.type,
         label: data.label,
         desc: data.desc,
         optional: data.optional,
-      });
+      };
+
+      if (fieldType === "dropdown" && property === "options") {
+        fieldInput.addListFunc = (list: HTMLElement, id: string) => {
+          addItemToList(list, id, `Option ${(fieldEditorData.options || []).length + 1}`, `value`);
+
+          if (!Array.isArray(fieldEditorData.options)) fieldEditorData.options = [];
+          fieldEditorData.options.push([]);
+        }
+      }
+
+      addFieldEditorInput(fieldInput);
     }
   }
 
@@ -787,8 +807,8 @@ export function initializeThemeSettingsEditor(): void {
 
   [addSettingsFieldBtn, returnThemeSettings].forEach(button =>
     button?.addEventListener("click", () => {
-      themeSettingsEVisible = !themeSettingsEVisible;
-      const visible = themeSettingsEVisible;
+      themeSettingsEditorVisible = !themeSettingsEditorVisible;
+      const visible = themeSettingsEditorVisible;
       if (themeSettingsEditor) {
         themeSettingsEditor.style.display = visible ? "" : "none";
       }

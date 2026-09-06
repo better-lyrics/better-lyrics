@@ -1,4 +1,4 @@
-import { GENERAL_ERROR_LOG, LOG_PREFIX, THEME_SETTINGS_ATTRIBUTE_TYPE, THEME_SETTINGS_TYPES } from "@constants";
+import { THEME_SETTINGS_ATTRIBUTE_TYPE, THEME_SETTINGS_TYPES } from "@constants";
 import { reloadLyrics } from "@core/appState";
 import { decompressString, isCompressed } from "@core/compression";
 import {
@@ -8,11 +8,12 @@ import {
   getSyncStorage,
   loadChunkedStyles,
 } from "@core/storage";
-import { hexToRgbSum, invertRegExp, log } from "@utils";
-import type { ThemeSettingField } from "@/options/themes";
+import { hexToRgbSum, invertRegExp } from "@utils";
 import { mainView } from "./mainLyricsView";
 import { publishPictureInPictureLyrics } from "./pictureInPicture/lyricsPublisher";
 import { logCore, logError } from "@core/logger";
+import type { ThemeSettingField } from "@/options/themes";
+import type { ThemeSavedSettingFields } from "@core/customCss";
 
 let hasSubscribedToStyles = false;
 
@@ -231,10 +232,7 @@ interface CSSStorageData {
   cssStorageType?: "sync" | "local" | "chunked";
   customCSS?: string;
   cssCompressed?: boolean;
-  themeSettings?: {
-    fields?: Record<string, ThemeSettingField>;
-    saved?: Record<string, any>;
-  };
+  themeSettings?: ThemeSavedSettingFields;
 }
 
 function decompressStyles(css: string): string {

@@ -55,7 +55,7 @@ const downloadFile = (content: string, defaultFilename: string): void => {
         URL.revokeObjectURL(url);
       })
       .catch(error => {
-        console.log(error);
+        errorEditor("Error saving file:", error);
         showAlert("Error saving file. Please try again.");
         URL.revokeObjectURL(url);
       });
@@ -166,9 +166,11 @@ class ImportManager {
     try {
       const parsedSettings = JSON.parse(themeSettings);
 
+      logEditor(`Parsed theme settings:`, parsedSettings);
       await saveCustomCss(undefined, { fields: parsedSettings });
       this.performImportCSS(applyThemeSettingsToCSS(await loadCustomCSS(true), parsedSettings), filename, true);
     } catch (err) {
+      errorEditor("Error importing theme settings:", err);
       showAlert("Unable to import theme settings");
       throw new Error(`Theme settings import failed: ${err}`);
     }

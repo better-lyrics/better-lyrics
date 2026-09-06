@@ -2040,7 +2040,8 @@ input.cm-textfield:focus-visible {
     gap: .5rem;
 }
 
-#theme-settings-field-editor-header {
+#theme-settings-field-editor-header,
+#theme-settings-field-editor-actions {
     display: flex;
     gap: .4rem;
 	align-items: center;
@@ -2051,6 +2052,11 @@ input.cm-textfield:focus-visible {
     backdrop-filter: blur(.2rem);
     z-index: 2;
     font-size: large;
+}
+
+#theme-settings-field-editor-actions {
+	right: calc(20px + .6rem);
+	flex-direction: row-reverse;
 }
 
 #theme-settings-field-editor-title {

@@ -89,7 +89,41 @@
 					id="editor"
 					style="height: 100%; min-height: 100%; width: 100%; overflow: auto"
 				></div>
-				<div id="theme-settings" style="display: none; height: 100%; min-height: 100%; width: 100%; overflow: auto"></div>
+				<div id="theme-settings" style="height: 90%; overflow: auto; margin: 1rem; border-radius: 1rem">
+					<div id="theme-settings-editor">
+						<div id="theme-settings-editor-header">
+							<div>
+								<h1 id="theme-settings-editor-title">__MSG_options_themeSettings_title__</h1>
+								<span id="theme-settings-editor-total">0 / 50</span>
+							</div>
+							<button id="add-settings-field-btn" class="small-btn">
+								<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24">
+									<path fill="currentColor" d="M18 13h-5v5a1 1 0 0 1-2 0v-5H6a1 1 0 0 1 0-2h5V6a1 1 0 0 1 2 0v5h5a1 1 0 0 1 0 2"/>
+								</svg>
+								<span>__MSG_options_themeSettings_addField__</span>
+							</button>
+						</div>
+						<div id="theme-settings-editor-fields"></div>
+					</div>
+					<div id="theme-settings-field-editor" style="display: none;">
+						<div id="theme-settings-field-editor-header">
+							<button id="return-theme-settings-btn" class="icon-btn no-dropdown" style="margin: 0;">
+								<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+									<path fill="currentColor" d="m7.83 13 4.9 4.9q.3.3.28.7t-.31.7q-.3.27-.7.29t-.7-.29l-6.6-6.6q-.15-.15-.21-.33T4.43 12t.06-.37.21-.33l6.6-6.6q.28-.27.69-.27t.71.27q.3.3.3.71t-.3.72L7.83 11H19q.43 0 .71.29T20 12t-.29.71T19 13z"/>
+								</svg>
+							</button>
+							<span id="theme-settings-field-editor-title">__MSG_options_themeSettings_addField__</span>
+						</div>
+						<div id="theme-settings-field-editor-inputs"></div>
+						<div id="theme-settings-field-editor-actions">
+							<button id="add-theme-settings-btn" class="icon-btn no-dropdown" style="margin: 0;">
+								<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+									<path fill="currentColor" d="M18 13h-5v5a1 1 0 0 1-2 0v-5H6a1 1 0 0 1 0-2h5V6a1 1 0 0 1 2 0v5h5a1 1 0 0 1 0 2"/>
+								</svg>
+							</button>
+						</div>
+					</div>
+				</div>
 				<div id="sync-indicator">__MSG_options_editor_saving__</div>
 			</div>
 			<div class="ie-utils" style="margin-left: 1em; margin-top: 1em;">
