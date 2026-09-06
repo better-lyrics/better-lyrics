@@ -1,21 +1,43 @@
+import {
+  THEME_SETTINGS_COLOR,
+  THEME_SETTINGS_DROPDOWN,
+  THEME_SETTINGS_MAX_FIELDS,
+  THEME_SETTINGS_RANGE,
+  THEME_SETTINGS_TEXTFIELD,
+  THEME_SETTINGS_TOGGLE,
+  THEME_SETTINGS_TYPES,
+} from "@constants";
 import { t } from "@core/i18n";
 import { getSyncStorage } from "@core/storage";
 import { formatCreators, saveCustomCss } from "@core/customCss";
 import { STORE_THEME_PREFIX } from "@core/storage";
+import Sortable from "sortablejs";
 import {
   getInstalledStoreThemes,
   getInstalledTheme,
   installSymlinkedThemeFromMarketplace,
 } from "../../store/themeStoreManager";
 import type { ThemeSource } from "../../store/types";
-import type { Theme } from "../../themes";
-import THEMES, { deleteCustomTheme, getCustomThemes, renameCustomTheme, saveCustomTheme } from "../../themes";
+import type { Theme, ThemeSettingField } from "../../themes";
+import THEMES, {
+  addSettingFieldCustomTheme,
+  deleteCustomTheme,
+  getCustomThemes,
+  getCustomThemeByName,
+  renameCustomTheme,
+  saveCustomTheme,
+  setCustomThemeSavedSettings,
+} from "../../themes";
+import { fillThemeSettings } from "../../options";
 import { SAVE_CUSTOM_THEME_DEBOUNCE, SAVE_DEBOUNCE_DELAY } from "../core/editor";
 import { editorStateManager } from "../core/state";
 import type { ThemeCardOptions } from "../types";
 import {
+  addSettingsFieldBtn,
   deleteThemeBtn,
   editThemeBtn,
+  modifyThemeSettingsBtn,
+  returnThemeSettings,
   syncIndicator,
   themeModalGrid,
   themeModalOverlay,
@@ -26,10 +48,23 @@ import {
   themePreviewCard,
   themePreviewName,
   themeSelectorBtn,
+  themeSettingsContainer,
+  themeSettingsEditor,
+  themeSettingsEditorFields,
+  themeSettingsEditorTotal,
+  themeSettingsFieldEditor,
+  themeSettingsFieldEditorInputs,
   themeSourceBadge,
 } from "../ui/dom";
-import { showAlert, showConfirm, showPrompt } from "../ui/feedback";
-import { applyStoreThemeComplete, broadcastRICSToTabs, showSyncError, showSyncSuccess } from "./storage";
+import { showAlert, showConfirm, showModal, showPrompt } from "../ui/feedback";
+import {
+  applyStoreThemeComplete,
+  applyThemeSettingsToCSS,
+  broadcastRICSToTabs,
+  loadThemeSettings,
+  showSyncError,
+  showSyncSuccess,
+} from "./storage";
 import { errorEditor, logEditor, warnEditor } from "@core/logger";
 
 const preloadedImages = new Set<string>();
@@ -138,6 +173,661 @@ export function themeSourceToEditorSource(source: ThemeSource | undefined): Edit
   return null;
 }
 
+// Theme settings
+let themeSettingsVisible = false;
+let themeSettingsEditorVisible = true;
+
+let storedFields: Record<string, ThemeSettingField> = {};
+let fieldElementId: Record<string, string> = {};
+
+function createSelectionsIcon(): SVGSVGElement {
+  const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+  svg.setAttribute("viewBox", "0 0 48 48");
+  svg.setAttribute("width", "32");
+  svg.setAttribute("height", "32");
+  const g = document.createElementNS("http://www.w3.org/2000/svg", "g");
+  g.setAttribute("fill", "none");
+  g.setAttribute("stroke", "currentColor");
+  g.setAttribute("stroke-linejoin", "round");
+  g.setAttribute("stroke-width", "4");
+  const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+  path.setAttribute("d", "M34 5H8a3 3 0 0 0-3 3v26a3 3 0 0 0 3 3h26a3 3 0 0 0 3-3V8a3 3 0 0 0-3-3Z");
+  g.appendChild(path);
+  const path2 = document.createElementNS("http://www.w3.org/2000/svg", "path");
+  path2.setAttribute("stroke-linecap", "round");
+  path2.setAttribute("d", "M44 13.002V42a2 2 0 0 1-2 2H13.003M13 20.486l6 5.525l10-10.292");
+  g.appendChild(path2);
+  svg.appendChild(g);
+  return svg;
+}
+
+function createExpandIcon(): SVGSVGElement {
+  const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+  svg.setAttribute("viewBox", "0 0 24 24");
+  svg.setAttribute("width", "32");
+  svg.setAttribute("height", "32");
+  const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+  path.setAttribute("fill", "currentColor");
+  path.setAttribute(
+    "d",
+    "m12 19.15l3.875-3.875q.3-.3.7-.3t.7.3t.3.713t-.3.712l-3.85 3.875q-.575.575-1.425.575t-1.425-.575L6.7 16.7q-.3-.3-.288-.712t.313-.713t.713-.3t.712.3zm0-14.3L8.15 8.7q-.3.3-.7.288t-.7-.288q-.3-.3-.312-.712t.287-.713l3.85-3.85Q11.15 2.85 12 2.85t1.425.575l3.85 3.85q.3.3.288.713t-.313.712q-.3.275-.7.288t-.7-.288z"
+  );
+  svg.appendChild(path);
+  return svg;
+}
+
+function createPlusIcon(): SVGSVGElement {
+  const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+  svg.setAttribute("viewBox", "0 0 24 24");
+  svg.setAttribute("width", "32");
+  svg.setAttribute("height", "32");
+  const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+  path.setAttribute("fill", "currentColor");
+  path.setAttribute("d", "M18 13h-5v5a1 1 0 0 1-2 0v-5H6a1 1 0 0 1 0-2h5V6a1 1 0 0 1 2 0v5h5a1 1 0 0 1 0 2");
+  svg.appendChild(path);
+  return svg;
+}
+
+function createEditIcon(): SVGSVGElement {
+  const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+  svg.setAttribute("viewBox", "0 0 20 20");
+  svg.setAttribute("fill", "currentColor");
+  const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+  path.setAttribute(
+    "d",
+    "m5.433 13.917 1.262-3.155A4 4 0 0 1 7.58 9.42l6.92-6.918a2.121 2.121 0 0 1 3 3l-6.92 6.918c-.383.383-.84.685-1.343.886l-3.154 1.262a.5.5 0 0 1-.65-.65Z"
+  );
+  svg.appendChild(path);
+  const path2 = document.createElementNS("http://www.w3.org/2000/svg", "path");
+  path2.setAttribute(
+    "d",
+    "M3.5 5.75c0-.69.56-1.25 1.25-1.25H10A.75.75 0 0 0 10 3H4.75A2.75 2.75 0 0 0 2 5.75v9.5A2.75 2.75 0 0 0 4.75 18h9.5A2.75 2.75 0 0 0 17 15.25V10a.75.75 0 0 0-1.5 0v5.25c0 .69-.56 1.25-1.25 1.25h-9.5c-.69 0-1.25-.56-1.25-1.25v-9.5Z"
+  );
+  svg.appendChild(path2);
+  return svg;
+}
+
+function createDeleteIcon(): SVGSVGElement {
+  const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+  svg.setAttribute("viewBox", "0 0 24 24");
+  const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+  path.setAttribute("fill", "currentColor");
+  path.setAttribute(
+    "d",
+    "M7 21q-.825 0-1.412-.587T5 19V6q-.425 0-.712-.288T4 5t.288-.712T5 4h4q0-.425.288-.712T10 3h4q.425 0 .713.288T15 4h4q.425 0 .713.288T20 5t-.288.713T19 6v13q0 .825-.587 1.413T17 21zM17 6H7v13h10zm-7 11q.425 0 .713-.288T11 16V9q0-.425-.288-.712T10 8t-.712.288T9 9v7q0 .425.288.713T10 17m4 0q.425 0 .713-.288T15 16V9q0-.425-.288-.712T14 8t-.712.288T13 9v7q0 .425.288.713T14 17M7 6v13z"
+  );
+  svg.appendChild(path);
+  return svg;
+}
+
+/**
+ * Validates the JSON data of the setting fields and returns
+ * an array of warnings with the source and cause
+ */
+export function validateThemeSettingFields(settingFields: Record<string, ThemeSettingField>) {
+  if (typeof settingFields !== "object" || Array.isArray(settingFields)) return null;
+
+  const warns = [];
+  for (const field in settingFields) {
+    const setting = settingFields[field];
+    if (typeof setting !== "object" || Array.isArray(setting)) {
+      warns.push({ field, cause: "INVALID_FIELD" });
+      continue;
+    }
+    if (typeof setting.type !== "string" || !THEME_SETTINGS_TYPES[setting.type]) {
+      warns.push({ field, cause: "FIELD_TYPE" });
+      continue;
+    }
+    if (typeof setting.label !== "string") {
+      warns.push({ field, cause: "FIELD_LABEL" });
+      continue;
+    }
+    if (setting.type !== "heading" && typeof setting.attribute !== "string") {
+      warns.push({ field, cause: "FIELD_ATTRIBUTE_NAME" });
+      continue;
+    }
+  }
+
+  return warns;
+}
+
+export async function renderThemeSettings(): Promise<void> {
+  if (!themeSettingsEditorFields) return;
+  themeSettingsEditorFields.replaceChildren();
+  fieldElementId = {};
+
+  const themeSettings = await loadThemeSettings();
+
+  if (themeSettingsEditorTotal)
+    themeSettingsEditorTotal.innerText = `${Object.keys(themeSettings.fields || {}).length} / ${THEME_SETTINGS_MAX_FIELDS}`;
+
+  if (typeof themeSettings.fields !== "object") return;
+
+  storedFields = themeSettings.fields;
+  const mapped: ThemeSettingField[] = [];
+
+  for (const field in themeSettings.fields) {
+    const setting = themeSettings.fields[field];
+    mapped.push({ id: field, ...setting });
+  }
+
+  mapped.sort((a, b) => a.pos! - b.pos!);
+
+  for (const field of mapped) {
+    const fieldElement = document.createElement("div");
+    fieldElement.id = `theme-setting-field-${field.id}`;
+    fieldElement.className = "theme-setting-field";
+
+    const sortableHandle = document.createElement("span");
+    sortableHandle.className = "sortable-handle";
+    fieldElement.appendChild(sortableHandle);
+
+    const fieldInfo = document.createElement("div");
+    fieldInfo.className = "theme-setting-field-info";
+
+    const fieldType = document.createElement("span");
+    fieldType.className = "theme-setting-field-type";
+    fieldType.innerText = field.type.toUpperCase();
+    fieldInfo.appendChild(fieldType);
+
+    const fieldLabel = document.createElement("span");
+    fieldLabel.className = "theme-setting-field-label";
+    fieldLabel.innerText = `${field.label || field.id}`;
+    fieldInfo.appendChild(fieldLabel);
+
+    fieldElement.appendChild(fieldInfo);
+
+    const fieldActions = document.createElement("div");
+    fieldActions.className = "theme-setting-field-actions";
+
+    const fieldEdit = document.createElement("button");
+    fieldEdit.className = "edit-theme-btn";
+    fieldEdit.title = "Modify theme setting field";
+    fieldEdit.style.display = "unset";
+    fieldEdit.style.height = "stretch";
+    fieldEdit.appendChild(createEditIcon());
+    fieldActions.appendChild(fieldEdit);
+
+    const fieldDelete = document.createElement("button");
+    fieldDelete.className = "delete-theme-btn";
+    fieldDelete.title = "Delete theme setting field";
+    fieldDelete.style.display = "unset";
+    fieldDelete.style.height = "stretch";
+    fieldDelete.appendChild(createDeleteIcon());
+    fieldActions.appendChild(fieldDelete);
+
+    fieldElement.appendChild(fieldActions);
+    themeSettingsEditorFields.appendChild(fieldElement);
+    fieldElementId[fieldElement.id] = field.id!;
+  }
+
+  new Sortable(themeSettingsEditorFields, {
+    animation: 150,
+    ghostClass: "dragging",
+    forceFallback: true,
+    filter: ".theme-settings-field-info",
+    preventOnFilter: false,
+    onUpdate: async () => {
+      const themeSettings = await loadThemeSettings();
+      const fields = themeSettingsEditorFields!.children;
+      for (let i = 0; i < fields.length; i++) {
+        storedFields[fieldElementId[fields[i].id]]!.pos = i;
+      }
+      await saveCustomCss(undefined, { ...themeSettings, fields: storedFields });
+      fillThemeSettings();
+      onChange();
+    },
+  });
+}
+
+export function promptRemoveConditionGroups(conditionGroups: string[]) {
+  showModal({
+    title: `Remove ${conditionGroups.length} Condition Groups`,
+    message: t("editor.themeSettings.removeConditionGroups.message"),
+  })
+}
+
+function generateListThemeSettings(fieldId: string) {
+  const listElement = document.createElement("div");
+  listElement.id = `theme-settings-field-editor-${fieldId}`;
+  listElement.className = "theme-settings-field-editor-list";
+
+  const header = document.createElement("div");
+  header.className = "theme-settings-field-editor-list-header";
+
+  const headerPart = document.createElement("div");
+  headerPart.className = "theme-settings-list-header";
+
+  const addListItemBtn = document.createElement("button");
+  addListItemBtn.id = `add-list-item-${fieldId}`;
+  addListItemBtn.classList.add("icon-btn");
+  addListItemBtn.classList.add("no-dropdown");
+  addListItemBtn.appendChild(createPlusIcon());
+  headerPart.appendChild(addListItemBtn);
+
+  const selectMultipleItemBtn = document.createElement("button");
+  selectMultipleItemBtn.id = `select-multiple-items-${fieldId}`;
+  selectMultipleItemBtn.classList.add("icon-btn");
+  selectMultipleItemBtn.classList.add("no-dropdown");
+  selectMultipleItemBtn.appendChild(createSelectionsIcon());
+  selectMultipleItemBtn.addEventListener("click", () => {
+    listElement.classList.toggle("on-selections");
+  });
+  headerPart.appendChild(selectMultipleItemBtn);
+
+  header.appendChild(headerPart);
+
+  const headerSelections = document.createElement("div");
+  headerSelections.classList.add("theme-settings-list-header");
+  headerSelections.classList.add("selections-actions");
+
+  const selectedItems = document.createElement("span");
+  selectedItems.style.opacity = ".5";
+  selectedItems.textContent = "0 selected";
+  headerSelections.appendChild(selectedItems);
+
+  const deleteItemsBtn = document.createElement("button");
+  deleteItemsBtn.id = `delete-multiple-items-${fieldId}`;
+  deleteItemsBtn.classList.add("icon-btn");
+  deleteItemsBtn.classList.add("no-dropdown");
+  deleteItemsBtn.addEventListener("click", () => {
+    if (!listElement.classList.contains("on-selections")) return;
+  });
+  deleteItemsBtn.appendChild(createDeleteIcon());
+  headerSelections.appendChild(deleteItemsBtn);
+
+  header.appendChild(headerSelections);
+
+  listElement.appendChild(header);
+
+  const container = document.createElement("div");
+  container.className = "theme-settings-field-editor-list-container";
+  listElement.appendChild(container);
+
+  return listElement;
+}
+
+export function addItemToList(
+  container: HTMLElement,
+  fieldId: string,
+  label: string,
+  span?: string,
+  group?: boolean,
+  updateCallback?: (item: HTMLElement) => void
+) {
+  const item = document.createElement("div");
+  item.className = "theme-settings-list-item";
+
+  const selectCheckbox = document.createElement("input");
+  selectCheckbox.type = "checkbox";
+  selectCheckbox.className = "theme-settings-list-item-select";
+  item.appendChild(selectCheckbox);
+
+  const itemInfo = document.createElement("div");
+  itemInfo.className = "theme-settings-list-item-info";
+
+  const itemLabel = document.createElement("span");
+  itemLabel.className = "theme-settings-list-item-label";
+  itemLabel.innerText = label;
+  itemInfo.appendChild(itemLabel);
+
+  if (span) {
+    const itemSpan = document.createElement("span");
+    itemSpan.className = "theme-settings-list-item-span";
+    itemSpan.innerText = span;
+    itemInfo.appendChild(itemSpan);
+  }
+
+  item.appendChild(itemInfo);
+
+  const itemActions = document.createElement("div");
+  itemActions.className = "theme-settings-list-item-actions";
+
+  if (group) {
+    const expandGroupBtn = document.createElement("button");
+    expandGroupBtn.id = `expand-group-${fieldId}-btn`;
+    expandGroupBtn.className = "icon-btn";
+    expandGroupBtn.appendChild(createExpandIcon());
+    itemActions.appendChild(expandGroupBtn);
+
+    const addSubItemBtn = document.createElement("button");
+    addSubItemBtn.id = `add-subitem-${fieldId}-btn`;
+    addSubItemBtn.className = "icon-btn";
+    addSubItemBtn.appendChild(createPlusIcon());
+    itemActions.appendChild(addSubItemBtn);
+  } else {
+    const itemEditBtn = document.createElement("button");
+    itemEditBtn.id = `edit-item-${fieldId}-btn`;
+    itemEditBtn.className = "icon-btn";
+    itemEditBtn.appendChild(createEditIcon());
+    itemActions.appendChild(itemEditBtn);
+  }
+
+  const itemDeleteBtn = document.createElement("button");
+  itemDeleteBtn.id = `delete-item-${fieldId}-btn`;
+  itemDeleteBtn.className = "icon-btn";
+  itemDeleteBtn.appendChild(createDeleteIcon());
+  itemActions.appendChild(itemDeleteBtn);
+
+  item.appendChild(itemActions);
+  container.appendChild(item);
+
+  return item;
+}
+
+const fieldEditorInputs: Record<string, HTMLElement> = {};
+const fieldEditorData: Record<string, any> = {};
+
+interface FieldEditorInput {
+  [key: string]: any;
+  type?: string;
+  id: string;
+  label: string;
+  desc?: string;
+  /** Input based property */
+  placeholder?: string;
+  /** Input based property */
+  pattern?: string | RegExp;
+  /** Range-input based property */
+  min?: number;
+  /** Range-input based property */
+  max?: number;
+  optional?: boolean;
+  /** Dropdown based property */
+  options?: Record<string, string> | string[];
+  /** Dropdown based property */
+  default?: number;
+}
+
+function addFieldEditorInput(field: FieldEditorInput) {
+  const container = document.createElement("div");
+  container.className = "theme-settings-field-editor-container";
+
+  const label = document.createElement("span");
+  label.className = "theme-settings-field-editor-label";
+  label.innerText = field.label;
+
+  if (!field.optional) {
+    const important = document.createElement("span");
+    important.className = "important";
+    important.innerText = " *";
+    label.appendChild(important);
+  }
+
+  container.appendChild(label);
+
+  if (field.desc) {
+    const description = document.createElement("span");
+    description.className = "theme-settings-field-editor-description";
+    description.innerText = field.desc;
+    container.appendChild(description);
+  }
+
+  if (!field.type || field.type === "text" || field.type === "number") {
+    const input = document.createElement("input");
+    input.id = `theme-settings-field-editor-${field.id}`;
+    input.type = field.type || "text";
+    if (field.min) {
+      if (input.type === "text") input.minLength = field.min;
+      if (input.type === "number") input.min = `${field.min}`;
+    }
+    if (field.max) {
+      if (input.type === "text") input.maxLength = field.max;
+      if (input.type === "number") input.max = `${field.max}`;
+    }
+    input.placeholder = field.placeholder || "";
+
+    if (field.pattern) {
+      input.addEventListener("input", () => {
+        input.value = input.value.trim().toLowerCase().replace(field.pattern!, "");
+      });
+    }
+
+    fieldEditorInputs[field.id] = input;
+    container.appendChild(input);
+  } else if (field.type === "options") {
+    const select = document.createElement("select");
+    select.id = `theme-settings-field-editor-${field.id}`;
+    select.className = "select";
+    select.style.maxWidth = "stretch";
+
+    if (Array.isArray(field.options)) {
+      for (const options of field.options) {
+        const option = document.createElement("option");
+        option.value = options;
+        option.innerText = options;
+        select.appendChild(option);
+      }
+    } else if (typeof field.options === "object") {
+      for (const options in field.options) {
+        const option = document.createElement("option");
+        option.value = options;
+        option.innerText = field.options[options];
+        select.appendChild(option);
+      }
+    }
+
+    fieldEditorInputs[field.id] = select;
+    container.appendChild(select);
+  } else if (field.type === "color") {
+    const color = document.createElement("input");
+    color.id = `theme-settings-field-editor-${field.id}`;
+    color.type = "color";
+
+    fieldEditorInputs[field.id] = color;
+    container.appendChild(color);
+  } else if (field.type === "toggle") {
+    const label = document.createElement("label");
+
+    const toggle = document.createElement("input");
+    toggle.type = "checkbox";
+    toggle.id = `theme-settings-field-editor-${field.id}`;
+    label.appendChild(toggle);
+
+    const checkmark = document.createElement("span");
+    checkmark.className = "checkmark";
+    label.appendChild(checkmark);
+
+    fieldEditorInputs[field.id] = label;
+    container.appendChild(label);
+  } else if (field.type === "list") {
+    const list = generateListThemeSettings(field.id);
+
+    if (typeof field.addListFunc === "function") {
+      const addListBtn = list.querySelector(`#add-list-item-${field.id}`);
+      addListBtn?.addEventListener("click", () => {
+        field.addListFunc(list.querySelector(".theme-settings-field-editor-list-container") as HTMLElement, field.id);
+      });
+    }
+
+    fieldEditorInputs[field.id] = list;
+    container.appendChild(list);
+  }
+
+  themeSettingsFieldEditorInputs?.appendChild(container);
+  return fieldEditorInputs[field.id];
+}
+
+function updateTSFieldEditorInputs(inputType: string): void {
+  const visibleFieldsType: Record<string, string[]> = {
+    heading: ["type", "id", "label", "available"],
+  };
+
+  const visibleFields = !THEME_SETTINGS_TYPES[inputType]
+    ? ["type"]
+    : visibleFieldsType[inputType] ||
+      Object.keys(fieldEditorInputs).filter(key => {
+        const split = key.split("-");
+        return split.length > 1 ? split[0] === inputType : split.length < 2;
+      });
+
+  for (const field in fieldEditorInputs) {
+    const parent = fieldEditorInputs[field].parentElement;
+    if (parent) parent.style.display = visibleFields.includes(field) ? "" : "none";
+  }
+}
+
+function fillThemeSettingsFieldEditor(): void {
+  const fieldTypes: Record<string, string> = { unspecified: t("options_themeSettings_unspecified") };
+  Object.keys(THEME_SETTINGS_TYPES).forEach(v => (fieldTypes[v] = t(`options_themeSettings_${v}`)));
+
+  const fieldTypeInputs: Record<string, any> = {
+    heading: {},
+    range: THEME_SETTINGS_RANGE,
+    color: THEME_SETTINGS_COLOR,
+    dropdown: THEME_SETTINGS_DROPDOWN,
+    toggle: THEME_SETTINGS_TOGGLE,
+    textfield: THEME_SETTINGS_TEXTFIELD,
+  };
+
+  const fieldAttributeTypes = {
+    css: "CSS (--)",
+    rics: "RICS ($)",
+    knobs: "Knobs (/* */)",
+  };
+
+  const typeInput = addFieldEditorInput({
+    type: "options",
+    id: "type",
+    label: "Type",
+    desc: "What type of setting field would suit to store kinds of value",
+    options: fieldTypes,
+  });
+
+  // fill input field
+  [
+    {
+      id: "id",
+      label: "Identifier",
+      desc: "A field identifier, used to differentiate each fields",
+      placeholder: "2-200 characters; allowed characters: a-z, 0-9, _ -",
+      min: 2,
+      max: 50,
+      pattern: /[^a-z0-9_-]/g,
+    },
+    {
+      id: "label",
+      label: "Label",
+      desc: "What does the field supposed to do in short terms",
+      placeholder: "1-200 characters explaining the field",
+      min: 1,
+      max: 200,
+    },
+    {
+      id: "attribute-name",
+      label: "Attribute Name",
+      desc: "The corresponding name of the attribute to capture the value\nWould be placed like --attribute-name on CSS",
+      placeholder: "2-50 characters; allowed characters: a-z, 0-9, _ -",
+      min: 2,
+      max: 50,
+      pattern: /[^a-z0-9_-]/g,
+    },
+    {
+      type: "options",
+      id: "attribute-type",
+      label: "Attribute Type",
+      desc: "What level of attribute would this field's value be recognized in",
+      options: fieldAttributeTypes,
+      default: 0,
+    },
+    {
+      type: "list",
+      id: "available",
+      label: "Available conditions",
+      desc: "List of condition groups of conditions of other setting field values to make this field effectively available and dependable\n\nIf a condition group did not get all of its conditions passed, it will try checking for other condition groups. Otherwise, the field will not be available to use and to depend on",
+      addListFunc: (list: HTMLElement, id: string) => {
+        addItemToList(
+          list,
+          id,
+          `Condition Group ${(fieldEditorData.available || []).length + 1}`,
+          `0 conditions`,
+          true,
+          () => {}
+        );
+
+        if (!Array.isArray(fieldEditorData.available)) fieldEditorData.available = [];
+        fieldEditorData.available.push([]);
+      },
+      optional: true,
+    },
+  ].forEach(v => addFieldEditorInput(v));
+
+  for (const fieldType in fieldTypeInputs) {
+    const inputs = fieldTypeInputs[fieldType];
+    for (const property in inputs) {
+      const data = inputs[property];
+      const fieldInput: FieldEditorInput = {
+        id: `${fieldType}-${property}`,
+        type: data.type,
+        label: data.label,
+        desc: data.desc,
+        optional: data.optional,
+      };
+
+      if (fieldType === "dropdown" && property === "options") {
+        fieldInput.addListFunc = (list: HTMLElement, id: string) => {
+          addItemToList(list, id, `Option ${(fieldEditorData.options || []).length + 1}`, `value`);
+
+          if (!Array.isArray(fieldEditorData.options)) fieldEditorData.options = [];
+          fieldEditorData.options.push([]);
+        }
+      }
+
+      addFieldEditorInput(fieldInput);
+    }
+  }
+
+  if (typeInput instanceof HTMLSelectElement) {
+    updateTSFieldEditorInputs(typeInput.value);
+    typeInput.addEventListener("change", () => updateTSFieldEditorInputs(typeInput.value));
+  }
+}
+
+export function initializeThemeSettingsEditor(): void {
+  modifyThemeSettingsBtn?.addEventListener("click", async () => {
+    themeSettingsVisible = !themeSettingsVisible;
+    const visible = themeSettingsVisible;
+    const editor = document.getElementById("editor");
+    if (editor) {
+      editor.style.display = visible ? "none" : "";
+    }
+    if (themeSettingsContainer) {
+      themeSettingsContainer.style.display = visible ? "" : "none";
+    }
+    if (modifyThemeSettingsBtn) {
+      modifyThemeSettingsBtn.dataset.tooltip = visible
+        ? t("options_editor_modifyStyle")
+        : t("options_editor_modifyThemeSettings");
+      modifyThemeSettingsBtn.classList.toggle("active", visible);
+    }
+    if (themeSettingsVisible) {
+      await renderThemeSettings();
+    }
+  });
+
+  [addSettingsFieldBtn, returnThemeSettings].forEach(button =>
+    button?.addEventListener("click", () => {
+      themeSettingsEditorVisible = !themeSettingsEditorVisible;
+      const visible = themeSettingsEditorVisible;
+      if (themeSettingsEditor) {
+        themeSettingsEditor.style.display = visible ? "" : "none";
+      }
+      if (themeSettingsFieldEditor) {
+        themeSettingsFieldEditor.style.display = visible ? "none" : "";
+      }
+    })
+  );
+
+  fillThemeSettingsFieldEditor();
+}
+
+export async function refreshThemeSettingsUI(): Promise<void> {
+  if (themeSettingsVisible) {
+    await renderThemeSettings();
+  }
+}
+
+// Theme manager
 class ThemeManager {
   async applyTheme(isCustom: boolean, index: number, themeName: string): Promise<void> {
     logEditor(`Applying ${isCustom ? "custom" : "built-in"} theme: ${themeName}`);
@@ -163,7 +853,8 @@ class ThemeManager {
       throw new Error(`Custom theme at index ${index} not found`);
     }
 
-    const themeContent = `/* ${selectedTheme.name}, a custom theme for BetterLyrics */\n\n${selectedTheme.css}\n`;
+    const css = applyThemeSettingsToCSS(selectedTheme.css, selectedTheme.settings, selectedTheme.savedSettings);
+    const themeContent = `/* ${selectedTheme.name}, a custom theme for BetterLyrics */\n\n${css}\n`;
 
     await editorStateManager.queueOperation("theme", async () => {
       logEditor(`Setting custom theme: ${selectedTheme.name}`);
@@ -177,7 +868,7 @@ class ThemeManager {
       showThemeName(selectedTheme.name, "custom");
       updateThemeSelectorButton();
 
-      await this.saveTheme(themeContent);
+      await this.saveTheme(selectedTheme.css, { fields: selectedTheme.settings, saved: selectedTheme.savedSettings });
 
       showAlert(`Applied custom theme: ${selectedTheme.name}`);
     });
@@ -210,6 +901,7 @@ class ThemeManager {
       const success = await applyStoreThemeComplete({
         themeId: installed.id,
         css: installed.css,
+        settings: { fields: installed.settings, saved: installed.savedSettings },
         title: installed.title || theme.name,
         creators: installed.creators || [],
         source: "marketplace",
@@ -229,7 +921,7 @@ class ThemeManager {
     logEditor(`Using bundled fallback for: ${selectedTheme.name}`);
 
     const response = await fetch(chrome.runtime.getURL(`css/themes/${selectedTheme.path}`));
-    const css = await response.text();
+    let css = await response.text();
 
     const themeContent = `/* ${selectedTheme.name}, a theme for BetterLyrics by ${selectedTheme.author} ${selectedTheme.link && `(${selectedTheme.link})`} */\n\n${css}\n`;
 
@@ -251,7 +943,10 @@ class ThemeManager {
     });
   }
 
-  private async saveTheme(css: string): Promise<void> {
+  private async saveTheme(
+    css: string,
+    settings: { fields?: Record<string, ThemeSettingField>; saved?: Record<string, any> } = {}
+  ): Promise<void> {
     editorStateManager.incrementSaveCount();
     editorStateManager.setIsSaving(true);
 
@@ -263,6 +958,7 @@ class ThemeManager {
       }
 
       showSyncSuccess(result.strategy, result.wasRetry);
+      fillThemeSettings();
       await broadcastRICSToTabs(css, result.strategy);
     } finally {
       editorStateManager.setIsSaving(false);
@@ -277,6 +973,10 @@ async function applyStoreThemeToEditor(
   themeId: string,
   css: string,
   title: string,
+  settings: {
+    fields?: Record<string, ThemeSettingField>;
+    saved?: Record<string, any>;
+  },
   source: EditorThemeSource = "marketplace"
 ): Promise<void> {
   logEditor(`applyStoreThemeToEditor called: ${title}, CSS length: ${css.length}, source: ${source}`);
@@ -285,6 +985,7 @@ async function applyStoreThemeToEditor(
     await editorStateManager.queueOperation("theme", async () => {
       logEditor(`Setting marketplace theme: ${title}, content length: ${css.length}`);
 
+      css = applyThemeSettingsToCSS(css, settings.fields, settings.saved);
       await editorStateManager.setEditorContent(css, `store-theme:${themeId}`, false);
 
       editorStateManager.setCurrentThemeName(title);
@@ -314,12 +1015,16 @@ export function initStoreThemeListener(): void {
       themeId: string;
       css: string;
       title: string;
+      settings: {
+        fields?: Record<string, ThemeSettingField>;
+        saved?: Record<string, any>;
+      };
       source?: "marketplace" | "url";
     }>;
-    const { themeId, css, title, source } = customEvent.detail;
+    const { themeId, css, title, settings, source } = customEvent.detail;
     const editorSource: EditorThemeSource = source === "url" ? "github" : "marketplace";
     logEditor(`Event detail: themeId=${themeId}, title=${title}, source=${source}, CSS length=${css.length}`);
-    await applyStoreThemeToEditor(themeId, css, title, editorSource);
+    await applyStoreThemeToEditor(themeId, css, title, settings, editorSource);
   });
 }
 
@@ -365,7 +1070,7 @@ export function hideThemeName(): void {
   editorStateManager.setIsCustomTheme(false);
 }
 
-export function onChange(_state: string) {
+export function onChange() {
   logEditor("onChange triggered, isProgrammaticChange:", editorStateManager.getIsProgrammaticChange());
   if (editorStateManager.getIsProgrammaticChange()) {
     return;
@@ -409,7 +1114,7 @@ function debounceSaveCustomTheme() {
         const cleanCss = css.replace(/^\/\*.*?\*\/\n\n/s, "").trim();
 
         try {
-          await saveCustomTheme(themeName, cleanCss);
+          await saveCustomTheme(themeName, cleanCss, (await loadThemeSettings()).fields);
           console.log(`Auto-saved custom theme: ${themeName}`);
         } catch (error) {
           console.error("Error auto-saving custom theme:", error);
@@ -425,7 +1130,7 @@ function debounceSave() {
   editorStateManager.setSaveTimeout(window.setTimeout(saveToStorage, SAVE_DEBOUNCE_DELAY));
 }
 
-export function saveToStorage(isTheme = false) {
+export async function saveToStorage(isTheme = false) {
   logEditor("saveToStorage called, isTheme:", isTheme);
   const currentEditor = editorStateManager.getEditor();
   if (!currentEditor) {

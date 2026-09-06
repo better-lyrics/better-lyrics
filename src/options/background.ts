@@ -22,6 +22,7 @@ import {
 } from "./store/themeStoreManager";
 import { fetchAllStoreThemes } from "./store/themeStoreService";
 import { logBackground, warnBackground } from "@core/logger";
+import type { ThemeSettingField } from "./themes";
 
 const THEME_UPDATE_ALARM = "theme-update-check";
 const UPDATE_INTERVAL_MINUTES = 360; // 6 hours

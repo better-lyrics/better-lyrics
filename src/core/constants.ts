@@ -116,6 +116,69 @@ export const ROMANIZATION_LANGUAGES: Record<string, string> = {
   fa: "Persian",
 };
 
+// Theme Settings
+export const THEME_SETTINGS_MAX_FIELDS = 50;
+
+export const THEME_SETTINGS_TYPES: Record<string, string> = {
+  heading: "string",
+  range: "number",
+  color: "string",
+  dropdown: "number",
+  toggle: "boolean",
+  textfield: "string",
+};
+
+export const THEME_SETTINGS_TOGGLE = {
+  onValue: { type: "text", label: "Toggled-On Value" },
+  offValue: { type: "text", label: "Toggled-Off Value" },
+  default: { type: "toggle", label: "Default toggle" },
+};
+
+export const THEME_SETTINGS_RANGE = {
+  outrange: { type: "toggle", label: "Out of range", optional: true },
+  min: { type: "number", label: "Minimum range" },
+  max: { type: "number", label: "Maximum range" },
+  step: {
+    type: "number",
+    label: "Range steps",
+    desc: "As in how many steps the range takes, not how many steps the range reaches to maximum",
+  },
+  default: { type: "number", label: "Default range" },
+};
+
+export const THEME_SETTINGS_DROPDOWN = {
+  options: { type: "list", label: "Choosable options", desc: "The options that can be chosen from the dropdown" },
+  default: { type: "options", label: "Default option", desc: "The default option of the dropdown" },
+};
+
+export const THEME_SETTINGS_COLOR = {
+  default: { type: "color", label: "Default color" },
+};
+
+export const THEME_SETTINGS_TEXTFIELD = {
+  pattern: {
+    type: "text",
+    label: "Allowed patterns",
+    desc: "Normal or RegEx patterns that can allow a certain characters to be filled in",
+  },
+  default: { type: "text", label: "Default value" },
+};
+
+export const THEME_SETTINGS_ATTRIBUTE_TYPE = ["css", "rics", "knobs"];
+
+export const THEME_SETTINGS_CONDITIONALS = [
+  "equals",
+  "not-equal",
+  "greater-than",
+  "less-than",
+  "contains",
+  "not-contains",
+  "starts",
+  "not-starts",
+  "ends",
+  "not-ends",
+];
+
 // Log Prefixes
 export const LOG_PREFIX = "[BetterLyrics]" as const;
 export const LOG_PREFIX_CONTENT = "[BetterLyrics:Content]" as const;

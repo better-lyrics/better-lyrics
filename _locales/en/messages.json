@@ -504,6 +504,10 @@
     "message": "Confirm",
     "description": "Confirm button label"
   },
+  "options_modal_ok": {
+    "message": "OK",
+    "description": "OK button label"
+  },
 
   "options_alert_cacheCleared": {
     "message": "Cache cleared successfully!",
@@ -582,6 +586,14 @@
     "message": "Rename custom theme",
     "description": "Rename theme button title"
   },
+  "options_editor_modifyThemeSettings": {
+    "message": "Modify theme settings",
+    "description": "Modify theme settings button title"
+  },
+  "options_editor_modifyStyle": {
+    "message": "Modify theme style",
+    "description": "Modify theme style button title"
+  },
   "options_editor_deleteTheme": {
     "message": "Delete custom theme",
     "description": "Delete theme button title"
@@ -589,6 +601,86 @@
   "options_editor_doubleClickRename": {
     "message": "Double-click to rename",
     "description": "Double-click to rename tooltip"
+  },
+
+  "options_themeSettings_title": {
+    "message": "Theme Settings",
+    "description": "Theme settings header title"
+  },
+  "options_themeSettings_addField": {
+    "message": "Add Field",
+    "description": "Add theme setting field button label"
+  },
+  "options_themeSettings_livePreview": {
+    "message": "Live preview",
+    "description": "Live preview checkbox for automatic theme settings preview"
+  },
+  "options_themeSettings_apply": {
+    "message": "Apply",
+    "description": "Apply button label"
+  },
+  "options_themeSettings_full": {
+    "message": "Sorry, you cannot add more than $MAX$ fields. Change your theme settings layout to meet exactly your needs",
+    "description": "Message when Theme Settings has reached maximum allowed fields",
+    "placeholders": {
+      "max": {
+        "content": "$1",
+        "example": "50"
+      }
+    }
+  },
+  "options_themeSettings_unspecified": {
+    "message": "Unspecified",
+    "description": "Default option in every dropdown of Theme Settings Field Editor"
+  },
+  "options_themeSettings_heading": {
+    "message": "Heading",
+    "description": "Heading setting field type"
+  },
+  "options_themeSettings_toggle": {
+    "message": "Toggle",
+    "description": "Toggle setting field type"
+  },
+  "options_themeSettings_range": {
+    "message": "Range",
+    "description": "Range setting field type"
+  },
+  "options_themeSettings_dropdown": {
+    "message": "Dropdown",
+    "description": "Dropdown setting field type"
+  },
+  "options_themeSettings_textfield": {
+    "message": "Text Field",
+    "description": "Textfield setting field type"
+  },
+  "options_themeSettings_color": {
+    "message": "Color",
+    "description": "Color setting field type"
+  },
+
+  "options_themeFile_import": {
+    "message": "Import Theme File",
+    "description": "Theme file import modal title"
+  },
+  "options_themeFile_selectImport": {
+    "message": "Which part of the theme would you like to import?",
+    "description": "Theme file select part to import label"
+  },
+  "options_themeFile_export": {
+    "message": "Export Theme File",
+    "description": "Theme file export modal title"
+  },
+  "options_themeFile_selectExport": {
+    "message": "Which part of the theme would you like to export?",
+    "description": "Theme file select part to export label"
+  },
+  "options_themeFile_code": {
+    "message": "CSS/RICS stylesheet code",
+    "description": "Option label for importing/exporting theme code"
+  },
+  "options_themeFile_settings": {
+    "message": "Theme settings",
+    "description": "Option label for importing/exporting theme settings"
   },
 
   "options_provider_betterLyrics": {

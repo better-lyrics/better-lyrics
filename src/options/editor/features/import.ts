@@ -1,26 +1,38 @@
 import { saveCustomCss } from "@core/customCss";
 import { editorStateManager } from "../core/state";
 import { showAlert } from "../ui/feedback";
-import { broadcastRICSToTabs, showSyncSuccess } from "./storage";
+import { applyThemeSettingsToCSS, broadcastRICSToTabs, loadCustomCSS, showSyncSuccess } from "./storage";
 import { hideThemeName, updateThemeSelectorButton } from "./themes";
 import { errorEditor, logEditor } from "@core/logger";
+import type { ThemeSettingField } from "@/options/themes";
 
-export const generateDefaultFilename = (): string => {
+export const generateDefaultFilename = (filetype: string): string => {
   const date = new Date();
   const timestamp = date.toISOString().replace(/[:.]/g, "-").slice(0, -5);
-  return `blyrics-theme-${timestamp}.rics`;
+  return `blyrics-theme-${timestamp}.${filetype}`;
 };
 
 export const saveCSSToFile = (css: string, defaultFilename: string): void => {
+  requestDownload(css, defaultFilename);
+};
+
+export const saveThemeSettingsToFile = (
+  themeSettings: { [key: string]: ThemeSettingField },
+  defaultFilename: string
+): void => {
+  requestDownload(JSON.stringify(themeSettings, null, 2), defaultFilename);
+};
+
+const requestDownload = (content: string, defaultFilename: string): void => {
   chrome.permissions.contains({ permissions: ["downloads"] }, hasPermission => {
     if (hasPermission) {
-      downloadFile(css, defaultFilename);
+      downloadFile(content, defaultFilename);
     } else {
       chrome.permissions.request({ permissions: ["downloads"] }, granted => {
         if (granted) {
-          downloadFile(css, defaultFilename);
+          downloadFile(content, defaultFilename);
         } else {
-          fallbackSaveMethod(css, defaultFilename);
+          fallbackSaveMethod(content, defaultFilename);
         }
       });
     }
@@ -43,7 +55,7 @@ const downloadFile = (content: string, defaultFilename: string): void => {
         URL.revokeObjectURL(url);
       })
       .catch(error => {
-        console.log(error);
+        errorEditor("Error saving file:", error);
         showAlert("Error saving file. Please try again.");
         URL.revokeObjectURL(url);
       });
@@ -70,14 +82,19 @@ const fallbackSaveMethod = (content: string, defaultFilename: string): void => {
 };
 
 class ImportManager {
-  async importCSSFile(file: File): Promise<void> {
+  async importFile(type: "css" | "settings" = "css", file: File): Promise<void> {
     logEditor(` Starting import of file: ${file.name}`);
 
     try {
-      const css = await this.readFileContent(file);
-      logEditor(` File read successfully: ${css.length} bytes`);
+      const content = await this.readFileContent(file);
+      logEditor(` File read successfully: ${content.length} bytes`);
 
-      await this.performImport(css, file.name);
+      if (type === "css") {
+        await this.performImportCSS(content, file.name);
+      }
+      if (type === "settings") {
+        await this.performImportThemeSettings(content, file.name);
+      }
     } catch (error) {
       errorEditor("Import failed:", error);
       showAlert("Error importing theme file! Please try again.");
@@ -106,7 +123,7 @@ class ImportManager {
     });
   }
 
-  private async performImport(css: string, filename: string): Promise<void> {
+  private async performImportCSS(css: string, filename: string, skipSave: boolean = false): Promise<void> {
     logEditor(` Performing import operation`);
 
     await editorStateManager.queueOperation("import", async () => {
@@ -141,6 +158,22 @@ class ImportManager {
         editorStateManager.resetSaveCount();
       }
     });
+  }
+
+  private async performImportThemeSettings(themeSettings: string, filename: string): Promise<void> {
+    logEditor(` Importing theme settings`);
+
+    try {
+      const parsedSettings = JSON.parse(themeSettings);
+
+      logEditor(`Parsed theme settings:`, parsedSettings);
+      await saveCustomCss(undefined, { fields: parsedSettings });
+      this.performImportCSS(applyThemeSettingsToCSS(await loadCustomCSS(true), parsedSettings), filename, true);
+    } catch (err) {
+      errorEditor("Error importing theme settings:", err);
+      showAlert("Unable to import theme settings");
+      throw new Error(`Theme settings import failed: ${err}`);
+    }
   }
 }
 

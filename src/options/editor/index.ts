@@ -1,16 +1,17 @@
 import { openSearchPanel } from "@codemirror/search";
 
-import { initI18n, loadLocaleOverride } from "@core/i18n";
+import { initI18n, loadLocaleOverride, t } from "@core/i18n";
 import { createEditorState, createEditorView } from "./core/editor";
 import { editorStateManager } from "./core/state";
-import { generateDefaultFilename, importManager, saveCSSToFile } from "./features/import";
-import { storageManager } from "./features/storage";
+import { generateDefaultFilename, importManager, saveCSSToFile, saveThemeSettingsToFile } from "./features/import";
+import { loadThemeSettings, storageManager } from "./features/storage";
 import {
   closeThemeModal,
   handleDeleteTheme,
   handleRenameTheme,
   handleSaveTheme,
   initStoreThemeListener,
+  initializeThemeSettingsEditor,
   openThemeModal,
   preloadInstalledThemeImages,
   saveToStorage,
@@ -21,6 +22,12 @@ import {
   editThemeBtn,
   openEditCSS,
   openOptions,
+  themeFileClose,
+  themeFileCode,
+  themeFileOverlay,
+  themeFileSelect,
+  themeFileSettings,
+  themeFileTitle,
   themeModalClose,
   themeModalOverlay,
   themeNameText,
@@ -111,38 +118,135 @@ function initializeThemeActions() {
 }
 
 function initializeFileOperations() {
-  document.getElementById("file-import-btn")?.addEventListener("click", () => {
-    const input = document.createElement("input");
-    input.type = "file";
-    input.accept = ".css,.rics";
-    input.onchange = async (event: Event) => {
-      const file = (event.target as HTMLInputElement).files?.[0];
-      if (!file) return;
-
-      try {
-        await importManager.importCSSFile(file);
-      } catch (err) {
-        errorEditor("File import error:", err);
+  function closeThemeFile() {
+    if (themeFileOverlay) {
+      const modal = document.querySelector(".theme-file-modal");
+      if (modal) {
+        modal.classList.add("closing");
       }
-    };
-    input.click();
+
+      themeFileOverlay.classList.remove("active");
+
+      setTimeout(() => {
+        if (themeModalOverlay) {
+          themeModalOverlay.style.display = "none";
+          if (modal) {
+            modal.classList.remove("closing");
+          }
+        }
+      }, 200);
+    }
+  }
+
+  themeFileOverlay?.addEventListener("click", e => {
+    if (e.target === themeFileOverlay) {
+      closeThemeFile();
+    }
+  });
+
+  themeFileClose?.addEventListener("click", () => closeThemeFile());
+
+  document.addEventListener("keydown", e => {
+    if (e.key === "Escape" && themeFileOverlay?.classList.contains("active")) {
+      closeThemeFile();
+    }
+  });
+
+  document.getElementById("file-import-btn")?.addEventListener("click", () => {
+    if (!themeFileOverlay) {
+      showAlert("Theme file operation interface not found!");
+      return;
+    }
+
+    if (themeFileTitle) {
+      themeFileTitle.innerText = t("options_themeFile_import");
+    }
+    if (themeFileSelect) {
+      themeFileSelect.innerText = t("options_themeFile_selectImport");
+    }
+
+    requestAnimationFrame(() => {
+      if (themeFileOverlay) {
+        themeFileOverlay.classList.add("active");
+      }
+    });
+
+    themeFileCode?.addEventListener("click", () => {
+      const input = document.createElement("input");
+      input.type = "file";
+      input.accept = ".css,.rics";
+      input.onchange = async (event: Event) => {
+        const file = (event.target as HTMLInputElement).files?.[0];
+        if (!file) return;
+
+        try {
+          await importManager.importFile("css", file);
+        } catch (err) {
+          errorEditor("File import error:", err);
+        }
+      };
+      input.click();
+    });
+
+    themeFileSettings?.addEventListener("click", () => {
+      const input = document.createElement("input");
+      input.type = "file";
+      input.accept = ".json";
+      input.onchange = async (event: Event) => {
+        const file = (event.target as HTMLInputElement).files?.[0];
+        if (!file) return;
+
+        try {
+          await importManager.importFile("settings", file);
+        } catch (err) {
+          errorEditor("File import error:", err);
+        }
+      };
+      input.click();
+    });
   });
 
   document.getElementById("file-export-btn")?.addEventListener("click", async () => {
-    const editor = editorStateManager.getEditor();
-    if (!editor) {
-      showAlert("Editor not initialized!");
+    if (!themeFileOverlay) {
+      showAlert("Theme file operation interface not found!");
       return;
     }
 
-    const css = editor.state.doc.toString();
-    if (!css) {
-      showAlert("No styles to export!");
-      return;
+    if (themeFileTitle) {
+      themeFileTitle.innerText = t("options_themeFile_export");
+    }
+    if (themeFileSelect) {
+      themeFileSelect.innerText = t("options_themeFile_selectExport");
     }
 
-    const defaultFilename = generateDefaultFilename();
-    saveCSSToFile(css, defaultFilename);
+    requestAnimationFrame(() => {
+      if (themeFileOverlay) {
+        themeFileOverlay.classList.add("active");
+      }
+    });
+
+    themeFileCode?.addEventListener("click", () => {
+      const editor = editorStateManager.getEditor();
+      if (!editor) {
+        showAlert("Editor not initialized!");
+        return;
+      }
+
+      const css = editor.state.doc.toString();
+      if (!css) {
+        showAlert("No styles to export!");
+        return;
+      }
+
+      const defaultFilename = generateDefaultFilename("rics");
+      saveCSSToFile(css, defaultFilename);
+    });
+
+    themeFileSettings?.addEventListener("click", async () => {
+      const themeSettings = await loadThemeSettings();
+      const defaultFilename = generateDefaultFilename("json");
+      saveThemeSettingsToFile({ ...themeSettings.fields }, defaultFilename);
+    });
   });
 
   document.getElementById("styling-guide-btn")?.addEventListener("click", () => {
@@ -199,6 +303,7 @@ export function initialize() {
     initializeEditorKeyboardShortcuts();
     initializeThemeModal();
     initializeThemeActions();
+    initializeThemeSettingsEditor();
     initializeFileOperations();
     initializeStorageListeners();
     initStoreThemeListener();

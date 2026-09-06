@@ -99,7 +99,7 @@ export function createEditorState(initialContents: string, options: EditorOption
     EditorView.updateListener.of(update => {
       let text = update.state.doc.toString();
       if (update.docChanged && !text.startsWith("Loading")) {
-        onChange(text);
+        onChange();
       }
     }),
   ];

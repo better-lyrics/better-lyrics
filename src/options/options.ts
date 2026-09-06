@@ -4,6 +4,7 @@ import {
   DOCK_CONTROL_ORDER_DEFAULT,
   DOCK_DEFAULT_POSITION,
   ROMANIZATION_LANGUAGES,
+  THEME_SETTINGS_TYPES,
   UNISON_API_BASE_URL,
 } from "@constants";
 import { attachHoldRepeat } from "@core/holdRepeat";
@@ -13,8 +14,26 @@ import { clearAllOffsets, getOffsetInfo } from "@core/storage";
 import { parseSvgString, syncTypeColors } from "@modules/ui/lyricsDock/icons";
 import Sortable from "sortablejs";
 import { showModal } from "./editor/ui/feedback";
+import {
+  applyThemeSettingsToCSS,
+  broadcastRICSToTabs,
+  getFieldValueOnAvailable,
+  loadCustomCSS,
+  loadThemeSettings,
+} from "./editor/features/storage";
 import { initStoreUI, setupYourThemesButton } from "./store/store";
 import { errorCore, warnCore } from "@core/logger";
+import {
+  themeSettingsApplyBtn,
+  themeSettingsBtn,
+  themeSettingsCancelBtn,
+  themeSettingsModalClose,
+  themeSettingsModalOverlay,
+  themeSettingsOkBtn,
+} from "./editor/ui/dom";
+import { handleSlider, registerSlider } from "./editor/ui/slider";
+import type { ThemeSettingField } from "./themes";
+import { getStorageStrategy, saveCustomCss } from "@/core/customCss";
 
 interface Options {
   isLogsEnabled: boolean;
@@ -40,6 +59,7 @@ interface Options {
   isControlsDockEnabled: boolean;
   controlsDockPosition: string;
   isControlsDockAutoHideInFullscreenEnabled: boolean;
+  themeSettingsLivePreview: boolean;
   isDockSourceEnabled: boolean;
   isDockTranslateEnabled: boolean;
   isDockRomanizeEnabled: boolean;
@@ -105,6 +125,7 @@ const getOptionsFromForm = (): Options => {
     isControlsDockAutoHideInFullscreenEnabled: (
       document.getElementById("isUnisonAutoHideInFullscreenEnabled") as HTMLInputElement
     ).checked,
+    themeSettingsLivePreview: (document.getElementById("themeSettingsLivePreview") as HTMLInputElement).checked,
     isDockSourceEnabled: (document.getElementById("isDockSourceEnabled") as HTMLInputElement).checked,
     isDockTranslateEnabled: (document.getElementById("isDockTranslateEnabled") as HTMLInputElement).checked,
     isDockRomanizeEnabled: (document.getElementById("isDockRomanizeEnabled") as HTMLInputElement).checked,
@@ -306,6 +327,7 @@ const restoreOptions = (): void => {
     isControlsDockEnabled: true,
     controlsDockPosition: DOCK_DEFAULT_POSITION,
     isControlsDockAutoHideInFullscreenEnabled: true,
+    themeSettingsLivePreview: false,
     isDockSourceEnabled: true,
     isDockTranslateEnabled: true,
     isDockRomanizeEnabled: true,
@@ -370,6 +392,7 @@ const setOptionsInForm = (items: Options): void => {
   (document.getElementById("isUnisonPinnedDockEnabled") as HTMLInputElement).checked = items.isControlsDockEnabled;
   (document.getElementById("isUnisonAutoHideInFullscreenEnabled") as HTMLInputElement).checked =
     items.isControlsDockAutoHideInFullscreenEnabled;
+  (document.getElementById("themeSettingsLivePreview") as HTMLInputElement).checked = items.themeSettingsLivePreview;
   setUnisonPositionInForm(items.controlsDockPosition);
   (document.getElementById("isDockSourceEnabled") as HTMLInputElement).checked = items.isDockSourceEnabled;
   (document.getElementById("isDockTranslateEnabled") as HTMLInputElement).checked = items.isDockTranslateEnabled;
@@ -725,6 +748,8 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
 
+  initThemeSettings();
+
   document.getElementById("open-unison-btn")?.addEventListener("click", () => {
     chrome.tabs.create({
       url: chrome.runtime.getURL("pages/unison.html"),
@@ -734,6 +759,301 @@ document.addEventListener("DOMContentLoaded", () => {
   initIdentityUI();
   initNicknameModal();
 });
+
+const fieldElements: Record<string, HTMLElement> = {};
+const changedFields: Record<string, any> = {};
+
+async function setChangedFields(field: string, value: any) {
+  changedFields[field] = value;
+
+  const themeSettings = await loadThemeSettings();
+  for (const field in fieldElements) {
+    const element = fieldElements[field];
+    const fieldVal = getFieldValueOnAvailable(field, themeSettings.fields, {
+      ...themeSettings.saved,
+      ...changedFields,
+    });
+    element.style.display = fieldVal === null || fieldVal === undefined ? "none" : "";
+  }
+
+  if ((document.getElementById("themeSettingsLivePreview") as HTMLInputElement).checked) {
+    const css = await loadCustomCSS(true);
+    const cssModified = applyThemeSettingsToCSS(css, themeSettings.fields, {
+      ...themeSettings.saved,
+      ...changedFields,
+    });
+    await broadcastRICSToTabs(cssModified, getStorageStrategy(cssModified));
+  }
+}
+
+function closeThemeSettings() {
+  if (themeSettingsModalOverlay) {
+    const modal = themeSettingsModalOverlay.querySelector(".modal");
+    if (modal) modal.classList.add("closing");
+    themeSettingsModalOverlay.classList.remove("active");
+
+    setTimeout(() => {
+      if (modal) modal.classList.remove("closing");
+    }, 200);
+  }
+}
+
+function initThemeSettings() {
+  fillThemeSettings();
+  themeSettingsBtn?.addEventListener("click", () => {
+    if (themeSettingsModalOverlay) {
+      requestAnimationFrame(() => themeSettingsModalOverlay!.classList.add("active"));
+    }
+  });
+
+  themeSettingsModalClose?.addEventListener("click", () => closeThemeSettings());
+
+  themeSettingsApplyBtn?.addEventListener("click", async () =>
+    await saveCustomCss(undefined, { ...(await loadThemeSettings()), saved: changedFields })
+  );
+
+  themeSettingsOkBtn?.addEventListener("click", async () => {
+    await saveCustomCss(undefined, { ...(await loadThemeSettings()), saved: changedFields });
+    closeThemeSettings();
+  });
+
+  themeSettingsCancelBtn?.addEventListener("click", () => {
+    closeThemeSettings();
+    fillThemeSettings();
+  });
+}
+
+export async function fillThemeSettings() {
+  const themeSettingsFields = document.getElementById("theme-settings-fields");
+  if (!themeSettingsFields) return;
+  themeSettingsFields.replaceChildren();
+
+  const themeSettings = await loadThemeSettings();
+  if (themeSettingsBtn)
+    themeSettingsBtn.style.display = Object.keys({ ...themeSettings.fields }).length > 0 ? "" : "none";
+
+  if (typeof themeSettings.fields !== "object") return;
+
+  const mapped: ThemeSettingField[] = [];
+
+  for (const field in themeSettings.fields) {
+    const setting = themeSettings.fields[field];
+    mapped.push({ id: field, ...setting });
+  }
+
+  mapped.sort((a, b) => a.pos! - b.pos!);
+
+  for (const field of mapped) {
+    if (
+      !field.id ||
+      !field.type ||
+      (field.type !== "heading" && typeof field.default !== THEME_SETTINGS_TYPES[field.type])
+    )
+      continue;
+
+    let savedVal = field.type === "heading" ? field.label : { ...themeSettings.saved }[field.id] || field.default;
+
+    if (field.type === "heading") {
+      const heading = document.createElement("h1");
+      heading.className = "theme-settings-heading";
+      heading.innerText = savedVal;
+
+      fieldElements[field.id] = heading;
+      themeSettingsFields.appendChild(heading);
+    } else if (field.type === "toggle") {
+      const checkboxContainer = document.createElement("div");
+      checkboxContainer.classList.add("theme-settings-container");
+      checkboxContainer.classList.add("container");
+
+      const span = document.createElement("span");
+      span.innerText = field.label;
+      checkboxContainer.appendChild(span);
+
+      const label = document.createElement("label");
+
+      const input = document.createElement("input");
+      input.type = "checkbox";
+      input.id = field.id;
+      input.checked = savedVal;
+      label.appendChild(input);
+
+      input.addEventListener("change", () => setChangedFields(field.id!, input.checked));
+
+      const checkmark = document.createElement("span");
+      checkmark.className = "checkmark";
+      label.appendChild(checkmark);
+
+      checkboxContainer.appendChild(label);
+
+      fieldElements[field.id] = checkboxContainer;
+      themeSettingsFields.appendChild(checkboxContainer);
+    } else if (field.type === "dropdown") {
+      if (!field.options || field.options.length < 1 || !field.options.every(opt => opt.value)) continue;
+
+      const dropdownContainer = document.createElement("div");
+      dropdownContainer.classList.add("theme-settings-container");
+      dropdownContainer.classList.add("container");
+
+      const span = document.createElement("span");
+      span.innerText = field.label;
+      dropdownContainer.appendChild(span);
+
+      const selectEl = document.createElement("div");
+      selectEl.className = "select";
+
+      const select = document.createElement("select");
+      select.id = field.id;
+
+      field.options.forEach(opt => {
+        const option = document.createElement("option");
+        option.value = opt.value;
+        option.innerText = opt.label || opt.value;
+        select.appendChild(option);
+      });
+
+      select.value = field.options[savedVal].value;
+      selectEl.appendChild(select);
+
+      select.addEventListener("change", () =>
+        setChangedFields(
+          field.id!,
+          field.options.findIndex(val => val.value === select.value)
+        )
+      );
+
+      dropdownContainer.appendChild(selectEl);
+
+      fieldElements[field.id] = dropdownContainer;
+      themeSettingsFields.appendChild(dropdownContainer);
+    } else if (field.type === "color") {
+      const colorContainer = document.createElement("div");
+      colorContainer.classList.add("theme-settings-container");
+      colorContainer.classList.add("container");
+
+      const span = document.createElement("span");
+      span.innerText = field.label;
+      colorContainer.appendChild(span);
+
+      const input = document.createElement("input");
+      input.type = "color";
+      input.id = field.id;
+      input.value = savedVal;
+
+      input.addEventListener("change", () => setChangedFields(field.id!, input.value));
+
+      colorContainer.appendChild(input);
+
+      fieldElements[field.id] = colorContainer;
+      themeSettingsFields.appendChild(colorContainer);
+    } else if (field.type === "textfield") {
+      const textContainer = document.createElement("div");
+      textContainer.classList.add("theme-settings-container");
+      textContainer.classList.add("container");
+
+      const span = document.createElement("span");
+      span.innerText = field.label;
+      textContainer.appendChild(span);
+
+      const input = document.createElement("input");
+      input.type = "text";
+      input.id = field.id;
+      input.value = savedVal;
+
+      input.addEventListener("change", () => setChangedFields(field.id!, input.value));
+
+      textContainer.appendChild(input);
+
+      fieldElements[field.id] = textContainer;
+      themeSettingsFields.appendChild(textContainer);
+    } else if (field.type === "range") {
+      if (typeof field.min !== "number" || typeof field.max !== "number" || typeof field.step !== "number") continue;
+      savedVal = Math.max(field.min, Math.min(field.max, savedVal));
+
+      const rangeContainer = document.createElement("div");
+      rangeContainer.classList.add("theme-settings-container");
+      rangeContainer.classList.add("container");
+      rangeContainer.style.display = "flex";
+      rangeContainer.style.flexDirection = "column";
+      rangeContainer.style.gap = ".5rem";
+
+      const div = document.createElement("div");
+      div.className = "theme-range-container";
+
+      const span = document.createElement("span");
+      span.innerText = field.label;
+      div.appendChild(span);
+
+      const input = document.createElement("input");
+      input.type = "number";
+      input.id = field.id;
+
+      if (!field.outrange) {
+        input.min = `${field.min}`;
+        input.max = `${field.max}`;
+      }
+
+      input.step = `${field.step}`;
+      input.value = savedVal;
+
+      input.addEventListener("change", () => setChangedFields(field.id!, Number(input.value)));
+
+      div.appendChild(input);
+      rangeContainer.appendChild(div);
+
+      const sliderElement = document.createElement("div");
+      sliderElement.className = "theme-slider-container";
+
+      const min = document.createElement("span");
+      min.innerText = `${field.min}`;
+      min.className = "slider--min";
+      sliderElement.appendChild(min);
+
+      const slider = document.createElement("div");
+      slider.id = `theme-settings-slider-${field}`;
+      slider.className = "slider slider--nonimmediate";
+      slider.setAttribute("min", `${field.min}`);
+      slider.setAttribute("max", `${field.max}`);
+      slider.setAttribute("step", `${field.step}`);
+      slider.setAttribute("value", `${savedVal}`);
+
+      const sliderBar = document.createElement("div");
+      sliderBar.className = "slider--bar";
+      slider.appendChild(sliderBar);
+
+      const sliderHead = document.createElement("div");
+      sliderHead.className = "slider--head";
+      slider.appendChild(sliderHead);
+
+      sliderElement.appendChild(slider);
+
+      registerSlider(
+        slider.id,
+        val => {
+          input.value = `${val.toFixed(3)}`;
+        },
+        "display"
+      );
+      registerSlider(
+        slider.id,
+        () => {
+          input.dispatchEvent(new Event("change"));
+        },
+        "core"
+      );
+      handleSlider(slider);
+
+      const max = document.createElement("span");
+      max.className = "slider--max";
+      max.innerText = `${field.max}`;
+      sliderElement.appendChild(max);
+
+      rangeContainer.appendChild(sliderElement);
+
+      fieldElements[field.id] = rangeContainer;
+      themeSettingsFields.appendChild(rangeContainer);
+    }
+  }
+}
 
 async function initIdentityUI(): Promise<void> {
   const displayNameEl = document.getElementById("identity-display-name");
