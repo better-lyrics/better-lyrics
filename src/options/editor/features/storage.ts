@@ -366,7 +366,7 @@ interface ApplyStoreThemeOptions {
   css: string;
   title: string;
   creators: string[];
-  settings?: { fields?: Record<string, ThemeSettingField>; saved?: Record<string, any> };
+  settings?: ThemeSavedSettingFields;
   source?: "marketplace" | "url";
 }
 
@@ -382,7 +382,7 @@ export async function applyStoreThemeComplete(options: ApplyStoreThemeOptions): 
     await chrome.storage.sync.set({ themeName: `store:${themeId}` });
     await setActiveStoreTheme(themeId);
 
-    const saveResult = await saveCustomCss(themeContent);
+    const saveResult = await saveCustomCss(themeContent, settings);
     if (!saveResult.success) {
       throw new Error("Failed to save theme to storage");
     }
