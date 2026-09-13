@@ -92,6 +92,7 @@ export function createProgressBar(options: ProgressBarOptions): ProgressBarHandl
   };
 
   const onPointerDown = (event: PointerEvent): void => {
+    if (event.button !== 0) return;
     const durationS = getSnapshot()?.durationS ?? 0;
     dragging = true;
     bar.classList.add("dragging");
