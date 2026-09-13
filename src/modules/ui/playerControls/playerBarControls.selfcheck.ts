@@ -89,11 +89,7 @@ const withDislike = fakeDoc({ "ytmusic-player-bar #button-shape-dislike button":
 toggleDislike(withDislike);
 assert.equal(dislikeBtn.clicks, 1, "toggleDislike clicks the inner dislike button");
 
-assert.equal(
-  isAdPlaying(fakeDoc({ "ytmusic-player-bar[is-advertisement]": el({}) })),
-  true,
-  "detects ad state"
-);
+assert.equal(isAdPlaying(fakeDoc({ "ytmusic-player-bar[is-advertisement]": el({}) })), true, "detects ad state");
 assert.equal(isAdPlaying(fakeDoc({})), false, "no ad state when the attribute is absent");
 
 console.log("playerBarControls selfcheck passed");

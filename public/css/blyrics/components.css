@@ -1363,3 +1363,91 @@ ytmusic-player-page:not([is-mweb-modernization-enabled]) #side-panel.blyrics-has
   background: rgb(255 255 255 / 10%);
   color: #fff;
 }
+
+/* -- Fullscreen player controls -------------------------------------------- */
+.blyrics-fs-info-row {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.blyrics-fs-info-row #blyrics-song-info {
+  min-width: 0;
+  flex: 1;
+}
+
+.blyrics-fs-info-actions {
+  flex: 0 0 auto;
+}
+
+.blyrics-fs-controls {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  max-width: 40rem;
+  margin-top: 1rem;
+}
+
+.blyrics-fs-controls[data-ad] {
+  display: none;
+}
+
+.blyrics-fs-disc {
+  display: grid;
+  width: 2.75rem;
+  height: 2.75rem;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  place-items: center;
+  background: transparent;
+  color: #fff;
+  cursor: pointer;
+  transition: background 140ms ease, transform 140ms ease;
+}
+
+.blyrics-fs-disc:hover {
+  background: rgb(255 255 255 / 24%);
+  transform: scale(1.06);
+}
+
+.blyrics-fs-disc svg {
+  width: 1.5rem;
+  height: 1.5rem;
+}
+
+.blyrics-fs-transport-slot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.blyrics-fs-transport-mid {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.blyrics-fs-play {
+  width: 3.5rem;
+  height: 3.5rem;
+  background: #fff;
+  color: #111;
+}
+
+.blyrics-fs-play:hover {
+  background: #fff;
+}
+
+.blyrics-fs-disc[data-active] {
+  color: #fff;
+}
+
+.blyrics-fs-controls[data-signed-out] .blyrics-fs-like,
+.blyrics-fs-controls[data-signed-out] .blyrics-fs-dislike {
+  display: none;
+}
+
+.blyrics-fs-disc.blyrics-fs-more--hidden {
+  display: none;
+}

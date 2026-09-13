@@ -38,6 +38,12 @@ import type { ThumbnailElement } from "@modules/lyrics/requestSniffer/NextRespon
 import { getArtworkMetadata } from "@modules/lyrics/requestSniffer/requestSniffer";
 import { lyricsElementAdded, mainView } from "@modules/ui/mainLyricsView";
 import { publishPictureInPictureLyrics } from "@modules/ui/pictureInPicture/lyricsPublisher";
+import {
+  createFullscreenControls,
+  type FullscreenControlsHandle,
+  wrapSongInfoWithActions,
+} from "@modules/ui/playerControls/fullscreenControls";
+import type { PlaybackSnapshot } from "@modules/ui/playerControls/playhead";
 import { getResumeScrollElement } from "@modules/ui/resumeScrollButton";
 import { getRequest, setRequest } from "@modules/unison/lyricsRequestTracker";
 import { sealMarks } from "@modules/unison/gamification";
@@ -1623,14 +1629,30 @@ export function cleanup(): void {
  * @param title - Song title
  * @param artist - Artist name
  */
+let fullscreenControls: FullscreenControlsHandle | null = null;
+
+function setFullscreenControls(handle: FullscreenControlsHandle | null): void {
+  if (fullscreenControls && fullscreenControls !== handle) fullscreenControls.destroy();
+  fullscreenControls = handle;
+}
+
+export function updateFullscreenControlsSnapshot(snapshot: PlaybackSnapshot | null): void {
+  fullscreenControls?.setSnapshot(snapshot);
+}
+
 export function injectSongAttributes(title: string, artist: string, album?: string): void {
   const mainPanel = document.getElementById("main-panel")!;
   console.assert(mainPanel != null);
+  const existingRow = document.getElementById("blyrics-fs-info-row");
   const existingSongInfo = document.getElementById("blyrics-song-info");
   const existingWatermark = document.getElementById("blyrics-watermark");
+  const existingControls = document.getElementById("blyrics-fs-controls");
 
+  existingRow?.remove();
   existingSongInfo?.remove();
   existingWatermark?.remove();
+  existingControls?.remove();
+  setFullscreenControls(null);
 
   const titleElm = document.createElement("p");
   titleElm.id = "blyrics-title";
@@ -1650,7 +1672,15 @@ export function injectSongAttributes(title: string, artist: string, album?: stri
   songInfoWrapper.id = "blyrics-song-info";
   songInfoWrapper.appendChild(titleElm);
   songInfoWrapper.appendChild(artistElm);
-  mainPanel.appendChild(songInfoWrapper);
+
+  const { row, moreButton } = wrapSongInfoWithActions(document, songInfoWrapper);
+  row.id = "blyrics-fs-info-row";
+  mainPanel.appendChild(row);
+
+  const controls = createFullscreenControls(document, moreButton);
+  controls.element.id = "blyrics-fs-controls";
+  mainPanel.appendChild(controls.element);
+  setFullscreenControls(controls);
 }
 
 /**

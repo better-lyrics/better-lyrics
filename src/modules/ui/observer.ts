@@ -32,6 +32,7 @@ import {
   renderLoader,
   resetThumbnailState,
   showYtThumbnail,
+  updateFullscreenControlsSnapshot,
 } from "./dom";
 
 let wakeLock: WakeLockSentinel | null = null;
@@ -327,6 +328,14 @@ export function initializeLyrics(): void {
     latestPlayerSnapshotTime = detail.browserTime;
     latestPlayerDuration = Number(detail.duration);
     latestPlaybackRate = detail.playbackRate ?? 1;
+
+    updateFullscreenControlsSnapshot({
+      currentTimeS: detail.currentTime,
+      durationS: Number(detail.duration),
+      playbackRate: detail.playbackRate ?? 1,
+      isPlaying: detail.playing,
+      wallTime: detail.browserTime,
+    });
 
     const currentVideoId = detail.videoId;
     const currentVideoDetails = detail.song + " " + detail.artist;
