@@ -48,6 +48,8 @@ export const REPORT_MODAL = "blyrics-report-lyrics" as const;
 // Custom Events
 // Duplicated as a literal in public/script.js; that file is a page-world script and cannot import.
 export const SEEK_EVENT = "blyrics-seek-to" as const;
+export const PLAYER_CONTROL_EVENT = "blyrics-player-control" as const;
+export const PLAYER_TIME_EVENT = "blyrics-send-player-time" as const;
 
 // Assets and Resources
 export const DISCORD_LOGO_SRC =

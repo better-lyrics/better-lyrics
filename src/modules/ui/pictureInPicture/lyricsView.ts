@@ -1,4 +1,4 @@
-import { PLAYER_BAR_SELECTOR } from "@constants";
+import { PLAYER_BAR_SELECTOR, PLAYER_CONTROL_EVENT, PLAYER_TIME_EVENT } from "@constants";
 import type { PlayerDetails } from "@core/appState";
 import { createHeaderLine, fillHeaderLayer, getHeaderLayers, PictureInPictureHeaderMarquee } from "./headerMarquee";
 import type { PictureInPicturePlaybackSnapshot, PictureInPictureViewDependencies } from "./types";
@@ -22,8 +22,6 @@ interface HeaderRow {
 type PlayerControlAction = "previous" | "play-pause" | "next";
 type PlayerControlIcon = Exclude<PlayerControlAction, "play-pause"> | "play" | "pause";
 
-const PLAYER_TIME_EVENT = "blyrics-send-player-time";
-const PLAYER_CONTROL_EVENT = "blyrics-player-control";
 const ARTWORK_SIZE = 512;
 const VISIBLE_METADATA_CHECK_INTERVAL = 250;
 const PLAYER_CONTROLS_IDLE_DELAY = 2000;
