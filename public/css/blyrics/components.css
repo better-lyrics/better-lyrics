@@ -1378,6 +1378,9 @@ html:not([blyrics-no-fs-controls]) ytmusic-player-page[player-fullscreened]:not(
   gap: 2rem;
   width: 100%;
   margin-top: 2rem;
+  /* #main-panel centres [art, column] and the base layout pulls the song block up by one
+     nav-bar height; carry that here so the art-to-title gap is the 2rem margin, not 2rem + 64px. */
+  transform: translateY(calc(var(--ytmusic-nav-bar-height) * -1));
   text-align: left;
 }
 
