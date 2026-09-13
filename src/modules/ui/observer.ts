@@ -10,7 +10,7 @@ import {
 } from "@constants";
 import { AppState, handleModifications, type PlayerDetails, reloadLyrics } from "@core/appState";
 import { preFetchLyrics } from "@modules/lyrics/lyrics";
-import { getArtworkMetadata, getSongMetadata } from "@modules/lyrics/requestSniffer/requestSniffer";
+import { getArtworkMetadata, getSongAlbum, getSongMetadata } from "@modules/lyrics/requestSniffer/requestSniffer";
 import { onAutoSwitchEnabled, onFullScreenDisabled, wakeDockIdle } from "@modules/settings/settings";
 import { adjustLyricOffset, OFFSET_STEP, OFFSET_STEP_LARGE } from "@modules/ui/lyricsDock/offset";
 import { currentTickOptions, mainView } from "@modules/ui/mainLyricsView";
@@ -400,6 +400,11 @@ export function initializeLyrics(): void {
     if (AppState.queueSongDetailsInjection && detail.song && detail.artist && document.getElementById("main-panel")) {
       AppState.queueSongDetailsInjection = false;
       injectSongAttributes(detail.song, detail.artist);
+      void getSongAlbum(detail.videoId).then(album => {
+        if (album && document.getElementById("blyrics-title")?.textContent === detail.song) {
+          injectSongAttributes(detail.song, detail.artist, album);
+        }
+      });
     }
 
     if (AppState.lyricInjectionFailed && !AppState.isPictureInPictureOpen) {

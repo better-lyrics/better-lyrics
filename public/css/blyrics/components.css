@@ -1214,20 +1214,31 @@ ytmusic-player-page:not([is-mweb-modernization-enabled]) #side-panel.blyrics-has
 	display: none;
 	z-index: 2;
 	max-width: 40rem;
+	text-align: left;
 	font-family: var(--blyrics-font-family);
 }
 
 #blyrics-song-info > p#blyrics-title {
+	overflow: hidden;
+	margin: 0;
 	font-size: 2rem;
 	font-weight: 700;
-	margin: 0;
+	text-overflow: ellipsis;
+	white-space: nowrap;
 }
 
 #blyrics-song-info > p#blyrics-artist {
-	font-size: 1.5rem;
+	overflow: hidden;
 	margin: 0;
-	opacity: 0.5;
 	margin-top: 0.25rem;
+	font-size: 1.5rem;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+	opacity: 0.5;
+}
+
+#blyrics-song-info #blyrics-album {
+	opacity: 0.8;
 }
 
 @keyframes blyrics-spin {

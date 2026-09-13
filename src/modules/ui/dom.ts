@@ -1623,7 +1623,7 @@ export function cleanup(): void {
  * @param title - Song title
  * @param artist - Artist name
  */
-export function injectSongAttributes(title: string, artist: string): void {
+export function injectSongAttributes(title: string, artist: string, album?: string): void {
   const mainPanel = document.getElementById("main-panel")!;
   console.assert(mainPanel != null);
   const existingSongInfo = document.getElementById("blyrics-song-info");
@@ -1639,6 +1639,12 @@ export function injectSongAttributes(title: string, artist: string): void {
   const artistElm = document.createElement("p");
   artistElm.id = "blyrics-artist";
   artistElm.textContent = artist;
+  if (album) {
+    const albumElm = document.createElement("span");
+    albumElm.id = "blyrics-album";
+    albumElm.textContent = ` · ${album}`;
+    artistElm.appendChild(albumElm);
+  }
 
   const songInfoWrapper = document.createElement("div");
   songInfoWrapper.id = "blyrics-song-info";
