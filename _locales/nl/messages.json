@@ -36,7 +36,7 @@
     "description": "General settings section title"
   },
   "options_general_description": {
-    "message": " ",
+    "message": "Instellingen die het algemene gedrag van Better Lyrics beïnvloeden.",
     "description": "General settings section description"
   },
   "options_general_showLogs": {
@@ -1066,7 +1066,7 @@
     "description": "Footer button text linking to the Better Lyrics Shaders companion extension"
   },
   "lyrics_searching": {
-    "message": "Better Lycrics zoekt naar songteksten...",
+    "message": "Better Lyrics zoekt naar songteksten...",
     "description": "Loading message while searching for lyrics"
   },
   "lyrics_stillSearching": {

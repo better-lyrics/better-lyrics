@@ -612,7 +612,7 @@
     "description": "Better Lyrics Portato provider name"
   },
   "options_provider_betterLyricsUnison": {
-    "message": "Better Lyrics Унисон",
+    "message": "Better Lyrics Unison",
     "description": "Better Lyrics Unison provider name"
   },
   "options_provider_musixmatch": {
@@ -1324,11 +1324,11 @@
     "description": "Button label when the server reports a synced version already exists; clicking reloads the page"
   },
   "unison_pageTitle": {
-    "message": "Унисон - Better Lyrics",
+    "message": "Unison - Better Lyrics",
     "description": "Page title for the Unison dashboard"
   },
   "unison_title": {
-    "message": "Унисон",
+    "message": "Unison",
     "description": "Unison branding title"
   },
   "unison_subtitle": {
