@@ -3,6 +3,7 @@ import {
   DOCK_CLASS,
   DOCK_CONTROL_ORDER_DEFAULT,
   DOCK_DEFAULT_POSITION,
+  FULLSCREEN_CONTROLS_DISABLED_ATTR,
   LYRICS_DISABLED_ATTR,
 } from "@constants";
 import { AppState, reloadLyrics } from "@core/appState";
@@ -52,6 +53,11 @@ export function handleSettings(): void {
     }
   );
 
+  onFullscreenControlsEnabled(
+    () => document.documentElement.removeAttribute(FULLSCREEN_CONTROLS_DISABLED_ATTR),
+    () => document.documentElement.setAttribute(FULLSCREEN_CONTROLS_DISABLED_ATTR, "")
+  );
+
   onStylizedAnimationsEnabled(
     () => {
       document.getElementById(DISABLE_EFFECTS_STYLE_ID)?.remove();
@@ -98,6 +104,19 @@ export function onAlbumArtEnabled(enableAlbumArt: EnableDisableCallback, disable
       enableAlbumArt();
     } else {
       disableAlbumArt();
+    }
+  });
+}
+
+function onFullscreenControlsEnabled(
+  enableControls: EnableDisableCallback,
+  disableControls: EnableDisableCallback
+): void {
+  getStorage({ isFullscreenControlsEnabled: true }, items => {
+    if (items.isFullscreenControlsEnabled) {
+      enableControls();
+    } else {
+      disableControls();
     }
   });
 }

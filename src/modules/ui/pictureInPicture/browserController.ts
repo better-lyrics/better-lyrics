@@ -39,6 +39,7 @@ let disposePageWorldDelegate: (() => void) | null = null;
 let storedArtworkTransition: unknown = DEFAULT_ARTWORK_TRANSITION;
 let storedTextTransition: unknown = DEFAULT_TEXT_TRANSITION;
 let storedMarqueeEnabled: unknown = true;
+let storedProgressBarEnabled: unknown = true;
 let isPictureInPictureEnabled = true;
 
 const PIP_SETTING_DEFAULTS = {
@@ -47,6 +48,7 @@ const PIP_SETTING_DEFAULTS = {
   pipArtworkTransition: DEFAULT_ARTWORK_TRANSITION,
   pipTextTransition: DEFAULT_TEXT_TRANSITION,
   pipMarqueeEnabled: true,
+  pipProgressBarEnabled: true,
   isLogsEnabled: true,
 } as const;
 
@@ -105,6 +107,7 @@ const activeController: PictureInPictureToggle = delegatesToPageWorld
       artworkTransition: () => storedArtworkTransition,
       textTransition: () => storedTextTransition,
       marqueeEnabled: () => storedMarqueeEnabled,
+      progressBarEnabled: () => storedProgressBarEnabled,
       windowTitle: () => t("picture_in_picture_open"),
       stylesheetUrls: () => ({
         lyrics: chrome.runtime.getURL(LYRIC_STYLESHEET_PATH),
@@ -164,6 +167,7 @@ export function publishPictureInPictureResources(): void {
       artworkTransition: String(items.pipArtworkTransition),
       textTransition: String(items.pipTextTransition),
       marqueeEnabled: items.pipMarqueeEnabled !== false,
+      progressBarEnabled: items.pipProgressBarEnabled !== false,
       logsEnabled: items.isLogsEnabled !== false,
     });
   });
@@ -239,6 +243,7 @@ export function initializePictureInPictureAutoRestore(): void {
     storedArtworkTransition = items.pipArtworkTransition;
     storedTextTransition = items.pipTextTransition;
     storedMarqueeEnabled = items.pipMarqueeEnabled;
+    storedProgressBarEnabled = items.pipProgressBarEnabled;
   });
 
   storageChangeListener = (changes, areaName) => {
@@ -262,6 +267,10 @@ export function initializePictureInPictureAutoRestore(): void {
 
     if (changes.pipMarqueeEnabled) {
       storedMarqueeEnabled = changes.pipMarqueeEnabled.newValue ?? true;
+    }
+
+    if (changes.pipProgressBarEnabled) {
+      storedProgressBarEnabled = changes.pipProgressBarEnabled.newValue ?? true;
     }
 
     if (!changes.isPictureInPictureAutoRestoreEnabled || hasAttemptedAutoRestore) return;

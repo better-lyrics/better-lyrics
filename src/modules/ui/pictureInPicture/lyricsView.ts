@@ -1,4 +1,6 @@
 import { PLAYER_BAR_SELECTOR, PLAYER_TIME_EVENT, SEEK_EVENT } from "@constants";
+import { parseSvgString } from "@modules/ui/lyricsDock/icons";
+import { playerControlIcons } from "@modules/ui/playerControls/icons";
 import { sendTransport } from "@modules/ui/playerControls/playerBarControls";
 import { createProgressBar, type ProgressBarHandle } from "@modules/ui/playerControls/progressBar";
 import type { PlayerDetails } from "@core/appState";
@@ -63,13 +65,6 @@ const MARQUEE_REARM_DELAY = 700;
 // where the next cover is prefetched and decodes at once, never blinks. Past
 // this the metadata poll is genuinely slow and stale art is the worse lie.
 const ARTWORK_STALE_GRACE = 600;
-
-const PLAYER_CONTROL_ICON_PATHS: Record<PlayerControlIcon, string> = {
-  previous: "M6 6h2v12H6V6zm3.5 6 8.5 6V6l-8.5 6z",
-  play: "M8 5v14l11-7z",
-  pause: "M7 5h4v14H7V5zm6 0h4v14h-4V5z",
-  next: "M16 6h2v12h-2V6zM6 18l8.5-6L6 6v12z",
-};
 
 function getArtworkUrl(url: string): string {
   if (/w\d+-h\d+/.test(url)) return url.replace(/w\d+-h\d+/, `w${ARTWORK_SIZE}-h${ARTWORK_SIZE}`);
@@ -145,16 +140,14 @@ export function preloadArtwork(url: string): void {
   proxy.src = getArtworkUrl(url);
 }
 
-function createControlIcon(document: Document, icon: PlayerControlIcon): SVGSVGElement {
-  const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+function createControlIcon(document: Document, icon: PlayerControlIcon): SVGElement {
+  const parsed = parseSvgString(playerControlIcons[icon]);
+  const svg = parsed
+    ? document.importNode(parsed, true)
+    : document.createElementNS("http://www.w3.org/2000/svg", "svg");
   svg.classList.add("blyrics-pip-artwork__control-icon", `blyrics-pip-artwork__control-icon--${icon}`);
-  svg.setAttribute("viewBox", "0 0 24 24");
   svg.setAttribute("aria-hidden", "true");
   svg.setAttribute("focusable", "false");
-
-  const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
-  path.setAttribute("d", PLAYER_CONTROL_ICON_PATHS[icon]);
-  svg.appendChild(path);
   return svg;
 }
 
@@ -777,5 +770,9 @@ export class PictureInPictureLyricsView {
   // own, runs past five seconds, and sits beside the lyrics.
   setMarqueeEnabled(enabled: unknown): void {
     this.marquee.setEnabled(enabled !== false);
+  }
+
+  setProgressBarEnabled(enabled: unknown): void {
+    this.progressBar.element.hidden = enabled === false;
   }
 }
