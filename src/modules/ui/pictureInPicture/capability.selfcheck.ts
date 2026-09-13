@@ -91,7 +91,7 @@ const retryController = new PictureInPictureController(
 retryController.toggle();
 assert.deepEqual(
   retryApi.requests,
-  [{ width: 540, height: 200, disallowReturnToOpener: true }],
+  [{ width: 540, height: 280, disallowReturnToOpener: true }],
   "Given a controller click, When a PiP window is requested, Then requestWindow receives exact dimensions synchronously"
 );
 await settle();
