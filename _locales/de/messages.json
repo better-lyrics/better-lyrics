@@ -99,6 +99,10 @@
     "message": "Songtexte sehen mit einer leichten Wellenbewegung bei jedem gesungenen Wort lebendiger aus. Deaktiviere es, wenn das Scrollen der Songtexte abgehackt aussieht.",
     "description": "Tooltip explaining the letter wave animation and its performance impact"
   },
+  "options_display_letterWaveTooltipStates": {
+    "message": "Auto stays off unless a theme turns it on. On and Off override any theme.",
+    "description": "Appended to the letter wave tooltip, explaining the three switch states"
+  },
   "options_display_passiveScroll": {
     "message": "Automatisch nicht synchronisierte Songtexte scrollen",
     "description": "Auto-scroll unsynced lyrics setting label"
