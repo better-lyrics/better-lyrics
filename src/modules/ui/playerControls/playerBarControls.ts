@@ -48,17 +48,43 @@ export function openQuickActions(doc: Document, anchor?: HTMLElement): void {
   if (anchor) anchorActionMenu(doc, anchor);
 }
 
+const ACTION_MENU_EDGE_GAP = 8;
+
+function pinDropdown(dropdown: HTMLElement, anchor: HTMLElement): void {
+  const win = dropdown.ownerDocument.defaultView ?? window;
+  const anchorRect = anchor.getBoundingClientRect();
+  const { width: menuWidth, height: menuHeight } = dropdown.getBoundingClientRect();
+  const gap = ACTION_MENU_EDGE_GAP;
+
+  let top = anchorRect.bottom + gap;
+  if (top + menuHeight > win.innerHeight - gap) {
+    const above = anchorRect.top - gap - menuHeight;
+    top = above >= gap ? above : Math.max(gap, win.innerHeight - menuHeight - gap);
+  }
+
+  let left = anchorRect.left;
+  if (left + menuWidth > win.innerWidth - gap) left = win.innerWidth - menuWidth - gap;
+  if (left < gap) left = gap;
+
+  dropdown.style.position = "fixed";
+  dropdown.style.inset = "auto";
+  dropdown.style.top = `${Math.round(top)}px`;
+  dropdown.style.left = `${Math.round(left)}px`;
+}
+
 function anchorActionMenu(doc: Document, anchor: HTMLElement): void {
   const win = doc.defaultView ?? window;
-  win.requestAnimationFrame(() => {
+  let attempts = 0;
+  const tryAnchor = (): void => {
     const dropdown = doc
       .querySelector<HTMLElement>("ytmusic-menu-popup-renderer")
       ?.closest<HTMLElement>("tp-yt-iron-dropdown");
-    if (!dropdown) return;
-    const rect = anchor.getBoundingClientRect();
-    dropdown.style.position = "fixed";
-    dropdown.style.inset = "auto";
-    dropdown.style.top = `${Math.round(rect.bottom + 8)}px`;
-    dropdown.style.left = `${Math.round(rect.left)}px`;
-  });
+    if (!dropdown) {
+      if (attempts++ < 20) win.requestAnimationFrame(tryAnchor);
+      return;
+    }
+    dropdown.addEventListener("iron-overlay-opened", () => pinDropdown(dropdown, anchor), { once: true });
+    win.setTimeout(() => pinDropdown(dropdown, anchor), 300);
+  };
+  win.requestAnimationFrame(tryAnchor);
 }
