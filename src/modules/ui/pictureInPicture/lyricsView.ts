@@ -1,4 +1,5 @@
-import { PLAYER_BAR_SELECTOR, PLAYER_CONTROL_EVENT, PLAYER_TIME_EVENT, SEEK_EVENT } from "@constants";
+import { PLAYER_BAR_SELECTOR, PLAYER_TIME_EVENT, SEEK_EVENT } from "@constants";
+import { sendTransport } from "@modules/ui/playerControls/playerBarControls";
 import { createProgressBar, type ProgressBarHandle } from "@modules/ui/playerControls/progressBar";
 import type { PlayerDetails } from "@core/appState";
 import { createHeaderLine, fillHeaderLayer, getHeaderLayers, PictureInPictureHeaderMarquee } from "./headerMarquee";
@@ -63,12 +64,6 @@ const MARQUEE_REARM_DELAY = 700;
 // this the metadata poll is genuinely slow and stale art is the worse lie.
 const ARTWORK_STALE_GRACE = 600;
 
-const PLAYER_CONTROL_IDS: Record<PlayerControlAction, string> = {
-  previous: "previous-button",
-  "play-pause": "play-pause-button",
-  next: "next-button",
-};
-
 const PLAYER_CONTROL_ICON_PATHS: Record<PlayerControlIcon, string> = {
   previous: "M6 6h2v12H6V6zm3.5 6 8.5 6V6l-8.5 6z",
   play: "M8 5v14l11-7z",
@@ -105,17 +100,6 @@ function getVisiblePlayerMetadata(sourceDocument: Document): DisplayMetadata {
     byline: bylineText,
     videoId,
   };
-}
-
-function getSourcePlayerControl(sourceDocument: Document, action: PlayerControlAction): HTMLElement | null {
-  return sourceDocument.querySelector<HTMLElement>(`${PLAYER_BAR_SELECTOR} #${PLAYER_CONTROL_IDS[action]}`);
-}
-
-function getSourceControlLabel(sourceDocument: Document, action: PlayerControlAction, fallback: string): string {
-  const control = getSourcePlayerControl(sourceDocument, action);
-  return (
-    control?.getAttribute("aria-label") ?? control?.querySelector<HTMLElement>("[aria-label]")?.ariaLabel ?? fallback
-  );
 }
 
 // Faces are siblings rather than nested layers because the slot clips its
@@ -255,16 +239,13 @@ export class PictureInPictureLyricsView {
     artworkControls.className = "blyrics-pip-artwork__controls";
     const previousButton = this.createPlayerControlButton(
       "previous",
-      getSourceControlLabel(sourceDocument, "previous", dependencies.translate("picture_in_picture_previous"))
+      dependencies.translate("picture_in_picture_previous")
     );
     this.playPauseButton = this.createPlayerControlButton(
       "play-pause",
-      getSourceControlLabel(sourceDocument, "play-pause", dependencies.translate("picture_in_picture_play"))
+      dependencies.translate("picture_in_picture_play")
     );
-    const nextButton = this.createPlayerControlButton(
-      "next",
-      getSourceControlLabel(sourceDocument, "next", dependencies.translate("picture_in_picture_next"))
-    );
+    const nextButton = this.createPlayerControlButton("next", dependencies.translate("picture_in_picture_next"));
     artworkControls.append(previousButton, this.playPauseButton, nextButton);
     this.artworkContainer.append(artworkCard, this.artworkVideo, artworkControls);
 
@@ -460,12 +441,7 @@ export class PictureInPictureLyricsView {
   }
 
   private activatePlayerControl(action: PlayerControlAction): void {
-    const sourceControl = getSourcePlayerControl(this.sourceDocument, action);
-    if (sourceControl) {
-      sourceControl.click();
-      return;
-    }
-    this.sourceDocument.dispatchEvent(new CustomEvent(PLAYER_CONTROL_EVENT, { detail: action }));
+    sendTransport(this.sourceDocument, action);
   }
 
   private updatePlayPauseButton(isPlaying: boolean): void {
@@ -474,11 +450,7 @@ export class PictureInPictureLyricsView {
     this.playPauseButton.toggleAttribute("data-playing", isPlaying);
     this.playPauseButton.setAttribute(
       "aria-label",
-      getSourceControlLabel(
-        this.sourceDocument,
-        "play-pause",
-        this.dependencies.translate(isPlaying ? "picture_in_picture_pause" : "picture_in_picture_play")
-      )
+      this.dependencies.translate(isPlaying ? "picture_in_picture_pause" : "picture_in_picture_play")
     );
   }
 
