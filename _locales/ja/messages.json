@@ -428,7 +428,7 @@
     "description": "Confirm button label inside the import identity modal"
   },
   "options_nickname_description": {
-    "message": "より良い歌詞で自分の名前を選んでください。文字、数字、アンダーバー、3〜20文字。",
+    "message": "Better Lyricsで自分の名前を選んでください。文字、数字、アンダーバー、3〜20文字。",
     "description": "Nickname subsection description"
   },
   "options_nickname_placeholder": {
@@ -604,7 +604,7 @@
     "description": "Better Lyrics Legato provider name"
   },
   "options_provider_betterLyricsPortato": {
-    "message": "Better Lyrics Legato",
+    "message": "Better Lyrics Portato",
     "description": "Better Lyrics Portato provider name"
   },
   "options_provider_betterLyricsUnison": {

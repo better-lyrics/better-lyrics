@@ -1,0 +1,38 @@
+name: i18n Brand Check
+
+on:
+  pull_request_target:
+    paths:
+      - "_locales/**"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  brand-check:
+    runs-on: ubuntu-latest
+    steps:
+      # pull_request_target runs the base branch's workflow and ignores [skip ci],
+      # so it fires even on Crowdin sync PRs. Check out the trusted base (the check
+      # script and the English source), then overlay only the PR's translation files
+      # as data. No PR code is executed.
+      - name: Checkout base
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: Overlay translations from the PR
+        if: github.event_name == 'pull_request_target'
+        run: |
+          git fetch --no-tags --depth=1 origin "refs/pull/${{ github.event.pull_request.number }}/head"
+          rm -rf _locales
+          git checkout FETCH_HEAD -- _locales
+
+      - name: Use Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22.x"
+
+      - name: Check product and brand names in translations
+        run: node --experimental-strip-types tooling/check-i18n-brand.ts
