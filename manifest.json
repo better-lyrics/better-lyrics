@@ -22,7 +22,7 @@
   ],
   "externally_connectable": {
     "matches": [
-      "https://unison.boidu.dev/*",
+      "https://unison.betterlyrics.org/*",
       "https://blrcunison.vercel.app/*"
     ]
   },
@@ -31,7 +31,7 @@
   ],
   "optional_host_permissions": [],
   "content_security_policy": {
-    "extension_pages": "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://api.fontshare.com https://fonts.googleapis.com; font-src 'self' data: https://cdn.fontshare.com https://fonts.gstatic.com; img-src 'self' data: https://blrcunison.vercel.app https://boidu.dev https://betterlyrics.org https://raw.githubusercontent.com https://placehold.co; connect-src https://unison.boidu.dev https://raw.githubusercontent.com https://api.github.com https://better-lyrics-themes-api.boidu.dev; frame-src https://better-lyrics-themes-api.boidu.dev;"
+    "extension_pages": "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://api.fontshare.com https://fonts.googleapis.com; font-src 'self' data: https://cdn.fontshare.com https://fonts.gstatic.com; img-src 'self' data: https://blrcunison.vercel.app https://boidu.dev https://betterlyrics.org https://raw.githubusercontent.com https://placehold.co; connect-src https://unison.betterlyrics.org https://raw.githubusercontent.com https://api.github.com https://themes.betterlyrics.org; frame-src https://themes.betterlyrics.org;"
   },
   "options_ui": {
     "page": "src/options/options.html",
@@ -58,7 +58,7 @@
     },
     {
       "matches": [
-        "https://unison.boidu.dev/*",
+        "https://unison.betterlyrics.org/*",
         "https://blrcunison.vercel.app/*"
       ],
       "resources": [

@@ -62,13 +62,13 @@ export const NOTO_SANS_UNIVERSAL_LINK =
 export const HOMEPAGE_URL = "https://betterlyrics.org" as const;
 export const HOMEPAGE_DOMAIN = "betterlyrics.org" as const;
 export const HOMEPAGE_ICON_URL = "https://betterlyrics.org/icon-512.png" as const;
-export const UNISON_API_URL = "https://unison.boidu.dev/lyrics" as const;
+export const UNISON_API_URL = "https://unison.betterlyrics.org/lyrics" as const;
 export const DISCORD_INVITE_URL = "https://discord.gg/UsHE3d5fWF" as const;
 export const SHADERS_CWS_URL =
   "https://chromewebstore.google.com/detail/better-lyrics-shaders/mffpncjphfmkppebdoaehdlnagnlpfai" as const;
 export const SHADERS_AMO_URL = "https://addons.mozilla.org/en-US/firefox/addon/better-lyrics-shaders/" as const;
-export const THEME_STORE_API_URL = "https://better-lyrics-themes-api.boidu.dev" as const;
-export const UNISON_API_BASE_URL = "https://unison.boidu.dev" as const;
+export const THEME_STORE_API_URL = "https://themes.betterlyrics.org" as const;
+export const UNISON_API_BASE_URL = "https://unison.betterlyrics.org" as const;
 export const UNISON_TRANSLATE_URL = `${UNISON_API_BASE_URL}/translate` as const;
 export const THEME_STORE_TURNSTILE_URL = `${THEME_STORE_API_URL}/turnstile` as const;
 const THEME_REGISTRY_BASE = "https://raw.githubusercontent.com/better-lyrics/themes" as const;
