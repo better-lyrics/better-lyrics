@@ -1630,6 +1630,7 @@ export function cleanup(): void {
  * @param artist - Artist name
  */
 let fullscreenControls: FullscreenControlsHandle | null = null;
+let fullscreenColumnWidthObserver: ResizeObserver | null = null;
 
 function setFullscreenControls(handle: FullscreenControlsHandle | null): void {
   if (fullscreenControls && fullscreenControls !== handle) fullscreenControls.destroy();
@@ -1638,6 +1639,18 @@ function setFullscreenControls(handle: FullscreenControlsHandle | null): void {
 
 export function updateFullscreenControlsSnapshot(snapshot: PlaybackSnapshot | null): void {
   fullscreenControls?.setSnapshot(snapshot);
+}
+
+function trackFullscreenColumnWidth(column: HTMLElement): void {
+  fullscreenColumnWidthObserver?.disconnect();
+  const player = document.querySelector<HTMLElement>("#player.ytmusic-player-page");
+  if (!player) return;
+  const apply = (): void => {
+    column.style.width = `${player.getBoundingClientRect().width}px`;
+  };
+  apply();
+  fullscreenColumnWidthObserver = new ResizeObserver(apply);
+  fullscreenColumnWidthObserver.observe(player);
 }
 
 export function injectSongAttributes(title: string, artist: string, album?: string): void {
@@ -1650,6 +1663,7 @@ export function injectSongAttributes(title: string, artist: string, album?: stri
   existingColumn?.remove();
   existingSongInfo?.remove();
   existingWatermark?.remove();
+  fullscreenColumnWidthObserver?.disconnect();
   setFullscreenControls(null);
 
   const titleElm = document.createElement("p");
@@ -1681,6 +1695,7 @@ export function injectSongAttributes(title: string, artist: string, album?: stri
   column.id = "blyrics-fs-column";
   column.append(row, controls.element);
   mainPanel.appendChild(column);
+  trackFullscreenColumnWidth(column);
   setFullscreenControls(controls);
 }
 

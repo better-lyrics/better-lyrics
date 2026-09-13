@@ -1372,12 +1372,12 @@ ytmusic-player-page:not([is-mweb-modernization-enabled]) #side-panel.blyrics-has
   display: none;
 }
 
-ytmusic-player-page[player-fullscreened]:not([blyrics-dfs]) #blyrics-fs-column {
+html:not([blyrics-no-fs-controls]) ytmusic-player-page[player-fullscreened]:not([blyrics-dfs]) #blyrics-fs-column {
   display: flex;
   flex-direction: column;
-  gap: 1.5rem;
+  gap: 2rem;
   width: 100%;
-  margin-top: 1.25rem;
+  margin-top: 2rem;
   text-align: left;
 }
 
@@ -1422,15 +1422,15 @@ ytmusic-player-page[player-fullscreened]:not([blyrics-dfs]) #blyrics-fs-column {
 }
 
 .blyrics-fs-more {
-  width: 2.25rem;
-  height: 2.25rem;
+  width: 2.75rem;
+  height: 2.75rem;
 }
 
 .blyrics-fs-disc {
   display: grid;
   flex: 0 0 auto;
-  width: 2.75rem;
-  height: 2.75rem;
+  width: 3.25rem;
+  height: 3.25rem;
   padding: 0;
   border: 0;
   border-radius: 50%;
@@ -1464,8 +1464,8 @@ ytmusic-player-page[player-fullscreened]:not([blyrics-dfs]) #blyrics-fs-column {
 }
 
 .blyrics-fs-play {
-  width: 3.5rem;
-  height: 3.5rem;
+  width: 4.25rem;
+  height: 4.25rem;
   background: #fff;
   color: #111;
 }
