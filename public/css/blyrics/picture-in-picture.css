@@ -92,8 +92,8 @@ body {
 
   position: relative;
   flex: 0 0 auto;
-  width: min(34vw, calc(100vh - clamp(24px, 7vw, 40px)));
-  min-width: 88px;
+  width: min(34vw, calc(100vh - clamp(24px, 7vw, 40px) - 3.5rem));
+  min-width: 72px;
   max-width: 240px;
   align-self: center;
   aspect-ratio: 1;
