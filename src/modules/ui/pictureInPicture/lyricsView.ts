@@ -1,4 +1,5 @@
-import { PLAYER_BAR_SELECTOR, PLAYER_CONTROL_EVENT, PLAYER_TIME_EVENT } from "@constants";
+import { PLAYER_BAR_SELECTOR, PLAYER_CONTROL_EVENT, PLAYER_TIME_EVENT, SEEK_EVENT } from "@constants";
+import { createProgressBar, type ProgressBarHandle } from "@modules/ui/playerControls/progressBar";
 import type { PlayerDetails } from "@core/appState";
 import { createHeaderLine, fillHeaderLayer, getHeaderLayers, PictureInPictureHeaderMarquee } from "./headerMarquee";
 import type { PictureInPicturePlaybackSnapshot, PictureInPictureViewDependencies } from "./types";
@@ -187,6 +188,7 @@ export class PictureInPictureLyricsView {
   private readonly reducedMotionQuery: MediaQueryList;
   private readonly lyricsViewport: HTMLElement;
   private readonly lyricsScroller: HTMLElement;
+  private readonly progressBar: ProgressBarHandle;
   private readonly lifecycleController = new AbortController();
   private artworkController: AbortController | null = null;
   private currentVideoId: string | null = null;
@@ -300,8 +302,22 @@ export class PictureInPictureLyricsView {
 
     this.showSearching();
 
+    this.progressBar = createProgressBar({
+      doc: pipDocument,
+      getSnapshot: () => this.lastPlaybackSnapshot,
+      onSeek: seconds => {
+        sourceDocument.dispatchEvent(new CustomEvent(SEEK_EVENT, { detail: seconds }));
+        dependencies.resetScrollResume();
+      },
+    });
+    this.progressBar.element.classList.add("blyrics-pip-progress");
+
+    const artColumn = pipDocument.createElement("div");
+    artColumn.className = "blyrics-pip-art-col";
+    artColumn.append(this.artworkContainer, this.progressBar.element);
+
     content.append(header, this.lyricsViewport);
-    this.shell.append(this.backdrop, this.artworkContainer, content);
+    this.shell.append(this.backdrop, artColumn, content);
     pipDocument.body.replaceChildren(this.shell);
 
     sourceDocument.addEventListener(PLAYER_TIME_EVENT, this.handlePlayerTime, {
@@ -416,6 +432,7 @@ export class PictureInPictureLyricsView {
     this.artworkController?.abort();
     this.clearArtworkStaleTimer();
     this.marquee.destroy();
+    this.progressBar.destroy();
     if (this.controlsIdleTimer !== null) this.pipWindow.clearTimeout(this.controlsIdleTimer);
     if (this.artworkBusyTimer !== null) this.pipWindow.clearTimeout(this.artworkBusyTimer);
     for (const row of this.headerRows) {

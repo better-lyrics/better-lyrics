@@ -1001,3 +1001,41 @@ body {
     padding-bottom: 4px;
   }
 }
+
+.blyrics-pip-art-col {
+  display: flex;
+  flex: 0 0 auto;
+  flex-direction: column;
+  gap: 18px;
+  align-self: center;
+}
+
+.blyrics-pip-progress {
+  width: 100%;
+  opacity: 0.45;
+  transition: opacity 220ms ease;
+}
+
+.blyrics-pip-art-col:hover .blyrics-pip-progress {
+  opacity: 1;
+}
+
+.blyrics-pip-progress .blyrics-progress__times {
+  font-size: 10px;
+}
+
+.blyrics-pip-progress .blyrics-progress__knob {
+  width: 18px;
+  height: 18px;
+  margin: -9px 0 0 -9px;
+}
+
+.blyrics-pip-progress .blyrics-progress__knob-dot {
+  width: 10px;
+  height: 10px;
+}
+
+.blyrics-pip-progress .blyrics-progress__knob:hover .blyrics-progress__knob-dot,
+.blyrics-pip-progress .blyrics-progress__bar.dragging .blyrics-progress__knob-dot {
+  transform: translate(-50%, -50%) scale(1.8);
+}
