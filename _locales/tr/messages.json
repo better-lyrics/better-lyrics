@@ -99,6 +99,10 @@
     "message": "Şarkı sözleri her harfte hafif bir yuvarlanma hareketi ile daha canlı hissettirir. Cihazınızda şarkı sözleri dalgalanıyorsa bu özelliği kapatın.",
     "description": "Tooltip explaining the letter wave animation and its performance impact"
   },
+  "options_display_letterWaveTooltipStates": {
+    "message": "Auto stays off unless a theme turns it on. On and Off override any theme.",
+    "description": "Appended to the letter wave tooltip, explaining the three switch states"
+  },
   "options_display_passiveScroll": {
     "message": "Asenkron sözleri otomatik kaydır",
     "description": "Auto-scroll unsynced lyrics setting label"
