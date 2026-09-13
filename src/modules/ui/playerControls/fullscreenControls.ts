@@ -40,7 +40,7 @@ export function wrapSongInfoWithActions(
   const actions = doc.createElement("div");
   actions.className = "blyrics-fs-info-actions";
   const moreButton = iconButton(doc, playerControlIcons.more, "Quick actions", "blyrics-fs-disc blyrics-fs-more");
-  moreButton.addEventListener("click", () => openQuickActions(doc));
+  moreButton.addEventListener("click", () => openQuickActions(doc, moreButton));
   actions.appendChild(moreButton);
   row.append(songInfo, actions);
   return { row, moreButton };
@@ -81,19 +81,24 @@ export function createFullscreenControls(doc: Document, moreButton?: HTMLButtonE
   like.addEventListener("click", () => toggleLike(doc));
   dislike.addEventListener("click", () => toggleDislike(doc));
 
+  const setSvg = (button: HTMLButtonElement, svg: string): void => {
+    const parsed = new DOMParser().parseFromString(svg, "image/svg+xml").documentElement;
+    if (parsed instanceof SVGElement) button.replaceChildren(parsed);
+  };
+
   const setPlayIcon = (isPlaying: boolean): void => {
-    const svg = new DOMParser().parseFromString(
-      isPlaying ? playerControlIcons.pause : playerControlIcons.play,
-      "image/svg+xml"
-    ).documentElement;
-    if (svg instanceof SVGElement) playPause.replaceChildren(svg);
+    setSvg(playPause, isPlaying ? playerControlIcons.pause : playerControlIcons.play);
     playPause.setAttribute("aria-label", isPlaying ? "Pause" : "Play");
   };
 
   const reflectRating = (): void => {
     const state = getRatingState(doc);
-    like.toggleAttribute("data-active", state === "LIKE");
-    dislike.toggleAttribute("data-active", state === "DISLIKE");
+    const liked = state === "LIKE";
+    const disliked = state === "DISLIKE";
+    like.toggleAttribute("data-active", liked);
+    dislike.toggleAttribute("data-active", disliked);
+    setSvg(like, liked ? playerControlIcons.likeFilled : playerControlIcons.like);
+    setSvg(dislike, disliked ? playerControlIcons.dislikeFilled : playerControlIcons.dislike);
   };
 
   const likeRenderer = doc.querySelector(`${PLAYER_BAR_SELECTOR} ytmusic-like-button-renderer#like-button-renderer`);

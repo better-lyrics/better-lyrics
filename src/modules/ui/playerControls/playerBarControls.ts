@@ -39,10 +39,26 @@ export function isSignedIn(doc: Document): boolean {
   return doc.querySelector(SIGNED_IN_SIGNAL) !== null;
 }
 
-export function openQuickActions(doc: Document): void {
+export function openQuickActions(doc: Document, anchor?: HTMLElement): void {
   const trigger = doc.querySelector<HTMLElement>(ACTION_MENU_TRIGGER);
   if (!trigger) return;
   for (const type of ["pointerdown", "mousedown", "pointerup", "mouseup", "click"]) {
     trigger.dispatchEvent(new MouseEvent(type, { bubbles: true, cancelable: true, view: doc.defaultView }));
   }
+  if (anchor) anchorActionMenu(doc, anchor);
+}
+
+function anchorActionMenu(doc: Document, anchor: HTMLElement): void {
+  const win = doc.defaultView ?? window;
+  win.requestAnimationFrame(() => {
+    const dropdown = doc
+      .querySelector<HTMLElement>("ytmusic-menu-popup-renderer")
+      ?.closest<HTMLElement>("tp-yt-iron-dropdown");
+    if (!dropdown) return;
+    const rect = anchor.getBoundingClientRect();
+    dropdown.style.position = "fixed";
+    dropdown.style.inset = "auto";
+    dropdown.style.top = `${Math.round(rect.bottom + 8)}px`;
+    dropdown.style.left = `${Math.round(rect.left)}px`;
+  });
 }
