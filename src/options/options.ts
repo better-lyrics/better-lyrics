@@ -18,6 +18,7 @@ import {
 } from "@core/keyIdentity";
 import { clearAllOffsets, getOffsetInfo } from "@core/storage";
 import { parseSvgString, syncTypeColors } from "@modules/ui/lyricsDock/icons";
+import { migrateLetterWavePref, type LetterWavePref } from "@modules/settings/letterWave";
 import { fetchOwnGamification, renderIdentityStats } from "@modules/unison/gamificationRender";
 import Sortable from "sortablejs";
 import { showModal } from "./editor/ui/feedback";
@@ -31,7 +32,7 @@ interface Options {
   isShadersPromoEnabled: boolean;
   isFullScreenDisabled: boolean;
   isStylizedAnimationsEnabled: boolean;
-  isLetterWaveEnabled: boolean;
+  letterWavePref: LetterWavePref;
   isPassiveScrollEnabled: boolean;
   isPictureInPictureEnabled: boolean;
   isPictureInPictureAutoRestoreEnabled: boolean;
@@ -93,7 +94,7 @@ const getOptionsFromForm = (): Options => {
     isShadersPromoEnabled: (document.getElementById("isShadersPromoEnabled") as HTMLInputElement).checked,
     isFullScreenDisabled: (document.getElementById("isFullScreenDisabled") as HTMLInputElement).checked,
     isStylizedAnimationsEnabled: (document.getElementById("isStylizedAnimationsEnabled") as HTMLInputElement).checked,
-    isLetterWaveEnabled: (document.getElementById("isLetterWaveEnabled") as HTMLInputElement).checked,
+    letterWavePref: getLetterWaveSwitchState(),
     isPassiveScrollEnabled: (document.getElementById("isPassiveScrollEnabled") as HTMLInputElement).checked,
     isPictureInPictureEnabled: (document.getElementById("isPictureInPictureEnabled") as HTMLInputElement).checked,
     isPictureInPictureAutoRestoreEnabled: (
@@ -284,7 +285,7 @@ const restoreOptions = (): void => {
     isCursorAutoHideEnabled: true,
     isFullScreenDisabled: false,
     isStylizedAnimationsEnabled: true,
-    isLetterWaveEnabled: false,
+    letterWavePref: "auto",
     isPassiveScrollEnabled: true,
     isPictureInPictureEnabled: true,
     isPictureInPictureAutoRestoreEnabled: false,
@@ -331,6 +332,7 @@ const restoreOptions = (): void => {
 
   const readKeys = [
     ...Object.keys(defaultOptions),
+    "isLetterWaveEnabled",
     "isUnisonPinnedDockEnabled",
     "unisonPinnedDockPosition",
     "isUnisonAutoHideInFullscreenEnabled",
@@ -340,6 +342,7 @@ const restoreOptions = (): void => {
     setOptionsInForm({
       ...defaultOptions,
       ...(raw as Options),
+      letterWavePref: migrateLetterWavePref(raw),
       isControlsDockEnabled:
         raw.isControlsDockEnabled ?? raw.isUnisonPinnedDockEnabled ?? defaultOptions.isControlsDockEnabled,
       controlsDockPosition:
@@ -367,7 +370,7 @@ const setOptionsInForm = (items: Options): void => {
   (document.getElementById("isFullScreenDisabled") as HTMLInputElement).checked = items.isFullScreenDisabled;
   (document.getElementById("isStylizedAnimationsEnabled") as HTMLInputElement).checked =
     items.isStylizedAnimationsEnabled;
-  (document.getElementById("isLetterWaveEnabled") as HTMLInputElement).checked = items.isLetterWaveEnabled;
+  setLetterWaveSwitchState(items.letterWavePref);
   (document.getElementById("isPassiveScrollEnabled") as HTMLInputElement).checked = items.isPassiveScrollEnabled;
   (document.getElementById("isPictureInPictureEnabled") as HTMLInputElement).checked = items.isPictureInPictureEnabled;
   (document.getElementById("isPictureInPictureAutoRestoreEnabled") as HTMLInputElement).checked =
@@ -577,6 +580,56 @@ function createProviderElem(providerId: string, checked = true): HTMLLIElement |
   return liElem;
 }
 
+// -- Letter wave switch --------------------------
+
+const LETTER_WAVE_ORDER: LetterWavePref[] = ["off", "auto", "on"];
+
+const LETTER_WAVE_STATE_LABELS: Record<LetterWavePref, string> = {
+  off: "Off",
+  auto: "Auto",
+  on: "On",
+};
+
+function getLetterWaveSwitchState(): LetterWavePref {
+  const state = document.getElementById("letterWaveSwitch")?.dataset.state;
+  return state === "on" || state === "off" || state === "auto" ? state : "auto";
+}
+
+function setLetterWaveSwitchState(pref: LetterWavePref): void {
+  const el = document.getElementById("letterWaveSwitch");
+  if (!el) return;
+  el.dataset.state = pref;
+  el.setAttribute("aria-valuenow", String(LETTER_WAVE_ORDER.indexOf(pref)));
+  el.setAttribute("aria-valuetext", LETTER_WAVE_STATE_LABELS[pref]);
+}
+
+function initLetterWaveSwitch(): void {
+  const el = document.getElementById("letterWaveSwitch");
+  if (!el) return;
+
+  const step = (delta: number, wrap: boolean): void => {
+    const count = LETTER_WAVE_ORDER.length;
+    const current = LETTER_WAVE_ORDER.indexOf(getLetterWaveSwitchState());
+    const next = wrap ? (current + delta + count) % count : Math.min(count - 1, Math.max(0, current + delta));
+    setLetterWaveSwitchState(LETTER_WAVE_ORDER[next]);
+    saveOptions();
+  };
+
+  el.addEventListener("click", () => step(1, true));
+  el.addEventListener("keydown", event => {
+    if (event.key === "ArrowRight" || event.key === "ArrowUp") {
+      step(1, false);
+      event.preventDefault();
+    } else if (event.key === "ArrowLeft" || event.key === "ArrowDown") {
+      step(-1, false);
+      event.preventDefault();
+    } else if (event.key === " " || event.key === "Enter") {
+      step(1, true);
+      event.preventDefault();
+    }
+  });
+}
+
 // -- Display Language Dropdown --------------------------
 
 function populateLanguageDropdown(): void {
@@ -624,6 +677,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   populateLanguageDropdown();
   initTabScrollIndicators();
   initSettingHelpTooltips();
+  initLetterWaveSwitch();
   restoreOptions();
   restoreActiveTab();
 });

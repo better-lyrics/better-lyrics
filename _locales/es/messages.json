@@ -1,10 +1,10 @@
 {
   "extensionName": {
-    "message": "Better Lyrics (Letras para YouTube Music)",
+    "message": "Better Lyrics (Letras para YouTube Música)",
     "description": "The name of the extension"
   },
   "extensionDescription": {
-    "message": "Mejora YouTube Music con hermosas letras sincronizadas, soporte multilingüe, traducciones en tiempo real y más",
+    "message": "Mejora YouTube Música con hermosas letras sincronizadas, soporte multilingüe, traducciones en tiempo real y más",
     "description": "The description of the extension"
   },
   "options_tab_general": {
@@ -428,7 +428,7 @@
     "description": "Confirm button label inside the import identity modal"
   },
   "options_nickname_description": {
-    "message": "Elige un nombre para ti mismo para Better Lyrics, Letras, números, y guión bajo, de 3 a 20 caracteres.",
+    "message": "Elige un nombre para ti mismo para Better Lyrics, Letras, números, y guion bajo, de 3 a 20 caracteres.",
     "description": "Nickname subsection description"
   },
   "options_nickname_placeholder": {
@@ -440,7 +440,7 @@
     "description": "Nickname save button label"
   },
   "options_nickname_reset": {
-    "message": "Reestablecer a predeterminados",
+    "message": "Restablecer a predeterminados",
     "description": "Nickname reset button label"
   },
   "options_nickname_modalTitle": {
@@ -496,7 +496,7 @@
     "description": "Status when nickname request fails"
   },
   "options_alert_importEmpty": {
-    "message": "Pega una indentidad JSON o escoge un archivo primero.",
+    "message": "Pega una identidad JSON o escoge un archivo primero.",
     "description": "Shown when the user clicks Import with no JSON provided"
   },
   "options_modal_selectTheme": {
@@ -532,7 +532,7 @@
     "description": "File save dialog opened message"
   },
   "options_alert_fileSaveFailed": {
-    "message": "Error al guardar el archivo. Por favor, inténtalo de nuevo.",
+    "message": "Error al guardar el archivo Por favor, inténtalo de nuevo.",
     "description": "File save failed message"
   },
   "options_alert_downloadInitiated": {
@@ -576,7 +576,7 @@
     "description": "Full editor experience note prefix"
   },
   "options_editor_openInNewTabLink": {
-    "message": "abre este editor en una nueva pestaña",
+    "message": "Abre este editor en una nueva pestaña",
     "description": "Open in new tab link text"
   },
   "options_editor_stylingGuide": {
@@ -1732,7 +1732,7 @@
     }
   },
   "unison_xpToNext": {
-    "message": "$xp$ XP to Level $level$",
+    "message": "$xp$ XP hasta el Nivel $level$",
     "description": "Explains how much experience remains before the next Unison level. $xp$ is a positive integer, $level$ is the next level number",
     "placeholders": {
       "xp": {
@@ -1750,7 +1750,7 @@
     "description": "Shown in place of the XP-to-next text when a Unison contributor is at the highest level"
   },
   "unison_rank": {
-    "message": "Rank #$rank$",
+    "message": "Posición #$rank$",
     "description": "Shows a Unison contributor's leaderboard rank within their tier. $rank$ is a positive integer",
     "placeholders": {
       "rank": {

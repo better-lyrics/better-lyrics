@@ -88,15 +88,15 @@
     "description": "Show stylized animations setting label"
   },
   "options_display_letterWave": {
-    "message": "Letter wave",
+    "message": "Vague de lettres",
     "description": "Label for the per-letter wave lyric animation toggle"
   },
   "options_display_letterWaveBadge": {
-    "message": "Experimental",
+    "message": "Expérimental",
     "description": "Badge shown next to the letter wave setting marking it as experimental"
   },
   "options_display_letterWaveTooltip": {
-    "message": "Lyrics feel more alive with a gentle rolling motion across each letter as they're sung. Turn it off if lyrics scroll feels choppy on your device.",
+    "message": "Les paroles paraissent plus vivantes grâce à un léger mouvement ondulant appliqué à chaque lettre au moment où elle est chantée. Désactivez cette option si le défilement des paroles semble saccadé sur votre appareil.",
     "description": "Tooltip explaining the letter wave animation and its performance impact"
   },
   "options_display_passiveScroll": {
@@ -388,7 +388,7 @@
     "description": "Your identity label"
   },
   "options_identity_unisonStats": {
-    "message": "Unison Stats",
+    "message": "Statistiques Unison",
     "description": "Section title above the user's own Unison level, tier, rank and badges on the Identity tab"
   },
   "options_identity_loading": {
@@ -1722,7 +1722,7 @@
     "description": "Shown when a lyrics report fails to submit"
   },
   "unison_level": {
-    "message": "Level $level$",
+    "message": "Niveau $level$",
     "description": "Shows a Unison contributor's numeric level. $level$ is a positive integer",
     "placeholders": {
       "level": {
@@ -1732,7 +1732,7 @@
     }
   },
   "unison_xpToNext": {
-    "message": "$xp$ XP to Level $level$",
+    "message": "$xp$ XP avant le niveau $level$",
     "description": "Explains how much experience remains before the next Unison level. $xp$ is a positive integer, $level$ is the next level number",
     "placeholders": {
       "xp": {
@@ -1760,7 +1760,7 @@
     }
   },
   "unison_viewProfile": {
-    "message": "View full profile",
+    "message": "Voir le profil complet",
     "description": "Link on the Identity tab that opens the user's full Unison profile in a new tab"
   },
   "unison_submitted_this": {

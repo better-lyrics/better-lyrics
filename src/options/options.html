@@ -145,15 +145,12 @@
 					<div class="container">
 						<div class="setting-row__text">
 							<div class="setting-row__title-line">
-								<span>__MSG_options_display_letterWave__</span>
+								<span id="letterWaveLabel">__MSG_options_display_letterWave__</span>
 								<span class="setting-badge">__MSG_options_display_letterWaveBadge__</span>
-								<span class="setting-help" tabindex="0" data-tooltip="__MSG_options_display_letterWaveTooltip__" aria-label="__MSG_options_display_letterWaveTooltip__">?</span>
+								<span class="setting-help" tabindex="0" data-tooltip="__MSG_options_display_letterWaveTooltip__ __MSG_options_display_letterWaveTooltipStates__" aria-label="__MSG_options_display_letterWaveTooltip__ __MSG_options_display_letterWaveTooltipStates__">?</span>
 							</div>
 						</div>
-						<label>
-							<input type="checkbox" id="isLetterWaveEnabled">
-							<span class="checkmark"></span>
-						</label>
+						<button type="button" class="triswitch" id="letterWaveSwitch" role="slider" aria-labelledby="letterWaveLabel" aria-valuemin="0" aria-valuemax="2" aria-valuenow="1"></button>
 					</div>
 					<div class="container">
 						<span>__MSG_options_display_passiveScroll__</span>

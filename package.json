@@ -19,6 +19,7 @@
         "update-version": "tsx tooling/update-version.ts",
         "typecheck": "npm run generate:locales && tsc --noEmit",
         "selfcheck": "tsx tooling/run-selfchecks.ts",
+        "check:i18n-brand": "tsx tooling/check-i18n-brand.ts",
         "knip": "knip --cache",
         "knip:fix": "knip --fix",
         "knip:ci": "knip --no-exit-code --reporter github-actions"
@@ -42,7 +43,7 @@
         "node": ">=22.12"
     },
     "dependencies": {
-        "@braccato/core": "1.6.2",
+        "@braccato/core": "1.6.3",
         "@braccato/parsers": "0.2.1",
         "@codemirror/autocomplete": "^6.20.3",
         "@codemirror/commands": "^6.11.0",
