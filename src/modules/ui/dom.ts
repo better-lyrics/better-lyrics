@@ -1643,15 +1643,13 @@ export function updateFullscreenControlsSnapshot(snapshot: PlaybackSnapshot | nu
 export function injectSongAttributes(title: string, artist: string, album?: string): void {
   const mainPanel = document.getElementById("main-panel")!;
   console.assert(mainPanel != null);
-  const existingRow = document.getElementById("blyrics-fs-info-row");
+  const existingColumn = document.getElementById("blyrics-fs-column");
   const existingSongInfo = document.getElementById("blyrics-song-info");
   const existingWatermark = document.getElementById("blyrics-watermark");
-  const existingControls = document.getElementById("blyrics-fs-controls");
 
-  existingRow?.remove();
+  existingColumn?.remove();
   existingSongInfo?.remove();
   existingWatermark?.remove();
-  existingControls?.remove();
   setFullscreenControls(null);
 
   const titleElm = document.createElement("p");
@@ -1675,11 +1673,14 @@ export function injectSongAttributes(title: string, artist: string, album?: stri
 
   const { row, moreButton } = wrapSongInfoWithActions(document, songInfoWrapper);
   row.id = "blyrics-fs-info-row";
-  mainPanel.appendChild(row);
 
   const controls = createFullscreenControls(document, moreButton);
   controls.element.id = "blyrics-fs-controls";
-  mainPanel.appendChild(controls.element);
+
+  const column = document.createElement("div");
+  column.id = "blyrics-fs-column";
+  column.append(row, controls.element);
+  mainPanel.appendChild(column);
   setFullscreenControls(controls);
 }
 

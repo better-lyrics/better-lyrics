@@ -1337,6 +1337,8 @@ ytmusic-player-page:not([is-mweb-modernization-enabled]) #side-panel.blyrics-has
 }
 
 .blyrics-progress__times {
+  position: relative;
+  z-index: 1;
   display: flex;
   align-items: baseline;
   justify-content: space-between;
@@ -1365,6 +1367,31 @@ ytmusic-player-page:not([is-mweb-modernization-enabled]) #side-panel.blyrics-has
 }
 
 /* -- Fullscreen player controls -------------------------------------------- */
+/* Enhanced fullscreen only; the column sits under the album art in #main-panel. */
+#blyrics-fs-column {
+  display: none;
+}
+
+ytmusic-player-page[player-fullscreened]:not([blyrics-dfs]) #blyrics-fs-column {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  width: 100%;
+  margin-top: 1.25rem;
+  text-align: left;
+}
+
+/* Neutralise the base/theme centring and translate on song info so the whole
+   column (info row, more button, controls) positions as one block. */
+#blyrics-fs-column #blyrics-song-info {
+  display: block;
+  transform: none;
+  max-width: none;
+  margin: 0;
+  padding: 0;
+  text-align: left;
+}
+
 .blyrics-fs-info-row {
   display: flex;
   align-items: center;
@@ -1380,20 +1407,28 @@ ytmusic-player-page:not([is-mweb-modernization-enabled]) #side-panel.blyrics-has
   flex: 0 0 auto;
 }
 
-.blyrics-fs-controls {
+#blyrics-fs-controls {
   display: flex;
   flex-direction: column;
-  gap: 1rem;
-  max-width: 40rem;
-  margin-top: 1rem;
+  gap: 1.5rem;
 }
 
-.blyrics-fs-controls[data-ad] {
+#blyrics-fs-controls[data-ad] {
   display: none;
+}
+
+#blyrics-fs-controls .blyrics-progress {
+  width: 100%;
+}
+
+.blyrics-fs-more {
+  width: 2.25rem;
+  height: 2.25rem;
 }
 
 .blyrics-fs-disc {
   display: grid;
+  flex: 0 0 auto;
   width: 2.75rem;
   height: 2.75rem;
   padding: 0;
@@ -1412,8 +1447,8 @@ ytmusic-player-page:not([is-mweb-modernization-enabled]) #side-panel.blyrics-has
 }
 
 .blyrics-fs-disc svg {
-  width: 1.5rem;
-  height: 1.5rem;
+  width: 56%;
+  height: 56%;
 }
 
 .blyrics-fs-transport-slot {
@@ -1439,15 +1474,11 @@ ytmusic-player-page:not([is-mweb-modernization-enabled]) #side-panel.blyrics-has
   background: #fff;
 }
 
+.blyrics-fs-play svg {
+  width: 46%;
+  height: 46%;
+}
+
 .blyrics-fs-disc[data-active] {
   color: #fff;
-}
-
-.blyrics-fs-controls[data-signed-out] .blyrics-fs-like,
-.blyrics-fs-controls[data-signed-out] .blyrics-fs-dislike {
-  display: none;
-}
-
-.blyrics-fs-disc.blyrics-fs-more--hidden {
-  display: none;
 }
