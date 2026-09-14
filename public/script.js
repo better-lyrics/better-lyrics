@@ -47,7 +47,13 @@ export default function initializePlayerBridge() {
 
     try {
       const { video_id, title, author } = player.getVideoData();
-      const duration = player.getDuration();
+      const playerResponse = typeof player.getPlayerResponse === "function" ? player.getPlayerResponse() : null;
+      const progressState = typeof player.getProgressState === "function" ? player.getProgressState() : null;
+      const metadataDuration = Number(playerResponse?.videoDetails?.lengthSeconds);
+      const seekableDuration = progressState?.duration;
+      let duration = player.getDuration();
+      if (Number.isFinite(seekableDuration) && seekableDuration > 0) duration = seekableDuration;
+      if (Number.isFinite(metadataDuration) && metadataDuration > 0) duration = metadataDuration;
       if (
         !video_id ||
         typeof title !== "string" ||
