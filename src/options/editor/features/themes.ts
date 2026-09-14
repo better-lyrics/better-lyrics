@@ -644,7 +644,7 @@ function rankThemeIdsByBayesian(stats: AllThemeStats): string[] {
   return entries.sort(([, a], [, b]) => scoreOf(b) - scoreOf(a)).map(([id]) => id);
 }
 
-async function loadFeaturedThemes(): Promise<FeaturedTheme[]> {
+export async function loadFeaturedThemes(): Promise<FeaturedTheme[]> {
   if (featuredThemesCache) return featuredThemesCache;
   if (featuredThemesPromise) return featuredThemesPromise;
 
