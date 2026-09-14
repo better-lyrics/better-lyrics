@@ -99,6 +99,10 @@
     "message": "Lyrics feel more alive with a gentle rolling motion across each letter as they're sung. Turn it off if lyrics scroll feels choppy on your device.",
     "description": "Tooltip explaining the letter wave animation and its performance impact"
   },
+  "options_display_letterWaveTooltipStates": {
+    "message": "Auto stays off unless a theme turns it on. On and Off override any theme.",
+    "description": "Appended to the letter wave tooltip, explaining the three switch states"
+  },
   "options_display_passiveScroll": {
     "message": "同期されていない歌詞を自動スクロール",
     "description": "Auto-scroll unsynced lyrics setting label"
@@ -428,7 +432,7 @@
     "description": "Confirm button label inside the import identity modal"
   },
   "options_nickname_description": {
-    "message": "より良い歌詞で自分の名前を選んでください。文字、数字、アンダーバー、3〜20文字。",
+    "message": "Better Lyricsで自分の名前を選んでください。文字、数字、アンダーバー、3〜20文字。",
     "description": "Nickname subsection description"
   },
   "options_nickname_placeholder": {
@@ -604,7 +608,7 @@
     "description": "Better Lyrics Legato provider name"
   },
   "options_provider_betterLyricsPortato": {
-    "message": "Better Lyrics Legato",
+    "message": "Better Lyrics Portato",
     "description": "Better Lyrics Portato provider name"
   },
   "options_provider_betterLyricsUnison": {
@@ -1197,29 +1201,27 @@
     "message": "テーマをインストールできませんでした。接続を確認して再度お試し下さい。",
     "description": "Alert when a symlinked theme fails to install from marketplace"
   },
-  "symlink_badge_marketplace": {
-    "message": "マーケットプレイス",
-    "description": "Badge text on symlinked theme cards"
+  "theme_top_badge": {
+    "message": "#$RANK$ on the Marketplace",
+    "description": "Tooltip on a featured theme's rank medal",
+    "placeholders": {
+      "rank": {
+        "content": "$1",
+        "example": "1"
+      }
+    }
   },
-  "symlink_badge_bundled": {
-    "message": "Bundled",
-    "description": "Badge text on non-symlinked built-in theme cards"
+  "theme_modal_section_featured": {
+    "message": "Featured Themes",
+    "description": "Section title for featured themes (top marketplace picks and built-ins) in the theme chooser modal"
   },
-  "deprecation_builtin_title": {
-    "message": "Heads up, these themes are moving!",
-    "description": "Title for the built-in themes deprecation banner in theme modal"
+  "theme_modal_section_all": {
+    "message": "All Themes",
+    "description": "Section title for the user's installed marketplace themes in the theme chooser modal"
   },
-  "deprecation_builtin_body": {
-    "message": "組み込みのテーマをテーママーケットプレイスに移行しています。既に存在するものもあれば、マーケットプレイスのバッジを探してください。 残りは今後のアップデートに続き、GitHubとDiscordのCSSバックアップも予定されています。",
-    "description": "Body text for the built-in themes deprecation banner"
-  },
-  "deprecation_builtin_cta": {
-    "message": "マーケットプレイスを見る",
-    "description": "CTA button text in the deprecation banner to open the marketplace"
-  },
-  "theme_modal_section_builtin": {
-    "message": "標準のテーマ",
-    "description": "Section title for built-in themes in the theme chooser modal"
+  "theme_modal_browse": {
+    "message": "Browse Marketplace",
+    "description": "Link in the theme chooser modal that opens the full Theme Marketplace page"
   },
   "theme_modal_section_custom": {
     "message": "カスタムテーマ",

@@ -10,7 +10,7 @@ export interface AuthPartner {
 }
 
 const AUTH_PARTNER_METADATA: Record<string, Pick<AuthPartner, "id" | "iconUrl">> = {
-  "https://unison.boidu.dev": { id: "unison", iconUrl: null },
+  "https://unison.betterlyrics.org": { id: "unison", iconUrl: null },
   "https://blrcunison.vercel.app": { id: "blrcunison", iconUrl: "https://blrcunison.vercel.app/logo_mono.svg" },
 };
 

@@ -99,6 +99,10 @@
     "message": "Lyrics feel more alive with a gentle rolling motion across each letter as they're sung. Turn it off if lyrics scroll feels choppy on your device.",
     "description": "Tooltip explaining the letter wave animation and its performance impact"
   },
+  "options_display_letterWaveTooltipStates": {
+    "message": "Auto stays off unless a theme turns it on. On and Off override any theme.",
+    "description": "Appended to the letter wave tooltip, explaining the three switch states"
+  },
   "options_display_passiveScroll": {
     "message": "Автопрокрутка несинхронизированных текстов",
     "description": "Auto-scroll unsynced lyrics setting label"
@@ -608,7 +612,7 @@
     "description": "Better Lyrics Portato provider name"
   },
   "options_provider_betterLyricsUnison": {
-    "message": "Better Lyrics Унисон",
+    "message": "Better Lyrics Unison",
     "description": "Better Lyrics Unison provider name"
   },
   "options_provider_musixmatch": {
@@ -1197,29 +1201,27 @@
     "message": "Не удалось установить тему. Проверьте подключение и повторите попытку.",
     "description": "Alert when a symlinked theme fails to install from marketplace"
   },
-  "symlink_badge_marketplace": {
-    "message": "Магазин",
-    "description": "Badge text on symlinked theme cards"
+  "theme_top_badge": {
+    "message": "#$RANK$ on the Marketplace",
+    "description": "Tooltip on a featured theme's rank medal",
+    "placeholders": {
+      "rank": {
+        "content": "$1",
+        "example": "1"
+      }
+    }
   },
-  "symlink_badge_bundled": {
-    "message": "Связанные",
-    "description": "Badge text on non-symlinked built-in theme cards"
+  "theme_modal_section_featured": {
+    "message": "Featured Themes",
+    "description": "Section title for featured themes (top marketplace picks and built-ins) in the theme chooser modal"
   },
-  "deprecation_builtin_title": {
-    "message": "Обрати внимание, темы переезжают!",
-    "description": "Title for the built-in themes deprecation banner in theme modal"
+  "theme_modal_section_all": {
+    "message": "All Themes",
+    "description": "Section title for the user's installed marketplace themes in the theme chooser modal"
   },
-  "deprecation_builtin_body": {
-    "message": "Мы переводим встроенные темы в Магазин тем. Некоторые из них уже переведены, ищите значок магазина. Остальные догонят в будущем обновлении, с CSS бэкапами на GitHub и Discord.",
-    "description": "Body text for the built-in themes deprecation banner"
-  },
-  "deprecation_builtin_cta": {
-    "message": "Открыть магазин",
-    "description": "CTA button text in the deprecation banner to open the marketplace"
-  },
-  "theme_modal_section_builtin": {
-    "message": "Встроенные темы",
-    "description": "Section title for built-in themes in the theme chooser modal"
+  "theme_modal_browse": {
+    "message": "Browse Marketplace",
+    "description": "Link in the theme chooser modal that opens the full Theme Marketplace page"
   },
   "theme_modal_section_custom": {
     "message": "Свои темы",
@@ -1320,11 +1322,11 @@
     "description": "Button label when the server reports a synced version already exists; clicking reloads the page"
   },
   "unison_pageTitle": {
-    "message": "Унисон - Better Lyrics",
+    "message": "Unison - Better Lyrics",
     "description": "Page title for the Unison dashboard"
   },
   "unison_title": {
-    "message": "Унисон",
+    "message": "Unison",
     "description": "Unison branding title"
   },
   "unison_subtitle": {

@@ -99,6 +99,10 @@
     "message": "Songtexte sehen mit einer leichten Wellenbewegung bei jedem gesungenen Wort lebendiger aus. Deaktiviere es, wenn das Scrollen der Songtexte abgehackt aussieht.",
     "description": "Tooltip explaining the letter wave animation and its performance impact"
   },
+  "options_display_letterWaveTooltipStates": {
+    "message": "Auto stays off unless a theme turns it on. On and Off override any theme.",
+    "description": "Appended to the letter wave tooltip, explaining the three switch states"
+  },
   "options_display_passiveScroll": {
     "message": "Automatisch nicht synchronisierte Songtexte scrollen",
     "description": "Auto-scroll unsynced lyrics setting label"
@@ -1197,29 +1201,27 @@
     "message": "Design konnte nicht installiert werden. Überprüfe die Verbindung und versuche erneut.",
     "description": "Alert when a symlinked theme fails to install from marketplace"
   },
-  "symlink_badge_marketplace": {
-    "message": "Marktplatz",
-    "description": "Badge text on symlinked theme cards"
+  "theme_top_badge": {
+    "message": "#$RANK$ on the Marketplace",
+    "description": "Tooltip on a featured theme's rank medal",
+    "placeholders": {
+      "rank": {
+        "content": "$1",
+        "example": "1"
+      }
+    }
   },
-  "symlink_badge_bundled": {
-    "message": "Vorinstalliert",
-    "description": "Badge text on non-symlinked built-in theme cards"
+  "theme_modal_section_featured": {
+    "message": "Featured Themes",
+    "description": "Section title for featured themes (top marketplace picks and built-ins) in the theme chooser modal"
   },
-  "deprecation_builtin_title": {
-    "message": "Achtung, diese Designs ziehen um!",
-    "description": "Title for the built-in themes deprecation banner in theme modal"
+  "theme_modal_section_all": {
+    "message": "All Themes",
+    "description": "Section title for the user's installed marketplace themes in the theme chooser modal"
   },
-  "deprecation_builtin_body": {
-    "message": "Wir migrieren vorinstallierte Designs zum Design Marktplatz. Ein paar sind schon, halte Ausblick nach dem Marktplatz-Abzeichen. Die restlichen werden in einem zukünftigen update folgen, mit CSS Backups auf GitHub und Discord.",
-    "description": "Body text for the built-in themes deprecation banner"
-  },
-  "deprecation_builtin_cta": {
-    "message": "Marktplatz durchsuchen",
-    "description": "CTA button text in the deprecation banner to open the marketplace"
-  },
-  "theme_modal_section_builtin": {
-    "message": "Vorinstallierte Designs",
-    "description": "Section title for built-in themes in the theme chooser modal"
+  "theme_modal_browse": {
+    "message": "Browse Marketplace",
+    "description": "Link in the theme chooser modal that opens the full Theme Marketplace page"
   },
   "theme_modal_section_custom": {
     "message": "Eigene Designs",

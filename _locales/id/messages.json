@@ -88,16 +88,20 @@
     "description": "Show stylized animations setting label"
   },
   "options_display_letterWave": {
-    "message": "Letter wave",
+    "message": "Gelombang huruf",
     "description": "Label for the per-letter wave lyric animation toggle"
   },
   "options_display_letterWaveBadge": {
-    "message": "Experimental",
+    "message": "Eksperimental",
     "description": "Badge shown next to the letter wave setting marking it as experimental"
   },
   "options_display_letterWaveTooltip": {
-    "message": "Lyrics feel more alive with a gentle rolling motion across each letter as they're sung. Turn it off if lyrics scroll feels choppy on your device.",
+    "message": "Lirik terlihat lebih hidup dengan gerakan berguling lembut di setiap huruf yang dinyanyikan. Matikan jika guliran lirik terasa aneh di perangkatmu.",
     "description": "Tooltip explaining the letter wave animation and its performance impact"
+  },
+  "options_display_letterWaveTooltipStates": {
+    "message": "Otomatis tetap mati kecuali saat tema menyalakannya. Nyala dan Mati menyampingkan tema apapun.",
+    "description": "Appended to the letter wave tooltip, explaining the three switch states"
   },
   "options_display_passiveScroll": {
     "message": "Gulir otomatis lirik taksinkron",
@@ -1197,29 +1201,27 @@
     "message": "Tidak dapat mengunduh tema. Coba cek koneksimu dan coba lagi.",
     "description": "Alert when a symlinked theme fails to install from marketplace"
   },
-  "symlink_badge_marketplace": {
-    "message": "Toko",
-    "description": "Badge text on symlinked theme cards"
+  "theme_top_badge": {
+    "message": "#$RANK$ on the Marketplace",
+    "description": "Tooltip on a featured theme's rank medal",
+    "placeholders": {
+      "rank": {
+        "content": "$1",
+        "example": "1"
+      }
+    }
   },
-  "symlink_badge_bundled": {
-    "message": "Sepaket",
-    "description": "Badge text on non-symlinked built-in theme cards"
+  "theme_modal_section_featured": {
+    "message": "Featured Themes",
+    "description": "Section title for featured themes (top marketplace picks and built-ins) in the theme chooser modal"
   },
-  "deprecation_builtin_title": {
-    "message": "Siap siap, tema tema ini bakalan pindah!",
-    "description": "Title for the built-in themes deprecation banner in theme modal"
+  "theme_modal_section_all": {
+    "message": "All Themes",
+    "description": "Section title for the user's installed marketplace themes in the theme chooser modal"
   },
-  "deprecation_builtin_body": {
-    "message": "Kami akan memindahkan tema-tema bawaan ini ke Toko Tema. Sudah ada beberapa, lihat yang ada lencana Toko. Sisanya bakalan ikutan di pembaruan selanjutnya, dengan cadangan CSS di GitHub dan Discord.",
-    "description": "Body text for the built-in themes deprecation banner"
-  },
-  "deprecation_builtin_cta": {
-    "message": "Jelajahi Toko",
-    "description": "CTA button text in the deprecation banner to open the marketplace"
-  },
-  "theme_modal_section_builtin": {
-    "message": "Tema Bawaan",
-    "description": "Section title for built-in themes in the theme chooser modal"
+  "theme_modal_browse": {
+    "message": "Browse Marketplace",
+    "description": "Link in the theme chooser modal that opens the full Theme Marketplace page"
   },
   "theme_modal_section_custom": {
     "message": "Tema Kustom",
