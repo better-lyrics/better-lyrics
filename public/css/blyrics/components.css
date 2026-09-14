@@ -1453,11 +1453,12 @@ html[blyrics-no-fs-controls] .blyrics-fs-info-actions {
   background: transparent;
   color: #fff;
   cursor: pointer;
-  transition: background 140ms ease;
+  transition: background 140ms ease, transform 140ms ease;
 }
 
 .blyrics-fs-disc:hover {
   background: rgb(255 255 255 / 24%);
+  transform: scale(1.06);
 }
 
 .blyrics-fs-disc:focus,
@@ -1639,7 +1640,19 @@ html[blyrics-no-fs-controls] .blyrics-fs-info-actions {
 
 /* -- Transport ripple + pop + nudge ----------------------------------------- */
 .blyrics-fs-disc.blyrics-control-pop {
-  animation: blyrics-control-pop 280ms cubic-bezier(0.33, 1, 0.68, 1);
+  animation: blyrics-fs-control-pop 280ms cubic-bezier(0.33, 1, 0.68, 1);
+}
+
+@keyframes blyrics-fs-control-pop {
+  0% {
+    transform: scale(0.93);
+  }
+  42% {
+    transform: scale(1.13);
+  }
+  100% {
+    transform: scale(1.06);
+  }
 }
 
 .blyrics-control-nudge-prev svg {
@@ -1675,18 +1688,6 @@ html[blyrics-no-fs-controls] .blyrics-fs-info-actions {
   to {
     transform: scale(2.6);
     opacity: 0;
-  }
-}
-
-@keyframes blyrics-control-pop {
-  0% {
-    transform: scale(0.96);
-  }
-  45% {
-    transform: scale(1.06);
-  }
-  100% {
-    transform: scale(1);
   }
 }
 
