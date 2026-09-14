@@ -81,14 +81,14 @@ function playLikeBurst(button: HTMLButtonElement): void {
     const ray = doc.createElement("span");
     ray.className = "blyrics-fs-rate-ray";
     ray.style.setProperty("--a", `${step * i}deg`);
-    ray.style.setProperty("--d0", "20");
-    ray.style.setProperty("--d1", "40");
+    ray.style.setProperty("--d0", "10");
+    ray.style.setProperty("--d1", "20");
     burst.appendChild(ray);
     const dot = doc.createElement("span");
     dot.className = "blyrics-fs-rate-dot";
     const angle = ((step * i + step / 2) * Math.PI) / 180;
-    dot.style.setProperty("--dx", `${Math.cos(angle) * 38}px`);
-    dot.style.setProperty("--dy", `${Math.sin(angle) * 38}px`);
+    dot.style.setProperty("--dx", `${Math.cos(angle) * 16}px`);
+    dot.style.setProperty("--dy", `${Math.sin(angle) * 16}px`);
     burst.appendChild(dot);
   }
   button.appendChild(burst);
@@ -96,7 +96,7 @@ function playLikeBurst(button: HTMLButtonElement): void {
     burst.querySelectorAll(".blyrics-fs-rate-ray").forEach(ray => ray.classList.add("blyrics-fs-rate-ray--go"));
     burst.querySelectorAll(".blyrics-fs-rate-dot").forEach(dot => dot.classList.add("blyrics-fs-rate-dot--go"));
   });
-  win.setTimeout(() => burst.remove(), 380);
+  win.setTimeout(() => burst.remove(), 540);
 }
 
 export function wrapSongInfoWithActions(

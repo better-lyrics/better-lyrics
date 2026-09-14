@@ -1581,9 +1581,9 @@ html[blyrics-no-fs-controls] .blyrics-fs-info-actions {
   position: absolute;
   top: 50%;
   left: 50%;
-  width: 2px;
-  height: 7px;
-  margin: -3.5px 0 0 -1px;
+  width: 1.5px;
+  height: 4px;
+  margin: -2px 0 0 -0.75px;
   border-radius: 2px;
   background: currentColor;
   opacity: 0;
@@ -1591,7 +1591,7 @@ html[blyrics-no-fs-controls] .blyrics-fs-info-actions {
 }
 
 .blyrics-fs-rate-ray--go {
-  animation: blyrics-fs-rate-ray 300ms cubic-bezier(0.2, 0.7, 0.3, 1) forwards;
+  animation: blyrics-fs-rate-ray 460ms cubic-bezier(0.2, 0.7, 0.3, 1) forwards;
 }
 
 @keyframes blyrics-fs-rate-ray {
@@ -1612,16 +1612,16 @@ html[blyrics-no-fs-controls] .blyrics-fs-info-actions {
   position: absolute;
   top: 50%;
   left: 50%;
-  width: 4px;
-  height: 4px;
-  margin: -2px 0 0 -2px;
+  width: 3px;
+  height: 3px;
+  margin: -1.5px 0 0 -1.5px;
   border-radius: 50%;
   background: currentColor;
   opacity: 0;
 }
 
 .blyrics-fs-rate-dot--go {
-  animation: blyrics-fs-rate-dot 320ms cubic-bezier(0.2, 0.7, 0.3, 1) forwards;
+  animation: blyrics-fs-rate-dot 480ms cubic-bezier(0.2, 0.7, 0.3, 1) forwards;
 }
 
 @keyframes blyrics-fs-rate-dot {
