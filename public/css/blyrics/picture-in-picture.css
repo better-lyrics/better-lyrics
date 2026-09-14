@@ -293,7 +293,7 @@ body {
 /* The pop rides the disc (::before), not the button, for the same reason the hover
    pop does: scaling the button slides the skip glyph's hard outer bar sideways. */
 .blyrics-pip-artwork__control.blyrics-control-pop::before {
-  animation: blyrics-control-pop 300ms cubic-bezier(0.34, 1.56, 0.64, 1);
+  animation: blyrics-control-pop 280ms cubic-bezier(0.33, 1, 0.68, 1);
 }
 
 .blyrics-control-nudge-prev svg {
@@ -334,10 +334,10 @@ body {
 
 @keyframes blyrics-control-pop {
   0% {
-    transform: scale(0.9);
+    transform: scale(0.96);
   }
-  50% {
-    transform: scale(1.12);
+  45% {
+    transform: scale(1.06);
   }
   100% {
     transform: scale(1);

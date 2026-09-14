@@ -25,14 +25,17 @@ export function createProgressBar(options: ProgressBarOptions): ProgressBarHandl
 
   const bar = doc.createElement("div");
   bar.className = "blyrics-progress__bar";
+  const fillClip = doc.createElement("div");
+  fillClip.className = "blyrics-progress__fill-clip";
   const fill = doc.createElement("div");
   fill.className = "blyrics-progress__fill";
+  fillClip.appendChild(fill);
   const knob = doc.createElement("div");
   knob.className = "blyrics-progress__knob";
   const dot = doc.createElement("span");
   dot.className = "blyrics-progress__knob-dot";
   knob.appendChild(dot);
-  bar.append(fill, knob);
+  bar.append(fillClip, knob);
 
   const times = doc.createElement("div");
   times.className = "blyrics-progress__times";
