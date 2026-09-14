@@ -604,11 +604,11 @@
     "description": "Better Lyrics provider name"
   },
   "options_provider_betterLyricsLegato": {
-    "message": "Better Lyrics Legado",
+    "message": "Better Lyrics Legato",
     "description": "Better Lyrics Legato provider name"
   },
   "options_provider_betterLyricsPortato": {
-    "message": "Better Lyrics Portado",
+    "message": "Better Lyrics Portato",
     "description": "Better Lyrics Portato provider name"
   },
   "options_provider_betterLyricsUnison": {
