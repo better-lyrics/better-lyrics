@@ -1581,9 +1581,9 @@ html[blyrics-no-fs-controls] .blyrics-fs-info-actions {
   position: absolute;
   top: 50%;
   left: 50%;
-  width: 1.5px;
-  height: 4px;
-  margin: -2px 0 0 -0.75px;
+  width: 2px;
+  height: 5px;
+  margin: -2.5px 0 0 -1px;
   border-radius: 2px;
   background: currentColor;
   opacity: 0;

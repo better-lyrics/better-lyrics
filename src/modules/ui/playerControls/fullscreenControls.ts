@@ -81,14 +81,14 @@ function playLikeBurst(button: HTMLButtonElement): void {
     const ray = doc.createElement("span");
     ray.className = "blyrics-fs-rate-ray";
     ray.style.setProperty("--a", `${step * i}deg`);
-    ray.style.setProperty("--d0", "10");
-    ray.style.setProperty("--d1", "20");
+    ray.style.setProperty("--d0", "12");
+    ray.style.setProperty("--d1", "26");
     burst.appendChild(ray);
     const dot = doc.createElement("span");
     dot.className = "blyrics-fs-rate-dot";
     const angle = ((step * i + step / 2) * Math.PI) / 180;
-    dot.style.setProperty("--dx", `${Math.cos(angle) * 16}px`);
-    dot.style.setProperty("--dy", `${Math.sin(angle) * 16}px`);
+    dot.style.setProperty("--dx", `${Math.cos(angle) * 21}px`);
+    dot.style.setProperty("--dy", `${Math.sin(angle) * 21}px`);
     burst.appendChild(dot);
   }
   button.appendChild(burst);
