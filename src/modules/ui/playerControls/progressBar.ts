@@ -115,6 +115,7 @@ export function createProgressBar(options: ProgressBarOptions): ProgressBarHandl
     bar.setPointerCapture(event.pointerId);
     glideFrom = interpolate(getSnapshot() ?? null, win.Date.now());
     glideTo = positionFor(event.clientX) * durationS;
+    scrubValue = glideTo;
     glideStart = win.performance.now();
     gliding = true;
   };
