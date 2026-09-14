@@ -13,6 +13,8 @@ export interface ProgressBarHandle {
 }
 
 const GLIDE_MS = 260;
+const SEEK_LATCH_TOLERANCE_S = 1;
+const SEEK_LATCH_TIMEOUT_MS = 2000;
 
 export function createProgressBar(options: ProgressBarOptions): ProgressBarHandle {
   const { doc, getSnapshot, onSeek } = options;
@@ -51,6 +53,8 @@ export function createProgressBar(options: ProgressBarOptions): ProgressBarHandl
   let glideStart = 0;
   let gliding = false;
   let scrubValue = 0;
+  let pendingSeekS: number | null = null;
+  let pendingSeekWall = 0;
 
   const measure = (): void => {
     barWidth = bar.getBoundingClientRect().width;
@@ -84,6 +88,14 @@ export function createProgressBar(options: ProgressBarOptions): ProgressBarHandl
       if (k >= 1) gliding = false;
     } else if (dragging) {
       currentS = scrubValue;
+    } else if (pendingSeekS !== null) {
+      const live = interpolate(snapshot ?? null, win.Date.now());
+      if (Math.abs(live - pendingSeekS) < SEEK_LATCH_TOLERANCE_S || now - pendingSeekWall > SEEK_LATCH_TIMEOUT_MS) {
+        currentS = live;
+        pendingSeekS = null;
+      } else {
+        currentS = pendingSeekS;
+      }
     } else {
       currentS = interpolate(snapshot ?? null, win.Date.now());
     }
@@ -93,6 +105,7 @@ export function createProgressBar(options: ProgressBarOptions): ProgressBarHandl
 
   const onPointerDown = (event: PointerEvent): void => {
     if (event.button !== 0) return;
+    pendingSeekS = null;
     const durationS = getSnapshot()?.durationS ?? 0;
     dragging = true;
     bar.classList.add("dragging");
@@ -117,7 +130,10 @@ export function createProgressBar(options: ProgressBarOptions): ProgressBarHandl
     if (bar.hasPointerCapture(event.pointerId)) bar.releasePointerCapture(event.pointerId);
     const durationS = getSnapshot()?.durationS ?? 0;
     const target = gliding ? glideTo : scrubValue;
-    onSeek(clamp01(durationS > 0 ? target / durationS : 0) * durationS);
+    const seekS = clamp01(durationS > 0 ? target / durationS : 0) * durationS;
+    pendingSeekS = seekS;
+    pendingSeekWall = win.performance.now();
+    onSeek(seekS);
   };
 
   const onEndClick = (): void => {
