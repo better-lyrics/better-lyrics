@@ -1,5 +1,6 @@
 import { PLAYER_BAR_SELECTOR, PLAYER_TIME_EVENT, SEEK_EVENT } from "@constants";
 import { parseSvgString } from "@modules/ui/lyricsDock/icons";
+import { attachTransportAnimation } from "@modules/ui/playerControls/controlAnimations";
 import { playerControlIcons } from "@modules/ui/playerControls/icons";
 import { sendTransport } from "@modules/ui/playerControls/playerBarControls";
 import { createProgressBar, type ProgressBarHandle } from "@modules/ui/playerControls/progressBar";
@@ -430,6 +431,7 @@ export class PictureInPictureLyricsView {
     } else {
       button.appendChild(createControlIcon(this.pipWindow.document, action));
     }
+    attachTransportAnimation(button, action);
     return button;
   }
 

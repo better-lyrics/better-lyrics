@@ -1435,6 +1435,7 @@ html[blyrics-no-fs-controls] .blyrics-fs-info-actions {
 }
 
 .blyrics-fs-disc {
+  position: relative;
   display: grid;
   flex: 0 0 auto;
   width: 3.25rem;
@@ -1489,4 +1490,203 @@ html[blyrics-no-fs-controls] .blyrics-fs-info-actions {
 
 .blyrics-fs-disc[data-active] {
   color: #fff;
+}
+
+/* -- Rating icons (layered outline + masked fill) --------------------------- */
+.blyrics-fs-rate-icon {
+  position: relative;
+  width: 56%;
+  height: 56%;
+}
+
+.blyrics-fs-rate-layer {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+}
+
+.blyrics-fs-disc .blyrics-fs-rate-layer svg {
+  width: 100%;
+  height: 100%;
+}
+
+.blyrics-fs-rate-layer--fill {
+  clip-path: inset(100% 0 0 0);
+}
+
+.blyrics-fs-like[data-active] .blyrics-fs-rate-layer--fill,
+.blyrics-fs-dislike[data-active] .blyrics-fs-rate-layer--fill {
+  clip-path: inset(0 0 0 0);
+}
+
+.blyrics-fs-like.blyrics-fs-rate-fire .blyrics-fs-rate-icon {
+  animation: blyrics-fs-rate-pop 640ms cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes blyrics-fs-rate-pop {
+  0% {
+    transform: scale(0.72) rotate(0deg);
+  }
+  35% {
+    transform: scale(1.24) rotate(-6deg);
+  }
+  65% {
+    transform: scale(1.05) rotate(6deg);
+  }
+  100% {
+    transform: scale(1) rotate(0deg);
+  }
+}
+
+.blyrics-fs-like.blyrics-fs-rate-fire .blyrics-fs-rate-layer--fill {
+  animation: blyrics-fs-rate-iris 900ms cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+@keyframes blyrics-fs-rate-iris {
+  from {
+    clip-path: circle(0% at 50% 55%);
+  }
+  to {
+    clip-path: circle(80% at 50% 55%);
+  }
+}
+
+.blyrics-fs-rate-burst {
+  position: absolute;
+  inset: 0;
+  overflow: visible;
+  pointer-events: none;
+}
+
+.blyrics-fs-rate-ray {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 2px;
+  height: 7px;
+  margin: -3.5px 0 0 -1px;
+  border-radius: 2px;
+  background: currentColor;
+  opacity: 0;
+  transform-origin: center;
+}
+
+.blyrics-fs-rate-ray--go {
+  animation: blyrics-fs-rate-ray 300ms cubic-bezier(0.2, 0.7, 0.3, 1) forwards;
+}
+
+@keyframes blyrics-fs-rate-ray {
+  0% {
+    opacity: 0;
+    transform: rotate(var(--a)) translateY(calc(var(--d0) * -1px)) scaleY(0.35);
+  }
+  22% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: rotate(var(--a)) translateY(calc(var(--d1) * -1px)) scaleY(1);
+  }
+}
+
+.blyrics-fs-rate-dot {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 4px;
+  height: 4px;
+  margin: -2px 0 0 -2px;
+  border-radius: 50%;
+  background: currentColor;
+  opacity: 0;
+}
+
+.blyrics-fs-rate-dot--go {
+  animation: blyrics-fs-rate-dot 320ms cubic-bezier(0.2, 0.7, 0.3, 1) forwards;
+}
+
+@keyframes blyrics-fs-rate-dot {
+  0% {
+    opacity: 0;
+    transform: translate(0, 0) scale(1);
+  }
+  22% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translate(var(--dx), var(--dy)) scale(0.3);
+  }
+}
+
+/* -- Transport ripple + pop + nudge ----------------------------------------- */
+.blyrics-fs-disc.blyrics-control-pop {
+  animation: blyrics-control-pop 300ms cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.blyrics-control-nudge-prev svg {
+  animation: blyrics-control-nudge-prev 300ms cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.blyrics-control-nudge-next svg {
+  animation: blyrics-control-nudge-next 300ms cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.blyrics-control-ripple-layer {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+.blyrics-control-ripple {
+  position: absolute;
+  border-radius: 50%;
+  background: rgb(255 255 255 / 34%);
+  opacity: 0.7;
+  transform: scale(0);
+  pointer-events: none;
+}
+
+.blyrics-control-ripple--go {
+  animation: blyrics-control-ripple 480ms ease-out forwards;
+}
+
+@keyframes blyrics-control-ripple {
+  to {
+    transform: scale(2.6);
+    opacity: 0;
+  }
+}
+
+@keyframes blyrics-control-pop {
+  0% {
+    transform: scale(0.9);
+  }
+  50% {
+    transform: scale(1.12);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+@keyframes blyrics-control-nudge-prev {
+  30% {
+    transform: translateX(-22%);
+  }
+  100% {
+    transform: translateX(0);
+  }
+}
+
+@keyframes blyrics-control-nudge-next {
+  30% {
+    transform: translateX(22%);
+  }
+  100% {
+    transform: translateX(0);
+  }
 }

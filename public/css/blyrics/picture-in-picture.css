@@ -289,6 +289,79 @@ body {
   display: block;
 }
 
+/* -- Transport ripple + pop + nudge ----------------------------------------- */
+/* The pop rides the disc (::before), not the button, for the same reason the hover
+   pop does: scaling the button slides the skip glyph's hard outer bar sideways. */
+.blyrics-pip-artwork__control.blyrics-control-pop::before {
+  animation: blyrics-control-pop 300ms cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.blyrics-control-nudge-prev svg {
+  animation: blyrics-control-nudge-prev 300ms cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.blyrics-control-nudge-next svg {
+  animation: blyrics-control-nudge-next 300ms cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.blyrics-control-ripple-layer {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+.blyrics-control-ripple {
+  position: absolute;
+  border-radius: 50%;
+  background: rgb(255 255 255 / 34%);
+  opacity: 0.7;
+  transform: scale(0);
+  pointer-events: none;
+}
+
+.blyrics-control-ripple--go {
+  animation: blyrics-control-ripple 480ms ease-out forwards;
+}
+
+@keyframes blyrics-control-ripple {
+  to {
+    transform: scale(2.6);
+    opacity: 0;
+  }
+}
+
+@keyframes blyrics-control-pop {
+  0% {
+    transform: scale(0.9);
+  }
+  50% {
+    transform: scale(1.12);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+@keyframes blyrics-control-nudge-prev {
+  30% {
+    transform: translateX(-22%);
+  }
+  100% {
+    transform: translateX(0);
+  }
+}
+
+@keyframes blyrics-control-nudge-next {
+  30% {
+    transform: translateX(22%);
+  }
+  100% {
+    transform: translateX(0);
+  }
+}
+
 .blyrics-pip-content {
   display: flex;
   min-width: 0;
