@@ -63,7 +63,7 @@ function ratingButton(doc: Document, kind: "like" | "dislike", label: string, cl
   return button;
 }
 
-const RATE_BURST_RAYS = 10;
+const RATE_BURST_RAYS = 8;
 
 function playLikeBurst(button: HTMLButtonElement): void {
   const doc = button.ownerDocument;
