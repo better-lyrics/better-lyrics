@@ -58,6 +58,8 @@ export function createProgressBar(options: ProgressBarOptions): ProgressBarHandl
   let scrubValue = 0;
   let pendingSeekS: number | null = null;
   let pendingSeekWall = 0;
+  let frame = 0;
+  let running = false;
 
   const measure = (): void => {
     barWidth = bar.getBoundingClientRect().width;
@@ -103,7 +105,20 @@ export function createProgressBar(options: ProgressBarOptions): ProgressBarHandl
       currentS = interpolate(snapshot ?? null, win.Date.now());
     }
     paint(currentS, durationS);
+    if (running) frame = win.requestAnimationFrame(tick);
+  };
+
+  const start = (): void => {
+    if (running) return;
+    running = true;
+    measure();
     frame = win.requestAnimationFrame(tick);
+  };
+
+  const stop = (): void => {
+    if (!running) return;
+    running = false;
+    win.cancelAnimationFrame(frame);
   };
 
   const onPointerDown = (event: PointerEvent): void => {
@@ -163,14 +178,18 @@ export function createProgressBar(options: ProgressBarOptions): ProgressBarHandl
   bar.addEventListener("pointercancel", onPointerUp);
   endTime.addEventListener("click", onEndClick);
 
-  measure();
-  let frame = win.requestAnimationFrame(tick);
+  const visibilityObserver = new win.IntersectionObserver(entries => {
+    if (entries.some(entry => entry.isIntersecting)) start();
+    else stop();
+  });
+  visibilityObserver.observe(element);
 
   return {
     element,
     destroy(): void {
-      win.cancelAnimationFrame(frame);
+      stop();
       resizeObserver.disconnect();
+      visibilityObserver.disconnect();
     },
   };
 }
