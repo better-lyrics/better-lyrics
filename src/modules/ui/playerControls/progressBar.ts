@@ -15,6 +15,7 @@ export interface ProgressBarHandle {
 const GLIDE_MS = 260;
 const SEEK_LATCH_TOLERANCE_S = 1;
 const SEEK_LATCH_TIMEOUT_MS = 2000;
+const JUMP_GLIDE_THRESHOLD_S = 0.75;
 
 export function createProgressBar(options: ProgressBarOptions): ProgressBarHandle {
   const { doc, getSnapshot, onSeek } = options;
@@ -51,10 +52,12 @@ export function createProgressBar(options: ProgressBarOptions): ProgressBarHandl
 
   let barWidth = 0;
   let dragging = false;
-  let glideFrom = 0;
-  let glideTo = 0;
-  let glideStart = 0;
+  let displayedS: number | null = null;
   let gliding = false;
+  let glideFrom = 0;
+  let glideStart = 0;
+  let glideTarget = 0;
+  let glideTracksLive = false;
   let scrubValue = 0;
   let pendingSeekS: number | null = null;
   let pendingSeekWall = 0;
@@ -82,29 +85,44 @@ export function createProgressBar(options: ProgressBarOptions): ProgressBarHandl
       endTime.dataset.mode === "remaining" ? formatRemaining(currentS, durationS) : formatTime(durationS);
   };
 
+  const liveTarget = (snapshot: PlaybackSnapshot | null, now: number): number => {
+    const live = interpolate(snapshot, win.Date.now());
+    if (pendingSeekS === null) return live;
+    if (Math.abs(live - pendingSeekS) < SEEK_LATCH_TOLERANCE_S || now - pendingSeekWall > SEEK_LATCH_TIMEOUT_MS) {
+      pendingSeekS = null;
+      return live;
+    }
+    return pendingSeekS;
+  };
+
   const tick = (): void => {
     const snapshot = getSnapshot();
     const durationS = snapshot?.durationS ?? 0;
     const now = win.performance.now();
-    let currentS: number;
+
     if (gliding) {
+      const target = glideTracksLive ? liveTarget(snapshot, now) : glideTarget;
       const k = clamp01((now - glideStart) / GLIDE_MS);
-      currentS = glideFrom + (glideTo - glideFrom) * easeOutCubic(k);
-      if (k >= 1) gliding = false;
-    } else if (dragging) {
-      currentS = scrubValue;
-    } else if (pendingSeekS !== null) {
-      const live = interpolate(snapshot ?? null, win.Date.now());
-      if (Math.abs(live - pendingSeekS) < SEEK_LATCH_TOLERANCE_S || now - pendingSeekWall > SEEK_LATCH_TIMEOUT_MS) {
-        currentS = live;
-        pendingSeekS = null;
-      } else {
-        currentS = pendingSeekS;
+      displayedS = glideFrom + (target - glideFrom) * easeOutCubic(k);
+      if (k >= 1) {
+        gliding = false;
+        displayedS = target;
       }
+    } else if (dragging) {
+      displayedS = scrubValue;
     } else {
-      currentS = interpolate(snapshot ?? null, win.Date.now());
+      const target = liveTarget(snapshot, now);
+      if (displayedS === null || Math.abs(target - displayedS) <= JUMP_GLIDE_THRESHOLD_S) {
+        displayedS = target;
+      } else {
+        gliding = true;
+        glideTracksLive = true;
+        glideFrom = displayedS;
+        glideStart = now;
+      }
     }
-    paint(currentS, durationS);
+
+    paint(displayedS ?? 0, durationS);
     if (running) frame = win.requestAnimationFrame(tick);
   };
 
@@ -119,6 +137,8 @@ export function createProgressBar(options: ProgressBarOptions): ProgressBarHandl
     if (!running) return;
     running = false;
     win.cancelAnimationFrame(frame);
+    gliding = false;
+    displayedS = null;
   };
 
   const onPointerDown = (event: PointerEvent): void => {
@@ -128,9 +148,11 @@ export function createProgressBar(options: ProgressBarOptions): ProgressBarHandl
     dragging = true;
     bar.classList.add("dragging");
     bar.setPointerCapture(event.pointerId);
-    glideFrom = interpolate(getSnapshot() ?? null, win.Date.now());
-    glideTo = positionFor(event.clientX) * durationS;
-    scrubValue = glideTo;
+    const clicked = positionFor(event.clientX) * durationS;
+    glideFrom = displayedS ?? interpolate(getSnapshot() ?? null, win.Date.now());
+    glideTarget = clicked;
+    glideTracksLive = false;
+    scrubValue = clicked;
     glideStart = win.performance.now();
     gliding = true;
   };
@@ -148,7 +170,7 @@ export function createProgressBar(options: ProgressBarOptions): ProgressBarHandl
     bar.classList.remove("dragging");
     if (bar.hasPointerCapture(event.pointerId)) bar.releasePointerCapture(event.pointerId);
     const durationS = getSnapshot()?.durationS ?? 0;
-    const target = gliding ? glideTo : scrubValue;
+    const target = gliding ? glideTarget : scrubValue;
     const seekS = clamp01(durationS > 0 ? target / durationS : 0) * durationS;
     pendingSeekS = seekS;
     pendingSeekWall = win.performance.now();
