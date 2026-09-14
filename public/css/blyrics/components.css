@@ -1241,6 +1241,15 @@ ytmusic-player-page:not([is-mweb-modernization-enabled]) #side-panel.blyrics-has
 	opacity: 0.8;
 }
 
+#blyrics-song-info .blyrics-song-link {
+	color: inherit;
+	text-decoration: none;
+}
+
+#blyrics-song-info .blyrics-song-link:hover {
+	text-decoration: underline;
+}
+
 @keyframes blyrics-spin {
 	0% {
 		transform: rotate(0deg);
@@ -1459,6 +1468,10 @@ html[blyrics-no-fs-controls] .blyrics-fs-info-actions {
 .blyrics-fs-disc:hover {
   background: rgb(255 255 255 / 24%);
   transform: scale(1.06);
+}
+
+.blyrics-fs-disc[data-menu-open] {
+  background: rgb(255 255 255 / 24%);
 }
 
 .blyrics-fs-disc:focus,

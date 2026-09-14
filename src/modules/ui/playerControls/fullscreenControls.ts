@@ -1,11 +1,10 @@
-import { PLAYER_BAR_SELECTOR } from "@constants";
 import { logContent } from "@core/logger";
 import { attachTransportAnimation } from "./controlAnimations";
 import { playerControlIcons } from "./icons";
 import {
   getRatingState,
   isAdPlaying,
-  isSignedIn,
+  observeRating,
   openQuickActions,
   seekTo,
   sendTransport,
@@ -99,10 +98,7 @@ function playLikeBurst(button: HTMLButtonElement): void {
   win.setTimeout(() => burst.remove(), 540);
 }
 
-export function wrapSongInfoWithActions(
-  doc: Document,
-  songInfo: HTMLElement
-): { row: HTMLElement; moreButton: HTMLButtonElement } {
+export function wrapSongInfoWithActions(doc: Document, songInfo: HTMLElement): HTMLElement {
   const row = doc.createElement("div");
   row.className = "blyrics-fs-info-row";
   const actions = doc.createElement("div");
@@ -111,10 +107,10 @@ export function wrapSongInfoWithActions(
   moreButton.addEventListener("click", () => openQuickActions(doc, moreButton));
   actions.appendChild(moreButton);
   row.append(songInfo, actions);
-  return { row, moreButton };
+  return row;
 }
 
-export function createFullscreenControls(doc: Document, moreButton?: HTMLButtonElement): FullscreenControlsHandle {
+export function createFullscreenControls(doc: Document): FullscreenControlsHandle {
   const element = doc.createElement("div");
   element.className = "blyrics-fs-controls";
 
@@ -173,16 +169,11 @@ export function createFullscreenControls(doc: Document, moreButton?: HTMLButtonE
     wasLiked = liked;
   };
 
-  const likeRenderer = doc.querySelector(`${PLAYER_BAR_SELECTOR} ytmusic-like-button-renderer#like-button-renderer`);
-  const ratingObserver = new MutationObserver(() => applyRating(true));
-  if (likeRenderer) ratingObserver.observe(likeRenderer, { attributes: true, attributeFilter: ["like-status"] });
+  const stopRatingObserver = observeRating(doc, () => applyRating(true));
   applyRating(false);
 
   const syncAvailability = (): void => {
-    const signedIn = isSignedIn(doc);
-    element.toggleAttribute("data-signed-out", !signedIn);
     element.toggleAttribute("data-ad", isAdPlaying(doc));
-    moreButton?.classList.toggle("blyrics-fs-more--hidden", !signedIn);
   };
   syncAvailability();
 
@@ -192,7 +183,7 @@ export function createFullscreenControls(doc: Document, moreButton?: HTMLButtonE
     element,
     destroy() {
       progress.destroy();
-      ratingObserver.disconnect();
+      stopRatingObserver();
       element.remove();
     },
     setSnapshot(next) {

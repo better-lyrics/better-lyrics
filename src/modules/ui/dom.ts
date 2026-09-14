@@ -43,6 +43,7 @@ import {
   type FullscreenControlsHandle,
   wrapSongInfoWithActions,
 } from "@modules/ui/playerControls/fullscreenControls";
+import { getBylineLinks } from "@modules/ui/playerControls/playerBarControls";
 import type { PlaybackSnapshot } from "@modules/ui/playerControls/playhead";
 import { getResumeScrollElement } from "@modules/ui/resumeScrollButton";
 import { getRequest, setRequest } from "@modules/unison/lyricsRequestTracker";
@@ -1653,6 +1654,15 @@ function trackFullscreenColumnWidth(column: HTMLElement): void {
   fullscreenColumnWidthObserver.observe(player);
 }
 
+function songInfoLabel(text: string, href: string | null): Node {
+  if (!href) return document.createTextNode(text);
+  const link = document.createElement("a");
+  link.className = "blyrics-song-link";
+  link.href = href;
+  link.textContent = text;
+  return link;
+}
+
 export function injectSongAttributes(title: string, artist: string, album?: string): void {
   const mainPanel = document.getElementById("main-panel")!;
   console.assert(mainPanel != null);
@@ -1666,17 +1676,23 @@ export function injectSongAttributes(title: string, artist: string, album?: stri
   fullscreenColumnWidthObserver?.disconnect();
   setFullscreenControls(null);
 
+  const { artistRuns, albumHref } = getBylineLinks(document);
+
   const titleElm = document.createElement("p");
   titleElm.id = "blyrics-title";
   titleElm.textContent = title;
 
   const artistElm = document.createElement("p");
   artistElm.id = "blyrics-artist";
-  artistElm.textContent = artist;
+  if (artistRuns.length > 0) {
+    for (const run of artistRuns) artistElm.appendChild(songInfoLabel(run.text, run.href));
+  } else {
+    artistElm.textContent = artist;
+  }
   if (album) {
     const albumElm = document.createElement("span");
     albumElm.id = "blyrics-album";
-    albumElm.textContent = ` · ${album}`;
+    albumElm.append(" · ", songInfoLabel(album, albumHref));
     artistElm.appendChild(albumElm);
   }
 
@@ -1685,10 +1701,10 @@ export function injectSongAttributes(title: string, artist: string, album?: stri
   songInfoWrapper.appendChild(titleElm);
   songInfoWrapper.appendChild(artistElm);
 
-  const { row, moreButton } = wrapSongInfoWithActions(document, songInfoWrapper);
+  const row = wrapSongInfoWithActions(document, songInfoWrapper);
   row.id = "blyrics-fs-info-row";
 
-  const controls = createFullscreenControls(document, moreButton);
+  const controls = createFullscreenControls(document);
   controls.element.id = "blyrics-fs-controls";
 
   const column = document.createElement("div");
