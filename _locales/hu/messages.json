@@ -83,6 +83,10 @@
     "message": "Homályosított albumborító megjelenítése a háttérben",
     "description": "Show album art background setting label"
   },
+  "options_display_fullscreenControls": {
+    "message": "Show player controls in fullscreen",
+    "description": "Toggle label for the playback controls strip (progress bar, transport, like and dislike) shown under the album art in the fullscreen lyrics view"
+  },
   "options_display_stylizedAnimations": {
     "message": "Stilizált animációk megjelenítése",
     "description": "Show stylized animations setting label"
@@ -174,6 +178,10 @@
   "options_display_pipMarquee": {
     "message": "Hosszú címek görgetése",
     "description": "Toggle label for whether a song title too long for the floating lyrics window scrolls across so it can be read in full"
+  },
+  "options_display_pipProgressBar": {
+    "message": "Show progress bar",
+    "description": "Toggle label, shown inside the floating lyrics window settings, for the seekable playback progress bar under the album art"
   },
   "options_display_shadersPromo": {
     "message": "Better Lyrics Shaders link mutatása",
