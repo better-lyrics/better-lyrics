@@ -1453,12 +1453,11 @@ html[blyrics-no-fs-controls] .blyrics-fs-info-actions {
   background: transparent;
   color: #fff;
   cursor: pointer;
-  transition: background 140ms ease, transform 140ms ease;
+  transition: background 140ms ease;
 }
 
 .blyrics-fs-disc:hover {
   background: rgb(255 255 255 / 24%);
-  transform: scale(1.06);
 }
 
 .blyrics-fs-disc:focus,
