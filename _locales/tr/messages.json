@@ -1201,29 +1201,27 @@
     "message": "Tema yüklenemedi. Bağlantınızı kontrol edin ve tekrar deneyin.",
     "description": "Alert when a symlinked theme fails to install from marketplace"
   },
-  "symlink_badge_marketplace": {
-    "message": "Mağaza",
-    "description": "Badge text on symlinked theme cards"
+  "theme_top_badge": {
+    "message": "#$RANK$ on the Marketplace",
+    "description": "Tooltip on a featured theme's rank medal",
+    "placeholders": {
+      "rank": {
+        "content": "$1",
+        "example": "1"
+      }
+    }
   },
-  "symlink_badge_bundled": {
-    "message": "Paketlenmiş",
-    "description": "Badge text on non-symlinked built-in theme cards"
+  "theme_modal_section_featured": {
+    "message": "Featured Themes",
+    "description": "Section title for featured themes (top marketplace picks and built-ins) in the theme chooser modal"
   },
-  "deprecation_builtin_title": {
-    "message": "Dikkat, bu temalar taşınıyor!",
-    "description": "Title for the built-in themes deprecation banner in theme modal"
+  "theme_modal_section_all": {
+    "message": "All Themes",
+    "description": "Section title for the user's installed marketplace themes in the theme chooser modal"
   },
-  "deprecation_builtin_body": {
-    "message": "Yerleşik temaları Tema Mağazası'na taşıyoruz. Bazıları halihazırda taşınmış durumda; Tema Mağazası rozetine bakabilirsiniz. Geri kalanlar ise gelecek bir güncellemede taşınacak; bu temaların CSS yedekleri GitHub ve Discord'da bulunacak.",
-    "description": "Body text for the built-in themes deprecation banner"
-  },
-  "deprecation_builtin_cta": {
-    "message": "Mağazayı Keşfedin",
-    "description": "CTA button text in the deprecation banner to open the marketplace"
-  },
-  "theme_modal_section_builtin": {
-    "message": "Yerleşik Temalar",
-    "description": "Section title for built-in themes in the theme chooser modal"
+  "theme_modal_browse": {
+    "message": "Browse Marketplace",
+    "description": "Link in the theme chooser modal that opens the full Theme Marketplace page"
   },
   "theme_modal_section_custom": {
     "message": "Özel Temalar",
