@@ -615,6 +615,7 @@ export async function updateThemeSelectorButton(): Promise<void> {
 
 // -- Featured ranking --------------------------
 const FEATURED_COUNT = 3;
+const FEATURED_CANDIDATE_COUNT = FEATURED_COUNT + 3;
 const BAYESIAN_CONFIDENCE = 10;
 const DEFAULT_GLOBAL_RATING = 4.5;
 const FEATURED_CACHE_KEY = "blyrics_featured_themes";
@@ -657,8 +658,8 @@ async function loadFeaturedThemes(): Promise<FeaturedTheme[]> {
 
       const statsResult = await fetchAllStats();
       if (!statsResult.success) return [];
-      const topIds = rankThemeIdsByBayesian(statsResult.data).slice(0, FEATURED_COUNT);
-      const ranked = await fetchStoreThemesByIds(topIds);
+      const topIds = rankThemeIdsByBayesian(statsResult.data).slice(0, FEATURED_CANDIDATE_COUNT);
+      const ranked = (await fetchStoreThemesByIds(topIds)).slice(0, FEATURED_COUNT);
       const featured = ranked.map(theme => ({ id: theme.id, title: theme.title, creators: theme.creators }));
       if (featured.length > 0) {
         featuredThemesCache = featured;
