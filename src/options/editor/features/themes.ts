@@ -8,7 +8,7 @@ import {
   installSymlinkedThemeFromMarketplace,
 } from "../../store/themeStoreManager";
 import { fetchAllStats } from "../../store/themeStoreApi";
-import { fetchAllStoreThemes } from "../../store/themeStoreService";
+import { fetchStoreThemesByIds } from "../../store/themeStoreService";
 import type { AllThemeStats, StoreTheme, ThemeSource, ThemeStats } from "../../store/types";
 import type { Theme } from "../../themes";
 import THEMES, { deleteCustomTheme, getCustomThemes, renameCustomTheme, saveCustomTheme } from "../../themes";
@@ -621,22 +621,22 @@ const DEFAULT_GLOBAL_RATING = 4.5;
 let featuredThemesCache: StoreTheme[] | null = null;
 let featuredThemesPromise: Promise<StoreTheme[]> | null = null;
 
-function rankThemesByBayesian(themes: StoreTheme[], stats: AllThemeStats): StoreTheme[] {
-  const rated = Object.values(stats).filter(stat => stat.ratingCount > 0);
+function rankThemeIdsByBayesian(stats: AllThemeStats): string[] {
+  const entries = Object.entries(stats);
+  const rated = entries.filter(([, stat]) => stat.ratingCount > 0);
   const globalMean = rated.length
-    ? rated.reduce((sum, stat) => sum + stat.rating, 0) / rated.length
+    ? rated.reduce((sum, [, stat]) => sum + stat.rating, 0) / rated.length
     : DEFAULT_GLOBAL_RATING;
-  const maxLogInstalls = Math.max(1, ...Object.values(stats).map(stat => Math.log10((stat.installs || 0) + 1)));
+  const maxLogInstalls = Math.max(1, ...entries.map(([, stat]) => Math.log10((stat.installs || 0) + 1)));
 
-  const scoreOf = (stat?: ThemeStats): number => {
-    if (!stat) return 0;
+  const scoreOf = (stat: ThemeStats): number => {
     const bayesianRating =
       (BAYESIAN_CONFIDENCE * globalMean + stat.rating * stat.ratingCount) / (BAYESIAN_CONFIDENCE + stat.ratingCount);
     const installsWeight = Math.log10((stat.installs || 0) + 1) / maxLogInstalls;
     return 0.55 * (bayesianRating / 5) + 0.45 * installsWeight;
   };
 
-  return [...themes].sort((a, b) => scoreOf(stats[b.id]) - scoreOf(stats[a.id]));
+  return entries.sort(([, a], [, b]) => scoreOf(b) - scoreOf(a)).map(([id]) => id);
 }
 
 async function loadFeaturedThemes(): Promise<StoreTheme[]> {
@@ -645,9 +645,10 @@ async function loadFeaturedThemes(): Promise<StoreTheme[]> {
 
   featuredThemesPromise = (async () => {
     try {
-      const [themes, statsResult] = await Promise.all([fetchAllStoreThemes(), fetchAllStats()]);
+      const statsResult = await fetchAllStats();
       if (!statsResult.success) return [];
-      const ranked = rankThemesByBayesian(themes, statsResult.data).slice(0, FEATURED_COUNT);
+      const topIds = rankThemeIdsByBayesian(statsResult.data).slice(0, FEATURED_COUNT);
+      const ranked = await fetchStoreThemesByIds(topIds);
       if (ranked.length > 0) featuredThemesCache = ranked;
       return ranked;
     } catch (error) {
