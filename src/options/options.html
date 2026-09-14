@@ -152,15 +152,12 @@
 					<div class="container">
 						<div class="setting-row__text">
 							<div class="setting-row__title-line">
-								<span>__MSG_options_display_letterWave__</span>
+								<span id="letterWaveLabel">__MSG_options_display_letterWave__</span>
 								<span class="setting-badge">__MSG_options_display_letterWaveBadge__</span>
-								<span class="setting-help" tabindex="0" data-tooltip="__MSG_options_display_letterWaveTooltip__" aria-label="__MSG_options_display_letterWaveTooltip__">?</span>
+								<span class="setting-help" tabindex="0" data-tooltip="__MSG_options_display_letterWaveTooltip__ __MSG_options_display_letterWaveTooltipStates__" aria-label="__MSG_options_display_letterWaveTooltip__ __MSG_options_display_letterWaveTooltipStates__">?</span>
 							</div>
 						</div>
-						<label>
-							<input type="checkbox" id="isLetterWaveEnabled">
-							<span class="checkmark"></span>
-						</label>
+						<button type="button" class="triswitch" id="letterWaveSwitch" role="slider" aria-labelledby="letterWaveLabel" aria-valuemin="0" aria-valuemax="2" aria-valuenow="1"></button>
 					</div>
 					<div class="container">
 						<span>__MSG_options_display_passiveScroll__</span>
@@ -975,7 +972,7 @@
 						</svg>
 					</a>
 					<svg class="rics-footer-sep" viewBox="0 0 4 4"><circle cx="2" cy="2" r="1.5" fill="currentColor"></circle></svg>
-					<a href="https://rics.boidu.dev" target="_blank">Playground</a>
+					<a href="https://rics.betterlyrics.org" target="_blank">Playground</a>
 					<svg class="rics-footer-sep" viewBox="0 0 4 4"><circle cx="2" cy="2" r="1.5" fill="currentColor"></circle></svg>
 					<a href="https://github.com/better-lyrics/rics" target="_blank">Docs</a>
 				</div>

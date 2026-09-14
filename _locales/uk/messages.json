@@ -99,6 +99,10 @@
     "message": "Текст стає живішим завдяки плавному руху кожної літери під час співу. Вимкніть це, якщо прокручування тексту на вашому пристрої виглядає рваною.",
     "description": "Tooltip explaining the letter wave animation and its performance impact"
   },
+  "options_display_letterWaveTooltipStates": {
+    "message": "Автоматично вимкнено, якщо не ввімкнено темою. Ручне вмикання чи вимикання ігнорує всі теми.",
+    "description": "Appended to the letter wave tooltip, explaining the three switch states"
+  },
   "options_display_passiveScroll": {
     "message": "Прокручування несинхронізованих текстів",
     "description": "Auto-scroll unsynced lyrics setting label"
@@ -388,7 +392,7 @@
     "description": "Your identity label"
   },
   "options_identity_unisonStats": {
-    "message": "Unison Stats",
+    "message": "Статистика Unison",
     "description": "Section title above the user's own Unison level, tier, rank and badges on the Identity tab"
   },
   "options_identity_loading": {
@@ -1722,7 +1726,7 @@
     "description": "Shown when a lyrics report fails to submit"
   },
   "unison_level": {
-    "message": "Level $level$",
+    "message": "Рівень $level$",
     "description": "Shows a Unison contributor's numeric level. $level$ is a positive integer",
     "placeholders": {
       "level": {
@@ -1732,7 +1736,7 @@
     }
   },
   "unison_xpToNext": {
-    "message": "$xp$ XP to Level $level$",
+    "message": "$xp$ ОД до рівня $level$",
     "description": "Explains how much experience remains before the next Unison level. $xp$ is a positive integer, $level$ is the next level number",
     "placeholders": {
       "xp": {
@@ -1746,11 +1750,11 @@
     }
   },
   "unison_maxLevel": {
-    "message": "Max level",
+    "message": "Максимальний рівень",
     "description": "Shown in place of the XP-to-next text when a Unison contributor is at the highest level"
   },
   "unison_rank": {
-    "message": "Rank #$rank$",
+    "message": "Позиція №$rank$",
     "description": "Shows a Unison contributor's leaderboard rank within their tier. $rank$ is a positive integer",
     "placeholders": {
       "rank": {
@@ -1760,7 +1764,7 @@
     }
   },
   "unison_viewProfile": {
-    "message": "View full profile",
+    "message": "Повний профіль",
     "description": "Link on the Identity tab that opens the user's full Unison profile in a new tab"
   },
   "unison_submitted_this": {

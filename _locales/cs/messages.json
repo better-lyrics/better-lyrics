@@ -99,6 +99,10 @@
     "message": "Lyrics feel more alive with a gentle rolling motion across each letter as they're sung. Turn it off if lyrics scroll feels choppy on your device.",
     "description": "Tooltip explaining the letter wave animation and its performance impact"
   },
+  "options_display_letterWaveTooltipStates": {
+    "message": "Auto stays off unless a theme turns it on. On and Off override any theme.",
+    "description": "Appended to the letter wave tooltip, explaining the three switch states"
+  },
   "options_display_passiveScroll": {
     "message": "Auto-scroll unsynced lyrics",
     "description": "Auto-scroll unsynced lyrics setting label"

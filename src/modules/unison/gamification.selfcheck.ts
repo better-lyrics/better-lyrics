@@ -77,8 +77,8 @@ const raw: RawCatalogue = {
 }
 
 {
-  const base = "https://unison.boidu.dev";
-  assert.equal(absoluteAssetUrl(base, "/badges/x.svg"), "https://unison.boidu.dev/badges/x.svg");
+  const base = "https://unison.betterlyrics.org";
+  assert.equal(absoluteAssetUrl(base, "/badges/x.svg"), "https://unison.betterlyrics.org/badges/x.svg");
   assert.equal(absoluteAssetUrl(base, "https://cdn.example.com/x.svg"), "https://cdn.example.com/x.svg");
   assert.equal(absoluteAssetUrl(base, "http://cdn.example.com/x.svg"), "http://cdn.example.com/x.svg");
 }
