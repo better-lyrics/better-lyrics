@@ -1,7 +1,7 @@
 import { t } from "@core/i18n";
 import { getSyncStorage } from "@core/storage";
 import { formatCreators, saveCustomCss } from "@core/customCss";
-import { STORE_THEME_PREFIX } from "@core/storage";
+import { getTransientStorage, setTransientStorage, STORE_THEME_PREFIX } from "@core/storage";
 import {
   getInstalledStoreThemes,
   getInstalledTheme,
@@ -9,7 +9,7 @@ import {
 } from "../../store/themeStoreManager";
 import { fetchAllStats } from "../../store/themeStoreApi";
 import { fetchStoreThemesByIds } from "../../store/themeStoreService";
-import type { AllThemeStats, StoreTheme, ThemeSource, ThemeStats } from "../../store/types";
+import type { AllThemeStats, ThemeSource, ThemeStats } from "../../store/types";
 import type { Theme } from "../../themes";
 import THEMES, { deleteCustomTheme, getCustomThemes, renameCustomTheme, saveCustomTheme } from "../../themes";
 import { SAVE_CUSTOM_THEME_DEBOUNCE, SAVE_DEBOUNCE_DELAY } from "../core/editor";
@@ -617,9 +617,13 @@ export async function updateThemeSelectorButton(): Promise<void> {
 const FEATURED_COUNT = 3;
 const BAYESIAN_CONFIDENCE = 10;
 const DEFAULT_GLOBAL_RATING = 4.5;
+const FEATURED_CACHE_KEY = "blyrics_featured_themes";
+const FEATURED_CACHE_TTL_MS = 24 * 60 * 60 * 1000;
 
-let featuredThemesCache: StoreTheme[] | null = null;
-let featuredThemesPromise: Promise<StoreTheme[]> | null = null;
+type FeaturedTheme = { id: string; title: string; creators: string[] };
+
+let featuredThemesCache: FeaturedTheme[] | null = null;
+let featuredThemesPromise: Promise<FeaturedTheme[]> | null = null;
 
 function rankThemeIdsByBayesian(stats: AllThemeStats): string[] {
   const entries = Object.entries(stats);
@@ -639,18 +643,28 @@ function rankThemeIdsByBayesian(stats: AllThemeStats): string[] {
   return entries.sort(([, a], [, b]) => scoreOf(b) - scoreOf(a)).map(([id]) => id);
 }
 
-async function loadFeaturedThemes(): Promise<StoreTheme[]> {
+async function loadFeaturedThemes(): Promise<FeaturedTheme[]> {
   if (featuredThemesCache) return featuredThemesCache;
   if (featuredThemesPromise) return featuredThemesPromise;
 
   featuredThemesPromise = (async () => {
     try {
+      const cached: FeaturedTheme[] | null = await getTransientStorage(FEATURED_CACHE_KEY);
+      if (cached && cached.length > 0) {
+        featuredThemesCache = cached;
+        return cached;
+      }
+
       const statsResult = await fetchAllStats();
       if (!statsResult.success) return [];
       const topIds = rankThemeIdsByBayesian(statsResult.data).slice(0, FEATURED_COUNT);
       const ranked = await fetchStoreThemesByIds(topIds);
-      if (ranked.length > 0) featuredThemesCache = ranked;
-      return ranked;
+      const featured = ranked.map(theme => ({ id: theme.id, title: theme.title, creators: theme.creators }));
+      if (featured.length > 0) {
+        featuredThemesCache = featured;
+        await setTransientStorage(FEATURED_CACHE_KEY, featured, FEATURED_CACHE_TTL_MS);
+      }
+      return featured;
     } catch (error) {
       warnEditor("Failed to load featured marketplace themes:", error);
       return [];
@@ -660,10 +674,6 @@ async function loadFeaturedThemes(): Promise<StoreTheme[]> {
   })();
 
   return featuredThemesPromise;
-}
-
-export function preloadFeaturedThemes(): void {
-  void loadFeaturedThemes();
 }
 
 // -- Theme modal --------------------------
