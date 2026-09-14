@@ -1214,20 +1214,40 @@ ytmusic-player-page:not([is-mweb-modernization-enabled]) #side-panel.blyrics-has
 	display: none;
 	z-index: 2;
 	max-width: 40rem;
+	text-align: left;
 	font-family: var(--blyrics-font-family);
 }
 
 #blyrics-song-info > p#blyrics-title {
+	overflow: hidden;
+	margin: 0;
 	font-size: 2rem;
 	font-weight: 700;
-	margin: 0;
+	text-overflow: ellipsis;
+	white-space: nowrap;
 }
 
 #blyrics-song-info > p#blyrics-artist {
-	font-size: 1.5rem;
+	overflow: hidden;
 	margin: 0;
-	opacity: 0.5;
 	margin-top: 0.25rem;
+	font-size: 1.5rem;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+	opacity: 0.5;
+}
+
+#blyrics-song-info #blyrics-album {
+	opacity: 0.8;
+}
+
+#blyrics-song-info .blyrics-song-link {
+	color: inherit;
+	text-decoration: none;
+}
+
+#blyrics-song-info .blyrics-song-link:hover {
+	text-decoration: underline;
 }
 
 @keyframes blyrics-spin {
@@ -1256,4 +1276,448 @@ ytmusic-player-page:not([is-mweb-modernization-enabled]) #side-panel.blyrics-has
 		border-radius: 1.75rem;
 		corner-shape: superellipse(1.6);
 	}
+}
+
+/* -- Player progress bar --------------------------------------------------- */
+.blyrics-progress {
+  --blyrics-progress-track: rgb(255 255 255 / 22%);
+  --blyrics-progress-dot-shadow: 0 1px 3px rgb(0 0 0 / 38%), 0 3px 8px rgb(0 0 0 / 24%);
+}
+
+.blyrics-progress__bar {
+  position: relative;
+  width: 100%;
+  height: 4px;
+  border-radius: 999px;
+  background: var(--blyrics-progress-track);
+  cursor: pointer;
+  touch-action: none;
+}
+
+.blyrics-progress__bar::before {
+  content: "";
+  position: absolute;
+  inset: -16px 0;
+}
+
+.blyrics-progress__fill-clip {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  border-radius: 999px;
+}
+
+.blyrics-progress__fill {
+  position: absolute;
+  inset: 0;
+  background: #fff;
+  transform: scaleX(0);
+  transform-origin: left center;
+  will-change: transform;
+}
+
+.blyrics-progress__knob {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  width: 20px;
+  height: 20px;
+  margin: -10px 0 0 -10px;
+  will-change: transform;
+}
+
+.blyrics-progress__knob-dot {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: var(--blyrics-progress-dot-shadow);
+  transform: translate(-50%, -50%) scale(1);
+  transition:
+    transform 150ms cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 140ms ease;
+}
+
+.blyrics-progress__bar:hover .blyrics-progress__knob-dot {
+  box-shadow: 0 0 0 4px rgb(255 255 255 / 16%), var(--blyrics-progress-dot-shadow);
+}
+
+.blyrics-progress__knob:hover .blyrics-progress__knob-dot,
+.blyrics-progress__bar.dragging .blyrics-progress__knob-dot {
+  box-shadow: var(--blyrics-progress-dot-shadow);
+  transform: translate(-50%, -50%) scale(1.3);
+}
+
+.blyrics-progress__times {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  margin-top: 6px;
+  color: rgb(255 255 255 / 60%);
+  font-variant-numeric: tabular-nums;
+}
+
+.blyrics-progress__end {
+  margin: -3px -5px;
+  padding: 3px 5px;
+  border: 0;
+  border-radius: 6px;
+  background: none;
+  color: inherit;
+  font: inherit;
+  font-variant-numeric: tabular-nums;
+  cursor: pointer;
+  transform-origin: 100% 50%;
+  transition: background 140ms ease, color 140ms ease;
+}
+
+.blyrics-progress__end:hover {
+  background: rgb(255 255 255 / 10%);
+  color: #fff;
+}
+
+/* -- Fullscreen player controls -------------------------------------------- */
+/* Enhanced fullscreen only; the column sits under the album art in #main-panel. */
+#blyrics-fs-column {
+  display: none;
+}
+
+ytmusic-player-page[player-fullscreened]:not([blyrics-dfs]) #blyrics-fs-column {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  width: 100%;
+  margin-top: 2rem;
+  /* #main-panel centres [art, column] and the base layout pulls the song block up by one
+     nav-bar height; carry that here so the art-to-title gap is the 2rem margin, not 2rem + 64px. */
+  transform: translateY(calc(var(--ytmusic-nav-bar-height) * -1));
+  text-align: left;
+}
+
+/* Neutralise the base/theme centring and translate on song info so the whole
+   column (info row, more button, controls) positions as one block. */
+#blyrics-fs-column #blyrics-song-info {
+  display: block;
+  transform: none;
+  max-width: none;
+  margin: 0;
+  padding: 0;
+  text-align: left;
+}
+
+.blyrics-fs-info-row {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.blyrics-fs-info-row #blyrics-song-info {
+  min-width: 0;
+  flex: 1;
+}
+
+.blyrics-fs-info-actions {
+  flex: 0 0 auto;
+}
+
+#blyrics-fs-controls {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+#blyrics-fs-controls[data-ad] {
+  display: none;
+}
+
+html[blyrics-no-fs-controls] #blyrics-fs-controls,
+html[blyrics-no-fs-controls] .blyrics-fs-info-actions {
+  display: none;
+}
+
+#blyrics-fs-controls .blyrics-progress {
+  width: 100%;
+}
+
+.blyrics-fs-more {
+  width: 2.75rem;
+  height: 2.75rem;
+}
+
+.blyrics-fs-disc {
+  position: relative;
+  display: grid;
+  flex: 0 0 auto;
+  width: 3.25rem;
+  height: 3.25rem;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  place-items: center;
+  background: transparent;
+  color: #fff;
+  cursor: pointer;
+  transition: background 140ms ease, transform 140ms ease;
+}
+
+.blyrics-fs-disc:hover {
+  background: rgb(255 255 255 / 24%);
+  transform: scale(1.06);
+}
+
+.blyrics-fs-disc[data-menu-open] {
+  background: rgb(255 255 255 / 24%);
+}
+
+.blyrics-fs-disc:focus,
+.blyrics-progress__end:focus,
+.blyrics-progress__bar:focus {
+  outline: none;
+}
+
+.blyrics-fs-disc:focus-visible,
+.blyrics-progress__end:focus-visible {
+  outline: 2px solid rgb(255 255 255 / 40%);
+  outline-offset: 2px;
+}
+
+.blyrics-fs-disc svg {
+  width: 56%;
+  height: 56%;
+}
+
+.blyrics-fs-transport-slot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.blyrics-fs-transport-mid {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.blyrics-fs-play {
+  width: 4.25rem;
+  height: 4.25rem;
+  background: #fff;
+  color: #111;
+}
+
+.blyrics-fs-play:hover {
+  background: #fff;
+}
+
+.blyrics-fs-play svg {
+  width: 46%;
+  height: 46%;
+}
+
+.blyrics-fs-disc[data-active] {
+  color: #fff;
+}
+
+/* -- Rating icons (layered outline + masked fill) --------------------------- */
+.blyrics-fs-rate-icon {
+  position: relative;
+  width: 56%;
+  height: 56%;
+}
+
+.blyrics-fs-rate-layer {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+}
+
+.blyrics-fs-disc .blyrics-fs-rate-layer svg {
+  width: 100%;
+  height: 100%;
+}
+
+.blyrics-fs-rate-layer--fill {
+  clip-path: inset(100% 0 0 0);
+}
+
+.blyrics-fs-like[data-active] .blyrics-fs-rate-layer--fill,
+.blyrics-fs-dislike[data-active] .blyrics-fs-rate-layer--fill {
+  clip-path: inset(0 0 0 0);
+}
+
+.blyrics-fs-like.blyrics-fs-rate-fire .blyrics-fs-rate-icon {
+  animation: blyrics-fs-rate-pop 640ms cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes blyrics-fs-rate-pop {
+  0% {
+    transform: scale(0.72) rotate(0deg);
+  }
+  35% {
+    transform: scale(1.24) rotate(-6deg);
+  }
+  65% {
+    transform: scale(1.05) rotate(6deg);
+  }
+  100% {
+    transform: scale(1) rotate(0deg);
+  }
+}
+
+.blyrics-fs-like.blyrics-fs-rate-fire .blyrics-fs-rate-layer--fill {
+  animation: blyrics-fs-rate-iris 900ms cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+@keyframes blyrics-fs-rate-iris {
+  from {
+    clip-path: circle(0% at 50% 55%);
+  }
+  to {
+    clip-path: circle(80% at 50% 55%);
+  }
+}
+
+.blyrics-fs-rate-burst {
+  position: absolute;
+  inset: 0;
+  overflow: visible;
+  pointer-events: none;
+}
+
+.blyrics-fs-rate-ray {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 2px;
+  height: 5px;
+  margin: -2.5px 0 0 -1px;
+  border-radius: 2px;
+  background: currentColor;
+  opacity: 0;
+  transform-origin: center;
+}
+
+.blyrics-fs-rate-ray--go {
+  animation: blyrics-fs-rate-ray 460ms cubic-bezier(0.2, 0.7, 0.3, 1) forwards;
+}
+
+@keyframes blyrics-fs-rate-ray {
+  0% {
+    opacity: 0;
+    transform: rotate(var(--a)) translateY(calc(var(--d0) * -1px)) scaleY(0.35);
+  }
+  22% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: rotate(var(--a)) translateY(calc(var(--d1) * -1px)) scaleY(1);
+  }
+}
+
+.blyrics-fs-rate-dot {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 3px;
+  height: 3px;
+  margin: -1.5px 0 0 -1.5px;
+  border-radius: 50%;
+  background: currentColor;
+  opacity: 0;
+}
+
+.blyrics-fs-rate-dot--go {
+  animation: blyrics-fs-rate-dot 480ms cubic-bezier(0.2, 0.7, 0.3, 1) forwards;
+}
+
+@keyframes blyrics-fs-rate-dot {
+  0% {
+    opacity: 0;
+    transform: translate(0, 0) scale(1);
+  }
+  22% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translate(var(--dx), var(--dy)) scale(0.3);
+  }
+}
+
+/* -- Transport ripple + pop + nudge ----------------------------------------- */
+.blyrics-fs-disc.blyrics-control-pop {
+  animation: blyrics-fs-control-pop 280ms cubic-bezier(0.33, 1, 0.68, 1);
+}
+
+@keyframes blyrics-fs-control-pop {
+  0% {
+    transform: scale(0.93);
+  }
+  42% {
+    transform: scale(1.13);
+  }
+  100% {
+    transform: scale(1.06);
+  }
+}
+
+.blyrics-control-nudge-prev svg {
+  animation: blyrics-control-nudge-prev 300ms cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.blyrics-control-nudge-next svg {
+  animation: blyrics-control-nudge-next 300ms cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.blyrics-control-ripple-layer {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+.blyrics-control-ripple {
+  position: absolute;
+  border-radius: 50%;
+  background: rgb(255 255 255 / 34%);
+  opacity: 0.7;
+  transform: scale(0);
+  pointer-events: none;
+}
+
+.blyrics-control-ripple--go {
+  animation: blyrics-control-ripple 480ms ease-out forwards;
+}
+
+@keyframes blyrics-control-ripple {
+  to {
+    transform: scale(2.6);
+    opacity: 0;
+  }
+}
+
+@keyframes blyrics-control-nudge-prev {
+  30% {
+    transform: translateX(-22%);
+  }
+  100% {
+    transform: translateX(0);
+  }
+}
+
+@keyframes blyrics-control-nudge-next {
+  30% {
+    transform: translateX(22%);
+  }
+  100% {
+    transform: translateX(0);
+  }
 }

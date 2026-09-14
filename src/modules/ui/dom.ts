@@ -38,6 +38,13 @@ import type { ThumbnailElement } from "@modules/lyrics/requestSniffer/NextRespon
 import { getArtworkMetadata } from "@modules/lyrics/requestSniffer/requestSniffer";
 import { lyricsElementAdded, mainView } from "@modules/ui/mainLyricsView";
 import { publishPictureInPictureLyrics } from "@modules/ui/pictureInPicture/lyricsPublisher";
+import {
+  createFullscreenControls,
+  type FullscreenControlsHandle,
+  wrapSongInfoWithActions,
+} from "@modules/ui/playerControls/fullscreenControls";
+import { getBylineLinks } from "@modules/ui/playerControls/playerBarControls";
+import type { PlaybackSnapshot } from "@modules/ui/playerControls/playhead";
 import { getResumeScrollElement } from "@modules/ui/resumeScrollButton";
 import { getRequest, setRequest } from "@modules/unison/lyricsRequestTracker";
 import { sealMarks } from "@modules/unison/gamification";
@@ -1623,14 +1630,53 @@ export function cleanup(): void {
  * @param title - Song title
  * @param artist - Artist name
  */
-export function injectSongAttributes(title: string, artist: string): void {
+let fullscreenControls: FullscreenControlsHandle | null = null;
+let fullscreenColumnWidthObserver: ResizeObserver | null = null;
+
+function setFullscreenControls(handle: FullscreenControlsHandle | null): void {
+  if (fullscreenControls && fullscreenControls !== handle) fullscreenControls.destroy();
+  fullscreenControls = handle;
+}
+
+export function updateFullscreenControlsSnapshot(snapshot: PlaybackSnapshot | null): void {
+  fullscreenControls?.setSnapshot(snapshot);
+}
+
+function trackFullscreenColumnWidth(column: HTMLElement): void {
+  fullscreenColumnWidthObserver?.disconnect();
+  const player = document.querySelector<HTMLElement>("#player.ytmusic-player-page");
+  if (!player) return;
+  const apply = (): void => {
+    column.style.width = `${player.getBoundingClientRect().width}px`;
+  };
+  apply();
+  fullscreenColumnWidthObserver = new ResizeObserver(apply);
+  fullscreenColumnWidthObserver.observe(player);
+}
+
+function songInfoLabel(text: string, href: string | null): Node {
+  if (!href) return document.createTextNode(text);
+  const link = document.createElement("a");
+  link.className = "blyrics-song-link";
+  link.href = href;
+  link.textContent = text;
+  return link;
+}
+
+export function injectSongAttributes(title: string, artist: string, album?: string): void {
   const mainPanel = document.getElementById("main-panel")!;
   console.assert(mainPanel != null);
+  const existingColumn = document.getElementById("blyrics-fs-column");
   const existingSongInfo = document.getElementById("blyrics-song-info");
   const existingWatermark = document.getElementById("blyrics-watermark");
 
+  existingColumn?.remove();
   existingSongInfo?.remove();
   existingWatermark?.remove();
+  fullscreenColumnWidthObserver?.disconnect();
+  setFullscreenControls(null);
+
+  const { artistRuns, albumHref } = getBylineLinks(document);
 
   const titleElm = document.createElement("p");
   titleElm.id = "blyrics-title";
@@ -1638,13 +1684,35 @@ export function injectSongAttributes(title: string, artist: string): void {
 
   const artistElm = document.createElement("p");
   artistElm.id = "blyrics-artist";
-  artistElm.textContent = artist;
+  if (artistRuns.length > 0) {
+    for (const run of artistRuns) artistElm.appendChild(songInfoLabel(run.text, run.href));
+  } else {
+    artistElm.textContent = artist;
+  }
+  if (album) {
+    const albumElm = document.createElement("span");
+    albumElm.id = "blyrics-album";
+    albumElm.append(" · ", songInfoLabel(album, albumHref));
+    artistElm.appendChild(albumElm);
+  }
 
   const songInfoWrapper = document.createElement("div");
   songInfoWrapper.id = "blyrics-song-info";
   songInfoWrapper.appendChild(titleElm);
   songInfoWrapper.appendChild(artistElm);
-  mainPanel.appendChild(songInfoWrapper);
+
+  const row = wrapSongInfoWithActions(document, songInfoWrapper);
+  row.id = "blyrics-fs-info-row";
+
+  const controls = createFullscreenControls(document);
+  controls.element.id = "blyrics-fs-controls";
+
+  const column = document.createElement("div");
+  column.id = "blyrics-fs-column";
+  column.append(row, controls.element);
+  mainPanel.appendChild(column);
+  trackFullscreenColumnWidth(column);
+  setFullscreenControls(controls);
 }
 
 /**
