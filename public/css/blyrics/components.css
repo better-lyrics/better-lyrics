@@ -1372,7 +1372,7 @@ ytmusic-player-page:not([is-mweb-modernization-enabled]) #side-panel.blyrics-has
   display: none;
 }
 
-html:not([blyrics-no-fs-controls]) ytmusic-player-page[player-fullscreened]:not([blyrics-dfs]) #blyrics-fs-column {
+ytmusic-player-page[player-fullscreened]:not([blyrics-dfs]) #blyrics-fs-column {
   display: flex;
   flex-direction: column;
   gap: 2rem;
@@ -1417,6 +1417,11 @@ html:not([blyrics-no-fs-controls]) ytmusic-player-page[player-fullscreened]:not(
 }
 
 #blyrics-fs-controls[data-ad] {
+  display: none;
+}
+
+html[blyrics-no-fs-controls] #blyrics-fs-controls,
+html[blyrics-no-fs-controls] .blyrics-fs-info-actions {
   display: none;
 }
 
