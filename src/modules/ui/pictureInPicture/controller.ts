@@ -7,8 +7,8 @@ import type {
 } from "./types";
 
 const REQUEST_OPTIONS = {
-  width: 540,
-  height: 280,
+  width: 720,
+  height: 300,
   disallowReturnToOpener: true,
 } as const satisfies DocumentPictureInPictureWindowOptions;
 
