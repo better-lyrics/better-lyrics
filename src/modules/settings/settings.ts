@@ -435,6 +435,12 @@ export function loadTranslationSettings(): void {
   );
 }
 
+export function loadEndTimeModeSetting(): void {
+  getStorage({ endTimeMode: "total" }, items => {
+    AppState.endTimeMode = items.endTimeMode === "remaining" ? "remaining" : "total";
+  });
+}
+
 /**
  * Loads the global and per-sync-type lyric offsets from storage into AppState.
  */

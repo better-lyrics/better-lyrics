@@ -49,8 +49,6 @@ ytmusic-player-page:not([is-mweb-modernization-enabled])[player-fullscreened]:no
 ytmusic-player-page:not([is-mweb-modernization-enabled])[player-fullscreened]:not([blyrics-dfs]) .av.ytmusic-player-page {
   position: relative;
   width: fit-content;
-  left: 50%;
-  transform: translateX(-50%);
   padding: 15px;
 }
 

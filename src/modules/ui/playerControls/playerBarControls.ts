@@ -58,6 +58,14 @@ export function getBylineLinks(doc: Document): BylineInfo {
   return info;
 }
 
+export function observeByline(doc: Document, onChange: () => void): () => void {
+  const byline = doc.querySelector(BYLINE);
+  if (!byline) return () => {};
+  const observer = new MutationObserver(onChange);
+  observer.observe(byline, { childList: true, subtree: true, characterData: true });
+  return () => observer.disconnect();
+}
+
 export function observeRating(doc: Document, onChange: () => void): () => void {
   const renderer = doc.querySelector(LIKE_RENDERER);
   if (!renderer) return () => {};

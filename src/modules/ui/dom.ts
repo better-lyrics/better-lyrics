@@ -43,7 +43,7 @@ import {
   type FullscreenControlsHandle,
   wrapSongInfoWithActions,
 } from "@modules/ui/playerControls/fullscreenControls";
-import { getBylineLinks } from "@modules/ui/playerControls/playerBarControls";
+import { getBylineLinks, observeByline } from "@modules/ui/playerControls/playerBarControls";
 import type { PlaybackSnapshot } from "@modules/ui/playerControls/playhead";
 import { getResumeScrollElement } from "@modules/ui/resumeScrollButton";
 import { getRequest, setRequest } from "@modules/unison/lyricsRequestTracker";
@@ -1663,6 +1663,32 @@ function songInfoLabel(text: string, href: string | null): Node {
   return link;
 }
 
+let lastSongInfo: { song: string; artist: string; album?: string } | null = null;
+let bylineObserverDisconnect: (() => void) | null = null;
+
+function populateArtistElement(artistElm: HTMLElement, artist: string, album?: string): void {
+  const { artistRuns, albumHref } = getBylineLinks(document);
+  artistElm.replaceChildren();
+  if (artistRuns.length > 0) {
+    for (const run of artistRuns) artistElm.appendChild(songInfoLabel(run.text, run.href));
+  } else {
+    artistElm.textContent = artist;
+  }
+  if (album) {
+    const albumElm = document.createElement("span");
+    albumElm.id = "blyrics-album";
+    albumElm.append(" · ", songInfoLabel(album, albumHref));
+    artistElm.appendChild(albumElm);
+  }
+}
+
+function refreshSongInfoLinks(): void {
+  const artistElm = document.getElementById("blyrics-artist");
+  if (!artistElm || !lastSongInfo) return;
+  if (document.getElementById("blyrics-title")?.textContent !== lastSongInfo.song) return;
+  populateArtistElement(artistElm, lastSongInfo.artist, lastSongInfo.album);
+}
+
 export function injectSongAttributes(title: string, artist: string, album?: string): void {
   const mainPanel = document.getElementById("main-panel")!;
   console.assert(mainPanel != null);
@@ -1676,25 +1702,17 @@ export function injectSongAttributes(title: string, artist: string, album?: stri
   fullscreenColumnWidthObserver?.disconnect();
   setFullscreenControls(null);
 
-  const { artistRuns, albumHref } = getBylineLinks(document);
-
   const titleElm = document.createElement("p");
   titleElm.id = "blyrics-title";
   titleElm.textContent = title;
 
   const artistElm = document.createElement("p");
   artistElm.id = "blyrics-artist";
-  if (artistRuns.length > 0) {
-    for (const run of artistRuns) artistElm.appendChild(songInfoLabel(run.text, run.href));
-  } else {
-    artistElm.textContent = artist;
-  }
-  if (album) {
-    const albumElm = document.createElement("span");
-    albumElm.id = "blyrics-album";
-    albumElm.append(" · ", songInfoLabel(album, albumHref));
-    artistElm.appendChild(albumElm);
-  }
+  populateArtistElement(artistElm, artist, album);
+
+  lastSongInfo = { song: title, artist, album };
+  bylineObserverDisconnect?.();
+  bylineObserverDisconnect = observeByline(document, refreshSongInfoLinks);
 
   const songInfoWrapper = document.createElement("div");
   songInfoWrapper.id = "blyrics-song-info";
