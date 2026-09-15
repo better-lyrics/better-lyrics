@@ -1,4 +1,6 @@
+import { AppState } from "@core/appState";
 import { logContent } from "@core/logger";
+import { setStorage } from "@core/storage";
 import { attachTransportAnimation } from "./controlAnimations";
 import { playerControlIcons } from "./icons";
 import {
@@ -125,6 +127,11 @@ export function createFullscreenControls(doc: Document): FullscreenControlsHandl
     doc,
     getSnapshot: () => snapshot,
     onSeek: seconds => seekTo(doc, seconds),
+    initialEndMode: AppState.endTimeMode,
+    onEndModeChange: mode => {
+      AppState.endTimeMode = mode;
+      setStorage({ endTimeMode: mode });
+    },
   });
   progressSlot.appendChild(progress.element);
 

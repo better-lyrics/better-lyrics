@@ -11,6 +11,7 @@ import {
   hideDockOnIdleInFullscreen,
   listenForPopupMessages,
   loadDockSettings,
+  loadEndTimeModeSetting,
   loadLyricOffsetSettings,
   loadPassiveScrollSetting,
   loadTranslationSettings,
@@ -66,6 +67,7 @@ async function modify(isDisposed: () => boolean): Promise<void> {
   handleSettings();
   setupWakeLockForFullscreen();
   loadTranslationSettings();
+  loadEndTimeModeSetting();
   loadLyricOffsetSettings();
   loadPassiveScrollSetting();
   loadDockSettings(hideDockOnIdleInFullscreen);
