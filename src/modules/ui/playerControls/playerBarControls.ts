@@ -59,11 +59,29 @@ export function getBylineLinks(doc: Document): BylineInfo {
 }
 
 export function observeByline(doc: Document, onChange: () => void): () => void {
-  const byline = doc.querySelector(BYLINE);
-  if (!byline) return () => {};
-  const observer = new MutationObserver(onChange);
-  observer.observe(byline, { childList: true, subtree: true, characterData: true });
-  return () => observer.disconnect();
+  let bylineObserver: MutationObserver | null = null;
+  const attach = (): boolean => {
+    const byline = doc.querySelector(BYLINE);
+    if (!byline) return false;
+    bylineObserver = new MutationObserver(onChange);
+    bylineObserver.observe(byline, { childList: true, subtree: true, characterData: true });
+    return true;
+  };
+
+  if (attach()) return () => bylineObserver?.disconnect();
+
+  const root = doc.querySelector(PLAYER_BAR_SELECTOR) ?? doc.body;
+  const rootObserver = new MutationObserver(() => {
+    if (attach()) {
+      rootObserver.disconnect();
+      onChange();
+    }
+  });
+  rootObserver.observe(root, { childList: true, subtree: true });
+  return () => {
+    rootObserver.disconnect();
+    bylineObserver?.disconnect();
+  };
 }
 
 export function observeRating(doc: Document, onChange: () => void): () => void {
