@@ -81,6 +81,21 @@ export interface UnisonFeedEntry {
   userVote?: 1 | -1 | null;
 }
 
+export interface LinkedVideo {
+  videoId: string;
+  isPrimary: boolean;
+}
+
+export interface SuggestedVideo {
+  videoId: string;
+  title: string;
+  artist: string;
+  album?: string;
+  videoType: "song" | "video";
+  durationSeconds: number;
+  matchScore: number;
+}
+
 export interface UnisonApiResponse<T> {
   success: boolean;
   data: T;
