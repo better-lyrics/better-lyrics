@@ -58,6 +58,18 @@ export function getBylineLinks(doc: Document): BylineInfo {
   return info;
 }
 
+export function activateBylineLink(doc: Document, href: string): boolean {
+  const byline = doc.querySelector(BYLINE);
+  if (!byline) return false;
+  for (const node of byline.childNodes) {
+    if (node instanceof HTMLAnchorElement && node.href === href) {
+      node.click();
+      return true;
+    }
+  }
+  return false;
+}
+
 export function observeByline(doc: Document, onChange: () => void): () => void {
   let bylineObserver: MutationObserver | null = null;
   const attach = (): boolean => {

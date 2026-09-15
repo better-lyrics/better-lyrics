@@ -43,7 +43,7 @@ import {
   type FullscreenControlsHandle,
   wrapSongInfoWithActions,
 } from "@modules/ui/playerControls/fullscreenControls";
-import { getBylineLinks, observeByline } from "@modules/ui/playerControls/playerBarControls";
+import { activateBylineLink, getBylineLinks, observeByline } from "@modules/ui/playerControls/playerBarControls";
 import type { PlaybackSnapshot } from "@modules/ui/playerControls/playhead";
 import { getResumeScrollElement } from "@modules/ui/resumeScrollButton";
 import { getRequest, setRequest } from "@modules/unison/lyricsRequestTracker";
@@ -1660,6 +1660,10 @@ function songInfoLabel(text: string, href: string | null): Node {
   link.className = "blyrics-song-link";
   link.href = href;
   link.textContent = text;
+  link.addEventListener("click", event => {
+    if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+    if (activateBylineLink(document, href)) event.preventDefault();
+  });
   return link;
 }
 
