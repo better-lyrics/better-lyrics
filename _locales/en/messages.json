@@ -1042,6 +1042,28 @@
       }
     }
   },
+  "blUpdate_available": {
+    "message": "Better Lyrics $version$ is now available",
+    "description": "Banner shown to pre-release (canary) users when the matching stable release ships",
+    "placeholders": {
+      "version": {
+        "content": "$1",
+        "example": "2.4.0"
+      }
+    }
+  },
+  "blUpdate_storeDelay": {
+    "message": "store may lag briefly",
+    "description": "Trailing note on the update banner for Chrome and Edge, whose store approval can lag the release"
+  },
+  "blUpdate_action": {
+    "message": "Update",
+    "description": "Action link on the update banner that opens the browser's extension store listing"
+  },
+  "blUpdate_dismiss": {
+    "message": "Dismiss",
+    "description": "Accessible label for the button that closes the update banner"
+  },
   "marketplace_discussion": {
     "message": "Discussion",
     "description": "Footer link in the theme detail modal that opens the theme's discussion thread"

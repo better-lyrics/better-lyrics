@@ -13,7 +13,7 @@ function parseVersion(version: string): number[] {
   });
 }
 
-function compareVersions(current: string, required: string): boolean {
+export function compareVersions(current: string, required: string): boolean {
   const currentParts = parseVersion(current);
   const requiredParts = parseVersion(required);
 
