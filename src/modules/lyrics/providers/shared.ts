@@ -10,6 +10,7 @@ import unified from "./unified";
 import ytLyrics, { type YTLyricSourceResult } from "./yt";
 import { ytCaptions } from "./ytCaptions";
 import unison, { type UnisonData } from "@modules/lyrics/providers/unison";
+import { mergePreferredProviders } from "./providerList";
 import { logCore } from "@core/logger";
 /** Current version of the lyrics cache format */
 const LYRIC_CACHE_VERSION = "2.1.0";
@@ -124,19 +125,10 @@ export function initProviders(): void {
   }
   hasInitializedProviders = true;
   const updateProvidersList = (preferredProviderList: string[] | null) => {
-    let activeProviderList: string[] = preferredProviderList ?? [...defaultPreferredProviderList];
+    const stored = preferredProviderList ?? [...defaultPreferredProviderList];
+    const merged = mergePreferredProviders(stored, defaultPreferredProviderList);
 
-    const isValid = defaultPreferredProviderList.every(provider => {
-      return activeProviderList.includes(provider) || activeProviderList.includes(`d_${provider}`);
-    });
-
-    if (!isValid) {
-      activeProviderList = [...defaultPreferredProviderList];
-      logCore("Invalid preferred provider list, resetting to default");
-    }
-
-    // Use the type guard. The resulting array is known to be LyricSourceKey[]
-    const finalProviderList = activeProviderList.filter(isLyricSourceKey);
+    const finalProviderList = merged.filter(isLyricSourceKey);
 
     logCore(PROVIDER_SWITCHED_LOG, finalProviderList);
     providerPriority = finalProviderList;
@@ -159,6 +151,7 @@ const sourceKeyToFillFn = {
   "bLyrics-richsynced": (p: ProviderParameters) => unified(p, "bLyrics-richsynced"),
   "bLyrics-synced": (p: ProviderParameters) => unified(p, "bLyrics-synced"),
   "unison-richsynced": unison,
+  "unison-wordsynced": unison,
   "unison-synced": unison,
   "unison-plain": unison,
   "musixmatch-richsync": (p: ProviderParameters) => unified(p, "musixmatch-richsync"),
