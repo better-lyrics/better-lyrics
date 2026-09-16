@@ -44,7 +44,7 @@
     },
     "dependencies": {
         "@braccato/core": "1.6.4",
-        "@braccato/parsers": "0.2.2",
+        "@braccato/parsers": "0.2.3",
         "@codemirror/autocomplete": "^6.20.3",
         "@codemirror/commands": "^6.11.0",
         "@codemirror/lint": "^6.9.7",
