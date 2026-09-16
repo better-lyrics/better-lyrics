@@ -10,7 +10,7 @@
 		<nav id="navbar">
 			<h1>
 				<img src="/images/icons/icon-48.png" alt="Better Lyrics" width="24" height="24">
-				<div class="heading">Better Lyrics <span>2.4.0 5</span></div>
+				<div class="heading">Better Lyrics <span>2.4.0 8</span></div>
 			</h1>
 			<div class="nav-container">
 				<a href="https://github.com/better-lyrics/better-lyrics" target="_blank">
@@ -136,11 +136,28 @@
 						</label>
 					</div>
 					<div class="container">
+						<span>__MSG_options_display_fullscreenControls__</span>
+						<label>
+							<input type="checkbox" id="isFullscreenControlsEnabled">
+							<span class="checkmark"></span>
+						</label>
+					</div>
+					<div class="container">
 						<span>__MSG_options_display_stylizedAnimations__</span>
 						<label>
 							<input type="checkbox" id="isStylizedAnimationsEnabled">
 							<span class="checkmark"></span>
 						</label>
+					</div>
+					<div class="container">
+						<div class="setting-row__text">
+							<div class="setting-row__title-line">
+								<span id="letterWaveLabel">__MSG_options_display_letterWave__</span>
+								<span class="setting-badge">__MSG_options_display_letterWaveBadge__</span>
+								<span class="setting-help" tabindex="0" data-tooltip="__MSG_options_display_letterWaveTooltip__ __MSG_options_display_letterWaveTooltipStates__" aria-label="__MSG_options_display_letterWaveTooltip__ __MSG_options_display_letterWaveTooltipStates__">?</span>
+							</div>
+						</div>
+						<button type="button" class="triswitch" id="letterWaveSwitch" role="slider" aria-labelledby="letterWaveLabel" aria-valuemin="0" aria-valuemax="2" aria-valuenow="1"></button>
 					</div>
 					<div class="container">
 						<span>__MSG_options_display_passiveScroll__</span>
@@ -491,6 +508,10 @@
 						</button>
 					</div>
 				</div>
+				<div class="container container--small" id="identity-stats-container" hidden="">
+					<p class="text-group__title">__MSG_options_identity_unisonStats__</p>
+					<div id="identity-stats"></div>
+				</div>
 			</div>
 		</div>
 		<div id="status"></div>
@@ -703,6 +724,13 @@
 						<span>__MSG_options_display_pipMarquee__</span>
 						<label>
 							<input type="checkbox" id="pipMarqueeEnabled">
+							<span class="checkmark"></span>
+						</label>
+					</div>
+					<div class="container pip-modal-row--dependent">
+						<span>__MSG_options_display_pipProgressBar__</span>
+						<label>
+							<input type="checkbox" id="pipProgressBarEnabled">
 							<span class="checkmark"></span>
 						</label>
 					</div>
@@ -1051,7 +1079,7 @@
 						</svg>
 					</a>
 					<svg class="rics-footer-sep" viewBox="0 0 4 4"><circle cx="2" cy="2" r="1.5" fill="currentColor"></circle></svg>
-					<a href="https://rics.boidu.dev" target="_blank">Playground</a>
+					<a href="https://rics.betterlyrics.org" target="_blank">Playground</a>
 					<svg class="rics-footer-sep" viewBox="0 0 4 4"><circle cx="2" cy="2" r="1.5" fill="currentColor"></circle></svg>
 					<a href="https://github.com/better-lyrics/rics" target="_blank">Docs</a>
 				</div>

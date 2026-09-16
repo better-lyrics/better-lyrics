@@ -69,6 +69,7 @@ interface AppStateType {
   dockControlsOrder: string[];
   currentUnisonData: UnisonData | null;
   isPictureInPictureOpen: boolean;
+  endTimeMode: "total" | "remaining";
 }
 
 export const AppState: AppStateType = {
@@ -115,6 +116,7 @@ export const AppState: AppStateType = {
   dockControlsOrder: [...DOCK_CONTROL_ORDER_DEFAULT],
   currentUnisonData: null,
   isPictureInPictureOpen: false,
+  endTimeMode: "total",
 };
 
 export function reloadLyrics(): void {

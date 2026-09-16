@@ -26,7 +26,7 @@ import {
   submitLyrics,
 } from "@modules/unison/unisonApi";
 import { UnisonErrorCode } from "@modules/unison/errorCodes";
-import { getTrustTier } from "@modules/unison/trustTier";
+import { appendInlineProfile, profileUrl } from "@modules/unison/gamificationRender";
 import { generatePetName, getDisplayName } from "@/core/keyIdentity";
 import { warnUnison } from "@core/logger";
 
@@ -1089,19 +1089,12 @@ function createUploaderCell(submitter: UnisonSubmitter): HTMLElement {
 
   const link = document.createElement("a");
   link.className = "unison-uploader-link";
-  link.href = `${UNISON_API_BASE_URL}/curator/${encodeURIComponent(submitter.keyId)}`;
+  link.href = profileUrl(submitter.displayName, submitter.keyId);
   link.target = "_blank";
   link.rel = "noreferrer noopener";
   link.textContent = submitter.displayName || generatePetName(submitter.keyId);
 
-  const tier = getTrustTier(submitter.reputation);
-  const tierBadge = document.createElement("span");
-  tierBadge.className = "unison-badge unison-badge--tier";
-  tierBadge.dataset.tier = tier;
-  tierBadge.textContent = t(`unison_tier_${tier}`);
-
-  cell.appendChild(link);
-  cell.appendChild(tierBadge);
+  appendInlineProfile(cell, link, submitter);
   return cell;
 }
 

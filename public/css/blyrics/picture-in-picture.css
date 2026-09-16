@@ -92,7 +92,7 @@ body {
 
   position: relative;
   flex: 0 0 auto;
-  width: min(34vw, calc(100vh - clamp(24px, 7vw, 40px)));
+  width: min(34vw, calc(100vh - clamp(24px, 7vw, 40px) - 3.5rem));
   min-width: 88px;
   max-width: 240px;
   align-self: center;
@@ -258,6 +258,10 @@ body {
   transform: scale(0.95);
 }
 
+.blyrics-pip-artwork__control:focus {
+  outline: none;
+}
+
 .blyrics-pip-artwork__control--play-pause {
   width: calc(var(--blyrics-pip-control-size) * 1.25);
   height: calc(var(--blyrics-pip-control-size) * 1.25);
@@ -287,6 +291,79 @@ body {
 
 .blyrics-pip-artwork__control--play-pause[data-playing] .blyrics-pip-artwork__control-icon--pause {
   display: block;
+}
+
+/* -- Transport ripple + pop + nudge ----------------------------------------- */
+/* The pop rides the disc (::before), not the button, for the same reason the hover
+   pop does: scaling the button slides the skip glyph's hard outer bar sideways. */
+.blyrics-pip-artwork__control.blyrics-control-pop::before {
+  animation: blyrics-pip-control-pop 280ms cubic-bezier(0.33, 1, 0.68, 1);
+}
+
+.blyrics-control-nudge-prev svg {
+  animation: blyrics-control-nudge-prev 300ms cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.blyrics-control-nudge-next svg {
+  animation: blyrics-control-nudge-next 300ms cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.blyrics-control-ripple-layer {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+.blyrics-control-ripple {
+  position: absolute;
+  border-radius: 50%;
+  background: rgb(255 255 255 / 34%);
+  opacity: 0.7;
+  transform: scale(0);
+  pointer-events: none;
+}
+
+.blyrics-control-ripple--go {
+  animation: blyrics-control-ripple 480ms ease-out forwards;
+}
+
+@keyframes blyrics-control-ripple {
+  to {
+    transform: scale(2.6);
+    opacity: 0;
+  }
+}
+
+@keyframes blyrics-pip-control-pop {
+  0% {
+    transform: scale(0.93);
+  }
+  42% {
+    transform: scale(1.15);
+  }
+  100% {
+    transform: scale(1.08);
+  }
+}
+
+@keyframes blyrics-control-nudge-prev {
+  30% {
+    transform: translateX(-22%);
+  }
+  100% {
+    transform: translateX(0);
+  }
+}
+
+@keyframes blyrics-control-nudge-next {
+  30% {
+    transform: translateX(22%);
+  }
+  100% {
+    transform: translateX(0);
+  }
 }
 
 .blyrics-pip-content {
@@ -1000,4 +1077,42 @@ body {
   .blyrics-pip-header {
     padding-bottom: 4px;
   }
+}
+
+.blyrics-pip-art-col {
+  display: flex;
+  flex: 0 0 auto;
+  flex-direction: column;
+  gap: 18px;
+  align-self: center;
+}
+
+.blyrics-pip-progress {
+  width: 100%;
+  opacity: 0.45;
+  transition: opacity 220ms ease;
+}
+
+.blyrics-pip-art-col:hover .blyrics-pip-progress {
+  opacity: 1;
+}
+
+.blyrics-pip-progress .blyrics-progress__times {
+  font-size: 10px;
+}
+
+.blyrics-pip-progress .blyrics-progress__knob {
+  width: 18px;
+  height: 18px;
+  margin: -9px 0 0 -9px;
+}
+
+.blyrics-pip-progress .blyrics-progress__knob-dot {
+  width: 10px;
+  height: 10px;
+}
+
+.blyrics-pip-progress .blyrics-progress__knob:hover .blyrics-progress__knob-dot,
+.blyrics-pip-progress .blyrics-progress__bar.dragging .blyrics-progress__knob-dot {
+  transform: translate(-50%, -50%) scale(1.4);
 }

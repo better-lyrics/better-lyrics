@@ -426,6 +426,87 @@ Animates `transform`, `opacity`, `filter: blur(8px)` over 320ms.
 
 Override `--blyrics-fullscreen-bottom-dock-shift` to tune the lift.
 
+## Fullscreen Player Controls
+
+Injected under the album art in fullscreen (audio) mode: song info, a seekable progress bar, transport, like/dislike, and a quick-actions trigger. The progress bar and the press animations are shared with the floating window. Hidden outside fullscreen, during ads, and while the fullscreen-controls setting is off.
+
+### DOM Structure
+
+```
+#blyrics-fs-column                          (fullscreen only, width tracks the player element)
+├── #blyrics-fs-info-row .blyrics-fs-info-row
+│   ├── #blyrics-song-info
+│   │   ├── p#blyrics-title
+│   │   └── p#blyrics-artist
+│   │       ├── a.blyrics-song-link          (one per artist, links to its channel)
+│   │       └── span#blyrics-album
+│   │           └── a.blyrics-song-link      (album, links to the album page)
+│   └── .blyrics-fs-info-actions
+│       └── button.blyrics-fs-disc.blyrics-fs-more   (quick-actions trigger)
+└── #blyrics-fs-controls
+    ├── .blyrics-progress                    (see Progress Bar)
+    └── .blyrics-fs-transport-slot
+        ├── button.blyrics-fs-disc.blyrics-fs-like
+        ├── .blyrics-fs-transport-mid
+        │   ├── button.blyrics-fs-disc       (previous)
+        │   ├── button.blyrics-fs-disc.blyrics-fs-play
+        │   └── button.blyrics-fs-disc       (next)
+        └── button.blyrics-fs-disc.blyrics-fs-dislike
+```
+
+### Selectors
+
+| Selector | Purpose |
+|----------|---------|
+| `#blyrics-fs-column` | Column under the album art holding the info row and the controls strip |
+| `#blyrics-fs-info-row` / `.blyrics-fs-info-row` | Song info plus the quick-actions trigger |
+| `#blyrics-song-info` | Title/artist/album block, also present outside fullscreen |
+| `.blyrics-song-link` | Artist and album links inside the info block; `color: inherit`, underline on hover |
+| `.blyrics-fs-info-actions` | Wrapper for the quick-actions trigger |
+| `#blyrics-fs-controls` | Controls strip: progress bar above the transport row |
+| `.blyrics-fs-disc` | Round control button base, shared by transport, rating, and more |
+| `.blyrics-fs-more` | Quick-actions trigger |
+| `.blyrics-fs-play` | Play/pause button, sized up from the rest |
+| `.blyrics-fs-like` / `.blyrics-fs-dislike` | Rating buttons |
+| `.blyrics-fs-transport-slot` / `.blyrics-fs-transport-mid` | Transport row layout |
+| `.blyrics-fs-rate-icon` | Holds the two rating icon layers |
+| `.blyrics-fs-rate-layer--outline` / `--fill` | Outline shows by default, fill shows when the rating is active |
+
+### State Attributes
+
+| Attribute | When applied |
+|-----------|--------------|
+| `.blyrics-fs-disc[data-active]` | Like or dislike is the current rating; the fill layer shows |
+| `.blyrics-fs-disc[data-menu-open]` | The quick-actions menu is open; keeps the trigger's hover background |
+| `#blyrics-fs-controls[data-ad]` | An ad is playing; the controls strip is hidden |
+| `html[blyrics-no-fs-controls]` | Fullscreen-controls setting is off; hides `#blyrics-fs-controls` and `.blyrics-fs-info-actions` |
+
+### Progress Bar
+
+Shared with the floating window, which scopes it under `.blyrics-pip-progress`.
+
+| Selector | Purpose |
+|----------|---------|
+| `.blyrics-progress` | Wrapper; owns `--blyrics-progress-dot-shadow` |
+| `.blyrics-progress__bar` | Seek track; carries `.dragging` while scrubbing |
+| `.blyrics-progress__fill-clip` / `.blyrics-progress__fill` | Elapsed fill, scaled through `transform` |
+| `.blyrics-progress__knob` / `.blyrics-progress__knob-dot` | Draggable handle |
+| `.blyrics-progress__times` | Row holding the elapsed and end times |
+| `.blyrics-progress__elapsed` | Elapsed time |
+| `.blyrics-progress__end[data-mode]` | End time; `total` shows the duration, `remaining` shows the time left, click toggles |
+
+### Press Feedback and Like Burst
+
+Applied briefly on interaction, shared by fullscreen and the floating window.
+
+| Class / Keyframe | Purpose |
+|------------------|---------|
+| `.blyrics-control-pop` | Scale pop on press (`blyrics-fs-control-pop`, `blyrics-pip-control-pop`) |
+| `.blyrics-control-nudge-prev` / `-next` | Previous and next icon nudge |
+| `.blyrics-control-ripple-layer` / `.blyrics-control-ripple` (`--go`) | Click ripple |
+| `.blyrics-fs-rate-fire` | Runs the like pop and iris (`blyrics-fs-rate-pop`, `blyrics-fs-rate-iris`) |
+| `.blyrics-fs-rate-burst` / `-ray` / `-dot` (`--go`) | Rays and dots that fly out on a like (`blyrics-fs-rate-ray`, `blyrics-fs-rate-dot`) |
+
 ## Theme Patterns
 
 ### 1. Disable Default Animations

@@ -63,6 +63,7 @@ export interface PictureInPictureHostEnvironment {
   readonly artworkTransition: () => unknown;
   readonly textTransition: () => unknown;
   readonly marqueeEnabled: () => unknown;
+  readonly progressBarEnabled: () => unknown;
   readonly windowTitle: () => string;
   readonly stylesheetUrls: () => { readonly lyrics: string; readonly fonts: readonly string[] };
   readonly loadStylesheet: () => Promise<string>;

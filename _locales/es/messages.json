@@ -1,10 +1,10 @@
 {
   "extensionName": {
-    "message": "Better Lyrics (Letras para YouTube Music)",
+    "message": "Better Lyrics (Letras para YouTube Música)",
     "description": "The name of the extension"
   },
   "extensionDescription": {
-    "message": "Mejora YouTube Music con hermosas letras sincronizadas, soporte multilingüe, traducciones en tiempo real y más",
+    "message": "Mejora YouTube Música con hermosas letras sincronizadas, soporte multilingüe, traducciones en tiempo real y más",
     "description": "The description of the extension"
   },
   "options_tab_general": {
@@ -83,9 +83,29 @@
     "message": "Mostrar fondo difuminado con portada del álbum",
     "description": "Show album art background setting label"
   },
+  "options_display_fullscreenControls": {
+    "message": "Mostrar los controles de reproductor en pantalla completa",
+    "description": "Toggle label for the playback controls strip (progress bar, transport, like and dislike) shown under the album art in the fullscreen lyrics view"
+  },
   "options_display_stylizedAnimations": {
     "message": "Mostrar animaciones estilizadas",
     "description": "Show stylized animations setting label"
+  },
+  "options_display_letterWave": {
+    "message": "Flujo de letras",
+    "description": "Label for the per-letter wave lyric animation toggle"
+  },
+  "options_display_letterWaveBadge": {
+    "message": "Experimental",
+    "description": "Badge shown next to the letter wave setting marking it as experimental"
+  },
+  "options_display_letterWaveTooltip": {
+    "message": "Las letras cobran más vida con un movimiento suave y fluido en cada letra a medida que se cantan. Desactívalo si el desplazamiento de las letras se ve entrecortado en tu dispositivo.",
+    "description": "Tooltip explaining the letter wave animation and its performance impact"
+  },
+  "options_display_letterWaveTooltipStates": {
+    "message": "Automático permanece apagado a menos que un Tema lo encienda. Activado o desactivado anual cualquier tema",
+    "description": "Appended to the letter wave tooltip, explaining the three switch states"
   },
   "options_display_passiveScroll": {
     "message": "Desplazar letras sin sincronizar automáticamente",
@@ -112,7 +132,7 @@
     "description": "Accessible label for the next track button in the Picture-in-Picture lyrics window, used when the YouTube Music player bar exposes no label of its own"
   },
   "options_display_pipEnabled": {
-    "message": "Enable floating window",
+    "message": "Activa ventana flotante",
     "description": "Master toggle for the floating lyrics window feature, which turns it off everywhere including the YouTube Music minimize button"
   },
   "options_display_pipAutoRestore": {
@@ -158,6 +178,10 @@
   "options_display_pipMarquee": {
     "message": "Desplazar títulos largos",
     "description": "Toggle label for whether a song title too long for the floating lyrics window scrolls across so it can be read in full"
+  },
+  "options_display_pipProgressBar": {
+    "message": "Mostrar la barra de progreso",
+    "description": "Toggle label, shown inside the floating lyrics window settings, for the seekable playback progress bar under the album art"
   },
   "options_display_shadersPromo": {
     "message": "Mostrar enlace a Shaders de Better Lyrics",
@@ -236,7 +260,7 @@
     "description": "Accessible label for the lyrics dock button that opens the source provider dropdown"
   },
   "lyricsDock_refresh": {
-    "message": "Refresh lyrics",
+    "message": "Reinicia las letras",
     "description": "Accessible label for the lyrics dock button that re-fetches lyrics for the current song, bypassing the cache"
   },
   "lyricsDock_previousSource": {
@@ -375,6 +399,10 @@
     "message": "Tu identidad",
     "description": "Your identity label"
   },
+  "options_identity_unisonStats": {
+    "message": "Estadísticas de Unison",
+    "description": "Section title above the user's own Unison level, tier, rank and badges on the Identity tab"
+  },
   "options_identity_loading": {
     "message": "Cargando...",
     "description": "Loading identity placeholder"
@@ -412,7 +440,7 @@
     "description": "Confirm button label inside the import identity modal"
   },
   "options_nickname_description": {
-    "message": "Elige un nombre para ti mismo para Better Lyrics, Letras, números, y guión bajo, de 3 a 20 caracteres.",
+    "message": "Elige un nombre para ti mismo para Better Lyrics, Letras, números, y guion bajo, de 3 a 20 caracteres.",
     "description": "Nickname subsection description"
   },
   "options_nickname_placeholder": {
@@ -424,7 +452,7 @@
     "description": "Nickname save button label"
   },
   "options_nickname_reset": {
-    "message": "Reestablecer a predeterminados",
+    "message": "Restablecer a predeterminados",
     "description": "Nickname reset button label"
   },
   "options_nickname_modalTitle": {
@@ -480,7 +508,7 @@
     "description": "Status when nickname request fails"
   },
   "options_alert_importEmpty": {
-    "message": "Pega una indentidad JSON o escoge un archivo primero.",
+    "message": "Pega una identidad JSON o escoge un archivo primero.",
     "description": "Shown when the user clicks Import with no JSON provided"
   },
   "options_modal_selectTheme": {
@@ -516,7 +544,7 @@
     "description": "File save dialog opened message"
   },
   "options_alert_fileSaveFailed": {
-    "message": "Error al guardar el archivo. Por favor, inténtalo de nuevo.",
+    "message": "Error al guardar el archivo Por favor, inténtalo de nuevo.",
     "description": "File save failed message"
   },
   "options_alert_downloadInitiated": {
@@ -560,7 +588,7 @@
     "description": "Full editor experience note prefix"
   },
   "options_editor_openInNewTabLink": {
-    "message": "abre este editor en una nueva pestaña",
+    "message": "Abre este editor en una nueva pestaña",
     "description": "Open in new tab link text"
   },
   "options_editor_stylingGuide": {
@@ -668,7 +696,7 @@
     "description": "Download shader link text"
   },
   "options_detail_shaderImportSuffix": {
-    "message": "e impórtalo en",
+    "message": "E impórtalo en",
     "description": "Shader import suffix text before Better Lyrics Shaders link"
   },
   "marketplace_pageTitle": {
@@ -808,7 +836,7 @@
     "description": "URL install modal message"
   },
   "marketplace_urlModalPlaceholder": {
-    "message": "github.com/usuario/repo o github.com/usuario/repo/tree/rama",
+    "message": "github.com/usuario/repo O github.com/usuario/repo/tree/rama",
     "description": "URL input placeholder"
   },
   "marketplace_urlModalError": {
@@ -828,7 +856,7 @@
     "description": "URL permission explanation title"
   },
   "marketplace_urlPermissionDesc": {
-    "message": "Instalar temas desde URLs de GitHub personalizadas requiere un acceso más amplio que la tienda. Esto permite a Better Lyrics:",
+    "message": "Instalar temas desde URL de GitHub personalizadas requiere un acceso más amplio que la tienda. Esto permite a Better Lyrics:",
     "description": "URL permission description"
   },
   "marketplace_urlPermissionItem1": {
@@ -872,7 +900,7 @@
     "description": "Sort shortcuts group"
   },
   "marketplace_shortcutsSortHint": {
-    "message": "pulsa de nuevo para invertir",
+    "message": "Pulsa de nuevo para invertir",
     "description": "Sort toggle hint"
   },
   "marketplace_shortcutsByRating": {
@@ -1164,7 +1192,7 @@
     }
   },
   "theme_author_prefix": {
-    "message": "por $AUTHOR$",
+    "message": "Por $AUTHOR$",
     "description": "Author prefix shown on theme selector button",
     "placeholders": {
       "author": {
@@ -1174,36 +1202,34 @@
     }
   },
   "theme_author_you": {
-    "message": "por Tú",
+    "message": "Por Tú",
     "description": "Author label for custom user themes on theme selector button"
   },
   "symlink_installFailed": {
     "message": "No se pudo instalar el tema, comprueba tu conexión y vuelve a intentar.",
     "description": "Alert when a symlinked theme fails to install from marketplace"
   },
-  "symlink_badge_marketplace": {
-    "message": "Tienda",
-    "description": "Badge text on symlinked theme cards"
+  "theme_top_badge": {
+    "message": "#$RANK$ en la tienda",
+    "description": "Tooltip on a featured theme's rank medal",
+    "placeholders": {
+      "rank": {
+        "content": "$1",
+        "example": "1"
+      }
+    }
   },
-  "symlink_badge_bundled": {
-    "message": "Empaquetado",
-    "description": "Badge text on non-symlinked built-in theme cards"
+  "theme_modal_section_featured": {
+    "message": "Temas presentados",
+    "description": "Section title for featured themes (top marketplace picks and built-ins) in the theme chooser modal"
   },
-  "deprecation_builtin_title": {
-    "message": "¡Atención, estos temas se están moviendo!",
-    "description": "Title for the built-in themes deprecation banner in theme modal"
+  "theme_modal_section_all": {
+    "message": "Todos los temas",
+    "description": "Section title for the user's installed marketplace themes in the theme chooser modal"
   },
-  "deprecation_builtin_body": {
-    "message": "Estamos migrando los temas integrados al Mercado de Temas. Algunos ya se han migrado, busca la insignia de \"Marketplace\". El resto se migrará en una futura actualización, con copias de seguridad de CSS en GitHub y Discord.",
-    "description": "Body text for the built-in themes deprecation banner"
-  },
-  "deprecation_builtin_cta": {
-    "message": "Explorar la Tienda",
-    "description": "CTA button text in the deprecation banner to open the marketplace"
-  },
-  "theme_modal_section_builtin": {
-    "message": "Temas integrados",
-    "description": "Section title for built-in themes in the theme chooser modal"
+  "theme_modal_browse": {
+    "message": "Navegar tienda",
+    "description": "Link in the theme chooser modal that opens the full Theme Marketplace page"
   },
   "theme_modal_section_custom": {
     "message": "Temas personalizados",
@@ -1420,7 +1446,7 @@
     "description": "Sort by effective score, lowest first"
   },
   "unison_sortMostVoted": {
-    "message": "Mas votadas",
+    "message": "Más votadas",
     "description": "Sort by vote count, most first"
   },
   "unison_sortLeastVoted": {
@@ -1464,11 +1490,11 @@
     "description": "Plain text format badge"
   },
   "unison_autoDetect": {
-    "message": "Auto detectar",
+    "message": "Autodetectar",
     "description": "Auto-detect format option"
   },
   "unison_noResults": {
-    "message": "No se han encontrado letras. Prueba con una busqueda diferente.",
+    "message": "No se han encontrado letras. Prueba con una búsqueda diferente.",
     "description": "No search results message"
   },
   "unison_interactingAs": {
@@ -1496,7 +1522,7 @@
     "description": "Artist field label"
   },
   "unison_album": {
-    "message": "Album",
+    "message": "Álbum",
     "description": "Album field label"
   },
   "unison_duration": {
@@ -1705,24 +1731,50 @@
     "message": "No se procesó. ¿Te importa intentarlo de nuevo?",
     "description": "Shown when a lyrics report fails to submit"
   },
-  "unison_tier_new": {
-    "message": "nuevo",
-    "description": "Trust tier badge for low-reputation Unison submitters"
+  "unison_level": {
+    "message": "Nivel $level$",
+    "description": "Shows a Unison contributor's numeric level. $level$ is a positive integer",
+    "placeholders": {
+      "level": {
+        "content": "$1",
+        "example": "6"
+      }
+    }
   },
-  "unison_tier_trusted": {
-    "message": "de confianza",
-    "description": "Trust tier badge for mid-reputation Unison submitters"
+  "unison_xpToNext": {
+    "message": "$xp$ XP hasta el Nivel $level$",
+    "description": "Explains how much experience remains before the next Unison level. $xp$ is a positive integer, $level$ is the next level number",
+    "placeholders": {
+      "xp": {
+        "content": "$1",
+        "example": "436"
+      },
+      "level": {
+        "content": "$2",
+        "example": "7"
+      }
+    }
   },
-  "unison_tier_veteran": {
-    "message": "veterano",
-    "description": "Trust tier badge for high-reputation Unison submitters"
+  "unison_maxLevel": {
+    "message": "Máximo Nivel",
+    "description": "Shown in place of the XP-to-next text when a Unison contributor is at the highest level"
   },
-  "unison_tier_expert": {
-    "message": "experto",
-    "description": "Trust tier badge for top-reputation Unison submitters"
+  "unison_rank": {
+    "message": "Posición #$rank$",
+    "description": "Shows a Unison contributor's leaderboard rank within their tier. $rank$ is a positive integer",
+    "placeholders": {
+      "rank": {
+        "content": "$1",
+        "example": "1"
+      }
+    }
+  },
+  "unison_viewProfile": {
+    "message": "Ver perfil completo",
+    "description": "Link on the Identity tab that opens the user's full Unison profile in a new tab"
   },
   "unison_submitted_this": {
-    "message": "letra enviada",
+    "message": "Letra enviada",
     "description": "Sub-label under the submitter name in the Unison footer card"
   },
   "unison_score_label": {

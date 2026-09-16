@@ -18,7 +18,15 @@ import {
   romanizeBatch,
   translateBatch,
 } from "@modules/lyrics/translation";
-import { addFooter, addNoLyricsButton, cleanup, createLyricsWrapper, flushLoader, renderLoader } from "@modules/ui/dom";
+import {
+  addFooter,
+  addNoLyricsButton,
+  cleanup,
+  createLyricsWrapper,
+  flushLoader,
+  renderLoader,
+  setFullscreenNoLyricsState,
+} from "@modules/ui/dom";
 import { lyricsElementAdded, mainView } from "@modules/ui/mainLyricsView";
 import { disableNativeLyricsFocus } from "@modules/ui/nativeLyricsFocus";
 import { publishPictureInPictureLyrics } from "@modules/ui/pictureInPicture/lyricsPublisher";
@@ -145,6 +153,7 @@ function injectLyrics(
 
   const allZero = lyrics.every(item => item.startTimeMs === 0);
   const noLyrics = lyrics[0].words === t("lyrics_notFound");
+  setFullscreenNoLyricsState(noLyrics);
 
   if (keepLoaderVisible) {
     renderLoader(true);

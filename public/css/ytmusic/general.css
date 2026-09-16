@@ -16,7 +16,8 @@ ytmusic-player-page:before {
 }
 
 /* Player bar styles */
-ytmusic-player-bar,
+/* Blur lives on #player-bar-background, never ytmusic-player-bar: a backdrop-filter on the
+   bar makes it a backdrop root and breaks the native volume slider's first hover hit-test. */
 #player-bar-background {
   backdrop-filter: blur(var(--blyrics-blur-amount));
 }
@@ -33,15 +34,21 @@ ytmusic-player-bar,
 
 #layout[player-ui-state="PLAYER_PAGE_OPEN"] #mini-guide-background,
 #layout[player-ui-state="PLAYER_PAGE_OPEN"] #nav-bar-background,
-#layout[player-ui-state="PLAYER_PAGE_OPEN"] #player-bar-background,
 ytmusic-app[blyrics-stylized] #layout[player-ui-state="PLAYER_PAGE_OPEN"] #mini-guide-background,
-ytmusic-app[blyrics-stylized] #layout[player-ui-state="PLAYER_PAGE_OPEN"] #nav-bar-background,
-ytmusic-app[blyrics-stylized] #layout[player-ui-state="PLAYER_PAGE_OPEN"] #player-bar-background {
+ytmusic-app[blyrics-stylized] #layout[player-ui-state="PLAYER_PAGE_OPEN"] #nav-bar-background {
   opacity: 0 !important;
 }
 
 #layout[player-ui-state="PLAYER_PAGE_OPEN"] ytmusic-player-bar {
   background: linear-gradient(0deg, transparent, transparent) !important;
+}
+
+/* On the player page the bar is transparent, so #player-bar-background carries the frost:
+   keep it visible but strip its dark fill so only the blur shows. */
+#layout[player-ui-state="PLAYER_PAGE_OPEN"] #player-bar-background,
+ytmusic-app[blyrics-stylized] #layout[player-ui-state="PLAYER_PAGE_OPEN"] #player-bar-background {
+  background: transparent !important;
+  opacity: 1 !important;
 }
 
 ytmusic-app[blyrics-stylized] #layout[player-ui-state="PLAYER_PAGE_OPEN"] #guide-wrapper {
@@ -53,7 +60,6 @@ ytmusic-app[blyrics-stylized] #layout[player-ui-state="PLAYER_PAGE_OPEN"] ytmusi
   background: linear-gradient(0deg, #00000000, #00000000) !important;
 }
 
-ytmusic-app[blyrics-stylized] ytmusic-player-bar,
 ytmusic-app[blyrics-stylized] #player-bar-background {
   backdrop-filter: blur(var(--blyrics-blur-amount));
 }
@@ -105,10 +111,6 @@ ytmusic-message-renderer.ytmusic-tab-renderer {
 #tab-renderer:not([page-type="MUSIC_PAGE_TYPE_TRACK_LYRICS"]) #blyrics-wrapper,
 #tab-renderer:not([page-type="MUSIC_PAGE_TYPE_TRACK_LYRICS"]) #blyrics-ad-overlay,
 #tab-renderer:not([page-type="MUSIC_PAGE_TYPE_TRACK_LYRICS"]) .blyrics-footer{
-  display: none !important;
-}
-
-#side-panel:has(#tab-renderer:not([page-type="MUSIC_PAGE_TYPE_TRACK_LYRICS"])) .blyrics-dock {
   display: none !important;
 }
 

@@ -502,6 +502,27 @@ export async function fetchAllStoreThemes(): Promise<StoreTheme[]> {
   return themes;
 }
 
+export async function fetchStoreThemesByIds(ids: string[]): Promise<StoreTheme[]> {
+  if (ids.length === 0) return [];
+
+  const lockfile = await fetchThemeLockfile();
+  const entryById = new Map(lockfile.themes.map(entry => [entry.id, entry]));
+  const entries = ids.map(id => entryById.get(id)).filter((entry): entry is LockfileEntry => entry !== undefined);
+
+  const results = await Promise.allSettled(entries.map(entry => fetchFullThemeFromRegistry(entry)));
+
+  const themes: StoreTheme[] = [];
+  for (const result of results) {
+    if (result.status === "fulfilled") {
+      themes.push(result.value);
+    } else {
+      warnStore("Failed to fetch featured theme:", result.reason);
+    }
+  }
+
+  return themes;
+}
+
 export async function validateThemeRepo(repo: string, branchOverride?: string): Promise<ThemeValidationResult> {
   const errors: string[] = [];
   const missingFiles: string[] = [];

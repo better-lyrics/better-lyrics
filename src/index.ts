@@ -11,6 +11,7 @@ import {
   hideDockOnIdleInFullscreen,
   listenForPopupMessages,
   loadDockSettings,
+  loadEndTimeModeSetting,
   loadLyricOffsetSettings,
   loadPassiveScrollSetting,
   loadTranslationSettings,
@@ -19,6 +20,7 @@ import {
 import {
   cleanup as cleanupLyrics,
   injectHeadTags,
+  observeLyricsPageType,
   reloadAlbumArt,
   setupAdObserver,
   unmountDock,
@@ -59,11 +61,13 @@ async function modify(isDisposed: () => boolean): Promise<void> {
   publishPictureInPictureResources();
   setupAdObserver();
   enableLyricsTab();
+  observeLyricsPageType();
   setupHomepageFullscreenHandler();
   hideCursorOnIdle();
   handleSettings();
   setupWakeLockForFullscreen();
   loadTranslationSettings();
+  loadEndTimeModeSetting();
   loadLyricOffsetSettings();
   loadPassiveScrollSetting();
   loadDockSettings(hideDockOnIdleInFullscreen);

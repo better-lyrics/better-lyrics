@@ -11,6 +11,7 @@ import {
   handleRenameTheme,
   handleSaveTheme,
   initStoreThemeListener,
+  loadFeaturedThemes,
   initializeThemeSettingsEditor,
   openThemeModal,
   preloadInstalledThemeImages,
@@ -290,6 +291,7 @@ async function initializeEditor() {
   await Promise.allSettled([setSelectedThemePromise, loadCustomCssPromise]);
 
   preloadInstalledThemeImages();
+  loadFeaturedThemes();
 
   logEditor("Editor initialization complete");
 }

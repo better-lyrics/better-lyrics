@@ -12,10 +12,26 @@ import { hexToRgbSum, invertRegExp } from "@utils";
 import { mainView } from "./mainLyricsView";
 import { publishPictureInPictureLyrics } from "./pictureInPicture/lyricsPublisher";
 import { logCore, logError } from "@core/logger";
+import { migrateLetterWavePref, type LetterWavePref } from "@modules/settings/letterWave";
 import type { ThemeSettingField } from "@/options/themes";
 import type { ThemeSavedSettingFields } from "@core/customCss";
 
 let hasSubscribedToStyles = false;
+let letterWavePref: LetterWavePref = "auto";
+
+// Position decides precedence: parseThemeConfig is last-wins. "auto" sits before
+// the theme so the theme can override it (today's behaviour); "on"/"off" sit
+// after, so the user's choice is the last word.
+function withLetterWaveSetting(css: string): string {
+  switch (letterWavePref) {
+    case "on":
+      return `${css}\n/* blyrics-letter-wave = true; */`;
+    case "off":
+      return `${css}\n/* blyrics-letter-wave = false; */`;
+    default:
+      return `/* blyrics-letter-wave = false; */\n${css}`;
+  }
+}
 
 function getFieldValueOnAvailable(
   field: string,
@@ -220,7 +236,7 @@ function applyThemeSettingsToCSS(
  * compressed, and compiling the RICS source it is written in.
  */
 export function applyCustomStyles(css: string): void {
-  const needsLyricReload = mainView.setTheme(css);
+  const needsLyricReload = mainView.setTheme(withLetterWaveSetting(css));
   publishPictureInPictureLyrics();
 
   if (needsLyricReload) {
@@ -240,6 +256,12 @@ function decompressStyles(css: string): string {
 }
 
 export async function getAndApplyCustomStyles(): Promise<void> {
+  const raw = await getSyncStorage<{ letterWavePref?: string; isLetterWaveEnabled?: boolean }>([
+    "letterWavePref",
+    "isLetterWaveEnabled",
+  ]);
+  letterWavePref = migrateLetterWavePref(raw);
+
   try {
     const syncData = await getSyncStorage<CSSStorageData>([
       "cssStorageType",
@@ -273,6 +295,8 @@ export async function getAndApplyCustomStyles(): Promise<void> {
       }
       css = applyThemeSettingsToCSS(css, settings?.fields, settings?.saved);
       applyCustomStyles(compileRicsToStyles(css));
+    } else {
+      applyCustomStyles("");
     }
   } catch (error) {
     logError(error);

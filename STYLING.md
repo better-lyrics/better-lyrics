@@ -63,9 +63,14 @@
 		- [Vote Button](#vote-button)
 		- [Floating Dock](#floating-dock)
 		- [Hide and Idle States](#hide-and-idle-states)
-	- [20. Best Practices for Modifying CSS](#20-best-practices-for-modifying-css)
-	- [21. Importing/Exporting Styles](#21-importingexporting-styles)
-	- [22. Additional Resources](#22-additional-resources)
+	- [20. Fullscreen Player Controls](#20-fullscreen-player-controls)
+		- [Structure](#structure)
+		- [Control Buttons](#control-buttons)
+		- [Progress Bar](#progress-bar)
+		- [Hiding the Controls](#hiding-the-controls)
+	- [21. Best Practices for Modifying CSS](#21-best-practices-for-modifying-css)
+	- [22. Importing/Exporting Styles](#22-importingexporting-styles)
+	- [23. Additional Resources](#23-additional-resources)
 
 ## 1. Introduction to CSS and Better Lyrics
 
@@ -1153,9 +1158,23 @@ The watermark is initially hidden but can be displayed for branding or attributi
   opacity: 0.5;
   margin-top: 0.25rem;
 }
+
+#blyrics-song-info #blyrics-album {
+  opacity: 0.8;
+}
 ```
 
-These styles create a clean display for song title and artist information, with the artist name appearing more subdued.
+These styles create a clean display for song title and artist information, with the artist name appearing more subdued. When an album is known, it follows the artist as `#blyrics-album`.
+
+The artist and album names are links to their YouTube Music pages, wrapped in `.blyrics-song-link`. Those links inherit the surrounding text color and underline on hover, so they blend in unless you style them:
+
+```css
+#blyrics-song-info .blyrics-song-link:hover {
+  text-decoration: underline;
+}
+```
+
+In fullscreen mode this block sits above a full set of playback controls. See [Fullscreen Player Controls](#20-fullscreen-player-controls).
 
 ## 14. Footer and Social Elements
 
@@ -1550,7 +1569,79 @@ A few related rules ship in the YTM stylesheets and you may want to override the
 
 Override `--blyrics-fullscreen-bottom-dock-shift` to tune the lift distance.
 
-## 20. Best Practices for Modifying CSS
+## 20. Fullscreen Player Controls
+
+In fullscreen (audio) mode, Better Lyrics adds a column under the album art with the song info and a set of playback controls: a seekable progress bar, previous/play-pause/next, like and dislike, and a quick-actions button. The progress bar and the button press animations are also used by the floating lyrics window. The controls strip hides during ads, and the "Fullscreen player controls" setting can turn it off.
+
+### Structure
+
+```
+#blyrics-fs-column
+├── #blyrics-fs-info-row
+│   ├── #blyrics-song-info               (title, artist, album)
+│   └── .blyrics-fs-info-actions
+│       └── .blyrics-fs-more             (quick-actions trigger)
+└── #blyrics-fs-controls
+    ├── .blyrics-progress                (seek bar and times)
+    └── .blyrics-fs-transport-slot
+        ├── .blyrics-fs-like
+        ├── previous / .blyrics-fs-play / next   (.blyrics-fs-disc)
+        └── .blyrics-fs-dislike
+```
+
+### Control Buttons
+
+Every round button shares `.blyrics-fs-disc`. Restyle the whole set at once, or target individual buttons:
+
+```css
+.blyrics-fs-disc {
+  color: #fff;
+}
+
+/* the emphasized play/pause button */
+.blyrics-fs-play {
+  background: rgba(255, 255, 255, 0.16);
+}
+
+/* keep the quick-actions button lit while its menu is open */
+.blyrics-fs-disc[data-menu-open] {
+  background: rgba(255, 255, 255, 0.24);
+}
+```
+
+Like and dislike show an outline icon by default and a filled icon when active. The active state is `[data-active]`:
+
+```css
+.blyrics-fs-like[data-active] {
+  color: #4fc3f7;
+}
+```
+
+### Progress Bar
+
+The seek bar is `.blyrics-progress`. The filled portion is `.blyrics-progress__fill`, the handle is `.blyrics-progress__knob`, and the times sit in `.blyrics-progress__times`. The end time shows either the total duration or the time remaining; a click toggles it, and `[data-mode]` targets each state:
+
+```css
+.blyrics-progress__fill {
+  background: var(--blyrics-lyric-active-color);
+}
+
+.blyrics-progress__end[data-mode="remaining"] {
+  opacity: 0.7;
+}
+```
+
+### Hiding the Controls
+
+The controls strip is `#blyrics-fs-controls`. It hides on its own during ads (`[data-ad]`) and when the fullscreen-controls setting is off (`html[blyrics-no-fs-controls]`). To hide it from your theme:
+
+```css
+#blyrics-fs-controls {
+  display: none;
+}
+```
+
+## 21. Best Practices for Modifying CSS
 
 When modifying this CSS:
 
@@ -1565,7 +1656,7 @@ When modifying this CSS:
 9. **Consider performance** - Avoid overly complex animations that might cause lag
 10. **Have fun** - CSS is about creativity and expression!
 
-## 21. Importing/Exporting Styles
+## 22. Importing/Exporting Styles
 
 The Better Lyrics extension allows you to import and export custom CSS styles for sharing and backup purposes.
 
@@ -1584,7 +1675,7 @@ The Better Lyrics extension allows you to import and export custom CSS styles fo
 
 Share your custom themes with the [Better Lyrics community on Discord](https://discord.gg/UsHE3d5fWF) and get featured in the extension!
 
-## 22. Additional Resources
+## 23. Additional Resources
 
 To learn more about CSS and web development:
 

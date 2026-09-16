@@ -10,7 +10,7 @@ import {
 } from "@constants";
 import { AppState, handleModifications, type PlayerDetails, reloadLyrics } from "@core/appState";
 import { preFetchLyrics } from "@modules/lyrics/lyrics";
-import { getArtworkMetadata, getSongMetadata } from "@modules/lyrics/requestSniffer/requestSniffer";
+import { getArtworkMetadata, getSongAlbum, getSongMetadata } from "@modules/lyrics/requestSniffer/requestSniffer";
 import { onAutoSwitchEnabled, onFullScreenDisabled, wakeDockIdle } from "@modules/settings/settings";
 import { adjustLyricOffset, OFFSET_STEP, OFFSET_STEP_LARGE } from "@modules/ui/lyricsDock/offset";
 import { currentTickOptions, mainView } from "@modules/ui/mainLyricsView";
@@ -32,6 +32,7 @@ import {
   renderLoader,
   resetThumbnailState,
   showYtThumbnail,
+  updateFullscreenControlsSnapshot,
 } from "./dom";
 
 let wakeLock: WakeLockSentinel | null = null;
@@ -328,6 +329,14 @@ export function initializeLyrics(): void {
     latestPlayerDuration = Number(detail.duration);
     latestPlaybackRate = detail.playbackRate ?? 1;
 
+    updateFullscreenControlsSnapshot({
+      currentTimeS: detail.currentTime,
+      durationS: Number(detail.duration),
+      playbackRate: detail.playbackRate ?? 1,
+      isPlaying: detail.playing,
+      wallTime: detail.browserTime,
+    });
+
     const currentVideoId = detail.videoId;
     const currentVideoDetails = detail.song + " " + detail.artist;
 
@@ -400,6 +409,11 @@ export function initializeLyrics(): void {
     if (AppState.queueSongDetailsInjection && detail.song && detail.artist && document.getElementById("main-panel")) {
       AppState.queueSongDetailsInjection = false;
       injectSongAttributes(detail.song, detail.artist);
+      void getSongAlbum(detail.videoId).then(album => {
+        if (album && document.getElementById("blyrics-title")?.textContent === detail.song) {
+          injectSongAttributes(detail.song, detail.artist, album);
+        }
+      });
     }
 
     if (AppState.lyricInjectionFailed && !AppState.isPictureInPictureOpen) {
@@ -625,15 +639,8 @@ export function setUpAvButtonListener(): void {
   }
 
   let handleAVSwitch = (isVideo: boolean) => {
-    let playerPage = document.querySelector("#player-page");
-
-    if (playerPage) {
-      if (isVideo) {
-        playerPage.setAttribute("blyrics-video-mode", "");
-      } else {
-        playerPage.removeAttribute("blyrics-video-mode");
-      }
-    }
+    document.querySelector("#player-page")?.toggleAttribute("blyrics-video-mode", isVideo);
+    document.querySelector("ytmusic-app-layout")?.toggleAttribute("blyrics-video-mode", isVideo);
   };
   const observerCallback = (mutationsList: MutationRecord[]) => {
     for (const mutation of mutationsList) {

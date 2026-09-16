@@ -145,30 +145,6 @@ const themes: Theme[] = [
     storeId: "spotlight",
   },
   {
-    name: "Pastel",
-    author: "BetterLyrics",
-    link: "https://twitter.com/boidushya",
-    path: "Pastel.css",
-  },
-  {
-    name: "Harmony Glow",
-    author: "NAMELESS",
-    link: "",
-    path: "Harmony Glow.css",
-  },
-  {
-    name: "Even Better Lyrics",
-    author: "Noah",
-    link: "",
-    path: "Even Better Lyrics.css",
-  },
-  {
-    name: "Big Blurry Slow Lyrics for TV",
-    author: "zobiron",
-    link: "",
-    path: "Big Blurry Slow Lyrics for TV.css",
-  },
-  {
     name: "Even Better Lyrics Plus",
     author: "Noah & BetterLyrics",
     link: "",
@@ -179,12 +155,6 @@ const themes: Theme[] = [
     author: "Semicolonhope",
     link: "",
     storeId: "minimal",
-  },
-  {
-    name: "Luxurious Glass",
-    author: "SKMJi",
-    link: "",
-    path: "Luxurious Glass.css",
   },
   {
     name: "Dynamic Background",

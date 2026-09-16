@@ -154,6 +154,7 @@ export function createPictureInPictureHost(
     view.setTransition(environment.artworkTransition());
     view.setTextTransition(environment.textTransition());
     view.setMarqueeEnabled(environment.marqueeEnabled());
+    view.setProgressBarEnabled(environment.progressBarEnabled());
   }
 
   // -- Lyrics --------------------------------------------

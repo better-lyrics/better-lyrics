@@ -1,7 +1,7 @@
 {
     "type": "module",
     "name": "better-lyrics",
-    "version": "2.4.0.5",
+    "version": "2.4.0.8",
     "description": "Enhance YouTube Music with beautiful time-synced lyrics, multilingual support, real-time translations and more",
     "scripts": {
         "generate:locales": "tsx tooling/generate-locales.ts",
@@ -19,6 +19,7 @@
         "update-version": "tsx tooling/update-version.ts",
         "typecheck": "npm run generate:locales && tsc --noEmit",
         "selfcheck": "tsx tooling/run-selfchecks.ts",
+        "check:i18n-brand": "tsx tooling/check-i18n-brand.ts",
         "knip": "knip --cache",
         "knip:fix": "knip --fix",
         "knip:ci": "knip --no-exit-code --reporter github-actions"
@@ -42,19 +43,19 @@
         "node": ">=22.12"
     },
     "dependencies": {
-        "@braccato/core": "1.5.0",
-        "@braccato/parsers": "0.2.1",
+        "@braccato/core": "1.6.4",
+        "@braccato/parsers": "0.2.2",
         "@codemirror/autocomplete": "^6.20.3",
         "@codemirror/commands": "^6.11.0",
         "@codemirror/lint": "^6.9.7",
-        "@codemirror/search": "^6.7.1",
-        "@codemirror/state": "^6.7.1",
-        "@codemirror/view": "^6.43.9",
+        "@codemirror/search": "^6.7.2",
+        "@codemirror/state": "^6.7.4",
+        "@codemirror/view": "^6.43.11",
         "@formkit/auto-animate": "^0.10.0",
-        "@fsegurai/codemirror-theme-material-dark": "^6.2.5",
+        "@fsegurai/codemirror-theme-material-dark": "^6.2.7",
         "@plasmohq/edge-addons-api": "^2.0.0",
         "codemirror-lang-rics": "^0.3.22",
-        "dompurify": "^3.4.14",
+        "dompurify": "^3.4.15",
         "fast-xml-parser": "^5.11.1",
         "fflate": "^0.8.3",
         "marked": "^18.0.11",
@@ -62,17 +63,17 @@
         "sortablejs": "^1.15.7"
     },
     "devDependencies": {
-        "@aws-sdk/client-s3": "^3.1121.0",
+        "@aws-sdk/client-s3": "^3.1131.0",
         "@biomejs/biome": "2.0.4",
-        "@types/chrome": "^0.2.7",
+        "@types/chrome": "^0.2.9",
         "@types/jsdom": "^28.0.3",
-        "@types/node": "^26.4.0",
+        "@types/node": "^26.5.1",
         "@types/sortablejs": "^1.15.9",
         "@typescript/lib-dom": "npm:@types/web@^0.0.280",
         "extension": "^4.1.5",
         "jsdom": "^29.1.1",
         "knip": "^5.88.1",
-        "tsx": "^4.23.12",
+        "tsx": "^4.23.13",
         "typescript": "^6.0.3"
     }
 }

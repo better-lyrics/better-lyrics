@@ -58,7 +58,7 @@
       background-color: var(--ts-navbar-color) !important;
     }
 
-    [style*="--blyrics-background-img"] {
+    #layout {
       --blyrics-background-img: unset !important;
     }
 

@@ -215,7 +215,7 @@ export async function importIdentity(json: string): Promise<KeyIdentity> {
   return identity;
 }
 
-let cachedDisplayName: Promise<string> | null = null;
+let cachedResolvedName: Promise<string | null> | null = null;
 
 async function fetchResolvedDisplayName(): Promise<string | null> {
   try {
@@ -237,21 +237,26 @@ async function fetchResolvedDisplayName(): Promise<string | null> {
   return null;
 }
 
-export async function getDisplayName(): Promise<string> {
-  if (!cachedDisplayName) {
-    const pending = fetchResolvedDisplayName().then(async resolved => {
-      if (resolved !== null) return resolved;
-      cachedDisplayName = null;
-      const identity = await getIdentity();
-      return generatePetName(identity.keyId);
+export function getResolvedDisplayName(): Promise<string | null> {
+  if (!cachedResolvedName) {
+    const pending = fetchResolvedDisplayName().then(resolved => {
+      if (resolved === null) cachedResolvedName = null;
+      return resolved;
     });
-    cachedDisplayName = pending;
+    cachedResolvedName = pending;
   }
-  return cachedDisplayName;
+  return cachedResolvedName;
+}
+
+export async function getDisplayName(): Promise<string> {
+  const resolved = await getResolvedDisplayName();
+  if (resolved !== null) return resolved;
+  const { keyId } = await getIdentity();
+  return generatePetName(keyId);
 }
 
 export function invalidateDisplayName(newValue?: string): void {
-  cachedDisplayName = newValue !== undefined ? Promise.resolve(newValue) : null;
+  cachedResolvedName = newValue !== undefined ? Promise.resolve(newValue) : null;
 }
 
 export async function isKeyRegistered(): Promise<boolean> {

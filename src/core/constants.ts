@@ -30,6 +30,7 @@ export const MODAL_CLASS = "blyrics-modal" as const;
 
 // DOM Selectors
 export const TAB_RENDERER_SELECTOR = "#tab-renderer" as const;
+export const LYRICS_PAGE_TYPE = "MUSIC_PAGE_TYPE_TRACK_LYRICS" as const;
 export const NO_LYRICS_TEXT_SELECTOR =
   "#tab-renderer > ytmusic-message-renderer > yt-formatted-string.text.style-scope.ytmusic-message-renderer" as const;
 export const FULLSCREEN_BUTTON_SELECTOR = ".fullscreen-button" as const;
@@ -40,6 +41,7 @@ export const PICTURE_IN_PICTURE_TOGGLE_SELECTOR = "[data-blyrics-picture-in-pict
 // DOM IDs and Attributes
 export const LYRICS_LOADER_ID = "blyrics-loader" as const;
 export const LYRICS_DISABLED_ATTR = "blyrics-dfs" as const;
+export const FULLSCREEN_CONTROLS_DISABLED_ATTR = "blyrics-no-fs-controls" as const;
 export const DISABLE_EFFECTS_STYLE_ID = "blyrics-disable-effects" as const;
 export const HIDDEN_CLASS = "blyrics-hidden" as const;
 export const REPORT_MODAL = "blyrics-report-lyrics" as const;
@@ -47,6 +49,8 @@ export const REPORT_MODAL = "blyrics-report-lyrics" as const;
 // Custom Events
 // Duplicated as a literal in public/script.js; that file is a page-world script and cannot import.
 export const SEEK_EVENT = "blyrics-seek-to" as const;
+export const PLAYER_CONTROL_EVENT = "blyrics-player-control" as const;
+export const PLAYER_TIME_EVENT = "blyrics-send-player-time" as const;
 
 // Assets and Resources
 export const DISCORD_LOGO_SRC =
@@ -61,13 +65,13 @@ export const NOTO_SANS_UNIVERSAL_LINK =
 export const HOMEPAGE_URL = "https://betterlyrics.org" as const;
 export const HOMEPAGE_DOMAIN = "betterlyrics.org" as const;
 export const HOMEPAGE_ICON_URL = "https://betterlyrics.org/icon-512.png" as const;
-export const UNISON_API_URL = "https://unison.boidu.dev/lyrics" as const;
+export const UNISON_API_URL = "https://unison.betterlyrics.org/lyrics" as const;
 export const DISCORD_INVITE_URL = "https://discord.gg/UsHE3d5fWF" as const;
 export const SHADERS_CWS_URL =
   "https://chromewebstore.google.com/detail/better-lyrics-shaders/mffpncjphfmkppebdoaehdlnagnlpfai" as const;
 export const SHADERS_AMO_URL = "https://addons.mozilla.org/en-US/firefox/addon/better-lyrics-shaders/" as const;
-export const THEME_STORE_API_URL = "https://better-lyrics-themes-api.boidu.dev" as const;
-export const UNISON_API_BASE_URL = "https://unison.boidu.dev" as const;
+export const THEME_STORE_API_URL = "https://themes.betterlyrics.org" as const;
+export const UNISON_API_BASE_URL = "https://unison.betterlyrics.org" as const;
 export const UNISON_TRANSLATE_URL = `${UNISON_API_BASE_URL}/translate` as const;
 export const THEME_STORE_TURNSTILE_URL = `${THEME_STORE_API_URL}/turnstile` as const;
 const THEME_REGISTRY_BASE = "https://raw.githubusercontent.com/better-lyrics/themes" as const;
@@ -468,28 +472,34 @@ export const PROVIDER_CONFIGS: ProviderConfig[] = [
     priority: 1,
   },
   { key: "binimum-richsynced", displayName: "BiniLyrics", syncType: "syllable", priority: 2 },
-  { key: "portato-richsynced", displayName: "Better Lyrics Portato", syncType: "word", priority: 3 },
-  { key: "musixmatch-richsync", displayName: "Musixmatch", syncType: "word", priority: 4 },
-  { key: "bLyrics-synced", displayName: "Better Lyrics", syncType: "line", priority: 5 },
+  {
+    key: "unison-wordsynced",
+    displayName: "Unison",
+    syncType: "word",
+    priority: 3,
+  },
+  { key: "portato-richsynced", displayName: "Better Lyrics Portato", syncType: "word", priority: 4 },
+  { key: "musixmatch-richsync", displayName: "Musixmatch", syncType: "word", priority: 5 },
+  { key: "bLyrics-synced", displayName: "Better Lyrics", syncType: "line", priority: 6 },
   {
     key: "unison-synced",
     displayName: "Unison",
     syncType: "line",
-    priority: 6,
+    priority: 7,
   },
-  { key: "yt-captions", displayName: "YouTube Captions", syncType: "line", priority: 7 },
-  { key: "binimum-synced", displayName: "BiniLyrics", syncType: "line", priority: 8 },
-  { key: "lrclib-synced", displayName: "LRCLib", syncType: "line", priority: 9 },
-  { key: "legato-synced", displayName: "Better Lyrics Legato", syncType: "line", priority: 10 },
-  { key: "musixmatch-synced", displayName: "Musixmatch", syncType: "line", priority: 11 },
-  { key: "yt-lyrics", displayName: "YouTube", syncType: "unsynced", priority: 12 },
+  { key: "yt-captions", displayName: "YouTube Captions", syncType: "line", priority: 8 },
+  { key: "binimum-synced", displayName: "BiniLyrics", syncType: "line", priority: 9 },
+  { key: "lrclib-synced", displayName: "LRCLib", syncType: "line", priority: 10 },
+  { key: "legato-synced", displayName: "Better Lyrics Legato", syncType: "line", priority: 11 },
+  { key: "musixmatch-synced", displayName: "Musixmatch", syncType: "line", priority: 12 },
+  { key: "yt-lyrics", displayName: "YouTube", syncType: "unsynced", priority: 13 },
   {
     key: "unison-plain",
     displayName: "Unison",
     syncType: "unsynced",
-    priority: 13,
+    priority: 14,
   },
-  { key: "lrclib-plain", displayName: "LRCLib", syncType: "unsynced", priority: 14 },
+  { key: "lrclib-plain", displayName: "LRCLib", syncType: "unsynced", priority: 15 },
 ] as const;
 
 export const LYRIC_SOURCE_KEYS = PROVIDER_CONFIGS.map(p => p.key);
