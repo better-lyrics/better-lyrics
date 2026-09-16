@@ -127,9 +127,11 @@ export default async function unison(providerParameters: ProviderParameters): Pr
 
   if (response.status === 404) {
     providerParameters.sourceMap["unison-richsynced"].filled = true;
+    providerParameters.sourceMap["unison-wordsynced"].filled = true;
     providerParameters.sourceMap["unison-synced"].filled = true;
     providerParameters.sourceMap["unison-plain"].filled = true;
     providerParameters.sourceMap["unison-richsynced"].lyricSourceResult = null;
+    providerParameters.sourceMap["unison-wordsynced"].lyricSourceResult = null;
     providerParameters.sourceMap["unison-synced"].lyricSourceResult = null;
     providerParameters.sourceMap["unison-plain"].lyricSourceResult = null;
     return;
@@ -140,6 +142,7 @@ export default async function unison(providerParameters: ProviderParameters): Pr
   }
 
   providerParameters.sourceMap["unison-richsynced"].filled = true;
+  providerParameters.sourceMap["unison-wordsynced"].filled = true;
   providerParameters.sourceMap["unison-synced"].filled = true;
   providerParameters.sourceMap["unison-plain"].filled = true;
 
@@ -147,6 +150,7 @@ export default async function unison(providerParameters: ProviderParameters): Pr
 
   if (!responseData.format || !responseData.lyrics) {
     providerParameters.sourceMap["unison-richsynced"].lyricSourceResult = null;
+    providerParameters.sourceMap["unison-wordsynced"].lyricSourceResult = null;
     providerParameters.sourceMap["unison-synced"].lyricSourceResult = null;
     providerParameters.sourceMap["unison-plain"].lyricSourceResult = null;
     return;
@@ -175,23 +179,26 @@ export default async function unison(providerParameters: ProviderParameters): Pr
         syncedKey: "unison-synced",
         ...result,
       });
+      providerParameters.sourceMap["unison-wordsynced"].lyricSourceResult = null;
       providerParameters.sourceMap["unison-plain"].lyricSourceResult = null;
       break;
     case "lrc":
       const lrc = parseLRC(responseData.lyrics, providerParameters.duration * 1000);
+      const isWordSynced = responseData.syncType === "richsync";
       const res: LyricSourceResult = {
         ...result,
         lyrics: lrc,
-        badgeSyncType: responseData.syncType === "richsync" ? "word" : "line",
       };
 
       providerParameters.sourceMap["unison-richsynced"].lyricSourceResult = null;
-      providerParameters.sourceMap["unison-synced"].lyricSourceResult = lrc ? res : null;
+      providerParameters.sourceMap["unison-wordsynced"].lyricSourceResult = lrc && isWordSynced ? res : null;
+      providerParameters.sourceMap["unison-synced"].lyricSourceResult = lrc && !isWordSynced ? res : null;
       providerParameters.sourceMap["unison-plain"].lyricSourceResult = null;
       break;
     case "plain":
       const plain = PlainParser.parse(responseData.lyrics);
       providerParameters.sourceMap["unison-richsynced"].lyricSourceResult = null;
+      providerParameters.sourceMap["unison-wordsynced"].lyricSourceResult = null;
       providerParameters.sourceMap["unison-synced"].lyricSourceResult = null;
       providerParameters.sourceMap["unison-plain"].lyricSourceResult = plain
         ? {

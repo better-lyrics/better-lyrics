@@ -340,8 +340,7 @@ export function addFooter(
   providerKey?: string,
   videoId?: string,
   unisonData?: UnisonData,
-  showRequestButton = false,
-  badgeSyncType?: SyncType
+  showRequestButton = false
 ): void {
   if (document.getElementsByClassName(FOOTER_CLASS).length !== 0) {
     document.getElementsByClassName(FOOTER_CLASS)[0].remove();
@@ -358,21 +357,19 @@ export function addFooter(
   sourceHref = sourceHref || HOMEPAGE_URL;
 
   const info = providerKey ? providerDisplayInfo[providerKey] : null;
-  const resolvedSyncType = badgeSyncType ?? info?.syncType ?? null;
-  AppState.currentBadgeSyncType = resolvedSyncType;
 
   footerLink.textContent = "";
   footerLink.href = sourceHref;
 
-  if (info && resolvedSyncType) {
+  if (info) {
     footerLink.appendChild(document.createTextNode(info.name));
     const iconWrapper = document.createElement("span");
     iconWrapper.style.opacity = "0.5";
     iconWrapper.style.marginLeft = "6px";
     iconWrapper.style.display = "inline-flex";
     iconWrapper.style.verticalAlign = "middle";
-    iconWrapper.style.color = syncTypeColors[resolvedSyncType];
-    const svgIcon = parseSvgString(syncTypeIcons[resolvedSyncType]);
+    iconWrapper.style.color = syncTypeColors[info.syncType];
+    const svgIcon = parseSvgString(syncTypeIcons[info.syncType]);
     if (svgIcon) {
       iconWrapper.appendChild(svgIcon);
     }

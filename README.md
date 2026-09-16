@@ -279,18 +279,19 @@ Available providers (default priority order):
 | 1   | Better Lyrics         | Syllable   |
 | 2   | Unison                | Syllable   |
 | 3   | BiniLyrics            | Syllable   |
-| 4   | Better Lyrics Portato | Word       |
-| 5   | Musixmatch            | Word       |
-| 6   | Better Lyrics         | Line       |
-| 7   | Unison                | Line       |
-| 8   | YouTube Captions      | Line       |
-| 9   | BiniLyrics            | Line       |
-| 10  | LRCLib                | Line       |
-| 11  | Better Lyrics Legato  | Line       |
-| 12  | Musixmatch            | Line       |
-| 13  | YouTube               | Unsynced   |
-| 14  | Unison                | Unsynced   |
-| 15  | LRCLib                | Unsynced   |
+| 4   | Unison                | Word       |
+| 5   | Better Lyrics Portato | Word       |
+| 6   | Musixmatch            | Word       |
+| 7   | Better Lyrics         | Line       |
+| 8   | Unison                | Line       |
+| 9   | YouTube Captions      | Line       |
+| 10  | BiniLyrics            | Line       |
+| 11  | LRCLib                | Line       |
+| 12  | Better Lyrics Legato  | Line       |
+| 13  | Musixmatch            | Line       |
+| 14  | YouTube               | Unsynced   |
+| 15  | Unison                | Unsynced   |
+| 16  | LRCLib                | Unsynced   |
 
 Adding custom providers isn't currently supported.
 

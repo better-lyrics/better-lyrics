@@ -1,4 +1,4 @@
-import { DOCK_CONTROL_ORDER_DEFAULT, DOCK_DEFAULT_POSITION, type SyncType } from "@constants";
+import { DOCK_CONTROL_ORDER_DEFAULT, DOCK_DEFAULT_POSITION } from "@constants";
 import type { LyricDecorations, LyricsData } from "@modules/lyrics/injectLyrics";
 import { createLyrics, type ParsedLyrics } from "@modules/lyrics/lyrics";
 import type { LyricSourceKey } from "@modules/lyrics/providers/shared";
@@ -55,7 +55,6 @@ interface AppStateType {
   richsyncOffsetTrim: number;
   lineOffsetTrim: number;
   currentProviderKey: string | null;
-  currentBadgeSyncType: SyncType | null;
   manualProviderKey: LyricSourceKey | null;
   availableProviderKeys: LyricSourceKey[];
   isControlsDockEnabled: boolean;
@@ -103,7 +102,6 @@ export const AppState: AppStateType = {
   richsyncOffsetTrim: 0,
   lineOffsetTrim: 0,
   currentProviderKey: null,
-  currentBadgeSyncType: null,
   manualProviderKey: null,
   availableProviderKeys: [],
   isControlsDockEnabled: true,
