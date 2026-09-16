@@ -2,7 +2,7 @@ import { compareVersions } from "../store/themeBuildResolver";
 
 const CANARY_SEGMENT_COUNT = 4;
 
-function isCanaryVersion(version: string): boolean {
+export function isCanaryVersion(version: string): boolean {
   return version.split(".").length >= CANARY_SEGMENT_COUNT;
 }
 
