@@ -4,6 +4,7 @@ import {
   LYRICS_NEGATIVE_CACHE_TTL_MS,
   PROVIDER_CONFIGS,
   PROVIDER_SWITCHED_LOG,
+  type SyncType,
 } from "@constants";
 import { getTransientStorage, setTransientStorage } from "@core/storage";
 import unified from "./unified";
@@ -64,6 +65,7 @@ export interface LyricSourceResult {
   song?: string;
   duration?: number;
   unisonData?: UnisonData;
+  badgeSyncType?: SyncType;
 }
 
 export type LyricsArray = Lyric[];

@@ -179,9 +179,10 @@ export default async function unison(providerParameters: ProviderParameters): Pr
       break;
     case "lrc":
       const lrc = parseLRC(responseData.lyrics, providerParameters.duration * 1000);
-      const res = {
+      const res: LyricSourceResult = {
         ...result,
         lyrics: lrc,
+        badgeSyncType: responseData.syncType === "richsync" ? "word" : "line",
       };
 
       providerParameters.sourceMap["unison-richsynced"].lyricSourceResult = null;

@@ -80,7 +80,8 @@ function buildSourceMenu(currentKey: string | null): HTMLElement {
   menu.className = `${DOCK_CLASS}__menu`;
 
   const current = currentKey ? PROVIDER_CONFIGS.find(config => config.key === currentKey) : null;
-  if (current) menu.style.setProperty("--dock-accent", syncTypeColors[current.syncType]);
+  if (current)
+    menu.style.setProperty("--dock-accent", syncTypeColors[AppState.currentBadgeSyncType ?? current.syncType]);
 
   for (const key of dockSourceList()) {
     const config = PROVIDER_CONFIGS.find(candidate => candidate.key === key);
@@ -159,11 +160,12 @@ export function buildSourceSlot(): HTMLElement | null {
   trigger.className = `${DOCK_CLASS}__source-trigger`;
   trigger.setAttribute("aria-label", t("lyricsDock_chooseSource"));
 
-  const icon = parseSvgString(syncTypeIcons[provider.syncType]);
+  const badgeSync = AppState.currentBadgeSyncType ?? provider.syncType;
+  const icon = parseSvgString(syncTypeIcons[badgeSync]);
   if (icon) {
     const iconWrap = document.createElement("span");
     iconWrap.className = `${DOCK_CLASS}__source-icon`;
-    iconWrap.style.color = syncTypeColors[provider.syncType];
+    iconWrap.style.color = syncTypeColors[badgeSync];
     iconWrap.appendChild(icon);
     trigger.appendChild(iconWrap);
   }
@@ -385,7 +387,8 @@ function buildOffsetMenu(): HTMLElement {
   const menu = document.createElement("div");
   menu.className = `${DOCK_CLASS}__menu ${DOCK_CLASS}__menu--offset`;
   const provider = currentProviderConfig();
-  if (provider) menu.style.setProperty("--dock-accent", syncTypeColors[provider.syncType]);
+  if (provider)
+    menu.style.setProperty("--dock-accent", syncTypeColors[AppState.currentBadgeSyncType ?? provider.syncType]);
 
   const reset = document.createElement("button");
   reset.type = "button";
@@ -502,7 +505,7 @@ export function buildControlsSegment(): HTMLElement {
 
   const provider = currentProviderConfig();
   if (provider) {
-    controls.style.setProperty("--dock-accent", syncTypeColors[provider.syncType]);
+    controls.style.setProperty("--dock-accent", syncTypeColors[AppState.currentBadgeSyncType ?? provider.syncType]);
   }
 
   const sections: HTMLElement[] = [];
