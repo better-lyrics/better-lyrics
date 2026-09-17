@@ -107,6 +107,7 @@ jobs:
           API_KEY: ${{ secrets.EDGE_API_KEY }}
           PRODUCT_ID: ${{ secrets.EDGE_PRODUCT_ID }}
         run: |
+          node -e "const fs=require('fs');const f='dist/edge/manifest.json';const m=JSON.parse(fs.readFileSync(f,'utf8'));delete m.key;delete m.update_url;fs.writeFileSync(f,JSON.stringify(m,null,2))"
           cd dist/edge && zip -r "../edge-v${{ inputs.version }}.zip" . && cd -
           npx tsx tooling/publish-edge.ts "dist/edge-v${{ inputs.version }}.zip"
 

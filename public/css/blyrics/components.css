@@ -1431,6 +1431,19 @@ ytmusic-player-page[player-fullscreened]:not([blyrics-dfs]) #blyrics-fs-column {
   gap: 1.5rem;
 }
 
+#blyrics-fs-controls,
+.blyrics-fs-info-actions {
+  opacity: 1;
+  pointer-events: auto;
+  transition: opacity 320ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+#layout[player-fullscreened]:not([blyrics-dfs])[show-fullscreen-controls] #blyrics-fs-controls,
+#layout[player-fullscreened]:not([blyrics-dfs])[show-fullscreen-controls] .blyrics-fs-info-actions {
+  opacity: 0;
+  pointer-events: none;
+}
+
 #blyrics-fs-controls[data-ad] {
   display: none;
 }
