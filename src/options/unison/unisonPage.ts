@@ -4,7 +4,9 @@ import { t } from "@core/i18n";
 import {
   DEFAULT_FEED_FILTERS,
   type FeedFilters,
+  type LinkedVideo,
   type ReportReason,
+  type SuggestedVideo,
   type UnisonConfidence,
   type UnisonFeedEntry,
   type UnisonFormat,
@@ -16,18 +18,24 @@ import {
 import {
   castVote,
   deleteLyrics,
+  editVariant,
   getFeed,
   getLyricsById,
   getLyricsByVideoId,
   getMySubmissions,
+  linkVideo,
+  listVideos,
   removeVote,
   reportLyrics,
   searchLyrics,
   submitLyrics,
+  suggestedVideos,
+  unlinkVideo,
 } from "@modules/unison/unisonApi";
 import { UnisonErrorCode } from "@modules/unison/errorCodes";
+import { sealMarks } from "@modules/unison/gamification";
 import { appendInlineProfile, profileUrl } from "@modules/unison/gamificationRender";
-import { generatePetName, getDisplayName } from "@/core/keyIdentity";
+import { generatePetName, getDisplayName, getIdentity } from "@/core/keyIdentity";
 import { warnUnison } from "@core/logger";
 
 // -- SVG Icons --------------------------
@@ -44,6 +52,7 @@ const ICONS = {
   confidenceTopRated: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="currentColor" d="m12 14.475l1.925 1.15q.275.175.538-.012t.187-.513l-.5-2.175l1.7-1.475q.25-.225.15-.537t-.45-.338l-2.225-.175l-.875-2.075q-.125-.3-.45-.3t-.45.3l-.875 2.075l-2.225.175q-.35.025-.45.338t.15.537l1.7 1.475l-.5 2.175q-.075.325.188.513t.537.012zM8.65 20H6q-.825 0-1.412-.587T4 18v-2.65L2.075 13.4q-.275-.3-.425-.662T1.5 12t.15-.737t.425-.663L4 8.65V6q0-.825.588-1.412T6 4h2.65l1.95-1.925q.3-.275.663-.425T12 1.5t.738.15t.662.425L15.35 4H18q.825 0 1.413.588T20 6v2.65l1.925 1.95q.275.3.425.663t.15.737t-.15.738t-.425.662L20 15.35V18q0 .825-.587 1.413T18 20h-2.65l-1.95 1.925q-.3.275-.662.425T12 22.5t-.737-.15t-.663-.425z"/></svg>`,
   success: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><!-- Icon from IconaMoon by Dariush Habibpour - https://creativecommons.org/licenses/by/4.0/ --><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="m15 10l-4 4l-2-2"/></g></svg>`,
   error: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><!-- Icon from IconaMoon by Dariush Habibpour - https://creativecommons.org/licenses/by/4.0/ --><g fill="none" stroke="currentColor" stroke-linejoin="round"><circle cx="12" cy="12" r="9" stroke-linecap="round" stroke-width="2"/><path stroke-width="3" d="M12 16h.01v.01H12z"/><path stroke-linecap="round" stroke-width="2" d="M12 12V8"/></g></svg>`,
+  editAsVariant: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><!-- Icon from Solar by 480 Design - https://creativecommons.org/licenses/by/4.0/ --><path fill="currentColor" d="M12 2c1.845 0 3.33 0 4.54.088L13.1 7.25H8.402l3.5-5.25zM3.465 3.464c1.252-1.252 3.157-1.433 6.631-1.46L6.599 7.25H2.104c.148-1.764.503-2.928 1.36-3.786M21.896 7.25c-.147-1.764-.503-2.928-1.36-3.786c-.598-.597-1.343-.95-2.337-1.16L14.902 7.25z"/><path fill="currentColor" fill-rule="evenodd" d="M17.5 22c-2.121 0-3.182 0-3.841-.659S13 19.621 13 17.5s0-3.182.659-3.841S15.379 13 17.5 13s3.182 0 3.841.659S22 15.379 22 17.5s0 3.182-.659 3.841S19.621 22 17.5 22m2.212-6.712a.983.983 0 0 1 0 1.39l-.058.058a.24.24 0 0 1-.211.067a1.6 1.6 0 0 1-.81-.436a1.6 1.6 0 0 1-.436-.81a.24.24 0 0 1 .067-.211l.058-.058a.983.983 0 0 1 1.39 0M17.35 19.04a3 3 0 0 1-.296.279a1.6 1.6 0 0 1-.303.187a3 3 0 0 1-.381.14l-1.021.34a.265.265 0 0 1-.335-.335l.34-1.02c.064-.194.097-.291.14-.382q.077-.163.187-.303c.062-.08.134-.152.279-.296l1.799-1.799c.043-.043.118-.023.138.035a1.98 1.98 0 0 0 1.217 1.217c.058.02.078.095.035.138z" clip-rule="evenodd"/><path fill="currentColor" d="M2.026 8.75C2 9.689 2 10.763 2 12c0 4.714 0 7.071 1.464 8.535C4.93 22 7.286 22 12 22c1.358 0 2.52 0 3.522-.035c-.884-.058-1.452-.213-1.863-.624C13 20.682 13 19.621 13 17.5s0-3.182.659-3.841S15.379 13 17.5 13s3.182 0 3.841.659c.411.411.566.979.624 1.863C22 14.52 22 13.358 22 12c0-1.237 0-2.311-.026-3.25z" opacity=".5"/></svg>`,
 } as const;
 
 const SORT_ICON_PATH = {
@@ -136,6 +145,9 @@ const feedTabCache: Record<FeedTabName, FeedTabCache> = {
 
 let activeFeedTab: FeedTabName = "recent";
 let feedSentinelObserver: IntersectionObserver | undefined;
+let editVariantMode: { parentId: number; voteCount: number; sealed: boolean } | null = null;
+let additionalVideosInput: { getIds(): string[]; clear(): void } | null = null;
+let detailRenderToken = 0;
 
 // -- Dev Stub --------------------------
 
@@ -221,9 +233,18 @@ function routeFromParams(): void {
 
   if (params.get("submit") === "true") {
     showView("submit");
-    prefillSubmitForm(params);
+    const editParent = params.get("editVariant");
+    if (editParent) {
+      prefillSubmitForm(params);
+      void enterEditVariantMode(Number(editParent));
+    } else {
+      clearEditVariantMode();
+      prefillSubmitForm(params);
+    }
     return;
   }
+
+  clearEditVariantMode();
 
   const lyricsId = params.get("id");
   if (lyricsId) {
@@ -974,6 +995,7 @@ async function loadDetailByVideoId(videoId: string): Promise<void> {
 }
 
 function renderDetail(entry: UnisonLyricsEntry, isOwn: boolean = false): void {
+  const token = ++detailRenderToken;
   detailMeta.replaceChildren();
   detailPreview.replaceChildren();
   detailLyrics.replaceChildren();
@@ -1037,10 +1059,12 @@ function renderDetail(entry: UnisonLyricsEntry, isOwn: boolean = false): void {
   detailMeta.appendChild(scoreRow);
   if (entry.fulfilled) detailMeta.appendChild(createFulfilledBlock(entry.submitter));
   detailMeta.appendChild(votingRow);
+  void appendEditVariantForOwner(entry, votingRow, token);
   if (isOwn) {
     detailMeta.appendChild(createDetailDeleteButton(entry.id));
   }
   detailMeta.appendChild(ytLink);
+  void renderOwnerVideoTools(entry, token);
 
   // -- Preview column
   renderPreviewInto(detailPreview, entry.lyrics);
@@ -1254,6 +1278,297 @@ function createDetailDeleteButton(unisonId: number): HTMLButtonElement {
   return btn;
 }
 
+// -- Video linking & edit (detail page) --------------------------
+
+function videoLinkErrorMessage(code: string | undefined, fallback: string): string {
+  switch (code) {
+    case UnisonErrorCode.NOT_OWNER:
+      return t("unison_deleteForbidden");
+    case UnisonErrorCode.LINK_CAP_REACHED:
+      return t("unison_error_linkCapReached");
+    case UnisonErrorCode.DURATION_MISMATCH:
+      return t("unison_error_durationMismatch");
+    case UnisonErrorCode.VIDEO_UNVERIFIABLE:
+      return t("unison_error_videoUnverifiable");
+    case UnisonErrorCode.CANNOT_UNLINK_PRIMARY:
+      return t("unison_error_cannotUnlinkPrimary");
+    default:
+      return fallback;
+  }
+}
+
+async function isOwnerOf(entry: UnisonLyricsEntry): Promise<boolean> {
+  if (!entry.submitter) return false;
+  try {
+    const { keyId } = await getIdentity();
+    return keyId === entry.submitter.keyId;
+  } catch (err) {
+    warnUnison("owner check failed", err);
+    return false;
+  }
+}
+
+function formatDurationSeconds(seconds: number): string {
+  const total = Math.max(0, Math.round(seconds));
+  const mins = Math.floor(total / 60);
+  const secs = total % 60;
+  return `${mins}:${secs.toString().padStart(2, "0")}`;
+}
+
+function createVideoIdLink(videoId: string): HTMLAnchorElement {
+  const link = document.createElement("a");
+  link.className = "unison-video-id";
+  link.href = `https://music.youtube.com/watch?v=${encodeURIComponent(videoId)}`;
+  link.target = "_blank";
+  link.rel = "noreferrer noopener";
+  link.textContent = videoId;
+  return link;
+}
+
+function renderLinkedVideoList(
+  lyricsId: number,
+  listEl: HTMLElement,
+  videos: LinkedVideo[],
+  refresh: () => Promise<void>
+): void {
+  listEl.replaceChildren();
+  if (!videos.length) {
+    const empty = document.createElement("li");
+    empty.className = "unison-video-empty";
+    empty.textContent = t("unison_noLinkedVideos");
+    listEl.appendChild(empty);
+    return;
+  }
+
+  for (const video of videos) {
+    const row = document.createElement("li");
+    row.className = "unison-video-row";
+    row.appendChild(createVideoIdLink(video.videoId));
+
+    if (video.isPrimary) {
+      const badge = document.createElement("span");
+      badge.className = "unison-video-primary";
+      badge.textContent = t("unison_videoPrimary");
+      row.appendChild(badge);
+    } else {
+      const removeBtn = document.createElement("button");
+      removeBtn.type = "button";
+      removeBtn.className = "unison-video-remove";
+      removeBtn.appendChild(svgIcon("trash"));
+      removeBtn.append(t("unison_removeVideo"));
+      removeBtn.addEventListener("click", async () => {
+        removeBtn.disabled = true;
+        const result = await unlinkVideo(lyricsId, video.videoId);
+        if (result.success) {
+          await refresh();
+          return;
+        }
+        removeBtn.disabled = false;
+        removeBtn.replaceChildren(
+          document.createTextNode(videoLinkErrorMessage(result.code, t("unison_unlinkFailed")))
+        );
+      });
+      row.appendChild(removeBtn);
+    }
+
+    listEl.appendChild(row);
+  }
+}
+
+const SUGGESTED_VIDEO_PAGE_SIZE = 5;
+
+function createSuggestedVideoRow(
+  lyricsId: number,
+  suggestion: SuggestedVideo,
+  refresh: () => Promise<void>
+): HTMLLIElement {
+  const row = document.createElement("li");
+  row.className = "unison-suggest-row";
+
+  const info = document.createElement("div");
+  info.className = "unison-suggest-info";
+
+  const title = document.createElement("span");
+  title.className = "unison-suggest-title";
+  title.textContent = suggestion.title;
+  info.appendChild(title);
+
+  const meta = document.createElement("span");
+  meta.className = "unison-suggest-meta";
+  meta.textContent = `${suggestion.artist} · ${formatDurationSeconds(suggestion.durationSeconds)}`;
+  info.appendChild(meta);
+  row.appendChild(info);
+
+  const addBtn = document.createElement("button");
+  addBtn.type = "button";
+  addBtn.className = "unison-video-add";
+  addBtn.textContent = t("unison_addVideo");
+  addBtn.addEventListener("click", async () => {
+    addBtn.disabled = true;
+    const result = await linkVideo(lyricsId, suggestion.videoId);
+    if (result.success) {
+      await refresh();
+      return;
+    }
+    addBtn.disabled = false;
+    addBtn.textContent = videoLinkErrorMessage(result.code, t("unison_linkFailed"));
+  });
+  row.appendChild(addBtn);
+
+  return row;
+}
+
+function renderSuggestedVideoList(
+  lyricsId: number,
+  listEl: HTMLElement,
+  suggestions: SuggestedVideo[],
+  refresh: () => Promise<void>
+): void {
+  listEl.replaceChildren();
+  if (!suggestions.length) {
+    const empty = document.createElement("li");
+    empty.className = "unison-video-empty";
+    empty.textContent = t("unison_noSuggestions");
+    listEl.appendChild(empty);
+    return;
+  }
+
+  const appendRows = (items: SuggestedVideo[]): void => {
+    for (const suggestion of items) {
+      listEl.appendChild(createSuggestedVideoRow(lyricsId, suggestion, refresh));
+    }
+  };
+
+  if (suggestions.length <= SUGGESTED_VIDEO_PAGE_SIZE) {
+    appendRows(suggestions);
+    return;
+  }
+
+  appendRows(suggestions.slice(0, SUGGESTED_VIDEO_PAGE_SIZE));
+
+  const moreRow = document.createElement("li");
+  moreRow.className = "unison-suggest-more";
+  const moreBtn = document.createElement("button");
+  moreBtn.type = "button";
+  moreBtn.className = "unison-suggest-more-btn";
+  moreBtn.textContent = t("unison_showMore");
+  moreBtn.addEventListener("click", () => {
+    moreRow.remove();
+    appendRows(suggestions.slice(SUGGESTED_VIDEO_PAGE_SIZE));
+  });
+  moreRow.appendChild(moreBtn);
+  listEl.appendChild(moreRow);
+}
+
+async function renderOwnerVideoTools(entry: UnisonLyricsEntry, token: number): Promise<void> {
+  if (!(await isOwnerOf(entry))) return;
+  if (token !== detailRenderToken) return;
+
+  const section = document.createElement("div");
+  section.className = "unison-detail-videos";
+
+  const linkedHeading = document.createElement("h3");
+  linkedHeading.className = "unison-detail-videos-heading";
+  linkedHeading.textContent = t("unison_linkedVideos");
+
+  const linkedList = document.createElement("ul");
+  linkedList.className = "unison-video-list";
+
+  const suggestHeading = document.createElement("h3");
+  suggestHeading.className = "unison-detail-videos-heading";
+  suggestHeading.textContent = t("unison_suggestedVideos");
+
+  const suggestList = document.createElement("ul");
+  suggestList.className = "unison-video-list unison-suggest-list";
+
+  section.appendChild(linkedHeading);
+  section.appendChild(linkedList);
+  section.appendChild(suggestHeading);
+  section.appendChild(suggestList);
+  detailMeta.appendChild(section);
+
+  async function refresh(): Promise<void> {
+    const [linkedRes, suggestRes] = await Promise.all([listVideos(entry.id), suggestedVideos(entry.id)]);
+    renderLinkedVideoList(entry.id, linkedList, linkedRes.data, refresh);
+    renderSuggestedVideoList(entry.id, suggestList, suggestRes.data, refresh);
+  }
+
+  await refresh();
+}
+
+async function appendEditVariantForOwner(entry: UnisonLyricsEntry, anchor: HTMLElement, token: number): Promise<void> {
+  if (!(await isOwnerOf(entry))) return;
+  if (token !== detailRenderToken) return;
+  anchor.insertAdjacentElement("afterend", createEditVariantButton(entry));
+}
+
+function createEditVariantButton(entry: UnisonLyricsEntry): HTMLButtonElement {
+  const btn = document.createElement("button");
+  btn.type = "button";
+  btn.className = "unison-vote-btn unison-vote-btn--edit";
+  btn.appendChild(svgIcon("editAsVariant"));
+  btn.append(t("unison_editAsVariant"));
+  btn.addEventListener("click", () => {
+    editVariantMode = { parentId: entry.id, voteCount: entry.voteCount, sealed: sealMarks(entry.marks).length > 0 };
+    navigateTo({ submit: "true", editVariant: String(entry.id) });
+    seedEditVariantForm(entry);
+  });
+  return btn;
+}
+
+async function enterEditVariantMode(parentId: number): Promise<void> {
+  if (editVariantMode?.parentId === parentId) return;
+  const result = await getLyricsById(parentId);
+  if (!result.success || !result.data) return;
+  if (!(await isOwnerOf(result.data))) return;
+  editVariantMode = { parentId, voteCount: result.data.voteCount, sealed: sealMarks(result.data.marks).length > 0 };
+  seedEditVariantForm(result.data);
+}
+
+function seedEditVariantForm(entry: UnisonLyricsEntry): void {
+  const setField = (id: string, value: string) => {
+    const el = document.getElementById(id) as HTMLInputElement | null;
+    if (el) el.value = value;
+  };
+  setField("unison-field-song", entry.song);
+  setField("unison-field-artist", entry.artist);
+  setField("unison-field-album", entry.album ?? "");
+  setField("unison-field-videoId", entry.videoId);
+  setField("unison-field-isrc", entry.isrc ?? "");
+  lyricsTextarea.value = entry.lyrics;
+  if (entry.language) submitLanguageSelect.value = entry.language;
+  updatePreview();
+  autoDetectFormat();
+  updateComposerLink();
+  showEditVariantBanner(entry.song);
+  setAdditionalVideosHidden(true);
+}
+
+function showEditVariantBanner(song: string): void {
+  let banner = document.getElementById("unison-edit-variant-banner");
+  if (!banner) {
+    banner = document.createElement("div");
+    banner.id = "unison-edit-variant-banner";
+    banner.className = "unison-edit-variant-banner";
+    viewSubmit.insertBefore(banner, viewSubmit.firstChild);
+  }
+  banner.textContent = t("unison_editingVariantOf", [song]);
+  banner.hidden = false;
+}
+
+function clearEditVariantMode(): void {
+  editVariantMode = null;
+  const banner = document.getElementById("unison-edit-variant-banner");
+  if (banner) banner.hidden = true;
+  setAdditionalVideosHidden(false);
+}
+
+function setAdditionalVideosHidden(hidden: boolean): void {
+  const field = document.getElementById("unison-additional-videos-field");
+  if (field) field.hidden = hidden;
+  if (hidden) additionalVideosInput?.clear();
+}
+
 function showReportMenu(unisonId: number, anchor: HTMLButtonElement): void {
   const existing = document.querySelector(".unison-report-dropdown");
   if (existing) existing.remove();
@@ -1293,6 +1608,13 @@ function showReportMenu(unisonId: number, anchor: HTMLButtonElement): void {
 
 function setupSubmitForm(): void {
   submitBtn.addEventListener("click", handleSubmit);
+
+  const additionalMount = document.getElementById("unison-additional-videos-mount");
+  if (additionalMount) {
+    additionalVideosInput = createVideoIdTokenInput(additionalMount, () =>
+      (document.getElementById("unison-field-videoId") as HTMLInputElement).value.trim()
+    );
+  }
 
   const languageDefault = document.createElement("option");
   languageDefault.value = "";
@@ -1578,6 +1900,240 @@ function updatePreview(): void {
   renderPreviewInto(previewContent, lyricsTextarea.value, true);
 }
 
+function editVariantErrorMessage(result: { code?: string; status?: number }): string {
+  if (result.code === UnisonErrorCode.VARIANT_CAP_REACHED) return t("unison_error_variantCapReached");
+  if (result.code === UnisonErrorCode.RATE_LIMITED || result.status === 429) return t("unison_error_rateLimited");
+  if (result.code === UnisonErrorCode.NOT_FOUND || result.status === 404) return t("unison_error_parentGone");
+  return t("unison_editVariantFailed");
+}
+
+function confirmDialog(opts: { title: string; body: string; confirmLabel: string; banner?: string }): Promise<boolean> {
+  return new Promise(resolve => {
+    const dialog = document.createElement("dialog");
+    dialog.className = "unison-confirm";
+
+    const heading = document.createElement("h3");
+    heading.className = "unison-confirm-title";
+    heading.textContent = opts.title;
+
+    const text = document.createElement("p");
+    text.className = "unison-confirm-body";
+    text.textContent = opts.body;
+    dialog.append(heading, text);
+
+    if (opts.banner) {
+      const banner = document.createElement("div");
+      banner.className = "unison-confirm-banner";
+      banner.textContent = opts.banner;
+      dialog.appendChild(banner);
+    }
+
+    const actions = document.createElement("div");
+    actions.className = "unison-confirm-actions";
+    const cancelBtn = document.createElement("button");
+    cancelBtn.type = "button";
+    cancelBtn.className = "unison-confirm-btn unison-confirm-btn--cancel";
+    cancelBtn.textContent = t("options_cancel");
+    const saveBtn = document.createElement("button");
+    saveBtn.type = "button";
+    saveBtn.className = "unison-confirm-btn unison-confirm-btn--save";
+    saveBtn.textContent = opts.confirmLabel;
+    actions.append(cancelBtn, saveBtn);
+    dialog.appendChild(actions);
+
+    const close = (result: boolean) => {
+      dialog.close();
+      dialog.remove();
+      resolve(result);
+    };
+    cancelBtn.addEventListener("click", () => close(false));
+    saveBtn.addEventListener("click", () => close(true));
+    dialog.addEventListener("cancel", event => {
+      event.preventDefault();
+      close(false);
+    });
+
+    document.body.appendChild(dialog);
+    dialog.showModal();
+    cancelBtn.focus();
+  });
+}
+
+async function handleEditVariantSubmit(lyrics: string, format: UnisonFormat | "auto", language: string): Promise<void> {
+  if (!editVariantMode) return;
+
+  if (!lyrics) {
+    showFeedback(submitFeedback, { title: t("unison_validationRequired"), isError: true });
+    return;
+  }
+
+  if (editVariantMode.voteCount > 0 || editVariantMode.sealed) {
+    const confirmed = await confirmDialog({
+      title: t("unison_editConfirmTitle"),
+      body: t("unison_editConfirmBody"),
+      confirmLabel: t("unison_editConfirmSave"),
+      banner: editVariantMode.sealed ? t("unison_editConfirmSealed") : undefined,
+    });
+    if (!confirmed) return;
+  }
+
+  const resolvedFormat = format === "auto" ? detectFormat(lyrics) : format;
+  submitBtn.disabled = true;
+  const result = await editVariant(editVariantMode.parentId, lyrics, resolvedFormat, language || undefined);
+
+  if (result.success) {
+    showFeedback(submitFeedback, { title: t("unison_editVariantSuccess"), isError: false });
+    const newId = result.data?.id;
+    clearEditVariantMode();
+    if (newId) setTimeout(() => navigateTo({ id: String(newId) }), 1500);
+    return;
+  }
+
+  submitBtn.disabled = false;
+  showFeedback(submitFeedback, { title: editVariantErrorMessage(result), hint: result.hint, isError: true });
+}
+
+function parseVideoId(raw: string): string | null {
+  const trimmed = raw.trim();
+  if (!trimmed) return null;
+  const idPattern = /^[\w-]{11}$/;
+  try {
+    const url = new URL(trimmed);
+    const v = url.searchParams.get("v");
+    if (v) return idPattern.test(v) ? v : null;
+    const segment = url.pathname.split("/").filter(Boolean).pop();
+    return segment && idPattern.test(segment) ? segment : null;
+  } catch {
+    return idPattern.test(trimmed) ? trimmed : null;
+  }
+}
+
+function createVideoIdTokenInput(
+  container: HTMLElement,
+  getPrimaryId: () => string
+): { getIds(): string[]; clear(): void } {
+  const tokens: { id: string | null; text: string }[] = [];
+
+  container.classList.add("unison-token-input");
+
+  const field = document.createElement("input");
+  field.type = "text";
+  field.className = "unison-token-input-field";
+  field.setAttribute("aria-label", t("unison_additionalVideos"));
+
+  const flashPill = (id: string): void => {
+    const pill = container.querySelector(`.unison-token[data-token-id="${id}"]`);
+    if (!pill) return;
+    pill.classList.add("unison-token--flash");
+    setTimeout(() => pill.classList.remove("unison-token--flash"), 500);
+  };
+
+  const render = (): void => {
+    for (const pill of container.querySelectorAll(".unison-token")) pill.remove();
+    tokens.forEach((token, index) => {
+      const pill = document.createElement("span");
+      pill.className = token.id ? "unison-token" : "unison-token unison-token--invalid";
+      if (token.id) pill.dataset.tokenId = token.id;
+
+      const label = document.createElement("span");
+      label.className = "unison-token-label";
+      label.textContent = token.text;
+      pill.appendChild(label);
+
+      const remove = document.createElement("button");
+      remove.type = "button";
+      remove.className = "unison-token-remove";
+      remove.setAttribute("aria-label", t("unison_removeVideo"));
+      remove.textContent = "×";
+      remove.addEventListener("click", () => {
+        tokens.splice(index, 1);
+        render();
+        field.focus();
+      });
+      pill.appendChild(remove);
+
+      container.insertBefore(pill, field);
+    });
+  };
+
+  const commit = (raw: string): void => {
+    const primaryId = parseVideoId(getPrimaryId());
+    for (const part of raw.split(/[\s,]+/)) {
+      const piece = part.trim();
+      if (!piece) continue;
+      const id = parseVideoId(piece);
+      if (!id) {
+        tokens.push({ id: null, text: piece });
+        continue;
+      }
+      if (id === primaryId) continue;
+      if (tokens.some(token => token.id === id)) {
+        flashPill(id);
+        continue;
+      }
+      tokens.push({ id, text: id });
+    }
+    render();
+  };
+
+  field.addEventListener("keydown", (event: KeyboardEvent) => {
+    if (event.key === "Enter" || event.key === "," || event.key === " ") {
+      if (!field.value.trim()) return;
+      event.preventDefault();
+      commit(field.value);
+      field.value = "";
+    } else if (event.key === "Backspace" && !field.value && tokens.length) {
+      tokens.pop();
+      render();
+    }
+  });
+
+  field.addEventListener("paste", (event: ClipboardEvent) => {
+    const text = event.clipboardData?.getData("text") ?? "";
+    if (!/[\s,]/.test(text)) return;
+    event.preventDefault();
+    commit(text);
+    field.value = "";
+  });
+
+  field.addEventListener("blur", () => {
+    if (!field.value.trim()) return;
+    commit(field.value);
+    field.value = "";
+  });
+
+  container.addEventListener("mousedown", (event: MouseEvent) => {
+    if (event.target === container) {
+      event.preventDefault();
+      field.focus();
+    }
+  });
+
+  container.appendChild(field);
+
+  return {
+    getIds: () => {
+      const ids: string[] = [];
+      for (const token of tokens) if (token.id) ids.push(token.id);
+      return ids;
+    },
+    clear: () => {
+      tokens.length = 0;
+      field.value = "";
+      render();
+    },
+  };
+}
+
+async function linkAdditionalVideos(lyricsId: number, ids: string[]): Promise<string[]> {
+  const skipped: string[] = [];
+  for (const id of ids) {
+    const result = await linkVideo(lyricsId, id);
+    if (!result.success) skipped.push(id);
+  }
+  return skipped;
+}
+
 async function handleSubmit(): Promise<void> {
   const song = (document.getElementById("unison-field-song") as HTMLInputElement).value.trim();
   const artist = (document.getElementById("unison-field-artist") as HTMLInputElement).value.trim();
@@ -1588,6 +2144,11 @@ async function handleSubmit(): Promise<void> {
   const language = submitLanguageSelect.value;
   const lyrics = lyricsTextarea.value.trim();
   let format = formatSelect.value as UnisonFormat | "auto";
+
+  if (editVariantMode) {
+    await handleEditVariantSubmit(lyrics, format, language);
+    return;
+  }
 
   if (!song || !artist || !videoId || !lyrics) {
     showFeedback(submitFeedback, { title: t("unison_validationRequired"), isError: true });
@@ -1612,19 +2173,27 @@ async function handleSubmit(): Promise<void> {
     language: language || undefined,
   });
 
-  submitBtn.disabled = false;
-
-  if (result.success) {
-    showFeedback(submitFeedback, { title: t("unison_submitSuccess"), isError: false });
-    if (result.data?.id) {
-      setTimeout(() => navigateTo({ id: String(result.data!.id) }), 1500);
-    }
-  } else {
+  if (!result.success) {
+    submitBtn.disabled = false;
     showFeedback(submitFeedback, {
       title: result.error ?? t("unison_submitFailed"),
       hint: result.hint,
       isError: true,
     });
+    return;
+  }
+
+  const newId = result.data?.id;
+  const additionalIds = additionalVideosInput?.getIds().filter(id => id !== videoId) ?? [];
+  const skipped = newId != null && additionalIds.length ? await linkAdditionalVideos(newId, additionalIds) : [];
+
+  showFeedback(submitFeedback, {
+    title: skipped.length ? t("unison_additionalVideosSkipped", [skipped.join(", ")]) : t("unison_submitSuccess"),
+    isError: false,
+  });
+
+  if (newId != null) {
+    setTimeout(() => navigateTo({ id: String(newId) }), 1500);
   }
 }
 

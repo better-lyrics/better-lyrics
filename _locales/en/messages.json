@@ -1631,6 +1631,24 @@
     "message": "11-character ID from the YouTube Music URL",
     "description": "Hint text below video ID field label"
   },
+  "unison_additionalVideos": {
+    "message": "Additional videos",
+    "description": "Label for the optional submit-form field where the user lists other videos of the same song to link to this lyric"
+  },
+  "unison_additionalVideosHint": {
+    "message": "Optional. Other uploads of this song to link, videoIds or URLs separated by spaces or commas. Each is verified; ones that don't match are skipped.",
+    "description": "Hint text below the additional videos field on the submit form"
+  },
+  "unison_additionalVideosSkipped": {
+    "message": "Submitted. Couldn't verify these videos, so they weren't linked: $videos$",
+    "description": "Feedback after submitting when some additional videos could not be linked. $videos$ is a comma-separated list of videoIds",
+    "placeholders": {
+      "videos": {
+        "content": "$1",
+        "example": "dQw4w9WgXcQ, abcdEFGH123"
+      }
+    }
+  },
   "unison_formatHint": {
     "message": "Auto-detected from lyrics content",
     "description": "Hint text below format field label"
@@ -1820,5 +1838,111 @@
   "unison_vote_plural": {
     "message": "votes",
     "description": "Plural noun used after numbers other than 1 in the Unison vote count (e.g. '5 votes')"
+  },
+  "unison_linkedVideos": {
+    "message": "Linked videos",
+    "description": "Heading for the list of YouTube videos a Unison lyric is linked to, on the lyric detail page"
+  },
+  "unison_noLinkedVideos": {
+    "message": "No linked videos yet",
+    "description": "Shown under the linked-videos heading when a lyric has no linked videos"
+  },
+  "unison_videoPrimary": {
+    "message": "Primary",
+    "description": "Badge marking the primary (home) video of a Unison lyric, which cannot be unlinked"
+  },
+  "unison_removeVideo": {
+    "message": "Remove",
+    "description": "Button that unlinks a video from a Unison lyric"
+  },
+  "unison_suggestedVideos": {
+    "message": "Suggested videos",
+    "description": "Heading for the list of videos Unison suggests linking to a lyric"
+  },
+  "unison_noSuggestions": {
+    "message": "No suggestions right now",
+    "description": "Shown under the suggested-videos heading when Unison has no suggestions"
+  },
+  "unison_addVideo": {
+    "message": "Add",
+    "description": "Button that links a suggested video to a Unison lyric"
+  },
+  "unison_linkFailed": {
+    "message": "Couldn't link this video",
+    "description": "Generic error shown when linking a video to a Unison lyric fails"
+  },
+  "unison_unlinkFailed": {
+    "message": "Couldn't remove this video",
+    "description": "Generic error shown when unlinking a video from a Unison lyric fails"
+  },
+  "unison_editAsVariant": {
+    "message": "Edit as new variant",
+    "description": "Button on a lyric detail page that starts editing the lyric as a new linked variant"
+  },
+  "unison_editingVariantOf": {
+    "message": "Editing a new variant of $song$",
+    "description": "Banner shown on the submit form when the user is creating an edited variant of an existing lyric. $song$ is the song title",
+    "placeholders": {
+      "song": {
+        "content": "$1",
+        "example": "Bohemian Rhapsody"
+      }
+    }
+  },
+  "unison_editVariantSuccess": {
+    "message": "New variant created!",
+    "description": "Success message shown after creating an edited variant of a Unison lyric"
+  },
+  "unison_editVariantFailed": {
+    "message": "Couldn't save this variant",
+    "description": "Generic error shown when creating an edited variant fails"
+  },
+  "unison_showMore": {
+    "message": "Show more",
+    "description": "Button that reveals the rest of the suggested videos list beyond the first few"
+  },
+  "unison_editConfirmTitle": {
+    "message": "Save your edit?",
+    "description": "Title of the dialog shown before saving an edited variant, when the lyric being edited already has votes"
+  },
+  "unison_editConfirmBody": {
+    "message": "Your edit goes up as a new variant starting at 0 votes. The votes on the current one don't come with it.",
+    "description": "Body text of the dialog explaining that saving an edit creates a fresh variant and does not carry over the current variant's votes"
+  },
+  "unison_editConfirmSealed": {
+    "message": "Heads up: this one's committee approved, so it's locked and your edit won't replace it. You can post yours as a separate variant, but climbing past an approved one is tough.",
+    "description": "Inline banner in the save-edit dialog, shown only when the lyric being edited is committee approved, explaining it stays locked and the edit posts as a separate hard-to-rank variant"
+  },
+  "unison_editConfirmSave": {
+    "message": "Save edit",
+    "description": "Confirm button in the dialog shown before saving an edited variant"
+  },
+  "unison_error_linkCapReached": {
+    "message": "Link limit reached for this lyric",
+    "description": "Error shown when a lyric already has the maximum number of linked videos"
+  },
+  "unison_error_durationMismatch": {
+    "message": "That video's length doesn't match",
+    "description": "Error shown when a video cannot be linked because its duration differs too much from the lyric"
+  },
+  "unison_error_videoUnverifiable": {
+    "message": "That video couldn't be verified",
+    "description": "Error shown when a video cannot be linked because Unison could not fetch it"
+  },
+  "unison_error_cannotUnlinkPrimary": {
+    "message": "The primary video can't be removed",
+    "description": "Error shown when the user tries to unlink the primary video of a lyric"
+  },
+  "unison_error_variantCapReached": {
+    "message": "Variant limit reached for this song",
+    "description": "Error shown when a song already has the maximum number of lyric variants"
+  },
+  "unison_error_parentGone": {
+    "message": "The original lyric is no longer available",
+    "description": "Error shown when editing a variant fails because the parent lyric was deleted"
+  },
+  "unison_error_rateLimited": {
+    "message": "Too many requests, try again soon",
+    "description": "Error shown when a Unison write is rejected for rate limiting"
   }
 }
