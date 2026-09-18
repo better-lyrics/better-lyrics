@@ -214,10 +214,10 @@ Lyric timing is driven by `element.animate()`.
 │   ├── .blyrics-line-main (div)
 │   │   ├── .blyrics-bidi-run.blyrics-highlight-run (span, aria-hidden overlay)
 │   │   │   └── .blyrics-word-group (span)
-│   │   │       └── .blyrics--word.blyrics-word-highlight (span) [data-content] [data-time] [data-duration] [data-long-word]
+│   │   │       └── .blyrics--word.blyrics-word-highlight (span) [data-content] [data-time] [data-duration] [data-long-word] [data-word-state]
 │   │   └── .blyrics-bidi-run (span)
 │   │       └── .blyrics-word-group (span)
-│   │           └── .blyrics--word (span) [data-content] [data-time] [data-duration] [data-long-word]
+│   │           └── .blyrics--word (span) [data-content] [data-time] [data-duration] [data-long-word] [data-word-state]
 │   ├── .blyrics-background-line (div, only when primary background vocals are present)
 │   │   ├── .blyrics-bidi-run.blyrics-highlight-run (span, aria-hidden overlay)
 │   │   │   └── .blyrics-word-group.blyrics-background-lyric
@@ -249,6 +249,7 @@ Lyric timing is driven by `element.animate()`.
 | `data-time` | Start time in seconds |
 | `data-duration` | Duration in seconds |
 | `data-long-word` | `"true"` or absent - present when duration exceeds threshold |
+| `data-word-state` | `"upcoming"`, `"active"`, or `"past"` - whether the word is not yet reached, being sung, or already sung. Written on both layers, only on change |
 
 ### Loader Attributes
 
@@ -286,6 +287,9 @@ Lyric timing is driven by `element.animate()`.
 | `[data-agent="v2"]`, `[data-agent="v3"]` | Secondary/tertiary voice (right) |
 | `[data-agent="v1000"]` | Duet/chorus (centered) |
 | `[data-long-word]` | Long sustained word |
+| `[data-word-state="upcoming"]` | Word not yet reached |
+| `[data-word-state="active"]` | Word being sung |
+| `[data-word-state="past"]` | Word already sung |
 
 ## Animation System
 
@@ -712,6 +716,24 @@ On by default. Each letter of a word floats in turn as it is sung, on top of the
 ```
 
 It layers on the word wobble rather than replacing it, so the default `scaleX` pop stays. To make the letters carry all the motion instead, set the word wobble to identity (`--blyrics-word-wobble-transform-*: translateY(0)`). It follows `--blyrics-animate-word-wobble`, so reduced motion turns it off. The split multiplies the DOM per character and reruns the karaoke sweep per letter, so a theme that does not want the cost turns it off with `blyrics-letter-wave = false`.
+
+### 17. Per-Word State (Karaoke)
+
+`data-word-state` marks whether each word is `upcoming`, `active`, or `past`. It is written on both the base `.blyrics--word` and its highlight overlay, and only when a word's state changes, so a theme can flip whole words as they are sung with no per-frame cost:
+
+```css
+.blyrics--word {
+  color: var(--blyrics-lyric-inactive-color);
+  transition: color 180ms ease;
+}
+
+.blyrics--word[data-word-state="active"],
+.blyrics--word[data-word-state="past"] {
+  color: var(--blyrics-lyric-active-color);
+}
+```
+
+A line-synced word, which has no duration of its own, is `active` from its start until the next word begins. To make this the whole reveal instead of layering over the swept overlay, stand the overlay down with `.blyrics-word-highlight { display: none; }`.
 
 ## Best Practices
 
