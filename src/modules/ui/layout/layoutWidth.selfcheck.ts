@@ -188,8 +188,8 @@ const abandoned = observeLayoutWidth(
   () => null,
   () => {}
 );
+assert.ok(process.getActiveResourcesInfo().includes("Timeout"), "a missing target leaves a retry pending");
 abandoned.destroy();
-await delay(RESOLVE_RETRY_MS + 100);
-assert.equal(observers.length, 0, "destroy cancels a pending retry");
+assert.equal(process.getActiveResourcesInfo().includes("Timeout"), false, "destroy cancels a pending retry");
 
 console.log("layoutWidth selfcheck passed");
