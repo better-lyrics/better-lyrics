@@ -33,6 +33,7 @@ import {
   WORD_HIGHLIGHT_CLASS,
 } from "@constants";
 import { AppState } from "@core/appState";
+import { getBrowserVendor } from "@core/browser";
 import { t } from "@core/i18n";
 import type { ThumbnailElement } from "@modules/lyrics/requestSniffer/NextResponse";
 import { getArtworkMetadata } from "@modules/lyrics/requestSniffer/requestSniffer";
@@ -1044,7 +1045,7 @@ function shouldRenderShadersPromo(): boolean {
 }
 
 function getShadersStoreUrl(): string {
-  return navigator.userAgent.includes("Firefox") ? SHADERS_AMO_URL : SHADERS_CWS_URL;
+  return getBrowserVendor() === "firefox" ? SHADERS_AMO_URL : SHADERS_CWS_URL;
 }
 
 /**

@@ -1,4 +1,5 @@
 import { LOG_PREFIX, RELEASES_LATEST_API_URL, STORE_AMO_URL, STORE_CWS_URL, STORE_EDGE_URL } from "@constants";
+import { getBrowserVendor } from "@core/browser";
 import { t } from "@core/i18n";
 import { getStorage, peekTransientStorage, setStorage, setTransientStorage } from "@core/storage";
 import { parseSvgString } from "@modules/ui/lyricsDock/icons";
@@ -15,9 +16,9 @@ const UPDATE_ICON_SVG = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24
 const X_ICON_SVG = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg>`;
 
 function getBrowserStore(): { url: string; showDelay: boolean } {
-  const ua = navigator.userAgent;
-  if (ua.includes("Firefox")) return { url: STORE_AMO_URL, showDelay: false };
-  if (ua.includes("Edg")) return { url: STORE_EDGE_URL, showDelay: true };
+  const vendor = getBrowserVendor();
+  if (vendor === "firefox") return { url: STORE_AMO_URL, showDelay: false };
+  if (vendor === "edge") return { url: STORE_EDGE_URL, showDelay: true };
   return { url: STORE_CWS_URL, showDelay: true };
 }
 
