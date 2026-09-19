@@ -1,4 +1,5 @@
 import { AD_PLAYING_ATTR, PLAYER_BAR_SELECTOR, PLAYER_CONTROL_EVENT, SEEK_EVENT } from "@constants";
+import { observeResize } from "@modules/ui/layout/layoutWidth";
 
 export type TransportAction = "previous" | "play-pause" | "next";
 export type RatingState = "LIKE" | "DISLIKE" | "INDIFFERENT";
@@ -192,18 +193,16 @@ function anchorActionMenu(doc: Document, anchor: HTMLElement): void {
       if (positionMatches(dropdown, pinned)) return;
       repin();
     });
-    const sizeLock = new win.ResizeObserver(repin);
+    const sizeLock = observeResize([dropdown, anchor], repin);
 
     styleLock.observe(dropdown, { attributes: true, attributeFilter: ["style"] });
-    sizeLock.observe(dropdown);
-    sizeLock.observe(anchor);
     win.addEventListener("resize", repin);
 
     dropdown.addEventListener(
       "iron-overlay-closed",
       () => {
         styleLock.disconnect();
-        sizeLock.disconnect();
+        sizeLock.destroy();
         win.removeEventListener("resize", repin);
         anchor.removeAttribute("data-menu-open");
       },
