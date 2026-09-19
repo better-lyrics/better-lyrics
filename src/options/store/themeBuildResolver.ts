@@ -1,46 +1,69 @@
 import type { ThemeBuild } from "./types";
 import { warnStore } from "@core/logger";
 
-type ParsedVersion = { release: number[]; canary: number | null };
-
-// A non-zero 4th part is a canary ordinal leading up to its stable release, so 2.4.0.8 sorts below 2.4.0.
-function parseVersion(version: string): ParsedVersion {
-  const parts = version
-    .replace(/-.*$/, "")
-    .split(".")
-    .map(part => {
-      const num = parseInt(part, 10);
-      if (isNaN(num)) {
-        warnStore(`Non-numeric version part "${part}" in "${version}", treating as 0`);
-        return 0;
-      }
-      return num;
-    });
-
-  const canary = parts[3] ?? 0;
-
-  return {
-    release: [parts[0] ?? 0, parts[1] ?? 0, parts[2] ?? 0],
-    canary: canary === 0 ? null : canary,
-  };
+function parseVersionParts(version: string): number[] {
+  const cleanVersion = version.replace(/-.*$/, "");
+  return cleanVersion.split(".").map(part => {
+    const num = parseInt(part, 10);
+    if (isNaN(num)) {
+      warnStore(`Non-numeric version part "${part}" in "${version}", treating as 0`);
+      return 0;
+    }
+    return num;
+  });
 }
 
-export function compareVersions(a: string, b: string): number {
-  const parsedA = parseVersion(a);
-  const parsedB = parseVersion(b);
+function canaryOrdinal(parts: number[]): number | null {
+  const ordinal = parts[3] ?? 0;
+  return ordinal === 0 ? null : ordinal;
+}
 
-  for (let i = 0; i < 3; i++) {
-    if (parsedA.release[i] !== parsedB.release[i]) return parsedA.release[i] - parsedB.release[i];
+// -- Theme build versions --------------------------
+
+function isThemeVersionAtLeast(current: string, required: string): boolean {
+  const currentParts = parseVersionParts(current);
+  const requiredParts = parseVersionParts(required);
+
+  const maxLength = Math.max(currentParts.length, requiredParts.length);
+
+  for (let i = 0; i < maxLength; i++) {
+    const currentPart = currentParts[i] || 0;
+    const requiredPart = requiredParts[i] || 0;
+
+    if (currentPart > requiredPart) return true;
+    if (currentPart < requiredPart) return false;
   }
 
-  if (parsedA.canary === parsedB.canary) return 0;
-  if (parsedA.canary === null) return 1;
-  if (parsedB.canary === null) return -1;
-  return parsedA.canary - parsedB.canary;
+  return true;
+}
+
+// -- Extension versions --------------------------
+
+export function compareExtensionVersions(a: string, b: string): number {
+  const partsA = parseVersionParts(a);
+  const partsB = parseVersionParts(b);
+
+  for (let i = 0; i < 3; i++) {
+    const releaseA = partsA[i] ?? 0;
+    const releaseB = partsB[i] ?? 0;
+    if (releaseA !== releaseB) return releaseA - releaseB;
+  }
+
+  const canaryA = canaryOrdinal(partsA);
+  const canaryB = canaryOrdinal(partsB);
+
+  if (canaryA === canaryB) return 0;
+  if (canaryA === null) return 1;
+  if (canaryB === null) return -1;
+  return canaryA - canaryB;
+}
+
+export function isCanaryVersion(version: string): boolean {
+  return canaryOrdinal(parseVersionParts(version)) !== null;
 }
 
 export function isVersionCompatible(themeMinVersion: string, extensionVersion: string): boolean {
-  return compareVersions(extensionVersion, themeMinVersion) >= 0;
+  return compareExtensionVersions(extensionVersion, themeMinVersion) >= 0;
 }
 
 /**
@@ -53,7 +76,7 @@ export function resolveBuildForVersion(builds: ThemeBuild[], extensionVersion: s
 
   for (const candidate of builds) {
     if (!isVersionCompatible(candidate.minVersion, extensionVersion)) continue;
-    if (best === null || compareVersions(candidate.version, best.version) > 0) {
+    if (best === null || isThemeVersionAtLeast(candidate.version, best.version)) {
       best = candidate;
     }
   }

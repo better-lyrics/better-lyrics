@@ -8,8 +8,14 @@ if (!globalRecord.chrome) {
   globalRecord.chrome = { runtime: { getManifest: () => ({ externally_connectable: { matches: [] } }) } };
 }
 
-const { resolveBuildForVersion, isAnyBuildCompatible, lowestBuildFloor, isOlderBuild, isVersionCompatible } =
-  await import("./themeBuildResolver");
+const {
+  resolveBuildForVersion,
+  isAnyBuildCompatible,
+  lowestBuildFloor,
+  isOlderBuild,
+  isVersionCompatible,
+  isCanaryVersion,
+} = await import("./themeBuildResolver");
 
 function build(version: string, minVersion: string): ThemeBuild {
   return {
@@ -71,6 +77,43 @@ function build(version: string, minVersion: string): ThemeBuild {
     "stable picks the latest, not the fallback"
   );
   assert.equal(resolveBuildForVersion(wolfthee, "2.3.3")?.version, "4.0.1", "an older release still gets the fallback");
+}
+
+{
+  const descending: ThemeBuild[] = [build("1.0.0.1", "1.0.0"), build("1.0.0", "1.0.0")];
+  assert.equal(
+    resolveBuildForVersion(descending, "2.4.0")?.version,
+    "1.0.0.1",
+    "a 4th segment outranks its absence on the theme axis"
+  );
+
+  const ascending: ThemeBuild[] = [build("1.0.0", "1.0.0"), build("1.0.0.1", "1.0.0")];
+  assert.equal(
+    resolveBuildForVersion(ascending, "2.4.0")?.version,
+    "1.0.0.1",
+    "theme build ordering does not depend on input order"
+  );
+
+  const deep: ThemeBuild[] = [build("1.0.0.0.5", "1.0.0"), build("1.0.0", "1.0.0")];
+  assert.equal(
+    resolveBuildForVersion(deep, "2.4.0")?.version,
+    "1.0.0.0.5",
+    "segments past the 4th still compare positionally"
+  );
+
+  const tied: ThemeBuild[] = [
+    { version: "1.0.0", minVersion: "1.0.0", path: "first", integrity: "sha256-first" },
+    { version: "1.0.0", minVersion: "1.0.0", path: "second", integrity: "sha256-second" },
+  ];
+  assert.equal(resolveBuildForVersion(tied, "2.4.0")?.path, "second", "equal theme versions keep last-wins");
+}
+
+{
+  assert.equal(isCanaryVersion("2.4.0.8"), true, "a non-zero 4th segment is a canary");
+  assert.equal(isCanaryVersion("2.4.0"), false, "a three-part release is not a canary");
+  assert.equal(isCanaryVersion("2.4.0.0"), false, "a zero 4th segment is not a canary");
+  assert.equal(isCanaryVersion("2.4.0-dev (abc1234) 47"), false, "a nightly off a release is not a canary");
+  assert.equal(isCanaryVersion("2.4.0.8-dev (abc1234) 47"), true, "a nightly off a canary is still a canary");
 }
 
 // No build qualifies: extension too old for every build.

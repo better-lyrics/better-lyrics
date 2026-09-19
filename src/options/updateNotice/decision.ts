@@ -1,10 +1,4 @@
-import { compareVersions } from "../store/themeBuildResolver";
-
-const CANARY_SEGMENT_COUNT = 4;
-
-export function isCanaryVersion(version: string): boolean {
-  return version.split(".").length >= CANARY_SEGMENT_COUNT;
-}
+import { compareExtensionVersions, isCanaryVersion } from "../store/themeBuildResolver";
 
 export function normalizeTag(tag: string): string {
   return tag.replace(/^v/i, "");
@@ -12,5 +6,5 @@ export function normalizeTag(tag: string): string {
 
 export function shouldNotifyStableRelease(runningVersion: string, latestStableTag: string): boolean {
   if (!latestStableTag || !isCanaryVersion(runningVersion)) return false;
-  return compareVersions(normalizeTag(latestStableTag), runningVersion) > 0;
+  return compareExtensionVersions(normalizeTag(latestStableTag), runningVersion) > 0;
 }

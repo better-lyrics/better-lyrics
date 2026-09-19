@@ -15,5 +15,7 @@ assert.equal(shouldNotifyStableRelease("2.3.3.1", "v2.3.3"), true);
 assert.equal(shouldNotifyStableRelease("2.4.0", "v2.4.0"), false);
 assert.equal(shouldNotifyStableRelease("2.4.0", "v2.5.0"), false);
 assert.equal(shouldNotifyStableRelease("2.4.0.8", ""), false);
+assert.equal(shouldNotifyStableRelease("2.4.0.0", "v2.4.1"), false);
+assert.equal(shouldNotifyStableRelease("2.4.0.0", "v2.4.0"), false);
 
 console.log("updateNotice/decision selfcheck passed");

@@ -129,7 +129,7 @@ export function setStorage(items: { [key: string]: any }): void {
  * @param {string} key - Storage key to retrieve
  * @returns {Promise<*|null>} The stored value or null if expired/not found
  */
-export async function getTransientStorage(key: string): Promise<any | null> {
+export async function peekTransientStorage(key: string): Promise<{ value: any; expired: boolean } | null> {
   try {
     const result = await chrome.storage.local.get(key);
     const item = result[key] as TransientStorageItem | undefined;
@@ -137,20 +137,30 @@ export async function getTransientStorage(key: string): Promise<any | null> {
     if (!item) return null;
 
     const { value, expiry } = item;
-    if (expiry && Date.now() > expiry) {
-      await chrome.storage.local.remove(key);
-      return null;
-    }
+    const decoded = typeof value === "string" && isCompressed(value) ? decompressString(value) : value;
 
-    if (typeof value === "string" && isCompressed(value)) {
-      return decompressString(value);
-    }
-
-    return value;
+    return { value: decoded, expired: Boolean(expiry && Date.now() > expiry) };
   } catch (error) {
     logError(error);
     return null;
   }
+}
+
+export async function getTransientStorage(key: string): Promise<any | null> {
+  const item = await peekTransientStorage(key);
+
+  if (!item) return null;
+
+  if (item.expired) {
+    try {
+      await chrome.storage.local.remove(key);
+    } catch (error) {
+      logError(error);
+    }
+    return null;
+  }
+
+  return item.value;
 }
 
 /**
