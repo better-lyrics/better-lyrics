@@ -3,10 +3,7 @@ import { warnStore } from "@core/logger";
 
 type ParsedVersion = { release: number[]; canary: number | null };
 
-// Better Lyrics versions are "major.minor.patch[.canary]". A non-zero fourth
-// part is a CANARY ORDINAL counting up to the stable release that closes that
-// line, so 2.4.0.1 < 2.4.0.10 < 2.4.0 -- the stable supersedes its canaries
-// rather than being outranked by them.
+// A non-zero 4th part is a canary ordinal leading up to its stable release, so 2.4.0.8 sorts below 2.4.0.
 function parseVersion(version: string): ParsedVersion {
   const parts = version
     .replace(/-.*$/, "")
@@ -28,11 +25,7 @@ function parseVersion(version: string): ParsedVersion {
   };
 }
 
-/**
- * Negative when a < b, 0 when equal, positive when a > b.
- * Missing parts count as 0, so "2.2.0" equals "2.2.0.0".
- */
-function compareVersions(a: string, b: string): number {
+export function compareVersions(a: string, b: string): number {
   const parsedA = parseVersion(a);
   const parsedB = parseVersion(b);
 

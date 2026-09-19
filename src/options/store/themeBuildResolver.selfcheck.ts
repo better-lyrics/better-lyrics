@@ -60,7 +60,6 @@ function build(version: string, minVersion: string): ThemeBuild {
   assert.equal(isVersionCompatible("2.0.5.6-canary", "2.0.5.6"), true, "a prerelease suffix is ignored");
 }
 
-// The registry's live floors resolve for a stable extension build.
 {
   const lyricGlow: ThemeBuild[] = [build("1.4.1", "2.4.0.1")];
   assert.equal(resolveBuildForVersion(lyricGlow, "2.4.0")?.version, "1.4.1", "canary-floored theme resolves on stable");
