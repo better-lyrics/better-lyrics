@@ -29,7 +29,7 @@ jobs:
         run: |
           VERSION=$(node -p "require('./package.json').version")
           HASH=$(git rev-parse --short HEAD)
-          echo "NIGHTLY_VERSION=$VERSION.${{ github.run_number }}-dev ($HASH)" >> $GITHUB_ENV
+          echo "NIGHTLY_VERSION=$VERSION-dev ($HASH) ${{ github.run_number }}" >> $GITHUB_ENV
 
       - name: Install dependencies
         run: |
