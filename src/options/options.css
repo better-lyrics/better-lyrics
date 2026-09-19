@@ -167,7 +167,7 @@ h1 img {
 
 @media (prefers-reduced-motion: reduce) {
     #bl-update-notice {
-        transition: grid-template-rows 0.2s ease;
+        transition: none;
     }
 }
 
