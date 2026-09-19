@@ -1,4 +1,7 @@
+import { LOG_PREFIX } from "@constants";
+
 export const RESOLVE_RETRY_MS = 1000;
+export const RESOLVE_MAX_ATTEMPTS = 10;
 
 export interface ObserverHandle {
   destroy(): void;
@@ -11,7 +14,8 @@ export function measureWidth(target: HTMLElement | null): number | null {
 
 function borderBoxInlineSize(entry: ResizeObserverEntry): number {
   const box = entry.borderBoxSize?.[0];
-  return box ? box.inlineSize : entry.contentRect.width;
+  if (box) return Math.round(box.inlineSize);
+  return Math.round(measureWidth(entry.target as HTMLElement) ?? entry.contentRect.width);
 }
 
 function observerFor(target: Element, callback: ResizeObserverCallback): ResizeObserver | null {
@@ -26,6 +30,7 @@ export function observeLayoutWidth(
   let observer: ResizeObserver | null = null;
   let observed: Element | null = null;
   let retry: ReturnType<typeof setTimeout> | undefined;
+  let attempts = 0;
   let destroyed = false;
 
   const stop = (): void => {
@@ -34,7 +39,13 @@ export function observeLayoutWidth(
     observed = null;
   };
 
-  const start = (): void => {
+  const scheduleRetry = (): void => {
+    if (attempts >= RESOLVE_MAX_ATTEMPTS) return;
+    attempts += 1;
+    retry = setTimeout(start, RESOLVE_RETRY_MS);
+  };
+
+  function start(): void {
     if (destroyed) return;
     clearTimeout(retry);
 
@@ -42,7 +53,7 @@ export function observeLayoutWidth(
     if (!target) {
       stop();
       onWidth(null);
-      retry = setTimeout(start, RESOLVE_RETRY_MS);
+      scheduleRetry();
       return;
     }
     if (target === observed) return;
@@ -59,13 +70,14 @@ export function observeLayoutWidth(
     });
     if (!next) {
       onWidth(null);
-      retry = setTimeout(start, RESOLVE_RETRY_MS);
+      scheduleRetry();
       return;
     }
+    attempts = 0;
     observer = next;
     observed = target;
     next.observe(target);
-  };
+  }
 
   start();
 
@@ -81,7 +93,10 @@ export function observeLayoutWidth(
 export function observeResize(targets: Element[], onResize: () => void): ObserverHandle {
   const first = targets[0];
   const observer = first ? observerFor(first, () => onResize()) : null;
-  if (!observer) return { destroy: () => {} };
+  if (!observer) {
+    if (first) console.warn(`${LOG_PREFIX} resize observation skipped, target has no view`);
+    return { destroy: () => {} };
+  }
   for (const target of targets) observer.observe(target);
   return { destroy: () => observer.disconnect() };
 }

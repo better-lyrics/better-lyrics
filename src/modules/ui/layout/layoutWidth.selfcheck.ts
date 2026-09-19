@@ -1,5 +1,5 @@
 import { strict as assert } from "node:assert";
-import { measureWidth, observeLayoutWidth, observeResize, RESOLVE_RETRY_MS } from "./layoutWidth";
+import { measureWidth, observeLayoutWidth, observeResize, RESOLVE_MAX_ATTEMPTS, RESOLVE_RETRY_MS } from "./layoutWidth";
 
 class FakeResizeObserver {
   targets: Element[] = [];
@@ -48,11 +48,19 @@ function observerWatching(target: Element): FakeResizeObserver {
 
 function fire(observer: FakeResizeObserver, width: number, viaContentRect = false): void {
   const entry = viaContentRect
-    ? ({ contentRect: { width } } as unknown as ResizeObserverEntry)
+    ? ({ target: { offsetWidth: 0 }, contentRect: { width } } as unknown as ResizeObserverEntry)
     : ({
         borderBoxSize: [{ inlineSize: width, blockSize: 0 }],
         contentRect: { width: -1 },
       } as unknown as ResizeObserverEntry);
+  observer.callback([entry], observer as unknown as ResizeObserver);
+}
+
+function fireFromTarget(observer: FakeResizeObserver, offsetWidth: number): void {
+  const entry = {
+    target: { offsetWidth },
+    contentRect: { width: -1 },
+  } as unknown as ResizeObserverEntry;
   observer.callback([entry], observer as unknown as ResizeObserver);
 }
 
@@ -76,10 +84,16 @@ fire(observers[0], 512);
 assert.deepEqual(widths, [512], "reports borderBoxSize, not contentRect");
 
 fire(observers[0], 320, true);
-assert.deepEqual(widths, [512, 320], "falls back to contentRect when borderBoxSize is absent");
+assert.deepEqual(widths, [512, 320], "falls back to contentRect when no border box is available");
+
+fireFromTarget(observers[0], 448);
+assert.deepEqual(widths, [512, 320, 448], "prefers the target's border box over contentRect");
+
+fire(observers[0], 512.4);
+assert.deepEqual(widths, [512, 320, 448, 512], "rounds a fractional inline size");
 
 fire(observers[0], 0);
-assert.deepEqual(widths, [512, 320, null], "a zero width is reported as null");
+assert.deepEqual(widths, [512, 320, 448, 512, null], "a zero width is reported as null");
 
 observation.destroy();
 assert.equal(observers[0].disconnected, true, "destroy disconnects the observer");
@@ -149,6 +163,18 @@ const empty = observeResize([], () => {});
 assert.equal(observers.length, 0, "an empty target list installs no observer");
 empty.destroy();
 
+reset();
+const warnings: string[] = [];
+const realWarn = console.warn;
+console.warn = ((...args: unknown[]) => {
+  warnings.push(args.join(" "));
+}) as typeof console.warn;
+const viewlessResize = observeResize([viewlessElement()], () => {});
+console.warn = realWarn;
+assert.equal(observers.length, 0, "a viewless target installs no resize observer");
+assert.equal(warnings.length, 1, "a viewless target is reported rather than dropped silently");
+viewlessResize.destroy();
+
 assert.equal(measureWidth(sizedElement(600)), 600, "measures a rendered element");
 assert.equal(measureWidth(sizedElement(0)), null, "an unrendered element has no width");
 assert.equal(measureWidth(null), null, "a missing element has no width");
@@ -191,5 +217,51 @@ const abandoned = observeLayoutWidth(
 assert.ok(process.getActiveResourcesInfo().includes("Timeout"), "a missing target leaves a retry pending");
 abandoned.destroy();
 assert.equal(process.getActiveResourcesInfo().includes("Timeout"), false, "destroy cancels a pending retry");
+
+reset();
+const realSetTimeout = globalThis.setTimeout;
+const realClearTimeout = globalThis.clearTimeout;
+const pending: Array<() => void> = [];
+globalThis.setTimeout = ((callback: () => void) => {
+  pending.push(callback);
+  return pending.length;
+}) as unknown as typeof setTimeout;
+globalThis.clearTimeout = (() => {}) as unknown as typeof clearTimeout;
+
+const capped: (number | null)[] = [];
+const cappedObservation = observeLayoutWidth(
+  () => null,
+  width => capped.push(width)
+);
+for (let attempt = 0; attempt < RESOLVE_MAX_ATTEMPTS + 5; attempt += 1) {
+  const next = pending.shift();
+  if (!next) break;
+  next();
+}
+assert.equal(pending.length, 0, "stops scheduling retries once the attempt cap is reached");
+assert.equal(capped.length, RESOLVE_MAX_ATTEMPTS + 1, "reports null once per attempt, then gives up");
+cappedObservation.destroy();
+
+reset();
+pending.length = 0;
+let recoveringTarget: Element | null = null;
+const recoveringObservation = observeLayoutWidth(
+  () => recoveringTarget,
+  () => {}
+);
+for (let attempt = 0; attempt < RESOLVE_MAX_ATTEMPTS - 1; attempt += 1) pending.shift()?.();
+assert.equal(pending.length, 1, "a missing target keeps retrying up to the cap");
+
+recoveringTarget = fakeElement();
+pending.shift()?.();
+assert.equal(observers.length, 1, "observes the target that finally appeared");
+
+recoveringTarget = null;
+fire(observers[0], 0);
+assert.equal(pending.length, 1, "resolving the target refills the attempt budget");
+recoveringObservation.destroy();
+
+globalThis.setTimeout = realSetTimeout;
+globalThis.clearTimeout = realClearTimeout;
 
 console.log("layoutWidth selfcheck passed");
