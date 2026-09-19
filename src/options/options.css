@@ -11,7 +11,7 @@ nav {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    margin-top: 0.75rem;
+    margin-top: calc(2rem + 8px);
     margin-bottom: 2rem;
 }
 
@@ -63,6 +63,114 @@ h1 img {
     color: rgba(255, 255, 255, 0.5);
 }
 
+/* -- Update Notice -------------------------------------- */
+#bl-update-notice {
+    display: grid;
+    grid-template-rows: 0fr;
+    margin: 0 calc(-2rem - 8px);
+    transition: grid-template-rows 0.28s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+#bl-update-notice.bl-show {
+    grid-template-rows: 1fr;
+}
+
+#bl-update-notice > .bl-update-inner {
+    overflow: hidden;
+    min-height: 0;
+}
+
+#bl-update-bar {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 2px calc(2rem + 8px);
+    background: rgba(255, 200, 61, 0.13);
+    border-bottom: 1px solid rgba(255, 200, 61, 0.22);
+    font-size: 0.82rem;
+    color: #fff;
+}
+
+#bl-update-bar .bl-update-icon {
+    flex: none;
+    display: inline-flex;
+    color: #ffc83d;
+}
+
+#bl-update-bar .bl-update-icon svg {
+    display: block;
+    width: 17px;
+    height: 17px;
+}
+
+#bl-update-bar .bl-update-msg {
+    flex: none;
+    white-space: nowrap;
+}
+
+#bl-update-bar .bl-update-msg b {
+    color: #ffd566;
+    font-weight: 700;
+}
+
+#bl-update-bar .bl-update-note {
+    flex: 0 1 auto;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    color: rgba(255, 255, 255, 0.5);
+}
+
+#bl-update-bar .bl-update-note::before {
+    content: "\00B7";
+    margin-right: 8px;
+}
+
+#bl-update-bar .bl-update-link {
+    margin-left: auto;
+    flex: none;
+    font-weight: 600;
+    font-size: 0.8rem;
+    color: #ffc83d;
+    text-decoration: none;
+}
+
+#bl-update-bar .bl-update-link:hover {
+    text-decoration: underline;
+}
+
+#bl-update-bar .bl-update-dismiss {
+    flex: none;
+    display: grid;
+    place-items: center;
+    width: 22px;
+    height: 22px;
+    padding: 0;
+    border: none;
+    border-radius: 7px;
+    background: none;
+    color: rgba(255, 255, 255, 0.5);
+    cursor: pointer;
+    transition: background 0.15s ease, color 0.15s ease;
+}
+
+#bl-update-bar .bl-update-dismiss:hover {
+    background: rgba(255, 255, 255, 0.08);
+    color: #fff;
+}
+
+#bl-update-bar .bl-update-dismiss svg {
+    width: 13px;
+    height: 13px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    #bl-update-notice {
+        transition: grid-template-rows 0.2s ease;
+    }
+}
+
 .options-page :where(button),
 .options-page :where(label),
 .options-page :where(label input) {
@@ -91,7 +199,8 @@ h1 img {
 body {
     background: #28292c;
     color: #fff;
-    padding: 1.25rem 2rem 1rem;
+    margin: 0;
+    padding: 0 calc(2rem + 8px) calc(1rem + 8px);
     overflow: hidden;
 }
 

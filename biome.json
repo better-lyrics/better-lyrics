@@ -11,6 +11,7 @@
       "!**/dist",
       "!**/node_modules",
       "!**/.claude",
+      "!**/docs",
       "!www/.next/**/*",
       "!src/options.html",
       "!src/core/generated/**",

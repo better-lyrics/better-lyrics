@@ -70,6 +70,13 @@ export const DISCORD_INVITE_URL = "https://discord.gg/UsHE3d5fWF" as const;
 export const SHADERS_CWS_URL =
   "https://chromewebstore.google.com/detail/better-lyrics-shaders/mffpncjphfmkppebdoaehdlnagnlpfai" as const;
 export const SHADERS_AMO_URL = "https://addons.mozilla.org/en-US/firefox/addon/better-lyrics-shaders/" as const;
+export const STORE_CWS_URL =
+  "https://chromewebstore.google.com/detail/better-lyrics/effdbpeggelllpfkjppbokhmmiinhlmg" as const;
+export const STORE_AMO_URL = "https://addons.mozilla.org/en-US/firefox/addon/better-lyrics/" as const;
+export const STORE_EDGE_URL =
+  "https://microsoftedge.microsoft.com/addons/detail/better-lyrics-lyrics-for/mjfeaklppoegooljmjicjdbiccgjdlhd" as const;
+export const RELEASES_LATEST_API_URL =
+  "https://api.github.com/repos/better-lyrics/better-lyrics/releases/latest" as const;
 export const THEME_STORE_API_URL = "https://themes.betterlyrics.org" as const;
 export const UNISON_API_BASE_URL = "https://unison.betterlyrics.org" as const;
 export const UNISON_TRANSLATE_URL = `${UNISON_API_BASE_URL}/translate` as const;

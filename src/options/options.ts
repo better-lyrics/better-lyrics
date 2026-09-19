@@ -24,6 +24,7 @@ import { fetchOwnGamification, renderIdentityStats } from "@modules/unison/gamif
 import Sortable from "sortablejs";
 import { showModal } from "./editor/ui/feedback";
 import { initStoreUI, setupYourThemesButton } from "./store/store";
+import { checkForStableRelease } from "./updateNotice";
 import { errorCore, warnCore } from "@core/logger";
 
 interface Options {
@@ -683,6 +684,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   initLetterWaveSwitch();
   restoreOptions();
   restoreActiveTab();
+  checkForStableRelease();
 });
 document.querySelectorAll("#options input, #options select").forEach(element => {
   element.addEventListener("change", saveOptions);
