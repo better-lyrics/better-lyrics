@@ -122,13 +122,6 @@ export function setStorage(items: { [key: string]: any }): void {
   chrome.storage.sync.set(items);
 }
 
-/**
- * Retrieves a value from transient storage with automatic expiry handling.
- * Automatically decompresses if the value was stored compressed.
- *
- * @param {string} key - Storage key to retrieve
- * @returns {Promise<*|null>} The stored value or null if expired/not found
- */
 export async function peekTransientStorage(key: string): Promise<{ value: any; expired: boolean } | null> {
   try {
     const result = await chrome.storage.local.get(key);

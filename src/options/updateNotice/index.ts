@@ -26,24 +26,23 @@ async function getLatestStableTag(): Promise<string | null> {
   const staleTag = (cached?.value as string | null) ?? null;
   if (cached && !cached.expired) return staleTag;
 
-  const remember = async (tag: string | null): Promise<string | null> => {
-    await setTransientStorage(CACHE_KEY, tag, TTL_MS);
-    return tag;
-  };
-
   try {
     const response = await fetchWithTimeout(
       RELEASES_LATEST_API_URL,
       { headers: { Accept: "application/vnd.github.v3+json" } },
       FETCH_TIMEOUT_MS
     );
-    if (!response.ok) return remember(staleTag);
+    if (!response.ok) return staleTag;
+
     const release = await response.json();
     const tag = typeof release.tag_name === "string" ? release.tag_name : null;
-    return remember(tag ?? staleTag);
+    if (!tag) return staleTag;
+
+    await setTransientStorage(CACHE_KEY, tag, TTL_MS);
+    return tag;
   } catch (error) {
     console.warn(`${LOG_PREFIX} stable release check failed`, error);
-    return remember(staleTag);
+    return staleTag;
   }
 }
 
