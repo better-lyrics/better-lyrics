@@ -8,9 +8,8 @@ if (!globalRecord.chrome) {
   globalRecord.chrome = { runtime: { getManifest: () => ({ externally_connectable: { matches: [] } }) } };
 }
 
-const { resolveBuildForVersion, isAnyBuildCompatible, lowestBuildFloor, isOlderBuild } = await import(
-  "./themeBuildResolver"
-);
+const { resolveBuildForVersion, isAnyBuildCompatible, lowestBuildFloor, isOlderBuild, isVersionCompatible } =
+  await import("./themeBuildResolver");
 
 function build(version: string, minVersion: string): ThemeBuild {
   return {
@@ -47,6 +46,31 @@ function build(version: string, minVersion: string): ThemeBuild {
   const builds: ThemeBuild[] = [build("2.0.0.1", "2.3.2.0"), build("1.5.0", "2.0")];
   const resolved = resolveBuildForVersion(builds, "2.3.2");
   assert.equal(resolved?.version, "2.0.0.1", "should tolerate 3-part vs 4-part version comparison");
+}
+
+{
+  assert.equal(isVersionCompatible("2.4.0.8", "2.4.0"), true, "release 2.4.0 outranks canary 2.4.0.8 floor");
+  assert.equal(isVersionCompatible("2.4.0.8", "2.4.0.3"), false, "canary 2.4.0.3 is below a 2.4.0.8 floor");
+  assert.equal(isVersionCompatible("2.4.0.8", "2.5.0"), true, "a later release satisfies a canary floor");
+  assert.equal(isVersionCompatible("2.2.0.0", "2.2.0"), true, "trailing zeros do not lower precedence");
+  assert.equal(isVersionCompatible("2.2.0", "2.2.0.0"), true, "trailing zeros do not raise the floor either");
+  assert.equal(isVersionCompatible("2.4.0", "2.4.0.8"), false, "a canary does not satisfy its own release floor");
+  assert.equal(isVersionCompatible("2.4.0.10", "2.4.0.9"), false, "canary ordinals compare numerically");
+  assert.equal(isVersionCompatible("2.3.3", "2.4.0.1"), true, "a canary still outranks the previous release");
+  assert.equal(isVersionCompatible("2.0.5.6-canary", "2.0.5.6"), true, "a prerelease suffix is ignored");
+}
+
+{
+  const lyricGlow: ThemeBuild[] = [build("1.4.1", "2.4.0.1")];
+  assert.equal(resolveBuildForVersion(lyricGlow, "2.4.0")?.version, "1.4.1", "canary-floored theme resolves on stable");
+
+  const wolfthee: ThemeBuild[] = [build("4.1.0", "2.4.0.1"), build("4.0.1", "2.0.5.6")];
+  assert.equal(
+    resolveBuildForVersion(wolfthee, "2.4.0")?.version,
+    "4.1.0",
+    "stable picks the latest, not the fallback"
+  );
+  assert.equal(resolveBuildForVersion(wolfthee, "2.3.3")?.version, "4.0.1", "an older release still gets the fallback");
 }
 
 // No build qualifies: extension too old for every build.
