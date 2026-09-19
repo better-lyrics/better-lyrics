@@ -528,13 +528,13 @@ Example:
   <div class="blyrics-line-main" dir="auto">
     <span class="blyrics-bidi-run blyrics-highlight-run" dir="auto" aria-hidden="true">
       <span class="blyrics-word-group">
-        <span class="blyrics--word blyrics-word-highlight" data-time="10.259" data-duration="0.42" data-content="Hello">Hello</span>
+        <span class="blyrics--word blyrics-word-highlight" data-time="10.259" data-duration="0.42" data-content="Hello" data-word-state="active">Hello</span>
       </span>
       text
     </span>
     <span class="blyrics-bidi-run" dir="auto">
       <span class="blyrics-word-group">
-        <span class="blyrics--word" data-time="10.259" data-duration="0.42" data-content="Hello">Hello</span>
+        <span class="blyrics--word" data-time="10.259" data-duration="0.42" data-content="Hello" data-word-state="active">Hello</span>
       </span>
       text
     </span>
@@ -661,10 +661,11 @@ Each word span has the following data attributes:
 
 | Attribute        | Description                                                                 |
 | ---------------- | --------------------------------------------------------------------------- |
-| `data-time`      | Start time of the word in seconds                                           |
-| `data-duration`  | Duration of the word in seconds                                             |
-| `data-content`   | The word text |
-| `data-long-word` | Present (with value `"true"`) when word duration exceeds the threshold      |
+| `data-time`       | Start time of the word in seconds                                           |
+| `data-duration`   | Duration of the word in seconds                                             |
+| `data-content`    | The word text |
+| `data-long-word`  | Present (with value `"true"`) when word duration exceeds the threshold      |
+| `data-word-state` | `upcoming`, `active`, or `past`: whether the word is not yet reached, being sung, or already sung |
 
 #### Targeting Long Words
 
@@ -683,6 +684,24 @@ Words with duration exceeding `blyrics-long-word-threshold` (default: 1500ms) ge
 `--blyrics-glow-color` resolves per word against each `.blyrics-word-highlight`, so different long words can glow different colors.
 
 Changing the threshold triggers a lyric reload automatically.
+
+#### Styling by Word State
+
+`data-word-state` marks whether a word is being sung. It carries `upcoming` before the word starts, `active` while it is being sung, and `past` once it has finished, and it is written on both layers of a word (the base `.blyrics--word` and its `.blyrics-word-highlight` overlay), so you can key either. A word stays `active` for exactly as long as it is sung, so a transition on the flip is the whole of a per-word karaoke effect where whole words change rather than sweeping:
+
+```css
+.blyrics--word {
+  color: var(--blyrics-lyric-inactive-color);
+  transition: color 180ms ease;
+}
+
+.blyrics--word[data-word-state="active"],
+.blyrics--word[data-word-state="past"] {
+  color: var(--blyrics-lyric-active-color);
+}
+```
+
+The renderer writes `data-word-state` only when a word's state changes, not every frame, so selecting on it adds no per-frame cost. A line-synced word, which has no duration of its own, is `active` from its start until the next word begins.
 
 ### Applying the Wobble Animation
 
