@@ -1,3 +1,4 @@
+import { observeLayoutWidth } from "@modules/ui/layout/layoutWidth";
 import { clamp01, easeOutCubic, interpolate, pctFromClientX, type PlaybackSnapshot } from "./playhead";
 import { formatRemaining, formatTime } from "./timeFormat";
 
@@ -68,12 +69,12 @@ export function createProgressBar(options: ProgressBarOptions): ProgressBarHandl
   let frame = 0;
   let running = false;
 
-  const measure = (): void => {
-    barWidth = bar.getBoundingClientRect().width;
-  };
-
-  const resizeObserver = new win.ResizeObserver(measure);
-  resizeObserver.observe(bar);
+  const barWidthObservation = observeLayoutWidth(
+    () => bar,
+    width => {
+      barWidth = width ?? 0;
+    }
+  );
 
   const positionFor = (clientX: number): number => {
     const rect = bar.getBoundingClientRect();
@@ -133,7 +134,7 @@ export function createProgressBar(options: ProgressBarOptions): ProgressBarHandl
   const start = (): void => {
     if (running) return;
     running = true;
-    measure();
+    barWidth = bar.offsetWidth || barWidth;
     frame = win.requestAnimationFrame(tick);
   };
 
@@ -216,7 +217,7 @@ export function createProgressBar(options: ProgressBarOptions): ProgressBarHandl
     element,
     destroy(): void {
       stop();
-      resizeObserver.disconnect();
+      barWidthObservation.destroy();
       visibilityObserver.disconnect();
     },
   };

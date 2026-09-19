@@ -36,6 +36,7 @@ import { AppState } from "@core/appState";
 import { t } from "@core/i18n";
 import type { ThumbnailElement } from "@modules/lyrics/requestSniffer/NextResponse";
 import { getArtworkMetadata } from "@modules/lyrics/requestSniffer/requestSniffer";
+import { type ObserverHandle, observeLayoutWidth, observeResize } from "@modules/ui/layout/layoutWidth";
 import { lyricsElementAdded, mainView } from "@modules/ui/mainLyricsView";
 import { publishPictureInPictureLyrics } from "@modules/ui/pictureInPicture/lyricsPublisher";
 import {
@@ -1374,7 +1375,7 @@ export function reloadAlbumArt() {
 }
 
 let lastLoadedThumbnail: ThumbnailElement | null = null;
-let thumbnailResizeObserver: ResizeObserver | null;
+let thumbnailWidth: ObserverHandle | null = null;
 
 export function resetThumbnailState(): void {
   lastLoadedThumbnail = null;
@@ -1389,8 +1390,12 @@ function setBackgroundImage(src: string): void {
   }
 }
 
+function containerSizeFor(width: number): number {
+  return Math.round(Math.max(width, 544));
+}
+
 function getContainerSize(): number {
-  return Math.round(Math.max(document.getElementById("thumbnail")?.getBoundingClientRect().width || 0, 544));
+  return containerSizeFor(document.getElementById("thumbnail")?.offsetWidth ?? 0);
 }
 
 function getHighResImageUrl(smallThumbnail: ThumbnailElement) {
@@ -1405,7 +1410,7 @@ function getHighResImageUrl(smallThumbnail: ThumbnailElement) {
 }
 
 export function addThumbnail(smallThumbnail: ThumbnailElement): void {
-  thumbnailResizeObserver?.disconnect();
+  thumbnailWidth?.destroy();
 
   let imgElm = document.getElementById("blyrics-img") as HTMLImageElement | undefined;
   if (!imgElm) {
@@ -1439,14 +1444,15 @@ export function addThumbnail(smallThumbnail: ThumbnailElement): void {
       return;
     }
 
-    const thumbnailElm = document.getElementById("thumbnail")!;
-    thumbnailResizeObserver = new ResizeObserver(() => {
-      if (getContainerSize() !== containerSize) {
-        thumbnailResizeObserver?.disconnect();
+    thumbnailWidth = observeLayoutWidth(
+      () => document.getElementById("thumbnail"),
+      width => {
+        if (width === null || containerSizeFor(width) === containerSize) return;
+        thumbnailWidth?.destroy();
+        thumbnailWidth = null;
         reloadAlbumArt();
       }
-    });
-    thumbnailResizeObserver.observe(thumbnailElm);
+    );
   };
 
   if (proxy.complete) {
@@ -1631,7 +1637,7 @@ export function cleanup(): void {
  * @param artist - Artist name
  */
 let fullscreenControls: FullscreenControlsHandle | null = null;
-let fullscreenColumnWidthObserver: ResizeObserver | null = null;
+let fullscreenColumnWidth: ObserverHandle | null = null;
 
 function setFullscreenControls(handle: FullscreenControlsHandle | null): void {
   if (fullscreenControls && fullscreenControls !== handle) fullscreenControls.destroy();
@@ -1643,15 +1649,17 @@ export function updateFullscreenControlsSnapshot(snapshot: PlaybackSnapshot | nu
 }
 
 function trackFullscreenColumnWidth(column: HTMLElement): void {
-  fullscreenColumnWidthObserver?.disconnect();
-  const player = document.querySelector<HTMLElement>("#player.ytmusic-player-page");
-  if (!player) return;
-  const apply = (): void => {
-    column.style.width = `${player.getBoundingClientRect().width}px`;
-  };
-  apply();
-  fullscreenColumnWidthObserver = new ResizeObserver(apply);
-  fullscreenColumnWidthObserver.observe(player);
+  fullscreenColumnWidth?.destroy();
+  fullscreenColumnWidth = observeLayoutWidth(
+    () => document.querySelector<HTMLElement>("#player.ytmusic-player-page"),
+    width => {
+      if (width === null) {
+        column.style.removeProperty("width");
+        return;
+      }
+      column.style.width = `${width}px`;
+    }
+  );
 }
 
 function songInfoLabel(text: string, href: string | null): Node {
@@ -1703,7 +1711,7 @@ export function injectSongAttributes(title: string, artist: string, album?: stri
   existingColumn?.remove();
   existingSongInfo?.remove();
   existingWatermark?.remove();
-  fullscreenColumnWidthObserver?.disconnect();
+  fullscreenColumnWidth?.destroy();
   setFullscreenControls(null);
 
   const titleElm = document.createElement("p");
@@ -1749,14 +1757,9 @@ function getGeniusLink(song: string, artist: string): string {
   return `https://duckduckgo.com/?q=${query}`;
 }
 
-let footerResizeObserver: ResizeObserver | null = null;
+let footerResize: ObserverHandle | null = null;
 
 function observeFooterForRecalc(footer: HTMLElement): void {
-  if (footerResizeObserver) {
-    footerResizeObserver.disconnect();
-  }
-  footerResizeObserver = new ResizeObserver(() => {
-    lyricsElementAdded();
-  });
-  footerResizeObserver.observe(footer);
+  footerResize?.destroy();
+  footerResize = observeResize([footer], lyricsElementAdded);
 }
