@@ -1,4 +1,4 @@
-import { observeLayoutWidth } from "@modules/ui/layout/layoutWidth";
+import { measureWidth, observeLayoutWidth } from "@modules/ui/layout/layoutWidth";
 import { clamp01, easeOutCubic, interpolate, pctFromClientX, type PlaybackSnapshot } from "./playhead";
 import { formatRemaining, formatTime } from "./timeFormat";
 
@@ -134,7 +134,7 @@ export function createProgressBar(options: ProgressBarOptions): ProgressBarHandl
   const start = (): void => {
     if (running) return;
     running = true;
-    barWidth = bar.offsetWidth || barWidth;
+    barWidth = measureWidth(bar) ?? barWidth;
     frame = win.requestAnimationFrame(tick);
   };
 

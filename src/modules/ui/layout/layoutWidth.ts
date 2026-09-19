@@ -1,7 +1,12 @@
-const RESOLVE_RETRY_MS = 1000;
+export const RESOLVE_RETRY_MS = 1000;
 
 export interface ObserverHandle {
   destroy(): void;
+}
+
+export function measureWidth(target: HTMLElement | null): number | null {
+  const width = target?.offsetWidth ?? 0;
+  return width > 0 ? width : null;
 }
 
 function borderBoxInlineSize(entry: ResizeObserverEntry): number {
@@ -54,6 +59,7 @@ export function observeLayoutWidth(
     });
     if (!next) {
       onWidth(null);
+      retry = setTimeout(start, RESOLVE_RETRY_MS);
       return;
     }
     observer = next;

@@ -1,5 +1,5 @@
 import { strict as assert } from "node:assert";
-import { observeLayoutWidth, observeResize } from "./layoutWidth";
+import { measureWidth, observeLayoutWidth, observeResize, RESOLVE_RETRY_MS } from "./layoutWidth";
 
 class FakeResizeObserver {
   targets: Element[] = [];
@@ -15,8 +15,6 @@ class FakeResizeObserver {
     this.targets.push(target);
   }
 
-  unobserve(): void {}
-
   disconnect(): void {
     this.disconnected = true;
   }
@@ -30,8 +28,22 @@ function fakeElement(): Element {
   } as unknown as Element;
 }
 
+function viewlessElement(): Element {
+  return { ownerDocument: { defaultView: null } } as unknown as Element;
+}
+
+function sizedElement(offsetWidth: number): HTMLElement {
+  return { offsetWidth } as unknown as HTMLElement;
+}
+
 function reset(): void {
   observers = [];
+}
+
+function observerWatching(target: Element): FakeResizeObserver {
+  const found = observers.find(observer => observer.targets.includes(target));
+  assert.ok(found, "an observer is watching the target");
+  return found;
 }
 
 function fire(observer: FakeResizeObserver, width: number, viaContentRect = false): void {
@@ -44,7 +56,12 @@ function fire(observer: FakeResizeObserver, width: number, viaContentRect = fals
   observer.callback([entry], observer as unknown as ResizeObserver);
 }
 
-// -- Width comes from the observer entry ------------------------------------
+function delay(ms: number): Promise<void> {
+  return new Promise(resolve => {
+    setTimeout(resolve, ms);
+  });
+}
+
 reset();
 const target = fakeElement();
 const widths: (number | null)[] = [];
@@ -61,14 +78,12 @@ assert.deepEqual(widths, [512], "reports borderBoxSize, not contentRect");
 fire(observers[0], 320, true);
 assert.deepEqual(widths, [512, 320], "falls back to contentRect when borderBoxSize is absent");
 
-// -- A zero width is reported as null, never as a number ---------------------
 fire(observers[0], 0);
 assert.deepEqual(widths, [512, 320, null], "a zero width is reported as null");
 
 observation.destroy();
 assert.equal(observers[0].disconnected, true, "destroy disconnects the observer");
 
-// -- A zero width re-resolves the target and follows a node swap -------------
 reset();
 const first = fakeElement();
 const second = fakeElement();
@@ -91,7 +106,6 @@ fire(observers[1], 900);
 assert.deepEqual(swapped, [null, 900], "reports the replacement node's width");
 swapObservation.destroy();
 
-// -- A zero width on an unchanged target keeps the same observer -------------
 reset();
 const stable = fakeElement();
 const stableWidths: (number | null)[] = [];
@@ -107,7 +121,6 @@ fire(observers[0], 640);
 assert.deepEqual(stableWidths, [null, 640], "recovers once the target is rendered again");
 stableObservation.destroy();
 
-// -- A missing target reports null and installs nothing ----------------------
 reset();
 const missingWidths: (number | null)[] = [];
 const missingObservation = observeLayoutWidth(
@@ -118,7 +131,6 @@ assert.deepEqual(missingWidths, [null], "reports null while the target is missin
 assert.equal(observers.length, 0, "installs no observer while the target is missing");
 missingObservation.destroy();
 
-// -- observeResize is a signal with no measurement ---------------------------
 reset();
 const dropdown = fakeElement();
 const anchor = fakeElement();
@@ -136,5 +148,48 @@ reset();
 const empty = observeResize([], () => {});
 assert.equal(observers.length, 0, "an empty target list installs no observer");
 empty.destroy();
+
+assert.equal(measureWidth(sizedElement(600)), 600, "measures a rendered element");
+assert.equal(measureWidth(sizedElement(0)), null, "an unrendered element has no width");
+assert.equal(measureWidth(null), null, "a missing element has no width");
+
+reset();
+let missingTarget: Element | null = null;
+const reacquired: (number | null)[] = [];
+const reacquisition = observeLayoutWidth(
+  () => missingTarget,
+  width => reacquired.push(width)
+);
+let viewlessTarget: Element = viewlessElement();
+const viewlessWidths: (number | null)[] = [];
+const viewlessObservation = observeLayoutWidth(
+  () => viewlessTarget,
+  width => viewlessWidths.push(width)
+);
+assert.equal(observers.length, 0, "a missing target and a viewless one both install nothing");
+assert.deepEqual(reacquired, [null], "reports null while the target is missing");
+assert.deepEqual(viewlessWidths, [null], "reports null while the target has no view");
+
+missingTarget = fakeElement();
+viewlessTarget = fakeElement();
+await delay(RESOLVE_RETRY_MS + 100);
+
+assert.equal(observers.length, 2, "both retry chains observe once their target resolves");
+fire(observerWatching(missingTarget), 700);
+fire(observerWatching(viewlessTarget), 800);
+assert.deepEqual(reacquired, [null, 700], "a missing target recovers when it appears");
+assert.deepEqual(viewlessWidths, [null, 800], "a target with no view recovers when it gains one");
+
+reacquisition.destroy();
+viewlessObservation.destroy();
+
+reset();
+const abandoned = observeLayoutWidth(
+  () => null,
+  () => {}
+);
+abandoned.destroy();
+await delay(RESOLVE_RETRY_MS + 100);
+assert.equal(observers.length, 0, "destroy cancels a pending retry");
 
 console.log("layoutWidth selfcheck passed");

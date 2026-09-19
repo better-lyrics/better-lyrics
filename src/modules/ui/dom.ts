@@ -36,7 +36,7 @@ import { AppState } from "@core/appState";
 import { t } from "@core/i18n";
 import type { ThumbnailElement } from "@modules/lyrics/requestSniffer/NextResponse";
 import { getArtworkMetadata } from "@modules/lyrics/requestSniffer/requestSniffer";
-import { type ObserverHandle, observeLayoutWidth, observeResize } from "@modules/ui/layout/layoutWidth";
+import { measureWidth, type ObserverHandle, observeLayoutWidth, observeResize } from "@modules/ui/layout/layoutWidth";
 import { lyricsElementAdded, mainView } from "@modules/ui/mainLyricsView";
 import { publishPictureInPictureLyrics } from "@modules/ui/pictureInPicture/lyricsPublisher";
 import {
@@ -1395,7 +1395,7 @@ function containerSizeFor(width: number): number {
 }
 
 function getContainerSize(): number {
-  return containerSizeFor(document.getElementById("thumbnail")?.offsetWidth ?? 0);
+  return containerSizeFor(measureWidth(document.getElementById("thumbnail")) ?? 0);
 }
 
 function getHighResImageUrl(smallThumbnail: ThumbnailElement) {
