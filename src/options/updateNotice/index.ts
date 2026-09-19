@@ -7,7 +7,7 @@ import { isCanaryVersion } from "../store/themeBuildResolver";
 import { fetchWithTimeout } from "../store/themeStoreService";
 import { normalizeTag, shouldNotifyStableRelease } from "./decision";
 
-const CACHE_KEY = "stableReleaseCheck";
+const CACHE_KEY = "blyrics_stableReleaseCheck";
 const DISMISS_KEY = "dismissedStableVersion";
 const TTL_MS = 12 * 60 * 60 * 1000;
 const FETCH_TIMEOUT_MS = 5000;
@@ -78,14 +78,20 @@ function buildNote(): HTMLElement {
 function dismissBar(notice: HTMLElement, tag: string): void {
   setStorage({ [DISMISS_KEY]: tag });
   notice.classList.remove("bl-show");
-  const remove = () => notice.remove();
-  notice.addEventListener(
-    "transitionend",
-    event => {
-      if (event.propertyName === "grid-template-rows") remove();
-    },
-    { once: true }
-  );
+
+  let removed = false;
+  const remove = (): void => {
+    if (removed) return;
+    removed = true;
+    notice.removeEventListener("transitionend", onTransitionEnd);
+    notice.remove();
+  };
+  function onTransitionEnd(event: TransitionEvent): void {
+    if (event.target !== notice || event.propertyName !== "grid-template-rows") return;
+    remove();
+  }
+
+  notice.addEventListener("transitionend", onTransitionEnd);
   setTimeout(remove, 400);
 }
 
