@@ -1,9 +1,12 @@
 /* The extension loads these families from Google Fonts, and published themes select on the stack by
    name, so it stays on this side of the renderer boundary. */
-:root {
+:root,
+.blyrics--line,
+.blyrics--translated,
+.blyrics--romanized {
+	--noto-sans-cjk: "Noto Sans HK", "Noto Sans JP", "Noto Sans KR", "Noto Sans SC", "Noto Sans TC";
 	--noto-sans-universal:
-		"Noto Sans", "Noto Sans HK", "Noto Sans JP", "Noto Sans KR", "Noto Sans SC",
-		"Noto Sans TC", "Noto Sans Arabic", "Noto Sans Armenian",
+		"Noto Sans", var(--noto-sans-cjk), "Noto Sans Arabic", "Noto Sans Armenian",
 		"Noto Sans Bengali", "Noto Sans Devanagari", "Noto Sans Georgian",
 		"Noto Sans Gujarati", "Noto Sans Hebrew", "Noto Sans Kannada",
 		"Noto Sans Khmer", "Noto Sans Lao Looped", "Noto Sans Lao",
@@ -15,6 +18,33 @@
 		"Noto Sans Warang Citi";
 }
 
+/* CJK web fonts are region-specific subsets: lang alone cannot replace their glyphs. */
+:where(.blyrics--line, .blyrics--translated, .blyrics--romanized):lang(ja) {
+	--noto-sans-cjk: "Noto Sans JP", "Hiragino Sans", Meiryo;
+}
+
+:where(.blyrics--line, .blyrics--translated, .blyrics--romanized):lang(ko) {
+	--noto-sans-cjk: "Noto Sans KR", "Malgun Gothic", "Apple SD Gothic Neo";
+}
+
+:where(.blyrics--line, .blyrics--translated, .blyrics--romanized):lang(zh) {
+	--noto-sans-cjk: "Noto Sans SC", "Microsoft YaHei", "PingFang SC";
+}
+
+:where(.blyrics--line, .blyrics--translated, .blyrics--romanized):is(:lang(zh-TW), :lang(zh-Hant)) {
+	--noto-sans-cjk: "Noto Sans TC", "Microsoft JhengHei", "PingFang TC";
+}
+
+:where(.blyrics--line, .blyrics--translated, .blyrics--romanized):is(
+	:lang(zh-HK), :lang(zh-MO), :lang(zh-Hant-HK), :lang(zh-Hant-MO), :lang(yue)
+) {
+	--noto-sans-cjk: "Noto Sans HK", "PingFang HK", "Microsoft JhengHei";
+}
+
+:where(.blyrics--line, .blyrics--translated, .blyrics--romanized):is(:lang(zh-Hans), :lang(yue-Hans)) {
+	--noto-sans-cjk: "Noto Sans SC", "Microsoft YaHei", "PingFang SC";
+}
+
 .blyrics-hidden {
 	display: none !important;
 }
@@ -24,7 +54,7 @@
 	align-self: flex-start !important;
 	color: var(--blyrics-error-color);
 	cursor: default;
-	font-family: var(--blyrics-font-family);
+	font-family: var(--blyrics-font-family, var(--blyrics-default-font-family));
 	font-size: var(--blyrics-font-size);
 	font-weight: var(--blyrics-font-weight);
 	line-height: 1;

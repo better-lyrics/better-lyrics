@@ -18,9 +18,10 @@ Essential reference for creating custom themes. For deep dives, see [STYLING.md]
 
 ### Typography
 
+Leave font-family overrides unset for language-aware CJK defaults. If adding a font, declare `--blyrics-font-family: "My Font", var(--noto-sans-universal), sans-serif` on `.blyrics--line, .blyrics--translated, .blyrics--romanized` so the fallback resolves in each element's language.
+
 ```css
 :root {
-  --blyrics-font-family: Satoshi, var(--noto-sans-universal), sans-serif;
   --blyrics-font-size: 3rem;
   --blyrics-font-weight: 700;
   --blyrics-line-height: 1.333;

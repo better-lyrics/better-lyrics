@@ -182,6 +182,7 @@ export function createPictureInPictureHost(
       mount: view.prepareLyricsMount(),
       loaderVisible: false,
       noLyrics: lyricsPayload?.noLyrics === true,
+      language: lyricsPayload?.language,
     });
     applyDecorations();
     syncSourceFooter();
@@ -242,7 +243,7 @@ export function createPictureInPictureHost(
         );
       }
       if (decoration.translation) {
-        injectTranslation(pipDocument, line.lyricElement, decoration.translation);
+        injectTranslation(pipDocument, line.lyricElement, decoration.translation, decoration.translationLanguage);
       }
     }
   }
@@ -318,6 +319,7 @@ export function createPictureInPictureHost(
       buildLyrics();
       return;
     }
+    activeRenderer?.setLanguage(payload.language);
     // A translation or romanization batch lands on the same lines, so nothing above rebuilds and
     // the new text has to be hung off the DOM that is already up. The lines grow, so re-measure.
     applyDecorations();
