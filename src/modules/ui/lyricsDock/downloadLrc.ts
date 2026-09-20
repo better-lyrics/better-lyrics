@@ -152,7 +152,7 @@ function buildLrcContent(lyrics: Lyric[], mode: "synced" | "richsync"): string {
 }
 
 // Targets the TTML Composer dialect: extended metadata as composer:meta, not amll:meta/iTunesMetadata.
-function buildTtmlContent(lyrics: Lyric[], lines: LineData[], mode: "synced" | "richsync"): string {
+function buildTtmlContent(lyrics: Lyric[], lines: readonly LineData[], mode: "synced" | "richsync"): string {
   const includeTranslations = AppState.isTranslateEnabled;
   const agentsUsed = new Set<string>();
 
@@ -175,6 +175,7 @@ function buildTtmlContent(lyrics: Lyric[], lines: LineData[], mode: "synced" | "
       agent =>
         `      <ttm:agent xml:id="${escapeXml(agent)}" type="person"><ttm:name>${escapeXml(agentDisplayName(lyrics, agent))}</ttm:name></ttm:agent>`
     )
+    
     .join("\n");
 
   const artist = AppState.currentArtist;
