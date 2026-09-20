@@ -24,6 +24,7 @@ export const DOCK_CONTROL_ORDER_DEFAULT = [
   "offset",
   "refresh",
   "pictureInPicture",
+  "download",
 ] as const;
 export const MODAL_OVERLAY_CLASS = "blyrics-modal-overlay" as const;
 export const MODAL_CLASS = "blyrics-modal" as const;

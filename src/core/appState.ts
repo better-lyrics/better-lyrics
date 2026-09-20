@@ -66,10 +66,14 @@ interface AppStateType {
   isDockOffsetEnabled: boolean;
   isDockRefreshEnabled: boolean;
   isDockPictureInPictureEnabled: boolean;
+  isDockDownloadLRCEnabled: boolean;
   dockControlsOrder: string[];
   currentUnisonData: UnisonData | null;
   isPictureInPictureOpen: boolean;
   endTimeMode: "total" | "remaining";
+  currentSong: string;
+  currentArtist: string;
+  defaultLyricDownloadFormat: string;
 }
 
 export const AppState: AppStateType = {
@@ -113,10 +117,14 @@ export const AppState: AppStateType = {
   isDockOffsetEnabled: true,
   isDockRefreshEnabled: false,
   isDockPictureInPictureEnabled: true,
+  isDockDownloadLRCEnabled: true,
   dockControlsOrder: [...DOCK_CONTROL_ORDER_DEFAULT],
   currentUnisonData: null,
   isPictureInPictureOpen: false,
   endTimeMode: "total",
+  currentSong: "",
+  currentArtist: "",
+  defaultLyricDownloadFormat: "ttml",
 };
 
 export function reloadLyrics(): void {

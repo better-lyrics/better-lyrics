@@ -11,7 +11,7 @@ import {
 import { AppState } from "@core/appState";
 import { t } from "@core/i18n";
 import { applySegmentMapToLyrics, type LyricSourceResultWithMeta } from "@modules/lyrics/lyrics";
-import type { LyricPart } from "@modules/lyrics/providers/shared";
+import type { Lyric, LyricPart } from "@modules/lyrics/providers/shared";
 import {
   getRomanizationFromCache,
   getTranslationFromCache,
@@ -78,6 +78,12 @@ export interface LyricsData {
   isMusicVideoSynced: boolean;
   tabSelector: HTMLElement;
   hasNonLatin: boolean;
+  // Plain parsed lyrics, index-aligned with `lines`, untouched by rendering - lyrics-dock download reads from here.
+  sourceLyrics: Lyric[];
+  // Original fetched text/format, when the source has one (see LyricSourceResult.rawText).
+  rawLyricsText?: string;
+  rawLyricsFormat?: "ttml" | "lrc";
+  lines: readonly LineData[];
 }
 
 /**
@@ -173,6 +179,10 @@ function injectLyrics(
     isMusicVideoSynced: data.musicVideoSynced === true,
     tabSelector,
     hasNonLatin: lyrics.some(item => !!item.words && containsNonLatin(item.words)),
+    lines: lines,
+    sourceLyrics: lyrics,
+    rawLyricsText: data.rawText,
+    rawLyricsFormat: data.rawFormat,
   };
 
   // Set before addFooter so the dock controls read the current song's lyric data.

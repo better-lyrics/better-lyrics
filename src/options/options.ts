@@ -60,10 +60,12 @@ interface Options {
   isDockOffsetEnabled: boolean;
   isDockRefreshEnabled: boolean;
   isDockPictureInPictureEnabled: boolean;
+  isDockDownloadLRCEnabled: boolean;
   dockControlsOrder: string[];
   globalLyricOffset: number;
   richsyncOffsetTrim: number;
   lineOffsetTrim: number;
+  lyricDefaultDownloadFormat: string;
 }
 
 const saveOptions = (): void => {
@@ -111,6 +113,7 @@ const getOptionsFromForm = (): Options => {
     pipProgressBarEnabled: (document.getElementById("pipProgressBarEnabled") as HTMLInputElement).checked,
     isTranslateEnabled: (document.getElementById("translate") as HTMLInputElement).checked,
     translationLanguage: (document.getElementById("translationLanguage") as HTMLInputElement).value,
+    lyricDefaultDownloadFormat: (document.getElementById("lyric-default-download-format") as HTMLInputElement).value,
     isCursorAutoHideEnabled: (document.getElementById("cursorAutoHide") as HTMLInputElement).checked,
     isRomanizationEnabled: (document.getElementById("isRomanizationEnabled") as HTMLInputElement).checked,
     preferredProviderList: preferredProviderList,
@@ -129,6 +132,7 @@ const getOptionsFromForm = (): Options => {
     isDockRefreshEnabled: (document.getElementById("isDockRefreshEnabled") as HTMLInputElement).checked,
     isDockPictureInPictureEnabled: (document.getElementById("isDockPictureInPictureEnabled") as HTMLInputElement)
       .checked,
+    isDockDownloadLRCEnabled: (document.getElementById("isDockDownloadLRCEnabled") as HTMLInputElement).checked,
     dockControlsOrder: getDockControlsOrder(),
     globalLyricOffset: parseFloat((document.getElementById("globalLyricOffset") as HTMLInputElement).value) || 0,
     richsyncOffsetTrim: parseFloat((document.getElementById("richsyncOffsetTrim") as HTMLInputElement).value) || 0,
@@ -333,10 +337,12 @@ const restoreOptions = (): void => {
     isDockOffsetEnabled: true,
     isDockRefreshEnabled: false,
     isDockPictureInPictureEnabled: true,
+    isDockDownloadLRCEnabled: true,
     dockControlsOrder: [...DOCK_CONTROL_ORDER_DEFAULT],
     globalLyricOffset: 0,
     richsyncOffsetTrim: 0,
     lineOffsetTrim: 0,
+    lyricDefaultDownloadFormat: "ttml",
   };
 
   const readKeys = [
@@ -375,6 +381,8 @@ const setOptionsInForm = (items: Options): void => {
   (document.getElementById("albumArt") as HTMLInputElement).checked = items.isAlbumArtEnabled;
   (document.getElementById("isShadersPromoEnabled") as HTMLInputElement).checked = items.isShadersPromoEnabled;
   (document.getElementById("autoSwitch") as HTMLInputElement).checked = items.isAutoSwitchEnabled;
+  (document.getElementById("lyric-default-download-format") as HTMLInputElement).value =
+    items.lyricDefaultDownloadFormat;
   (document.getElementById("cursorAutoHide") as HTMLInputElement).checked = items.isCursorAutoHideEnabled;
   (document.getElementById("isFullScreenDisabled") as HTMLInputElement).checked = items.isFullScreenDisabled;
   (document.getElementById("isFullscreenControlsEnabled") as HTMLInputElement).checked =
@@ -405,6 +413,7 @@ const setOptionsInForm = (items: Options): void => {
   (document.getElementById("isDockRefreshEnabled") as HTMLInputElement).checked = items.isDockRefreshEnabled;
   (document.getElementById("isDockPictureInPictureEnabled") as HTMLInputElement).checked =
     items.isDockPictureInPictureEnabled;
+  (document.getElementById("isDockDownloadLRCEnabled") as HTMLInputElement).checked = items.isDockDownloadLRCEnabled;
   setOffsetDisplay("globalLyricOffset", items.globalLyricOffset);
   setOffsetDisplay("richsyncOffsetTrim", items.richsyncOffsetTrim);
   setOffsetDisplay("lineOffsetTrim", items.lineOffsetTrim);
@@ -1592,6 +1601,7 @@ function resetDockSettings(): void {
   (document.getElementById("isDockOffsetEnabled") as HTMLInputElement).checked = true;
   (document.getElementById("isDockRefreshEnabled") as HTMLInputElement).checked = false;
   (document.getElementById("isDockPictureInPictureEnabled") as HTMLInputElement).checked = true;
+  (document.getElementById("isDockDownloadLRCEnabled") as HTMLInputElement).checked = true;
   setUnisonPositionInForm(DOCK_DEFAULT_POSITION);
   setDockControlsOrderInForm([...DOCK_CONTROL_ORDER_DEFAULT]);
   syncUnisonModalDependentState(true);
@@ -1642,6 +1652,8 @@ function setupUnisonActionsModal(): void {
     "isDockOffsetEnabled",
     "isDockRefreshEnabled",
     "isDockPictureInPictureEnabled",
+    "isDockDownloadLRCEnabled",
+    "lyric-default-download-format",
   ]) {
     document.getElementById(id)?.addEventListener("change", debouncedSaveOptions);
   }
