@@ -1,47 +1,38 @@
 import {
   AUTO_SWITCH_ENABLED_LOG,
   FULLSCREEN_BUTTON_SELECTOR,
-  GENERAL_ERROR_LOG,
-  LOG_PREFIX,
-  LYRICS_CLASS,
   LYRICS_TAB_CLICKED_LOG,
   LYRICS_WRAPPER_ID,
-  PAUSING_LYRICS_SCROLL_LOG,
   SONG_SWITCHED_LOG,
   TAB_CONTENT_CLASS,
   TAB_HEADER_CLASS,
   TAB_RENDERER_SELECTOR,
-  USER_SCROLLING_CLASS,
 } from "@constants";
 import { AppState, handleModifications, type PlayerDetails, reloadLyrics } from "@core/appState";
 import { preFetchLyrics } from "@modules/lyrics/lyrics";
-import { getArtworkMetadata, getSongMetadata } from "@modules/lyrics/requestSniffer/requestSniffer";
+import { getArtworkMetadata, getSongAlbum, getSongMetadata } from "@modules/lyrics/requestSniffer/requestSniffer";
 import { onAutoSwitchEnabled, onFullScreenDisabled, wakeDockIdle } from "@modules/settings/settings";
-import {
-  animationEngine,
-  animEngineState,
-  cancelPendingLineScroll,
-  getResumeScrollElement,
-  noteAnimationVisibilityChange,
-} from "@modules/ui/animationEngine";
 import { adjustLyricOffset, OFFSET_STEP, OFFSET_STEP_LARGE } from "@modules/ui/lyricsDock/offset";
+import { currentTickOptions, mainView } from "@modules/ui/mainLyricsView";
 import { preloadArtwork } from "@modules/ui/pictureInPicture/lyricsView";
+import { revealQueueAutoplaySection } from "@modules/ui/queueAutoplay";
 import {
   closePlayerPageIfOpenedForFullscreen,
   isNavigating,
   isPlayerPageOpen,
   openPlayerPageForFullscreen,
 } from "@modules/ui/navigation";
-import { log } from "@utils";
+import { getResumeScrollElement } from "@modules/ui/resumeScrollButton";
+import { logCore, logError } from "@core/logger";
 import {
   addThumbnail,
   cleanup,
   injectSongAttributes,
-  isLoaderActive,
   preloadHighResThumbnail,
   renderLoader,
   resetThumbnailState,
   showYtThumbnail,
+  updateFullscreenControlsSnapshot,
 } from "./dom";
 
 let wakeLock: WakeLockSentinel | null = null;
@@ -77,7 +68,12 @@ function runAnimationEngine(now: number, force = false): void {
     : 0;
   const currentTime = Math.min(latestPlayerTime + elapsedS, latestPlayerDuration || Infinity);
   if (AppState.suppressZeroTime < wallTime || currentTime !== 0) {
-    animationEngine(currentTime, wallTime, latestPlayerPlaying);
+    if (
+      AppState.areLyricsTicking &&
+      mainView.tick(currentTime, currentTickOptions(wallTime, latestPlayerPlaying)) === "lyrics-missing"
+    ) {
+      AppState.areLyricsTicking = false;
+    }
   }
 }
 
@@ -93,7 +89,7 @@ function startAnimationFrameLoop(): void {
 
 async function requestWakeLock(): Promise<void> {
   if (!("wakeLock" in navigator)) {
-    log(GENERAL_ERROR_LOG, "Wake Lock API not supported in this browser.");
+    logError("Wake Lock API not supported in this browser.");
     return;
   }
 
@@ -103,7 +99,7 @@ async function requestWakeLock(): Promise<void> {
       wakeLock = null;
     });
   } catch (err) {
-    log(GENERAL_ERROR_LOG, "Wake Lock request failed:", err);
+    logError("Wake Lock request failed:", err);
   }
 }
 
@@ -272,11 +268,11 @@ export function lyricReloader(): void {
         setTimeout(() => {
           tabRenderer.scrollTop = scrollPositions[i];
           // Don't start ticking until we set the height
-          AppState.areLyricsTicking = AppState.areLyricsLoaded && (i === 1 || AppState.isPictureInPictureOpen);
+          AppState.areLyricsTicking = AppState.areLyricsLoaded && i === 1;
         }, 0);
         currentTab = i;
 
-        if (i !== 1 && !AppState.isPictureInPictureOpen) {
+        if (i !== 1) {
           // stop ticking immediately
           AppState.areLyricsTicking = false;
         }
@@ -286,7 +282,7 @@ export function lyricReloader(): void {
     tab2.addEventListener("click", () => {
       getResumeScrollElement().classList.remove("blyrics-hidden");
       if (!AppState.areLyricsLoaded) {
-        log(LYRICS_TAB_CLICKED_LOG);
+        logCore(LYRICS_TAB_CLICKED_LOG);
         cleanup();
         renderLoader();
         reloadLyrics();
@@ -298,6 +294,7 @@ export function lyricReloader(): void {
     };
 
     tab1.addEventListener("click", onNonLyricTabClick);
+    tab1.addEventListener("click", revealQueueAutoplaySection);
     tab3.addEventListener("click", onNonLyricTabClick);
   } else {
     setTimeout(() => lyricReloader(), 1000);
@@ -315,7 +312,7 @@ export function initializeLyrics(): void {
   hasInitializedLyrics = true;
 
   document.addEventListener("visibilitychange", () => {
-    noteAnimationVisibilityChange();
+    mainView.noteVisibilityChange();
     if (document.visibilityState === "visible") {
       runAnimationEngine(performance.now(), true);
     }
@@ -334,6 +331,14 @@ export function initializeLyrics(): void {
     AppState.currentSong = detail.song;
     AppState.currentArtist = detail.artist;
 
+    updateFullscreenControlsSnapshot({
+      currentTimeS: detail.currentTime,
+      durationS: Number(detail.duration),
+      playbackRate: detail.playbackRate ?? 1,
+      isPlaying: detail.playing,
+      wallTime: detail.browserTime,
+    });
+
     const currentVideoId = detail.videoId;
     const currentVideoDetails = detail.song + " " + detail.artist;
 
@@ -343,10 +348,10 @@ export function initializeLyrics(): void {
       AppState.lastVideoDetails = currentVideoDetails;
       resetThumbnailState();
       if (!detail.song || !detail.artist) {
-        log("Lyrics switched: Still waiting for metadata ", detail.videoId);
+        logCore("Lyrics switched: Still waiting for metadata ", detail.videoId);
         return;
       }
-      log(SONG_SWITCHED_LOG, detail.videoId);
+      logCore(SONG_SWITCHED_LOG, detail.videoId);
 
       AppState.queueLyricInjection = true;
       AppState.queueSongDetailsInjection = true;
@@ -368,9 +373,12 @@ export function initializeLyrics(): void {
       });
     }
 
-    if (AppState.areLyricsTicking && AppState.areLyricsLoaded && !AppState.hasPreloadedNextSong) {
+    // Ticking is the side panel's business, but this warms the next song's artwork and lyrics for
+    // whichever view is on screen, and the floating window is a view the side panel cannot see.
+    const isAnyViewShowingLyrics = AppState.areLyricsTicking || AppState.isPictureInPictureOpen;
+    if (isAnyViewShowingLyrics && AppState.areLyricsLoaded && !AppState.hasPreloadedNextSong) {
       AppState.hasPreloadedNextSong = true;
-      log(LOG_PREFIX, "Trying to preload next song");
+      logCore("Trying to preload next song");
       getSongMetadata(AppState.lastVideoId).then(async data => {
         if (data && data.nextVideoId) {
           let next = await getSongMetadata(data.nextVideoId);
@@ -403,6 +411,11 @@ export function initializeLyrics(): void {
     if (AppState.queueSongDetailsInjection && detail.song && detail.artist && document.getElementById("main-panel")) {
       AppState.queueSongDetailsInjection = false;
       injectSongAttributes(detail.song, detail.artist);
+      void getSongAlbum(detail.videoId).then(album => {
+        if (album && document.getElementById("blyrics-title")?.textContent === detail.song) {
+          injectSongAttributes(detail.song, detail.artist, album);
+        }
+      });
     }
 
     if (AppState.lyricInjectionFailed && !AppState.isPictureInPictureOpen) {
@@ -420,7 +433,7 @@ export function initializeLyrics(): void {
         if (tabSelector.getAttribute("aria-selected") !== "true") {
           onAutoSwitchEnabled(() => {
             tabSelector.click();
-            log(AUTO_SWITCH_ENABLED_LOG);
+            logCore(AUTO_SWITCH_ENABLED_LOG);
             getResumeScrollElement().classList.remove("blyrics-hidden");
           });
         }
@@ -428,9 +441,10 @@ export function initializeLyrics(): void {
       }
     }
 
-    // A window owning a Picture-in-Picture document still reports "hidden", and this is the only
-    // path that ticks the engine while playback is paused, so pausing would never reach the
-    // running word animations.
+    // The only path that ticks while playback is paused, so it is what lands a pause on the running
+    // word animations. The floating window term is not about the window: an opener that owns one
+    // reports "hidden" for as long as it is open, however visible it actually is, so without it the
+    // side panel would keep sweeping the current line after the user hits pause.
     if (document.visibilityState === "visible" || AppState.isPictureInPictureOpen) {
       runAnimationEngine(performance.now(), true);
     }
@@ -447,24 +461,7 @@ export function scrollEventHandler(): void {
     return;
   }
 
-  if (animEngineState.skipScrolls > 0) {
-    animEngineState.skipScrolls--;
-    animEngineState.skipScrollsDecayTimes.shift();
-    return;
-  }
-  cancelPendingLineScroll();
-  if (!isLoaderActive()) {
-    if (animEngineState.scrollResumeTime < Date.now()) {
-      log(PAUSING_LYRICS_SCROLL_LOG);
-    }
-    const isPassive = AppState.lyricData?.syncType === "none";
-    animEngineState.scrollResumeTime = Date.now() + (isPassive ? 5000 : 25000);
-    animEngineState.wasUserScrolling = true;
-
-    getResumeScrollElement().removeAttribute("autoscroll-hidden");
-    const lyricsElement = document.getElementsByClassName(LYRICS_CLASS)[0] as HTMLElement;
-    lyricsElement.classList.add(USER_SCROLLING_CLASS);
-  }
+  mainView.noteUserScroll();
 }
 
 /**
@@ -644,15 +641,8 @@ export function setUpAvButtonListener(): void {
   }
 
   let handleAVSwitch = (isVideo: boolean) => {
-    let playerPage = document.querySelector("#player-page");
-
-    if (playerPage) {
-      if (isVideo) {
-        playerPage.setAttribute("blyrics-video-mode", "");
-      } else {
-        playerPage.removeAttribute("blyrics-video-mode");
-      }
-    }
+    document.querySelector("#player-page")?.toggleAttribute("blyrics-video-mode", isVideo);
+    document.querySelector("ytmusic-app-layout")?.toggleAttribute("blyrics-video-mode", isVideo);
   };
   const observerCallback = (mutationsList: MutationRecord[]) => {
     for (const mutation of mutationsList) {
@@ -670,5 +660,5 @@ export function setUpAvButtonListener(): void {
     attributeFilter: ["is-video-playback-mode-selected"],
   });
   handleAVSwitch(avToggle.getAttribute("is-video-playback-mode-selected") === "true");
-  log(LOG_PREFIX, "Set up a/v toggle observer");
+  logCore("Set up a/v toggle observer");
 }

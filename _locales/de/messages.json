@@ -83,52 +83,76 @@
     "message": "Verschwommenes Albumcover als Hintergrund anzeigen",
     "description": "Show album art background setting label"
   },
+  "options_display_fullscreenControls": {
+    "message": "Wiedergabesteuerung im Vollbildmodus anzeigen",
+    "description": "Toggle label for the playback controls strip (progress bar, transport, like and dislike) shown under the album art in the fullscreen lyrics view"
+  },
   "options_display_stylizedAnimations": {
     "message": "Stilisierte Animationen anzeigen",
     "description": "Show stylized animations setting label"
+  },
+  "options_display_letterWave": {
+    "message": "Buchstaben-Welle",
+    "description": "Label for the per-letter wave lyric animation toggle"
+  },
+  "options_display_letterWaveBadge": {
+    "message": "Experimentell",
+    "description": "Badge shown next to the letter wave setting marking it as experimental"
+  },
+  "options_display_letterWaveTooltip": {
+    "message": "Songtexte sehen mit einer leichten Wellenbewegung bei jedem gesungenen Wort lebendiger aus. Deaktiviere es, wenn das Scrollen der Songtexte abgehackt aussieht.",
+    "description": "Tooltip explaining the letter wave animation and its performance impact"
+  },
+  "options_display_letterWaveTooltipStates": {
+    "message": "Bleibt standardmäßig deaktiviert, es sei denn, ein Thema aktiviert es.",
+    "description": "Appended to the letter wave tooltip, explaining the three switch states"
   },
   "options_display_passiveScroll": {
     "message": "Automatisch nicht synchronisierte Songtexte scrollen",
     "description": "Auto-scroll unsynced lyrics setting label"
   },
   "picture_in_picture_open": {
-    "message": "Open Picture-in-Picture lyrics",
+    "message": "Öffne Songtexte in Picture-in-Picture",
     "description": "Accessible label for the dock action that opens the floating lyrics window"
   },
   "picture_in_picture_previous": {
-    "message": "Previous",
+    "message": "Vorherige",
     "description": "Accessible label for the previous track button in the Picture-in-Picture lyrics window, used when the YouTube Music player bar exposes no label of its own"
   },
   "picture_in_picture_play": {
-    "message": "Play",
+    "message": "Abspielen",
     "description": "Accessible label for the play button in the Picture-in-Picture lyrics window, used when the YouTube Music player bar exposes no label of its own"
   },
   "picture_in_picture_pause": {
-    "message": "Pause",
+    "message": "Pausieren",
     "description": "Accessible label for the pause button in the Picture-in-Picture lyrics window, used when the YouTube Music player bar exposes no label of its own"
   },
   "picture_in_picture_next": {
-    "message": "Next",
+    "message": "Nächste",
     "description": "Accessible label for the next track button in the Picture-in-Picture lyrics window, used when the YouTube Music player bar exposes no label of its own"
   },
+  "options_display_pipEnabled": {
+    "message": "Schwebendes Fenster aktivieren",
+    "description": "Master toggle for the floating lyrics window feature, which turns it off everywhere including the YouTube Music minimize button"
+  },
   "options_display_pipAutoRestore": {
-    "message": "Reopen floating lyrics automatically",
+    "message": "Öffne fliegende Songtexte automatisch",
     "description": "Setting label for automatically reopening the floating lyrics window after page load"
   },
   "options_display_pipAutoRestoreTooltip": {
-    "message": "Keeps the floating lyrics window from closing for good when you reload or move between songs and pages. Browsers only let a floating window open right after you interact with the page, so it reopens on your first click or key press instead of instantly.",
+    "message": "Hält das schwebende Songtext-Fenster vor dem Schließen, wenn Sie zwischen Liedern und Seiten neu laden oder bewegen. Browser lassen ein schwebendes Fenster nur öffnen, nachdem Sie mit der Seite interagieren so öffnet es sich wieder auf Ihren ersten Klick oder Tastendruck statt sofort.",
     "description": "Help tooltip explaining what automatic floating-lyrics reopening does and why it waits for the first interaction"
   },
   "options_display_pipArtworkTransition": {
-    "message": "Album art transition",
+    "message": "Albumcover-Übergang",
     "description": "Setting label, shown inside the floating lyrics window settings, for choosing how album art changes between songs"
   },
   "options_pipTransition_shuffle": {
-    "message": "Shuffle",
+    "message": "Zufällige Wiedergabe",
     "description": "Name of an album art transition where the artwork tilts back and the new cover is dealt in like a playing card"
   },
   "options_pipTransition_flip": {
-    "message": "Flip",
+    "message": "Spiegeln",
     "description": "Name of an album art transition where the artwork rotates like a card to reveal the new cover on its other side"
   },
   "options_pipTransition_push": {
@@ -136,24 +160,28 @@
     "description": "Name of a transition, offered for both album art and song titles, where the new content slides in from the side and pushes the old out"
   },
   "options_pipTransition_crossfade": {
-    "message": "Crossfade",
+    "message": "Überblenden",
     "description": "Name of a transition, offered for both album art and song titles, where the new content fades in over the old"
   },
   "options_pipTransition_spring": {
-    "message": "Spring",
+    "message": "Feder",
     "description": "Name of a song title transition where the words of the new title bounce up into place one after another"
   },
   "options_display_pipWindow": {
-    "message": "Floating lyrics window",
+    "message": "Schwebendes Songtext-Fenster",
     "description": "Label for the row that opens the settings for the floating lyrics window"
   },
   "options_display_pipTextTransition": {
-    "message": "Title transition",
+    "message": "Titelübergang",
     "description": "Setting label, shown inside the floating lyrics window settings, for choosing how the song title and artist change between songs"
   },
   "options_display_pipMarquee": {
-    "message": "Scroll long titles",
+    "message": "Lange Titel Scrollen",
     "description": "Toggle label for whether a song title too long for the floating lyrics window scrolls across so it can be read in full"
+  },
+  "options_display_pipProgressBar": {
+    "message": "Fortschrittsbalken anzeigen",
+    "description": "Toggle label, shown inside the floating lyrics window settings, for the seekable playback progress bar under the album art"
   },
   "options_display_shadersPromo": {
     "message": "Link für Better Lyrics Shaders anzeigen",
@@ -172,7 +200,7 @@
     "description": "Toggle label inside the lyrics controls dock modal for showing the floating dock"
   },
   "options_unisonModal_showPinned_hint": {
-    "message": "Ein schwebendes Dock um die Quellen, Übersetzungen, Romanisierung, Sync-push und Unison Text Abstimmungen zu bearbeiten",
+    "message": "Ein schwebendes Dock um die Quellen, Übersetzungen, Romanisierung, Sync-push und Unison-Songtext-Abstimmungen zu bearbeiten",
     "description": "Hint text under the Show controls dock toggle"
   },
   "options_unisonModal_autoHide": {
@@ -180,7 +208,7 @@
     "description": "Toggle label inside the Unison Actions modal for auto-hiding the dock when idle in fullscreen"
   },
   "options_unisonModal_autoHide_hint": {
-    "message": "Verstecke schwebende Steuerung, wenn sie inaktiv im Vollbildmodus sind",
+    "message": "Verstecke schwebende Steuerung, wenn Du inaktiv im Vollbildmodus bist",
     "description": "Hint text under the Auto-hide in fullscreen toggle"
   },
   "options_unisonModal_position": {
@@ -220,7 +248,7 @@
     "description": "Toggle label for showing the lyrics source switcher control in the dock"
   },
   "options_unisonModal_controlPictureInPicture": {
-    "message": "Floating window",
+    "message": "Schwebendes Fenster",
     "description": "Toggle label for showing the control that opens the floating lyrics window in the dock"
   },
   "options_unisonModal_controlOffset": {
@@ -230,6 +258,10 @@
   "lyricsDock_chooseSource": {
     "message": "Songtext-Quelle wählen",
     "description": "Accessible label for the lyrics dock button that opens the source provider dropdown"
+  },
+  "lyricsDock_refresh": {
+    "message": "Songtexte neu laden",
+    "description": "Accessible label for the lyrics dock button that re-fetches lyrics for the current song, bypassing the cache"
   },
   "lyricsDock_previousSource": {
     "message": "Vorherige Quelle",
@@ -252,11 +284,11 @@
     "description": "Label in the lyrics dock offset menu for the global offset applied to all songs and sync types"
   },
   "options_offsetModal_perSong": {
-    "message": "Per-song offsets",
+    "message": "Versatz pro Song",
     "description": "Heading in the offset settings modal for the section that manages saved per-song sync offsets"
   },
   "options_offsetModal_perSongClear": {
-    "message": "Clear all",
+    "message": "Alle entfernen",
     "description": "Button in the offset settings modal that deletes every saved per-song sync offset"
   },
   "options_offsetModal_perSongCount": {
@@ -264,7 +296,7 @@
     "description": "Label in the offset settings modal showing how many per-song sync offsets are stored"
   },
   "options_offsetModal_appliesTo": {
-    "message": "Applies to",
+    "message": "Gilt für",
     "description": "Label in the offset settings modal preceding the list of sync types a given offset affects"
   },
   "options_language_displayLanguage": {
@@ -337,7 +369,11 @@
   },
   "options_themes_create": {
     "message": "Erstellen",
-    "description": "Create button label"
+    "description": "Button to open the style editor if there are no styles"
+  },
+  "options_themes_edit": {
+    "message": "Bearbeiten",
+    "description": "Button to open the style editor"
   },
   "options_themes_marketplace": {
     "message": "Design-Marktplatz",
@@ -362,6 +398,10 @@
   "options_identity_yourIdentity": {
     "message": "Deine Identität",
     "description": "Your identity label"
+  },
+  "options_identity_unisonStats": {
+    "message": "Unison-Statistiken",
+    "description": "Section title above the user's own Unison level, tier, rank and badges on the Identity tab"
   },
   "options_identity_loading": {
     "message": "Laden...",
@@ -976,7 +1016,7 @@
     "description": "Footer link in the theme detail modal that opens the theme's discussion thread"
   },
   "marketplace_commit": {
-    "message": "Commit $hash$",
+    "message": "$hash$ Commit",
     "description": "Footer chip in the theme detail modal linking to the exact source commit a theme was built from",
     "placeholders": {
       "hash": {
@@ -1169,29 +1209,27 @@
     "message": "Design konnte nicht installiert werden. Überprüfe die Verbindung und versuche erneut.",
     "description": "Alert when a symlinked theme fails to install from marketplace"
   },
-  "symlink_badge_marketplace": {
-    "message": "Marktplatz",
-    "description": "Badge text on symlinked theme cards"
+  "theme_top_badge": {
+    "message": "#$RANK$ auf dem Marktplatz",
+    "description": "Tooltip on a featured theme's rank medal",
+    "placeholders": {
+      "rank": {
+        "content": "$1",
+        "example": "1"
+      }
+    }
   },
-  "symlink_badge_bundled": {
-    "message": "Vorinstalliert",
-    "description": "Badge text on non-symlinked built-in theme cards"
+  "theme_modal_section_featured": {
+    "message": "Empfohlene Designs",
+    "description": "Section title for featured themes (top marketplace picks and built-ins) in the theme chooser modal"
   },
-  "deprecation_builtin_title": {
-    "message": "Achtung, diese Designs ziehen um!",
-    "description": "Title for the built-in themes deprecation banner in theme modal"
+  "theme_modal_section_all": {
+    "message": "Alle Designs",
+    "description": "Section title for the user's installed marketplace themes in the theme chooser modal"
   },
-  "deprecation_builtin_body": {
-    "message": "Wir migrieren vorinstallierte Designs zum Design Marktplatz. Ein paar sind schon, halte Ausblick nach dem Marktplatz-Abzeichen. Die restlichen werden in einem zukünftigen update folgen, mit CSS Backups auf GitHub und Discord.",
-    "description": "Body text for the built-in themes deprecation banner"
-  },
-  "deprecation_builtin_cta": {
+  "theme_modal_browse": {
     "message": "Marktplatz durchsuchen",
-    "description": "CTA button text in the deprecation banner to open the marketplace"
-  },
-  "theme_modal_section_builtin": {
-    "message": "Vorinstallierte Designs",
-    "description": "Section title for built-in themes in the theme chooser modal"
+    "description": "Link in the theme chooser modal that opens the full Theme Marketplace page"
   },
   "theme_modal_section_custom": {
     "message": "Eigene Designs",
@@ -1693,21 +1731,47 @@
     "message": "Diese Meldung ist fehlgeschlagen, würden sie es erneut versuchen?",
     "description": "Shown when a lyrics report fails to submit"
   },
-  "unison_tier_new": {
-    "message": "Neu",
-    "description": "Trust tier badge for low-reputation Unison submitters"
+  "unison_level": {
+    "message": "Level $level$",
+    "description": "Shows a Unison contributor's numeric level. $level$ is a positive integer",
+    "placeholders": {
+      "level": {
+        "content": "$1",
+        "example": "6"
+      }
+    }
   },
-  "unison_tier_trusted": {
-    "message": "Vertrauenswürdig",
-    "description": "Trust tier badge for mid-reputation Unison submitters"
+  "unison_xpToNext": {
+    "message": "$xp$ XP bis Level $level$",
+    "description": "Explains how much experience remains before the next Unison level. $xp$ is a positive integer, $level$ is the next level number",
+    "placeholders": {
+      "xp": {
+        "content": "$1",
+        "example": "436"
+      },
+      "level": {
+        "content": "$2",
+        "example": "7"
+      }
+    }
   },
-  "unison_tier_veteran": {
-    "message": "Veteran",
-    "description": "Trust tier badge for high-reputation Unison submitters"
+  "unison_maxLevel": {
+    "message": "Höchstes Level",
+    "description": "Shown in place of the XP-to-next text when a Unison contributor is at the highest level"
   },
-  "unison_tier_expert": {
-    "message": "Experte",
-    "description": "Trust tier badge for top-reputation Unison submitters"
+  "unison_rank": {
+    "message": "Rang #$rank$",
+    "description": "Shows a Unison contributor's leaderboard rank within their tier. $rank$ is a positive integer",
+    "placeholders": {
+      "rank": {
+        "content": "$1",
+        "example": "1"
+      }
+    }
+  },
+  "unison_viewProfile": {
+    "message": "Zeige vollständiges Profil",
+    "description": "Link on the Identity tab that opens the user's full Unison profile in a new tab"
   },
   "unison_submitted_this": {
     "message": "diesen Songtext eingereicht",

@@ -1,9 +1,12 @@
-import { CURRENT_LYRICS_CLASS, LINE_CLASS, LYRICS_CLASS, PLAYER_BAR_SELECTOR, SEEK_EVENT } from "@constants";
+import { PLAYER_BAR_SELECTOR, PLAYER_TIME_EVENT, SEEK_EVENT } from "@constants";
+import { parseSvgString } from "@modules/ui/lyricsDock/icons";
+import { attachTransportAnimation } from "@modules/ui/playerControls/controlAnimations";
+import { playerControlIcons } from "@modules/ui/playerControls/icons";
+import { sendTransport } from "@modules/ui/playerControls/playerBarControls";
+import { createProgressBar, type ProgressBarHandle } from "@modules/ui/playerControls/progressBar";
 import type { PlayerDetails } from "@core/appState";
-import { getSeekTimeFromClick } from "@modules/lyrics/seekFromClick";
 import { createHeaderLine, fillHeaderLayer, getHeaderLayers, PictureInPictureHeaderMarquee } from "./headerMarquee";
-import { MIRROR_ID_ATTR } from "./pipMirror";
-import type { PictureInPictureViewDependencies } from "./types";
+import type { PictureInPicturePlaybackSnapshot, PictureInPictureViewDependencies } from "./types";
 
 interface DisplayMetadata {
   readonly title: string;
@@ -24,12 +27,9 @@ interface HeaderRow {
 type PlayerControlAction = "previous" | "play-pause" | "next";
 type PlayerControlIcon = Exclude<PlayerControlAction, "play-pause"> | "play" | "pause";
 
-const PLAYER_TIME_EVENT = "blyrics-send-player-time";
-const PLAYER_CONTROL_EVENT = "blyrics-player-control";
 const ARTWORK_SIZE = 512;
 const VISIBLE_METADATA_CHECK_INTERVAL = 250;
 const PLAYER_CONTROLS_IDLE_DELAY = 2000;
-const SCROLL_ANCHOR_RATIO = 0.4;
 
 // Durations mirror the keyframes in picture-in-picture.css; they only gate the
 // rapid-skip guard, so drift shows up as a guard that releases early or late.
@@ -67,19 +67,6 @@ const MARQUEE_REARM_DELAY = 700;
 // this the metadata poll is genuinely slow and stale art is the worse lie.
 const ARTWORK_STALE_GRACE = 600;
 
-const PLAYER_CONTROL_IDS: Record<PlayerControlAction, string> = {
-  previous: "previous-button",
-  "play-pause": "play-pause-button",
-  next: "next-button",
-};
-
-const PLAYER_CONTROL_ICON_PATHS: Record<PlayerControlIcon, string> = {
-  previous: "M6 6h2v12H6V6zm3.5 6 8.5 6V6l-8.5 6z",
-  play: "M8 5v14l11-7z",
-  pause: "M7 5h4v14H7V5zm6 0h4v14h-4V5z",
-  next: "M16 6h2v12h-2V6zM6 18l8.5-6L6 6v12z",
-};
-
 function getArtworkUrl(url: string): string {
   if (/w\d+-h\d+/.test(url)) return url.replace(/w\d+-h\d+/, `w${ARTWORK_SIZE}-h${ARTWORK_SIZE}`);
   return url.replace(/\/(sd|hq|mq)?default\.jpg/, "/maxresdefault.jpg");
@@ -109,17 +96,6 @@ function getVisiblePlayerMetadata(sourceDocument: Document): DisplayMetadata {
     byline: bylineText,
     videoId,
   };
-}
-
-function getSourcePlayerControl(sourceDocument: Document, action: PlayerControlAction): HTMLElement | null {
-  return sourceDocument.querySelector<HTMLElement>(`${PLAYER_BAR_SELECTOR} #${PLAYER_CONTROL_IDS[action]}`);
-}
-
-function getSourceControlLabel(sourceDocument: Document, action: PlayerControlAction, fallback: string): string {
-  const control = getSourcePlayerControl(sourceDocument, action);
-  return (
-    control?.getAttribute("aria-label") ?? control?.querySelector<HTMLElement>("[aria-label]")?.ariaLabel ?? fallback
-  );
 }
 
 // Faces are siblings rather than nested layers because the slot clips its
@@ -165,16 +141,14 @@ export function preloadArtwork(url: string): void {
   proxy.src = getArtworkUrl(url);
 }
 
-function createControlIcon(document: Document, icon: PlayerControlIcon): SVGSVGElement {
-  const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+function createControlIcon(document: Document, icon: PlayerControlIcon): SVGElement {
+  const parsed = parseSvgString(playerControlIcons[icon]);
+  const svg = parsed
+    ? document.importNode(parsed, true)
+    : document.createElementNS("http://www.w3.org/2000/svg", "svg");
   svg.classList.add("blyrics-pip-artwork__control-icon", `blyrics-pip-artwork__control-icon--${icon}`);
-  svg.setAttribute("viewBox", "0 0 24 24");
   svg.setAttribute("aria-hidden", "true");
   svg.setAttribute("focusable", "false");
-
-  const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
-  path.setAttribute("d", PLAYER_CONTROL_ICON_PATHS[icon]);
-  svg.appendChild(path);
   return svg;
 }
 
@@ -192,6 +166,7 @@ export class PictureInPictureLyricsView {
   private readonly reducedMotionQuery: MediaQueryList;
   private readonly lyricsViewport: HTMLElement;
   private readonly lyricsScroller: HTMLElement;
+  private readonly progressBar: ProgressBarHandle;
   private readonly lifecycleController = new AbortController();
   private artworkController: AbortController | null = null;
   private currentVideoId: string | null = null;
@@ -201,6 +176,7 @@ export class PictureInPictureLyricsView {
   private lastPointerMoveTime = 0;
   private fallbackArtworkUrl = "";
   private isSearching = false;
+  private lastPlaybackSnapshot: PictureInPicturePlaybackSnapshot | null = null;
   private artworkTransition: ArtworkTransition = DEFAULT_ARTWORK_TRANSITION;
   private artworkIndex = 0;
   private artworkBusyUntil = 0;
@@ -257,16 +233,13 @@ export class PictureInPictureLyricsView {
     artworkControls.className = "blyrics-pip-artwork__controls";
     const previousButton = this.createPlayerControlButton(
       "previous",
-      getSourceControlLabel(sourceDocument, "previous", dependencies.translate("picture_in_picture_previous"))
+      dependencies.translate("picture_in_picture_previous")
     );
     this.playPauseButton = this.createPlayerControlButton(
       "play-pause",
-      getSourceControlLabel(sourceDocument, "play-pause", dependencies.translate("picture_in_picture_play"))
+      dependencies.translate("picture_in_picture_play")
     );
-    const nextButton = this.createPlayerControlButton(
-      "next",
-      getSourceControlLabel(sourceDocument, "next", dependencies.translate("picture_in_picture_next"))
-    );
+    const nextButton = this.createPlayerControlButton("next", dependencies.translate("picture_in_picture_next"));
     artworkControls.append(previousButton, this.playPauseButton, nextButton);
     this.artworkContainer.append(artworkCard, this.artworkVideo, artworkControls);
 
@@ -301,14 +274,25 @@ export class PictureInPictureLyricsView {
 
     this.lyricsScroller = pipDocument.createElement("div");
     this.lyricsScroller.className = "blyrics-pip-scroller";
-    this.lyricsScroller.addEventListener("click", this.handleLyricClick, {
-      signal: this.lifecycleController.signal,
-    });
 
     this.showSearching();
 
+    this.progressBar = createProgressBar({
+      doc: pipDocument,
+      getSnapshot: () => this.lastPlaybackSnapshot,
+      onSeek: seconds => {
+        sourceDocument.dispatchEvent(new CustomEvent(SEEK_EVENT, { detail: seconds }));
+        dependencies.resetScrollResume();
+      },
+    });
+    this.progressBar.element.classList.add("blyrics-pip-progress");
+
+    const artColumn = pipDocument.createElement("div");
+    artColumn.className = "blyrics-pip-art-col";
+    artColumn.append(this.artworkContainer, this.progressBar.element);
+
     content.append(header, this.lyricsViewport);
-    this.shell.append(this.backdrop, this.artworkContainer, content);
+    this.shell.append(this.backdrop, artColumn, content);
     pipDocument.body.replaceChildren(this.shell);
 
     sourceDocument.addEventListener(PLAYER_TIME_EVENT, this.handlePlayerTime, {
@@ -321,15 +305,31 @@ export class PictureInPictureLyricsView {
     pipWindow.addEventListener("pagehide", this.destroy, { once: true });
   }
 
-  get pipDocument(): Document {
-    return this.pipWindow.document;
+  /**
+   * The element the renderer scrolls. Its own scroll container, so the engine moves the lines by
+   * writing scrollTop the same way it does in the side panel.
+   */
+  get scrollElement(): HTMLElement {
+    return this.lyricsScroller;
   }
 
-  mountLyrics(twinRoot: HTMLElement): void {
+  get playbackSnapshot(): PictureInPicturePlaybackSnapshot | null {
+    return this.lastPlaybackSnapshot;
+  }
+
+  isLoaderActive(): boolean {
+    return this.isSearching;
+  }
+
+  /**
+   * Puts the scroller back on screen in place of the loader, and hands back the element the built
+   * lyrics container mounts into.
+   */
+  prepareLyricsMount(): HTMLElement {
     this.isSearching = false;
-    this.lyricsScroller.replaceChildren(twinRoot);
     this.lyricsViewport.replaceChildren(this.lyricsScroller);
     this.shell.setAttribute("aria-busy", "false");
+    return this.lyricsScroller;
   }
 
   // Called from the sync loop, so it has to no-op once the loader is already up.
@@ -355,27 +355,19 @@ export class PictureInPictureLyricsView {
     this.shell.setAttribute("aria-busy", "true");
   }
 
-  hasTwinMounted(): boolean {
-    return this.lyricsScroller.firstElementChild?.hasAttribute(MIRROR_ID_ATTR) ?? false;
-  }
-
-  updateScroll(): void {
-    const twin = this.lyricsScroller.firstElementChild as HTMLElement | null;
-    if (!twin) return;
-    const active = twin.querySelector<HTMLElement>(`.${CURRENT_LYRICS_CLASS}`);
-    if (!active) return;
-    const viewportHeight = this.lyricsViewport.clientHeight;
-    if (viewportHeight <= 0) return;
-    const activeCenter = active.offsetTop + active.offsetHeight / 2;
-    const maxScroll = Math.max(0, this.lyricsScroller.scrollHeight - viewportHeight);
-    const translateY = Math.max(-maxScroll, Math.min(0, viewportHeight * SCROLL_ANCHOR_RATIO - activeCenter));
-    const transform = `translateY(${translateY}px)`;
-    if (this.lyricsScroller.style.transform !== transform) this.lyricsScroller.style.transform = transform;
-  }
-
   private readonly handlePlayerTime = (event: Event): void => {
     const detail = (event as CustomEvent<PlayerDetails>).detail;
     if (!detail) return;
+
+    // `playing` rather than `isPlaying`: it also clears while the player buffers or seeks, which is
+    // what the animation clock has to follow.
+    this.lastPlaybackSnapshot = {
+      currentTimeS: detail.currentTime,
+      durationS: Number(detail.duration),
+      playbackRate: detail.playbackRate ?? 1,
+      isPlaying: detail.playing,
+      wallTime: detail.browserTime,
+    };
 
     this.updatePlayPauseButton(detail.isPlaying);
 
@@ -389,17 +381,6 @@ export class PictureInPictureLyricsView {
       this.refreshVisibleMetadata(detail.videoId);
       this.refreshAnimatedArtwork(detail.isPlaying);
     }
-  };
-
-  private readonly handleLyricClick = (event: MouseEvent): void => {
-    const line = (event.target as Element | null)?.closest<HTMLElement>(`.${LINE_CLASS}`);
-    if (!line) return;
-    const sync = line.closest<HTMLElement>(`.${LYRICS_CLASS}`)?.dataset.sync;
-    if (sync !== "synced" && sync !== "richsync") return;
-    const seekTime = getSeekTimeFromClick(event, line);
-    if (seekTime === null) return;
-    this.sourceDocument.dispatchEvent(new CustomEvent(SEEK_EVENT, { detail: seekTime }));
-    this.dependencies.resetScrollResume();
   };
 
   private readonly handlePointerMove = (): void => {
@@ -426,6 +407,7 @@ export class PictureInPictureLyricsView {
     this.artworkController?.abort();
     this.clearArtworkStaleTimer();
     this.marquee.destroy();
+    this.progressBar.destroy();
     if (this.controlsIdleTimer !== null) this.pipWindow.clearTimeout(this.controlsIdleTimer);
     if (this.artworkBusyTimer !== null) this.pipWindow.clearTimeout(this.artworkBusyTimer);
     for (const row of this.headerRows) {
@@ -449,16 +431,12 @@ export class PictureInPictureLyricsView {
     } else {
       button.appendChild(createControlIcon(this.pipWindow.document, action));
     }
+    attachTransportAnimation(button, action);
     return button;
   }
 
   private activatePlayerControl(action: PlayerControlAction): void {
-    const sourceControl = getSourcePlayerControl(this.sourceDocument, action);
-    if (sourceControl) {
-      sourceControl.click();
-      return;
-    }
-    this.sourceDocument.dispatchEvent(new CustomEvent(PLAYER_CONTROL_EVENT, { detail: action }));
+    sendTransport(this.sourceDocument, action);
   }
 
   private updatePlayPauseButton(isPlaying: boolean): void {
@@ -467,11 +445,7 @@ export class PictureInPictureLyricsView {
     this.playPauseButton.toggleAttribute("data-playing", isPlaying);
     this.playPauseButton.setAttribute(
       "aria-label",
-      getSourceControlLabel(
-        this.sourceDocument,
-        "play-pause",
-        this.dependencies.translate(isPlaying ? "picture_in_picture_pause" : "picture_in_picture_play")
-      )
+      this.dependencies.translate(isPlaying ? "picture_in_picture_pause" : "picture_in_picture_play")
     );
   }
 
@@ -798,5 +772,9 @@ export class PictureInPictureLyricsView {
   // own, runs past five seconds, and sits beside the lyrics.
   setMarqueeEnabled(enabled: unknown): void {
     this.marquee.setEnabled(enabled !== false);
+  }
+
+  setProgressBarEnabled(enabled: unknown): void {
+    this.progressBar.element.hidden = enabled === false;
   }
 }

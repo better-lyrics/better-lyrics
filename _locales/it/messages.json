@@ -83,9 +83,29 @@
     "message": "Mostra copertina album sfocata come sfondo",
     "description": "Show album art background setting label"
   },
+  "options_display_fullscreenControls": {
+    "message": "Mostra controlli player in schermo intero",
+    "description": "Toggle label for the playback controls strip (progress bar, transport, like and dislike) shown under the album art in the fullscreen lyrics view"
+  },
   "options_display_stylizedAnimations": {
     "message": "Mostra animazioni stilizzate",
     "description": "Show stylized animations setting label"
+  },
+  "options_display_letterWave": {
+    "message": "Lettere ad onda",
+    "description": "Label for the per-letter wave lyric animation toggle"
+  },
+  "options_display_letterWaveBadge": {
+    "message": "Sperimentale",
+    "description": "Badge shown next to the letter wave setting marking it as experimental"
+  },
+  "options_display_letterWaveTooltip": {
+    "message": "I testi appaiono più vivaci con un gentile movimento roteante attraverso ogni lettera mentre vengono cantate. Spegnilo se lo scorrimento dei testi appare a scatti sul tuo dispositivo.",
+    "description": "Tooltip explaining the letter wave animation and its performance impact"
+  },
+  "options_display_letterWaveTooltipStates": {
+    "message": "Auto rimane spento a meno che un tema non lo accenda. Acceso e Spento forzano su qualsiasi tema.",
+    "description": "Appended to the letter wave tooltip, explaining the three switch states"
   },
   "options_display_passiveScroll": {
     "message": "Scorri in automatico testi non sincronizzati",
@@ -110,6 +130,10 @@
   "picture_in_picture_next": {
     "message": "Avanti",
     "description": "Accessible label for the next track button in the Picture-in-Picture lyrics window, used when the YouTube Music player bar exposes no label of its own"
+  },
+  "options_display_pipEnabled": {
+    "message": "Abilita finestra fluttuante",
+    "description": "Master toggle for the floating lyrics window feature, which turns it off everywhere including the YouTube Music minimize button"
   },
   "options_display_pipAutoRestore": {
     "message": "Riapri testo fluttuante automaticamente",
@@ -154,6 +178,10 @@
   "options_display_pipMarquee": {
     "message": "Scorri titoli lunghi",
     "description": "Toggle label for whether a song title too long for the floating lyrics window scrolls across so it can be read in full"
+  },
+  "options_display_pipProgressBar": {
+    "message": "Mostra barra dei progressi",
+    "description": "Toggle label, shown inside the floating lyrics window settings, for the seekable playback progress bar under the album art"
   },
   "options_display_shadersPromo": {
     "message": "Mostra link a Better Lyrics Shaders",
@@ -230,6 +258,10 @@
   "lyricsDock_chooseSource": {
     "message": "Scegli fonte testi",
     "description": "Accessible label for the lyrics dock button that opens the source provider dropdown"
+  },
+  "lyricsDock_refresh": {
+    "message": "Ricarica testo",
+    "description": "Accessible label for the lyrics dock button that re-fetches lyrics for the current song, bypassing the cache"
   },
   "lyricsDock_previousSource": {
     "message": "Fonte precedente",
@@ -337,7 +369,11 @@
   },
   "options_themes_create": {
     "message": "Crea",
-    "description": "Create button label"
+    "description": "Button to open the style editor if there are no styles"
+  },
+  "options_themes_edit": {
+    "message": "Modifica",
+    "description": "Button to open the style editor"
   },
   "options_themes_marketplace": {
     "message": "Marketplace temi",
@@ -362,6 +398,10 @@
   "options_identity_yourIdentity": {
     "message": "La tua identità",
     "description": "Your identity label"
+  },
+  "options_identity_unisonStats": {
+    "message": "Statistiche Unison",
+    "description": "Section title above the user's own Unison level, tier, rank and badges on the Identity tab"
   },
   "options_identity_loading": {
     "message": "Caricamento...",
@@ -1169,29 +1209,27 @@
     "message": "Impossibile installare il tema. Controlla la tua connessione e riprova.",
     "description": "Alert when a symlinked theme fails to install from marketplace"
   },
-  "symlink_badge_marketplace": {
-    "message": "Marketplace",
-    "description": "Badge text on symlinked theme cards"
+  "theme_top_badge": {
+    "message": "#$RANK$ nel Marketplace",
+    "description": "Tooltip on a featured theme's rank medal",
+    "placeholders": {
+      "rank": {
+        "content": "$1",
+        "example": "1"
+      }
+    }
   },
-  "symlink_badge_bundled": {
-    "message": "Impacchettato",
-    "description": "Badge text on non-symlinked built-in theme cards"
+  "theme_modal_section_featured": {
+    "message": "Temi in Evidenza",
+    "description": "Section title for featured themes (top marketplace picks and built-ins) in the theme chooser modal"
   },
-  "deprecation_builtin_title": {
-    "message": "Attento, questi temi se ne andranno!",
-    "description": "Title for the built-in themes deprecation banner in theme modal"
+  "theme_modal_section_all": {
+    "message": "Tutti i Temi",
+    "description": "Section title for the user's installed marketplace themes in the theme chooser modal"
   },
-  "deprecation_builtin_body": {
-    "message": "Stiamo migrando i temi integrati al Marketplace dei Temi. Alcuni son stati già migrati, cerca il badge Marketplace. Il resto li seguiranno in un aggiornamento futuro, con backup CSS su GitHub e Discord.",
-    "description": "Body text for the built-in themes deprecation banner"
-  },
-  "deprecation_builtin_cta": {
-    "message": "Sfoglia Marketplace",
-    "description": "CTA button text in the deprecation banner to open the marketplace"
-  },
-  "theme_modal_section_builtin": {
-    "message": "Temi Integrati",
-    "description": "Section title for built-in themes in the theme chooser modal"
+  "theme_modal_browse": {
+    "message": "Esplora Marketplace",
+    "description": "Link in the theme chooser modal that opens the full Theme Marketplace page"
   },
   "theme_modal_section_custom": {
     "message": "Temi Personalizzati",
@@ -1693,21 +1731,47 @@
     "message": "La segnalazione non è stata inviata. Ti dispiace riprovare di nuovo?",
     "description": "Shown when a lyrics report fails to submit"
   },
-  "unison_tier_new": {
-    "message": "nuovo",
-    "description": "Trust tier badge for low-reputation Unison submitters"
+  "unison_level": {
+    "message": "Livello $level$",
+    "description": "Shows a Unison contributor's numeric level. $level$ is a positive integer",
+    "placeholders": {
+      "level": {
+        "content": "$1",
+        "example": "6"
+      }
+    }
   },
-  "unison_tier_trusted": {
-    "message": "affidabile",
-    "description": "Trust tier badge for mid-reputation Unison submitters"
+  "unison_xpToNext": {
+    "message": "$xp$ XP fino al Livello $level$",
+    "description": "Explains how much experience remains before the next Unison level. $xp$ is a positive integer, $level$ is the next level number",
+    "placeholders": {
+      "xp": {
+        "content": "$1",
+        "example": "436"
+      },
+      "level": {
+        "content": "$2",
+        "example": "7"
+      }
+    }
   },
-  "unison_tier_veteran": {
-    "message": "veterano",
-    "description": "Trust tier badge for high-reputation Unison submitters"
+  "unison_maxLevel": {
+    "message": "Livello massimo",
+    "description": "Shown in place of the XP-to-next text when a Unison contributor is at the highest level"
   },
-  "unison_tier_expert": {
-    "message": "esperto",
-    "description": "Trust tier badge for top-reputation Unison submitters"
+  "unison_rank": {
+    "message": "Rango #$rank$",
+    "description": "Shows a Unison contributor's leaderboard rank within their tier. $rank$ is a positive integer",
+    "placeholders": {
+      "rank": {
+        "content": "$1",
+        "example": "1"
+      }
+    }
+  },
+  "unison_viewProfile": {
+    "message": "Visualizza profilo completo",
+    "description": "Link on the Identity tab that opens the user's full Unison profile in a new tab"
   },
   "unison_submitted_this": {
     "message": "ha inviato questo testo",

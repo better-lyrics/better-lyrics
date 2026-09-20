@@ -53,10 +53,11 @@ try {
     }
 
     if (browser === "edge") {
-      console.log("Removing key field from manifest.json for edge...");
+      console.log("Removing store-forbidden fields (key, update_url) from manifest.json for edge...");
       const manifestPath = join(distDir, "manifest.json");
       const manifest = JSON.parse(readFileSync(manifestPath, "utf-8"));
       delete manifest.key;
+      delete manifest.update_url;
       writeFileSync(manifestPath, JSON.stringify(manifest, null, 2));
     }
 

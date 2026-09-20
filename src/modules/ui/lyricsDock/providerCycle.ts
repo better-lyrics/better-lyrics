@@ -1,5 +1,5 @@
 import { AppState, reloadLyrics } from "@core/appState";
-import { type LyricSourceKey, providerPriority } from "@modules/lyrics/providers/shared";
+import type { LyricSourceKey } from "@modules/lyrics/providers/shared";
 
 // Pins a specific provider and re-injects through the existing abort + injection queue.
 export function selectProvider(key: LyricSourceKey): void {
@@ -10,7 +10,7 @@ export function selectProvider(key: LyricSourceKey): void {
 // Pins the next/previous provider and re-injects through the existing abort + injection
 // queue. A genuine song change cancels the in-flight switch and resets the override.
 export function cycleProvider(direction: 1 | -1): void {
-  const list = AppState.availableProviderKeys.length > 0 ? AppState.availableProviderKeys : providerPriority;
+  const list = AppState.availableProviderKeys;
   if (list.length < 2) return;
 
   const basis = AppState.manualProviderKey ?? AppState.currentProviderKey;

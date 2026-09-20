@@ -35,6 +35,51 @@ npm run lint      # Run linter & formatter
 npm run typecheck # TypeScript type check
 ```
 
+### Working on the renderer
+
+The lyrics renderer and the format parsers live in their own repo,
+[braccato](https://github.com/better-lyrics/braccato), and get pulled in here as the published
+`@braccato/core` and `@braccato/parsers` packages.
+
+For most renderer work you don't need this extension at all. braccato ships a demo page with Vite and
+hot reload, so run `pnpm -C demo dev`, open `http://localhost:5173/`, and timing or CSS changes show
+up as you type. Come back here when you need to check the parts the demo can't show you: the lyrics
+tab, fullscreen, the floating window, a real song's timings.
+
+For that, symlink your local checkout over the installed copy. Build braccato and register the link:
+
+```bash
+git clone https://github.com/better-lyrics/braccato.git
+cd braccato
+pnpm install
+pnpm build:packages
+cd packages/core && npm link   # or packages/parsers
+```
+
+Then point this repo at it:
+
+```bash
+cd better-lyrics
+npm link @braccato/core
+npm run dev
+```
+
+`npm run dev` opens Chrome on YouTube Music with the extension loaded. The link lives only in
+`node_modules`, so `package.json` and `package-lock.json` stay clean and it can't sneak into a commit.
+
+After each edit to the renderer, rebuild braccato so the extension has something new to pick up:
+
+```bash
+pnpm build:packages
+```
+
+That rebuild on its own won't reload anything, because the dev server ignores every path with `dist`
+in it and that's where the linked package's output lands. Save any file in `src/` afterwards and the
+resulting rebuild will pull in the fresh package output.
+
+When you're done, `npm install` puts the published copy back. Avoid `npm unlink`, which removes the
+dependency from `package.json` instead of just dropping the symlink.
+
 ## Code Guidelines
 
 ### Imports

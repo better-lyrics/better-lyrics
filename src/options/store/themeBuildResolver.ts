@@ -1,21 +1,28 @@
-import { LOG_PREFIX_STORE } from "@constants";
 import type { ThemeBuild } from "./types";
+import { warnStore } from "@core/logger";
 
-function parseVersion(version: string): number[] {
+function parseVersionParts(version: string): number[] {
   const cleanVersion = version.replace(/-.*$/, "");
   return cleanVersion.split(".").map(part => {
     const num = parseInt(part, 10);
     if (isNaN(num)) {
-      console.warn(LOG_PREFIX_STORE, `Non-numeric version part "${part}" in "${version}", treating as 0`);
+      warnStore(`Non-numeric version part "${part}" in "${version}", treating as 0`);
       return 0;
     }
     return num;
   });
 }
 
-function compareVersions(current: string, required: string): boolean {
-  const currentParts = parseVersion(current);
-  const requiredParts = parseVersion(required);
+function canaryOrdinal(parts: number[]): number | null {
+  const ordinal = parts[3] ?? 0;
+  return ordinal === 0 ? null : ordinal;
+}
+
+// -- Theme build versions --------------------------
+
+function isThemeVersionAtLeast(current: string, required: string): boolean {
+  const currentParts = parseVersionParts(current);
+  const requiredParts = parseVersionParts(required);
 
   const maxLength = Math.max(currentParts.length, requiredParts.length);
 
@@ -30,8 +37,33 @@ function compareVersions(current: string, required: string): boolean {
   return true;
 }
 
+// -- Extension versions --------------------------
+
+export function compareExtensionVersions(a: string, b: string): number {
+  const partsA = parseVersionParts(a);
+  const partsB = parseVersionParts(b);
+
+  for (let i = 0; i < 3; i++) {
+    const releaseA = partsA[i] ?? 0;
+    const releaseB = partsB[i] ?? 0;
+    if (releaseA !== releaseB) return releaseA - releaseB;
+  }
+
+  const canaryA = canaryOrdinal(partsA);
+  const canaryB = canaryOrdinal(partsB);
+
+  if (canaryA === canaryB) return 0;
+  if (canaryA === null) return 1;
+  if (canaryB === null) return -1;
+  return canaryA - canaryB;
+}
+
+export function isCanaryVersion(version: string): boolean {
+  return canaryOrdinal(parseVersionParts(version)) !== null;
+}
+
 export function isVersionCompatible(themeMinVersion: string, extensionVersion: string): boolean {
-  return compareVersions(extensionVersion, themeMinVersion);
+  return compareExtensionVersions(extensionVersion, themeMinVersion) >= 0;
 }
 
 /**
@@ -44,7 +76,7 @@ export function resolveBuildForVersion(builds: ThemeBuild[], extensionVersion: s
 
   for (const candidate of builds) {
     if (!isVersionCompatible(candidate.minVersion, extensionVersion)) continue;
-    if (best === null || compareVersions(candidate.version, best.version)) {
+    if (best === null || isThemeVersionAtLeast(candidate.version, best.version)) {
       best = candidate;
     }
   }

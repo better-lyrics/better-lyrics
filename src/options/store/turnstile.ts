@@ -1,4 +1,5 @@
-import { LOG_PREFIX_STORE, THEME_STORE_TURNSTILE_URL } from "@constants";
+import { THEME_STORE_TURNSTILE_URL } from "@constants";
+import { errorStore, logStore } from "@core/logger";
 
 // -- Types ------------------------------------
 
@@ -89,13 +90,13 @@ function handleMessage(event: MessageEvent): void {
   if (!data || typeof data !== "object") return;
 
   if (data.type === "turnstile-token" && data.token) {
-    console.log(LOG_PREFIX_STORE, "Received Turnstile token");
+    logStore("Received Turnstile token");
     if (pendingResolve) {
       pendingResolve(data.token);
     }
     cleanupTurnstile();
   } else if (data.type === "turnstile-error") {
-    console.error(LOG_PREFIX_STORE, "Turnstile error:", data.error);
+    errorStore("Turnstile error:", data.error);
     if (pendingReject) {
       pendingReject(new Error(data.error ?? "Turnstile verification failed"));
     }

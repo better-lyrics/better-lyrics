@@ -8,17 +8,20 @@
  * @param {Object} [request.settings] - Settings object for updateSettings action
  * @returns {boolean} Returns true to indicate asynchronous response
  */
-import { LOG_PREFIX_BACKGROUND } from "@constants";
-import { getLocalStorage, getSyncStorage } from "@core/storage";
+
+import { buildStoreThemeContent, saveCustomCss } from "@core/customCss";
+import { getAppliedStoreThemeId, getLocalStorage, getSyncStorage } from "@core/storage";
 import { initBackgroundAuth } from "@modules/auth/backgroundAuth";
 import {
   getInstalledStoreThemes,
+  getInstalledTheme,
   installSymlinkedThemeFromMarketplace,
   performSilentUpdates,
   performUrlThemeUpdates,
   setActiveStoreTheme,
 } from "./store/themeStoreManager";
 import { fetchAllStoreThemes } from "./store/themeStoreService";
+import { logBackground, warnBackground } from "@core/logger";
 
 const THEME_UPDATE_ALARM = "theme-update-check";
 const UPDATE_INTERVAL_MINUTES = 360; // 6 hours
@@ -34,21 +37,6 @@ const SYMLINKED_THEME_MAP: Record<string, string> = {
   "Apple Music": "apple-music",
 };
 
-const SYNC_STORAGE_LIMIT = 7000;
-
-async function saveThemeCSS(css: string, title: string, creators: string[]): Promise<void> {
-  const themeContent = `/* ${title}, a marketplace theme by ${creators.join(", ")} */\n\n${css}\n`;
-  const cssSize = new Blob([themeContent]).size;
-
-  if (cssSize <= SYNC_STORAGE_LIMIT) {
-    await chrome.storage.sync.set({ customCSS: themeContent, cssStorageType: "sync", cssCompressed: false });
-  } else {
-    await chrome.storage.local.set({ customCSS: themeContent, cssCompressed: false });
-    await chrome.storage.sync.set({ cssStorageType: "local", cssCompressed: false });
-    await chrome.storage.sync.remove("customCSS");
-  }
-}
-
 async function migrateSymlinkedThemes(): Promise<void> {
   try {
     const result = await getLocalStorage<{ [SYMLINKED_MIGRATION_KEY]?: number }>([SYMLINKED_MIGRATION_KEY]);
@@ -60,7 +48,7 @@ async function migrateSymlinkedThemes(): Promise<void> {
     if (themeName && !themeName.startsWith("store:")) {
       const storeId = SYMLINKED_THEME_MAP[themeName];
       if (storeId) {
-        console.log(LOG_PREFIX_BACKGROUND, `Migrating symlinked theme: ${themeName} → store:${storeId}`);
+        logBackground(`Migrating symlinked theme: ${themeName} → store:${storeId}`);
         await chrome.storage.sync.set({ themeName: `store:${storeId}` });
         await setActiveStoreTheme(storeId);
         const installed = await installSymlinkedThemeFromMarketplace(storeId);
@@ -69,14 +57,43 @@ async function migrateSymlinkedThemes(): Promise<void> {
           await chrome.storage.sync.remove("activeStoreTheme");
           return;
         }
-        await saveThemeCSS(installed.css, installed.title, installed.creators);
-        console.log(LOG_PREFIX_BACKGROUND, `Migrated active theme: ${themeName} → store:${storeId}`);
+        await saveCustomCss(buildStoreThemeContent(installed.title, installed.creators, installed.css));
+        logBackground(`Migrated active theme: ${themeName} → store:${storeId}`);
       }
     }
 
     await chrome.storage.local.set({ [SYMLINKED_MIGRATION_KEY]: SYMLINKED_MIGRATION_VERSION });
   } catch (err) {
-    console.warn(LOG_PREFIX_BACKGROUND, "Symlinked themes migration failed:", err);
+    warnBackground("Symlinked themes migration failed:", err);
+  }
+}
+
+// -- Applied Theme CSS Resync --------------------------
+
+const THEME_CSS_RESYNC_KEY = "appliedThemeCssResyncVersion";
+const THEME_CSS_RESYNC_VERSION = 1;
+
+/** Heals installs that auto-updated before the write path was fixed. */
+async function resyncAppliedThemeCss(): Promise<void> {
+  try {
+    const stored = await getLocalStorage<{ [THEME_CSS_RESYNC_KEY]?: number }>([THEME_CSS_RESYNC_KEY]);
+    if ((stored[THEME_CSS_RESYNC_KEY] ?? 0) >= THEME_CSS_RESYNC_VERSION) return;
+
+    const themeId = await getAppliedStoreThemeId();
+    const theme = themeId ? await getInstalledTheme(themeId) : null;
+
+    if (theme?.css) {
+      const result = await saveCustomCss(buildStoreThemeContent(theme.title, theme.creators, theme.css));
+      if (!result.success) {
+        warnBackground(`Failed to resync applied theme: ${theme.title}`, result.error);
+        return;
+      }
+      logBackground(`Resynced applied theme: ${theme.title} v${theme.version}`);
+    }
+
+    await chrome.storage.local.set({ [THEME_CSS_RESYNC_KEY]: THEME_CSS_RESYNC_VERSION });
+  } catch (err) {
+    warnBackground("Applied theme resync failed:", err);
   }
 }
 
@@ -85,17 +102,17 @@ async function checkAndApplyThemeUpdates(): Promise<void> {
     const installed = await getInstalledStoreThemes();
     if (installed.length === 0) return;
 
-    console.log(LOG_PREFIX_BACKGROUND, "Checking for theme updates...");
+    logBackground("Checking for theme updates...");
     const storeThemes = await fetchAllStoreThemes();
     const marketplaceUpdatedIds = await performSilentUpdates(storeThemes);
     const urlUpdatedIds = await performUrlThemeUpdates();
     const updatedIds = [...marketplaceUpdatedIds, ...urlUpdatedIds];
 
     if (updatedIds.length > 0) {
-      console.log(LOG_PREFIX_BACKGROUND, `Updated ${updatedIds.length} theme(s):`, updatedIds.join(", "));
+      logBackground(`Updated ${updatedIds.length} theme(s):`, updatedIds.join(", "));
     }
   } catch (err) {
-    console.warn(LOG_PREFIX_BACKGROUND, "Theme update check failed:", err);
+    warnBackground("Theme update check failed:", err);
   }
 }
 
@@ -106,7 +123,7 @@ function setupThemeUpdateAlarm(): void {
         delayInMinutes: 1,
         periodInMinutes: UPDATE_INTERVAL_MINUTES,
       });
-      console.log(LOG_PREFIX_BACKGROUND, "Theme update alarm created");
+      logBackground("Theme update alarm created");
     }
   });
 }
@@ -114,12 +131,14 @@ function setupThemeUpdateAlarm(): void {
 chrome.runtime.onInstalled.addListener(async () => {
   setupThemeUpdateAlarm();
   await migrateSymlinkedThemes();
+  await resyncAppliedThemeCss();
   checkAndApplyThemeUpdates();
 });
 
 chrome.runtime.onStartup.addListener(async () => {
   setupThemeUpdateAlarm();
   await migrateSymlinkedThemes();
+  await resyncAppliedThemeCss();
   checkAndApplyThemeUpdates();
 });
 
@@ -135,7 +154,7 @@ chrome.runtime.onMessage.addListener(request => {
       tabs.forEach(tab => {
         if (tab.id != null) {
           chrome.tabs.sendMessage(tab.id, { action: "applyStyles", ricsSource: request.ricsSource }).catch(err => {
-            console.warn(LOG_PREFIX_BACKGROUND, `Failed to send message to tab ${tab.id}:`, err);
+            warnBackground(`Failed to send message to tab ${tab.id}:`, err);
           });
         }
       });

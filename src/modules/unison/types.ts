@@ -1,9 +1,19 @@
 // -- API Response Types --------------------------
 
+export interface Mark {
+  type: string;
+  label: string;
+  icon: string;
+  by?: { keyId: string; displayName: string; tier?: string | null };
+  at?: number;
+}
+
 export interface UnisonSubmitter {
   keyId: string;
   reputation: number;
   displayName: string;
+  tier?: string | null;
+  level?: number;
 }
 
 export interface UnisonFulfillment {
@@ -29,6 +39,7 @@ export interface UnisonLyricsEntry {
   confidence: UnisonConfidence;
   submitter?: UnisonSubmitter;
   fulfilled?: UnisonFulfillment;
+  marks?: Mark[];
   userVote?: 1 | -1 | null;
 }
 
@@ -66,6 +77,7 @@ export interface UnisonFeedEntry {
   voteCount: number;
   confidence: UnisonConfidence;
   createdAt: number;
+  marks?: Mark[];
   userVote?: 1 | -1 | null;
 }
 

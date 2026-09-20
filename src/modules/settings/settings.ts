@@ -1,18 +1,20 @@
 import {
+  DISABLE_EFFECTS_STYLE_ID,
   DOCK_CLASS,
   DOCK_CONTROL_ORDER_DEFAULT,
   DOCK_DEFAULT_POSITION,
-  LOG_PREFIX_CONTENT,
+  FULLSCREEN_CONTROLS_DISABLED_ATTR,
   LYRICS_DISABLED_ATTR,
 } from "@constants";
 import { AppState, reloadLyrics } from "@core/appState";
 import { clearCache, compileRicsToStyles, getStorage } from "@core/storage";
-import { log, setUpLog } from "@core/utils";
-import { calculateLyricPositions } from "@modules/lyrics/injectLyrics";
+import { configureLogging, logContent } from "@core/logger";
 import { clearCache as clearTranslationCache } from "@modules/lyrics/translation";
 import { mountDock, mountVotingSegment, reloadAlbumArt, unmountDock, updateDockPosition } from "@modules/ui/dom";
 import { applyGlobalOffsets } from "@modules/ui/lyricsDock/offset";
+import { mainView } from "@modules/ui/mainLyricsView";
 import { isPlayerFullscreened, onFullscreenChange } from "@modules/ui/observer";
+import { publishPictureInPictureLyrics } from "@modules/ui/pictureInPicture/lyricsPublisher";
 import { applyCustomStyles, getAndApplyCustomStyles } from "@modules/ui/styleInjector";
 
 let hasInitializedMessageListener = false;
@@ -23,6 +25,12 @@ type EnableDisableCallback = () => void;
  * Handles settings initialization and applies user preferences.
  * Sets up fullscreen behavior, animations, and other settings.
  */
+export function applyLoggingSetting(): void {
+  getStorage({ isLogsEnabled: true }, items => {
+    configureLogging(items.isLogsEnabled !== false);
+  });
+}
+
 export function handleSettings(): void {
   onFullScreenDisabled(
     () => {
@@ -45,18 +53,20 @@ export function handleSettings(): void {
     }
   );
 
+  onFullscreenControlsEnabled(
+    () => document.documentElement.removeAttribute(FULLSCREEN_CONTROLS_DISABLED_ATTR),
+    () => document.documentElement.setAttribute(FULLSCREEN_CONTROLS_DISABLED_ATTR, "")
+  );
+
   onStylizedAnimationsEnabled(
     () => {
-      let styleElm = document.getElementById("blyrics-disable-effects");
-      if (styleElm) {
-        styleElm.remove();
-      }
+      document.getElementById(DISABLE_EFFECTS_STYLE_ID)?.remove();
     },
     async () => {
-      let styleElem = document.getElementById("blyrics-disable-effects");
+      let styleElem = document.getElementById(DISABLE_EFFECTS_STYLE_ID);
       if (!styleElem) {
         styleElem = document.createElement("style");
-        styleElem.id = "blyrics-disable-effects";
+        styleElem.id = DISABLE_EFFECTS_STYLE_ID;
 
         styleElem.textContent = await fetch(chrome.runtime.getURL("css/disablestylizedanimations.css")).then(res =>
           res.text()
@@ -94,6 +104,19 @@ export function onAlbumArtEnabled(enableAlbumArt: EnableDisableCallback, disable
       enableAlbumArt();
     } else {
       disableAlbumArt();
+    }
+  });
+}
+
+function onFullscreenControlsEnabled(
+  enableControls: EnableDisableCallback,
+  disableControls: EnableDisableCallback
+): void {
+  getStorage({ isFullscreenControlsEnabled: true }, items => {
+    if (items.isFullscreenControlsEnabled) {
+      enableControls();
+    } else {
+      disableControls();
     }
   });
 }
@@ -206,25 +229,25 @@ export function listenForPopupMessages(): void {
   hasInitializedMessageListener = true;
 
   chrome.runtime.onMessage.addListener((request, _, sendResponse) => {
-    log(LOG_PREFIX_CONTENT, "Received message:", request.action);
+    logContent("Received message:", request.action);
     if (request.action === "applyStyles") {
-      log(LOG_PREFIX_CONTENT, "Processing applyStyles, RICS length:", request.ricsSource?.length);
+      logContent("Processing applyStyles, RICS length:", request.ricsSource?.length);
       if (request.ricsSource) {
-        log(LOG_PREFIX_CONTENT, "Compiling RICS and applying styles");
+        logContent("Compiling RICS and applying styles");
         const compiledCSS = compileRicsToStyles(request.ricsSource);
         applyCustomStyles(compiledCSS);
-        calculateLyricPositions();
-        log(LOG_PREFIX_CONTENT, "Styles applied successfully");
+        mainView.relayout();
+        logContent("Styles applied successfully");
       } else {
-        log(LOG_PREFIX_CONTENT, "Loading styles from storage");
+        logContent("Loading styles from storage");
         getAndApplyCustomStyles().then(() => {
-          calculateLyricPositions();
-          log(LOG_PREFIX_CONTENT, "Styles loaded from storage and applied");
+          mainView.relayout();
+          logContent("Styles loaded from storage and applied");
         });
       }
     } else if (request.action === "updateSettings") {
       clearTranslationCache();
-      setUpLog();
+      applyLoggingSetting();
       hideCursorOnIdle();
       handleSettings();
       loadTranslationSettings();
@@ -245,6 +268,7 @@ export function listenForPopupMessages(): void {
           reloadAlbumArt();
         }
       );
+      getAndApplyCustomStyles();
       reloadLyrics();
     } else if (request.action === "clearCache") {
       try {
@@ -262,6 +286,9 @@ export function listenForPopupMessages(): void {
 export function loadPassiveScrollSetting(): void {
   getStorage({ isPassiveScrollEnabled: true }, items => {
     AppState.isPassiveScrollEnabled = items.isPassiveScrollEnabled;
+    // The side panel reads this off AppState every tick. The floating window only sees the copy
+    // that rode over on the last payload, so a change reaches it on a republish or not at all.
+    publishPictureInPictureLyrics();
   });
 }
 
@@ -290,6 +317,7 @@ export function loadDockSettings(callback?: () => void): void {
       "isDockTranslateEnabled",
       "isDockRomanizeEnabled",
       "isDockOffsetEnabled",
+      "isDockRefreshEnabled",
       "isDockPictureInPictureEnabled",
       "isDockDownloadLRCEnabled",
       "dockControlsOrder",
@@ -305,6 +333,7 @@ export function loadDockSettings(callback?: () => void): void {
       AppState.isDockTranslateEnabled = items.isDockTranslateEnabled ?? true;
       AppState.isDockRomanizeEnabled = items.isDockRomanizeEnabled ?? true;
       AppState.isDockOffsetEnabled = items.isDockOffsetEnabled ?? true;
+      AppState.isDockRefreshEnabled = items.isDockRefreshEnabled ?? false;
       AppState.isDockPictureInPictureEnabled = items.isDockPictureInPictureEnabled ?? true;
       AppState.isDockDownloadLRCEnabled = items.isDockDownloadLRCEnabled ?? true;
       AppState.dockControlsOrder = normalizeDockControlsOrder(items.dockControlsOrder);
@@ -408,6 +437,12 @@ export function loadTranslationSettings(): void {
       AppState.translationDisabledLanguages = items.translationDisabledLanguages || [];
     }
   );
+}
+
+export function loadEndTimeModeSetting(): void {
+  getStorage({ endTimeMode: "total" }, items => {
+    AppState.endTimeMode = items.endTimeMode === "remaining" ? "remaining" : "total";
+  });
 }
 
 /**

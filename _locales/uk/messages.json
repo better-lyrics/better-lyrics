@@ -83,12 +83,32 @@
     "message": "Розмитий фон з обкладинки альбому",
     "description": "Show album art background setting label"
   },
+  "options_display_fullscreenControls": {
+    "message": "Елементи керування в повноекранному режимі",
+    "description": "Toggle label for the playback controls strip (progress bar, transport, like and dislike) shown under the album art in the fullscreen lyrics view"
+  },
   "options_display_stylizedAnimations": {
     "message": "Стилізовані анімації",
     "description": "Show stylized animations setting label"
   },
+  "options_display_letterWave": {
+    "message": "Хвилювання літер",
+    "description": "Label for the per-letter wave lyric animation toggle"
+  },
+  "options_display_letterWaveBadge": {
+    "message": "Експеримент",
+    "description": "Badge shown next to the letter wave setting marking it as experimental"
+  },
+  "options_display_letterWaveTooltip": {
+    "message": "Текст стає живішим завдяки плавному руху кожної літери під час співу. Вимкніть це, якщо прокручування тексту на вашому пристрої виглядає рваною.",
+    "description": "Tooltip explaining the letter wave animation and its performance impact"
+  },
+  "options_display_letterWaveTooltipStates": {
+    "message": "Автоматично вимкнено, якщо не ввімкнено темою. Ручне вмикання чи вимикання ігнорує всі теми.",
+    "description": "Appended to the letter wave tooltip, explaining the three switch states"
+  },
   "options_display_passiveScroll": {
-    "message": "Автопрокрутка текстів пісень",
+    "message": "Прокручування несинхронізованих текстів",
     "description": "Auto-scroll unsynced lyrics setting label"
   },
   "picture_in_picture_open": {
@@ -111,8 +131,12 @@
     "message": "Далі",
     "description": "Accessible label for the next track button in the Picture-in-Picture lyrics window, used when the YouTube Music player bar exposes no label of its own"
   },
+  "options_display_pipEnabled": {
+    "message": "Увімкнути плавуче вікно",
+    "description": "Master toggle for the floating lyrics window feature, which turns it off everywhere including the YouTube Music minimize button"
+  },
   "options_display_pipAutoRestore": {
-    "message": "Автоматично відкривати плавуче вікно текстів",
+    "message": "Автоматично відкривати вікно",
     "description": "Setting label for automatically reopening the floating lyrics window after page load"
   },
   "options_display_pipAutoRestoreTooltip": {
@@ -154,6 +178,10 @@
   "options_display_pipMarquee": {
     "message": "Прогортувати довгі назви",
     "description": "Toggle label for whether a song title too long for the floating lyrics window scrolls across so it can be read in full"
+  },
+  "options_display_pipProgressBar": {
+    "message": "Показувати смужку прогресу",
+    "description": "Toggle label, shown inside the floating lyrics window settings, for the seekable playback progress bar under the album art"
   },
   "options_display_shadersPromo": {
     "message": "Показати посилання на Better Lyrics Shaders",
@@ -231,6 +259,10 @@
     "message": "Вибір джерела тексту",
     "description": "Accessible label for the lyrics dock button that opens the source provider dropdown"
   },
+  "lyricsDock_refresh": {
+    "message": "Перезавантажити текст",
+    "description": "Accessible label for the lyrics dock button that re-fetches lyrics for the current song, bypassing the cache"
+  },
   "lyricsDock_previousSource": {
     "message": "Попереднє джерело",
     "description": "Accessible label for the lyrics dock button that switches to the previous lyrics provider"
@@ -296,7 +328,7 @@
     "description": "Translation language setting label"
   },
   "options_sources_title": {
-    "message": "Пріоритет джерел текстів пісень",
+    "message": "Пріоритет джерел текстів",
     "description": "Sources settings section title"
   },
   "options_sources_description": {
@@ -337,14 +369,18 @@
   },
   "options_themes_create": {
     "message": "Створити",
-    "description": "Create button label"
+    "description": "Button to open the style editor if there are no styles"
+  },
+  "options_themes_edit": {
+    "message": "Редагувати",
+    "description": "Button to open the style editor"
   },
   "options_themes_marketplace": {
     "message": "Магазин тем",
     "description": "Theme marketplace button label"
   },
   "options_themes_installedThemes": {
-    "message": "Встановлені теми",
+    "message": "Установлені теми",
     "description": "Installed themes button label"
   },
   "options_identity_title": {
@@ -362,6 +398,10 @@
   "options_identity_yourIdentity": {
     "message": "Ваш ідентифікатор",
     "description": "Your identity label"
+  },
+  "options_identity_unisonStats": {
+    "message": "Статистика Unison",
+    "description": "Section title above the user's own Unison level, tier, rank and badges on the Identity tab"
   },
   "options_identity_loading": {
     "message": "Завантаження...",
@@ -412,11 +452,11 @@
     "description": "Nickname save button label"
   },
   "options_nickname_reset": {
-    "message": "Скинути до типових",
+    "message": "Скинути",
     "description": "Nickname reset button label"
   },
   "options_nickname_modalTitle": {
-    "message": "Встановити псевдонім",
+    "message": "Установити псевдонім",
     "description": "Nickname modal title"
   },
   "options_nickname_edit": {
@@ -740,7 +780,7 @@
     "description": "Filter for compatible themes"
   },
   "marketplace_installFromUrl": {
-    "message": "Установити з URL-адреси",
+    "message": "Установити з посилання",
     "description": "Install from URL button"
   },
   "marketplace_submitTheme": {
@@ -788,7 +828,7 @@
     "description": "GitHub badge text"
   },
   "marketplace_urlModalTitle": {
-    "message": "Встановити з URL-адреси",
+    "message": "Установити з посилання",
     "description": "URL install modal title"
   },
   "marketplace_urlModalMessage": {
@@ -816,7 +856,7 @@
     "description": "URL permission explanation title"
   },
   "marketplace_urlPermissionDesc": {
-    "message": "Для встановлення тем із користувацьких URL GitHub Better Lyrics потрібні розширені дозволи. Це дає змогу:",
+    "message": "Для встановлення тем із власних GitHub-посилань Better Lyrics потрібні розширені дозволи. Це дає змогу:",
     "description": "URL permission description"
   },
   "marketplace_urlPermissionItem1": {
@@ -828,7 +868,7 @@
     "description": "URL permission list item 2"
   },
   "marketplace_urlPermissionItem3": {
-    "message": "Перевіряти структуру теми перед встановленням",
+    "message": "Перевіряти структуру теми перед установленням",
     "description": "URL permission list item 3"
   },
   "marketplace_urlPermissionNote": {
@@ -852,7 +892,7 @@
     "description": "Refresh shortcut label"
   },
   "marketplace_shortcutsInstallUrl": {
-    "message": "Встановити з URL-адреси",
+    "message": "Установити з посилання",
     "description": "Install from URL shortcut label"
   },
   "marketplace_shortcutsSort": {
@@ -976,7 +1016,7 @@
     "description": "Footer link in the theme detail modal that opens the theme's discussion thread"
   },
   "marketplace_commit": {
-    "message": "Закомітити $hash$",
+    "message": "Комміт $hash$",
     "description": "Footer chip in the theme detail modal linking to the exact source commit a theme was built from",
     "placeholders": {
       "hash": {
@@ -1169,29 +1209,27 @@
     "message": "Не вдалося встановити тему. Перевірте з’єднання та повторіть спробу.",
     "description": "Alert when a symlinked theme fails to install from marketplace"
   },
-  "symlink_badge_marketplace": {
-    "message": "Магазин тем",
-    "description": "Badge text on symlinked theme cards"
+  "theme_top_badge": {
+    "message": "№$RANK$ в магазині",
+    "description": "Tooltip on a featured theme's rank medal",
+    "placeholders": {
+      "rank": {
+        "content": "$1",
+        "example": "1"
+      }
+    }
   },
-  "symlink_badge_bundled": {
-    "message": "Вбудована",
-    "description": "Badge text on non-symlinked built-in theme cards"
+  "theme_modal_section_featured": {
+    "message": "Рекомендовані теми",
+    "description": "Section title for featured themes (top marketplace picks and built-ins) in the theme chooser modal"
   },
-  "deprecation_builtin_title": {
-    "message": "Увага: ці теми переміщуються!",
-    "description": "Title for the built-in themes deprecation banner in theme modal"
+  "theme_modal_section_all": {
+    "message": "Усі теми",
+    "description": "Section title for the user's installed marketplace themes in the theme chooser modal"
   },
-  "deprecation_builtin_body": {
-    "message": "Ми переносимо вбудовані теми до магазину тем. Деякі — вже там (шукайте позначку «Магазин тем»). Інші ж, з’являться в наступному оновленні, а резервні копії CSS будуть доступні на GitHub і в Discord.",
-    "description": "Body text for the built-in themes deprecation banner"
-  },
-  "deprecation_builtin_cta": {
+  "theme_modal_browse": {
     "message": "Огляд магазину",
-    "description": "CTA button text in the deprecation banner to open the marketplace"
-  },
-  "theme_modal_section_builtin": {
-    "message": "Вбудовані теми",
-    "description": "Section title for built-in themes in the theme chooser modal"
+    "description": "Link in the theme chooser modal that opens the full Theme Marketplace page"
   },
   "theme_modal_section_custom": {
     "message": "Користувацькі теми",
@@ -1250,7 +1288,7 @@
     "description": "Shown in the sign-in consent popup when the connection to the extension's service worker is lost before the user can approve or cancel."
   },
   "lyrics_requestSyncedVersion": {
-    "message": "Запит синхронізованої версії",
+    "message": "Запросити синхронізовану версію",
     "description": "Button label asking the community to contribute synced lyrics for the current song"
   },
   "lyrics_requestedFirst": {
@@ -1258,11 +1296,11 @@
     "description": "Button label after a successful first-ever request for this song"
   },
   "lyrics_requestedOneOther": {
-    "message": "Запит створено · ще 1 особа хоче цього",
+    "message": "Запит створено · ще 1 користувач очікує",
     "description": "Button label after a successful request when exactly one other person has also requested"
   },
   "lyrics_requestedNOthers": {
-    "message": "Запит створено · ще $N$ осіб хочуть цього",
+    "message": "Запит створено · ще $N$ користувачів очікують",
     "description": "Button label after a successful request when N other people have also requested",
     "placeholders": {
       "n": {
@@ -1693,21 +1731,47 @@
     "message": "Щось пішло не так. Можливо, спробуйте ще раз?",
     "description": "Shown when a lyrics report fails to submit"
   },
-  "unison_tier_new": {
-    "message": "новачок",
-    "description": "Trust tier badge for low-reputation Unison submitters"
+  "unison_level": {
+    "message": "Рівень $level$",
+    "description": "Shows a Unison contributor's numeric level. $level$ is a positive integer",
+    "placeholders": {
+      "level": {
+        "content": "$1",
+        "example": "6"
+      }
+    }
   },
-  "unison_tier_trusted": {
-    "message": "надійний",
-    "description": "Trust tier badge for mid-reputation Unison submitters"
+  "unison_xpToNext": {
+    "message": "$xp$ ОД до рівня $level$",
+    "description": "Explains how much experience remains before the next Unison level. $xp$ is a positive integer, $level$ is the next level number",
+    "placeholders": {
+      "xp": {
+        "content": "$1",
+        "example": "436"
+      },
+      "level": {
+        "content": "$2",
+        "example": "7"
+      }
+    }
   },
-  "unison_tier_veteran": {
-    "message": "ветеран",
-    "description": "Trust tier badge for high-reputation Unison submitters"
+  "unison_maxLevel": {
+    "message": "Максимальний рівень",
+    "description": "Shown in place of the XP-to-next text when a Unison contributor is at the highest level"
   },
-  "unison_tier_expert": {
-    "message": "експерт",
-    "description": "Trust tier badge for top-reputation Unison submitters"
+  "unison_rank": {
+    "message": "Позиція №$rank$",
+    "description": "Shows a Unison contributor's leaderboard rank within their tier. $rank$ is a positive integer",
+    "placeholders": {
+      "rank": {
+        "content": "$1",
+        "example": "1"
+      }
+    }
+  },
+  "unison_viewProfile": {
+    "message": "Повний профіль",
+    "description": "Link on the Identity tab that opens the user's full Unison profile in a new tab"
   },
   "unison_submitted_this": {
     "message": "подав цей текст",

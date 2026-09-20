@@ -1,5 +1,4 @@
-import { LOG_PREFIX } from "@constants";
-import { log } from "@utils";
+import { logCore } from "@core/logger";
 
 const NATIVE_LYRICS_SHELF_SELECTOR = "#tab-renderer ytmusic-description-shelf-renderer";
 const NATIVE_LYRICS_HEADER_SELECTOR =
@@ -51,7 +50,7 @@ function handleMutations(mutations: MutationRecord[]): void {
     return;
   }
 
-  log(LOG_PREFIX, "Native lyrics focus observer fired", { mutationCount: mutations.length });
+  logCore("Native lyrics focus observer fired", { mutationCount: mutations.length });
   scheduleApply();
 }
 

@@ -1,7 +1,8 @@
-import { AUTH_MESSAGE_TYPES, AUTH_PORT_NAME_PREFIX, BL_AUTH_SITE_PORT_NAME, LOG_PREFIX_AUTH } from "@constants";
+import { AUTH_MESSAGE_TYPES, AUTH_PORT_NAME_PREFIX, BL_AUTH_SITE_PORT_NAME } from "@constants";
 import { signPayload } from "@core/keyIdentity";
 import { isApproved, pruneExpired, rememberApproval } from "@modules/auth/approvedOrigins";
 import { isAllowedAuthOrigin } from "@modules/auth/partners";
+import { warnAuth } from "@core/logger";
 
 interface AuthRequest {
   type: typeof AUTH_MESSAGE_TYPES.REQUEST;
@@ -63,11 +64,11 @@ function resolveSlot(slot: PendingRequest, requestId: string, response: External
     slot.sitePort.disconnect();
     slot.popupPort?.disconnect();
   } catch (err) {
-    console.warn(LOG_PREFIX_AUTH, "site port post failed", err);
+    warnAuth("site port post failed", err);
   }
 
   if (slot.windowId !== null) {
-    chrome.windows.remove(slot.windowId).catch(err => console.warn(LOG_PREFIX_AUTH, "window remove failed", err));
+    chrome.windows.remove(slot.windowId).catch(err => warnAuth("window remove failed", err));
   }
 }
 
@@ -76,7 +77,7 @@ async function signFor(request: AuthRequest): Promise<ExternalResponse> {
     const signedBody = await signPayload({ origin: request.origin }, { nonce: request.nonce });
     return { ok: true, signedBody };
   } catch (err) {
-    console.warn(LOG_PREFIX_AUTH, "sign failed", err);
+    warnAuth("sign failed", err);
     return { ok: false, reason: "SIGN_FAILED" };
   }
 }
@@ -97,7 +98,7 @@ async function openConsentPopup(requestId: string, request: AuthRequest): Promis
     });
     return win?.id ?? null;
   } catch (err) {
-    console.warn(LOG_PREFIX_AUTH, "popup open failed", err);
+    warnAuth("popup open failed", err);
     return null;
   }
 }
@@ -120,7 +121,7 @@ async function handlePortMessage(requestId: string, slot: PendingRequest, msg: P
 // -- Public API --------------------------
 
 export function initBackgroundAuth(): void {
-  pruneExpired().catch(err => console.warn(LOG_PREFIX_AUTH, "pruneExpired failed", err));
+  pruneExpired().catch(err => warnAuth("pruneExpired failed", err));
 
   chrome.runtime.onConnectExternal.addListener(sitePort => {
     if (sitePort.name !== BL_AUTH_SITE_PORT_NAME) {
@@ -160,7 +161,7 @@ export function initBackgroundAuth(): void {
             sitePort.postMessage(signed);
             sitePort.disconnect();
           } catch (err) {
-            console.warn(LOG_PREFIX_AUTH, "site port post failed", err);
+            warnAuth("site port post failed", err);
           }
           return;
         }
@@ -173,7 +174,7 @@ export function initBackgroundAuth(): void {
           return;
         }
         if (!siteConnected) {
-          chrome.windows.remove(windowId).catch(err => console.warn(LOG_PREFIX_AUTH, "window remove failed", err));
+          chrome.windows.remove(windowId).catch(err => warnAuth("window remove failed", err));
           return;
         }
 
@@ -185,7 +186,7 @@ export function initBackgroundAuth(): void {
           windowId,
           resolved: false,
         });
-      })().catch(err => console.warn(LOG_PREFIX_AUTH, "site port handler failed", err));
+      })().catch(err => warnAuth("site port handler failed", err));
     });
 
     sitePort.onDisconnect.addListener(() => {
@@ -196,9 +197,7 @@ export function initBackgroundAuth(): void {
           pending.delete(requestId);
           slot.popupPort?.disconnect();
           if (slot.windowId !== null) {
-            chrome.windows
-              .remove(slot.windowId)
-              .catch(err => console.warn(LOG_PREFIX_AUTH, "window remove failed", err));
+            chrome.windows.remove(slot.windowId).catch(err => warnAuth("window remove failed", err));
           }
           return;
         }
@@ -219,9 +218,7 @@ export function initBackgroundAuth(): void {
 
     port.onMessage.addListener(msg => {
       if (!isValidPortMessage(msg)) return;
-      void handlePortMessage(requestId, slot, msg).catch(err =>
-        console.warn(LOG_PREFIX_AUTH, "port message handler failed", err)
-      );
+      void handlePortMessage(requestId, slot, msg).catch(err => warnAuth("port message handler failed", err));
     });
 
     port.onDisconnect.addListener(() => {

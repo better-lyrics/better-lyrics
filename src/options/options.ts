@@ -3,18 +3,29 @@
 import {
   DOCK_CONTROL_ORDER_DEFAULT,
   DOCK_DEFAULT_POSITION,
-  LOG_PREFIX,
   ROMANIZATION_LANGUAGES,
   UNISON_API_BASE_URL,
 } from "@constants";
 import { attachHoldRepeat } from "@core/holdRepeat";
 import { getLanguageDisplayName, initI18n, loadLocaleOverride, SUPPORTED_LOCALES, t } from "@core/i18n";
-import { exportIdentity, getDisplayName, importIdentity, invalidateDisplayName, signPayload } from "@core/keyIdentity";
+import {
+  exportIdentity,
+  getDisplayName,
+  getResolvedDisplayName,
+  importIdentity,
+  invalidateDisplayName,
+  signPayload,
+} from "@core/keyIdentity";
 import { clearAllOffsets, getOffsetInfo } from "@core/storage";
 import { parseSvgString, syncTypeColors } from "@modules/ui/lyricsDock/icons";
+import { migrateLetterWavePref, type LetterWavePref } from "@modules/settings/letterWave";
+import { mergePreferredProviders } from "@modules/lyrics/providers/providerList";
+import { fetchOwnGamification, renderIdentityStats } from "@modules/unison/gamificationRender";
 import Sortable from "sortablejs";
 import { showModal } from "./editor/ui/feedback";
 import { initStoreUI, setupYourThemesButton } from "./store/store";
+import { checkForStableRelease } from "./updateNotice";
+import { errorCore, warnCore } from "@core/logger";
 
 interface Options {
   isLogsEnabled: boolean;
@@ -22,12 +33,16 @@ interface Options {
   isAlbumArtEnabled: boolean;
   isShadersPromoEnabled: boolean;
   isFullScreenDisabled: boolean;
+  isFullscreenControlsEnabled: boolean;
   isStylizedAnimationsEnabled: boolean;
+  letterWavePref: LetterWavePref;
   isPassiveScrollEnabled: boolean;
+  isPictureInPictureEnabled: boolean;
   isPictureInPictureAutoRestoreEnabled: boolean;
   pipArtworkTransition: string;
   pipTextTransition: string;
   pipMarqueeEnabled: boolean;
+  pipProgressBarEnabled: boolean;
   isTranslateEnabled: boolean;
   translationLanguage: string;
   isCursorAutoHideEnabled: boolean;
@@ -43,6 +58,7 @@ interface Options {
   isDockTranslateEnabled: boolean;
   isDockRomanizeEnabled: boolean;
   isDockOffsetEnabled: boolean;
+  isDockRefreshEnabled: boolean;
   isDockPictureInPictureEnabled: boolean;
   isDockDownloadLRCEnabled: boolean;
   dockControlsOrder: string[];
@@ -83,14 +99,18 @@ const getOptionsFromForm = (): Options => {
     isAlbumArtEnabled: (document.getElementById("albumArt") as HTMLInputElement).checked,
     isShadersPromoEnabled: (document.getElementById("isShadersPromoEnabled") as HTMLInputElement).checked,
     isFullScreenDisabled: (document.getElementById("isFullScreenDisabled") as HTMLInputElement).checked,
+    isFullscreenControlsEnabled: (document.getElementById("isFullscreenControlsEnabled") as HTMLInputElement).checked,
     isStylizedAnimationsEnabled: (document.getElementById("isStylizedAnimationsEnabled") as HTMLInputElement).checked,
+    letterWavePref: getLetterWaveSwitchState(),
     isPassiveScrollEnabled: (document.getElementById("isPassiveScrollEnabled") as HTMLInputElement).checked,
+    isPictureInPictureEnabled: (document.getElementById("isPictureInPictureEnabled") as HTMLInputElement).checked,
     isPictureInPictureAutoRestoreEnabled: (
       document.getElementById("isPictureInPictureAutoRestoreEnabled") as HTMLInputElement
     ).checked,
     pipArtworkTransition: (document.getElementById("pipArtworkTransition") as HTMLSelectElement).value,
     pipTextTransition: (document.getElementById("pipTextTransition") as HTMLSelectElement).value,
     pipMarqueeEnabled: (document.getElementById("pipMarqueeEnabled") as HTMLInputElement).checked,
+    pipProgressBarEnabled: (document.getElementById("pipProgressBarEnabled") as HTMLInputElement).checked,
     isTranslateEnabled: (document.getElementById("translate") as HTMLInputElement).checked,
     translationLanguage: (document.getElementById("translationLanguage") as HTMLInputElement).value,
     lyricDefaultDownloadFormat: (document.getElementById("lyric-default-download-format") as HTMLInputElement).value,
@@ -109,6 +129,7 @@ const getOptionsFromForm = (): Options => {
     isDockTranslateEnabled: (document.getElementById("isDockTranslateEnabled") as HTMLInputElement).checked,
     isDockRomanizeEnabled: (document.getElementById("isDockRomanizeEnabled") as HTMLInputElement).checked,
     isDockOffsetEnabled: (document.getElementById("isDockOffsetEnabled") as HTMLInputElement).checked,
+    isDockRefreshEnabled: (document.getElementById("isDockRefreshEnabled") as HTMLInputElement).checked,
     isDockPictureInPictureEnabled: (document.getElementById("isDockPictureInPictureEnabled") as HTMLInputElement)
       .checked,
     isDockDownloadLRCEnabled: (document.getElementById("isDockDownloadLRCEnabled") as HTMLInputElement).checked,
@@ -273,12 +294,16 @@ const restoreOptions = (): void => {
     isShadersPromoEnabled: true,
     isCursorAutoHideEnabled: true,
     isFullScreenDisabled: false,
+    isFullscreenControlsEnabled: true,
     isStylizedAnimationsEnabled: true,
+    letterWavePref: "auto",
     isPassiveScrollEnabled: true,
+    isPictureInPictureEnabled: true,
     isPictureInPictureAutoRestoreEnabled: false,
     pipArtworkTransition: "shuffle",
     pipTextTransition: "spring",
     pipMarqueeEnabled: true,
+    pipProgressBarEnabled: true,
     isTranslateEnabled: false,
     translationLanguage: "en",
     isRomanizationEnabled: false,
@@ -286,6 +311,7 @@ const restoreOptions = (): void => {
       "bLyrics-richsynced",
       "unison-richsynced",
       "binimum-richsynced",
+      "unison-wordsynced",
       "portato-richsynced",
       "musixmatch-richsync",
       "yt-captions",
@@ -309,6 +335,7 @@ const restoreOptions = (): void => {
     isDockTranslateEnabled: true,
     isDockRomanizeEnabled: true,
     isDockOffsetEnabled: true,
+    isDockRefreshEnabled: false,
     isDockPictureInPictureEnabled: true,
     isDockDownloadLRCEnabled: true,
     dockControlsOrder: [...DOCK_CONTROL_ORDER_DEFAULT],
@@ -320,6 +347,7 @@ const restoreOptions = (): void => {
 
   const readKeys = [
     ...Object.keys(defaultOptions),
+    "isLetterWaveEnabled",
     "isUnisonPinnedDockEnabled",
     "unisonPinnedDockPosition",
     "isUnisonAutoHideInFullscreenEnabled",
@@ -329,6 +357,7 @@ const restoreOptions = (): void => {
     setOptionsInForm({
       ...defaultOptions,
       ...(raw as Options),
+      letterWavePref: migrateLetterWavePref(raw),
       isControlsDockEnabled:
         raw.isControlsDockEnabled ?? raw.isUnisonPinnedDockEnabled ?? defaultOptions.isControlsDockEnabled,
       controlsDockPosition:
@@ -356,14 +385,19 @@ const setOptionsInForm = (items: Options): void => {
     items.lyricDefaultDownloadFormat;
   (document.getElementById("cursorAutoHide") as HTMLInputElement).checked = items.isCursorAutoHideEnabled;
   (document.getElementById("isFullScreenDisabled") as HTMLInputElement).checked = items.isFullScreenDisabled;
+  (document.getElementById("isFullscreenControlsEnabled") as HTMLInputElement).checked =
+    items.isFullscreenControlsEnabled;
   (document.getElementById("isStylizedAnimationsEnabled") as HTMLInputElement).checked =
     items.isStylizedAnimationsEnabled;
+  setLetterWaveSwitchState(items.letterWavePref);
   (document.getElementById("isPassiveScrollEnabled") as HTMLInputElement).checked = items.isPassiveScrollEnabled;
+  (document.getElementById("isPictureInPictureEnabled") as HTMLInputElement).checked = items.isPictureInPictureEnabled;
   (document.getElementById("isPictureInPictureAutoRestoreEnabled") as HTMLInputElement).checked =
     items.isPictureInPictureAutoRestoreEnabled;
   (document.getElementById("pipArtworkTransition") as HTMLSelectElement).value = items.pipArtworkTransition;
   (document.getElementById("pipTextTransition") as HTMLSelectElement).value = items.pipTextTransition;
   (document.getElementById("pipMarqueeEnabled") as HTMLInputElement).checked = items.pipMarqueeEnabled;
+  (document.getElementById("pipProgressBarEnabled") as HTMLInputElement).checked = items.pipProgressBarEnabled;
   (document.getElementById("translate") as HTMLInputElement).checked = items.isTranslateEnabled;
   (document.getElementById("translationLanguage") as HTMLInputElement).value = items.translationLanguage;
   (document.getElementById("isRomanizationEnabled") as HTMLInputElement).checked = items.isRomanizationEnabled;
@@ -376,6 +410,7 @@ const setOptionsInForm = (items: Options): void => {
   (document.getElementById("isDockTranslateEnabled") as HTMLInputElement).checked = items.isDockTranslateEnabled;
   (document.getElementById("isDockRomanizeEnabled") as HTMLInputElement).checked = items.isDockRomanizeEnabled;
   (document.getElementById("isDockOffsetEnabled") as HTMLInputElement).checked = items.isDockOffsetEnabled;
+  (document.getElementById("isDockRefreshEnabled") as HTMLInputElement).checked = items.isDockRefreshEnabled;
   (document.getElementById("isDockPictureInPictureEnabled") as HTMLInputElement).checked =
     items.isDockPictureInPictureEnabled;
   (document.getElementById("isDockDownloadLRCEnabled") as HTMLInputElement).checked = items.isDockDownloadLRCEnabled;
@@ -384,6 +419,7 @@ const setOptionsInForm = (items: Options): void => {
   setOffsetDisplay("lineOffsetTrim", items.lineOffsetTrim);
   setDockControlsOrderInForm(items.dockControlsOrder);
   syncUnisonModalDependentState(items.isControlsDockEnabled);
+  syncPictureInPictureModalDependentState(items.isPictureInPictureEnabled);
   romanizationDisabledLanguages = items.romanizationDisabledLanguages || [];
   translationDisabledLanguages = items.translationDisabledLanguages || [];
   updateExclusionsConfigVisibility();
@@ -393,11 +429,11 @@ const setOptionsInForm = (items: Options): void => {
   const providersListElem = document.getElementById("providers-list")!;
   providersListElem.replaceChildren();
 
-  // Always recreate in the default order to make sure no items go missing
-  let unseenProviders = [
+  const defaultProviderOrder = [
     "bLyrics-richsynced",
     "unison-richsynced",
     "binimum-richsynced",
+    "unison-wordsynced",
     "portato-richsynced",
     "musixmatch-richsync",
     "yt-captions",
@@ -412,23 +448,14 @@ const setOptionsInForm = (items: Options): void => {
     "lrclib-plain",
   ];
 
-  for (let i = 0; i < items.preferredProviderList.length; i++) {
-    const providerId = items.preferredProviderList[i];
-
+  for (const providerId of mergePreferredProviders(items.preferredProviderList, defaultProviderOrder)) {
     const disabled = providerId.startsWith("d_");
     const rawProviderId = disabled ? providerId.slice(2) : providerId;
     const providerElem = createProviderElem(rawProviderId, !disabled);
 
     if (providerElem === null) continue;
     providersListElem.appendChild(providerElem);
-    unseenProviders = unseenProviders.filter(p => p !== rawProviderId);
   }
-
-  unseenProviders.forEach(p => {
-    const providerElem = createProviderElem(p);
-    if (providerElem === null) return;
-    providersListElem.appendChild(providerElem);
-  });
 };
 type SyncType = "syllable" | "word" | "line" | "unsynced";
 
@@ -449,6 +476,7 @@ const getProviderIdToInfoMap = (): { [key: string]: ProviderInfo } => ({
     syncType: "line",
   },
   "unison-richsynced": { name: t("options_provider_betterLyricsUnison"), syncType: "syllable" },
+  "unison-wordsynced": { name: t("options_provider_betterLyricsUnison"), syncType: "word" },
   "unison-synced": { name: t("options_provider_betterLyricsUnison"), syncType: "line" },
   "unison-plain": { name: t("options_provider_betterLyricsUnison"), syncType: "unsynced" },
   "yt-captions": {
@@ -565,6 +593,56 @@ function createProviderElem(providerId: string, checked = true): HTMLLIElement |
   return liElem;
 }
 
+// -- Letter wave switch --------------------------
+
+const LETTER_WAVE_ORDER: LetterWavePref[] = ["off", "auto", "on"];
+
+const LETTER_WAVE_STATE_LABELS: Record<LetterWavePref, string> = {
+  off: "Off",
+  auto: "Auto",
+  on: "On",
+};
+
+function getLetterWaveSwitchState(): LetterWavePref {
+  const state = document.getElementById("letterWaveSwitch")?.dataset.state;
+  return state === "on" || state === "off" || state === "auto" ? state : "auto";
+}
+
+function setLetterWaveSwitchState(pref: LetterWavePref): void {
+  const el = document.getElementById("letterWaveSwitch");
+  if (!el) return;
+  el.dataset.state = pref;
+  el.setAttribute("aria-valuenow", String(LETTER_WAVE_ORDER.indexOf(pref)));
+  el.setAttribute("aria-valuetext", LETTER_WAVE_STATE_LABELS[pref]);
+}
+
+function initLetterWaveSwitch(): void {
+  const el = document.getElementById("letterWaveSwitch");
+  if (!el) return;
+
+  const step = (delta: number, wrap: boolean): void => {
+    const count = LETTER_WAVE_ORDER.length;
+    const current = LETTER_WAVE_ORDER.indexOf(getLetterWaveSwitchState());
+    const next = wrap ? (current + delta + count) % count : Math.min(count - 1, Math.max(0, current + delta));
+    setLetterWaveSwitchState(LETTER_WAVE_ORDER[next]);
+    saveOptions();
+  };
+
+  el.addEventListener("click", () => step(1, true));
+  el.addEventListener("keydown", event => {
+    if (event.key === "ArrowRight" || event.key === "ArrowUp") {
+      step(1, false);
+      event.preventDefault();
+    } else if (event.key === "ArrowLeft" || event.key === "ArrowDown") {
+      step(-1, false);
+      event.preventDefault();
+    } else if (event.key === " " || event.key === "Enter") {
+      step(1, true);
+      event.preventDefault();
+    }
+  });
+}
+
 // -- Display Language Dropdown --------------------------
 
 function populateLanguageDropdown(): void {
@@ -612,8 +690,10 @@ document.addEventListener("DOMContentLoaded", async () => {
   populateLanguageDropdown();
   initTabScrollIndicators();
   initSettingHelpTooltips();
+  initLetterWaveSwitch();
   restoreOptions();
   restoreActiveTab();
+  checkForStableRelease();
 });
 document.querySelectorAll("#options input, #options select").forEach(element => {
   element.addEventListener("change", saveOptions);
@@ -742,9 +822,18 @@ async function initIdentityUI(): Promise<void> {
   try {
     displayNameEl.textContent = await getDisplayName();
   } catch (error) {
-    console.error(LOG_PREFIX, "Failed to load identity:", error);
+    errorCore("Failed to load identity:", error);
     displayNameEl.textContent = t("options_alert_identityLoadError");
   }
+
+  void fetchOwnGamification().then(async user => {
+    const statsEl = document.getElementById("identity-stats");
+    const statsWrap = document.getElementById("identity-stats-container");
+    if (!user || !statsEl || !statsWrap) return;
+    const handle = (await getResolvedDisplayName().catch(() => null)) ?? undefined;
+    await renderIdentityStats(statsEl, user, handle);
+    statsWrap.hidden = false;
+  });
 
   document.getElementById("export-identity-btn")?.addEventListener("click", handleExportIdentity);
   document.getElementById("import-identity-btn")?.addEventListener("click", handleImportIdentity);
@@ -917,7 +1006,7 @@ function initNicknameModal(): void {
       setStatus(mapCheckResult(json.data));
     } catch (error) {
       if (seq !== checkSeq) return;
-      console.warn(LOG_PREFIX, "Nickname availability check failed:", error);
+      warnCore("Nickname availability check failed:", error);
       setStatus("error");
     }
   };
@@ -966,7 +1055,7 @@ function initNicknameModal(): void {
           const errJson = (await response.clone().json()) as { error?: string };
           if (errJson.error === "NICKNAME_PROFANE") conflict = "profane";
         } catch (err) {
-          console.warn(LOG_PREFIX, "Nickname conflict body parse failed:", err);
+          warnCore("Nickname conflict body parse failed:", err);
         }
         setStatus(conflict);
         resetBtn.disabled = false;
@@ -990,7 +1079,7 @@ function initNicknameModal(): void {
       resetBtn.disabled = false;
       closeNicknameModal();
     } catch (error) {
-      console.warn(LOG_PREFIX, "Nickname save failed:", error);
+      warnCore("Nickname save failed:", error);
       setStatus("error");
       resetBtn.disabled = false;
     }
@@ -1034,7 +1123,7 @@ function initNicknameModal(): void {
       resetBtn.disabled = false;
       closeNicknameModal();
     } catch (error) {
-      console.warn(LOG_PREFIX, "Nickname reset failed:", error);
+      warnCore("Nickname reset failed:", error);
       setStatus("error");
       resetBtn.disabled = false;
     }
@@ -1061,7 +1150,7 @@ async function handleExportIdentity(): Promise<void> {
       }
     });
   } catch (error) {
-    console.error(LOG_PREFIX, "Failed to export identity:", error);
+    errorCore("Failed to export identity:", error);
     showAlert(t("options_alert_exportFailed"));
   }
 }
@@ -1510,6 +1599,7 @@ function resetDockSettings(): void {
   (document.getElementById("isDockTranslateEnabled") as HTMLInputElement).checked = true;
   (document.getElementById("isDockRomanizeEnabled") as HTMLInputElement).checked = true;
   (document.getElementById("isDockOffsetEnabled") as HTMLInputElement).checked = true;
+  (document.getElementById("isDockRefreshEnabled") as HTMLInputElement).checked = false;
   (document.getElementById("isDockPictureInPictureEnabled") as HTMLInputElement).checked = true;
   (document.getElementById("isDockDownloadLRCEnabled") as HTMLInputElement).checked = true;
   setUnisonPositionInForm(DOCK_DEFAULT_POSITION);
@@ -1560,6 +1650,7 @@ function setupUnisonActionsModal(): void {
     "isDockTranslateEnabled",
     "isDockRomanizeEnabled",
     "isDockOffsetEnabled",
+    "isDockRefreshEnabled",
     "isDockPictureInPictureEnabled",
     "isDockDownloadLRCEnabled",
     "lyric-default-download-format",
@@ -1613,6 +1704,15 @@ function initPictureInPictureModal(): void {
   for (const control of overlay.querySelectorAll("input, select")) {
     control.addEventListener("change", saveOptions);
   }
+
+  const enabledToggle = document.getElementById("isPictureInPictureEnabled") as HTMLInputElement | null;
+  enabledToggle?.addEventListener("change", () => syncPictureInPictureModalDependentState(enabledToggle.checked));
+}
+
+function syncPictureInPictureModalDependentState(enabled: boolean): void {
+  const body = document.getElementById("pip-modal-body");
+  if (!body) return;
+  body.dataset.pipDisabled = enabled ? "false" : "true";
 }
 
 function initOffsetModal(): void {

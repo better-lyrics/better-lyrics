@@ -1,7 +1,8 @@
-import { GENERAL_ERROR_LOG, LYRIC_SOURCE_KEYS, OFFSET_STORAGE_PREFIX, STORAGE_TRANSIENT_SET_LOG } from "@constants";
-import { log, truncateSource } from "@utils";
+import { LYRIC_SOURCE_KEYS, OFFSET_STORAGE_PREFIX, STORAGE_TRANSIENT_SET_LOG } from "@constants";
+import { truncateSource } from "@utils";
 import { compileWithDetails } from "rics";
 import { compressString, decompressString, isCompressed } from "./compression";
+import { logCore, logError } from "@core/logger";
 
 /**
  * Keys that should NEVER be deleted by clearCache or any bulk delete operation.
@@ -28,6 +29,15 @@ export async function getSyncStorage<T>(keys: string | string[] | null): Promise
   return (await chrome.storage.sync.get(keys as string[])) as unknown as T;
 }
 
+export const STORE_THEME_PREFIX = "store:";
+
+/** Null once edited: editing drops themeName but leaves activeStoreTheme set. */
+export async function getAppliedStoreThemeId(): Promise<string | null> {
+  const { themeName } = await getSyncStorage<{ themeName?: string }>(["themeName"]);
+  if (!themeName?.startsWith(STORE_THEME_PREFIX)) return null;
+  return themeName.slice(STORE_THEME_PREFIX.length) || null;
+}
+
 interface TransientStorageItem {
   type: "transient";
   value: any;
@@ -48,24 +58,18 @@ export function compileRicsToStyles(sourceCode: string): string {
     const elapsed = performance.now() - startTime;
 
     if (elapsed > HARD_TIMEOUT) {
-      log(
-        GENERAL_ERROR_LOG,
-        `rics compilation timeout: took ${elapsed.toFixed(0)}ms\nSource:\n${truncateSource(sourceCode)}`
-      );
+      logError(`rics compilation timeout: took ${elapsed.toFixed(0)}ms\nSource:\n${truncateSource(sourceCode)}`);
       return sourceCode;
     }
 
     if (result.errors.length > 0) {
-      log(
-        GENERAL_ERROR_LOG,
-        `rics compilation errors: ${JSON.stringify(result.errors)}\nSource:\n${truncateSource(sourceCode)}`
-      );
+      logError(`rics compilation errors: ${JSON.stringify(result.errors)}\nSource:\n${truncateSource(sourceCode)}`);
       return sourceCode;
     }
     return result.css;
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error);
-    log(GENERAL_ERROR_LOG, `rics compilation failed: ${message}\nSource:\n${truncateSource(sourceCode)}`);
+    logError(`rics compilation failed: ${message}\nSource:\n${truncateSource(sourceCode)}`);
     return sourceCode;
   }
 }
@@ -87,7 +91,7 @@ export async function loadChunkedStyles(): Promise<string | null> {
   for (let i = 0; i < metadata.customCSS_chunkCount; i++) {
     const chunk = chunksData[`customCSS_chunk_${i}`];
     if (!chunk) {
-      log(GENERAL_ERROR_LOG, `Missing CSS chunk ${i}`);
+      logError(`Missing CSS chunk ${i}`);
       return null;
     }
     chunks.push(chunk);
@@ -118,14 +122,7 @@ export function setStorage(items: { [key: string]: any }): void {
   chrome.storage.sync.set(items);
 }
 
-/**
- * Retrieves a value from transient storage with automatic expiry handling.
- * Automatically decompresses if the value was stored compressed.
- *
- * @param {string} key - Storage key to retrieve
- * @returns {Promise<*|null>} The stored value or null if expired/not found
- */
-export async function getTransientStorage(key: string): Promise<any | null> {
+export async function peekTransientStorage(key: string): Promise<{ value: any; expired: boolean } | null> {
   try {
     const result = await chrome.storage.local.get(key);
     const item = result[key] as TransientStorageItem | undefined;
@@ -133,20 +130,30 @@ export async function getTransientStorage(key: string): Promise<any | null> {
     if (!item) return null;
 
     const { value, expiry } = item;
-    if (expiry && Date.now() > expiry) {
-      await chrome.storage.local.remove(key);
-      return null;
-    }
+    const decoded = typeof value === "string" && isCompressed(value) ? decompressString(value) : value;
 
-    if (typeof value === "string" && isCompressed(value)) {
-      return decompressString(value);
-    }
-
-    return value;
+    return { value: decoded, expired: Boolean(expiry && Date.now() > expiry) };
   } catch (error) {
-    log(GENERAL_ERROR_LOG, error);
+    logError(error);
     return null;
   }
+}
+
+export async function getTransientStorage(key: string): Promise<any | null> {
+  const item = await peekTransientStorage(key);
+
+  if (!item) return null;
+
+  if (item.expired) {
+    try {
+      await chrome.storage.local.remove(key);
+    } catch (error) {
+      logError(error);
+    }
+    return null;
+  }
+
+  return item.value;
 }
 
 /**
@@ -169,10 +176,10 @@ export async function setTransientStorage(key: string, value: any, ttl: number):
         expiry,
       },
     });
-    log(STORAGE_TRANSIENT_SET_LOG, key);
+    logCore(STORAGE_TRANSIENT_SET_LOG, key);
     await saveCacheInfo();
   } catch (error) {
-    log(GENERAL_ERROR_LOG, error);
+    logError(error);
   }
 }
 
@@ -190,7 +197,7 @@ export async function setPersistentStorage(key: string, value: any): Promise<voi
       [key]: { type: "transient", value: storedValue, expiry: 0 },
     });
   } catch (error) {
-    log(GENERAL_ERROR_LOG, error);
+    logError(error);
   }
 }
 
@@ -234,7 +241,7 @@ async function getUpdatedCacheInfo(): Promise<{ count: number; size: number }> {
       size: totalSize,
     };
   } catch (error) {
-    log(GENERAL_ERROR_LOG, error);
+    logError(error);
     return { count: 0, size: 0 };
   }
 }
@@ -261,7 +268,22 @@ export async function clearCache(): Promise<void> {
     await chrome.storage.local.remove(lyricsKeys);
     await saveCacheInfo();
   } catch (error) {
-    log(GENERAL_ERROR_LOG, error);
+    logError(error);
+  }
+}
+
+export async function clearSongCache(videoId: string): Promise<void> {
+  if (!videoId) return;
+  try {
+    const prefix = `blyrics_${videoId}_`;
+    const result = await chrome.storage.local.get(null);
+    const songKeys = Object.keys(result).filter(
+      key => key.startsWith(prefix) && !PROTECTED_STORAGE_KEYS.includes(key as (typeof PROTECTED_STORAGE_KEYS)[number])
+    );
+    await chrome.storage.local.remove(songKeys);
+    await saveCacheInfo();
+  } catch (error) {
+    logError(error);
   }
 }
 
@@ -288,7 +310,7 @@ export async function purgeExpiredKeys(): Promise<void> {
       await chrome.storage.local.remove(keysToRemove);
     }
   } catch (error) {
-    log(GENERAL_ERROR_LOG, error);
+    logError(error);
   }
 }
 
@@ -303,7 +325,7 @@ export async function getOffsetInfo(): Promise<{ count: number }> {
     const offsetKeys = Object.keys(result).filter(key => key.startsWith(OFFSET_STORAGE_PREFIX));
     return { count: offsetKeys.length };
   } catch (error) {
-    log(GENERAL_ERROR_LOG, error);
+    logError(error);
     return { count: 0 };
   }
 }
@@ -320,7 +342,7 @@ export async function clearAllOffsets(): Promise<number> {
     await chrome.storage.local.remove(offsetKeys);
     return offsetKeys.length;
   } catch (error) {
-    log(GENERAL_ERROR_LOG, error);
+    logError(error);
     return 0;
   }
 }

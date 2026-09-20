@@ -83,9 +83,29 @@
     "message": "Tampilkan latar belakang sampul album yang buram",
     "description": "Show album art background setting label"
   },
+  "options_display_fullscreenControls": {
+    "message": "Show player controls in fullscreen",
+    "description": "Toggle label for the playback controls strip (progress bar, transport, like and dislike) shown under the album art in the fullscreen lyrics view"
+  },
   "options_display_stylizedAnimations": {
     "message": "Tampilkan animasi bergaya",
     "description": "Show stylized animations setting label"
+  },
+  "options_display_letterWave": {
+    "message": "Gelombang huruf",
+    "description": "Label for the per-letter wave lyric animation toggle"
+  },
+  "options_display_letterWaveBadge": {
+    "message": "Eksperimental",
+    "description": "Badge shown next to the letter wave setting marking it as experimental"
+  },
+  "options_display_letterWaveTooltip": {
+    "message": "Lirik terlihat lebih hidup dengan gerakan berguling lembut di setiap huruf yang dinyanyikan. Matikan jika guliran lirik terasa aneh di perangkatmu.",
+    "description": "Tooltip explaining the letter wave animation and its performance impact"
+  },
+  "options_display_letterWaveTooltipStates": {
+    "message": "Otomatis tetap mati kecuali saat tema menyalakannya. Nyala dan Mati menyampingkan tema apapun.",
+    "description": "Appended to the letter wave tooltip, explaining the three switch states"
   },
   "options_display_passiveScroll": {
     "message": "Gulir otomatis lirik taksinkron",
@@ -110,6 +130,10 @@
   "picture_in_picture_next": {
     "message": "Selanjutnya",
     "description": "Accessible label for the next track button in the Picture-in-Picture lyrics window, used when the YouTube Music player bar exposes no label of its own"
+  },
+  "options_display_pipEnabled": {
+    "message": "Aktifkan jendela mengambang",
+    "description": "Master toggle for the floating lyrics window feature, which turns it off everywhere including the YouTube Music minimize button"
   },
   "options_display_pipAutoRestore": {
     "message": "Buka kembali lirik mengambang otomatis",
@@ -154,6 +178,10 @@
   "options_display_pipMarquee": {
     "message": "Gulir judul panjang",
     "description": "Toggle label for whether a song title too long for the floating lyrics window scrolls across so it can be read in full"
+  },
+  "options_display_pipProgressBar": {
+    "message": "Show progress bar",
+    "description": "Toggle label, shown inside the floating lyrics window settings, for the seekable playback progress bar under the album art"
   },
   "options_display_shadersPromo": {
     "message": "Buka tautan ke Better Lyrics Shaders",
@@ -230,6 +258,10 @@
   "lyricsDock_chooseSource": {
     "message": "Pilih sumber lirik",
     "description": "Accessible label for the lyrics dock button that opens the source provider dropdown"
+  },
+  "lyricsDock_refresh": {
+    "message": "Segarkan Lirik",
+    "description": "Accessible label for the lyrics dock button that re-fetches lyrics for the current song, bypassing the cache"
   },
   "lyricsDock_previousSource": {
     "message": "Sumber sebelumnya",
@@ -337,7 +369,11 @@
   },
   "options_themes_create": {
     "message": "Buat",
-    "description": "Create button label"
+    "description": "Button to open the style editor if there are no styles"
+  },
+  "options_themes_edit": {
+    "message": "Edit",
+    "description": "Button to open the style editor"
   },
   "options_themes_marketplace": {
     "message": "Toko Tema",
@@ -362,6 +398,10 @@
   "options_identity_yourIdentity": {
     "message": "Sinkron",
     "description": "Your identity label"
+  },
+  "options_identity_unisonStats": {
+    "message": "Statistik Unison",
+    "description": "Section title above the user's own Unison level, tier, rank and badges on the Identity tab"
   },
   "options_identity_loading": {
     "message": "Memuat...",
@@ -1169,29 +1209,27 @@
     "message": "Tidak dapat mengunduh tema. Coba cek koneksimu dan coba lagi.",
     "description": "Alert when a symlinked theme fails to install from marketplace"
   },
-  "symlink_badge_marketplace": {
-    "message": "Toko",
-    "description": "Badge text on symlinked theme cards"
+  "theme_top_badge": {
+    "message": "#$RANK$ on the Marketplace",
+    "description": "Tooltip on a featured theme's rank medal",
+    "placeholders": {
+      "rank": {
+        "content": "$1",
+        "example": "1"
+      }
+    }
   },
-  "symlink_badge_bundled": {
-    "message": "Sepaket",
-    "description": "Badge text on non-symlinked built-in theme cards"
+  "theme_modal_section_featured": {
+    "message": "Featured Themes",
+    "description": "Section title for featured themes (top marketplace picks and built-ins) in the theme chooser modal"
   },
-  "deprecation_builtin_title": {
-    "message": "Siap siap, tema tema ini bakalan pindah!",
-    "description": "Title for the built-in themes deprecation banner in theme modal"
+  "theme_modal_section_all": {
+    "message": "All Themes",
+    "description": "Section title for the user's installed marketplace themes in the theme chooser modal"
   },
-  "deprecation_builtin_body": {
-    "message": "Kami akan memindahkan tema-tema bawaan ini ke Toko Tema. Sudah ada beberapa, lihat yang ada lencana Toko. Sisanya bakalan ikutan di pembaruan selanjutnya, dengan cadangan CSS di GitHub dan Discord.",
-    "description": "Body text for the built-in themes deprecation banner"
-  },
-  "deprecation_builtin_cta": {
-    "message": "Jelajahi Toko",
-    "description": "CTA button text in the deprecation banner to open the marketplace"
-  },
-  "theme_modal_section_builtin": {
-    "message": "Tema Bawaan",
-    "description": "Section title for built-in themes in the theme chooser modal"
+  "theme_modal_browse": {
+    "message": "Browse Marketplace",
+    "description": "Link in the theme chooser modal that opens the full Theme Marketplace page"
   },
   "theme_modal_section_custom": {
     "message": "Tema Kustom",
@@ -1693,21 +1731,47 @@
     "message": "Sepertinya nggak sampai. Boleh coba lagi?",
     "description": "Shown when a lyrics report fails to submit"
   },
-  "unison_tier_new": {
-    "message": "baru",
-    "description": "Trust tier badge for low-reputation Unison submitters"
+  "unison_level": {
+    "message": "Level $level$",
+    "description": "Shows a Unison contributor's numeric level. $level$ is a positive integer",
+    "placeholders": {
+      "level": {
+        "content": "$1",
+        "example": "6"
+      }
+    }
   },
-  "unison_tier_trusted": {
-    "message": "terpercaya",
-    "description": "Trust tier badge for mid-reputation Unison submitters"
+  "unison_xpToNext": {
+    "message": "$xp$ XP ke Level $level$",
+    "description": "Explains how much experience remains before the next Unison level. $xp$ is a positive integer, $level$ is the next level number",
+    "placeholders": {
+      "xp": {
+        "content": "$1",
+        "example": "436"
+      },
+      "level": {
+        "content": "$2",
+        "example": "7"
+      }
+    }
   },
-  "unison_tier_veteran": {
-    "message": "veteran",
-    "description": "Trust tier badge for high-reputation Unison submitters"
+  "unison_maxLevel": {
+    "message": "Level maks",
+    "description": "Shown in place of the XP-to-next text when a Unison contributor is at the highest level"
   },
-  "unison_tier_expert": {
-    "message": "ahli",
-    "description": "Trust tier badge for top-reputation Unison submitters"
+  "unison_rank": {
+    "message": "Peringkat #$rank$",
+    "description": "Shows a Unison contributor's leaderboard rank within their tier. $rank$ is a positive integer",
+    "placeholders": {
+      "rank": {
+        "content": "$1",
+        "example": "1"
+      }
+    }
+  },
+  "unison_viewProfile": {
+    "message": "Lihat profil lengkap",
+    "description": "Link on the Identity tab that opens the user's full Unison profile in a new tab"
   },
   "unison_submitted_this": {
     "message": "mengirim lirik ini",

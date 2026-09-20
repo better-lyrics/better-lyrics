@@ -83,41 +83,105 @@
     "message": "ぼかしたアルバムアートを背景に表示",
     "description": "Show album art background setting label"
   },
+  "options_display_fullscreenControls": {
+    "message": "Show player controls in fullscreen",
+    "description": "Toggle label for the playback controls strip (progress bar, transport, like and dislike) shown under the album art in the fullscreen lyrics view"
+  },
   "options_display_stylizedAnimations": {
     "message": "スタイリッシュなアニメーションを表示",
     "description": "Show stylized animations setting label"
+  },
+  "options_display_letterWave": {
+    "message": "Letter wave",
+    "description": "Label for the per-letter wave lyric animation toggle"
+  },
+  "options_display_letterWaveBadge": {
+    "message": "Experimental",
+    "description": "Badge shown next to the letter wave setting marking it as experimental"
+  },
+  "options_display_letterWaveTooltip": {
+    "message": "Lyrics feel more alive with a gentle rolling motion across each letter as they're sung. Turn it off if lyrics scroll feels choppy on your device.",
+    "description": "Tooltip explaining the letter wave animation and its performance impact"
+  },
+  "options_display_letterWaveTooltipStates": {
+    "message": "Auto stays off unless a theme turns it on. On and Off override any theme.",
+    "description": "Appended to the letter wave tooltip, explaining the three switch states"
   },
   "options_display_passiveScroll": {
     "message": "同期されていない歌詞を自動スクロール",
     "description": "Auto-scroll unsynced lyrics setting label"
   },
   "picture_in_picture_open": {
-    "message": "Open Picture-in-Picture lyrics",
+    "message": "ピクチャーインピクチャー歌詞を開く",
     "description": "Accessible label for the dock action that opens the floating lyrics window"
   },
   "picture_in_picture_previous": {
-    "message": "Previous",
+    "message": "前",
     "description": "Accessible label for the previous track button in the Picture-in-Picture lyrics window, used when the YouTube Music player bar exposes no label of its own"
   },
   "picture_in_picture_play": {
-    "message": "Play",
+    "message": "再生",
     "description": "Accessible label for the play button in the Picture-in-Picture lyrics window, used when the YouTube Music player bar exposes no label of its own"
   },
   "picture_in_picture_pause": {
-    "message": "Pause",
+    "message": "一時停止",
     "description": "Accessible label for the pause button in the Picture-in-Picture lyrics window, used when the YouTube Music player bar exposes no label of its own"
   },
   "picture_in_picture_next": {
-    "message": "Next",
+    "message": "次",
     "description": "Accessible label for the next track button in the Picture-in-Picture lyrics window, used when the YouTube Music player bar exposes no label of its own"
   },
+  "options_display_pipEnabled": {
+    "message": "Enable floating window",
+    "description": "Master toggle for the floating lyrics window feature, which turns it off everywhere including the YouTube Music minimize button"
+  },
   "options_display_pipAutoRestore": {
-    "message": "Reopen floating lyrics automatically",
+    "message": "フローティング歌詞を自動的に開く",
     "description": "Setting label for automatically reopening the floating lyrics window after page load"
   },
   "options_display_pipAutoRestoreTooltip": {
     "message": "Keeps the floating lyrics window from closing for good when you reload or move between songs and pages. Browsers only let a floating window open right after you interact with the page, so it reopens on your first click or key press instead of instantly.",
     "description": "Help tooltip explaining what automatic floating-lyrics reopening does and why it waits for the first interaction"
+  },
+  "options_display_pipArtworkTransition": {
+    "message": "Album art transition",
+    "description": "Setting label, shown inside the floating lyrics window settings, for choosing how album art changes between songs"
+  },
+  "options_pipTransition_shuffle": {
+    "message": "シャッフル",
+    "description": "Name of an album art transition where the artwork tilts back and the new cover is dealt in like a playing card"
+  },
+  "options_pipTransition_flip": {
+    "message": "反転",
+    "description": "Name of an album art transition where the artwork rotates like a card to reveal the new cover on its other side"
+  },
+  "options_pipTransition_push": {
+    "message": "押し出す",
+    "description": "Name of a transition, offered for both album art and song titles, where the new content slides in from the side and pushes the old out"
+  },
+  "options_pipTransition_crossfade": {
+    "message": "クロスフェード",
+    "description": "Name of a transition, offered for both album art and song titles, where the new content fades in over the old"
+  },
+  "options_pipTransition_spring": {
+    "message": "弾む",
+    "description": "Name of a song title transition where the words of the new title bounce up into place one after another"
+  },
+  "options_display_pipWindow": {
+    "message": "フローティング歌詞ウィンドウ",
+    "description": "Label for the row that opens the settings for the floating lyrics window"
+  },
+  "options_display_pipTextTransition": {
+    "message": "タイトル トランジション",
+    "description": "Setting label, shown inside the floating lyrics window settings, for choosing how the song title and artist change between songs"
+  },
+  "options_display_pipMarquee": {
+    "message": "長いタイトルをスクロール",
+    "description": "Toggle label for whether a song title too long for the floating lyrics window scrolls across so it can be read in full"
+  },
+  "options_display_pipProgressBar": {
+    "message": "Show progress bar",
+    "description": "Toggle label, shown inside the floating lyrics window settings, for the seekable playback progress bar under the album art"
   },
   "options_display_shadersPromo": {
     "message": "Better Lyricsシェーダーへのリンクを表示",
@@ -194,6 +258,10 @@
   "lyricsDock_chooseSource": {
     "message": "Choose lyrics source",
     "description": "Accessible label for the lyrics dock button that opens the source provider dropdown"
+  },
+  "lyricsDock_refresh": {
+    "message": "Refresh lyrics",
+    "description": "Accessible label for the lyrics dock button that re-fetches lyrics for the current song, bypassing the cache"
   },
   "lyricsDock_previousSource": {
     "message": "Previous source",
@@ -301,7 +369,11 @@
   },
   "options_themes_create": {
     "message": "作成",
-    "description": "Create button label"
+    "description": "Button to open the style editor if there are no styles"
+  },
+  "options_themes_edit": {
+    "message": "Edit",
+    "description": "Button to open the style editor"
   },
   "options_themes_marketplace": {
     "message": "テーママーケットプレイス",
@@ -326,6 +398,10 @@
   "options_identity_yourIdentity": {
     "message": "あなたのID",
     "description": "Your identity label"
+  },
+  "options_identity_unisonStats": {
+    "message": "Unison Stats",
+    "description": "Section title above the user's own Unison level, tier, rank and badges on the Identity tab"
   },
   "options_identity_loading": {
     "message": "読み込み中...",
@@ -364,7 +440,7 @@
     "description": "Confirm button label inside the import identity modal"
   },
   "options_nickname_description": {
-    "message": "より良い歌詞で自分の名前を選んでください。文字、数字、アンダーバー、3〜20文字。",
+    "message": "Better Lyricsで自分の名前を選んでください。文字、数字、アンダーバー、3〜20文字。",
     "description": "Nickname subsection description"
   },
   "options_nickname_placeholder": {
@@ -540,7 +616,7 @@
     "description": "Better Lyrics Legato provider name"
   },
   "options_provider_betterLyricsPortato": {
-    "message": "Better Lyrics Legato",
+    "message": "Better Lyrics Portato",
     "description": "Better Lyrics Portato provider name"
   },
   "options_provider_betterLyricsUnison": {
@@ -978,11 +1054,11 @@
     "description": "Powered by label"
   },
   "editor_playground": {
-    "message": "Playground",
+    "message": "プレイグラウンド",
     "description": "Playground link text"
   },
   "editor_docs": {
-    "message": "Docs",
+    "message": "ドキュメント",
     "description": "Docs link text"
   },
   "lyrics_source": {
@@ -1022,11 +1098,11 @@
     "description": "Resume Autoscroll button label"
   },
   "options_language_exclusions": {
-    "message": "Language exclusions",
+    "message": "言語の除外",
     "description": "Label for language exclusions setting"
   },
   "options_manage": {
-    "message": "Manage",
+    "message": "管理",
     "description": "Manage button label"
   },
   "options_language_exclusionsTitle": {
@@ -1133,29 +1209,27 @@
     "message": "テーマをインストールできませんでした。接続を確認して再度お試し下さい。",
     "description": "Alert when a symlinked theme fails to install from marketplace"
   },
-  "symlink_badge_marketplace": {
-    "message": "マーケットプレイス",
-    "description": "Badge text on symlinked theme cards"
+  "theme_top_badge": {
+    "message": "#$RANK$ on the Marketplace",
+    "description": "Tooltip on a featured theme's rank medal",
+    "placeholders": {
+      "rank": {
+        "content": "$1",
+        "example": "1"
+      }
+    }
   },
-  "symlink_badge_bundled": {
-    "message": "Bundled",
-    "description": "Badge text on non-symlinked built-in theme cards"
+  "theme_modal_section_featured": {
+    "message": "Featured Themes",
+    "description": "Section title for featured themes (top marketplace picks and built-ins) in the theme chooser modal"
   },
-  "deprecation_builtin_title": {
-    "message": "Heads up, these themes are moving!",
-    "description": "Title for the built-in themes deprecation banner in theme modal"
+  "theme_modal_section_all": {
+    "message": "All Themes",
+    "description": "Section title for the user's installed marketplace themes in the theme chooser modal"
   },
-  "deprecation_builtin_body": {
-    "message": "組み込みのテーマをテーママーケットプレイスに移行しています。既に存在するものもあれば、マーケットプレイスのバッジを探してください。 残りは今後のアップデートに続き、GitHubとDiscordのCSSバックアップも予定されています。",
-    "description": "Body text for the built-in themes deprecation banner"
-  },
-  "deprecation_builtin_cta": {
-    "message": "マーケットプレイスを見る",
-    "description": "CTA button text in the deprecation banner to open the marketplace"
-  },
-  "theme_modal_section_builtin": {
-    "message": "標準のテーマ",
-    "description": "Section title for built-in themes in the theme chooser modal"
+  "theme_modal_browse": {
+    "message": "Browse Marketplace",
+    "description": "Link in the theme chooser modal that opens the full Theme Marketplace page"
   },
   "theme_modal_section_custom": {
     "message": "カスタムテーマ",
@@ -1657,21 +1731,47 @@
     "message": "報告に失敗しました。もう一度試してみますか？",
     "description": "Shown when a lyrics report fails to submit"
   },
-  "unison_tier_new": {
-    "message": "新しい",
-    "description": "Trust tier badge for low-reputation Unison submitters"
+  "unison_level": {
+    "message": "Level $level$",
+    "description": "Shows a Unison contributor's numeric level. $level$ is a positive integer",
+    "placeholders": {
+      "level": {
+        "content": "$1",
+        "example": "6"
+      }
+    }
   },
-  "unison_tier_trusted": {
-    "message": "信頼済",
-    "description": "Trust tier badge for mid-reputation Unison submitters"
+  "unison_xpToNext": {
+    "message": "$xp$ XP to Level $level$",
+    "description": "Explains how much experience remains before the next Unison level. $xp$ is a positive integer, $level$ is the next level number",
+    "placeholders": {
+      "xp": {
+        "content": "$1",
+        "example": "436"
+      },
+      "level": {
+        "content": "$2",
+        "example": "7"
+      }
+    }
   },
-  "unison_tier_veteran": {
-    "message": "ベテラン",
-    "description": "Trust tier badge for high-reputation Unison submitters"
+  "unison_maxLevel": {
+    "message": "Max level",
+    "description": "Shown in place of the XP-to-next text when a Unison contributor is at the highest level"
   },
-  "unison_tier_expert": {
-    "message": "エキスパート",
-    "description": "Trust tier badge for top-reputation Unison submitters"
+  "unison_rank": {
+    "message": "Rank #$rank$",
+    "description": "Shows a Unison contributor's leaderboard rank within their tier. $rank$ is a positive integer",
+    "placeholders": {
+      "rank": {
+        "content": "$1",
+        "example": "1"
+      }
+    }
+  },
+  "unison_viewProfile": {
+    "message": "View full profile",
+    "description": "Link on the Identity tab that opens the user's full Unison profile in a new tab"
   },
   "unison_submitted_this": {
     "message": "この歌詞を提出しました",

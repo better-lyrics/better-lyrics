@@ -1,13 +1,17 @@
 import { LOG_PREFIX_UNISON, UNISON_API_URL } from "@/core/constants";
 import { getIdentity, signPayload } from "@/core/keyIdentity";
-import { parseLRC, parsePlainLyrics } from "./lrcUtils";
+import { parseLRC, PlainParser } from "@braccato/parsers";
 import type { LyricSourceResult, ProviderParameters } from "./shared";
-import { fillTtml } from "./ttmlUtils";
+import { fillTtml } from "@modules/lyrics/providers/ttmlSource";
+import { warnUnison } from "@core/logger";
+import type { Mark } from "@modules/unison/types";
 
 interface SubmitterInfo {
   keyId: string;
   reputation: number;
   displayName?: string;
+  tier?: string | null;
+  level?: number;
 }
 
 interface UnisonResponse {
@@ -15,13 +19,13 @@ interface UnisonResponse {
   videoId: string;
   song: string;
   artist: string;
-  duration: number;
   lyrics: string;
   format: "ttml" | "lrc" | "plain";
   syncType: "richsync" | "linesync" | "plain";
   effectiveScore: number;
   voteCount: number;
   submitter?: SubmitterInfo;
+  marks?: Mark[];
   /** A property only passed if `x-api-key` header is also passed */
   userVote: 1 | -1 | null;
 }
@@ -40,6 +44,7 @@ export interface UnisonData {
   effectiveScore: number;
   lyricsId: number;
   submitter?: SubmitterInfo;
+  marks?: Mark[];
 }
 
 export async function vote(lyricsId: number, upvote: boolean) {
@@ -52,7 +57,7 @@ export async function vote(lyricsId: number, upvote: boolean) {
     });
     return { ok: response.ok, status: response.status };
   } catch (err) {
-    console.warn(`${LOG_PREFIX_UNISON} vote failed`, err);
+    warnUnison(`vote failed`, err);
     return { ok: false, status: 0 };
   }
 }
@@ -67,7 +72,7 @@ export async function deleteVote(lyricsId: number) {
     });
     return { ok: response.ok, status: response.status };
   } catch (err) {
-    console.warn(`${LOG_PREFIX_UNISON} deleteVote failed`, err);
+    warnUnison(`deleteVote failed`, err);
     return { ok: false, status: 0 };
   }
 }
@@ -82,7 +87,7 @@ export async function report(lyricsId: number, reason: UnisonReportReason | stri
     });
     return { ok: response.ok, status: response.status };
   } catch (err) {
-    console.warn(`${LOG_PREFIX_UNISON} report failed`, err);
+    warnUnison(`report failed`, err);
     return { ok: false, status: 0 };
   }
 }
@@ -99,7 +104,7 @@ export async function byId(lyricsId: number): Promise<UnisonResponse | null> {
     }
     return response.json().then(json => json.data);
   } catch (err) {
-    console.warn(`${LOG_PREFIX_UNISON} byId failed`, err);
+    warnUnison(`byId failed`, err);
     return null;
   }
 }
@@ -122,9 +127,11 @@ export default async function unison(providerParameters: ProviderParameters): Pr
 
   if (response.status === 404) {
     providerParameters.sourceMap["unison-richsynced"].filled = true;
+    providerParameters.sourceMap["unison-wordsynced"].filled = true;
     providerParameters.sourceMap["unison-synced"].filled = true;
     providerParameters.sourceMap["unison-plain"].filled = true;
     providerParameters.sourceMap["unison-richsynced"].lyricSourceResult = null;
+    providerParameters.sourceMap["unison-wordsynced"].lyricSourceResult = null;
     providerParameters.sourceMap["unison-synced"].lyricSourceResult = null;
     providerParameters.sourceMap["unison-plain"].lyricSourceResult = null;
     return;
@@ -135,6 +142,7 @@ export default async function unison(providerParameters: ProviderParameters): Pr
   }
 
   providerParameters.sourceMap["unison-richsynced"].filled = true;
+  providerParameters.sourceMap["unison-wordsynced"].filled = true;
   providerParameters.sourceMap["unison-synced"].filled = true;
   providerParameters.sourceMap["unison-plain"].filled = true;
 
@@ -142,6 +150,7 @@ export default async function unison(providerParameters: ProviderParameters): Pr
 
   if (!responseData.format || !responseData.lyrics) {
     providerParameters.sourceMap["unison-richsynced"].lyricSourceResult = null;
+    providerParameters.sourceMap["unison-wordsynced"].lyricSourceResult = null;
     providerParameters.sourceMap["unison-synced"].lyricSourceResult = null;
     providerParameters.sourceMap["unison-plain"].lyricSourceResult = null;
     return;
@@ -153,6 +162,7 @@ export default async function unison(providerParameters: ProviderParameters): Pr
     effectiveScore: responseData.effectiveScore,
     lyricsId: responseData.id,
     submitter: responseData.submitter,
+    marks: responseData.marks,
   };
 
   const result = {
@@ -164,27 +174,31 @@ export default async function unison(providerParameters: ProviderParameters): Pr
 
   switch (responseData.format) {
     case "ttml":
-      await fillTtml(responseData.lyrics, providerParameters, {
+      fillTtml(responseData.lyrics, providerParameters, {
         richsyncKey: "unison-richsynced",
         syncedKey: "unison-synced",
         ...result,
       });
+      providerParameters.sourceMap["unison-wordsynced"].lyricSourceResult = null;
       providerParameters.sourceMap["unison-plain"].lyricSourceResult = null;
       break;
     case "lrc":
-      const lrc = parseLRC(responseData.lyrics, responseData.duration);
-      const res = {
+      const lrc = parseLRC(responseData.lyrics, providerParameters.duration * 1000);
+      const isWordSynced = responseData.syncType === "richsync";
+      const res: LyricSourceResult = {
         ...result,
         lyrics: lrc,
       };
 
       providerParameters.sourceMap["unison-richsynced"].lyricSourceResult = null;
-      providerParameters.sourceMap["unison-synced"].lyricSourceResult = lrc ? res : null;
+      providerParameters.sourceMap["unison-wordsynced"].lyricSourceResult = lrc && isWordSynced ? res : null;
+      providerParameters.sourceMap["unison-synced"].lyricSourceResult = lrc && !isWordSynced ? res : null;
       providerParameters.sourceMap["unison-plain"].lyricSourceResult = null;
       break;
     case "plain":
-      const plain = parsePlainLyrics(responseData.lyrics);
+      const plain = PlainParser.parse(responseData.lyrics);
       providerParameters.sourceMap["unison-richsynced"].lyricSourceResult = null;
+      providerParameters.sourceMap["unison-wordsynced"].lyricSourceResult = null;
       providerParameters.sourceMap["unison-synced"].lyricSourceResult = null;
       providerParameters.sourceMap["unison-plain"].lyricSourceResult = plain
         ? {

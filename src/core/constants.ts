@@ -1,30 +1,36 @@
 import type { LyricSourceKey } from "@modules/lyrics/providers/shared";
 
+// The renderer module owns the names it emits into the lyrics DOM. They are re-exported here so
+// existing importers keep reaching them through @constants.
+export {
+  FOOTER_CLASS,
+  LINE_CLASS,
+  LYRICS_CLASS,
+  LYRICS_WRAPPER_ID,
+  ROMANIZED_LYRICS_CLASS,
+  TRANSLATED_LYRICS_CLASS,
+  WORD_HIGHLIGHT_CLASS,
+} from "@braccato/core/constants";
+
 // DOM Class Names
 export const TAB_HEADER_CLASS = "tab-header style-scope ytmusic-player-page" as const;
 export const TAB_CONTENT_CLASS = "tab-content style-scope tp-yt-paper-tab" as const;
-export const LYRICS_CLASS = "blyrics-container" as const;
-export const CURRENT_LYRICS_CLASS = "blyrics--active" as const;
-export const ANIMATING_CLASS = "blyrics--animating" as const;
-export const PAUSED_CLASS = "blyrics--paused" as const;
-export const ZERO_DURATION_ANIMATION_CLASS = "blyrics-zero-dur-animate" as const;
-export const RTL_CLASS = "blyrics-rtl" as const;
-export const WORD_CLASS = "blyrics--word" as const;
-export const LINE_CLASS = "blyrics--line" as const;
-export const BACKGROUND_LYRIC_CLASS = "blyrics-background-lyric" as const;
-export const EXPLICIT_WORD_CLASS = "blyrics-explicit" as const;
-export const USER_SCROLLING_CLASS = "blyrics-user-scrolling" as const;
-export const TRANSLATED_LYRICS_CLASS = "blyrics--translated" as const;
-export const ROMANIZED_LYRICS_CLASS = "blyrics--romanized" as const;
-export const FOOTER_CLASS = "blyrics-footer" as const;
 export const DOCK_CLASS = "blyrics-dock" as const;
 export const DOCK_DEFAULT_POSITION = "bottom-right" as const;
-export const DOCK_CONTROL_ORDER_DEFAULT = ["source", "translate", "romanize", "offset", "download", "pictureInPicture"] as const;
+export const DOCK_CONTROL_ORDER_DEFAULT = [
+  "source",
+  "translate",
+  "romanize",
+  "offset",
+  "refresh",
+  "pictureInPicture",
+] as const;
 export const MODAL_OVERLAY_CLASS = "blyrics-modal-overlay" as const;
 export const MODAL_CLASS = "blyrics-modal" as const;
 
 // DOM Selectors
 export const TAB_RENDERER_SELECTOR = "#tab-renderer" as const;
+export const LYRICS_PAGE_TYPE = "MUSIC_PAGE_TYPE_TRACK_LYRICS" as const;
 export const NO_LYRICS_TEXT_SELECTOR =
   "#tab-renderer > ytmusic-message-renderer > yt-formatted-string.text.style-scope.ytmusic-message-renderer" as const;
 export const FULLSCREEN_BUTTON_SELECTOR = ".fullscreen-button" as const;
@@ -34,14 +40,17 @@ export const PICTURE_IN_PICTURE_TOGGLE_SELECTOR = "[data-blyrics-picture-in-pict
 
 // DOM IDs and Attributes
 export const LYRICS_LOADER_ID = "blyrics-loader" as const;
-export const LYRICS_WRAPPER_ID = "blyrics-wrapper" as const;
 export const LYRICS_DISABLED_ATTR = "blyrics-dfs" as const;
+export const FULLSCREEN_CONTROLS_DISABLED_ATTR = "blyrics-no-fs-controls" as const;
+export const DISABLE_EFFECTS_STYLE_ID = "blyrics-disable-effects" as const;
 export const HIDDEN_CLASS = "blyrics-hidden" as const;
 export const REPORT_MODAL = "blyrics-report-lyrics" as const;
 
 // Custom Events
 // Duplicated as a literal in public/script.js; that file is a page-world script and cannot import.
 export const SEEK_EVENT = "blyrics-seek-to" as const;
+export const PLAYER_CONTROL_EVENT = "blyrics-player-control" as const;
+export const PLAYER_TIME_EVENT = "blyrics-send-player-time" as const;
 
 // Assets and Resources
 export const DISCORD_LOGO_SRC =
@@ -56,13 +65,21 @@ export const NOTO_SANS_UNIVERSAL_LINK =
 export const HOMEPAGE_URL = "https://betterlyrics.org" as const;
 export const HOMEPAGE_DOMAIN = "betterlyrics.org" as const;
 export const HOMEPAGE_ICON_URL = "https://betterlyrics.org/icon-512.png" as const;
-export const UNISON_API_URL = "https://unison.boidu.dev/lyrics" as const;
+export const UNISON_API_URL = "https://unison.betterlyrics.org/lyrics" as const;
 export const DISCORD_INVITE_URL = "https://discord.gg/UsHE3d5fWF" as const;
 export const SHADERS_CWS_URL =
   "https://chromewebstore.google.com/detail/better-lyrics-shaders/mffpncjphfmkppebdoaehdlnagnlpfai" as const;
 export const SHADERS_AMO_URL = "https://addons.mozilla.org/en-US/firefox/addon/better-lyrics-shaders/" as const;
-export const THEME_STORE_API_URL = "https://better-lyrics-themes-api.boidu.dev" as const;
-export const UNISON_API_BASE_URL = "https://unison.boidu.dev" as const;
+export const STORE_CWS_URL =
+  "https://chromewebstore.google.com/detail/better-lyrics/effdbpeggelllpfkjppbokhmmiinhlmg" as const;
+export const STORE_AMO_URL = "https://addons.mozilla.org/en-US/firefox/addon/better-lyrics/" as const;
+export const STORE_EDGE_URL =
+  "https://microsoftedge.microsoft.com/addons/detail/better-lyrics-lyrics-for/mjfeaklppoegooljmjicjdbiccgjdlhd" as const;
+export const RELEASES_LATEST_API_URL =
+  "https://api.github.com/repos/better-lyrics/better-lyrics/releases/latest" as const;
+export const THEME_STORE_API_URL = "https://themes.betterlyrics.org" as const;
+export const UNISON_API_BASE_URL = "https://unison.betterlyrics.org" as const;
+export const UNISON_TRANSLATE_URL = `${UNISON_API_BASE_URL}/translate` as const;
 export const THEME_STORE_TURNSTILE_URL = `${THEME_STORE_API_URL}/turnstile` as const;
 const THEME_REGISTRY_BASE = "https://raw.githubusercontent.com/better-lyrics/themes" as const;
 export const THEME_REGISTRY_URL = `${THEME_REGISTRY_BASE}/master` as const;
@@ -157,7 +174,6 @@ export const LYRICS_TAB_NOT_DISABLED_LOG =
   "[BetterLyrics] (Safe to ignore) Lyrics tab is not disabled, unable to enable it" as const;
 export const SONG_SWITCHED_LOG = "[BetterLyrics] Song has been switched" as const;
 export const LOADER_TRANSITION_ENDED = "[BetterLyrics] Loader Transition Ended" as const;
-export const PAUSING_LYRICS_SCROLL_LOG = "[BetterLyrics] Pausing Lyrics Autoscroll Due to User Scroll" as const;
 
 // Feature State Logs
 export const AUTO_SWITCH_ENABLED_LOG = "[BetterLyrics] Auto switch enabled, switching to lyrics tab" as const;
@@ -169,12 +185,7 @@ export const SYNC_DISABLED_LOG =
 // Error and Storage Logs
 export const SERVER_ERROR_LOG = "[BetterLyrics] Server Error:" as const;
 export const STORAGE_TRANSIENT_SET_LOG = "[BetterLyrics] Set transient storage for key: " as const;
-export const NO_LYRICS_ELEMENT_LOG =
-  "[BetterLyrics] No lyrics element found on the page, skipping lyrics injection" as const;
-export const LYRICS_CHECK_INTERVAL_ERROR = "[BetterLyrics] Error in lyrics check interval:" as const;
 export const MUSIC_NOTES = "♪𝅘𝅥𝅮𝅘𝅥𝅯𝅘𝅥𝅰𝅘𝅥𝅱𝅘𝅥𝅲" as const;
-
-export const BLYRICS_INSTRUMENTAL_GAP_MS = 5000;
 
 export const LYRICS_CACHE_TTL_MS = 7 * 24 * 60 * 60 * 1000;
 export const LYRICS_NEGATIVE_CACHE_TTL_MS = 30 * 60 * 1000;
@@ -405,28 +416,34 @@ export const PROVIDER_CONFIGS: ProviderConfig[] = [
     priority: 1,
   },
   { key: "binimum-richsynced", displayName: "BiniLyrics", syncType: "syllable", priority: 2 },
-  { key: "portato-richsynced", displayName: "Better Lyrics Portato", syncType: "word", priority: 3 },
-  { key: "musixmatch-richsync", displayName: "Musixmatch", syncType: "word", priority: 4 },
-  { key: "bLyrics-synced", displayName: "Better Lyrics", syncType: "line", priority: 5 },
+  {
+    key: "unison-wordsynced",
+    displayName: "Unison",
+    syncType: "word",
+    priority: 3,
+  },
+  { key: "portato-richsynced", displayName: "Better Lyrics Portato", syncType: "word", priority: 4 },
+  { key: "musixmatch-richsync", displayName: "Musixmatch", syncType: "word", priority: 5 },
+  { key: "bLyrics-synced", displayName: "Better Lyrics", syncType: "line", priority: 6 },
   {
     key: "unison-synced",
     displayName: "Unison",
     syncType: "line",
-    priority: 6,
+    priority: 7,
   },
-  { key: "yt-captions", displayName: "YouTube Captions", syncType: "line", priority: 7 },
-  { key: "binimum-synced", displayName: "BiniLyrics", syncType: "line", priority: 8 },
-  { key: "lrclib-synced", displayName: "LRCLib", syncType: "line", priority: 9 },
-  { key: "legato-synced", displayName: "Better Lyrics Legato", syncType: "line", priority: 10 },
-  { key: "musixmatch-synced", displayName: "Musixmatch", syncType: "line", priority: 11 },
-  { key: "yt-lyrics", displayName: "YouTube", syncType: "unsynced", priority: 12 },
+  { key: "yt-captions", displayName: "YouTube Captions", syncType: "line", priority: 8 },
+  { key: "binimum-synced", displayName: "BiniLyrics", syncType: "line", priority: 9 },
+  { key: "lrclib-synced", displayName: "LRCLib", syncType: "line", priority: 10 },
+  { key: "legato-synced", displayName: "Better Lyrics Legato", syncType: "line", priority: 11 },
+  { key: "musixmatch-synced", displayName: "Musixmatch", syncType: "line", priority: 12 },
+  { key: "yt-lyrics", displayName: "YouTube", syncType: "unsynced", priority: 13 },
   {
     key: "unison-plain",
     displayName: "Unison",
     syncType: "unsynced",
-    priority: 13,
+    priority: 14,
   },
-  { key: "lrclib-plain", displayName: "LRCLib", syncType: "unsynced", priority: 14 },
+  { key: "lrclib-plain", displayName: "LRCLib", syncType: "unsynced", priority: 15 },
 ] as const;
 
 export const LYRIC_SOURCE_KEYS = PROVIDER_CONFIGS.map(p => p.key);

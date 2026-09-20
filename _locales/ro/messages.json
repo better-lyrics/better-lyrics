@@ -83,9 +83,29 @@
     "message": "Arată coperta albumului blurată pe fundal",
     "description": "Show album art background setting label"
   },
+  "options_display_fullscreenControls": {
+    "message": "Show player controls in fullscreen",
+    "description": "Toggle label for the playback controls strip (progress bar, transport, like and dislike) shown under the album art in the fullscreen lyrics view"
+  },
   "options_display_stylizedAnimations": {
     "message": "Afișare animații stilizate",
     "description": "Show stylized animations setting label"
+  },
+  "options_display_letterWave": {
+    "message": "Letter wave",
+    "description": "Label for the per-letter wave lyric animation toggle"
+  },
+  "options_display_letterWaveBadge": {
+    "message": "Experimental",
+    "description": "Badge shown next to the letter wave setting marking it as experimental"
+  },
+  "options_display_letterWaveTooltip": {
+    "message": "Lyrics feel more alive with a gentle rolling motion across each letter as they're sung. Turn it off if lyrics scroll feels choppy on your device.",
+    "description": "Tooltip explaining the letter wave animation and its performance impact"
+  },
+  "options_display_letterWaveTooltipStates": {
+    "message": "Auto stays off unless a theme turns it on. On and Off override any theme.",
+    "description": "Appended to the letter wave tooltip, explaining the three switch states"
   },
   "options_display_passiveScroll": {
     "message": "Derulare automată versurilor nesincronizate",
@@ -110,6 +130,10 @@
   "picture_in_picture_next": {
     "message": "Next",
     "description": "Accessible label for the next track button in the Picture-in-Picture lyrics window, used when the YouTube Music player bar exposes no label of its own"
+  },
+  "options_display_pipEnabled": {
+    "message": "Enable floating window",
+    "description": "Master toggle for the floating lyrics window feature, which turns it off everywhere including the YouTube Music minimize button"
   },
   "options_display_pipAutoRestore": {
     "message": "Reopen floating lyrics automatically",
@@ -154,6 +178,10 @@
   "options_display_pipMarquee": {
     "message": "Scroll long titles",
     "description": "Toggle label for whether a song title too long for the floating lyrics window scrolls across so it can be read in full"
+  },
+  "options_display_pipProgressBar": {
+    "message": "Show progress bar",
+    "description": "Toggle label, shown inside the floating lyrics window settings, for the seekable playback progress bar under the album art"
   },
   "options_display_shadersPromo": {
     "message": "Show link to Better Lyrics Shaders",
@@ -230,6 +258,10 @@
   "lyricsDock_chooseSource": {
     "message": "Choose lyrics source",
     "description": "Accessible label for the lyrics dock button that opens the source provider dropdown"
+  },
+  "lyricsDock_refresh": {
+    "message": "Refresh lyrics",
+    "description": "Accessible label for the lyrics dock button that re-fetches lyrics for the current song, bypassing the cache"
   },
   "lyricsDock_previousSource": {
     "message": "Previous source",
@@ -337,7 +369,11 @@
   },
   "options_themes_create": {
     "message": "Creează",
-    "description": "Create button label"
+    "description": "Button to open the style editor if there are no styles"
+  },
+  "options_themes_edit": {
+    "message": "Edit",
+    "description": "Button to open the style editor"
   },
   "options_themes_marketplace": {
     "message": "Bazar de Teme",
@@ -363,6 +399,10 @@
     "message": "Identitatea Ta",
     "description": "Your identity label"
   },
+  "options_identity_unisonStats": {
+    "message": "Unison Stats",
+    "description": "Section title above the user's own Unison level, tier, rank and badges on the Identity tab"
+  },
   "options_identity_loading": {
     "message": "Se încarcă...",
     "description": "Loading identity placeholder"
@@ -384,15 +424,15 @@
     "description": "Title of the import identity modal"
   },
   "options_identityImport_chooseFile": {
-    "message": "Choose File",
+    "message": "Alege fișierul",
     "description": "Label for the file picker button in the import identity modal"
   },
   "options_identityImport_or": {
-    "message": "or",
+    "message": "sau",
     "description": "Divider between file picker and paste textarea in the import identity modal"
   },
   "options_identityImport_pastePlaceholder": {
-    "message": "Paste identity JSON here...",
+    "message": "Lipește JSON-ul de identitatea aici...",
     "description": "Placeholder for the identity JSON textarea"
   },
   "options_identityImport_import": {
@@ -404,19 +444,19 @@
     "description": "Nickname subsection description"
   },
   "options_nickname_placeholder": {
-    "message": "Pick a nickname",
+    "message": "Alege o poreclă",
     "description": "Nickname input placeholder"
   },
   "options_nickname_save": {
-    "message": "Save",
+    "message": "Salvează",
     "description": "Nickname save button label"
   },
   "options_nickname_reset": {
-    "message": "Reset to default",
+    "message": "Resetare la valori implicite",
     "description": "Nickname reset button label"
   },
   "options_nickname_modalTitle": {
-    "message": "Set your nickname",
+    "message": "Setează-ți porecla",
     "description": "Nickname modal title"
   },
   "options_nickname_edit": {
@@ -1169,29 +1209,27 @@
     "message": "Nu s-a putut instala tema. Verificați conexiunea și încercați din nou.",
     "description": "Alert when a symlinked theme fails to install from marketplace"
   },
-  "symlink_badge_marketplace": {
-    "message": "Piață",
-    "description": "Badge text on symlinked theme cards"
+  "theme_top_badge": {
+    "message": "#$RANK$ on the Marketplace",
+    "description": "Tooltip on a featured theme's rank medal",
+    "placeholders": {
+      "rank": {
+        "content": "$1",
+        "example": "1"
+      }
+    }
   },
-  "symlink_badge_bundled": {
-    "message": "Combinat",
-    "description": "Badge text on non-symlinked built-in theme cards"
+  "theme_modal_section_featured": {
+    "message": "Featured Themes",
+    "description": "Section title for featured themes (top marketplace picks and built-ins) in the theme chooser modal"
   },
-  "deprecation_builtin_title": {
-    "message": "Atenție, migrăm aceste teme!",
-    "description": "Title for the built-in themes deprecation banner in theme modal"
+  "theme_modal_section_all": {
+    "message": "All Themes",
+    "description": "Section title for the user's installed marketplace themes in the theme chooser modal"
   },
-  "deprecation_builtin_body": {
-    "message": "Migrăm teme incluse în Piața Temelor. Unele deja există, caută insigna de piață. Restul va urma într-o actualizare viitoare, cu rezerve de CSS pe GitHub și Discord.",
-    "description": "Body text for the built-in themes deprecation banner"
-  },
-  "deprecation_builtin_cta": {
-    "message": "Răsfoiește piața",
-    "description": "CTA button text in the deprecation banner to open the marketplace"
-  },
-  "theme_modal_section_builtin": {
-    "message": "Teme incluse",
-    "description": "Section title for built-in themes in the theme chooser modal"
+  "theme_modal_browse": {
+    "message": "Browse Marketplace",
+    "description": "Link in the theme chooser modal that opens the full Theme Marketplace page"
   },
   "theme_modal_section_custom": {
     "message": "Temă personalizată",
@@ -1693,21 +1731,47 @@
     "message": "Asta nu s-a trimis. Încerci din nou?",
     "description": "Shown when a lyrics report fails to submit"
   },
-  "unison_tier_new": {
-    "message": "nou",
-    "description": "Trust tier badge for low-reputation Unison submitters"
+  "unison_level": {
+    "message": "Level $level$",
+    "description": "Shows a Unison contributor's numeric level. $level$ is a positive integer",
+    "placeholders": {
+      "level": {
+        "content": "$1",
+        "example": "6"
+      }
+    }
   },
-  "unison_tier_trusted": {
-    "message": "de încredere",
-    "description": "Trust tier badge for mid-reputation Unison submitters"
+  "unison_xpToNext": {
+    "message": "$xp$ XP to Level $level$",
+    "description": "Explains how much experience remains before the next Unison level. $xp$ is a positive integer, $level$ is the next level number",
+    "placeholders": {
+      "xp": {
+        "content": "$1",
+        "example": "436"
+      },
+      "level": {
+        "content": "$2",
+        "example": "7"
+      }
+    }
   },
-  "unison_tier_veteran": {
-    "message": "veteran",
-    "description": "Trust tier badge for high-reputation Unison submitters"
+  "unison_maxLevel": {
+    "message": "Max level",
+    "description": "Shown in place of the XP-to-next text when a Unison contributor is at the highest level"
   },
-  "unison_tier_expert": {
-    "message": "expert",
-    "description": "Trust tier badge for top-reputation Unison submitters"
+  "unison_rank": {
+    "message": "Rank #$rank$",
+    "description": "Shows a Unison contributor's leaderboard rank within their tier. $rank$ is a positive integer",
+    "placeholders": {
+      "rank": {
+        "content": "$1",
+        "example": "1"
+      }
+    }
+  },
+  "unison_viewProfile": {
+    "message": "View full profile",
+    "description": "Link on the Identity tab that opens the user's full Unison profile in a new tab"
   },
   "unison_submitted_this": {
     "message": "s-a trimis acest licric",

@@ -1,5 +1,5 @@
 import { XMLParser } from "fast-xml-parser";
-import { LOG_PREFIX_UNISON, UNISON_API_BASE_URL } from "@constants";
+import { UNISON_API_BASE_URL } from "@constants";
 import { t } from "@core/i18n";
 import {
   DEFAULT_FEED_FILTERS,
@@ -26,8 +26,9 @@ import {
   submitLyrics,
 } from "@modules/unison/unisonApi";
 import { UnisonErrorCode } from "@modules/unison/errorCodes";
-import { getTrustTier } from "@modules/unison/trustTier";
+import { appendInlineProfile, profileUrl } from "@modules/unison/gamificationRender";
 import { generatePetName, getDisplayName } from "@/core/keyIdentity";
+import { warnUnison } from "@core/logger";
 
 // -- SVG Icons --------------------------
 
@@ -307,7 +308,7 @@ async function loadIdentity(): Promise<void> {
       if (el) el.textContent = text;
     }
   } catch (err) {
-    console.warn(LOG_PREFIX_UNISON, "Failed to load identity:", err);
+    warnUnison("Failed to load identity:", err);
   }
 }
 
@@ -456,7 +457,7 @@ function appendLanguageOptions(select: HTMLSelectElement): void {
   try {
     displayNames = new Intl.DisplayNames(undefined, { type: "language" });
   } catch (err) {
-    console.warn(LOG_PREFIX_UNISON, "Intl.DisplayNames unavailable, falling back to language codes", err);
+    warnUnison("Intl.DisplayNames unavailable, falling back to language codes", err);
     displayNames = null;
   }
   for (const code of LANGUAGE_OPTIONS) {
@@ -1088,19 +1089,12 @@ function createUploaderCell(submitter: UnisonSubmitter): HTMLElement {
 
   const link = document.createElement("a");
   link.className = "unison-uploader-link";
-  link.href = `${UNISON_API_BASE_URL}/curator/${encodeURIComponent(submitter.keyId)}`;
+  link.href = profileUrl(submitter.displayName, submitter.keyId);
   link.target = "_blank";
   link.rel = "noreferrer noopener";
   link.textContent = submitter.displayName || generatePetName(submitter.keyId);
 
-  const tier = getTrustTier(submitter.reputation);
-  const tierBadge = document.createElement("span");
-  tierBadge.className = "unison-badge unison-badge--tier";
-  tierBadge.dataset.tier = tier;
-  tierBadge.textContent = t(`unison_tier_${tier}`);
-
-  cell.appendChild(link);
-  cell.appendChild(tierBadge);
+  appendInlineProfile(cell, link, submitter);
   return cell;
 }
 

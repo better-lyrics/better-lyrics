@@ -28,6 +28,26 @@ export interface PictureInPictureViewDependencies {
     signal?: AbortSignal
   ) => Promise<PictureInPictureSongMetadata | null>;
   readonly resetScrollResume: () => void;
+  /**
+   * Where the window's diagnostics go. The isolated world routes them through the extension's
+   * logger; the page world, which has no access to it, writes to the console under the same prefix.
+   */
+  readonly log: (...args: unknown[]) => void;
+}
+
+/**
+ * The last player snapshot the window saw, kept so its own animation frame loop can interpolate a
+ * playback time between the ~100ms events rather than only rendering when one arrives.
+ */
+export interface PictureInPicturePlaybackSnapshot {
+  readonly currentTimeS: number;
+  readonly durationS: number;
+  readonly playbackRate: number;
+  readonly isPlaying: boolean;
+  /**
+   * Wall clock time the page world took the snapshot at, in milliseconds.
+   */
+  readonly wallTime: number;
 }
 
 export interface PictureInPictureToggle {
@@ -43,6 +63,7 @@ export interface PictureInPictureHostEnvironment {
   readonly artworkTransition: () => unknown;
   readonly textTransition: () => unknown;
   readonly marqueeEnabled: () => unknown;
+  readonly progressBarEnabled: () => unknown;
   readonly windowTitle: () => string;
   readonly stylesheetUrls: () => { readonly lyrics: string; readonly fonts: readonly string[] };
   readonly loadStylesheet: () => Promise<string>;
@@ -60,6 +81,7 @@ export interface PictureInPictureControllerDependencies<TWindow> {
   readonly closeWindow: (pipWindow: TWindow) => void;
   readonly observePageHide: (pipWindow: TWindow, listener: () => void) => void;
   readonly reportFailure: (message: string, error: unknown) => void;
+  readonly dispose?: () => void;
 }
 
 export type PictureInPictureCapability<TWindow = Window> =
