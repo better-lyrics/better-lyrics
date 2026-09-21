@@ -84,7 +84,7 @@
     "description": "Show album art background setting label"
   },
   "options_display_fullscreenControls": {
-    "message": "Show player controls in fullscreen",
+    "message": "Oynatıcı kontrollerini tam ekranda göster",
     "description": "Toggle label for the playback controls strip (progress bar, transport, like and dislike) shown under the album art in the fullscreen lyrics view"
   },
   "options_display_stylizedAnimations": {
@@ -104,7 +104,7 @@
     "description": "Tooltip explaining the letter wave animation and its performance impact"
   },
   "options_display_letterWaveTooltipStates": {
-    "message": "Auto stays off unless a theme turns it on. On and Off override any theme.",
+    "message": "Bir tema aksini yapana kadar otomatik kapalı kalır. Açık ve Kapalı herhangi bir temayı geçersiz kılar.",
     "description": "Appended to the letter wave tooltip, explaining the three switch states"
   },
   "options_display_passiveScroll": {
@@ -180,7 +180,7 @@
     "description": "Toggle label for whether a song title too long for the floating lyrics window scrolls across so it can be read in full"
   },
   "options_display_pipProgressBar": {
-    "message": "Show progress bar",
+    "message": "İlerleme çubuğunu göster",
     "description": "Toggle label, shown inside the floating lyrics window settings, for the seekable playback progress bar under the album art"
   },
   "options_display_shadersPromo": {
@@ -1012,7 +1012,7 @@
     }
   },
   "blUpdate_available": {
-    "message": "Better Lyrics $version$ is now available",
+    "message": "Better Lyrics $version$ kullanılabilir",
     "description": "Banner shown to pre-release (canary) users when the matching stable release ships",
     "placeholders": {
       "version": {
@@ -1022,15 +1022,15 @@
     }
   },
   "blUpdate_storeDelay": {
-    "message": "store may lag briefly",
+    "message": "mağaza kısa süreliğine gecikebilir",
     "description": "Trailing note on the update banner for Chrome and Edge, whose store approval can lag the release"
   },
   "blUpdate_action": {
-    "message": "Update",
+    "message": "Güncelle",
     "description": "Action link on the update banner that opens the browser's extension store listing"
   },
   "blUpdate_dismiss": {
-    "message": "Dismiss",
+    "message": "Yoksay",
     "description": "Accessible label for the button that closes the update banner"
   },
   "marketplace_discussion": {
@@ -1112,7 +1112,7 @@
     "description": "Message shown during ad playback"
   },
   "lyrics_notFound": {
-    "message": "Bu şarkı için sözler bulunamadı",
+    "message": "Şarkı sözleri bulunamadı",
     "description": "Message when no lyrics are available"
   },
   "lyrics_resumeAutoscroll": {
@@ -1232,7 +1232,7 @@
     "description": "Alert when a symlinked theme fails to install from marketplace"
   },
   "theme_top_badge": {
-    "message": "#$RANK$ on the Marketplace",
+    "message": "Mağazada #$RANK$",
     "description": "Tooltip on a featured theme's rank medal",
     "placeholders": {
       "rank": {
@@ -1242,15 +1242,15 @@
     }
   },
   "theme_modal_section_featured": {
-    "message": "Featured Themes",
+    "message": "Öne Çıkan Temalar",
     "description": "Section title for featured themes (top marketplace picks and built-ins) in the theme chooser modal"
   },
   "theme_modal_section_all": {
-    "message": "All Themes",
+    "message": "Tüm Temalar",
     "description": "Section title for the user's installed marketplace themes in the theme chooser modal"
   },
   "theme_modal_browse": {
-    "message": "Browse Marketplace",
+    "message": "Mağazayı Keşfedin",
     "description": "Link in the theme chooser modal that opens the full Theme Marketplace page"
   },
   "theme_modal_section_custom": {
