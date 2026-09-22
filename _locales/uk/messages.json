@@ -1012,7 +1012,7 @@
     }
   },
   "blUpdate_available": {
-    "message": "Better Lyrics $version$ is now available",
+    "message": "Better Lyrics $version$ вже доступно",
     "description": "Banner shown to pre-release (canary) users when the matching stable release ships",
     "placeholders": {
       "version": {
@@ -1022,15 +1022,15 @@
     }
   },
   "blUpdate_storeDelay": {
-    "message": "store may lag briefly",
+    "message": "може трохи затримуватися",
     "description": "Trailing note on the update banner for Chrome and Edge, whose store approval can lag the release"
   },
   "blUpdate_action": {
-    "message": "Update",
+    "message": "Оновити",
     "description": "Action link on the update banner that opens the browser's extension store listing"
   },
   "blUpdate_dismiss": {
-    "message": "Dismiss",
+    "message": "Закрити",
     "description": "Accessible label for the button that closes the update banner"
   },
   "marketplace_discussion": {
