@@ -1088,7 +1088,7 @@
     "description": "Lyrics source label"
   },
   "lyrics_searchOnGenius": {
-    "message": "Genius'ta araştır",
+    "message": "Genius'ta ara",
     "description": "Search on Genius button text"
   },
   "lyrics_getShaders": {
