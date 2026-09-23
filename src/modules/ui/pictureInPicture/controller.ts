@@ -8,7 +8,7 @@ import type {
 
 const WINDOW_SIZES = {
   horizontal: { width: 720, height: 300 },
-  vertical: { width: 360, height: 740 },
+  vertical: { width: 340, height: 720 },
 } as const;
 
 export const DEFAULT_WINDOW_LAYOUT = "horizontal";

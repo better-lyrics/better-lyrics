@@ -262,7 +262,7 @@ const verticalController = new PictureInPictureController({
 verticalController.toggle();
 assert.deepEqual(
   verticalApi.requests,
-  [{ width: 360, height: 740, disallowReturnToOpener: true }],
+  [{ width: 340, height: 720, disallowReturnToOpener: true }],
   "Given the vertical layout setting, When a PiP window is requested, Then it asks for portrait dimensions"
 );
 
