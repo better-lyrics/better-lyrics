@@ -283,7 +283,7 @@ Side-specific knobs are relative to scroll direction. On a downward scroll, line
 
 Configure line-scroll style values with comment-based knobs, not `:root` declarations. JS copies those values onto each animated line before resolving the Web Animation, so formulas that reference per-line variables resolve in the correct line scope. The resolved keyframes are snapshotted before the animation starts, which lets later scrolls update the same line variables without changing animations that are already running.
 
-The default two-keyframe animation starts each visible line at the signed scroll delta and animates it back to `0`. The base scroll gate is `--blyrics-lyric-scroll-duration`, while the default per-line visual tail uses `750ms` plus a side-specific relative-index delay. Lines above the active lyric get a subtle logarithmic tail. Lines below get a stronger logarithmic tail plus a small linear term, so farther trailing lines keep finishing progressively later during larger jumps instead of flattening at a fixed cap.
+The default two-keyframe animation starts each visible line at the signed scroll delta and animates it back to `0`. Scrolls have no duration-based gate; the default per-line visual tail uses `750ms` plus a side-specific relative-index delay. Lines above the active lyric get a subtle logarithmic tail. Lines below get a stronger logarithmic tail plus a small linear term, so farther trailing lines keep finishing progressively later during larger jumps instead of flattening at a fixed cap.
 
 ```css
 /*
@@ -301,7 +301,7 @@ blyrics-line-scroll-above-duration = calc(
 */
 ```
 
-The engine animates the individual `translate` property instead of `transform`, so this effect can run alongside the existing line-scale transform animation. Per-line scroll effects can overlap: custom line durations may run longer than `--blyrics-lyric-scroll-duration`, but the next autoscroll is gated only by `--blyrics-lyric-scroll-duration`. Overlapping scroll effects are composed with additive Web Animations (`composite: "add"`), so this behavior expects modern browser support for additive `element.animate()` effects.
+The engine animates the individual `translate` property instead of `transform`, so this effect can run alongside the existing line-scale transform animation. Per-line scroll effects can overlap: a new scroll starts as soon as an ungrouped lyric reaches its scroll time, even while earlier line animations are running. Overlapping scroll effects are composed with additive Web Animations (`composite: "add"`), so this behavior expects modern browser support for additive `element.animate()` effects.
 
 ### Layout
 
@@ -332,10 +332,9 @@ The engine animates the individual `translate` property instead of `transform`, 
 
 | Variable                                 | Default Value                    | Description                                     |
 | ---------------------------------------- | -------------------------------- | ----------------------------------------------- |
-| `--blyrics-lyric-scroll-duration`³       | `650ms`                          | Duration for scrolling lyric transitions        |
 | `--blyrics-lyric-scroll-timing-function` | `cubic-bezier(0.86, 0, 0.2, 1)`  | Timing function for scrolling lyric transitions |
 
-³If `blyrics-early-scroll-consider-s` and `blyrics-queue-scroll-ms` are not manually set, they are derived automatically from this duration. See [Additional Configuration Options (Knobs)](#additional-configuration-options-knobs) for details.
+`--blyrics-lyric-scroll-duration` and its `--blyrics-lyric-transition-duration` alias have been removed, along with the old container transform transition. Use the line-scroll duration knobs to control visual motion; early-consider is independent of animation duration. Replace any explicit references to the removed variables with a duration or your own custom property. If a line duration is missing, invalid or resolves to a nonpositive value, the engine uses an internal `750ms` fallback.
 
 ### Gradient Stops
 
@@ -385,8 +384,7 @@ The following options are avalible:
 | `blyrics-disable-richsync`            | `false`       | Set to `true` to render richsynced lyrics through the line-synced path instead, including zero-duration `.blyrics-line-synced-word` spans and line-synced fade-in. |
 | `blyrics-line-synced-animation-delay` | `50`          | For non-richsynced lyrics, this value controls the delay each word gets when highlighting (in ms).                                         |
 | `blyrics-lyric-ending-threshold-s`    | `0.5`         | Controls the time (in seconds) before a lyric line is finished that we consider it completed for scrolling purposes.                       |
-| `blyrics-early-scroll-consider-s`⁴    | Auto (`~0.54` at the default scroll duration) | Controls how far into the future (in seconds) we should look for lines to group together for scrolling purposes.                           |
-| `blyrics-queue-scroll-ms`⁴            | Auto (`~131` at the default scroll duration)  | If we're unable to scroll due to having scrolled recently, what is the maximum amount of time that a scroll can be "queued" for.           |
+| `blyrics-early-scroll-consider-s`    | `0.54` | Controls how far into the future (in seconds) we should look for lines to group together for scrolling purposes.                           |
 | `blyrics-debug-renderer`              | `false`       | Set to `true` to enable the debug renderer.                                                                                                |
 | `blyrics-debug-animation-timing`      | `false`       | Set to `true` to log WAAPI lyric animation timing samples, learned offsets, and timing cleanup events.                                    |
 | `blyrics-target-scroll-pos-ratio`     | `0.37`        | Position on the screen lyrics should be at. 0.5 means the selected lyric will be in the middle of the screen, 0 means top, 1 means bottom. |
@@ -422,14 +420,9 @@ The following options are avalible:
 | `blyrics-line-scroll-active-translate-y-end` | Inherits shared end offset | End offset for the active line.                                                                        |
 | `blyrics-line-scroll-below-translate-y-end` | Inherits shared end offset | End offset for visible lines below the active line.                                                          |
 
-⁴If neither knob is manually set, both values are derived from `--blyrics-lyric-scroll-duration` using the default timing ratio. Auto-derived queue time is capped at `200ms`.
+`blyrics-early-scroll-consider-s` is an independent lookahead in seconds. When a lyric triggers an autoscroll, nearby upcoming lines within this window participate in choosing the target. Entering the window alone does not trigger a scroll. Lines included in that scroll do not trigger another scroll when their own scroll time arrives. Seeking and resuming autoscroll can still reposition the viewport.
 
-If one of these knobs is manually set, the other is derived from the equation below. Auto-derived queue time is still capped at `200ms`.
-
-`var(--blyrics-lyric-scroll-duration)` + `0.02s` = `blyrics-early-scroll-consider-s` +
-`blyrics-queue-scroll-ms`
-
-If both are manually set, keep the equation balanced yourself. An unbalanced equation may cause dropped frames or missed scrolls.
+The scroll gate and `blyrics-queue-scroll-ms` have been removed; the old queue knob has no effect. There is no timing equation to balance against animation duration.
 
 #### Scoping the scroll position to one view
 
@@ -467,13 +460,12 @@ The main container for the lyrics is styled using the `.blyrics-container` class
   line-height: var(--blyrics-line-height);
   position: relative !important;
   z-index: 1;
-  transition: transform var(--blyrics-lyric-scroll-duration) var(--blyrics-lyric-scroll-timing-function) 0s;
   padding-top: 2rem;
   padding-bottom: calc(var(--blyrics-padding-bottom));
 }
 ```
 
-This sets the overall appearance of the lyrics container, including typography, positioning, and scroll behavior. The `isolation: isolate` property creates a new stacking context to prevent z-index issues with other page elements. Note that scrolling is achieved via `transform` for better performance.
+This sets the overall appearance of the lyrics container, including typography, positioning, and scroll behavior. The `isolation: isolate` property creates a new stacking context to prevent z-index issues with other page elements. Autoscroll updates the viewport position and smooths the movement with additive per-line `translate` animations.
 
 ### Container Data Attributes
 
