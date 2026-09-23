@@ -143,6 +143,18 @@
     "message": "Megakadályozza, hogy a kép a képben dalszövegablak végleg bezáródjon, amikor az oldalt újratöltöd, vagy dalok és oldalak között váltasz. A böngészők csak az oldallal való interakciót követően engedélyezik a lebegő ablak megnyitását, ezért az nem azonnal, hanem az első kattintás vagy billentyűleütéskor nyílik meg újra.",
     "description": "Help tooltip explaining what automatic floating-lyrics reopening does and why it waits for the first interaction"
   },
+  "options_display_pipWindowLayout": {
+    "message": "Window layout",
+    "description": "Setting label, shown inside the floating lyrics window settings, for choosing whether the window opens wide or tall"
+  },
+  "options_pipWindowLayout_horizontal": {
+    "message": "Horizontal",
+    "description": "Floating lyrics window layout option: a wide window with the album art beside the lyrics"
+  },
+  "options_pipWindowLayout_vertical": {
+    "message": "Vertical",
+    "description": "Floating lyrics window layout option: a tall window with the album art above the lyrics"
+  },
   "options_display_pipArtworkTransition": {
     "message": "Albumborítő áttűnés",
     "description": "Setting label, shown inside the floating lyrics window settings, for choosing how album art changes between songs"
