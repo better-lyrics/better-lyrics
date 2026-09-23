@@ -1,0 +1,16 @@
+name: Rebuild docs
+
+on:
+  push:
+    branches: [master]
+    paths: [STYLING.md, STYLING-SKILL.md]
+
+permissions: {}
+
+jobs:
+  rebuild:
+    runs-on: ubuntu-latest
+    steps:
+      - run: curl -fsS -X POST "$DOCS_DEPLOY_HOOK_URL"
+        env:
+          DOCS_DEPLOY_HOOK_URL: ${{ secrets.DOCS_DEPLOY_HOOK_URL }}
