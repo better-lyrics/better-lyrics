@@ -46,7 +46,7 @@
         "@braccato/core": "1.8.0",
         "@braccato/parsers": "0.2.3",
         "@codemirror/autocomplete": "^6.20.3",
-        "@codemirror/commands": "^6.11.0",
+        "@codemirror/commands": "^6.11.1",
         "@codemirror/lint": "^6.9.7",
         "@codemirror/search": "^6.7.2",
         "@codemirror/state": "^6.7.4",
