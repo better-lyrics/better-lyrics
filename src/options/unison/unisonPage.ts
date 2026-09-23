@@ -1,5 +1,6 @@
 import { UNISON_API_BASE_URL } from "@constants";
 import { t } from "@core/i18n";
+import { formatTimeAgo } from "@core/relativeTime";
 import {
   DEFAULT_FEED_FILTERS,
   type FeedFilters,
@@ -752,19 +753,6 @@ async function performSearch(query: string): Promise<void> {
   }
 }
 
-// -- Relative Time --------------------------
-
-function formatRelativeTime(timestampSec: number): string {
-  const seconds = Math.floor((Date.now() - timestampSec * 1000) / 1000);
-  if (seconds < 60) return `${seconds}s ago`;
-  const minutes = Math.floor(seconds / 60);
-  if (minutes < 60) return `${minutes}m ago`;
-  const hours = Math.floor(minutes / 60);
-  if (hours < 24) return `${hours}h ago`;
-  const days = Math.floor(hours / 24);
-  return `${days}d ago`;
-}
-
 function formatScoreNumber(score: number): string {
   return Number.isInteger(score) ? score.toString() : score.toFixed(2);
 }
@@ -854,7 +842,7 @@ function createLyricsCard(entry: UnisonSearchEntry | UnisonFeedEntry, options: L
   if ("createdAt" in entry) {
     const time = document.createElement("span");
     time.className = "unison-card-time";
-    time.textContent = formatRelativeTime(entry.createdAt);
+    time.textContent = formatTimeAgo(entry.createdAt * 1000, "narrow");
     footer.appendChild(time);
   }
 

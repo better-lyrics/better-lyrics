@@ -1,5 +1,5 @@
-export function formatTimeAgo(timestampMs: number): string {
-  const rtf = new Intl.RelativeTimeFormat(navigator.language, { numeric: "auto" });
+export function formatTimeAgo(timestampMs: number, style: Intl.RelativeTimeFormatStyle = "long"): string {
+  const rtf = new Intl.RelativeTimeFormat(navigator.language, { numeric: "auto", style });
   const diffMs = timestampMs - Date.now();
   const absDiffSeconds = Math.abs(diffMs / 1000);
 
