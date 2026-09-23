@@ -163,6 +163,10 @@ body {
   object-fit: cover;
 }
 
+.blyrics-pip-artwork__image[data-letterboxed] {
+  transform: scale(1.4);
+}
+
 /* The motion cover sits above both faces rather than inside one: it is always
    cleared on a track change, so it never has to take part in a transition.
 
