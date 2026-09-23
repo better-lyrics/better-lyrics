@@ -1,3 +1,4 @@
+import { UNISON_REVISION_PREVIEW_RETRY_MAX_MS, UNISON_REVISION_PREVIEW_RETRY_MS } from "@constants";
 import { UnisonErrorCode } from "./errorCodes";
 import type { FieldCheck, PendingReason, PreviewResult, RevisionStatus, RevisionSummary } from "./types";
 
@@ -233,8 +234,12 @@ function blockedOutcome(kind: "error" | "neutral", icon: EditorOutcome["icon"], 
   return { kind, icon, title: message(key), hint: [], saveLabel: SAVE_LABEL, canSave: false };
 }
 
+export function checkingOutcome(hint: RevisionMessage[] = []): EditorOutcome {
+  return { ...blockedOutcome("neutral", "info", "unison_rev_checking"), hint };
+}
+
 export function editorOutcome(preview: PreviewResult | null, liveRevNo: number): EditorOutcome {
-  if (!preview) return blockedOutcome("neutral", "info", "unison_rev_checking");
+  if (!preview) return checkingOutcome();
   if (preview.checks.some(check => check.status === "bad"))
     return blockedOutcome("error", "bad", "unison_rev_fixErrors");
 
@@ -325,6 +330,25 @@ function revisionErrorMessage(result: FailedResult): RevisionMessage {
   return result.error ? { text: result.error } : GENERIC_ERROR;
 }
 
+function serverHint(result: FailedResult): RevisionMessage[] {
+  return result.hint ? [{ text: result.hint }] : [];
+}
+
 export function revisionFailure(result: FailedResult): RevisionFailure {
-  return { title: revisionErrorMessage(result), hint: result.hint ? [{ text: result.hint }] : [] };
+  return { title: revisionErrorMessage(result), hint: serverHint(result) };
+}
+
+// -- Preview Failures --------------------------
+
+type PreviewFailure = { retry: true; hint: RevisionMessage[] } | { retry: false; failure: RevisionFailure };
+
+export function previewFailure(result: FailedResult): PreviewFailure {
+  if (result.status === undefined || result.code === UnisonErrorCode.RATE_LIMITED) {
+    return { retry: true, hint: serverHint(result) };
+  }
+  return { retry: false, failure: revisionFailure(result) };
+}
+
+export function previewRetryDelayMs(attempt: number): number {
+  return Math.min(UNISON_REVISION_PREVIEW_RETRY_MS * 2 ** Math.max(0, attempt), UNISON_REVISION_PREVIEW_RETRY_MAX_MS);
 }

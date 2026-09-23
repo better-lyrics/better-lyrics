@@ -6,6 +6,7 @@ import {
   SEALED_NOTICE,
   checkFieldLabel,
   checkIssue,
+  checkingOutcome,
   draftField,
   driftMeter,
   editorOutcome,
@@ -15,6 +16,8 @@ import {
   hasBadLyrics,
   nextRevisionNumber,
   pendingNotice,
+  previewFailure,
+  previewRetryDelayMs,
   rateLimitLine,
   reasonLabel,
   rejectedNotice,
@@ -427,6 +430,67 @@ const REASONS: PendingReason[] = ["sealed", "flagged", "large_text_drift", "larg
     "unison_rev_error",
     "no text, generic"
   );
+}
+
+// -- Preview failures --------------------------
+
+{
+  const THROTTLE_HINT = "Too many checks at once. Wait a moment and keep typing.";
+  const throttled = previewFailure({ code: "RATE_LIMITED", status: 429, error: "Rate limited", hint: THROTTLE_HINT });
+  assert.equal(throttled.retry, true, "a preview 429 is temporary");
+  assert.deepEqual(throttled.retry && throttled.hint, [{ text: THROTTLE_HINT }], "the throttle hint passes through");
+
+  const offline = previewFailure({ error: "Failed to fetch" });
+  assert.equal(offline.retry, true, "a preview network error is temporary");
+  assert.deepEqual(offline.retry && offline.hint, [], "no hint means no hint");
+
+  const checking = checkingOutcome([{ text: THROTTLE_HINT }]);
+  assert.equal(keyOf(checking.title), "unison_rev_checking", "a throttled preview reads as still checking");
+  assert.equal(checking.kind, "neutral");
+  assert.equal(checking.canSave, false, "saving waits for a real preview");
+  assert.deepEqual(checking.hint, [{ text: THROTTLE_HINT }]);
+  assert.deepEqual(checkingOutcome(), editorOutcome(null, 5), "one checking state");
+
+  for (const result of [
+    { code: "NOT_OWNER", status: 403 },
+    { code: "NOT_FOUND", status: 404 },
+    { code: "INVALID_PAYLOAD", status: 400, error: "Bad payload" },
+    { status: 500 },
+  ]) {
+    const outcome = previewFailure(result);
+    assert.equal(outcome.retry, false, `${result.status} is not retried`);
+    assert.deepEqual(!outcome.retry && outcome.failure, revisionFailure(result), "hard failures match save failures");
+  }
+}
+
+// -- Preview failures: regressions --------------------------
+
+{
+  const throttled = previewFailure({ code: "RATE_LIMITED", status: 429 });
+  assert.equal(throttled.retry, true, "regression: a preview 429 never shows the daily limit");
+  assert.equal(
+    keyOf(revisionFailure({ code: "RATE_LIMITED", status: 429 }).title),
+    "unison_rev_limitReached",
+    "a save 429 still shows the daily limit"
+  );
+  const exhausted = editorOutcome(
+    preview({ rateLimit: { lyricRemaining: 0, lyricLimit: 5, userRemaining: 12, userLimit: 20 } }),
+    5
+  );
+  assert.equal(keyOf(exhausted.title), "unison_rev_limitReached", "a preview with 0 remaining still shows the limit");
+}
+
+// -- Preview retry backoff --------------------------
+
+{
+  assert.equal(previewRetryDelayMs(0), 5000);
+  assert.equal(previewRetryDelayMs(1), 10000);
+  assert.equal(previewRetryDelayMs(2), 10000, "the backoff is capped");
+  assert.equal(previewRetryDelayMs(50), 10000, "large attempts stay capped");
+  assert.equal(previewRetryDelayMs(-1), 5000, "negative attempts clamp to the first delay");
+  for (let attempt = 0; attempt < 10; attempt++) {
+    assert.ok(previewRetryDelayMs(attempt + 1) >= previewRetryDelayMs(attempt), "the backoff never shrinks");
+  }
 }
 
 // -- Every key exists --------------------------

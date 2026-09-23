@@ -2,12 +2,16 @@ import { UNISON_REVISION_PREVIEW_DEBOUNCE_MS } from "@constants";
 import { t } from "@core/i18n";
 import {
   type RevisionFailure,
+  type RevisionMessage,
   checkFieldLabel,
   checkIssue,
+  checkingOutcome,
   draftField,
   editorOutcome,
   failureOutcome,
   hasBadLyrics,
+  previewFailure,
+  previewRetryDelayMs,
   rateLimitLine,
   revisionFailure,
 } from "@modules/unison/revisions";
@@ -79,10 +83,17 @@ export function renderRevisionEditor(entry: UnisonLyricsEntry, surface: EditorSu
   let preview: PreviewResult | null = null;
   let failure: RevisionFailure | null = null;
   let failureRetry = false;
+  let retryHint: RevisionMessage[] | null = null;
+  let retryAttempt = 0;
   let requestToken = 0;
   let settledToken = -1;
   let saving = false;
   let debounceTimer: ReturnType<typeof setTimeout> | undefined;
+  let retryTimer: ReturnType<typeof setTimeout> | undefined;
+  host.onLeave(() => {
+    clearTimeout(debounceTimer);
+    clearTimeout(retryTimer);
+  });
 
   const draft = (): RevisionDraft => {
     const lyrics = textarea.value.trim();
@@ -94,7 +105,11 @@ export function renderRevisionEditor(entry: UnisonLyricsEntry, surface: EditorSu
     return body;
   };
 
-  const currentOutcome = () => (failure ? failureOutcome(failure, failureRetry) : editorOutcome(preview, liveRevNo));
+  const currentOutcome = () => {
+    if (failure) return failureOutcome(failure, failureRetry);
+    if (retryHint) return checkingOutcome(retryHint);
+    return editorOutcome(preview, liveRevNo);
+  };
 
   const renderSaveButton = (): void => {
     const outcome = currentOutcome();
@@ -132,18 +147,27 @@ export function renderRevisionEditor(entry: UnisonLyricsEntry, surface: EditorSu
     const result = await previewRevision(entry.id, draft());
     if (token !== requestToken || !host.isCurrent()) return;
     settledToken = token;
+    failure = null;
+    retryHint = null;
     if (result.success && result.data) {
       preview = result.data;
-      failure = null;
+      retryAttempt = 0;
     } else {
-      failure = revisionFailure(result);
-      failureRetry = false;
+      const outcome = previewFailure(result);
+      if (outcome.retry) {
+        retryHint = outcome.hint;
+        retryTimer = setTimeout(() => void runPreview(++requestToken), previewRetryDelayMs(retryAttempt++));
+      } else {
+        failure = outcome.failure;
+        failureRetry = false;
+      }
     }
     render();
   };
 
   const schedulePreview = (): void => {
     clearTimeout(debounceTimer);
+    clearTimeout(retryTimer);
     failure = null;
     const token = ++requestToken;
     debounceTimer = setTimeout(() => void runPreview(token), UNISON_REVISION_PREVIEW_DEBOUNCE_MS);
@@ -158,18 +182,26 @@ export function renderRevisionEditor(entry: UnisonLyricsEntry, surface: EditorSu
   controls.languageSelect.addEventListener("change", schedulePreview);
   controls.isrcInput.addEventListener("input", schedulePreview);
 
+  const setSaving = (value: boolean): void => {
+    saving = value;
+    textarea.disabled = value;
+    controls.languageSelect.disabled = value;
+    controls.isrcInput.disabled = value;
+  };
+
   bar.save.addEventListener("click", async () => {
     if (bar.save.disabled) return;
-    saving = true;
+    const body = draft();
+    setSaving(true);
     renderSaveButton();
-    const result = await saveRevision(entry.id, draft());
+    const result = await saveRevision(entry.id, body);
     if (!host.isCurrent()) return;
-    saving = false;
     if (result.success && result.data) {
       const saved = result.data.revision;
       host.navigate(saved.status === "live" ? { id } : { id, revisions: "1", rev: String(saved.revNo) });
       return;
     }
+    setSaving(false);
     failure = revisionFailure(result);
     failureRetry = result.status === undefined;
     render();
