@@ -83,6 +83,7 @@ function createRevisionNotice(entry: UnisonLyricsEntry, host: RevisionHost): HTM
     const withdraw = createButton({ label: t("unison_rev_withdraw"), icon: "revert" });
     bindButtonAction(withdraw, async () => {
       const result = await withdrawPendingRevision(entry.id);
+      if (!host.isCurrent()) return null;
       if (result.success) {
         host.navigate({ id }, { replace: true });
         return null;

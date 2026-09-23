@@ -340,8 +340,7 @@ export async function unlinkVideo(
 
 async function getJson<T>(path: string): Promise<ApiResult<T | null>> {
   try {
-    const headers = await identityHeaders();
-    const response = await fetchWithTimeout(`${UNISON_API_BASE_URL}${path}`, { headers });
+    const response = await fetchWithTimeout(`${UNISON_API_BASE_URL}${path}`);
     if (!response.ok) {
       const errorData: UnisonErrorBody | null = await response.json().catch(() => null);
       return {

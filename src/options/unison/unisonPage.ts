@@ -133,7 +133,7 @@ const feedTabCache: Record<FeedTabName, FeedTabCache> = {
 let activeFeedTab: FeedTabName = "recent";
 let feedSentinelObserver: IntersectionObserver | undefined;
 let additionalVideosInput: { getIds(): string[] } | null = null;
-let detailRenderToken = 0;
+let activeView = new AbortController();
 
 // -- Dev Stub --------------------------
 
@@ -187,6 +187,12 @@ const DEV_STUB_LYRICS_ENTRY: UnisonLyricsEntry = {
 
 type View = "search" | "detail" | "submit" | "revisions";
 
+function claimView(): AbortSignal {
+  activeView.abort();
+  activeView = new AbortController();
+  return activeView.signal;
+}
+
 function showView(view: View): void {
   if (view !== "search") saveActiveTabContent();
   viewSearch.hidden = view !== "search";
@@ -221,6 +227,7 @@ function navigateTo(params: Record<string, string>, options: { replace?: boolean
 
 function routeFromParams(): void {
   const params = new URLSearchParams(window.location.search);
+  const view = claimView();
 
   if (params.get("submit") === "true") {
     showView("submit");
@@ -234,22 +241,22 @@ function routeFromParams(): void {
     if (params.get("revisions") === "1") {
       showView("revisions");
       const rev = params.get("rev");
-      void loadRevisions(id, rev ? Number(rev) : null);
+      void loadRevisions(id, rev ? Number(rev) : null, view);
       return;
     }
     showView("detail");
     if (params.get("edit") === "1") {
-      void loadEditor(id);
+      void loadEditor(id, view);
       return;
     }
-    loadDetailById(id, params.get("mine") === "1");
+    void loadDetailById(id, view, params.get("mine") === "1");
     return;
   }
 
   const videoId = params.get("v");
   if (videoId) {
     showView("detail");
-    loadDetailByVideoId(videoId);
+    void loadDetailByVideoId(videoId, view);
     return;
   }
 
@@ -856,7 +863,6 @@ function createLyricsCard(entry: UnisonSearchEntry | UnisonFeedEntry, options: L
 // -- Detail View --------------------------
 
 function renderDetailSkeleton(): void {
-  detailRenderToken++;
   detailMeta.replaceChildren();
   detailPreview.replaceChildren();
   detailLyrics.replaceChildren();
@@ -895,28 +901,29 @@ function renderDetailSkeleton(): void {
   detailLyrics.appendChild(lyricsSkel);
 }
 
-async function loadDetailById(id: number, isOwn: boolean = false): Promise<void> {
+async function loadDetailById(id: number, view: AbortSignal, isOwn: boolean = false): Promise<void> {
   renderDetailSkeleton();
   if (IS_DEV && id === DEV_STUB_LYRICS_ENTRY.id) {
-    renderDetail(DEV_STUB_LYRICS_ENTRY, isOwn);
+    renderDetail(DEV_STUB_LYRICS_ENTRY, view, isOwn);
     return;
   }
   const result = await getLyricsById(id);
+  if (view.aborted) return;
   if (result.success && result.data) {
-    renderDetail(result.data, isOwn);
+    renderDetail(result.data, view, isOwn);
   }
 }
 
-async function loadDetailByVideoId(videoId: string): Promise<void> {
+async function loadDetailByVideoId(videoId: string, view: AbortSignal): Promise<void> {
   renderDetailSkeleton();
   const result = await getLyricsByVideoId(videoId);
+  if (view.aborted) return;
   if (result.success && result.data) {
-    renderDetail(result.data);
+    renderDetail(result.data, view);
   }
 }
 
-function renderDetail(entry: UnisonLyricsEntry, isOwn: boolean = false): void {
-  const token = ++detailRenderToken;
+function renderDetail(entry: UnisonLyricsEntry, view: AbortSignal, isOwn: boolean = false): void {
   detailMeta.replaceChildren();
   detailPreview.replaceChildren();
   detailLyrics.replaceChildren();
@@ -986,8 +993,8 @@ function renderDetail(entry: UnisonLyricsEntry, isOwn: boolean = false): void {
     detailMeta.appendChild(createDetailDeleteButton(entry.id));
   }
   detailMeta.appendChild(ytLink);
-  void renderOwnerVideoTools(entry, token);
-  void renderDetailRevisionBar(entry, token);
+  void renderOwnerVideoTools(entry, view);
+  void renderDetailRevisionBar(entry, view);
 
   // -- Preview column
   renderPreviewInto(detailPreview, entry.lyrics);
@@ -1368,9 +1375,9 @@ function renderSuggestedVideoList(
   listEl.appendChild(moreRow);
 }
 
-async function renderOwnerVideoTools(entry: UnisonLyricsEntry, token: number): Promise<void> {
+async function renderOwnerVideoTools(entry: UnisonLyricsEntry, view: AbortSignal): Promise<void> {
   if (!(await isOwnerOf(entry))) return;
-  if (token !== detailRenderToken) return;
+  if (view.aborted) return;
 
   const section = document.createElement("div");
   section.className = "unison-detail-videos";
@@ -1406,41 +1413,43 @@ async function renderOwnerVideoTools(entry: UnisonLyricsEntry, token: number): P
 
 // -- Revisions --------------------------
 
-function revisionHost(token: number): RevisionHost {
+function revisionHost(view: AbortSignal): RevisionHost {
   const mine = new URLSearchParams(window.location.search).get("mine");
   return {
-    navigate: (params, options) => navigateTo(mine ? { ...params, mine } : params, options),
-    isCurrent: () => token === detailRenderToken,
+    navigate: (params, options) => {
+      if (!view.aborted) navigateTo(mine ? { ...params, mine } : params, options);
+    },
+    isCurrent: () => !view.aborted,
+    onLeave: callback => view.addEventListener("abort", callback, { once: true }),
   };
 }
 
-async function renderDetailRevisionBar(entry: UnisonLyricsEntry, token: number): Promise<void> {
+async function renderDetailRevisionBar(entry: UnisonLyricsEntry, view: AbortSignal): Promise<void> {
   if (!entry.revision) return;
   const isOwner = await isOwnerOf(entry);
-  if (token !== detailRenderToken) return;
-  renderRevisionBar(entry, revisionSlot, revisionHost(token), isOwner);
+  if (view.aborted) return;
+  renderRevisionBar(entry, revisionSlot, revisionHost(view), isOwner);
 }
 
 async function loadRevisionEntry(
   id: number,
-  token: number,
+  view: AbortSignal,
   ownerOnly: boolean
 ): Promise<{ entry: UnisonLyricsEntry; isOwner: boolean } | null> {
   const result = await getLyricsById(id);
   const entry = result.success ? result.data : null;
   const isOwner = entry?.revision ? await isOwnerOf(entry) : false;
-  if (token !== detailRenderToken) return null;
+  if (view.aborted) return null;
   if (!entry?.revision || (ownerOnly && !isOwner)) {
-    revisionHost(token).navigate({ id: String(id) }, { replace: true });
+    revisionHost(view).navigate({ id: String(id) }, { replace: true });
     return null;
   }
   return { entry, isOwner };
 }
 
-async function loadEditor(id: number): Promise<void> {
+async function loadEditor(id: number, view: AbortSignal): Promise<void> {
   renderDetailSkeleton();
-  const token = ++detailRenderToken;
-  const loaded = await loadRevisionEntry(id, token, true);
+  const loaded = await loadRevisionEntry(id, view, true);
   if (!loaded) return;
   const surface: EditorSurface = {
     meta: detailMeta,
@@ -1448,19 +1457,18 @@ async function loadEditor(id: number): Promise<void> {
     lyrics: detailLyrics,
     savebar: savebarSlot,
   };
-  renderRevisionEditor(loaded.entry, surface, revisionHost(token));
+  renderRevisionEditor(loaded.entry, surface, revisionHost(view));
 }
 
-async function loadRevisions(id: number, openRevNo: number | null): Promise<void> {
-  const token = ++detailRenderToken;
+async function loadRevisions(id: number, openRevNo: number | null, view: AbortSignal): Promise<void> {
   const skeleton = document.createElement("div");
   skeleton.className = "unison-skeleton";
   skeleton.style.width = "100%";
   skeleton.style.height = "50vh";
   revisionsRoot.replaceChildren(skeleton);
-  const loaded = await loadRevisionEntry(id, token, false);
+  const loaded = await loadRevisionEntry(id, view, false);
   if (!loaded) return;
-  renderRevisionsPage(loaded.entry, revisionsRoot, revisionHost(token), loaded.isOwner, openRevNo);
+  renderRevisionsPage(loaded.entry, revisionsRoot, revisionHost(view), loaded.isOwner, openRevNo);
 }
 
 function showReportMenu(unisonId: number, anchor: HTMLButtonElement): void {

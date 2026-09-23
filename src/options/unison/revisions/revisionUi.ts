@@ -17,6 +17,7 @@ import { type IconKey, svgIcon } from "../icons";
 export interface RevisionHost {
   navigate(params: Record<string, string>, options?: { replace?: boolean }): void;
   isCurrent(): boolean;
+  onLeave(callback: () => void): void;
 }
 
 // -- Text --------------------------
