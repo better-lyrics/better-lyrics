@@ -371,18 +371,21 @@ const REASONS: PendingReason[] = ["sealed", "flagged", "large_text_drift", "larg
 // -- Revert notes --------------------------
 
 {
-  const unknown = revertNote(null, 6);
+  const unknown = revertNote(null, 6, false);
   assert.equal(unknown.note, null);
   assert.equal(unknown.canRevert, true, "a failed check still lets the server decide");
 
-  const same = revertNote(preview({ noChanges: true }), 6);
+  const same = revertNote(preview({ noChanges: true }), 6, false);
   assert.equal(same.canRevert, false, "reverting to an identical revision is disabled");
   assert.equal(keyOf(same.note?.title ?? { text: "" }), "unison_rev_noChanges");
 
-  const live = revertNote(preview(), 6);
+  const live = revertNote(preview(), 6, false);
+  assert.equal(live.note?.kind, "neutral", "browsing a past row is a quiet note");
+  assert.equal(revertNote(preview(), 6, true).note?.kind, "info", "confirming stands out");
   assert.deepEqual(track(live.note?.title ?? { text: "" }), { key: "unison_rev_revertLive", subs: ["6"] });
 
-  const review = revertNote(preview({ outcome: { goesLive: false, reason: "large_text_drift" } }), 6);
+  const review = revertNote(preview({ outcome: { goesLive: false, reason: "large_text_drift" } }), 6, true);
+  assert.equal(review.note?.kind, "pending");
   assert.equal(review.note?.icon, "pending");
   assert.deepEqual(track(review.note?.title ?? { text: "" }), { key: "unison_rev_revertReview", subs: ["6"] });
   assert.deepEqual(review.note?.hint.map(track), [{ key: "unison_rev_reason_largeText" }]);

@@ -284,7 +284,7 @@ function renderBrowse(
   if (ctx.reverted?.revisionId === rev.id && rev.status === "live") {
     note = createNote(revertedNote(ctx.reverted.targetRevNo));
   } else if (rev.status === "past" && ctx.isOwner) {
-    const revert = revertNote(preview, nextRevisionNumber(ctx.revisions));
+    const revert = revertNote(preview, nextRevisionNumber(ctx.revisions), false);
     if (revert.note) note = createNote(revert.note);
     if (revert.canRevert) {
       const button = createButton({ label: t("unison_rev_revertToThis"), icon: "revert" });
@@ -345,7 +345,7 @@ async function renderConfirm(
     return messageText(revisionFailure(result).title);
   });
 
-  const { note } = revertNote(preview, nextRevisionNumber(ctx.revisions));
+  const { note } = revertNote(preview, nextRevisionNumber(ctx.revisions), true);
   detail.replaceChildren(
     createDetailHead(
       t("unison_rev_number", [String(rev.revNo)]),

@@ -180,7 +180,8 @@ export function revisionNote(rev: RevisionSummary, liveRevNo: number): RevisionN
 
 export function revertNote(
   preview: PreviewResult | null,
-  nextRevNo: number
+  nextRevNo: number,
+  confirming: boolean
 ): { note: RevisionNote | null; canRevert: boolean } {
   if (!preview) return { note: null, canRevert: true };
   if (preview.noChanges) {
@@ -191,13 +192,18 @@ export function revertNote(
   }
   if (preview.outcome.goesLive) {
     return {
-      note: { kind: "info", icon: "info", title: message("unison_rev_revertLive", nextRevNo), hint: [] },
+      note: {
+        kind: confirming ? "info" : "neutral",
+        icon: "info",
+        title: message("unison_rev_revertLive", nextRevNo),
+        hint: [],
+      },
       canRevert: true,
     };
   }
   return {
     note: {
-      kind: "pending",
+      kind: confirming ? "pending" : "neutral",
       icon: "pending",
       title: message("unison_rev_revertReview", nextRevNo),
       hint: [reasonLabel(preview.outcome.reason)],
