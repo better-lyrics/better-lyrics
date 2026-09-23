@@ -143,6 +143,18 @@
     "message": "Evita que la letra en ventana flotante se cierre para bien cuando actualizas o cambias de canciones o páginas. Los navegadores solo dejan una ventana flotante abierta después de interactuar con la página, por lo que se reabre en tu primer clic o pulso de tecla en vez de instantáneamente.",
     "description": "Help tooltip explaining what automatic floating-lyrics reopening does and why it waits for the first interaction"
   },
+  "options_display_pipWindowLayout": {
+    "message": "Window layout",
+    "description": "Setting label, shown inside the floating lyrics window settings, for choosing whether the window opens wide or tall"
+  },
+  "options_pipWindowLayout_horizontal": {
+    "message": "Horizontal",
+    "description": "Floating lyrics window layout option: a wide window with the album art beside the lyrics"
+  },
+  "options_pipWindowLayout_vertical": {
+    "message": "Vertical",
+    "description": "Floating lyrics window layout option: a tall window with the album art above the lyrics"
+  },
   "options_display_pipArtworkTransition": {
     "message": "Transición de carátula",
     "description": "Setting label, shown inside the floating lyrics window settings, for choosing how album art changes between songs"
