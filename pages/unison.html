@@ -154,17 +154,26 @@
 			<section id="unison-view-detail" class="unison-view" hidden>
 				<div class="unison-detail-layout">
 					<div class="unison-detail-meta" id="unison-detail-meta"></div>
-					<div class="unison-detail-columns">
-						<div class="unison-detail-col">
-							<h3 class="unison-detail-col-title">__MSG_unison_preview__</h3>
-							<div class="unison-detail-preview" id="unison-detail-preview"></div>
+					<div class="unison-rev-detail-main">
+						<div id="unison-revision-slot"></div>
+						<div class="unison-detail-columns">
+							<div class="unison-detail-col">
+								<h3 class="unison-detail-col-title">__MSG_unison_preview__</h3>
+								<div class="unison-detail-preview" id="unison-detail-preview"></div>
+							</div>
+							<div class="unison-detail-col">
+								<h3 class="unison-detail-col-title">__MSG_unison_rawLyrics__</h3>
+								<div class="unison-detail-lyrics" id="unison-detail-lyrics"></div>
+							</div>
 						</div>
-						<div class="unison-detail-col">
-							<h3 class="unison-detail-col-title">__MSG_unison_rawLyrics__</h3>
-							<div class="unison-detail-lyrics" id="unison-detail-lyrics"></div>
-						</div>
+						<div id="unison-revision-savebar-slot"></div>
 					</div>
 				</div>
+			</section>
+
+			<!-- Revisions View -->
+			<section id="unison-view-revisions" class="unison-view" hidden>
+				<div id="unison-revisions-root"></div>
 			</section>
 
 			<!-- Submit View -->
