@@ -6,7 +6,12 @@ import { DEFAULT_FEED_FILTERS } from "./types";
 import type {
   FeedFilters,
   LinkedVideo,
+  PreviewResult,
   ReportReason,
+  RevisionContent,
+  RevisionDiff,
+  RevisionDraft,
+  RevisionSummary,
   SuggestedVideo,
   UnisonApiResponse,
   UnisonFeedEntry,
@@ -329,4 +334,79 @@ export async function unlinkVideo(
     "DELETE",
     {}
   );
+}
+
+// -- Revisions --------------------------
+
+async function getJson<T>(path: string): Promise<ApiResult<T | null>> {
+  try {
+    const headers = await identityHeaders();
+    const response = await fetchWithTimeout(`${UNISON_API_BASE_URL}${path}`, { headers });
+    if (!response.ok) {
+      const errorData: UnisonErrorBody | null = await response.json().catch(() => null);
+      return {
+        success: false,
+        data: null,
+        error: errorData?.error ?? `Fetch failed: ${response.status}`,
+        code: errorData?.code,
+        hint: errorData?.hint,
+        status: response.status,
+      };
+    }
+    const json: UnisonApiResponse<T> = await response.json();
+    return { success: json.success, data: json.data ?? null };
+  } catch (err) {
+    const error = err instanceof Error ? err.message : "Network error";
+    warnUnison(path, error);
+    return { success: false, data: null, error };
+  }
+}
+
+export async function listRevisions(lyricsId: number): Promise<ApiResult<RevisionSummary[]>> {
+  const result = await getJson<{ revisions: RevisionSummary[] }>(`/lyrics/${lyricsId}/revisions`);
+  return { ...result, data: result.data?.revisions ?? [] };
+}
+
+export async function getRevision(lyricsId: number, revisionId: number): Promise<ApiResult<RevisionContent | null>> {
+  return getJson<RevisionContent>(`/lyrics/${lyricsId}/revisions/${revisionId}`);
+}
+
+export async function getRevisionDiff(
+  lyricsId: number,
+  revisionId: number,
+  againstId?: number
+): Promise<ApiResult<RevisionDiff | null>> {
+  const query = againstId === undefined ? "" : `?against=${againstId}`;
+  return getJson<RevisionDiff>(`/lyrics/${lyricsId}/revisions/${revisionId}/diff${query}`);
+}
+
+export async function previewRevision(
+  lyricsId: number,
+  draft: RevisionDraft
+): Promise<ApiResult<PreviewResult | null>> {
+  return signedRequest<PreviewResult | null>(`/lyrics/${lyricsId}/revisions/preview`, "POST", draft);
+}
+
+export async function saveRevision(
+  lyricsId: number,
+  draft: RevisionDraft
+): Promise<ApiResult<{ revision: RevisionSummary } | null>> {
+  return signedRequest<{ revision: RevisionSummary } | null>(`/lyrics/${lyricsId}/revisions`, "POST", draft);
+}
+
+export async function revertToRevision(
+  lyricsId: number,
+  revisionId: number
+): Promise<ApiResult<{ revision: RevisionSummary } | null>> {
+  return signedRequest<{ revision: RevisionSummary } | null>(
+    `/lyrics/${lyricsId}/revisions/${revisionId}/revert`,
+    "POST",
+    {}
+  );
+}
+
+export async function withdrawPendingRevision(
+  lyricsId: number
+): Promise<ApiResult<{ revision: RevisionSummary } | null>> {
+  return signedRequest<{ revision: RevisionSummary } | null>(`/lyrics/${lyricsId}/revisions/pending`, "DELETE", {});
 }
