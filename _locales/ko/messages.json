@@ -144,15 +144,15 @@
     "description": "Help tooltip explaining what automatic floating-lyrics reopening does and why it waits for the first interaction"
   },
   "options_display_pipWindowLayout": {
-    "message": "Window layout",
+    "message": "창 레이아웃",
     "description": "Setting label, shown inside the floating lyrics window settings, for choosing whether the window opens wide or tall"
   },
   "options_pipWindowLayout_horizontal": {
-    "message": "Horizontal",
+    "message": "가로",
     "description": "Floating lyrics window layout option: a wide window with the album art beside the lyrics"
   },
   "options_pipWindowLayout_vertical": {
-    "message": "Vertical",
+    "message": "세로",
     "description": "Floating lyrics window layout option: a tall window with the album art above the lyrics"
   },
   "options_display_pipArtworkTransition": {
