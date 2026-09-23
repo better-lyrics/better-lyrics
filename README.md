@@ -154,6 +154,8 @@ Custom styling for lyrics is available from Better Lyrics v1.7.0 onwards. This a
 
 For AI agents creating themes, see the [Theme Creation Guide for AI Agents](./STYLING-SKILL.md).
 
+Both guides are also on the docs site as the [Styling guide](https://docs.betterlyrics.org/theming) and the [Guide for agents](https://docs.betterlyrics.org/theming/agents).
+
 ## Theme Marketplace
 
 Browse and install community-created themes directly from the extension. Access the Marketplace via the Themes tab in extension settings. You can search, filter by ratings or downloads, and install themes with one click. Installed themes auto-update when creators publish new versions. You can also install themes from GitHub repositories by entering a repo URL.
