@@ -19,6 +19,7 @@ export interface PictureInPictureInitPayload {
   readonly textTransition: string;
   readonly marqueeEnabled: boolean;
   readonly progressBarEnabled: boolean;
+  readonly windowLayout: string;
   readonly logsEnabled: boolean;
 }
 
