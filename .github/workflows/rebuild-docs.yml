@@ -5,6 +5,8 @@ on:
     branches: [master]
     paths: [STYLING.md, STYLING-SKILL.md]
 
+permissions: {}
+
 jobs:
   rebuild:
     runs-on: ubuntu-latest
