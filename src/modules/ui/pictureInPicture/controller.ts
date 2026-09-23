@@ -6,11 +6,17 @@ import type {
   PictureInPictureToggle,
 } from "./types";
 
-const REQUEST_OPTIONS = {
-  width: 720,
-  height: 300,
-  disallowReturnToOpener: true,
-} as const satisfies DocumentPictureInPictureWindowOptions;
+const WINDOW_SIZES = {
+  horizontal: { width: 720, height: 300 },
+  vertical: { width: 360, height: 740 },
+} as const;
+
+export const DEFAULT_WINDOW_LAYOUT = "horizontal";
+
+function getRequestOptions(layout: unknown): DocumentPictureInPictureWindowOptions {
+  const size = layout === "vertical" ? WINDOW_SIZES.vertical : WINDOW_SIZES.horizontal;
+  return { ...size, disallowReturnToOpener: true };
+}
 
 export function createGatedToggle(inner: PictureInPictureToggle, isEnabled: () => boolean): PictureInPictureToggle {
   return {
@@ -62,7 +68,7 @@ export class PictureInPictureController<TWindow> {
     let request: Promise<TWindow>;
     try {
       // Keep this call directly in the dock click stack; user activation does not survive an await.
-      request = api.requestWindow(REQUEST_OPTIONS);
+      request = api.requestWindow(getRequestOptions(this.dependencies.windowLayout()));
     } catch (error) {
       this.isOpening = false;
       this.dependencies.reportFailure("Document Picture-in-Picture request failed", error);

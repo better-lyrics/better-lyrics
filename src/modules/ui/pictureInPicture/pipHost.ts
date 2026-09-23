@@ -365,6 +365,7 @@ export function createPictureInPictureHost(
 
   return new PictureInPictureController<Window>({
     host: window,
+    windowLayout: environment.windowLayout,
     loadStylesheet: environment.loadStylesheet,
     renderLoadingShell,
     injectStylesheet: environment.injectStylesheet,
