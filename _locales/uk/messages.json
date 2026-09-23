@@ -143,6 +143,18 @@
     "message": "Запобігає закриттю плавучого вікна текстів при перезавантаженні чи переходу між піснями й сторінками. Браузери дозволяють відкривати плавуче вікно лише після взаємодії зі сторінкою, тому воно відкриватиметься не миттєво, а при першому натисканні.",
     "description": "Help tooltip explaining what automatic floating-lyrics reopening does and why it waits for the first interaction"
   },
+  "options_display_pipWindowLayout": {
+    "message": "Window layout",
+    "description": "Setting label, shown inside the floating lyrics window settings, for choosing whether the window opens wide or tall"
+  },
+  "options_pipWindowLayout_horizontal": {
+    "message": "Horizontal",
+    "description": "Floating lyrics window layout option: a wide window with the album art beside the lyrics"
+  },
+  "options_pipWindowLayout_vertical": {
+    "message": "Vertical",
+    "description": "Floating lyrics window layout option: a tall window with the album art above the lyrics"
+  },
   "options_display_pipArtworkTransition": {
     "message": "Перехід обкладинки",
     "description": "Setting label, shown inside the floating lyrics window settings, for choosing how album art changes between songs"
