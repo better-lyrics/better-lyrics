@@ -226,13 +226,19 @@ export interface PreviewResult {
   rateLimit: { lyricRemaining: number; lyricLimit: number; userRemaining: number; userLimit: number };
 }
 
+export interface DiffHead {
+  kind: "translation" | "transliteration" | "credit";
+  lang: string | null;
+  line: number | null;
+}
+
 export type DiffRow =
-  | { kind: "same"; lineNo: number; startMs: number | null; text: string }
-  | { kind: "add"; lineNo: number; startMs: number | null; text: string }
-  | { kind: "del"; lineNo: number; startMs: number | null; text: string }
-  | { kind: "word"; lineNo: number; startMs: number | null; parts: Array<["=" | "+" | "-", string]> }
+  | { kind: "same"; lineNo: number; startMs: number | null; text: string; head?: DiffHead }
+  | { kind: "add"; lineNo: number; startMs: number | null; text: string; head?: DiffHead }
+  | { kind: "del"; lineNo: number; startMs: number | null; text: string; head?: DiffHead }
+  | { kind: "word"; lineNo: number; startMs: number | null; parts: Array<["=" | "+" | "-", string]>; head?: DiffHead }
   | { kind: "timing"; lineNo: number; startMs: number; deltaMs: number; text: string }
-  | { kind: "gap"; count: number };
+  | { kind: "gap"; count: number; section?: "head" };
 
 export interface RevisionDiff {
   rows: DiffRow[];

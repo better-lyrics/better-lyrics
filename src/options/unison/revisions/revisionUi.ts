@@ -1,10 +1,13 @@
 import { t } from "@core/i18n";
 import {
+  DIFF_HEAD_SECTION,
   type RevisionMessage,
   type RevisionNote,
+  diffHeadLabel,
   driftMeter,
   formatDiffTime,
   formatTimingDelta,
+  splitDiffRows,
   statusLabel,
   unchangedLines,
 } from "@modules/unison/revisions";
@@ -182,8 +185,20 @@ export function createDiffView(rows: DiffRow[], emptyText: string): HTMLElement 
     diff.appendChild(empty);
     return diff;
   }
-  diff.append(...rows.map(createDiffRow));
+  const { body, head } = splitDiffRows(rows);
+  diff.append(...body.map(createDiffRow));
+  if (head.length > 0) diff.appendChild(createHeadSection(head));
   return diff;
+}
+
+function createHeadSection(rows: DiffRow[]): HTMLElement {
+  const section = document.createElement("div");
+  section.className = "unison-rev-diff-section";
+  const label = document.createElement("div");
+  label.className = "unison-rev-diff-section-label";
+  label.textContent = messageText(DIFF_HEAD_SECTION);
+  section.append(label, ...rows.map(createDiffRow));
+  return section;
 }
 
 function createDiffRow(row: DiffRow): HTMLElement {
@@ -199,7 +214,11 @@ function createDiffRow(row: DiffRow): HTMLElement {
 
   const time = document.createElement("span");
   time.className = "unison-rev-diff-time";
-  time.textContent = row.startMs === null ? "" : formatDiffTime(row.startMs);
+  if ("head" in row && row.head) {
+    time.textContent = diffHeadLabel(row.head).map(messageText).join(" · ");
+  } else {
+    time.textContent = row.startMs === null ? "" : formatDiffTime(row.startMs);
+  }
 
   const mark = document.createElement("span");
   mark.className = "unison-rev-diff-mark";

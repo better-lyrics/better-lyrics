@@ -1,6 +1,15 @@
 import { UNISON_REVISION_PREVIEW_RETRY_MAX_MS, UNISON_REVISION_PREVIEW_RETRY_MS } from "@constants";
+import { getLanguageDisplayName } from "@core/i18n";
 import { UnisonErrorCode } from "./errorCodes";
-import type { FieldCheck, PendingReason, PreviewResult, RevisionStatus, RevisionSummary } from "./types";
+import type {
+  DiffHead,
+  DiffRow,
+  FieldCheck,
+  PendingReason,
+  PreviewResult,
+  RevisionStatus,
+  RevisionSummary,
+} from "./types";
 
 // -- Messages --------------------------
 
@@ -96,6 +105,32 @@ export function hasBadLyrics(preview: PreviewResult): boolean {
 
 export function unchangedLines(count: number): RevisionMessage {
   return message("unison_rev_unchangedLines", count);
+}
+
+const HEAD_KIND_KEY: Record<DiffHead["kind"], string> = {
+  translation: "options_translation_tab",
+  transliteration: "options_romanization_tab",
+  credit: "unison_rev_headCredits",
+};
+
+export const DIFF_HEAD_SECTION = message("unison_rev_headSection");
+
+function isHeadRow(row: DiffRow): boolean {
+  return row.kind === "gap" ? row.section === "head" : "head" in row && row.head !== undefined;
+}
+
+export function splitDiffRows(rows: DiffRow[]): { body: DiffRow[]; head: DiffRow[] } {
+  const headStart = rows.findIndex(isHeadRow);
+  if (headStart === -1) return { body: rows, head: [] };
+  return { body: rows.slice(0, headStart), head: rows.slice(headStart) };
+}
+
+export function diffHeadLabel(head: DiffHead): RevisionMessage[] {
+  const label = [message(HEAD_KIND_KEY[head.kind])];
+  if (head.kind === "credit") return label;
+  if (head.lang) label.push({ text: getLanguageDisplayName(head.lang) });
+  if (head.line !== null) label.push(message("unison_rev_headLine", head.line));
+  return label;
 }
 
 // -- Revision Rows --------------------------

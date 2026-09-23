@@ -2311,6 +2311,37 @@ select.unison-input {
   color: rgba(255, 255, 255, 0.3);
 }
 
+.unison-rev-diff-section {
+  display: grid;
+  grid-template-columns: fit-content(40%) 1rem 1fr auto;
+  column-gap: 0.5rem;
+}
+
+.unison-rev-diff-section > * {
+  grid-column: 1 / -1;
+}
+
+.unison-rev-diff-section > .unison-rev-diff-row {
+  grid-template-columns: subgrid;
+}
+
+.unison-rev-diff-section > .unison-rev-diff-gap {
+  grid-column: 3 / -1;
+  padding-left: 0;
+}
+
+.unison-rev-diff-section-label {
+  padding: 0.25rem 0.875rem;
+  font-size: 0.6875rem;
+  color: rgba(255, 255, 255, 0.45);
+}
+
+.unison-rev-diff-section:not(:first-child) .unison-rev-diff-section-label {
+  margin-top: 0.375rem;
+  padding-top: 0.625rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
 .unison-rev-diff-empty {
   padding: 1.5rem;
   text-align: center;

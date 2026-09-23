@@ -2137,6 +2137,24 @@
       }
     }
   },
+  "unison_rev_headSection": {
+    "message": "Translations, romanization and credits",
+    "description": "Label above the diff rows for text stored outside the lyric lines: translations, romanizations and credits"
+  },
+  "unison_rev_headCredits": {
+    "message": "Credits",
+    "description": "Diff row label for a changed credit, such as a songwriter or singer name"
+  },
+  "unison_rev_headLine": {
+    "message": "line $line$",
+    "description": "Part of a diff row label that names the lyric line a translation or romanization belongs to, e.g. 'Translation · Spanish · line 3'",
+    "placeholders": {
+      "line": {
+        "content": "$1",
+        "example": "3"
+      }
+    }
+  },
   "unison_rev_noDiff": {
     "message": "No changes to show",
     "description": "Diff area when there is nothing to compare"

@@ -1,12 +1,15 @@
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
+import { getLanguageDisplayName } from "@core/i18n";
 import {
+  DIFF_HEAD_SECTION,
   type RevisionMessage,
   SEALED_NOTICE,
   checkFieldLabel,
   checkIssue,
   checkingOutcome,
+  diffHeadLabel,
   draftField,
   driftMeter,
   editorOutcome,
@@ -27,10 +30,11 @@ import {
   revisionFailure,
   revisionNote,
   revisionReason,
+  splitDiffRows,
   statusLabel,
   unchangedLines,
 } from "./revisions";
-import type { FieldCheck, PendingReason, PreviewResult, RevisionStatus, RevisionSummary } from "./types";
+import type { DiffRow, FieldCheck, PendingReason, PreviewResult, RevisionStatus, RevisionSummary } from "./types";
 
 const messages: Record<string, { message: string }> = JSON.parse(
   readFileSync(join(process.cwd(), "_locales/en/messages.json"), "utf8")
@@ -322,6 +326,93 @@ const REASONS: PendingReason[] = ["sealed", "flagged", "large_text_drift", "larg
 
   assert.equal(nextRevisionNumber([revision({ revNo: 5 }), revision({ revNo: 7 }), revision({ revNo: 2 })]), 8);
   assert.equal(nextRevisionNumber([]), 1);
+}
+
+// -- Diff head labels --------------------------
+
+{
+  keyOf(DIFF_HEAD_SECTION);
+
+  const translation = diffHeadLabel({ kind: "translation", lang: "es", line: 3 }).map(track);
+  assert.deepEqual(translation, [
+    { key: "options_translation_tab" },
+    { text: getLanguageDisplayName("es") },
+    { key: "unison_rev_headLine", subs: ["3"] },
+  ]);
+
+  const romanization = diffHeadLabel({ kind: "transliteration", lang: "ja-Latn", line: 1 }).map(track);
+  assert.deepEqual(romanization, [
+    { key: "options_romanization_tab" },
+    { text: getLanguageDisplayName("ja-Latn") },
+    { key: "unison_rev_headLine", subs: ["1"] },
+  ]);
+
+  assert.deepEqual(diffHeadLabel({ kind: "credit", lang: null, line: null }).map(track), [
+    { key: "unison_rev_headCredits" },
+  ]);
+}
+
+// -- Diff head labels: edge cases --------------------------
+
+{
+  assert.deepEqual(
+    diffHeadLabel({ kind: "translation", lang: null, line: 4 }),
+    [{ key: "options_translation_tab" }, { key: "unison_rev_headLine", subs: ["4"] }],
+    "a block without xml:lang drops the language"
+  );
+  assert.deepEqual(
+    diffHeadLabel({ kind: "transliteration", lang: "ko-Latn", line: null }),
+    [{ key: "options_romanization_tab" }, { text: getLanguageDisplayName("ko-Latn") }],
+    "a row without a line drops the line"
+  );
+  assert.deepEqual(
+    diffHeadLabel({ kind: "credit", lang: "en", line: 2 }),
+    [{ key: "unison_rev_headCredits" }],
+    "credits never show a language or line"
+  );
+  assert.deepEqual(diffHeadLabel({ kind: "translation", lang: "", line: 0 }), [
+    { key: "options_translation_tab" },
+    { key: "unison_rev_headLine", subs: ["0"] },
+  ]);
+}
+
+// -- Diff sections --------------------------
+
+{
+  const credit = { kind: "credit", lang: null, line: null } as const;
+  const bodyGap: DiffRow = { kind: "gap", count: 16 };
+  const bodySame: DiffRow = { kind: "same", lineNo: 1, startMs: 14_210, text: "Amazing grace" };
+  const headSame: DiffRow = { kind: "same", lineNo: 1, startMs: null, text: "John Newton", head: credit };
+  const headWord: DiffRow = {
+    kind: "word",
+    lineNo: 3,
+    startMs: null,
+    parts: [
+      ["=", "Que salvó a un "],
+      ["-", "desdichado"],
+      ["+", "alma"],
+      ["=", " como yo"],
+    ],
+    head: { kind: "translation", lang: "es", line: 2 },
+  };
+  const headGap: DiffRow = { kind: "gap", count: 12, section: "head" };
+
+  assert.deepEqual(splitDiffRows([bodyGap, headSame, headWord, headGap]), {
+    body: [bodyGap],
+    head: [headSame, headWord, headGap],
+  });
+  assert.deepEqual(splitDiffRows([bodySame, bodyGap]), { body: [bodySame, bodyGap], head: [] });
+  assert.deepEqual(splitDiffRows([]), { body: [], head: [] });
+  assert.deepEqual(
+    splitDiffRows([bodySame, headGap, headWord]),
+    { body: [bodySame], head: [headGap, headWord] },
+    "a head gap opens the head section"
+  );
+  assert.deepEqual(
+    splitDiffRows([headSame, bodyGap, headWord]),
+    { body: [], head: [headSame, bodyGap, headWord] },
+    "a gap after the first head row stays in the head section"
+  );
 }
 
 // -- Revision rows: regressions --------------------------
