@@ -65,7 +65,7 @@
     "devDependencies": {
         "@aws-sdk/client-s3": "^3.1131.0",
         "@biomejs/biome": "2.0.4",
-        "@types/chrome": "^0.2.9",
+        "@types/chrome": "^0.3.0",
         "@types/jsdom": "^28.0.3",
         "@types/node": "^26.5.1",
         "@types/sortablejs": "^1.15.9",
