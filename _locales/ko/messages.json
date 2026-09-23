@@ -143,6 +143,18 @@
     "message": "페이지를 새로고침하거나 곡이나 페이지를 이동할 때 플로팅 가사 창이 완전히 닫히지 않도록 막습니다. 브라우저에서는 사용자가 페이지와 상호작용한 뒤에만 플로팅 창을 열도록 허용하므로, 플로팅 창은 첫 번째 클릭이나 키 입력을 받아야 다시 열리며 즉시 열리지는 않습니다.",
     "description": "Help tooltip explaining what automatic floating-lyrics reopening does and why it waits for the first interaction"
   },
+  "options_display_pipWindowLayout": {
+    "message": "Window layout",
+    "description": "Setting label, shown inside the floating lyrics window settings, for choosing whether the window opens wide or tall"
+  },
+  "options_pipWindowLayout_horizontal": {
+    "message": "Horizontal",
+    "description": "Floating lyrics window layout option: a wide window with the album art beside the lyrics"
+  },
+  "options_pipWindowLayout_vertical": {
+    "message": "Vertical",
+    "description": "Floating lyrics window layout option: a tall window with the album art above the lyrics"
+  },
   "options_display_pipArtworkTransition": {
     "message": "앨범 아트 전환",
     "description": "Setting label, shown inside the floating lyrics window settings, for choosing how album art changes between songs"
