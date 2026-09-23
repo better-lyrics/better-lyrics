@@ -163,6 +163,10 @@ body {
   object-fit: cover;
 }
 
+.blyrics-pip-artwork__image[data-letterboxed] {
+  transform: scale(1.4);
+}
+
 /* The motion cover sits above both faces rather than inside one: it is always
    cleared on a track change, so it never has to take part in a transition.
 
@@ -533,6 +537,7 @@ body {
   --blyrics-font-size: clamp(1rem, 5cqw, 2.4rem) !important;
   --blyrics-translated-font-size: clamp(0.675rem, 2.5cqw, 1.5rem) !important;
   --blyrics-padding: clamp(0.25rem, 2cqw, 0.5rem) !important;
+  --blyrics-footer-font-size: clamp(0.6rem, 2.6cqw, 0.85rem) !important;
   margin: 0 !important;
   margin-block: 0 !important;
   margin-inline: 0 !important;
@@ -559,7 +564,6 @@ body {
 }
 
 .blyrics-pip-lyrics .blyrics-footer__container {
-  font-size: clamp(0.6rem, 2.6cqw, 0.85rem);
   padding: 0.3em 0.7em;
   border-radius: 0.6em;
 }
@@ -1115,4 +1119,45 @@ body {
 .blyrics-pip-progress .blyrics-progress__knob:hover .blyrics-progress__knob-dot,
 .blyrics-pip-progress .blyrics-progress__bar.dragging .blyrics-progress__knob-dot {
   transform: translate(-50%, -50%) scale(1.4);
+}
+
+/* -- Vertical mode ----------------------------------------------------------- */
+/* The height cap keeps about half a near-square window for the lyrics. */
+@media (max-aspect-ratio: 4/5) {
+  .blyrics-pip-shell {
+    flex-direction: column;
+    max-height: none;
+  }
+
+  .blyrics-pip-art-col {
+    align-self: stretch;
+  }
+
+  .blyrics-pip-artwork {
+    width: min(100%, 50vh);
+    min-width: 0;
+    max-width: none;
+  }
+
+  .blyrics-pip-artwork__controls {
+    --blyrics-pip-control-size: clamp(36px, 13vw, 52px);
+  }
+
+  .blyrics-pip-progress .blyrics-progress__times {
+    font-size: 12px;
+  }
+
+  .blyrics-pip-header__title {
+    font-size: clamp(18px, 6vw, 24px);
+  }
+
+  .blyrics-pip-header__artist {
+    font-size: clamp(13px, 4.2vw, 16px);
+  }
+
+  .blyrics-pip-lyrics .blyrics-container {
+    --blyrics-font-size: clamp(1.2rem, 6.5cqw, 1.75rem) !important;
+    --blyrics-translated-font-size: clamp(0.8rem, 3.4cqw, 1.05rem) !important;
+    --blyrics-footer-font-size: clamp(0.7rem, 3cqw, 0.85rem) !important;
+  }
 }

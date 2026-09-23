@@ -132,7 +132,7 @@ In `blyrics/variables.css` (shipped by `@braccato/core`), you'll see a `:root` s
 :root {
   --blyrics-ui-text-color: var(--blyrics-text-color, color(display-p3 1 1 1 / 1));
   --blyrics-glow-color: var(--blyrics-highlight-color, color(display-p3 1 1 1 / 0.5));
-  --blyrics-font-family: Satoshi, var(--noto-sans-universal, "Noto Sans"), Avenir, -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, Cantarell, Open Sans, Helvetica Neue, sans-serif;
+  --blyrics-default-font-family: Satoshi, var(--noto-sans-universal, "Noto Sans"), Avenir, -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, Cantarell, Open Sans, Helvetica Neue, sans-serif;
   /* ... more variables ... */
 }
 ```
@@ -158,13 +158,13 @@ These custom properties allow for easy customization of colors, sizes, and other
 
 | Variable                           | Default Value                                                                                                                                                        | Description                                                              |
 | ---------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------ |
-| `--blyrics-font-family`¹           | `Satoshi, var(--noto-sans-universal, "Noto Sans"), Avenir, -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, Cantarell, Open Sans, Helvetica Neue, sans-serif` | Font family for lyrics                                                 |
+| `--blyrics-font-family`¹           | Unset; falls back to `--blyrics-default-font-family` | Explicit font family override for lyrics                                                 |
 | `--blyrics-font-size`              | `3rem`                                                                                                                                                               | Font size for lyrics                                                     |
 | `--blyrics-font-weight`            | `700`                                                                                                                                                                | Font weight for lyrics                                                   |
 | `--blyrics-line-height`            | `1.333`                                                                                                                                                              | Line height for lyrics                                                   |
 | `--blyrics-translated-font-size`   | `2rem`                                                                                                                                                               | Font size of translated/romanized lyrics                                 |
 | `--blyrics-translated-font-weight` | `600`                                                                                                                                                                | Font weight of translated/romanized lyrics                               |
-| `--blyrics-translated-font-family` | Inherits `--blyrics-font-family`                                                                                                                                     | Font family of translated/romanized lyrics                               |
+| `--blyrics-translated-font-family` | Unset; uses `--blyrics-font-family` or the local default stack                                                                                                                                     | Font family of translated/romanized lyrics                               |
 | `--blyrics-translated-color`       | `color(display-p3 1 1 1 / var(--blyrics-translated-opacity, 0.6))`                                                                                                   | Color of translated/romanized lyrics                                     |
 | `--blyrics-footer-font-family`     | `Roboto, Noto Naskh Arabic UI, Arial, sans-serif`                                                                                                                    | Font family of footer                                                    |
 | `--blyrics-footer-font-size`       | `14px`                                                                                                                                                               | Font size of footer                                                      |
@@ -173,7 +173,15 @@ These custom properties allow for easy customization of colors, sizes, and other
 
 ¹To add a custom web-font, use `@import`. It must be placed at the very top of your theme.
 
-²You don't want to override this. You should use this in your own font families as a fallback.
+²The extension resolves this fallback at each lyric and translation's `lang` boundary, selecting the appropriate Japanese, Korean, Simplified Chinese, Taiwan, or Hong Kong Noto subset. Keep the default font overrides unset to use this behavior. When adding a custom family with the Noto fallback, declare it at these boundaries rather than at `:root`, where CSS would resolve the fallback before the text language is known:
+
+```css
+.blyrics--line,
+.blyrics--translated,
+.blyrics--romanized {
+  --blyrics-font-family: "My Custom Font", var(--noto-sans-universal), sans-serif;
+}
+```
 
 ### Animations
 
@@ -416,6 +424,21 @@ The following options are avalible:
 
 The scroll gate and `blyrics-queue-scroll-ms` have been removed; the old queue knob has no effect. There is no timing equation to balance against animation duration.
 
+#### Scoping the scroll position to one view
+
+Knobs are global, so the side panel, fullscreen and the Picture-in-Picture window all read the same values. If you want the Picture-in-Picture window to scroll differently, set `--blyrics-target-scroll-pos-ratio` on its `.blyrics-container` instead. Wherever that variable resolves, it wins over the `blyrics-target-scroll-pos-ratio` knob. Use a plain number from `0` to `1`: values outside that range get clamped, units like `%` aren't converted, and anything that isn't a number falls back to the knob.
+
+The variable is read once, when the theme is applied. The side panel and fullscreen share one view, so a selector that only matches in fullscreen won't take effect when you toggle it. The Picture-in-Picture window has its own view, which is why scoping to it works.
+
+This keeps lyrics centered everywhere except the Picture-in-Picture window:
+
+```css
+/* blyrics-target-scroll-pos-ratio = 0.5; */
+.blyrics-pip-shell .blyrics-container {
+  --blyrics-target-scroll-pos-ratio: 0.37;
+}
+```
+
 Tip: Pay attention to the units of the values; Some values are in *seconds* (s), while others are in *milliseconds* (ms).
 
 ### Dynamic Properties
@@ -430,7 +453,7 @@ The main container for the lyrics is styled using the `.blyrics-container` class
 
 ```css
 .blyrics-container {
-  font-family: var(--blyrics-font-family);
+  font-family: var(--blyrics-font-family, var(--blyrics-default-font-family));
   font-size: var(--blyrics-font-size);
   font-weight: var(--blyrics-font-weight);
   isolation: isolate;
@@ -914,7 +937,7 @@ Ensures the lyrics panel has adequate space for comfortable reading. The `33em` 
   background-clip: text;
   color: transparent;
   content: "Better Lyrics is searching for lyrics...";
-  font-family: var(--blyrics-font-family);
+  font-family: var(--blyrics-font-family, var(--blyrics-default-font-family));
   font-size: 2rem;
   font-weight: 700;
   isolation: isolate;
@@ -964,7 +987,7 @@ The loader supports several attributes for different states:
   align-self: flex-start !important;
   color: var(--blyrics-error-color);
   cursor: default;
-  font-family: var(--blyrics-font-family);
+  font-family: var(--blyrics-font-family, var(--blyrics-default-font-family));
   font-size: var(--blyrics-font-size);
   font-weight: var(--blyrics-font-weight);
   line-height: 1;
@@ -987,7 +1010,7 @@ Styles error messages with reduced opacity and a distinct color.
   border-radius: var(--blyrics-border-radius);
   color: var(--blyrics-ui-text-color);
   cursor: pointer;
-  font-family: var(--blyrics-font-family);
+  font-family: var(--blyrics-font-family, var(--blyrics-default-font-family));
   font-size: 1.5rem;
   font-weight: 600;
   padding: 1rem 2rem;
@@ -1255,7 +1278,7 @@ This CSS feature query detects when ThemeSong is active and adjusts the layout a
   display: block;
   font-size: var(--blyrics-translated-font-size);
   font-weight: var(--blyrics-translated-font-weight);
-  font-family: var(--blyrics-translated-font-family);
+  font-family: var(--blyrics-translated-font-family, var(--blyrics-font-family, var(--blyrics-default-font-family)));
   color: var(--blyrics-translated-color);
   white-space: normal;
   line-height: 1.1;
@@ -1404,7 +1427,7 @@ To customize instrumental breaks:
 
 ```css
 .autoscroll-resume-button {
-  font-family: var(--blyrics-font-family);
+  font-family: var(--blyrics-font-family, var(--blyrics-default-font-family));
   position: absolute;
   display: block;
   font-size: 1.75rem;

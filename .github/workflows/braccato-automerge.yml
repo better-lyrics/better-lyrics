@@ -1,0 +1,55 @@
+name: Auto-merge braccato bumps
+
+on:
+  workflow_run:
+    workflows: [Build, Auto-fix Code Quality Issues]
+    types: [completed]
+
+permissions:
+  checks: read
+  statuses: read
+  pull-requests: read
+  contents: read
+
+jobs:
+  merge:
+    if: >-
+      github.event.workflow_run.conclusion == 'success' &&
+      github.event.workflow_run.event == 'pull_request' &&
+      github.event.workflow_run.actor.login == 'dependabot[bot]' &&
+      contains(github.event.workflow_run.head_branch, '/braccato-')
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    concurrency:
+      group: braccato-automerge-${{ github.event.workflow_run.head_branch }}
+    steps:
+      - uses: actions/create-github-app-token@v3
+        id: app-token
+        with:
+          app-id: ${{ secrets.APP_ID }}
+          private-key: ${{ secrets.APP_PRIVATE_KEY }}
+
+      # The app token merges so the push to master still runs its workflows; GITHUB_TOKEN only reads checks.
+      - name: Merge, or queue the merge for review, once every check is green
+        env:
+          GH_TOKEN: ${{ github.token }}
+          MERGE_TOKEN: ${{ steps.app-token.outputs.token }}
+          REPO: ${{ github.repository }}
+          PR_NUMBER: ${{ github.event.workflow_run.pull_requests[0].number }}
+          HEAD_BRANCH: ${{ github.event.workflow_run.head_branch }}
+          HEAD_SHA: ${{ github.event.workflow_run.head_sha }}
+        run: |
+          pr="$PR_NUMBER"
+          if [ -z "$pr" ]; then
+            pr=$(gh pr list --repo "$REPO" --head "$HEAD_BRANCH" --state open --json number -q '.[0].number')
+          fi
+          if [ -z "$pr" ] || [ "$(gh pr view "$pr" --repo "$REPO" --json state -q .state)" != OPEN ]; then
+            echo "No open PR for $HEAD_BRANCH"
+            exit 0
+          fi
+          gh pr checks "$pr" --repo "$REPO" --watch --interval 30
+          if gh pr checks "$pr" --repo "$REPO" --json bucket -q '.[].bucket' | grep -qxE 'cancel|fail'; then
+            echo "PR #$pr has a cancelled or failed check"
+            exit 1
+          fi
+          GH_TOKEN="$MERGE_TOKEN" gh pr merge "$pr" --repo "$REPO" --squash --auto --match-head-commit "$HEAD_SHA"

@@ -18,9 +18,10 @@ Essential reference for creating custom themes. For deep dives, see [STYLING.md]
 
 ### Typography
 
+Leave font-family overrides unset for language-aware CJK defaults. If adding a font, declare `--blyrics-font-family: "My Font", var(--noto-sans-universal), sans-serif` on `.blyrics--line, .blyrics--translated, .blyrics--romanized` so the fallback resolves in each element's language.
+
 ```css
 :root {
-  --blyrics-font-family: Satoshi, var(--noto-sans-universal), sans-serif;
   --blyrics-font-size: 3rem;
   --blyrics-font-weight: 700;
   --blyrics-line-height: 1.333;
@@ -186,6 +187,8 @@ blyrics-line-scroll-above-duration = calc(750ms + log(var(--blyrics-line-scroll-
 | `blyrics-line-scroll-{above,active,below}-translate-y-{start,end}` | shared offset | Side-specific Y offsets; `above`/`below` swap on upward scrolls |
 
 **Scroll timing**: `blyrics-early-scroll-consider-s` defaults to `0.54` seconds independently of animation duration. Lookahead only affects the target when another lyric triggers a scroll; entering the window alone does not scroll. Lines included in a committed scroll cannot trigger again at their own start. Seeking, resuming autoscroll and relayout may still reposition the view. There is no scroll gate or queue; `blyrics-queue-scroll-ms` is ignored and no timing equation needs balancing. `--blyrics-lyric-scroll-duration`, its `--blyrics-lyric-transition-duration` alias and the container transform transition have been removed. Use the line-scroll duration knobs instead; replace explicit references to the removed variables with a duration or your own custom property. Missing, invalid or nonpositive line durations fall back to an internal `750ms`. Themes that relied on automatically derived lookahead should set it explicitly.
+
+**PiP scroll position**: knobs are shared by the panel, fullscreen and PiP. To give PiP its own position, set `--blyrics-target-scroll-pos-ratio` under `.blyrics-pip-shell`: `.blyrics-pip-shell .blyrics-container { --blyrics-target-scroll-pos-ratio: 0.37; }`. It overrides `blyrics-target-scroll-pos-ratio` wherever it resolves. Plain number, clamped to `0` to `1`, `%` not converted, non-numbers fall back to the knob. Read once per theme apply, and panel and fullscreen share one view, so a fullscreen-only selector won't switch on toggle.
 
 ## Dynamic Properties
 

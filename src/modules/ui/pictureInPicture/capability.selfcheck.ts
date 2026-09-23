@@ -49,6 +49,7 @@ function createDependencies(
 ): PictureInPictureControllerDependencies<FakeWindow> {
   return {
     host: { documentPictureInPicture: api },
+    windowLayout: () => undefined,
     loadStylesheet,
     renderLoadingShell: () => undefined,
     injectStylesheet,
@@ -247,6 +248,22 @@ assert.equal(
   gateToggleCount,
   1,
   "Given the feature is disabled, When a stale control is clicked, Then no window opens"
+);
+
+const verticalApi = new FakeApi([Promise.resolve(new FakeWindow())]);
+const verticalController = new PictureInPictureController({
+  ...createDependencies(
+    verticalApi,
+    () => Promise.resolve(".pip {}"),
+    () => undefined
+  ),
+  windowLayout: () => "vertical",
+});
+verticalController.toggle();
+assert.deepEqual(
+  verticalApi.requests,
+  [{ width: 340, height: 720, disallowReturnToOpener: true }],
+  "Given the vertical layout setting, When a PiP window is requested, Then it asks for portrait dimensions"
 );
 
 console.log("Picture-in-Picture controller selfcheck passed");

@@ -125,7 +125,7 @@
 #blyrics-loader:after {
 	color: color-mix(in srgb, var(--blyrics-ui-text-color) 70%, transparent);
 	content: var(--blyrics-loader-text, "");
-	font-family: var(--blyrics-font-family);
+	font-family: var(--blyrics-font-family, var(--blyrics-default-font-family));
 	font-size: 2.2rem;
 	font-weight: 700;
 	isolation: isolate;
@@ -186,7 +186,7 @@
 	background-clip: text;
 	color: transparent;
 	content: var(--blyrics-text-ad-playing, "[elevator music]");
-	font-family: var(--blyrics-font-family);
+	font-family: var(--blyrics-font-family, var(--blyrics-default-font-family));
 	font-size: 2rem;
 	font-weight: 700;
 	isolation: isolate;
@@ -1123,7 +1123,7 @@ ytmusic-player-page:not([is-mweb-modernization-enabled]) #side-panel.blyrics-has
 }
 
 .autoscroll-resume-button {
-	font-family: var(--blyrics-font-family);
+	font-family: var(--blyrics-font-family, var(--blyrics-default-font-family));
 	position: absolute;
 	display: block;
 	font-size: 1.75rem;
@@ -1215,7 +1215,7 @@ ytmusic-player-page:not([is-mweb-modernization-enabled]) #side-panel.blyrics-has
 	z-index: 2;
 	max-width: 40rem;
 	text-align: start;
-	font-family: var(--blyrics-font-family);
+	font-family: var(--blyrics-font-family, var(--blyrics-default-font-family));
 }
 
 #blyrics-song-info > p#blyrics-title {
