@@ -40,6 +40,8 @@ import { appendLanguageOptions, matchLanguageOption } from "./languages";
 import { detectFormat, renderPreviewInto } from "./lyricsPreview";
 import { appendMetaRow } from "./metaTable";
 import { renderRevisionBar } from "./revisions/revisionBar";
+import { type EditorSurface, renderRevisionEditor } from "./revisions/revisionEditor";
+import { renderRevisionsPage } from "./revisions/revisionList";
 import type { RevisionHost } from "./revisions/revisionUi";
 
 // -- Icons --------------------------
@@ -73,6 +75,8 @@ let searchInput: HTMLInputElement;
 let viewSearch: HTMLElement;
 let viewDetail: HTMLElement;
 let viewSubmit: HTMLElement;
+let viewRevisions: HTMLElement;
+let revisionsRoot: HTMLElement;
 let resultsGrid: HTMLElement;
 let noResults: HTMLElement;
 let feedContainer: HTMLElement;
@@ -180,13 +184,14 @@ const DEV_STUB_LYRICS_ENTRY: UnisonLyricsEntry = {
 
 // -- Router --------------------------
 
-type View = "search" | "detail" | "submit";
+type View = "search" | "detail" | "submit" | "revisions";
 
 function showView(view: View): void {
   if (view !== "search") saveActiveTabContent();
   viewSearch.hidden = view !== "search";
   viewDetail.hidden = view !== "detail";
   viewSubmit.hidden = view !== "submit";
+  viewRevisions.hidden = view !== "revisions";
 
   const isSubmit = view === "submit";
   const headerSearch = document.getElementById("unison-header-search");
@@ -224,8 +229,19 @@ function routeFromParams(): void {
 
   const lyricsId = params.get("id");
   if (lyricsId) {
+    const id = Number(lyricsId);
+    if (params.get("revisions") === "1") {
+      showView("revisions");
+      const rev = params.get("rev");
+      void loadRevisions(id, rev ? Number(rev) : null);
+      return;
+    }
     showView("detail");
-    loadDetailById(Number(lyricsId), params.get("mine") === "1");
+    if (params.get("edit") === "1") {
+      void loadEditor(id);
+      return;
+    }
+    loadDetailById(id, params.get("mine") === "1");
     return;
   }
 
@@ -264,6 +280,8 @@ export function initUnisonPage(): void {
   viewSearch = document.getElementById("unison-view-search") as HTMLElement;
   viewDetail = document.getElementById("unison-view-detail") as HTMLElement;
   viewSubmit = document.getElementById("unison-view-submit") as HTMLElement;
+  viewRevisions = document.getElementById("unison-view-revisions") as HTMLElement;
+  revisionsRoot = document.getElementById("unison-revisions-root") as HTMLElement;
   resultsGrid = document.getElementById("unison-results-grid") as HTMLElement;
   noResults = document.getElementById("unison-no-results") as HTMLElement;
   feedContainer = document.getElementById("unison-feed") as HTMLElement;
@@ -1413,6 +1431,48 @@ async function renderDetailRevisionBar(entry: UnisonLyricsEntry, token: number):
   const isOwner = await isOwnerOf(entry);
   if (token !== detailRenderToken) return;
   renderRevisionBar(entry, revisionSlot, revisionHost(token), isOwner);
+}
+
+async function loadRevisionEntry(
+  id: number,
+  token: number,
+  ownerOnly: boolean
+): Promise<{ entry: UnisonLyricsEntry; isOwner: boolean } | null> {
+  const result = await getLyricsById(id);
+  const entry = result.success ? result.data : null;
+  const isOwner = entry?.revision ? await isOwnerOf(entry) : false;
+  if (token !== detailRenderToken) return null;
+  if (!entry?.revision || (ownerOnly && !isOwner)) {
+    revisionHost(token).navigate({ id: String(id) }, { replace: true });
+    return null;
+  }
+  return { entry, isOwner };
+}
+
+async function loadEditor(id: number): Promise<void> {
+  renderDetailSkeleton();
+  const token = ++detailRenderToken;
+  const loaded = await loadRevisionEntry(id, token, true);
+  if (!loaded) return;
+  const surface: EditorSurface = {
+    meta: detailMeta,
+    preview: detailPreview,
+    lyrics: detailLyrics,
+    savebar: savebarSlot,
+  };
+  renderRevisionEditor(loaded.entry, surface, revisionHost(token));
+}
+
+async function loadRevisions(id: number, openRevNo: number | null): Promise<void> {
+  const token = ++detailRenderToken;
+  const skeleton = document.createElement("div");
+  skeleton.className = "unison-skeleton";
+  skeleton.style.width = "100%";
+  skeleton.style.height = "50vh";
+  revisionsRoot.replaceChildren(skeleton);
+  const loaded = await loadRevisionEntry(id, token, false);
+  if (!loaded) return;
+  renderRevisionsPage(loaded.entry, revisionsRoot, revisionHost(token), loaded.isOwner, openRevNo);
 }
 
 function showReportMenu(unisonId: number, anchor: HTMLButtonElement): void {
