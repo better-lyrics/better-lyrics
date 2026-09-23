@@ -143,6 +143,18 @@
     "message": "Hält das schwebende Songtext-Fenster vor dem Schließen, wenn Sie zwischen Liedern und Seiten neu laden oder bewegen. Browser lassen ein schwebendes Fenster nur öffnen, nachdem Sie mit der Seite interagieren so öffnet es sich wieder auf Ihren ersten Klick oder Tastendruck statt sofort.",
     "description": "Help tooltip explaining what automatic floating-lyrics reopening does and why it waits for the first interaction"
   },
+  "options_display_pipWindowLayout": {
+    "message": "Fenster-Layout",
+    "description": "Setting label, shown inside the floating lyrics window settings, for choosing whether the window opens wide or tall"
+  },
+  "options_pipWindowLayout_horizontal": {
+    "message": "Horizontal",
+    "description": "Floating lyrics window layout option: a wide window with the album art beside the lyrics"
+  },
+  "options_pipWindowLayout_vertical": {
+    "message": "Vertikal",
+    "description": "Floating lyrics window layout option: a tall window with the album art above the lyrics"
+  },
   "options_display_pipArtworkTransition": {
     "message": "Albumcover-Übergang",
     "description": "Setting label, shown inside the floating lyrics window settings, for choosing how album art changes between songs"
