@@ -39,6 +39,7 @@ interface Options {
   isPassiveScrollEnabled: boolean;
   isPictureInPictureEnabled: boolean;
   isPictureInPictureAutoRestoreEnabled: boolean;
+  pipWindowLayout: string;
   pipArtworkTransition: string;
   pipTextTransition: string;
   pipMarqueeEnabled: boolean;
@@ -105,6 +106,7 @@ const getOptionsFromForm = (): Options => {
     isPictureInPictureAutoRestoreEnabled: (
       document.getElementById("isPictureInPictureAutoRestoreEnabled") as HTMLInputElement
     ).checked,
+    pipWindowLayout: (document.getElementById("pipWindowLayout") as HTMLSelectElement).value,
     pipArtworkTransition: (document.getElementById("pipArtworkTransition") as HTMLSelectElement).value,
     pipTextTransition: (document.getElementById("pipTextTransition") as HTMLSelectElement).value,
     pipMarqueeEnabled: (document.getElementById("pipMarqueeEnabled") as HTMLInputElement).checked,
@@ -296,6 +298,7 @@ const restoreOptions = (): void => {
     isPassiveScrollEnabled: true,
     isPictureInPictureEnabled: true,
     isPictureInPictureAutoRestoreEnabled: false,
+    pipWindowLayout: "horizontal",
     pipArtworkTransition: "shuffle",
     pipTextTransition: "spring",
     pipMarqueeEnabled: true,
@@ -386,6 +389,7 @@ const setOptionsInForm = (items: Options): void => {
   (document.getElementById("isPictureInPictureEnabled") as HTMLInputElement).checked = items.isPictureInPictureEnabled;
   (document.getElementById("isPictureInPictureAutoRestoreEnabled") as HTMLInputElement).checked =
     items.isPictureInPictureAutoRestoreEnabled;
+  (document.getElementById("pipWindowLayout") as HTMLSelectElement).value = items.pipWindowLayout;
   (document.getElementById("pipArtworkTransition") as HTMLSelectElement).value = items.pipArtworkTransition;
   (document.getElementById("pipTextTransition") as HTMLSelectElement).value = items.pipTextTransition;
   (document.getElementById("pipMarqueeEnabled") as HTMLInputElement).checked = items.pipMarqueeEnabled;

@@ -19,6 +19,7 @@ export interface PictureInPictureInitPayload {
   readonly textTransition: string;
   readonly marqueeEnabled: boolean;
   readonly progressBarEnabled: boolean;
+  readonly windowLayout: string;
   readonly logsEnabled: boolean;
 }
 
@@ -43,6 +44,7 @@ export interface PictureInPictureLyricsPayload {
    */
   readonly lyrics: readonly Lyric[] | null;
   readonly noLyrics: boolean;
+  readonly language?: string | null;
   /**
    * The translated and romanized text the isolated world injected into the side panel, per line
    * index. It rides on the payload rather than arriving as its own message because the window
