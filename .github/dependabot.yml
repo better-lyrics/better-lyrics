@@ -8,7 +8,15 @@ updates:
   - package-ecosystem: "npm"
     directory: "/"
     schedule:
-      interval: "weekly"
+      interval: "daily"
+    groups:
+      # First match wins, so braccato gets its own PR, which auto-merges once CI is green.
+      braccato:
+        patterns: ["@braccato/*"]
+        update-types: [minor, patch]
+      minor-and-patch:
+        patterns: ["*"]
+        update-types: [minor, patch]
     ignore:
       - dependency-name: "extension"
         versions: [">= 3.0.0"]

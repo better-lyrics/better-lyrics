@@ -431,6 +431,21 @@ If one of these knobs is manually set, the other is derived from the equation be
 
 If both are manually set, keep the equation balanced yourself. An unbalanced equation may cause dropped frames or missed scrolls.
 
+#### Scoping the scroll position to one view
+
+Knobs are global, so the side panel, fullscreen and the Picture-in-Picture window all read the same values. If you want the Picture-in-Picture window to scroll differently, set `--blyrics-target-scroll-pos-ratio` on its `.blyrics-container` instead. Wherever that variable resolves, it wins over the `blyrics-target-scroll-pos-ratio` knob. Use a plain number from `0` to `1`: values outside that range get clamped, units like `%` aren't converted, and anything that isn't a number falls back to the knob.
+
+The variable is read once, when the theme is applied. The side panel and fullscreen share one view, so a selector that only matches in fullscreen won't take effect when you toggle it. The Picture-in-Picture window has its own view, which is why scoping to it works.
+
+This keeps lyrics centered everywhere except the Picture-in-Picture window:
+
+```css
+/* blyrics-target-scroll-pos-ratio = 0.5; */
+.blyrics-pip-shell .blyrics-container {
+  --blyrics-target-scroll-pos-ratio: 0.37;
+}
+```
+
 Tip: Pay attention to the units of the values; Some values are in *seconds* (s), while others are in *milliseconds* (ms).
 
 ### Dynamic Properties
