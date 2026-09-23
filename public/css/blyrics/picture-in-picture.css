@@ -1143,10 +1143,6 @@ body {
     font-size: 12px;
   }
 
-  .blyrics-pip-content {
-    min-height: 0;
-  }
-
   .blyrics-pip-header__title {
     font-size: clamp(18px, 6vw, 24px);
   }
