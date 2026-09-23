@@ -143,6 +143,18 @@
     "message": "Giữ cho cửa sổ lời bài hát nổi mà không bị đóng hoàn toàn khi bạn tải lại trang, chuyển bài hát hoặc chuyển trang. Do chính sách bảo mật của trình duyệt chỉ cho phép mở cửa sổ nổi sau khi người dùng tương tác với trang, nên cửa sổ sẽ tự động bật lại ngay ở lần nhấp chuột hoặc nhấn phím đầu tiên của bạn thay vì mở lập tức.",
     "description": "Help tooltip explaining what automatic floating-lyrics reopening does and why it waits for the first interaction"
   },
+  "options_display_pipWindowLayout": {
+    "message": "Window layout",
+    "description": "Setting label, shown inside the floating lyrics window settings, for choosing whether the window opens wide or tall"
+  },
+  "options_pipWindowLayout_horizontal": {
+    "message": "Horizontal",
+    "description": "Floating lyrics window layout option: a wide window with the album art beside the lyrics"
+  },
+  "options_pipWindowLayout_vertical": {
+    "message": "Vertical",
+    "description": "Floating lyrics window layout option: a tall window with the album art above the lyrics"
+  },
   "options_display_pipArtworkTransition": {
     "message": "Hiệu ứng chuyển ảnh bìa",
     "description": "Setting label, shown inside the floating lyrics window settings, for choosing how album art changes between songs"
