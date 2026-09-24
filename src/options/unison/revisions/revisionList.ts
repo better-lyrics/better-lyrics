@@ -318,7 +318,7 @@ function renderBrowse(
 
   const against = diff?.success ? diff.data?.againstRevNo : null;
   detail.replaceChildren(
-    createDetailHead(null, against ? t("unison_rev_comparedWith", [String(against)]) : null, actions),
+    createDetailHead(against ? t("unison_rev_comparedWith", [String(against)]) : null, actions),
     ...(note ? [note] : []),
     createDiffLegend(),
     rev.revNo === 1 ? createDiffView([], t("unison_rev_noDiff")) : diffBody(diff)
@@ -349,26 +349,16 @@ function renderConfirm(
 
   const { note } = revertNote(preview, nextRevisionNumber(ctx.revisions), true);
   detail.replaceChildren(
-    createDetailHead(
-      t("unison_rev_number", [String(rev.revNo)]),
-      t("unison_rev_comparedWith", [String(ctx.liveRevNo)]),
-      [cancel, confirm]
-    ),
+    createDetailHead(t("unison_rev_comparedWith", [String(ctx.liveRevNo)]), [cancel, confirm]),
     ...(note ? [createNote(note)] : []),
     createDiffLegend(),
     diffBody(diff)
   );
 }
 
-function createDetailHead(title: string | null, sub: string | null, actions: HTMLElement[]): HTMLElement {
+function createDetailHead(sub: string | null, actions: HTMLElement[]): HTMLElement {
   const heading = document.createElement("div");
   heading.className = "unison-rev-diff-heading";
-  if (title) {
-    const titleEl = document.createElement("h3");
-    titleEl.className = "unison-rev-diff-title";
-    titleEl.textContent = title;
-    heading.appendChild(titleEl);
-  }
   if (sub) {
     const subEl = document.createElement("p");
     subEl.className = "unison-rev-diff-sub";

@@ -2153,16 +2153,6 @@ select.unison-input {
   gap: 0.25rem;
 }
 
-.unison-rev-diff-title {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  font-size: 1rem;
-  font-weight: 600;
-  color: #fff;
-  margin: 0;
-}
-
 .unison-rev-diff-sub {
   font-size: 0.75rem;
   color: rgba(255, 255, 255, 0.45);
