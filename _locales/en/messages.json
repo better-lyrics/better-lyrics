@@ -1896,8 +1896,8 @@
     "description": "Error shown when the user tries to unlink the primary video of a lyric"
   },
   "unison_rev_number": {
-    "message": "Rev $rev$",
-    "description": "Short revision label. $rev$ is the revision number",
+    "message": "Revision $rev$",
+    "description": "Revision label. $rev$ is the revision number",
     "placeholders": {
       "rev": {
         "content": "$1",
@@ -1930,7 +1930,7 @@
     }
   },
   "unison_rev_pendingChip": {
-    "message": "Rev $rev$ pending",
+    "message": "Revision $rev$ pending",
     "description": "Chip for an edit waiting for council review",
     "placeholders": {
       "rev": {
@@ -1992,7 +1992,7 @@
     }
   },
   "unison_rev_staysLive": {
-    "message": "Rev $rev$ stays live until the council decides.",
+    "message": "Revision $rev$ stays live until the council decides.",
     "description": "Names the revision listeners keep seeing during review",
     "placeholders": {
       "rev": {
@@ -2002,7 +2002,7 @@
     }
   },
   "unison_rev_rejectedTitle": {
-    "message": "Rev $rev$ was rejected",
+    "message": "Revision $rev$ was rejected",
     "description": "Title when the council rejected an edit",
     "placeholders": {
       "rev": {
@@ -2062,7 +2062,7 @@
     "description": "Revisions list reason for an edit that went live without review"
   },
   "unison_rev_reverted": {
-    "message": "Reverted to rev $rev$",
+    "message": "Reverted to revision $rev$",
     "description": "Revisions list reason and success message for a revert",
     "placeholders": {
       "rev": {
@@ -2106,7 +2106,7 @@
     "description": "Column header and editor sidebar label"
   },
   "unison_rev_comparedWith": {
-    "message": "Compared with rev $rev$",
+    "message": "Compared with revision $rev$",
     "description": "Line above a diff. $rev$ is the compared revision",
     "placeholders": {
       "rev": {
@@ -2164,7 +2164,7 @@
     "description": "Button that starts a revert to a past revision"
   },
   "unison_rev_revertLive": {
-    "message": "Reverting goes live now as rev $rev$",
+    "message": "Reverting goes live now as revision $rev$",
     "description": "Note before a revert that skips review",
     "placeholders": {
       "rev": {
@@ -2174,7 +2174,7 @@
     }
   },
   "unison_rev_revertReview": {
-    "message": "Reverting goes to council review as rev $rev$",
+    "message": "Reverting goes to council review as revision $rev$",
     "description": "Note before a revert that needs review",
     "placeholders": {
       "rev": {
