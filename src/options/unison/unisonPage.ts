@@ -215,9 +215,9 @@ function navigateTo(params: Record<string, string>, options: { replace?: boolean
     url.searchParams.set(key, value);
   }
   if (options.replace) {
-    window.history.replaceState({}, "", url.toString());
+    window.history.replaceState(window.history.state, "", url.toString());
   } else {
-    window.history.pushState({}, "", url.toString());
+    window.history.pushState({ inApp: true }, "", url.toString());
   }
   routeFromParams();
 }
@@ -576,7 +576,7 @@ function switchTab(next: FeedTabName): void {
   const url = new URL(window.location.href);
   if (next === "mine") url.searchParams.set("tab", "mine");
   else url.searchParams.delete("tab");
-  window.history.replaceState({}, "", url.toString());
+  window.history.replaceState(window.history.state, "", url.toString());
   updateTabActiveState();
   applyActiveTabContent();
 }
@@ -1421,6 +1421,11 @@ function revisionHost(view: AbortSignal): RevisionHost {
   return {
     navigate: (params, options) => {
       if (!view.aborted) navigateTo(mine ? { ...params, mine } : params, options);
+    },
+    leave: fallback => {
+      if (view.aborted) return;
+      if (window.history.state?.inApp) window.history.back();
+      else navigateTo(mine ? { ...fallback, mine } : fallback, { replace: true });
     },
     isCurrent: () => !view.aborted,
     onLeave: callback => view.addEventListener("abort", callback, { once: true }),

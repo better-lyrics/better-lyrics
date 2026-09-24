@@ -94,7 +94,7 @@ function createPageHead(entry: UnisonLyricsEntry, host: RevisionHost, isOwner: b
   back.type = "button";
   back.className = "unison-back-btn";
   back.append(svgIcon("back"), t("unison_back"));
-  back.addEventListener("click", () => host.navigate({ id }));
+  back.addEventListener("click", () => host.leave({ id }));
 
   const title = document.createElement("h2");
   title.className = "unison-section-title";

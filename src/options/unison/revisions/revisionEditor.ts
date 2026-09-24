@@ -78,7 +78,7 @@ export function renderRevisionEditor(entry: UnisonLyricsEntry, surface: EditorSu
 
   const bar = createSaveBar();
   surface.savebar.replaceChildren(bar.root);
-  bar.cancel.addEventListener("click", () => host.navigate({ id }));
+  bar.cancel.addEventListener("click", () => host.leave({ id }));
 
   let preview: PreviewResult | null = null;
   let failure: RevisionFailure | null = null;
@@ -198,7 +198,8 @@ export function renderRevisionEditor(entry: UnisonLyricsEntry, surface: EditorSu
     if (!host.isCurrent()) return;
     if (result.success && result.data) {
       const saved = result.data.revision;
-      host.navigate(saved.status === "live" ? { id } : { id, revisions: "1", rev: String(saved.revNo) });
+      if (saved.status === "live") host.leave({ id });
+      else host.navigate({ id, revisions: "1", rev: String(saved.revNo) }, { replace: true });
       return;
     }
     setSaving(false);
@@ -223,7 +224,7 @@ function renderSidebar(
   back.type = "button";
   back.className = "unison-back-btn";
   back.append(svgIcon("back"), t("options_modal_cancel"));
-  back.addEventListener("click", () => host.navigate({ id: String(entry.id) }));
+  back.addEventListener("click", () => host.leave({ id: String(entry.id) }));
 
   const title = document.createElement("h2");
   title.className = "unison-detail-title";
