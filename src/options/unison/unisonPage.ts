@@ -40,7 +40,7 @@ import { type IconKey, svgIcon } from "./icons";
 import { appendLanguageOptions, matchLanguageOption } from "./languages";
 import { detectFormat, renderPreviewInto } from "./lyricsPreview";
 import { appendMetaRow } from "./metaTable";
-import { IS_DEV, devFixtureHint, devFixtures } from "./revisions/devFixtures";
+import { IS_DEV, devFixtureHint, devFixtures } from "@modules/unison/devFixtures";
 import { renderRevisionBar } from "./revisions/revisionBar";
 import { type EditorSurface, renderRevisionEditor } from "./revisions/revisionEditor";
 import { renderRevisionsPage } from "./revisions/revisionList";

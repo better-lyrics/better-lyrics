@@ -1,7 +1,7 @@
 import { UNISON_API_BASE_URL } from "@constants";
 import { getIdentity, isKeyRegistered, markKeyRegistered, signPayload } from "@/core/keyIdentity";
 import { fetchWithTimeout } from "@/options/store/themeStoreService";
-import { IS_DEV, devFixtures } from "@/options/unison/revisions/devFixtures";
+import { IS_DEV, devFixtures } from "@modules/unison/devFixtures";
 import { UnisonErrorCode } from "./errorCodes";
 import { DEFAULT_FEED_FILTERS } from "./types";
 import type {
