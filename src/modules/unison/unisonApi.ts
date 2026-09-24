@@ -1,12 +1,18 @@
 import { UNISON_API_BASE_URL } from "@constants";
 import { getIdentity, isKeyRegistered, markKeyRegistered, signPayload } from "@/core/keyIdentity";
 import { fetchWithTimeout } from "@/options/store/themeStoreService";
+import { IS_DEV, devFixtures } from "@modules/unison/devFixtures";
 import { UnisonErrorCode } from "./errorCodes";
 import { DEFAULT_FEED_FILTERS } from "./types";
 import type {
   FeedFilters,
   LinkedVideo,
+  PreviewResult,
   ReportReason,
+  RevisionContent,
+  RevisionDiff,
+  RevisionDraft,
+  RevisionSummary,
   SuggestedVideo,
   UnisonApiResponse,
   UnisonFeedEntry,
@@ -204,6 +210,7 @@ export async function getMySubmissions(
 }
 
 export async function getLyricsById(id: number): Promise<ApiResult<UnisonLyricsEntry | null>> {
+  if (IS_DEV && devFixtures.has(id)) return devFixtures.lyrics(id);
   try {
     const headers: Record<string, string> = {};
     try {
@@ -329,4 +336,85 @@ export async function unlinkVideo(
     "DELETE",
     {}
   );
+}
+
+// -- Revisions --------------------------
+
+async function getJson<T>(path: string): Promise<ApiResult<T | null>> {
+  try {
+    const response = await fetchWithTimeout(`${UNISON_API_BASE_URL}${path}`);
+    if (!response.ok) {
+      const errorData: UnisonErrorBody | null = await response.json().catch(() => null);
+      return {
+        success: false,
+        data: null,
+        error: errorData?.error ?? `Fetch failed: ${response.status}`,
+        code: errorData?.code,
+        hint: errorData?.hint,
+        status: response.status,
+      };
+    }
+    const json: UnisonApiResponse<T> = await response.json();
+    return { success: json.success, data: json.data ?? null };
+  } catch (err) {
+    const error = err instanceof Error ? err.message : "Network error";
+    warnUnison(path, error);
+    return { success: false, data: null, error };
+  }
+}
+
+export async function listRevisions(lyricsId: number): Promise<ApiResult<RevisionSummary[]>> {
+  if (IS_DEV && devFixtures.has(lyricsId)) return devFixtures.revisions(lyricsId);
+  const result = await getJson<{ revisions: RevisionSummary[] }>(`/lyrics/${lyricsId}/revisions`);
+  return { ...result, data: result.data?.revisions ?? [] };
+}
+
+export async function getRevision(lyricsId: number, revisionId: number): Promise<ApiResult<RevisionContent | null>> {
+  if (IS_DEV && devFixtures.has(lyricsId)) return devFixtures.revision(lyricsId, revisionId);
+  return getJson<RevisionContent>(`/lyrics/${lyricsId}/revisions/${revisionId}`);
+}
+
+export async function getRevisionDiff(
+  lyricsId: number,
+  revisionId: number,
+  againstId?: number
+): Promise<ApiResult<RevisionDiff | null>> {
+  if (IS_DEV && devFixtures.has(lyricsId)) return devFixtures.diff(lyricsId, revisionId, againstId);
+  const query = againstId === undefined ? "" : `?against=${againstId}`;
+  return getJson<RevisionDiff>(`/lyrics/${lyricsId}/revisions/${revisionId}/diff${query}`);
+}
+
+export async function previewRevision(
+  lyricsId: number,
+  draft: RevisionDraft
+): Promise<ApiResult<PreviewResult | null>> {
+  if (IS_DEV && devFixtures.has(lyricsId)) return devFixtures.preview(lyricsId, draft);
+  return signedRequest<PreviewResult | null>(`/lyrics/${lyricsId}/revisions/preview`, "POST", draft);
+}
+
+export async function saveRevision(
+  lyricsId: number,
+  draft: RevisionDraft
+): Promise<ApiResult<{ revision: RevisionSummary } | null>> {
+  if (IS_DEV && devFixtures.has(lyricsId)) return devFixtures.save(lyricsId, draft);
+  return signedRequest<{ revision: RevisionSummary } | null>(`/lyrics/${lyricsId}/revisions`, "POST", draft);
+}
+
+export async function revertToRevision(
+  lyricsId: number,
+  revisionId: number
+): Promise<ApiResult<{ revision: RevisionSummary } | null>> {
+  if (IS_DEV && devFixtures.has(lyricsId)) return devFixtures.revert(lyricsId, revisionId);
+  return signedRequest<{ revision: RevisionSummary } | null>(
+    `/lyrics/${lyricsId}/revisions/${revisionId}/revert`,
+    "POST",
+    {}
+  );
+}
+
+export async function withdrawPendingRevision(
+  lyricsId: number
+): Promise<ApiResult<{ revision: RevisionSummary } | null>> {
+  if (IS_DEV && devFixtures.has(lyricsId)) return devFixtures.withdraw(lyricsId);
+  return signedRequest<{ revision: RevisionSummary } | null>(`/lyrics/${lyricsId}/revisions/pending`, "DELETE", {});
 }

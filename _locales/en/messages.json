@@ -1894,5 +1894,375 @@
   "unison_error_cannotUnlinkPrimary": {
     "message": "The primary video can't be removed",
     "description": "Error shown when the user tries to unlink the primary video of a lyric"
+  },
+  "unison_rev_number": {
+    "message": "Revision $rev$",
+    "description": "Revision label. $rev$ is the revision number",
+    "placeholders": {
+      "rev": {
+        "content": "$1",
+        "example": "5"
+      }
+    }
+  },
+  "unison_rev_original": {
+    "message": "Original",
+    "description": "Label for revision 1 of a Unison lyric, the original upload"
+  },
+  "unison_rev_neverEdited": {
+    "message": "Uploaded $when$, never edited",
+    "description": "Revision bar text for a lyric with no edits. $when$ is a relative time",
+    "placeholders": {
+      "when": {
+        "content": "$1",
+        "example": "3 months ago"
+      }
+    }
+  },
+  "unison_rev_editedAgo": {
+    "message": "Edited $when$",
+    "description": "Revision bar text for the live revision. $when$ is a relative time",
+    "placeholders": {
+      "when": {
+        "content": "$1",
+        "example": "2 days ago"
+      }
+    }
+  },
+  "unison_rev_pendingChip": {
+    "message": "Revision $rev$ pending",
+    "description": "Chip for an edit waiting for council review",
+    "placeholders": {
+      "rev": {
+        "content": "$1",
+        "example": "7"
+      }
+    }
+  },
+  "unison_rev_revisions": {
+    "message": "Revisions",
+    "description": "Button and page title for the list of a lyric's revisions"
+  },
+  "unison_rev_editLyrics": {
+    "message": "Edit lyrics",
+    "description": "Button that opens the lyric editor"
+  },
+  "unison_rev_viewChanges": {
+    "message": "View changes",
+    "description": "Button that opens the diff of the pending edit"
+  },
+  "unison_rev_withdraw": {
+    "message": "Withdraw",
+    "description": "Button that withdraws a pending edit before the council reviews it"
+  },
+  "unison_rev_reason_sealed": {
+    "message": "Sealed lyric",
+    "description": "Why an edit needs council review: the council approved (sealed) this lyric"
+  },
+  "unison_rev_reason_flagged": {
+    "message": "Flagged for review",
+    "description": "Why an edit needs council review: an automatic check flagged it"
+  },
+  "unison_rev_reason_largeText": {
+    "message": "Large text change",
+    "description": "Why an edit needs council review: too much of the text changed"
+  },
+  "unison_rev_reason_largeTiming": {
+    "message": "Large timing change",
+    "description": "Why an edit needs council review: too much of the timing changed"
+  },
+  "unison_rev_goesToReview": {
+    "message": "Goes to council review: $reason$",
+    "description": "Editor outcome before saving. $reason$ is a review reason, like 'Large text change'",
+    "placeholders": {
+      "reason": {
+        "content": "$1",
+        "example": "Large text change"
+      }
+    }
+  },
+  "unison_rev_pendingTitle": {
+    "message": "Waiting for council review: $reason$",
+    "description": "Title for a saved edit that waits for review. $reason$ is a review reason, like 'Large text change'",
+    "placeholders": {
+      "reason": {
+        "content": "$1",
+        "example": "Large text change"
+      }
+    }
+  },
+  "unison_rev_staysLive": {
+    "message": "Revision $rev$ stays live until the council decides.",
+    "description": "Names the revision listeners keep seeing during review",
+    "placeholders": {
+      "rev": {
+        "content": "$1",
+        "example": "5"
+      }
+    }
+  },
+  "unison_rev_rejectedTitle": {
+    "message": "Revision $rev$ was rejected",
+    "description": "Title when the council rejected an edit",
+    "placeholders": {
+      "rev": {
+        "content": "$1",
+        "example": "6"
+      }
+    }
+  },
+  "unison_rev_councilNote": {
+    "message": "Council note: “$note$”",
+    "description": "The note the council left when it rejected an edit",
+    "placeholders": {
+      "note": {
+        "content": "$1",
+        "example": "Timing drifts after the bridge."
+      }
+    }
+  },
+  "unison_rev_sealedHint": {
+    "message": "Every edit goes to council review before it goes live.",
+    "description": "Explains what editing a sealed lyric means"
+  },
+  "unison_rev_status_live": {
+    "message": "Live",
+    "description": "Revision status: the version listeners see"
+  },
+  "unison_rev_status_pending": {
+    "message": "Pending",
+    "description": "Revision status: waiting for council review"
+  },
+  "unison_rev_status_past": {
+    "message": "Past",
+    "description": "Revision status: was live before"
+  },
+  "unison_rev_status_superseded": {
+    "message": "Superseded",
+    "description": "Revision status: replaced by a newer save before review"
+  },
+  "unison_rev_status_rejected": {
+    "message": "Rejected",
+    "description": "Revision status: the council rejected it"
+  },
+  "unison_rev_status_withdrawn": {
+    "message": "Withdrawn",
+    "description": "Revision status: the owner withdrew it"
+  },
+  "unison_rev_anchor": {
+    "message": "Anchor",
+    "description": "Chip on the revision that edits are measured against"
+  },
+  "unison_rev_approved": {
+    "message": "Approved by the council",
+    "description": "Revisions list reason for a council-approved revision"
+  },
+  "unison_rev_withinLimits": {
+    "message": "Within limits",
+    "description": "Revisions list reason for an edit that went live without review"
+  },
+  "unison_rev_reverted": {
+    "message": "Reverted to revision $rev$",
+    "description": "Revisions list reason and success message for a revert",
+    "placeholders": {
+      "rev": {
+        "content": "$1",
+        "example": "2"
+      }
+    }
+  },
+  "unison_rev_driftValues": {
+    "message": "Text $text$% · Timing $timing$%",
+    "description": "How much text and timing an edit changed, as whole numbers",
+    "placeholders": {
+      "text": {
+        "content": "$1",
+        "example": "8"
+      },
+      "timing": {
+        "content": "$2",
+        "example": "4"
+      }
+    }
+  },
+  "unison_rev_colStatus": {
+    "message": "Status",
+    "description": "Revisions list column header"
+  },
+  "unison_rev_colChange": {
+    "message": "Change",
+    "description": "Revisions list column header (noun): how much an edit changed"
+  },
+  "unison_rev_colReason": {
+    "message": "Reason",
+    "description": "Revisions list column header"
+  },
+  "unison_rev_colWhen": {
+    "message": "When",
+    "description": "Revisions list column header: relative time"
+  },
+  "unison_rev_revision": {
+    "message": "Revision",
+    "description": "Column header and editor sidebar label"
+  },
+  "unison_rev_comparedWith": {
+    "message": "Compared with revision $rev$",
+    "description": "Line above a diff. $rev$ is the compared revision",
+    "placeholders": {
+      "rev": {
+        "content": "$1",
+        "example": "5"
+      }
+    }
+  },
+  "unison_rev_legendAdded": {
+    "message": "Added",
+    "description": "Diff legend: added lines or words"
+  },
+  "unison_rev_legendRemoved": {
+    "message": "Removed",
+    "description": "Diff legend: removed lines or words"
+  },
+  "unison_rev_legendTiming": {
+    "message": "Timing only",
+    "description": "Diff legend: lines whose timing changed but text did not"
+  },
+  "unison_rev_unchangedLines": {
+    "message": "Unchanged lines: $count$",
+    "description": "Collapsed part of a diff",
+    "placeholders": {
+      "count": {
+        "content": "$1",
+        "example": "13"
+      }
+    }
+  },
+  "unison_rev_headSection": {
+    "message": "Translations, romanization and credits",
+    "description": "Label above the diff rows for text stored outside the lyric lines: translations, romanizations and credits"
+  },
+  "unison_rev_headCredits": {
+    "message": "Credits",
+    "description": "Diff row label for a changed credit, such as a songwriter or singer name"
+  },
+  "unison_rev_headLine": {
+    "message": "line $line$",
+    "description": "Part of a diff row label that names the lyric line a translation or romanization belongs to, e.g. 'Translation · Spanish · line 3'",
+    "placeholders": {
+      "line": {
+        "content": "$1",
+        "example": "3"
+      }
+    }
+  },
+  "unison_rev_noDiff": {
+    "message": "No changes to show",
+    "description": "Diff area when there is nothing to compare"
+  },
+  "unison_rev_revertToThis": {
+    "message": "Revert to this",
+    "description": "Button that starts a revert to a past revision"
+  },
+  "unison_rev_revertLive": {
+    "message": "Reverting goes live now as revision $rev$",
+    "description": "Note before a revert that skips review",
+    "placeholders": {
+      "rev": {
+        "content": "$1",
+        "example": "6"
+      }
+    }
+  },
+  "unison_rev_revertReview": {
+    "message": "Reverting goes to council review as revision $rev$",
+    "description": "Note before a revert that needs review",
+    "placeholders": {
+      "rev": {
+        "content": "$1",
+        "example": "6"
+      }
+    }
+  },
+  "unison_rev_locked": {
+    "message": "Song, artist and album can't be edited.",
+    "description": "Editor note about fields that are locked"
+  },
+  "unison_rev_editsLeft": {
+    "message": "$remaining$ of $limit$ edits left today",
+    "description": "Edits left in the last 24 hours",
+    "placeholders": {
+      "remaining": {
+        "content": "$1",
+        "example": "3"
+      },
+      "limit": {
+        "content": "$2",
+        "example": "5"
+      }
+    }
+  },
+  "unison_rev_textChanged": {
+    "message": "Text changed",
+    "description": "Meter label: how much of the text changed"
+  },
+  "unison_rev_timingChanged": {
+    "message": "Timing changed",
+    "description": "Meter label: how much of the timing changed"
+  },
+  "unison_rev_ofLimit": {
+    "message": "of $limit$% limit",
+    "description": "Follows a bold percentage in a meter, like '8% of 15% limit'",
+    "placeholders": {
+      "limit": {
+        "content": "$1",
+        "example": "15"
+      }
+    }
+  },
+  "unison_rev_checkLine": {
+    "message": "Line $line$: $message$",
+    "description": "A server check message tied to a line. $message$ comes from the server",
+    "placeholders": {
+      "line": {
+        "content": "$1",
+        "example": "13"
+      },
+      "message": {
+        "content": "$2",
+        "example": "This is not a timestamp."
+      }
+    }
+  },
+  "unison_rev_checking": {
+    "message": "Checking your edit...",
+    "description": "Editor status while the server checks the edit"
+  },
+  "unison_rev_fixErrors": {
+    "message": "Fix the errors to save",
+    "description": "Editor status when the edit has errors"
+  },
+  "unison_rev_limitReached": {
+    "message": "Edit limit reached",
+    "description": "Shown when the daily edit limit is used up"
+  },
+  "unison_rev_noChanges": {
+    "message": "No changes from the live revision",
+    "description": "Shown when an edit or revert would change nothing"
+  },
+  "unison_rev_goesLive": {
+    "message": "Goes live when you save",
+    "description": "Editor status when the edit skips review"
+  },
+  "unison_rev_submitForReview": {
+    "message": "Submit for review",
+    "description": "Save button label when the edit needs review"
+  },
+  "unison_rev_noEdits": {
+    "message": "No edits yet",
+    "description": "Revisions page notice for a lyric that was never edited"
+  },
+  "unison_rev_error": {
+    "message": "Something went wrong. Try again.",
+    "description": "Fallback error for revision actions"
   }
 }
