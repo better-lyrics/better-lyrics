@@ -846,6 +846,147 @@ kbd {
   opacity: 0.7;
 }
 
+/* -- Video linking (owner tools) --------------------------  */
+
+.unison-detail-videos {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.unison-detail-videos-heading {
+  margin: 0;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.unison-video-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.375rem;
+}
+
+.unison-video-row,
+.unison-suggest-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  padding: 0.375rem 0.5rem;
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: 0.375rem;
+}
+
+.unison-video-id {
+  font-family: monospace;
+  font-size: 0.75rem;
+  color: rgb(165, 180, 252);
+  text-decoration: none;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.unison-video-id:hover {
+  text-decoration: underline;
+}
+
+.unison-video-primary {
+  font-size: 0.6875rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: rgba(255, 255, 255, 0.4);
+}
+
+.unison-video-empty {
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.4);
+}
+
+.unison-suggest-info {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.unison-suggest-title {
+  font-size: 0.8125rem;
+  color: rgba(255, 255, 255, 0.85);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.unison-suggest-meta {
+  font-size: 0.6875rem;
+  color: rgba(255, 255, 255, 0.4);
+}
+
+.unison-video-remove,
+.unison-video-add {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  flex-shrink: 0;
+  padding: 0.25rem 0.5rem;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 0.375rem;
+  color: rgba(255, 255, 255, 0.7);
+  font-family: inherit;
+  font-size: 0.6875rem;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.unison-video-remove:hover:not(:disabled),
+.unison-video-add:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+}
+
+.unison-video-remove svg {
+  width: 0.875rem;
+  height: 0.875rem;
+}
+
+.unison-video-remove:disabled,
+.unison-video-add:disabled {
+  cursor: default;
+  opacity: 0.5;
+}
+
+.unison-suggest-more {
+  display: flex;
+  justify-content: center;
+}
+
+.unison-suggest-more-btn {
+  padding: 0.3125rem 0.75rem;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 0.375rem;
+  color: rgba(255, 255, 255, 0.6);
+  font-family: inherit;
+  font-size: 0.6875rem;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.unison-suggest-more-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+}
+
 /* -- Report Dropdown --------------------------  */
 
 .unison-report-dropdown {
@@ -1078,6 +1219,99 @@ kbd {
 .unison-input--mono {
   font-variant-numeric: tabular-nums;
   letter-spacing: 0.02em;
+}
+
+.unison-token-input {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.375rem;
+  min-height: 2rem;
+  padding: 0.3125rem 0.5rem;
+  background: rgba(255, 255, 255, 0.025);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 0.375rem;
+  transition: all 0.2s;
+  box-sizing: border-box;
+  cursor: text;
+}
+
+.unison-token-input:focus-within {
+  background: rgba(255, 255, 255, 0.15);
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+.unison-token {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.0625rem 0.1875rem 0.0625rem 0.4375rem;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 0.25rem;
+  font-family: monospace;
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.unison-token--invalid {
+  background: rgba(248, 113, 113, 0.12);
+  border-color: rgba(248, 113, 113, 0.4);
+  color: rgb(252, 165, 165);
+}
+
+.unison-token--flash {
+  animation: unison-token-flash 0.5s ease;
+}
+
+@keyframes unison-token-flash {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 rgba(129, 140, 248, 0);
+  }
+  40% {
+    box-shadow: 0 0 0 2px rgba(129, 140, 248, 0.5);
+  }
+}
+
+.unison-token-remove {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1rem;
+  height: 1rem;
+  padding: 0;
+  background: none;
+  border: none;
+  border-radius: 0.125rem;
+  color: inherit;
+  opacity: 0.55;
+  font-size: 0.9375rem;
+  line-height: 1;
+  cursor: pointer;
+  transition: opacity 0.15s;
+}
+
+.unison-token-remove:hover,
+.unison-token-remove:focus-visible {
+  opacity: 1;
+  outline: none;
+}
+
+.unison-token-input-field {
+  flex: 1;
+  min-width: 6rem;
+  height: 1.5rem;
+  background: none;
+  border: none;
+  outline: none;
+  color: #fff;
+  font-family: inherit;
+  font-size: 0.8125rem;
+}
+
+.unison-token-input-field::placeholder {
+  color: rgba(255, 255, 255, 0.3);
 }
 
 select.unison-input {
