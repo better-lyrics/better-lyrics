@@ -573,6 +573,10 @@ function switchTab(next: FeedTabName): void {
   if (next === activeFeedTab) return;
   saveActiveTabContent();
   activeFeedTab = next;
+  const url = new URL(window.location.href);
+  if (next === "mine") url.searchParams.set("tab", "mine");
+  else url.searchParams.delete("tab");
+  window.history.replaceState({}, "", url.toString());
   updateTabActiveState();
   applyActiveTabContent();
 }
