@@ -35,11 +35,12 @@ import { UnisonErrorCode } from "@modules/unison/errorCodes";
 import { appendInlineProfile, profileUrl } from "@modules/unison/gamificationRender";
 import { generatePetName, getDisplayName, getIdentity } from "@/core/keyIdentity";
 import { warnUnison } from "@core/logger";
-import { fillFeedback } from "./feedback";
+import { createFeedback, fillFeedback } from "./feedback";
 import { type IconKey, svgIcon } from "./icons";
 import { appendLanguageOptions, matchLanguageOption } from "./languages";
 import { detectFormat, renderPreviewInto } from "./lyricsPreview";
 import { appendMetaRow } from "./metaTable";
+import { IS_DEV, devFixtureHint, devFixtures } from "./revisions/devFixtures";
 import { renderRevisionBar } from "./revisions/revisionBar";
 import { type EditorSurface, renderRevisionEditor } from "./revisions/revisionEditor";
 import { renderRevisionsPage } from "./revisions/revisionList";
@@ -137,14 +138,6 @@ let activeView = new AbortController();
 
 // -- Dev Stub --------------------------
 
-const IS_DEV = (() => {
-  try {
-    return process.env.NODE_ENV !== "production";
-  } catch {
-    return false;
-  }
-})();
-
 const DEV_STUB_BASE = {
   id: -1,
   videoId: "dQw4w9WgXcQ",
@@ -182,6 +175,10 @@ const DEV_STUB_LYRICS_ENTRY: UnisonLyricsEntry = {
   lyrics:
     "[00:00.00]This is a dev stub for testing\n[00:05.00]Click the delete button below\n[00:10.00]Confirm to send DELETE /lyrics/-1\n[00:15.00]Server returns 404 (treated as success)\n[00:20.00]You'll be sent back to My Submissions",
 };
+
+function createDevFixtureHint(): HTMLElement {
+  return createFeedback({ kind: "neutral", icon: "info", title: "Dev fixture", hint: devFixtureHint() });
+}
 
 // -- Router --------------------------
 
@@ -622,8 +619,9 @@ async function loadMySubmissions(): Promise<void> {
     if (token !== cache.requestId) return;
 
     const realEntries = result.success ? result.data.entries : [];
-    const stubEntries = IS_DEV && cursor === undefined ? [DEV_STUB_SUBMISSION] : [];
-    const entries = [...stubEntries, ...realEntries];
+    const stubEntries =
+      IS_DEV && cursor === undefined ? [{ entry: DEV_STUB_SUBMISSION, mine: true }, ...devFixtures.feed()] : [];
+    const entries = [...stubEntries, ...realEntries.map(entry => ({ entry, mine: true }))];
 
     if (entries.length === 0) {
       if (cursor === undefined && result.success) {
@@ -634,8 +632,8 @@ async function loadMySubmissions(): Promise<void> {
       return;
     }
 
-    for (const entry of entries) {
-      appendToTab("mine", createLyricsCard(entry, { fromMine: true }));
+    for (const { entry, mine } of entries) {
+      appendToTab("mine", createLyricsCard(entry, { fromMine: mine }));
     }
 
     cache.cursor = result.success ? result.data.nextCursor : undefined;
@@ -993,6 +991,7 @@ function renderDetail(entry: UnisonLyricsEntry, view: AbortSignal, isOwn: boolea
     detailMeta.appendChild(createDetailDeleteButton(entry.id));
   }
   detailMeta.appendChild(ytLink);
+  if (IS_DEV && devFixtures.has(entry.id)) detailMeta.appendChild(createDevFixtureHint());
   void renderOwnerVideoTools(entry, view);
   void renderDetailRevisionBar(entry, view);
 
@@ -1458,6 +1457,7 @@ async function loadEditor(id: number, view: AbortSignal): Promise<void> {
     savebar: savebarSlot,
   };
   renderRevisionEditor(loaded.entry, surface, revisionHost(view));
+  if (IS_DEV && devFixtures.has(id)) detailMeta.appendChild(createDevFixtureHint());
 }
 
 async function loadRevisions(id: number, openRevNo: number | null, view: AbortSignal): Promise<void> {
