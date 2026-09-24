@@ -250,12 +250,15 @@ function createRevisionItem(rev: RevisionSummary, ctx: ListContext, open: boolea
 
 async function fillBrowse(detail: HTMLElement, rev: RevisionSummary, ctx: ListContext): Promise<void> {
   detail.replaceChildren(createLoadingLine());
-  const [diff, preview] = await Promise.all([
+  const revertable = ctx.isOwner && rev.status === "past";
+  const live = ctx.revisions.find(candidate => candidate.status === "live");
+  const [diff, preview, liveDiff] = await Promise.all([
     rev.revNo === 1 ? Promise.resolve(null) : getRevisionDiff(ctx.entry.id, rev.id),
-    ctx.isOwner && rev.status === "past" ? previewRevert(ctx.entry, rev.id) : Promise.resolve(null),
+    revertable ? previewRevert(ctx.entry, rev.id) : Promise.resolve(null),
+    revertable && live ? getRevisionDiff(ctx.entry.id, rev.id, live.id) : Promise.resolve(null),
   ]);
   if (!ctx.host.isCurrent()) return;
-  renderBrowse(detail, rev, ctx, diff, preview);
+  renderBrowse(detail, rev, ctx, diff, preview, liveDiff);
 }
 
 async function previewRevert(entry: UnisonLyricsEntry, revisionId: number): Promise<PreviewResult | null> {
@@ -276,7 +279,8 @@ function renderBrowse(
   rev: RevisionSummary,
   ctx: ListContext,
   diff: DiffResult | null,
-  preview: PreviewResult | null
+  preview: PreviewResult | null,
+  liveDiff: DiffResult | null
 ): void {
   const actions: HTMLElement[] = [];
   let note: HTMLElement | null = null;
@@ -289,7 +293,9 @@ function renderBrowse(
     if (revert.canRevert) {
       const button = createButton({ label: t("unison_rev_revertToThis"), icon: "revert" });
       button.addEventListener("click", () => {
-        void renderConfirm(detail, rev, ctx, preview, () => renderBrowse(detail, rev, ctx, diff, preview));
+        renderConfirm(detail, rev, ctx, preview, liveDiff, () =>
+          renderBrowse(detail, rev, ctx, diff, preview, liveDiff)
+        );
       });
       actions.push(button);
     }
@@ -319,18 +325,14 @@ function renderBrowse(
   );
 }
 
-async function renderConfirm(
+function renderConfirm(
   detail: HTMLElement,
   rev: RevisionSummary,
   ctx: ListContext,
   preview: PreviewResult | null,
+  diff: DiffResult | null,
   back: () => void
-): Promise<void> {
-  const live = ctx.revisions.find(candidate => candidate.status === "live");
-  detail.replaceChildren(createLoadingLine());
-  const diff = live ? await getRevisionDiff(ctx.entry.id, rev.id, live.id) : null;
-  if (!ctx.host.isCurrent()) return;
-
+): void {
   const cancel = createButton({ label: t("options_modal_cancel") });
   cancel.addEventListener("click", back);
 
