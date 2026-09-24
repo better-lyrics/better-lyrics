@@ -182,7 +182,7 @@ function createRevisionItem(rev: RevisionSummary, ctx: ListContext, open: boolea
 
   const num = document.createElement("span");
   num.className = "unison-rev-num";
-  num.textContent = t("unison_rev_number", [String(rev.revNo)]);
+  num.textContent = String(rev.revNo);
 
   const chips = document.createElement("span");
   chips.className = "unison-rev-chips";

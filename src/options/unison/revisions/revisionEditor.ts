@@ -237,7 +237,7 @@ function renderSidebar(
   table.className = "unison-detail-table";
   if (entry.album) appendMetaRow(table, t("unison_album"), entry.album);
   const formatCell = appendMetaRow(table, t("unison_format"), t(`unison_format_${entry.format}`));
-  appendMetaRow(table, t("unison_rev_revision"), t("unison_rev_number", [String(entry.revision?.revNo ?? 1)]));
+  appendMetaRow(table, t("unison_rev_revision"), String(entry.revision?.revNo ?? 1));
 
   const locked = document.createElement("div");
   locked.className = "unison-rev-locked";
