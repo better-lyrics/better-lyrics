@@ -246,15 +246,16 @@ async function fetchResolvedProfile(): Promise<ResolvedProfile | null> {
   return null;
 }
 
+function rememberResolvedProfile(pending: Promise<ResolvedProfile | null>): Promise<ResolvedProfile | null> {
+  cachedResolvedProfile = pending;
+  void pending.then(resolved => {
+    if (resolved === null && cachedResolvedProfile === pending) cachedResolvedProfile = null;
+  });
+  return pending;
+}
+
 export function getResolvedProfile(): Promise<ResolvedProfile | null> {
-  if (!cachedResolvedProfile) {
-    const pending = fetchResolvedProfile().then(resolved => {
-      if (resolved === null) cachedResolvedProfile = null;
-      return resolved;
-    });
-    cachedResolvedProfile = pending;
-  }
-  return cachedResolvedProfile;
+  return cachedResolvedProfile ?? rememberResolvedProfile(fetchResolvedProfile());
 }
 
 async function getResolvedDisplayName(): Promise<string | null> {
@@ -269,15 +270,11 @@ export async function getDisplayName(): Promise<string> {
 }
 
 export function invalidateDisplayName(newValue?: string): void {
-  if (newValue === undefined) {
+  if (newValue === undefined || !cachedResolvedProfile) {
     cachedResolvedProfile = null;
     return;
   }
-  const previous = cachedResolvedProfile ?? Promise.resolve(null);
-  cachedResolvedProfile = previous.then(profile => ({
-    displayName: newValue,
-    avatarUrl: profile?.avatarUrl ?? null,
-  }));
+  rememberResolvedProfile(cachedResolvedProfile.then(profile => profile && { ...profile, displayName: newValue }));
 }
 
 export async function isKeyRegistered(): Promise<boolean> {
