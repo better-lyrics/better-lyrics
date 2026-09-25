@@ -12,6 +12,7 @@ interface SubmitterInfo {
   displayName?: string;
   tier?: string | null;
   level?: number;
+  avatarUrl?: string | null;
 }
 
 interface UnisonResponse {
