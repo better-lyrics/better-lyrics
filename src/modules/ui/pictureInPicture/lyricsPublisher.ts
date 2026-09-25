@@ -73,6 +73,7 @@ export function publishPictureInPictureLyrics(): void {
   sendLyrics({
     lyrics: retimed?.lyrics ?? lyrics,
     language: AppState.lyricData?.language,
+    songwriters: AppState.lyricData?.songwriters,
     noLyrics: lyrics !== null && lyrics.length > 0 && lyrics[0].words === t("lyrics_notFound"),
     decorations: retimed?.decorations ?? AppState.lyricDecorations,
     globalLyricOffset: AppState.globalLyricOffset,
