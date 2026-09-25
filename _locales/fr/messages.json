@@ -84,7 +84,7 @@
     "description": "Show album art background setting label"
   },
   "options_display_fullscreenControls": {
-    "message": "Show player controls in fullscreen",
+    "message": "Afficher les commandes du lecteur en plein écran",
     "description": "Toggle label for the playback controls strip (progress bar, transport, like and dislike) shown under the album art in the fullscreen lyrics view"
   },
   "options_display_stylizedAnimations": {
@@ -104,7 +104,7 @@
     "description": "Tooltip explaining the letter wave animation and its performance impact"
   },
   "options_display_letterWaveTooltipStates": {
-    "message": "Auto stays off unless a theme turns it on. On and Off override any theme.",
+    "message": "Le mode Auto reste désactivé sauf si un thème l’active. Activé et Désactivé ont priorité sur le thème.",
     "description": "Appended to the letter wave tooltip, explaining the three switch states"
   },
   "options_display_passiveScroll": {
@@ -112,7 +112,7 @@
     "description": "Auto-scroll unsynced lyrics setting label"
   },
   "picture_in_picture_open": {
-    "message": "Ouvrir les paroles en Picture-in-Picture",
+    "message": "Ouvrir les paroles en mode Picture-in-Picture",
     "description": "Accessible label for the dock action that opens the floating lyrics window"
   },
   "picture_in_picture_previous": {
@@ -136,12 +136,24 @@
     "description": "Master toggle for the floating lyrics window feature, which turns it off everywhere including the YouTube Music minimize button"
   },
   "options_display_pipAutoRestore": {
-    "message": "Réouvrir automatiquement les paroles flottantes",
+    "message": "Rouvrir automatiquement les paroles flottantes",
     "description": "Setting label for automatically reopening the floating lyrics window after page load"
   },
   "options_display_pipAutoRestoreTooltip": {
     "message": "Empêche la fenêtre des paroles flottantes de se fermer définitivement lorsque vous rechargez la page ou changez de morceau et de page. Les navigateurs n'autorisent l'ouverture d'une fenêtre flottante qu'immédiatement après une interaction de votre part ; elle se rouvrira donc lors de votre premier clic ou appui sur une touche plutôt qu'instantanément.",
     "description": "Help tooltip explaining what automatic floating-lyrics reopening does and why it waits for the first interaction"
+  },
+  "options_display_pipWindowLayout": {
+    "message": "Disposition de la fenêtre",
+    "description": "Setting label, shown inside the floating lyrics window settings, for choosing whether the window opens wide or tall"
+  },
+  "options_pipWindowLayout_horizontal": {
+    "message": "Horizontal",
+    "description": "Floating lyrics window layout option: a wide window with the album art beside the lyrics"
+  },
+  "options_pipWindowLayout_vertical": {
+    "message": "Vertical",
+    "description": "Floating lyrics window layout option: a tall window with the album art above the lyrics"
   },
   "options_display_pipArtworkTransition": {
     "message": "Transition des pochettes d'albums",
@@ -180,7 +192,7 @@
     "description": "Toggle label for whether a song title too long for the floating lyrics window scrolls across so it can be read in full"
   },
   "options_display_pipProgressBar": {
-    "message": "Show progress bar",
+    "message": "Afficher la barre de progression",
     "description": "Toggle label, shown inside the floating lyrics window settings, for the seekable playback progress bar under the album art"
   },
   "options_display_shadersPromo": {
@@ -1011,6 +1023,28 @@
       }
     }
   },
+  "blUpdate_available": {
+    "message": "Better Lyrics $version$ est maintenant disponible",
+    "description": "Banner shown to pre-release (canary) users when the matching stable release ships",
+    "placeholders": {
+      "version": {
+        "content": "$1",
+        "example": "2.4.0"
+      }
+    }
+  },
+  "blUpdate_storeDelay": {
+    "message": "store may lag briefly",
+    "description": "Trailing note on the update banner for Chrome and Edge, whose store approval can lag the release"
+  },
+  "blUpdate_action": {
+    "message": "Mettre à jour",
+    "description": "Action link on the update banner that opens the browser's extension store listing"
+  },
+  "blUpdate_dismiss": {
+    "message": "Ignorer",
+    "description": "Accessible label for the button that closes the update banner"
+  },
   "marketplace_discussion": {
     "message": "Discussion",
     "description": "Footer link in the theme detail modal that opens the theme's discussion thread"
@@ -1210,7 +1244,7 @@
     "description": "Alert when a symlinked theme fails to install from marketplace"
   },
   "theme_top_badge": {
-    "message": "#$RANK$ on the Marketplace",
+    "message": "N°$RANK$ sur le Marketplace",
     "description": "Tooltip on a featured theme's rank medal",
     "placeholders": {
       "rank": {
@@ -1220,15 +1254,15 @@
     }
   },
   "theme_modal_section_featured": {
-    "message": "Featured Themes",
+    "message": "Thèmes à la une",
     "description": "Section title for featured themes (top marketplace picks and built-ins) in the theme chooser modal"
   },
   "theme_modal_section_all": {
-    "message": "All Themes",
+    "message": "Tous les thèmes",
     "description": "Section title for the user's installed marketplace themes in the theme chooser modal"
   },
   "theme_modal_browse": {
-    "message": "Browse Marketplace",
+    "message": "Parcourir le Marketplace",
     "description": "Link in the theme chooser modal that opens the full Theme Marketplace page"
   },
   "theme_modal_section_custom": {

@@ -143,6 +143,18 @@
     "message": "Hält das schwebende Songtext-Fenster vor dem Schließen, wenn Sie zwischen Liedern und Seiten neu laden oder bewegen. Browser lassen ein schwebendes Fenster nur öffnen, nachdem Sie mit der Seite interagieren so öffnet es sich wieder auf Ihren ersten Klick oder Tastendruck statt sofort.",
     "description": "Help tooltip explaining what automatic floating-lyrics reopening does and why it waits for the first interaction"
   },
+  "options_display_pipWindowLayout": {
+    "message": "Fenster-Layout",
+    "description": "Setting label, shown inside the floating lyrics window settings, for choosing whether the window opens wide or tall"
+  },
+  "options_pipWindowLayout_horizontal": {
+    "message": "Horizontal",
+    "description": "Floating lyrics window layout option: a wide window with the album art beside the lyrics"
+  },
+  "options_pipWindowLayout_vertical": {
+    "message": "Vertikal",
+    "description": "Floating lyrics window layout option: a tall window with the album art above the lyrics"
+  },
   "options_display_pipArtworkTransition": {
     "message": "Albumcover-Übergang",
     "description": "Setting label, shown inside the floating lyrics window settings, for choosing how album art changes between songs"
@@ -1010,6 +1022,28 @@
         "example": "2.0.5.6"
       }
     }
+  },
+  "blUpdate_available": {
+    "message": "Better Lyrics $version$ ist jetzt verfügbar",
+    "description": "Banner shown to pre-release (canary) users when the matching stable release ships",
+    "placeholders": {
+      "version": {
+        "content": "$1",
+        "example": "2.4.0"
+      }
+    }
+  },
+  "blUpdate_storeDelay": {
+    "message": "store may lag briefly",
+    "description": "Trailing note on the update banner for Chrome and Edge, whose store approval can lag the release"
+  },
+  "blUpdate_action": {
+    "message": "Aktualisieren",
+    "description": "Action link on the update banner that opens the browser's extension store listing"
+  },
+  "blUpdate_dismiss": {
+    "message": "Ignorieren",
+    "description": "Accessible label for the button that closes the update banner"
   },
   "marketplace_discussion": {
     "message": "Diskussion",
