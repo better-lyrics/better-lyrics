@@ -128,6 +128,13 @@ ytmusic-player-page[player-fullscreened]:not([blyrics-dfs]) .blyrics-no-lyrics-b
   display: none;
 }
 
+/* #main-panel is re-centered above, but #side-panel itself is never hidden, so YTM's own
+   panel background stays visible as a stray box next to the centered player. */
+ytmusic-player-page[player-fullscreened]:not([blyrics-dfs])[blyrics-no-lyrics] #side-panel {
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
 ytmusic-player-page[player-fullscreened]:not([blyrics-dfs])[blyrics-no-lyrics] #blyrics-wrapper {
   display: flex !important;
   height: 100%;
