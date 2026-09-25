@@ -5,7 +5,9 @@ import { UnisonErrorCode } from "./errorCodes";
 import { DEFAULT_FEED_FILTERS } from "./types";
 import type {
   FeedFilters,
+  LinkedVideo,
   ReportReason,
+  SuggestedVideo,
   UnisonApiResponse,
   UnisonFeedEntry,
   UnisonLyricsEntry,
@@ -283,4 +285,48 @@ export async function reportLyrics(
 
 export async function requestLyrics(request: UnisonLyricsRequest): Promise<ApiResult<UnisonRequestSuccess | null>> {
   return signedRequest<UnisonRequestSuccess | null>("/requests", "POST", request as unknown as Record<string, unknown>);
+}
+
+// -- Video linking --------------------------
+
+export async function listVideos(lyricsId: number): Promise<ApiResult<LinkedVideo[]>> {
+  try {
+    const response = await fetchWithTimeout(`${UNISON_API_BASE_URL}/lyrics/${lyricsId}/videos`);
+    if (!response.ok) {
+      return { success: false, data: [], error: `Fetch failed: ${response.status}` };
+    }
+    const json: UnisonApiResponse<{ videos: LinkedVideo[] }> = await response.json();
+    return { success: json.success, data: json.data?.videos ?? [] };
+  } catch (err) {
+    const error = err instanceof Error ? err.message : "Network error";
+    warnUnison("List videos failed:", error);
+    return { success: false, data: [], error };
+  }
+}
+
+export async function suggestedVideos(lyricsId: number): Promise<ApiResult<SuggestedVideo[]>> {
+  const res = await signedRequest<{ suggestions: SuggestedVideo[] }>(
+    `/lyrics/${lyricsId}/suggested-videos`,
+    "POST",
+    {}
+  );
+  return { success: res.success, data: res.data?.suggestions ?? [], error: res.error };
+}
+
+export async function linkVideo(
+  lyricsId: number,
+  videoId: string
+): Promise<ApiResult<{ videos: LinkedVideo[] } | null>> {
+  return signedRequest<{ videos: LinkedVideo[] } | null>(`/lyrics/${lyricsId}/videos`, "POST", { videoId });
+}
+
+export async function unlinkVideo(
+  lyricsId: number,
+  videoId: string
+): Promise<ApiResult<{ videos: LinkedVideo[] } | null>> {
+  return signedRequest<{ videos: LinkedVideo[] } | null>(
+    `/lyrics/${lyricsId}/videos/${encodeURIComponent(videoId)}`,
+    "DELETE",
+    {}
+  );
 }
