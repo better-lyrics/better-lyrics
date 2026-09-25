@@ -13,7 +13,7 @@ import unison, { type UnisonData } from "@modules/lyrics/providers/unison";
 import { mergePreferredProviders } from "./providerList";
 import { logCore } from "@core/logger";
 /** Current version of the lyrics cache format */
-const LYRIC_CACHE_VERSION = "2.1.0";
+const LYRIC_CACHE_VERSION = "2.2.0";
 
 interface AudioTrackData {
   id: string;
