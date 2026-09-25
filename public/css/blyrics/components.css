@@ -462,8 +462,19 @@
 
 .blyrics-gam__ring.blyrics-gam__ring--avatar {
 	--blyrics-gam-ring: 44px;
+	--blyrics-gam-pill: 16px;
+	--blyrics-gam-pill-offset: calc(var(--blyrics-gam-ring) * 0.29463);
+	--blyrics-gam-cutout: calc(var(--blyrics-gam-pill) / 2 + 2px);
 	width: var(--blyrics-gam-ring);
 	height: var(--blyrics-gam-ring);
+}
+
+.blyrics-gam__ring--avatar svg {
+	mask-image: radial-gradient(
+		circle at calc(50% - var(--blyrics-gam-pill-offset)) calc(50% + var(--blyrics-gam-pill-offset)),
+		transparent var(--blyrics-gam-cutout),
+		#000 calc(var(--blyrics-gam-cutout) + 0.5px)
+	);
 }
 
 .blyrics-gam__ring-avatar {
@@ -473,28 +484,29 @@
 	border-radius: 50%;
 	object-fit: cover;
 	display: block;
+	mask-image: radial-gradient(
+		circle at calc(50% + var(--blyrics-gam-pill-offset)) calc(50% + var(--blyrics-gam-pill-offset)),
+		transparent var(--blyrics-gam-cutout),
+		#000 calc(var(--blyrics-gam-cutout) + 0.5px)
+	);
 }
 
 .blyrics-gam__ring-level {
-	--blyrics-gam-pill: 16px;
-	--blyrics-gam-pill-offset: calc(var(--blyrics-gam-ring) * 0.20537 - var(--blyrics-gam-pill) / 2);
+	--blyrics-gam-pill-edge: calc(50% - var(--blyrics-gam-pill-offset) - var(--blyrics-gam-pill) / 2);
 	position: absolute;
-	right: var(--blyrics-gam-pill-offset);
-	bottom: var(--blyrics-gam-pill-offset);
+	right: var(--blyrics-gam-pill-edge);
+	bottom: var(--blyrics-gam-pill-edge);
 	display: grid;
 	place-items: center;
-	box-sizing: border-box;
-	min-width: var(--blyrics-gam-pill);
+	width: var(--blyrics-gam-pill);
 	height: var(--blyrics-gam-pill);
-	padding: 0 4px;
-	border-radius: 999px;
+	border-radius: 50%;
 	background-color: #ffc83d;
 	color: #1a1300;
 	font-size: 10px;
 	font-weight: 800;
 	line-height: 1;
 	font-variant-numeric: tabular-nums;
-	box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.4);
 }
 
 .blyrics-gam__tier {
