@@ -84,7 +84,7 @@
     "description": "Show album art background setting label"
   },
   "options_display_fullscreenControls": {
-    "message": "Show player controls in fullscreen",
+    "message": "แสดงแถบควบคุมตอนเต็มจอ",
     "description": "Toggle label for the playback controls strip (progress bar, transport, like and dislike) shown under the album art in the fullscreen lyrics view"
   },
   "options_display_stylizedAnimations": {
@@ -96,15 +96,15 @@
     "description": "Label for the per-letter wave lyric animation toggle"
   },
   "options_display_letterWaveBadge": {
-    "message": "Experimental",
+    "message": "ทดลอง",
     "description": "Badge shown next to the letter wave setting marking it as experimental"
   },
   "options_display_letterWaveTooltip": {
-    "message": "Lyrics feel more alive with a gentle rolling motion across each letter as they're sung. Turn it off if lyrics scroll feels choppy on your device.",
+    "message": "เพิ่มลูกเล่นให้เนื้อเพลงพลิ้วไหวตามจังหวะร้อง ปิดฟังก์ชันนี้ได้หากรู้สึกว่ากระตุกบนอุปกรณ์ของคุณ",
     "description": "Tooltip explaining the letter wave animation and its performance impact"
   },
   "options_display_letterWaveTooltipStates": {
-    "message": "Auto stays off unless a theme turns it on. On and Off override any theme.",
+    "message": "โหมด \"อัตโนมัติ\" จะปิดไว้จนกว่าธีมจะสั่งเปิด ส่วนการเลือก \"เปิด/ปิด\" เองจะทับการตั้งค่าของธีมเสมอ",
     "description": "Appended to the letter wave tooltip, explaining the three switch states"
   },
   "options_display_passiveScroll": {
@@ -144,39 +144,39 @@
     "description": "Help tooltip explaining what automatic floating-lyrics reopening does and why it waits for the first interaction"
   },
   "options_display_pipWindowLayout": {
-    "message": "Window layout",
+    "message": "การจัดวางหน้าต่าง",
     "description": "Setting label, shown inside the floating lyrics window settings, for choosing whether the window opens wide or tall"
   },
   "options_pipWindowLayout_horizontal": {
-    "message": "Horizontal",
+    "message": "แนวนอน",
     "description": "Floating lyrics window layout option: a wide window with the album art beside the lyrics"
   },
   "options_pipWindowLayout_vertical": {
-    "message": "Vertical",
+    "message": "แนวตั้ง",
     "description": "Floating lyrics window layout option: a tall window with the album art above the lyrics"
   },
   "options_display_pipArtworkTransition": {
-    "message": "Album art transition",
+    "message": "เอฟเฟกต์เปลี่ยนภาพปก",
     "description": "Setting label, shown inside the floating lyrics window settings, for choosing how album art changes between songs"
   },
   "options_pipTransition_shuffle": {
-    "message": "Shuffle",
+    "message": "สลับสับเปลี่ยน",
     "description": "Name of an album art transition where the artwork tilts back and the new cover is dealt in like a playing card"
   },
   "options_pipTransition_flip": {
-    "message": "Flip",
+    "message": "พลิก",
     "description": "Name of an album art transition where the artwork rotates like a card to reveal the new cover on its other side"
   },
   "options_pipTransition_push": {
-    "message": "Push",
+    "message": "ดัน",
     "description": "Name of a transition, offered for both album art and song titles, where the new content slides in from the side and pushes the old out"
   },
   "options_pipTransition_crossfade": {
-    "message": "Crossfade",
+    "message": "เลือนซ้อน",
     "description": "Name of a transition, offered for both album art and song titles, where the new content fades in over the old"
   },
   "options_pipTransition_spring": {
-    "message": "Spring",
+    "message": "เด้งแบบสปริง",
     "description": "Name of a song title transition where the words of the new title bounce up into place one after another"
   },
   "options_display_pipWindow": {
