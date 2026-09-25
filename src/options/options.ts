@@ -11,7 +11,7 @@ import { getLanguageDisplayName, initI18n, loadLocaleOverride, SUPPORTED_LOCALES
 import {
   exportIdentity,
   getDisplayName,
-  getResolvedDisplayName,
+  getResolvedProfile,
   importIdentity,
   invalidateDisplayName,
   signPayload,
@@ -825,8 +825,8 @@ async function initIdentityUI(): Promise<void> {
     const statsEl = document.getElementById("identity-stats");
     const statsWrap = document.getElementById("identity-stats-container");
     if (!user || !statsEl || !statsWrap) return;
-    const handle = (await getResolvedDisplayName().catch(() => null)) ?? undefined;
-    await renderIdentityStats(statsEl, user, handle);
+    const profile = await getResolvedProfile();
+    await renderIdentityStats(statsEl, user, profile?.displayName, profile?.avatarUrl ?? null);
     statsWrap.hidden = false;
   });
 

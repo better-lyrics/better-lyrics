@@ -686,6 +686,16 @@ kbd {
   color: #f5f5f7;
 }
 
+.blyrics-gam__ring.blyrics-gam__ring--avatar {
+  --blyrics-gam-ring: 34px;
+}
+
+.blyrics-gam__ring-level {
+  --blyrics-gam-pill: 14px;
+  padding: 0 3px;
+  font-size: 9px;
+}
+
 .blyrics-gam__tier {
   display: inline-flex;
   align-items: center;

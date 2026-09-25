@@ -1843,6 +1843,14 @@
     "message": "View full profile",
     "description": "Link on the Identity tab that opens the user's full Unison profile in a new tab"
   },
+  "unison_changePicture": {
+    "message": "Change picture",
+    "description": "Link on the Identity tab, shown when the user has a Unison profile picture, that opens the Unison website where they can pick a different one"
+  },
+  "unison_addPicture": {
+    "message": "Add a picture",
+    "description": "Link on the Identity tab, shown when the user has no Unison profile picture, that opens the Unison website where they can pick one"
+  },
   "unison_submitted_this": {
     "message": "submitted this lyric",
     "description": "Sub-label under the submitter name in the Unison footer card"
