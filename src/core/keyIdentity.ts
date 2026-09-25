@@ -221,6 +221,7 @@ interface ResolvedProfile {
 }
 
 let cachedResolvedProfile: Promise<ResolvedProfile | null> | null = null;
+let lastSavedDisplayName: string | null = null;
 
 async function fetchResolvedProfile(): Promise<ResolvedProfile | null> {
   try {
@@ -265,16 +266,19 @@ async function getResolvedDisplayName(): Promise<string | null> {
 export async function getDisplayName(): Promise<string> {
   const resolved = await getResolvedDisplayName();
   if (resolved !== null) return resolved;
+  if (lastSavedDisplayName !== null) return lastSavedDisplayName;
   const { keyId } = await getIdentity();
   return generatePetName(keyId);
 }
 
 export function invalidateDisplayName(newValue?: string): void {
-  if (newValue === undefined || !cachedResolvedProfile) {
+  lastSavedDisplayName = newValue ?? null;
+  if (newValue === undefined) {
     cachedResolvedProfile = null;
     return;
   }
-  rememberResolvedProfile(cachedResolvedProfile.then(profile => profile && { ...profile, displayName: newValue }));
+  const base = cachedResolvedProfile ?? fetchResolvedProfile();
+  rememberResolvedProfile(base.then(profile => profile && { ...profile, displayName: newValue }));
 }
 
 export async function isKeyRegistered(): Promise<boolean> {

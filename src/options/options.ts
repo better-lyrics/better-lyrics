@@ -1315,17 +1315,19 @@ async function updateIdentityDisplay(): Promise<void> {
   await renderOwnIdentityStats();
 }
 
+let identityStatsRender = 0;
+
 async function renderOwnIdentityStats(): Promise<void> {
   const statsEl = document.getElementById("identity-stats");
   const statsWrap = document.getElementById("identity-stats-container");
   if (!statsEl || !statsWrap) return;
+  const render = ++identityStatsRender;
   const [user, profile] = await Promise.all([fetchOwnGamification(), getResolvedProfile()]);
-  if (!user) {
-    statsWrap.hidden = true;
-    return;
-  }
-  await renderIdentityStats(statsEl, user, profile?.displayName, profile?.avatarUrl ?? null);
-  statsWrap.hidden = false;
+  const next = document.createElement("div");
+  if (user) await renderIdentityStats(next, user, profile?.displayName, profile?.avatarUrl ?? null);
+  if (render !== identityStatsRender) return;
+  statsEl.replaceChildren(...next.childNodes);
+  statsWrap.hidden = !user;
 }
 
 function watchPictureChanges(): void {
