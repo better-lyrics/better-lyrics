@@ -45,6 +45,7 @@ export interface PictureInPictureLyricsPayload {
   readonly lyrics: readonly Lyric[] | null;
   readonly noLyrics: boolean;
   readonly language?: string | null;
+  readonly songwriters?: readonly string[];
   /**
    * The translated and romanized text the isolated world injected into the side panel, per line
    * index. It rides on the payload rather than arriving as its own message because the window

@@ -207,6 +207,7 @@ export function createPictureInPictureHost(
       loaderVisible: false,
       noLyrics: lyricsPayload?.noLyrics === true,
       language: lyricsPayload?.language,
+      songwriters: lyricsPayload?.songwriters,
     });
     applyDecorations();
     syncSourceFooter();

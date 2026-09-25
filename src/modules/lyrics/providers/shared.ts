@@ -64,6 +64,7 @@ export interface LyricSourceResult {
   artist?: string;
   song?: string;
   duration?: number;
+  songwriters?: string[];
   unisonData?: UnisonData;
 }
 

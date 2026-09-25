@@ -142,6 +142,19 @@ Leave font-family overrides unset for language-aware CJK defaults. If adding a f
 }
 ```
 
+### Songwriter Credits
+
+```css
+:root {
+  --blyrics-credits-label: "Written by"; /* localized by the extension */
+  --blyrics-credits-font-size: max(0.4em, 12px);
+  --blyrics-credits-opacity: 0.2; /* during the song */
+  --blyrics-credits-focused-opacity: 0.85; /* after the last line ends */
+}
+```
+
+`p.blyrics-credits` follows the last line. It is not a `div`, so `.blyrics-container > div` line rules skip it; style it through `.blyrics-credits`. Hide with `display: none` or the `blyrics-hide-credits` knob.
+
 ## Configuration Knobs
 
 Comment-based parameters that control JS behavior. Place anywhere in your theme:
@@ -173,6 +186,7 @@ blyrics-line-scroll-above-duration = calc(750ms + log(var(--blyrics-line-scroll-
 | `blyrics-long-word-threshold` | `1500` | Duration (ms) above which `data-long-word` is set |
 | `blyrics-letter-wave` | `true` | Experimental, on by default. Split words into per-letter spans and float each letter as it is sung, over the word wobble. Tune with `--blyrics-letter-wave-*`; long words also get a per-letter scale swell. Disable with `blyrics-letter-wave = false` |
 | `blyrics-hide-instrumental-only` | `false` | Treat "[Instrumental Only]" as no lyrics (enables fullscreen effect) |
+| `blyrics-hide-credits` | `false` | Never build the songwriter credits line |
 | `blyrics-passive-scroll-enabled` | `true` | Unsynced auto-scroll: enable/disable entirely (overrides user setting) |
 | `blyrics-passive-scroll-seconds-per-line` | `3.5` | Unsynced auto-scroll: seconds per line (scroll speed) |
 | `blyrics-passive-scroll-bottom-pause-s` | `1.5` | Unsynced auto-scroll: pause at bottom (s) |
@@ -241,6 +255,7 @@ Lyric timing is driven by `element.animate()`.
 | `data-sync` | `"richsync"`, `"synced"`, `"none"` | Sync type |
 | `data-loader-visible` | `"true"`, `"false"`, or absent | Loader visibility |
 | `data-no-lyrics` | `"true"` or absent | No lyrics available |
+| `data-credits-focused` | present or absent | Songwriter credits hold the scroll focus |
 
 ### Word Data Attributes
 
