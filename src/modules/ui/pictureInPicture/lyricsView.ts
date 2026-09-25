@@ -204,6 +204,7 @@ export class PictureInPictureLyricsView {
     this.shell.setAttribute("aria-busy", "true");
     this.shell.setAttribute("blyrics-pip-transition", this.artworkTransition);
     this.shell.setAttribute("blyrics-pip-text-transition", this.textTransition);
+    this.shell.style.setProperty("--blyrics-credits-label", `"${dependencies.translate("lyrics_writtenBy")}"`);
 
     this.backdrop = pipDocument.createElement("div");
     this.backdrop.className = "blyrics-pip-backdrop";

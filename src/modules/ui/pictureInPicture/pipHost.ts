@@ -42,6 +42,10 @@ function hasSameLines(left: readonly Lyric[] | null, right: readonly Lyric[] | n
   );
 }
 
+function hasSameNames(left: readonly string[] = [], right: readonly string[] = []): boolean {
+  return left.length === right.length && left.every((name, index) => name === right[index]);
+}
+
 const stylesheetSettlements = new WeakMap<HTMLLinkElement, Promise<void>>();
 
 function whenStylesheetSettled(link: HTMLLinkElement): Promise<void> {
@@ -104,6 +108,7 @@ export function createPictureInPictureHost(
   let activeWindow: Window | null = null;
   let lyricsPayload: PictureInPictureLyricsPayload | null = null;
   let builtLines: readonly Lyric[] | null = null;
+  let builtSongwriters: readonly string[] | undefined;
   let clonedFooterSource: Element | null = null;
   let syncFrame: number | null = null;
   let styleObserver: MutationObserver | null = null;
@@ -193,6 +198,7 @@ export function createPictureInPictureHost(
 
     const lines = lyricsPayload?.lyrics ?? null;
     builtLines = lines;
+    builtSongwriters = lyricsPayload?.songwriters;
     // The container the copy hung off is about to go, so the next sync makes a fresh one.
     clonedFooterSource = null;
 
@@ -340,7 +346,7 @@ export function createPictureInPictureHost(
     // An offset nudge republishes the same lines. Rebuilding on one would throw away the DOM the
     // window is animating and restart the line it is part way through. A theme change republishes
     // them too, and the rebuild that one wants is decided where the theme arrives instead.
-    if (!hasSameLines(builtLines, payload.lyrics)) {
+    if (!hasSameLines(builtLines, payload.lyrics) || !hasSameNames(builtSongwriters, payload.songwriters)) {
       buildLyrics();
       return;
     }
@@ -385,6 +391,7 @@ export function createPictureInPictureHost(
     activeView = null;
     lyricsPayload = null;
     builtLines = null;
+    builtSongwriters = undefined;
     clonedFooterSource = null;
     activeWindow = null;
   }
