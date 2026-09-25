@@ -1,6 +1,8 @@
 import { compressString } from "./compression";
 import { getLocalStorage } from "./storage";
 import { errorCore, logCore } from "@core/logger";
+import type { ThemeSettingField } from "@/options/themes";
+import { loadCustomCSS, loadThemeSettings } from "@/options/editor/features/storage";
 
 const SYNC_STORAGE_LIMIT = 7000;
 const LOCAL_STORAGE_SAFE_LIMIT = 500 * 1024;
@@ -20,6 +22,11 @@ interface SaveResult {
 interface ChunkMetadata {
   customCSS_chunked?: boolean;
   customCSS_chunkCount?: number;
+}
+
+export interface ThemeSavedSettingFields {
+  fields?: Record<string, ThemeSettingField>;
+  saved?: Record<string, any>;
 }
 
 /** Theme records come from unvalidated metadata.json, so creators may be absent or not an array. */
@@ -121,7 +128,7 @@ async function saveChunkedCSS(css: string): Promise<void> {
   logCore(`Storage usage after save: ${finalUsage.used} / ${finalUsage.total} bytes`);
 }
 
-function getStorageStrategy(css: string): "local" | "sync" | "chunked" {
+export function getStorageStrategy(css: string): "local" | "sync" | "chunked" {
   const cssSize = new Blob([css]).size;
   if (cssSize > LOCAL_STORAGE_SAFE_LIMIT) {
     return "chunked";
@@ -129,7 +136,9 @@ function getStorageStrategy(css: string): "local" | "sync" | "chunked" {
   return cssSize > SYNC_STORAGE_LIMIT ? "local" : "sync";
 }
 
-export async function saveCustomCss(css: string, retryCount = 0): Promise<SaveResult> {
+export async function saveCustomCss(css?: string, themeSettings?: ThemeSavedSettingFields | null, retryCount = 0): Promise<SaveResult> {
+  if (!css) css = await loadCustomCSS(true);
+  if (!themeSettings) themeSettings = await loadThemeSettings();
   try {
     const cssSize = new Blob([css]).size;
     logCore(`Saving CSS: ${cssSize} bytes (${(cssSize / 1024).toFixed(2)} KB)`);
@@ -154,15 +163,15 @@ export async function saveCustomCss(css: string, retryCount = 0): Promise<SaveRe
 
     if (strategy === "local") {
       await clearLyricsCacheIfNeeded(compressedSize * SPACE_HEADROOM);
-      await chrome.storage.local.set({ customCSS: cssToStore, cssCompressed: shouldCompress });
+      await chrome.storage.local.set({ customCSS: cssToStore, cssCompressed: shouldCompress, themeSettings });
       await chrome.storage.sync.set({ cssStorageType: "local", cssCompressed: shouldCompress });
       await clearCSSChunks();
-      await chrome.storage.sync.remove("customCSS");
+      await chrome.storage.sync.remove(["customCSS", "themeSettings"]);
       logCore("Saved to local storage");
     } else {
-      await chrome.storage.sync.set({ customCSS: cssToStore, cssStorageType: "sync", cssCompressed: shouldCompress });
+      await chrome.storage.sync.set({ customCSS: cssToStore, cssStorageType: "sync", cssCompressed: shouldCompress, themeSettings });
       await clearCSSChunks();
-      await chrome.storage.local.remove(["customCSS", "cssCompressed"]);
+      await chrome.storage.local.remove(["customCSS", "cssCompressed", "themeSettings"]);
       logCore("Saved to sync storage");
     }
 
