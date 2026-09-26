@@ -554,7 +554,8 @@ body {
   border-radius: 0.375rem;
 }
 
-.blyrics-pip-lyrics .blyrics-container > div {
+.blyrics-pip-lyrics .blyrics-container > div,
+.blyrics-pip-lyrics .blyrics-container > .blyrics-credits {
   margin-inline: 0 !important;
 }
 

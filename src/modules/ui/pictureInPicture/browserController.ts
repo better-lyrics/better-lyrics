@@ -22,6 +22,7 @@ const LYRIC_STYLESHEET_PATH = "css/blyrics/index.css";
 const PIP_STRING_KEYS = [
   "picture_in_picture_open",
   "lyrics_searching",
+  "lyrics_writtenBy",
   "picture_in_picture_previous",
   "picture_in_picture_play",
   "picture_in_picture_pause",

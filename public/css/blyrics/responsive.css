@@ -7,7 +7,8 @@
 
 @media (max-width: 615px) {
 	/* Styles for smaller screens */
-	.blyrics-container > div {
+	.blyrics-container > div,
+	.blyrics-container > .blyrics-credits {
 		margin-inline: 4rem !important;
 	}
 	/* The album art backdrop is the side panel's decoration, so it is anchored on the page rather

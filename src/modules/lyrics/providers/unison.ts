@@ -1,6 +1,6 @@
 import { LOG_PREFIX_UNISON, UNISON_API_URL } from "@/core/constants";
 import { getIdentity, signPayload } from "@/core/keyIdentity";
-import { parseLRC, PlainParser } from "@braccato/parsers";
+import { LRCParser, parseLRC, PlainParser } from "@braccato/parsers";
 import type { LyricSourceResult, ProviderParameters } from "./shared";
 import { fillTtml } from "@modules/lyrics/providers/ttmlSource";
 import { warnUnison } from "@core/logger";
@@ -12,6 +12,7 @@ interface SubmitterInfo {
   displayName?: string;
   tier?: string | null;
   level?: number;
+  avatarUrl?: string | null;
 }
 
 interface UnisonResponse {
@@ -188,6 +189,7 @@ export default async function unison(providerParameters: ProviderParameters): Pr
       const res: LyricSourceResult = {
         ...result,
         lyrics: lrc,
+        songwriters: LRCParser.metadata(responseData.lyrics).songwriters,
       };
 
       providerParameters.sourceMap["unison-richsynced"].lyricSourceResult = null;

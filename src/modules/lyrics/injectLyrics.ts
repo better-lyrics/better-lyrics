@@ -86,6 +86,7 @@ export interface LyricsData {
   tabSelector: HTMLElement;
   hasNonLatin: boolean;
   language?: string | null;
+  songwriters?: readonly string[];
 }
 
 /**
@@ -174,6 +175,7 @@ function injectLyrics(
     loaderVisible: keepLoaderVisible,
     noLyrics,
     language: data.language,
+    songwriters: data.songwriters,
   });
 
   const syncType: SyncType = mainView.syncType;
@@ -187,6 +189,7 @@ function injectLyrics(
     isMusicVideoSynced: data.musicVideoSynced === true,
     tabSelector,
     hasNonLatin: lyrics.some(item => !!item.words && containsNonLatin(item.words)),
+    songwriters: data.songwriters,
   };
 
   // Set before addFooter so the dock controls read the current song's lyric data.

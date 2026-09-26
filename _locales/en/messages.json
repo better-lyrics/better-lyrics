@@ -1158,6 +1158,10 @@
     "message": "[elevator music]",
     "description": "Message shown during ad playback"
   },
+  "lyrics_writtenBy": {
+    "message": "Written by",
+    "description": "Label shown before the songwriter names after the last lyric line"
+  },
   "lyrics_notFound": {
     "message": "No lyrics found for this song",
     "description": "Message when no lyrics are available"
@@ -1838,6 +1842,14 @@
   "unison_viewProfile": {
     "message": "View full profile",
     "description": "Link on the Identity tab that opens the user's full Unison profile in a new tab"
+  },
+  "unison_changePicture": {
+    "message": "Change picture",
+    "description": "Link on the Identity tab, shown when the user has a Unison profile picture, that opens the Unison website where they can pick a different one"
+  },
+  "unison_addPicture": {
+    "message": "Add a picture",
+    "description": "Link on the Identity tab, shown when the user has no Unison profile picture, that opens the Unison website where they can pick one"
   },
   "unison_submitted_this": {
     "message": "submitted this lyric",
