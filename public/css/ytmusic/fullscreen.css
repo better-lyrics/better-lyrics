@@ -103,6 +103,14 @@ ytmusic-player-page[player-fullscreened]:not([blyrics-dfs])[blyrics-video-mode] 
   max-width: 100%;
 }
 
+/* The hidden YTM player bar still takes clicks, so the controls row must sit above it. */
+html:not([blyrics-no-fs-controls]) ytmusic-player-page[player-fullscreened]:not([blyrics-dfs])[blyrics-video-mode] #player.ytmusic-player-page {
+  width: min(
+    100%,
+    calc((100vh - 18rem - var(--ytmusic-nav-bar-height) - var(--ytmusic-player-bar-height)) * var(--blyrics-video-aspect-ratio))
+  );
+}
+
 /* Center Player When No Lyrics */
 ytmusic-player-page[player-fullscreened]:not([blyrics-video-mode]):not([blyrics-dfs])[blyrics-no-lyrics] #main-panel {
   position: relative;
@@ -113,6 +121,7 @@ ytmusic-player-page[player-fullscreened]:not([blyrics-video-mode]):not([blyrics-
 }
 
 ytmusic-player-page[player-fullscreened][blyrics-video-mode]:not([blyrics-dfs])[blyrics-no-lyrics] #main-panel {
+  z-index: 2;
   transform: translateX(calc(50vw - 50% - var(--ytmusic-player-page-horizontal-padding) / 2));
   transition: transform 0.3s ease-in-out;
   transition-delay: var(--blyrics-no-lyrics-slide-delay);
