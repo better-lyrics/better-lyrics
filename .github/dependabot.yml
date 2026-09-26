@@ -9,6 +9,9 @@ updates:
     directory: "/"
     schedule:
       interval: "daily"
+    cooldown:
+      default-days: 3
+      exclude: ["@braccato/*"]
     groups:
       # First match wins, so braccato gets its own PR, which auto-merges once CI is green.
       braccato:
