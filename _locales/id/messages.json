@@ -1124,7 +1124,7 @@
     "description": "Message shown during ad playback"
   },
   "lyrics_writtenBy": {
-    "message": "Written by",
+    "message": "Ditulis oleh",
     "description": "Label shown before the songwriter names after the last lyric line"
   },
   "lyrics_notFound": {
