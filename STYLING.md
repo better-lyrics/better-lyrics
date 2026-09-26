@@ -45,6 +45,7 @@
 	- [12. Adding a Watermark](#12-adding-a-watermark)
 	- [13. Displaying Song Information](#13-displaying-song-information)
 	- [14. Footer and Social Elements](#14-footer-and-social-elements)
+		- [Songwriter Credits](#songwriter-credits)
 	- [15. ThemeSong Compatibility](#15-themesong-compatibility)
 	- [16. Translated and Romanized Lyrics](#16-translated-and-romanized-lyrics)
 	- [17. Instrumental Breaks](#17-instrumental-breaks)
@@ -393,6 +394,7 @@ The following options are avalible:
 | `blyrics-long-word-threshold`         | `1500`        | Duration threshold (in ms) above which words get `data-long-word="true"`. Useful for glow effects on held notes.                           |
 | `blyrics-letter-wave`                 | `true`        | Experimental, on by default. Split every word into per-letter spans and float each letter up as it is sung, layered on top of the word wobble. Tune with the `--blyrics-letter-wave-*` variables; words past `blyrics-long-word-threshold` also get a per-letter scale swell. Disable with `blyrics-letter-wave = false`. |
 | `blyrics-hide-instrumental-only`      | `false`       | Treat "[Instrumental Only]" as no lyrics (enables fullscreen effect).                                                                      |
+| `blyrics-hide-credits`                | `false`       | Set to `true` to never build the songwriter credits line. See [Songwriter Credits](#songwriter-credits).                                  |
 | `blyrics-passive-scroll-enabled`          | `true`    | Enable/disable unsynced lyrics auto-scroll entirely. Overrides the user setting when set to `false`.                                       |
 | `blyrics-passive-scroll-seconds-per-line` | `3.5`     | For unsynced lyrics auto-scroll: seconds spent scrolling per lyric line. Controls overall scroll speed.                                    |
 | `blyrics-passive-scroll-bottom-pause-s`   | `1.5`     | For unsynced lyrics auto-scroll: seconds to pause at the bottom before scrolling back to top.                                              |
@@ -475,6 +477,7 @@ The `.blyrics-container` element has two data attributes that indicate its curre
 | --------------------- | ---------------------------------- | ---------------------------------------------------------- |
 | `data-sync`           | `"richsync"`, `"synced"`, `"none"` | Indicates the synchronization type of the current lyrics   |
 | `data-loader-visible` | `"true"`, `"false"`                | Indicates whether the loading spinner is currently visible |
+| `data-credits-focused` | present or absent                 | Present while the songwriter credits hold the scroll focus |
 
 #### Sync Type Styling
 
@@ -1248,6 +1251,31 @@ In fullscreen mode this block sits above a full set of playback controls. See [F
 ```
 
 Creates styled footer elements including a Discord button with hover effects.
+
+### Songwriter Credits
+
+When the lyrics name their songwriters, a `.blyrics-credits` line ("Written by A, B & C") follows the last lyric, before the footer. It stays dim while the song plays. When the last line ends, it brightens, takes the scroll focus, and the container gets `data-credits-focused`. Seeking back gives the focus to the lines again. Unsynced lyrics show the credits at full strength from the start.
+
+| Custom property                     | Default            | Description                                    |
+| ----------------------------------- | ------------------ | ---------------------------------------------- |
+| `--blyrics-credits-label`           | `"Written by"`     | Text before the names. Set to the user's language by the extension. |
+| `--blyrics-credits-font-size`       | `max(0.4em, 12px)` | Font size of the credits line                  |
+| `--blyrics-credits-opacity`         | `0.2`              | Opacity while the song plays                   |
+| `--blyrics-credits-focused-opacity` | `0.85`             | Opacity after the last line ends               |
+
+```css
+.blyrics-credits {
+  font-style: italic;
+}
+
+.blyrics-container[data-credits-focused] > .blyrics-credits {
+  color: var(--blyrics-lyric-active-color);
+}
+```
+
+The credits are a `<p>`, not a `<div>`, so rules written for lyric lines as `.blyrics-container > div` (hover effects, per-line opacity and blur) do not apply to them. Style them through `.blyrics-credits`.
+
+To hide the credits, set `.blyrics-credits { display: none; }` (autoscroll then ignores them), or declare `/* blyrics-hide-credits = true; */` so they are never built.
 
 ## 15. ThemeSong Compatibility
 

@@ -80,6 +80,7 @@ export const RELEASES_LATEST_API_URL =
 export const THEME_STORE_API_URL = "https://themes.betterlyrics.org" as const;
 export const UNISON_API_BASE_URL = "https://unison.betterlyrics.org" as const;
 export const UNISON_TRANSLATE_URL = `${UNISON_API_BASE_URL}/translate` as const;
+export const UNISON_PICTURE_URL = `${UNISON_API_BASE_URL}/me` as const;
 export const THEME_STORE_TURNSTILE_URL = `${THEME_STORE_API_URL}/turnstile` as const;
 const THEME_REGISTRY_BASE = "https://raw.githubusercontent.com/better-lyrics/themes" as const;
 export const THEME_REGISTRY_URL = `${THEME_REGISTRY_BASE}/master` as const;
