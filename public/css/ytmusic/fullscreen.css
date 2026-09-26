@@ -103,7 +103,6 @@ ytmusic-player-page[player-fullscreened]:not([blyrics-dfs])[blyrics-video-mode] 
   max-width: 100%;
 }
 
-/* The hidden YTM player bar still takes clicks, so the controls row must sit above it. */
 html:not([blyrics-no-fs-controls]) ytmusic-player-page[player-fullscreened]:not([blyrics-dfs])[blyrics-video-mode] #player.ytmusic-player-page {
   width: min(
     100%,
