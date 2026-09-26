@@ -1123,6 +1123,10 @@
     "message": "[Fahrstuhlmusik]",
     "description": "Message shown during ad playback"
   },
+  "lyrics_writtenBy": {
+    "message": "Getextet von",
+    "description": "Label shown before the songwriter names after the last lyric line"
+  },
   "lyrics_notFound": {
     "message": "Keine Songtexte für diesen Song gefunden",
     "description": "Message when no lyrics are available"
@@ -1806,6 +1810,14 @@
   "unison_viewProfile": {
     "message": "Zeige vollständiges Profil",
     "description": "Link on the Identity tab that opens the user's full Unison profile in a new tab"
+  },
+  "unison_changePicture": {
+    "message": "Bild ändern",
+    "description": "Link on the Identity tab, shown when the user has a Unison profile picture, that opens the Unison website where they can pick a different one"
+  },
+  "unison_addPicture": {
+    "message": "Bild hinzufügen",
+    "description": "Link on the Identity tab, shown when the user has no Unison profile picture, that opens the Unison website where they can pick one"
   },
   "unison_submitted_this": {
     "message": "diesen Songtext eingereicht",
