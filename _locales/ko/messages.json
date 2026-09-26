@@ -1123,6 +1123,10 @@
     "message": "[엘리베이터 음악]",
     "description": "Message shown during ad playback"
   },
+  "lyrics_writtenBy": {
+    "message": "작성자",
+    "description": "Label shown before the songwriter names after the last lyric line"
+  },
   "lyrics_notFound": {
     "message": "이 노래의 가사를 찾을 수 없습니다",
     "description": "Message when no lyrics are available"
@@ -1806,6 +1810,14 @@
   "unison_viewProfile": {
     "message": "전체 프로필 보기",
     "description": "Link on the Identity tab that opens the user's full Unison profile in a new tab"
+  },
+  "unison_changePicture": {
+    "message": "사진 변경",
+    "description": "Link on the Identity tab, shown when the user has a Unison profile picture, that opens the Unison website where they can pick a different one"
+  },
+  "unison_addPicture": {
+    "message": "사진 추가",
+    "description": "Link on the Identity tab, shown when the user has no Unison profile picture, that opens the Unison website where they can pick one"
   },
   "unison_submitted_this": {
     "message": "이 가사를 등록했습니다",
