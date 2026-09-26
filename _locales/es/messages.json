@@ -1123,6 +1123,10 @@
     "message": "[música de ascensor]",
     "description": "Message shown during ad playback"
   },
+  "lyrics_writtenBy": {
+    "message": "Escrito por",
+    "description": "Label shown before the songwriter names after the last lyric line"
+  },
   "lyrics_notFound": {
     "message": "No se encontraron letras para esta canción",
     "description": "Message when no lyrics are available"
@@ -1236,7 +1240,7 @@
     }
   },
   "theme_author_you": {
-    "message": "Por Tú",
+    "message": "Por Ti",
     "description": "Author label for custom user themes on theme selector button"
   },
   "symlink_installFailed": {
@@ -1314,7 +1318,7 @@
     "description": "Secondary button: reject the sign-in request"
   },
   "auth_invalidRequest": {
-    "message": "Solicitud de inicio de sesión inválida",
+    "message": "Solicitud de inicio de sesión inválida.",
     "description": "Error state shown when the popup receives malformed parameters"
   },
   "auth_sessionExpired": {
@@ -1584,7 +1588,7 @@
     "description": "Back button text in detail view"
   },
   "unison_noPreview": {
-    "message": "Pega o arrestra una letra para ver una vista previa",
+    "message": "Pega o arrastra una letra para ver una vista previa",
     "description": "Empty state text shown in submit preview before lyrics are entered"
   },
   "unison_preview": {
@@ -1806,6 +1810,14 @@
   "unison_viewProfile": {
     "message": "Ver perfil completo",
     "description": "Link on the Identity tab that opens the user's full Unison profile in a new tab"
+  },
+  "unison_changePicture": {
+    "message": "Cambiar imagen",
+    "description": "Link on the Identity tab, shown when the user has a Unison profile picture, that opens the Unison website where they can pick a different one"
+  },
+  "unison_addPicture": {
+    "message": "Añadir imagen",
+    "description": "Link on the Identity tab, shown when the user has no Unison profile picture, that opens the Unison website where they can pick one"
   },
   "unison_submitted_this": {
     "message": "Letra enviada",
