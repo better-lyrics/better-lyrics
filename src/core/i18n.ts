@@ -113,6 +113,7 @@ export function subscribeToLocaleChanges(onLocaleApplied?: () => void): void {
 export function injectI18nCssVars(): void {
   const vars: Record<string, string> = {
     "--blyrics-text-ad-playing": t("lyrics_adPlaying"),
+    "--blyrics-credits-label": t("lyrics_writtenBy"),
   };
 
   const root = document.documentElement;

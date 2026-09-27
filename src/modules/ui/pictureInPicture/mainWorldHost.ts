@@ -60,6 +60,7 @@ function createController(): PictureInPictureController<Window> {
     textTransition: () => resources?.textTransition,
     marqueeEnabled: () => resources?.marqueeEnabled,
     progressBarEnabled: () => resources?.progressBarEnabled,
+    windowLayout: () => resources?.windowLayout,
     windowTitle: () => resources?.strings.picture_in_picture_open ?? "",
     stylesheetUrls: () => ({
       lyrics: resources?.lyricsStylesheetUrl ?? "",

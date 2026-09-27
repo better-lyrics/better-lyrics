@@ -250,6 +250,7 @@ jobs:
       - name: Zip Edge artifact
         run: |
           VERSION=${{ needs.release.outputs.version }}
+          node -e "const fs=require('fs');const f='dist/edge/manifest.json';const m=JSON.parse(fs.readFileSync(f,'utf8'));delete m.key;delete m.update_url;fs.writeFileSync(f,JSON.stringify(m,null,2))"
           cd dist/edge
           zip -r ../edge-v$VERSION.zip .
           

@@ -125,7 +125,7 @@
 #blyrics-loader:after {
 	color: color-mix(in srgb, var(--blyrics-ui-text-color) 70%, transparent);
 	content: var(--blyrics-loader-text, "");
-	font-family: var(--blyrics-font-family);
+	font-family: var(--blyrics-font-family, var(--blyrics-default-font-family));
 	font-size: 2.2rem;
 	font-weight: 700;
 	isolation: isolate;
@@ -186,7 +186,7 @@
 	background-clip: text;
 	color: transparent;
 	content: var(--blyrics-text-ad-playing, "[elevator music]");
-	font-family: var(--blyrics-font-family);
+	font-family: var(--blyrics-font-family, var(--blyrics-default-font-family));
 	font-size: 2rem;
 	font-weight: 700;
 	isolation: isolate;
@@ -458,6 +458,55 @@
 	font-weight: 700;
 	font-variant-numeric: tabular-nums;
 	color: #f5f5f7;
+}
+
+.blyrics-gam__ring.blyrics-gam__ring--avatar {
+	--blyrics-gam-ring: 44px;
+	--blyrics-gam-pill: 16px;
+	--blyrics-gam-pill-offset: calc(var(--blyrics-gam-ring) * 0.29463);
+	--blyrics-gam-cutout: calc(var(--blyrics-gam-pill) / 2 + 2px);
+	width: var(--blyrics-gam-ring);
+	height: var(--blyrics-gam-ring);
+}
+
+.blyrics-gam__ring--avatar svg {
+	mask-image: radial-gradient(
+		circle at calc(50% - var(--blyrics-gam-pill-offset)) calc(50% + var(--blyrics-gam-pill-offset)),
+		transparent var(--blyrics-gam-cutout),
+		#000 calc(var(--blyrics-gam-cutout) + 0.5px)
+	);
+}
+
+.blyrics-gam__ring-avatar {
+	--blyrics-gam-avatar-size: calc(var(--blyrics-gam-ring) * 26 / 36 - 6px);
+	width: var(--blyrics-gam-avatar-size);
+	height: var(--blyrics-gam-avatar-size);
+	border-radius: 50%;
+	object-fit: cover;
+	display: block;
+	mask-image: radial-gradient(
+		circle at calc(50% + var(--blyrics-gam-pill-offset)) calc(50% + var(--blyrics-gam-pill-offset)),
+		transparent var(--blyrics-gam-cutout),
+		#000 calc(var(--blyrics-gam-cutout) + 0.5px)
+	);
+}
+
+.blyrics-gam__ring-level {
+	--blyrics-gam-pill-edge: calc(50% - var(--blyrics-gam-pill-offset) - var(--blyrics-gam-pill) / 2);
+	position: absolute;
+	right: var(--blyrics-gam-pill-edge);
+	bottom: var(--blyrics-gam-pill-edge);
+	display: grid;
+	place-items: center;
+	width: var(--blyrics-gam-pill);
+	height: var(--blyrics-gam-pill);
+	border-radius: 50%;
+	background-color: #ffc83d;
+	color: #1a1300;
+	font-size: 10px;
+	font-weight: 800;
+	line-height: 1;
+	font-variant-numeric: tabular-nums;
 }
 
 .blyrics-gam__tier {
@@ -1123,7 +1172,7 @@ ytmusic-player-page:not([is-mweb-modernization-enabled]) #side-panel.blyrics-has
 }
 
 .autoscroll-resume-button {
-	font-family: var(--blyrics-font-family);
+	font-family: var(--blyrics-font-family, var(--blyrics-default-font-family));
 	position: absolute;
 	display: block;
 	font-size: 1.75rem;
@@ -1215,7 +1264,7 @@ ytmusic-player-page:not([is-mweb-modernization-enabled]) #side-panel.blyrics-has
 	z-index: 2;
 	max-width: 40rem;
 	text-align: start;
-	font-family: var(--blyrics-font-family);
+	font-family: var(--blyrics-font-family, var(--blyrics-default-font-family));
 }
 
 #blyrics-song-info > p#blyrics-title {
@@ -1429,6 +1478,19 @@ ytmusic-player-page[player-fullscreened]:not([blyrics-dfs]) #blyrics-fs-column {
   display: flex;
   flex-direction: column;
   gap: 1.5rem;
+}
+
+#blyrics-fs-controls,
+.blyrics-fs-info-actions {
+  opacity: 1;
+  pointer-events: auto;
+  transition: opacity 320ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+#layout[player-fullscreened]:not([blyrics-dfs])[show-fullscreen-controls] #blyrics-fs-controls,
+#layout[player-fullscreened]:not([blyrics-dfs])[show-fullscreen-controls] .blyrics-fs-info-actions {
+  opacity: 0;
+  pointer-events: none;
 }
 
 #blyrics-fs-controls[data-ad] {

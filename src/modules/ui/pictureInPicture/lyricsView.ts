@@ -72,7 +72,13 @@ function getArtworkUrl(url: string): string {
   return url.replace(/\/(sd|hq|mq)?default\.jpg/, "/maxresdefault.jpg");
 }
 
+const MISSING_THUMBNAIL_WIDTH = 120;
+
 function getFallbackArtworkUrl(videoId: string): string {
+  return `https://i.ytimg.com/vi/${videoId}/maxresdefault.jpg`;
+}
+
+function getLetterboxedArtworkUrl(videoId: string): string {
   return `https://i.ytimg.com/vi/${videoId}/hqdefault.jpg`;
 }
 
@@ -198,6 +204,7 @@ export class PictureInPictureLyricsView {
     this.shell.setAttribute("aria-busy", "true");
     this.shell.setAttribute("blyrics-pip-transition", this.artworkTransition);
     this.shell.setAttribute("blyrics-pip-text-transition", this.textTransition);
+    this.shell.style.setProperty("--blyrics-credits-label", `"${dependencies.translate("lyrics_writtenBy")}"`);
 
     this.backdrop = pipDocument.createElement("div");
     this.backdrop.className = "blyrics-pip-backdrop";
@@ -644,8 +651,19 @@ export class PictureInPictureLyricsView {
     const { signal } = attempt;
     songSignal.addEventListener("abort", () => attempt.abort(), { once: true, signal });
 
+    const letterboxedUrl = getLetterboxedArtworkUrl(videoId);
+    const fallBack = (): void => {
+      if (url === letterboxedUrl) return;
+      attempt.abort();
+      this.setArtwork(url === this.fallbackArtworkUrl ? letterboxedUrl : this.fallbackArtworkUrl, videoId, songSignal);
+    };
+
     const commit = (): void => {
       if (signal.aborted || this.currentVideoId !== videoId) return;
+      if (url === this.fallbackArtworkUrl && image.naturalWidth <= MISSING_THUMBNAIL_WIDTH) {
+        fallBack();
+        return;
+      }
       this.clearArtworkStaleTimer();
       // There is nothing to transition from when the placeholder is what is on screen, so the first
       // cover in a window, and any cover that lands after a slow lookup fell back, just appears.
@@ -656,15 +674,8 @@ export class PictureInPictureLyricsView {
       this.runArtworkSwap(nextIndex, isFirstArtwork);
     };
 
-    image.addEventListener(
-      "error",
-      () => {
-        if (url === this.fallbackArtworkUrl) return;
-        attempt.abort();
-        this.setArtwork(this.fallbackArtworkUrl, videoId, songSignal);
-      },
-      { once: true, signal }
-    );
+    image.addEventListener("error", fallBack, { once: true, signal });
+    image.toggleAttribute("data-letterboxed", url === letterboxedUrl);
     image.src = url;
 
     if (!image.complete) {

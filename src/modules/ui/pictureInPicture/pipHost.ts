@@ -15,6 +15,7 @@ import type { PictureInPictureHostEnvironment } from "./types";
 
 const PIP_OPEN_ATTRIBUTE = "blyrics-pip-open";
 const FOOTER_SOURCE_LINK_ID = "betterLyricsFooterLink";
+const STYLESHEET_REVEAL_TIMEOUT_MS = 1000;
 
 // Gecko ignores @property in a stylesheet that is cross-origin to the document, and ours are served
 // from moz-extension:// into a window of the page's own origin. An unregistered custom property
@@ -39,6 +40,32 @@ function hasSameLines(left: readonly Lyric[] | null, right: readonly Lyric[] | n
   return left.every(
     (line, index) => line.startTimeMs === right[index].startTimeMs && line.words === right[index].words
   );
+}
+
+function hasSameNames(left: readonly string[] = [], right: readonly string[] = []): boolean {
+  return left.length === right.length && left.every((name, index) => name === right[index]);
+}
+
+const stylesheetSettlements = new WeakMap<HTMLLinkElement, Promise<void>>();
+
+function whenStylesheetSettled(link: HTMLLinkElement): Promise<void> {
+  let settlement = stylesheetSettlements.get(link);
+  if (!settlement) {
+    settlement = new Promise(resolve => {
+      link.addEventListener("load", () => resolve(), { once: true });
+      link.addEventListener("error", () => resolve(), { once: true });
+    });
+    stylesheetSettlements.set(link, settlement);
+  }
+  return settlement;
+}
+
+function revealWhenStyled(pipWindow: Window): void {
+  const links = Array.from(pipWindow.document.head.querySelectorAll<HTMLLinkElement>('link[rel="stylesheet"]'));
+  const timeout = new Promise<void>(resolve => pipWindow.setTimeout(resolve, STYLESHEET_REVEAL_TIMEOUT_MS));
+  void Promise.race([Promise.all(links.map(whenStylesheetSettled)), timeout]).then(() => {
+    pipWindow.document.documentElement.style.removeProperty("visibility");
+  });
 }
 
 /**
@@ -81,6 +108,7 @@ export function createPictureInPictureHost(
   let activeWindow: Window | null = null;
   let lyricsPayload: PictureInPictureLyricsPayload | null = null;
   let builtLines: readonly Lyric[] | null = null;
+  let builtSongwriters: readonly string[] | undefined;
   let clonedFooterSource: Element | null = null;
   let syncFrame: number | null = null;
   let styleObserver: MutationObserver | null = null;
@@ -146,6 +174,7 @@ export function createPictureInPictureHost(
       const link = pipWindow.document.createElement("link");
       link.rel = "stylesheet";
       link.href = href;
+      void whenStylesheetSettled(link);
       pipWindow.document.head.appendChild(link);
     }
   }
@@ -169,6 +198,7 @@ export function createPictureInPictureHost(
 
     const lines = lyricsPayload?.lyrics ?? null;
     builtLines = lines;
+    builtSongwriters = lyricsPayload?.songwriters;
     // The container the copy hung off is about to go, so the next sync makes a fresh one.
     clonedFooterSource = null;
 
@@ -182,6 +212,8 @@ export function createPictureInPictureHost(
       mount: view.prepareLyricsMount(),
       loaderVisible: false,
       noLyrics: lyricsPayload?.noLyrics === true,
+      language: lyricsPayload?.language,
+      songwriters: lyricsPayload?.songwriters,
     });
     applyDecorations();
     syncSourceFooter();
@@ -242,7 +274,7 @@ export function createPictureInPictureHost(
         );
       }
       if (decoration.translation) {
-        injectTranslation(pipDocument, line.lyricElement, decoration.translation);
+        injectTranslation(pipDocument, line.lyricElement, decoration.translation, decoration.translationLanguage);
       }
     }
   }
@@ -314,10 +346,11 @@ export function createPictureInPictureHost(
     // An offset nudge republishes the same lines. Rebuilding on one would throw away the DOM the
     // window is animating and restart the line it is part way through. A theme change republishes
     // them too, and the rebuild that one wants is decided where the theme arrives instead.
-    if (!hasSameLines(builtLines, payload.lyrics)) {
+    if (!hasSameLines(builtLines, payload.lyrics) || !hasSameNames(builtSongwriters, payload.songwriters)) {
       buildLyrics();
       return;
     }
+    activeRenderer?.setLanguage(payload.language);
     // A translation or romanization batch lands on the same lines, so nothing above rebuilds and
     // the new text has to be hung off the DOM that is already up. The lines grow, so re-measure.
     applyDecorations();
@@ -326,6 +359,7 @@ export function createPictureInPictureHost(
 
   function renderLoadingShell(pipWindow: Window): void {
     activeWindow = pipWindow;
+    pipWindow.document.documentElement.style.visibility = "hidden";
     document.documentElement.setAttribute(PIP_OPEN_ATTRIBUTE, "");
     environment.onOpened();
     pipWindow.document.title = environment.windowTitle();
@@ -357,15 +391,20 @@ export function createPictureInPictureHost(
     activeView = null;
     lyricsPayload = null;
     builtLines = null;
+    builtSongwriters = undefined;
     clonedFooterSource = null;
     activeWindow = null;
   }
 
   return new PictureInPictureController<Window>({
     host: window,
+    windowLayout: environment.windowLayout,
     loadStylesheet: environment.loadStylesheet,
     renderLoadingShell,
-    injectStylesheet: environment.injectStylesheet,
+    injectStylesheet: (pipWindow, stylesheet) => {
+      environment.injectStylesheet(pipWindow, stylesheet);
+      revealWhenStyled(pipWindow);
+    },
     closeWindow: pipWindow => {
       teardownWindow(pipWindow);
       pipWindow.close();

@@ -143,6 +143,18 @@
     "message": "Keeps the floating lyrics window from closing for good when you reload or move between songs and pages. Browsers only let a floating window open right after you interact with the page, so it reopens on your first click or key press instead of instantly.",
     "description": "Help tooltip explaining what automatic floating-lyrics reopening does and why it waits for the first interaction"
   },
+  "options_display_pipWindowLayout": {
+    "message": "Window layout",
+    "description": "Setting label, shown inside the floating lyrics window settings, for choosing whether the window opens wide or tall"
+  },
+  "options_pipWindowLayout_horizontal": {
+    "message": "Horizontal",
+    "description": "Floating lyrics window layout option: a wide window with the album art beside the lyrics"
+  },
+  "options_pipWindowLayout_vertical": {
+    "message": "Vertical",
+    "description": "Floating lyrics window layout option: a tall window with the album art above the lyrics"
+  },
   "options_display_pipArtworkTransition": {
     "message": "Album art transition",
     "description": "Setting label, shown inside the floating lyrics window settings, for choosing how album art changes between songs"
@@ -1011,6 +1023,28 @@
       }
     }
   },
+  "blUpdate_available": {
+    "message": "Better Lyrics $version$ is now available",
+    "description": "Banner shown to pre-release (canary) users when the matching stable release ships",
+    "placeholders": {
+      "version": {
+        "content": "$1",
+        "example": "2.4.0"
+      }
+    }
+  },
+  "blUpdate_storeDelay": {
+    "message": "store may lag briefly",
+    "description": "Trailing note on the update banner for Chrome and Edge, whose store approval can lag the release"
+  },
+  "blUpdate_action": {
+    "message": "Update",
+    "description": "Action link on the update banner that opens the browser's extension store listing"
+  },
+  "blUpdate_dismiss": {
+    "message": "Dismiss",
+    "description": "Accessible label for the button that closes the update banner"
+  },
   "marketplace_discussion": {
     "message": "Discussion",
     "description": "Footer link in the theme detail modal that opens the theme's discussion thread"
@@ -1088,6 +1122,10 @@
   "lyrics_adPlaying": {
     "message": "[música de elevador]",
     "description": "Message shown during ad playback"
+  },
+  "lyrics_writtenBy": {
+    "message": "Written by",
+    "description": "Label shown before the songwriter names after the last lyric line"
   },
   "lyrics_notFound": {
     "message": "Nenhuma letra encontrada para esta música",
@@ -1772,6 +1810,14 @@
   "unison_viewProfile": {
     "message": "View full profile",
     "description": "Link on the Identity tab that opens the user's full Unison profile in a new tab"
+  },
+  "unison_changePicture": {
+    "message": "Change picture",
+    "description": "Link on the Identity tab, shown when the user has a Unison profile picture, that opens the Unison website where they can pick a different one"
+  },
+  "unison_addPicture": {
+    "message": "Add a picture",
+    "description": "Link on the Identity tab, shown when the user has no Unison profile picture, that opens the Unison website where they can pick one"
   },
   "unison_submitted_this": {
     "message": "submitted this lyric",

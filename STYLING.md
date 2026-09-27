@@ -45,6 +45,7 @@
 	- [12. Adding a Watermark](#12-adding-a-watermark)
 	- [13. Displaying Song Information](#13-displaying-song-information)
 	- [14. Footer and Social Elements](#14-footer-and-social-elements)
+		- [Songwriter Credits](#songwriter-credits)
 	- [15. ThemeSong Compatibility](#15-themesong-compatibility)
 	- [16. Translated and Romanized Lyrics](#16-translated-and-romanized-lyrics)
 	- [17. Instrumental Breaks](#17-instrumental-breaks)
@@ -132,7 +133,7 @@ In `blyrics/variables.css` (shipped by `@braccato/core`), you'll see a `:root` s
 :root {
   --blyrics-ui-text-color: var(--blyrics-text-color, color(display-p3 1 1 1 / 1));
   --blyrics-glow-color: var(--blyrics-highlight-color, color(display-p3 1 1 1 / 0.5));
-  --blyrics-font-family: Satoshi, var(--noto-sans-universal, "Noto Sans"), Avenir, -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, Cantarell, Open Sans, Helvetica Neue, sans-serif;
+  --blyrics-default-font-family: Satoshi, var(--noto-sans-universal, "Noto Sans"), Avenir, -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, Cantarell, Open Sans, Helvetica Neue, sans-serif;
   /* ... more variables ... */
 }
 ```
@@ -158,13 +159,13 @@ These custom properties allow for easy customization of colors, sizes, and other
 
 | Variable                           | Default Value                                                                                                                                                        | Description                                                              |
 | ---------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------ |
-| `--blyrics-font-family`¹           | `Satoshi, var(--noto-sans-universal, "Noto Sans"), Avenir, -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, Cantarell, Open Sans, Helvetica Neue, sans-serif` | Font family for lyrics                                                 |
+| `--blyrics-font-family`¹           | Unset; falls back to `--blyrics-default-font-family` | Explicit font family override for lyrics                                                 |
 | `--blyrics-font-size`              | `3rem`                                                                                                                                                               | Font size for lyrics                                                     |
 | `--blyrics-font-weight`            | `700`                                                                                                                                                                | Font weight for lyrics                                                   |
 | `--blyrics-line-height`            | `1.333`                                                                                                                                                              | Line height for lyrics                                                   |
 | `--blyrics-translated-font-size`   | `2rem`                                                                                                                                                               | Font size of translated/romanized lyrics                                 |
 | `--blyrics-translated-font-weight` | `600`                                                                                                                                                                | Font weight of translated/romanized lyrics                               |
-| `--blyrics-translated-font-family` | Inherits `--blyrics-font-family`                                                                                                                                     | Font family of translated/romanized lyrics                               |
+| `--blyrics-translated-font-family` | Unset; uses `--blyrics-font-family` or the local default stack                                                                                                                                     | Font family of translated/romanized lyrics                               |
 | `--blyrics-translated-color`       | `color(display-p3 1 1 1 / var(--blyrics-translated-opacity, 0.6))`                                                                                                   | Color of translated/romanized lyrics                                     |
 | `--blyrics-footer-font-family`     | `Roboto, Noto Naskh Arabic UI, Arial, sans-serif`                                                                                                                    | Font family of footer                                                    |
 | `--blyrics-footer-font-size`       | `14px`                                                                                                                                                               | Font size of footer                                                      |
@@ -173,7 +174,15 @@ These custom properties allow for easy customization of colors, sizes, and other
 
 ¹To add a custom web-font, use `@import`. It must be placed at the very top of your theme.
 
-²You don't want to override this. You should use this in your own font families as a fallback.
+²The extension resolves this fallback at each lyric and translation's `lang` boundary, selecting the appropriate Japanese, Korean, Simplified Chinese, Taiwan, or Hong Kong Noto subset. Keep the default font overrides unset to use this behavior. When adding a custom family with the Noto fallback, declare it at these boundaries rather than at `:root`, where CSS would resolve the fallback before the text language is known:
+
+```css
+.blyrics--line,
+.blyrics--translated,
+.blyrics--romanized {
+  --blyrics-font-family: "My Custom Font", var(--noto-sans-universal), sans-serif;
+}
+```
 
 ### Animations
 
@@ -275,7 +284,7 @@ Side-specific knobs are relative to scroll direction. On a downward scroll, line
 
 Configure line-scroll style values with comment-based knobs, not `:root` declarations. JS copies those values onto each animated line before resolving the Web Animation, so formulas that reference per-line variables resolve in the correct line scope. The resolved keyframes are snapshotted before the animation starts, which lets later scrolls update the same line variables without changing animations that are already running.
 
-The default two-keyframe animation starts each visible line at the signed scroll delta and animates it back to `0`. The base scroll gate is `--blyrics-lyric-scroll-duration`, while the default per-line visual tail uses `750ms` plus a side-specific relative-index delay. Lines above the active lyric get a subtle logarithmic tail. Lines below get a stronger logarithmic tail plus a small linear term, so farther trailing lines keep finishing progressively later during larger jumps instead of flattening at a fixed cap.
+The default two-keyframe animation starts each visible line at the signed scroll delta and animates it back to `0`. Scrolls have no duration-based gate; the default per-line visual tail uses `750ms` plus a side-specific relative-index delay. Lines above the active lyric get a subtle logarithmic tail. Lines below get a stronger logarithmic tail plus a small linear term, so farther trailing lines keep finishing progressively later during larger jumps instead of flattening at a fixed cap.
 
 ```css
 /*
@@ -293,7 +302,7 @@ blyrics-line-scroll-above-duration = calc(
 */
 ```
 
-The engine animates the individual `translate` property instead of `transform`, so this effect can run alongside the existing line-scale transform animation. Per-line scroll effects can overlap: custom line durations may run longer than `--blyrics-lyric-scroll-duration`, but the next autoscroll is gated only by `--blyrics-lyric-scroll-duration`. Overlapping scroll effects are composed with additive Web Animations (`composite: "add"`), so this behavior expects modern browser support for additive `element.animate()` effects.
+The engine animates the individual `translate` property instead of `transform`, so this effect can run alongside the existing line-scale transform animation. Per-line scroll effects can overlap: a new scroll starts as soon as an ungrouped lyric reaches its scroll time, even while earlier line animations are running. Overlapping scroll effects are composed with additive Web Animations (`composite: "add"`), so this behavior expects modern browser support for additive `element.animate()` effects.
 
 ### Layout
 
@@ -324,10 +333,9 @@ The engine animates the individual `translate` property instead of `transform`, 
 
 | Variable                                 | Default Value                    | Description                                     |
 | ---------------------------------------- | -------------------------------- | ----------------------------------------------- |
-| `--blyrics-lyric-scroll-duration`³       | `650ms`                          | Duration for scrolling lyric transitions        |
 | `--blyrics-lyric-scroll-timing-function` | `cubic-bezier(0.86, 0, 0.2, 1)`  | Timing function for scrolling lyric transitions |
 
-³If `blyrics-early-scroll-consider-s` and `blyrics-queue-scroll-ms` are not manually set, they are derived automatically from this duration. See [Additional Configuration Options (Knobs)](#additional-configuration-options-knobs) for details.
+`--blyrics-lyric-scroll-duration` and its `--blyrics-lyric-transition-duration` alias have been removed, along with the old container transform transition. Use the line-scroll duration knobs to control visual motion; early-consider is independent of animation duration. Replace any explicit references to the removed variables with a duration or your own custom property. If a line duration is missing, invalid or resolves to a nonpositive value, the engine uses an internal `750ms` fallback.
 
 ### Gradient Stops
 
@@ -377,8 +385,7 @@ The following options are avalible:
 | `blyrics-disable-richsync`            | `false`       | Set to `true` to render richsynced lyrics through the line-synced path instead, including zero-duration `.blyrics-line-synced-word` spans and line-synced fade-in. |
 | `blyrics-line-synced-animation-delay` | `50`          | For non-richsynced lyrics, this value controls the delay each word gets when highlighting (in ms).                                         |
 | `blyrics-lyric-ending-threshold-s`    | `0.5`         | Controls the time (in seconds) before a lyric line is finished that we consider it completed for scrolling purposes.                       |
-| `blyrics-early-scroll-consider-s`⁴    | Auto (`~0.54` at the default scroll duration) | Controls how far into the future (in seconds) we should look for lines to group together for scrolling purposes.                           |
-| `blyrics-queue-scroll-ms`⁴            | Auto (`~131` at the default scroll duration)  | If we're unable to scroll due to having scrolled recently, what is the maximum amount of time that a scroll can be "queued" for.           |
+| `blyrics-early-scroll-consider-s`    | `0.54` | Controls how far into the future (in seconds) we should look for lines to group together for scrolling purposes.                           |
 | `blyrics-debug-renderer`              | `false`       | Set to `true` to enable the debug renderer.                                                                                                |
 | `blyrics-debug-animation-timing`      | `false`       | Set to `true` to log WAAPI lyric animation timing samples, learned offsets, and timing cleanup events.                                    |
 | `blyrics-target-scroll-pos-ratio`     | `0.37`        | Position on the screen lyrics should be at. 0.5 means the selected lyric will be in the middle of the screen, 0 means top, 1 means bottom. |
@@ -387,6 +394,7 @@ The following options are avalible:
 | `blyrics-long-word-threshold`         | `1500`        | Duration threshold (in ms) above which words get `data-long-word="true"`. Useful for glow effects on held notes.                           |
 | `blyrics-letter-wave`                 | `true`        | Experimental, on by default. Split every word into per-letter spans and float each letter up as it is sung, layered on top of the word wobble. Tune with the `--blyrics-letter-wave-*` variables; words past `blyrics-long-word-threshold` also get a per-letter scale swell. Disable with `blyrics-letter-wave = false`. |
 | `blyrics-hide-instrumental-only`      | `false`       | Treat "[Instrumental Only]" as no lyrics (enables fullscreen effect).                                                                      |
+| `blyrics-hide-credits`                | `false`       | Set to `true` to never build the songwriter credits line. See [Songwriter Credits](#songwriter-credits).                                  |
 | `blyrics-passive-scroll-enabled`          | `true`    | Enable/disable unsynced lyrics auto-scroll entirely. Overrides the user setting when set to `false`.                                       |
 | `blyrics-passive-scroll-seconds-per-line` | `3.5`     | For unsynced lyrics auto-scroll: seconds spent scrolling per lyric line. Controls overall scroll speed.                                    |
 | `blyrics-passive-scroll-bottom-pause-s`   | `1.5`     | For unsynced lyrics auto-scroll: seconds to pause at the bottom before scrolling back to top.                                              |
@@ -414,14 +422,24 @@ The following options are avalible:
 | `blyrics-line-scroll-active-translate-y-end` | Inherits shared end offset | End offset for the active line.                                                                        |
 | `blyrics-line-scroll-below-translate-y-end` | Inherits shared end offset | End offset for visible lines below the active line.                                                          |
 
-⁴If neither knob is manually set, both values are derived from `--blyrics-lyric-scroll-duration` using the default timing ratio. Auto-derived queue time is capped at `200ms`.
+`blyrics-early-scroll-consider-s` is an independent lookahead in seconds. When a lyric triggers an autoscroll, nearby upcoming lines within this window participate in choosing the target. Entering the window alone does not trigger a scroll. Lines included in that scroll do not trigger another scroll when their own scroll time arrives. Seeking and resuming autoscroll can still reposition the viewport.
 
-If one of these knobs is manually set, the other is derived from the equation below. Auto-derived queue time is still capped at `200ms`.
+The scroll gate and `blyrics-queue-scroll-ms` have been removed; the old queue knob has no effect. There is no timing equation to balance against animation duration.
 
-`var(--blyrics-lyric-scroll-duration)` + `0.02s` = `blyrics-early-scroll-consider-s` +
-`blyrics-queue-scroll-ms`
+#### Scoping the scroll position to one view
 
-If both are manually set, keep the equation balanced yourself. An unbalanced equation may cause dropped frames or missed scrolls.
+Knobs are global, so the side panel, fullscreen and the Picture-in-Picture window all read the same values. If you want the Picture-in-Picture window to scroll differently, set `--blyrics-target-scroll-pos-ratio` on its `.blyrics-container` instead. Wherever that variable resolves, it wins over the `blyrics-target-scroll-pos-ratio` knob. Use a plain number from `0` to `1`: values outside that range get clamped, units like `%` aren't converted, and anything that isn't a number falls back to the knob.
+
+The variable is read once, when the theme is applied. The side panel and fullscreen share one view, so a selector that only matches in fullscreen won't take effect when you toggle it. The Picture-in-Picture window has its own view, which is why scoping to it works.
+
+This keeps lyrics centered everywhere except the Picture-in-Picture window:
+
+```css
+/* blyrics-target-scroll-pos-ratio = 0.5; */
+.blyrics-pip-shell .blyrics-container {
+  --blyrics-target-scroll-pos-ratio: 0.37;
+}
+```
 
 Tip: Pay attention to the units of the values; Some values are in *seconds* (s), while others are in *milliseconds* (ms).
 
@@ -437,20 +455,19 @@ The main container for the lyrics is styled using the `.blyrics-container` class
 
 ```css
 .blyrics-container {
-  font-family: var(--blyrics-font-family);
+  font-family: var(--blyrics-font-family, var(--blyrics-default-font-family));
   font-size: var(--blyrics-font-size);
   font-weight: var(--blyrics-font-weight);
   isolation: isolate;
   line-height: var(--blyrics-line-height);
   position: relative !important;
   z-index: 1;
-  transition: transform var(--blyrics-lyric-scroll-duration) var(--blyrics-lyric-scroll-timing-function) 0s;
   padding-top: 2rem;
   padding-bottom: calc(var(--blyrics-padding-bottom));
 }
 ```
 
-This sets the overall appearance of the lyrics container, including typography, positioning, and scroll behavior. The `isolation: isolate` property creates a new stacking context to prevent z-index issues with other page elements. Note that scrolling is achieved via `transform` for better performance.
+This sets the overall appearance of the lyrics container, including typography, positioning, and scroll behavior. The `isolation: isolate` property creates a new stacking context to prevent z-index issues with other page elements. Autoscroll updates the viewport position and smooths the movement with additive per-line `translate` animations.
 
 ### Container Data Attributes
 
@@ -460,6 +477,7 @@ The `.blyrics-container` element has two data attributes that indicate its curre
 | --------------------- | ---------------------------------- | ---------------------------------------------------------- |
 | `data-sync`           | `"richsync"`, `"synced"`, `"none"` | Indicates the synchronization type of the current lyrics   |
 | `data-loader-visible` | `"true"`, `"false"`                | Indicates whether the loading spinner is currently visible |
+| `data-credits-focused` | present or absent                 | Present while the songwriter credits hold the scroll focus |
 
 #### Sync Type Styling
 
@@ -528,13 +546,13 @@ Example:
   <div class="blyrics-line-main" dir="auto">
     <span class="blyrics-bidi-run blyrics-highlight-run" dir="auto" aria-hidden="true">
       <span class="blyrics-word-group">
-        <span class="blyrics--word blyrics-word-highlight" data-time="10.259" data-duration="0.42" data-content="Hello">Hello</span>
+        <span class="blyrics--word blyrics-word-highlight" data-time="10.259" data-duration="0.42" data-content="Hello" data-word-state="active">Hello</span>
       </span>
       text
     </span>
     <span class="blyrics-bidi-run" dir="auto">
       <span class="blyrics-word-group">
-        <span class="blyrics--word" data-time="10.259" data-duration="0.42" data-content="Hello">Hello</span>
+        <span class="blyrics--word" data-time="10.259" data-duration="0.42" data-content="Hello" data-word-state="active">Hello</span>
       </span>
       text
     </span>
@@ -661,10 +679,11 @@ Each word span has the following data attributes:
 
 | Attribute        | Description                                                                 |
 | ---------------- | --------------------------------------------------------------------------- |
-| `data-time`      | Start time of the word in seconds                                           |
-| `data-duration`  | Duration of the word in seconds                                             |
-| `data-content`   | The word text |
-| `data-long-word` | Present (with value `"true"`) when word duration exceeds the threshold      |
+| `data-time`       | Start time of the word in seconds                                           |
+| `data-duration`   | Duration of the word in seconds                                             |
+| `data-content`    | The word text |
+| `data-long-word`  | Present (with value `"true"`) when word duration exceeds the threshold      |
+| `data-word-state` | `upcoming`, `active`, or `past`: whether the word is not yet reached, being sung, or already sung |
 
 #### Targeting Long Words
 
@@ -683,6 +702,24 @@ Words with duration exceeding `blyrics-long-word-threshold` (default: 1500ms) ge
 `--blyrics-glow-color` resolves per word against each `.blyrics-word-highlight`, so different long words can glow different colors.
 
 Changing the threshold triggers a lyric reload automatically.
+
+#### Styling by Word State
+
+`data-word-state` marks whether a word is being sung. It carries `upcoming` before the word starts, `active` while it is being sung, and `past` once it has finished, and it is written on both layers of a word (the base `.blyrics--word` and its `.blyrics-word-highlight` overlay), so you can key either. A word stays `active` for exactly as long as it is sung, so a transition on the flip is the whole of a per-word karaoke effect where whole words change rather than sweeping:
+
+```css
+.blyrics--word {
+  color: var(--blyrics-lyric-inactive-color);
+  transition: color 180ms ease;
+}
+
+.blyrics--word[data-word-state="active"],
+.blyrics--word[data-word-state="past"] {
+  color: var(--blyrics-lyric-active-color);
+}
+```
+
+The renderer writes `data-word-state` only when a word's state changes, not every frame, so selecting on it adds no per-frame cost. A line-synced word, which has no duration of its own, is `active` from its start until the next word begins.
 
 ### Applying the Wobble Animation
 
@@ -903,7 +940,7 @@ Ensures the lyrics panel has adequate space for comfortable reading. The `33em` 
   background-clip: text;
   color: transparent;
   content: "Better Lyrics is searching for lyrics...";
-  font-family: var(--blyrics-font-family);
+  font-family: var(--blyrics-font-family, var(--blyrics-default-font-family));
   font-size: 2rem;
   font-weight: 700;
   isolation: isolate;
@@ -953,7 +990,7 @@ The loader supports several attributes for different states:
   align-self: flex-start !important;
   color: var(--blyrics-error-color);
   cursor: default;
-  font-family: var(--blyrics-font-family);
+  font-family: var(--blyrics-font-family, var(--blyrics-default-font-family));
   font-size: var(--blyrics-font-size);
   font-weight: var(--blyrics-font-weight);
   line-height: 1;
@@ -976,7 +1013,7 @@ Styles error messages with reduced opacity and a distinct color.
   border-radius: var(--blyrics-border-radius);
   color: var(--blyrics-ui-text-color);
   cursor: pointer;
-  font-family: var(--blyrics-font-family);
+  font-family: var(--blyrics-font-family, var(--blyrics-default-font-family));
   font-size: 1.5rem;
   font-weight: 600;
   padding: 1rem 2rem;
@@ -1215,6 +1252,31 @@ In fullscreen mode this block sits above a full set of playback controls. See [F
 
 Creates styled footer elements including a Discord button with hover effects.
 
+### Songwriter Credits
+
+When the lyrics name their songwriters, a `.blyrics-credits` line ("Written by A, B & C") follows the last lyric, before the footer. It stays dim while the song plays. When the last line ends, it brightens, takes the scroll focus, and the container gets `data-credits-focused`. Seeking back gives the focus to the lines again. Unsynced lyrics show the credits at full strength from the start.
+
+| Custom property                     | Default            | Description                                    |
+| ----------------------------------- | ------------------ | ---------------------------------------------- |
+| `--blyrics-credits-label`           | `"Written by"`     | Text before the names. Set to the user's language by the extension. |
+| `--blyrics-credits-font-size`       | `max(0.4em, 12px)` | Font size of the credits line                  |
+| `--blyrics-credits-opacity`         | `0.2`              | Opacity while the song plays                   |
+| `--blyrics-credits-focused-opacity` | `0.85`             | Opacity after the last line ends               |
+
+```css
+.blyrics-credits {
+  font-style: italic;
+}
+
+.blyrics-container[data-credits-focused] > .blyrics-credits {
+  color: var(--blyrics-lyric-active-color);
+}
+```
+
+The credits are a `<p>`, not a `<div>`, so rules written for lyric lines as `.blyrics-container > div` (hover effects, per-line opacity and blur) do not apply to them. Style them through `.blyrics-credits`.
+
+To hide the credits, set `.blyrics-credits { display: none; }` (autoscroll then ignores them), or declare `/* blyrics-hide-credits = true; */` so they are never built.
+
 ## 15. ThemeSong Compatibility
 
 The `themesong.css` file ensures compatibility with the ThemeSong browser extension:
@@ -1244,7 +1306,7 @@ This CSS feature query detects when ThemeSong is active and adjusts the layout a
   display: block;
   font-size: var(--blyrics-translated-font-size);
   font-weight: var(--blyrics-translated-font-weight);
-  font-family: var(--blyrics-translated-font-family);
+  font-family: var(--blyrics-translated-font-family, var(--blyrics-font-family, var(--blyrics-default-font-family)));
   color: var(--blyrics-translated-color);
   white-space: normal;
   line-height: 1.1;
@@ -1393,7 +1455,7 @@ To customize instrumental breaks:
 
 ```css
 .autoscroll-resume-button {
-  font-family: var(--blyrics-font-family);
+  font-family: var(--blyrics-font-family, var(--blyrics-default-font-family));
   position: absolute;
   display: block;
   font-size: 1.75rem;

@@ -14,6 +14,7 @@ export interface UnisonSubmitter {
   displayName: string;
   tier?: string | null;
   level?: number;
+  avatarUrl?: string | null;
 }
 
 export interface UnisonFulfillment {

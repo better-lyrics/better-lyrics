@@ -1,6 +1,6 @@
 import { CUBEY_LYRICS_API_URL, CUBEY_LYRICS_API_URL_TURNSTILE, HOMEPAGE_URL, LOG_PREFIX } from "@constants";
 import { getLocalStorage } from "@core/storage";
-import { lrcFixers, parseLRC, parseQRC, PlainParser } from "@braccato/parsers";
+import { LRCParser, lrcFixers, parseLRC, parseQRC, PlainParser, QRCParser } from "@braccato/parsers";
 import { type LyricSourceKey, type LyricSourceResult, type ProviderParameters, saveLyricsToCache } from "./shared";
 import { fillTtml } from "@modules/lyrics/providers/ttmlSource";
 import { errorCore, logCore, warnCore } from "@core/logger";
@@ -448,6 +448,7 @@ async function processStreamData(event: string, data: any, params: ProviderParam
         lrcFixers(lyrics);
         sourceMap["musixmatch-richsync"].lyricSourceResult = {
           lyrics,
+          songwriters: LRCParser.metadata(results.wordByWord).songwriters,
           source: "Musixmatch",
           sourceHref: "https://www.musixmatch.com",
           musicVideoSynced: false,
@@ -465,6 +466,7 @@ async function processStreamData(event: string, data: any, params: ProviderParam
         const lyrics = parseLRC(results.synced, durationMs);
         sourceMap["musixmatch-synced"].lyricSourceResult = {
           lyrics,
+          songwriters: LRCParser.metadata(results.synced).songwriters,
           source: "Musixmatch",
           sourceHref: "https://www.musixmatch.com",
           musicVideoSynced: false,
@@ -480,6 +482,7 @@ async function processStreamData(event: string, data: any, params: ProviderParam
         const lyrics = parseLRC(results.synced, durationMs);
         sourceMap["lrclib-synced"].lyricSourceResult = {
           lyrics,
+          songwriters: LRCParser.metadata(results.synced).songwriters,
           source: "LRCLib",
           sourceHref: "https://lrclib.net",
           musicVideoSynced: false,
@@ -509,6 +512,7 @@ async function processStreamData(event: string, data: any, params: ProviderParam
         const lyrics = parseLRC(decodedLyrics.lyrics, durationMs);
         sourceMap["legato-synced"].lyricSourceResult = {
           lyrics,
+          songwriters: LRCParser.metadata(decodedLyrics.lyrics).songwriters,
           source: "Better Lyrics Legato",
           sourceHref: HOMEPAGE_URL,
           musicVideoSynced: false,
@@ -529,6 +533,7 @@ async function processStreamData(event: string, data: any, params: ProviderParam
         if (lyrics.length > 0) {
           sourceMap["portato-richsynced"].lyricSourceResult = {
             lyrics,
+            songwriters: QRCParser.metadata(decodedLyrics.lyrics).songwriters,
             source: "Better Lyrics Portato",
             sourceHref: HOMEPAGE_URL,
             musicVideoSynced: false,

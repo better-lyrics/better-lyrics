@@ -64,6 +64,8 @@ export interface PictureInPictureHostEnvironment {
   readonly textTransition: () => unknown;
   readonly marqueeEnabled: () => unknown;
   readonly progressBarEnabled: () => unknown;
+  // Read at request time, so it only shapes the next window rather than resizing an open one.
+  readonly windowLayout: () => unknown;
   readonly windowTitle: () => string;
   readonly stylesheetUrls: () => { readonly lyrics: string; readonly fonts: readonly string[] };
   readonly loadStylesheet: () => Promise<string>;
@@ -75,6 +77,7 @@ export interface PictureInPictureHostEnvironment {
 
 export interface PictureInPictureControllerDependencies<TWindow> {
   readonly host: object;
+  readonly windowLayout: () => unknown;
   readonly loadStylesheet: () => Promise<string>;
   readonly renderLoadingShell: (pipWindow: TWindow) => void;
   readonly injectStylesheet: (pipWindow: TWindow, stylesheet: string) => void;

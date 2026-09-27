@@ -1,4 +1,4 @@
-import { parseTTMLContent } from "@braccato/parsers";
+import { parseTTMLContent, TTMLParser } from "@braccato/parsers";
 import { HOMEPAGE_DOMAIN, HOMEPAGE_URL } from "@constants";
 import type { LyricSourceKey, LyricSourceResult, ProviderParameters } from "@modules/lyrics/providers/shared";
 import type { UnisonData } from "@modules/lyrics/providers/unison";
@@ -47,6 +47,7 @@ export function fillTtml(
     musicVideoSynced: false,
     source,
     sourceHref,
+    songwriters: TTMLParser.metadata(responseString).songwriters,
     unisonData,
   };
 

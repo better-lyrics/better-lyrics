@@ -104,7 +104,7 @@
     "description": "Tooltip explaining the letter wave animation and its performance impact"
   },
   "options_display_letterWaveTooltipStates": {
-    "message": "Automático permanece apagado a menos que un Tema lo encienda. Activado o desactivado anual cualquier tema",
+    "message": "Automático permanece apagado a menos que un Tema lo encienda. Activado o desactivado anual cualquier tema.",
     "description": "Appended to the letter wave tooltip, explaining the three switch states"
   },
   "options_display_passiveScroll": {
@@ -142,6 +142,18 @@
   "options_display_pipAutoRestoreTooltip": {
     "message": "Evita que la letra en ventana flotante se cierre para bien cuando actualizas o cambias de canciones o páginas. Los navegadores solo dejan una ventana flotante abierta después de interactuar con la página, por lo que se reabre en tu primer clic o pulso de tecla en vez de instantáneamente.",
     "description": "Help tooltip explaining what automatic floating-lyrics reopening does and why it waits for the first interaction"
+  },
+  "options_display_pipWindowLayout": {
+    "message": "Diseño de ventanas",
+    "description": "Setting label, shown inside the floating lyrics window settings, for choosing whether the window opens wide or tall"
+  },
+  "options_pipWindowLayout_horizontal": {
+    "message": "Horizontal",
+    "description": "Floating lyrics window layout option: a wide window with the album art beside the lyrics"
+  },
+  "options_pipWindowLayout_vertical": {
+    "message": "Vertical",
+    "description": "Floating lyrics window layout option: a tall window with the album art above the lyrics"
   },
   "options_display_pipArtworkTransition": {
     "message": "Transición de carátula",
@@ -1011,6 +1023,28 @@
       }
     }
   },
+  "blUpdate_available": {
+    "message": "Better Lyrics $version$ está disponible",
+    "description": "Banner shown to pre-release (canary) users when the matching stable release ships",
+    "placeholders": {
+      "version": {
+        "content": "$1",
+        "example": "2.4.0"
+      }
+    }
+  },
+  "blUpdate_storeDelay": {
+    "message": "la tienda puede demorarse un poco",
+    "description": "Trailing note on the update banner for Chrome and Edge, whose store approval can lag the release"
+  },
+  "blUpdate_action": {
+    "message": "Actualización",
+    "description": "Action link on the update banner that opens the browser's extension store listing"
+  },
+  "blUpdate_dismiss": {
+    "message": "Descartar",
+    "description": "Accessible label for the button that closes the update banner"
+  },
   "marketplace_discussion": {
     "message": "Discusión",
     "description": "Footer link in the theme detail modal that opens the theme's discussion thread"
@@ -1088,6 +1122,10 @@
   "lyrics_adPlaying": {
     "message": "[música de ascensor]",
     "description": "Message shown during ad playback"
+  },
+  "lyrics_writtenBy": {
+    "message": "Escrito por",
+    "description": "Label shown before the songwriter names after the last lyric line"
   },
   "lyrics_notFound": {
     "message": "No se encontraron letras para esta canción",
@@ -1202,7 +1240,7 @@
     }
   },
   "theme_author_you": {
-    "message": "Por Tú",
+    "message": "Por Ti",
     "description": "Author label for custom user themes on theme selector button"
   },
   "symlink_installFailed": {
@@ -1280,7 +1318,7 @@
     "description": "Secondary button: reject the sign-in request"
   },
   "auth_invalidRequest": {
-    "message": "Solicitud de inicio de sesión inválida",
+    "message": "Solicitud de inicio de sesión inválida.",
     "description": "Error state shown when the popup receives malformed parameters"
   },
   "auth_sessionExpired": {
@@ -1550,7 +1588,7 @@
     "description": "Back button text in detail view"
   },
   "unison_noPreview": {
-    "message": "Pega o arrestra una letra para ver una vista previa",
+    "message": "Pega o arrastra una letra para ver una vista previa",
     "description": "Empty state text shown in submit preview before lyrics are entered"
   },
   "unison_preview": {
@@ -1772,6 +1810,14 @@
   "unison_viewProfile": {
     "message": "Ver perfil completo",
     "description": "Link on the Identity tab that opens the user's full Unison profile in a new tab"
+  },
+  "unison_changePicture": {
+    "message": "Cambiar imagen",
+    "description": "Link on the Identity tab, shown when the user has a Unison profile picture, that opens the Unison website where they can pick a different one"
+  },
+  "unison_addPicture": {
+    "message": "Añadir imagen",
+    "description": "Link on the Identity tab, shown when the user has no Unison profile picture, that opens the Unison website where they can pick one"
   },
   "unison_submitted_this": {
     "message": "Letra enviada",

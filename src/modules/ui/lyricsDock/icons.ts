@@ -1,8 +1,21 @@
 import { type SyncType } from "@constants";
 
+let svgPolicy: TrustedTypePolicy | null | undefined;
+
+function toTrustedSvg(svgString: string): string | TrustedHTML {
+  if (svgPolicy === undefined) {
+    try {
+      svgPolicy = window.trustedTypes?.createPolicy("blyrics-svg", { createHTML: source => source }) ?? null;
+    } catch {
+      svgPolicy = null;
+    }
+  }
+  return svgPolicy ? svgPolicy.createHTML(svgString) : svgString;
+}
+
 export function parseSvgString(svgString: string): SVGElement | null {
   const parser = new DOMParser();
-  const doc = parser.parseFromString(svgString, "image/svg+xml");
+  const doc = parser.parseFromString(toTrustedSvg(svgString), "image/svg+xml");
   const svg = doc.documentElement;
   if (svg instanceof SVGElement && !doc.querySelector("parsererror")) {
     return svg;

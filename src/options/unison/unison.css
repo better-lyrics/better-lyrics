@@ -633,6 +633,7 @@ kbd {
   display: inline-flex;
   align-items: center;
   flex-wrap: wrap;
+  justify-content: flex-end;
   gap: 9px;
 }
 
@@ -684,6 +685,15 @@ kbd {
   font-weight: 700;
   font-variant-numeric: tabular-nums;
   color: #f5f5f7;
+}
+
+.blyrics-gam__ring.blyrics-gam__ring--avatar {
+  --blyrics-gam-ring: 34px;
+  --blyrics-gam-pill: 14px;
+}
+
+.blyrics-gam__ring-level {
+  font-size: 9px;
 }
 
 .blyrics-gam__tier {

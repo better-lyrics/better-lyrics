@@ -215,9 +215,15 @@ export async function importIdentity(json: string): Promise<KeyIdentity> {
   return identity;
 }
 
-let cachedResolvedName: Promise<string | null> | null = null;
+interface ResolvedProfile {
+  displayName: string;
+  avatarUrl: string | null;
+}
 
-async function fetchResolvedDisplayName(): Promise<string | null> {
+let cachedResolvedProfile: Promise<ResolvedProfile | null> | null = null;
+let lastSavedDisplayName: string | null = null;
+
+async function fetchResolvedProfile(): Promise<ResolvedProfile | null> {
   try {
     const signed = await signPayload({});
     const response = await fetch(`${UNISON_API_BASE_URL}/auth/nickname/me`, {
@@ -226,9 +232,13 @@ async function fetchResolvedDisplayName(): Promise<string | null> {
       body: JSON.stringify(signed),
     });
     if (response.ok) {
-      const json = (await response.json()) as { success?: boolean; data?: { displayName?: string } };
+      const json = (await response.json()) as {
+        success?: boolean;
+        data?: { displayName?: string; avatarUrl?: string | null };
+      };
       if (json.success && typeof json.data?.displayName === "string") {
-        return json.data.displayName;
+        const avatarUrl = json.data.avatarUrl;
+        return { displayName: json.data.displayName, avatarUrl: typeof avatarUrl === "string" ? avatarUrl : null };
       }
     }
   } catch (err) {
@@ -237,26 +247,38 @@ async function fetchResolvedDisplayName(): Promise<string | null> {
   return null;
 }
 
-export function getResolvedDisplayName(): Promise<string | null> {
-  if (!cachedResolvedName) {
-    const pending = fetchResolvedDisplayName().then(resolved => {
-      if (resolved === null) cachedResolvedName = null;
-      return resolved;
-    });
-    cachedResolvedName = pending;
-  }
-  return cachedResolvedName;
+function rememberResolvedProfile(pending: Promise<ResolvedProfile | null>): Promise<ResolvedProfile | null> {
+  cachedResolvedProfile = pending;
+  void pending.then(resolved => {
+    if (resolved === null && cachedResolvedProfile === pending) cachedResolvedProfile = null;
+  });
+  return pending;
+}
+
+export function getResolvedProfile(): Promise<ResolvedProfile | null> {
+  return cachedResolvedProfile ?? rememberResolvedProfile(fetchResolvedProfile());
+}
+
+async function getResolvedDisplayName(): Promise<string | null> {
+  return (await getResolvedProfile())?.displayName ?? null;
 }
 
 export async function getDisplayName(): Promise<string> {
   const resolved = await getResolvedDisplayName();
   if (resolved !== null) return resolved;
+  if (lastSavedDisplayName !== null) return lastSavedDisplayName;
   const { keyId } = await getIdentity();
   return generatePetName(keyId);
 }
 
 export function invalidateDisplayName(newValue?: string): void {
-  cachedResolvedName = newValue !== undefined ? Promise.resolve(newValue) : null;
+  lastSavedDisplayName = newValue ?? null;
+  if (newValue === undefined) {
+    cachedResolvedProfile = null;
+    return;
+  }
+  const base = cachedResolvedProfile ?? fetchResolvedProfile();
+  rememberResolvedProfile(base.then(profile => profile && { ...profile, displayName: newValue }));
 }
 
 export async function isKeyRegistered(): Promise<boolean> {

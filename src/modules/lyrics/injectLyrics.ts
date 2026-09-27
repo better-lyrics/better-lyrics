@@ -46,6 +46,7 @@ interface LyricLineDecoration {
   romanization?: string;
   timedRomanization?: LyricPart[];
   translation?: string;
+  translationLanguage?: string;
 }
 
 /**
@@ -56,6 +57,12 @@ export type LyricDecorations = Record<number, LyricLineDecoration>;
 
 function recordLyricDecoration(index: number, decoration: LyricLineDecoration): void {
   AppState.lyricDecorations[index] = { ...AppState.lyricDecorations[index], ...decoration };
+}
+
+function updateLyricLanguage(language: string): void {
+  if (AppState.lyricData) AppState.lyricData.language = language;
+  mainView.setLanguage(language);
+  publishPictureInPictureLyrics();
 }
 
 function isRomanizationDisabledForLang(lang: string): boolean {
@@ -78,6 +85,8 @@ export interface LyricsData {
   isMusicVideoSynced: boolean;
   tabSelector: HTMLElement;
   hasNonLatin: boolean;
+  language?: string | null;
+  songwriters?: readonly string[];
 }
 
 /**
@@ -161,7 +170,13 @@ function injectLyrics(
     flushLoader(allZero && !noLyrics);
   }
 
-  mainView.setLyrics(lyrics, { mount: lyricsWrapper, loaderVisible: keepLoaderVisible, noLyrics });
+  mainView.setLyrics(lyrics, {
+    mount: lyricsWrapper,
+    loaderVisible: keepLoaderVisible,
+    noLyrics,
+    language: data.language,
+    songwriters: data.songwriters,
+  });
 
   const syncType: SyncType = mainView.syncType;
   const lines: readonly LineData[] = mainView.lines;
@@ -170,9 +185,11 @@ function injectLyrics(
 
   const lyricsData: LyricsData = {
     syncType: syncType,
+    language: data.language,
     isMusicVideoSynced: data.musicVideoSynced === true,
     tabSelector,
     hasNonLatin: lyrics.some(item => !!item.words && containsNonLatin(item.words)),
+    songwriters: data.songwriters,
   };
 
   // Set before addFooter so the dock controls read the current song's lyric data.
@@ -284,21 +301,24 @@ async function processBatchTranslationsAndRomanizations(
 
     if (isTranslateEnabled && !isSourceLangDisabled) {
       let translationResult: string | null = null;
+      let translationLanguage = targetTranslationLang;
 
       const matchedLang =
         item.translations && Object.keys(item.translations).find(lang => langCodesMatch(targetTranslationLang, lang));
       if (item.translations && matchedLang) {
         translationResult = item.translations[matchedLang];
+        translationLanguage = matchedLang;
       } else if (item.translation && langCodesMatch(targetTranslationLang, item.translation.lang)) {
         translationResult = item.translation.text;
+        translationLanguage = item.translation.lang;
       } else {
         const cached = getTranslationFromCache(item.words, targetTranslationLang);
         translationResult = cached?.translatedText || null;
       }
 
       if (translationResult && !isSameText(translationResult, item.words)) {
-        injectTranslation(doc, lyricElement, translationResult);
-        recordLyricDecoration(index, { translation: translationResult });
+        injectTranslation(doc, lyricElement, translationResult, translationLanguage);
+        recordLyricDecoration(index, { translation: translationResult, translationLanguage });
         didInjectCachedContent = true;
       } else if (sourceLanguage !== targetTranslationLang || containsNonLatin(item.words) || !sourceLanguage) {
         translationBatch.push({ index, text: item.words });
@@ -329,6 +349,7 @@ async function processBatchTranslationsAndRomanizations(
 
         if (!sourceLanguage && response.detectedLanguage) {
           sourceLanguage = response.detectedLanguage;
+          updateLyricLanguage(sourceLanguage);
           logCore("Determined language via romanization batch: " + sourceLanguage);
         }
 
@@ -361,6 +382,7 @@ async function processBatchTranslationsAndRomanizations(
 
         if (!sourceLanguage && response.detectedLanguage) {
           sourceLanguage = response.detectedLanguage;
+          updateLyricLanguage(sourceLanguage);
           logCore("Determined language via translation batch: " + sourceLanguage);
         }
 
@@ -369,8 +391,11 @@ async function processBatchTranslationsAndRomanizations(
         response.results.forEach((result, i) => {
           if (result) {
             const originalIndex = translationBatch[i].index;
-            injectTranslation(doc, linesData[originalIndex].lyricElement, result.translatedText);
-            recordLyricDecoration(originalIndex, { translation: result.translatedText });
+            injectTranslation(doc, linesData[originalIndex].lyricElement, result.translatedText, targetTranslationLang);
+            recordLyricDecoration(originalIndex, {
+              translation: result.translatedText,
+              translationLanguage: targetTranslationLang,
+            });
           }
         });
         lyricsElementAdded();

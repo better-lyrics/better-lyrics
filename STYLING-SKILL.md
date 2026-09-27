@@ -18,9 +18,10 @@ Essential reference for creating custom themes. For deep dives, see [STYLING.md]
 
 ### Typography
 
+Leave font-family overrides unset for language-aware CJK defaults. If adding a font, declare `--blyrics-font-family: "My Font", var(--noto-sans-universal), sans-serif` on `.blyrics--line, .blyrics--translated, .blyrics--romanized` so the fallback resolves in each element's language.
+
 ```css
 :root {
-  --blyrics-font-family: Satoshi, var(--noto-sans-universal), sans-serif;
   --blyrics-font-size: 3rem;
   --blyrics-font-weight: 700;
   --blyrics-line-height: 1.333;
@@ -96,7 +97,6 @@ Essential reference for creating custom themes. For deep dives, see [STYLING.md]
   --blyrics-timing-offset: 0.115s;
   --blyrics-richsync-timing-offset: 0.150s;
   --blyrics-scroll-timing-offset: 0.5s;
-  --blyrics-lyric-scroll-duration: 650ms;
   --blyrics-lyric-scroll-timing-function: cubic-bezier(0.86, 0, 0.2, 1);
 }
 ```
@@ -142,6 +142,19 @@ Essential reference for creating custom themes. For deep dives, see [STYLING.md]
 }
 ```
 
+### Songwriter Credits
+
+```css
+:root {
+  --blyrics-credits-label: "Written by"; /* localized by the extension */
+  --blyrics-credits-font-size: max(0.4em, 12px);
+  --blyrics-credits-opacity: 0.2; /* during the song */
+  --blyrics-credits-focused-opacity: 0.85; /* after the last line ends */
+}
+```
+
+`p.blyrics-credits` follows the last line. It is not a `div`, so `.blyrics-container > div` line rules skip it; style it through `.blyrics-credits`. Hide with `display: none` or the `blyrics-hide-credits` knob.
+
 ## Configuration Knobs
 
 Comment-based parameters that control JS behavior. Place anywhere in your theme:
@@ -164,8 +177,7 @@ blyrics-line-scroll-above-duration = calc(750ms + log(var(--blyrics-line-scroll-
 | `blyrics-disable-richsync` | `false` | Render richsynced lyrics through the line-synced path instead, including line-synced fade-in |
 | `blyrics-line-synced-animation-delay` | `50` | Per-word delay for synced lyrics (ms) |
 | `blyrics-lyric-ending-threshold-s` | `0.5` | Seconds before line ends to consider it complete |
-| `blyrics-early-scroll-consider-s` | auto (`~0.54` default) | Future lookahead for scroll grouping (s) |
-| `blyrics-queue-scroll-ms` | auto (`~131` default, capped at `200`) | Max queued scroll delay (ms) |
+| `blyrics-early-scroll-consider-s` | `0.54` | Independent future lookahead for scroll grouping (s) |
 | `blyrics-debug-renderer` | `false` | Enable debug overlay |
 | `blyrics-debug-animation-timing` | `false` | Log WAAPI lyric animation timing samples, learned offsets, and timing cleanup events |
 | `blyrics-target-scroll-pos-ratio` | `0.37` | Lyric position (0=top, 0.5=center, 1=bottom) |
@@ -174,6 +186,7 @@ blyrics-line-scroll-above-duration = calc(750ms + log(var(--blyrics-line-scroll-
 | `blyrics-long-word-threshold` | `1500` | Duration (ms) above which `data-long-word` is set |
 | `blyrics-letter-wave` | `true` | Experimental, on by default. Split words into per-letter spans and float each letter as it is sung, over the word wobble. Tune with `--blyrics-letter-wave-*`; long words also get a per-letter scale swell. Disable with `blyrics-letter-wave = false` |
 | `blyrics-hide-instrumental-only` | `false` | Treat "[Instrumental Only]" as no lyrics (enables fullscreen effect) |
+| `blyrics-hide-credits` | `false` | Never build the songwriter credits line |
 | `blyrics-passive-scroll-enabled` | `true` | Unsynced auto-scroll: enable/disable entirely (overrides user setting) |
 | `blyrics-passive-scroll-seconds-per-line` | `3.5` | Unsynced auto-scroll: seconds per line (scroll speed) |
 | `blyrics-passive-scroll-bottom-pause-s` | `1.5` | Unsynced auto-scroll: pause at bottom (s) |
@@ -187,7 +200,9 @@ blyrics-line-scroll-above-duration = calc(750ms + log(var(--blyrics-line-scroll-
 | `blyrics-line-scroll-translate-y-{start,end}` | delta / `0px` | Shared Y offsets |
 | `blyrics-line-scroll-{above,active,below}-translate-y-{start,end}` | shared offset | Side-specific Y offsets; `above`/`below` swap on upward scrolls |
 
-**Scroll timing**: if `blyrics-early-scroll-consider-s` and `blyrics-queue-scroll-ms` are not manually set, they are derived from `--blyrics-lyric-scroll-duration` using the default timing ratio. If one is manually set, the other is derived from the scroll equation; auto-derived queueing is capped at `200ms`. If both are manually set, keep this balanced: `--blyrics-lyric-scroll-duration` + 0.02s = `blyrics-early-scroll-consider-s` + `blyrics-queue-scroll-ms`.
+**Scroll timing**: `blyrics-early-scroll-consider-s` defaults to `0.54` seconds independently of animation duration. Lookahead only affects the target when another lyric triggers a scroll; entering the window alone does not scroll. Lines included in a committed scroll cannot trigger again at their own start. Seeking, resuming autoscroll and relayout may still reposition the view. There is no scroll gate or queue; `blyrics-queue-scroll-ms` is ignored and no timing equation needs balancing. `--blyrics-lyric-scroll-duration`, its `--blyrics-lyric-transition-duration` alias and the container transform transition have been removed. Use the line-scroll duration knobs instead; replace explicit references to the removed variables with a duration or your own custom property. Missing, invalid or nonpositive line durations fall back to an internal `750ms`. Themes that relied on automatically derived lookahead should set it explicitly.
+
+**PiP scroll position**: knobs are shared by the panel, fullscreen and PiP. To give PiP its own position, set `--blyrics-target-scroll-pos-ratio` under `.blyrics-pip-shell`: `.blyrics-pip-shell .blyrics-container { --blyrics-target-scroll-pos-ratio: 0.37; }`. It overrides `blyrics-target-scroll-pos-ratio` wherever it resolves. Plain number, clamped to `0` to `1`, `%` not converted, non-numbers fall back to the knob. Read once per theme apply, and panel and fullscreen share one view, so a fullscreen-only selector won't switch on toggle.
 
 ## Dynamic Properties
 
@@ -214,10 +229,10 @@ Lyric timing is driven by `element.animate()`.
 │   ├── .blyrics-line-main (div)
 │   │   ├── .blyrics-bidi-run.blyrics-highlight-run (span, aria-hidden overlay)
 │   │   │   └── .blyrics-word-group (span)
-│   │   │       └── .blyrics--word.blyrics-word-highlight (span) [data-content] [data-time] [data-duration] [data-long-word]
+│   │   │       └── .blyrics--word.blyrics-word-highlight (span) [data-content] [data-time] [data-duration] [data-long-word] [data-word-state]
 │   │   └── .blyrics-bidi-run (span)
 │   │       └── .blyrics-word-group (span)
-│   │           └── .blyrics--word (span) [data-content] [data-time] [data-duration] [data-long-word]
+│   │           └── .blyrics--word (span) [data-content] [data-time] [data-duration] [data-long-word] [data-word-state]
 │   ├── .blyrics-background-line (div, only when primary background vocals are present)
 │   │   ├── .blyrics-bidi-run.blyrics-highlight-run (span, aria-hidden overlay)
 │   │   │   └── .blyrics-word-group.blyrics-background-lyric
@@ -240,6 +255,7 @@ Lyric timing is driven by `element.animate()`.
 | `data-sync` | `"richsync"`, `"synced"`, `"none"` | Sync type |
 | `data-loader-visible` | `"true"`, `"false"`, or absent | Loader visibility |
 | `data-no-lyrics` | `"true"` or absent | No lyrics available |
+| `data-credits-focused` | present or absent | Songwriter credits hold the scroll focus |
 
 ### Word Data Attributes
 
@@ -249,6 +265,7 @@ Lyric timing is driven by `element.animate()`.
 | `data-time` | Start time in seconds |
 | `data-duration` | Duration in seconds |
 | `data-long-word` | `"true"` or absent - present when duration exceeds threshold |
+| `data-word-state` | `"upcoming"`, `"active"`, or `"past"` - whether the word is not yet reached, being sung, or already sung. Written on both layers, only on change |
 
 ### Loader Attributes
 
@@ -286,6 +303,9 @@ Lyric timing is driven by `element.animate()`.
 | `[data-agent="v2"]`, `[data-agent="v3"]` | Secondary/tertiary voice (right) |
 | `[data-agent="v1000"]` | Duet/chorus (centered) |
 | `[data-long-word]` | Long sustained word |
+| `[data-word-state="upcoming"]` | Word not yet reached |
+| `[data-word-state="active"]` | Word being sung |
+| `[data-word-state="past"]` | Word already sung |
 
 ## Animation System
 
@@ -310,7 +330,7 @@ Timing uses the Web Animations API:
 - Lyric line scale and scroll smoothing also use `element.animate()`
 - Scroll smoothing uses per-line `translate`, not container `transform`; JS automatically animates lines visible in the previous or current viewport and provides relative index, absolute relative index, signed scroll delta, and absolute scroll distance as CSS variables
 - Visible lyric lines receive inline `will-change: transform, translate` before scroll animations start
-- Per-line scroll effects can overlap with additive Web Animations (`composite: "add"`); custom line durations are visual only, and the next autoscroll is gated by `--blyrics-lyric-scroll-duration`
+- Per-line scroll effects can overlap with additive Web Animations (`composite: "add"`); new lyric groups scroll immediately while earlier animations continue; line durations control visual motion independently of lookahead
 - The instrumental wave morphs between `--blyrics-instrumental-wave-path-high` and `--blyrics-instrumental-wave-path-low`; both must use the same path commands in the same order with the same argument counts, or the ripple snaps at the halfway point instead of morphing
 - Visual keyframe values, effect enable flags, durations, and easing are CSS variables; JS still owns scheduling, pause/resume, seeking, and cancellation
 - `prefers-reduced-motion: reduce` keeps smooth scroll enabled but disables side-specific line-scroll differential effects
@@ -712,6 +732,24 @@ On by default. Each letter of a word floats in turn as it is sung, on top of the
 ```
 
 It layers on the word wobble rather than replacing it, so the default `scaleX` pop stays. To make the letters carry all the motion instead, set the word wobble to identity (`--blyrics-word-wobble-transform-*: translateY(0)`). It follows `--blyrics-animate-word-wobble`, so reduced motion turns it off. The split multiplies the DOM per character and reruns the karaoke sweep per letter, so a theme that does not want the cost turns it off with `blyrics-letter-wave = false`.
+
+### 17. Per-Word State (Karaoke)
+
+`data-word-state` marks whether each word is `upcoming`, `active`, or `past`. It is written on both the base `.blyrics--word` and its highlight overlay, and only when a word's state changes, so a theme can flip whole words as they are sung with no per-frame cost:
+
+```css
+.blyrics--word {
+  color: var(--blyrics-lyric-inactive-color);
+  transition: color 180ms ease;
+}
+
+.blyrics--word[data-word-state="active"],
+.blyrics--word[data-word-state="past"] {
+  color: var(--blyrics-lyric-active-color);
+}
+```
+
+A line-synced word, which has no duration of its own, is `active` from its start until the next word begins. To make this the whole reveal instead of layering over the swept overlay, stand the overlay down with `.blyrics-word-highlight { display: none; }`.
 
 ## Best Practices
 

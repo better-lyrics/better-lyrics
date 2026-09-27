@@ -1,4 +1,4 @@
-import { UNISON_API_BASE_URL } from "@constants";
+import { UNISON_API_BASE_URL, UNISON_PICTURE_URL } from "@constants";
 import { t } from "@core/i18n";
 import { getIdentity } from "@core/keyIdentity";
 import { warnUnison } from "@core/logger";
@@ -20,6 +20,7 @@ interface InlineSubmitter {
   keyId: string;
   tier?: string | null;
   level?: number;
+  avatarUrl?: string | null;
 }
 
 // -- Caches --------------------------
@@ -125,7 +126,7 @@ function ringCircle(className: string, pct: number | null): SVGCircleElement {
   return circle;
 }
 
-function buildRing(level: number, pct: number): HTMLElement {
+function buildRing(level: number, pct: number, avatarUrl?: string | null): HTMLElement {
   const ring = document.createElement("span");
   ring.className = `${GAM}__ring`;
 
@@ -138,7 +139,25 @@ function buildRing(level: number, pct: number): HTMLElement {
   num.textContent = String(level);
 
   ring.append(svg, num);
+  if (avatarUrl) showAvatarOnceLoaded(ring, num, avatarUrl);
   return ring;
+}
+
+function showAvatarOnceLoaded(ring: HTMLElement, num: HTMLElement, avatarUrl: string): void {
+  const avatar = document.createElement("img");
+  avatar.className = `${GAM}__ring-avatar`;
+  avatar.alt = "";
+  avatar.decoding = "async";
+  avatar.addEventListener(
+    "load",
+    () => {
+      ring.classList.add(`${GAM}__ring--avatar`);
+      num.className = `${GAM}__ring-level`;
+      ring.insertBefore(avatar, num);
+    },
+    { once: true }
+  );
+  avatar.src = avatarUrl;
 }
 
 function buildTierChip(catalogue: BadgeCatalogue, tierKey: string, rank: number | null): HTMLElement | null {
@@ -241,13 +260,13 @@ export function buildSeal(mark: Mark): HTMLElement {
   return seal;
 }
 
-function buildProfileLink(handle: string | undefined, keyId: string): HTMLAnchorElement {
+function buildOutboundLink(href: string, label: string): HTMLAnchorElement {
   const link = document.createElement("a");
   link.className = `${GAM}__plink`;
-  link.href = profileUrl(handle, keyId);
+  link.href = href;
   link.target = "_blank";
   link.rel = "noreferrer noopener";
-  link.textContent = t("unison_viewProfile");
+  link.textContent = label;
 
   const icon = document.createElementNS(SVG_NS, "svg");
   icon.setAttribute("viewBox", "0 0 24 24");
@@ -282,7 +301,7 @@ export function appendInlineProfile(row: HTMLElement, nameEl: HTMLElement, submi
     const level = user?.level ?? submitter.level;
     if (typeof level === "number") {
       const pct = user ? levelProgress(user.xp, user.xpForNext, user.xpFloor).pct : 0;
-      ring.replaceWith(buildRing(level, pct));
+      ring.replaceWith(buildRing(level, pct, submitter.avatarUrl));
     } else {
       ring.remove();
     }
@@ -303,7 +322,8 @@ export function appendInlineProfile(row: HTMLElement, nameEl: HTMLElement, submi
 export async function renderIdentityStats(
   container: HTMLElement,
   user: UserGamification,
-  handle: string | undefined
+  handle: string | undefined,
+  avatarUrl: string | null
 ): Promise<void> {
   const catalogue = await loadCatalogue();
 
@@ -312,7 +332,7 @@ export async function renderIdentityStats(
 
   const row = document.createElement("div");
   row.className = `${GAM}__stats-row`;
-  row.appendChild(buildRing(user.level, levelProgress(user.xp, user.xpForNext, user.xpFloor).pct));
+  row.appendChild(buildRing(user.level, levelProgress(user.xp, user.xpForNext, user.xpFloor).pct, avatarUrl));
 
   const chip = catalogue && user.tier ? buildTierChip(catalogue, user.tier, user.tierRank) : null;
   if (chip) row.appendChild(chip);
@@ -326,7 +346,8 @@ export async function renderIdentityStats(
   foot.className = `${GAM}__stats-foot`;
   const strip = catalogue ? buildFeaturedStrip(catalogue, user) : null;
   if (strip) foot.appendChild(strip);
-  foot.appendChild(buildProfileLink(handle, user.keyId));
+  foot.appendChild(buildOutboundLink(UNISON_PICTURE_URL, t(avatarUrl ? "unison_changePicture" : "unison_addPicture")));
+  foot.appendChild(buildOutboundLink(profileUrl(handle, user.keyId), t("unison_viewProfile")));
   stats.appendChild(foot);
 
   container.replaceChildren(stats);

@@ -10,7 +10,7 @@ import { getStorage } from "@core/storage";
 import { getArtworkMetadata } from "@modules/lyrics/requestSniffer/requestSniffer";
 import { resumeAllAutoscroll } from "@braccato/core";
 import { onSignal, sendInit, sendMetadata } from "./bridge";
-import { createGatedToggle } from "./controller";
+import { createGatedToggle, DEFAULT_WINDOW_LAYOUT } from "./controller";
 import { publishPictureInPictureLyrics } from "./lyricsPublisher";
 import { DEFAULT_ARTWORK_TRANSITION, DEFAULT_TEXT_TRANSITION } from "./lyricsView";
 import { createPictureInPictureHost } from "./pipHost";
@@ -22,6 +22,7 @@ const LYRIC_STYLESHEET_PATH = "css/blyrics/index.css";
 const PIP_STRING_KEYS = [
   "picture_in_picture_open",
   "lyrics_searching",
+  "lyrics_writtenBy",
   "picture_in_picture_previous",
   "picture_in_picture_play",
   "picture_in_picture_pause",
@@ -40,6 +41,7 @@ let storedArtworkTransition: unknown = DEFAULT_ARTWORK_TRANSITION;
 let storedTextTransition: unknown = DEFAULT_TEXT_TRANSITION;
 let storedMarqueeEnabled: unknown = true;
 let storedProgressBarEnabled: unknown = true;
+let storedWindowLayout: unknown = DEFAULT_WINDOW_LAYOUT;
 let isPictureInPictureEnabled = true;
 
 const PIP_SETTING_DEFAULTS = {
@@ -49,6 +51,7 @@ const PIP_SETTING_DEFAULTS = {
   pipTextTransition: DEFAULT_TEXT_TRANSITION,
   pipMarqueeEnabled: true,
   pipProgressBarEnabled: true,
+  pipWindowLayout: DEFAULT_WINDOW_LAYOUT,
   isLogsEnabled: true,
 } as const;
 
@@ -108,6 +111,7 @@ const activeController: PictureInPictureToggle = delegatesToPageWorld
       textTransition: () => storedTextTransition,
       marqueeEnabled: () => storedMarqueeEnabled,
       progressBarEnabled: () => storedProgressBarEnabled,
+      windowLayout: () => storedWindowLayout,
       windowTitle: () => t("picture_in_picture_open"),
       stylesheetUrls: () => ({
         lyrics: chrome.runtime.getURL(LYRIC_STYLESHEET_PATH),
@@ -168,6 +172,7 @@ export function publishPictureInPictureResources(): void {
       textTransition: String(items.pipTextTransition),
       marqueeEnabled: items.pipMarqueeEnabled !== false,
       progressBarEnabled: items.pipProgressBarEnabled !== false,
+      windowLayout: String(items.pipWindowLayout),
       logsEnabled: items.isLogsEnabled !== false,
     });
   });
@@ -244,6 +249,7 @@ export function initializePictureInPictureAutoRestore(): void {
     storedTextTransition = items.pipTextTransition;
     storedMarqueeEnabled = items.pipMarqueeEnabled;
     storedProgressBarEnabled = items.pipProgressBarEnabled;
+    storedWindowLayout = items.pipWindowLayout;
   });
 
   storageChangeListener = (changes, areaName) => {
@@ -271,6 +277,10 @@ export function initializePictureInPictureAutoRestore(): void {
 
     if (changes.pipProgressBarEnabled) {
       storedProgressBarEnabled = changes.pipProgressBarEnabled.newValue ?? true;
+    }
+
+    if (changes.pipWindowLayout) {
+      storedWindowLayout = changes.pipWindowLayout.newValue ?? DEFAULT_WINDOW_LAYOUT;
     }
 
     if (!changes.isPictureInPictureAutoRestoreEnabled || hasAttemptedAutoRestore) return;
