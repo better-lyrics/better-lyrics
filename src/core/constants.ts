@@ -80,6 +80,9 @@ export const RELEASES_LATEST_API_URL =
 export const THEME_STORE_API_URL = "https://themes.betterlyrics.org" as const;
 export const UNISON_API_BASE_URL = "https://unison.betterlyrics.org" as const;
 export const UNISON_TRANSLATE_URL = `${UNISON_API_BASE_URL}/translate` as const;
+export const UNISON_REVISION_PREVIEW_DEBOUNCE_MS = 400;
+export const UNISON_REVISION_PREVIEW_RETRY_MS = 5000;
+export const UNISON_REVISION_PREVIEW_RETRY_MAX_MS = 10000;
 export const UNISON_PICTURE_URL = `${UNISON_API_BASE_URL}/me` as const;
 export const THEME_STORE_TURNSTILE_URL = `${THEME_STORE_API_URL}/turnstile` as const;
 const THEME_REGISTRY_BASE = "https://raw.githubusercontent.com/better-lyrics/themes" as const;
@@ -190,6 +193,8 @@ export const MUSIC_NOTES = "♪𝅘𝅥𝅮𝅘𝅥𝅯𝅘𝅥𝅰𝅘𝅥𝅱𝅘𝅥𝅲" as const;
 
 export const LYRICS_CACHE_TTL_MS = 7 * 24 * 60 * 60 * 1000;
 export const LYRICS_NEGATIVE_CACHE_TTL_MS = 30 * 60 * 1000;
+export const UNISON_NEGATIVE_CACHE_TTL_MS = 5 * 60 * 1000;
+export const UNISON_MAX_VIDEOS_PER_LYRIC = 20;
 
 export const OFFSET_STORAGE_PREFIX = "blyricsOffset_";
 

@@ -1,3 +1,4 @@
+<!DOCTYPE html>
 <html lang="en-US" style="width: unset; max-width: unset">
 	<head>
 		<meta name="color-scheme" content="dark" />
@@ -154,17 +155,30 @@
 			<section id="unison-view-detail" class="unison-view" hidden>
 				<div class="unison-detail-layout">
 					<div class="unison-detail-meta" id="unison-detail-meta"></div>
-					<div class="unison-detail-columns">
-						<div class="unison-detail-col">
-							<h3 class="unison-detail-col-title">__MSG_unison_preview__</h3>
-							<div class="unison-detail-preview" id="unison-detail-preview"></div>
+					<div class="unison-rev-detail-main">
+						<div id="unison-revision-slot"></div>
+						<div class="unison-detail-columns">
+							<div class="unison-detail-col">
+								<div class="unison-detail-col-head" id="unison-detail-preview-head">
+									<h3 class="unison-detail-col-title">__MSG_unison_preview__</h3>
+								</div>
+								<div class="unison-detail-preview" id="unison-detail-preview"></div>
+							</div>
+							<div class="unison-detail-col">
+								<div class="unison-detail-col-head" id="unison-detail-lyrics-head">
+									<h3 class="unison-detail-col-title">__MSG_unison_rawLyrics__</h3>
+								</div>
+								<div class="unison-detail-lyrics" id="unison-detail-lyrics"></div>
+							</div>
 						</div>
-						<div class="unison-detail-col">
-							<h3 class="unison-detail-col-title">__MSG_unison_rawLyrics__</h3>
-							<div class="unison-detail-lyrics" id="unison-detail-lyrics"></div>
-						</div>
+						<div id="unison-revision-savebar-slot"></div>
 					</div>
 				</div>
+			</section>
+
+			<!-- Revisions View -->
+			<section id="unison-view-revisions" class="unison-view" hidden>
+				<div id="unison-revisions-root"></div>
 			</section>
 
 			<!-- Submit View -->
@@ -185,7 +199,7 @@
 							</label>
 							<label class="unison-field">
 								<span class="unison-field-label">__MSG_unison_album__</span>
-								<input type="text" id="unison-field-album" class="unison-input" placeholder="__MSG_unison_placeholder_album__" />
+								<input type="text" id="unison-field-album" class="unison-input" maxlength="500" placeholder="__MSG_unison_placeholder_album__" />
 							</label>
 							<label class="unison-field">
 								<span class="unison-field-label">__MSG_unison_language__</span>
@@ -217,6 +231,15 @@
 										<option value="plain">__MSG_unison_format_plain__</option>
 									</select>
 								</label>
+							</div>
+						</div>
+						<div class="unison-field">
+							<span class="unison-field-label">__MSG_unison_additionalVideos__</span>
+							<span class="unison-field-hint">__MSG_unison_additionalVideosHint__</span>
+							<div id="unison-additional-videos-mount"></div>
+							<div id="unison-submit-suggestions" class="unison-submit-suggestions" hidden>
+								<span class="unison-field-hint">__MSG_unison_suggestedVideos__</span>
+								<ul id="unison-submit-suggestions-list" class="unison-video-list unison-suggest-list"></ul>
 							</div>
 						</div>
 						<label class="unison-field">

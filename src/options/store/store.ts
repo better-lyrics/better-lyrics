@@ -1,5 +1,6 @@
 import { formatCreators } from "@core/customCss";
 import { t } from "@core/i18n";
+import { formatTimeAgo } from "@core/relativeTime";
 import { getLocalStorage, getSyncStorage } from "@core/storage";
 import autoAnimate, { type AnimationController } from "@formkit/auto-animate";
 import DOMPurify from "dompurify";
@@ -593,19 +594,6 @@ function createCommitIcon(): SVGSVGElement {
   );
   svg.appendChild(path);
   return svg;
-}
-
-function formatTimeAgo(isoDate: string): string {
-  const rtf = new Intl.RelativeTimeFormat(navigator.language, { numeric: "auto" });
-  const diffMs = new Date(isoDate).getTime() - Date.now();
-  const absDiffSeconds = Math.abs(diffMs / 1000);
-
-  if (absDiffSeconds < 60) return rtf.format(Math.round(diffMs / 1000), "second");
-  if (absDiffSeconds < 3600) return rtf.format(Math.round(diffMs / 60000), "minute");
-  if (absDiffSeconds < 86400) return rtf.format(Math.round(diffMs / 3600000), "hour");
-  if (absDiffSeconds < 2592000) return rtf.format(Math.round(diffMs / 86400000), "day");
-  if (absDiffSeconds < 31536000) return rtf.format(Math.round(diffMs / 2592000000), "month");
-  return rtf.format(Math.round(diffMs / 31536000000), "year");
 }
 
 function formatNumber(num: number): string {
@@ -1834,7 +1822,7 @@ async function openDetailModal(theme: StoreTheme, urlThemeInfo?: UrlThemeInfo): 
       updatedText.appendChild(document.createTextNode(`${t("marketplace_lastUpdatedOn", [localized])} `));
       const relative = document.createElement("span");
       relative.className = "detail-meta-muted";
-      relative.textContent = `(${formatTimeAgo(theme.locked)})`;
+      relative.textContent = `(${formatTimeAgo(new Date(theme.locked).getTime())})`;
       updatedText.appendChild(relative);
       updatedChip.appendChild(updatedText);
       metaRow.appendChild(updatedChip);
