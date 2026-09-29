@@ -1,4 +1,5 @@
 import { warnUnison } from "@core/logger";
+import { findBestLanguageMatch } from "@utils";
 
 // -- Languages --------------------------
 
@@ -61,9 +62,5 @@ export function appendLanguageOptions(select: HTMLSelectElement): void {
 }
 
 export function matchLanguageOption(lang: string): string | null {
-  const lower = lang.toLowerCase();
-  const exact = LANGUAGE_OPTIONS.find(code => code.toLowerCase() === lower);
-  if (exact) return exact;
-  const base = lower.split("-")[0];
-  return LANGUAGE_OPTIONS.find(code => code.toLowerCase().split("-")[0] === base) ?? null;
+  return findBestLanguageMatch(lang, LANGUAGE_OPTIONS) ?? null;
 }

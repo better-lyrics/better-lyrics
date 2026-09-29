@@ -1545,6 +1545,58 @@ function renderSuggestedVideoList(
   listEl.appendChild(othersRow);
 }
 
+function createManualVideoLinkForm(onLink: (videoId: string) => Promise<string | null>): HTMLFormElement {
+  const form = document.createElement("form");
+  form.className = "unison-video-link-form";
+
+  const field = document.createElement("input");
+  field.type = "text";
+  field.className = "unison-input unison-input--mono";
+  field.placeholder = t("unison_linkVideoPlaceholder");
+  field.setAttribute("aria-label", t("unison_linkVideoPlaceholder"));
+
+  const addBtn = document.createElement("button");
+  addBtn.type = "submit";
+  addBtn.className = "unison-video-add";
+  addBtn.textContent = t("unison_addVideo");
+
+  const error = document.createElement("p");
+  error.className = "unison-video-link-error";
+  error.setAttribute("role", "alert");
+  error.hidden = true;
+
+  const showError = (message: string): void => {
+    error.textContent = message;
+    error.hidden = false;
+  };
+
+  field.addEventListener("input", () => {
+    error.hidden = true;
+  });
+
+  form.addEventListener("submit", async event => {
+    event.preventDefault();
+    const submitted = field.value;
+    const videoId = parseVideoId(submitted);
+    if (!videoId) {
+      showError(t("unison_linkVideoInvalid"));
+      return;
+    }
+    addBtn.disabled = true;
+    const failure = await onLink(videoId);
+    addBtn.disabled = false;
+    if (failure !== null) {
+      showError(failure);
+      return;
+    }
+    if (field.value === submitted) field.value = "";
+    error.hidden = true;
+  });
+
+  form.append(field, addBtn, error);
+  return form;
+}
+
 async function renderOwnerVideoTools(entry: UnisonLyricsEntry, view: AbortSignal): Promise<void> {
   if (!(await isOwnerOf(entry))) return;
   if (view.aborted) return;
@@ -1566,8 +1618,17 @@ async function renderOwnerVideoTools(entry: UnisonLyricsEntry, view: AbortSignal
   const suggestList = document.createElement("ul");
   suggestList.className = "unison-video-list unison-suggest-list";
 
+  const linkAndRefresh = async (videoId: string): Promise<string | null> => {
+    const result = await linkVideo(entry.id, videoId);
+    if (!result.success) return videoLinkErrorMessage(result.code, t("unison_linkFailed"));
+    await refresh();
+    return null;
+  };
+  const manualLinkForm = createManualVideoLinkForm(linkAndRefresh);
+
   section.appendChild(linkedHeading);
   section.appendChild(linkedList);
+  section.appendChild(manualLinkForm);
   section.appendChild(suggestHeading);
   section.appendChild(suggestList);
   detailMeta.appendChild(section);
@@ -1584,12 +1645,9 @@ async function renderOwnerVideoTools(entry: UnisonLyricsEntry, view: AbortSignal
       renderVideoListError(suggestList, retry);
       return;
     }
-    renderSuggestedVideoList(suggestList, entry.song, suggestRes.data, async suggestion => {
-      const result = await linkVideo(entry.id, suggestion.videoId);
-      if (!result.success) return videoLinkErrorMessage(result.code, t("unison_linkFailed"));
-      await refresh();
-      return null;
-    });
+    renderSuggestedVideoList(suggestList, entry.song, suggestRes.data, suggestion =>
+      linkAndRefresh(suggestion.videoId)
+    );
   }
 
   await refresh();

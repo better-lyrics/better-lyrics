@@ -142,6 +142,39 @@
 							<span class="checkmark"></span>
 						</label>
 					</div>
+					<div class="container" id="high-resolution-video-setting">
+						<div class="setting-row__text">
+							<div class="setting-row__title-line">
+								<span id="highResolutionVideoLabel">__MSG_options_display_highResolutionVideo__</span>
+								<span class="setting-help" tabindex="0" data-tooltip="__MSG_options_display_highResolutionVideoInfo__" aria-label="__MSG_options_display_highResolutionVideoInfo__">?</span>
+							</div>
+						</div>
+						<label>
+							<input type="checkbox" id="isHighResolutionVideoEnabled" aria-labelledby="highResolutionVideoLabel" aria-describedby="videoQualityApplyHint" checked>
+							<span class="checkmark"></span>
+						</label>
+					</div>
+					<div class="container" id="preferred-video-quality-setting">
+						<div class="setting-row__text">
+								<span id="preferredVideoQualityLabel">__MSG_options_display_preferredVideoQuality__</span>
+								<span class="setting-row__hint" id="videoQualityLimitHint" hidden>__MSG_options_display_videoQualityLimit__</span>
+						</div>
+						<div class="select">
+							<select id="preferredVideoQuality" aria-labelledby="preferredVideoQualityLabel" aria-describedby="videoQualityLimitHint videoQualityApplyHint">
+								<option value="auto">__MSG_options_display_videoQualityAuto__</option>
+								<option value="hd4320">4320p (8K)</option>
+								<option value="hd2160">2160p (4K)</option>
+								<option value="hd1440">1440p</option>
+								<option value="hd1080">1080p</option>
+								<option value="hd720">720p</option>
+								<option value="large">480p</option>
+								<option value="medium">360p</option>
+								<option value="small">240p</option>
+								<option value="tiny">144p</option>
+							</select>
+						</div>
+					</div>
+					<p class="video-quality-hint" id="videoQualityApplyHint">__MSG_options_display_videoQualityApplyHint__</p>
 					<div class="container">
 						<span>__MSG_options_display_stylizedAnimations__</span>
 						<label>

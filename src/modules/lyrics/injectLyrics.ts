@@ -32,7 +32,7 @@ import { disableNativeLyricsFocus } from "@modules/ui/nativeLyricsFocus";
 import { publishPictureInPictureLyrics } from "@modules/ui/pictureInPicture/lyricsPublisher";
 import { injectRomanization, injectTranslation, type LineData } from "@braccato/core";
 import { containsNonLatin, detectNonLatinLanguage } from "@braccato/core/text";
-import { langCodesMatch, languageMatchesAny } from "@utils";
+import { findBestLanguageMatch, langCodesMatch, languageMatchesAny } from "@utils";
 import { logCore } from "@core/logger";
 
 export type { LineData };
@@ -304,11 +304,11 @@ async function processBatchTranslationsAndRomanizations(
       let translationLanguage = targetTranslationLang;
 
       const matchedLang =
-        item.translations && Object.keys(item.translations).find(lang => langCodesMatch(targetTranslationLang, lang));
+        item.translations && findBestLanguageMatch(targetTranslationLang, Object.keys(item.translations));
       if (item.translations && matchedLang) {
         translationResult = item.translations[matchedLang];
         translationLanguage = matchedLang;
-      } else if (item.translation && langCodesMatch(targetTranslationLang, item.translation.lang)) {
+      } else if (item.translation && findBestLanguageMatch(targetTranslationLang, [item.translation.lang])) {
         translationResult = item.translation.text;
         translationLanguage = item.translation.lang;
       } else {

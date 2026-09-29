@@ -2930,3 +2930,22 @@ input.cm-textfield:focus-visible {
         corner-shape: superellipse(1.6);
     }
 }
+
+.setting-row__hint,
+.settings-group > p.video-quality-hint {
+    color: rgba(255, 255, 255, 0.5);
+    font-size: 0.6875rem;
+    line-height: 1.5;
+}
+
+.settings-group > p.video-quality-hint {
+    margin: -0.75rem 0 1.5rem;
+}
+
+#preferredVideoQuality option:disabled {
+    color: #777;
+}
+
+#preferred-video-quality-setting .select {
+    flex-shrink: 0;
+}

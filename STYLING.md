@@ -1759,7 +1759,7 @@ renderer does not enable HDR or choose a brightness on its own.
 
 The bundled **HDR** theme supplies a gain-map JPEG only inside HDR-display and CSS-support
 queries. Select it in the theme picker to enable brighter lyrics, the instrumental note, and
-image-colored glow. Remove the older prototype CSS and console helper before using it.
+image-colored glow.
 `--dynamic-range` controls the display-dependent brightness ceiling (the default is 70% standard,
 30% no-limit). Glow follows the normal per-word duration, easing and blur radius settings, with
 `--blyrics-image-glow-opacity-from` and `--blyrics-image-glow-opacity-to` controlling its strength.
@@ -1767,8 +1767,8 @@ image-colored glow. Remove the older prototype CSS and console helper before usi
 The glow blurs a separate copy after its karaoke mask, preserving the sharp fill and leaving room
 at word edges without padding changes. Letter masks and motion share the renderer's clock.
 For fragmented long words and bidi-sensitive inline runs, a parallel text run keeps the halo
-aligned with every wrapped fragment. Arabic and Syriac word groups retain joined lettering
-through whole-word sweeps rather than individual letter waves. Forced colors retain system text
+aligned with every wrapped fragment. Joining-script and mixed-direction word groups use
+whole-word sweeps to preserve native text shaping. Forced colors retain system text
 colors. Missing note images fall back to the ordinary note fill.
 
 A display's HDR headroom and browser compositing affect the observed brightness. Screenshots

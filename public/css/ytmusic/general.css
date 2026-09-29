@@ -158,10 +158,3 @@ ytmusic-player-page:not([is-mweb-modernization-enabled]):not([blyrics-video-mode
 .ytmusic-av-toggle{
   border-radius: 1000rem !important;
 }
-
-/* Trick yt player into serving higher res videos */
-#movie_player {
-  width: 200%;
-  height: 200%;
-  transform: scale(50%) translateX(-50%) translateY(-50%);
-}

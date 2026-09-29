@@ -3,6 +3,7 @@
   "entry": [
     "src/index.ts",
     "src/pageWorld.ts",
+    "src/videoQualityPage.ts",
     "src/options/background.ts",
     "src/options/options.ts",
     "src/options/editor.ts",
