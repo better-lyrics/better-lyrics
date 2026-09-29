@@ -59,6 +59,9 @@ jobs:
         if: ${{ env.HAS_R2_SECRETS == 'false' }}
         run: npm run build
 
+      - name: Check packaged HDR theme
+        run: npx tsx tooling/check-packaged-hdr-theme.ts
+
       - name: Upload Chrome artifact
         uses: actions/upload-artifact@v4
         with:

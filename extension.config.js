@@ -73,8 +73,7 @@ const emitRendererStyles = {
           size: () => contents.length,
         });
       }
-      // Theme comments carry renderer settings, not just documentation. Public CSS normally
-      // passes through the minimizer, which strips these and silently disables opt-in features.
+      // Bypass the minimizer: it strips theme comments, which carry renderer settings.
       for (const name of bundledThemes()) {
         const contents = readFileSync(join(bundledThemesDir, name));
         const asset = { source: () => contents, size: () => contents.length };
