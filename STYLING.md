@@ -1749,3 +1749,27 @@ To learn more about CSS and web development:
 - [Flexbox Guide](https://css-tricks.com/snippets/css/a-guide-to-flexbox/)
 
 The best way to learn CSS is through experimentation and practice. Join the [Better Lyrics Discord community](https://discord.gg/UsHE3d5fWF) for help, inspiration, and to share your creations!
+
+## Optional image highlights and HDR
+
+The renderer supports theme-provided image fills. They are disabled by default. A theme opts in
+with `/* blyrics-image-highlights = true; */` and supplies one CSS image URL through
+`--blyrics-highlight-image` on `.blyrics-container`. This works with SDR textures too; the
+renderer does not enable HDR or choose a brightness on its own.
+
+The bundled **HDR** theme supplies a gain-map JPEG only inside HDR-display and CSS-support
+queries. Select it in the theme picker to enable brighter lyrics, the instrumental note, and
+image-colored glow. Remove the older prototype CSS and console helper before using it.
+`--dynamic-range` controls the display-dependent brightness ceiling (the default is 70% standard,
+30% no-limit). Glow follows the normal per-word duration, easing and blur radius settings, with
+`--blyrics-image-glow-opacity-from` and `--blyrics-image-glow-opacity-to` controlling its strength.
+
+The glow blurs a separate copy after its karaoke mask, preserving the sharp fill and leaving room
+at word edges without padding changes. Letter masks and motion share the renderer's clock.
+For fragmented long words and bidi-sensitive inline runs, a parallel text run keeps the halo
+aligned with every wrapped fragment. Arabic and Syriac word groups retain joined lettering
+through whole-word sweeps rather than individual letter waves. Forced colors retain system text
+colors. Missing note images fall back to the ordinary note fill.
+
+A display's HDR headroom and browser compositing affect the observed brightness. Screenshots
+can check animation and clipping, but cannot establish the monitor's emitted luminance.
