@@ -73,7 +73,6 @@ const emitRendererStyles = {
           size: () => contents.length,
         });
       }
-      // Bypass the minimizer: it strips theme comments, which carry renderer settings.
       for (const name of bundledThemes()) {
         const contents = readFileSync(join(bundledThemesDir, name));
         const asset = { source: () => contents, size: () => contents.length };

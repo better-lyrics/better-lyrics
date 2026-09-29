@@ -1,7 +1,4 @@
-/* Optional HDR image highlights. Select this theme to enable the renderer layers.
-   blyrics-image-highlights = true;
-   The SDR image base is white; the gain map requests up to 4x reference white.
-   Brightness is a display-dependent ceiling, not a linear percentage multiplier. */
+/* blyrics-image-highlights = true; */
 :root {
   --dynamic-range: dynamic-range-limit-mix(standard 70%, no-limit 30%);
   --blyrics-image-glow-opacity-from: 1;
