@@ -1,6 +1,6 @@
 {
   "manifest_version": 3,
-  "version": "3.0.0.1",
+  "version": "3.0.0.2",
   "default_locale": "en",
   "name": "Better Lyrics (Lyrics for YouTube Music)",
   "description": "__MSG_extensionDescription__",
@@ -32,7 +32,7 @@
   ],
   "optional_host_permissions": [],
   "content_security_policy": {
-    "extension_pages": "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://api.fontshare.com https://fonts.googleapis.com; font-src 'self' data: https://cdn.fontshare.com https://fonts.gstatic.com; img-src 'self' data: https://blrcunison.vercel.app https://boidu.dev https://betterlyrics.org https://raw.githubusercontent.com https://placehold.co https://cdn.betterlyrics.org https://cdn.discordapp.com https://*.googleusercontent.com; connect-src https://unison.betterlyrics.org https://unison.boidu.dev https://raw.githubusercontent.com https://api.github.com https://themes.betterlyrics.org; frame-src https://themes.betterlyrics.org;"
+    "extension_pages": "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://api.fontshare.com https://fonts.googleapis.com; font-src 'self' data: https://cdn.fontshare.com https://fonts.gstatic.com; img-src 'self' data: https://blrcunison.vercel.app https://boidu.dev https://betterlyrics.org https://raw.githubusercontent.com https://placehold.co https://cdn.betterlyrics.org https://cdn.discordapp.com https://*.googleusercontent.com https://i.ytimg.com; connect-src https://unison.betterlyrics.org https://unison.boidu.dev https://raw.githubusercontent.com https://api.github.com https://themes.betterlyrics.org; frame-src https://themes.betterlyrics.org;"
   },
   "options_ui": {
     "page": "src/options/options.html",
@@ -88,6 +88,12 @@
   "edge:key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAmNspBNCi4WHoRlH/rRPneLNqtWHzsEsK+Z4a7qmose6afikym7/5A/7I/OuXeJFqJXLc7YfWVUtdBWfHRSjT9Earq0wdOfElHyWnHQ1/cn55xbCdMJRSsVKEg3NRHWKbwpBFlt6XUog5sl48Gf+v6aZrv069MWEnXA13BEWqRX9hALG6WswyxaZXKokwH2AvnDDaWHrBghti6kmSNuXWCJj4c02YwZ5LgOJ3m5cI7bq/Mi7RtVuK+Odsj2/iESXAwNvLcMiOTW8vrioj/KfySjXpi16HCZIm0e6EvTq08CQUvIEpxV7Gaiq5w2j2TFKPMQ4aaHTiEgWMSZ0DeihLNQIDAQAB",
   "content_scripts": [
     {
+      "matches": ["*://music.youtube.com/*"],
+      "js": ["src/videoQualityPage.ts"],
+      "run_at": "document_start",
+      "world": "MAIN"
+    },
+    {
       "matches": [
         "*://music.youtube.com/*"
       ],
@@ -131,5 +137,5 @@
   "action": {
     "default_popup": "src/options/options.html"
   },
-  "version_name": "3.0.0 1"
+  "version_name": "3.0.0 2"
 }

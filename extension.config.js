@@ -73,6 +73,25 @@ const emitRendererStyles = {
   },
 };
 
+const versionStylesheetImports = {
+  apply: compiler => {
+    compiler.hooks.emit.tap("VersionStylesheetImports", compilation => {
+      const { version, version_name } = JSON.parse(compilation.getAsset("manifest.json").source.source().toString());
+      const cacheKey = encodeURIComponent(version_name ?? version);
+      for (const { name, source } of compilation.getAssets()) {
+        if (!name.endsWith(".css")) continue;
+        const css = source.source().toString();
+        const versioned = css.replace(
+          /@import\s+(url\(\s*)?(["'])([^"']+)\2/g,
+          (_, url = "", quote, path) => `@import ${url}${quote}${path}?v=${cacheKey}${quote}`
+        );
+        if (versioned === css) continue;
+        compilation.updateAsset(name, new compiler.webpack.sources.RawSource(versioned));
+      }
+    });
+  },
+};
+
 const linuxChromeSandbox = "/opt/google/chrome/chrome-sandbox";
 if (process.platform === "linux" && existsSync(linuxChromeSandbox)) {
   process.env.CHROME_DEVEL_SANDBOX ??= linuxChromeSandbox;
@@ -119,7 +138,7 @@ const config = {
     const isDevelopment = rspackConfig.mode !== "production";
     const shouldBuildSourcemaps = isDevelopment || process.env.SOURCEMAPS_ENABLED === "true";
 
-    rspackConfig.plugins.push(emitRendererStyles);
+    rspackConfig.plugins.push(emitRendererStyles, versionStylesheetImports);
 
     if (!isDevelopment) {
       console.log(

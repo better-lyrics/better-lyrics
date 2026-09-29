@@ -5,6 +5,7 @@ import {
   PICTURE_IN_PICTURE_TOGGLE_SELECTOR,
 } from "@constants";
 import { AppState } from "@core/appState";
+import { versionedStylesheetUrl } from "@core/extensionStylesheet";
 import { t } from "@core/i18n";
 import { getStorage } from "@core/storage";
 import { getArtworkMetadata } from "@modules/lyrics/requestSniffer/requestSniffer";
@@ -87,7 +88,7 @@ function injectStylesheet(pipWindow: Window, stylesheet: string): void {
 }
 
 async function loadStylesheet(): Promise<string> {
-  const response = await fetch(chrome.runtime.getURL(STYLESHEET_PATH));
+  const response = await fetch(versionedStylesheetUrl(STYLESHEET_PATH));
   if (!response.ok) throw new Error(`Document Picture-in-Picture stylesheet failed to load: ${response.status}`);
   return response.text();
 }
@@ -114,7 +115,7 @@ const activeController: PictureInPictureToggle = delegatesToPageWorld
       windowLayout: () => storedWindowLayout,
       windowTitle: () => t("picture_in_picture_open"),
       stylesheetUrls: () => ({
-        lyrics: chrome.runtime.getURL(LYRIC_STYLESHEET_PATH),
+        lyrics: versionedStylesheetUrl(LYRIC_STYLESHEET_PATH),
         fonts: [FONT_LINK, NOTO_SANS_UNIVERSAL_LINK],
       }),
       loadStylesheet,
@@ -163,8 +164,8 @@ export function publishPictureInPictureResources(): void {
   getStorage(PIP_SETTING_DEFAULTS, items => {
     sendInit({
       strings: Object.fromEntries(PIP_STRING_KEYS.map(key => [key, t(key)])),
-      lyricsStylesheetUrl: chrome.runtime.getURL(LYRIC_STYLESHEET_PATH),
-      pipStylesheetUrl: chrome.runtime.getURL(STYLESHEET_PATH),
+      lyricsStylesheetUrl: versionedStylesheetUrl(LYRIC_STYLESHEET_PATH),
+      pipStylesheetUrl: versionedStylesheetUrl(STYLESHEET_PATH),
       fontUrls: [FONT_LINK, NOTO_SANS_UNIVERSAL_LINK],
       enabled: items.isPictureInPictureEnabled !== false,
       autoRestoreEnabled: Boolean(items.isPictureInPictureAutoRestoreEnabled),

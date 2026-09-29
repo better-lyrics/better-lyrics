@@ -4,6 +4,7 @@ import {
   LYRICS_NEGATIVE_CACHE_TTL_MS,
   PROVIDER_CONFIGS,
   PROVIDER_SWITCHED_LOG,
+  UNISON_NEGATIVE_CACHE_TTL_MS,
 } from "@constants";
 import { getTransientStorage, setTransientStorage } from "@core/storage";
 import unified from "./unified";
@@ -188,11 +189,8 @@ export async function saveLyricsToCache(providerParameters: ProviderParameters, 
   if (source.filled && !source.resultCached && !source.lyricSourceResult && provider !== "metadata") {
     source.resultCached = true;
     const cacheKey = `blyrics_${providerParameters.videoId}_${provider}`;
-    await setTransientStorage(
-      cacheKey,
-      JSON.stringify({ version: LYRIC_CACHE_VERSION, missing: true }),
-      LYRICS_NEGATIVE_CACHE_TTL_MS
-    );
+    const negativeTtl = provider.startsWith("unison") ? UNISON_NEGATIVE_CACHE_TTL_MS : LYRICS_NEGATIVE_CACHE_TTL_MS;
+    await setTransientStorage(cacheKey, JSON.stringify({ version: LYRIC_CACHE_VERSION, missing: true }), negativeTtl);
     return;
   }
 

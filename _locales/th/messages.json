@@ -92,7 +92,7 @@
     "description": "Show stylized animations setting label"
   },
   "options_display_letterWave": {
-    "message": "Letter wave",
+    "message": "กระเพื่อมตัวอักษร",
     "description": "Label for the per-letter wave lyric animation toggle"
   },
   "options_display_letterWaveBadge": {
@@ -140,7 +140,7 @@
     "description": "Setting label for automatically reopening the floating lyrics window after page load"
   },
   "options_display_pipAutoRestoreTooltip": {
-    "message": "Keeps the floating lyrics window from closing for good when you reload or move between songs and pages. Browsers only let a floating window open right after you interact with the page, so it reopens on your first click or key press instead of instantly.",
+    "message": "บังคับหน้าต่างเนื้อเพลงแยกที่แยกออกมาไม่ให้ปิดเมื่อรีโหลดหน้าใหม่ เลือกเพลง หรือไปหน้าต่าง ๆ เบราว์เซอร์จะให้มีการสร้างหน้าต่างลอยก็ต่อเมื่อมีการคลิกหรือใช้งานหน้าเว็บก่อนเท่านั้น ดังนั้นหน้าต่างลอยจะเปิดเมื่อมีการคลิกหรือกดปุ่มก่อน ไม่ได้ขึ้นมาในทันที",
     "description": "Help tooltip explaining what automatic floating-lyrics reopening does and why it waits for the first interaction"
   },
   "options_display_pipWindowLayout": {
@@ -180,19 +180,19 @@
     "description": "Name of a song title transition where the words of the new title bounce up into place one after another"
   },
   "options_display_pipWindow": {
-    "message": "Floating lyrics window",
+    "message": "หน้าต่างเนื้อเพลงแบบลอย",
     "description": "Label for the row that opens the settings for the floating lyrics window"
   },
   "options_display_pipTextTransition": {
-    "message": "Title transition",
+    "message": "รูปแบบการเปลี่ยนชื่อเพลง",
     "description": "Setting label, shown inside the floating lyrics window settings, for choosing how the song title and artist change between songs"
   },
   "options_display_pipMarquee": {
-    "message": "Scroll long titles",
+    "message": "เลื่อนชื่อเพลงยาวซ้ายขวา",
     "description": "Toggle label for whether a song title too long for the floating lyrics window scrolls across so it can be read in full"
   },
   "options_display_pipProgressBar": {
-    "message": "Show progress bar",
+    "message": "แสดงแถบเลือกเวลา",
     "description": "Toggle label, shown inside the floating lyrics window settings, for the seekable playback progress bar under the album art"
   },
   "options_display_shadersPromo": {
@@ -200,19 +200,19 @@
     "description": "Toggle label for the Shaders companion link shown in the lyrics footer"
   },
   "options_display_unisonActions": {
-    "message": "Lyrics controls dock",
+    "message": "กล่องควบคุมเนื้อเพลง",
     "description": "Display-section row label for the lyrics controls dock modal trigger"
   },
   "options_unisonModal_title": {
-    "message": "Lyrics controls dock",
+    "message": "กล่องควบคุมเนื้อเพลง",
     "description": "Title of the lyrics controls dock settings modal"
   },
   "options_unisonModal_showPinned": {
-    "message": "Show controls dock",
+    "message": "แสดงกล่องควบคุม",
     "description": "Toggle label inside the lyrics controls dock modal for showing the floating dock"
   },
   "options_unisonModal_showPinned_hint": {
-    "message": "A floating dock to switch source, toggle translation and romanization, nudge sync, and vote on Unison lyrics",
+    "message": "กล่องลอยสำหรับเปลี่ยนที่มาของเนื้อเพลง เปิดหรือปิดการแปลและการถอดเสียง ปรับการซิงก์เวลาของเนื้อเพลง และโหวตเนื้อเพลงบน Unison",
     "description": "Hint text under the Show controls dock toggle"
   },
   "options_unisonModal_autoHide": {
@@ -252,63 +252,63 @@
     "description": "Tooltip for the bottom-right cell in the Unison position picker"
   },
   "options_unisonModal_controlsShown": {
-    "message": "Controls shown",
+    "message": "ตัวควบคุมที่แสดง",
     "description": "Label above the toggles that pick which controls appear in the lyrics dock"
   },
   "options_unisonModal_controlSource": {
-    "message": "Source switcher",
+    "message": "สลับที่มาเนื้อเพลง",
     "description": "Toggle label for showing the lyrics source switcher control in the dock"
   },
   "options_unisonModal_controlPictureInPicture": {
-    "message": "Floating window",
+    "message": "หน้าต่างลอย",
     "description": "Toggle label for showing the control that opens the floating lyrics window in the dock"
   },
   "options_unisonModal_controlOffset": {
-    "message": "Sync offset",
+    "message": "ปรับซิงก์ใหม่",
     "description": "Toggle label for showing the sync offset control in the dock"
   },
   "lyricsDock_chooseSource": {
-    "message": "Choose lyrics source",
+    "message": "เลือกที่มาของเนื้อเพลง",
     "description": "Accessible label for the lyrics dock button that opens the source provider dropdown"
   },
   "lyricsDock_refresh": {
-    "message": "Refresh lyrics",
+    "message": "รีเฟรชเนื้อเพลง",
     "description": "Accessible label for the lyrics dock button that re-fetches lyrics for the current song, bypassing the cache"
   },
   "lyricsDock_previousSource": {
-    "message": "Previous source",
+    "message": "ที่มาก่อนหน้า",
     "description": "Accessible label for the lyrics dock button that switches to the previous lyrics provider"
   },
   "lyricsDock_nextSource": {
-    "message": "Next source",
+    "message": "ที่มาถัดไป",
     "description": "Accessible label for the lyrics dock button that switches to the next lyrics provider"
   },
   "lyricsDock_offsetEarlier": {
-    "message": "Shift lyrics earlier",
+    "message": "ขยับเนื้อเพลงให้เร็วขึ้น",
     "description": "Accessible label for the lyrics dock button that nudges sync timing earlier"
   },
   "lyricsDock_offsetLater": {
-    "message": "Shift lyrics later",
+    "message": "ขยับเนื้อเพลงให้ช้าลง",
     "description": "Accessible label for the lyrics dock button that nudges sync timing later"
   },
   "lyricsDock_offsetGlobal": {
-    "message": "Global",
+    "message": "ใช้กับทุกเพลง",
     "description": "Label in the lyrics dock offset menu for the global offset applied to all songs and sync types"
   },
   "options_offsetModal_perSong": {
-    "message": "Per-song offsets",
+    "message": "สำหรับเพลงนี้",
     "description": "Heading in the offset settings modal for the section that manages saved per-song sync offsets"
   },
   "options_offsetModal_perSongClear": {
-    "message": "Clear all",
+    "message": "ลบการตั้งค่า",
     "description": "Button in the offset settings modal that deletes every saved per-song sync offset"
   },
   "options_offsetModal_perSongCount": {
-    "message": "Saved offsets",
+    "message": "บันทึกออฟเซ็ตแล้ว",
     "description": "Label in the offset settings modal showing how many per-song sync offsets are stored"
   },
   "options_offsetModal_appliesTo": {
-    "message": "Applies to",
+    "message": "ใช้กับ",
     "description": "Label in the offset settings modal preceding the list of sync types a given offset affects"
   },
   "options_language_displayLanguage": {
@@ -384,7 +384,7 @@
     "description": "Button to open the style editor if there are no styles"
   },
   "options_themes_edit": {
-    "message": "Edit",
+    "message": "แก้ไข",
     "description": "Button to open the style editor"
   },
   "options_themes_marketplace": {
@@ -404,7 +404,7 @@
     "description": "Identity settings section description"
   },
   "options_identity_warning": {
-    "message": "Treat this like your password. Never share it. Export a backup. No one can recover a lost identity, not even admins.",
+    "message": "มองสิ่งนี้เป็นเหมือนรหัสผ่าน ห้ามแบ่งปันกับใคร กดส่งออกเพื่อใช้ภายหลัง ไม่มีใครสามารถกู้คืนตัวตนนี้ได้หากสูญหายแม้เป็นผู้ดูแลระบบ",
     "description": "Security warning in the Identity settings tab: keep the identity private and back it up because it is unrecoverable"
   },
   "options_identity_yourIdentity": {
@@ -412,7 +412,7 @@
     "description": "Your identity label"
   },
   "options_identity_unisonStats": {
-    "message": "Unison Stats",
+    "message": "สถิติของ Unison",
     "description": "Section title above the user's own Unison level, tier, rank and badges on the Identity tab"
   },
   "options_identity_loading": {
@@ -648,7 +648,7 @@
     "description": "YouTube provider name"
   },
   "options_provider_youtubeCaptions": {
-    "message": "YouTube Captions",
+    "message": "คำอธิบายภาพของ YouTube",
     "description": "YouTube Captions provider name"
   },
   "options_provider_binilyrics": {
@@ -1014,7 +1014,7 @@
     }
   },
   "marketplace_requiresVersion": {
-    "message": "Requires v$version$+",
+    "message": "ต้องใช้ v$version$ ขึ้นไป",
     "description": "Footer chip in the theme detail modal showing the minimum Better Lyrics version a theme needs",
     "placeholders": {
       "version": {
@@ -1024,7 +1024,7 @@
     }
   },
   "blUpdate_available": {
-    "message": "Better Lyrics $version$ is now available",
+    "message": "Better Lyrics เวอร์ชัน $version$ พร้อมใช้งานแล้ว",
     "description": "Banner shown to pre-release (canary) users when the matching stable release ships",
     "placeholders": {
       "version": {
@@ -1034,23 +1034,23 @@
     }
   },
   "blUpdate_storeDelay": {
-    "message": "store may lag briefly",
+    "message": "การอัปเดตผ่านทางสโตร์อาจล่าช้า",
     "description": "Trailing note on the update banner for Chrome and Edge, whose store approval can lag the release"
   },
   "blUpdate_action": {
-    "message": "Update",
+    "message": "อัปเดต",
     "description": "Action link on the update banner that opens the browser's extension store listing"
   },
   "blUpdate_dismiss": {
-    "message": "Dismiss",
+    "message": "ปิด",
     "description": "Accessible label for the button that closes the update banner"
   },
   "marketplace_discussion": {
-    "message": "Discussion",
+    "message": "พูดคุย",
     "description": "Footer link in the theme detail modal that opens the theme's discussion thread"
   },
   "marketplace_commit": {
-    "message": "Commit $hash$",
+    "message": "คอมมิต $hash$",
     "description": "Footer chip in the theme detail modal linking to the exact source commit a theme was built from",
     "placeholders": {
       "hash": {
@@ -1124,7 +1124,7 @@
     "description": "Message shown during ad playback"
   },
   "lyrics_writtenBy": {
-    "message": "Written by",
+    "message": "ประพันธ์โดย",
     "description": "Label shown before the songwriter names after the last lyric line"
   },
   "lyrics_notFound": {
@@ -1248,7 +1248,7 @@
     "description": "Alert when a symlinked theme fails to install from marketplace"
   },
   "theme_top_badge": {
-    "message": "#$RANK$ on the Marketplace",
+    "message": "อันดับ $RANK$ ใน Marketplace",
     "description": "Tooltip on a featured theme's rank medal",
     "placeholders": {
       "rank": {
@@ -1258,15 +1258,15 @@
     }
   },
   "theme_modal_section_featured": {
-    "message": "Featured Themes",
+    "message": "ธีมมาแรง",
     "description": "Section title for featured themes (top marketplace picks and built-ins) in the theme chooser modal"
   },
   "theme_modal_section_all": {
-    "message": "All Themes",
+    "message": "ธีมทั้งหมด",
     "description": "Section title for the user's installed marketplace themes in the theme chooser modal"
   },
   "theme_modal_browse": {
-    "message": "Browse Marketplace",
+    "message": "ค้นดู Marketplace",
     "description": "Link in the theme chooser modal that opens the full Theme Marketplace page"
   },
   "theme_modal_section_custom": {
@@ -1639,6 +1639,32 @@
     "message": "รหัสจาก URL ของ YouTube Music ยาว 11 ตัวอักษร",
     "description": "Hint text below video ID field label"
   },
+  "unison_additionalVideos": {
+    "message": "วีดีโอเพิ่มเติม",
+    "description": "Label for the optional submit-form field where the user lists other videos of the same song to link to this lyric"
+  },
+  "unison_additionalVideosHint": {
+    "message": "ไม่บังคับ วีดีโออื่นที่ลิงก์มายังเพลงนี้ ระบุรหัสวีดีโอหรือลิงก์แยกด้วยช่องว่างหรือคอมมา แต่ละรายการจะถูกตรวจสอบและหากไม่ตรงจะข้ามไป",
+    "description": "Hint text below the additional videos field on the submit form"
+  },
+  "unison_additionalVideosSkipped": {
+    "message": "ส่งเรียบร้อยแล้ว แต่ไม่ได้ลิงก์กับวีดีโอ: $videos$",
+    "description": "Feedback after submitting when some additional videos could not be linked. $videos$ is a comma-separated list of videoIds",
+    "placeholders": {
+      "videos": {
+        "content": "$1",
+        "example": "dQw4w9WgXcQ, abcdEFGH123"
+      }
+    }
+  },
+  "unison_additionalVideosInvalid": {
+    "message": "วีดีโอที่เพิ่มบางรายการไม่ใช่รหัสวีดีโอหรือ URL ที่ถูกต้อง แก้ไขหรือลบออกเพื่อส่งอีกครั้ง",
+    "description": "Error shown on submit when the additional videos field contains entries that are not valid YouTube video IDs or URLs"
+  },
+  "unison_viewSubmittedLyrics": {
+    "message": "ดูเนื้อเพลง",
+    "description": "Button in the submit feedback that opens the lyric that was just submitted, shown when some additional videos could not be linked"
+  },
   "unison_formatHint": {
     "message": "ตรวจจับจากเนื้อหาเพลงอัตโนมัติ",
     "description": "Hint text below format field label"
@@ -1680,19 +1706,19 @@
     "description": "Language label in detail view"
   },
   "unison_uploadedBy": {
-    "message": "Uploaded by",
+    "message": "อัปโหลดโดย",
     "description": "Metadata row label in the Unison detail sidebar, before the uploader's name which links to their curator page"
   },
   "unison_languageUnspecified": {
-    "message": "Not specified",
+    "message": "ไม่ระบุ",
     "description": "Default option in the submission form's language dropdown, used when the submitter has not chosen a language"
   },
   "unison_fulfilledBadge": {
-    "message": "Requested & fulfilled",
+    "message": "มีคำขอและทำให้แล้ว",
     "description": "Badge on the Unison detail page shown when this lyric answered a community request"
   },
   "unison_fulfilledNote": {
-    "message": "Someone wanted this on Better Lyrics, and $name$ came through with it.",
+    "message": "มีผู้ต้องการให้มีเพลงนี้ใน Better Lyrics และ $name$ ดำเนินการให้",
     "description": "Sentence on the Unison detail page explaining that the lyric fulfilled a community request. $name$ is the uploader's display name",
     "placeholders": {
       "name": {
@@ -1702,7 +1728,7 @@
     }
   },
   "unison_fulfilledBoardLink": {
-    "message": "See the requests board",
+    "message": "ดูบอร์ดคำขอ",
     "description": "Link on the Unison detail page that opens the community requests board (queue of most-wanted songs)"
   },
   "unison_validationRequired": {
@@ -1770,7 +1796,7 @@
     "description": "Shown when a lyrics report fails to submit"
   },
   "unison_level": {
-    "message": "Level $level$",
+    "message": "ระดับ $level$",
     "description": "Shows a Unison contributor's numeric level. $level$ is a positive integer",
     "placeholders": {
       "level": {
@@ -1780,7 +1806,7 @@
     }
   },
   "unison_xpToNext": {
-    "message": "$xp$ XP to Level $level$",
+    "message": "อีก $xp$ XP จะเป็นระดับ $level$",
     "description": "Explains how much experience remains before the next Unison level. $xp$ is a positive integer, $level$ is the next level number",
     "placeholders": {
       "xp": {
@@ -1794,11 +1820,11 @@
     }
   },
   "unison_maxLevel": {
-    "message": "Max level",
+    "message": "ระดับสูงสุด",
     "description": "Shown in place of the XP-to-next text when a Unison contributor is at the highest level"
   },
   "unison_rank": {
-    "message": "Rank #$rank$",
+    "message": "อันดับที่ $rank$",
     "description": "Shows a Unison contributor's leaderboard rank within their tier. $rank$ is a positive integer",
     "placeholders": {
       "rank": {
@@ -1808,15 +1834,15 @@
     }
   },
   "unison_viewProfile": {
-    "message": "View full profile",
+    "message": "ดูโปรไฟล์แบบเต็ม",
     "description": "Link on the Identity tab that opens the user's full Unison profile in a new tab"
   },
   "unison_changePicture": {
-    "message": "Change picture",
+    "message": "เปลี่ยนภาพ",
     "description": "Link on the Identity tab, shown when the user has a Unison profile picture, that opens the Unison website where they can pick a different one"
   },
   "unison_addPicture": {
-    "message": "Add a picture",
+    "message": "เพิ่มภาพ",
     "description": "Link on the Identity tab, shown when the user has no Unison profile picture, that opens the Unison website where they can pick one"
   },
   "unison_submitted_this": {
@@ -1834,5 +1860,547 @@
   "unison_vote_plural": {
     "message": "คะแนน",
     "description": "Plural noun used after numbers other than 1 in the Unison vote count (e.g. '5 votes')"
+  },
+  "unison_linkedVideos": {
+    "message": "วีดีโอที่ลิงก์",
+    "description": "Heading for the list of YouTube videos a Unison lyric is linked to, on the lyric detail page"
+  },
+  "unison_noLinkedVideos": {
+    "message": "ยังไม่ได้มีการลิงก์วีดีโอใด",
+    "description": "Shown under the linked-videos heading when a lyric has no linked videos"
+  },
+  "unison_videoPrimary": {
+    "message": "หลัก",
+    "description": "Badge marking the primary (home) video of a Unison lyric, which cannot be unlinked"
+  },
+  "unison_removeVideo": {
+    "message": "นำออก",
+    "description": "Button that unlinks a video from a Unison lyric"
+  },
+  "unison_suggestedVideos": {
+    "message": "วีดีโอที่แนะนำ",
+    "description": "Heading for the list of videos Unison suggests linking to a lyric"
+  },
+  "unison_noMatchingVideos": {
+    "message": "ไม่มีวีดีโอที่ตรงกัน",
+    "description": "Suggested videos list when every suggestion is judged a different recording; those stay behind the other versions toggle below it"
+  },
+  "unison_noSuggestions": {
+    "message": "ไม่มีคำแนะนำในขณะนี้",
+    "description": "Shown under the suggested-videos heading when Unison has no suggestions"
+  },
+  "unison_linkConfirmTitle": {
+    "message": "ลิงก์วีดีโอนี้หรือไม่",
+    "description": "Title of the confirmation shown before linking a suggested video whose title differs from the lyric's song title"
+  },
+  "unison_linkConfirmBody": {
+    "message": "\"$video$\" ไม่ได้มีชื่อวีดีโอตรงกับ \"$song$\" ตรวจว่าเป็นเสียงเดียวกันก่อนการลิงก์ เนื่องจากเวอร์ชันรีมิกซ์ การแสดงสด และสปีดอัป อาจจะต้องมีเนื้อเพลงขอตัวเองแยกต่างหาก",
+    "description": "Body of the confirmation before linking a suggested video. $video$ is the suggested video's title, $song$ is the lyric's song title",
+    "placeholders": {
+      "video": {
+        "content": "$1",
+        "example": "Blinding Lights (Major Lazer Remix)"
+      },
+      "song": {
+        "content": "$2",
+        "example": "Blinding Lights"
+      }
+    }
+  },
+  "unison_addVideo": {
+    "message": "เพิ่ม",
+    "description": "Button that links a suggested video to a Unison lyric"
+  },
+  "unison_linkFailed": {
+    "message": "ไม่สามารถลิงก์วีดีโอนี้ได้",
+    "description": "Generic error shown when linking a video to a Unison lyric fails"
+  },
+  "unison_unlinkFailed": {
+    "message": "ไม่สามารถลบวีดีโอนี้ได้",
+    "description": "Generic error shown when unlinking a video from a Unison lyric fails"
+  },
+  "unison_suggestMatchSameHint": {
+    "message": "อาจเป็นเสียงเดียวกัน",
+    "description": "Tooltip and accessible label for the lightbulb icon on a suggested video judged to be the same recording as the lyric; also marks videos added to the additional videos field automatically"
+  },
+  "unison_suggestMatchRelated": {
+    "message": "อาจเป็นคนละเวอร์ชัน ตรวจสอบให้ดีก่อนเพิ่ม",
+    "description": "Tooltip and accessible label for the question mark icon on a suggested video that may be a different version of the song (an edit or variant), asking the user to check before linking"
+  },
+  "unison_suggestMatchDifferentHint": {
+    "message": "คนละเวอร์ชันหรือคนละเพลง",
+    "description": "Tooltip and accessible label for the layers icon on a suggested video judged to be a different recording of the song, such as a remix or live version"
+  },
+  "unison_suggestOtherVersions": {
+    "message": "แสดงอีก $count$ เวอร์ชัน",
+    "description": "Toggle that reveals suggested videos judged to be different recordings, such as remixes or live versions. $count$ is how many are hidden",
+    "placeholders": {
+      "count": {
+        "content": "$1",
+        "example": "3"
+      }
+    }
+  },
+  "unison_suggestHideOtherVersions": {
+    "message": "ซ่อนรุ่นอื่น",
+    "description": "Label of the other versions toggle while it is open; clicking it hides the suggested videos judged to be different recordings again"
+  },
+  "unison_videosLoadFailed": {
+    "message": "ไม่สามารถโหลดวีดีโอได้",
+    "description": "Shown in place of the linked or suggested videos list when Unison could not load it; a retry button follows"
+  },
+  "unison_showMore": {
+    "message": "แสดงเพิ่ม",
+    "description": "Button that reveals the rest of the suggested videos list beyond the first few"
+  },
+  "unison_error_linkCapReached": {
+    "message": "เนื้อเพลงนี้ลิงก์เต็มขีดจำกัดแล้ว",
+    "description": "Error shown when a lyric already has the maximum number of linked videos"
+  },
+  "unison_error_durationMismatch": {
+    "message": "ความยาววีดีโอไม่ตรงกัน",
+    "description": "Error shown when a video cannot be linked because its duration differs too much from the lyric"
+  },
+  "unison_error_videoUnverifiable": {
+    "message": "ไม่สามารถยืนยันวีดีโอได้",
+    "description": "Error shown when a video cannot be linked because Unison could not fetch it"
+  },
+  "unison_error_cannotUnlinkPrimary": {
+    "message": "ไม่สามารถลบวีดีโอหลักได้",
+    "description": "Error shown when the user tries to unlink the primary video of a lyric"
+  },
+  "unison_rev_number": {
+    "message": "รุ่น $rev$",
+    "description": "Revision label. $rev$ is the revision number",
+    "placeholders": {
+      "rev": {
+        "content": "$1",
+        "example": "5"
+      }
+    }
+  },
+  "unison_rev_original": {
+    "message": "ต้นฉบับ",
+    "description": "Label for revision 1 of a Unison lyric, the original upload"
+  },
+  "unison_rev_neverEdited": {
+    "message": "อัโหลดเมื่อ $when$ และยังไม่เคยมีการแก้ไข",
+    "description": "Revision bar text for a lyric with no edits. $when$ is a relative time",
+    "placeholders": {
+      "when": {
+        "content": "$1",
+        "example": "3 months ago"
+      }
+    }
+  },
+  "unison_rev_editedAgo": {
+    "message": "แก้ไขล่าสุดเมื่อ $when$",
+    "description": "Revision bar text for the live revision. $when$ is a relative time",
+    "placeholders": {
+      "when": {
+        "content": "$1",
+        "example": "2 days ago"
+      }
+    }
+  },
+  "unison_rev_pendingChip": {
+    "message": "รุ่น $rev$ รอตรวจสอบ",
+    "description": "Chip for an edit waiting for council review",
+    "placeholders": {
+      "rev": {
+        "content": "$1",
+        "example": "7"
+      }
+    }
+  },
+  "unison_rev_revisions": {
+    "message": "รุ่นการแก้ไข",
+    "description": "Button and page title for the list of a lyric's revisions"
+  },
+  "unison_rev_editLyrics": {
+    "message": "แก้ไขเนื้อเพลง",
+    "description": "Button that opens the lyric editor"
+  },
+  "unison_rev_viewChanges": {
+    "message": "ดูการเปลี่ยนแปลง",
+    "description": "Button that opens the diff of the pending edit, and link in the editor save bar that opens the Changes tab"
+  },
+  "unison_rev_changes": {
+    "message": "การเปลี่ยนแปลง",
+    "description": "Editor tab that lists what the edit changes compared with an earlier revision"
+  },
+  "unison_rev_changesTabs": {
+    "message": "Preview or changes",
+    "description": "Screen reader label for the editor tabs that switch between the lyric preview and the list of changes"
+  },
+  "unison_rev_details": {
+    "message": "Details",
+    "description": "Diff section label above changed song details: language, ISRC and album"
+  },
+  "unison_rev_updating": {
+    "message": "Updating",
+    "description": "Shown while the list of changes refreshes after an edit"
+  },
+  "unison_rev_checkFailed": {
+    "message": "Couldn't check your edit",
+    "description": "Editor save bar title when the edit check failed for a reason the server did not explain"
+  },
+  "unison_rev_checkFailedHint": {
+    "message": "Save turns back on once the check runs.",
+    "description": "Editor save bar hint under the failed check title, followed by a Try again link"
+  },
+  "unison_rev_tryAgain": {
+    "message": "ลองอีกครั้ง",
+    "description": "Link or button that runs the edit check again after it failed"
+  },
+  "unison_rev_changesError": {
+    "message": "ไม่สามารถโหลดการเปลี่ยนแปลงได้",
+    "description": "Error title in the editor Changes tab when the edit check failed"
+  },
+  "unison_rev_changesErrorHint": {
+    "message": "เกิดข้อผิดพลาด แต่บันทึกร่างของคุณแล้ว การแสดงตัวอย่างยังสามารถใช้งานได้",
+    "description": "Error hint in the editor Changes tab when the edit check failed"
+  },
+  "unison_rev_changesNeedParse": {
+    "message": "การเปลี่ยนแปลงจะกลับมาอีกครั้งเมื่อแจงส่วนเนื้อเพลงแล้ว",
+    "description": "Editor Changes tab while the lyrics have errors that stop them from being read"
+  },
+  "unison_rev_withdraw": {
+    "message": "ถอนคำขอแก้ไข",
+    "description": "Button that withdraws a pending edit before the council reviews it"
+  },
+  "unison_rev_reason_sealed": {
+    "message": "เนื้อเพลงถูกป้องกัน",
+    "description": "Why an edit needs council review: the council approved (sealed) this lyric"
+  },
+  "unison_rev_reason_flagged": {
+    "message": "ทำเครื่องหมายว่ารอตรวจสอบ",
+    "description": "Why an edit needs council review: an automatic check flagged it"
+  },
+  "unison_rev_reason_largeText": {
+    "message": "มีการเปลี่ยนแปลงข้อความจำนวนมาก",
+    "description": "Why an edit needs council review: too much of the text changed"
+  },
+  "unison_rev_reason_largeTiming": {
+    "message": "มีการเปลี่ยนแปลงเวลาที่ซิงก์จำนวนมาก",
+    "description": "Why an edit needs council review: too much of the timing changed"
+  },
+  "unison_rev_goesToReview": {
+    "message": "ไปยังหน้ารอการตรวจสอบ เนื่องจาก$reason$",
+    "description": "Editor outcome before saving. $reason$ is a review reason, like 'Large text change'",
+    "placeholders": {
+      "reason": {
+        "content": "$1",
+        "example": "Large text change"
+      }
+    }
+  },
+  "unison_rev_pendingTitle": {
+    "message": "กำลังรอการตรวจสอบเนื่องจาก$reason$",
+    "description": "Title for a saved edit that waits for review. $reason$ is a review reason, like 'Large text change'",
+    "placeholders": {
+      "reason": {
+        "content": "$1",
+        "example": "Large text change"
+      }
+    }
+  },
+  "unison_rev_staysLive": {
+    "message": "จะแสดงรุ่น $rev$ จนกว่าจะมีการพิจารณาแล้ว",
+    "description": "Names the revision listeners keep seeing during review",
+    "placeholders": {
+      "rev": {
+        "content": "$1",
+        "example": "5"
+      }
+    }
+  },
+  "unison_rev_rejectedTitle": {
+    "message": "รุ่น $rev$ ถูกปฏิเสธ",
+    "description": "Title when the council rejected an edit",
+    "placeholders": {
+      "rev": {
+        "content": "$1",
+        "example": "6"
+      }
+    }
+  },
+  "unison_rev_councilNote": {
+    "message": "หมายเหตุจากผู้ตรวจสอบ: \"$note$\"",
+    "description": "The note the council left when it rejected an edit",
+    "placeholders": {
+      "note": {
+        "content": "$1",
+        "example": "Timing drifts after the bridge."
+      }
+    }
+  },
+  "unison_rev_sealedHint": {
+    "message": "ทุกการแก้ไขต้องผ่านกลุ่มผู้ตรวจสอบก่อนเผยแพร่",
+    "description": "Explains what editing a sealed lyric means"
+  },
+  "unison_rev_status_live": {
+    "message": "Live",
+    "description": "Revision status: the version listeners see"
+  },
+  "unison_rev_status_pending": {
+    "message": "Pending",
+    "description": "Revision status: waiting for council review"
+  },
+  "unison_rev_status_past": {
+    "message": "Past",
+    "description": "Revision status: was live before"
+  },
+  "unison_rev_status_superseded": {
+    "message": "Superseded",
+    "description": "Revision status: replaced by a newer save before review"
+  },
+  "unison_rev_status_rejected": {
+    "message": "Rejected",
+    "description": "Revision status: the council rejected it"
+  },
+  "unison_rev_status_withdrawn": {
+    "message": "ถอนคำขอ",
+    "description": "Revision status: the owner withdrew it"
+  },
+  "unison_rev_anchor": {
+    "message": "ปักรุ่นนี้",
+    "description": "Chip on the revision that edits are measured against"
+  },
+  "unison_rev_approved": {
+    "message": "อนุมัติแล้วโดยกลุ่มผู้ตรวจสอบ",
+    "description": "Revisions list reason for a council-approved revision"
+  },
+  "unison_rev_withinLimits": {
+    "message": "ยังอยู่ภายในจำกัดที่กำหนด",
+    "description": "Revisions list reason for an edit that went live without review"
+  },
+  "unison_rev_reverted": {
+    "message": "ย้อนกลับไปที่รุ่น $rev$ แล้ว",
+    "description": "Revisions list reason and success message for a revert",
+    "placeholders": {
+      "rev": {
+        "content": "$1",
+        "example": "2"
+      }
+    }
+  },
+  "unison_rev_driftValues": {
+    "message": "ข้อความ $text$% · เวลา $timing$%",
+    "description": "How much text and timing an edit changed, as whole numbers",
+    "placeholders": {
+      "text": {
+        "content": "$1",
+        "example": "8"
+      },
+      "timing": {
+        "content": "$2",
+        "example": "4"
+      }
+    }
+  },
+  "unison_rev_colStatus": {
+    "message": "สถานะ",
+    "description": "Revisions list column header"
+  },
+  "unison_rev_colChange": {
+    "message": "เปลี่ยนแปลง",
+    "description": "Revisions list column header (noun): how much an edit changed"
+  },
+  "unison_rev_colReason": {
+    "message": "เหตุผล",
+    "description": "Revisions list column header"
+  },
+  "unison_rev_colWhen": {
+    "message": "เมื่อ",
+    "description": "Revisions list column header: relative time"
+  },
+  "unison_rev_revision": {
+    "message": "รุ่น",
+    "description": "Column header and editor sidebar label"
+  },
+  "unison_rev_comparedWith": {
+    "message": "เปรียบเทียบกับรุ่น $rev$",
+    "description": "Line above a diff. $rev$ is the compared revision",
+    "placeholders": {
+      "rev": {
+        "content": "$1",
+        "example": "5"
+      }
+    }
+  },
+  "unison_rev_legendAdded": {
+    "message": "ถูกเพิ่ม",
+    "description": "Diff legend: added lines or words"
+  },
+  "unison_rev_legendRemoved": {
+    "message": "ถูกลบออก",
+    "description": "Diff legend: removed lines or words"
+  },
+  "unison_rev_legendTiming": {
+    "message": "เวลาเท่านั้น",
+    "description": "Diff legend: lines whose timing changed but text did not"
+  },
+  "unison_rev_unchangedLines": {
+    "message": "บรรทัดไม่เปลี่ยนแปลง: $count$",
+    "description": "Collapsed part of a diff",
+    "placeholders": {
+      "count": {
+        "content": "$1",
+        "example": "13"
+      }
+    }
+  },
+  "unison_rev_headSection": {
+    "message": "การแปล การถอดเสียงเป็นโรมัน และเครดิต",
+    "description": "Label above the diff rows for text stored outside the lyric lines: translations, romanizations and credits"
+  },
+  "unison_rev_headCredits": {
+    "message": "เครดิต",
+    "description": "Diff row label for a changed credit, such as a songwriter or singer name"
+  },
+  "unison_rev_headLine": {
+    "message": "บรรทัด $line$",
+    "description": "Part of a diff row label that names the lyric line a translation or romanization belongs to, e.g. 'Translation · Spanish · line 3'",
+    "placeholders": {
+      "line": {
+        "content": "$1",
+        "example": "3"
+      }
+    }
+  },
+  "unison_rev_noDiff": {
+    "message": "ไม่มีการเปลี่ยนแปลงที่ต้องแสดง",
+    "description": "Diff area when there is nothing to compare"
+  },
+  "unison_rev_revertToThis": {
+    "message": "ย้อนกลับมาเป็นรุ่นนี้",
+    "description": "Button that starts a revert to a past revision"
+  },
+  "unison_rev_revertLive": {
+    "message": "การย้อนสำเร็จแล้วเป็นรุ่น $rev$",
+    "description": "Note before a revert that skips review",
+    "placeholders": {
+      "rev": {
+        "content": "$1",
+        "example": "6"
+      }
+    }
+  },
+  "unison_rev_revertCheckFailed": {
+    "message": "ไม่สามารถตรวจสอบได้ว่าการย้อนจะเผยแพร่หรือต้องผ่านการตรวจสอบก่อนหรือไม่",
+    "description": "Note on a past revision when the check of where a revert would land failed; the owner can still revert and the server decides"
+  },
+  "unison_rev_revertReview": {
+    "message": "การย้อนถูกส่งให้กลุ่มผู้ตรวจสอบในฐานะรุ่น $rev$",
+    "description": "Note before a revert that needs review",
+    "placeholders": {
+      "rev": {
+        "content": "$1",
+        "example": "6"
+      }
+    }
+  },
+  "unison_rev_locked": {
+    "message": "ไม่สามารถแก้ไขชื่อเพลงและศิลปินได้",
+    "description": "Editor note about fields that are locked"
+  },
+  "unison_rev_editsLeft": {
+    "message": "วันนี้แก้ไขได้อีก $remaining$ จากทั้งหมด $limit$ ครั้ง",
+    "description": "Edits left in the last 24 hours",
+    "placeholders": {
+      "remaining": {
+        "content": "$1",
+        "example": "3"
+      },
+      "limit": {
+        "content": "$2",
+        "example": "5"
+      }
+    }
+  },
+  "unison_rev_textChanged": {
+    "message": "ข้อความเปลี่ยนแปลง",
+    "description": "Meter label: how much of the text changed"
+  },
+  "unison_rev_timingChanged": {
+    "message": "เวลาเปลี่ยนแปลง",
+    "description": "Meter label: how much of the timing changed"
+  },
+  "unison_rev_textChangedSince": {
+    "message": "ข้อความมีการเปลี่ยนแปลงตั้งแต่รุ่น $rev$ ทั้งหมด",
+    "description": "Meter label: how much of the text changed since an earlier revision that the limit is measured against. $rev$ is that revision",
+    "placeholders": {
+      "rev": {
+        "content": "$1",
+        "example": "2"
+      }
+    }
+  },
+  "unison_rev_timingChangedSince": {
+    "message": "เวลาเปลี่ยนแปลงตั้งแต่รุ่น $rev$ ทั้งหมด",
+    "description": "Meter label: how much of the timing changed since an earlier revision that the limit is measured against. $rev$ is that revision",
+    "placeholders": {
+      "rev": {
+        "content": "$1",
+        "example": "2"
+      }
+    }
+  },
+  "unison_rev_ofLimit": {
+    "message": "จากขีดจำกัด $limit$%",
+    "description": "Follows a bold percentage in a meter, like '8% of 15% limit'",
+    "placeholders": {
+      "limit": {
+        "content": "$1",
+        "example": "15"
+      }
+    }
+  },
+  "unison_rev_checkLine": {
+    "message": "บรรทัด $line$: $message$",
+    "description": "A server check message tied to a line. $message$ comes from the server",
+    "placeholders": {
+      "line": {
+        "content": "$1",
+        "example": "13"
+      },
+      "message": {
+        "content": "$2",
+        "example": "This is not a timestamp."
+      }
+    }
+  },
+  "unison_rev_checking": {
+    "message": "กำลังตรวจสอบการแก้ไขของคุณ...",
+    "description": "Editor status while the server checks the edit"
+  },
+  "unison_rev_fixErrors": {
+    "message": "แก้ไขปัญหาเพื่อบันทึก",
+    "description": "Editor status when the edit has errors"
+  },
+  "unison_rev_limitReached": {
+    "message": "จำนวนการแก้ไขถึงขีกจำกัดแล้ว",
+    "description": "Shown when the daily edit limit is used up"
+  },
+  "unison_rev_noChanges": {
+    "message": "ไม่มีการเปลี่ยนแปลงเมื่อเทียบกับรุ่นที่เผยแพร่อยู่",
+    "description": "Shown when an edit or revert would change nothing"
+  },
+  "unison_rev_goesLive": {
+    "message": "เผยแพร่เมื่อคุณกดบันทึก",
+    "description": "Editor status when the edit skips review"
+  },
+  "unison_rev_submitForReview": {
+    "message": "ส่งให้ตรวจสอบ",
+    "description": "Save button label when the edit needs review"
+  },
+  "unison_rev_noEdits": {
+    "message": "ยังไม่มีการแก้ไข",
+    "description": "Revisions page notice for a lyric that was never edited"
+  },
+  "unison_rev_error": {
+    "message": "เกิดข้อผิดพลาด โปรดลองใหม่อีกครั้ง",
+    "description": "Fallback error for revision actions"
   }
 }

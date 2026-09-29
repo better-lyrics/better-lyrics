@@ -517,20 +517,29 @@ body {
 }
 
 .blyrics-pip-lyrics {
+  --blyrics-pip-lyrics-fade-top: 12%;
+  --blyrics-pip-lyrics-fade-bottom: 16%;
   position: relative;
   min-height: 0;
   flex: 1;
   container-type: size;
   overflow: hidden;
-  mask-image: linear-gradient(to bottom, transparent, #000 12%, #000 84%, transparent);
+  mask-image: linear-gradient(
+    to bottom,
+    transparent,
+    #000 var(--blyrics-pip-lyrics-fade-top),
+    #000 calc(100% - var(--blyrics-pip-lyrics-fade-bottom)),
+    transparent
+  );
 }
 
 /* The renderer scrolls this element by writing scrollTop, so it has to be a scroll container.
    Hidden rather than auto: there is no room for a scrollbar, and the lines are only ever moved
-   programmatically. */
+   programmatically. The scroll padding tells the renderer the faded edges are not visible. */
 .blyrics-pip-scroller {
   height: 100%;
   overflow: hidden;
+  scroll-padding-block: var(--blyrics-pip-lyrics-fade-top) var(--blyrics-pip-lyrics-fade-bottom);
 }
 
 .blyrics-pip-lyrics .blyrics-container {

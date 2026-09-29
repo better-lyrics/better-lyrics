@@ -34,6 +34,7 @@ import {
 } from "@constants";
 import { AppState } from "@core/appState";
 import { getBrowserVendor } from "@core/browser";
+import { versionedStylesheetUrl } from "@core/extensionStylesheet";
 import { t } from "@core/i18n";
 import type { ThumbnailElement } from "@modules/lyrics/requestSniffer/NextResponse";
 import { getArtworkMetadata } from "@modules/lyrics/requestSniffer/requestSniffer";
@@ -1573,10 +1574,15 @@ export async function injectHeadTags(): Promise<void> {
 
   for (const file of cssFiles) {
     const id = `blyrics-style-${file.replace(/(\/index)?\.css$/, "")}`;
-    if (document.getElementById(id)) continue;
+    const href = versionedStylesheetUrl(file);
+    const existing = document.getElementById(id);
+    if (existing) {
+      if (existing instanceof HTMLLinkElement && existing.href !== href) existing.href = href;
+      continue;
+    }
     const link = document.createElement("link");
     link.rel = "stylesheet";
-    link.href = chrome.runtime.getURL(file);
+    link.href = href;
     link.id = id;
     document.head.appendChild(link);
   }

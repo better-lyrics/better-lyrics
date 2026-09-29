@@ -1,0 +1,4 @@
+{
+  "disabledLabels": ["crowdin"],
+  "ignoreKeywords": "chore(i18n): sync translations"
+}

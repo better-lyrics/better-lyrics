@@ -313,7 +313,9 @@ async function processBatchTranslationsAndRomanizations(
         translationLanguage = item.translation.lang;
       } else {
         const cached = getTranslationFromCache(item.words, targetTranslationLang);
-        translationResult = cached?.translatedText || null;
+        if (cached && !isTranslationDisabledForLang(cached.originalLanguage)) {
+          translationResult = cached.translatedText;
+        }
       }
 
       if (translationResult && !isSameText(translationResult, item.words)) {
@@ -386,10 +388,8 @@ async function processBatchTranslationsAndRomanizations(
           logCore("Determined language via translation batch: " + sourceLanguage);
         }
 
-        if (isTranslationDisabledForLang(sourceLanguage || "")) return;
-
         response.results.forEach((result, i) => {
-          if (result) {
+          if (result && !isTranslationDisabledForLang(result.originalLanguage)) {
             const originalIndex = translationBatch[i].index;
             injectTranslation(doc, linesData[originalIndex].lyricElement, result.translatedText, targetTranslationLang);
             recordLyricDecoration(originalIndex, {
