@@ -1,3 +1,4 @@
+import type { ThemeSettingField } from "../themes";
 export interface ThemeBuild {
   version: string;
   minVersion: string;
@@ -29,6 +30,7 @@ export interface StoreThemeMetadata {
   creators: string[];
   minVersion: string;
   hasShaders: boolean;
+  hasSettings: boolean;
   tags?: string[];
   version: string;
   images?: string[];
@@ -44,6 +46,7 @@ export interface StoreTheme extends ResolvedStoreThemeMetadata {
   imageUrls: string[];
   cssUrl: string;
   shaderUrl?: string;
+  settingsUrl?: string;
   commit?: string;
   locked?: string;
   registryPath?: string;
@@ -62,6 +65,8 @@ export interface InstalledStoreTheme {
   title: string;
   creators: string[];
   css: string;
+  settings?: Record<string, ThemeSettingField>;
+  savedSettings?: Record<string, any>;
   shaderConfig?: Record<string, unknown>;
   installedAt: number;
   version: string;
@@ -73,6 +78,7 @@ export interface InstalledStoreTheme {
   imageUrls?: string[];
   minVersion?: string;
   hasShaders?: boolean;
+  hasSettings?: boolean;
   tags?: string[];
   commit?: string;
 }

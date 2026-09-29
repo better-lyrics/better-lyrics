@@ -22,6 +22,7 @@ import {
 } from "./store/themeStoreManager";
 import { fetchAllStoreThemes } from "./store/themeStoreService";
 import { logBackground, warnBackground } from "@core/logger";
+import type { ThemeSettingField } from "./themes";
 
 const THEME_UPDATE_ALARM = "theme-update-check";
 const UPDATE_INTERVAL_MINUTES = 360; // 6 hours
@@ -57,7 +58,7 @@ async function migrateSymlinkedThemes(): Promise<void> {
           await chrome.storage.sync.remove("activeStoreTheme");
           return;
         }
-        await saveCustomCss(buildStoreThemeContent(installed.title, installed.creators, installed.css));
+        await saveCustomCss(buildStoreThemeContent(installed.title, installed.creators, installed.css), installed.hasSettings ? { fields: installed.settings, saved: installed.savedSettings } : undefined);
         logBackground(`Migrated active theme: ${themeName} → store:${storeId}`);
       }
     }
@@ -83,7 +84,7 @@ async function resyncAppliedThemeCss(): Promise<void> {
     const theme = themeId ? await getInstalledTheme(themeId) : null;
 
     if (theme?.css) {
-      const result = await saveCustomCss(buildStoreThemeContent(theme.title, theme.creators, theme.css));
+      const result = await saveCustomCss(buildStoreThemeContent(theme.title, theme.creators, theme.css), theme.hasSettings ? { fields: theme.settings, saved: theme.savedSettings } : undefined);
       if (!result.success) {
         warnBackground(`Failed to resync applied theme: ${theme.title}`, result.error);
         return;
