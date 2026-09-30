@@ -10,7 +10,7 @@
 		<nav id="navbar">
 			<h1>
 				<img src="/images/icons/icon-48.png" alt="Better Lyrics" width="24" height="24">
-				<div class="heading">Better Lyrics <span>3.0.0 2</span></div>
+				<div class="heading">Better Lyrics <span>3.0.0 3</span></div>
 			</h1>
 			<div class="nav-container">
 				<a href="https://github.com/better-lyrics/better-lyrics" target="_blank">
@@ -150,17 +150,20 @@
 							</div>
 						</div>
 						<label>
-							<input type="checkbox" id="isHighResolutionVideoEnabled" aria-labelledby="highResolutionVideoLabel" aria-describedby="videoQualityApplyHint" checked>
+							<input type="checkbox" id="isHighResolutionVideoEnabled" aria-labelledby="highResolutionVideoLabel" checked="">
 							<span class="checkmark"></span>
 						</label>
 					</div>
 					<div class="container" id="preferred-video-quality-setting">
 						<div class="setting-row__text">
+							<div class="setting-row__title-line">
 								<span id="preferredVideoQualityLabel">__MSG_options_display_preferredVideoQuality__</span>
-								<span class="setting-row__hint" id="videoQualityLimitHint" hidden>__MSG_options_display_videoQualityLimit__</span>
+								<span class="setting-help" tabindex="0" data-tooltip="__MSG_options_display_videoQualityApplyHint__" aria-label="__MSG_options_display_videoQualityApplyHint__">?</span>
+							</div>
+							<span class="setting-row__hint" id="videoQualityLimitHint" hidden="">__MSG_options_display_videoQualityLimit__</span>
 						</div>
 						<div class="select">
-							<select id="preferredVideoQuality" aria-labelledby="preferredVideoQualityLabel" aria-describedby="videoQualityLimitHint videoQualityApplyHint">
+							<select id="preferredVideoQuality" aria-labelledby="preferredVideoQualityLabel" aria-describedby="videoQualityLimitHint">
 								<option value="auto">__MSG_options_display_videoQualityAuto__</option>
 								<option value="hd4320">4320p (8K)</option>
 								<option value="hd2160">2160p (4K)</option>
@@ -174,7 +177,6 @@
 							</select>
 						</div>
 					</div>
-					<p class="video-quality-hint" id="videoQualityApplyHint">__MSG_options_display_videoQualityApplyHint__</p>
 					<div class="container">
 						<span>__MSG_options_display_stylizedAnimations__</span>
 						<label>
@@ -203,6 +205,13 @@
 						<span>__MSG_options_display_shadersPromo__</span>
 						<label>
 							<input type="checkbox" id="isShadersPromoEnabled">
+							<span class="checkmark"></span>
+						</label>
+					</div>
+					<div class="container">
+						<span>__MSG_options_display_karaoke__</span>
+						<label>
+							<input type="checkbox" id="isKaraokeEnabled">
 							<span class="checkmark"></span>
 						</label>
 					</div>

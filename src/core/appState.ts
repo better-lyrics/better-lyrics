@@ -7,6 +7,7 @@ import type { UnisonData } from "@modules/lyrics/providers/unison";
 import { flushLoader } from "@modules/ui/dom";
 import { clearSongCache } from "@core/storage";
 import { logError } from "@core/logger";
+import { KARAOKE_DEFAULTS } from "@modules/karaoke/defaults";
 
 export interface PlayerDetails {
   currentTime: number;
@@ -70,6 +71,8 @@ interface AppStateType {
   currentUnisonData: UnisonData | null;
   isPictureInPictureOpen: boolean;
   endTimeMode: "total" | "remaining";
+  playbackRate: number;
+  isKaraokeEnabled: boolean;
 }
 
 export const AppState: AppStateType = {
@@ -117,6 +120,8 @@ export const AppState: AppStateType = {
   currentUnisonData: null,
   isPictureInPictureOpen: false,
   endTimeMode: "total",
+  playbackRate: 1,
+  ...KARAOKE_DEFAULTS,
 };
 
 export function reloadLyrics(): void {

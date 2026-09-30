@@ -1436,7 +1436,7 @@ ytmusic-player-page:not([is-mweb-modernization-enabled]) #side-panel.blyrics-has
   display: none;
 }
 
-ytmusic-player-page[player-fullscreened]:not([blyrics-dfs]) #blyrics-fs-column {
+ytmusic-player-page[player-fullscreened]:not([blyrics-dfs], [blyrics-karaoke]) #blyrics-fs-column {
   display: flex;
   flex-direction: column;
   gap: 2rem;

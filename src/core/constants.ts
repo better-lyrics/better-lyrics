@@ -42,6 +42,7 @@ export const PICTURE_IN_PICTURE_TOGGLE_SELECTOR = "[data-blyrics-picture-in-pict
 export const LYRICS_LOADER_ID = "blyrics-loader" as const;
 export const LYRICS_DISABLED_ATTR = "blyrics-dfs" as const;
 export const FULLSCREEN_CONTROLS_DISABLED_ATTR = "blyrics-no-fs-controls" as const;
+export const KARAOKE_ACTIVE_ATTR = "blyrics-karaoke" as const;
 export const DISABLE_EFFECTS_STYLE_ID = "blyrics-disable-effects" as const;
 export const HIDDEN_CLASS = "blyrics-hidden" as const;
 export const REPORT_MODAL = "blyrics-report-lyrics" as const;
@@ -195,6 +196,8 @@ export const LYRICS_CACHE_TTL_MS = 7 * 24 * 60 * 60 * 1000;
 export const LYRICS_NEGATIVE_CACHE_TTL_MS = 30 * 60 * 1000;
 export const UNISON_NEGATIVE_CACHE_TTL_MS = 5 * 60 * 1000;
 export const UNISON_MAX_VIDEOS_PER_LYRIC = 20;
+
+export const ARTWORK_MIN_SIZE_PX = 1440;
 
 export const OFFSET_STORAGE_PREFIX = "blyricsOffset_";
 

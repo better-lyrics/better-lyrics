@@ -1,7 +1,9 @@
 @import url("variables.css");
 @import url("lyrics.css");
+@import url("stage.css");
 @import url("components.css");
 @import url("instrumental.css");
 @import url("misc.css");
 @import url("responsive.css");
 @import url("modal.css");
+@import url("karaoke.css");

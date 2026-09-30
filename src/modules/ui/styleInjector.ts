@@ -7,8 +7,9 @@ import {
   getSyncStorage,
   loadChunkedStyles,
 } from "@core/storage";
+import { applyKaraokeTheme } from "@modules/karaoke/karaokeView";
 import { mainView } from "./mainLyricsView";
-import { publishPictureInPictureLyrics } from "./pictureInPicture/lyricsPublisher";
+import { publishSecondaryViews } from "@modules/ui/secondaryViews";
 import { logCore, logError } from "@core/logger";
 import { migrateLetterWavePref, type LetterWavePref } from "@modules/settings/letterWave";
 
@@ -36,8 +37,10 @@ function withLetterWaveSetting(css: string): string {
  * compressed, and compiling the RICS source it is written in.
  */
 export function applyCustomStyles(css: string): void {
-  const needsLyricReload = mainView.setTheme(withLetterWaveSetting(css));
-  publishPictureInPictureLyrics();
+  const themeCss = withLetterWaveSetting(css);
+  const needsLyricReload = mainView.setTheme(themeCss);
+  applyKaraokeTheme(themeCss);
+  publishSecondaryViews();
 
   if (needsLyricReload) {
     reloadLyrics();

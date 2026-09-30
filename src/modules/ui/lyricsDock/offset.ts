@@ -2,7 +2,7 @@ import { OFFSET_STORAGE_PREFIX } from "@constants";
 import { AppState } from "@core/appState";
 import { getTransientStorage, setPersistentStorage, setStorage } from "@core/storage";
 import { retickMainView } from "@modules/ui/mainLyricsView";
-import { publishPictureInPictureLyrics } from "@modules/ui/pictureInPicture/lyricsPublisher";
+import { publishSecondaryViews } from "@modules/ui/secondaryViews";
 
 export const OFFSET_STEP = 0.1;
 export const OFFSET_STEP_LARGE = 0.5;
@@ -13,7 +13,7 @@ const OFFSET_PERSIST_DELAY = 400;
 // hands the floating window the offsets its own tick reads.
 function renderOffsetChange(): void {
   retickMainView();
-  publishPictureInPictureLyrics();
+  publishSecondaryViews();
 }
 
 function offsetKey(videoId: string, source: string): string {

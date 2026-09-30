@@ -42,7 +42,8 @@ import { bindLyricsFileDrop, LYRICS_FILE_READING_EVENT } from "@/options/unison/
 import { createFeedback, fillFeedback } from "@/options/unison/feedback";
 import { type IconKey, svgIcon } from "@/options/unison/icons";
 import { appendLanguageOptions, matchLanguageOption } from "@/options/unison/languages";
-import { detectFormat, renderPreviewInto } from "@/options/unison/lyricsPreview";
+import { renderPreviewInto } from "@/options/unison/lyricsPreview";
+import { detectFormat } from "@/options/unison/lyricsPreviewLines";
 import { appendMetaRow } from "@/options/unison/metaTable";
 import { IS_DEV, devFixtureHint, devFixtures } from "@modules/unison/devFixtures";
 import { renderRevisionBar } from "@/options/unison/revisions/revisionBar";
@@ -50,6 +51,7 @@ import { type EditorSurface, renderRevisionEditor } from "@/options/unison/revis
 import { renderRevisionsPage } from "@/options/unison/revisions/revisionList";
 import { type RevisionHost, createButton } from "@/options/unison/revisions/revisionUi";
 import { initTooltips } from "@/options/unison/tooltip";
+import { XMLParser } from "fast-xml-parser";
 
 // -- Icons --------------------------
 
@@ -101,6 +103,7 @@ let savebarSlot: HTMLElement;
 let submitBtn: HTMLButtonElement;
 let submitFeedback: HTMLElement;
 let previewContent: HTMLElement;
+let previewHead: HTMLElement;
 let lyricsTextarea: HTMLTextAreaElement;
 let formatSelect: HTMLSelectElement;
 let submitLanguageSelect: HTMLSelectElement;
@@ -320,6 +323,7 @@ export function initUnisonPage(): void {
   submitBtn = document.getElementById("unison-submit-btn") as HTMLButtonElement;
   submitFeedback = document.getElementById("unison-submit-feedback") as HTMLElement;
   previewContent = document.getElementById("unison-preview-content") as HTMLElement;
+  previewHead = document.getElementById("unison-preview-head") as HTMLElement;
   lyricsTextarea = document.getElementById("unison-field-lyrics") as HTMLTextAreaElement;
   formatSelect = document.getElementById("unison-field-format") as HTMLSelectElement;
   submitLanguageSelect = document.getElementById("unison-field-language") as HTMLSelectElement;
@@ -469,6 +473,43 @@ function autoDetectLanguage(): void {
   if (!lang) return;
   const matched = matchLanguageOption(lang);
   if (matched) submitLanguageSelect.value = matched;
+}
+
+const ttmlMetaParser = new XMLParser({ ignoreAttributes: false, removeNSPrefix: true });
+
+function findIsrcMeta(node: unknown): string | null {
+  if (!node || typeof node !== "object") return null;
+  for (const [key, child] of Object.entries(node)) {
+    if (key === "meta") {
+      for (const meta of [child].flat()) {
+        if (String(meta?.["@_key"]).toLowerCase() !== "isrc") continue;
+        const value = String(meta["@_value"] ?? "")
+          .toUpperCase()
+          .replace(/[\s-]/g, "");
+        if (/^[A-Z]{2}[A-Z0-9]{3}\d{7}$/.test(value)) return value;
+      }
+    }
+    const found = findIsrcMeta(child);
+    if (found) return found;
+  }
+  return null;
+}
+
+function detectTtmlIsrc(text: string): string | null {
+  if (!/isrc/i.test(text)) return null;
+  try {
+    return findIsrcMeta(ttmlMetaParser.parse(text));
+  } catch (error) {
+    warnUnison("Failed to read TTML metadata", error);
+    return null;
+  }
+}
+
+function autoDetectIsrc(): void {
+  const isrcInput = document.getElementById("unison-field-isrc") as HTMLInputElement;
+  if (isrcInput.value.trim()) return;
+  const isrc = detectTtmlIsrc(lyricsTextarea.value);
+  if (isrc) isrcInput.value = isrc;
 }
 
 function clearFeedTabCache(cache: FeedTabCache): void {
@@ -913,6 +954,7 @@ function renderDetailSkeleton(): void {
   detailMeta.appendChild(artistSkel);
   detailMeta.appendChild(metaSkel);
 
+  renderPreviewInto(detailPreview, "", false, detailPreviewHead);
   const previewSkel = document.createElement("div");
   previewSkel.className = "unison-skeleton";
   previewSkel.style.width = "100%";
@@ -1023,7 +1065,7 @@ function renderDetail(entry: UnisonLyricsEntry, view: AbortSignal, isOwn: boolea
   void renderDetailRevisionBar(entry, view);
 
   // -- Preview column
-  renderPreviewInto(detailPreview, entry.lyrics);
+  renderPreviewInto(detailPreview, entry.lyrics, false, detailPreviewHead);
 
   // -- Raw lyrics column
   const pre = document.createElement("pre");
@@ -1853,6 +1895,7 @@ function setupSubmitForm(): void {
     updatePreview();
     autoDetectFormat();
     autoDetectLanguage();
+    autoDetectIsrc();
   });
 
   lyricsTextarea.addEventListener(LYRICS_FILE_READING_EVENT, syncSubmitButton);
@@ -1861,6 +1904,7 @@ function setupSubmitForm(): void {
     updatePreview();
     autoDetectFormat();
     autoDetectLanguage();
+    autoDetectIsrc();
   });
 }
 
@@ -2033,7 +2077,7 @@ function autoDetectFormat(): void {
 }
 
 function updatePreview(): void {
-  renderPreviewInto(previewContent, lyricsTextarea.value, true);
+  renderPreviewInto(previewContent, lyricsTextarea.value, true, previewHead);
 }
 
 function parseVideoId(raw: string): string | null {

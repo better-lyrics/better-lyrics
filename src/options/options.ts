@@ -18,6 +18,7 @@ import {
   signPayload,
 } from "@core/keyIdentity";
 import { clearAllOffsets, getOffsetInfo } from "@core/storage";
+import { KARAOKE_DEFAULTS } from "@modules/karaoke/defaults";
 import { parseSvgString, syncTypeColors } from "@modules/ui/lyricsDock/icons";
 import { migrateLetterWavePref, type LetterWavePref } from "@modules/settings/letterWave";
 import { mergePreferredProviders } from "@modules/lyrics/providers/providerList";
@@ -48,6 +49,7 @@ interface Options extends VideoQualitySettings {
   pipTextTransition: string;
   pipMarqueeEnabled: boolean;
   pipProgressBarEnabled: boolean;
+  isKaraokeEnabled: boolean;
   isTranslateEnabled: boolean;
   translationLanguage: string;
   isCursorAutoHideEnabled: boolean;
@@ -120,6 +122,7 @@ const getOptionsFromForm = (): Options => {
     pipTextTransition: (document.getElementById("pipTextTransition") as HTMLSelectElement).value,
     pipMarqueeEnabled: (document.getElementById("pipMarqueeEnabled") as HTMLInputElement).checked,
     pipProgressBarEnabled: (document.getElementById("pipProgressBarEnabled") as HTMLInputElement).checked,
+    isKaraokeEnabled: (document.getElementById("isKaraokeEnabled") as HTMLInputElement).checked,
     isTranslateEnabled: (document.getElementById("translate") as HTMLInputElement).checked,
     translationLanguage: (document.getElementById("translationLanguage") as HTMLInputElement).value,
     isCursorAutoHideEnabled: (document.getElementById("cursorAutoHide") as HTMLInputElement).checked,
@@ -314,6 +317,7 @@ const restoreOptions = (): void => {
     pipTextTransition: "spring",
     pipMarqueeEnabled: true,
     pipProgressBarEnabled: true,
+    ...KARAOKE_DEFAULTS,
     isTranslateEnabled: false,
     translationLanguage: "en",
     isRomanizationEnabled: false,
@@ -410,6 +414,7 @@ const setOptionsInForm = (items: Options): void => {
   (document.getElementById("pipTextTransition") as HTMLSelectElement).value = items.pipTextTransition;
   (document.getElementById("pipMarqueeEnabled") as HTMLInputElement).checked = items.pipMarqueeEnabled;
   (document.getElementById("pipProgressBarEnabled") as HTMLInputElement).checked = items.pipProgressBarEnabled;
+  (document.getElementById("isKaraokeEnabled") as HTMLInputElement).checked = items.isKaraokeEnabled;
   (document.getElementById("translate") as HTMLInputElement).checked = items.isTranslateEnabled;
   (document.getElementById("translationLanguage") as HTMLInputElement).value = items.translationLanguage;
   (document.getElementById("isRomanizationEnabled") as HTMLInputElement).checked = items.isRomanizationEnabled;

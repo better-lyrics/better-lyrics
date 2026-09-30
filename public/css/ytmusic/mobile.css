@@ -4,20 +4,20 @@
     max-width: unset;
   }
 
-  ytmusic-player-page:not([is-mweb-modernization-enabled])[player-fullscreened]:not([blyrics-dfs]):not([blyrics-video-mode])
+  ytmusic-player-page:not([is-mweb-modernization-enabled])[player-fullscreened]:not([blyrics-dfs], [blyrics-karaoke]):not([blyrics-video-mode])
   #side-panel {
     height: 100vh;
     transform: translateY(calc(0px - var(--ytmusic-nav-bar-height) - var(--ytmusic-player-page-vertical-padding)));
   }
 
-  ytmusic-player-page:not([is-mweb-modernization-enabled])[player-fullscreened]:not([blyrics-dfs])[blyrics-video-mode]
+  ytmusic-player-page:not([is-mweb-modernization-enabled])[player-fullscreened]:not([blyrics-dfs], [blyrics-karaoke])[blyrics-video-mode]
   #side-panel {
     height: 100vh;
     transform: translateY(calc(0px - var(--ytmusic-player-page-vertical-padding)));
   }
 
 
-  ytmusic-player-page:not([is-mweb-modernization-enabled])[player-fullscreened]:not([blyrics-dfs]) 
+  ytmusic-player-page:not([is-mweb-modernization-enabled])[player-fullscreened]:not([blyrics-dfs], [blyrics-karaoke]) 
   .blyrics-container {
     padding-top: var(--blyrics-padding-top);
   }
@@ -34,17 +34,17 @@
   }
 
   /* Fullscreen panel sizes */
-  ytmusic-player-page:not([is-mweb-modernization-enabled])[player-fullscreened]:not([blyrics-dfs]):not([blyrics-video-mode])
+  ytmusic-player-page:not([is-mweb-modernization-enabled])[player-fullscreened]:not([blyrics-dfs], [blyrics-karaoke]):not([blyrics-video-mode])
   #side-panel {
     width: var(--blyrics-fullscreen-panel-size);
   }
 
-  ytmusic-player-page:not([is-mweb-modernization-enabled])[player-fullscreened]:not([blyrics-dfs])[blyrics-video-mode]
+  ytmusic-player-page:not([is-mweb-modernization-enabled])[player-fullscreened]:not([blyrics-dfs], [blyrics-karaoke])[blyrics-video-mode]
   #side-panel {
     width: var(--blyrics-fullscreen-video-panel-size);
   }
 
-  ytmusic-player-page:not([is-mweb-modernization-enabled])[player-fullscreened]:not([blyrics-dfs]):not([blyrics-video-mode])
+  ytmusic-player-page:not([is-mweb-modernization-enabled])[player-fullscreened]:not([blyrics-dfs], [blyrics-karaoke]):not([blyrics-video-mode])
   #player.ytmusic-player-page {
     margin-bottom: 0;
     margin-top: 0;
@@ -74,12 +74,12 @@
 }
 
 @media (max-width: 936px) {
-  ytmusic-player-page:not([is-mweb-modernization-enabled])[player-fullscreened]:not([blyrics-dfs])[blyrics-video-mode]
+  ytmusic-player-page:not([is-mweb-modernization-enabled])[player-fullscreened]:not([blyrics-dfs], [blyrics-karaoke])[blyrics-video-mode]
   .content.ytmusic-player-page {
     margin-top: 4em;
   }
 
-  ytmusic-app-layout:not([is-mweb-modernization-enabled])[player-fullscreened]:not([blyrics-dfs])
+  ytmusic-app-layout:not([is-mweb-modernization-enabled])[player-fullscreened]:not([blyrics-dfs], [blyrics-karaoke])
   > [slot="player-page"]
   #side-panel {
     margin-top: 0;
@@ -92,19 +92,19 @@
   mask-image: none;
   -webkit-mask-image: none;
 }
-ytmusic-player-page[is-mweb-modernization-enabled][player-fullscreened]:not([blyrics-dfs])
+ytmusic-player-page[is-mweb-modernization-enabled][player-fullscreened]:not([blyrics-dfs], [blyrics-karaoke])
 #player-controls.ytmusic-player-page {
   max-width: 100vw;
 }
-ytmusic-player-page[is-mweb-modernization-enabled][player-fullscreened]:not([blyrics-dfs])
+ytmusic-player-page[is-mweb-modernization-enabled][player-fullscreened]:not([blyrics-dfs], [blyrics-karaoke])
 #main-panel.ytmusic-player-page {
   padding: 0 !important;
 }
 
-ytmusic-player-page[is-mweb-modernization-enabled][player-fullscreened][blyrics-dfs][blyrics-video-mode] #player-controls.ytmusic-player-page {
+ytmusic-player-page[is-mweb-modernization-enabled][player-fullscreened]:is([blyrics-dfs], [blyrics-karaoke])[blyrics-video-mode] #player-controls.ytmusic-player-page {
   max-width: unset !important;
 }
 
-ytmusic-player-page[is-mweb-modernization-enabled][player-fullscreened][blyrics-dfs][blyrics-video-mode] #main-panel.ytmusic-player-page {
+ytmusic-player-page[is-mweb-modernization-enabled][player-fullscreened]:is([blyrics-dfs], [blyrics-karaoke])[blyrics-video-mode] #main-panel.ytmusic-player-page {
   padding: unset !important;
 }

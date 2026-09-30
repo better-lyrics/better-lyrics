@@ -1,94 +1,40 @@
-import { t } from "@core/i18n";
-import type { UnisonFormat } from "@modules/unison/types";
-import { XMLParser } from "fast-xml-parser";
+import type { Lyric } from "@braccato/parsers";
+import { getLanguageDisplayName, t } from "@core/i18n";
+import { createDropdownSelect, type DropdownOption, type DropdownSelect } from "@/options/unison/dropdownSelect";
 import { parseSvgMarkup } from "@/options/unison/icons";
+import {
+  ORIGINAL_VIEW,
+  type PreviewLine,
+  parseLyrics,
+  previewDisplayLines,
+  ROMANIZATION_VIEW,
+  translationLanguages,
+} from "@/options/unison/lyricsPreviewLines";
 
 // -- Format --------------------------
 
-export function detectFormat(text: string): UnisonFormat {
-  if (/^\[[\d:.]+\]/m.test(text)) return "lrc";
-  if (/<tt[\s>]/i.test(text)) return "ttml";
-  return "plain";
-}
-
 // -- Preview --------------------------
 
-function stripLrcTimestamps(line: string): string {
-  return line.replace(/^\[[\d:.]+\]\s*/g, "");
-}
+const PREVIEW_LINE_LIMIT = 100;
 
-interface TtmlNode {
-  "#text"?: string;
-  ":@"?: Record<string, string>;
-  span?: TtmlNode[];
-  p?: TtmlNode[];
-  [key: string]: unknown;
-}
-
-interface PreviewLine {
+interface PreviewState {
   text: string;
-  isBackground: boolean;
+  showEmpty: boolean;
+  view: string;
+  select?: DropdownSelect;
 }
 
-function collectText(nodes: TtmlNode[]): string {
-  let text = "";
-  for (const node of nodes) {
-    if (node["#text"] != null) text += node["#text"];
-    if (node.span) text += collectText(node.span);
+const previewStates = new WeakMap<HTMLElement, PreviewState>();
+
+function viewOptions(lyrics: Lyric[]): DropdownOption[] {
+  const options: DropdownOption[] = [{ value: ORIGINAL_VIEW, label: t("unison_rev_original") }];
+  if (lyrics.some(line => line.romanization)) {
+    options.push({ value: ROMANIZATION_VIEW, label: t("options_romanization_tab") });
   }
-  return text;
-}
-
-function parseTtmlLines(text: string): PreviewLine[] {
-  const parser = new XMLParser({
-    ignoreAttributes: false,
-    attributeNamePrefix: "@_",
-    textNodeName: "#text",
-    trimValues: false,
-    removeNSPrefix: true,
-    preserveOrder: true,
-    allowBooleanAttributes: true,
-    parseAttributeValue: false,
-    parseTagValue: false,
-  });
-
-  let parsed: TtmlNode[];
-  try {
-    parsed = parser.parse(text) as TtmlNode[];
-  } catch {
-    return text.split("\n").map(t => ({ text: t, isBackground: false }));
+  for (const lang of translationLanguages(lyrics)) {
+    options.push({ value: lang, label: getLanguageDisplayName(lang) });
   }
-
-  const lines: PreviewLine[] = [];
-
-  function walkNodes(nodes: TtmlNode[]) {
-    for (const node of nodes) {
-      if (node.p) {
-        let mainText = "";
-        const bgTexts: string[] = [];
-        for (const child of node.p) {
-          if (child[":@"]?.["@_role"] === "x-bg") {
-            const bg = collectText(child.span ?? []).trim();
-            if (bg) bgTexts.push(bg);
-          } else {
-            mainText += child["#text"] ?? "";
-            if (child.span) mainText += collectText(child.span);
-          }
-        }
-        mainText = mainText.trim();
-        if (mainText) lines.push({ text: mainText, isBackground: false });
-        for (const bg of bgTexts) lines.push({ text: bg, isBackground: true });
-      }
-      for (const key of Object.keys(node)) {
-        if (key === ":@" || key === "#text") continue;
-        const val = node[key as keyof TtmlNode];
-        if (Array.isArray(val)) walkNodes(val as TtmlNode[]);
-      }
-    }
-  }
-
-  walkNodes(parsed);
-  return lines.length > 0 ? lines : text.split("\n").map(t => ({ text: t, isBackground: false }));
+  return options;
 }
 
 function renderPreviewEmpty(container: HTMLElement): void {
@@ -108,47 +54,52 @@ function renderPreviewEmpty(container: HTMLElement): void {
   container.appendChild(empty);
 }
 
-export function renderPreviewInto(container: HTMLElement, text: string, showEmpty = false): void {
+function renderLine(container: HTMLElement, line: PreviewLine): void {
+  const div = document.createElement("div");
+  div.className = `unison-preview-line${line.isBackground ? " unison-preview-line--bg" : ""}`;
+  div.textContent = line.text;
+  container.appendChild(div);
+}
+
+function renderPreview(container: HTMLElement, head: HTMLElement | undefined, state: PreviewState): void {
   container.replaceChildren();
+  const { text } = state;
   if (!text.trim()) {
-    if (showEmpty) renderPreviewEmpty(container);
+    if (state.showEmpty) renderPreviewEmpty(container);
+    if (state.select) state.select.setHidden(true);
     return;
   }
 
-  const isTtml = /<tt[\s>]/i.test(text);
-  const isLrc = /^\[[\d:.]+\]/m.test(text);
-
-  if (isTtml) {
-    const ttmlLines = parseTtmlLines(text);
-    for (const line of ttmlLines.slice(0, 100)) {
-      const div = document.createElement("div");
-      div.className = `unison-preview-line${line.isBackground ? " unison-preview-line--bg" : ""}`;
-      div.textContent = line.text;
-      container.appendChild(div);
-    }
-    if (ttmlLines.length > 100) {
-      const more = document.createElement("div");
-      more.className = "unison-preview-line unison-preview-line--truncated";
-      more.textContent = `... ${ttmlLines.length - 100} more lines`;
-      container.appendChild(more);
-    }
-  } else {
-    const lines = text
-      .split("\n")
-      .map(l => (isLrc ? stripLrcTimestamps(l) : l))
-      .filter(l => l.trim() && !l.startsWith("["));
-
-    for (const line of lines.slice(0, 100)) {
-      const div = document.createElement("div");
-      div.className = "unison-preview-line";
-      div.textContent = line || "\u00A0";
-      container.appendChild(div);
-    }
-    if (lines.length > 100) {
-      const more = document.createElement("div");
-      more.className = "unison-preview-line unison-preview-line--truncated";
-      more.textContent = `... ${lines.length - 100} more lines`;
-      container.appendChild(more);
-    }
+  const lyrics = parseLyrics(text);
+  const options = viewOptions(lyrics);
+  const view = options.some(option => option.value === state.view) ? state.view : ORIGINAL_VIEW;
+  if (head && options.length > 1) {
+    state.select ??= createDropdownSelect(t("unison_preview"), value => {
+      state.view = value;
+      renderPreview(container, head, state);
+    });
+    if (state.select.root.parentElement !== head) head.appendChild(state.select.root);
+    state.select.setOptions(options, view);
+    state.select.setHidden(false);
+  } else if (state.select) {
+    state.select.setHidden(true);
   }
+
+  const shown = previewDisplayLines(text, lyrics, view);
+  for (const line of shown.slice(0, PREVIEW_LINE_LIMIT)) renderLine(container, line);
+  if (shown.length > PREVIEW_LINE_LIMIT) {
+    const more = document.createElement("div");
+    more.className = "unison-preview-line unison-preview-line--truncated";
+    more.textContent = `... ${shown.length - PREVIEW_LINE_LIMIT} more lines`;
+    container.appendChild(more);
+  }
+}
+
+export function renderPreviewInto(container: HTMLElement, text: string, showEmpty = false, head?: HTMLElement): void {
+  const state = previewStates.get(container) ?? { text, showEmpty, view: ORIGINAL_VIEW };
+  state.text = text;
+  state.showEmpty = showEmpty;
+  if (!text.trim()) state.view = ORIGINAL_VIEW;
+  previewStates.set(container, state);
+  renderPreview(container, head, state);
 }

@@ -1,12 +1,7 @@
 import { DISABLE_EFFECTS_STYLE_ID, FOOTER_CLASS } from "@constants";
 import { CUSTOM_THEME_STYLE_ID } from "@braccato/core/constants";
-import {
-  createLyricsRenderer,
-  injectRomanization,
-  injectTranslation,
-  type Lyric,
-  type LyricsRenderer,
-} from "@braccato/core";
+import { applyLyricDecorations } from "@modules/lyrics/lyricDecorations";
+import { createLyricsRenderer, type Lyric, type LyricsRenderer } from "@braccato/core";
 import { onLyrics, type PictureInPictureLyricsPayload } from "./bridge";
 import { PictureInPictureController } from "./controller";
 import { PictureInPictureLyricsView } from "./lyricsView";
@@ -60,11 +55,14 @@ function whenStylesheetSettled(link: HTMLLinkElement): Promise<void> {
   return settlement;
 }
 
-function revealWhenStyled(pipWindow: Window): void {
+function revealWhenStyled(pipWindow: Window, onStyled: () => void): void {
   const links = Array.from(pipWindow.document.head.querySelectorAll<HTMLLinkElement>('link[rel="stylesheet"]'));
   const timeout = new Promise<void>(resolve => pipWindow.setTimeout(resolve, STYLESHEET_REVEAL_TIMEOUT_MS));
-  void Promise.race([Promise.all(links.map(whenStylesheetSettled)), timeout]).then(() => {
+  const styled = Promise.all(links.map(whenStylesheetSettled));
+  void Promise.race([styled.then(() => true), timeout.then(() => false)]).then(isStyled => {
     pipWindow.document.documentElement.style.removeProperty("visibility");
+    onStyled();
+    if (!isStyled) void styled.then(onStyled);
   });
 }
 
@@ -246,37 +244,13 @@ export function createPictureInPictureHost(
   }
 
   /**
-   * Hangs the translated and romanized text the opener fetched off this window's own line elements.
    * Run after every build rather than only when the payload changes, because a theme change rebuilds
-   * the lyrics from scratch and would otherwise drop them. Both injectors no-op on a line that
-   * already carries one, so re-running costs a lookup per line.
+   * the lyrics from scratch and would otherwise drop them.
    */
   function applyDecorations(): void {
-    const renderer = activeRenderer;
-    // The container is built out of the renderer's own document, so it names it. Reading it off
-    // `activeWindow` instead makes this depend on two variables, assigned in two other functions,
-    // staying in step.
-    const pipDocument = renderer?.container?.ownerDocument;
     const decorations = lyricsPayload?.decorations;
-    if (!renderer || !pipDocument || !decorations) return;
-
-    const lines = renderer.lines;
-    for (const [index, decoration] of Object.entries(decorations)) {
-      const line = lines[Number(index)];
-      if (!line) continue;
-      if (decoration.romanization) {
-        injectRomanization(
-          pipDocument,
-          line.lyricElement,
-          line,
-          decoration.romanization,
-          decoration.timedRomanization ?? null
-        );
-      }
-      if (decoration.translation) {
-        injectTranslation(pipDocument, line.lyricElement, decoration.translation, decoration.translationLanguage);
-      }
-    }
+    if (!activeRenderer || !decorations) return;
+    applyLyricDecorations(activeRenderer, decorations);
   }
 
   function measureLyrics(): void {
@@ -403,7 +377,9 @@ export function createPictureInPictureHost(
     renderLoadingShell,
     injectStylesheet: (pipWindow, stylesheet) => {
       environment.injectStylesheet(pipWindow, stylesheet);
-      revealWhenStyled(pipWindow);
+      revealWhenStyled(pipWindow, () => {
+        if (activeWindow === pipWindow) measureLyrics();
+      });
     },
     closeWindow: pipWindow => {
       teardownWindow(pipWindow);

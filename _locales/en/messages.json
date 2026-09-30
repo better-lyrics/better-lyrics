@@ -1184,7 +1184,7 @@
   },
   "options_romanization_tab": {
     "message": "Romanization",
-    "description": "Romanization tab label"
+    "description": "Romanization tab label in options, and the romanized lyrics option in the Unison preview language picker"
   },
   "options_translation_tab": {
     "message": "Translation",
@@ -2021,7 +2021,7 @@
   },
   "unison_rev_original": {
     "message": "Original",
-    "description": "Label for revision 1 of a Unison lyric, the original upload"
+    "description": "Label for revision 1 of a Unison lyric (the original upload), and for the untranslated lyrics option in the preview language picker"
   },
   "unison_rev_neverEdited": {
     "message": "Uploaded $when$, never edited",
@@ -2443,6 +2443,10 @@
     "message": "Something went wrong. Try again.",
     "description": "Fallback error for revision actions"
   },
+  "options_display_karaoke": {
+    "message": "Karaoke subtitles",
+    "description": "Toggle label for showing synced lyrics as subtitles over a music video in fullscreen"
+  },
   "options_display_highResolutionVideo": {
     "message": "Enable higher-resolution videos",
     "description": "Display settings toggle for enabling video resolutions above 1080p."
@@ -2465,6 +2469,6 @@
   },
   "options_display_videoQualityApplyHint": {
     "message": "Higher-resolution playback changes apply to the next video or after refreshing. Preferred quality uses the closest available lower resolution.",
-    "description": "Hint explaining when video playback changes take effect and how unavailable resolutions fall back."
+    "description": "Tooltip explaining when video playback changes take effect and how unavailable resolutions fall back."
   }
 }

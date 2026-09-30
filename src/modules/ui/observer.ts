@@ -9,6 +9,8 @@ import {
   TAB_RENDERER_SELECTOR,
 } from "@constants";
 import { AppState, handleModifications, type PlayerDetails, reloadLyrics } from "@core/appState";
+import { syncKaraoke, tickKaraoke } from "@modules/karaoke/karaokeView";
+import { isKaraokeActive } from "@modules/karaoke/state";
 import { preFetchLyrics } from "@modules/lyrics/lyrics";
 import { getArtworkMetadata, getSongAlbum, getSongMetadata } from "@modules/lyrics/requestSniffer/requestSniffer";
 import { onAutoSwitchEnabled, onFullScreenDisabled, wakeDockIdle } from "@modules/settings/settings";
@@ -23,6 +25,7 @@ import {
   openPlayerPageForFullscreen,
 } from "@modules/ui/navigation";
 import { getResumeScrollElement } from "@modules/ui/resumeScrollButton";
+import { isLyricsWantedOffTab } from "@modules/ui/secondaryViews";
 import { logCore, logError } from "@core/logger";
 import {
   addThumbnail,
@@ -42,7 +45,7 @@ let fullscreenObserver: MutationObserver | null = null;
 let lyricsTabObserver: MutationObserver | null = null;
 let inertObserver: MutationObserver | null = null;
 let fullscreenExitObserver: MutationObserver | null = null;
-let avButtonObserver: MutationObserver | null = null;
+let videoModeObserver: MutationObserver | null = null;
 
 let hasInitializedLyricReloader = false;
 let hasInitializedHomepageFullscreen = false;
@@ -56,7 +59,6 @@ let latestPlayerPlaying = false;
 let latestPlayerTime = 0;
 let latestPlayerSnapshotTime = 0;
 let latestPlayerDuration = 0;
-let latestPlaybackRate = 1;
 
 function runAnimationEngine(now: number, force = false): void {
   if (!force && (!latestPlayerPlaying || now - lastAnimationEngineRun < ANIMATION_ENGINE_INTERVAL_MS)) return;
@@ -64,10 +66,11 @@ function runAnimationEngine(now: number, force = false): void {
   lastAnimationEngineRun = now;
   const wallTime = Date.now();
   const elapsedS = latestPlayerPlaying
-    ? (Math.max(0, wallTime - latestPlayerSnapshotTime) * latestPlaybackRate) / 1000
+    ? (Math.max(0, wallTime - latestPlayerSnapshotTime) * AppState.playbackRate) / 1000
     : 0;
   const currentTime = Math.min(latestPlayerTime + elapsedS, latestPlayerDuration || Infinity);
   if (AppState.suppressZeroTime < wallTime || currentTime !== 0) {
+    if (isKaraokeActive()) tickKaraoke(currentTime, wallTime, latestPlayerPlaying);
     if (
       AppState.areLyricsTicking &&
       mainView.tick(currentTime, currentTickOptions(wallTime, latestPlayerPlaying)) === "lyrics-missing"
@@ -327,12 +330,12 @@ export function initializeLyrics(): void {
     latestPlayerTime = detail.currentTime;
     latestPlayerSnapshotTime = detail.browserTime;
     latestPlayerDuration = Number(detail.duration);
-    latestPlaybackRate = detail.playbackRate ?? 1;
+    AppState.playbackRate = detail.playbackRate ?? 1;
 
     updateFullscreenControlsSnapshot({
       currentTimeS: detail.currentTime,
       durationS: Number(detail.duration),
-      playbackRate: detail.playbackRate ?? 1,
+      playbackRate: AppState.playbackRate,
       isPlaying: detail.playing,
       wallTime: detail.browserTime,
     });
@@ -416,7 +419,7 @@ export function initializeLyrics(): void {
       });
     }
 
-    if (AppState.lyricInjectionFailed && !AppState.isPictureInPictureOpen) {
+    if (AppState.lyricInjectionFailed && !isLyricsWantedOffTab()) {
       const tabSelector = document.getElementsByClassName(TAB_HEADER_CLASS)[1];
       if (tabSelector && tabSelector.getAttribute("aria-selected") !== "true") {
         return; // wait to resolve until tab is visible
@@ -627,36 +630,24 @@ export function setupAltHoverHandler(): void {
   });
 }
 
-export function setUpAvButtonListener(): void {
-  let avToggle = document.querySelector("#av-id > ytmusic-av-toggle");
-  if (!avToggle) {
-    setTimeout(setUpAvButtonListener, 1000);
+export function setUpVideoModeListener(): void {
+  const playerPage = document.querySelector("#player-page");
+  if (!playerPage) {
+    setTimeout(setUpVideoModeListener, 1000);
     return;
   }
 
-  if (avButtonObserver) {
-    avButtonObserver.disconnect();
-  }
+  videoModeObserver?.disconnect();
 
-  let handleAVSwitch = (isVideo: boolean) => {
-    document.querySelector("#player-page")?.toggleAttribute("blyrics-video-mode", isVideo);
+  const syncVideoMode = () => {
+    const isVideo = playerPage.hasAttribute("video-mode");
+    playerPage.toggleAttribute("blyrics-video-mode", isVideo);
     document.querySelector("ytmusic-app-layout")?.toggleAttribute("blyrics-video-mode", isVideo);
-  };
-  const observerCallback = (mutationsList: MutationRecord[]) => {
-    for (const mutation of mutationsList) {
-      if (mutation.type === "attributes" && mutation.attributeName === "is-video-playback-mode-selected") {
-        const isVideo = avToggle.getAttribute("is-video-playback-mode-selected") === "true";
-        handleAVSwitch(isVideo);
-      }
-    }
+    syncKaraoke();
   };
 
-  avButtonObserver = new MutationObserver(observerCallback);
-
-  avButtonObserver.observe(avToggle, {
-    attributes: true,
-    attributeFilter: ["is-video-playback-mode-selected"],
-  });
-  handleAVSwitch(avToggle.getAttribute("is-video-playback-mode-selected") === "true");
-  logCore("Set up a/v toggle observer");
+  videoModeObserver = new MutationObserver(syncVideoMode);
+  videoModeObserver.observe(playerPage, { attributes: true, attributeFilter: ["video-mode"] });
+  syncVideoMode();
+  logCore("Set up video mode observer");
 }

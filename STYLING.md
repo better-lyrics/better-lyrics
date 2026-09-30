@@ -72,6 +72,10 @@
 	- [21. Best Practices for Modifying CSS](#21-best-practices-for-modifying-css)
 	- [22. Importing/Exporting Styles](#22-importingexporting-styles)
 	- [23. Additional Resources](#23-additional-resources)
+	- [24. Karaoke Subtitles](#24-karaoke-subtitles)
+		- [Karaoke Structure](#karaoke-structure)
+		- [Styling the Plate](#styling-the-plate)
+		- [Stage Lines](#stage-lines)
 
 ## 1. Introduction to CSS and Better Lyrics
 
@@ -438,6 +442,14 @@ This keeps lyrics centered everywhere except the Picture-in-Picture window:
 /* blyrics-target-scroll-pos-ratio = 0.5; */
 .blyrics-pip-shell .blyrics-container {
   --blyrics-target-scroll-pos-ratio: 0.37;
+}
+```
+
+The Picture-in-Picture window also defaults `--blyrics-scroll-timing-offset` to `0s`, so a line stays put until its last syllable ends instead of moving up half a second early inside the short window. A value set on `:root` doesn't reach it; to change it, set the variable on the same selector:
+
+```css
+.blyrics-pip-shell .blyrics-container {
+  --blyrics-scroll-timing-offset: 0.2s;
 }
 ```
 
@@ -1749,6 +1761,98 @@ To learn more about CSS and web development:
 - [Flexbox Guide](https://css-tricks.com/snippets/css/a-guide-to-flexbox/)
 
 The best way to learn CSS is through experimentation and practice. Join the [Better Lyrics Discord community](https://discord.gg/UsHE3d5fWF) for help, inspiration, and to share your creations!
+
+## 24. Karaoke Subtitles
+
+When the "Karaoke subtitles" option is on (it is on by default) and a music video plays in fullscreen, the video fills the screen and the synced lyrics show over it one line at a time, on a blurred plate. The Better Lyrics side panel and the fullscreen controls column stay hidden for as long as karaoke owns the fullscreen video, including while lyrics load and when a song has no lyrics or only unsynced ones.
+
+While karaoke owns the layout, `ytmusic-app-layout` and `#player-page` carry the `blyrics-karaoke` attribute. The fullscreen rules from [section 10](#10-implementing-fullscreen-mode) skip it with `:not([blyrics-karaoke])`, so use the attribute when a fullscreen rule of yours should also skip karaoke:
+
+```css
+ytmusic-player-page[player-fullscreened]:not([blyrics-dfs], [blyrics-karaoke]) #blyrics-watermark {
+  display: none;
+}
+```
+
+### Karaoke Structure
+
+The overlay is a fixed layer added to the page the first time karaoke is used. The lyrics inside it are the normal `.blyrics-container`, laid out as a stage:
+
+```
+#blyrics-karaoke                                   ([data-bar], [data-title-card])
+├── .blyrics-karaoke__stage
+│   ├── .blyrics-karaoke__plate.blyrics-karaoke-surface   ([data-plate] when shown)
+│   ├── .blyrics-karaoke__plate.blyrics-karaoke-surface
+│   └── .blyrics-karaoke__mount
+│       └── .blyrics-container[data-layout="stage"]
+│           ├── .blyrics--line                     (one per lyric line)
+│           └── .blyrics-credits                   (end card)
+│               └── .blyrics-karaoke-source        (provider name and sync icon)
+└── .blyrics-karaoke__title
+    └── .blyrics-karaoke__card.blyrics-karaoke-surface
+        ├── .blyrics-karaoke__card-title
+        ├── .blyrics-karaoke__card-artist
+        └── .blyrics-karaoke__card-credit
+```
+
+There are two plates so that when the next line is somewhere else on screen, a new plate can fade in there while the old one fades out. The title card shows the song, artist and songwriters during an intro, when the first sung line is at least five seconds in.
+
+| Attribute | When applied |
+|-----------|--------------|
+| `#blyrics-karaoke[data-bar]` | The YouTube Music player bar is showing; the lines lift above it |
+| `#blyrics-karaoke[data-title-card]` | The intro title card is showing; the stage is hidden |
+| `.blyrics-karaoke__plate[data-plate]` | This plate is behind the line being sung |
+| `.blyrics-karaoke__plate[data-end-card]` | This plate is behind the end card (songwriter credits and source); it keeps the attribute while it fades out |
+
+### Styling the Plate
+
+Both plates and the title card share `.blyrics-karaoke-surface`, so one rule restyles the whole backdrop. `--blyrics-karaoke-video-scale` shrinks the video and the overlay together relative to the screen. It is a unitless number and defaults to `1`. Below `1`, the frame takes the video's own aspect ratio, so a 4:3 or ultrawide video never shows black bars inside it:
+
+```css
+:root {
+  --blyrics-karaoke-video-scale: 0.94;
+}
+
+#blyrics-karaoke .blyrics-karaoke-surface {
+  border-radius: 0.3em;
+  background: rgb(0 0 0 / 70%);
+  box-shadow: none;
+  backdrop-filter: blur(12px);
+}
+```
+
+Each backdrop can also be styled on its own: the intro card is `.blyrics-karaoke__card`, the plate behind sung lines is `.blyrics-karaoke__plate:not([data-end-card])`, and the plate behind the end card is `.blyrics-karaoke__plate[data-end-card]`:
+
+```css
+#blyrics-karaoke .blyrics-karaoke__card {
+  background: rgb(0 0 0 / 55%);
+}
+
+#blyrics-karaoke .blyrics-karaoke__plate:not([data-end-card]) {
+  background: rgb(0 0 0 / 70%);
+}
+
+#blyrics-karaoke .blyrics-karaoke__plate[data-end-card] {
+  background: rgb(20 20 40 / 80%);
+}
+```
+
+The lyric size comes from `--blyrics-font-size`, the same as everywhere else. Line scaling is turned off inside karaoke: `--blyrics-scale` and `--blyrics-active-scale` are forced to `1` on `#blyrics-karaoke .blyrics-container`, so sung and waiting lines keep the same size.
+
+### Stage Lines
+
+Style lines as you do in the scrolling view. Colors, fonts and animations carry over. The stage only decides where each line sits. The stage marks each line with extra attributes:
+
+| Attribute | Meaning |
+|-----------|---------|
+| `data-stage-role="current"` | The line being sung |
+| `data-stage-role="previous"` | The line that just finished |
+| `data-stage-role="queued"` | A line waiting its turn |
+| `data-stage-role="gone"` | A line that has left the stage |
+| `data-stage-visible` | The line is on screen; without it the line is `visibility: hidden` |
+| `.blyrics-container[data-stage-duet]` | The sung lines use both sides: `v1` lines sit on the left, `v2` and `v3` on the right, `v1000` stays centred. A song with one singer stays centred whichever voice it is |
+
+The stage fades lines in and out through `--blyrics-stage-opacity`, and it sets `opacity` from that property with `!important`. Do not set `opacity` on stage lines. It is overridden, so it cannot show a hidden line or hold one that is leaving.
 
 ## Optional image highlights and HDR
 

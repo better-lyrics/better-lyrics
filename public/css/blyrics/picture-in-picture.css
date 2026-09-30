@@ -555,6 +555,10 @@ body {
   padding-inline: 0 !important;
 }
 
+:where(.blyrics-pip-lyrics .blyrics-container) {
+  --blyrics-scroll-timing-offset: 0s;
+}
+
 /* Romanization is otherwise sized at the translated size over 1.25; here both secondary lines
    share one size so the variable above is the only knob. */
 .blyrics-pip-lyrics .blyrics--romanized {
