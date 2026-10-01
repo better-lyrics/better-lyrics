@@ -1,6 +1,6 @@
 {
   "manifest_version": 3,
-  "version": "3.0.0.2",
+  "version": "3.0.0.3",
   "default_locale": "en",
   "name": "Better Lyrics (Lyrics for YouTube Music)",
   "description": "__MSG_extensionDescription__",
@@ -88,8 +88,12 @@
   "edge:key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAmNspBNCi4WHoRlH/rRPneLNqtWHzsEsK+Z4a7qmose6afikym7/5A/7I/OuXeJFqJXLc7YfWVUtdBWfHRSjT9Earq0wdOfElHyWnHQ1/cn55xbCdMJRSsVKEg3NRHWKbwpBFlt6XUog5sl48Gf+v6aZrv069MWEnXA13BEWqRX9hALG6WswyxaZXKokwH2AvnDDaWHrBghti6kmSNuXWCJj4c02YwZ5LgOJ3m5cI7bq/Mi7RtVuK+Odsj2/iESXAwNvLcMiOTW8vrioj/KfySjXpi16HCZIm0e6EvTq08CQUvIEpxV7Gaiq5w2j2TFKPMQ4aaHTiEgWMSZ0DeihLNQIDAQAB",
   "content_scripts": [
     {
-      "matches": ["*://music.youtube.com/*"],
-      "js": ["src/videoQualityPage.ts"],
+      "matches": [
+        "*://music.youtube.com/*"
+      ],
+      "js": [
+        "src/videoQualityPage.ts"
+      ],
       "run_at": "document_start",
       "world": "MAIN"
     },
@@ -137,5 +141,5 @@
   "action": {
     "default_popup": "src/options/options.html"
   },
-  "version_name": "3.0.0 2"
+  "version_name": "3.0.0 3"
 }

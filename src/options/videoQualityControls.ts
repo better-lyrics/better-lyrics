@@ -10,8 +10,6 @@ export function syncVideoQualityControls(doc: Document): void {
   if (select.selectedOptions[0]?.disabled) select.value = "hd1080";
   const hint = doc.getElementById("videoQualityLimitHint");
   if (hint) hint.hidden = toggle.checked;
-  select.setAttribute(
-    "aria-describedby",
-    toggle.checked ? "videoQualityApplyHint" : "videoQualityLimitHint videoQualityApplyHint"
-  );
+  if (toggle.checked) select.removeAttribute("aria-describedby");
+  else select.setAttribute("aria-describedby", "videoQualityLimitHint");
 }

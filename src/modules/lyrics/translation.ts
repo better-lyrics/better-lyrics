@@ -6,7 +6,7 @@ import {
   UNISON_TRANSLATE_URL,
 } from "@constants";
 import { logCore } from "@core/logger";
-import { containsNonLatin, detectNonLatinLanguage } from "@braccato/core/text";
+import type { ScriptClassifier } from "@modules/lyrics/nonLatinScript";
 import { languageMatchesAny } from "@utils";
 
 interface TranslationResult {
@@ -28,6 +28,7 @@ const cache: TranslationCache = {
 
 interface BatchRequest {
   lines: string[];
+  scripts: ScriptClassifier;
   targetLanguage?: string; // For translations
   sourceLanguage?: string; // For romanizations
   videoId?: string;
@@ -62,13 +63,14 @@ function enrichViaUnison(
   to: string,
   from: string | undefined,
   videoId: string | undefined,
+  scripts: ScriptClassifier,
   signal?: AbortSignal
 ): Promise<string | undefined> {
   if (items.length === 0) return Promise.resolve(undefined);
   const body = JSON.stringify({ lines: items.map(item => item.text), to, from, videoId });
   const existing = inFlightUnison.get(body);
   if (existing) return existing;
-  const request = fetchUnison(body, items, to, signal);
+  const request = fetchUnison(body, items, to, scripts, signal);
   inFlightUnison.set(body, request);
   return request.finally(() => inFlightUnison.delete(body));
 }
@@ -77,6 +79,7 @@ async function fetchUnison(
   body: string,
   items: { index: number; text: string }[],
   to: string,
+  scripts: ScriptClassifier,
   signal?: AbortSignal
 ): Promise<string | undefined> {
   try {
@@ -90,18 +93,18 @@ async function fetchUnison(
     const data = (await response.json()) as { lines: UnisonTranslateLine[]; detectedLang: string };
     if (!Array.isArray(data.lines) || data.lines.length !== items.length) return;
 
-    const batchHasNonLatin = items.some(item => containsNonLatin(item.text));
+    const batchHasNonLatin = items.some(item => scripts.hasNonLatinScript(item.text));
     items.forEach((item, i) => {
       const line = data.lines[i];
       const lower = item.text.toLowerCase();
       if (line?.translation && line.needsTranslation && line.translation.toLowerCase() !== lower) {
-        const isLanguageKnown = containsNonLatin(item.text) || !batchHasNonLatin;
+        const isLanguageKnown = scripts.hasNonLatinScript(item.text) || !batchHasNonLatin;
         (isLanguageKnown ? cache.translation : cache.unisonLatinFallback).set(`${to}_${item.text}`, {
-          originalLanguage: detectNonLatinLanguage(item.text) || data.detectedLang || "",
+          originalLanguage: scripts.detectScriptLanguage(item.text) || data.detectedLang || "",
           translatedText: line.translation,
         });
       }
-      if (line?.romanization && line.romanization.toLowerCase() !== lower) {
+      if (line?.romanization && scripts.hasNonLatinScript(item.text) && line.romanization.toLowerCase() !== lower) {
         cache.romanization.set(item.text, line.romanization);
       }
     });
@@ -117,7 +120,7 @@ async function fetchUnison(
  * Translates a batch of lyric lines in a single request, chunked if necessary.
  */
 export async function translateBatch(request: BatchRequest): Promise<BatchTranslationResponse> {
-  const { lines, targetLanguage, signal } = request;
+  const { lines, targetLanguage, scripts, signal } = request;
   if (!targetLanguage || lines.length === 0) {
     return { results: lines.map(() => null), detectedLanguage: "" };
   }
@@ -147,6 +150,7 @@ export async function translateBatch(request: BatchRequest): Promise<BatchTransl
     targetLanguage,
     request.sourceLanguage,
     request.videoId,
+    scripts,
     signal
   );
   toTranslate = toTranslate.filter(({ index, text }) => {
@@ -172,8 +176,8 @@ export async function translateBatch(request: BatchRequest): Promise<BatchTransl
   const separatorEncoded = encodeURIComponent(BATCH_SEPARATOR);
 
   const scriptGroups = [
-    toTranslate.filter(item => containsNonLatin(item.text)),
-    toTranslate.filter(item => !containsNonLatin(item.text)),
+    toTranslate.filter(item => scripts.hasNonLatinScript(item.text)),
+    toTranslate.filter(item => !scripts.hasNonLatinScript(item.text)),
   ].sort((a, b) => b.length - a.length);
 
   for (const group of scriptGroups) {
@@ -237,7 +241,7 @@ export async function translateBatch(request: BatchRequest): Promise<BatchTransl
         const translatedText = translatedLines[i]?.trim();
         if (translatedText && translatedText.toLowerCase() !== item.text.toLowerCase()) {
           const result = {
-            originalLanguage: detectNonLatinLanguage(item.text) || chunkLanguage,
+            originalLanguage: scripts.detectScriptLanguage(item.text) || chunkLanguage,
             translatedText,
           };
           cache.translation.set(`${targetLanguage}_${item.text}`, result);
@@ -258,14 +262,18 @@ export async function translateBatch(request: BatchRequest): Promise<BatchTransl
   return { results, detectedLanguage };
 }
 
-function resolveRomanizationLanguage(sourceLanguage: string | undefined, lines: string[]): string {
+function resolveRomanizationLanguage(
+  sourceLanguage: string | undefined,
+  lines: string[],
+  scripts: ScriptClassifier
+): string {
   if (sourceLanguage && languageMatchesAny(sourceLanguage, ROMANIZATION_LANGUAGES)) {
     return sourceLanguage;
   }
 
   const tally = new Map<string, number>();
   for (const line of lines) {
-    const detected = detectNonLatinLanguage(line);
+    const detected = scripts.detectScriptLanguage(line);
     if (detected) {
       tally.set(detected, (tally.get(detected) ?? 0) + 1);
     }
@@ -294,7 +302,7 @@ function chooseRomanizationSeparator(texts: string[]): string {
  * Romanizes a batch of lyric lines in a single request, chunked if necessary.
  */
 export async function romanizeBatch(request: BatchRequest): Promise<BatchRomanizationResponse> {
-  const { lines, sourceLanguage, signal } = request;
+  const { lines, sourceLanguage, scripts, signal } = request;
   if (lines.length === 0) {
     return { results: lines.map(() => null), detectedLanguage: "" };
   }
@@ -305,7 +313,7 @@ export async function romanizeBatch(request: BatchRequest): Promise<BatchRomaniz
   // Check cache first
   lines.forEach((line, index) => {
     const trimmed = line.trim();
-    if (!trimmed || trimmed === "♪" || !containsNonLatin(trimmed)) return;
+    if (!trimmed || trimmed === "♪" || !scripts.hasNonLatinScript(trimmed)) return;
 
     if (cache.romanization.has(trimmed)) {
       results[index] = cache.romanization.get(trimmed)!;
@@ -325,6 +333,7 @@ export async function romanizeBatch(request: BatchRequest): Promise<BatchRomaniz
     request.targetLanguage || "en",
     sourceLanguage,
     request.videoId,
+    scripts,
     signal
   );
   if (unisonLang) {
@@ -349,7 +358,8 @@ export async function romanizeBatch(request: BatchRequest): Promise<BatchRomaniz
 
   const lang = resolveRomanizationLanguage(
     sourceLanguage,
-    toRomanize.map(item => item.text)
+    toRomanize.map(item => item.text),
+    scripts
   );
   detectedLanguage = lang;
   const separator = chooseRomanizationSeparator(toRomanize.map(item => item.text));

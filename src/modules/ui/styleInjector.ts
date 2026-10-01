@@ -8,9 +8,10 @@ import {
   getSyncStorage,
   loadChunkedStyles,
 } from "@core/storage";
+import { applyKaraokeTheme } from "@modules/karaoke/karaokeView";
 import { hexToRgbSum, invertRegExp } from "@utils";
 import { mainView } from "./mainLyricsView";
-import { publishPictureInPictureLyrics } from "./pictureInPicture/lyricsPublisher";
+import { publishSecondaryViews } from "@modules/ui/secondaryViews";
 import { logCore, logError } from "@core/logger";
 import { migrateLetterWavePref, type LetterWavePref } from "@modules/settings/letterWave";
 import type { ThemeSettingField } from "@/options/themes";
@@ -236,8 +237,10 @@ function applyThemeSettingsToCSS(
  * compressed, and compiling the RICS source it is written in.
  */
 export function applyCustomStyles(css: string): void {
-  const needsLyricReload = mainView.setTheme(withLetterWaveSetting(css));
-  publishPictureInPictureLyrics();
+  const themeCss = withLetterWaveSetting(css);
+  const needsLyricReload = mainView.setTheme(themeCss);
+  applyKaraokeTheme(themeCss);
+  publishSecondaryViews();
 
   if (needsLyricReload) {
     reloadLyrics();

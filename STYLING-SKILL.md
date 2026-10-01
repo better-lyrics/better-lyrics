@@ -204,6 +204,8 @@ blyrics-line-scroll-above-duration = calc(750ms + log(var(--blyrics-line-scroll-
 
 **PiP scroll position**: knobs are shared by the panel, fullscreen and PiP. To give PiP its own position, set `--blyrics-target-scroll-pos-ratio` under `.blyrics-pip-shell`: `.blyrics-pip-shell .blyrics-container { --blyrics-target-scroll-pos-ratio: 0.37; }`. It overrides `blyrics-target-scroll-pos-ratio` wherever it resolves. Plain number, clamped to `0` to `1`, `%` not converted, non-numbers fall back to the knob. Read once per theme apply, and panel and fullscreen share one view, so a fullscreen-only selector won't switch on toggle.
 
+**PiP scroll timing**: PiP defaults `--blyrics-scroll-timing-offset` to `0s` (at zero specificity), so a line moves only once the next one starts. A `:root` value doesn't reach it; override under `.blyrics-pip-shell .blyrics-container`.
+
 ## Dynamic Properties
 
 Properties set by JS at runtime on individual elements:
@@ -526,6 +528,66 @@ Applied briefly on interaction, shared by fullscreen and the floating window.
 | `.blyrics-control-ripple-layer` / `.blyrics-control-ripple` (`--go`) | Click ripple |
 | `.blyrics-fs-rate-fire` | Runs the like pop and iris (`blyrics-fs-rate-pop`, `blyrics-fs-rate-iris`) |
 | `.blyrics-fs-rate-burst` / `-ray` / `-dot` (`--go`) | Rays and dots that fly out on a like (`blyrics-fs-rate-ray`, `blyrics-fs-rate-dot`) |
+
+## Karaoke Subtitles
+
+With the "Karaoke subtitles" option on (the default) and a music video in fullscreen, the video fills the screen and synced lines show over it one at a time on a blurred plate. The side panel and `#blyrics-fs-column` stay hidden the whole time karaoke owns the fullscreen video, even while lyrics load or when there are none or only unsynced ones. Lines keep the theme's look; the stage only decides where they go.
+
+### DOM Structure
+
+```
+#blyrics-karaoke                                    (fixed overlay on body)
+├── .blyrics-karaoke__stage
+│   ├── .blyrics-karaoke__plate.blyrics-karaoke-surface    (two plates, swapped when the line moves far)
+│   ├── .blyrics-karaoke__plate.blyrics-karaoke-surface
+│   └── .blyrics-karaoke__mount
+│       └── .blyrics-container[data-layout="stage"]
+│           ├── .blyrics--line
+│           └── .blyrics-credits                    (end card)
+│               └── .blyrics-karaoke-source         (provider name and sync icon)
+└── .blyrics-karaoke__title                         (intro title card)
+    └── .blyrics-karaoke__card.blyrics-karaoke-surface
+        ├── p.blyrics-karaoke__card-title
+        ├── p.blyrics-karaoke__card-artist
+        └── p.blyrics-karaoke__card-credit
+```
+
+### State Attributes
+
+| Attribute | When applied |
+|-----------|--------------|
+| `ytmusic-app-layout[blyrics-karaoke]` / `#player-page[blyrics-karaoke]` | Karaoke owns the fullscreen video layout |
+| `#blyrics-karaoke[data-bar]` | Player bar is showing; the stage lifts above it |
+| `#blyrics-karaoke[data-title-card]` | Intro title card is showing; the stage is hidden |
+| `.blyrics-karaoke__plate[data-plate]` | Plate is shown behind the current line |
+| `.blyrics-karaoke__plate[data-end-card]` | Plate is behind the end card (credits and source); kept while it fades out |
+| `data-stage-role` on a line | `current`, `previous`, `queued` or `gone` |
+| `data-stage-visible` on a line | Line is on screen; otherwise `visibility: hidden` |
+| `.blyrics-container[data-stage-duet]` | Sung lines use both sides: `v1` left, `v2`/`v3` right, `v1000` centred. A one-singer song stays centred |
+
+### Theme Hooks
+
+| Hook | Notes |
+|------|-------|
+| `.blyrics-karaoke-surface` | Backdrop shared by both plates and the title card |
+| `--blyrics-karaoke-video-scale` | Unitless, default `1`; e.g. `0.94` shrinks the video and overlay relative to the screen |
+| `--blyrics-font-size` | Sets the karaoke lyric size, as elsewhere |
+| `--blyrics-scale` / `--blyrics-active-scale` | Forced to `1` on `#blyrics-karaoke .blyrics-container`; no line scaling in karaoke |
+| `--blyrics-stage-opacity` | Set by the engine; stage line `opacity` reads it with `!important` |
+
+Never set `opacity` on stage lines. It is overridden, so a theme cannot show a hidden line or hold a leaving one.
+
+```css
+:root {
+  --blyrics-karaoke-video-scale: 0.94;
+}
+
+#blyrics-karaoke .blyrics-karaoke-surface {
+  border-radius: 0.3em;
+  background: rgb(0 0 0 / 70%);
+  backdrop-filter: blur(12px);
+}
+```
 
 ## Theme Patterns
 

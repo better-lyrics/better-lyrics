@@ -41,6 +41,7 @@ type TabName = "preview" | "changes";
 
 const TAB_ORDER: TabName[] = ["preview", "changes"];
 const HEAD_TABS_CLASS = "unison-detail-col-head--tabs";
+const HEAD_CHANGES_CLASS = "unison-detail-col-head--changes";
 
 // -- Tabs --------------------------
 
@@ -84,7 +85,7 @@ export function mountChangesTabs(surface: ChangesSurface, host: RevisionHost, ha
 
   const teardown = (): void => {
     previewHead.replaceChildren(...originalHead);
-    previewHead.classList.remove(HEAD_TABS_CLASS);
+    previewHead.classList.remove(HEAD_TABS_CLASS, HEAD_CHANGES_CLASS);
     lyricsHead.classList.remove(HEAD_TABS_CLASS);
     preview.removeAttribute("role");
     preview.removeAttribute("aria-labelledby");
@@ -102,6 +103,7 @@ export function mountChangesTabs(surface: ChangesSurface, host: RevisionHost, ha
     }
     preview.hidden = next !== "preview";
     panel.hidden = next !== "changes";
+    previewHead.classList.toggle(HEAD_CHANGES_CLASS, next === "changes");
   };
 
   const select = (next: TabName): void => {

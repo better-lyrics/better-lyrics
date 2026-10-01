@@ -113,6 +113,10 @@ export function toggleDislike(doc: Document): void {
   doc.querySelector<HTMLElement>(DISLIKE_BUTTON)?.click();
 }
 
+export function getPlayerBar(doc: Document): HTMLElement | null {
+  return doc.querySelector<HTMLElement>(PLAYER_BAR_SELECTOR);
+}
+
 export function isAdPlaying(doc: Document): boolean {
   return doc.querySelector(`${PLAYER_BAR_SELECTOR}[${AD_PLAYING_ATTR}]`) !== null;
 }

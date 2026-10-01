@@ -1,0 +1,245 @@
+/* Karaoke subtitles over a fullscreen music video. Position and backdrop only: the lines keep
+   braccato's and the theme's look. */
+#blyrics-karaoke {
+    --blyrics-karaoke-ease: cubic-bezier(0.2, 0, 0, 1);
+    --blyrics-karaoke-spring: linear(0, 0.027, 0.095, 0.187, 0.291, 0.398, 0.502, 0.598, 0.684, 0.758, 0.822, 0.874, 0.916, 0.949, 0.974, 0.993, 1.006, 1.014, 1.019, 1.022, 1.023, 1.022, 1.02, 1.018, 1.016, 1.013, 1.011, 1.009, 1.007, 1.005, 1.004, 1.003, 1);
+    --blyrics-karaoke-floor: 7.5cqh;
+    --blyrics-karaoke-lift: 0px;
+    position: fixed;
+    inset: var(--blyrics-karaoke-frame-y) var(--blyrics-karaoke-frame-x);
+    z-index: 3;
+    container-type: size;
+    pointer-events: none;
+}
+
+#blyrics-karaoke[hidden] {
+    display: none;
+}
+
+#blyrics-karaoke[data-bar] {
+    --blyrics-karaoke-lift: max(0px, calc(var(--blyrics-karaoke-bar-height, 72px) - 4.5cqh));
+}
+
+#blyrics-karaoke .blyrics-karaoke__stage {
+    position: absolute;
+    inset: 8cqh 8cqw var(--blyrics-karaoke-floor);
+    translate: 0 calc(-1 * var(--blyrics-karaoke-lift));
+    transition:
+        opacity 250ms ease-out,
+        translate 300ms var(--blyrics-karaoke-ease);
+}
+
+#blyrics-karaoke .blyrics-karaoke__mount {
+    position: absolute;
+    inset: 0;
+}
+
+/* Subtitles hold still: no scale between sung and waiting lines. */
+#blyrics-karaoke .blyrics-container {
+    --blyrics-animate-line-scale: 0;
+    --blyrics-scale: 1;
+    --blyrics-active-scale: 1;
+}
+
+/* -- Backdrop ----------------------------------------------- */
+
+/* The plate and the title card hold no controls, so a backdrop filter cannot break hit testing here. */
+#blyrics-karaoke .blyrics-karaoke-surface {
+    border-radius: 0.46em;
+    background: rgb(14 14 18 / 52%);
+    box-shadow:
+        inset 0 0 0 1px rgb(255 255 255 / 7%),
+        inset 0 1px 0 rgb(255 255 255 / 6%),
+        0 0.3em 1em rgb(0 0 0 / 22%);
+    -webkit-backdrop-filter: blur(22px) saturate(1.5);
+    backdrop-filter: blur(22px) saturate(1.5);
+}
+
+#blyrics-karaoke .blyrics-karaoke__plate {
+    position: absolute;
+    top: 0;
+    left: 0;
+    font-size: var(--blyrics-font-size);
+    opacity: 0;
+    transition:
+        translate 470ms var(--blyrics-karaoke-spring),
+        width 470ms var(--blyrics-karaoke-spring),
+        height 470ms var(--blyrics-karaoke-spring),
+        opacity 260ms ease-out;
+}
+
+#blyrics-karaoke .blyrics-karaoke__plate[data-plate] {
+    opacity: 1;
+}
+
+#blyrics-karaoke .blyrics-karaoke__mount {
+    transition: clip-path 470ms var(--blyrics-karaoke-spring);
+}
+
+#blyrics-karaoke .blyrics-karaoke__stage[data-plate-motion="grow"] .blyrics-karaoke__plate {
+    transition-duration: 300ms, 300ms, 300ms, 260ms;
+}
+
+#blyrics-karaoke .blyrics-karaoke__stage[data-plate-motion="grow"] .blyrics-karaoke__mount {
+    transition-duration: 300ms;
+}
+
+#blyrics-karaoke .blyrics-karaoke__stage[data-plate-motion="resize"] .blyrics-karaoke__plate {
+    transition-duration: 420ms, 420ms, 420ms, 260ms;
+    transition-timing-function: var(--blyrics-karaoke-ease), var(--blyrics-karaoke-ease), var(--blyrics-karaoke-ease), ease-out;
+}
+
+#blyrics-karaoke .blyrics-karaoke__stage[data-plate-motion="resize"] .blyrics-karaoke__mount {
+    transition-duration: 420ms;
+    transition-timing-function: var(--blyrics-karaoke-ease);
+}
+
+#blyrics-karaoke .blyrics-karaoke__stage.is-snap .blyrics-karaoke__plate {
+    transition: opacity 260ms ease-out;
+}
+
+#blyrics-karaoke .blyrics-karaoke__stage.is-snap .blyrics-karaoke__mount {
+    transition: none;
+}
+
+#blyrics-karaoke[data-title-card] .blyrics-karaoke__stage {
+    opacity: 0;
+}
+
+/* -- End card ----------------------------------------------- */
+
+#blyrics-karaoke .blyrics-credits {
+    --blyrics-credits-font-size: 0.58em;
+    text-align: center;
+    text-wrap: balance;
+}
+
+#blyrics-karaoke .blyrics-karaoke-source {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.4em;
+    margin-top: 0.3em;
+    color: var(--blyrics-translated-color);
+    font-size: 0.44em;
+    font-weight: 550;
+}
+
+#blyrics-karaoke .blyrics-karaoke-source img {
+    width: 1.05em;
+    height: 1.05em;
+    border-radius: 50%;
+}
+
+#blyrics-karaoke .blyrics-karaoke-source svg {
+    width: 1em;
+    height: 1em;
+    opacity: 0.7;
+}
+
+/* -- Title card --------------------------------------------- */
+
+#blyrics-karaoke .blyrics-karaoke__title {
+    position: absolute;
+    right: 12cqw;
+    bottom: var(--blyrics-karaoke-floor);
+    left: 12cqw;
+    translate: 0 calc(-1 * var(--blyrics-karaoke-lift));
+    transition: translate 300ms var(--blyrics-karaoke-ease);
+    color: var(--blyrics-ui-text-color);
+    font-family: var(--blyrics-font-family, var(--blyrics-default-font-family));
+    font-size: calc(var(--blyrics-font-size) * 0.7);
+    font-weight: 700;
+    line-height: 1.333;
+    text-align: center;
+    text-shadow:
+        0 0 0.6em rgb(0 0 0 / 45%),
+        0 0.04em 0.12em rgb(0 0 0 / 40%);
+}
+
+#blyrics-karaoke .blyrics-karaoke__card {
+    display: inline-grid;
+    max-width: 100%;
+    justify-items: center;
+    padding: 0.42em 0.9em 0.5em;
+    opacity: 0;
+    transform: translateY(0.3em);
+    transition:
+        opacity 240ms ease-out 120ms,
+        transform 420ms var(--blyrics-karaoke-ease);
+}
+
+#blyrics-karaoke[data-title-card] .blyrics-karaoke__card {
+    opacity: 1;
+    transform: none;
+    transition:
+        opacity 320ms ease-out,
+        transform 420ms var(--blyrics-karaoke-ease);
+}
+
+#blyrics-karaoke .blyrics-karaoke__card p {
+    margin: 0;
+    opacity: 0;
+    transform: translateY(-0.25em);
+    transition:
+        opacity 280ms ease-out,
+        transform 280ms var(--blyrics-karaoke-ease);
+}
+
+#blyrics-karaoke .blyrics-karaoke__card p:empty {
+    display: none;
+}
+
+#blyrics-karaoke[data-title-card] .blyrics-karaoke__card p {
+    opacity: 1;
+    transform: none;
+    transition:
+        opacity 420ms ease-out,
+        transform 520ms var(--blyrics-karaoke-ease);
+}
+
+#blyrics-karaoke[data-title-card] .blyrics-karaoke__card p:nth-child(2) {
+    transition-delay: 90ms;
+}
+
+#blyrics-karaoke[data-title-card] .blyrics-karaoke__card p:nth-child(3) {
+    transition-delay: 180ms;
+}
+
+#blyrics-karaoke .blyrics-karaoke__card-title {
+    font-size: 1.4em;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    line-height: 1.1;
+}
+
+#blyrics-karaoke .blyrics-karaoke__card-artist {
+    margin-top: 0.12em !important;
+    color: var(--blyrics-translated-color);
+    font-size: 0.75em;
+    font-weight: 600;
+}
+
+#blyrics-karaoke .blyrics-karaoke__card-credit {
+    margin-top: 0.5em !important;
+    color: var(--blyrics-translated-color);
+    font-size: 0.65em;
+    overflow: hidden;
+    max-width: 36em;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-weight: 550;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    #blyrics-karaoke :is(
+            .blyrics-karaoke__stage,
+            .blyrics-karaoke__plate,
+            .blyrics-karaoke__mount,
+            .blyrics-karaoke__title,
+            .blyrics-karaoke__card,
+            .blyrics-karaoke__card p
+        ) {
+        transition-duration: 0ms !important;
+    }
+}

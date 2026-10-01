@@ -9,12 +9,13 @@ import { t } from "@core/i18n";
 import { type LineData, type LyricsData, processLyrics } from "@modules/lyrics/injectLyrics";
 import { stringSimilarity } from "@modules/lyrics/lyricParseUtils";
 import { flushLoader, refreshDockSources, renderLoader } from "@modules/ui/dom";
-import { publishPictureInPictureLyrics } from "@modules/ui/pictureInPicture/lyricsPublisher";
+import { isLyricsWantedOffTab, publishSecondaryViews } from "@modules/ui/secondaryViews";
 import type { Lyric, LyricSourceResult, ProviderParameters, SourceMapType } from "./providers/shared";
 import { getLyrics, newSourceMap, providerPriority } from "./providers/shared";
 import { awaitUnifiedStream } from "./providers/unified";
 import type { YTLyricSourceResult } from "./providers/yt";
 import { getSongAlbum, getSongMetadata, type SegmentMap } from "./requestSniffer/requestSniffer";
+import { getSegmentMapTimeShiftMs } from "@modules/lyrics/segmentMap";
 import { clearCache as clearTranslationCache } from "./translation";
 import { mainView } from "@modules/ui/mainLyricsView";
 import { resetPlaybackClock, resumeAllAutoscroll } from "@braccato/core";
@@ -75,29 +76,7 @@ function retainParsedLyrics(data: LyricSourceResultWithMeta): void {
     musicVideoSynced: data.musicVideoSynced,
     segmentMap: data.segmentMap,
   };
-  publishPictureInPictureLyrics();
-}
-
-/**
- * How far a time recorded against the counterpart video moves when the same song is played back as
- * its other version. Pure, so a view that renders the lyrics somewhere other than the side panel can
- * shift a copy of them instead of the records the side panel is animating.
- *
- * @param segmentMap - Segment map pairing the two versions of the song
- * @param timeMs - Time on the counterpart video's timeline, in milliseconds
- * @returns The shift to add, in milliseconds
- */
-export function getSegmentMapTimeShiftMs(segmentMap: SegmentMap, timeMs: number): number {
-  let lastTimeChange = 0;
-  for (let segment of segmentMap.segment) {
-    if (timeMs >= segment.counterpartVideoStartTimeMilliseconds) {
-      lastTimeChange = segment.primaryVideoStartTimeMilliseconds - segment.counterpartVideoStartTimeMilliseconds;
-      if (timeMs <= segment.counterpartVideoStartTimeMilliseconds + segment.durationMilliseconds) {
-        break;
-      }
-    }
-  }
-  return lastTimeChange;
+  publishSecondaryViews();
 }
 
 export function applySegmentMapToLyrics(
@@ -202,14 +181,14 @@ export async function createLyrics(detail: PlayerDetails, signal: AbortSignal): 
       AppState.suppressZeroTime = Date.now() + 5000;
       AppState.areLyricsTicking = true; // Keep lyrics ticking while new lyrics are fetched.
       // The window keeps showing these lines through the refetch, so it needs the same deadline.
-      publishPictureInPictureLyrics();
+      publishSecondaryViews();
       logCore("Switching between audio/video: Skipping Loader", segmentMap);
     } else if (isSoftReload) {
       // Same-song reload (provider switch or translation/romanization toggle): keep the
       // current lyrics on screen and swap them in once the new ones are ready, no loader.
       AppState.suppressZeroTime = Date.now() + 5000;
       AppState.areLyricsTicking = true;
-      publishPictureInPictureLyrics();
+      publishSecondaryViews();
       logCore("Soft reload: keeping current lyrics, skipping loader");
     } else {
       logCore("Not Switching between audio/video", isAVSwitch, segmentMap);
@@ -236,7 +215,7 @@ export async function createLyrics(detail: PlayerDetails, signal: AbortSignal): 
     }
 
     const tabSelector = document.getElementsByClassName(TAB_HEADER_CLASS)[1];
-    if (tabSelector?.getAttribute("aria-selected") !== "true" && !AppState.isPictureInPictureOpen) {
+    if (tabSelector?.getAttribute("aria-selected") !== "true" && !isLyricsWantedOffTab()) {
       AppState.areLyricsLoaded = false;
       AppState.areLyricsTicking = false;
       AppState.lyricInjectionFailed = true;
@@ -280,26 +259,31 @@ export async function createLyrics(detail: PlayerDetails, signal: AbortSignal): 
     };
     let ytLyricsEarlyInjectAbortController = new AbortController();
 
-    let ytLyricsPromise = getLyrics(providerParameters, "yt-lyrics").then(lyrics => {
-      if (!AppState.areLyricsLoaded && lyrics && !signal.aborted) {
-        if (!ytLyricsEarlyInjectAbortController.signal.aborted) {
-          logCore("Temporarily Using YT Music Lyrics while we wait for synced lyrics to load");
-          let lyricsWithMeta = {
-            ...lyrics,
-            song: providerParameters.song,
-            artist: providerParameters.artist,
-            duration: providerParameters.duration,
-            videoId: providerParameters.videoId,
-            album: providerParameters.album || "",
-            segmentMap: null,
-          };
+    let ytLyricsPromise = getLyrics(providerParameters, "yt-lyrics")
+      .then(lyrics => {
+        if (!AppState.areLyricsLoaded && lyrics && !signal.aborted) {
+          if (!ytLyricsEarlyInjectAbortController.signal.aborted) {
+            logCore("Temporarily Using YT Music Lyrics while we wait for synced lyrics to load");
+            let lyricsWithMeta = {
+              ...lyrics,
+              song: providerParameters.song,
+              artist: providerParameters.artist,
+              duration: providerParameters.duration,
+              videoId: providerParameters.videoId,
+              album: providerParameters.album || "",
+              segmentMap: null,
+            };
 
-          processLyrics(document, lyricsWithMeta, true, signal);
-          retainParsedLyrics(lyricsWithMeta);
+            processLyrics(document, lyricsWithMeta, true, signal);
+            retainParsedLyrics(lyricsWithMeta);
+          }
         }
-      }
-      return lyrics;
-    });
+        return lyrics;
+      })
+      .catch(err => {
+        logCore(err);
+        return null;
+      });
 
     try {
       let meta = await getLyrics(providerParameters, "metadata");
@@ -345,7 +329,7 @@ export async function createLyrics(detail: PlayerDetails, signal: AbortSignal): 
             continue;
           }
           ytLyricsEarlyInjectAbortController.abort("Lyrics are ready"); // May not be ideal when the stringSimilarity fails, but this should be rare anyways
-          let ytLyrics = (await ytLyricsPromise) as YTLyricSourceResult;
+          let ytLyrics = sourceLyrics.source === "Unison" ? null : ((await ytLyricsPromise) as YTLyricSourceResult);
 
           if (ytLyrics !== null) {
             let lyricText = "";
