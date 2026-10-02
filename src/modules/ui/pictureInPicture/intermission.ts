@@ -1,4 +1,5 @@
 import { formatTime } from "@modules/ui/playerControls/timeFormat";
+import { type CountdownState, nextCountdown } from "./intermissionCountdown";
 import { splitUpNext } from "./intermissionText";
 
 export interface Intermission {
@@ -18,7 +19,6 @@ const GLYPH_EXIT_MS = 380;
 const GLYPH_EXIT_EASING = "cubic-bezier(0.32, 0, 0.2, 1)";
 const SPRING_EASING =
   "linear(0, 0.0591, 0.197, 0.3672, 0.5384, 0.6914, 0.8169, 0.9122, 0.979, 1.0214, 1.0445, 1.0535, 1.0531, 1.0471, 1.0384, 1.0289, 1.0201, 1.0126, 1.0068, 1.0025, 0.9997, 0.998, 0.9972, 0.9971, 1)";
-const NEW_AD_RISE_S = 0.5;
 
 export function createIntermission(doc: Document, strings: IntermissionStrings): Intermission {
   const create = (tag: string, className: string): HTMLElement => {
@@ -57,7 +57,7 @@ export function createIntermission(doc: Document, strings: IntermissionStrings):
   const reducedMotion = doc.defaultView?.matchMedia("(prefers-reduced-motion: reduce)") ?? null;
   let shownText: string | null = null;
   let shownTitle: string | null = null;
-  let lastRemainingS: number | null = null;
+  let countdown: CountdownState | null = null;
   let drain: Animation | null = null;
 
   function createLayer(glyph: string): HTMLElement {
@@ -74,6 +74,8 @@ export function createIntermission(doc: Document, strings: IntermissionStrings):
 
   function rollGlyph(clip: Element, glyph: string): void {
     const outgoing = clip.lastElementChild;
+    while (clip.firstElementChild && clip.firstElementChild !== outgoing) clip.firstElementChild.remove();
+    for (const animation of outgoing?.getAnimations() ?? []) animation.finish();
     const incoming = createLayer(glyph);
     clip.append(incoming);
     incoming.animate(
@@ -144,12 +146,11 @@ export function createIntermission(doc: Document, strings: IntermissionStrings):
   return {
     element,
     update(remainingS, title) {
-      if (remainingS !== null && (lastRemainingS === null || remainingS > lastRemainingS + NEW_AD_RISE_S)) {
-        restartDrain(remainingS);
-      }
-      lastRemainingS = remainingS;
+      const step = nextCountdown(remainingS, countdown);
+      countdown = step.state;
+      if (step.isNewAd && remainingS !== null) restartDrain(remainingS);
 
-      const text = remainingS === null ? "" : formatTime(Math.ceil(remainingS));
+      const text = countdown === null ? "" : formatTime(countdown.shownS);
       if (text === shownText && title === shownTitle) return;
       element.removeAttribute("aria-hidden");
       if (text !== shownText) renderCount(text, shownText);
@@ -161,7 +162,7 @@ export function createIntermission(doc: Document, strings: IntermissionStrings):
       element.setAttribute("aria-hidden", "true");
       shownText = null;
       shownTitle = null;
-      lastRemainingS = null;
+      countdown = null;
     },
   };
 }

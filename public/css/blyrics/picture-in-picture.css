@@ -1115,20 +1115,14 @@ body {
 }
 
 .blyrics-pip-intermission__glyph {
-  position: relative;
-  display: inline-block;
+  display: inline-grid;
   overflow: hidden;
   height: 1.2em;
   line-height: 1.2;
 }
 
 .blyrics-pip-intermission__glyph > span {
-  display: block;
-}
-
-.blyrics-pip-intermission__glyph > span + span {
-  position: absolute;
-  inset: 0;
+  grid-area: 1 / 1;
 }
 
 .blyrics-pip-intermission__bar {
