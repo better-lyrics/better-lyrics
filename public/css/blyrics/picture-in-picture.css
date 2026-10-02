@@ -657,7 +657,8 @@ body {
   gap: clamp(0.5rem, 2.5cqw, 0.875rem);
 }
 
-.blyrics-pip-loader__mark {
+.blyrics-pip-loader__mark,
+.blyrics-pip-intermission__mark {
   flex: 0 0 auto;
   width: clamp(1rem, 4.5cqw, 1.5rem);
   height: clamp(1rem, 4.5cqw, 1.5rem);
@@ -665,7 +666,8 @@ body {
   animation: blyrics-spin 1.5s linear infinite;
 }
 
-.blyrics-pip-loader__label {
+.blyrics-pip-loader__label,
+.blyrics-pip-intermission__label {
   margin: 0;
   background: var(--blyrics-shimmer-gradient) 0 0 / 200% 100%;
   -webkit-background-clip: text;
@@ -1055,6 +1057,129 @@ body {
   }
 }
 
+/* -- Intermission ------------------------------------------------------------ */
+.blyrics-pip-art-col,
+.blyrics-pip-content {
+  transition:
+    opacity 380ms ease,
+    transform 620ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.blyrics-pip-shell[data-video="ad"] .blyrics-pip-art-col,
+.blyrics-pip-shell[data-video="ad"] .blyrics-pip-content {
+  opacity: 0;
+  transform: scale(0.97);
+  pointer-events: none;
+  transition:
+    opacity 300ms ease,
+    transform 380ms cubic-bezier(0.32, 0, 0.2, 1);
+}
+
+.blyrics-pip-intermission {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transform: scale(1.04);
+  pointer-events: none;
+  transition:
+    opacity 260ms ease,
+    transform 380ms cubic-bezier(0.32, 0, 0.2, 1);
+}
+
+.blyrics-pip-shell[data-video="ad"] .blyrics-pip-intermission {
+  opacity: 1;
+  transform: none;
+  transition:
+    opacity 400ms ease 180ms,
+    transform 620ms cubic-bezier(0.22, 1, 0.36, 1) 180ms;
+}
+
+.blyrics-pip-intermission [hidden] {
+  display: none;
+}
+
+.blyrics-pip-intermission__row {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.blyrics-pip-intermission__count {
+  display: flex;
+  font-size: clamp(28px, 9vw, 44px);
+  font-weight: 760;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.03em;
+}
+
+.blyrics-pip-intermission__glyph {
+  position: relative;
+  display: inline-block;
+  overflow: hidden;
+  height: 1.2em;
+  line-height: 1.2;
+}
+
+.blyrics-pip-intermission__glyph > span {
+  display: block;
+}
+
+.blyrics-pip-intermission__glyph > span + span {
+  position: absolute;
+  inset: 0;
+}
+
+.blyrics-pip-intermission__bar {
+  position: relative;
+  width: 180px;
+  height: 3px;
+  margin-top: 6px;
+  overflow: hidden;
+  border-radius: 3px;
+  background: rgb(255 255 255 / 14%);
+}
+
+.blyrics-pip-intermission__fill {
+  height: 100%;
+  background: rgb(255 255 255 / 85%);
+  transform-origin: left;
+}
+
+.blyrics-pip-intermission__next {
+  display: flex;
+  max-width: 70%;
+  gap: 10px;
+  align-items: center;
+  color: rgb(255 255 255 / 62%);
+  font-size: 13px;
+}
+
+.blyrics-pip-intermission__next > span:last-child {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.blyrics-pip-intermission__thumb {
+  width: 28px;
+  height: 28px;
+  flex: none;
+  border-radius: 6px;
+  background: var(--blyrics-pip-art, none) center / cover;
+  box-shadow: inset 0 0 0 1px rgb(255 255 255 / 10%);
+}
+
+.blyrics-pip-intermission__next b {
+  color: #fff;
+  font-weight: 650;
+}
+
 /* -- Reduced motion ----------------------------------------------------------
    Every preset collapses to a plain opacity crossfade with no scale, translate
    or rotation. Deliberately not the crossfade preset: that one carries a 1.06
@@ -1122,6 +1247,18 @@ body {
      just shortened to match the artwork. */
   .blyrics-pip-backdrop__layer[data-front="true"] {
     animation-duration: 260ms !important;
+  }
+
+  .blyrics-pip-art-col,
+  .blyrics-pip-content,
+  .blyrics-pip-intermission {
+    transform: none !important;
+    transition-property: opacity !important;
+  }
+
+  .blyrics-pip-intermission__mark,
+  .blyrics-pip-intermission__label {
+    animation: none !important;
   }
 }
 
