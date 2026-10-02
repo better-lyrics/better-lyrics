@@ -272,6 +272,7 @@ export class PictureInPictureLyricsView {
   private videoRetireFrame: number | null = null;
   private videoDeferTimer: number | null = null;
   private committedCover: { readonly url: string; readonly letterboxed: boolean } | null = null;
+  private videoAspect: string | null = null;
   private textTransition: TextTransition = DEFAULT_TEXT_TRANSITION;
   private prefersReducedMotion = false;
   private hasHeaderText = false;
@@ -307,6 +308,14 @@ export class PictureInPictureLyricsView {
     this.artworkFaces = [frontFace.element, backFace.element];
     this.artworkImages = [frontFace.image, backFace.image];
     this.faceVideos = [frontFace.video, backFace.video];
+    this.faceVideos.forEach((video, index) => {
+      const followFrontAspect = (): void => {
+        if (index === this.artworkIndex && this.faceTracks[index] !== null) this.writeVideoAspect(video);
+      };
+      for (const type of ["loadedmetadata", "resize"]) {
+        video.addEventListener(type, followFrontAspect, { signal: this.lifecycleController.signal });
+      }
+    });
     frontFace.element.setAttribute("data-front", "true");
     backFace.element.setAttribute("data-front", "false");
 
@@ -1071,6 +1080,7 @@ export class PictureInPictureLyricsView {
       if (controller.signal.aborted) return;
       this.pendingVideo = null;
       this.artworkContainer.setAttribute("data-video-face", "");
+      this.writeVideoAspect(video);
       this.runArtworkSwap(nextIndex, skipAnimation);
       this.retireHiddenFaceVideo(skipAnimation);
     };
@@ -1124,6 +1134,14 @@ export class PictureInPictureLyricsView {
     this.pendingVideo.controller.abort();
     this.pendingVideo = null;
     this.setFaceTrack(1 - this.artworkIndex, null);
+  }
+
+  private writeVideoAspect(video: HTMLVideoElement): void {
+    const aspect = video.videoWidth > 0 && video.videoHeight > 0 ? `${video.videoWidth} / ${video.videoHeight}` : null;
+    if (aspect === this.videoAspect) return;
+    this.videoAspect = aspect;
+    if (aspect) this.shell.style.setProperty("--blyrics-pip-video-aspect", aspect);
+    else this.shell.style.removeProperty("--blyrics-pip-video-aspect");
   }
 
   private syncFaceCover(index: number): void {

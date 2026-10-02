@@ -199,7 +199,7 @@ body {
   inset: 0;
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  object-fit: contain;
   border-radius: inherit;
   background: #000;
   mask-image: radial-gradient(#fff, #fff);
@@ -211,8 +211,8 @@ body {
 }
 
 .blyrics-pip-shell[data-video="on"] .blyrics-pip-artwork {
-  aspect-ratio: 16 / 9;
-  width: min(48vw, calc((100vh - clamp(24px, 7vw, 40px) - 3.5rem) * 16 / 9));
+  aspect-ratio: var(--blyrics-pip-video-aspect, 16 / 9);
+  width: min(48vw, calc((100vh - clamp(24px, 7vw, 40px) - 3.5rem) * var(--blyrics-pip-video-aspect, 16 / 9)));
   max-width: 420px;
 }
 
@@ -1344,7 +1344,7 @@ body {
   }
 
   .blyrics-pip-shell[data-video="on"] .blyrics-pip-artwork {
-    width: 100%;
+    width: min(100%, calc(50vh * var(--blyrics-pip-video-aspect, 16 / 9)));
     max-width: none;
   }
 
