@@ -8,6 +8,7 @@ import { cssTimeMs } from "@/ui/motion";
 import type { PlayerDetails } from "@core/appState";
 import { createHeaderLine, fillHeaderLayer, getHeaderLayers, PictureInPictureHeaderMarquee } from "./headerMarquee";
 import type { PictureInPicturePlaybackSnapshot, PictureInPictureViewDependencies } from "./types";
+import type { VideoMirrorState } from "./videoMirrorState";
 
 interface DisplayMetadata {
   readonly title: string;
@@ -217,6 +218,7 @@ export class PictureInPictureLyricsView {
   private readonly artworkFaces: readonly [HTMLElement, HTMLElement];
   private readonly artworkImages: readonly [HTMLImageElement, HTMLImageElement];
   private readonly artworkVideo: HTMLVideoElement;
+  private readonly musicVideo: HTMLVideoElement;
   private readonly playPauseButton: HTMLButtonElement;
   private readonly headerRows: readonly [HeaderRow, HeaderRow];
   private readonly marquee: PictureInPictureHeaderMarquee;
@@ -260,6 +262,7 @@ export class PictureInPictureLyricsView {
     this.shell.setAttribute("aria-busy", "true");
     this.shell.setAttribute("blyrics-pip-transition", this.artworkTransition);
     this.shell.setAttribute("blyrics-pip-text-transition", this.textTransition);
+    this.shell.setAttribute("data-video", "off");
     this.shell.style.setProperty("--blyrics-credits-label", `"${dependencies.translate("lyrics_writtenBy")}"`);
 
     this.backdrop = pipDocument.createElement("div");
@@ -292,6 +295,12 @@ export class PictureInPictureLyricsView {
     this.artworkVideo.addEventListener("playing", () => this.artworkContainer.setAttribute("data-animated", "true"));
     this.artworkVideo.addEventListener("error", () => this.artworkContainer.removeAttribute("data-animated"));
 
+    this.musicVideo = pipDocument.createElement("video");
+    this.musicVideo.className = "blyrics-pip-artwork__music-video";
+    this.musicVideo.muted = true;
+    this.musicVideo.playsInline = true;
+    this.musicVideo.setAttribute("aria-hidden", "true");
+
     const artworkControls = pipDocument.createElement("div");
     artworkControls.className = "blyrics-pip-artwork__controls";
     const previousButton = this.createPlayerControlButton(
@@ -304,7 +313,7 @@ export class PictureInPictureLyricsView {
     );
     const nextButton = this.createPlayerControlButton("next", dependencies.translate("picture_in_picture_next"));
     artworkControls.append(previousButton, this.playPauseButton, nextButton);
-    this.artworkContainer.append(artworkCard, this.artworkVideo, artworkControls);
+    this.artworkContainer.append(artworkCard, this.artworkVideo, this.musicVideo, artworkControls);
 
     const content = pipDocument.createElement("section");
     content.className = "blyrics-pip-content";
@@ -972,5 +981,13 @@ export class PictureInPictureLyricsView {
 
   setProgressBarEnabled(enabled: unknown): void {
     this.progressBar.element.hidden = enabled === false;
+  }
+
+  get musicVideoElement(): HTMLVideoElement {
+    return this.musicVideo;
+  }
+
+  setVideoState(state: VideoMirrorState): void {
+    this.shell.setAttribute("data-video", state);
   }
 }

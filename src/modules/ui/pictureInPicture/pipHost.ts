@@ -7,6 +7,7 @@ import { PictureInPictureController } from "./controller";
 import { PictureInPictureLyricsView } from "./lyricsView";
 import { createPictureInPictureLyricsHost } from "./pipLyricsHost";
 import type { PictureInPictureHostEnvironment } from "./types";
+import { createVideoMirror, type VideoMirror } from "./videoMirror";
 
 const PIP_OPEN_ATTRIBUTE = "blyrics-pip-open";
 const FOOTER_SOURCE_LINK_ID = "betterLyricsFooterLink";
@@ -103,6 +104,7 @@ export function createPictureInPictureHost(
 ): PictureInPictureController<Window> {
   let activeView: PictureInPictureLyricsView | null = null;
   let activeRenderer: LyricsRenderer | null = null;
+  let activeMirror: VideoMirror | null = null;
   let activeWindow: Window | null = null;
   let lyricsPayload: PictureInPictureLyricsPayload | null = null;
   let builtLines: readonly Lyric[] | null = null;
@@ -292,6 +294,7 @@ export function createPictureInPictureHost(
     const renderer = activeRenderer;
     if (!view || !renderer) return;
     applySettings(view);
+    activeMirror?.refresh();
 
     const payload = lyricsPayload;
     const snapshot = view.playbackSnapshot;
@@ -365,6 +368,14 @@ export function createPictureInPictureHost(
     registerAnimatableProperties(pipWindow);
     injectLyricStyles(pipWindow);
     activeView = new PictureInPictureLyricsView(pipWindow, document, environment.view);
+    const view = activeView;
+    activeMirror = createVideoMirror({
+      sourceDocument: document,
+      target: view.musicVideoElement,
+      isEnabled: () => environment.videoEnabled() !== false,
+      onStateChange: state => view.setVideoState(state),
+      log: environment.view.log,
+    });
     activeRenderer = createLyricsRenderer({
       document: pipWindow.document,
       window: pipWindow,
@@ -385,6 +396,8 @@ export function createPictureInPictureHost(
     environment.onClosed();
     stopSyncLoop(pipWindow);
     stopStyleMirror();
+    activeMirror?.destroy();
+    activeMirror = null;
     activeRenderer?.destroy();
     activeRenderer = null;
     activeView = null;
