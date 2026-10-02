@@ -68,6 +68,7 @@ export function createIntermission(doc: Document, strings: IntermissionStrings):
 
   function createGlyph(glyph: string): HTMLElement {
     const clip = create("span", GLYPH_CLASS);
+    clip.toggleAttribute("data-digit", /\d/.test(glyph));
     clip.append(createLayer(glyph));
     return clip;
   }

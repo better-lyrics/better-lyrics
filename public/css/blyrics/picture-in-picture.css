@@ -1121,6 +1121,12 @@ body {
   line-height: 1.2;
 }
 
+/* tabular-nums is a no-op in this font, so digits get a fixed cell. */
+.blyrics-pip-intermission__glyph[data-digit] {
+  width: 1ch;
+  justify-items: center;
+}
+
 .blyrics-pip-intermission__glyph > span {
   grid-area: 1 / 1;
 }
