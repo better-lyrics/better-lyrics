@@ -1,5 +1,11 @@
 import { strict as assert } from "node:assert";
-import { type KaraokeConditions, shouldShowKaraoke, wantsKaraokeLyrics } from "@modules/karaoke/gate";
+import {
+  type KaraokeConditions,
+  shouldShowKaraoke,
+  shouldShowWindowStage,
+  type WindowStageConditions,
+  wantsKaraokeLyrics,
+} from "@modules/karaoke/gate";
 
 const all: KaraokeConditions = {
   enabled: true,
@@ -27,5 +33,12 @@ assert.equal(wantsKaraokeLyrics({ ...all, adPlaying: true }), true, "an ad does 
 for (const key of ["enabled", "fullscreen", "videoMode"] as const) {
   assert.equal(wantsKaraokeLyrics({ ...all, [key]: false }), false, `${key} off wants no karaoke lyrics`);
 }
+
+const windowAll: WindowStageConditions = { enabled: true, videoState: "on", synced: true };
+assert.equal(shouldShowWindowStage(windowAll), true);
+assert.equal(shouldShowWindowStage({ ...windowAll, enabled: false }), false, "karaoke off");
+assert.equal(shouldShowWindowStage({ ...windowAll, synced: false }), false, "unsynced lyrics");
+assert.equal(shouldShowWindowStage({ ...windowAll, videoState: "off" }), false, "song mode or setting off");
+assert.equal(shouldShowWindowStage({ ...windowAll, videoState: "ad" }), false, "ad shows the intermission");
 
 console.log("karaoke gate self-check passed");
