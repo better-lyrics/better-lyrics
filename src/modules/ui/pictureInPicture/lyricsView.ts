@@ -7,6 +7,8 @@ import { createProgressBar, type ProgressBarHandle } from "@modules/ui/playerCon
 import { cssTimeMs } from "@/ui/motion";
 import type { PlayerDetails } from "@core/appState";
 import { createHeaderLine, fillHeaderLayer, getHeaderLayers, PictureInPictureHeaderMarquee } from "./headerMarquee";
+import { createIntermission, type Intermission } from "./intermission";
+import { AD_UP_NEXT_SLOT } from "./intermissionText";
 import type { PictureInPicturePlaybackSnapshot, PictureInPictureViewDependencies } from "./types";
 import type { VideoMirrorState } from "./videoMirrorState";
 
@@ -226,6 +228,7 @@ export class PictureInPictureLyricsView {
   private readonly lyricsViewport: HTMLElement;
   private readonly lyricsScroller: HTMLElement;
   private readonly progressBar: ProgressBarHandle;
+  private readonly intermission: Intermission;
   private readonly lifecycleController = new AbortController();
   private artworkController: AbortController | null = null;
   private currentVideoId: string | null = null;
@@ -364,7 +367,11 @@ export class PictureInPictureLyricsView {
     artColumn.append(this.artworkContainer, this.progressBar.element);
 
     content.append(header, this.lyricsViewport);
-    this.shell.append(this.backdrop, artColumn, content);
+    this.intermission = createIntermission(pipDocument, {
+      adPlaying: dependencies.translate("picture_in_picture_adPlaying"),
+      upNext: dependencies.translate("picture_in_picture_adUpNext", AD_UP_NEXT_SLOT),
+    });
+    this.shell.append(this.backdrop, artColumn, content, this.intermission.element);
     pipDocument.body.replaceChildren(this.shell);
 
     sourceDocument.addEventListener(PLAYER_TIME_EVENT, this.handlePlayerTime, {
@@ -988,6 +995,11 @@ export class PictureInPictureLyricsView {
   }
 
   setVideoState(state: VideoMirrorState): void {
+    if (state !== "ad" && this.shell.getAttribute("data-video") === "ad") this.intermission.reset();
     this.shell.setAttribute("data-video", state);
+  }
+
+  setIntermission(remainingS: number | null): void {
+    this.intermission.update(remainingS, this.headerRows[0].text);
   }
 }

@@ -295,6 +295,7 @@ export function createPictureInPictureHost(
     if (!view || !renderer) return;
     applySettings(view);
     activeMirror?.refresh();
+    if (activeMirror?.state === "ad") view.setIntermission(activeMirror.adRemainingS());
 
     const payload = lyricsPayload;
     const snapshot = view.playbackSnapshot;
