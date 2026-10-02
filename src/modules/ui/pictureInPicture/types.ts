@@ -21,7 +21,7 @@ export interface PictureInPictureSongMetadata {
 }
 
 export interface PictureInPictureViewDependencies {
-  readonly translate: (key: string) => string;
+  readonly translate: (key: string, substitutions?: string) => string;
   readonly getArtworkMetadata: (
     videoId: string,
     maxCheckCount?: number,

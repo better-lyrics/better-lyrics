@@ -12,6 +12,7 @@ import { getArtworkMetadata } from "@modules/lyrics/requestSniffer/requestSniffe
 import { resumeAllAutoscroll } from "@braccato/core";
 import { onSignal, sendInit, sendMetadata } from "./bridge";
 import { createGatedToggle, DEFAULT_WINDOW_LAYOUT } from "./controller";
+import { AD_UP_NEXT_SLOT } from "./intermissionText";
 import { publishPictureInPictureLyrics } from "./lyricsPublisher";
 import { DEFAULT_ARTWORK_TRANSITION, DEFAULT_TEXT_TRANSITION } from "./lyricsView";
 import { createPictureInPictureHost } from "./pipHost";
@@ -28,6 +29,8 @@ const PIP_STRING_KEYS = [
   "picture_in_picture_play",
   "picture_in_picture_pause",
   "picture_in_picture_next",
+  "picture_in_picture_adPlaying",
+  "picture_in_picture_adUpNext",
 ] as const;
 let hasInitializedAutoRestore = false;
 let hasAttemptedAutoRestore = false;
@@ -166,7 +169,9 @@ export function publishPictureInPictureResources(): void {
   if (!delegatesToPageWorld) return;
   getStorage(PIP_SETTING_DEFAULTS, items => {
     sendInit({
-      strings: Object.fromEntries(PIP_STRING_KEYS.map(key => [key, t(key)])),
+      strings: Object.fromEntries(
+        PIP_STRING_KEYS.map(key => [key, key === "picture_in_picture_adUpNext" ? t(key, AD_UP_NEXT_SLOT) : t(key)])
+      ),
       lyricsStylesheetUrl: versionedStylesheetUrl(LYRIC_STYLESHEET_PATH),
       pipStylesheetUrl: versionedStylesheetUrl(STYLESHEET_PATH),
       fontUrls: [FONT_LINK, NOTO_SANS_UNIVERSAL_LINK],
