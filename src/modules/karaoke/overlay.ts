@@ -37,14 +37,14 @@ export interface KaraokeOverlayBar {
   observeShown(onChange: (shown: boolean) => void): () => void;
 }
 
-interface KaraokeOverlayOptions {
+export interface KaraokeOverlayOptions {
   readonly doc: Document;
   readonly mountParent: HTMLElement;
   readonly writtenByLabel: string;
   readonly bar: KaraokeOverlayBar | null;
 }
 
-export interface KaraokeOverlay {
+interface KaraokeOverlay {
   ensureMount(): HTMLElement;
   setVisible(visible: boolean, onResize: () => void): void;
   setTitleCard(text: TitleCardText): void;
