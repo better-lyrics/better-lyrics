@@ -5,6 +5,7 @@ import { playerControlIcons } from "@modules/ui/playerControls/icons";
 import { sendTransport } from "@modules/ui/playerControls/playerBarControls";
 import { createProgressBar, type ProgressBarHandle } from "@modules/ui/playerControls/progressBar";
 import { cssTimeMs } from "@/ui/motion";
+import type { KaraokeOverlayBar } from "@modules/karaoke/overlay";
 import type { PlayerDetails } from "@core/appState";
 import { createHeaderLine, fillHeaderLayer, getHeaderLayers, PictureInPictureHeaderMarquee } from "./headerMarquee";
 import { createIntermission, type Intermission } from "./intermission";
@@ -244,6 +245,10 @@ export class PictureInPictureLyricsView {
   private readonly lyricsScroller: HTMLElement;
   private readonly progressBar: ProgressBarHandle;
   private readonly intermission: Intermission;
+  private readonly stage: HTMLElement;
+  private readonly stageVideo: HTMLVideoElement;
+  private isStageActive = false;
+  private stageTrack: MediaStreamTrack | null = null;
   private readonly lifecycleController = new AbortController();
   private artworkController: AbortController | null = null;
   private currentVideoId: string | null = null;
@@ -398,7 +403,24 @@ export class PictureInPictureLyricsView {
       adPlaying: dependencies.translate("picture_in_picture_adPlaying"),
       upNext: dependencies.translate("picture_in_picture_adUpNext", AD_UP_NEXT_SLOT),
     });
-    this.shell.append(this.backdrop, artColumn, content, this.intermission.element);
+    this.stage = pipDocument.createElement("div");
+    this.stage.className = "blyrics-pip-stage";
+    this.stageVideo = pipDocument.createElement("video");
+    this.stageVideo.className = "blyrics-pip-stage__video";
+    this.stageVideo.muted = true;
+    this.stageVideo.playsInline = true;
+    this.stageVideo.setAttribute("aria-hidden", "true");
+    for (const type of ["loadedmetadata", "resize"]) {
+      this.stageVideo.addEventListener(
+        type,
+        () => {
+          if (this.stageTrack !== null) this.writeVideoAspect(this.stageVideo);
+        },
+        { signal: this.lifecycleController.signal }
+      );
+    }
+    this.stage.append(this.stageVideo);
+    this.shell.append(this.backdrop, artColumn, content, this.stage, this.intermission.element);
     pipDocument.body.replaceChildren(this.shell);
 
     sourceDocument.addEventListener(PLAYER_TIME_EVENT, this.handlePlayerTime, {
@@ -417,6 +439,24 @@ export class PictureInPictureLyricsView {
    */
   get scrollElement(): HTMLElement {
     return this.lyricsScroller;
+  }
+
+  get stageParent(): HTMLElement {
+    return this.stage;
+  }
+
+  get stageBar(): KaraokeOverlayBar {
+    const controls = this.artworkContainer;
+    return {
+      element: () => this.progressBar.element,
+      observeShown(onChange: (shown: boolean) => void): () => void {
+        const read = (): void => onChange(!controls.hasAttribute("data-controls-idle"));
+        const observer = new MutationObserver(read);
+        observer.observe(controls, { attributes: true, attributeFilter: ["data-controls-idle"] });
+        read();
+        return () => observer.disconnect();
+      },
+    };
   }
 
   get videoId(): string | null {
@@ -649,6 +689,7 @@ export class PictureInPictureLyricsView {
     this.clearVideoDeferTimer();
     this.setFaceTrack(0, null);
     this.setFaceTrack(1, null);
+    this.setStageTrack(null);
     for (const row of this.headerRows) {
       if (row.busyTimer !== null) this.pipWindow.clearTimeout(row.busyTimer);
     }
@@ -1041,8 +1082,21 @@ export class PictureInPictureLyricsView {
     this.applyVideoPlan();
   }
 
+  setStageActive(active: boolean): void {
+    if (active === this.isStageActive) return;
+    this.isStageActive = active;
+    if (active) this.shell.setAttribute("data-layout", "stage");
+    else this.shell.removeAttribute("data-layout");
+    this.applyVideoPlan();
+  }
+
   private readonly applyVideoPlan = (): void => {
     this.clearVideoDeferTimer();
+    if (this.isStageActive) {
+      this.moveVideoToStage();
+      return;
+    }
+    this.setStageTrack(null);
     const plan = planVideoSwap({
       state: this.videoState,
       track: this.videoTrack,
@@ -1086,6 +1140,24 @@ export class PictureInPictureLyricsView {
     };
     if (video.readyState >= HTMLMediaElement.HAVE_CURRENT_DATA) commit();
     else video.addEventListener("loadeddata", commit, { once: true, signal: controller.signal });
+  }
+
+  // One decoding copy: the faces let go while the stage holds the track.
+  private moveVideoToStage(): void {
+    this.cancelPendingVideo();
+    this.clearVideoRetireTimer();
+    for (const index of [0, 1]) {
+      this.setFaceTrack(index, null);
+      this.syncFaceCover(index);
+    }
+    this.artworkContainer.removeAttribute("data-video-face");
+    this.setStageTrack(this.videoState === "on" ? this.videoTrack : null);
+  }
+
+  private setStageTrack(track: MediaStreamTrack | null): void {
+    if (this.stageTrack === track) return;
+    this.stageTrack = track;
+    this.playTrack(this.stageVideo, track);
   }
 
   private showCoverFace(nextIndex: number, skipAnimation: boolean): void {
@@ -1157,6 +1229,10 @@ export class PictureInPictureLyricsView {
     this.faceTracks[index] = track;
     const video = this.faceVideos[index];
     video.hidden = track === null;
+    this.playTrack(video, track);
+  }
+
+  private playTrack(video: HTMLVideoElement, track: MediaStreamTrack | null): void {
     if (!track) {
       video.srcObject = null;
       return;

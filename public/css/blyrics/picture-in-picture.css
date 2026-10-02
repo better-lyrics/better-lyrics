@@ -216,6 +216,26 @@ body {
   max-width: 420px;
 }
 
+/* -- Karaoke stage ----------------------------------------------------------- */
+.blyrics-pip-stage {
+  display: none;
+}
+
+.blyrics-pip-shell[data-layout="stage"] .blyrics-pip-stage {
+  display: block;
+  position: fixed;
+  inset: 0;
+}
+
+.blyrics-pip-stage__video {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  mask-image: radial-gradient(#fff, #fff);
+  pointer-events: none;
+}
+
 /* The 3D presets stop the slot clipping so the card can leave it, which also stops the slot
    clipping this scrim, so it carries the radius itself. */
 .blyrics-pip-artwork__controls {

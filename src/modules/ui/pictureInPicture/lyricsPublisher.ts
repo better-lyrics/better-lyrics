@@ -13,8 +13,14 @@ import { sendLyrics } from "./bridge";
 export function publishPictureInPictureLyrics(): void {
   if (!AppState.isPictureInPictureOpen) return;
 
+  const lyricData = AppState.lyricData;
   sendLyrics({
     ...currentViewLyrics(),
+    // YouTube's provisional lines stand in while the synced providers answer, so they never count as timed.
+    syncType: !lyricData || lyricData.isProvisional ? "none" : lyricData.syncType,
+    title: lyricData?.song ?? "",
+    artist: lyricData?.artist ?? "",
+    providerKey: AppState.currentProviderKey,
     globalLyricOffset: AppState.globalLyricOffset,
     lyricOffset: AppState.lyricOffset,
     richsyncOffsetTrim: AppState.richsyncOffsetTrim,

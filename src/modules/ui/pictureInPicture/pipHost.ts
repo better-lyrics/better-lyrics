@@ -3,6 +3,9 @@ import { CUSTOM_THEME_STYLE_ID } from "@braccato/core/constants";
 import { applyLyricDecorations } from "@modules/lyrics/lyricDecorations";
 import { createLyricsRenderer, type Lyric, type LyricsRenderer } from "@braccato/core";
 import { VIDEO_QUALITY_BOOST_EVENT } from "@modules/settings/videoQuality";
+import { shouldShowWindowStage } from "@modules/karaoke/gate";
+import { createKaraokeStage, type KaraokeStage } from "@modules/karaoke/stage";
+import { isAdPlaying } from "@modules/ui/playerControls/playerBarControls";
 import { onLyrics, type PictureInPictureLyricsPayload } from "./bridge";
 import { PictureInPictureController } from "./controller";
 import { PictureInPictureLyricsView } from "./lyricsView";
@@ -37,6 +40,10 @@ function hasSameLines(left: readonly Lyric[] | null, right: readonly Lyric[] | n
   return left.every(
     (line, index) => line.startTimeMs === right[index].startTimeMs && line.words === right[index].words
   );
+}
+
+function hasTimedLyrics(payload: PictureInPictureLyricsPayload | null): boolean {
+  return payload !== null && !payload.noLyrics && payload.syncType !== "none" && (payload.lyrics?.length ?? 0) > 0;
 }
 
 function hasSameNames(left: readonly string[] = [], right: readonly string[] = []): boolean {
@@ -105,6 +112,8 @@ export function createPictureInPictureHost(
 ): PictureInPictureController<Window> {
   let activeView: PictureInPictureLyricsView | null = null;
   let activeRenderer: LyricsRenderer | null = null;
+  let activeStage: KaraokeStage | null = null;
+  let isStageShown = false;
   let activeMirror: VideoMirror | null = null;
   let activeWindow: Window | null = null;
   let lyricsPayload: PictureInPictureLyricsPayload | null = null;
@@ -152,6 +161,7 @@ export function createPictureInPictureHost(
       // Recorded only once it is applied. A guard written first would go on claiming a theme that
       // threw on the way in, and nothing else in the window's life reads that stylesheet again.
       const needsLyricRebuild = renderer.setTheme(css);
+      activeStage?.setTheme(css);
       appliedThemeCss = css;
       return needsLyricRebuild;
     };
@@ -215,6 +225,7 @@ export function createPictureInPictureHost(
       const showLoader = (): void => {
         view.showSearching(animate);
         renderer.clear();
+        activeStage?.clear();
       };
       if (!animate || !view.holdLyrics(showLoader)) showLoader();
       return;
@@ -229,6 +240,7 @@ export function createPictureInPictureHost(
         builtLines = null;
         view.showSearching();
         renderer.clear();
+        activeStage?.clear();
         return;
       }
       // The container the copy hung off is about to go, so the next sync makes a fresh one.
@@ -240,6 +252,7 @@ export function createPictureInPictureHost(
         language: payload?.language,
         songwriters: payload?.songwriters,
       });
+      buildStage(payload);
       applyDecorations();
       syncSourceFooter();
       // The decorations and the footer both land after the build measured itself, and both add height.
@@ -252,6 +265,41 @@ export function createPictureInPictureHost(
 
     if (animate) view.afterNextFrame(mountLyrics);
     else mountLyrics();
+  }
+
+  function buildStage(payload: PictureInPictureLyricsPayload | null): void {
+    const stage = activeStage;
+    if (!stage) return;
+    if (!payload?.lyrics || !hasTimedLyrics(payload)) {
+      stage.clear();
+      return;
+    }
+    stage.build({
+      lyrics: [...payload.lyrics],
+      language: payload.language,
+      songwriters: payload.songwriters,
+      title: payload.title,
+      artist: payload.artist,
+      providerKey: payload.providerKey,
+    });
+    // The overlay only exists once built, so a stage shown before its first build is revealed here.
+    stage.setVisible(isStageShown, relayoutStage);
+  }
+
+  function relayoutStage(): void {
+    activeStage?.relayout();
+  }
+
+  function syncStageVisibility(view: PictureInPictureLyricsView): void {
+    const shown = shouldShowWindowStage({
+      enabled: environment.karaokeEnabled() !== false,
+      videoState: activeMirror?.state ?? "off",
+      synced: hasTimedLyrics(lyricsPayload),
+    });
+    if (shown === isStageShown) return;
+    isStageShown = shown;
+    view.setStageActive(shown);
+    activeStage?.setVisible(shown, relayoutStage);
   }
 
   /**
@@ -286,6 +334,7 @@ export function createPictureInPictureHost(
     const decorations = lyricsPayload?.decorations;
     if (!activeRenderer || !decorations) return;
     applyLyricDecorations(activeRenderer, decorations);
+    if (hasTimedLyrics(lyricsPayload)) activeStage?.applyDecorations(decorations, () => tickLyrics(false));
   }
 
   function measureLyrics(): void {
@@ -304,6 +353,7 @@ export function createPictureInPictureHost(
     applySettings(view);
     activeMirror?.refresh();
     if (activeMirror?.state === "ad") view.setIntermission(activeMirror.adRemainingS());
+    syncStageVisibility(view);
 
     const payload = lyricsPayload;
     const snapshot = view.playbackSnapshot;
@@ -318,7 +368,7 @@ export function createPictureInPictureHost(
     // the window to the first line and back. The side panel's driver drops the same frames.
     if (currentTime === 0 && wallTime < payload.suppressZeroTimeUntil) return;
 
-    renderer.tick(currentTime, {
+    const tickOptions = {
       eventCreationTime: wallTime,
       isPlaying: snapshot.isPlaying,
       smoothScroll,
@@ -327,7 +377,10 @@ export function createPictureInPictureHost(
       richsyncOffsetTrim: payload.richsyncOffsetTrim,
       lineOffsetTrim: payload.lineOffsetTrim,
       passiveScrollEnabled: payload.passiveScrollEnabled,
-    });
+    };
+    // First on the shared clock, so the stage is the view that sees a seek as a jump.
+    if (isStageShown) activeStage?.tick(currentTime, tickOptions);
+    renderer.tick(currentTime, tickOptions);
   }
 
   function stopSyncLoop(pipWindow: Window): void {
@@ -362,6 +415,7 @@ export function createPictureInPictureHost(
       return;
     }
     activeRenderer?.setLanguage(payload.language);
+    activeStage?.setLanguage(payload.language);
     // A translation or romanization batch lands on the same lines, so nothing above rebuilds and
     // the new text has to be hung off the DOM that is already up. The lines grow, so re-measure.
     applyDecorations();
@@ -387,6 +441,21 @@ export function createPictureInPictureHost(
       },
       log: environment.view.log,
     });
+    activeStage = createKaraokeStage({
+      doc: pipWindow.document,
+      win: pipWindow,
+      overlay: {
+        doc: pipWindow.document,
+        mountParent: view.stageParent,
+        writtenByLabel: environment.view.translate("lyrics_writtenBy"),
+        bar: view.stageBar,
+      },
+      isVisible: () => isStageShown,
+      isAdPlaying: () => isAdPlaying(document),
+      get log() {
+        return environment.view.log;
+      },
+    });
     activeRenderer = createLyricsRenderer({
       document: pipWindow.document,
       window: pipWindow,
@@ -410,6 +479,9 @@ export function createPictureInPictureHost(
     activeMirror?.destroy();
     activeMirror = null;
     setQualityBoost(false);
+    activeStage?.destroy();
+    activeStage = null;
+    isStageShown = false;
     activeRenderer?.destroy();
     activeRenderer = null;
     activeView = null;

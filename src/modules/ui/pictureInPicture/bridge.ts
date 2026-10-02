@@ -1,4 +1,4 @@
-import type { LyricDecorations } from "@modules/lyrics/injectLyrics";
+import type { LyricDecorations, SyncType } from "@modules/lyrics/injectLyrics";
 import type { Lyric } from "@braccato/core";
 import type { PictureInPictureSongMetadata } from "./types";
 import { warnGeneral } from "@core/logger";
@@ -48,6 +48,10 @@ export interface PictureInPictureLyricsPayload {
   readonly noLyrics: boolean;
   readonly language?: string | null;
   readonly songwriters?: readonly string[];
+  readonly syncType: SyncType;
+  readonly title: string;
+  readonly artist: string;
+  readonly providerKey: string | null;
   /**
    * The translated and romanized text the isolated world injected into the side panel, per line
    * index. It rides on the payload rather than arriving as its own message because the window
