@@ -2,6 +2,7 @@ import { DISABLE_EFFECTS_STYLE_ID, FOOTER_CLASS } from "@constants";
 import { CUSTOM_THEME_STYLE_ID } from "@braccato/core/constants";
 import { applyLyricDecorations } from "@modules/lyrics/lyricDecorations";
 import { createLyricsRenderer, type Lyric, type LyricsRenderer } from "@braccato/core";
+import { VIDEO_QUALITY_BOOST_EVENT } from "@modules/settings/videoQuality";
 import { onLyrics, type PictureInPictureLyricsPayload } from "./bridge";
 import { PictureInPictureController } from "./controller";
 import { PictureInPictureLyricsView } from "./lyricsView";
@@ -113,6 +114,13 @@ export function createPictureInPictureHost(
   let buildCount = 0;
   let syncFrame: number | null = null;
   let styleObserver: MutationObserver | null = null;
+  let isQualityBoosted = false;
+
+  function setQualityBoost(next: boolean): void {
+    if (next === isQualityBoosted) return;
+    isQualityBoosted = next;
+    document.dispatchEvent(new CustomEvent(VIDEO_QUALITY_BOOST_EVENT, { detail: JSON.stringify(next) }));
+  }
 
   function stopStyleMirror(): void {
     styleObserver?.disconnect();
@@ -373,7 +381,10 @@ export function createPictureInPictureHost(
     activeMirror = createVideoMirror({
       sourceDocument: document,
       isEnabled: () => environment.videoEnabled() !== false,
-      onChange: (state, track) => view.setVideo(state, track),
+      onChange: (state, track) => {
+        setQualityBoost(state === "on");
+        view.setVideo(state, track);
+      },
       log: environment.view.log,
     });
     activeRenderer = createLyricsRenderer({
@@ -398,6 +409,7 @@ export function createPictureInPictureHost(
     stopStyleMirror();
     activeMirror?.destroy();
     activeMirror = null;
+    setQualityBoost(false);
     activeRenderer?.destroy();
     activeRenderer = null;
     activeView = null;

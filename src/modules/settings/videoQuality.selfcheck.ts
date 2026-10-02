@@ -4,6 +4,7 @@ import {
   DEFAULT_VIDEO_QUALITY_SETTINGS,
   normalizeVideoQualitySettings,
   selectVideoQuality,
+  VIDEO_QUALITY_BOOST_EVENT,
   VIDEO_QUALITY_SETTINGS_EVENT,
 } from "@modules/settings/videoQuality";
 import type { VideoQualityPlayer } from "@modules/settings/videoQualityPlayer";
@@ -42,6 +43,22 @@ assert.equal(
   "auto",
   "never explicitly select a disabled quality"
 );
+assert.equal(selectVideoQuality(defaults, ["hd2160", "hd1080", "auto"], true), "hd2160", "boost takes the top level");
+assert.equal(
+  selectVideoQuality(
+    { isHighResolutionVideoEnabled: false, preferredVideoQuality: "auto" },
+    ["hd2160", "hd1080"],
+    true
+  ),
+  "hd1080",
+  "boost stays inside the high resolution setting"
+);
+assert.equal(
+  selectVideoQuality({ ...defaults, preferredVideoQuality: "hd720" }, ["hd2160", "hd720", "large"], true),
+  "hd720",
+  "an explicit choice wins over the boost"
+);
+assert.equal(selectVideoQuality(defaults, ["auto"], true), "auto", "boost with no levels stays on auto");
 
 let enabled = true;
 let received: unknown[] = [];
@@ -184,6 +201,42 @@ assert.equal(refreshes, 1, "a failed/filtered initial refresh must not retry for
 (nextApi.loadVideoByPlayerVars as typeof original)(vars);
 video.dispatchEvent(new dom.window.Event("loadedmetadata"));
 assert.equal(refreshes, 2, "replaying also resets the one-time format refresh guard");
+nextApi.getPlayerResponse = undefined;
+const boost = (detail: string) => doc.dispatchEvent(new dom.window.CustomEvent(VIDEO_QUALITY_BOOST_EVENT, { detail }));
+qualities = ["hd2160", "hd1080", "large", "auto"];
+settings("auto");
+await settle();
+assert.equal(qualityCalls.at(-1), "auto");
+boost("true");
+await settle();
+assert.equal(qualityCalls.at(-1), "hd2160", "boost on pins the top level");
+boost("false");
+await settle();
+assert.equal(qualityCalls.at(-1), "auto", "boost off restores the setting at once");
+settings("large");
+await settle();
+boost("true");
+await settle();
+assert.equal(qualityCalls.at(-1), "large", "boost leaves an explicit choice alone");
+settings("auto");
+await settle();
+boost("false");
+await settle();
+const beforeAdBoost = qualityCalls.length;
+doc.querySelector("ytmusic-player")?.classList.add("ad-showing");
+boost("true");
+await settle();
+assert.equal(qualityCalls.length, beforeAdBoost, "boost waits out an ad");
+doc.querySelector("ytmusic-player")?.classList.remove("ad-showing");
+video.dispatchEvent(new dom.window.Event("loadedmetadata"));
+assert.equal(qualityCalls.at(-1), "hd2160", "boost lands after the ad");
+const beforeMalformed = qualityCalls.length;
+for (const detail of ["{", "1", '"on"']) boost(detail);
+await settle();
+assert.equal(qualityCalls.length, beforeMalformed, "malformed boost changes nothing");
+assert.equal(warningCount("Failed to read video quality boost"), 1, "malformed boost logs once");
+boost("false");
+await settle();
 const playbackError = new Error("player unavailable");
 Object.assign(host, { getPlayer: () => Promise.reject(playbackError) });
 for (let i = 0; i < 2; i++) {
