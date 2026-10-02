@@ -20,6 +20,7 @@ export interface PictureInPictureInitPayload {
   readonly marqueeEnabled: boolean;
   readonly progressBarEnabled: boolean;
   readonly videoEnabled: boolean;
+  readonly karaokeEnabled: boolean;
   readonly windowLayout: string;
   readonly logsEnabled: boolean;
 }

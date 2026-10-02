@@ -61,6 +61,7 @@ function createController(): PictureInPictureController<Window> {
     marqueeEnabled: () => resources?.marqueeEnabled,
     progressBarEnabled: () => resources?.progressBarEnabled,
     videoEnabled: () => resources?.videoEnabled,
+    karaokeEnabled: () => resources?.karaokeEnabled,
     windowLayout: () => resources?.windowLayout,
     windowTitle: () => resources?.strings.picture_in_picture_open ?? "",
     stylesheetUrls: () => ({

@@ -18,6 +18,7 @@ import { DEFAULT_ARTWORK_TRANSITION, DEFAULT_TEXT_TRANSITION } from "./lyricsVie
 import { createPictureInPictureHost } from "./pipHost";
 import type { PictureInPictureToggle, PictureInPictureViewDependencies } from "./types";
 import { type LogSink, logCore, logError } from "@core/logger";
+import { KARAOKE_DEFAULTS } from "@modules/karaoke/defaults";
 
 const STYLESHEET_PATH = "css/blyrics/picture-in-picture.css";
 const LYRIC_STYLESHEET_PATH = "css/blyrics/index.css";
@@ -46,6 +47,7 @@ let storedTextTransition: unknown = DEFAULT_TEXT_TRANSITION;
 let storedMarqueeEnabled: unknown = true;
 let storedProgressBarEnabled: unknown = true;
 let storedVideoEnabled: unknown = true;
+let storedKaraokeEnabled: unknown = KARAOKE_DEFAULTS.isKaraokeEnabled;
 let storedWindowLayout: unknown = DEFAULT_WINDOW_LAYOUT;
 let isPictureInPictureEnabled = true;
 
@@ -57,6 +59,7 @@ const PIP_SETTING_DEFAULTS = {
   pipMarqueeEnabled: true,
   pipProgressBarEnabled: true,
   pipVideoEnabled: true,
+  ...KARAOKE_DEFAULTS,
   pipWindowLayout: DEFAULT_WINDOW_LAYOUT,
   isLogsEnabled: true,
 } as const;
@@ -118,6 +121,7 @@ const activeController: PictureInPictureToggle = delegatesToPageWorld
       marqueeEnabled: () => storedMarqueeEnabled,
       progressBarEnabled: () => storedProgressBarEnabled,
       videoEnabled: () => storedVideoEnabled,
+      karaokeEnabled: () => storedKaraokeEnabled,
       windowLayout: () => storedWindowLayout,
       windowTitle: () => t("picture_in_picture_open"),
       stylesheetUrls: () => ({
@@ -182,6 +186,7 @@ export function publishPictureInPictureResources(): void {
       marqueeEnabled: items.pipMarqueeEnabled !== false,
       progressBarEnabled: items.pipProgressBarEnabled !== false,
       videoEnabled: items.pipVideoEnabled !== false,
+      karaokeEnabled: items.isKaraokeEnabled !== false,
       windowLayout: String(items.pipWindowLayout),
       logsEnabled: items.isLogsEnabled !== false,
     });
@@ -260,6 +265,7 @@ export function initializePictureInPictureAutoRestore(): void {
     storedMarqueeEnabled = items.pipMarqueeEnabled;
     storedProgressBarEnabled = items.pipProgressBarEnabled;
     storedVideoEnabled = items.pipVideoEnabled;
+    storedKaraokeEnabled = items.isKaraokeEnabled;
     storedWindowLayout = items.pipWindowLayout;
   });
 
@@ -292,6 +298,10 @@ export function initializePictureInPictureAutoRestore(): void {
 
     if (changes.pipVideoEnabled) {
       storedVideoEnabled = changes.pipVideoEnabled.newValue ?? true;
+    }
+
+    if (changes.isKaraokeEnabled) {
+      storedKaraokeEnabled = changes.isKaraokeEnabled.newValue ?? KARAOKE_DEFAULTS.isKaraokeEnabled;
     }
 
     if (changes.pipWindowLayout) {
