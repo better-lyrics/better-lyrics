@@ -168,8 +168,8 @@ body {
   transform: scale(1.4);
 }
 
-/* The motion cover sits above both faces rather than inside one: it is always
-   cleared on a track change, so it never has to take part in a transition.
+/* The motion cover sits above both faces rather than inside one: it is cleared
+   on a track change and steps aside while a music video face is in front.
 
    Gecko composites the video in its own layer and ignores the container's overflow clip, so the
    radius has to sit on the video itself. The mask is not decorative: it is what makes that rounded
@@ -193,9 +193,7 @@ body {
   opacity: 1;
 }
 
-/* -- Music video -------------------------------------------------------------
-   Each face carries its own video so the preset moves it with the face. Script only fills the face
-   that shows it. Same radius and mask as the motion cover, for the same Gecko reason. */
+/* -- Music video ------------------------------------------------------------- */
 .blyrics-pip-artwork__music-video {
   position: absolute;
   inset: 0;
@@ -208,8 +206,7 @@ body {
   pointer-events: none;
 }
 
-/* The motion cover sits above both faces and would hide the video on the front one. */
-.blyrics-pip-shell[data-video="on"] .blyrics-pip-artwork__video {
+.blyrics-pip-artwork[data-video-face] .blyrics-pip-artwork__video {
   opacity: 0;
 }
 
