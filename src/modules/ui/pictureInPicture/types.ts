@@ -64,6 +64,7 @@ export interface PictureInPictureHostEnvironment {
   readonly textTransition: () => unknown;
   readonly marqueeEnabled: () => unknown;
   readonly progressBarEnabled: () => unknown;
+  readonly videoEnabled: () => unknown;
   // Read at request time, so it only shapes the next window rather than resizing an open one.
   readonly windowLayout: () => unknown;
   readonly windowTitle: () => string;

@@ -42,6 +42,7 @@ let storedArtworkTransition: unknown = DEFAULT_ARTWORK_TRANSITION;
 let storedTextTransition: unknown = DEFAULT_TEXT_TRANSITION;
 let storedMarqueeEnabled: unknown = true;
 let storedProgressBarEnabled: unknown = true;
+let storedVideoEnabled: unknown = true;
 let storedWindowLayout: unknown = DEFAULT_WINDOW_LAYOUT;
 let isPictureInPictureEnabled = true;
 
@@ -52,6 +53,7 @@ const PIP_SETTING_DEFAULTS = {
   pipTextTransition: DEFAULT_TEXT_TRANSITION,
   pipMarqueeEnabled: true,
   pipProgressBarEnabled: true,
+  pipVideoEnabled: true,
   pipWindowLayout: DEFAULT_WINDOW_LAYOUT,
   isLogsEnabled: true,
 } as const;
@@ -112,6 +114,7 @@ const activeController: PictureInPictureToggle = delegatesToPageWorld
       textTransition: () => storedTextTransition,
       marqueeEnabled: () => storedMarqueeEnabled,
       progressBarEnabled: () => storedProgressBarEnabled,
+      videoEnabled: () => storedVideoEnabled,
       windowLayout: () => storedWindowLayout,
       windowTitle: () => t("picture_in_picture_open"),
       stylesheetUrls: () => ({
@@ -173,6 +176,7 @@ export function publishPictureInPictureResources(): void {
       textTransition: String(items.pipTextTransition),
       marqueeEnabled: items.pipMarqueeEnabled !== false,
       progressBarEnabled: items.pipProgressBarEnabled !== false,
+      videoEnabled: items.pipVideoEnabled !== false,
       windowLayout: String(items.pipWindowLayout),
       logsEnabled: items.isLogsEnabled !== false,
     });
@@ -250,6 +254,7 @@ export function initializePictureInPictureAutoRestore(): void {
     storedTextTransition = items.pipTextTransition;
     storedMarqueeEnabled = items.pipMarqueeEnabled;
     storedProgressBarEnabled = items.pipProgressBarEnabled;
+    storedVideoEnabled = items.pipVideoEnabled;
     storedWindowLayout = items.pipWindowLayout;
   });
 
@@ -278,6 +283,10 @@ export function initializePictureInPictureAutoRestore(): void {
 
     if (changes.pipProgressBarEnabled) {
       storedProgressBarEnabled = changes.pipProgressBarEnabled.newValue ?? true;
+    }
+
+    if (changes.pipVideoEnabled) {
+      storedVideoEnabled = changes.pipVideoEnabled.newValue ?? true;
     }
 
     if (changes.pipWindowLayout) {

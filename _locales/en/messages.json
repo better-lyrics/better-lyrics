@@ -228,6 +228,10 @@
     "message": "Show progress bar",
     "description": "Toggle label, shown inside the floating lyrics window settings, for the seekable playback progress bar under the album art"
   },
+  "options_display_pipVideo": {
+    "message": "Show music video",
+    "description": "Toggle label, shown inside the floating lyrics window settings, for playing the music video in the floating window while YouTube Music is in video mode"
+  },
   "options_display_shadersPromo": {
     "message": "Show link to Better Lyrics Shaders",
     "description": "Toggle label for the Shaders companion link shown in the lyrics footer"
