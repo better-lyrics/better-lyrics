@@ -1,17 +1,45 @@
 import { AppState } from "@core/appState";
+import { t } from "@core/i18n";
 import { type LogSink, logCore } from "@core/logger";
 import { applyLyricDecorations } from "@modules/lyrics/lyricDecorations";
 import { type ObserverHandle, observeResize } from "@modules/ui/layout/layoutWidth";
 import type { LyricDecorations } from "@modules/lyrics/injectLyrics";
 import { currentViewLyrics } from "@modules/lyrics/viewLyrics";
 import { currentTickOptions, lyricsElementAdded } from "@modules/ui/mainLyricsView";
-import { isAdPlaying } from "@modules/ui/playerControls/playerBarControls";
+import { getPlayerBar, isAdPlaying } from "@modules/ui/playerControls/playerBarControls";
 import { createLyricsRenderer, type LyricsRenderer } from "@braccato/core";
 import { decorateEndCard } from "@modules/karaoke/endCard";
-import { karaokeOverlay } from "@modules/karaoke/overlay";
+import { createKaraokeOverlay, type KaraokeOverlay, type KaraokeOverlayBar } from "@modules/karaoke/overlay";
 import { isKaraokeActive, isKaraokeLayout, isKaraokeWanted, syncKaraokeAttribute } from "@modules/karaoke/state";
 
 // -- The karaoke view --------------------------
+
+const mainPageBar: KaraokeOverlayBar = {
+  element: () => getPlayerBar(document),
+  observeShown(onChange: (shown: boolean) => void): () => void {
+    const layout = document.getElementById("layout");
+    if (!layout) return () => undefined;
+    const read = () => onChange(layout.hasAttribute("show-fullscreen-controls"));
+    const observer = new MutationObserver(read);
+    observer.observe(layout, { attributes: true, attributeFilter: ["show-fullscreen-controls"] });
+    read();
+    return () => observer.disconnect();
+  },
+};
+
+let overlay: KaraokeOverlay | null = null;
+
+function ensureOverlay(): KaraokeOverlay {
+  overlay ??= createKaraokeOverlay({
+    doc: document,
+    mountParent: document.body,
+    get writtenByLabel(): string {
+      return t("lyrics_writtenBy");
+    },
+    bar: mainPageBar,
+  });
+  return overlay;
+}
 
 const karaokeView: Omit<LyricsRenderer, "destroy"> = createLyricsRenderer({
   document,
@@ -23,7 +51,7 @@ const karaokeView: Omit<LyricsRenderer, "destroy"> = createLyricsRenderer({
     get log(): LogSink {
       return logCore;
     },
-    onStageLayout: box => karaokeOverlay.setPlateBox(box),
+    onStageLayout: box => overlay?.setPlateBox(box),
   },
 });
 
@@ -72,7 +100,7 @@ function publishKaraokeLyrics(): void {
   const rebuilt = source !== builtFrom || segmentMap !== builtSegmentMap;
   if (rebuilt) {
     karaokeView.setLyrics(view.lyrics, {
-      mount: karaokeOverlay.ensureMount(),
+      mount: ensureOverlay().ensureMount(),
       language: view.language,
       songwriters: view.songwriters,
     });
@@ -83,7 +111,7 @@ function publishKaraokeLyrics(): void {
     const firstSung = karaokeView.lines.find(line => line.lyricElement.dataset.instrumental !== "true");
     firstSungLineStartS = firstSung?.time ?? Number.POSITIVE_INFINITY;
     hasIntroNote = karaokeView.lines[0]?.lyricElement.dataset.instrumental === "true";
-    karaokeOverlay.setTitleCard({
+    ensureOverlay().setTitleCard({
       title: lyricData.song,
       artist: lyricData.artist,
       songwriters: view.songwriters ?? [],
@@ -105,7 +133,7 @@ function publishKaraokeLyrics(): void {
 
 // Ticks before the side panel: on the shared clock only the first view to tick sees a seek as a jump.
 export function tickKaraoke(timeS: number, wallTime: number, isPlaying: boolean): void {
-  karaokeOverlay.update(timeS, firstSungLineStartS, hasIntroNote);
+  overlay?.update(timeS, firstSungLineStartS, hasIntroNote);
   karaokeView.tick(timeS, currentTickOptions(wallTime, isPlaying));
 }
 
@@ -146,7 +174,7 @@ export function syncKaraoke(): void {
 
   if (active) publishKaraokeLyrics();
   else if (!AppState.parsedLyrics && builtFrom !== null) clearKaraokeLyrics();
-  karaokeOverlay.setVisible(active, relayoutKaraoke);
+  overlay?.setVisible(active, relayoutKaraoke);
 
   // Each view was off the screen while the other one showed, so neither kept its measurements.
   if (active !== wasActive) {
@@ -169,7 +197,7 @@ export function applyKaraokeTheme(css: string): void {
 
 export function disposeKaraoke(): void {
   clearKaraokeLyrics();
-  karaokeOverlay.destroy();
+  overlay?.destroy();
   panelRefit?.destroy();
   panelRefit = null;
   wasActive = false;
