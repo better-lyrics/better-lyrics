@@ -372,9 +372,8 @@ export function createPictureInPictureHost(
     const view = activeView;
     activeMirror = createVideoMirror({
       sourceDocument: document,
-      target: view.musicVideoElement,
       isEnabled: () => environment.videoEnabled() !== false,
-      onStateChange: state => view.setVideoState(state),
+      onChange: (state, track) => view.setVideo(state, track),
       log: environment.view.log,
     });
     activeRenderer = createLyricsRenderer({

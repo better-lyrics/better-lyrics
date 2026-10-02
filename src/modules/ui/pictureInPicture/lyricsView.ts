@@ -11,6 +11,7 @@ import { createIntermission, type Intermission } from "./intermission";
 import { AD_UP_NEXT_SLOT } from "./intermissionText";
 import type { PictureInPicturePlaybackSnapshot, PictureInPictureViewDependencies } from "./types";
 import type { VideoMirrorState } from "./videoMirrorState";
+import { planVideoSwap } from "./videoSwapPlan";
 
 interface DisplayMetadata {
   readonly title: string;
@@ -178,7 +179,13 @@ function createHeaderRow(element: HTMLElement): HeaderRow {
   };
 }
 
-function createArtworkFace(document: Document): [HTMLElement, HTMLImageElement] {
+interface ArtworkFace {
+  readonly element: HTMLElement;
+  readonly image: HTMLImageElement;
+  readonly video: HTMLVideoElement;
+}
+
+function createArtworkFace(document: Document): ArtworkFace {
   const face = document.createElement("div");
   face.className = "blyrics-pip-artwork__face";
 
@@ -191,8 +198,15 @@ function createArtworkFace(document: Document): [HTMLElement, HTMLImageElement] 
   image.alt = "";
   image.draggable = false;
 
-  face.append(placeholder, image);
-  return [face, image];
+  const video = document.createElement("video");
+  video.className = "blyrics-pip-artwork__music-video";
+  video.muted = true;
+  video.playsInline = true;
+  video.hidden = true;
+  video.setAttribute("aria-hidden", "true");
+
+  face.append(placeholder, image, video);
+  return { element: face, image, video };
 }
 
 // Warms the browser cache so a transition never has to wait on a decode.
@@ -219,8 +233,9 @@ export class PictureInPictureLyricsView {
   private readonly backdropLayers: readonly [HTMLElement, HTMLElement];
   private readonly artworkFaces: readonly [HTMLElement, HTMLElement];
   private readonly artworkImages: readonly [HTMLImageElement, HTMLImageElement];
+  private readonly faceVideos: readonly [HTMLVideoElement, HTMLVideoElement];
+  private readonly faceTracks: [MediaStreamTrack | null, MediaStreamTrack | null] = [null, null];
   private readonly artworkVideo: HTMLVideoElement;
-  private readonly musicVideo: HTMLVideoElement;
   private readonly playPauseButton: HTMLButtonElement;
   private readonly headerRows: readonly [HeaderRow, HeaderRow];
   private readonly marquee: PictureInPictureHeaderMarquee;
@@ -249,6 +264,11 @@ export class PictureInPictureLyricsView {
   private artworkBusyUntil = 0;
   private artworkBusyTimer: number | null = null;
   private artworkStaleTimer: number | null = null;
+  private backdropIndex = 0;
+  private videoState: VideoMirrorState = "off";
+  private videoTrack: MediaStreamTrack | null = null;
+  private pendingVideo: { readonly track: MediaStreamTrack; readonly controller: AbortController } | null = null;
+  private videoRetireTimer: number | null = null;
   private textTransition: TextTransition = DEFAULT_TEXT_TRANSITION;
   private prefersReducedMotion = false;
   private hasHeaderText = false;
@@ -279,16 +299,17 @@ export class PictureInPictureLyricsView {
     this.artworkContainer = pipDocument.createElement("div");
     this.artworkContainer.className = "blyrics-pip-artwork";
 
-    const [frontFace, frontImage] = createArtworkFace(pipDocument);
-    const [backFace, backImage] = createArtworkFace(pipDocument);
-    this.artworkFaces = [frontFace, backFace];
-    this.artworkImages = [frontImage, backImage];
-    frontFace.setAttribute("data-front", "true");
-    backFace.setAttribute("data-front", "false");
+    const frontFace = createArtworkFace(pipDocument);
+    const backFace = createArtworkFace(pipDocument);
+    this.artworkFaces = [frontFace.element, backFace.element];
+    this.artworkImages = [frontFace.image, backFace.image];
+    this.faceVideos = [frontFace.video, backFace.video];
+    frontFace.element.setAttribute("data-front", "true");
+    backFace.element.setAttribute("data-front", "false");
 
     const artworkCard = pipDocument.createElement("div");
     artworkCard.className = "blyrics-pip-artwork__card";
-    artworkCard.append(frontFace, backFace);
+    artworkCard.append(frontFace.element, backFace.element);
 
     this.artworkVideo = pipDocument.createElement("video");
     this.artworkVideo.className = "blyrics-pip-artwork__video";
@@ -297,12 +318,6 @@ export class PictureInPictureLyricsView {
     this.artworkVideo.playsInline = true;
     this.artworkVideo.addEventListener("playing", () => this.artworkContainer.setAttribute("data-animated", "true"));
     this.artworkVideo.addEventListener("error", () => this.artworkContainer.removeAttribute("data-animated"));
-
-    this.musicVideo = pipDocument.createElement("video");
-    this.musicVideo.className = "blyrics-pip-artwork__music-video";
-    this.musicVideo.muted = true;
-    this.musicVideo.playsInline = true;
-    this.musicVideo.setAttribute("aria-hidden", "true");
 
     const artworkControls = pipDocument.createElement("div");
     artworkControls.className = "blyrics-pip-artwork__controls";
@@ -316,7 +331,7 @@ export class PictureInPictureLyricsView {
     );
     const nextButton = this.createPlayerControlButton("next", dependencies.translate("picture_in_picture_next"));
     artworkControls.append(previousButton, this.playPauseButton, nextButton);
-    this.artworkContainer.append(artworkCard, this.artworkVideo, this.musicVideo, artworkControls);
+    this.artworkContainer.append(artworkCard, this.artworkVideo, artworkControls);
 
     const content = pipDocument.createElement("section");
     content.className = "blyrics-pip-content";
@@ -617,6 +632,10 @@ export class PictureInPictureLyricsView {
     if (this.controlsIdleTimer !== null) this.pipWindow.clearTimeout(this.controlsIdleTimer);
     this.releaseHold();
     if (this.artworkBusyTimer !== null) this.pipWindow.clearTimeout(this.artworkBusyTimer);
+    this.pendingVideo?.controller.abort();
+    this.clearVideoRetireTimer();
+    this.setFaceTrack(0, null);
+    this.setFaceTrack(1, null);
     for (const row of this.headerRows) {
       if (row.busyTimer !== null) this.pipWindow.clearTimeout(row.busyTimer);
     }
@@ -871,8 +890,18 @@ export class PictureInPictureLyricsView {
       const isFirstArtwork = !this.artworkContainer.hasAttribute("data-has-art");
       this.artworkContainer.setAttribute("data-has-art", "true");
       this.shell.style.setProperty("--blyrics-pip-art", `url("${url}")`);
-      this.paintBackdrop(nextIndex, url, isFirstArtwork);
-      this.runArtworkSwap(nextIndex, isFirstArtwork);
+      this.paintBackdrop(url, isFirstArtwork);
+      // The video owns the swap; both faces take the cover so falling back to it needs no load.
+      if (this.videoState === "on") {
+        for (const other of this.artworkImages) {
+          if (other === image) continue;
+          other.toggleAttribute("data-letterboxed", url === letterboxedUrl);
+          other.src = url;
+        }
+        return;
+      }
+      if (nextIndex === this.artworkIndex) return;
+      this.showCoverFace(nextIndex, isFirstArtwork);
     };
 
     image.addEventListener("error", fallBack, { once: true, signal });
@@ -886,9 +915,11 @@ export class PictureInPictureLyricsView {
     }
   }
 
-  // Rides the same index as the artwork faces so the wash and the cover are never
-  // a track apart. The outgoing layer keeps its image and stays opaque underneath.
-  private paintBackdrop(nextIndex: number, url: string, skipAnimation: boolean): void {
+  // Indexed apart from the faces, which hold still while the video is on. The outgoing layer
+  // keeps its image and stays opaque underneath.
+  private paintBackdrop(url: string, skipAnimation: boolean): void {
+    const nextIndex = 1 - this.backdropIndex;
+    this.backdropIndex = nextIndex;
     this.backdropLayers[nextIndex].style.backgroundImage = `url("${url}")`;
     // The wash follows the cover. Written in the same task as the data-front flip
     // below: any state change that makes the animation newly match starts it.
@@ -990,13 +1021,91 @@ export class PictureInPictureLyricsView {
     this.progressBar.element.hidden = enabled === false;
   }
 
-  get musicVideoElement(): HTMLVideoElement {
-    return this.musicVideo;
+  // -- Music video ---------------------------------
+
+  setVideo(state: VideoMirrorState, track: MediaStreamTrack | null): void {
+    if (state !== "ad" && this.videoState === "ad") this.intermission.reset();
+    this.videoState = state;
+    this.videoTrack = track;
+    this.shell.setAttribute("data-video", state);
+
+    const plan = planVideoSwap({
+      state,
+      track,
+      frontTrack: this.faceTracks[this.artworkIndex],
+      hasArt: this.artworkContainer.hasAttribute("data-has-art"),
+    });
+    if (plan.kind === "video" && this.pendingVideo?.track === plan.track) return;
+    this.cancelPendingVideo();
+    if (plan.kind === "video") this.loadFaceVideo(plan.track, plan.skipAnimation);
+    else if (plan.kind === "cover") this.showCoverFace(1 - this.artworkIndex, plan.skipAnimation);
   }
 
-  setVideoState(state: VideoMirrorState): void {
-    if (state !== "ad" && this.shell.getAttribute("data-video") === "ad") this.intermission.reset();
-    this.shell.setAttribute("data-video", state);
+  // Waits for the first frame, as the cover waits for its decode.
+  private loadFaceVideo(track: MediaStreamTrack, skipAnimation: boolean): void {
+    const nextIndex = 1 - this.artworkIndex;
+    const video = this.faceVideos[nextIndex];
+    const controller = new AbortController();
+    this.pendingVideo = { track, controller };
+    this.clearVideoRetireTimer();
+    this.setFaceTrack(nextIndex, track);
+
+    const commit = (): void => {
+      if (controller.signal.aborted || this.videoTrack !== track || this.videoState !== "on") return;
+      this.pendingVideo = null;
+      this.runArtworkSwap(nextIndex, skipAnimation);
+      this.retireHiddenFaceVideo(skipAnimation);
+    };
+    if (video.readyState >= HTMLMediaElement.HAVE_CURRENT_DATA) commit();
+    else video.addEventListener("loadeddata", commit, { once: true, signal: controller.signal });
+  }
+
+  private showCoverFace(nextIndex: number, skipAnimation: boolean): void {
+    this.clearVideoRetireTimer();
+    this.setFaceTrack(nextIndex, null);
+    this.runArtworkSwap(nextIndex, skipAnimation);
+    this.retireHiddenFaceVideo(skipAnimation);
+  }
+
+  // The outgoing face keeps its video until the preset has carried it off.
+  private retireHiddenFaceVideo(immediately: boolean): void {
+    const retire = (): void => {
+      this.videoRetireTimer = null;
+      this.setFaceTrack(1 - this.artworkIndex, null);
+    };
+    if (immediately) {
+      retire();
+      return;
+    }
+    this.videoRetireTimer = this.pipWindow.setTimeout(retire, ARTWORK_TRANSITION_DURATIONS[this.artworkTransition]);
+  }
+
+  private clearVideoRetireTimer(): void {
+    if (this.videoRetireTimer === null) return;
+    this.pipWindow.clearTimeout(this.videoRetireTimer);
+    this.videoRetireTimer = null;
+  }
+
+  private cancelPendingVideo(): void {
+    if (!this.pendingVideo) return;
+    this.pendingVideo.controller.abort();
+    this.pendingVideo = null;
+    this.setFaceTrack(1 - this.artworkIndex, null);
+  }
+
+  private setFaceTrack(index: number, track: MediaStreamTrack | null): void {
+    if (this.faceTracks[index] === track) return;
+    this.faceTracks[index] = track;
+    const video = this.faceVideos[index];
+    video.hidden = track === null;
+    if (!track) {
+      video.srcObject = null;
+      return;
+    }
+    video.srcObject = new MediaStream([track]);
+    video.play().catch((error: unknown) => {
+      this.dependencies.log("music video playback failed", error);
+    });
   }
 
   setIntermission(remainingS: number | null): void {

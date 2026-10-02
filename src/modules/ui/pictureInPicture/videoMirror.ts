@@ -8,9 +8,8 @@ const PLAYER_PAGE_SELECTOR = "ytmusic-player-page";
 
 interface VideoMirrorOptions {
   readonly sourceDocument: Document;
-  readonly target: HTMLVideoElement;
   readonly isEnabled: () => boolean;
-  readonly onStateChange: (state: VideoMirrorState) => void;
+  readonly onChange: (state: VideoMirrorState, track: MediaStreamTrack | null) => void;
   readonly log: LogSink;
 }
 
@@ -23,17 +22,12 @@ export interface VideoMirror {
 
 type CapturableVideo = HTMLVideoElement & { captureStream?: () => MediaStream };
 
-export function createVideoMirror({
-  sourceDocument,
-  target,
-  isEnabled,
-  onStateChange,
-  log,
-}: VideoMirrorOptions): VideoMirror {
+export function createVideoMirror({ sourceDocument, isEnabled, onChange, log }: VideoMirrorOptions): VideoMirror {
   let player: CapturableVideo | null = null;
   let stream: MediaStream | null = null;
   let mirrored: MediaStreamTrack | null = null;
   let state: VideoMirrorState = "off";
+  let published: MediaStreamTrack | null = null;
   let lastEnabled = isEnabled();
   let hasLoggedUnsupported = false;
   const lifecycle = new AbortController();
@@ -69,22 +63,11 @@ export function createVideoMirror({
     player.addEventListener("loadstart", attach, { signal: lifecycle.signal });
   }
 
-  function playMirror(): void {
-    target.play().catch((error: unknown) => {
-      log("music video playback failed", error);
-    });
-  }
-
-  function setState(next: VideoMirrorState): void {
-    if (next === state) return;
+  function publish(next: VideoMirrorState): void {
+    if (next === state && mirrored === published) return;
     state = next;
-    if (next === "on" && mirrored) {
-      target.srcObject = new MediaStream([mirrored]);
-      playMirror();
-    } else {
-      target.srcObject = null;
-    }
-    onStateChange(next);
+    published = mirrored;
+    onChange(state, published);
   }
 
   function sync(): void {
@@ -96,7 +79,6 @@ export function createVideoMirror({
         stream?.removeTrack(track);
       }
     }
-    const trackChanged = newest !== mirrored;
     mirrored = newest;
     lastEnabled = isEnabled();
     const next = videoMirrorState({
@@ -105,11 +87,7 @@ export function createVideoMirror({
       adPlaying: isAdPlaying(sourceDocument),
       hasVideoTrack: newest !== null && newest.readyState === "live",
     });
-    if (next === "on" && trackChanged && state === "on" && mirrored) {
-      target.srcObject = new MediaStream([mirrored]);
-      playMirror();
-    }
-    setState(next);
+    publish(next);
   }
 
   const observer = new MutationObserver(sync);
@@ -136,7 +114,6 @@ export function createVideoMirror({
     destroy(): void {
       lifecycle.abort();
       observer.disconnect();
-      target.srcObject = null;
       stopCapture();
     },
   };
