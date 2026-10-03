@@ -13,6 +13,7 @@ const AUTH_PARTNER_METADATA: Record<string, Pick<AuthPartner, "id" | "iconUrl">>
   "https://unison.betterlyrics.org": { id: "unison", iconUrl: null },
   "https://unison.boidu.dev": { id: "unison", iconUrl: null },
   "https://blrcunison.vercel.app": { id: "blrcunison", iconUrl: "https://blrcunison.vercel.app/logo_mono.svg" },
+  "https://unison.prjktla.my.id": { id: "uniclient", iconUrl: "https://unison.prjktla.my.id/logo.svg" },
 };
 
 let authPartners: readonly AuthPartner[] | null = null;
