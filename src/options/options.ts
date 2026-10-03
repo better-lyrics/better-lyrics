@@ -95,6 +95,7 @@ interface Options extends VideoQualitySettings {
   isTranslateEnabled: boolean;
   translationLanguage: string;
   isCursorAutoHideEnabled: boolean;
+  isFuriganaEnabled: boolean;
   isRomanizationEnabled: boolean;
   preferredProviderList: string[];
   romanizationDisabledLanguages: string[];
@@ -168,6 +169,7 @@ const getOptionsFromForm = (): Options => {
     isTranslateEnabled: (document.getElementById("translate") as HTMLInputElement).checked,
     translationLanguage: (document.getElementById("translationLanguage") as HTMLInputElement).value,
     isCursorAutoHideEnabled: (document.getElementById("cursorAutoHide") as HTMLInputElement).checked,
+    isFuriganaEnabled: (document.getElementById("isFuriganaEnabled") as HTMLInputElement).checked,
     isRomanizationEnabled: (document.getElementById("isRomanizationEnabled") as HTMLInputElement).checked,
     preferredProviderList: preferredProviderList,
     romanizationDisabledLanguages: romanizationDisabledLanguages,
@@ -351,6 +353,7 @@ const restoreOptions = (): void => {
     ...KARAOKE_DEFAULTS,
     isTranslateEnabled: false,
     translationLanguage: "en",
+    isFuriganaEnabled: false,
     isRomanizationEnabled: false,
     preferredProviderList: [
       "bLyrics-richsynced",
@@ -449,6 +452,7 @@ const setOptionsInForm = (items: Options): void => {
   (document.getElementById("isKaraokeEnabled") as HTMLInputElement).checked = items.isKaraokeEnabled;
   (document.getElementById("translate") as HTMLInputElement).checked = items.isTranslateEnabled;
   setDropdownFieldValue("translationLanguage", items.translationLanguage);
+  (document.getElementById("isFuriganaEnabled") as HTMLInputElement).checked = items.isFuriganaEnabled ?? false;
   (document.getElementById("isRomanizationEnabled") as HTMLInputElement).checked = items.isRomanizationEnabled;
   setDropdownFieldValue("uiLanguage", items.uiLanguage);
   (document.getElementById("isUnisonPinnedDockEnabled") as HTMLInputElement).checked = items.isControlsDockEnabled;

@@ -44,6 +44,7 @@ interface AppStateType {
   lastLoadedVideoId: string | null;
   lyricAbortController: AbortController | null;
   isTranslateEnabled: boolean;
+  isFuriganaEnabled: boolean;
   isRomanizationEnabled: boolean;
   romanizationDisabledLanguages: string[];
   translationDisabledLanguages: string[];
@@ -94,6 +95,7 @@ export const AppState: AppStateType = {
   lastLoadedVideoId: null,
   lyricAbortController: null,
   isTranslateEnabled: false,
+  isFuriganaEnabled: false,
   isRomanizationEnabled: false,
   romanizationDisabledLanguages: [],
   translationDisabledLanguages: [],

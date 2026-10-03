@@ -358,6 +358,18 @@
     "message": "Romanization",
     "description": "Romanization setting label"
   },
+  "options_language_furigana": {
+    "message": "Furigana (Japanese Kanji Reading)",
+    "description": "Furigana setting label"
+  },
+  "options_language_furigana_tab": {
+    "message": "Furigana",
+    "description": "Furigana tab label"
+  },
+  "options_language_furigana_desc": {
+    "message": "Display furigana readings above Japanese kanji based on romaji pronunciation; only available for certain songs.",
+    "description": "Furigana setting description"
+  },
   "options_language_translate": {
     "message": "Translate song lyrics",
     "description": "Translate song lyrics setting label"
