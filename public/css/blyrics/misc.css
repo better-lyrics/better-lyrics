@@ -64,3 +64,30 @@
 	padding-top: var(--blyrics-padding) !important;
 	word-break: break-word;
 }
+
+/* Furigana (Ruby) styles */
+ruby.blyrics-ruby {
+	ruby-position: over;
+	ruby-align: space-around;
+}
+
+rt.blyrics-rt {
+	font-size: 0.52em;
+	line-height: 1;
+	font-weight: 500;
+	opacity: 0.85;
+	user-select: none;
+	letter-spacing: normal;
+	ruby-align: space-around;
+}
+
+.blyrics-word-highlight rt.blyrics-rt {
+	color: inherit;
+}
+
+/* Ensure words with furigana stay inline-block even inside .blyrics-word-group-long */
+.blyrics--word[data-has-furigana="true"],
+.blyrics-word-highlight[data-has-furigana="true"] {
+	display: inline-block !important;
+	vertical-align: baseline;
+}
