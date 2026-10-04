@@ -8,6 +8,12 @@ import { cssTimeMs } from "@/ui/motion";
 import type { PlayerDetails } from "@core/appState";
 import { createHeaderLine, fillHeaderLayer, getHeaderLayers, PictureInPictureHeaderMarquee } from "./headerMarquee";
 import type { PictureInPicturePlaybackSnapshot, PictureInPictureViewDependencies } from "./types";
+import {
+  isAvToggleAvailable,
+  observeAvMode,
+  setAvMode,
+  type AvMode,
+} from "@modules/ui/playerControls/avToggle";
 
 interface DisplayMetadata {
   readonly title: string;
@@ -68,6 +74,8 @@ const MARQUEE_REARM_DELAY = 700;
 // this the metadata poll is genuinely slow and stale art is the worse lie.
 const ARTWORK_STALE_GRACE = 600;
 
+const YT_PLAYER_VIDEO_SELECTOR = "video.video-stream.html5-main-video";
+
 const LYRICS_MOTION_DEFAULTS = {
   holdDelay: 250,
   exitDuration: 200,
@@ -79,6 +87,15 @@ const LYRICS_MOTION_DEFAULTS = {
   revealBlur: "3px",
   revealEasing: "cubic-bezier(0.22, 1, 0.36, 1)",
 } as const;
+
+/**
+ * Represents a video element that may support capturing its playback
+ * as a MediaStream across supported browsers.
+ */
+interface CapturableVideoElement extends HTMLVideoElement {
+  captureStream?: () => MediaStream;
+  mozCaptureStream?: () => MediaStream;
+}
 
 interface LyricsMotion {
   holdDelay: number;
@@ -217,6 +234,11 @@ export class PictureInPictureLyricsView {
   private readonly artworkFaces: readonly [HTMLElement, HTMLElement];
   private readonly artworkImages: readonly [HTMLImageElement, HTMLImageElement];
   private readonly artworkVideo: HTMLVideoElement;
+  private readonly playbackVideo: HTMLVideoElement;
+  private readonly avToggle: HTMLElement;
+  private readonly songButton: HTMLButtonElement;
+  private readonly videoButton: HTMLButtonElement;
+  private readonly stopObservingAvMode: () => void;
   private readonly playPauseButton: HTMLButtonElement;
   private readonly headerRows: readonly [HeaderRow, HeaderRow];
   private readonly marquee: PictureInPictureHeaderMarquee;
@@ -227,6 +249,7 @@ export class PictureInPictureLyricsView {
   private readonly lifecycleController = new AbortController();
   private artworkController: AbortController | null = null;
   private currentVideoId: string | null = null;
+  private pendingAvModeChange: AvMode | null = null;
   private lastVisibleMetadataCheck = 0;
   private lastPlayingState: boolean | null = null;
   private controlsIdleTimer: number | null = null;
@@ -273,6 +296,40 @@ export class PictureInPictureLyricsView {
     this.artworkContainer = pipDocument.createElement("div");
     this.artworkContainer.className = "blyrics-pip-artwork";
 
+    this.avToggle = pipDocument.createElement("div");
+    this.avToggle.className = "blyrics-pip-av-toggle";
+
+    this.playbackVideo = pipDocument.createElement("video");
+    this.playbackVideo.className = "blyrics-pip-playback-video";
+    this.playbackVideo.autoplay = true;
+    this.playbackVideo.muted = true;
+    this.playbackVideo.playsInline = true;
+
+    this.songButton = pipDocument.createElement("button");
+    this.songButton.type = "button";
+    this.songButton.className = "blyrics-pip-av-toggle__button";
+    this.songButton.textContent = "Song";
+
+    this.videoButton = pipDocument.createElement("button");
+    this.videoButton.type = "button";
+    this.videoButton.className = "blyrics-pip-av-toggle__button";
+    this.videoButton.textContent = "Video";
+
+    this.avToggle.append(this.songButton, this.videoButton);
+
+    this.songButton.addEventListener("click", () => {
+      setAvMode(this.sourceDocument, "song");
+    },
+    { signal: this.lifecycleController.signal }
+    );
+
+    this.videoButton.addEventListener("click", () => {
+      setAvMode(this.sourceDocument, "video");
+    },
+    { signal: this.lifecycleController.signal }
+    );
+
+
     const [frontFace, frontImage] = createArtworkFace(pipDocument);
     const [backFace, backImage] = createArtworkFace(pipDocument);
     this.artworkFaces = [frontFace, backFace];
@@ -304,7 +361,7 @@ export class PictureInPictureLyricsView {
     );
     const nextButton = this.createPlayerControlButton("next", dependencies.translate("picture_in_picture_next"));
     artworkControls.append(previousButton, this.playPauseButton, nextButton);
-    this.artworkContainer.append(artworkCard, this.artworkVideo, artworkControls);
+    this.artworkContainer.append(artworkCard, this.artworkVideo, this.playbackVideo, this.avToggle, artworkControls);
 
     const content = pipDocument.createElement("section");
     content.className = "blyrics-pip-content";
@@ -366,6 +423,14 @@ export class PictureInPictureLyricsView {
       signal: this.lifecycleController.signal,
     });
     pipWindow.addEventListener("pagehide", this.destroy, { once: true });
+
+    this.stopObservingAvMode = observeAvMode(
+      this.sourceDocument,
+      mode => this.updateAvToggle(mode),
+      mode => {
+        this.pendingAvModeChange = mode;
+      },
+    );
   }
 
   /**
@@ -561,8 +626,26 @@ export class PictureInPictureLyricsView {
     this.updatePlayPauseButton(detail.isPlaying);
 
     if (detail.videoId !== this.currentVideoId) {
-      this.showSong(detail);
-      if (this.holdTimer !== null) this.expireHold();
+      const avModeChange = this.pendingAvModeChange;
+      this.pendingAvModeChange = null;
+
+      if (avModeChange === "video") {
+        this.currentVideoId = detail.videoId;
+        this.lastVisibleMetadataCheck = Date.now();
+
+        this.setHeaderText(detail.song, detail.artist);
+      } else if (avModeChange === "song") {
+        this.currentVideoId = detail.videoId;
+        this.lastVisibleMetadataCheck = Date.now();
+
+        this.setHeaderText(detail.song, detail.artist);
+        this.clearAnimatedArtwork();
+        this.loadArtwork(detail.videoId);
+      } else {
+        this.showSong(detail);
+
+        if (this.holdTimer !== null) this.expireHold();
+      }
     }
 
     const now = Date.now();
@@ -593,6 +676,8 @@ export class PictureInPictureLyricsView {
   }
 
   private readonly destroy = (): void => {
+    this.stopObservingAvMode();
+    this.detachPlaybackVideo();
     this.lifecycleController.abort();
     this.artworkController?.abort();
     this.clearArtworkStaleTimer();
@@ -628,6 +713,49 @@ export class PictureInPictureLyricsView {
 
   private activatePlayerControl(action: PlayerControlAction): void {
     sendTransport(this.sourceDocument, action);
+  }
+
+  private updateAvToggle(mode: AvMode): void {
+    const available = isAvToggleAvailable(this.sourceDocument);
+
+    this.avToggle.hidden = !available;
+
+    this.songButton.toggleAttribute("data-selected", mode === "song");
+    this.videoButton.toggleAttribute("data-selected", mode === "video");
+
+    this.songButton.setAttribute("aria-pressed", String(mode === "song"));
+    this.videoButton.setAttribute("aria-pressed", String(mode === "video"));
+
+    const isVideo = mode === "video";
+
+    this.artworkContainer.toggleAttribute("data-video-mode", isVideo);
+
+    if (isVideo) {
+      this.attachPlaybackVideo();
+    } else {
+      this.detachPlaybackVideo();
+    }
+  }
+
+  private attachPlaybackVideo(): void {
+    const sourceVideo =
+      this.sourceDocument.querySelector<CapturableVideoElement>(YT_PLAYER_VIDEO_SELECTOR);
+
+    if (!sourceVideo) return;
+
+    const captureStream =
+      sourceVideo.captureStream?.bind(sourceVideo) ??
+      sourceVideo.mozCaptureStream?.bind(sourceVideo);
+
+    if (!captureStream) return;
+
+    this.playbackVideo.srcObject = captureStream();
+    void this.playbackVideo.play().catch(() => { });
+  }
+
+  private detachPlaybackVideo(): void {
+    this.playbackVideo.pause();
+    this.playbackVideo.srcObject = null;
   }
 
   private updatePlayPauseButton(isPlaying: boolean): void {
@@ -827,6 +955,17 @@ export class PictureInPictureLyricsView {
   // gets back on screen.
   private setArtwork(url: string, videoId: string, songSignal: AbortSignal): void {
     if (songSignal.aborted) return;
+
+    const currentImage = this.artworkImages[this.artworkIndex];
+
+    if (
+      this.artworkContainer.hasAttribute("data-has-art") &&
+      currentImage.getAttribute("src") === url
+    ) {
+      this.clearArtworkStaleTimer();
+      return;
+    }
+
     const nextIndex = 1 - this.artworkIndex;
     const image = this.artworkImages[nextIndex];
 

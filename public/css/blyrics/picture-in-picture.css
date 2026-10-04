@@ -192,6 +192,77 @@ body {
   opacity: 1;
 }
 
+.blyrics-pip-playback-video {
+    position: absolute;
+    z-index: 3;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    border-radius: inherit;
+    background: #000;
+    opacity: 0;
+    mask-image: radial-gradient(#fff, #fff);
+    pointer-events: none;
+    transition: opacity 180ms ease;
+}
+
+.blyrics-pip-artwork[data-video-mode] .blyrics-pip-playback-video {
+    opacity: 1;
+}
+
+.blyrics-pip-artwork[data-video-mode] .blyrics-pip-artwork__card,
+.blyrics-pip-artwork[data-video-mode] .blyrics-pip-artwork__video {
+    opacity: 0;
+    visibility: hidden;
+}
+
+.blyrics-pip-av-toggle {
+    position: absolute;
+    z-index: 5;
+    top: clamp(8px, 2vw, 12px);
+    left: 50%;
+    display: flex;
+    gap: 2px;
+    padding: 3px;
+    border: 1px solid rgb(255 255 255 / 12%);
+    border-radius: 999px;
+    background: rgb(0 0 0 / 12%);
+    opacity: 0;
+    backdrop-filter: blur(8px);
+    transform: translateX(-50%);
+    pointer-events: none;
+    transition: opacity 180ms ease;
+}
+
+.blyrics-pip-av-toggle[hidden] {
+    display: none;
+}
+
+.blyrics-pip-av-toggle__button {
+    padding: 4px 10px;
+    border: 0;
+    border-radius: 999px;
+    background: transparent;
+    color: rgb(255 255 255 / 68%);
+    font: inherit;
+    font-size: clamp(9px, 2.8vw, 12px);
+    font-weight: 600;
+    cursor: pointer;
+    transition:
+        background-color 140ms ease,
+        color 140ms ease;
+}
+
+.blyrics-pip-av-toggle__button:hover {
+    color: #fff;
+}
+
+.blyrics-pip-av-toggle__button[data-selected] {
+    background: rgb(255 255 255 / 92%);
+    color: #111;
+}
+
 /* The 3D presets stop the slot clipping so the card can leave it, which also stops the slot
    clipping this scrim, so it carries the radius itself. */
 .blyrics-pip-artwork__controls {
@@ -213,10 +284,13 @@ body {
    where the card no longer is. Moving it into the card is not the answer either, since it would
    then flip away with the card. */
 .blyrics-pip-shell:not([data-running="true"])
-  .blyrics-pip-artwork:hover:not([data-controls-idle])
-  .blyrics-pip-artwork__controls {
-  opacity: 1;
-  pointer-events: auto;
+    .blyrics-pip-artwork:hover:not([data-controls-idle])
+    .blyrics-pip-artwork__controls,
+.blyrics-pip-shell:not([data-running="true"])
+    .blyrics-pip-artwork:hover:not([data-controls-idle])
+    .blyrics-pip-av-toggle {
+    opacity: 1;
+    pointer-events: auto;
 }
 
 .blyrics-pip-artwork__controls {
