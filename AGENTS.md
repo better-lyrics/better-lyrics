@@ -149,5 +149,8 @@ reads like this (the model and handle here are only an illustration):
 Keep this line even when the human reviews and amends the work. That disclosure is the whole
 requirement — no generated-by footers or commit trailers are expected on top of it.
 
+The PR template carries an **Authorship** section holding this line and a human-authored
+alternative. Tick the box that applies and fill the line in; do not delete the section.
+
 Undisclosed agent-authored PRs are closed on sight, and unreviewed agent output from outside
 contributors is not accepted at all — see the policy in CONTRIBUTING.md.
