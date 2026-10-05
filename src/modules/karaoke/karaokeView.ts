@@ -48,7 +48,7 @@ function clearKaraokeLyrics(): void {
 function signatureOf(decorations: LyricDecorations): string {
   let signature = "";
   for (const [index, decoration] of Object.entries(decorations)) {
-    signature += `${index}${decoration.romanization ? "r" : ""}${decoration.translation ? "t" : ""},`;
+    signature += `${index}${decoration.romanization ? "r" : ""}${decoration.translation ? "t" : ""}${decoration.furiganaMap ? "f" : ""},`;
   }
   return signature;
 }
