@@ -65,12 +65,14 @@ function getRenderedPartsForAlignment(
  * view's elements and write nothing back to the `Lyric` objects, so a second view building from the
  * same lines would otherwise show neither.
  */
+export type FuriganaMap = Record<number, RubySegment[]> | Map<number, RubySegment[]>;
+
 interface LyricLineDecoration {
   romanization?: string;
   timedRomanization?: LyricPart[];
   translation?: string;
   translationLanguage?: string;
-  furiganaMap?: Map<number, RubySegment[]>;
+  furiganaMap?: FuriganaMap;
 }
 
 /**
@@ -309,7 +311,7 @@ async function processBatchTranslationsAndRomanizations(
         );
         const injected = injectFuriganaToLine(doc, lineData, furiganaMap);
         if (injected) {
-          recordLyricDecoration(index, { furiganaMap });
+          recordLyricDecoration(index, { furiganaMap: Object.fromEntries(furiganaMap) });
           didInjectCachedContent = true;
         }
       }

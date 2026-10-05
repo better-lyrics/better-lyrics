@@ -40,14 +40,17 @@ function createRubyFragment(doc: Document, segments: RubySegment[]): DocumentFra
 export function injectFuriganaToLine(
   doc: Document,
   lineData: LineData,
-  partSegmentsMap: Map<number, RubySegment[]>
+  partSegmentsMap: Map<number, RubySegment[]> | Record<number, RubySegment[]>
 ): boolean {
   if (!lineData.parts || lineData.parts.length === 0) return false;
 
   let injectedAny = false;
 
   lineData.parts.forEach((part, partIdx) => {
-    let segments = partSegmentsMap.get(partIdx);
+    let segments =
+      partSegmentsMap instanceof Map
+        ? partSegmentsMap.get(partIdx)
+        : (partSegmentsMap as Record<number, RubySegment[]>)[partIdx];
     if (!segments || !segments.some(s => Boolean(s.ruby))) {
       return;
     }
@@ -79,6 +82,7 @@ export function injectFuriganaToLine(
     if (part.lyricElement) {
       part.lyricElement.replaceChildren(createRubyFragment(doc, segments));
       part.lyricElement.dataset.hasFurigana = "true";
+      part.lyricElement.dataset.content = segText;
       part.lyricElement.classList.remove("blyrics-word--lettered");
       part.letterElements = undefined;
       injectedAny = true;
@@ -87,6 +91,7 @@ export function injectFuriganaToLine(
     if (part.highlightElement) {
       part.highlightElement.replaceChildren(createRubyFragment(doc, segments));
       part.highlightElement.dataset.hasFurigana = "true";
+      part.highlightElement.dataset.content = segText;
       part.highlightElement.classList.remove("blyrics-word-highlight--lettered", "blyrics-word--lettered");
       part.highlightLetterElements = undefined;
     }
