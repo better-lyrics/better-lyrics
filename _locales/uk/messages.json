@@ -40,11 +40,11 @@
     "description": "Auto switch to lyrics tab setting label"
   },
   "options_general_clearCachedLyrics": {
-    "message": "Clear cached lyrics",
+    "message": "Очистити кеш текстів",
     "description": "Label for the clear cache action row"
   },
   "options_general_clearCachedLyricsHint": {
-    "message": "They download again as you play",
+    "message": "Вони завантажаться повторно при відтворенні",
     "description": "Hint under the clear cached lyrics label"
   },
   "options_general_clearCache": {
@@ -56,7 +56,7 @@
     "description": "Total lyrics in cache label"
   },
   "options_general_storageUsed": {
-    "message": "Storage used",
+    "message": "Використано сховища",
     "description": "Popup General tab: label under the total local storage size"
   },
   "options_general_segment": {
@@ -74,23 +74,23 @@
     }
   },
   "options_general_browseThemes": {
-    "message": "Browse themes",
+    "message": "Переглянути теми",
     "description": "Popup General tab: one-line description on the Theme Marketplace shortcut"
   },
   "options_general_whatsNew": {
-    "message": "What's new",
+    "message": "Що нового",
     "description": "Popup General tab: shortcut to the latest release notes"
   },
   "options_general_whatsNewHint": {
-    "message": "Latest release notes",
+    "message": "Список останніх змін",
     "description": "Popup General tab: one-line description on the What's new shortcut"
   },
   "options_display_fullscreenTab": {
-    "message": "Fullscreen",
+    "message": "Повноекранний",
     "description": "Header tab in Display for fullscreen settings"
   },
   "options_display_videoTab": {
-    "message": "Video",
+    "message": "Відео",
     "description": "Header tab in Display for video settings"
   },
   "options_display_disableFullscreen": {
@@ -118,11 +118,11 @@
     "description": "Label for the per-letter wave lyric animation toggle"
   },
   "options_display_letterWaveOff": {
-    "message": "Off",
+    "message": "Вимкнено",
     "description": "Spoken value of the letter wave three-way switch when the effect is off"
   },
   "options_display_letterWaveOn": {
-    "message": "On",
+    "message": "Увімкнено",
     "description": "Spoken value of the letter wave three-way switch when the effect is always on"
   },
   "options_display_letterWaveBadge": {
@@ -174,15 +174,15 @@
     "description": "Help tooltip explaining what automatic floating-lyrics reopening does and why it waits for the first interaction"
   },
   "options_display_pipWindowLayout": {
-    "message": "Window layout",
+    "message": "Макет вікна",
     "description": "Setting label, shown inside the floating lyrics window settings, for choosing whether the window opens wide or tall"
   },
   "options_pipWindowLayout_horizontal": {
-    "message": "Horizontal",
+    "message": "Горизонтальний",
     "description": "Floating lyrics window layout option: a wide window with the album art beside the lyrics"
   },
   "options_pipWindowLayout_vertical": {
-    "message": "Vertical",
+    "message": "Вертикальний",
     "description": "Floating lyrics window layout option: a tall window with the album art above the lyrics"
   },
   "options_display_pipArtworkTransition": {
@@ -414,11 +414,11 @@
     "description": "Installed themes button label"
   },
   "options_identity_backupTitle": {
-    "message": "Back up your identity",
+    "message": "Збережіть свій ідентифікатор",
     "description": "Title of the identity backup warning"
   },
   "options_identity_backupBody": {
-    "message": "Your contributions and level are tied to this key. If you lose it, no one can restore it, including the Better Lyrics team. Never share it: anyone who has it can act as you.",
+    "message": "Ваші внески та рівень прив'язані до цього ключа. Якщо ви його втратите, ніхто не зможе його відновити, навіть команда Better Lyrics. Ніколи нікому його не передавайте — будь-хто зможе діяти від вашого імені, якщо матиме ваш ідентифікатор.",
     "description": "Body of the identity backup warning"
   },
   "options_identity_yourIdentity": {
@@ -534,7 +534,7 @@
     "description": "Status when nickname request fails"
   },
   "options_alert_refreshFailed": {
-    "message": "Could not refresh lyrics. Open YouTube Music and try again.",
+    "message": "Не вдалося перезавантажити тексти. Відкрийте YouTube Music і спробуйте ще раз.",
     "description": "Shown when the popup's Refresh lyrics button finds no YouTube Music tab or none of them responds"
   },
   "options_alert_importEmpty": {
@@ -590,43 +590,43 @@
     "description": "Identity load error message"
   },
   "editor_alert_nothingToSave": {
-    "message": "No styles to save as a theme",
+    "message": "Для збереження теми треба щоб в ній були стилі",
     "description": "Toast when the user saves an empty editor as a custom theme"
   },
   "editor_alert_saveDialogOpened": {
-    "message": "Theme file save dialog opened. Choose where to save your file",
+    "message": "Відкрилося діалогове вікно. Виберіть місце для збереження файлу",
     "description": "Toast after the browser save dialog opens for an exported theme file"
   },
   "editor_alert_downloadStarted": {
-    "message": "Theme file download started. Check your downloads folder",
+    "message": "Завантаження теми розпочалося. Перевірте каталог для завантажень",
     "description": "Toast after an exported theme file starts downloading without a save dialog"
   },
   "editor_alert_applyFailed": {
-    "message": "Could not apply theme",
+    "message": "Не вдалося застосувати тему",
     "description": "Toast when applying a built-in or custom theme from the theme picker fails"
   },
   "editor_alert_saveFailed": {
-    "message": "Could not save your styles",
+    "message": "Не вдалося зберегти ваші стилі",
     "description": "Toast when saving the custom CSS editor content fails"
   },
   "editor_alert_storageFull": {
-    "message": "Storage is full. Clear the lyrics cache in settings, then try again",
+    "message": "Сховище переповнене. Очистьте кеш текстів у налаштуваннях і спробуйте ще раз",
     "description": "Toast when saving the custom CSS editor content fails because extension storage is full"
   },
   "editor_prompt_saveMessage": {
-    "message": "Enter a name for this theme",
+    "message": "Укажіть назву для цієї теми",
     "description": "Message in the save as theme dialog"
   },
   "editor_prompt_renameMessage": {
-    "message": "Enter a new name for this theme",
+    "message": "Укажіть нову назву для цієї теми",
     "description": "Message in the rename theme dialog"
   },
   "editor_prompt_themeName": {
-    "message": "Theme name",
+    "message": "Назва теми",
     "description": "Placeholder of the theme name field in the save and rename dialogs"
   },
   "editor_prompt_deleteMessage": {
-    "message": "Delete the theme $NAME$? This cannot be undone.",
+    "message": "Видалити тему «$NAME$»? Цю дію неможливо скасувати.",
     "description": "Message in the delete custom theme dialog",
     "placeholders": {
       "name": {
@@ -636,11 +636,11 @@
     }
   },
   "editor_alert_importFailed": {
-    "message": "Could not import the theme file. Try again",
+    "message": "Не вдалося імпортувати файл теми. Спробуйте ще раз",
     "description": "Toast when importing a theme file fails"
   },
   "editor_alert_imported": {
-    "message": "Imported $NAME$",
+    "message": "Імпортовано «$NAME$»",
     "description": "Toast after a theme file is imported into the editor",
     "placeholders": {
       "name": {
@@ -650,7 +650,7 @@
     }
   },
   "editor_alert_themeSaved": {
-    "message": "Saved theme: $NAME$",
+    "message": "Збережено тему «$NAME$»",
     "description": "Toast after the editor styles are saved as a custom theme",
     "placeholders": {
       "name": {
@@ -660,11 +660,11 @@
     }
   },
   "editor_alert_themeSaveFailed": {
-    "message": "Could not save the theme",
+    "message": "Не вдалося зберегти тему",
     "description": "Toast when saving a custom theme fails"
   },
   "editor_alert_themeRenamed": {
-    "message": "Renamed theme to $NAME$",
+    "message": "Тему перейменовано на «$NAME$»",
     "description": "Toast after a custom theme is renamed",
     "placeholders": {
       "name": {
@@ -674,7 +674,7 @@
     }
   },
   "editor_alert_themeNameTaken": {
-    "message": "A theme named $NAME$ already exists",
+    "message": "Тема з назвою «$NAME$» вже існує",
     "description": "Toast when a custom theme is renamed to a name another custom theme already uses",
     "placeholders": {
       "name": {
@@ -684,15 +684,15 @@
     }
   },
   "editor_alert_themeRenameFailed": {
-    "message": "Could not rename the theme",
+    "message": "Не вдалося перейменувати тему",
     "description": "Toast when renaming a custom theme fails"
   },
   "editor_alert_themeDeleted": {
-    "message": "Custom theme deleted",
+    "message": "Користувацьку тему видалено",
     "description": "Toast after a custom theme is deleted"
   },
   "editor_alert_themeDeleteFailed": {
-    "message": "Could not delete the theme",
+    "message": "Не вдалося видалити тему",
     "description": "Toast when deleting a custom theme fails"
   },
   "options_editor_saving": {
@@ -744,31 +744,31 @@
     "description": "Double-click to rename tooltip"
   },
   "options_editor_findReplaceTitle": {
-    "message": "Find and replace",
+    "message": "Знайти та замінити",
     "description": "Title of the modal shown when find and replace is used in the popup editor"
   },
   "options_editor_findReplaceFullscreenOnly": {
-    "message": "Find and replace is only available in the fullscreen editor.",
+    "message": "Функція «Знайти та замінити» доступна лише в повноекранному редакторі.",
     "description": "Modal body explaining that find and replace needs the fullscreen editor"
   },
   "options_editor_findReplaceOpenHint": {
-    "message": "Open the fullscreen editor to use every editor feature.",
+    "message": "Відкрийте повноекранний редактор, щоб скористатися повним функціоналом.",
     "description": "Second line of the find and replace modal, pointing to the fullscreen editor"
   },
   "options_editor_openFullscreen": {
-    "message": "Open fullscreen editor",
+    "message": "Відкрити повноекранний редактор",
     "description": "Confirm button in the find and replace modal that opens the fullscreen editor"
   },
   "options_editor_close": {
-    "message": "Close",
+    "message": "Закрити",
     "description": "Cancel button that closes the find and replace modal"
   },
   "options_editor_notReady": {
-    "message": "Editor not initialized",
+    "message": "Редактор не ініціалізовано",
     "description": "Alert shown when an editor action runs before the editor has loaded"
   },
   "options_editor_nothingToExport": {
-    "message": "No styles to export",
+    "message": "Немає стилів для експорту",
     "description": "Alert shown when exporting while the editor is empty"
   },
   "options_provider_betterLyrics": {
@@ -1152,7 +1152,7 @@
     "description": "Theme apply error"
   },
   "marketplace_alert_installed": {
-    "message": "Installed $NAME$",
+    "message": "«$NAME$» установлено",
     "description": "Toast after a Marketplace theme is installed; it has an Apply action",
     "placeholders": {
       "name": {
@@ -1162,7 +1162,7 @@
     }
   },
   "marketplace_alert_installedFrom": {
-    "message": "Installed $NAME$ from $SOURCE$",
+    "message": "Установлено «$NAME$» з $SOURCE$",
     "description": "Toast after a theme is installed from a GitHub repository URL; SOURCE is the repository, with the branch in parentheses when one was given",
     "placeholders": {
       "name": {
@@ -1176,7 +1176,7 @@
     }
   },
   "marketplace_alert_removed": {
-    "message": "Removed $NAME$",
+    "message": "«$NAME$» видалено",
     "description": "Toast after an installed Marketplace theme is removed",
     "placeholders": {
       "name": {
@@ -1186,11 +1186,11 @@
     }
   },
   "marketplace_alert_storageFull": {
-    "message": "Storage is full. Remove some installed themes and try again.",
+    "message": "Сховище переповнене. Видаліть деякі теми та спробуйте ще раз.",
     "description": "Toast when a theme cannot be installed because extension storage is full"
   },
   "marketplace_alert_installFailed": {
-    "message": "Could not install $NAME$",
+    "message": "Не вдалося встановити «$NAME$»",
     "description": "Toast when installing a Marketplace theme fails",
     "placeholders": {
       "name": {
@@ -1200,7 +1200,7 @@
     }
   },
   "marketplace_alert_removeFailed": {
-    "message": "Could not remove $NAME$",
+    "message": "Не вдалося видалити «$NAME$»",
     "description": "Toast when removing an installed Marketplace theme fails",
     "placeholders": {
       "name": {
@@ -1224,11 +1224,11 @@
     }
   },
   "marketplace_tooltipInstallsSingular": {
-    "message": "1 install",
+    "message": "1 встановлення",
     "description": "Tooltip on a theme's install count when it has exactly one install"
   },
   "marketplace_byline": {
-    "message": "By $AUTHOR$ · v$VERSION$",
+    "message": "Від $AUTHOR$ · v$VERSION$",
     "description": "Byline under a theme name: its creators and version",
     "placeholders": {
       "author": {
@@ -1242,7 +1242,7 @@
     }
   },
   "marketplace_themeActiveLabel": {
-    "message": "$TITLE$, active",
+    "message": "«$TITLE$», активна",
     "description": "Accessible name of the currently applied theme in the installed themes menu",
     "placeholders": {
       "title": {
@@ -1252,7 +1252,7 @@
     }
   },
   "marketplace_tooltipInstalls": {
-    "message": "$COUNT$ installs",
+    "message": "Установлень: $COUNT$",
     "description": "Tooltip on a theme's install count",
     "placeholders": {
       "count": {
@@ -1262,7 +1262,7 @@
     }
   },
   "marketplace_tooltipRating": {
-    "message": "$AVERAGE$ average from $COUNT$ ratings",
+    "message": "Середня оцінка: $AVERAGE$ (усього оцінок — $COUNT$)",
     "description": "Tooltip on a theme's star rating",
     "placeholders": {
       "average": {
@@ -1276,7 +1276,7 @@
     }
   },
   "marketplace_tooltipOlderBuild": {
-    "message": "You're on v$CURRENT$. Latest is v$LATEST$",
+    "message": "Ваша версія — v$CURRENT$. Останньою версією є v$LATEST$",
     "description": "Tooltip on the badge shown when an installed theme build is older than the latest one",
     "placeholders": {
       "current": {
@@ -1290,7 +1290,7 @@
     }
   },
   "marketplace_tooltipOlderBuildFloor": {
-    "message": "You're on v$CURRENT$. Latest v$LATEST$ needs Better Lyrics $FLOOR$+",
+    "message": "Ваша версія — v$CURRENT$. Остання версія (v$LATEST$) потребує Better Lyrics $FLOOR$+",
     "description": "Tooltip on the older build badge when the latest build needs a newer extension version",
     "placeholders": {
       "current": {
@@ -1308,7 +1308,7 @@
     }
   },
   "marketplace_installedFrom": {
-    "message": "Installed from $REPO$",
+    "message": "Установлено з $REPO$",
     "description": "Tooltip on the GitHub badge of a theme installed from a repository URL",
     "placeholders": {
       "repo": {
@@ -1318,19 +1318,19 @@
     }
   },
   "marketplace_ricsBadge": {
-    "message": "This theme uses RICS",
+    "message": "Ця тема використовує RICS",
     "description": "Tooltip and accessible label on the RICS badge in the theme detail view"
   },
   "marketplace_urlValidating": {
-    "message": "Validating...",
+    "message": "Перевірка...",
     "description": "Install button text while a theme repository URL is being checked"
   },
   "marketplace_urlInstalling": {
-    "message": "Installing...",
+    "message": "Установлення...",
     "description": "Install button text while a theme from a repository URL is being installed"
   },
   "marketplace_incompatibleConfirm": {
-    "message": "This theme needs Better Lyrics v$VERSION$+ and may not work on your version. Install anyway?",
+    "message": "Ця тема потребує Better Lyrics v$VERSION$+ і може не працювати на вашій версії. Усе одно встановити?",
     "description": "Confirm dialog before installing a theme that needs a newer extension version",
     "placeholders": {
       "version": {
@@ -1340,7 +1340,7 @@
     }
   },
   "marketplace_sortDescendingLabel": {
-    "message": "$LABEL$, descending. Activate to reverse.",
+    "message": "$LABEL$, у порядку спадання. Клацніть, щоб змінити порядок.",
     "description": "Accessible label of the selected sort chip when sorting in descending order",
     "placeholders": {
       "label": {
@@ -1350,7 +1350,7 @@
     }
   },
   "marketplace_sortAscendingLabel": {
-    "message": "$LABEL$, ascending. Activate to reverse.",
+    "message": "$LABEL$, у порядку зростання. Клацніть, щоб змінити порядок.",
     "description": "Accessible label of the selected sort chip when sorting in ascending order",
     "placeholders": {
       "label": {
@@ -1360,7 +1360,7 @@
     }
   },
   "unison_sortAscendingClearLabel": {
-    "message": "$LABEL$, ascending. Activate to clear the sort.",
+    "message": "$LABEL$, у порядку зростання. Клацніть, щоб скасувати сортування.",
     "description": "Accessible label of the selected Unison sort chip in ascending order, where activating it again removes the sort",
     "placeholders": {
       "label": {
@@ -1370,15 +1370,15 @@
     }
   },
   "marketplace_emptyStore": {
-    "message": "No themes available yet. Check back later",
+    "message": "Немає доступних тем. Спробуйте пізніше",
     "description": "Shown when the Marketplace registry has no themes"
   },
   "marketplace_loadFailed": {
-    "message": "Could not load themes. Check your connection and try again",
+    "message": "Не вдалося завантажити теми. Перевірте з'єднання та спробуйте ще раз",
     "description": "Shown when the Marketplace theme list fails to load"
   },
   "marketplace_ratedAs": {
-    "message": "You rated this $RATING$/5 as $NAME$",
+    "message": "Ваша оцінка — $RATING$/5 (під ім'ям $NAME$)",
     "description": "Status under the rating stars after the user rated a theme",
     "placeholders": {
       "rating": {
@@ -1392,19 +1392,19 @@
     }
   },
   "marketplace_ratingSubmitting": {
-    "message": "Submitting...",
+    "message": "Надсилання...",
     "description": "Status while a theme rating is being sent"
   },
   "marketplace_ratingVerifying": {
-    "message": "Verifying...",
+    "message": "Перевірка...",
     "description": "Status while the rating anti-abuse check runs"
   },
   "marketplace_ratingVerifyFailed": {
-    "message": "Verification failed. Try again",
+    "message": "Перевірку не пройдено. Спробуйте ще раз",
     "description": "Status when the rating anti-abuse check fails"
   },
   "marketplace_urlInvalid": {
-    "message": "Invalid GitHub URL. Use github.com/user/repo or github.com/user/repo/tree/branch",
+    "message": "Неправильне посилання на GitHub. Використовуйте github.com/user/repo чи github.com/user/repo/tree/branch",
     "description": "Error in the install from URL dialog when the URL is not a GitHub repository"
   },
   "marketplace_requiresVersion": {
@@ -1518,7 +1518,7 @@
     "description": "Message shown during ad playback"
   },
   "lyrics_writtenBy": {
-    "message": "Written by",
+    "message": "Автори:",
     "description": "Label shown before the songwriter names after the last lyric line"
   },
   "lyrics_notFound": {
@@ -1534,19 +1534,19 @@
     "description": "Label for language exclusions setting"
   },
   "options_about": {
-    "message": "About",
+    "message": "Про розширення",
     "description": "Footer button that opens the About page"
   },
   "options_about_tagline": {
-    "message": "Time-synced lyrics for YouTube Music.",
+    "message": "Синхронізовані тексти пісень для YouTube Music.",
     "description": "About page tagline under the product name"
   },
   "options_about_whatHeading": {
-    "message": "What it is",
+    "message": "Що це",
     "description": "About page section heading"
   },
   "options_about_whatBody": {
-    "message": "Better Lyrics upgrades your YouTube Music experience by providing beautiful time-synced lyrics for your favorite songs.",
+    "message": "Better Lyrics покращує ваш досвід користування YouTube Music за допомогою гарних синхронізованих текстів для ваших улюблених пісень.",
     "description": "About page section body"
   },
   "options_about_doesHeading": {
