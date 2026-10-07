@@ -307,6 +307,7 @@ export class PictureInPictureLyricsView {
 
     this.artworkContainer = pipDocument.createElement("div");
     this.artworkContainer.className = "blyrics-pip-artwork";
+    this.artworkContainer.setAttribute("data-controls-idle", "true");
 
     const frontFace = createArtworkFace(pipDocument);
     const backFace = createArtworkFace(pipDocument);
@@ -427,6 +428,10 @@ export class PictureInPictureLyricsView {
       signal: this.lifecycleController.signal,
     });
     pipWindow.addEventListener("pointermove", this.handlePointerMove, {
+      passive: true,
+      signal: this.lifecycleController.signal,
+    });
+    pipDocument.documentElement.addEventListener("pointerleave", this.handlePointerLeave, {
       passive: true,
       signal: this.lifecycleController.signal,
     });
@@ -660,6 +665,12 @@ export class PictureInPictureLyricsView {
     this.lastPointerMoveTime = this.pipWindow.performance.now();
     this.artworkContainer.removeAttribute("data-controls-idle");
     if (this.controlsIdleTimer === null) this.scheduleControlsIdleCheck();
+  };
+
+  private readonly handlePointerLeave = (): void => {
+    if (this.controlsIdleTimer !== null) this.pipWindow.clearTimeout(this.controlsIdleTimer);
+    this.controlsIdleTimer = null;
+    this.artworkContainer.setAttribute("data-controls-idle", "true");
   };
 
   private scheduleControlsIdleCheck(): void {
