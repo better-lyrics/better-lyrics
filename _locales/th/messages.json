@@ -40,7 +40,7 @@
     "description": "Auto switch to lyrics tab setting label"
   },
   "options_general_clearCachedLyrics": {
-    "message": "Clear cached lyrics",
+    "message": "เคลียแคชเนื้อเพลง",
     "description": "Label for the clear cache action row"
   },
   "options_general_clearCachedLyricsHint": {
@@ -56,7 +56,7 @@
     "description": "Total lyrics in cache label"
   },
   "options_general_storageUsed": {
-    "message": "Storage used",
+    "message": "พื้นที่เก็บข้อมูลที่ใช้",
     "description": "Popup General tab: label under the total local storage size"
   },
   "options_general_segment": {
@@ -74,11 +74,11 @@
     }
   },
   "options_general_browseThemes": {
-    "message": "Browse themes",
+    "message": " ค้นหาธีม",
     "description": "Popup General tab: one-line description on the Theme Marketplace shortcut"
   },
   "options_general_whatsNew": {
-    "message": "What's new",
+    "message": "มีอะไรใหม่บ้าง",
     "description": "Popup General tab: shortcut to the latest release notes"
   },
   "options_general_whatsNewHint": {
@@ -86,11 +86,11 @@
     "description": "Popup General tab: one-line description on the What's new shortcut"
   },
   "options_display_fullscreenTab": {
-    "message": "Fullscreen",
+    "message": "เต็มจอ",
     "description": "Header tab in Display for fullscreen settings"
   },
   "options_display_videoTab": {
-    "message": "Video",
+    "message": "วีดีโอ",
     "description": "Header tab in Display for video settings"
   },
   "options_display_disableFullscreen": {
@@ -118,11 +118,11 @@
     "description": "Label for the per-letter wave lyric animation toggle"
   },
   "options_display_letterWaveOff": {
-    "message": "Off",
+    "message": "ปิด",
     "description": "Spoken value of the letter wave three-way switch when the effect is off"
   },
   "options_display_letterWaveOn": {
-    "message": "On",
+    "message": "เปิด",
     "description": "Spoken value of the letter wave three-way switch when the effect is always on"
   },
   "options_display_letterWaveBadge": {
@@ -414,7 +414,7 @@
     "description": "Installed themes button label"
   },
   "options_identity_backupTitle": {
-    "message": "Back up your identity",
+    "message": "สำรองข้อมูลตัวตนของคุณ",
     "description": "Title of the identity backup warning"
   },
   "options_identity_backupBody": {

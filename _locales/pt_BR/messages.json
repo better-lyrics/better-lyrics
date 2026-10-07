@@ -1,62 +1,62 @@
 {
   "extensionName": {
-    "message": "Better Lyrics (YouTube Music用歌詞)",
+    "message": "Better Lyrics (Lyrics for YouTube Music)",
     "description": "The name of the extension"
   },
   "extensionDescription": {
-    "message": "YouTube Musicを美しい同期歌詞、多言語サポート、リアルタイム翻訳などで強化します",
+    "message": "Melhore o YouTube Music com belas letras sincronizadas, suporte multilíngue, traduções em tempo real e mais",
     "description": "The description of the extension"
   },
   "options_tab_general": {
-    "message": "一般",
+    "message": "Geral",
     "description": "General settings tab label"
   },
   "options_tab_display": {
-    "message": "表示",
+    "message": "Exibição",
     "description": "Display settings tab label"
   },
   "options_tab_language": {
-    "message": "言語",
+    "message": "Idioma",
     "description": "Language settings tab label"
   },
   "options_tab_sources": {
-    "message": "ソース",
+    "message": "Fontes",
     "description": "Sources settings tab label"
   },
   "options_tab_identity": {
-    "message": "ID",
+    "message": "Identidade",
     "description": "Identity settings tab label"
   },
   "options_tab_themes": {
-    "message": "テーマ",
+    "message": "Temas",
     "description": "Themes settings tab label"
   },
   "options_general_showLogs": {
-    "message": "ログを表示",
+    "message": "Mostrar logs",
     "description": "Show logs setting label"
   },
   "options_general_autoSwitch": {
-    "message": "歌詞タブに自動切り替え",
+    "message": "Mudar automaticamente para a aba de letras",
     "description": "Auto switch to lyrics tab setting label"
   },
   "options_general_clearCachedLyrics": {
-    "message": "キャッシュされた歌詞をクリア",
+    "message": "Clear cached lyrics",
     "description": "Label for the clear cache action row"
   },
   "options_general_clearCachedLyricsHint": {
-    "message": "再生中に再度ダウンロードします",
+    "message": "They download again as you play",
     "description": "Hint under the clear cached lyrics label"
   },
   "options_general_clearCache": {
-    "message": "キャッシュをクリア",
+    "message": "Limpar cache",
     "description": "Clear cache button label"
   },
   "options_general_totalLyrics": {
-    "message": "キャッシュ内の歌詞数",
+    "message": "Total de letras em cache",
     "description": "Total lyrics in cache label"
   },
   "options_general_storageUsed": {
-    "message": "使用中のストレージ",
+    "message": "Storage used",
     "description": "Popup General tab: label under the total local storage size"
   },
   "options_general_segment": {
@@ -74,43 +74,43 @@
     }
   },
   "options_general_browseThemes": {
-    "message": "テーマをブラウズ",
+    "message": "Browse themes",
     "description": "Popup General tab: one-line description on the Theme Marketplace shortcut"
   },
   "options_general_whatsNew": {
-    "message": "新着情報",
+    "message": "What's new",
     "description": "Popup General tab: shortcut to the latest release notes"
   },
   "options_general_whatsNewHint": {
-    "message": "最新のリリース ノート",
+    "message": "Latest release notes",
     "description": "Popup General tab: one-line description on the What's new shortcut"
   },
   "options_display_fullscreenTab": {
-    "message": "フルスクリーン",
+    "message": "Fullscreen",
     "description": "Header tab in Display for fullscreen settings"
   },
   "options_display_videoTab": {
-    "message": "動画",
+    "message": "Video",
     "description": "Header tab in Display for video settings"
   },
   "options_display_disableFullscreen": {
-    "message": "フルスクリーンモードを無効化",
+    "message": "Desativar modo tela cheia",
     "description": "Disable fullscreen mode setting label"
   },
   "options_display_autoHideCursor": {
-    "message": "フルスクリーン時にカーソルを自動非表示",
+    "message": "Ocultar cursor automaticamente em tela cheia",
     "description": "Auto-hide cursor setting label"
   },
   "options_display_albumArt": {
-    "message": "ぼかしたアルバムアートを背景に表示",
+    "message": "Mostrar capa do álbum desfocada como fundo",
     "description": "Show album art background setting label"
   },
   "options_display_fullscreenControls": {
-    "message": "プレイヤーコントロールを全画面表示で表示",
+    "message": "Show player controls in fullscreen",
     "description": "Toggle label for the playback controls strip (progress bar, transport, like and dislike) shown under the album art in the fullscreen lyrics view"
   },
   "options_display_stylizedAnimations": {
-    "message": "スタイリッシュなアニメーションを表示",
+    "message": "Mostrar animações estilizadas",
     "description": "Show stylized animations setting label"
   },
   "options_display_letterWave": {
@@ -118,115 +118,115 @@
     "description": "Label for the per-letter wave lyric animation toggle"
   },
   "options_display_letterWaveOff": {
-    "message": "オフ",
+    "message": "Off",
     "description": "Spoken value of the letter wave three-way switch when the effect is off"
   },
   "options_display_letterWaveOn": {
-    "message": "オン",
+    "message": "On",
     "description": "Spoken value of the letter wave three-way switch when the effect is always on"
   },
   "options_display_letterWaveBadge": {
-    "message": "実験的",
+    "message": "Experimental",
     "description": "Badge shown next to the letter wave setting marking it as experimental"
   },
   "options_display_letterWaveTooltip": {
-    "message": "歌詞は、それぞれの文字を横切る穏やかな回転運動で、より生き生きと感じます。 端末で歌詞のスクロールが不安定になった場合はOFFにしてください。",
+    "message": "Lyrics feel more alive with a gentle rolling motion across each letter as they're sung. Turn it off if lyrics scroll feels choppy on your device.",
     "description": "Tooltip explaining the letter wave animation and its performance impact"
   },
   "options_display_letterWaveTooltipStates": {
-    "message": "テーマがオンにならない限り、自動はオフになります。オンとオフはテーマを上書きします。",
+    "message": "Auto stays off unless a theme turns it on. On and Off override any theme.",
     "description": "Appended to the letter wave tooltip, explaining the three switch states"
   },
   "options_display_passiveScroll": {
-    "message": "同期されていない歌詞を自動スクロール",
+    "message": "Auto-scroll unsynced lyrics",
     "description": "Auto-scroll unsynced lyrics setting label"
   },
   "picture_in_picture_open": {
-    "message": "ピクチャーインピクチャー歌詞を開く",
+    "message": "Open Picture-in-Picture lyrics",
     "description": "Accessible label for the dock action that opens the floating lyrics window"
   },
   "picture_in_picture_previous": {
-    "message": "前",
+    "message": "Previous",
     "description": "Accessible label for the previous track button in the Picture-in-Picture lyrics window, used when the YouTube Music player bar exposes no label of its own"
   },
   "picture_in_picture_play": {
-    "message": "再生",
+    "message": "Play",
     "description": "Accessible label for the play button in the Picture-in-Picture lyrics window, used when the YouTube Music player bar exposes no label of its own"
   },
   "picture_in_picture_pause": {
-    "message": "一時停止",
+    "message": "Pause",
     "description": "Accessible label for the pause button in the Picture-in-Picture lyrics window, used when the YouTube Music player bar exposes no label of its own"
   },
   "picture_in_picture_next": {
-    "message": "次",
+    "message": "Next",
     "description": "Accessible label for the next track button in the Picture-in-Picture lyrics window, used when the YouTube Music player bar exposes no label of its own"
   },
   "options_display_pipEnabled": {
-    "message": "フローティングウィンドウを有効にする",
+    "message": "Enable floating window",
     "description": "Master toggle for the floating lyrics window feature, which turns it off everywhere including the YouTube Music minimize button"
   },
   "options_display_pipAutoRestore": {
-    "message": "フローティング歌詞を自動的に開く",
+    "message": "Reopen floating lyrics automatically",
     "description": "Setting label for automatically reopening the floating lyrics window after page load"
   },
   "options_display_pipAutoRestoreTooltip": {
-    "message": "曲やページ間を再読み込みまたは移動した際に、フローティング歌詞ウィンドウが閉じないようにします。 ブラウザーは、ページとやり取りした直後にフローティングウィンドウを開かせます。 一度クリックするかキーを押すと再び開きます。",
+    "message": "Keeps the floating lyrics window from closing for good when you reload or move between songs and pages. Browsers only let a floating window open right after you interact with the page, so it reopens on your first click or key press instead of instantly.",
     "description": "Help tooltip explaining what automatic floating-lyrics reopening does and why it waits for the first interaction"
   },
   "options_display_pipWindowLayout": {
-    "message": "ウィンドウレイアウト",
+    "message": "Window layout",
     "description": "Setting label, shown inside the floating lyrics window settings, for choosing whether the window opens wide or tall"
   },
   "options_pipWindowLayout_horizontal": {
-    "message": "水平",
+    "message": "Horizontal",
     "description": "Floating lyrics window layout option: a wide window with the album art beside the lyrics"
   },
   "options_pipWindowLayout_vertical": {
-    "message": "垂直",
+    "message": "Vertical",
     "description": "Floating lyrics window layout option: a tall window with the album art above the lyrics"
   },
   "options_display_pipArtworkTransition": {
-    "message": "アルバムアートの切り替え",
+    "message": "Album art transition",
     "description": "Setting label, shown inside the floating lyrics window settings, for choosing how album art changes between songs"
   },
   "options_pipTransition_shuffle": {
-    "message": "シャッフル",
+    "message": "Shuffle",
     "description": "Name of an album art transition where the artwork tilts back and the new cover is dealt in like a playing card"
   },
   "options_pipTransition_flip": {
-    "message": "反転",
+    "message": "Flip",
     "description": "Name of an album art transition where the artwork rotates like a card to reveal the new cover on its other side"
   },
   "options_pipTransition_push": {
-    "message": "押し出す",
+    "message": "Push",
     "description": "Name of a transition, offered for both album art and song titles, where the new content slides in from the side and pushes the old out"
   },
   "options_pipTransition_crossfade": {
-    "message": "クロスフェード",
+    "message": "Crossfade",
     "description": "Name of a transition, offered for both album art and song titles, where the new content fades in over the old"
   },
   "options_pipTransition_spring": {
-    "message": "弾む",
+    "message": "Spring",
     "description": "Name of a song title transition where the words of the new title bounce up into place one after another"
   },
   "options_display_pipWindow": {
-    "message": "フローティング歌詞ウィンドウ",
+    "message": "Floating lyrics window",
     "description": "Label for the row that opens the settings for the floating lyrics window"
   },
   "options_display_pipTextTransition": {
-    "message": "タイトル トランジション",
+    "message": "Title transition",
     "description": "Setting label, shown inside the floating lyrics window settings, for choosing how the song title and artist change between songs"
   },
   "options_display_pipMarquee": {
-    "message": "長いタイトルをスクロール",
+    "message": "Scroll long titles",
     "description": "Toggle label for whether a song title too long for the floating lyrics window scrolls across so it can be read in full"
   },
   "options_display_pipProgressBar": {
-    "message": "プログレスバーを表示",
+    "message": "Show progress bar",
     "description": "Toggle label, shown inside the floating lyrics window settings, for the seekable playback progress bar under the album art"
   },
   "options_display_shadersPromo": {
-    "message": "Better Lyricsシェーダーへのリンクを表示",
+    "message": "Show link to Better Lyrics Shaders",
     "description": "Toggle label for the Shaders companion link shown in the lyrics footer"
   },
   "options_display_unisonActions": {
@@ -246,39 +246,39 @@
     "description": "Hint text under the Show controls dock toggle"
   },
   "options_unisonModal_autoHide": {
-    "message": "全画面表示で自動的に隠す",
+    "message": "Auto-hide in fullscreen",
     "description": "Toggle label inside the Unison Actions modal for auto-hiding the dock when idle in fullscreen"
   },
   "options_unisonModal_autoHide_hint": {
-    "message": "全画面表示時にフローティングコントロールを非表示にする",
+    "message": "Hide the floating control when you are idle in fullscreen mode",
     "description": "Hint text under the Auto-hide in fullscreen toggle"
   },
   "options_unisonModal_position": {
-    "message": "位置",
+    "message": "Position",
     "description": "Label above the visual position picker in the Unison Actions modal"
   },
   "options_unisonModal_position_topLeft": {
-    "message": "左上",
+    "message": "Top left",
     "description": "Tooltip for the top-left cell in the Unison position picker"
   },
   "options_unisonModal_position_topCenter": {
-    "message": "中央上",
+    "message": "Top center",
     "description": "Tooltip for the top-center cell in the Unison position picker"
   },
   "options_unisonModal_position_topRight": {
-    "message": "右上",
+    "message": "Top right",
     "description": "Tooltip for the top-right cell in the Unison position picker"
   },
   "options_unisonModal_position_bottomLeft": {
-    "message": "左下",
+    "message": "Bottom left",
     "description": "Tooltip for the bottom-left cell in the Unison position picker"
   },
   "options_unisonModal_position_bottomCenter": {
-    "message": "中央下",
+    "message": "Bottom center",
     "description": "Tooltip for the bottom-center cell in the Unison position picker"
   },
   "options_unisonModal_position_bottomRight": {
-    "message": "右下",
+    "message": "Bottom right",
     "description": "Tooltip for the bottom-right cell in the Unison position picker"
   },
   "options_unisonModal_controlsShown": {
@@ -310,7 +310,7 @@
     "description": "Accessible label for the lyrics dock button that switches to the previous lyrics provider"
   },
   "lyricsDock_nextSource": {
-    "message": "次のソース",
+    "message": "Next source",
     "description": "Accessible label for the lyrics dock button that switches to the next lyrics provider"
   },
   "lyricsDock_offsetEarlier": {
@@ -322,51 +322,51 @@
     "description": "Accessible label for the lyrics dock button that nudges sync timing later"
   },
   "lyricsDock_offsetGlobal": {
-    "message": "全体",
+    "message": "Global",
     "description": "Label in the lyrics dock offset menu for the global offset applied to all songs and sync types"
   },
   "options_offsetModal_perSong": {
-    "message": "曲ごとのオフセット",
+    "message": "Per-song offsets",
     "description": "Heading in the offset settings modal for the section that manages saved per-song sync offsets"
   },
   "options_offsetModal_perSongClear": {
-    "message": "全て消去",
+    "message": "Clear all",
     "description": "Button in the offset settings modal that deletes every saved per-song sync offset"
   },
   "options_offsetModal_perSongCount": {
-    "message": "保存されたオフセット",
+    "message": "Saved offsets",
     "description": "Label in the offset settings modal showing how many per-song sync offsets are stored"
   },
   "options_offsetModal_appliesTo": {
-    "message": "適用先",
+    "message": "Applies to",
     "description": "Label in the offset settings modal preceding the list of sync types a given offset affects"
   },
   "options_language_displayLanguage": {
-    "message": "表示言語",
+    "message": "Display language",
     "description": "Label for the UI language selector dropdown"
   },
   "options_language_displayLanguageAuto": {
-    "message": "自動",
+    "message": "Auto",
     "description": "Option label for automatic language detection based on browser settings"
   },
   "options_language_romanization": {
-    "message": "ローマ字化",
+    "message": "Romanização",
     "description": "Romanization setting label"
   },
   "options_language_translate": {
-    "message": "歌詞を翻訳",
+    "message": "Traduzir letras das músicas",
     "description": "Translate song lyrics setting label"
   },
   "options_language_translationLanguage": {
-    "message": "翻訳言語",
+    "message": "Idioma de tradução",
     "description": "Translation language setting label"
   },
   "options_sources_title": {
-    "message": "歌詞ソースの優先順位",
+    "message": "Preferência de fonte de letras",
     "description": "Sources settings section title"
   },
   "options_sources_description": {
-    "message": "ドラッグして優先順位を変更。上位のソースが先に試行されます。チェックを外すと無効化。",
+    "message": "Arraste para reordenar a prioridade. Fontes superiores são tentadas primeiro. Desmarque para desativar.",
     "description": "Sources settings section description"
   },
   "options_sources_openUnison": {
@@ -374,43 +374,43 @@
     "description": "Label on the small button in the Sources section header that opens the Unison page"
   },
   "options_themes_title": {
-    "message": "テーマ設定",
+    "message": "Configurações de tema",
     "description": "Theme settings section title"
   },
   "options_themes_theme": {
-    "message": "テーマ",
+    "message": "Tema",
     "description": "Theme label"
   },
   "options_themes_chooseTheme": {
-    "message": "テーマを選択",
+    "message": "Escolher um tema",
     "description": "Choose a theme button label"
   },
   "options_themes_change": {
-    "message": "変更",
+    "message": "Change",
     "description": "Change theme button label"
   },
   "options_themes_customTheme": {
-    "message": "カスタムテーマ",
+    "message": "Custom theme",
     "description": "Display name for unnamed custom themes"
   },
   "options_themes_customStyles": {
-    "message": "カスタムスタイル",
+    "message": "Estilos personalizados",
     "description": "Custom styles label"
   },
   "options_themes_create": {
-    "message": "作成",
+    "message": "Criar",
     "description": "Button to open the style editor if there are no styles"
   },
   "options_themes_edit": {
-    "message": "編集",
+    "message": "Edit",
     "description": "Button to open the style editor"
   },
   "options_themes_marketplace": {
-    "message": "テーママーケットプレイス",
+    "message": "Loja de temas",
     "description": "Theme marketplace button label"
   },
   "options_themes_installedThemes": {
-    "message": "インストール済みテーマ",
+    "message": "Temas instalados",
     "description": "Installed themes button label"
   },
   "options_identity_backupTitle": {
@@ -422,207 +422,207 @@
     "description": "Body of the identity backup warning"
   },
   "options_identity_yourIdentity": {
-    "message": "あなたのID",
+    "message": "Sua identidade",
     "description": "Your identity label"
   },
   "options_identity_unisonStats": {
-    "message": "Unison統計",
+    "message": "Unison stats",
     "description": "Section title above the user's own Unison level, tier, rank and badges on the Identity tab"
   },
   "options_identity_loading": {
-    "message": "読み込み中...",
+    "message": "Carregando...",
     "description": "Loading identity placeholder"
   },
   "options_identity_exportImport": {
-    "message": "エクスポート/インポート",
+    "message": "Exportar/Importar",
     "description": "Export/Import section label"
   },
   "options_identity_exportKey": {
-    "message": "キーをエクスポート",
+    "message": "Exportar chave",
     "description": "Export key button label"
   },
   "options_identity_importKey": {
-    "message": "キーをインポート",
+    "message": "Importar chave",
     "description": "Import key button label"
   },
   "options_identityImport_title": {
-    "message": "IDをインポート",
+    "message": "Import identity",
     "description": "Title of the import identity modal"
   },
   "options_identityImport_chooseFile": {
-    "message": "ファイル選択",
+    "message": "Choose file",
     "description": "Label for the file picker button in the import identity modal"
   },
   "options_identityImport_or": {
-    "message": "または",
+    "message": "or",
     "description": "Divider between file picker and paste textarea in the import identity modal"
   },
   "options_identityImport_pastePlaceholder": {
-    "message": "JSONをここに貼り付けてください…",
+    "message": "Paste identity JSON here...",
     "description": "Placeholder for the identity JSON textarea"
   },
   "options_identityImport_import": {
-    "message": "インポート",
+    "message": "Import",
     "description": "Confirm button label inside the import identity modal"
   },
   "options_nickname_description": {
-    "message": "Better Lyricsで自分の名前を選んでください。文字、数字、アンダーバー、3〜20文字。",
+    "message": "Pick a name for yourself across Better Lyrics. Letters, numbers, and underscore, 3 to 20 characters.",
     "description": "Nickname subsection description"
   },
   "options_nickname_placeholder": {
-    "message": "ニックネームを選択",
+    "message": "Pick a nickname",
     "description": "Nickname input placeholder"
   },
   "options_nickname_save": {
-    "message": "保存",
+    "message": "Save",
     "description": "Nickname save button label"
   },
   "options_nickname_reset": {
-    "message": "初期設定にリセット",
+    "message": "Reset to default",
     "description": "Nickname reset button label"
   },
   "options_nickname_modalTitle": {
-    "message": "ニックネームを設定",
+    "message": "Set your nickname",
     "description": "Nickname modal title"
   },
   "options_nickname_edit": {
-    "message": "編集",
+    "message": "Edit",
     "description": "Nickname edit button label"
   },
   "options_nickname_editLabel": {
-    "message": "ニックネームを編集",
+    "message": "Edit nickname",
     "description": "Accessible label for the nickname edit button"
   },
   "options_nickname_status_checking": {
-    "message": "確認中…",
+    "message": "Checking...",
     "description": "Status while checking nickname availability; shared with the install from URL button while it checks the repository"
   },
   "options_nickname_status_available": {
-    "message": "利用可能",
+    "message": "Available",
     "description": "Status when nickname is available"
   },
   "options_nickname_status_taken": {
-    "message": "既に使用中",
+    "message": "Already taken",
     "description": "Status when nickname is already taken"
   },
   "options_nickname_status_invalid": {
-    "message": "3〜20文字、数字、アンダーバー",
+    "message": "3 to 20 letters, numbers, or underscores",
     "description": "Status when nickname format is invalid"
   },
   "options_nickname_status_profane": {
-    "message": "許可されていません。別のものをお試しください",
+    "message": "Not allowed, try another",
     "description": "Status when nickname is flagged as inappropriate by the server"
   },
   "options_nickname_status_self": {
-    "message": "これはあなたの現在のニックネームです",
+    "message": "This is your current nickname",
     "description": "Status when entered nickname matches current"
   },
   "options_nickname_status_saved": {
-    "message": "保存しました",
+    "message": "Saved",
     "description": "Status when a setting or nickname is saved; shared by the popup save status and the editor save toast"
   },
   "options_nickname_status_submitting": {
-    "message": "保存中…",
+    "message": "Saving...",
     "description": "Status while nickname save is in flight"
   },
   "options_nickname_status_rateLimited": {
-    "message": "ちょっと待って、しばらくしてからもう一度お試しください",
+    "message": "Slow down, try again in a moment",
     "description": "Status when nickname checks are rate limited"
   },
   "options_nickname_status_error": {
-    "message": "サーバーに接続できませんでした",
+    "message": "Could not reach the server",
     "description": "Status when nickname request fails"
   },
   "options_alert_refreshFailed": {
-    "message": "歌詞を更新できませんでした。YouTubeの音楽を開いて再度お試し下さい。",
+    "message": "Could not refresh lyrics. Open YouTube Music and try again.",
     "description": "Shown when the popup's Refresh lyrics button finds no YouTube Music tab or none of them responds"
   },
   "options_alert_importEmpty": {
-    "message": "ID JSON を貼り付けるか、最初にファイルを選択します。",
+    "message": "Paste identity JSON or choose a file first.",
     "description": "Shown when the user clicks Import with no JSON provided"
   },
   "options_modal_selectTheme": {
-    "message": "テーマを選択",
+    "message": "Selecionar um tema",
     "description": "Theme modal title"
   },
   "options_modal_cancel": {
-    "message": "キャンセル",
+    "message": "Cancelar",
     "description": "Cancel button label"
   },
   "options_modal_confirm": {
-    "message": "確認",
+    "message": "Confirmar",
     "description": "Confirm button label"
   },
   "options_alert_cacheCleared": {
-    "message": "キャッシュをクリアしました！",
+    "message": "Cache limpo com sucesso!",
     "description": "Cache cleared success message"
   },
   "options_alert_cacheClearFailed": {
-    "message": "キャッシュのクリアに失敗しました！",
+    "message": "Falha ao limpar o cache!",
     "description": "Cache clear failed message"
   },
   "options_alert_nothingToClear": {
-    "message": "クリアするものがありません！",
+    "message": "Nada para limpar!",
     "description": "Nothing to clear message"
   },
   "options_alert_exportFailed": {
-    "message": "IDのエクスポートに失敗しました",
+    "message": "Falha ao exportar a identidade",
     "description": "Export identity failed message"
   },
   "options_alert_fileSaveDialogOpened": {
-    "message": "ファイル保存ダイアログが開きました。",
+    "message": "Diálogo de salvamento aberto.",
     "description": "File save dialog opened message"
   },
   "options_alert_fileSaveFailed": {
-    "message": "ファイルの保存中にエラーが発生しました。再試行してください。",
+    "message": "Erro ao salvar o arquivo. Por favor, tente novamente.",
     "description": "File save failed message"
   },
   "options_alert_downloadInitiated": {
-    "message": "IDファイルのダウンロードを開始しました。",
+    "message": "Download do arquivo de identidade iniciado.",
     "description": "Download initiated message"
   },
   "options_alert_importSuccess": {
-    "message": "IDを正常にインポートしました！",
+    "message": "Identidade importada com sucesso!",
     "description": "Import success message"
   },
   "options_alert_identityLoadError": {
-    "message": "IDの読み込み中にエラーが発生しました",
+    "message": "Erro ao carregar a identidade",
     "description": "Identity load error message"
   },
   "editor_alert_nothingToSave": {
-    "message": "テーマとして保存するスタイルはありません",
+    "message": "No styles to save as a theme",
     "description": "Toast when the user saves an empty editor as a custom theme"
   },
   "editor_alert_saveDialogOpened": {
-    "message": "テーマファイルの保存ダイアログが開きました。ファイルの保存先を選択してください",
+    "message": "Theme file save dialog opened. Choose where to save your file",
     "description": "Toast after the browser save dialog opens for an exported theme file"
   },
   "editor_alert_downloadStarted": {
-    "message": "テーマファイルのダウンロードが開始されました。ダウンロードフォルダを確認してください",
+    "message": "Theme file download started. Check your downloads folder",
     "description": "Toast after an exported theme file starts downloading without a save dialog"
   },
   "editor_alert_applyFailed": {
-    "message": "テーマを適用できませんでした",
+    "message": "Could not apply theme",
     "description": "Toast when applying a built-in or custom theme from the theme picker fails"
   },
   "editor_alert_saveFailed": {
-    "message": "スタイルを保存できませんでした",
+    "message": "Could not save your styles",
     "description": "Toast when saving the custom CSS editor content fails"
   },
   "editor_alert_storageFull": {
-    "message": "ストレージがいっぱいです。設定中の歌詞のキャッシュをクリアして、もう一度やり直してください",
+    "message": "Storage is full. Clear the lyrics cache in settings, then try again",
     "description": "Toast when saving the custom CSS editor content fails because extension storage is full"
   },
   "editor_prompt_saveMessage": {
-    "message": "テーマの名前を入力してください",
+    "message": "Enter a name for this theme",
     "description": "Message in the save as theme dialog"
   },
   "editor_prompt_renameMessage": {
-    "message": "このテーマの新しい名前を入力してください",
+    "message": "Enter a new name for this theme",
     "description": "Message in the rename theme dialog"
   },
   "editor_prompt_themeName": {
-    "message": "テーマ名",
+    "message": "Theme name",
     "description": "Placeholder of the theme name field in the save and rename dialogs"
   },
   "editor_prompt_deleteMessage": {
@@ -696,51 +696,51 @@
     "description": "Toast when deleting a custom theme fails"
   },
   "options_editor_saving": {
-    "message": "保存中...",
+    "message": "Salvando...",
     "description": "Saving indicator text"
   },
   "options_editor_importFile": {
-    "message": "ファイルからインポート",
+    "message": "Importar de arquivo",
     "description": "Import from file tooltip"
   },
   "options_editor_exportFile": {
-    "message": "ファイルにエクスポート",
+    "message": "Exportar para arquivo",
     "description": "Export to file tooltip"
   },
   "options_editor_saveAsTheme": {
-    "message": "テーマとして保存",
+    "message": "Salvar como tema",
     "description": "Save as theme tooltip"
   },
   "options_editor_openInNewTab": {
-    "message": "新しいタブで開く",
+    "message": "Abrir em nova aba",
     "description": "Open in new tab tooltip"
   },
   "options_editor_backToSettings": {
-    "message": "設定に戻る",
+    "message": "Voltar para configurações",
     "description": "Back to settings button label"
   },
   "options_editor_fullExperienceNote": {
-    "message": "エディターの完全な機能を利用するには、",
+    "message": "Para a experiência completa do editor, ",
     "description": "Full editor experience note prefix"
   },
   "options_editor_openInNewTabLink": {
-    "message": "このエディターを新しいタブで開いてください",
+    "message": "abra este editor em uma nova aba",
     "description": "Open in new tab link text"
   },
   "options_editor_stylingGuide": {
-    "message": "スタイリングガイド",
+    "message": "Guia de estilo",
     "description": "Styling guide link text"
   },
   "options_editor_renameTheme": {
-    "message": "カスタムテーマの名前を変更",
+    "message": "Renomear tema personalizado",
     "description": "Rename theme button title, also the title of the rename theme dialog"
   },
   "options_editor_deleteTheme": {
-    "message": "カスタムテーマを削除",
+    "message": "Excluir tema personalizado",
     "description": "Delete theme button title, also the title of the delete theme confirm dialog"
   },
   "options_editor_doubleClickRename": {
-    "message": "ダブルクリックで名前を変更",
+    "message": "Clique duplo para renomear",
     "description": "Double-click to rename tooltip"
   },
   "options_editor_findReplaceTitle": {
@@ -808,183 +808,183 @@
     "description": "BiniLyrics provider name"
   },
   "options_syncType_syllable": {
-    "message": "音節",
+    "message": "Sílaba",
     "description": "Syllable sync type label"
   },
   "options_syncType_syllable_tooltip": {
-    "message": "歌われるごとに個々の音節をハイライトします。音節同期は最高の体験を提供します。",
+    "message": "Destaca sílabas individuais conforme são cantadas. A sincronização por sílaba oferece a melhor experiência.",
     "description": "Syllable sync type tooltip"
   },
   "options_syncType_word": {
-    "message": "単語",
+    "message": "Palavra",
     "description": "Word sync type label"
   },
   "options_syncType_word_tooltip": {
-    "message": "歌われるごとに個々の単語をハイライトします。単語同期は良好な体験を提供します。",
+    "message": "Destaca palavras individuais conforme são cantadas. A sincronização por palavra oferece uma boa experiência.",
     "description": "Word sync type tooltip"
   },
   "options_syncType_line": {
-    "message": "行",
+    "message": "Linha",
     "description": "Line sync type label"
   },
   "options_syncType_line_tooltip": {
-    "message": "歌われるごとに行全体をハイライトします。行同期は基本的な体験を提供します。",
+    "message": "Destaca linhas inteiras conforme são cantadas. A sincronização por linha oferece uma experiência básica.",
     "description": "Line sync type tooltip"
   },
   "options_syncType_unsynced": {
-    "message": "同期なし",
+    "message": "Não sincronizado",
     "description": "Unsynced sync type label"
   },
   "options_syncType_unsynced_tooltip": {
-    "message": "タイミング情報のない歌詞。同期なしの歌詞は最小限の体験を提供します。",
+    "message": "Letras sem informações de tempo. Letras não sincronizadas oferecem uma experiência mínima.",
     "description": "Unsynced sync type tooltip"
   },
   "options_detail_rateTheme": {
-    "message": "このテーマを評価",
+    "message": "Avaliar este tema",
     "description": "Rate theme label"
   },
   "options_detail_install": {
-    "message": "インストール",
+    "message": "Instalar",
     "description": "Install button label"
   },
   "options_detail_viewOnGitHub": {
-    "message": "GitHubで見る",
+    "message": "Ver no GitHub",
     "description": "View on GitHub link text"
   },
   "options_detail_shaderInfo": {
-    "message": "このテーマにはシェーダー設定が含まれています。",
+    "message": "Este tema inclui uma configuração de shader.",
     "description": "Shader info text prefix"
   },
   "options_detail_downloadShader": {
-    "message": "shader.jsonをダウンロード",
+    "message": "Baixar shader.json",
     "description": "Download shader link text"
   },
   "options_detail_shaderImportSuffix": {
-    "message": "してインポート：",
+    "message": "e importe em",
     "description": "Shader import suffix text before Better Lyrics Shaders link"
   },
   "marketplace_pageTitle": {
-    "message": "Better Lyricsテーママーケットプレイス",
+    "message": "Loja de temas Better Lyrics",
     "description": "Page title"
   },
   "marketplace_title": {
-    "message": "テーママーケットプレイス",
+    "message": "Loja de temas",
     "description": "Header title"
   },
   "marketplace_subtitle": {
-    "message": "コミュニティテーマを発見してインストール",
+    "message": "Descubra e instale temas da comunidade",
     "description": "Header subtitle"
   },
   "marketplace_searchPlaceholder": {
-    "message": "テーマを検索...",
+    "message": "Pesquisar temas...",
     "description": "Search input placeholder"
   },
   "marketplace_refresh": {
-    "message": "更新",
+    "message": "Atualizar",
     "description": "Refresh button label"
   },
   "marketplace_keyboardShortcuts": {
-    "message": "キーボードショートカット",
+    "message": "Atalhos de teclado",
     "description": "Keyboard shortcuts button label"
   },
   "marketplace_sortBy": {
-    "message": "並び替え",
+    "message": "Ordenar por",
     "description": "Sort filter group label"
   },
   "marketplace_sortRatingDesc": {
-    "message": "高評価順",
+    "message": "Mais bem avaliados",
     "description": "Sort by highest rating"
   },
   "marketplace_sortRatingAsc": {
-    "message": "低評価順",
+    "message": "Menos bem avaliados",
     "description": "Sort by lowest rating"
   },
   "marketplace_sortDownloadsDesc": {
-    "message": "ダウンロード数（多い順）",
+    "message": "Mais baixados",
     "description": "Sort by most downloads"
   },
   "marketplace_sortDownloadsAsc": {
-    "message": "ダウンロード数（少ない順）",
+    "message": "Menos baixados",
     "description": "Sort by least downloads"
   },
   "marketplace_sortNewest": {
-    "message": "新しい順",
+    "message": "Mais recentes",
     "description": "Sort by newest"
   },
   "marketplace_sortOldest": {
-    "message": "古い順",
+    "message": "Mais antigos",
     "description": "Sort by oldest"
   },
   "marketplace_show": {
-    "message": "表示",
+    "message": "Mostrar",
     "description": "Show filter group label"
   },
   "marketplace_showAll": {
-    "message": "すべて",
+    "message": "Todos",
     "description": "Show all themes"
   },
   "marketplace_showInstalled": {
-    "message": "インストール済み",
+    "message": "Instalados",
     "description": "Show installed themes"
   },
   "marketplace_showNotInstalled": {
-    "message": "未インストール",
+    "message": "Não instalados",
     "description": "Show not installed themes"
   },
   "marketplace_options": {
-    "message": "オプション",
+    "message": "Opções",
     "description": "Options filter group label"
   },
   "marketplace_hasShaders": {
-    "message": "シェーダーあり",
+    "message": "Com shaders",
     "description": "Filter for themes with shaders"
   },
   "marketplace_compatibleOnly": {
-    "message": "互換性のあるもののみ",
+    "message": "Apenas compatíveis",
     "description": "Filter for compatible themes"
   },
   "marketplace_installFromUrl": {
-    "message": "URLからインストール",
+    "message": "Instalar de URL",
     "description": "Install from URL button"
   },
   "marketplace_submitTheme": {
-    "message": "テーマを投稿",
+    "message": "Enviar um tema",
     "description": "Submit a theme link"
   },
   "marketplace_loading": {
-    "message": "テーマを読み込み中...",
+    "message": "Carregando temas...",
     "description": "Loading message"
   },
   "marketplace_retry": {
-    "message": "再試行",
+    "message": "Tentar novamente",
     "description": "Retry button"
   },
   "marketplace_noThemesMatch": {
-    "message": "フィルターに一致するテーマがありません",
+    "message": "Nenhum tema corresponde aos seus filtros",
     "description": "Empty state message"
   },
   "marketplace_grantPermission": {
-    "message": "権限を許可",
+    "message": "Conceder permissão",
     "description": "Grant permission button"
   },
   "marketplace_install": {
-    "message": "インストール",
+    "message": "Instalar",
     "description": "Install button"
   },
   "marketplace_remove": {
-    "message": "削除",
+    "message": "Remover",
     "description": "Remove button"
   },
   "marketplace_apply": {
-    "message": "適用",
+    "message": "Aplicar",
     "description": "Apply button"
   },
   "marketplace_active": {
-    "message": "有効",
+    "message": "Ativo",
     "description": "Active theme indicator"
   },
   "marketplace_shadersBadge": {
-    "message": "シェーダー",
+    "message": "Shaders",
     "description": "Shaders badge text"
   },
   "marketplace_githubBadge": {
@@ -992,123 +992,123 @@
     "description": "GitHub badge text"
   },
   "marketplace_urlModalTitle": {
-    "message": "URLからインストール",
+    "message": "Instalar de URL",
     "description": "URL install modal title"
   },
   "marketplace_urlModalMessage": {
-    "message": "GitHubリポジトリのURLを入力してテーマを直接インストール：",
+    "message": "Digite a URL de um repositório do GitHub para instalar um tema diretamente:",
     "description": "URL install modal message"
   },
   "marketplace_urlModalPlaceholder": {
-    "message": "github.com/user/repo または github.com/user/repo/tree/branch",
+    "message": "github.com/usuario/repo ou github.com/usuario/repo/tree/branch",
     "description": "URL input placeholder"
   },
   "marketplace_urlModalError": {
-    "message": "GitHubリポジトリのURLを入力してください",
+    "message": "Por favor, digite a URL de um repositório do GitHub",
     "description": "URL validation error"
   },
   "marketplace_cancel": {
-    "message": "キャンセル",
+    "message": "Cancelar",
     "description": "Cancel button"
   },
   "marketplace_urlPermissionTitle": {
-    "message": "追加の権限が必要です",
+    "message": "Permissão adicional necessária",
     "description": "URL permission modal title"
   },
   "marketplace_urlPermissionWhy": {
-    "message": "なぜ必要ですか？",
+    "message": "Por que isso é necessário?",
     "description": "URL permission explanation title"
   },
   "marketplace_urlPermissionDesc": {
-    "message": "カスタムGitHub URLからテーマをインストールするには、マーケットプレイスより広いアクセスが必要です。これにより、Better Lyricsは以下のことができます：",
+    "message": "Instalar temas de URLs personalizadas do GitHub requer um acesso mais amplo do que a loja. Isso permite que Better Lyrics:",
     "description": "URL permission description"
   },
   "marketplace_urlPermissionItem1": {
-    "message": "任意のGitHubリポジトリからテーマファイルを取得",
+    "message": "Buscar arquivos de tema de qualquer repositório do GitHub",
     "description": "URL permission list item 1"
   },
   "marketplace_urlPermissionItem2": {
-    "message": "リポジトリのデフォルトブランチを検出",
+    "message": "Detectar o branch padrão do repositório",
     "description": "URL permission list item 2"
   },
   "marketplace_urlPermissionItem3": {
-    "message": "インストール前にテーマ構造を検証",
+    "message": "Validar a estrutura do tema antes da instalação",
     "description": "URL permission list item 3"
   },
   "marketplace_urlPermissionNote": {
-    "message": "この権限はURL経由でテーマをインストールする場合にのみ使用されます。マーケットプレイスのテーマには必要ありません。",
+    "message": "Esta permissão só é usada ao instalar temas via URL. Temas da loja não precisam dela.",
     "description": "URL permission note"
   },
   "marketplace_shortcutsTitle": {
-    "message": "キーボードショートカット",
+    "message": "Atalhos de teclado",
     "description": "Shortcuts modal title"
   },
   "marketplace_shortcutsNavigation": {
-    "message": "ナビゲーション",
+    "message": "Navegação",
     "description": "Navigation shortcuts group"
   },
   "marketplace_shortcutsSearch": {
-    "message": "テーマを検索",
+    "message": "Pesquisar temas",
     "description": "Search shortcut label"
   },
   "marketplace_shortcutsRefresh": {
-    "message": "マーケットプレイスを更新",
+    "message": "Atualizar loja",
     "description": "Refresh shortcut label"
   },
   "marketplace_shortcutsInstallUrl": {
-    "message": "URLからインストール",
+    "message": "Instalar de URL",
     "description": "Install from URL shortcut label"
   },
   "marketplace_shortcutsSort": {
-    "message": "並び替え",
+    "message": "Ordenar",
     "description": "Sort shortcuts group"
   },
   "marketplace_shortcutsSortHint": {
-    "message": "もう一度押すと逆順",
+    "message": "pressione novamente para inverter",
     "description": "Sort toggle hint"
   },
   "marketplace_shortcutsByRating": {
-    "message": "評価順",
+    "message": "Por avaliação",
     "description": "Sort by rating shortcut"
   },
   "marketplace_shortcutsByDownloads": {
-    "message": "ダウンロード順",
+    "message": "Por downloads",
     "description": "Sort by downloads shortcut"
   },
   "marketplace_shortcutsByDate": {
-    "message": "日付順",
+    "message": "Por data",
     "description": "Sort by date shortcut"
   },
   "marketplace_shortcutsFilters": {
-    "message": "フィルター",
+    "message": "Filtros",
     "description": "Filters shortcuts group"
   },
   "marketplace_shortcutsShowAll": {
-    "message": "すべて表示",
+    "message": "Mostrar todos",
     "description": "Show all shortcut"
   },
   "marketplace_shortcutsShowInstalled": {
-    "message": "インストール済みを表示",
+    "message": "Mostrar instalados",
     "description": "Show installed shortcut"
   },
   "marketplace_shortcutsShowNotInstalled": {
-    "message": "未インストールを表示",
+    "message": "Mostrar não instalados",
     "description": "Show not installed shortcut"
   },
   "marketplace_shortcutsToggleShaders": {
-    "message": "シェーダー切り替え",
+    "message": "Alternar shaders",
     "description": "Toggle shaders shortcut"
   },
   "marketplace_shortcutsToggleCompatible": {
-    "message": "互換性切り替え",
+    "message": "Alternar compatível",
     "description": "Toggle compatible shortcut"
   },
   "marketplace_shortcutsDetails": {
-    "message": "テーマの詳細",
+    "message": "Detalhes do tema",
     "description": "Theme details shortcuts group"
   },
   "marketplace_shortcutsInstallRemove": {
-    "message": "インストール / 削除",
+    "message": "Instalar / Remover",
     "description": "Install/remove shortcut"
   },
   "marketplace_shortcutsApply": {
@@ -1116,39 +1116,39 @@
     "description": "Apply theme shortcut label"
   },
   "marketplace_shortcutsPrevImage": {
-    "message": "前の画像",
+    "message": "Imagem anterior",
     "description": "Previous image shortcut"
   },
   "marketplace_shortcutsNextImage": {
-    "message": "次の画像",
+    "message": "Próxima imagem",
     "description": "Next image shortcut"
   },
   "marketplace_shortcutsGeneral": {
-    "message": "一般",
+    "message": "Geral",
     "description": "General shortcuts group"
   },
   "marketplace_shortcutsCloseModal": {
-    "message": "モーダルを閉じる",
+    "message": "Fechar janela",
     "description": "Close modal shortcut"
   },
   "marketplace_shortcutsShowShortcuts": {
-    "message": "ショートカットを表示",
+    "message": "Mostrar atalhos",
     "description": "Show shortcuts shortcut"
   },
   "marketplace_shortcutsApplyTheme": {
-    "message": "テーマを適用（インストール後）",
+    "message": "Aplicar tema (após instalar)",
     "description": "Apply theme shortcut"
   },
   "marketplace_ratingFailed": {
-    "message": "評価の送信に失敗しました",
+    "message": "Falha ao enviar avaliação",
     "description": "Rating submission error"
   },
   "marketplace_shaderFetchFailed": {
-    "message": "シェーダー設定の取得に失敗しました",
+    "message": "Falha ao buscar configuração do shader",
     "description": "Shader fetch error"
   },
   "marketplace_applyFailed": {
-    "message": "テーマの適用に失敗しました",
+    "message": "Falha ao aplicar o tema",
     "description": "Theme apply error"
   },
   "marketplace_alert_installed": {
@@ -1210,7 +1210,7 @@
     }
   },
   "marketplace_noThemesInstalled": {
-    "message": "インストールされたテーマはありません",
+    "message": "Nenhum tema instalado",
     "description": "Empty installed themes message"
   },
   "marketplace_lastUpdatedOn": {
@@ -1454,47 +1454,47 @@
     }
   },
   "editor_pageTitle": {
-    "message": "Better Lyrics CSSエディター",
+    "message": "Editor CSS Better Lyrics",
     "description": "Standalone editor page title"
   },
   "editor_importFromFile": {
-    "message": "ファイルからインポート",
+    "message": "Importar de arquivo",
     "description": "Import from file button"
   },
   "editor_exportToFile": {
-    "message": "ファイルにエクスポート",
+    "message": "Exportar para arquivo",
     "description": "Export to file button"
   },
   "editor_saveAsTheme": {
-    "message": "テーマとして保存",
+    "message": "Salvar como tema",
     "description": "Save as theme button"
   },
   "editor_stylingGuide": {
-    "message": "スタイリングガイド",
+    "message": "Guia de estilo",
     "description": "Styling guide button"
   },
   "editor_tip": {
-    "message": "ヒント：このスタンドアロンタブは別ウィンドウに移動したり、YouTube Musicと分割画面で使用して変更をリアルタイムで確認できます。詳細は",
+    "message": "Dica: Esta aba independente pode ser movida para uma janela separada ou usada em tela dividida junto com YouTube Music para ver suas alterações em tempo real. Para mais informações, visite o",
     "description": "Editor tip text"
   },
   "editor_poweredBy": {
-    "message": "Powered by",
+    "message": "Desenvolvido por",
     "description": "Powered by label"
   },
   "editor_playground": {
-    "message": "プレイグラウンド",
+    "message": "Playground",
     "description": "Playground link text"
   },
   "editor_docs": {
-    "message": "ドキュメント",
+    "message": "Documentação",
     "description": "Docs link text"
   },
   "lyrics_source": {
-    "message": "ソース：",
+    "message": "Fonte: ",
     "description": "Lyrics source label"
   },
   "lyrics_searchOnGenius": {
-    "message": "Geniusで検索",
+    "message": "Pesquisar no Genius",
     "description": "Search on Genius button text"
   },
   "lyrics_getShaders": {
@@ -1502,19 +1502,19 @@
     "description": "Footer button text linking to the Better Lyrics Shaders companion extension"
   },
   "lyrics_searching": {
-    "message": "Better Lyricsが歌詞を検索中...",
+    "message": "Better Lyrics está buscando letras...",
     "description": "Loading message while searching for lyrics"
   },
   "lyrics_stillSearching": {
-    "message": "同期歌詞を検索中...",
+    "message": "Ainda buscando letras sincronizadas...",
     "description": "Loading message while still searching"
   },
   "lyrics_noSyncedLyrics": {
-    "message": "Better Lyricsは同期歌詞を見つけられませんでした",
+    "message": "Better Lyrics não conseguiu encontrar letras sincronizadas",
     "description": "Message when no synced lyrics found"
   },
   "lyrics_adPlaying": {
-    "message": "[エレベーターミュージック]",
+    "message": "[música de elevador]",
     "description": "Message shown during ad playback"
   },
   "lyrics_writtenBy": {
@@ -1522,7 +1522,7 @@
     "description": "Label shown before the songwriter names after the last lyric line"
   },
   "lyrics_notFound": {
-    "message": "この曲の歌詞が見つかりませんでした",
+    "message": "Nenhuma letra encontrada para esta música",
     "description": "Message when no lyrics are available"
   },
   "lyrics_resumeAutoscroll": {
@@ -1530,7 +1530,7 @@
     "description": "Resume Autoscroll button label"
   },
   "options_language_exclusions": {
-    "message": "言語の除外",
+    "message": "Exclusões de idioma",
     "description": "Label for language exclusions setting"
   },
   "options_about": {
@@ -1672,19 +1672,19 @@
     }
   },
   "options_language_exclusionsTitle": {
-    "message": "Language exclusions",
+    "message": "Exclusões de Idioma",
     "description": "Modal title for language exclusions"
   },
   "options_romanization_tab": {
-    "message": "ローマ字化",
+    "message": "Romanização",
     "description": "Romanization tab label in options, and the romanized lyrics option in the Unison preview language picker"
   },
   "options_translation_tab": {
-    "message": "翻訳",
+    "message": "Tradução",
     "description": "Translation tab label"
   },
   "options_searchLanguages": {
-    "message": "言語を検索…",
+    "message": "Pesquisar idiomas...",
     "description": "Search input placeholder"
   },
   "ui_close": {
@@ -1708,7 +1708,7 @@
     "description": "Hint text for translation exclusions"
   },
   "options_resetToDefault": {
-    "message": "$TYPE$ をデフォルトにリセット",
+    "message": "Reset $TYPE$ to default",
     "description": "Reset to default button label",
     "placeholders": {
       "type": {
@@ -1718,7 +1718,7 @@
     }
   },
   "options_romanization_resetTitle": {
-    "message": "$TYPE$ 除外をリセット",
+    "message": "Reset $TYPE$ exclusions",
     "description": "Modal title for resetting exclusions",
     "placeholders": {
       "type": {
@@ -1728,19 +1728,19 @@
     }
   },
   "options_romanization_resetMessage": {
-    "message": "除外されたすべての言語をクリアします。続行しますか？",
+    "message": "This will clear all excluded languages. Continue?",
     "description": "Confirmation message for resetting exclusions"
   },
   "options_reset": {
-    "message": "リセット",
+    "message": "Reset",
     "description": "Reset button label"
   },
   "options_cancel": {
-    "message": "キャンセル",
+    "message": "Cancel",
     "description": "Cancel button label"
   },
   "options_romanization_resetSuccess": {
-    "message": "$TYPE$ 除外はデフォルトにリセットされました",
+    "message": "$TYPE$ exclusions reset to default",
     "description": "Success message after resetting exclusions",
     "placeholders": {
       "type": {
@@ -1750,7 +1750,7 @@
     }
   },
   "symlink_applied": {
-    "message": "適用テーマ： $NAME$ (マーケットプレイス)",
+    "message": "Applied theme: $NAME$ (Marketplace)",
     "description": "Alert after successfully applying a symlinked theme from marketplace",
     "placeholders": {
       "name": {
@@ -1760,7 +1760,7 @@
     }
   },
   "builtin_applied": {
-    "message": "適用されたテーマ: $NAME$",
+    "message": "Applied theme: $NAME$",
     "description": "Toast after applying a built-in, custom or installed theme",
     "placeholders": {
       "name": {
@@ -1770,7 +1770,7 @@
     }
   },
   "theme_author_prefix": {
-    "message": "作成者： $AUTHOR$",
+    "message": "By $AUTHOR$",
     "description": "Author prefix shown on theme selector button",
     "placeholders": {
       "author": {
@@ -1780,11 +1780,11 @@
     }
   },
   "theme_author_you": {
-    "message": "あなたによって",
+    "message": "By you",
     "description": "Author label for custom user themes on theme selector button"
   },
   "symlink_installFailed": {
-    "message": "テーマをインストールできませんでした。接続を確認して再度お試し下さい。",
+    "message": "Couldn't install theme. Check your connection and try again.",
     "description": "Alert when a symlinked theme fails to install from marketplace"
   },
   "theme_top_badge": {
@@ -1810,19 +1810,19 @@
     "description": "Link in the theme chooser modal that opens the full Theme Marketplace page"
   },
   "theme_modal_section_custom": {
-    "message": "カスタムテーマ",
+    "message": "Custom themes",
     "description": "Section title for custom themes in the theme chooser modal"
   },
   "lyrics_submitToUnison": {
-    "message": "Unisonで歌詞を投稿する",
+    "message": "Submit lyrics with Unison",
     "description": "Button text for submitting lyrics to Unison"
   },
   "auth_pageTitle": {
-    "message": "Better Lyricsでサインイン",
+    "message": "Sign in with Better Lyrics",
     "description": "Browser tab title for the auth consent popup"
   },
   "auth_consentHeading": {
-    "message": "$ORIGIN$ にサインイン",
+    "message": "Sign in to $ORIGIN$",
     "description": "Consent prompt heading. $ORIGIN$ is replaced with the requesting site, e.g. unison.boidu.dev",
     "placeholders": {
       "origin": {
@@ -1832,7 +1832,7 @@
     }
   },
   "auth_consentSubheading": {
-    "message": "$NAME$ としてサインインします。",
+    "message": "You will sign in as $NAME$.",
     "description": "Identifies the current BL identity. $NAME$ is the deterministic display name.",
     "placeholders": {
       "name": {
@@ -1842,43 +1842,43 @@
     }
   },
   "auth_consentExplainer": {
-    "message": "Better Lyricsは、このアイデンティティを管理することを証明する一度限りのメッセージに署名します。サイトにはあなたの秘密鍵が表示されることはありません。",
+    "message": "Better Lyrics will sign a one-time message proving you control this identity. The site never sees your private key.",
     "description": "Short explainer body in the consent popup"
   },
   "auth_rememberLabel": {
-    "message": "24時間再度表示しない",
+    "message": "Don't ask again for 24 hours",
     "description": "Checkbox label allowing the user to remember this approval"
   },
   "auth_approve": {
-    "message": "承認",
+    "message": "Approve",
     "description": "Primary button: approve the sign-in request"
   },
   "auth_cancel": {
-    "message": "キャンセル",
+    "message": "Cancel",
     "description": "Secondary button: reject the sign-in request"
   },
   "auth_invalidRequest": {
-    "message": "無効なサインインリクエストです。",
+    "message": "Invalid sign-in request.",
     "description": "Error state shown when the popup receives malformed parameters"
   },
   "auth_sessionExpired": {
-    "message": "サインインの有効期限が切れました。このウィンドウを閉じて再度お試し下さい。",
+    "message": "Sign-in expired. Please close this window and try again.",
     "description": "Shown in the sign-in consent popup when the connection to the extension's service worker is lost before the user can approve or cancel."
   },
   "lyrics_requestSyncedVersion": {
-    "message": "同期されたバージョンをリクエスト",
+    "message": "Request a synced version",
     "description": "Button label asking the community to contribute synced lyrics for the current song"
   },
   "lyrics_requestedFirst": {
-    "message": "要求された・あなたが最初にリクエスト",
+    "message": "Requested · you're the first",
     "description": "Button label after a successful first-ever request for this song"
   },
   "lyrics_requestedOneOther": {
-    "message": "要求された・他の1人がこれを望んでいます",
+    "message": "Requested · 1 other wants this",
     "description": "Button label after a successful request when exactly one other person has also requested"
   },
   "lyrics_requestedNOthers": {
-    "message": "リクエストされた· 他の $N$ ユーザーがこれを望んでいます",
+    "message": "Requested · $N$ others want this",
     "description": "Button label after a successful request when N other people have also requested",
     "placeholders": {
       "n": {
@@ -1888,23 +1888,23 @@
     }
   },
   "lyrics_requestErrorRateLimit": {
-    "message": "数分後にもう一度試してください",
+    "message": "Try again in a minute",
     "description": "Button label shown briefly when the request is rate-limited"
   },
   "lyrics_requestErrorNetwork": {
-    "message": "Unisonに到達できませんでした",
+    "message": "Couldn't reach Unison",
     "description": "Button label shown briefly when the request fails for a transport/network reason (no HTTP response received)"
   },
   "lyrics_requestErrorServer": {
-    "message": "Unisonに問題があります",
+    "message": "Unison is having trouble",
     "description": "Button label shown briefly when the request fails with a 5xx server error"
   },
   "lyrics_requestErrorGeneric": {
-    "message": "リクエストを送信できませんでした",
+    "message": "Couldn't send the request",
     "description": "Button label shown briefly when the request fails for any other reason (catch-all)"
   },
   "lyrics_requestSyncedLanded": {
-    "message": "同期されたバージョンが利用可能です。更新します。",
+    "message": "Synced version available. Refresh.",
     "description": "Button label when the server reports a synced version already exists; clicking reloads the page"
   },
   "unison_pageTitle": {
@@ -1916,15 +1916,15 @@
     "description": "Unison branding title"
   },
   "unison_subtitle": {
-    "message": "コミュニティの歌詞",
+    "message": "Community Lyrics",
     "description": "Unison subtitle text"
   },
   "unison_search": {
-    "message": "歌詞を検索",
+    "message": "Search lyrics",
     "description": "Search button label"
   },
   "unison_searchPlaceholder": {
-    "message": "曲、アーティスト、または歌詞を検索…",
+    "message": "Search songs, artists, or lyrics...",
     "description": "Search input placeholder"
   },
   "unison_searchResults": {
@@ -1952,15 +1952,15 @@
     }
   },
   "unison_submit": {
-    "message": "歌詞を投稿",
+    "message": "Submit Lyrics",
     "description": "Submit lyrics button text"
   },
   "unison_submitSuccess": {
-    "message": "歌詞が投稿されました！",
+    "message": "Lyrics submitted!",
     "description": "Success message after submitting lyrics"
   },
   "unison_submitDescription": {
-    "message": "任意のYouTube音楽トラックにコミュニティの歌詞を投稿します。LRC（タイムスタンプ）、TTML（XML）、プレーンテキストを貼り付けます。同期されたフォーマットが優先されます。",
+    "message": "Submit community lyrics for any YouTube Music track. Paste LRC (timestamped), TTML (XML), or plain text. Synced formats are prioritized.",
     "description": "Description text for the submission form"
   },
   "unison_composerHintPrefix": {
@@ -2148,19 +2148,19 @@
     "description": "Link text to open song in YouTube Music"
   },
   "unison_back": {
-    "message": "戻る",
+    "message": "Back",
     "description": "Back button text in detail view"
   },
   "unison_noPreview": {
-    "message": "プレビューを表示するには歌詞を貼り付けるかドロップしてください",
+    "message": "Paste or drop lyrics to see a preview",
     "description": "Empty state text shown in submit preview before lyrics are entered"
   },
   "unison_preview": {
-    "message": "プレビュー",
+    "message": "Preview",
     "description": "Column title for parsed lyrics preview in detail view"
   },
   "unison_rawLyrics": {
-    "message": "生の歌詞",
+    "message": "Raw Lyrics",
     "description": "Column title for raw lyrics source in detail view"
   },
   "unison_isrc": {
@@ -2168,39 +2168,39 @@
     "description": "ISRC field label"
   },
   "unison_placeholder_song": {
-    "message": "例： ボヘミアン・ラプソディ",
+    "message": "e.g. Bohemian Rhapsody",
     "description": "Placeholder for song input"
   },
   "unison_placeholder_artist": {
-    "message": "例： クイーン",
+    "message": "e.g. Queen",
     "description": "Placeholder for artist input"
   },
   "unison_placeholder_album": {
-    "message": "例： オペラ座の夜",
+    "message": "e.g. A Night at the Opera",
     "description": "Placeholder for album input"
   },
   "unison_placeholder_duration": {
-    "message": "例: 354",
+    "message": "e.g. 354",
     "description": "Placeholder for duration input"
   },
   "unison_placeholder_videoId": {
-    "message": "例: dQw4w9WgXcQ",
+    "message": "e.g. dQw4w9WgXcQ",
     "description": "Placeholder for video ID input"
   },
   "unison_placeholder_isrc": {
-    "message": "例: GBAYE0601498",
+    "message": "e.g. GBAYE0601498",
     "description": "Placeholder for ISRC input"
   },
   "unison_placeholder_lyrics": {
-    "message": "ここにLRC、TTML、またはプレーンテキストの歌詞を貼り付けてください。ファイルをドラッグ＆ドロップすることもできます。",
+    "message": "Paste LRC, TTML, or plain text lyrics here. You can also drag & drop a file.",
     "description": "Placeholder for lyrics textarea"
   },
   "unison_durationHint": {
-    "message": "曲の長さ（秒）",
+    "message": "Song length in seconds",
     "description": "Hint text below duration field label"
   },
   "unison_videoIdHint": {
-    "message": "YouTubeの音楽URLから11文字のID",
+    "message": "11-character ID from the YouTube Music URL",
     "description": "Hint text below video ID field label"
   },
   "unison_additionalVideos": {
@@ -2230,15 +2230,15 @@
     "description": "Button in the submit feedback that opens the lyric that was just submitted, shown when some additional videos could not be linked"
   },
   "unison_formatHint": {
-    "message": "歌詞の内容から自動検出",
+    "message": "Auto-detected from lyrics content",
     "description": "Hint text below format field label"
   },
   "unison_isrcHintPrefix": {
-    "message": "次を使用して検索：",
+    "message": "Find it using an",
     "description": "Text before ISRC finder link"
   },
   "unison_isrcHintLinkText": {
-    "message": "ISRC 検索ツール",
+    "message": "ISRC lookup tool",
     "description": "Link text for ISRC finder"
   },
   "unison_feedTabsLabel": {
@@ -2246,15 +2246,15 @@
     "description": "Accessible name of the tab list that switches between the community feed and the user's own submissions"
   },
   "unison_tabFeed": {
-    "message": "フィード",
+    "message": "Feed",
     "description": "Feed tab label for recent submissions"
   },
   "unison_tabMySubmissions": {
-    "message": "自分の投稿履歴",
+    "message": "My submissions",
     "description": "Feed tab label for user's own submissions"
   },
   "unison_noSubmissions": {
-    "message": "まだ歌詞を投稿していません。",
+    "message": "You haven't submitted any lyrics yet.",
     "description": "Empty state for my submissions tab"
   },
   "unison_emptyMineHint": {
@@ -2262,27 +2262,27 @@
     "description": "Second line of the empty My Submissions tab, under the title and above the submit button"
   },
   "unison_noFilterResults": {
-    "message": "フィルターに一致する歌詞がありません",
+    "message": "No lyrics match your filters",
     "description": "Empty state shown when the active sort/filter combination returns no entries"
   },
   "unison_noFeedYet": {
-    "message": "歌詞はまだありません",
+    "message": "No lyrics here yet",
     "description": "Empty state shown when the recent feed is empty with no filters applied"
   },
   "unison_sync": {
-    "message": "同期",
+    "message": "Sync",
     "description": "Sync type label in detail view"
   },
   "unison_language": {
-    "message": "言語",
+    "message": "Language",
     "description": "Language label in detail view"
   },
   "unison_uploadedBy": {
-    "message": "投稿者",
+    "message": "Uploaded by",
     "description": "Metadata row label in the Unison detail sidebar, before the uploader's name which links to their curator page"
   },
   "unison_languageUnspecified": {
-    "message": "指定なし",
+    "message": "Not specified",
     "description": "Default option in the submission form's language dropdown, used when the submitter has not chosen a language"
   },
   "unison_fulfilledBadge": {
@@ -2300,71 +2300,71 @@
     }
   },
   "unison_fulfilledBoardLink": {
-    "message": "リクエストボードを見る",
+    "message": "See the requests board",
     "description": "Link on the Unison detail page that opens the community requests board (queue of most-wanted songs)"
   },
   "unison_validationRequired": {
-    "message": "曲、アーティスト、ビデオID、歌詞を入力してください。",
+    "message": "Please fill in song, artist, video ID, and lyrics.",
     "description": "Validation error when required fields are missing"
   },
   "unison_submitFailed": {
-    "message": "投稿に失敗しました",
+    "message": "Submission failed",
     "description": "Fallback error message when submission fails"
   },
   "report_lyrics_title": {
-    "message": "歌詞を報告",
+    "message": "Report Lyrics",
     "description": "Title for the report lyrics modal"
   },
   "report_lyrics_info": {
-    "message": "この曲の歌詞が互換性がない理由を指定してください",
+    "message": "Specify the reason why the lyrics for this song are not compatible",
     "description": "Information about using the report lyrics modal"
   },
   "report_lyrics_wrong_song": {
-    "message": "曲またはバージョンが間違っています",
+    "message": "Wrong song or version",
     "description": "Reason for the report that the lyrics are for the wrong song or version"
   },
   "report_lyrics_bad_sync": {
-    "message": "同期が正しくありません",
+    "message": "Bad synchronization",
     "description": "Reason for the report that the lyrics are too off on the part synchronization"
   },
   "report_lyrics_offensive": {
-    "message": "不快",
+    "message": "Offensive",
     "description": "Reason for the report that the lyrics are offensive or too offensive"
   },
   "report_lyrics_spam": {
-    "message": "スパムまたは歌詞は曲とは関係ありません",
+    "message": "Spam or lyrics are irrelevant to the song",
     "description": "Reason for the report that the lyrics are a spam attempt and/or irrelevant with the sung parts"
   },
   "report_lyrics_other": {
-    "message": "他の理由",
+    "message": "Other reason",
     "description": "Reason for the report that the lyrics is bad in other reasons"
   },
   "report_lyrics_details_placeholder": {
-    "message": "このレポートについての詳細情報",
+    "message": "Additional details about this report",
     "description": "Placeholder for report lyrics details input"
   },
   "report_lyrics_submit": {
-    "message": "送信",
+    "message": "Submit",
     "description": "Submit button for reporting lyrics"
   },
   "report_lyrics_cancel": {
-    "message": "キャンセル",
+    "message": "Cancel",
     "description": "Cancel button for reporting lyrics"
   },
   "report_lyrics_reporting": {
-    "message": "歌詞を報告しています…",
+    "message": "Reporting lyrics...",
     "description": "Report lyrics on a reporting process"
   },
   "report_lyrics_success": {
-    "message": "報告してくれてありがとう！すぐに確認します。",
+    "message": "Thanks for the heads up! We'll take a look soon.",
     "description": "Shown after a lyrics report is successfully submitted"
   },
   "report_lyrics_already": {
-    "message": "既にこの歌詞の報告を受け取っています。報告しようとしていただき、ありがとうございます！",
+    "message": "We've got this one already. Thanks though!",
     "description": "Shown when the user tries to report the same lyrics twice"
   },
   "report_lyrics_error": {
-    "message": "報告に失敗しました。もう一度試してみますか？",
+    "message": "That didn't go through. Mind trying again?",
     "description": "Shown when a lyrics report fails to submit"
   },
   "unison_level": {
@@ -2418,7 +2418,7 @@
     "description": "Link on the Identity tab, shown when the user has no Unison profile picture, that opens the Unison website where they can pick one"
   },
   "unison_submitted_this": {
-    "message": "この歌詞を提出しました",
+    "message": "submitted this lyric",
     "description": "Sub-label under the submitter name in the Unison footer card"
   },
   "unison_score_label": {

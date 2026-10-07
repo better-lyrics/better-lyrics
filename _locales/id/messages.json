@@ -40,11 +40,11 @@
     "description": "Auto switch to lyrics tab setting label"
   },
   "options_general_clearCachedLyrics": {
-    "message": "Clear cached lyrics",
+    "message": "Bersihkan lirik tersimpan",
     "description": "Label for the clear cache action row"
   },
   "options_general_clearCachedLyricsHint": {
-    "message": "They download again as you play",
+    "message": "Liriknya diunduh lagi saat kamu memutar lagu",
     "description": "Hint under the clear cached lyrics label"
   },
   "options_general_clearCache": {
@@ -86,7 +86,7 @@
     "description": "Popup General tab: one-line description on the What's new shortcut"
   },
   "options_display_fullscreenTab": {
-    "message": "Fullscreen",
+    "message": "Layar penuh",
     "description": "Header tab in Display for fullscreen settings"
   },
   "options_display_videoTab": {
@@ -118,11 +118,11 @@
     "description": "Label for the per-letter wave lyric animation toggle"
   },
   "options_display_letterWaveOff": {
-    "message": "Off",
+    "message": "Mati",
     "description": "Spoken value of the letter wave three-way switch when the effect is off"
   },
   "options_display_letterWaveOn": {
-    "message": "On",
+    "message": "Nyala",
     "description": "Spoken value of the letter wave three-way switch when the effect is always on"
   },
   "options_display_letterWaveBadge": {
@@ -414,11 +414,11 @@
     "description": "Installed themes button label"
   },
   "options_identity_backupTitle": {
-    "message": "Back up your identity",
+    "message": "Cadangkan identitas mu",
     "description": "Title of the identity backup warning"
   },
   "options_identity_backupBody": {
-    "message": "Your contributions and level are tied to this key. If you lose it, no one can restore it, including the Better Lyrics team. Never share it: anyone who has it can act as you.",
+    "message": "Kontribusi dan levelmu terhubung dengan kunci ini. Kalau hilang, tidak bisa dikembalikan, bahkan tim Better Lyrics sekalipun. Jangan dibagikan: seseorang yang punya kunci ini bisa mengaku menjadi dirimu.",
     "description": "Body of the identity backup warning"
   },
   "options_identity_yourIdentity": {
@@ -534,7 +534,7 @@
     "description": "Status when nickname request fails"
   },
   "options_alert_refreshFailed": {
-    "message": "Could not refresh lyrics. Open YouTube Music and try again.",
+    "message": "Tidak bisa menyegarkan lirik. Buka YouTube Musik dan coba lagi.",
     "description": "Shown when the popup's Refresh lyrics button finds no YouTube Music tab or none of them responds"
   },
   "options_alert_importEmpty": {
@@ -590,43 +590,43 @@
     "description": "Identity load error message"
   },
   "editor_alert_nothingToSave": {
-    "message": "No styles to save as a theme",
+    "message": "Tidak ada style untuk disimpan sebagai tema",
     "description": "Toast when the user saves an empty editor as a custom theme"
   },
   "editor_alert_saveDialogOpened": {
-    "message": "Theme file save dialog opened. Choose where to save your file",
+    "message": "Dialog simpan file tema terbuka. Pilih tempat kamu ingin menyimpan file",
     "description": "Toast after the browser save dialog opens for an exported theme file"
   },
   "editor_alert_downloadStarted": {
-    "message": "Theme file download started. Check your downloads folder",
+    "message": "Pengunduhan file tema dimulai. Cek folder unduhan mu",
     "description": "Toast after an exported theme file starts downloading without a save dialog"
   },
   "editor_alert_applyFailed": {
-    "message": "Could not apply theme",
+    "message": "Tidak bisa menerapkan tema",
     "description": "Toast when applying a built-in or custom theme from the theme picker fails"
   },
   "editor_alert_saveFailed": {
-    "message": "Could not save your styles",
+    "message": "Tidak bisa menyimpan style mu",
     "description": "Toast when saving the custom CSS editor content fails"
   },
   "editor_alert_storageFull": {
-    "message": "Storage is full. Clear the lyrics cache in settings, then try again",
+    "message": "Penyimpanan penuh. Bersihkan lirik tersimpan di pengaturan, lalu coba lagi",
     "description": "Toast when saving the custom CSS editor content fails because extension storage is full"
   },
   "editor_prompt_saveMessage": {
-    "message": "Enter a name for this theme",
+    "message": "Masukkan nama untuk tema ini",
     "description": "Message in the save as theme dialog"
   },
   "editor_prompt_renameMessage": {
-    "message": "Enter a new name for this theme",
+    "message": "Masukkan nama baru untuk tema ini",
     "description": "Message in the rename theme dialog"
   },
   "editor_prompt_themeName": {
-    "message": "Theme name",
+    "message": "Nama tema",
     "description": "Placeholder of the theme name field in the save and rename dialogs"
   },
   "editor_prompt_deleteMessage": {
-    "message": "Delete the theme $NAME$? This cannot be undone.",
+    "message": "Hapus tema $NAME$? Tidak bisa dikembalikan.",
     "description": "Message in the delete custom theme dialog",
     "placeholders": {
       "name": {
@@ -636,11 +636,11 @@
     }
   },
   "editor_alert_importFailed": {
-    "message": "Could not import the theme file. Try again",
+    "message": "Tidak dapat mengimpor file tema. Coba lagi",
     "description": "Toast when importing a theme file fails"
   },
   "editor_alert_imported": {
-    "message": "Imported $NAME$",
+    "message": "Mengimpor $NAME$",
     "description": "Toast after a theme file is imported into the editor",
     "placeholders": {
       "name": {
@@ -650,7 +650,7 @@
     }
   },
   "editor_alert_themeSaved": {
-    "message": "Saved theme: $NAME$",
+    "message": "Tema tersimpan: $NAME$",
     "description": "Toast after the editor styles are saved as a custom theme",
     "placeholders": {
       "name": {
@@ -660,11 +660,11 @@
     }
   },
   "editor_alert_themeSaveFailed": {
-    "message": "Could not save the theme",
+    "message": "Tidak dapat menyimpan tema",
     "description": "Toast when saving a custom theme fails"
   },
   "editor_alert_themeRenamed": {
-    "message": "Renamed theme to $NAME$",
+    "message": "Menamai ulang tema ke $NAME$",
     "description": "Toast after a custom theme is renamed",
     "placeholders": {
       "name": {
@@ -674,7 +674,7 @@
     }
   },
   "editor_alert_themeNameTaken": {
-    "message": "A theme named $NAME$ already exists",
+    "message": "Tema bernama $NAME$ sudah ada",
     "description": "Toast when a custom theme is renamed to a name another custom theme already uses",
     "placeholders": {
       "name": {
@@ -684,7 +684,7 @@
     }
   },
   "editor_alert_themeRenameFailed": {
-    "message": "Could not rename the theme",
+    "message": "Tidak dapat menamai ulang tema",
     "description": "Toast when renaming a custom theme fails"
   },
   "editor_alert_themeDeleted": {
