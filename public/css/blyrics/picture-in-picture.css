@@ -1358,7 +1358,11 @@ body {
 }
 
 .blyrics-pip-shell[data-layout="stage"] #blyrics-karaoke .blyrics-karaoke__card-credit {
+  display: -webkit-box;
   max-width: 100%;
+  white-space: normal;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
 }
 
 .blyrics-pip-shell[data-layout="stage"] #blyrics-karaoke .blyrics-credits {
