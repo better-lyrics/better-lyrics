@@ -65,7 +65,7 @@ function getRenderedPartsForAlignment(
  * view's elements and write nothing back to the `Lyric` objects, so a second view building from the
  * same lines would otherwise show neither.
  */
-export type FuriganaMap = Record<number, RubySegment[]> | Map<number, RubySegment[]>;
+type FuriganaMap = Record<number, RubySegment[]> | Map<number, RubySegment[]>;
 
 interface LyricLineDecoration {
   romanization?: string;
