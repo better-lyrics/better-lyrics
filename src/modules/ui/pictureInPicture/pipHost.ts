@@ -148,26 +148,33 @@ export function createPictureInPictureHost(
   let windowFrame = readStoredWindowFrame();
   let requestedSize: WindowSize | null = null;
 
-  function contentWindowSize(): WindowSize {
+  function contentWindowSize(syncedLyrics: boolean): WindowSize {
     const video = getPlayerVideo(document);
-    const videoMode = isVideoModeShown(document);
-    const karaokeEnabled = environment.karaokeEnabled() !== false;
     return fitWindowSize({
       layout: environment.windowLayout(),
       videoEnabled: environment.videoEnabled() !== false,
-      videoMode,
+      videoMode: isVideoModeShown(document),
       adPlaying: isAdPlaying(document),
       videoWidth: video?.videoWidth ?? 0,
       videoHeight: video?.videoHeight ?? 0,
-      karaokeEnabled,
-      syncedLyrics: expectsSyncedLyrics({
-        flag: syncedLyricsFlag,
-        currentVideoId: playerVideoId,
-        karaokeEnabled,
-        videoMode,
-      }),
+      karaokeEnabled: environment.karaokeEnabled() !== false,
+      syncedLyrics,
     });
   }
+
+  // Before the window opens no lyrics have crossed yet, so the opener's flag stands in for them.
+  function openingWindowSize(): WindowSize {
+    return contentWindowSize(
+      expectsSyncedLyrics({
+        flag: syncedLyricsFlag,
+        currentVideoId: playerVideoId,
+        karaokeEnabled: environment.karaokeEnabled() !== false,
+        videoMode: isVideoModeShown(document),
+      })
+    );
+  }
+
+  const liveWindowSize = (): WindowSize => contentWindowSize(hasTimedLyrics(lyricsPayload));
 
   // -- Window frame --------------------------------------------
 
@@ -181,7 +188,7 @@ export function createPictureInPictureHost(
   }
 
   function requestWindowSize(): WindowSize {
-    requestedSize = withWindowFrame(contentWindowSize(), windowFrame);
+    requestedSize = withWindowFrame(openingWindowSize(), windowFrame);
     return requestedSize;
   }
 
@@ -553,7 +560,7 @@ export function createPictureInPictureHost(
     pipWindow.document.title = environment.windowTitle();
     registerAnimatableProperties(pipWindow);
     injectLyricStyles(pipWindow);
-    activeView = new PictureInPictureLyricsView(pipWindow, document, environment.view, contentWindowSize);
+    activeView = new PictureInPictureLyricsView(pipWindow, document, environment.view, liveWindowSize);
     const view = activeView;
     activeMirror = createVideoMirror({
       sourceDocument: document,

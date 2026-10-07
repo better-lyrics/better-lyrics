@@ -112,6 +112,7 @@ const ARTWORK_STALE_GRACE = 600;
 const MODE_SWITCH_LIMIT_MS = 3000;
 // resizeTo spends the click's transient activation, which Chrome keeps for about five seconds.
 const MODE_SWITCH_RESIZE_LIMIT_MS = 2000;
+const MODE_SWITCH_RESIZE_FINAL_MS = 4500;
 
 const LYRICS_MOTION_DEFAULTS = {
   holdDelay: 250,
@@ -332,7 +333,7 @@ export class PictureInPictureLyricsView {
     readonly limitTimer: number;
     settleFrame: number | null;
   } | null = null;
-  private pendingResize: { readonly limitTimer: number; sawModeSwitch: boolean } | null = null;
+  private pendingResize: { limitTimer: number; sawModeSwitch: boolean; readonly startedAt: number } | null = null;
 
   constructor(
     private readonly pipWindow: Window,
@@ -1419,14 +1420,20 @@ export class PictureInPictureLyricsView {
   }
 
   private recordModeSwitch(progress: ModeSwitchProgress): void {
-    if (this.pendingResize) this.pendingResize.sawModeSwitch = true;
+    const pendingResize = this.pendingResize;
+    if (pendingResize && !pendingResize.sawModeSwitch) {
+      pendingResize.sawModeSwitch = true;
+      this.pipWindow.clearTimeout(pendingResize.limitTimer);
+      const remainingMs = MODE_SWITCH_RESIZE_FINAL_MS - (this.pipWindow.performance.now() - pendingResize.startedAt);
+      pendingResize.limitTimer = this.pipWindow.setTimeout(this.resizeToContent, Math.max(0, remainingMs));
+    }
     if (this.modeSwitch) {
       this.modeSwitch.progress = progress;
       return;
     }
     this.modeSwitch = {
       progress,
-      limitTimer: this.pipWindow.setTimeout(this.endModeSwitch, MODE_SWITCH_LIMIT_MS),
+      limitTimer: this.pipWindow.setTimeout(this.finishModeSwitch, MODE_SWITCH_LIMIT_MS),
       settleFrame: null,
     };
     this.shell.setAttribute("data-instant", "");
@@ -1454,10 +1461,14 @@ export class PictureInPictureLyricsView {
       modeSwitch.settleFrame = null;
       if (this.modeSwitch !== modeSwitch) return;
       if (!isModeSwitchSettled(modeSwitch.progress, this.modeSwitchSurface())) return;
-      this.endModeSwitch();
-      if (this.pendingResize?.sawModeSwitch) this.resizeToContent();
+      this.finishModeSwitch();
     });
   }
+
+  private readonly finishModeSwitch = (): void => {
+    this.endModeSwitch();
+    if (this.pendingResize?.sawModeSwitch) this.resizeToContent();
+  };
 
   private readonly endModeSwitch = (): void => {
     const modeSwitch = this.modeSwitch;
@@ -1475,6 +1486,7 @@ export class PictureInPictureLyricsView {
     this.pendingResize = {
       limitTimer: this.pipWindow.setTimeout(this.resizeToContent, MODE_SWITCH_RESIZE_LIMIT_MS),
       sawModeSwitch: false,
+      startedAt: this.pipWindow.performance.now(),
     };
   }
 
