@@ -258,7 +258,7 @@
     "description": "Label above the visual position picker in the Unison Actions modal"
   },
   "options_unisonModal_position_topLeft": {
-    "message": "",
+    "message": "Alto a sinistra",
     "description": "Tooltip for the top-left cell in the Unison position picker"
   },
   "options_unisonModal_position_topCenter": {
