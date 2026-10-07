@@ -218,7 +218,11 @@ export function createPictureInPictureHost(
         stop();
         return;
       }
-      const frame = measureWindowFrame(requested, { width: pipWindow.innerWidth, height: pipWindow.innerHeight });
+      const frame = measureWindowFrame(
+        requested,
+        { width: pipWindow.innerWidth, height: pipWindow.innerHeight },
+        { width: pipWindow.screen.availWidth, height: pipWindow.screen.availHeight }
+      );
       if (frame && (frame.width > 0 || frame.height > 0)) {
         stop();
         storeWindowFrame(frame);

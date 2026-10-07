@@ -158,18 +158,19 @@ assert.ok(Math.abs(aspectOf(stage) - 16 / 9) < 0.01, "the 16:9 stage keeps the a
 // -- Window frame: Document PiP counts its own top bar in the requested height ----
 
 const MAC_FRAME = { width: 0, height: 56 };
+const SCREEN = { width: 1512, height: 944 };
 assert.deepEqual(
-  measureWindowFrame({ width: 640, height: 241 }, { width: 640, height: 185 }),
+  measureWindowFrame({ width: 640, height: 241 }, { width: 640, height: 185 }, SCREEN),
   MAC_FRAME,
   "the cinema stage on Chrome macOS loses 56px to the top bar"
 );
 assert.deepEqual(
-  measureWindowFrame({ width: 340, height: 720 }, { width: 340, height: 664 }),
+  measureWindowFrame({ width: 340, height: 720 }, { width: 340, height: 664 }, SCREEN),
   MAC_FRAME,
   "the vertical window loses the same 56px"
 );
 assert.deepEqual(
-  measureWindowFrame({ width: 640, height: 360 }, { width: 640, height: 360 }),
+  measureWindowFrame({ width: 640, height: 360 }, { width: 640, height: 360 }, SCREEN),
   { width: 0, height: 0 },
   "a browser that sizes the inside reports no frame"
 );
@@ -180,27 +181,37 @@ assert.deepEqual(
 );
 const compensated = withWindowFrame({ width: 640, height: 241 }, MAC_FRAME);
 assert.deepEqual(
-  measureWindowFrame(compensated, { width: 640, height: 241 }),
+  measureWindowFrame(compensated, { width: 640, height: 241 }, SCREEN),
   MAC_FRAME,
   "a compensated request measures the same frame again"
 );
 assert.equal(
-  measureWindowFrame({ width: 640, height: 360 }, { width: 700, height: 360 }),
+  measureWindowFrame({ width: 640, height: 360 }, { width: 700, height: 360 }, SCREEN),
   null,
   "a window larger than requested, a minimum size or a remembered size, teaches nothing"
 );
 assert.equal(
-  measureWindowFrame({ width: 760, height: 816 }, { width: 760, height: 600 }),
+  measureWindowFrame({ width: 760, height: 816 }, { width: 760, height: 600 }, SCREEN),
   null,
   "a request clamped to a short screen teaches nothing"
 );
 assert.equal(
-  measureWindowFrame({ width: 640, height: 360 }, { width: 500, height: 300 }),
+  measureWindowFrame({ width: 760, height: 816 }, { width: 760, height: 780 }, SCREEN),
+  null,
+  "a request past most of the screen may have been clamped by a plausible amount, so it teaches nothing"
+);
+assert.deepEqual(
+  measureWindowFrame({ width: 340, height: 720 }, { width: 340, height: 664 }, { width: 1920, height: 1080 }),
+  MAC_FRAME,
+  "the same request on a taller screen still teaches the frame"
+);
+assert.equal(
+  measureWindowFrame({ width: 640, height: 360 }, { width: 500, height: 300 }, SCREEN),
   null,
   "a width far from the request is a remembered size, not a frame"
 );
 assert.equal(
-  measureWindowFrame({ width: 640, height: 360 }, { width: Number.NaN, height: 300 }),
+  measureWindowFrame({ width: 640, height: 360 }, { width: Number.NaN, height: 300 }, SCREEN),
   null,
   "an unreadable size teaches nothing"
 );

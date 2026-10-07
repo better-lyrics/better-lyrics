@@ -93,6 +93,7 @@ export function fitWindowSize(content: WindowContent): WindowSize {
 
 const MAX_FRAME_WIDTH = 32;
 const MAX_FRAME_HEIGHT = 160;
+const CLAMP_FREE_SCREEN_SHARE = 0.8;
 const FRAME_PATTERN = /^(\d+)x(\d+)$/;
 
 function isPlausibleFrame({ width, height }: WindowSize): boolean {
@@ -106,7 +107,10 @@ function isPlausibleFrame({ width, height }: WindowSize): boolean {
   );
 }
 
-export function measureWindowFrame(requested: WindowSize, inner: WindowSize): WindowSize | null {
+export function measureWindowFrame(requested: WindowSize, inner: WindowSize, screen: WindowSize): WindowSize | null {
+  // The browser shrinks a request near the screen's size, and the shortfall would read as frame.
+  if (requested.width > screen.width * CLAMP_FREE_SCREEN_SHARE) return null;
+  if (requested.height > screen.height * CLAMP_FREE_SCREEN_SHARE) return null;
   const frame = { width: requested.width - inner.width, height: requested.height - inner.height };
   return isPlausibleFrame(frame) ? frame : null;
 }
