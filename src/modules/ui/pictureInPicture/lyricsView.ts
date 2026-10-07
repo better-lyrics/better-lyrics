@@ -1219,6 +1219,7 @@ export class PictureInPictureLyricsView {
     this.isStageActive = active;
     if (active) this.shell.setAttribute("data-layout", "stage");
     else this.shell.removeAttribute("data-layout");
+    if (active) this.syncStageTextScale();
     this.applyVideoPlan();
   }
 
@@ -1357,7 +1358,7 @@ export class PictureInPictureLyricsView {
     this.syncStageTextScale();
   }
 
-  private readonly syncStageTextScale = (): void => {
+  readonly syncStageTextScale = (): void => {
     const win = this.pipWindow;
     const sourceWindow = this.sourceDocument.defaultView ?? win;
     const scale = stageTextScale({
@@ -1366,6 +1367,7 @@ export class PictureInPictureLyricsView {
       videoAspect: this.videoSize ? this.videoSize.width / this.videoSize.height : null,
       sourceRemPx: Number.parseFloat(sourceWindow.getComputedStyle(this.sourceDocument.documentElement).fontSize),
       remPx: Number.parseFloat(win.getComputedStyle(win.document.documentElement).fontSize),
+      baseFontPx: Number.parseFloat(win.getComputedStyle(this.stage).fontSize),
     });
     this.shell.style.setProperty("--blyrics-pip-karaoke-text-scale", String(scale));
   };

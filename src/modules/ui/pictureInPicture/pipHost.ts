@@ -178,6 +178,7 @@ export function createPictureInPictureHost(
       // threw on the way in, and nothing else in the window's life reads that stylesheet again.
       const needsLyricRebuild = renderer.setTheme(css);
       activeStage?.setTheme(css);
+      activeView?.syncStageTextScale();
       appliedThemeCss = css;
       return needsLyricRebuild;
     };
@@ -521,7 +522,9 @@ export function createPictureInPictureHost(
     injectStylesheet: (pipWindow, stylesheet) => {
       environment.injectStylesheet(pipWindow, stylesheet);
       revealWhenStyled(pipWindow, () => {
-        if (activeWindow === pipWindow) measureLyrics();
+        if (activeWindow !== pipWindow) return;
+        activeView?.syncStageTextScale();
+        measureLyrics();
       });
     },
     closeWindow: pipWindow => {

@@ -219,8 +219,10 @@ body {
 }
 
 /* -- Karaoke stage ----------------------------------------------------------- */
+/* The font size is the theme's unscaled subtitle size, which script reads to keep the text readable. */
 .blyrics-pip-stage {
   display: none;
+  font-size: var(--blyrics-font-size);
 }
 
 .blyrics-pip-shell[data-layout="stage"] .blyrics-pip-stage {
