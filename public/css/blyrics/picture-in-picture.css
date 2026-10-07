@@ -267,6 +267,8 @@ body {
 
 .blyrics-pip-artwork__controls {
   --blyrics-pip-control-size: clamp(24px, 8vw, 36px);
+  --blyrics-pip-control-tint: rgb(0 0 0 / 28%);
+  --blyrics-pip-control-backdrop: blur(8px);
 }
 
 .blyrics-pip-artwork__control {
@@ -292,8 +294,8 @@ body {
   position: absolute;
   inset: 0;
   border-radius: 50%;
-  background: rgb(0 0 0 / 28%);
-  backdrop-filter: blur(8px);
+  background: var(--blyrics-pip-control-tint);
+  backdrop-filter: var(--blyrics-pip-control-backdrop);
   transition:
     background-color 140ms ease,
     transform 140ms ease;
@@ -344,11 +346,22 @@ body {
 }
 
 .blyrics-pip-mode-toggle {
+  position: relative;
   display: flex;
   gap: 2px;
   padding: 3px;
   border-radius: 999px;
-  background: rgb(0 0 0 / 28%);
+}
+
+/* On the pill itself the blur would make it a backdrop root and break hit testing on its options. */
+.blyrics-pip-mode-toggle::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: var(--blyrics-pip-control-tint);
+  backdrop-filter: var(--blyrics-pip-control-backdrop);
+  pointer-events: none;
 }
 
 .blyrics-pip-mode-toggle[hidden] {
@@ -356,6 +369,7 @@ body {
 }
 
 .blyrics-pip-mode-toggle__option {
+  position: relative;
   padding: 3px 10px;
   border: 0;
   border-radius: 999px;
