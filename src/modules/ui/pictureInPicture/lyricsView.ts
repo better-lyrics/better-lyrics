@@ -109,6 +109,8 @@ const ARTWORK_STALE_GRACE = 600;
 
 // Long enough for the counterpart's stream to reach its first frame, short of a window stuck instant.
 const MODE_SWITCH_LIMIT_MS = 3000;
+// resizeTo spends the click's transient activation, which Chrome keeps for about five seconds.
+const MODE_SWITCH_RESIZE_LIMIT_MS = 2000;
 
 const LYRICS_MOTION_DEFAULTS = {
   holdDelay: 250,
@@ -329,6 +331,7 @@ export class PictureInPictureLyricsView {
     readonly limitTimer: number;
     settleFrame: number | null;
   } | null = null;
+  private pendingResize: { readonly limitTimer: number; sawModeSwitch: boolean } | null = null;
 
   constructor(
     private readonly pipWindow: Window,
@@ -760,6 +763,7 @@ export class PictureInPictureLyricsView {
     this.artworkController?.abort();
     this.clearArtworkStaleTimer();
     this.endModeSwitch();
+    this.cancelPendingResize();
     this.marquee.destroy();
     this.progressBar.destroy();
     if (this.controlsIdleTimer !== null) this.pipWindow.clearTimeout(this.controlsIdleTimer);
@@ -814,9 +818,13 @@ export class PictureInPictureLyricsView {
     button.className = "blyrics-pip-mode-toggle__option";
     button.textContent = this.dependencies.translate(PLAYBACK_MODE_LABEL_KEYS[mode]);
     button.setAttribute("aria-pressed", "false");
-    button.addEventListener("click", () => switchPlaybackMode(this.sourceDocument, mode), {
-      signal: this.lifecycleController.signal,
-    });
+    button.addEventListener(
+      "click",
+      () => {
+        if (switchPlaybackMode(this.sourceDocument, mode)) this.resizeAfterModeSwitch();
+      },
+      { signal: this.lifecycleController.signal }
+    );
     return button;
   }
 
@@ -1391,6 +1399,7 @@ export class PictureInPictureLyricsView {
   }
 
   private recordModeSwitch(progress: ModeSwitchProgress): void {
+    if (this.pendingResize) this.pendingResize.sawModeSwitch = true;
     if (this.modeSwitch) {
       this.modeSwitch.progress = progress;
       return;
@@ -1424,7 +1433,9 @@ export class PictureInPictureLyricsView {
     modeSwitch.settleFrame = this.pipWindow.requestAnimationFrame(() => {
       modeSwitch.settleFrame = null;
       if (this.modeSwitch !== modeSwitch) return;
-      if (isModeSwitchSettled(modeSwitch.progress, this.modeSwitchSurface())) this.endModeSwitch();
+      if (!isModeSwitchSettled(modeSwitch.progress, this.modeSwitchSurface())) return;
+      this.endModeSwitch();
+      if (this.pendingResize?.sawModeSwitch) this.resizeToContent();
     });
   }
 
@@ -1437,6 +1448,34 @@ export class PictureInPictureLyricsView {
     // Computed while transitions are still off, or dropping the attribute would animate to the new values.
     void this.shell.offsetWidth;
     this.shell.removeAttribute("data-instant");
+  };
+
+  private resizeAfterModeSwitch(): void {
+    this.cancelPendingResize();
+    this.pendingResize = {
+      limitTimer: this.pipWindow.setTimeout(this.resizeToContent, MODE_SWITCH_RESIZE_LIMIT_MS),
+      sawModeSwitch: false,
+    };
+  }
+
+  private cancelPendingResize(): void {
+    if (this.pendingResize) this.pipWindow.clearTimeout(this.pendingResize.limitTimer);
+    this.pendingResize = null;
+  }
+
+  private readonly resizeToContent = (): void => {
+    this.cancelPendingResize();
+    const win = this.pipWindow;
+    if (!win.navigator.userActivation?.isActive) {
+      this.dependencies.log("floating window resize skipped, the click's activation has lapsed");
+      return;
+    }
+    const { width, height } = this.contentSize();
+    try {
+      win.resizeTo(width + win.outerWidth - win.innerWidth, height + win.outerHeight - win.innerHeight);
+    } catch (error) {
+      this.dependencies.log("floating window resize was refused", error);
+    }
   };
 
   setIntermission(remainingS: number | null): void {
