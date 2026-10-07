@@ -1,5 +1,5 @@
 import { PLAYER_BAR_SELECTOR, PLAYER_TIME_EVENT, SEEK_EVENT } from "@constants";
-import { parseSvgString } from "@modules/ui/lyricsDock/icons";
+import { controlIcons, parseSvgString } from "@modules/ui/lyricsDock/icons";
 import { attachTransportAnimation } from "@modules/ui/playerControls/controlAnimations";
 import { playerControlIcons } from "@modules/ui/playerControls/icons";
 import {
@@ -51,7 +51,15 @@ interface HeaderRow {
 }
 
 type PlayerControlAction = "previous" | "play-pause" | "next";
-type PlayerControlIcon = Exclude<PlayerControlAction, "play-pause"> | "play" | "pause" | "fit";
+const WINDOW_CONTROL_ICONS = {
+  previous: playerControlIcons.previous,
+  next: playerControlIcons.next,
+  play: playerControlIcons.play,
+  pause: playerControlIcons.pause,
+  close: controlIcons.pictureInPictureExit,
+} as const;
+
+type WindowControlIcon = keyof typeof WINDOW_CONTROL_ICONS;
 
 const PLAYBACK_MODES: readonly PlaybackMode[] = ["song", "video"];
 const PLAYBACK_MODE_LABEL_KEYS: Record<PlaybackMode, string> = {
@@ -245,8 +253,8 @@ export function preloadArtwork(url: string): void {
   proxy.src = getArtworkUrl(url);
 }
 
-function createControlIcon(document: Document, icon: PlayerControlIcon): SVGElement {
-  const parsed = parseSvgString(playerControlIcons[icon]);
+function createControlIcon(document: Document, icon: WindowControlIcon): SVGElement {
+  const parsed = parseSvgString(WINDOW_CONTROL_ICONS[icon]);
   const svg = parsed
     ? document.importNode(parsed, true)
     : document.createElementNS("http://www.w3.org/2000/svg", "svg");
@@ -398,7 +406,7 @@ export class PictureInPictureLyricsView {
     this.modeToggle.append(songButton, videoButton);
     const artworkChrome = pipDocument.createElement("div");
     artworkChrome.className = "blyrics-pip-artwork__chrome";
-    artworkChrome.append(this.modeToggle, this.createFitButton());
+    artworkChrome.append(this.modeToggle, this.createCloseButton());
     artworkControls.append(previousButton, this.playPauseButton, nextButton, artworkChrome);
     this.artworkContainer.append(artworkCard, this.artworkVideo, artworkControls);
 
@@ -788,27 +796,17 @@ export class PictureInPictureLyricsView {
     return button;
   }
 
-  private createFitButton(): HTMLButtonElement {
+  private createCloseButton(): HTMLButtonElement {
     const button = this.pipWindow.document.createElement("button");
-    const label = this.dependencies.translate("picture_in_picture_fit");
+    const label = this.dependencies.translate("ui_close");
     button.type = "button";
-    button.className = "blyrics-pip-artwork__control blyrics-pip-artwork__control--fit";
+    button.className = "blyrics-pip-artwork__control blyrics-pip-artwork__control--close";
     button.setAttribute("aria-label", label);
     button.title = label;
-    button.appendChild(createControlIcon(this.pipWindow.document, "fit"));
-    button.addEventListener("click", this.fitToContent, { signal: this.lifecycleController.signal });
+    button.appendChild(createControlIcon(this.pipWindow.document, "close"));
+    button.addEventListener("click", () => this.pipWindow.close(), { signal: this.lifecycleController.signal });
     return button;
   }
-
-  private readonly fitToContent = (): void => {
-    const win = this.pipWindow;
-    const { width, height } = this.contentSize();
-    try {
-      win.resizeTo(width + win.outerWidth - win.innerWidth, height + win.outerHeight - win.innerHeight);
-    } catch (error) {
-      this.dependencies.log("floating window resize was refused", error);
-    }
-  };
 
   private createModeButton(mode: PlaybackMode): HTMLButtonElement {
     const button = this.pipWindow.document.createElement("button");

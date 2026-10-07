@@ -35,7 +35,7 @@ const PIP_STRING_KEYS = [
   "picture_in_picture_adUpNext",
   "unison_song",
   "options_display_videoTab",
-  "picture_in_picture_fit",
+  "ui_close",
 ] as const;
 let hasInitializedAutoRestore = false;
 let hasAttemptedAutoRestore = false;
