@@ -1306,6 +1306,17 @@ body {
 .blyrics-pip-shell[data-layout="stage"] #blyrics-karaoke {
   --blyrics-karaoke-frame-x: calc((100vw - var(--blyrics-pip-stage-width)) / 2);
   --blyrics-karaoke-frame-y: calc((100vh - var(--blyrics-pip-stage-height)) / 2);
+  --blyrics-pip-karaoke-font-size: calc(var(--blyrics-font-size) * var(--blyrics-pip-karaoke-text-scale, 1));
+  --blyrics-pip-karaoke-translated-font-size: calc(
+    var(--blyrics-translated-font-size) * var(--blyrics-pip-karaoke-text-scale, 1)
+  );
+}
+
+/* Read above, written below: a property cannot scale its own inherited value on one element. */
+.blyrics-pip-shell[data-layout="stage"] #blyrics-karaoke > *,
+.blyrics-pip-shell[data-layout="stage"] #blyrics-karaoke .blyrics-container {
+  --blyrics-font-size: var(--blyrics-pip-karaoke-font-size) !important;
+  --blyrics-translated-font-size: var(--blyrics-pip-karaoke-translated-font-size) !important;
 }
 
 /* A perspective would make the slot the containing block of the fixed hover chrome. */

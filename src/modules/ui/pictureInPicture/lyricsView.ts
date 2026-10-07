@@ -31,6 +31,7 @@ import {
 } from "./modeSwitch";
 import type { PictureInPicturePlaybackSnapshot, PictureInPictureViewDependencies } from "./types";
 import type { VideoMirrorState } from "./videoMirrorState";
+import { stageTextScale } from "./stageTextScale";
 import { planVideoSwap } from "./videoSwapPlan";
 import type { WindowSize } from "./windowSize";
 
@@ -319,7 +320,7 @@ export class PictureInPictureLyricsView {
   private videoRetireFrame: number | null = null;
   private videoDeferTimer: number | null = null;
   private committedCover: { readonly url: string; readonly letterboxed: boolean } | null = null;
-  private videoAspect: string | null = null;
+  private videoSize: WindowSize | null = null;
   private textTransition: TextTransition = DEFAULT_TEXT_TRANSITION;
   private prefersReducedMotion = false;
   private hasHeaderText = false;
@@ -497,6 +498,8 @@ export class PictureInPictureLyricsView {
       passive: true,
       signal: this.lifecycleController.signal,
     });
+    pipWindow.addEventListener("resize", this.syncStageTextScale, { signal: this.lifecycleController.signal });
+    this.syncStageTextScale();
     pipWindow.addEventListener("pagehide", this.destroy, { once: true });
     this.modeObserver = observePlaybackMode(sourceDocument, this.syncModeToggle);
   }
@@ -1345,12 +1348,27 @@ export class PictureInPictureLyricsView {
   }
 
   private writeVideoAspect(video: HTMLVideoElement): void {
-    const aspect = video.videoWidth > 0 && video.videoHeight > 0 ? `${video.videoWidth} / ${video.videoHeight}` : null;
-    if (aspect === this.videoAspect) return;
-    this.videoAspect = aspect;
-    if (aspect) this.shell.style.setProperty("--blyrics-pip-video-aspect", aspect);
+    const { videoWidth: width, videoHeight: height } = video;
+    const size = width > 0 && height > 0 ? { width, height } : null;
+    if (size?.width === this.videoSize?.width && size?.height === this.videoSize?.height) return;
+    this.videoSize = size;
+    if (size) this.shell.style.setProperty("--blyrics-pip-video-aspect", `${size.width} / ${size.height}`);
     else this.shell.style.removeProperty("--blyrics-pip-video-aspect");
+    this.syncStageTextScale();
   }
+
+  private readonly syncStageTextScale = (): void => {
+    const win = this.pipWindow;
+    const sourceWindow = this.sourceDocument.defaultView ?? win;
+    const scale = stageTextScale({
+      viewport: { width: win.innerWidth, height: win.innerHeight },
+      screen: { width: sourceWindow.screen.width, height: sourceWindow.screen.height },
+      videoAspect: this.videoSize ? this.videoSize.width / this.videoSize.height : null,
+      sourceRemPx: Number.parseFloat(sourceWindow.getComputedStyle(this.sourceDocument.documentElement).fontSize),
+      remPx: Number.parseFloat(win.getComputedStyle(win.document.documentElement).fontSize),
+    });
+    this.shell.style.setProperty("--blyrics-pip-karaoke-text-scale", String(scale));
+  };
 
   private syncFaceCover(index: number): void {
     const cover = this.committedCover;
