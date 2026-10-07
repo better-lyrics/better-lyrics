@@ -186,7 +186,9 @@ body {
   opacity: 0;
   mask-image: radial-gradient(#fff, #fff);
   pointer-events: none;
-  transition: opacity 300ms ease;
+  transition:
+    opacity 300ms ease,
+    scale 620ms cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .blyrics-pip-artwork[data-animated] .blyrics-pip-artwork__video {
@@ -1197,6 +1199,96 @@ body {
   font-weight: 650;
 }
 
+/* -- Stage layout ------------------------------------------------------------ */
+.blyrics-pip-artwork__card,
+.blyrics-pip-shell[blyrics-pip-transition="flip"] .blyrics-pip-artwork__face,
+.blyrics-pip-lyrics {
+  transition:
+    opacity 400ms ease,
+    scale 620ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.blyrics-pip-shell[data-layout="stage"] {
+  --blyrics-pip-stage-width: min(100vw, 100vh * (var(--blyrics-pip-video-aspect, 16 / 9)));
+  --blyrics-pip-stage-height: min(100vh, 100vw / (var(--blyrics-pip-video-aspect, 16 / 9)));
+}
+
+.blyrics-pip-shell[data-layout="stage"] #blyrics-karaoke {
+  --blyrics-karaoke-frame-x: calc((100vw - var(--blyrics-pip-stage-width)) / 2);
+  --blyrics-karaoke-frame-y: calc((100vh - var(--blyrics-pip-stage-height)) / 2);
+}
+
+/* A perspective would make the slot the containing block of the fixed hover chrome. */
+.blyrics-pip-shell[data-layout="stage"] .blyrics-pip-artwork {
+  box-shadow: none;
+  perspective: none;
+}
+
+/* Slot pieces fade, not the chrome's columns; flip fades faces, as opacity flattens its 3D card. */
+.blyrics-pip-shell[data-layout="stage"]:not([blyrics-pip-transition="flip"]) .blyrics-pip-artwork__card,
+.blyrics-pip-shell[data-layout="stage"][blyrics-pip-transition="flip"] .blyrics-pip-artwork__face,
+.blyrics-pip-shell[data-layout="stage"] .blyrics-pip-artwork__video,
+.blyrics-pip-shell[data-layout="stage"] .blyrics-pip-lyrics {
+  opacity: 0;
+  scale: 0.98;
+  pointer-events: none;
+}
+
+.blyrics-pip-shell[data-layout="stage"] .blyrics-pip-artwork__controls {
+  --blyrics-pip-control-size: 36px;
+
+  position: fixed;
+  gap: 16px;
+  justify-content: center;
+  /* Raises the transport a tenth of its height, clear of the plate. */
+  padding-bottom: calc(var(--blyrics-pip-control-size) * 0.25);
+  border-radius: 0;
+  background: linear-gradient(to bottom, rgb(0 0 0 / 55%), transparent 32%, transparent 62%, rgb(0 0 0 / 62%));
+}
+
+.blyrics-pip-shell[data-layout="stage"] .blyrics-pip-artwork:not([data-controls-idle]) .blyrics-pip-artwork__controls {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.blyrics-pip-shell[data-layout="stage"] .blyrics-pip-header {
+  position: fixed;
+  z-index: 5;
+  top: 14px;
+  right: 16px;
+  left: 16px;
+  padding: 0;
+  transition: opacity 180ms ease;
+}
+
+.blyrics-pip-shell[data-layout="stage"] .blyrics-pip-header__title {
+  font-size: 16px;
+}
+
+.blyrics-pip-shell[data-layout="stage"] .blyrics-pip-header__artist {
+  font-size: 12px;
+}
+
+.blyrics-pip-shell[data-layout="stage"] .blyrics-pip-progress {
+  position: fixed;
+  z-index: 5;
+  right: 16px;
+  bottom: 12px;
+  left: 16px;
+  width: auto;
+  opacity: 1;
+  transition: opacity 180ms ease;
+}
+
+.blyrics-pip-shell[data-layout="stage"] .blyrics-pip-artwork[data-controls-idle] ~ .blyrics-pip-progress,
+.blyrics-pip-shell[data-layout="stage"]
+  .blyrics-pip-art-col:has(> .blyrics-pip-artwork[data-controls-idle])
+  ~ .blyrics-pip-content
+  .blyrics-pip-header {
+  opacity: 0;
+  pointer-events: none;
+}
+
 /* -- Reduced motion ----------------------------------------------------------
    Every preset collapses to a plain opacity crossfade with no scale, translate
    or rotation. Deliberately not the crossfade preset: that one carries a 1.06
@@ -1254,6 +1346,18 @@ body {
     animation: none !important;
     transform: none !important;
     backface-visibility: visible !important;
+  }
+
+  .blyrics-pip-artwork__card,
+  .blyrics-pip-artwork__face {
+    transition: opacity 400ms ease !important;
+  }
+
+  .blyrics-pip-artwork__card,
+  .blyrics-pip-artwork__face,
+  .blyrics-pip-artwork__video,
+  .blyrics-pip-lyrics {
+    scale: none !important;
   }
 
   .blyrics-pip-shell[data-running="true"] .blyrics-pip-artwork__face[data-front="true"] {
@@ -1388,5 +1492,36 @@ body {
     --blyrics-font-size: clamp(1.2rem, 6.5cqw, 1.75rem) !important;
     --blyrics-translated-font-size: clamp(0.8rem, 3.4cqw, 1.05rem) !important;
     --blyrics-footer-font-size: clamp(0.7rem, 3cqw, 0.85rem) !important;
+  }
+
+  .blyrics-pip-shell[data-layout="stage"] .blyrics-pip-stage__video {
+    object-position: top;
+  }
+
+  .blyrics-pip-shell[data-layout="stage"] #blyrics-karaoke {
+    inset: var(--blyrics-pip-stage-height) var(--blyrics-karaoke-frame-x) 0;
+  }
+
+  /* The progress bar sits on the video, above the frame, so the plate has nothing to clear. */
+  .blyrics-pip-shell[data-layout="stage"] #blyrics-karaoke[data-bar] {
+    --blyrics-karaoke-lift: 0px;
+  }
+
+  .blyrics-pip-shell[data-layout="stage"] #blyrics-karaoke .blyrics-karaoke__plate {
+    background: none;
+    box-shadow: none;
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
+
+  .blyrics-pip-shell[data-layout="stage"] .blyrics-pip-artwork__controls {
+    bottom: auto;
+    height: var(--blyrics-pip-stage-height);
+    padding-bottom: 0;
+  }
+
+  .blyrics-pip-shell[data-layout="stage"] .blyrics-pip-progress {
+    top: calc(var(--blyrics-pip-stage-height) - 30px);
+    bottom: auto;
   }
 }
