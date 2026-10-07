@@ -14,6 +14,8 @@ export interface DocumentPictureInPicture<TWindow = Window> {
 // Narrowed to what the view reads, so the MAIN world can satisfy it from a serialized bridge
 // payload rather than the full sniffed record.
 export interface PictureInPictureSongMetadata {
+  readonly id: string;
+  readonly counterpartVideoId: string | null;
   readonly displayTitle: string;
   readonly displayByline: string;
   readonly artist: string;

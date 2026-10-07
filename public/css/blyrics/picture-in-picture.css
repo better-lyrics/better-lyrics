@@ -1525,3 +1525,28 @@ body {
     bottom: auto;
   }
 }
+
+/* -- Song and video switch ---------------------------------------------------
+   Transitions only: a removed animation replays once the attribute goes, so script skips keyframes. */
+.blyrics-pip-shell[data-instant] :is(
+    .blyrics-pip-backdrop,
+    .blyrics-pip-art-col,
+    .blyrics-pip-content,
+    .blyrics-pip-artwork,
+    .blyrics-pip-artwork__card,
+    .blyrics-pip-artwork__face,
+    .blyrics-pip-artwork__video,
+    .blyrics-pip-header,
+    .blyrics-pip-progress,
+    .blyrics-pip-lyrics
+  ),
+.blyrics-pip-shell[data-instant] #blyrics-karaoke :is(
+    .blyrics-karaoke__stage,
+    .blyrics-karaoke__plate,
+    .blyrics-karaoke__mount,
+    .blyrics-karaoke__title,
+    .blyrics-karaoke__card,
+    .blyrics-karaoke__card p
+  ) {
+  transition: none !important;
+}

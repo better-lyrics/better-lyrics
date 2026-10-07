@@ -411,7 +411,7 @@ export function createPictureInPictureHost(
     // window is animating and restart the line it is part way through. A theme change republishes
     // them too, and the rebuild that one wants is decided where the theme arrives instead.
     if (!hasSameLines(builtLines, payload.lyrics) || !hasSameNames(builtSongwriters, payload.songwriters)) {
-      buildLyrics(true);
+      buildLyrics(activeView?.isSwitchingMode !== true);
       return;
     }
     activeRenderer?.setLanguage(payload.language);
@@ -439,6 +439,7 @@ export function createPictureInPictureHost(
         setQualityBoost(state === "on");
         view.setVideo(state, track);
       },
+      onModeFlip: expectsVideo => view.noteModeFlip(expectsVideo),
       log: environment.view.log,
     });
     activeStage = createKaraokeStage({

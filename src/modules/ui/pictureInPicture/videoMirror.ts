@@ -10,6 +10,7 @@ interface VideoMirrorOptions {
   readonly sourceDocument: Document;
   readonly isEnabled: () => boolean;
   readonly onChange: (state: VideoMirrorState, track: MediaStreamTrack | null) => void;
+  readonly onModeFlip: (expectsVideo: boolean) => void;
   readonly log: LogSink;
 }
 
@@ -22,7 +23,13 @@ export interface VideoMirror {
 
 type CapturableVideo = HTMLVideoElement & { captureStream?: () => MediaStream };
 
-export function createVideoMirror({ sourceDocument, isEnabled, onChange, log }: VideoMirrorOptions): VideoMirror {
+export function createVideoMirror({
+  sourceDocument,
+  isEnabled,
+  onChange,
+  onModeFlip,
+  log,
+}: VideoMirrorOptions): VideoMirror {
   let player: CapturableVideo | null = null;
   let stream: MediaStream | null = null;
   let mirrored: MediaStreamTrack | null = null;
@@ -33,6 +40,9 @@ export function createVideoMirror({ sourceDocument, isEnabled, onChange, log }: 
   const lifecycle = new AbortController();
 
   const findPlayer = (): CapturableVideo | null => sourceDocument.querySelector<CapturableVideo>(PLAYER_VIDEO_SELECTOR);
+  const readVideoMode = (): boolean =>
+    sourceDocument.querySelector(PLAYER_PAGE_SELECTOR)?.hasAttribute("video-mode") ?? false;
+  let lastVideoMode = readVideoMode();
 
   function stopCapture(): void {
     for (const track of stream?.getTracks() ?? []) track.stop();
@@ -81,10 +91,16 @@ export function createVideoMirror({ sourceDocument, isEnabled, onChange, log }: 
     }
     mirrored = newest;
     lastEnabled = isEnabled();
+    const videoMode = readVideoMode();
+    const adPlaying = isAdPlaying(sourceDocument);
+    if (videoMode !== lastVideoMode) {
+      lastVideoMode = videoMode;
+      if (!adPlaying) onModeFlip(lastEnabled && videoMode && stream !== null);
+    }
     const next = videoMirrorState({
       enabled: lastEnabled,
-      videoMode: sourceDocument.querySelector(PLAYER_PAGE_SELECTOR)?.hasAttribute("video-mode") ?? false,
-      adPlaying: isAdPlaying(sourceDocument),
+      videoMode,
+      adPlaying,
       hasVideoTrack: newest !== null && newest.readyState === "live",
     });
     publish(next);

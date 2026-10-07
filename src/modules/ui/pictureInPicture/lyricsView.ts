@@ -10,6 +10,17 @@ import type { PlayerDetails } from "@core/appState";
 import { createHeaderLine, fillHeaderLayer, getHeaderLayers, PictureInPictureHeaderMarquee } from "./headerMarquee";
 import { createIntermission, type Intermission } from "./intermission";
 import { AD_UP_NEXT_SLOT } from "./intermissionText";
+import {
+  canFlipStartModeSwitch,
+  type CounterpartPair,
+  counterpartPair,
+  isCounterpartChange,
+  isModeSwitchSettled,
+  type ModeSwitchProgress,
+  type ModeSwitchSurface,
+  recordFlip,
+  recordTrackChange,
+} from "./modeSwitch";
 import type { PictureInPicturePlaybackSnapshot, PictureInPictureViewDependencies } from "./types";
 import type { VideoMirrorState } from "./videoMirrorState";
 import { planVideoSwap } from "./videoSwapPlan";
@@ -72,6 +83,9 @@ const MARQUEE_REARM_DELAY = 700;
 // where the next cover is prefetched and decodes at once, never blinks. Past
 // this the metadata poll is genuinely slow and stale art is the worse lie.
 const ARTWORK_STALE_GRACE = 600;
+
+// Long enough for the counterpart's stream to reach its first frame, short of a window stuck instant.
+const MODE_SWITCH_LIMIT_MS = 3000;
 
 const LYRICS_MOTION_DEFAULTS = {
   holdDelay: 250,
@@ -281,6 +295,14 @@ export class PictureInPictureLyricsView {
   private textTransition: TextTransition = DEFAULT_TEXT_TRANSITION;
   private prefersReducedMotion = false;
   private hasHeaderText = false;
+  private counterpartPair: CounterpartPair | null = null;
+  private pendingArtworkVideoId: string | null = null;
+  private lastTrackChangeTime = Number.NEGATIVE_INFINITY;
+  private modeSwitch: {
+    progress: ModeSwitchProgress;
+    readonly limitTimer: number;
+    settleFrame: number | null;
+  } | null = null;
 
   constructor(
     private readonly pipWindow: Window,
@@ -649,8 +671,15 @@ export class PictureInPictureLyricsView {
     this.updatePlayPauseButton(detail.isPlaying);
 
     if (detail.videoId !== this.currentVideoId) {
-      this.showSong(detail);
+      const isModeSwitch = isCounterpartChange(this.counterpartPair, this.currentVideoId, detail.videoId);
+      if (isModeSwitch) this.recordModeSwitch(recordTrackChange(this.modeSwitch?.progress ?? null));
+      else {
+        this.endModeSwitch();
+        this.lastTrackChangeTime = this.pipWindow.performance.now();
+      }
+      this.showSong(detail, isModeSwitch);
       if (this.holdTimer !== null) this.expireHold();
+      this.checkModeSwitchSettled();
     }
 
     const now = Date.now();
@@ -690,6 +719,7 @@ export class PictureInPictureLyricsView {
     this.lifecycleController.abort();
     this.artworkController?.abort();
     this.clearArtworkStaleTimer();
+    this.endModeSwitch();
     this.marquee.destroy();
     this.progressBar.destroy();
     if (this.controlsIdleTimer !== null) this.pipWindow.clearTimeout(this.controlsIdleTimer);
@@ -740,11 +770,13 @@ export class PictureInPictureLyricsView {
     );
   }
 
-  private showSong(detail: PlayerDetails): void {
+  // A counterpart reports its own title, which the song's metadata then corrects back: a flicker.
+  private showSong(detail: PlayerDetails, isModeSwitch: boolean): void {
     if (this.currentVideoId === null) this.lyricsVideoId = detail.videoId;
+    if (!isModeSwitch) this.counterpartPair = null;
     this.currentVideoId = detail.videoId;
     this.lastVisibleMetadataCheck = Date.now();
-    this.setHeaderText(detail.song, detail.artist, true);
+    if (!isModeSwitch) this.setHeaderText(detail.song, detail.artist, true);
     this.clearAnimatedArtwork();
     this.loadArtwork(detail.videoId);
   }
@@ -759,8 +791,9 @@ export class PictureInPictureLyricsView {
     if (changed.length === 0) return;
 
     const isFirstPaint = !this.hasHeaderText;
+    const isInstant = isFirstPaint || this.isSwitchingMode;
     this.hasHeaderText = true;
-    const animating = changed.filter(row => isSongChange || row.text === "");
+    const animating = changed.filter(row => isInstant || isSongChange || row.text === "");
     this.headerRows.forEach((row, position) => {
       row.text = incoming[position];
     });
@@ -772,10 +805,10 @@ export class PictureInPictureLyricsView {
       }
       // Trailing the title only means something when the title is moving too.
       const delay = animating.length > 1 && row === this.headerRows[1] ? HEADER_ROW_STAGGER : 0;
-      this.swapRow(row, isFirstPaint, delay);
+      this.swapRow(row, isInstant, delay);
     }
     // Both rows have to be filled before measuring, since they share one cycle.
-    if (isFirstPaint) this.marquee.arm();
+    if (isInstant) this.armMarqueeWhenSettled();
   }
 
   // A correction still has to be seen arriving, so it crossfades. What it must not
@@ -803,7 +836,7 @@ export class PictureInPictureLyricsView {
     row.layers[1 - index].setAttribute("aria-hidden", "true");
   }
 
-  private swapRow(row: HeaderRow, isFirstPaint: boolean, delayMs: number): void {
+  private swapRow(row: HeaderRow, isInstant: boolean, delayMs: number): void {
     if (row.busyTimer !== null) this.pipWindow.clearTimeout(row.busyTimer);
     row.busyTimer = null;
     row.hasPendingCorrection = false;
@@ -811,7 +844,8 @@ export class PictureInPictureLyricsView {
 
     // Nothing to transition from on the first song in a window, so it just
     // appears, the same way the first cover does.
-    if (isFirstPaint) {
+    if (isInstant) {
+      row.element.removeAttribute("data-swapping");
       this.paintRow(row, row.index);
       return;
     }
@@ -904,11 +938,13 @@ export class PictureInPictureLyricsView {
     const controller = new AbortController();
     this.artworkController = controller;
     this.fallbackArtworkUrl = getFallbackArtworkUrl(videoId);
+    this.pendingArtworkVideoId = videoId;
     this.clearArtworkStaleTimer();
     this.scheduleArtworkWipe(ARTWORK_STALE_GRACE);
 
     void this.dependencies.getArtworkMetadata(videoId, 250, controller.signal).then(metadata => {
       if (controller.signal.aborted || this.currentVideoId !== videoId) return;
+      if (metadata) this.counterpartPair = counterpartPair(metadata.id, metadata.counterpartVideoId);
       this.setHeaderText(
         metadata?.displayTitle || this.headerRows[0].text,
         metadata?.displayByline || metadata?.artist || this.headerRows[1].text
@@ -957,14 +993,15 @@ export class PictureInPictureLyricsView {
       this.shell.style.setProperty("--blyrics-pip-art", `url("${url}")`);
       this.paintBackdrop(url, isFirstArtwork);
       this.committedCover = { url, letterboxed: url === letterboxedUrl };
+      this.pendingArtworkVideoId = null;
       if (this.videoState === "on") {
         const hiddenIndex = 1 - this.artworkIndex;
         if (this.faceTracks[this.artworkIndex] !== null) this.syncFaceCover(this.artworkIndex);
         this.syncFaceCover(hiddenIndex);
-        return;
+      } else if (nextIndex !== this.artworkIndex) {
+        this.showCoverFace(nextIndex, isFirstArtwork);
       }
-      if (nextIndex === this.artworkIndex) return;
-      this.showCoverFace(nextIndex, isFirstArtwork);
+      this.checkModeSwitchSettled();
     };
 
     image.addEventListener("error", fallBack, { once: true, signal });
@@ -985,13 +1022,14 @@ export class PictureInPictureLyricsView {
     this.backdropLayers[nextIndex].style.backgroundImage = `url("${url}")`;
     // The wash follows the cover. Written in the same task as the data-front flip
     // below: any state change that makes the animation newly match starts it.
-    if (skipAnimation) this.backdrop.setAttribute("data-first", "true");
+    if (skipAnimation || this.isSwitchingMode) this.backdrop.setAttribute("data-first", "true");
     else this.backdrop.removeAttribute("data-first");
     this.backdropLayers[nextIndex].setAttribute("data-front", "true");
     this.backdropLayers[1 - nextIndex].setAttribute("data-front", "false");
   }
 
-  private runArtworkSwap(nextIndex: number, skipAnimation: boolean): void {
+  private runArtworkSwap(nextIndex: number, requestedSkip: boolean): void {
+    const skipAnimation = requestedSkip || this.isSwitchingMode;
     const duration = ARTWORK_TRANSITION_DURATIONS[this.artworkTransition];
     const now = this.pipWindow.performance.now();
     const isBusy = this.artworkBusyUntil > now;
@@ -1102,6 +1140,11 @@ export class PictureInPictureLyricsView {
   }
 
   private readonly applyVideoPlan = (): void => {
+    this.runVideoPlan();
+    this.checkModeSwitchSettled();
+  };
+
+  private runVideoPlan(): void {
     this.clearVideoDeferTimer();
     if (this.isStageActive) {
       this.moveVideoToStage();
@@ -1125,12 +1168,12 @@ export class PictureInPictureLyricsView {
       return;
     }
     const busyMs = this.artworkBusyUntil - this.pipWindow.performance.now();
-    if (busyMs > 0) {
+    if (busyMs > 0 && !this.isSwitchingMode) {
       this.videoDeferTimer = this.pipWindow.setTimeout(this.applyVideoPlan, busyMs);
       return;
     }
     this.loadFaceVideo(plan.track, plan.skipAnimation);
-  };
+  }
 
   // Waits for the first frame, as the cover waits for its decode.
   private loadFaceVideo(track: MediaStreamTrack, skipAnimation: boolean): void {
@@ -1148,6 +1191,7 @@ export class PictureInPictureLyricsView {
       this.writeVideoAspect(video);
       this.runArtworkSwap(nextIndex, skipAnimation);
       this.retireHiddenFaceVideo(skipAnimation);
+      this.checkModeSwitchSettled();
     };
     if (video.readyState >= HTMLMediaElement.HAVE_CURRENT_DATA) commit();
     else video.addEventListener("loadeddata", commit, { once: true, signal: controller.signal });
@@ -1180,7 +1224,8 @@ export class PictureInPictureLyricsView {
   }
 
   // The outgoing face keeps its video until the preset has carried it off.
-  private retireHiddenFaceVideo(immediately: boolean): void {
+  private retireHiddenFaceVideo(requestedImmediately: boolean): void {
+    const immediately = requestedImmediately || this.isSwitchingMode;
     this.clearVideoRetireTimer();
     const retire = (): void => {
       this.videoRetireFrame = null;
@@ -1255,6 +1300,72 @@ export class PictureInPictureLyricsView {
       this.dependencies.log("music video playback failed", error);
     });
   }
+
+  // -- Song and video switch -----------------------
+
+  get isSwitchingMode(): boolean {
+    return this.modeSwitch !== null;
+  }
+
+  noteModeFlip(expectsVideo: boolean): void {
+    const canStart = canFlipStartModeSwitch({
+      pair: this.counterpartPair,
+      currentVideoId: this.currentVideoId,
+      msSinceTrackChange: this.pipWindow.performance.now() - this.lastTrackChangeTime,
+    });
+    if (!this.modeSwitch && !canStart) return;
+    this.recordModeSwitch(recordFlip(this.modeSwitch?.progress ?? null, expectsVideo));
+    this.checkModeSwitchSettled();
+  }
+
+  private recordModeSwitch(progress: ModeSwitchProgress): void {
+    if (this.modeSwitch) {
+      this.modeSwitch.progress = progress;
+      return;
+    }
+    this.modeSwitch = {
+      progress,
+      limitTimer: this.pipWindow.setTimeout(this.endModeSwitch, MODE_SWITCH_LIMIT_MS),
+      settleFrame: null,
+    };
+    this.shell.setAttribute("data-instant", "");
+    if (this.artworkBusyTimer !== null) {
+      this.pipWindow.clearTimeout(this.artworkBusyTimer);
+      this.artworkBusyTimer = null;
+      this.shell.setAttribute("data-running", "false");
+    }
+    if (this.videoDeferTimer !== null) this.applyVideoPlan();
+  }
+
+  private modeSwitchSurface(): ModeSwitchSurface {
+    return {
+      showsVideo: this.stageTrack !== null || this.faceTracks[this.artworkIndex] !== null,
+      isArtworkPending: this.pendingArtworkVideoId !== null,
+      isVideoPending: this.pendingVideo !== null || this.videoDeferTimer !== null,
+    };
+  }
+
+  private checkModeSwitchSettled(): void {
+    const modeSwitch = this.modeSwitch;
+    if (!modeSwitch || modeSwitch.settleFrame !== null) return;
+    if (!isModeSwitchSettled(modeSwitch.progress, this.modeSwitchSurface())) return;
+    modeSwitch.settleFrame = this.pipWindow.requestAnimationFrame(() => {
+      modeSwitch.settleFrame = null;
+      if (this.modeSwitch !== modeSwitch) return;
+      if (isModeSwitchSettled(modeSwitch.progress, this.modeSwitchSurface())) this.endModeSwitch();
+    });
+  }
+
+  private readonly endModeSwitch = (): void => {
+    const modeSwitch = this.modeSwitch;
+    if (!modeSwitch) return;
+    this.modeSwitch = null;
+    this.pipWindow.clearTimeout(modeSwitch.limitTimer);
+    if (modeSwitch.settleFrame !== null) this.pipWindow.cancelAnimationFrame(modeSwitch.settleFrame);
+    // Computed while transitions are still off, or dropping the attribute would animate to the new values.
+    void this.shell.offsetWidth;
+    this.shell.removeAttribute("data-instant");
+  };
 
   setIntermission(remainingS: number | null): void {
     this.intermission.update(remainingS, this.headerRows[0].text);
