@@ -38,13 +38,18 @@ export function normalizeVideoQualitySettings(
   };
 }
 
+// The floating window is never more than 80% of the screen, so a higher tier only costs start-up time.
+const BOOSTED_VIDEO_QUALITY: VideoQuality = "hd1080";
+
 export function selectVideoQuality(
   settings: VideoQualitySettings,
   available: string[],
   isBoosted = false
 ): VideoQuality {
   if (settings.preferredVideoQuality === "auto") {
-    return isBoosted ? selectVideoQuality({ ...settings, preferredVideoQuality: "hd4320" }, available) : "auto";
+    return isBoosted
+      ? selectVideoQuality({ ...settings, preferredVideoQuality: BOOSTED_VIDEO_QUALITY }, available)
+      : "auto";
   }
   const ceiling = Math.min(
     VIDEO_QUALITIES[settings.preferredVideoQuality],

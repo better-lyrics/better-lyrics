@@ -43,7 +43,12 @@ assert.equal(
   "auto",
   "never explicitly select a disabled quality"
 );
-assert.equal(selectVideoQuality(defaults, ["hd2160", "hd1080", "auto"], true), "hd2160", "boost takes the top level");
+assert.equal(selectVideoQuality(defaults, ["hd2160", "hd1080", "auto"], true), "hd1080", "boost stops at 1080p");
+assert.equal(
+  selectVideoQuality(defaults, ["hd720", "large", "auto"], true),
+  "hd720",
+  "boost takes the top level under 1080p"
+);
 assert.equal(
   selectVideoQuality(
     { isHighResolutionVideoEnabled: false, preferredVideoQuality: "auto" },
@@ -209,7 +214,7 @@ await settle();
 assert.equal(qualityCalls.at(-1), "auto");
 boost("true");
 await settle();
-assert.equal(qualityCalls.at(-1), "hd2160", "boost on pins the top level");
+assert.equal(qualityCalls.at(-1), "hd1080", "boost on pins 1080p");
 boost("false");
 await settle();
 assert.equal(qualityCalls.at(-1), "auto", "boost off restores the setting at once");
@@ -229,7 +234,7 @@ await settle();
 assert.equal(qualityCalls.length, beforeAdBoost, "boost waits out an ad");
 doc.querySelector("ytmusic-player")?.classList.remove("ad-showing");
 video.dispatchEvent(new dom.window.Event("loadedmetadata"));
-assert.equal(qualityCalls.at(-1), "hd2160", "boost lands after the ad");
+assert.equal(qualityCalls.at(-1), "hd1080", "boost lands after the ad");
 const beforeMalformed = qualityCalls.length;
 for (const detail of ["{", "1", '"on"']) boost(detail);
 await settle();
