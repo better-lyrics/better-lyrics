@@ -33,6 +33,7 @@ const FOOTER_SOURCE_LINK_ID = "betterLyricsFooterLink";
 const STYLESHEET_REVEAL_TIMEOUT_MS = 1000;
 const WINDOW_FRAME_STORAGE_KEY = "blyrics-pip-window-frame";
 const NO_WINDOW_FRAME: WindowSize = { width: 0, height: 0 };
+const WINDOW_FRAME_SETTLE_MS = 1000;
 
 // Gecko ignores @property in a stylesheet that is cross-origin to the document, and ours are served
 // from moz-extension:// into a window of the page's own origin. An unregistered custom property
@@ -183,18 +184,47 @@ export function createPictureInPictureHost(
     return requestedSize;
   }
 
-  function learnWindowFrame(pipWindow: Window): void {
-    const requested = requestedSize;
-    requestedSize = null;
-    if (!requested) return;
-    const frame = measureWindowFrame(requested, { width: pipWindow.innerWidth, height: pipWindow.innerHeight });
-    if (!frame) return;
+  function storeWindowFrame(frame: WindowSize): void {
     windowFrame = frame;
     try {
       window.localStorage.setItem(WINDOW_FRAME_STORAGE_KEY, formatWindowFrame(frame));
     } catch (error) {
       environment.view.log("floating window frame could not be stored", error);
     }
+  }
+
+  function learnWindowFrame(pipWindow: Window): void {
+    if (!requestedSize) return;
+    const requested: WindowSize = requestedSize;
+    requestedSize = null;
+
+    const deadline = pipWindow.performance.now() + WINDOW_FRAME_SETTLE_MS;
+    let frameRequest: number | null = null;
+    const stop = (): void => {
+      pipWindow.removeEventListener("resize", check);
+      if (frameRequest !== null) pipWindow.cancelAnimationFrame(frameRequest);
+      frameRequest = null;
+    };
+    function check(): void {
+      if (activeWindow !== pipWindow) {
+        stop();
+        return;
+      }
+      const frame = measureWindowFrame(requested, { width: pipWindow.innerWidth, height: pipWindow.innerHeight });
+      if (frame && (frame.width > 0 || frame.height > 0)) {
+        stop();
+        storeWindowFrame(frame);
+        return;
+      }
+      if (pipWindow.performance.now() >= deadline) {
+        stop();
+        return;
+      }
+      if (frameRequest !== null) pipWindow.cancelAnimationFrame(frameRequest);
+      frameRequest = pipWindow.requestAnimationFrame(check);
+    }
+    pipWindow.addEventListener("resize", check);
+    frameRequest = pipWindow.requestAnimationFrame(check);
   }
 
   function setQualityBoost(next: boolean): void {
