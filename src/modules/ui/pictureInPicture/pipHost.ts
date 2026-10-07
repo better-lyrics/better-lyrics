@@ -1,4 +1,5 @@
-import { DISABLE_EFFECTS_STYLE_ID, FOOTER_CLASS } from "@constants";
+import { DISABLE_EFFECTS_STYLE_ID, FOOTER_CLASS, PLAYER_TIME_EVENT } from "@constants";
+import type { PlayerDetails } from "@core/appState";
 import { CUSTOM_THEME_STYLE_ID } from "@braccato/core/constants";
 import { applyLyricDecorations } from "@modules/lyrics/lyricDecorations";
 import { createLyricsRenderer, type Lyric, type LyricsRenderer } from "@braccato/core";
@@ -6,17 +7,32 @@ import { VIDEO_QUALITY_BOOST_EVENT } from "@modules/settings/videoQuality";
 import { shouldShowWindowStage } from "@modules/karaoke/gate";
 import { createKaraokeStage, type KaraokeStage } from "@modules/karaoke/stage";
 import { getPlayerVideo, isAdPlaying, isVideoModeShown } from "@modules/ui/playerControls/playerBarControls";
-import { onLyrics, onLyricsSynced, type PictureInPictureLyricsPayload } from "./bridge";
+import {
+  onLyrics,
+  onLyricsSynced,
+  type PictureInPictureLyricsPayload,
+  type PictureInPictureLyricsSynced,
+} from "./bridge";
 import { PictureInPictureController } from "./controller";
 import { PictureInPictureLyricsView } from "./lyricsView";
 import { createPictureInPictureLyricsHost } from "./pipLyricsHost";
 import type { PictureInPictureHostEnvironment } from "./types";
 import { createVideoMirror, type VideoMirror } from "./videoMirror";
-import { fitWindowSize, type WindowSize } from "./windowSize";
+import {
+  expectsSyncedLyrics,
+  fitWindowSize,
+  formatWindowFrame,
+  measureWindowFrame,
+  parseWindowFrame,
+  type WindowSize,
+  withWindowFrame,
+} from "./windowSize";
 
 const PIP_OPEN_ATTRIBUTE = "blyrics-pip-open";
 const FOOTER_SOURCE_LINK_ID = "betterLyricsFooterLink";
 const STYLESHEET_REVEAL_TIMEOUT_MS = 1000;
+const WINDOW_FRAME_STORAGE_KEY = "blyrics-pip-window-frame";
+const NO_WINDOW_FRAME: WindowSize = { width: 0, height: 0 };
 
 // Gecko ignores @property in a stylesheet that is cross-origin to the document, and ours are served
 // from moz-extension:// into a window of the page's own origin. An unregistered custom property
@@ -125,20 +141,60 @@ export function createPictureInPictureHost(
   let syncFrame: number | null = null;
   let styleObserver: MutationObserver | null = null;
   let isQualityBoosted = false;
-  let hasSyncedLyrics = false;
+  let syncedLyricsFlag: PictureInPictureLyricsSynced | null = null;
+  let playerVideoId: string | null = null;
+  let windowFrame = readStoredWindowFrame();
+  let requestedSize: WindowSize | null = null;
 
   function contentWindowSize(): WindowSize {
     const video = getPlayerVideo(document);
+    const videoMode = isVideoModeShown(document);
+    const karaokeEnabled = environment.karaokeEnabled() !== false;
     return fitWindowSize({
       layout: environment.windowLayout(),
       videoEnabled: environment.videoEnabled() !== false,
-      videoMode: isVideoModeShown(document),
+      videoMode,
       adPlaying: isAdPlaying(document),
       videoWidth: video?.videoWidth ?? 0,
       videoHeight: video?.videoHeight ?? 0,
-      karaokeEnabled: environment.karaokeEnabled() !== false,
-      syncedLyrics: hasSyncedLyrics,
+      karaokeEnabled,
+      syncedLyrics: expectsSyncedLyrics({
+        flag: syncedLyricsFlag,
+        currentVideoId: playerVideoId,
+        karaokeEnabled,
+        videoMode,
+      }),
     });
+  }
+
+  // -- Window frame --------------------------------------------
+
+  function readStoredWindowFrame(): WindowSize {
+    try {
+      return parseWindowFrame(window.localStorage.getItem(WINDOW_FRAME_STORAGE_KEY)) ?? NO_WINDOW_FRAME;
+    } catch (error) {
+      environment.view.log("floating window frame could not be read", error);
+      return NO_WINDOW_FRAME;
+    }
+  }
+
+  function requestWindowSize(): WindowSize {
+    requestedSize = withWindowFrame(contentWindowSize(), windowFrame);
+    return requestedSize;
+  }
+
+  function learnWindowFrame(pipWindow: Window): void {
+    const requested = requestedSize;
+    requestedSize = null;
+    if (!requested) return;
+    const frame = measureWindowFrame(requested, { width: pipWindow.innerWidth, height: pipWindow.innerHeight });
+    if (!frame) return;
+    windowFrame = frame;
+    try {
+      window.localStorage.setItem(WINDOW_FRAME_STORAGE_KEY, formatWindowFrame(frame));
+    } catch (error) {
+      environment.view.log("floating window frame could not be stored", error);
+    }
   }
 
   function setQualityBoost(next: boolean): void {
@@ -422,9 +478,15 @@ export function createPictureInPictureHost(
 
   // Subscribed once rather than per window: the opener publishes the current lyrics as soon as it is
   // told the window opened, which is before the view that renders them exists.
-  const unsubscribeLyricsSynced = onLyricsSynced(synced => {
-    hasSyncedLyrics = synced;
+  const unsubscribeLyricsSynced = onLyricsSynced(flag => {
+    syncedLyricsFlag = flag;
   });
+
+  const trackPlayerVideo = (event: Event): void => {
+    const videoId = (event as CustomEvent<PlayerDetails | null>).detail?.videoId;
+    if (videoId) playerVideoId = videoId;
+  };
+  document.addEventListener(PLAYER_TIME_EVENT, trackPlayerVideo);
 
   const unsubscribeLyrics = onLyrics(payload => {
     lyricsPayload = payload;
@@ -445,6 +507,7 @@ export function createPictureInPictureHost(
 
   function renderLoadingShell(pipWindow: Window): void {
     activeWindow = pipWindow;
+    learnWindowFrame(pipWindow);
     pipWindow.document.documentElement.style.visibility = "hidden";
     document.documentElement.setAttribute(PIP_OPEN_ATTRIBUTE, "");
     environment.onOpened();
@@ -516,7 +579,7 @@ export function createPictureInPictureHost(
 
   return new PictureInPictureController<Window>({
     host: window,
-    windowSize: contentWindowSize,
+    windowSize: requestWindowSize,
     loadStylesheet: environment.loadStylesheet,
     renderLoadingShell,
     injectStylesheet: (pipWindow, stylesheet) => {
@@ -544,6 +607,7 @@ export function createPictureInPictureHost(
     dispose: () => {
       unsubscribeLyrics();
       unsubscribeLyricsSynced();
+      document.removeEventListener(PLAYER_TIME_EVENT, trackPlayerVideo);
     },
   });
 }

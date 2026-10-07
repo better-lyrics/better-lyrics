@@ -13,8 +13,9 @@ import { sendLyrics, sendLyricsSynced } from "./bridge";
 export function publishPictureInPictureLyrics(): void {
   const lyricData = AppState.lyricData;
   // YouTube's provisional lines stand in while the synced providers answer, so they never count as timed.
-  const syncType = !lyricData || lyricData.isProvisional ? "none" : lyricData.syncType;
-  sendLyricsSynced(syncType !== "none");
+  const isSettled = lyricData !== null && !lyricData.isProvisional;
+  const syncType = isSettled ? lyricData.syncType : "none";
+  sendLyricsSynced({ videoId: isSettled ? AppState.lastLoadedVideoId : null, synced: syncType !== "none" });
   if (!AppState.isPictureInPictureOpen) return;
 
   sendLyrics({

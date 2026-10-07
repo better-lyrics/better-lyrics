@@ -1,4 +1,5 @@
 import { shouldShowWindowStage } from "@modules/karaoke/gate";
+import type { PictureInPictureLyricsSynced } from "./bridge";
 import { videoMirrorState } from "./videoMirrorState";
 
 export interface WindowSize {
@@ -86,4 +87,55 @@ export function fitWindowSize(content: WindowContent): WindowSize {
     return stageSize(aspect);
   }
   return content.layout === "vertical" ? verticalSlotSize(aspect) : horizontalSlotSize(aspect);
+}
+
+// -- Window frame -----------------------------------------------------------------
+
+const MAX_FRAME_WIDTH = 32;
+const MAX_FRAME_HEIGHT = 160;
+const FRAME_PATTERN = /^(\d+)x(\d+)$/;
+
+function isPlausibleFrame({ width, height }: WindowSize): boolean {
+  return (
+    Number.isFinite(width) &&
+    Number.isFinite(height) &&
+    width >= 0 &&
+    height >= 0 &&
+    width <= MAX_FRAME_WIDTH &&
+    height <= MAX_FRAME_HEIGHT
+  );
+}
+
+export function measureWindowFrame(requested: WindowSize, inner: WindowSize): WindowSize | null {
+  const frame = { width: requested.width - inner.width, height: requested.height - inner.height };
+  return isPlausibleFrame(frame) ? frame : null;
+}
+
+export function withWindowFrame(size: WindowSize, frame: WindowSize): WindowSize {
+  return { width: size.width + frame.width, height: size.height + frame.height };
+}
+
+export function formatWindowFrame({ width, height }: WindowSize): string {
+  return `${width}x${height}`;
+}
+
+export function parseWindowFrame(value: string | null): WindowSize | null {
+  const match = value ? FRAME_PATTERN.exec(value) : null;
+  if (!match) return null;
+  const frame = { width: Number(match[1]), height: Number(match[2]) };
+  return isPlausibleFrame(frame) ? frame : null;
+}
+
+// -- Synced lyrics at open --------------------------------------------------------
+
+interface SyncedLyricsContext {
+  readonly flag: PictureInPictureLyricsSynced | null;
+  readonly currentVideoId: string | null;
+  readonly karaokeEnabled: boolean;
+  readonly videoMode: boolean;
+}
+
+export function expectsSyncedLyrics({ flag, currentVideoId, karaokeEnabled, videoMode }: SyncedLyricsContext): boolean {
+  if (flag && flag.videoId !== null && flag.videoId === currentVideoId) return flag.synced;
+  return karaokeEnabled && videoMode;
 }

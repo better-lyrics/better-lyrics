@@ -72,6 +72,11 @@ export interface PictureInPictureLyricsPayload {
   readonly suppressZeroTimeUntil: number;
 }
 
+export interface PictureInPictureLyricsSynced {
+  readonly videoId: string | null;
+  readonly synced: boolean;
+}
+
 // Details cross as JSON strings, not objects. Gecko hands the page a dead wrapper for any object a
 // content script puts on a CustomEvent unless it is cloneInto'd first, and a string never needs
 // that. The existing ISOLATED to MAIN events pass primitives for the same reason.
@@ -110,6 +115,6 @@ export const sendLyrics = (payload: PictureInPictureLyricsPayload): void => send
 export const onLyrics = (handler: (payload: PictureInPictureLyricsPayload) => void): (() => void) =>
   subscribe(PIP_LYRICS_EVENT, handler);
 
-export const sendLyricsSynced = (synced: boolean): void => send(PIP_LYRICS_SYNCED_EVENT, synced);
-export const onLyricsSynced = (handler: (synced: boolean) => void): (() => void) =>
+export const sendLyricsSynced = (payload: PictureInPictureLyricsSynced): void => send(PIP_LYRICS_SYNCED_EVENT, payload);
+export const onLyricsSynced = (handler: (payload: PictureInPictureLyricsSynced) => void): (() => void) =>
   subscribe(PIP_LYRICS_SYNCED_EVENT, handler);

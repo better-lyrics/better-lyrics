@@ -1,5 +1,13 @@
 import { strict as assert } from "node:assert";
-import { fitWindowSize, type WindowContent } from "./windowSize";
+import {
+  expectsSyncedLyrics,
+  fitWindowSize,
+  formatWindowFrame,
+  measureWindowFrame,
+  parseWindowFrame,
+  type WindowContent,
+  withWindowFrame,
+} from "./windowSize";
 
 const HORIZONTAL = { width: 720, height: 300 };
 const VERTICAL = { width: 340, height: 720 };
@@ -146,5 +154,101 @@ for (const input of cases) {
   assert.deepEqual(fitWindowSize(input), size, "the same content always gets the same size");
 }
 assert.ok(Math.abs(aspectOf(stage) - 16 / 9) < 0.01, "the 16:9 stage keeps the aspect");
+
+// -- Window frame: Document PiP counts its own top bar in the requested height ----
+
+const MAC_FRAME = { width: 0, height: 56 };
+assert.deepEqual(
+  measureWindowFrame({ width: 640, height: 241 }, { width: 640, height: 185 }),
+  MAC_FRAME,
+  "the cinema stage on Chrome macOS loses 56px to the top bar"
+);
+assert.deepEqual(
+  measureWindowFrame({ width: 340, height: 720 }, { width: 340, height: 664 }),
+  MAC_FRAME,
+  "the vertical window loses the same 56px"
+);
+assert.deepEqual(
+  measureWindowFrame({ width: 640, height: 360 }, { width: 640, height: 360 }),
+  { width: 0, height: 0 },
+  "a browser that sizes the inside reports no frame"
+);
+assert.deepEqual(
+  withWindowFrame({ width: 640, height: 185 }, MAC_FRAME),
+  { width: 640, height: 241 },
+  "the frame is added to the content size"
+);
+const compensated = withWindowFrame({ width: 640, height: 241 }, MAC_FRAME);
+assert.deepEqual(
+  measureWindowFrame(compensated, { width: 640, height: 241 }),
+  MAC_FRAME,
+  "a compensated request measures the same frame again"
+);
+assert.equal(
+  measureWindowFrame({ width: 640, height: 360 }, { width: 700, height: 360 }),
+  null,
+  "a window larger than requested, a minimum size or a remembered size, teaches nothing"
+);
+assert.equal(
+  measureWindowFrame({ width: 760, height: 816 }, { width: 760, height: 600 }),
+  null,
+  "a request clamped to a short screen teaches nothing"
+);
+assert.equal(
+  measureWindowFrame({ width: 640, height: 360 }, { width: 500, height: 300 }),
+  null,
+  "a width far from the request is a remembered size, not a frame"
+);
+assert.equal(
+  measureWindowFrame({ width: 640, height: 360 }, { width: Number.NaN, height: 300 }),
+  null,
+  "an unreadable size teaches nothing"
+);
+
+assert.deepEqual(parseWindowFrame(formatWindowFrame(MAC_FRAME)), MAC_FRAME, "a stored frame reads back");
+assert.deepEqual(parseWindowFrame("0x0"), { width: 0, height: 0 }, "a stored zero frame reads back");
+assert.equal(parseWindowFrame(null), null, "nothing stored is no frame");
+assert.equal(parseWindowFrame(""), null, "an empty value is no frame");
+assert.equal(parseWindowFrame("56"), null, "a malformed value is no frame");
+assert.equal(parseWindowFrame("-4x56"), null, "a negative value is no frame");
+assert.equal(parseWindowFrame("0x900"), null, "an implausible value is no frame");
+
+// -- Synced lyrics at open -----------------------------------------
+
+const flag = { videoId: "abc", synced: false };
+const known = { flag, currentVideoId: "abc", karaokeEnabled: true, videoMode: true };
+assert.equal(expectsSyncedLyrics(known), false, "a flag for this song is believed");
+assert.equal(
+  expectsSyncedLyrics({ ...known, flag: { videoId: "abc", synced: true } }),
+  true,
+  "a synced flag for this song is believed"
+);
+assert.equal(
+  expectsSyncedLyrics({ ...known, currentVideoId: "xyz" }),
+  true,
+  "regression: a flag from the previous song does not shrink the stage to the slot"
+);
+assert.equal(
+  expectsSyncedLyrics({ ...known, flag: { videoId: null, synced: false } }),
+  true,
+  "lyrics still loading assume the stage"
+);
+assert.equal(expectsSyncedLyrics({ ...known, flag: null }), true, "no flag yet assumes the stage");
+assert.equal(expectsSyncedLyrics({ ...known, currentVideoId: null }), true, "no current song yet assumes the stage");
+assert.equal(
+  expectsSyncedLyrics({ ...known, currentVideoId: "xyz", karaokeEnabled: false }),
+  false,
+  "an unknown song with karaoke off assumes nothing"
+);
+assert.equal(
+  expectsSyncedLyrics({ ...known, currentVideoId: "xyz", videoMode: false }),
+  false,
+  "an unknown song in song mode assumes nothing"
+);
+assert.equal(
+  expectsSyncedLyrics({ ...known, flag: { videoId: "abc", synced: true }, karaokeEnabled: false }),
+  true,
+  "a known flag is reported as is, the size decides what karaoke does with it"
+);
 
 console.log("windowSize self-check passed");
