@@ -1648,7 +1648,7 @@
     "description": "About page section heading"
   },
   "options_about_madeByBody": {
-    "message": "$BOIDU$ and $ADALIE$, with thanks to the translators and everyone in the Better Lyrics community who has tested it, reported bugs and submitted lyrics!",
+    "message": "$BOIDU$, $ADALIE$에게서, 번역자분들과 Better Lyrics 커뮤니티 내에서 테스트하고, 버그를 제보하고, 가사를 제출하신 모든 분들께 감사드립니다!",
     "description": "About page credits; the names become links",
     "placeholders": {
       "boidu": {
@@ -1770,7 +1770,7 @@
     }
   },
   "theme_author_prefix": {
-    "message": "By $AUTHOR$",
+    "message": "$AUTHOR$ 제작",
     "description": "Author prefix shown on theme selector button",
     "placeholders": {
       "author": {
@@ -1780,7 +1780,7 @@
     }
   },
   "theme_author_you": {
-    "message": "By you",
+    "message": "내가 제작",
     "description": "Author label for custom user themes on theme selector button"
   },
   "symlink_installFailed": {

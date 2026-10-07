@@ -27,7 +27,6 @@ interface UnisonResponse {
   voteCount: number;
   submitter?: SubmitterInfo;
   marks?: Mark[];
-  /** A property only passed if `x-api-key` header is also passed */
   userVote: 1 | -1 | null;
 }
 

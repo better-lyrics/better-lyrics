@@ -24,7 +24,8 @@
     "matches": [
       "https://unison.betterlyrics.org/*",
       "https://unison.boidu.dev/*",
-      "https://blrcunison.vercel.app/*"
+      "https://blrcunison.vercel.app/*",
+      "https://unison.prjktla.my.id/*"
     ]
   },
   "optional_permissions": [
@@ -61,7 +62,8 @@
       "matches": [
         "https://unison.betterlyrics.org/*",
         "https://unison.boidu.dev/*",
-        "https://blrcunison.vercel.app/*"
+        "https://blrcunison.vercel.app/*",
+        "https://unison.prjktla.my.id/*"
       ],
       "resources": [
         "pages/auth.html"

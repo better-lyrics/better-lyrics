@@ -222,6 +222,7 @@ export const UNISON_MAX_VIDEOS_PER_LYRIC = 20;
 export const ARTWORK_MIN_SIZE_PX = 1440;
 
 export const OFFSET_STORAGE_PREFIX = "blyricsOffset_";
+export const PROVIDER_PIN_STORAGE_PREFIX = "blyricsProviderPin_";
 
 export const PLAYER_BAR_SELECTOR = "ytmusic-player-bar" as const;
 export const AD_PLAYING_ATTR = "is-advertisement" as const;
