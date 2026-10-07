@@ -1389,14 +1389,30 @@ body {
   pointer-events: none;
 }
 
+/* The transport keeps to the space between the header and a lifted one-line plate, shrinking only
+   when a short window leaves less than its height. */
 .blyrics-pip-shell[data-layout="stage"] .blyrics-pip-artwork__controls {
-  --blyrics-pip-control-size: 36px;
+  --blyrics-pip-header-bottom: 50px;
+  --blyrics-pip-progress-height: 22px;
+  --blyrics-pip-transport-margin: 6px;
+  --blyrics-pip-plate-top: calc(
+    100vh - var(--blyrics-pip-progress-inset) - var(--blyrics-pip-progress-height) - var(--blyrics-pip-plate-gap) -
+      var(--blyrics-font-size) * var(--blyrics-pip-karaoke-text-scale, 1) * (var(--blyrics-line-height, 1.333) + 0.56)
+  );
+  --blyrics-pip-control-size: clamp(
+    20px,
+    (var(--blyrics-pip-plate-top) - var(--blyrics-pip-header-bottom) - 2 * var(--blyrics-pip-transport-margin)) / 1.25,
+    36px
+  );
+  --blyrics-pip-transport-y: min(
+    (100vh - var(--blyrics-pip-control-size) * 0.25) / 2,
+    var(--blyrics-pip-plate-top) - var(--blyrics-pip-transport-margin) - var(--blyrics-pip-control-size) * 0.625
+  );
 
   position: fixed;
   gap: 16px;
   justify-content: center;
-  /* Raises the transport a tenth of its height, clear of the plate. */
-  padding-bottom: calc(var(--blyrics-pip-control-size) * 0.25);
+  padding-bottom: max(0px, 100vh - 2 * var(--blyrics-pip-transport-y));
   border-radius: 0;
   background: linear-gradient(to bottom, rgb(0 0 0 / 55%), transparent 32%, transparent 62%, rgb(0 0 0 / 62%));
 }
@@ -1680,6 +1696,7 @@ body {
 
   /* The transport centres on the video, held below the header when the video is too short for both. */
   .blyrics-pip-shell[data-layout="stage"] .blyrics-pip-artwork__controls {
+    --blyrics-pip-control-size: 36px;
     --blyrics-pip-transport-y: max(var(--blyrics-pip-stage-height) / 2, 88px);
 
     padding-bottom: max(0px, 100vh - 2 * var(--blyrics-pip-transport-y));
