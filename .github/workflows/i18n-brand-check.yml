@@ -37,6 +37,10 @@ jobs:
       - name: Check product and brand names in translations
         run: node --experimental-strip-types tooling/check-i18n-brand.ts
 
+      - name: Check placeholders and empty messages in translations
+        if: ${{ !cancelled() }}
+        run: node --experimental-strip-types tooling/check-i18n-format.ts
+
   stale-check:
     if: github.event_name == 'workflow_dispatch' || github.event.pull_request.head.ref == 'chore/i18n'
     runs-on: ubuntu-latest
