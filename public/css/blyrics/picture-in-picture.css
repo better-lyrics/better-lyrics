@@ -168,13 +168,7 @@ body {
   transform: scale(1.4);
 }
 
-/* The motion cover sits above both faces rather than inside one: it is cleared
-   on a track change and steps aside while a music video face is in front.
-
-   Gecko composites the video in its own layer and ignores the container's overflow clip, so the
-   radius has to sit on the video itself. The mask is not decorative: it is what makes that rounded
-   corner survive compositing. Without it the corners are square on Firefox even with the radius
-   set. `inherit` keeps the video matched to the container however the radius was set. */
+/* Gecko ignores the overflow clip on composited video, so this radius and opaque mask are what round it. */
 .blyrics-pip-artwork__video {
   position: absolute;
   z-index: 3;
@@ -1389,8 +1383,7 @@ body {
   pointer-events: none;
 }
 
-/* The transport keeps to the space between the header and a lifted one-line plate, shrinking only
-   when a short window leaves less than its height. */
+/* Fits between the header and a lifted one-line plate, shrinking only in short windows. */
 .blyrics-pip-shell[data-layout="stage"] .blyrics-pip-artwork__controls {
   --blyrics-pip-header-bottom: 50px;
   --blyrics-pip-progress-height: 22px;
