@@ -9,14 +9,14 @@ import type { PictureInPictureViewDependencies } from "./types";
  */
 export function createPictureInPictureLyricsHost(
   view: PictureInPictureLyricsView,
-  dependencies: PictureInPictureViewDependencies
+  dependencies: PictureInPictureViewDependencies,
+  isStageShown: () => boolean
 ): LyricsRendererHost {
   return {
     /**
-     * The instance only exists while the window is open, and unlike the side panel a floating
-     * window is never behind another tab.
+     * A floating window is never behind another tab, but the stage covers these lyrics while it shows.
      */
-    isViewVisible: () => true,
+    isViewVisible: () => !isStageShown(),
     isLoaderActive: () => view.isLoaderActive(),
     /**
      * The window has no ad overlay of its own, so there is nothing to move into a state. It still

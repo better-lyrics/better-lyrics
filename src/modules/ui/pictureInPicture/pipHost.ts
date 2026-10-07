@@ -132,6 +132,7 @@ export function createPictureInPictureHost(
   let activeRenderer: LyricsRenderer | null = null;
   let activeStage: KaraokeStage | null = null;
   let isStageShown = false;
+  let isRescrollPending = false;
   let activeMirror: VideoMirror | null = null;
   let activeWindow: Window | null = null;
   let lyricsPayload: PictureInPictureLyricsPayload | null = null;
@@ -401,6 +402,8 @@ export function createPictureInPictureHost(
     });
     if (shown === isStageShown) return;
     isStageShown = shown;
+    // The scroll view sat out every tick under the stage, so it lands on the current line in one jump.
+    if (!shown) isRescrollPending = true;
     view.setStageActive(shown);
     activeStage?.setVisible(shown, relayoutStage);
   }
@@ -483,6 +486,12 @@ export function createPictureInPictureHost(
     };
     // First on the shared clock, so the stage is the view that sees a seek as a jump.
     if (isStageShown) activeStage?.tick(currentTime, tickOptions);
+    if (isRescrollPending) {
+      isRescrollPending = false;
+      measureLyrics();
+      renderer.tick(currentTime, { ...tickOptions, smoothScroll: false });
+      return;
+    }
     renderer.tick(currentTime, tickOptions);
   }
 
@@ -574,7 +583,7 @@ export function createPictureInPictureHost(
     activeRenderer = createLyricsRenderer({
       document: pipWindow.document,
       window: pipWindow,
-      host: createPictureInPictureLyricsHost(activeView, environment.view),
+      host: createPictureInPictureLyricsHost(activeView, environment.view, () => isStageShown),
     });
     // After the renderer, because the theme is applied through it, and before the build below,
     // which reads the settings that theme declares.
@@ -597,6 +606,7 @@ export function createPictureInPictureHost(
     activeStage?.destroy();
     activeStage = null;
     isStageShown = false;
+    isRescrollPending = false;
     activeRenderer?.destroy();
     activeRenderer = null;
     activeView = null;
