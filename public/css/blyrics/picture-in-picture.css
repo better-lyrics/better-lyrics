@@ -1303,6 +1303,8 @@ body {
 .blyrics-pip-shell[data-layout="stage"] {
   --blyrics-pip-stage-width: min(100vw, 100vh * (var(--blyrics-pip-video-aspect, 16 / 9)));
   --blyrics-pip-stage-height: min(100vh, 100vw / (var(--blyrics-pip-video-aspect, 16 / 9)));
+  --blyrics-pip-progress-inset: 12px;
+  --blyrics-pip-plate-gap: 12px;
 }
 
 .blyrics-pip-shell[data-layout="stage"] #blyrics-karaoke {
@@ -1311,6 +1313,17 @@ body {
   --blyrics-pip-karaoke-font-size: calc(var(--blyrics-font-size) * var(--blyrics-pip-karaoke-text-scale, 1));
   --blyrics-pip-karaoke-translated-font-size: calc(
     var(--blyrics-translated-font-size) * var(--blyrics-pip-karaoke-text-scale, 1)
+  );
+  --blyrics-pip-plate-overhang: calc(var(--blyrics-pip-karaoke-font-size) * 0.36);
+  --blyrics-pip-frame-bottom-gap: var(--blyrics-karaoke-frame-y);
+}
+
+/* The row is inset from the window's bottom, which can sit below the frame's, so the lift clears all of it. */
+.blyrics-pip-shell[data-layout="stage"] #blyrics-karaoke[data-bar] {
+  --blyrics-karaoke-lift: max(
+    0px,
+    var(--blyrics-karaoke-bar-height, 0px) + var(--blyrics-pip-progress-inset) + var(--blyrics-pip-plate-gap) +
+      var(--blyrics-pip-plate-overhang) - var(--blyrics-karaoke-floor) - var(--blyrics-pip-frame-bottom-gap)
   );
 }
 
@@ -1382,7 +1395,7 @@ body {
   position: fixed;
   z-index: 5;
   right: 16px;
-  bottom: 12px;
+  bottom: var(--blyrics-pip-progress-inset);
   left: 16px;
   width: auto;
   opacity: 1;
