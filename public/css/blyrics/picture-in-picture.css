@@ -1624,13 +1624,12 @@ body {
     object-position: top;
   }
 
+  /* The band under the video holds the subtitles; the current line settles on its middle. */
   .blyrics-pip-shell[data-layout="stage"] #blyrics-karaoke {
-    inset: var(--blyrics-pip-stage-height) var(--blyrics-karaoke-frame-x) 0;
-  }
+    --blyrics-karaoke-floor: max(7.5cqh, 50cqh - var(--blyrics-pip-karaoke-font-size) * 0.75);
+    --blyrics-pip-frame-bottom-gap: 0px;
 
-  /* The progress bar sits on the video, above the frame, so the plate has nothing to clear. */
-  .blyrics-pip-shell[data-layout="stage"] #blyrics-karaoke[data-bar] {
-    --blyrics-karaoke-lift: 0px;
+    inset: var(--blyrics-pip-stage-height) 0 0;
   }
 
   .blyrics-pip-shell[data-layout="stage"] #blyrics-karaoke .blyrics-karaoke__plate {
@@ -1640,15 +1639,11 @@ body {
     backdrop-filter: none;
   }
 
+  /* The transport centres on the video, held below the header when the video is too short for both. */
   .blyrics-pip-shell[data-layout="stage"] .blyrics-pip-artwork__controls {
-    bottom: auto;
-    height: var(--blyrics-pip-stage-height);
-    padding-bottom: 0;
-  }
+    --blyrics-pip-transport-y: max(var(--blyrics-pip-stage-height) / 2, 88px);
 
-  .blyrics-pip-shell[data-layout="stage"] .blyrics-pip-progress {
-    top: calc(var(--blyrics-pip-stage-height) - 30px);
-    bottom: auto;
+    padding-bottom: max(0px, 100vh - 2 * var(--blyrics-pip-transport-y));
   }
 }
 
