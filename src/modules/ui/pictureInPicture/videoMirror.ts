@@ -1,10 +1,13 @@
 import { AD_PLAYING_ATTR, PLAYER_BAR_SELECTOR } from "@constants";
 import type { LogSink } from "@core/logger";
-import { isAdPlaying } from "@modules/ui/playerControls/playerBarControls";
+import {
+  getPlayerPage,
+  getPlayerVideo,
+  isAdPlaying,
+  isVideoModeShown,
+  VIDEO_MODE_ATTR,
+} from "@modules/ui/playerControls/playerBarControls";
 import { pickVideoTrack, type VideoMirrorState, videoMirrorState } from "./videoMirrorState";
-
-const PLAYER_VIDEO_SELECTOR = "#movie_player video";
-const PLAYER_PAGE_SELECTOR = "ytmusic-player-page";
 
 interface VideoMirrorOptions {
   readonly sourceDocument: Document;
@@ -39,9 +42,8 @@ export function createVideoMirror({
   let hasLoggedUnsupported = false;
   const lifecycle = new AbortController();
 
-  const findPlayer = (): CapturableVideo | null => sourceDocument.querySelector<CapturableVideo>(PLAYER_VIDEO_SELECTOR);
-  const readVideoMode = (): boolean =>
-    sourceDocument.querySelector(PLAYER_PAGE_SELECTOR)?.hasAttribute("video-mode") ?? false;
+  const findPlayer = (): CapturableVideo | null => getPlayerVideo<CapturableVideo>(sourceDocument);
+  const readVideoMode = (): boolean => isVideoModeShown(sourceDocument);
   let lastVideoMode = readVideoMode();
 
   function stopCapture(): void {
@@ -107,8 +109,8 @@ export function createVideoMirror({
   }
 
   const observer = new MutationObserver(sync);
-  const playerPage = sourceDocument.querySelector(PLAYER_PAGE_SELECTOR);
-  if (playerPage) observer.observe(playerPage, { attributes: true, attributeFilter: ["video-mode"] });
+  const playerPage = getPlayerPage(sourceDocument);
+  if (playerPage) observer.observe(playerPage, { attributes: true, attributeFilter: [VIDEO_MODE_ATTR] });
   const playerBar = sourceDocument.querySelector(PLAYER_BAR_SELECTOR);
   if (playerBar) observer.observe(playerBar, { attributes: true, attributeFilter: [AD_PLAYING_ATTR] });
 

@@ -26,6 +26,9 @@ const BYLINE = `${PLAYER_BAR_SELECTOR} yt-formatted-string.byline`;
 const LIKE_BUTTON = `${PLAYER_BAR_SELECTOR} #button-shape-like button`;
 const DISLIKE_BUTTON = `${PLAYER_BAR_SELECTOR} #button-shape-dislike button`;
 const ACTION_MENU_TRIGGER = `${PLAYER_BAR_SELECTOR} ytmusic-menu-renderer [aria-label="Action menu"]`;
+const PLAYER_PAGE = "ytmusic-player-page";
+const PLAYER_VIDEO = "#movie_player video";
+export const VIDEO_MODE_ATTR = "video-mode";
 const AV_TOGGLE = "#av-id > ytmusic-av-toggle";
 const AV_HAS_VIDEO_ATTR = "selected-item-has-video";
 const AV_DISABLED_ATTR = "toggle-disabled";
@@ -132,6 +135,18 @@ export function isAdPlaying(doc: Document): boolean {
 }
 
 // -- Song and video toggle --------------------------
+
+export function getPlayerPage(doc: Document): Element | null {
+  return doc.querySelector(PLAYER_PAGE);
+}
+
+export function getPlayerVideo<TVideo extends HTMLVideoElement = HTMLVideoElement>(doc: Document): TVideo | null {
+  return doc.querySelector<TVideo>(PLAYER_VIDEO);
+}
+
+export function isVideoModeShown(doc: Document): boolean {
+  return getPlayerPage(doc)?.hasAttribute(VIDEO_MODE_ATTR) ?? false;
+}
 
 export function getSelectedPlaybackMode(doc: Document): PlaybackMode | null {
   const toggle = doc.querySelector(AV_TOGGLE);

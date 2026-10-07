@@ -32,6 +32,7 @@ import {
 import type { PictureInPicturePlaybackSnapshot, PictureInPictureViewDependencies } from "./types";
 import type { VideoMirrorState } from "./videoMirrorState";
 import { planVideoSwap } from "./videoSwapPlan";
+import type { WindowSize } from "./windowSize";
 
 interface DisplayMetadata {
   readonly title: string;
@@ -50,7 +51,7 @@ interface HeaderRow {
 }
 
 type PlayerControlAction = "previous" | "play-pause" | "next";
-type PlayerControlIcon = Exclude<PlayerControlAction, "play-pause"> | "play" | "pause";
+type PlayerControlIcon = Exclude<PlayerControlAction, "play-pause"> | "play" | "pause" | "fit";
 
 const PLAYBACK_MODES: readonly PlaybackMode[] = ["song", "video"];
 const PLAYBACK_MODE_LABEL_KEYS: Record<PlaybackMode, string> = {
@@ -324,7 +325,8 @@ export class PictureInPictureLyricsView {
   constructor(
     private readonly pipWindow: Window,
     private readonly sourceDocument: Document,
-    private readonly dependencies: PictureInPictureViewDependencies
+    private readonly dependencies: PictureInPictureViewDependencies,
+    private readonly contentSize: () => WindowSize
   ) {
     const pipDocument = pipWindow.document;
 
@@ -396,7 +398,7 @@ export class PictureInPictureLyricsView {
     this.modeToggle.append(songButton, videoButton);
     const artworkChrome = pipDocument.createElement("div");
     artworkChrome.className = "blyrics-pip-artwork__chrome";
-    artworkChrome.append(this.modeToggle);
+    artworkChrome.append(this.modeToggle, this.createFitButton());
     artworkControls.append(previousButton, this.playPauseButton, nextButton, artworkChrome);
     this.artworkContainer.append(artworkCard, this.artworkVideo, artworkControls);
 
@@ -785,6 +787,28 @@ export class PictureInPictureLyricsView {
     attachTransportAnimation(button, action);
     return button;
   }
+
+  private createFitButton(): HTMLButtonElement {
+    const button = this.pipWindow.document.createElement("button");
+    const label = this.dependencies.translate("picture_in_picture_fit");
+    button.type = "button";
+    button.className = "blyrics-pip-artwork__control blyrics-pip-artwork__control--fit";
+    button.setAttribute("aria-label", label);
+    button.title = label;
+    button.appendChild(createControlIcon(this.pipWindow.document, "fit"));
+    button.addEventListener("click", this.fitToContent, { signal: this.lifecycleController.signal });
+    return button;
+  }
+
+  private readonly fitToContent = (): void => {
+    const win = this.pipWindow;
+    const { width, height } = this.contentSize();
+    try {
+      win.resizeTo(width + win.outerWidth - win.innerWidth, height + win.outerHeight - win.innerHeight);
+    } catch (error) {
+      this.dependencies.log("floating window resize was refused", error);
+    }
+  };
 
   private createModeButton(mode: PlaybackMode): HTMLButtonElement {
     const button = this.pipWindow.document.createElement("button");

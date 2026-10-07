@@ -11,11 +11,12 @@ import { getStorage } from "@core/storage";
 import { getArtworkMetadata } from "@modules/lyrics/requestSniffer/requestSniffer";
 import { resumeAllAutoscroll } from "@braccato/core";
 import { onSignal, sendInit, sendMetadata } from "./bridge";
-import { createGatedToggle, DEFAULT_WINDOW_LAYOUT } from "./controller";
+import { createGatedToggle } from "./controller";
 import { AD_UP_NEXT_SLOT } from "./intermissionText";
 import { publishPictureInPictureLyrics } from "./lyricsPublisher";
 import { DEFAULT_ARTWORK_TRANSITION, DEFAULT_TEXT_TRANSITION } from "./lyricsView";
 import { createPictureInPictureHost } from "./pipHost";
+import { DEFAULT_WINDOW_LAYOUT } from "./windowSize";
 import type { PictureInPictureToggle, PictureInPictureViewDependencies } from "./types";
 import { type LogSink, logCore, logError } from "@core/logger";
 import { KARAOKE_DEFAULTS } from "@modules/karaoke/defaults";
@@ -34,6 +35,7 @@ const PIP_STRING_KEYS = [
   "picture_in_picture_adUpNext",
   "unison_song",
   "options_display_videoTab",
+  "picture_in_picture_fit",
 ] as const;
 let hasInitializedAutoRestore = false;
 let hasAttemptedAutoRestore = false;
@@ -159,6 +161,7 @@ function createPageWorldDelegate(): PictureInPictureToggle {
       );
     } else if (signal.type === "ready") {
       publishPictureInPictureResources();
+      publishPictureInPictureLyrics();
     }
   });
 

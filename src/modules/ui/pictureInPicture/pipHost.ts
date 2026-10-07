@@ -5,13 +5,14 @@ import { createLyricsRenderer, type Lyric, type LyricsRenderer } from "@braccato
 import { VIDEO_QUALITY_BOOST_EVENT } from "@modules/settings/videoQuality";
 import { shouldShowWindowStage } from "@modules/karaoke/gate";
 import { createKaraokeStage, type KaraokeStage } from "@modules/karaoke/stage";
-import { isAdPlaying } from "@modules/ui/playerControls/playerBarControls";
-import { onLyrics, type PictureInPictureLyricsPayload } from "./bridge";
+import { getPlayerVideo, isAdPlaying, isVideoModeShown } from "@modules/ui/playerControls/playerBarControls";
+import { onLyrics, onLyricsSynced, type PictureInPictureLyricsPayload } from "./bridge";
 import { PictureInPictureController } from "./controller";
 import { PictureInPictureLyricsView } from "./lyricsView";
 import { createPictureInPictureLyricsHost } from "./pipLyricsHost";
 import type { PictureInPictureHostEnvironment } from "./types";
 import { createVideoMirror, type VideoMirror } from "./videoMirror";
+import { fitWindowSize, type WindowSize } from "./windowSize";
 
 const PIP_OPEN_ATTRIBUTE = "blyrics-pip-open";
 const FOOTER_SOURCE_LINK_ID = "betterLyricsFooterLink";
@@ -124,6 +125,21 @@ export function createPictureInPictureHost(
   let syncFrame: number | null = null;
   let styleObserver: MutationObserver | null = null;
   let isQualityBoosted = false;
+  let hasSyncedLyrics = false;
+
+  function contentWindowSize(): WindowSize {
+    const video = getPlayerVideo(document);
+    return fitWindowSize({
+      layout: environment.windowLayout(),
+      videoEnabled: environment.videoEnabled() !== false,
+      videoMode: isVideoModeShown(document),
+      adPlaying: isAdPlaying(document),
+      videoWidth: video?.videoWidth ?? 0,
+      videoHeight: video?.videoHeight ?? 0,
+      karaokeEnabled: environment.karaokeEnabled() !== false,
+      syncedLyrics: hasSyncedLyrics,
+    });
+  }
 
   function setQualityBoost(next: boolean): void {
     if (next === isQualityBoosted) return;
@@ -405,6 +421,10 @@ export function createPictureInPictureHost(
 
   // Subscribed once rather than per window: the opener publishes the current lyrics as soon as it is
   // told the window opened, which is before the view that renders them exists.
+  const unsubscribeLyricsSynced = onLyricsSynced(synced => {
+    hasSyncedLyrics = synced;
+  });
+
   const unsubscribeLyrics = onLyrics(payload => {
     lyricsPayload = payload;
     // An offset nudge republishes the same lines. Rebuilding on one would throw away the DOM the
@@ -430,7 +450,7 @@ export function createPictureInPictureHost(
     pipWindow.document.title = environment.windowTitle();
     registerAnimatableProperties(pipWindow);
     injectLyricStyles(pipWindow);
-    activeView = new PictureInPictureLyricsView(pipWindow, document, environment.view);
+    activeView = new PictureInPictureLyricsView(pipWindow, document, environment.view, contentWindowSize);
     const view = activeView;
     activeMirror = createVideoMirror({
       sourceDocument: document,
@@ -495,7 +515,7 @@ export function createPictureInPictureHost(
 
   return new PictureInPictureController<Window>({
     host: window,
-    windowLayout: environment.windowLayout,
+    windowSize: contentWindowSize,
     loadStylesheet: environment.loadStylesheet,
     renderLoadingShell,
     injectStylesheet: (pipWindow, stylesheet) => {
@@ -518,6 +538,9 @@ export function createPictureInPictureHost(
         { once: true }
       ),
     reportFailure: environment.reportFailure,
-    dispose: unsubscribeLyrics,
+    dispose: () => {
+      unsubscribeLyrics();
+      unsubscribeLyricsSynced();
+    },
   });
 }

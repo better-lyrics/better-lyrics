@@ -1,3 +1,5 @@
+import type { WindowSize } from "./windowSize";
+
 export interface DocumentPictureInPictureWindowOptions {
   readonly width: number;
   readonly height: number;
@@ -81,7 +83,7 @@ export interface PictureInPictureHostEnvironment {
 
 export interface PictureInPictureControllerDependencies<TWindow> {
   readonly host: object;
-  readonly windowLayout: () => unknown;
+  readonly windowSize: () => WindowSize;
   readonly loadStylesheet: () => Promise<string>;
   readonly renderLoadingShell: (pipWindow: TWindow) => void;
   readonly injectStylesheet: (pipWindow: TWindow, stylesheet: string) => void;

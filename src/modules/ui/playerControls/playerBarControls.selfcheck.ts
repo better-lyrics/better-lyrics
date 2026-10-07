@@ -3,6 +3,7 @@ import {
   canSwitchPlaybackMode,
   getRatingState,
   getSelectedPlaybackMode,
+  isVideoModeShown,
   isAdPlaying,
   type RatingState,
   seekTo,
@@ -131,5 +132,16 @@ assert.equal(switchPlaybackMode(noVideo.doc, "video"), false, "a track without a
 assert.equal(getSelectedPlaybackMode(fakeDoc({})), null, "no mode without the toggle");
 assert.equal(canSwitchPlaybackMode(fakeDoc({})), false, "no switching without the toggle");
 assert.equal(switchPlaybackMode(fakeDoc({}), "video"), false, "no switch without the toggle");
+
+assert.equal(isVideoModeShown(fakeDoc({ "ytmusic-player-page": el({ "video-mode": "" }) })), true, "reads video-mode");
+assert.equal(isVideoModeShown(fakeDoc({ "ytmusic-player-page": el({}) })), false, "song mode without video-mode");
+assert.equal(isVideoModeShown(fakeDoc({})), false, "no player page is song mode");
+assert.equal(
+  isVideoModeShown(
+    fakeDoc({ "ytmusic-player-page": el({}), [AV_TOGGLE]: el({ "is-video-playback-mode-selected": "true" }) })
+  ),
+  false,
+  "regression: the toggle's selection never stands in for a video on screen"
+);
 
 console.log("playerBarControls selfcheck passed");

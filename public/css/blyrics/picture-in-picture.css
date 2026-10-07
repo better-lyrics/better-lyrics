@@ -327,7 +327,7 @@ body {
   background: #fff;
 }
 
-/* -- Window chrome: song and video toggle ----------------------------------- */
+/* -- Window chrome: song and video toggle, fit ------------------------------ */
 .blyrics-pip-artwork__controls:has(:focus-visible) {
   opacity: 1;
   pointer-events: auto;
@@ -390,6 +390,17 @@ body {
 .blyrics-pip-mode-toggle__option:focus-visible {
   outline: 2px solid #fff;
   outline-offset: 1px;
+}
+
+.blyrics-pip-artwork__control:focus-visible {
+  outline: 2px solid #fff;
+  outline-offset: 1px;
+}
+
+.blyrics-pip-artwork__control--fit {
+  --blyrics-pip-control-size: 28px;
+
+  margin-left: auto;
 }
 
 .blyrics-pip-artwork__control-icon {

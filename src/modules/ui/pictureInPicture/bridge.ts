@@ -7,6 +7,7 @@ const PIP_INIT_EVENT = "blyrics-pip-init" as const;
 const PIP_SIGNAL_EVENT = "blyrics-pip-signal" as const;
 const PIP_METADATA_EVENT = "blyrics-pip-metadata" as const;
 const PIP_LYRICS_EVENT = "blyrics-pip-lyrics" as const;
+const PIP_LYRICS_SYNCED_EVENT = "blyrics-pip-lyrics-synced" as const;
 
 export interface PictureInPictureInitPayload {
   readonly strings: Record<string, string>;
@@ -108,3 +109,7 @@ export const onMetadata = (handler: (payload: PictureInPictureMetadataPayload) =
 export const sendLyrics = (payload: PictureInPictureLyricsPayload): void => send(PIP_LYRICS_EVENT, payload);
 export const onLyrics = (handler: (payload: PictureInPictureLyricsPayload) => void): (() => void) =>
   subscribe(PIP_LYRICS_EVENT, handler);
+
+export const sendLyricsSynced = (synced: boolean): void => send(PIP_LYRICS_SYNCED_EVENT, synced);
+export const onLyricsSynced = (handler: (synced: boolean) => void): (() => void) =>
+  subscribe(PIP_LYRICS_SYNCED_EVENT, handler);
