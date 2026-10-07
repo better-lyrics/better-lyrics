@@ -1214,7 +1214,7 @@
     "description": "Empty installed themes message"
   },
   "marketplace_lastUpdatedOn": {
-    "message": "最後更新於 {date}  ",
+    "message": "最後更新於 $date$",
     "description": "Tooltip showing full date when a theme was last updated",
     "placeholders": {
       "date": {
@@ -2356,7 +2356,7 @@
     "description": "Report lyrics on a reporting process"
   },
   "report_lyrics_success": {
-    "message": "",
+    "message": "Thanks for the heads up! We'll take a look soon.",
     "description": "Shown after a lyrics report is successfully submitted"
   },
   "report_lyrics_already": {
