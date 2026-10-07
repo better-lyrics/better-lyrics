@@ -2,7 +2,15 @@ import { PLAYER_BAR_SELECTOR, PLAYER_TIME_EVENT, SEEK_EVENT } from "@constants";
 import { parseSvgString } from "@modules/ui/lyricsDock/icons";
 import { attachTransportAnimation } from "@modules/ui/playerControls/controlAnimations";
 import { playerControlIcons } from "@modules/ui/playerControls/icons";
-import { sendTransport } from "@modules/ui/playerControls/playerBarControls";
+import {
+  canSwitchPlaybackMode,
+  getSelectedPlaybackMode,
+  observePlaybackMode,
+  type PlaybackMode,
+  type PlaybackModeObserver,
+  sendTransport,
+  switchPlaybackMode,
+} from "@modules/ui/playerControls/playerBarControls";
 import { createProgressBar, type ProgressBarHandle } from "@modules/ui/playerControls/progressBar";
 import { cssTimeMs } from "@/ui/motion";
 import type { KaraokeOverlayBar } from "@modules/karaoke/overlay";
@@ -43,6 +51,12 @@ interface HeaderRow {
 
 type PlayerControlAction = "previous" | "play-pause" | "next";
 type PlayerControlIcon = Exclude<PlayerControlAction, "play-pause"> | "play" | "pause";
+
+const PLAYBACK_MODES: readonly PlaybackMode[] = ["song", "video"];
+const PLAYBACK_MODE_LABEL_KEYS: Record<PlaybackMode, string> = {
+  song: "unison_song",
+  video: "options_display_videoTab",
+};
 
 const ARTWORK_SIZE = 512;
 const VISIBLE_METADATA_CHECK_INTERVAL = 250;
@@ -252,6 +266,9 @@ export class PictureInPictureLyricsView {
   private readonly faceTracks: [MediaStreamTrack | null, MediaStreamTrack | null] = [null, null];
   private readonly artworkVideo: HTMLVideoElement;
   private readonly playPauseButton: HTMLButtonElement;
+  private readonly modeToggle: HTMLElement;
+  private readonly modeButtons: Record<PlaybackMode, HTMLButtonElement>;
+  private readonly modeObserver: PlaybackModeObserver;
   private readonly headerRows: readonly [HeaderRow, HeaderRow];
   private readonly marquee: PictureInPictureHeaderMarquee;
   private readonly reducedMotionQuery: MediaQueryList;
@@ -370,7 +387,17 @@ export class PictureInPictureLyricsView {
       dependencies.translate("picture_in_picture_play")
     );
     const nextButton = this.createPlayerControlButton("next", dependencies.translate("picture_in_picture_next"));
-    artworkControls.append(previousButton, this.playPauseButton, nextButton);
+    this.modeToggle = pipDocument.createElement("div");
+    this.modeToggle.className = "blyrics-pip-mode-toggle";
+    this.modeToggle.setAttribute("role", "group");
+    this.modeToggle.hidden = true;
+    const [songButton, videoButton] = PLAYBACK_MODES.map(mode => this.createModeButton(mode));
+    this.modeButtons = { song: songButton, video: videoButton };
+    this.modeToggle.append(songButton, videoButton);
+    const artworkChrome = pipDocument.createElement("div");
+    artworkChrome.className = "blyrics-pip-artwork__chrome";
+    artworkChrome.append(this.modeToggle);
+    artworkControls.append(previousButton, this.playPauseButton, nextButton, artworkChrome);
     this.artworkContainer.append(artworkCard, this.artworkVideo, artworkControls);
 
     const content = pipDocument.createElement("section");
@@ -458,6 +485,7 @@ export class PictureInPictureLyricsView {
       signal: this.lifecycleController.signal,
     });
     pipWindow.addEventListener("pagehide", this.destroy, { once: true });
+    this.modeObserver = observePlaybackMode(sourceDocument, this.syncModeToggle);
   }
 
   /**
@@ -678,6 +706,7 @@ export class PictureInPictureLyricsView {
         this.lastTrackChangeTime = this.pipWindow.performance.now();
       }
       this.showSong(detail, isModeSwitch);
+      this.modeObserver.refresh();
       if (this.holdTimer !== null) this.expireHold();
       this.checkModeSwitchSettled();
     }
@@ -717,6 +746,7 @@ export class PictureInPictureLyricsView {
 
   private readonly destroy = (): void => {
     this.lifecycleController.abort();
+    this.modeObserver.disconnect();
     this.artworkController?.abort();
     this.clearArtworkStaleTimer();
     this.endModeSwitch();
@@ -755,6 +785,26 @@ export class PictureInPictureLyricsView {
     attachTransportAnimation(button, action);
     return button;
   }
+
+  private createModeButton(mode: PlaybackMode): HTMLButtonElement {
+    const button = this.pipWindow.document.createElement("button");
+    button.type = "button";
+    button.className = "blyrics-pip-mode-toggle__option";
+    button.textContent = this.dependencies.translate(PLAYBACK_MODE_LABEL_KEYS[mode]);
+    button.setAttribute("aria-pressed", "false");
+    button.addEventListener("click", () => switchPlaybackMode(this.sourceDocument, mode), {
+      signal: this.lifecycleController.signal,
+    });
+    return button;
+  }
+
+  private readonly syncModeToggle = (): void => {
+    const selected = getSelectedPlaybackMode(this.sourceDocument);
+    this.modeToggle.hidden = selected === null || !canSwitchPlaybackMode(this.sourceDocument);
+    for (const mode of PLAYBACK_MODES) {
+      this.modeButtons[mode].setAttribute("aria-pressed", String(mode === selected));
+    }
+  };
 
   private activatePlayerControl(action: PlayerControlAction): void {
     sendTransport(this.sourceDocument, action);
