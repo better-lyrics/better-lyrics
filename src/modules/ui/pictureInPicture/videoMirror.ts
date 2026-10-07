@@ -37,6 +37,7 @@ export function createVideoMirror(options: VideoMirrorOptions): VideoMirror {
   let lastEnabled = isEnabled();
   let hasLoggedUnsupported = false;
   let attachment: AbortController | null = null;
+  let attachedEnabled = false;
 
   const findPlayer = (): CapturableVideo | null => getPlayerVideo<CapturableVideo>(sourceDocument);
   const readVideoMode = (): boolean => isVideoModeShown(sourceDocument);
@@ -52,14 +53,18 @@ export function createVideoMirror(options: VideoMirrorOptions): VideoMirror {
 
   function attach(): void {
     const next = findPlayer();
-    if (next === player && stream) return;
+    const enabled = isEnabled();
+    if (next === player && enabled === attachedEnabled && stream) return;
     stopCapture();
     player = next;
+    attachedEnabled = enabled;
     if (!player) return;
     attachment = new AbortController();
     const { signal } = attachment;
     // Ahead of the capture, so a source that could not be captured is retried on the next one.
     player.addEventListener("loadstart", reattach, { signal });
+    if (!enabled) return;
+    // Firefox before 149 only has mozCaptureStream, which takes the player's audio off the speakers for good.
     if (typeof player.captureStream !== "function") {
       if (!hasLoggedUnsupported) options.log("captureStream unavailable, floating window keeps the artwork");
       hasLoggedUnsupported = true;
@@ -89,7 +94,7 @@ export function createVideoMirror(options: VideoMirrorOptions): VideoMirror {
   }
 
   function sync(): void {
-    if (findPlayer() !== player) attach();
+    if (findPlayer() !== player || isEnabled() !== attachedEnabled) attach();
     const newest = stream ? pickVideoTrack(stream.getTracks()) : null;
     for (const track of stream?.getTracks() ?? []) {
       if (track !== newest) {
