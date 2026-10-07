@@ -426,7 +426,7 @@
     "description": "Your identity label"
   },
   "options_identity_unisonStats": {
-    "message": "ユニゾン統計",
+    "message": "Unison統計",
     "description": "Section title above the user's own Unison level, tier, rank and badges on the Identity tab"
   },
   "options_identity_loading": {
