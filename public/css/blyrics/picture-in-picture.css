@@ -1334,6 +1334,41 @@ body {
   --blyrics-translated-font-size: var(--blyrics-pip-karaoke-translated-font-size) !important;
 }
 
+.blyrics-pip-shell[data-layout="stage"] #blyrics-karaoke {
+  overflow-wrap: anywhere;
+}
+
+/* The card's secondary rows are fractions of its size, so it keeps a floor of its own. */
+.blyrics-pip-shell[data-layout="stage"] #blyrics-karaoke .blyrics-karaoke__title {
+  font-size: max(var(--blyrics-font-size) * 0.7, 16px);
+}
+
+.blyrics-pip-shell[data-layout="stage"] #blyrics-karaoke .blyrics-karaoke__card-title {
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+.blyrics-pip-shell[data-layout="stage"] #blyrics-karaoke .blyrics-karaoke__card-artist {
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.blyrics-pip-shell[data-layout="stage"] #blyrics-karaoke .blyrics-karaoke__card-credit {
+  max-width: 100%;
+}
+
+.blyrics-pip-shell[data-layout="stage"] #blyrics-karaoke .blyrics-credits {
+  --blyrics-credits-font-size: max(0.58em, 12px);
+}
+
+.blyrics-pip-shell[data-layout="stage"] #blyrics-karaoke .blyrics-karaoke-source {
+  font-size: max(0.44em, 11px);
+}
+
 /* A perspective would make the slot the containing block of the fixed hover chrome. */
 .blyrics-pip-shell[data-layout="stage"] .blyrics-pip-artwork {
   box-shadow: none;
