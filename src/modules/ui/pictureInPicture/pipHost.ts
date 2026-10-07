@@ -552,7 +552,9 @@ export function createPictureInPictureHost(
       onChange: (state, track) => view.setVideo(state, track),
       onModeFlip: expectsVideo => view.noteModeFlip(expectsVideo),
       onQualityBoost: setQualityBoost,
-      log: environment.view.log,
+      get log() {
+        return environment.view.log;
+      },
     });
     activeStage = createKaraokeStage({
       doc: pipWindow.document,

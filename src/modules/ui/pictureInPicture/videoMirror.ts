@@ -27,14 +27,8 @@ export interface VideoMirror {
 
 type CapturableVideo = HTMLVideoElement & { captureStream?: () => MediaStream };
 
-export function createVideoMirror({
-  sourceDocument,
-  isEnabled,
-  onChange,
-  onModeFlip,
-  onQualityBoost,
-  log,
-}: VideoMirrorOptions): VideoMirror {
+export function createVideoMirror(options: VideoMirrorOptions): VideoMirror {
+  const { sourceDocument, isEnabled, onChange, onModeFlip, onQualityBoost } = options;
   let player: CapturableVideo | null = null;
   let stream: MediaStream | null = null;
   let mirrored: MediaStreamTrack | null = null;
@@ -42,13 +36,15 @@ export function createVideoMirror({
   let published: MediaStreamTrack | null = null;
   let lastEnabled = isEnabled();
   let hasLoggedUnsupported = false;
-  const lifecycle = new AbortController();
+  let attachment: AbortController | null = null;
 
   const findPlayer = (): CapturableVideo | null => getPlayerVideo<CapturableVideo>(sourceDocument);
   const readVideoMode = (): boolean => isVideoModeShown(sourceDocument);
   let lastVideoMode = readVideoMode();
 
   function stopCapture(): void {
+    attachment?.abort();
+    attachment = null;
     for (const track of stream?.getTracks() ?? []) track.stop();
     stream = null;
     mirrored = null;
@@ -60,21 +56,29 @@ export function createVideoMirror({
     stopCapture();
     player = next;
     if (!player) return;
+    attachment = new AbortController();
+    const { signal } = attachment;
+    // Ahead of the capture, so a source that could not be captured is retried on the next one.
+    player.addEventListener("loadstart", reattach, { signal });
     if (typeof player.captureStream !== "function") {
-      if (!hasLoggedUnsupported) log("captureStream unavailable, floating window keeps the artwork");
+      if (!hasLoggedUnsupported) options.log("captureStream unavailable, floating window keeps the artwork");
       hasLoggedUnsupported = true;
       return;
     }
     try {
       stream = player.captureStream();
     } catch (error) {
-      log("captureStream failed", error);
+      options.log("captureStream failed", error);
       stream = null;
       return;
     }
-    stream.addEventListener("addtrack", sync, { signal: lifecycle.signal });
-    stream.addEventListener("removetrack", sync, { signal: lifecycle.signal });
-    player.addEventListener("loadstart", attach, { signal: lifecycle.signal });
+    stream.addEventListener("addtrack", sync, { signal });
+    stream.addEventListener("removetrack", sync, { signal });
+  }
+
+  function reattach(): void {
+    attach();
+    sync();
   }
 
   function publish(next: VideoMirrorState): void {
@@ -133,7 +137,6 @@ export function createVideoMirror({
       if (isEnabled() !== lastEnabled) sync();
     },
     destroy(): void {
-      lifecycle.abort();
       observer.disconnect();
       stopCapture();
     },
