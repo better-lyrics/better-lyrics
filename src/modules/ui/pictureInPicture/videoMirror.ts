@@ -7,13 +7,14 @@ import {
   isVideoModeShown,
   VIDEO_MODE_ATTR,
 } from "@modules/ui/playerControls/playerBarControls";
-import { pickVideoTrack, type VideoMirrorState, videoMirrorState } from "./videoMirrorState";
+import { pickVideoTrack, type VideoMirrorState, videoMirrorState, wantsQualityBoost } from "./videoMirrorState";
 
 interface VideoMirrorOptions {
   readonly sourceDocument: Document;
   readonly isEnabled: () => boolean;
   readonly onChange: (state: VideoMirrorState, track: MediaStreamTrack | null) => void;
   readonly onModeFlip: (expectsVideo: boolean) => void;
+  readonly onQualityBoost: (wanted: boolean) => void;
   readonly log: LogSink;
 }
 
@@ -31,6 +32,7 @@ export function createVideoMirror({
   isEnabled,
   onChange,
   onModeFlip,
+  onQualityBoost,
   log,
 }: VideoMirrorOptions): VideoMirror {
   let player: CapturableVideo | null = null;
@@ -106,6 +108,7 @@ export function createVideoMirror({
       hasVideoTrack: newest !== null && newest.readyState === "live",
     });
     publish(next);
+    onQualityBoost(wantsQualityBoost({ enabled: lastEnabled, videoMode, state: next }));
   }
 
   const observer = new MutationObserver(sync);

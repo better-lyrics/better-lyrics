@@ -1,5 +1,5 @@
 import { strict as assert } from "node:assert";
-import { pickVideoTrack, type VideoMirrorInputs, videoMirrorState } from "./videoMirrorState";
+import { pickVideoTrack, type VideoMirrorInputs, videoMirrorState, wantsQualityBoost } from "./videoMirrorState";
 
 const playing: VideoMirrorInputs = { enabled: true, videoMode: true, adPlaying: false, hasVideoTrack: true };
 
@@ -11,6 +11,13 @@ assert.equal(videoMirrorState({ ...playing, adPlaying: true }), "ad", "ad wins o
 assert.equal(videoMirrorState({ ...playing, adPlaying: true, videoMode: false }), "ad", "ad in song mode");
 assert.equal(videoMirrorState({ ...playing, adPlaying: true, hasVideoTrack: false }), "ad", "ad before a track");
 assert.equal(videoMirrorState({ ...playing, adPlaying: true, enabled: false }), "off", "setting off hides ads too");
+
+assert.equal(wantsQualityBoost({ enabled: true, videoMode: true, state: "on" }), true, "video showing");
+assert.equal(wantsQualityBoost({ enabled: true, videoMode: true, state: "off" }), true, "gap between songs");
+assert.equal(wantsQualityBoost({ enabled: true, videoMode: false, state: "off" }), false, "song mode");
+assert.equal(wantsQualityBoost({ enabled: false, videoMode: true, state: "off" }), false, "setting off");
+assert.equal(wantsQualityBoost({ enabled: true, videoMode: true, state: "ad" }), true, "ad in video mode");
+assert.equal(wantsQualityBoost({ enabled: true, videoMode: false, state: "ad" }), true, "ad in song mode");
 
 const audio = { kind: "audio" };
 const videoA = { kind: "video" };

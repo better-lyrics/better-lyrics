@@ -549,12 +549,9 @@ export function createPictureInPictureHost(
     activeMirror = createVideoMirror({
       sourceDocument: document,
       isEnabled: () => environment.videoEnabled() !== false,
-      onChange: (state, track) => {
-        // Track gaps between songs must not flip the quality, or each new song restarts its buffer.
-        setQualityBoost(state !== "off" || (environment.videoEnabled() !== false && isVideoModeShown(document)));
-        view.setVideo(state, track);
-      },
+      onChange: (state, track) => view.setVideo(state, track),
       onModeFlip: expectsVideo => view.noteModeFlip(expectsVideo),
+      onQualityBoost: setQualityBoost,
       log: environment.view.log,
     });
     activeStage = createKaraokeStage({
