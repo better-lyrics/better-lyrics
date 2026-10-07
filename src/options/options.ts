@@ -10,7 +10,14 @@ import {
   UNISON_PICTURE_URL,
 } from "@constants";
 import { attachHoldRepeat } from "@core/holdRepeat";
-import { getLanguageDisplayName, initI18n, loadLocaleOverride, SUPPORTED_LOCALES, t } from "@core/i18n";
+import {
+  getLanguageDisplayName,
+  initI18n,
+  loadLocaleOverride,
+  resolveUiLanguage,
+  SUPPORTED_LOCALES,
+  t,
+} from "@core/i18n";
 import {
   exportIdentity,
   forgetDisplayName,
@@ -450,7 +457,7 @@ const setOptionsInForm = (items: Options): void => {
   (document.getElementById("translate") as HTMLInputElement).checked = items.isTranslateEnabled;
   setDropdownFieldValue("translationLanguage", items.translationLanguage);
   (document.getElementById("isRomanizationEnabled") as HTMLInputElement).checked = items.isRomanizationEnabled;
-  setDropdownFieldValue("uiLanguage", items.uiLanguage);
+  setDropdownFieldValue("uiLanguage", resolveUiLanguage(items.uiLanguage));
   (document.getElementById("isUnisonPinnedDockEnabled") as HTMLInputElement).checked = items.isControlsDockEnabled;
   (document.getElementById("isUnisonAutoHideInFullscreenEnabled") as HTMLInputElement).checked =
     items.isControlsDockAutoHideInFullscreenEnabled;
