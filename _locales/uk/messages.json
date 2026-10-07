@@ -2716,47 +2716,47 @@
     }
   },
   "unison_rev_sealedHint": {
-    "message": "Every edit goes to council review before it goes live.",
+    "message": "Кожна зміна перевіряється радою перед публікацією.",
     "description": "Explains what editing a sealed lyric means"
   },
   "unison_rev_status_live": {
-    "message": "Live",
+    "message": "Чинна версія",
     "description": "Revision status: the version listeners see"
   },
   "unison_rev_status_pending": {
-    "message": "Pending",
+    "message": "На розгляді",
     "description": "Revision status: waiting for council review"
   },
   "unison_rev_status_past": {
-    "message": "Past",
+    "message": "Попередня версія",
     "description": "Revision status: was live before"
   },
   "unison_rev_status_superseded": {
-    "message": "Superseded",
+    "message": "Замінено",
     "description": "Revision status: replaced by a newer save before review"
   },
   "unison_rev_status_rejected": {
-    "message": "Rejected",
+    "message": "Відхилено",
     "description": "Revision status: the council rejected it"
   },
   "unison_rev_status_withdrawn": {
-    "message": "Withdrawn",
+    "message": "Відкликано",
     "description": "Revision status: the owner withdrew it"
   },
   "unison_rev_anchor": {
-    "message": "Anchor",
+    "message": "Якір",
     "description": "Chip on the revision that edits are measured against"
   },
   "unison_rev_approved": {
-    "message": "Approved by the council",
+    "message": "Схвалено радою",
     "description": "Revisions list reason for a council-approved revision"
   },
   "unison_rev_withinLimits": {
-    "message": "Within limits",
+    "message": "У межах ліміту",
     "description": "Revisions list reason for an edit that went live without review"
   },
   "unison_rev_reverted": {
-    "message": "Reverted to revision $rev$",
+    "message": "Повернуто до редакції $rev$",
     "description": "Revisions list reason and success message for a revert",
     "placeholders": {
       "rev": {
@@ -2766,7 +2766,7 @@
     }
   },
   "unison_rev_driftValues": {
-    "message": "Text $text$% · Timing $timing$%",
+    "message": "Текст $text$% · Часові проміжки $timing$%",
     "description": "How much text and timing an edit changed, as whole numbers",
     "placeholders": {
       "text": {
@@ -2780,27 +2780,27 @@
     }
   },
   "unison_rev_colStatus": {
-    "message": "Status",
+    "message": "Стан",
     "description": "Revisions list column header"
   },
   "unison_rev_colChange": {
-    "message": "Change",
+    "message": "Зміна",
     "description": "Revisions list column header (noun): how much an edit changed"
   },
   "unison_rev_colReason": {
-    "message": "Reason",
+    "message": "Причина",
     "description": "Revisions list column header"
   },
   "unison_rev_colWhen": {
-    "message": "When",
+    "message": "Коли",
     "description": "Revisions list column header: relative time"
   },
   "unison_rev_revision": {
-    "message": "Revision",
+    "message": "Редакція",
     "description": "Column header and editor sidebar label"
   },
   "unison_rev_comparedWith": {
-    "message": "Compared with revision $rev$",
+    "message": "У порівнянні з редакцією $rev$",
     "description": "Line above a diff. $rev$ is the compared revision",
     "placeholders": {
       "rev": {
@@ -2810,19 +2810,19 @@
     }
   },
   "unison_rev_legendAdded": {
-    "message": "Added",
+    "message": "Додано",
     "description": "Diff legend: added lines or words"
   },
   "unison_rev_legendRemoved": {
-    "message": "Removed",
+    "message": "Вилучено",
     "description": "Diff legend: removed lines or words"
   },
   "unison_rev_legendTiming": {
-    "message": "Timing only",
+    "message": "Лише часові проміжки",
     "description": "Diff legend: lines whose timing changed but text did not"
   },
   "unison_rev_syllablesRetimed": {
-    "message": "Syllables retimed: $count$",
+    "message": "Зміна часу складів: $count$",
     "description": "Diff note: how many syllables of a line moved while the line start stayed",
     "placeholders": {
       "count": {
@@ -2832,15 +2832,15 @@
     }
   },
   "unison_rev_syllableTimingAdded": {
-    "message": "Syllable timing added",
+    "message": "Додано час складів",
     "description": "Diff note: a line that had only line timing now has syllable timing"
   },
   "unison_rev_syllableTimingRemoved": {
-    "message": "Syllable timing removed",
+    "message": "Прибрано час складів",
     "description": "Diff note: a line that had syllable timing now has only line timing"
   },
   "unison_rev_unchangedLines": {
-    "message": "Unchanged lines: $count$",
+    "message": "Незмінені рядки: $count$",
     "description": "Collapsed part of a diff",
     "placeholders": {
       "count": {
@@ -2850,15 +2850,15 @@
     }
   },
   "unison_rev_headSection": {
-    "message": "Translations, romanization and credits",
+    "message": "Переклади, романізація й автори",
     "description": "Label above the diff rows for text stored outside the lyric lines: translations, romanizations and credits"
   },
   "unison_rev_headCredits": {
-    "message": "Credits",
+    "message": "Автори",
     "description": "Diff row label for a changed credit, such as a songwriter or singer name"
   },
   "unison_rev_headLine": {
-    "message": "line $line$",
+    "message": "рядок $line$",
     "description": "Part of a diff row label that names the lyric line a translation or romanization belongs to, e.g. 'Translation · Spanish · line 3'",
     "placeholders": {
       "line": {
@@ -2868,15 +2868,15 @@
     }
   },
   "unison_rev_noDiff": {
-    "message": "No changes to show",
+    "message": "Нічого показувати",
     "description": "Diff area when there is nothing to compare"
   },
   "unison_rev_revertToThis": {
-    "message": "Revert to this",
+    "message": "Повернутися до цієї редакції",
     "description": "Button that starts a revert to a past revision"
   },
   "unison_rev_revertLive": {
-    "message": "Reverting goes live now as revision $rev$",
+    "message": "Повернення редакції $rev$ застосується одразу",
     "description": "Note before a revert that skips review",
     "placeholders": {
       "rev": {
@@ -2886,11 +2886,11 @@
     }
   },
   "unison_rev_revertCheckFailed": {
-    "message": "Couldn't check whether reverting goes live or to council review",
+    "message": "Не вдалося визначити, чи повернення застосується одразу, чи буде перевірятися радою",
     "description": "Note on a past revision when the check of where a revert would land failed; the owner can still revert and the server decides"
   },
   "unison_rev_revertReview": {
-    "message": "Reverting goes to council review as revision $rev$",
+    "message": "Повернення редакції $rev$ буде перевірятися радою",
     "description": "Note before a revert that needs review",
     "placeholders": {
       "rev": {
@@ -2900,11 +2900,11 @@
     }
   },
   "unison_rev_locked": {
-    "message": "Song and artist can't be edited.",
+    "message": "Не можна змінювати назву і виконавця.",
     "description": "Editor note about fields that are locked"
   },
   "unison_rev_editsLeft": {
-    "message": "$remaining$ of $limit$ edits left today",
+    "message": "Залишилося змін на сьогодні: $remaining$/$limit$",
     "description": "Edits left in the last 24 hours",
     "placeholders": {
       "remaining": {
@@ -2918,15 +2918,15 @@
     }
   },
   "unison_rev_textChanged": {
-    "message": "Text changed",
+    "message": "Зміни тексту",
     "description": "Meter label: how much of the text changed"
   },
   "unison_rev_timingChanged": {
-    "message": "Timing changed",
+    "message": "Зміни часових проміжків",
     "description": "Meter label: how much of the timing changed"
   },
   "unison_rev_textChangedSince": {
-    "message": "Text changed since revision $rev$",
+    "message": "Змінено тексту в порівнянні з редакцією $rev$",
     "description": "Meter label: how much of the text changed since an earlier revision that the limit is measured against. $rev$ is that revision",
     "placeholders": {
       "rev": {
@@ -2936,7 +2936,7 @@
     }
   },
   "unison_rev_timingChangedSince": {
-    "message": "Timing changed since revision $rev$",
+    "message": "Змінено часових проміжків у порівнянні з редакцією $rev$",
     "description": "Meter label: how much of the timing changed since an earlier revision that the limit is measured against. $rev$ is that revision",
     "placeholders": {
       "rev": {
@@ -2946,7 +2946,7 @@
     }
   },
   "unison_rev_ofLimit": {
-    "message": "of $limit$% limit",
+    "message": "від ліміту в $limit$%",
     "description": "Follows a bold percentage in a meter, like '8% of 15% limit'",
     "placeholders": {
       "limit": {
@@ -2956,7 +2956,7 @@
     }
   },
   "unison_rev_checkLine": {
-    "message": "Line $line$: $message$",
+    "message": "Рядок $line$: $message$",
     "description": "A server check message tied to a line. $message$ comes from the server",
     "placeholders": {
       "line": {
@@ -2970,63 +2970,63 @@
     }
   },
   "unison_rev_checking": {
-    "message": "Checking your edit...",
+    "message": "Перевірка змін...",
     "description": "Editor status while the server checks the edit"
   },
   "unison_rev_fixErrors": {
-    "message": "Fix the errors to save",
+    "message": "Виправте помилки, щоб зберегти",
     "description": "Editor status when the edit has errors"
   },
   "unison_rev_limitReached": {
-    "message": "Edit limit reached",
+    "message": "Досягнуто ліміту змін",
     "description": "Shown when the daily edit limit is used up"
   },
   "unison_rev_noChanges": {
-    "message": "No changes from the live revision",
+    "message": "Без змін у порівнянні з поточною редакцією",
     "description": "Shown when an edit or revert would change nothing"
   },
   "unison_rev_goesLive": {
-    "message": "Goes live when you save",
+    "message": "Застосується після збереження",
     "description": "Editor status when the edit skips review"
   },
   "unison_rev_submitForReview": {
-    "message": "Submit for review",
+    "message": "Відправити на перевірку",
     "description": "Save button label when the edit needs review"
   },
   "unison_rev_noEdits": {
-    "message": "No edits yet",
+    "message": "Поки що немає змін",
     "description": "Revisions page notice for a lyric that was never edited"
   },
   "unison_rev_error": {
-    "message": "Something went wrong. Try again.",
+    "message": "Щось пішло не так. Спробуйте ще раз.",
     "description": "Fallback error for revision actions"
   },
   "options_display_karaoke": {
-    "message": "Karaoke subtitles",
+    "message": "Субтитри-караоке",
     "description": "Toggle label for showing synced lyrics as subtitles over a music video in fullscreen"
   },
   "options_display_highResolutionVideo": {
-    "message": "Enable higher-resolution videos",
+    "message": "Увімкнути відео з вищою роздільністю",
     "description": "Display settings toggle for enabling video resolutions above 1080p."
   },
   "options_display_highResolutionVideoInfo": {
-    "message": "Unlocks resolutions above 1080p when available. May affect seamless transitions between videos. Audio-only gapless playback is preserved. Only disable if you experience playback or transition issues.",
+    "message": "Розблоковує роздільність вище 1080p, якщо вона доступна. Може вплинути на плавність переходів між відео. Безперервне відтворення аудіо зберігається. Вимикайте цю опцію лише в разі виникнення проблем із відтворенням або переходами.",
     "description": "Help tooltip explaining higher video resolutions and the possible effect on seamless video transitions."
   },
   "options_display_preferredVideoQuality": {
-    "message": "Preferred video quality",
+    "message": "Бажана якість відео",
     "description": "Display settings label for the preferred video resolution selector."
   },
   "options_display_videoQualityLimit": {
-    "message": "Enable higher-resolution videos for 1440p, 4K, and 8K.",
+    "message": "Увімкніть відео з вищою роздільністю: 1440p, 4K і 8K.",
     "description": "Hint shown when resolutions above 1080p are disabled by the higher-resolution video toggle."
   },
   "options_display_videoQualityAuto": {
-    "message": "Auto",
+    "message": "Автоматично",
     "description": "Video quality choice that lets YouTube Music select the resolution automatically."
   },
   "options_display_videoQualityApplyHint": {
-    "message": "Higher-resolution playback changes apply to the next video or after refreshing. Preferred quality uses the closest available lower resolution.",
+    "message": "Зміни роздільності на вищу застосуються до наступного відео або після оновлення сторінки. Ця опція вибирає найближчу доступну роздільність в меншу сторону.",
     "description": "Tooltip explaining when video playback changes take effect and how unavailable resolutions fall back."
   }
 }
