@@ -94,7 +94,7 @@ function snapPlate(stage: HTMLElement, plate: HTMLElement, rect: StageBox): void
 }
 
 export function createKaraokeOverlay(options: KaraokeOverlayOptions): KaraokeOverlay {
-  const { doc, mountParent, bar } = options;
+  const { doc, bar } = options;
   const view = doc.defaultView;
   if (!view) throw new Error("Karaoke overlay needs a document with a window");
 
@@ -144,7 +144,7 @@ export function createKaraokeOverlay(options: KaraokeOverlayOptions): KaraokeOve
     titleCard.append(card);
 
     root.append(stage, titleCard);
-    mountParent.append(root);
+    options.mountParent.append(root);
     return { root, stage, plates, mount, title, artist, credit };
   }
 

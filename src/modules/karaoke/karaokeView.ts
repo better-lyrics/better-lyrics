@@ -31,7 +31,9 @@ function createMainPageStage(): KaraokeStage {
     win: window,
     overlay: {
       doc: document,
-      mountParent: document.body,
+      get mountParent(): HTMLElement {
+        return document.body;
+      },
       get writtenByLabel(): string {
         return t("lyrics_writtenBy");
       },
