@@ -1511,6 +1511,6 @@ export class PictureInPictureLyricsView {
   };
 
   setIntermission(remainingS: number | null): void {
-    this.intermission.update(remainingS, this.headerRows[0].text);
+    this.intermission.update(remainingS, this.headerRows[0].text, this.lastPlaybackSnapshot?.isPlaying !== false);
   }
 }

@@ -4,7 +4,7 @@ import { splitUpNext } from "./intermissionText";
 
 export interface Intermission {
   readonly element: HTMLElement;
-  update(remainingS: number | null, title: string): void;
+  update(remainingS: number | null, title: string, isPlaying: boolean): void;
   reset(): void;
 }
 
@@ -59,6 +59,7 @@ export function createIntermission(doc: Document, strings: IntermissionStrings):
   let shownTitle: string | null = null;
   let countdown: CountdownState | null = null;
   let drain: Animation | null = null;
+  let drainMs = 0;
 
   function createLayer(glyph: string): HTMLElement {
     const layer = doc.createElement("span");
@@ -137,19 +138,32 @@ export function createIntermission(doc: Document, strings: IntermissionStrings):
 
   function restartDrain(remainingS: number): void {
     drain?.cancel();
+    drainMs = remainingS * 1000;
     drain = fill.animate([{ transform: "scaleX(1)" }, { transform: "scaleX(0)" }], {
-      duration: remainingS * 1000,
+      duration: drainMs,
       easing: "linear",
       fill: "forwards",
     });
   }
 
+  function followPlayback(remainingS: number, isPlaying: boolean): void {
+    if (!drain) return;
+    if (!isPlaying) {
+      if (drain.playState === "running") drain.pause();
+      return;
+    }
+    if (drain.playState !== "paused") return;
+    drain.currentTime = Math.max(0, drainMs - remainingS * 1000);
+    drain.play();
+  }
+
   return {
     element,
-    update(remainingS, title) {
+    update(remainingS, title, isPlaying) {
       const step = nextCountdown(remainingS, countdown);
       countdown = step.state;
       if (step.isNewAd && remainingS !== null) restartDrain(remainingS);
+      if (remainingS !== null) followPlayback(remainingS, isPlaying);
 
       const text = countdown === null ? "" : formatTime(countdown.shownS);
       if (text === shownText && title === shownTitle) return;
