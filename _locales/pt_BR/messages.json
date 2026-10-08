@@ -270,27 +270,27 @@
     "description": "Tooltip for the top-right cell in the Unison position picker"
   },
   "options_unisonModal_position_bottomLeft": {
-    "message": "Bottom left",
+    "message": "Base à esquerda",
     "description": "Tooltip for the bottom-left cell in the Unison position picker"
   },
   "options_unisonModal_position_bottomCenter": {
-    "message": "Bottom center",
+    "message": "Base central",
     "description": "Tooltip for the bottom-center cell in the Unison position picker"
   },
   "options_unisonModal_position_bottomRight": {
-    "message": "Bottom right",
+    "message": "Base à direita",
     "description": "Tooltip for the bottom-right cell in the Unison position picker"
   },
   "options_unisonModal_controlsShown": {
-    "message": "Controls shown",
+    "message": "Controles exibidos",
     "description": "Label above the toggles that pick which controls appear in the lyrics dock"
   },
   "options_unisonModal_controlSource": {
-    "message": "Source switcher",
+    "message": "Alternador de fonte",
     "description": "Toggle label for showing the lyrics source switcher control in the dock"
   },
   "options_unisonModal_controlPictureInPicture": {
-    "message": "Floating window",
+    "message": "Janela flutuante",
     "description": "Toggle label for showing the control that opens the floating lyrics window in the dock"
   },
   "options_unisonModal_controlOffset": {
