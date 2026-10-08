@@ -9,6 +9,7 @@ import {
 } from "@modules/ui/playerControls/playerBarControls";
 import {
   pickVideoTrack,
+  playerHasVideo,
   type VideoMirrorState,
   videoMirrorState,
   wantsQualityBoost,
@@ -68,6 +69,8 @@ export function createVideoMirror(options: VideoMirrorOptions): VideoMirror {
     const { signal } = attachment;
     player.addEventListener("loadstart", reattach, { signal });
     if (!enabled) return;
+    player.addEventListener("loadedmetadata", sync, { signal });
+    player.addEventListener("resize", sync, { signal });
     if (typeof player.captureStream !== "function") {
       if (!hasLoggedUnsupported) options.log("captureStream unavailable, floating window keeps the artwork");
       hasLoggedUnsupported = true;
@@ -117,7 +120,7 @@ export function createVideoMirror(options: VideoMirrorOptions): VideoMirror {
       enabled: lastEnabled,
       videoMode,
       adPlaying,
-      hasVideoTrack: newest !== null && newest.readyState === "live",
+      hasVideoTrack: newest !== null && newest.readyState === "live" && player !== null && playerHasVideo(player),
     });
     publish(next);
     onQualityBoost(wantsQualityBoost({ enabled: lastEnabled, videoMode, state: next }));

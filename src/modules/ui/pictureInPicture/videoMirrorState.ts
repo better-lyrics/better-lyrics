@@ -34,3 +34,15 @@ export function pickVideoTrack<TTrack extends { readonly kind: string }>(tracks:
   }
   return null;
 }
+
+const HAVE_METADATA = 1;
+
+export function playerHasVideo({
+  readyState,
+  videoWidth,
+}: {
+  readonly readyState: number;
+  readonly videoWidth: number;
+}): boolean {
+  return readyState < HAVE_METADATA || videoWidth > 0;
+}

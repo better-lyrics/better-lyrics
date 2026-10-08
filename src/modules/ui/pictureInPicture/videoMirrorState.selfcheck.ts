@@ -1,6 +1,7 @@
 import { strict as assert } from "node:assert";
 import {
   pickVideoTrack,
+  playerHasVideo,
   type VideoMirrorInputs,
   videoMirrorState,
   wantsQualityBoost,
@@ -30,5 +31,17 @@ const videoB = { kind: "video" };
 assert.equal(pickVideoTrack([]), null);
 assert.equal(pickVideoTrack([audio]), null, "audio only");
 assert.equal(pickVideoTrack([videoA, audio, videoB, audio]), videoB, "newest video track");
+
+const HAVE_NOTHING = 0;
+const HAVE_METADATA = 1;
+const HAVE_ENOUGH_DATA = 4;
+assert.equal(playerHasVideo({ readyState: HAVE_ENOUGH_DATA, videoWidth: 1920 }), true, "video playing");
+assert.equal(playerHasVideo({ readyState: HAVE_NOTHING, videoWidth: 0 }), true, "next source still loading");
+assert.equal(
+  playerHasVideo({ readyState: HAVE_METADATA, videoWidth: 0 }),
+  false,
+  "regression: audio-only source in a hidden tab"
+);
+assert.equal(playerHasVideo({ readyState: HAVE_ENOUGH_DATA, videoWidth: 0 }), false, "audio-only source playing");
 
 console.log("video mirror state self-check passed");
