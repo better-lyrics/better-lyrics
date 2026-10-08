@@ -123,7 +123,7 @@ export function createVideoMirror(options: VideoMirrorOptions): VideoMirror {
       hasVideoTrack: newest !== null && newest.readyState === "live" && player !== null && playerHasVideo(player),
     });
     publish(next);
-    onQualityBoost(wantsQualityBoost({ enabled: lastEnabled, videoMode, state: next }));
+    onQualityBoost(wantsQualityBoost({ enabled: lastEnabled && stream !== null, videoMode, state: next }));
   }
 
   const observer = new MutationObserver(sync);
