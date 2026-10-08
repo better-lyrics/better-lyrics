@@ -1492,6 +1492,19 @@ body {
   pointer-events: none;
 }
 
+.blyrics-pip-shell[data-layout="stage"] .blyrics-pip-mode-toggle {
+  transition: opacity 180ms ease;
+}
+
+@media not all and (max-aspect-ratio: 4/5) {
+  @media (max-width: 340px) {
+    .blyrics-pip-shell[data-layout="stage"][data-stage-card="title"] .blyrics-pip-mode-toggle {
+      opacity: 0;
+      pointer-events: none;
+    }
+  }
+}
+
 .blyrics-pip-shell[data-layout="stage"] .blyrics-pip-artwork:not([data-controls-idle]) .blyrics-pip-artwork__controls {
   opacity: 1;
   pointer-events: auto;

@@ -1972,7 +1972,7 @@ The window sets its own plate size on `.blyrics-pip-shell`: a `0.75rem` radius, 
 }
 ```
 
-While a card shows, the window sets `data-stage-card` on `.blyrics-pip-shell` (`title` or `end`, the same as `data-card` on the overlay) and `--blyrics-pip-card-height`, the card's height in pixels. The transport uses them to stay above the card, and the header hides while the title card shows because the card repeats the title and artist. Both are read-only.
+While a card shows, the window sets `data-stage-card` on `.blyrics-pip-shell` (`title` or `end`, the same as `data-card` on the overlay) and `--blyrics-pip-card-height`, the card's height in pixels. The transport uses them to stay above the card, and the header hides while the title card shows because the card repeats the title and artist. In stage windows 340px wide or less (not tall ones), the song and video pill also fades out during the title card so the transport fits beside the close button. Both are read-only.
 
 The window scales the karaoke text down to its size. The factor is `--blyrics-pip-karaoke-text-scale`, a unitless number the extension sets on `.blyrics-pip-shell` when the window resizes. Inside the stage, `--blyrics-font-size` and `--blyrics-translated-font-size` are your values multiplied by it, so set those as usual and the window keeps them in proportion. Treat the factor as read-only: the transport controls place themselves with it, so an override moves the text but not the controls.
 
