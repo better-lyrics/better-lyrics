@@ -162,7 +162,6 @@ export function createPictureInPictureHost(
     });
   }
 
-  // Before the window opens no lyrics have crossed yet, so the opener's flag stands in for them.
   function openingWindowSize(): WindowSize {
     return contentWindowSize(
       expectsSyncedLyrics({
@@ -397,7 +396,6 @@ export function createPictureInPictureHost(
       artist: payload.artist,
       providerKey: payload.providerKey,
     });
-    // The overlay only exists once built, so a stage shown before its first build is revealed here.
     stage.setVisible(isStageShown, relayoutStage);
   }
 
@@ -413,7 +411,6 @@ export function createPictureInPictureHost(
     });
     if (shown === isStageShown) return;
     isStageShown = shown;
-    // The scroll view sat out every tick under the stage, so it lands on the current line in one jump.
     if (!shown) isRescrollPending = true;
     view.setStageActive(shown);
     activeStage?.setVisible(shown, relayoutStage);
@@ -495,7 +492,6 @@ export function createPictureInPictureHost(
       lineOffsetTrim: payload.lineOffsetTrim,
       passiveScrollEnabled: payload.passiveScrollEnabled,
     };
-    // First on the shared clock, so the stage is the view that sees a seek as a jump.
     if (isStageShown) activeStage?.tick(currentTime, tickOptions);
     if (isRescrollPending) {
       isRescrollPending = false;

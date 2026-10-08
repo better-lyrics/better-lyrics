@@ -66,10 +66,8 @@ export function createVideoMirror(options: VideoMirrorOptions): VideoMirror {
     if (!player) return;
     attachment = new AbortController();
     const { signal } = attachment;
-    // Ahead of the capture, so a source that could not be captured is retried on the next one.
     player.addEventListener("loadstart", reattach, { signal });
     if (!enabled) return;
-    // Firefox before 149 only has mozCaptureStream, which takes the player's audio off the speakers for good.
     if (typeof player.captureStream !== "function") {
       if (!hasLoggedUnsupported) options.log("captureStream unavailable, floating window keeps the artwork");
       hasLoggedUnsupported = true;

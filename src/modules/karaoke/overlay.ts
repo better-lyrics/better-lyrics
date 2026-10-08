@@ -31,9 +31,7 @@ interface TitleCardText {
 }
 
 export interface KaraokeOverlayBar {
-  /** The element whose height lifts the stage, or null for none. */
   element(): HTMLElement | null;
-  /** Calls back whenever the bar shows or hides; returns a disposer. */
   observeShown(onChange: (shown: boolean) => void): () => void;
 }
 
@@ -235,7 +233,6 @@ export function createKaraokeOverlay(options: KaraokeOverlayOptions): KaraokeOve
         return;
       }
 
-      // Plate and clip move as one, so a line is never seen outside its plate.
       if (!isMountClipped) {
         stage.classList.add(SNAP_CLASS);
         clipMount(mount, previous, radius);

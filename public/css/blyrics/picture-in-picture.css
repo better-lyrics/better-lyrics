@@ -168,7 +168,6 @@ body {
   transform: scale(1.4);
 }
 
-/* Gecko ignores the overflow clip on composited video, so this radius and opaque mask are what round it. */
 .blyrics-pip-artwork__video {
   position: absolute;
   z-index: 3;
@@ -213,7 +212,6 @@ body {
 }
 
 /* -- Karaoke stage ----------------------------------------------------------- */
-/* The font size is the theme's unscaled subtitle size, which script reads to keep the text readable. */
 .blyrics-pip-stage {
   display: none;
   font-size: var(--blyrics-font-size);
@@ -349,7 +347,6 @@ body {
   border-radius: 999px;
 }
 
-/* On the pill itself the blur would make it a backdrop root and break hit testing on its options. */
 .blyrics-pip-mode-toggle::before {
   content: "";
   position: absolute;
@@ -1229,7 +1226,6 @@ body {
   line-height: 1.2;
 }
 
-/* tabular-nums is a no-op in this font, so digits get a fixed cell. */
 .blyrics-pip-intermission__glyph[data-digit] {
   width: 1ch;
   justify-items: center;
@@ -1312,7 +1308,6 @@ body {
   --blyrics-pip-frame-bottom-gap: var(--blyrics-karaoke-frame-y);
 }
 
-/* The row is inset from the window's bottom, which can sit below the frame's, so the lift clears all of it. */
 .blyrics-pip-shell[data-layout="stage"] #blyrics-karaoke[data-bar] {
   --blyrics-karaoke-lift: max(
     0px,
@@ -1321,7 +1316,6 @@ body {
   );
 }
 
-/* Read above, written below: a property cannot scale its own inherited value on one element. */
 .blyrics-pip-shell[data-layout="stage"] #blyrics-karaoke > *,
 .blyrics-pip-shell[data-layout="stage"] #blyrics-karaoke .blyrics-container {
   --blyrics-font-size: var(--blyrics-pip-karaoke-font-size) !important;
@@ -1332,7 +1326,6 @@ body {
   overflow-wrap: anywhere;
 }
 
-/* The card's secondary rows are fractions of its size, so it keeps a floor of its own. */
 .blyrics-pip-shell[data-layout="stage"] #blyrics-karaoke .blyrics-karaoke__title {
   font-size: max(var(--blyrics-font-size) * 0.7, 16px);
 }
@@ -1367,13 +1360,11 @@ body {
   font-size: max(0.44em, 11px);
 }
 
-/* A perspective would make the slot the containing block of the fixed hover chrome. */
 .blyrics-pip-shell[data-layout="stage"] .blyrics-pip-artwork {
   box-shadow: none;
   perspective: none;
 }
 
-/* Slot pieces fade, not the chrome's columns; flip fades faces, as opacity flattens its 3D card. */
 .blyrics-pip-shell[data-layout="stage"]:not([blyrics-pip-transition="flip"]) .blyrics-pip-artwork__card,
 .blyrics-pip-shell[data-layout="stage"][blyrics-pip-transition="flip"] .blyrics-pip-artwork__face,
 .blyrics-pip-shell[data-layout="stage"] .blyrics-pip-artwork__video,
@@ -1383,7 +1374,6 @@ body {
   pointer-events: none;
 }
 
-/* Fits between the header and a lifted one-line plate, shrinking only in short windows. */
 .blyrics-pip-shell[data-layout="stage"] .blyrics-pip-artwork__controls {
   --blyrics-pip-header-bottom: 50px;
   --blyrics-pip-progress-height: 22px;
@@ -1672,7 +1662,6 @@ body {
     object-position: top;
   }
 
-  /* The band under the video holds the subtitles; the current line settles on its middle. */
   .blyrics-pip-shell[data-layout="stage"] #blyrics-karaoke {
     --blyrics-karaoke-floor: max(7.5cqh, 50cqh - var(--blyrics-pip-karaoke-font-size) * 0.75);
     --blyrics-pip-frame-bottom-gap: 0px;
@@ -1687,7 +1676,6 @@ body {
     backdrop-filter: none;
   }
 
-  /* The transport centres on the video, held below the header when the video is too short for both. */
   .blyrics-pip-shell[data-layout="stage"] .blyrics-pip-artwork__controls {
     --blyrics-pip-control-size: 36px;
     --blyrics-pip-transport-y: max(var(--blyrics-pip-stage-height) / 2, 88px);
@@ -1696,8 +1684,7 @@ body {
   }
 }
 
-/* -- Song and video switch ---------------------------------------------------
-   Transitions only: a removed animation replays once the attribute goes, so script skips keyframes. */
+/* -- Song and video switch --------------------------------------------------- */
 .blyrics-pip-shell[data-instant] :is(
     .blyrics-pip-backdrop,
     .blyrics-pip-art-col,

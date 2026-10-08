@@ -24,7 +24,6 @@ interface QualityBoostInputs {
   readonly state: VideoMirrorState;
 }
 
-// Held through track gaps between songs, or each new song restarts its buffer at the new quality.
 export function wantsQualityBoost({ enabled, videoMode, state }: QualityBoostInputs): boolean {
   return enabled && (videoMode || state === "ad");
 }

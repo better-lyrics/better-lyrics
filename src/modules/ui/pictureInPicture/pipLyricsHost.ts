@@ -13,9 +13,6 @@ export function createPictureInPictureLyricsHost(
   isStageShown: () => boolean
 ): LyricsRendererHost {
   return {
-    /**
-     * A floating window is never behind another tab, but the stage covers these lyrics while it shows.
-     */
     isViewVisible: () => !isStageShown(),
     isLoaderActive: () => view.isLoaderActive(),
     /**

@@ -108,7 +108,6 @@ function isPlausibleFrame({ width, height }: WindowSize): boolean {
 }
 
 export function measureWindowFrame(requested: WindowSize, inner: WindowSize, screen: WindowSize): WindowSize | null {
-  // The browser shrinks a request near the screen's size, and the shortfall would read as frame.
   if (requested.width > screen.width * CLAMP_FREE_SCREEN_SHARE) return null;
   if (requested.height > screen.height * CLAMP_FREE_SCREEN_SHARE) return null;
   const frame = { width: requested.width - inner.width, height: requested.height - inner.height };

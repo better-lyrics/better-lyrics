@@ -12,7 +12,6 @@ export interface ModeSwitchSurface {
   readonly isVideoPending: boolean;
 }
 
-// YTM can flip video-mode up to a snapshot after the id it belongs to, and the next snapshot is a second away.
 export const FLIP_TRAILS_TRACK_CHANGE_MS = 1000;
 
 interface FlipContext {

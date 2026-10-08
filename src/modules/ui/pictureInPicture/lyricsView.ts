@@ -116,9 +116,7 @@ const MARQUEE_REARM_DELAY = 700;
 // this the metadata poll is genuinely slow and stale art is the worse lie.
 const ARTWORK_STALE_GRACE = 600;
 
-// Long enough for the counterpart's stream to reach its first frame, short of a window stuck instant.
 const MODE_SWITCH_LIMIT_MS = 3000;
-// resizeTo spends the click's transient activation, which Chrome keeps for about five seconds.
 const MODE_SWITCH_RESIZE_LIMIT_MS = 2000;
 const MODE_SWITCH_RESIZE_FINAL_MS = 4500;
 
@@ -862,7 +860,6 @@ export class PictureInPictureLyricsView {
     );
   }
 
-  // A counterpart reports its own title, which the song's metadata then corrects back: a flicker.
   private showSong(detail: PlayerDetails, isModeSwitch: boolean): void {
     if (this.currentVideoId === null) this.lyricsVideoId = detail.videoId;
     if (!isModeSwitch) this.counterpartPair = null;
@@ -1107,7 +1104,6 @@ export class PictureInPictureLyricsView {
     }
   }
 
-  // Indexed apart from the faces, which hold still while the video is on.
   private paintBackdrop(url: string, skipAnimation: boolean): void {
     const nextIndex = 1 - this.backdropIndex;
     this.backdropIndex = nextIndex;
@@ -1268,7 +1264,6 @@ export class PictureInPictureLyricsView {
     this.loadFaceVideo(plan.track, plan.skipAnimation);
   }
 
-  // Waits for the first frame, as the cover waits for its decode.
   private loadFaceVideo(track: MediaStreamTrack, skipAnimation: boolean): void {
     const nextIndex = 1 - this.artworkIndex;
     const video = this.faceVideos[nextIndex];
@@ -1290,7 +1285,6 @@ export class PictureInPictureLyricsView {
     else video.addEventListener("loadeddata", commit, { once: true, signal: controller.signal });
   }
 
-  // One decoding copy: the faces let go while the stage holds the track.
   private moveVideoToStage(): void {
     this.cancelPendingVideo();
     this.clearVideoRetireTimer();
@@ -1316,7 +1310,6 @@ export class PictureInPictureLyricsView {
     this.retireHiddenFaceVideo(skipAnimation);
   }
 
-  // The outgoing face keeps its video until the preset has carried it off.
   private retireHiddenFaceVideo(requestedImmediately: boolean): void {
     const immediately = requestedImmediately || this.isSwitchingMode;
     this.clearVideoRetireTimer();
@@ -1404,7 +1397,6 @@ export class PictureInPictureLyricsView {
     }
     video.srcObject = new MediaStream([track]);
     video.play().catch((error: unknown) => {
-      // A newer srcObject interrupting play() is the normal swap path.
       if (error instanceof DOMException && error.name === "AbortError") return;
       this.dependencies.log("music video playback failed", error);
     });
@@ -1484,7 +1476,6 @@ export class PictureInPictureLyricsView {
     this.modeSwitch = null;
     this.pipWindow.clearTimeout(modeSwitch.limitTimer);
     if (modeSwitch.settleFrame !== null) this.pipWindow.cancelAnimationFrame(modeSwitch.settleFrame);
-    // Computed while transitions are still off, or dropping the attribute would animate to the new values.
     void this.shell.offsetWidth;
     this.shell.removeAttribute("data-instant");
   };
