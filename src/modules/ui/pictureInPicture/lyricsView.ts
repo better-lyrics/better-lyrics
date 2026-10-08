@@ -378,7 +378,9 @@ export class PictureInPictureLyricsView {
     this.faceVideos = [frontFace.video, backFace.video];
     this.faceVideos.forEach((video, index) => {
       const followFrontAspect = (): void => {
-        if (index === this.artworkIndex && this.faceTracks[index] !== null) this.writeVideoAspect(video);
+        if (index !== this.artworkIndex || this.faceTracks[index] === null) return;
+        this.writeVideoAspect(video);
+        this.checkModeSwitchSettled();
       };
       for (const type of ["loadedmetadata", "resize"]) {
         video.addEventListener(type, followFrontAspect, { signal: this.lifecycleController.signal });
@@ -487,7 +489,9 @@ export class PictureInPictureLyricsView {
       this.stageVideo.addEventListener(
         type,
         () => {
-          if (this.stageTrack !== null) this.writeVideoAspect(this.stageVideo);
+          if (this.stageTrack === null) return;
+          this.writeVideoAspect(this.stageVideo);
+          this.checkModeSwitchSettled();
         },
         { signal: this.lifecycleController.signal }
       );
@@ -837,6 +841,7 @@ export class PictureInPictureLyricsView {
       "click",
       () => {
         if (switchPlaybackMode(this.sourceDocument, mode)) this.resizeAfterModeSwitch();
+        else if (getSelectedPlaybackMode(this.sourceDocument) === mode) this.resizeToContent();
       },
       { signal: this.lifecycleController.signal }
     );
@@ -1450,9 +1455,14 @@ export class PictureInPictureLyricsView {
     if (this.videoDeferTimer !== null) this.applyVideoPlan();
   }
 
+  private shownVideo(): HTMLVideoElement | null {
+    if (this.stageTrack !== null) return this.stageVideo;
+    return this.faceTracks[this.artworkIndex] !== null ? this.faceVideos[this.artworkIndex] : null;
+  }
+
   private modeSwitchSurface(): ModeSwitchSurface {
     return {
-      showsVideo: this.stageTrack !== null || this.faceTracks[this.artworkIndex] !== null,
+      showsVideo: (this.shownVideo()?.videoWidth ?? 0) > 0,
       isArtworkPending: this.pendingArtworkVideoId !== null,
       isVideoPending: this.pendingVideo !== null || this.videoDeferTimer !== null,
     };

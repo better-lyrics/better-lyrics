@@ -453,7 +453,6 @@ body {
 .blyrics-pip-mode-toggle__option[aria-pressed="true"] {
   background: rgb(255 255 255 / 92%);
   color: #111;
-  cursor: default;
 }
 
 .blyrics-pip-mode-toggle__option:focus {
