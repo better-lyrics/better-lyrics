@@ -79,8 +79,22 @@ ytmusic-player-page:not([blyrics-dfs], [blyrics-karaoke])[blyrics-video-mode] #p
   background-color: transparent;
 }
 
+/* Cover crops the sub-pixel rounding mismatch rather than letterboxing it as a 1px black row. */
+ytmusic-player-page:not([blyrics-dfs], [blyrics-karaoke])[blyrics-video-mode]:not([player-ui-state=MINIPLAYER]) .html5-video-player {
+  background: transparent !important;
+}
+
+ytmusic-player-page:not([blyrics-dfs], [blyrics-karaoke])[blyrics-video-mode]:not([player-ui-state=MINIPLAYER]) video.html5-main-video {
+  object-fit: cover !important;
+  background: #000;
+}
+
 ytmusic-player-page:not([blyrics-dfs], [blyrics-karaoke])[blyrics-video-mode] #av-id {
   padding-bottom: 10px;
+}
+
+ytmusic-player-page[player-fullscreened] #song-media-window {
+  visibility: hidden;
 }
 
 /* Cap #player width so width / aspect-ratio (its derived height) fits in the
