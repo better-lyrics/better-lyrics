@@ -106,7 +106,7 @@ const retryController = new PictureInPictureController(
 retryController.toggle();
 assert.deepEqual(
   retryApi.requests,
-  [{ width: 720, height: 300, disallowReturnToOpener: true }],
+  [{ width: 720, height: 300, disallowReturnToOpener: true, preferInitialWindowPlacement: true }],
   "Given a controller click, When a PiP window is requested, Then requestWindow receives exact dimensions synchronously"
 );
 await settle();
@@ -276,7 +276,7 @@ const verticalController = new PictureInPictureController({
 verticalController.toggle();
 assert.deepEqual(
   verticalApi.requests,
-  [{ width: 340, height: 720, disallowReturnToOpener: true }],
+  [{ width: 340, height: 720, disallowReturnToOpener: true, preferInitialWindowPlacement: true }],
   "Given the vertical layout setting, When a PiP window is requested, Then it asks for portrait dimensions"
 );
 
@@ -300,7 +300,7 @@ const stageController = new PictureInPictureController({
 stageController.toggle();
 assert.deepEqual(
   stageApi.requests,
-  [{ width: 640, height: 360, disallowReturnToOpener: true }],
+  [{ width: 640, height: 360, disallowReturnToOpener: true, preferInitialWindowPlacement: true }],
   "Given a music video with karaoke, When a PiP window is requested, Then it asks for the stage size in the same call"
 );
 

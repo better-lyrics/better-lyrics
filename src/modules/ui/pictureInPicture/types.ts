@@ -4,6 +4,7 @@ export interface DocumentPictureInPictureWindowOptions {
   readonly width: number;
   readonly height: number;
   readonly disallowReturnToOpener?: boolean;
+  readonly preferInitialWindowPlacement?: boolean;
 }
 
 export interface DocumentPictureInPicture<TWindow = Window> {

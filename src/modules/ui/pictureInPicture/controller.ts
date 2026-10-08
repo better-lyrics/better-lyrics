@@ -8,7 +8,7 @@ import type {
 import type { WindowSize } from "@modules/ui/pictureInPicture/windowSize";
 
 function getRequestOptions(size: WindowSize): DocumentPictureInPictureWindowOptions {
-  return { width: size.width, height: size.height, disallowReturnToOpener: true };
+  return { width: size.width, height: size.height, disallowReturnToOpener: true, preferInitialWindowPlacement: true };
 }
 
 export function createGatedToggle(inner: PictureInPictureToggle, isEnabled: () => boolean): PictureInPictureToggle {
