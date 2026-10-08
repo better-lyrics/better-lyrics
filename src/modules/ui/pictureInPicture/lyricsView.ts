@@ -841,7 +841,8 @@ export class PictureInPictureLyricsView {
       "click",
       () => {
         if (switchPlaybackMode(this.sourceDocument, mode)) this.resizeAfterModeSwitch();
-        else if (getSelectedPlaybackMode(this.sourceDocument) === mode) this.resizeToContent();
+        else if (this.isSwitchSettled() && getSelectedPlaybackMode(this.sourceDocument) === mode)
+          this.resizeToContent();
       },
       { signal: this.lifecycleController.signal }
     );
@@ -1494,6 +1495,10 @@ export class PictureInPictureLyricsView {
     void this.shell.offsetWidth;
     this.shell.removeAttribute("data-instant");
   };
+
+  private isSwitchSettled(): boolean {
+    return this.modeSwitch === null && this.pendingResize === null;
+  }
 
   private resizeAfterModeSwitch(): void {
     this.cancelPendingResize();
