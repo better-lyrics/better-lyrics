@@ -1084,7 +1084,11 @@ export class PictureInPictureLyricsView {
 
     const letterboxedUrl = getLetterboxedArtworkUrl(videoId);
     const fallBack = (): void => {
-      if (url === letterboxedUrl) return;
+      if (url === letterboxedUrl) {
+        this.pendingArtworkVideoId = null;
+        this.checkModeSwitchSettled();
+        return;
+      }
       attempt.abort();
       this.setArtwork(url === this.fallbackArtworkUrl ? letterboxedUrl : this.fallbackArtworkUrl, videoId, songSignal);
     };
