@@ -235,7 +235,7 @@ body {
 
 .blyrics-pip-shell:not([data-layout="stage"]) .blyrics-pip-artwork__controls {
   --blyrics-pip-artwork-min-width: max(
-    var(--blyrics-pip-control-size) * 3.25 + 32px,
+    var(--blyrics-pip-control-size) * 3.25 + 16px,
     var(--blyrics-pip-artwork-min-height) * var(--blyrics-pip-artwork-aspect)
   );
 
@@ -1620,7 +1620,7 @@ body {
   }
 }
 
-@media (max-height: 230px) {
+@media (max-height: 215px) {
   .blyrics-pip-shell:not([data-video="on"], [data-layout="stage"]) {
     padding-block: 8px;
   }
@@ -1630,7 +1630,7 @@ body {
   }
 }
 
-@media (max-height: 200px) {
+@media (max-height: 185px) {
   .blyrics-pip-shell:not([data-video="on"], [data-layout="stage"]) .blyrics-pip-progress {
     display: none;
   }
