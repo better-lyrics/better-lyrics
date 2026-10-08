@@ -648,9 +648,10 @@ With "Show music video" on and YouTube Music in video mode, the floating window 
 | `--blyrics-pip-karaoke-text-scale` | Read-only. Unitless, set inline on `.blyrics-pip-shell` on resize; stage `--blyrics-font-size` and `--blyrics-translated-font-size` are multiplied by it. The transport uses it too, so overriding moves text but not controls |
 | `--blyrics-pip-control-tint` | Default `rgb(0 0 0 / 28%)`, on `.blyrics-pip-artwork__controls`; background of control discs and the mode pill |
 | `--blyrics-pip-control-backdrop` | Default `blur(8px)`, on `.blyrics-pip-artwork__controls`; `backdrop-filter` of control discs and the mode pill |
+| `--blyrics-pip-control-size` | Default `36px` (`44px` in tall windows), on `.blyrics-pip-artwork`; previous and next button size, play and pause is 1.25 times larger. Does not change with window size: the artwork grows so the pill, close button and transport fit inside it at its aspect ratio, and short windows hide the progress row. Normal layout only; the stage sizes its own transport |
 | `#blyrics-karaoke` in the window | Same plate, title card, end card classes and attributes as fullscreen; prefix `.blyrics-pip-shell` to target the window only |
 
-Internal, do not set: `--blyrics-pip-stage-width`, `-stage-height`, `-progress-inset`, `-progress-height`, `-plate-gap`, `-plate-overhang`, `-plate-top`, `-frame-bottom-gap`, `-header-bottom`, `-transport-margin`, `-transport-y`, `-karaoke-font-size`, `-karaoke-translated-font-size`. They derive from each other and place the transport between the header and the plate.
+Internal, do not set: `--blyrics-pip-stage-width`, `-stage-height`, `-progress-inset`, `-progress-height`, `-plate-gap`, `-plate-overhang`, `-plate-top`, `-frame-bottom-gap`, `-header-bottom`, `-transport-margin`, `-transport-y`, `-karaoke-font-size`, `-karaoke-translated-font-size`. They derive from each other and place the transport between the header and the plate. Also internal, normal layout: `--blyrics-pip-artwork-aspect`, `-artwork-min-height`, `-artwork-min-width`, `-chrome-height`, `-transport-edge`; they size the artwork minimum.
 
 Tall windows (`max-aspect-ratio: 4/5`) put the video at the top and the lines in the band under it, with no plate background.
 

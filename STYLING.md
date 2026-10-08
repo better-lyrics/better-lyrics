@@ -1998,7 +1998,15 @@ The control discs and the pill share two variables, set on `.blyrics-pip-artwork
 }
 ```
 
-The stage layout uses more `--blyrics-pip-*` variables to place the transport, the plate and the progress row (`-stage-width`, `-stage-height`, `-progress-inset`, `-progress-height`, `-plate-gap`, `-plate-overhang`, `-plate-top`, `-frame-bottom-gap`, `-header-bottom`, `-transport-margin`, `-transport-y`, `-karaoke-font-size`, `-karaoke-translated-font-size`). They are internal. Each is derived from the others, so changing one can push the controls into the lines.
+`--blyrics-pip-control-size` sets the size of the previous and next buttons; play and pause is 1.25 times larger. It defaults to `36px`, or `44px` in tall windows, and is set on `.blyrics-pip-artwork`. The size stays the same when the window resizes. Instead, the artwork grows until the pill, the close button and the transport all fit inside it, at its own aspect ratio. In short windows the progress row under the artwork is hidden to make room. The karaoke stage sizes its own transport, so this variable only changes the normal layout.
+
+```css
+.blyrics-pip-artwork {
+  --blyrics-pip-control-size: 32px;
+}
+```
+
+The stage layout uses more `--blyrics-pip-*` variables to place the transport, the plate and the progress row (`-stage-width`, `-stage-height`, `-progress-inset`, `-progress-height`, `-plate-gap`, `-plate-overhang`, `-plate-top`, `-frame-bottom-gap`, `-header-bottom`, `-transport-margin`, `-transport-y`, `-karaoke-font-size`, `-karaoke-translated-font-size`). They are internal. Each is derived from the others, so changing one can push the controls into the lines. The normal layout also has internal variables for its artwork minimum: `--blyrics-pip-artwork-aspect`, `-artwork-min-height`, `-artwork-min-width`, `-chrome-height` and `-transport-edge`.
 
 ## Optional image highlights and HDR
 
