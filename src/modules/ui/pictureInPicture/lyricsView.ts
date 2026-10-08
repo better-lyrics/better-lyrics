@@ -66,6 +66,8 @@ const WINDOW_CONTROL_ICONS = {
   play: playerControlIcons.play,
   pause: playerControlIcons.pause,
   close: controlIcons.pictureInPictureExit,
+  song: controlIcons.musicNote,
+  video: controlIcons.videoCamera,
 } as const;
 
 type WindowControlIcon = keyof typeof WINDOW_CONTROL_ICONS;
@@ -825,8 +827,11 @@ export class PictureInPictureLyricsView {
   private createModeButton(mode: PlaybackMode): HTMLButtonElement {
     const button = this.pipWindow.document.createElement("button");
     button.type = "button";
+    const label = this.dependencies.translate(PLAYBACK_MODE_LABEL_KEYS[mode]);
     button.className = "blyrics-pip-mode-toggle__option";
-    button.textContent = this.dependencies.translate(PLAYBACK_MODE_LABEL_KEYS[mode]);
+    button.setAttribute("aria-label", label);
+    button.title = label;
+    button.appendChild(createControlIcon(this.pipWindow.document, mode));
     button.setAttribute("aria-pressed", "false");
     button.addEventListener(
       "click",

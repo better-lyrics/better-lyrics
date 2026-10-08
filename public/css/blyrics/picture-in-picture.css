@@ -216,7 +216,7 @@ body {
 
 /* -- Artwork minimum --------------------------------------------------------- */
 .blyrics-pip-shell:not([data-layout="stage"]) .blyrics-pip-artwork {
-  --blyrics-pip-chrome-height: max(28px, 12px * 1.4 + 12px);
+  --blyrics-pip-chrome-height: 28px;
   --blyrics-pip-artwork-min-height: calc(
     var(--blyrics-pip-chrome-height) + var(--blyrics-pip-control-size) * 1.25 + 24px
   );
@@ -427,20 +427,22 @@ body {
 
 .blyrics-pip-mode-toggle__option {
   position: relative;
-  padding: 3px 10px;
+  display: grid;
+  padding: 3px 6px;
   border: 0;
   border-radius: 999px;
+  place-items: center;
   background: none;
   color: rgb(255 255 255 / 72%);
-  font: inherit;
-  font-size: 12px;
-  font-weight: 600;
-  line-height: 1.4;
-  white-space: nowrap;
   cursor: pointer;
   transition:
     background-color 140ms ease,
     color 140ms ease;
+}
+
+.blyrics-pip-mode-toggle__option .blyrics-pip-artwork__control-icon {
+  width: 16px;
+  height: 16px;
 }
 
 .blyrics-pip-mode-toggle__option:hover {
@@ -1618,7 +1620,7 @@ body {
   }
 }
 
-@media (max-height: 245px) {
+@media (max-height: 230px) {
   .blyrics-pip-shell:not([data-video="on"], [data-layout="stage"]) {
     padding-block: 8px;
   }
@@ -1628,7 +1630,7 @@ body {
   }
 }
 
-@media (max-height: 215px) {
+@media (max-height: 200px) {
   .blyrics-pip-shell:not([data-video="on"], [data-layout="stage"]) .blyrics-pip-progress {
     display: none;
   }
