@@ -1493,14 +1493,20 @@ body {
 }
 
 .blyrics-pip-shell[data-layout="stage"] .blyrics-pip-mode-toggle {
-  transition: opacity 180ms ease;
+  transition:
+    opacity 180ms ease,
+    visibility 0s;
 }
 
 @media not all and (max-aspect-ratio: 4/5) {
   @media (max-width: 340px) {
     .blyrics-pip-shell[data-layout="stage"][data-stage-card="title"] .blyrics-pip-mode-toggle {
+      visibility: hidden;
       opacity: 0;
       pointer-events: none;
+      transition:
+        opacity 180ms ease,
+        visibility 0s 180ms;
     }
   }
 }
