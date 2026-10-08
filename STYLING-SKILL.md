@@ -573,6 +573,9 @@ With the "Karaoke subtitles" option on (the default) and a music video in fullsc
 |------|-------|
 | `.blyrics-karaoke-surface` | Backdrop shared by both plates and the title card |
 | `--blyrics-karaoke-video-scale` | Unitless, default `1`; e.g. `0.94` shrinks the video and overlay relative to the screen |
+| `--blyrics-karaoke-plate-padding-block` / `-inline` | Defaults `0.18em` / `0.55em`; padding of the plate around a sung line. Any unit; `em` follows the lyric size |
+| `--blyrics-karaoke-card-padding-block` / `-inline` | Defaults `0.36em` / `0.8em`; padding of the plate around the end card |
+| `--blyrics-karaoke-plate-radius` | Default `0.46em`; corner radius of both plates and the title card. The line clip follows it |
 | `--blyrics-font-size` | Sets the karaoke lyric size, as elsewhere |
 | `--blyrics-scale` / `--blyrics-active-scale` | Forced to `1` on `#blyrics-karaoke .blyrics-container`; no line scaling in karaoke |
 | `--blyrics-stage-opacity` | Set by the engine; stage line `opacity` reads it with `!important` |
@@ -645,6 +648,7 @@ With "Show music video" on and YouTube Music in video mode, the floating window 
 | Hook | Notes |
 |------|-------|
 | `--blyrics-pip-video-aspect` | Read-only. Video's `W / H`, set inline on `.blyrics-pip-shell`; unset until known, rules fall back to `16 / 9` |
+| Plate variables in the window | The window sets them on `.blyrics-pip-shell[data-layout="stage"]`: radius `0.75rem`, line padding `0.5rem` / `0.75rem`, end card padding `0.5rem` / `1rem`. Override them there in `rem` or `px`; the window reads them there to keep the plate clear of the progress row and transport |
 | `--blyrics-pip-karaoke-text-scale` | Read-only. Unitless, set inline on `.blyrics-pip-shell` on resize; stage `--blyrics-font-size` and `--blyrics-translated-font-size` are multiplied by it. The transport uses it too, so overriding moves text but not controls |
 | `--blyrics-pip-control-tint` | Default `rgb(0 0 0 / 28%)`, on `.blyrics-pip-artwork__controls`; background of control discs and the mode pill |
 | `--blyrics-pip-control-backdrop` | Default `blur(8px)`, on `.blyrics-pip-artwork__controls`; `backdrop-filter` of control discs and the mode pill |

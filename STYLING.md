@@ -1877,6 +1877,23 @@ Each backdrop can also be styled on its own: the intro card is `.blyrics-karaoke
 }
 ```
 
+The plate's size and corners come from five variables. Set them on `#blyrics-karaoke` or any parent. Any unit works: `em` follows the lyric size, `rem` and `px` stay fixed. The plate grows around the text by its padding, and the lines are clipped to the same corners.
+
+| Variable | Default | What it does |
+|----------|---------|--------------|
+| `--blyrics-karaoke-plate-padding-block` | `0.18em` | Space above and below a sung line |
+| `--blyrics-karaoke-plate-padding-inline` | `0.55em` | Space left and right of a sung line |
+| `--blyrics-karaoke-card-padding-block` | `0.36em` | Space above and below the end card |
+| `--blyrics-karaoke-card-padding-inline` | `0.8em` | Space left and right of the end card |
+| `--blyrics-karaoke-plate-radius` | `0.46em` | Corner radius of both plates and the intro title card |
+
+```css
+#blyrics-karaoke {
+  --blyrics-karaoke-plate-padding-block: 0.3em;
+  --blyrics-karaoke-plate-radius: 0.6em;
+}
+```
+
 The lyric size comes from `--blyrics-font-size`, the same as everywhere else. Line scaling is turned off inside karaoke: `--blyrics-scale` and `--blyrics-active-scale` are forced to `1` on `#blyrics-karaoke .blyrics-container`, so sung and waiting lines keep the same size.
 
 ### Bars Around the Video
@@ -1943,6 +1960,14 @@ The stage is a second `#blyrics-karaoke` overlay, built inside the floating wind
 ```css
 .blyrics-pip-shell #blyrics-karaoke .blyrics-karaoke-surface {
   background: rgb(0 0 0 / 55%);
+}
+```
+
+The window sets its own plate size on `.blyrics-pip-shell`: a `0.75rem` radius, `0.5rem` by `0.75rem` padding around a line, and `0.5rem` by `1rem` around the end card. They are in `rem` so the plate stays readable around the scaled down text. To change them in the window, set the same variables on `.blyrics-pip-shell[data-layout="stage"]` and use `rem` or `px`. The window reads them there to keep the lines clear of the progress row and the transport, so a value set only on `#blyrics-karaoke` or in `em` can let the plate run into the controls.
+
+```css
+.blyrics-pip-shell[data-layout="stage"] {
+  --blyrics-karaoke-plate-padding-block: 0.375rem;
 }
 ```
 

@@ -1361,6 +1361,15 @@ body {
   --blyrics-pip-stage-height: min(100vh, 100vw / (var(--blyrics-pip-video-aspect, 16 / 9)));
   --blyrics-pip-progress-inset: 12px;
   --blyrics-pip-plate-gap: 12px;
+  --blyrics-karaoke-plate-radius: 0.75rem;
+  --blyrics-karaoke-plate-padding-block: 0.5rem;
+  --blyrics-karaoke-plate-padding-inline: 0.75rem;
+  --blyrics-karaoke-card-padding-block: 0.5rem;
+  --blyrics-karaoke-card-padding-inline: 1rem;
+  --blyrics-pip-plate-overhang: max(
+    var(--blyrics-karaoke-plate-padding-block),
+    var(--blyrics-karaoke-card-padding-block)
+  );
 }
 
 .blyrics-pip-shell[data-layout="stage"] #blyrics-karaoke {
@@ -1370,7 +1379,6 @@ body {
   --blyrics-pip-karaoke-translated-font-size: calc(
     var(--blyrics-translated-font-size) * var(--blyrics-pip-karaoke-text-scale, 1)
   );
-  --blyrics-pip-plate-overhang: calc(var(--blyrics-pip-karaoke-font-size) * 0.36);
   --blyrics-pip-frame-bottom-gap: var(--blyrics-karaoke-frame-y);
 }
 
@@ -1445,8 +1453,12 @@ body {
   --blyrics-pip-progress-height: 22px;
   --blyrics-pip-transport-margin: 6px;
   --blyrics-pip-plate-top: calc(
-    100vh - var(--blyrics-pip-progress-inset) - var(--blyrics-pip-progress-height) - var(--blyrics-pip-plate-gap) -
-      var(--blyrics-font-size) * var(--blyrics-pip-karaoke-text-scale, 1) * (var(--blyrics-line-height, 1.333) + 0.56)
+    min(
+        100vh - var(--blyrics-pip-progress-inset) - var(--blyrics-pip-progress-height) - var(--blyrics-pip-plate-gap) -
+          var(--blyrics-pip-plate-overhang),
+        (100vh + var(--blyrics-pip-stage-height)) / 2 - var(--blyrics-pip-stage-height) * 0.075
+      ) - var(--blyrics-font-size) * var(--blyrics-pip-karaoke-text-scale, 1) * (var(--blyrics-line-height, 1.333) + 0.2) -
+      var(--blyrics-karaoke-plate-padding-block)
   );
   --blyrics-pip-control-size: clamp(
     20px,

@@ -5,14 +5,18 @@ import { isTitleCardVisible } from "@modules/karaoke/titleCard";
 
 const OVERLAY_ID = "blyrics-karaoke";
 const SNAP_CLASS = "is-snap";
-const PLATE_PAD_EM = { x: 0.55, y: 0.18 };
-const CARD_PAD_EM = { x: 0.8, y: 0.36 };
-const PLATE_RADIUS_EM = 0.46;
+const END_CARD_ATTRIBUTE = "data-end-card";
 // Under this shared width a new plate fades in rather than the old one sliding across the screen.
 const MIN_SHARED_WIDTH = 0.5;
 const MAX_SPRING_RATIO = 1.5;
 
 type PlateMotion = "grow" | "shrink" | "resize";
+
+interface PlateGeometry {
+  padX: number;
+  padY: number;
+  radius: number;
+}
 
 interface OverlayParts {
   root: HTMLElement;
@@ -103,6 +107,19 @@ export function createKaraokeOverlay(options: KaraokeOverlayOptions): KaraokeOve
   let lastPlate: StageBox | null = null;
   let isMountClipped = false;
   let activePlate = 0;
+
+  const readPlateGeometry = (plate: HTMLElement, isCard: boolean): PlateGeometry => {
+    const wasCard = plate.hasAttribute(END_CARD_ATTRIBUTE);
+    plate.toggleAttribute(END_CARD_ATTRIBUTE, isCard);
+    const style = view.getComputedStyle(plate);
+    const geometry = {
+      padX: Number.parseFloat(style.paddingLeft) || 0,
+      padY: Number.parseFloat(style.paddingTop) || 0,
+      radius: Number.parseFloat(style.borderTopLeftRadius) || 0,
+    };
+    plate.toggleAttribute(END_CARD_ATTRIBUTE, wasCard);
+    return geometry;
+  };
 
   function clipMount(mount: HTMLElement, rect: StageBox, radius: number): void {
     mount.style.clipPath = `xywh(${rect.x.toFixed(1)}px ${rect.y.toFixed(1)}px ${rect.width.toFixed(1)}px ${rect.height.toFixed(1)}px round ${radius.toFixed(1)}px)`;
@@ -202,13 +219,8 @@ export function createKaraokeOverlay(options: KaraokeOverlayOptions): KaraokeOve
         return;
       }
 
-      const container = mount.firstElementChild;
-      const fontSize = container ? Number.parseFloat(view.getComputedStyle(container).fontSize) || 16 : 16;
       const isCard = mount.querySelector(`.${CREDITS_CLASS}[data-stage-role="current"]`) !== null;
-      const pad = isCard ? CARD_PAD_EM : PLATE_PAD_EM;
-      const padX = fontSize * pad.x;
-      const padY = fontSize * pad.y;
-      const radius = fontSize * PLATE_RADIUS_EM;
+      const { padX, padY, radius } = readPlateGeometry(plate, isCard);
       const target: StageBox = {
         x: box.x - padX,
         y: box.y - padY,
@@ -222,11 +234,11 @@ export function createKaraokeOverlay(options: KaraokeOverlayOptions): KaraokeOve
         plate.removeAttribute("data-plate");
         activePlate = 1 - activePlate;
         unclipMount(mount);
-        plates[activePlate].toggleAttribute("data-end-card", isCard);
+        plates[activePlate].toggleAttribute(END_CARD_ATTRIBUTE, isCard);
         snapPlate(stage, plates[activePlate], target);
         return;
       }
-      plate.toggleAttribute("data-end-card", isCard);
+      plate.toggleAttribute(END_CARD_ATTRIBUTE, isCard);
       if (!previous) {
         snapPlate(stage, plate, target);
         clipMount(mount, target, radius);
