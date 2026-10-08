@@ -12,12 +12,12 @@ import {
   onLyricsSynced,
   type PictureInPictureLyricsPayload,
   type PictureInPictureLyricsSynced,
-} from "./bridge";
-import { PictureInPictureController } from "./controller";
-import { PictureInPictureLyricsView } from "./lyricsView";
-import { createPictureInPictureLyricsHost } from "./pipLyricsHost";
-import type { PictureInPictureHostEnvironment } from "./types";
-import { createVideoMirror, type VideoMirror } from "./videoMirror";
+} from "@modules/ui/pictureInPicture/bridge";
+import { PictureInPictureController } from "@modules/ui/pictureInPicture/controller";
+import { PictureInPictureLyricsView } from "@modules/ui/pictureInPicture/lyricsView";
+import { createPictureInPictureLyricsHost } from "@modules/ui/pictureInPicture/pipLyricsHost";
+import type { PictureInPictureHostEnvironment } from "@modules/ui/pictureInPicture/types";
+import { createVideoMirror, type VideoMirror } from "@modules/ui/pictureInPicture/videoMirror";
 import {
   expectsSyncedLyrics,
   fitWindowSize,
@@ -26,7 +26,7 @@ import {
   parseWindowFrame,
   type WindowSize,
   withWindowFrame,
-} from "./windowSize";
+} from "@modules/ui/pictureInPicture/windowSize";
 
 const PIP_OPEN_ATTRIBUTE = "blyrics-pip-open";
 const FOOTER_SOURCE_LINK_ID = "betterLyricsFooterLink";

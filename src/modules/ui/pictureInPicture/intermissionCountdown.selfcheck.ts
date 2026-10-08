@@ -1,5 +1,5 @@
 import { strict as assert } from "node:assert";
-import { type CountdownState, nextCountdown } from "./intermissionCountdown";
+import { type CountdownState, nextCountdown } from "@modules/ui/pictureInPicture/intermissionCountdown";
 
 // -- Start of an ad ---------------------------------
 assert.deepEqual(nextCountdown(14.2, null), { state: { remainingS: 14.2, shownS: 15 }, isNewAd: true }, "first tick");

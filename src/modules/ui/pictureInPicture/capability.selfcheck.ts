@@ -1,12 +1,12 @@
 import { strict as assert } from "node:assert";
-import { getPictureInPictureCapability } from "./capability";
-import { createGatedToggle, PictureInPictureController } from "./controller";
+import { getPictureInPictureCapability } from "@modules/ui/pictureInPicture/capability";
+import { createGatedToggle, PictureInPictureController } from "@modules/ui/pictureInPicture/controller";
 import type {
   DocumentPictureInPicture,
   DocumentPictureInPictureWindowOptions,
   PictureInPictureControllerDependencies,
-} from "./types";
-import { fitWindowSize, type WindowContent } from "./windowSize";
+} from "@modules/ui/pictureInPicture/types";
+import { fitWindowSize, type WindowContent } from "@modules/ui/pictureInPicture/windowSize";
 
 function songModeContent(layout: unknown): WindowContent {
   return {

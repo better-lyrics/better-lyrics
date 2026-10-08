@@ -5,11 +5,11 @@ import {
   type PictureInPictureInitPayload,
   sendSignal,
   type PictureInPictureSignal,
-} from "./bridge";
+} from "@modules/ui/pictureInPicture/bridge";
 import { createLogSink, type LogSink, warnGeneral } from "@core/logger";
-import type { PictureInPictureController } from "./controller";
-import { createPictureInPictureHost } from "./pipHost";
-import type { PictureInPictureSongMetadata } from "./types";
+import type { PictureInPictureController } from "@modules/ui/pictureInPicture/controller";
+import { createPictureInPictureHost } from "@modules/ui/pictureInPicture/pipHost";
+import type { PictureInPictureSongMetadata } from "@modules/ui/pictureInPicture/types";
 
 const IGNORED_AUTO_RESTORE_KEYS = new Set(["Escape", "Alt", "Control", "Meta", "Shift"]);
 

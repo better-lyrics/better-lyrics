@@ -1,6 +1,6 @@
 import { formatTime } from "@modules/ui/playerControls/timeFormat";
-import { type CountdownState, nextCountdown } from "./intermissionCountdown";
-import { splitUpNext } from "./intermissionText";
+import { type CountdownState, nextCountdown } from "@modules/ui/pictureInPicture/intermissionCountdown";
+import { splitUpNext } from "@modules/ui/pictureInPicture/intermissionText";
 
 export interface Intermission {
   readonly element: HTMLElement;

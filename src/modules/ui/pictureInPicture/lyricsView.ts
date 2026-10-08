@@ -15,9 +15,14 @@ import { createProgressBar, type ProgressBarHandle } from "@modules/ui/playerCon
 import { cssTimeMs } from "@/ui/motion";
 import type { KaraokeOverlayBar } from "@modules/karaoke/overlay";
 import type { PlayerDetails } from "@core/appState";
-import { createHeaderLine, fillHeaderLayer, getHeaderLayers, PictureInPictureHeaderMarquee } from "./headerMarquee";
-import { createIntermission, type Intermission } from "./intermission";
-import { AD_UP_NEXT_SLOT } from "./intermissionText";
+import {
+  createHeaderLine,
+  fillHeaderLayer,
+  getHeaderLayers,
+  PictureInPictureHeaderMarquee,
+} from "@modules/ui/pictureInPicture/headerMarquee";
+import { createIntermission, type Intermission } from "@modules/ui/pictureInPicture/intermission";
+import { AD_UP_NEXT_SLOT } from "@modules/ui/pictureInPicture/intermissionText";
 import {
   canFlipStartModeSwitch,
   type CounterpartPair,
@@ -28,12 +33,15 @@ import {
   type ModeSwitchSurface,
   recordFlip,
   recordTrackChange,
-} from "./modeSwitch";
-import type { PictureInPicturePlaybackSnapshot, PictureInPictureViewDependencies } from "./types";
-import type { VideoMirrorState } from "./videoMirrorState";
-import { stageTextScale } from "./stageTextScale";
-import { planVideoSwap } from "./videoSwapPlan";
-import type { WindowSize } from "./windowSize";
+} from "@modules/ui/pictureInPicture/modeSwitch";
+import type {
+  PictureInPicturePlaybackSnapshot,
+  PictureInPictureViewDependencies,
+} from "@modules/ui/pictureInPicture/types";
+import type { VideoMirrorState } from "@modules/ui/pictureInPicture/videoMirrorState";
+import { stageTextScale } from "@modules/ui/pictureInPicture/stageTextScale";
+import { planVideoSwap } from "@modules/ui/pictureInPicture/videoSwapPlan";
+import type { WindowSize } from "@modules/ui/pictureInPicture/windowSize";
 
 interface DisplayMetadata {
   readonly title: string;

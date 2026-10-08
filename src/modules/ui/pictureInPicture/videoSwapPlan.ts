@@ -1,4 +1,4 @@
-import type { VideoMirrorState } from "./videoMirrorState";
+import type { VideoMirrorState } from "@modules/ui/pictureInPicture/videoMirrorState";
 
 interface VideoSwapInputs<TTrack> {
   readonly state: VideoMirrorState;

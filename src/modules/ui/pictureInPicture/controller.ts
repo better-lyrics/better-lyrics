@@ -1,11 +1,11 @@
-import { getPictureInPictureCapability } from "./capability";
+import { getPictureInPictureCapability } from "@modules/ui/pictureInPicture/capability";
 import type {
   DocumentPictureInPicture,
   DocumentPictureInPictureWindowOptions,
   PictureInPictureControllerDependencies,
   PictureInPictureToggle,
-} from "./types";
-import type { WindowSize } from "./windowSize";
+} from "@modules/ui/pictureInPicture/types";
+import type { WindowSize } from "@modules/ui/pictureInPicture/windowSize";
 
 function getRequestOptions(size: WindowSize): DocumentPictureInPictureWindowOptions {
   return { width: size.width, height: size.height, disallowReturnToOpener: true };

@@ -1,6 +1,6 @@
 import { shouldShowWindowStage } from "@modules/karaoke/gate";
-import type { PictureInPictureLyricsSynced } from "./bridge";
-import { videoMirrorState } from "./videoMirrorState";
+import type { PictureInPictureLyricsSynced } from "@modules/ui/pictureInPicture/bridge";
+import { videoMirrorState } from "@modules/ui/pictureInPicture/videoMirrorState";
 
 export interface WindowSize {
   readonly width: number;

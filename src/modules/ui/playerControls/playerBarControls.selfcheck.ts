@@ -12,7 +12,7 @@ import {
   toggleDislike,
   toggleLike,
   type TransportAction,
-} from "./playerBarControls";
+} from "@modules/ui/playerControls/playerBarControls";
 
 interface FakeEl {
   attrs: Record<string, string>;

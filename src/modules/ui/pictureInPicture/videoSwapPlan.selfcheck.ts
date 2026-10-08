@@ -1,5 +1,5 @@
 import { strict as assert } from "node:assert";
-import { planVideoSwap } from "./videoSwapPlan";
+import { planVideoSwap } from "@modules/ui/pictureInPicture/videoSwapPlan";
 
 const trackA = { id: "a" };
 const trackB = { id: "b" };

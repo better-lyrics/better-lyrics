@@ -1,5 +1,9 @@
 import { strict as assert } from "node:assert";
-import { STAGE_MIN_FONT_PX, type StageTextScaleInput, stageTextScale } from "./stageTextScale";
+import {
+  STAGE_MIN_FONT_PX,
+  type StageTextScaleInput,
+  stageTextScale,
+} from "@modules/ui/pictureInPicture/stageTextScale";
 
 const SCREEN = { width: 1920, height: 1080 };
 const BASE_FONT_PX = 48;

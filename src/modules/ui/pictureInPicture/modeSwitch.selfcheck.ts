@@ -10,7 +10,7 @@ import {
   type ModeSwitchSurface,
   recordFlip,
   recordTrackChange,
-} from "./modeSwitch";
+} from "@modules/ui/pictureInPicture/modeSwitch";
 
 // -- Counterpart pairs --------------------------
 

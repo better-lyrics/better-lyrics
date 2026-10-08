@@ -1,5 +1,10 @@
 import { strict as assert } from "node:assert";
-import { pickVideoTrack, type VideoMirrorInputs, videoMirrorState, wantsQualityBoost } from "./videoMirrorState";
+import {
+  pickVideoTrack,
+  type VideoMirrorInputs,
+  videoMirrorState,
+  wantsQualityBoost,
+} from "@modules/ui/pictureInPicture/videoMirrorState";
 
 const playing: VideoMirrorInputs = { enabled: true, videoMode: true, adPlaying: false, hasVideoTrack: true };
 

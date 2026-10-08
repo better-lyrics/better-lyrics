@@ -1,4 +1,4 @@
-import type { WindowSize } from "./windowSize";
+import type { WindowSize } from "@modules/ui/pictureInPicture/windowSize";
 
 export interface StageTextScaleInput {
   readonly viewport: WindowSize;

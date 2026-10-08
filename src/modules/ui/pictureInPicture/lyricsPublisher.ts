@@ -1,6 +1,6 @@
 import { AppState } from "@core/appState";
 import { currentViewLyrics } from "@modules/lyrics/viewLyrics";
-import { sendLyrics, sendLyricsSynced } from "./bridge";
+import { sendLyrics, sendLyricsSynced } from "@modules/ui/pictureInPicture/bridge";
 
 /**
  * Hands the floating window the lyrics it renders and the settings it renders them against. Called

@@ -7,7 +7,7 @@ import {
   parseWindowFrame,
   type WindowContent,
   withWindowFrame,
-} from "./windowSize";
+} from "@modules/ui/pictureInPicture/windowSize";
 
 const HORIZONTAL = { width: 720, height: 300 };
 const VERTICAL = { width: 340, height: 720 };

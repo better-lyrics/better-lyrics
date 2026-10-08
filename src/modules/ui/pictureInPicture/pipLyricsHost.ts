@@ -1,7 +1,7 @@
 import { AD_PLAYING_ATTR, PLAYER_BAR_SELECTOR, SEEK_EVENT } from "@constants";
 import type { LyricsRendererHost } from "@braccato/core";
-import type { PictureInPictureLyricsView } from "./lyricsView";
-import type { PictureInPictureViewDependencies } from "./types";
+import type { PictureInPictureLyricsView } from "@modules/ui/pictureInPicture/lyricsView";
+import type { PictureInPictureViewDependencies } from "@modules/ui/pictureInPicture/types";
 
 /**
  * The floating window's answers to what a lyrics view cannot work out on its own. Everything

@@ -1,6 +1,6 @@
 import type { LyricDecorations, SyncType } from "@modules/lyrics/injectLyrics";
 import type { Lyric } from "@braccato/core";
-import type { PictureInPictureSongMetadata } from "./types";
+import type { PictureInPictureSongMetadata } from "@modules/ui/pictureInPicture/types";
 import { warnGeneral } from "@core/logger";
 
 const PIP_INIT_EVENT = "blyrics-pip-init" as const;

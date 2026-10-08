@@ -45,9 +45,9 @@ import { fetchOwnGamification, renderIdentityStats } from "@modules/unison/gamif
 import type Sortable from "sortablejs";
 import { initializeThemes } from "@/options/editor/themesUi";
 import { openEditCSS, openOptions } from "@/options/editor/ui/dom";
-import { showModal } from "./editor/ui/feedback";
-import { initStoreUI, setupYourThemesButton } from "./store/store";
-import { checkForStableRelease } from "./updateNotice";
+import { showModal } from "@/options/editor/ui/feedback";
+import { initStoreUI, setupYourThemesButton } from "@/options/store/store";
+import { checkForStableRelease } from "@/options/updateNotice";
 import { errorCore, warnCore } from "@core/logger";
 
 import { normalizeVideoQualitySettings, type VideoQualitySettings } from "@modules/settings/videoQuality";

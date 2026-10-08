@@ -7,7 +7,12 @@ import {
   isVideoModeShown,
   VIDEO_MODE_ATTR,
 } from "@modules/ui/playerControls/playerBarControls";
-import { pickVideoTrack, type VideoMirrorState, videoMirrorState, wantsQualityBoost } from "./videoMirrorState";
+import {
+  pickVideoTrack,
+  type VideoMirrorState,
+  videoMirrorState,
+  wantsQualityBoost,
+} from "@modules/ui/pictureInPicture/videoMirrorState";
 
 interface VideoMirrorOptions {
   readonly sourceDocument: Document;
