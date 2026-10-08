@@ -242,31 +242,31 @@
     "description": "Toggle label inside the lyrics controls dock modal for showing the floating dock"
   },
   "options_unisonModal_showPinned_hint": {
-    "message": "A floating dock to switch source, toggle translation and romanization, nudge sync, and vote on Unison lyrics",
+    "message": "Painel flutuante para mudar fonte, ativar tradução e romanização, sincronizar e votar em letras de Unison",
     "description": "Hint text under the Show controls dock toggle"
   },
   "options_unisonModal_autoHide": {
-    "message": "Auto-hide in fullscreen",
+    "message": "Ocultar automaticamente em tela cheia",
     "description": "Toggle label inside the Unison Actions modal for auto-hiding the dock when idle in fullscreen"
   },
   "options_unisonModal_autoHide_hint": {
-    "message": "Hide the floating control when you are idle in fullscreen mode",
+    "message": "Ocultar o controle flutuante enquanto ocioso no modo de tela cheia",
     "description": "Hint text under the Auto-hide in fullscreen toggle"
   },
   "options_unisonModal_position": {
-    "message": "Position",
+    "message": "Posição",
     "description": "Label above the visual position picker in the Unison Actions modal"
   },
   "options_unisonModal_position_topLeft": {
-    "message": "Top left",
+    "message": "Topo à esquerda",
     "description": "Tooltip for the top-left cell in the Unison position picker"
   },
   "options_unisonModal_position_topCenter": {
-    "message": "Top center",
+    "message": "Topo central",
     "description": "Tooltip for the top-center cell in the Unison position picker"
   },
   "options_unisonModal_position_topRight": {
-    "message": "Top right",
+    "message": "Topo à direita",
     "description": "Tooltip for the top-right cell in the Unison position picker"
   },
   "options_unisonModal_position_bottomLeft": {
@@ -534,11 +534,11 @@
     "description": "Status when nickname request fails"
   },
   "options_alert_refreshFailed": {
-    "message": "Could not refresh lyrics. Open YouTube Music and try again.",
+    "message": "Não foi possível atualizar a letra. Abra o YouTube Music e tente novamente.",
     "description": "Shown when the popup's Refresh lyrics button finds no YouTube Music tab or none of them responds"
   },
   "options_alert_importEmpty": {
-    "message": "Paste identity JSON or choose a file first.",
+    "message": "Cole o JSON de identidade ou escolha um arquivo primeiro.",
     "description": "Shown when the user clicks Import with no JSON provided"
   },
   "options_modal_selectTheme": {
@@ -590,7 +590,7 @@
     "description": "Identity load error message"
   },
   "editor_alert_nothingToSave": {
-    "message": "No styles to save as a theme",
+    "message": "Sem estilos para salvar como tema",
     "description": "Toast when the user saves an empty editor as a custom theme"
   },
   "editor_alert_saveDialogOpened": {
