@@ -13,7 +13,7 @@ import {
 } from "@modules/ui/playerControls/playerBarControls";
 import { createProgressBar, type ProgressBarHandle } from "@modules/ui/playerControls/progressBar";
 import { cssTimeMs } from "@/ui/motion";
-import type { KaraokeOverlayBar } from "@modules/karaoke/overlay";
+import type { KaraokeCard, KaraokeOverlayBar } from "@modules/karaoke/overlay";
 import type { PlayerDetails } from "@core/appState";
 import {
   createHeaderLine,
@@ -541,6 +541,16 @@ export class PictureInPictureLyricsView {
         return () => observer.disconnect();
       },
     };
+  }
+
+  setStageCard(card: KaraokeCard | null, heightPx: number): void {
+    if (card) {
+      this.shell.setAttribute("data-stage-card", card);
+      this.shell.style.setProperty("--blyrics-pip-card-height", `${heightPx}px`);
+      return;
+    }
+    this.shell.removeAttribute("data-stage-card");
+    this.shell.style.removeProperty("--blyrics-pip-card-height");
   }
 
   get videoId(): string | null {

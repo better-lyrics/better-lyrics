@@ -1841,6 +1841,7 @@ There are two plates so that when the next line is somewhere else on screen, a n
 |-----------|--------------|
 | `#blyrics-karaoke[data-bar]` | The YouTube Music player bar is showing; the lines lift above it |
 | `#blyrics-karaoke[data-title-card]` | The intro title card is showing; the stage is hidden |
+| `#blyrics-karaoke[data-card]` | A card is showing: `title` for the intro title card, `end` for the end card. Absent while sung lines show |
 | `.blyrics-karaoke__plate[data-plate]` | This plate is behind the line being sung |
 | `.blyrics-karaoke__plate[data-end-card]` | This plate is behind the end card (songwriter credits and source); it keeps the attribute while it fades out |
 
@@ -1970,6 +1971,8 @@ The window sets its own plate size on `.blyrics-pip-shell`: a `0.75rem` radius, 
   --blyrics-karaoke-plate-padding-block: 0.375rem;
 }
 ```
+
+While a card shows, the window sets `data-stage-card` on `.blyrics-pip-shell` (`title` or `end`, the same as `data-card` on the overlay) and `--blyrics-pip-card-height`, the card's height in pixels. The transport uses them to stay above the card, and the header hides while the title card shows because the card repeats the title and artist. Both are read-only.
 
 The window scales the karaoke text down to its size. The factor is `--blyrics-pip-karaoke-text-scale`, a unitless number the extension sets on `.blyrics-pip-shell` when the window resizes. Inside the stage, `--blyrics-font-size` and `--blyrics-translated-font-size` are your values multiplied by it, so set those as usual and the window keeps them in proportion. Treat the factor as read-only: the transport controls place themselves with it, so an override moves the text but not the controls.
 

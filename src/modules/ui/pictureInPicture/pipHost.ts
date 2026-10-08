@@ -580,6 +580,7 @@ export function createPictureInPictureHost(
         mountParent: view.stageParent,
         writtenByLabel: environment.view.translate("lyrics_writtenBy"),
         bar: view.stageBar,
+        onCardChange: (card, heightPx) => view.setStageCard(card, heightPx),
       },
       isVisible: () => isStageShown,
       isAdPlaying: () => isAdPlaying(document),

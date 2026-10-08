@@ -18,11 +18,14 @@ interface PlateGeometry {
   radius: number;
 }
 
+export type KaraokeCard = "title" | "end";
+
 interface OverlayParts {
   root: HTMLElement;
   stage: HTMLElement;
   plates: [HTMLElement, HTMLElement];
   mount: HTMLElement;
+  titleCard: HTMLElement;
   title: HTMLElement;
   artist: HTMLElement;
   credit: HTMLElement;
@@ -44,6 +47,7 @@ export interface KaraokeOverlayOptions {
   readonly mountParent: HTMLElement;
   readonly writtenByLabel: string;
   readonly bar: KaraokeOverlayBar | null;
+  readonly onCardChange?: (card: KaraokeCard | null, heightPx: number) => void;
 }
 
 interface KaraokeOverlay {
@@ -107,6 +111,26 @@ export function createKaraokeOverlay(options: KaraokeOverlayOptions): KaraokeOve
   let lastPlate: StageBox | null = null;
   let isMountClipped = false;
   let activePlate = 0;
+  let endCardHeight: number | null = null;
+  let shownCard: { card: KaraokeCard | null; heightPx: number } = { card: null, heightPx: 0 };
+
+  function syncCard(): void {
+    if (!parts) return;
+    let card: KaraokeCard | null = null;
+    let heightPx = 0;
+    if (isTitleCardShown) {
+      card = "title";
+      heightPx = parts.titleCard.offsetHeight;
+    } else if (endCardHeight !== null) {
+      card = "end";
+      heightPx = endCardHeight;
+    }
+    if (card) parts.root.setAttribute("data-card", card);
+    else parts.root.removeAttribute("data-card");
+    if (card === shownCard.card && Math.abs(heightPx - shownCard.heightPx) < 0.5) return;
+    shownCard = { card, heightPx };
+    options.onCardChange?.(card, heightPx);
+  }
 
   const readPlateGeometry = (plate: HTMLElement, isCard: boolean): PlateGeometry => {
     const wasCard = plate.hasAttribute(END_CARD_ATTRIBUTE);
@@ -160,7 +184,7 @@ export function createKaraokeOverlay(options: KaraokeOverlayOptions): KaraokeOve
 
     root.append(stage, titleCard);
     options.mountParent.append(root);
-    return { root, stage, plates, mount, title, artist, credit };
+    return { root, stage, plates, mount, titleCard, title, artist, credit };
   }
 
   function ensureParts(): OverlayParts {
@@ -198,6 +222,7 @@ export function createKaraokeOverlay(options: KaraokeOverlayOptions): KaraokeOve
       resizeHandle = observeResize(barElement ? [parts.stage, barElement] : [parts.stage], () => {
         measurePlayerBar();
         onResize();
+        syncCard();
       });
     },
 
@@ -206,6 +231,7 @@ export function createKaraokeOverlay(options: KaraokeOverlayOptions): KaraokeOve
       titleText.textContent = title;
       artistText.textContent = artist;
       credit.textContent = songwriters.length > 0 ? `${options.writtenByLabel} ${formatNames(songwriters)}` : "";
+      syncCard();
     },
 
     setPlateBox(box: StageBox | null): void {
@@ -216,6 +242,8 @@ export function createKaraokeOverlay(options: KaraokeOverlayOptions): KaraokeOve
       if (!box) {
         plate.removeAttribute("data-plate");
         unclipMount(mount);
+        endCardHeight = null;
+        syncCard();
         return;
       }
 
@@ -229,6 +257,8 @@ export function createKaraokeOverlay(options: KaraokeOverlayOptions): KaraokeOve
       };
       const previous = wasShown ? lastPlate : null;
       lastPlate = target;
+      endCardHeight = isCard ? target.height - padY : null;
+      syncCard();
 
       if (previous && sharedWidth(previous, target) < MIN_SHARED_WIDTH) {
         plate.removeAttribute("data-plate");
@@ -260,6 +290,9 @@ export function createKaraokeOverlay(options: KaraokeOverlayOptions): KaraokeOve
       stopObserving();
       parts?.root.remove();
       parts = null;
+      endCardHeight = null;
+      if (shownCard.card) options.onCardChange?.(null, 0);
+      shownCard = { card: null, heightPx: 0 };
       lastPlate = null;
       isMountClipped = false;
       activePlate = 0;
@@ -272,6 +305,7 @@ export function createKaraokeOverlay(options: KaraokeOverlayOptions): KaraokeOve
       if (shown === isTitleCardShown) return;
       isTitleCardShown = shown;
       parts.root.toggleAttribute("data-title-card", shown);
+      syncCard();
     },
   };
 }

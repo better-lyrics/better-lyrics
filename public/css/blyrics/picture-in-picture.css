@@ -1452,13 +1452,14 @@ body {
   --blyrics-pip-header-bottom: 50px;
   --blyrics-pip-progress-height: 22px;
   --blyrics-pip-transport-margin: 6px;
+  --blyrics-pip-stage-anchor: min(
+    100vh - var(--blyrics-pip-progress-inset) - var(--blyrics-pip-progress-height) - var(--blyrics-pip-plate-gap) -
+      var(--blyrics-pip-plate-overhang),
+    (100vh + var(--blyrics-pip-stage-height)) / 2 - var(--blyrics-pip-stage-height) * 0.075
+  );
   --blyrics-pip-plate-top: calc(
-    min(
-        100vh - var(--blyrics-pip-progress-inset) - var(--blyrics-pip-progress-height) - var(--blyrics-pip-plate-gap) -
-          var(--blyrics-pip-plate-overhang),
-        (100vh + var(--blyrics-pip-stage-height)) / 2 - var(--blyrics-pip-stage-height) * 0.075
-      ) - var(--blyrics-font-size) * var(--blyrics-pip-karaoke-text-scale, 1) * (var(--blyrics-line-height, 1.333) + 0.2) -
-      var(--blyrics-karaoke-plate-padding-block)
+    var(--blyrics-pip-stage-anchor) - var(--blyrics-font-size) * var(--blyrics-pip-karaoke-text-scale, 1) *
+      (var(--blyrics-line-height, 1.333) + 0.2) - var(--blyrics-karaoke-plate-padding-block)
   );
   --blyrics-pip-control-size: clamp(
     20px,
@@ -1476,6 +1477,19 @@ body {
   padding-bottom: max(0px, 100vh - 2 * var(--blyrics-pip-transport-y));
   border-radius: 0;
   background: linear-gradient(to bottom, rgb(0 0 0 / 55%), transparent 32%, transparent 62%, rgb(0 0 0 / 62%));
+}
+
+.blyrics-pip-shell[data-layout="stage"][data-stage-card] .blyrics-pip-artwork__controls {
+  --blyrics-pip-plate-top: calc(var(--blyrics-pip-stage-anchor) - var(--blyrics-pip-card-height, 0px));
+}
+
+.blyrics-pip-shell[data-layout="stage"][data-stage-card="title"] .blyrics-pip-artwork__controls {
+  --blyrics-pip-header-bottom: 12px;
+}
+
+.blyrics-pip-shell[data-layout="stage"][data-stage-card="title"] .blyrics-pip-header {
+  opacity: 0;
+  pointer-events: none;
 }
 
 .blyrics-pip-shell[data-layout="stage"] .blyrics-pip-artwork:not([data-controls-idle]) .blyrics-pip-artwork__controls {

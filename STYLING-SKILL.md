@@ -561,6 +561,7 @@ With the "Karaoke subtitles" option on (the default) and a music video in fullsc
 | `ytmusic-app-layout[blyrics-karaoke]` / `#player-page[blyrics-karaoke]` | Karaoke owns the fullscreen video layout |
 | `#blyrics-karaoke[data-bar]` | Player bar is showing; the stage lifts above it |
 | `#blyrics-karaoke[data-title-card]` | Intro title card is showing; the stage is hidden |
+| `#blyrics-karaoke[data-card]` | `title` or `end` while that card shows; absent for sung lines |
 | `.blyrics-karaoke__plate[data-plate]` | Plate is shown behind the current line |
 | `.blyrics-karaoke__plate[data-end-card]` | Plate is behind the end card (credits and source); kept while it fades out |
 | `data-stage-role` on a line | `current`, `previous`, `queued` or `gone` |
@@ -637,6 +638,7 @@ With "Show music video" on and YouTube Music in video mode, the floating window 
 | `.blyrics-pip-shell[data-video="ad"]` | Ad is playing; intermission shows, art column and lyrics hidden |
 | `.blyrics-pip-shell[data-video="off"]` | Option off, song mode, or no video track yet |
 | `.blyrics-pip-shell[data-layout="stage"]` | Karaoke stage over the video: option on, video mode, karaoke on, synced lyrics |
+| `.blyrics-pip-shell[data-stage-card]` | `title` or `end` while a karaoke card shows in the stage; `--blyrics-pip-card-height` (read-only) holds its height. The transport stays above the card and the header hides during the title card |
 | `.blyrics-pip-shell[data-instant]` | Song/video switch in progress; transitions forced off until it settles |
 | `.blyrics-pip-artwork[data-video-face]` | Visible artwork face holds the video |
 | `.blyrics-pip-mode-toggle[hidden]` | Track has no song/video switch; also hidden in windows under 130px tall |
