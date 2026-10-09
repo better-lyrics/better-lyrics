@@ -572,6 +572,8 @@ export function createPictureInPictureHost(
         return environment.view.log;
       },
     });
+    const mirror = activeMirror;
+    view.onVideoStall(() => mirror.recapture());
     activeStage = createKaraokeStage({
       doc: pipWindow.document,
       win: pipWindow,

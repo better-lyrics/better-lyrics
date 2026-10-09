@@ -81,6 +81,7 @@ const PLAYBACK_MODE_LABEL_KEYS: Record<PlaybackMode, string> = {
 const ARTWORK_SIZE = 512;
 const VISIBLE_METADATA_CHECK_INTERVAL = 250;
 const PLAYER_CONTROLS_IDLE_DELAY = 2000;
+const VIDEO_FIRST_FRAME_TIMEOUT = 2500;
 
 // Durations mirror the keyframes in picture-in-picture.css; they only gate the
 // rapid-skip guard, so drift shows up as a guard that releases early or late.
@@ -328,6 +329,7 @@ export class PictureInPictureLyricsView {
   private videoRetireTimer: number | null = null;
   private videoRetireFrame: number | null = null;
   private videoDeferTimer: number | null = null;
+  private videoStallHandler: (() => void) | null = null;
   private committedCover: { readonly url: string; readonly letterboxed: boolean } | null = null;
   private videoSize: WindowSize | null = null;
   private textTransition: TextTransition = DEFAULT_TEXT_TRANSITION;
@@ -1420,11 +1422,23 @@ export class PictureInPictureLyricsView {
       video.srcObject = null;
       return;
     }
-    video.srcObject = new MediaStream([track]);
+    const stream = new MediaStream([track]);
+    video.srcObject = stream;
     video.play().catch((error: unknown) => {
       if (error instanceof DOMException && error.name === "AbortError") return;
       this.dependencies.log("music video playback failed", error);
     });
+    const checkFirstFrame = (): void => {
+      if (video.srcObject !== stream || track.readyState !== "live") return;
+      if (video.readyState >= HTMLMediaElement.HAVE_CURRENT_DATA) return;
+      this.videoStallHandler?.();
+      this.pipWindow.setTimeout(checkFirstFrame, VIDEO_FIRST_FRAME_TIMEOUT);
+    };
+    this.pipWindow.setTimeout(checkFirstFrame, VIDEO_FIRST_FRAME_TIMEOUT);
+  }
+
+  onVideoStall(handler: () => void): void {
+    this.videoStallHandler = handler;
   }
 
   // -- Song and video switch -----------------------

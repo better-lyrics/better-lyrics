@@ -28,8 +28,11 @@ export interface VideoMirror {
   readonly state: VideoMirrorState;
   adRemainingS(): number | null;
   refresh(): void;
+  recapture(): void;
   destroy(): void;
 }
+
+const RECAPTURE_COOLDOWN_MS = 10_000;
 
 type CapturableVideo = HTMLVideoElement & { captureStream?: () => MediaStream };
 
@@ -44,6 +47,7 @@ export function createVideoMirror(options: VideoMirrorOptions): VideoMirror {
   let hasLoggedUnsupported = false;
   let attachment: AbortController | null = null;
   let attachedEnabled = false;
+  let lastRecaptureAt = Number.NEGATIVE_INFINITY;
 
   const findPlayer = (): CapturableVideo | null => getPlayerVideo<CapturableVideo>(sourceDocument);
   const readVideoMode = (): boolean => isVideoModeShown(sourceDocument);
@@ -146,6 +150,15 @@ export function createVideoMirror(options: VideoMirrorOptions): VideoMirror {
     },
     refresh(): void {
       if (isEnabled() !== lastEnabled) sync();
+    },
+    recapture(): void {
+      const now = performance.now();
+      if (!stream || !player || player.readyState < HTMLMediaElement.HAVE_CURRENT_DATA || player.seeking) return;
+      if (now - lastRecaptureAt < RECAPTURE_COOLDOWN_MS) return;
+      lastRecaptureAt = now;
+      options.log("music video track sent no frames, capturing again");
+      player = null;
+      reattach();
     },
     destroy(): void {
       observer.disconnect();
