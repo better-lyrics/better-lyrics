@@ -14,7 +14,7 @@ Better Lyrics upgrades your YouTube Music™ experience by providing beautiful t
  <a aria-label="Better Stack Badge" href="https://better-lyrics-status.boidu.dev"><img height="20" src="https://uptime.betterstack.com/status-badges/v2/monitor/1dqoz.svg" alt="Better Stack Badge" /></a>
 
  <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
-<img src="https://img.shields.io/badge/all_contributors-22-orange.svg" alt=""/>
+<img src="https://img.shields.io/badge/all_contributors-23-orange.svg" alt=""/>
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
  <a aria-label="Crowdin" href="https://crowdin.com/project/better-lyrics"><img alt="Crowdin" src="https://badges.crowdin.net/better-lyrics/localized.svg"></a>
  <a aria-label="Graphite" href="https://graphite.com/?utm_source=github&utm_medium=readme&utm_campaign=better-lyrics"><img height="20" src="https://img.shields.io/badge/Code_Review-Graphite-black?logo=Graphite&logoColor=white" alt="Graphite" /></a>
@@ -405,6 +405,7 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
     </tr>
     <tr>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/snowyukitty"><img src="https://avatars.githubusercontent.com/u/270071858?v=4?s=100" width="100px;" alt="snowyukitty"/><br /><sub><b>snowyukitty</b></sub></a><br /><a href="https://github.com/better-lyrics/better-lyrics/commits?author=snowyukitty" title="Code">💻</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/tommyorwhat"><img src="https://avatars.githubusercontent.com/u/111241986?v=4?s=100" width="100px;" alt="Tommy"/><br /><sub><b>Tommy</b></sub></a><br /><a href="#design-tommyorwhat" title="Design">🎨</a> <a href="https://github.com/better-lyrics/better-lyrics/commits?author=tommyorwhat" title="Code">💻</a></td>
     </tr>
   </tbody>
 </table>
