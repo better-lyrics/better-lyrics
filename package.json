@@ -59,7 +59,7 @@
         "dompurify": "^3.4.16",
         "fast-xml-parser": "^5.11.2",
         "fflate": "^0.8.3",
-        "marked": "^18.0.14",
+        "marked": "^18.1.0",
         "rics": "^0.3.22",
         "sortablejs": "^1.15.7"
     },
