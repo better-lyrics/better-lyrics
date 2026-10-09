@@ -1,48 +1,66 @@
 import { AppState } from "@core/appState";
+import { t } from "@core/i18n";
 import { type LogSink, logCore } from "@core/logger";
-import { applyLyricDecorations } from "@modules/lyrics/lyricDecorations";
 import { type ObserverHandle, observeResize } from "@modules/ui/layout/layoutWidth";
 import type { LyricDecorations } from "@modules/lyrics/injectLyrics";
 import { currentViewLyrics } from "@modules/lyrics/viewLyrics";
 import { currentTickOptions, lyricsElementAdded } from "@modules/ui/mainLyricsView";
-import { isAdPlaying } from "@modules/ui/playerControls/playerBarControls";
-import { createLyricsRenderer, type LyricsRenderer } from "@braccato/core";
-import { decorateEndCard } from "@modules/karaoke/endCard";
-import { karaokeOverlay } from "@modules/karaoke/overlay";
+import { getPlayerBar, isAdPlaying } from "@modules/ui/playerControls/playerBarControls";
+import type { KaraokeOverlayBar } from "@modules/karaoke/overlay";
+import { createKaraokeStage, type KaraokeStage } from "@modules/karaoke/stage";
 import { isKaraokeActive, isKaraokeLayout, isKaraokeWanted, syncKaraokeAttribute } from "@modules/karaoke/state";
 
 // -- The karaoke view --------------------------
 
-const karaokeView: Omit<LyricsRenderer, "destroy"> = createLyricsRenderer({
-  document,
-  window,
-  layout: "stage",
-  host: {
-    isViewVisible: isKaraokeActive,
-    syncAdState: () => isAdPlaying(document),
+const mainPageBar: KaraokeOverlayBar = {
+  element: () => getPlayerBar(document),
+  observeShown(onChange: (shown: boolean) => void): () => void {
+    const layout = document.getElementById("layout");
+    if (!layout) return () => undefined;
+    const read = () => onChange(layout.hasAttribute("show-fullscreen-controls"));
+    const observer = new MutationObserver(read);
+    observer.observe(layout, { attributes: true, attributeFilter: ["show-fullscreen-controls"] });
+    read();
+    return () => observer.disconnect();
+  },
+};
+
+function createMainPageStage(): KaraokeStage {
+  return createKaraokeStage({
+    doc: document,
+    win: window,
+    overlay: {
+      doc: document,
+      get mountParent(): HTMLElement {
+        return document.body;
+      },
+      get writtenByLabel(): string {
+        return t("lyrics_writtenBy");
+      },
+      bar: mainPageBar,
+    },
+    isVisible: isKaraokeActive,
+    isAdPlaying: () => isAdPlaying(document),
     get log(): LogSink {
       return logCore;
     },
-    onStageLayout: box => karaokeOverlay.setPlateBox(box),
-  },
-});
+  });
+}
+
+let stage = createMainPageStage();
 
 let builtFrom: object | null = null;
 let builtSegmentMap: object | null = null;
 let builtLanguage: string | null | undefined;
 let decorationSignature = "";
-let firstSungLineStartS = Number.POSITIVE_INFINITY;
-let hasIntroNote = false;
 let wasActive = false;
 let wasLayout = false;
 
 function clearKaraokeLyrics(): void {
-  karaokeView.clear();
+  stage.clear();
   builtFrom = null;
   builtSegmentMap = null;
   decorationSignature = "";
-  firstSungLineStartS = Number.POSITIVE_INFINITY;
-  hasIntroNote = false;
 }
 
 function signatureOf(decorations: LyricDecorations): string {
@@ -71,52 +89,42 @@ function publishKaraokeLyrics(): void {
   const segmentMap = source.segmentMap ?? null;
   const rebuilt = source !== builtFrom || segmentMap !== builtSegmentMap;
   if (rebuilt) {
-    karaokeView.setLyrics(view.lyrics, {
-      mount: karaokeOverlay.ensureMount(),
+    stage.build({
+      lyrics: view.lyrics,
       language: view.language,
       songwriters: view.songwriters,
+      title: lyricData.song,
+      artist: lyricData.artist,
+      providerKey: AppState.currentProviderKey,
     });
     builtFrom = source;
     builtSegmentMap = segmentMap;
     builtLanguage = view.language;
     decorationSignature = "";
-    const firstSung = karaokeView.lines.find(line => line.lyricElement.dataset.instrumental !== "true");
-    firstSungLineStartS = firstSung?.time ?? Number.POSITIVE_INFINITY;
-    hasIntroNote = karaokeView.lines[0]?.lyricElement.dataset.instrumental === "true";
-    karaokeOverlay.setTitleCard({
-      title: lyricData.song,
-      artist: lyricData.artist,
-      songwriters: view.songwriters ?? [],
-    });
-    decorateEndCard(karaokeView.container);
   } else if (view.language !== builtLanguage) {
     builtLanguage = view.language;
-    karaokeView.setLanguage(view.language);
+    stage.setLanguage(view.language);
   }
 
   const signature = signatureOf(view.decorations);
   if (!rebuilt && signature === decorationSignature) return;
   decorationSignature = signature;
-  applyLyricDecorations(karaokeView, view.decorations);
-  karaokeView.scheduleLyricPositionUpdate(isKaraokeActive, retickKaraoke);
+  stage.applyDecorations(view.decorations, retickKaraoke);
 }
 
 // -- Ticking --------------------------
 
 // Ticks before the side panel: on the shared clock only the first view to tick sees a seek as a jump.
 export function tickKaraoke(timeS: number, wallTime: number, isPlaying: boolean): void {
-  karaokeOverlay.update(timeS, firstSungLineStartS, hasIntroNote);
-  karaokeView.tick(timeS, currentTickOptions(wallTime, isPlaying));
+  stage.tick(timeS, currentTickOptions(wallTime, isPlaying));
 }
 
 function retickKaraoke(): void {
-  karaokeView.retickFromPlaybackClock((eventCreationTime, isPlaying) =>
-    currentTickOptions(eventCreationTime, isPlaying, false)
-  );
+  stage.retick((eventCreationTime, isPlaying) => currentTickOptions(eventCreationTime, isPlaying, false));
 }
 
 function relayoutKaraoke(): void {
-  karaokeView.relayout();
+  stage.relayout();
   retickKaraoke();
 }
 
@@ -146,7 +154,7 @@ export function syncKaraoke(): void {
 
   if (active) publishKaraokeLyrics();
   else if (!AppState.parsedLyrics && builtFrom !== null) clearKaraokeLyrics();
-  karaokeOverlay.setVisible(active, relayoutKaraoke);
+  stage.setVisible(active, relayoutKaraoke);
 
   // Each view was off the screen while the other one showed, so neither kept its measurements.
   if (active !== wasActive) {
@@ -164,12 +172,13 @@ export function syncKaraoke(): void {
 }
 
 export function applyKaraokeTheme(css: string): void {
-  karaokeView.setTheme(css);
+  stage.setTheme(css);
 }
 
 export function disposeKaraoke(): void {
   clearKaraokeLyrics();
-  karaokeOverlay.destroy();
+  stage.destroy();
+  stage = createMainPageStage();
   panelRefit?.destroy();
   panelRefit = null;
   wasActive = false;

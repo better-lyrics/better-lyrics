@@ -45,9 +45,9 @@ import { fetchOwnGamification, renderIdentityStats } from "@modules/unison/gamif
 import type Sortable from "sortablejs";
 import { initializeThemes } from "@/options/editor/themesUi";
 import { openEditCSS, openOptions } from "@/options/editor/ui/dom";
-import { showModal } from "./editor/ui/feedback";
-import { initStoreUI, setupYourThemesButton } from "./store/store";
-import { checkForStableRelease } from "./updateNotice";
+import { showModal } from "@/options/editor/ui/feedback";
+import { initStoreUI, setupYourThemesButton } from "@/options/store/store";
+import { checkForStableRelease } from "@/options/updateNotice";
 import { errorCore, warnCore } from "@core/logger";
 
 import { normalizeVideoQualitySettings, type VideoQualitySettings } from "@modules/settings/videoQuality";
@@ -98,6 +98,7 @@ interface Options extends VideoQualitySettings {
   pipTextTransition: string;
   pipMarqueeEnabled: boolean;
   pipProgressBarEnabled: boolean;
+  pipVideoEnabled: boolean;
   isKaraokeEnabled: boolean;
   isTranslateEnabled: boolean;
   translationLanguage: string;
@@ -171,6 +172,7 @@ const getOptionsFromForm = (): Options => {
     pipTextTransition: (document.getElementById("pipTextTransition") as HTMLInputElement).value,
     pipMarqueeEnabled: (document.getElementById("pipMarqueeEnabled") as HTMLInputElement).checked,
     pipProgressBarEnabled: (document.getElementById("pipProgressBarEnabled") as HTMLInputElement).checked,
+    pipVideoEnabled: (document.getElementById("pipVideoEnabled") as HTMLInputElement).checked,
     isKaraokeEnabled: (document.getElementById("isKaraokeEnabled") as HTMLInputElement).checked,
     isTranslateEnabled: (document.getElementById("translate") as HTMLInputElement).checked,
     translationLanguage: (document.getElementById("translationLanguage") as HTMLInputElement).value,
@@ -355,6 +357,7 @@ const restoreOptions = (): void => {
     pipTextTransition: "spring",
     pipMarqueeEnabled: true,
     pipProgressBarEnabled: true,
+    pipVideoEnabled: true,
     ...KARAOKE_DEFAULTS,
     isTranslateEnabled: false,
     translationLanguage: "en",
@@ -453,6 +456,7 @@ const setOptionsInForm = (items: Options): void => {
   setDropdownFieldValue("pipTextTransition", items.pipTextTransition);
   (document.getElementById("pipMarqueeEnabled") as HTMLInputElement).checked = items.pipMarqueeEnabled;
   (document.getElementById("pipProgressBarEnabled") as HTMLInputElement).checked = items.pipProgressBarEnabled;
+  (document.getElementById("pipVideoEnabled") as HTMLInputElement).checked = items.pipVideoEnabled;
   (document.getElementById("isKaraokeEnabled") as HTMLInputElement).checked = items.isKaraokeEnabled;
   (document.getElementById("translate") as HTMLInputElement).checked = items.isTranslateEnabled;
   setDropdownFieldValue("translationLanguage", items.translationLanguage);

@@ -561,6 +561,7 @@ With the "Karaoke subtitles" option on (the default) and a music video in fullsc
 | `ytmusic-app-layout[blyrics-karaoke]` / `#player-page[blyrics-karaoke]` | Karaoke owns the fullscreen video layout |
 | `#blyrics-karaoke[data-bar]` | Player bar is showing; the stage lifts above it |
 | `#blyrics-karaoke[data-title-card]` | Intro title card is showing; the stage is hidden |
+| `#blyrics-karaoke[data-card]` | `title` or `end` while that card shows; absent for sung lines |
 | `.blyrics-karaoke__plate[data-plate]` | Plate is shown behind the current line |
 | `.blyrics-karaoke__plate[data-end-card]` | Plate is behind the end card (credits and source); kept while it fades out |
 | `data-stage-role` on a line | `current`, `previous`, `queued` or `gone` |
@@ -573,6 +574,9 @@ With the "Karaoke subtitles" option on (the default) and a music video in fullsc
 |------|-------|
 | `.blyrics-karaoke-surface` | Backdrop shared by both plates and the title card |
 | `--blyrics-karaoke-video-scale` | Unitless, default `1`; e.g. `0.94` shrinks the video and overlay relative to the screen |
+| `--blyrics-karaoke-plate-padding-block` / `-inline` | Defaults `0.18em` / `0.55em`; padding of the plate around a sung line. Any unit; `em` follows the lyric size |
+| `--blyrics-karaoke-card-padding-block` / `-inline` | Defaults `0.36em` / `0.8em`; padding of the plate around the end card |
+| `--blyrics-karaoke-plate-radius` | Default `0.46em`; corner radius of both plates and the title card. The line clip follows it |
 | `--blyrics-font-size` | Sets the karaoke lyric size, as elsewhere |
 | `--blyrics-scale` / `--blyrics-active-scale` | Forced to `1` on `#blyrics-karaoke .blyrics-container`; no line scaling in karaoke |
 | `--blyrics-stage-opacity` | Set by the engine; stage line `opacity` reads it with `!important` |
@@ -589,6 +593,85 @@ Never set `opacity` on stage lines. It is overridden, so a theme cannot show a h
   border-radius: 0.3em;
   background: rgb(0 0 0 / 70%);
   backdrop-filter: blur(12px);
+}
+```
+
+## Floating Window Music Video
+
+With "Show music video" on and YouTube Music in video mode, the floating window plays the video in the art slot. With karaoke subtitles also on and synced lyrics, it shows a full-window karaoke stage over the video instead. Ads are never mirrored: the artwork and lyrics fade out and a countdown intermission shows.
+
+### DOM Structure
+
+```
+.blyrics-pip-shell                                  ([data-video], [data-layout], [data-instant])
+├── .blyrics-pip-art-col
+│   └── .blyrics-pip-artwork                        ([data-video-face])
+│       ├── .blyrics-pip-artwork__card
+│       │   └── .blyrics-pip-artwork__face           (front and back)
+│       │       └── video.blyrics-pip-artwork__music-video
+│       └── .blyrics-pip-artwork__controls
+│           └── .blyrics-pip-artwork__chrome
+│               ├── .blyrics-pip-mode-toggle
+│               │   └── button.blyrics-pip-mode-toggle__option   (song, video)
+│               └── button.blyrics-pip-artwork__control.blyrics-pip-artwork__control--close
+├── .blyrics-pip-stage
+│   ├── video.blyrics-pip-stage__video
+│   └── #blyrics-karaoke                            (same tree as fullscreen karaoke)
+└── .blyrics-pip-intermission
+    ├── .blyrics-pip-intermission__row
+    │   ├── .blyrics-pip-intermission__mark
+    │   └── p.blyrics-pip-intermission__label
+    ├── .blyrics-pip-intermission__count
+    │   └── .blyrics-pip-intermission__glyph        ([data-digit] on digits)
+    ├── .blyrics-pip-intermission__bar
+    │   └── .blyrics-pip-intermission__fill         (drains through transform: scaleX)
+    └── .blyrics-pip-intermission__next
+        ├── .blyrics-pip-intermission__thumb
+        └── span                                    ("Then <b>song</b>")
+```
+
+### State Attributes
+
+| Attribute | When applied |
+|-----------|--------------|
+| `.blyrics-pip-shell[data-video="on"]` | Video is playing in the window |
+| `.blyrics-pip-shell[data-video="ad"]` | Ad is playing; intermission shows, art column and lyrics hidden |
+| `.blyrics-pip-shell[data-video="off"]` | Option off, song mode, or no video track yet |
+| `.blyrics-pip-shell[data-layout="stage"]` | Karaoke stage over the video: option on, video mode, karaoke on, synced lyrics |
+| `.blyrics-pip-shell[data-stage-card]` | `title` or `end` while a karaoke card shows in the stage; `--blyrics-pip-card-height` (read-only) holds its height. The transport stays above the card and the header hides during the title card; at 340px wide or less (not tall windows) the mode pill hides too |
+| `.blyrics-pip-shell[data-instant]` | Song/video switch in progress; transitions forced off until it settles |
+| `.blyrics-pip-artwork[data-video-face]` | Visible artwork face holds the video |
+| `.blyrics-pip-mode-toggle[hidden]` | Track has no song/video switch; also hidden in windows under 130px tall |
+| `.blyrics-pip-mode-toggle__option[aria-pressed="true"]` | Current mode |
+| `.blyrics-pip-intermission__count[hidden]`, `__bar[hidden]`, `__next[hidden]` | No ad time or next title to show |
+
+### Theme Hooks
+
+| Hook | Notes |
+|------|-------|
+| `--blyrics-pip-video-aspect` | Read-only. Video's `W / H`, set inline on `.blyrics-pip-shell`; unset until known, rules fall back to `16 / 9` |
+| Plate variables in the window | The window sets them on `.blyrics-pip-shell[data-layout="stage"]`: radius `0.75rem`, line padding `0.5rem` / `0.75rem`, end card padding `0.5rem` / `1rem`. Override them there in `rem` or `px`; the window reads them there to keep the plate clear of the progress row and transport |
+| `--blyrics-pip-karaoke-text-scale` | Read-only. Unitless, set inline on `.blyrics-pip-shell` on resize; stage `--blyrics-font-size` and `--blyrics-translated-font-size` are multiplied by it. The transport uses it too, so overriding moves text but not controls |
+| `--blyrics-pip-control-tint` | Default `rgb(0 0 0 / 28%)`, on `.blyrics-pip-artwork__controls`; background of control discs and the mode pill |
+| `--blyrics-pip-control-backdrop` | Default `blur(8px)`, on `.blyrics-pip-artwork__controls`; `backdrop-filter` of control discs and the mode pill |
+| `--blyrics-pip-control-size` | Default `36px` (`44px` in tall windows), on `.blyrics-pip-artwork`; previous and next button size, play and pause is 1.25 times larger. Does not change with window size: the artwork grows so the pill, close button and transport fit inside it at its aspect ratio, and short windows hide the progress row. Normal layout only; the stage sizes its own transport |
+| `#blyrics-karaoke` in the window | Same plate, title card, end card classes and attributes as fullscreen; prefix `.blyrics-pip-shell` to target the window only |
+
+Internal, do not set: `--blyrics-pip-stage-width`, `-stage-height`, `-progress-inset`, `-progress-height`, `-plate-gap`, `-plate-overhang`, `-plate-top`, `-frame-bottom-gap`, `-header-bottom`, `-transport-margin`, `-transport-y`, `-karaoke-font-size`, `-karaoke-translated-font-size`. They derive from each other and place the transport between the header and the plate. Also internal, normal layout: `--blyrics-pip-artwork-aspect`, `-artwork-min-height`, `-artwork-min-width`, `-chrome-height`, `-transport-edge`; they size the artwork minimum.
+
+Tall windows (`max-aspect-ratio: 4/5`) put the video at the top and the lines in the band under it, with no plate background.
+
+```css
+.blyrics-pip-shell #blyrics-karaoke .blyrics-karaoke-surface {
+  background: rgb(0 0 0 / 55%);
+}
+
+.blyrics-pip-artwork__controls {
+  --blyrics-pip-control-tint: rgb(255 255 255 / 12%);
+}
+
+.blyrics-pip-intermission__fill {
+  background: var(--blyrics-lyric-active-color);
 }
 ```
 

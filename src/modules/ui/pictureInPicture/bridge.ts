@@ -1,12 +1,13 @@
-import type { LyricDecorations } from "@modules/lyrics/injectLyrics";
+import type { LyricDecorations, SyncType } from "@modules/lyrics/injectLyrics";
 import type { Lyric } from "@braccato/core";
-import type { PictureInPictureSongMetadata } from "./types";
+import type { PictureInPictureSongMetadata } from "@modules/ui/pictureInPicture/types";
 import { warnGeneral } from "@core/logger";
 
 const PIP_INIT_EVENT = "blyrics-pip-init" as const;
 const PIP_SIGNAL_EVENT = "blyrics-pip-signal" as const;
 const PIP_METADATA_EVENT = "blyrics-pip-metadata" as const;
 const PIP_LYRICS_EVENT = "blyrics-pip-lyrics" as const;
+const PIP_LYRICS_SYNCED_EVENT = "blyrics-pip-lyrics-synced" as const;
 
 export interface PictureInPictureInitPayload {
   readonly strings: Record<string, string>;
@@ -19,6 +20,8 @@ export interface PictureInPictureInitPayload {
   readonly textTransition: string;
   readonly marqueeEnabled: boolean;
   readonly progressBarEnabled: boolean;
+  readonly videoEnabled: boolean;
+  readonly karaokeEnabled: boolean;
   readonly windowLayout: string;
   readonly logsEnabled: boolean;
 }
@@ -46,6 +49,10 @@ export interface PictureInPictureLyricsPayload {
   readonly noLyrics: boolean;
   readonly language?: string | null;
   readonly songwriters?: readonly string[];
+  readonly syncType: SyncType;
+  readonly title: string;
+  readonly artist: string;
+  readonly providerKey: string | null;
   /**
    * The translated and romanized text the isolated world injected into the side panel, per line
    * index. It rides on the payload rather than arriving as its own message because the window
@@ -63,6 +70,11 @@ export interface PictureInPictureLyricsPayload {
    * to the first line and back on every provider switch and audio to video swap.
    */
   readonly suppressZeroTimeUntil: number;
+}
+
+export interface PictureInPictureLyricsSynced {
+  readonly videoId: string | null;
+  readonly suitsStage: boolean;
 }
 
 // Details cross as JSON strings, not objects. Gecko hands the page a dead wrapper for any object a
@@ -102,3 +114,7 @@ export const onMetadata = (handler: (payload: PictureInPictureMetadataPayload) =
 export const sendLyrics = (payload: PictureInPictureLyricsPayload): void => send(PIP_LYRICS_EVENT, payload);
 export const onLyrics = (handler: (payload: PictureInPictureLyricsPayload) => void): (() => void) =>
   subscribe(PIP_LYRICS_EVENT, handler);
+
+export const sendLyricsSynced = (payload: PictureInPictureLyricsSynced): void => send(PIP_LYRICS_SYNCED_EVENT, payload);
+export const onLyricsSynced = (handler: (payload: PictureInPictureLyricsSynced) => void): (() => void) =>
+  subscribe(PIP_LYRICS_SYNCED_EVENT, handler);

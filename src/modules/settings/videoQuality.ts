@@ -1,4 +1,5 @@
 export const VIDEO_QUALITY_SETTINGS_EVENT = "blyrics-video-quality-settings";
+export const VIDEO_QUALITY_BOOST_EVENT = "blyrics-video-quality-boost";
 export const VIDEO_QUALITY_REQUEST_EVENT = "blyrics-request-video-quality-settings";
 
 export const VIDEO_QUALITIES = {
@@ -37,8 +38,18 @@ export function normalizeVideoQualitySettings(
   };
 }
 
-export function selectVideoQuality(settings: VideoQualitySettings, available: string[]): VideoQuality {
-  if (settings.preferredVideoQuality === "auto") return "auto";
+const BOOSTED_VIDEO_QUALITY: VideoQuality = "hd1080";
+
+export function selectVideoQuality(
+  settings: VideoQualitySettings,
+  available: string[],
+  isBoosted = false
+): VideoQuality {
+  if (settings.preferredVideoQuality === "auto") {
+    return isBoosted
+      ? selectVideoQuality({ ...settings, preferredVideoQuality: BOOSTED_VIDEO_QUALITY }, available)
+      : "auto";
+  }
   const ceiling = Math.min(
     VIDEO_QUALITIES[settings.preferredVideoQuality],
     settings.isHighResolutionVideoEnabled ? Infinity : 1080

@@ -10,13 +10,16 @@ import { t } from "@core/i18n";
 import { getStorage } from "@core/storage";
 import { getArtworkMetadata } from "@modules/lyrics/requestSniffer/requestSniffer";
 import { resumeAllAutoscroll } from "@braccato/core";
-import { onSignal, sendInit, sendMetadata } from "./bridge";
-import { createGatedToggle, DEFAULT_WINDOW_LAYOUT } from "./controller";
-import { publishPictureInPictureLyrics } from "./lyricsPublisher";
-import { DEFAULT_ARTWORK_TRANSITION, DEFAULT_TEXT_TRANSITION } from "./lyricsView";
-import { createPictureInPictureHost } from "./pipHost";
-import type { PictureInPictureToggle, PictureInPictureViewDependencies } from "./types";
+import { onSignal, sendInit, sendMetadata } from "@modules/ui/pictureInPicture/bridge";
+import { createGatedToggle } from "@modules/ui/pictureInPicture/controller";
+import { AD_UP_NEXT_SLOT } from "@modules/ui/pictureInPicture/intermissionText";
+import { publishPictureInPictureLyrics } from "@modules/ui/pictureInPicture/lyricsPublisher";
+import { DEFAULT_ARTWORK_TRANSITION, DEFAULT_TEXT_TRANSITION } from "@modules/ui/pictureInPicture/lyricsView";
+import { createPictureInPictureHost } from "@modules/ui/pictureInPicture/pipHost";
+import { DEFAULT_WINDOW_LAYOUT } from "@modules/ui/pictureInPicture/windowSize";
+import type { PictureInPictureToggle, PictureInPictureViewDependencies } from "@modules/ui/pictureInPicture/types";
 import { type LogSink, logCore, logError } from "@core/logger";
+import { KARAOKE_DEFAULTS } from "@modules/karaoke/defaults";
 
 const STYLESHEET_PATH = "css/blyrics/picture-in-picture.css";
 const LYRIC_STYLESHEET_PATH = "css/blyrics/index.css";
@@ -28,6 +31,11 @@ const PIP_STRING_KEYS = [
   "picture_in_picture_play",
   "picture_in_picture_pause",
   "picture_in_picture_next",
+  "picture_in_picture_adPlaying",
+  "picture_in_picture_adUpNext",
+  "unison_song",
+  "options_display_videoTab",
+  "ui_close",
 ] as const;
 let hasInitializedAutoRestore = false;
 let hasAttemptedAutoRestore = false;
@@ -42,6 +50,8 @@ let storedArtworkTransition: unknown = DEFAULT_ARTWORK_TRANSITION;
 let storedTextTransition: unknown = DEFAULT_TEXT_TRANSITION;
 let storedMarqueeEnabled: unknown = true;
 let storedProgressBarEnabled: unknown = true;
+let storedVideoEnabled: unknown = true;
+let storedKaraokeEnabled: unknown = KARAOKE_DEFAULTS.isKaraokeEnabled;
 let storedWindowLayout: unknown = DEFAULT_WINDOW_LAYOUT;
 let isPictureInPictureEnabled = true;
 
@@ -52,6 +62,8 @@ const PIP_SETTING_DEFAULTS = {
   pipTextTransition: DEFAULT_TEXT_TRANSITION,
   pipMarqueeEnabled: true,
   pipProgressBarEnabled: true,
+  pipVideoEnabled: true,
+  ...KARAOKE_DEFAULTS,
   pipWindowLayout: DEFAULT_WINDOW_LAYOUT,
   isLogsEnabled: true,
 } as const;
@@ -112,6 +124,8 @@ const activeController: PictureInPictureToggle = delegatesToPageWorld
       textTransition: () => storedTextTransition,
       marqueeEnabled: () => storedMarqueeEnabled,
       progressBarEnabled: () => storedProgressBarEnabled,
+      videoEnabled: () => storedVideoEnabled,
+      karaokeEnabled: () => storedKaraokeEnabled,
       windowLayout: () => storedWindowLayout,
       windowTitle: () => t("picture_in_picture_open"),
       stylesheetUrls: () => ({
@@ -147,6 +161,7 @@ function createPageWorldDelegate(): PictureInPictureToggle {
       );
     } else if (signal.type === "ready") {
       publishPictureInPictureResources();
+      publishPictureInPictureLyrics();
     }
   });
 
@@ -163,7 +178,9 @@ export function publishPictureInPictureResources(): void {
   if (!delegatesToPageWorld) return;
   getStorage(PIP_SETTING_DEFAULTS, items => {
     sendInit({
-      strings: Object.fromEntries(PIP_STRING_KEYS.map(key => [key, t(key)])),
+      strings: Object.fromEntries(
+        PIP_STRING_KEYS.map(key => [key, key === "picture_in_picture_adUpNext" ? t(key, AD_UP_NEXT_SLOT) : t(key)])
+      ),
       lyricsStylesheetUrl: versionedStylesheetUrl(LYRIC_STYLESHEET_PATH),
       pipStylesheetUrl: versionedStylesheetUrl(STYLESHEET_PATH),
       fontUrls: [FONT_LINK, NOTO_SANS_UNIVERSAL_LINK],
@@ -173,6 +190,8 @@ export function publishPictureInPictureResources(): void {
       textTransition: String(items.pipTextTransition),
       marqueeEnabled: items.pipMarqueeEnabled !== false,
       progressBarEnabled: items.pipProgressBarEnabled !== false,
+      videoEnabled: items.pipVideoEnabled !== false,
+      karaokeEnabled: items.isKaraokeEnabled !== false,
       windowLayout: String(items.pipWindowLayout),
       logsEnabled: items.isLogsEnabled !== false,
     });
@@ -250,6 +269,8 @@ export function initializePictureInPictureAutoRestore(): void {
     storedTextTransition = items.pipTextTransition;
     storedMarqueeEnabled = items.pipMarqueeEnabled;
     storedProgressBarEnabled = items.pipProgressBarEnabled;
+    storedVideoEnabled = items.pipVideoEnabled;
+    storedKaraokeEnabled = items.isKaraokeEnabled;
     storedWindowLayout = items.pipWindowLayout;
   });
 
@@ -278,6 +299,14 @@ export function initializePictureInPictureAutoRestore(): void {
 
     if (changes.pipProgressBarEnabled) {
       storedProgressBarEnabled = changes.pipProgressBarEnabled.newValue ?? true;
+    }
+
+    if (changes.pipVideoEnabled) {
+      storedVideoEnabled = changes.pipVideoEnabled.newValue ?? true;
+    }
+
+    if (changes.isKaraokeEnabled) {
+      storedKaraokeEnabled = changes.isKaraokeEnabled.newValue ?? KARAOKE_DEFAULTS.isKaraokeEnabled;
     }
 
     if (changes.pipWindowLayout) {

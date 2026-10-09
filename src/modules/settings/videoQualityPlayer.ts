@@ -2,6 +2,7 @@ import { warnCore } from "@core/logger";
 import {
   normalizeVideoQualitySettings,
   selectVideoQuality,
+  VIDEO_QUALITY_BOOST_EVENT,
   VIDEO_QUALITY_REQUEST_EVENT,
   VIDEO_QUALITY_SETTINGS_EVENT,
   type VideoQualitySettings,
@@ -64,6 +65,7 @@ export function patchVideoQualityPlayer(
 
 export function startVideoQualityPlayer(doc: Document = document, win: Window = window): () => void {
   let settings: VideoQualitySettings | null = null;
+  let isBoosted = false;
   let disposed = false;
   let api: VideoQualityPlayer | null = null;
   let unpatch: (() => void) | undefined;
@@ -104,7 +106,7 @@ export function startVideoQualityPlayer(doc: Document = document, win: Window = 
         api.updateVideoData({ prefer_gapless: false }, true);
         return;
       }
-      const quality = selectVideoQuality(settings, available);
+      const quality = selectVideoQuality(settings, available, isBoosted);
       const key = `${data.video_id}:${available.join(",")}:${quality}`;
       if (key === lastQualityKey || typeof api.setPlaybackQualityRange !== "function") return;
       api.setPlaybackQualityRange(quality, quality);
@@ -157,6 +159,18 @@ export function startVideoQualityPlayer(doc: Document = document, win: Window = 
       reportFailure("Failed to read video quality settings", error);
     }
   };
+  const receiveBoost = (event: Event): void => {
+    try {
+      const raw: unknown = JSON.parse((event as CustomEvent<string>).detail);
+      if (typeof raw !== "boolean") throw new TypeError(`Expected a boolean, got ${typeof raw}`);
+      if (raw === isBoosted) return;
+      isBoosted = raw;
+      lastQualityKey = "";
+      connect();
+    } catch (error) {
+      reportFailure("Failed to read video quality boost", error);
+    }
+  };
   const onLoadedMetadata = (event: Event): void => {
     const target = event.target as Element | null;
     if (target?.tagName !== "VIDEO" || !target.closest("ytmusic-player")) return;
@@ -164,6 +178,7 @@ export function startVideoQualityPlayer(doc: Document = document, win: Window = 
     applyQuality();
   };
   doc.addEventListener(VIDEO_QUALITY_SETTINGS_EVENT, receive);
+  doc.addEventListener(VIDEO_QUALITY_BOOST_EVENT, receiveBoost);
   doc.addEventListener("yt-navigate-finish", connect);
   doc.addEventListener("loadedmetadata", onLoadedMetadata, true);
   const observer = new MutationObserver(connect);
@@ -176,6 +191,7 @@ export function startVideoQualityPlayer(doc: Document = document, win: Window = 
     win.clearInterval(interval);
     unpatch?.();
     doc.removeEventListener(VIDEO_QUALITY_SETTINGS_EVENT, receive);
+    doc.removeEventListener(VIDEO_QUALITY_BOOST_EVENT, receiveBoost);
     doc.removeEventListener("yt-navigate-finish", connect);
     doc.removeEventListener("loadedmetadata", onLoadedMetadata, true);
   };

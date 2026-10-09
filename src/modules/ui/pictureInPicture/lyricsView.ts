@@ -1,13 +1,47 @@
 import { PLAYER_BAR_SELECTOR, PLAYER_TIME_EVENT, SEEK_EVENT } from "@constants";
-import { parseSvgString } from "@modules/ui/lyricsDock/icons";
+import { controlIcons, parseSvgString } from "@modules/ui/lyricsDock/icons";
 import { attachTransportAnimation } from "@modules/ui/playerControls/controlAnimations";
 import { playerControlIcons } from "@modules/ui/playerControls/icons";
-import { sendTransport } from "@modules/ui/playerControls/playerBarControls";
+import {
+  canSwitchPlaybackMode,
+  getSelectedPlaybackMode,
+  observePlaybackMode,
+  type PlaybackMode,
+  type PlaybackModeObserver,
+  sendTransport,
+  switchPlaybackMode,
+} from "@modules/ui/playerControls/playerBarControls";
 import { createProgressBar, type ProgressBarHandle } from "@modules/ui/playerControls/progressBar";
 import { cssTimeMs } from "@/ui/motion";
+import type { KaraokeCard, KaraokeOverlayBar } from "@modules/karaoke/overlay";
 import type { PlayerDetails } from "@core/appState";
-import { createHeaderLine, fillHeaderLayer, getHeaderLayers, PictureInPictureHeaderMarquee } from "./headerMarquee";
-import type { PictureInPicturePlaybackSnapshot, PictureInPictureViewDependencies } from "./types";
+import {
+  createHeaderLine,
+  fillHeaderLayer,
+  getHeaderLayers,
+  PictureInPictureHeaderMarquee,
+} from "@modules/ui/pictureInPicture/headerMarquee";
+import { createIntermission, type Intermission } from "@modules/ui/pictureInPicture/intermission";
+import { AD_UP_NEXT_SLOT } from "@modules/ui/pictureInPicture/intermissionText";
+import {
+  canFlipStartModeSwitch,
+  type CounterpartPair,
+  counterpartPair,
+  isCounterpartChange,
+  isModeSwitchSettled,
+  type ModeSwitchProgress,
+  type ModeSwitchSurface,
+  recordFlip,
+  recordTrackChange,
+} from "@modules/ui/pictureInPicture/modeSwitch";
+import type {
+  PictureInPicturePlaybackSnapshot,
+  PictureInPictureViewDependencies,
+} from "@modules/ui/pictureInPicture/types";
+import type { VideoMirrorState } from "@modules/ui/pictureInPicture/videoMirrorState";
+import { stageTextScale } from "@modules/ui/pictureInPicture/stageTextScale";
+import { planVideoSwap } from "@modules/ui/pictureInPicture/videoSwapPlan";
+import type { WindowSize } from "@modules/ui/pictureInPicture/windowSize";
 
 interface DisplayMetadata {
   readonly title: string;
@@ -26,11 +60,28 @@ interface HeaderRow {
 }
 
 type PlayerControlAction = "previous" | "play-pause" | "next";
-type PlayerControlIcon = Exclude<PlayerControlAction, "play-pause"> | "play" | "pause";
+const WINDOW_CONTROL_ICONS = {
+  previous: playerControlIcons.previous,
+  next: playerControlIcons.next,
+  play: playerControlIcons.play,
+  pause: playerControlIcons.pause,
+  close: controlIcons.pictureInPictureExit,
+  song: controlIcons.musicNote,
+  video: controlIcons.videoCamera,
+} as const;
+
+type WindowControlIcon = keyof typeof WINDOW_CONTROL_ICONS;
+
+const PLAYBACK_MODES: readonly PlaybackMode[] = ["song", "video"];
+const PLAYBACK_MODE_LABEL_KEYS: Record<PlaybackMode, string> = {
+  song: "unison_song",
+  video: "options_display_videoTab",
+};
 
 const ARTWORK_SIZE = 512;
 const VISIBLE_METADATA_CHECK_INTERVAL = 250;
 const PLAYER_CONTROLS_IDLE_DELAY = 2000;
+const VIDEO_FIRST_FRAME_TIMEOUT = 2500;
 
 // Durations mirror the keyframes in picture-in-picture.css; they only gate the
 // rapid-skip guard, so drift shows up as a guard that releases early or late.
@@ -67,6 +118,10 @@ const MARQUEE_REARM_DELAY = 700;
 // where the next cover is prefetched and decodes at once, never blinks. Past
 // this the metadata poll is genuinely slow and stale art is the worse lie.
 const ARTWORK_STALE_GRACE = 600;
+
+const MODE_SWITCH_LIMIT_MS = 3000;
+const MODE_SWITCH_RESIZE_LIMIT_MS = 2000;
+const MODE_SWITCH_RESIZE_FINAL_MS = 4500;
 
 const LYRICS_MOTION_DEFAULTS = {
   holdDelay: 250,
@@ -175,7 +230,13 @@ function createHeaderRow(element: HTMLElement): HeaderRow {
   };
 }
 
-function createArtworkFace(document: Document): [HTMLElement, HTMLImageElement] {
+interface ArtworkFace {
+  readonly element: HTMLElement;
+  readonly image: HTMLImageElement;
+  readonly video: HTMLVideoElement;
+}
+
+function createArtworkFace(document: Document): ArtworkFace {
   const face = document.createElement("div");
   face.className = "blyrics-pip-artwork__face";
 
@@ -188,8 +249,15 @@ function createArtworkFace(document: Document): [HTMLElement, HTMLImageElement] 
   image.alt = "";
   image.draggable = false;
 
-  face.append(placeholder, image);
-  return [face, image];
+  const video = document.createElement("video");
+  video.className = "blyrics-pip-artwork__music-video";
+  video.muted = true;
+  video.playsInline = true;
+  video.hidden = true;
+  video.setAttribute("aria-hidden", "true");
+
+  face.append(placeholder, image, video);
+  return { element: face, image, video };
 }
 
 // Warms the browser cache so a transition never has to wait on a decode.
@@ -198,8 +266,8 @@ export function preloadArtwork(url: string): void {
   proxy.src = getArtworkUrl(url);
 }
 
-function createControlIcon(document: Document, icon: PlayerControlIcon): SVGElement {
-  const parsed = parseSvgString(playerControlIcons[icon]);
+function createControlIcon(document: Document, icon: WindowControlIcon): SVGElement {
+  const parsed = parseSvgString(WINDOW_CONTROL_ICONS[icon]);
   const svg = parsed
     ? document.importNode(parsed, true)
     : document.createElementNS("http://www.w3.org/2000/svg", "svg");
@@ -216,14 +284,24 @@ export class PictureInPictureLyricsView {
   private readonly backdropLayers: readonly [HTMLElement, HTMLElement];
   private readonly artworkFaces: readonly [HTMLElement, HTMLElement];
   private readonly artworkImages: readonly [HTMLImageElement, HTMLImageElement];
+  private readonly faceVideos: readonly [HTMLVideoElement, HTMLVideoElement];
+  private readonly faceTracks: [MediaStreamTrack | null, MediaStreamTrack | null] = [null, null];
   private readonly artworkVideo: HTMLVideoElement;
   private readonly playPauseButton: HTMLButtonElement;
+  private readonly modeToggle: HTMLElement;
+  private readonly modeButtons: Record<PlaybackMode, HTMLButtonElement>;
+  private readonly modeObserver: PlaybackModeObserver;
   private readonly headerRows: readonly [HeaderRow, HeaderRow];
   private readonly marquee: PictureInPictureHeaderMarquee;
   private readonly reducedMotionQuery: MediaQueryList;
   private readonly lyricsViewport: HTMLElement;
   private readonly lyricsScroller: HTMLElement;
   private readonly progressBar: ProgressBarHandle;
+  private readonly intermission: Intermission;
+  private readonly stage: HTMLElement;
+  private readonly stageVideo: HTMLVideoElement;
+  private isStageActive = false;
+  private stageTrack: MediaStreamTrack | null = null;
   private readonly lifecycleController = new AbortController();
   private artworkController: AbortController | null = null;
   private currentVideoId: string | null = null;
@@ -244,14 +322,35 @@ export class PictureInPictureLyricsView {
   private artworkBusyUntil = 0;
   private artworkBusyTimer: number | null = null;
   private artworkStaleTimer: number | null = null;
+  private backdropIndex = 0;
+  private videoState: VideoMirrorState = "off";
+  private videoTrack: MediaStreamTrack | null = null;
+  private pendingVideo: { readonly track: MediaStreamTrack; readonly controller: AbortController } | null = null;
+  private videoRetireTimer: number | null = null;
+  private videoRetireFrame: number | null = null;
+  private videoDeferTimer: number | null = null;
+  private videoStallHandler: (() => void) | null = null;
+  private stageTextScaleHandler: (() => void) | null = null;
+  private committedCover: { readonly url: string; readonly letterboxed: boolean } | null = null;
+  private videoSize: WindowSize | null = null;
   private textTransition: TextTransition = DEFAULT_TEXT_TRANSITION;
   private prefersReducedMotion = false;
   private hasHeaderText = false;
+  private counterpartPair: CounterpartPair | null = null;
+  private pendingArtworkVideoId: string | null = null;
+  private lastTrackChangeTime = Number.NEGATIVE_INFINITY;
+  private modeSwitch: {
+    progress: ModeSwitchProgress;
+    readonly limitTimer: number;
+    settleFrame: number | null;
+  } | null = null;
+  private pendingResize: { limitTimer: number; sawModeSwitch: boolean; readonly startedAt: number } | null = null;
 
   constructor(
     private readonly pipWindow: Window,
     private readonly sourceDocument: Document,
-    private readonly dependencies: PictureInPictureViewDependencies
+    private readonly dependencies: PictureInPictureViewDependencies,
+    private readonly contentSize: () => WindowSize
   ) {
     const pipDocument = pipWindow.document;
 
@@ -260,6 +359,7 @@ export class PictureInPictureLyricsView {
     this.shell.setAttribute("aria-busy", "true");
     this.shell.setAttribute("blyrics-pip-transition", this.artworkTransition);
     this.shell.setAttribute("blyrics-pip-text-transition", this.textTransition);
+    this.shell.setAttribute("data-video", "off");
     this.shell.style.setProperty("--blyrics-credits-label", `"${dependencies.translate("lyrics_writtenBy")}"`);
 
     this.backdrop = pipDocument.createElement("div");
@@ -272,17 +372,29 @@ export class PictureInPictureLyricsView {
 
     this.artworkContainer = pipDocument.createElement("div");
     this.artworkContainer.className = "blyrics-pip-artwork";
+    this.artworkContainer.setAttribute("data-controls-idle", "true");
 
-    const [frontFace, frontImage] = createArtworkFace(pipDocument);
-    const [backFace, backImage] = createArtworkFace(pipDocument);
-    this.artworkFaces = [frontFace, backFace];
-    this.artworkImages = [frontImage, backImage];
-    frontFace.setAttribute("data-front", "true");
-    backFace.setAttribute("data-front", "false");
+    const frontFace = createArtworkFace(pipDocument);
+    const backFace = createArtworkFace(pipDocument);
+    this.artworkFaces = [frontFace.element, backFace.element];
+    this.artworkImages = [frontFace.image, backFace.image];
+    this.faceVideos = [frontFace.video, backFace.video];
+    this.faceVideos.forEach((video, index) => {
+      const followFrontAspect = (): void => {
+        if (index !== this.artworkIndex || this.faceTracks[index] === null) return;
+        this.writeVideoAspect(video);
+        this.checkModeSwitchSettled();
+      };
+      for (const type of ["loadedmetadata", "resize"]) {
+        video.addEventListener(type, followFrontAspect, { signal: this.lifecycleController.signal });
+      }
+    });
+    frontFace.element.setAttribute("data-front", "true");
+    backFace.element.setAttribute("data-front", "false");
 
     const artworkCard = pipDocument.createElement("div");
     artworkCard.className = "blyrics-pip-artwork__card";
-    artworkCard.append(frontFace, backFace);
+    artworkCard.append(frontFace.element, backFace.element);
 
     this.artworkVideo = pipDocument.createElement("video");
     this.artworkVideo.className = "blyrics-pip-artwork__video";
@@ -303,7 +415,17 @@ export class PictureInPictureLyricsView {
       dependencies.translate("picture_in_picture_play")
     );
     const nextButton = this.createPlayerControlButton("next", dependencies.translate("picture_in_picture_next"));
-    artworkControls.append(previousButton, this.playPauseButton, nextButton);
+    this.modeToggle = pipDocument.createElement("div");
+    this.modeToggle.className = "blyrics-pip-mode-toggle";
+    this.modeToggle.setAttribute("role", "group");
+    this.modeToggle.hidden = true;
+    const [songButton, videoButton] = PLAYBACK_MODES.map(mode => this.createModeButton(mode));
+    this.modeButtons = { song: songButton, video: videoButton };
+    this.modeToggle.append(songButton, videoButton);
+    const artworkChrome = pipDocument.createElement("div");
+    artworkChrome.className = "blyrics-pip-artwork__chrome";
+    artworkChrome.append(this.modeToggle, this.createCloseButton());
+    artworkControls.append(previousButton, this.playPauseButton, nextButton, artworkChrome);
     this.artworkContainer.append(artworkCard, this.artworkVideo, artworkControls);
 
     const content = pipDocument.createElement("section");
@@ -355,7 +477,30 @@ export class PictureInPictureLyricsView {
     artColumn.append(this.artworkContainer, this.progressBar.element);
 
     content.append(header, this.lyricsViewport);
-    this.shell.append(this.backdrop, artColumn, content);
+    this.intermission = createIntermission(pipDocument, {
+      adPlaying: dependencies.translate("picture_in_picture_adPlaying"),
+      upNext: dependencies.translate("picture_in_picture_adUpNext", AD_UP_NEXT_SLOT),
+    });
+    this.stage = pipDocument.createElement("div");
+    this.stage.className = "blyrics-pip-stage";
+    this.stageVideo = pipDocument.createElement("video");
+    this.stageVideo.className = "blyrics-pip-stage__video";
+    this.stageVideo.muted = true;
+    this.stageVideo.playsInline = true;
+    this.stageVideo.setAttribute("aria-hidden", "true");
+    for (const type of ["loadedmetadata", "resize"]) {
+      this.stageVideo.addEventListener(
+        type,
+        () => {
+          if (this.stageTrack === null) return;
+          this.writeVideoAspect(this.stageVideo);
+          this.checkModeSwitchSettled();
+        },
+        { signal: this.lifecycleController.signal }
+      );
+    }
+    this.stage.append(this.stageVideo);
+    this.shell.append(this.backdrop, artColumn, content, this.stage, this.intermission.element);
     pipDocument.body.replaceChildren(this.shell);
 
     sourceDocument.addEventListener(PLAYER_TIME_EVENT, this.handlePlayerTime, {
@@ -365,7 +510,14 @@ export class PictureInPictureLyricsView {
       passive: true,
       signal: this.lifecycleController.signal,
     });
+    pipDocument.documentElement.addEventListener("pointerleave", this.handlePointerLeave, {
+      passive: true,
+      signal: this.lifecycleController.signal,
+    });
+    pipWindow.addEventListener("resize", this.syncStageTextScale, { signal: this.lifecycleController.signal });
+    this.syncStageTextScale();
     pipWindow.addEventListener("pagehide", this.destroy, { once: true });
+    this.modeObserver = observePlaybackMode(sourceDocument, this.syncModeToggle);
   }
 
   /**
@@ -374,6 +526,34 @@ export class PictureInPictureLyricsView {
    */
   get scrollElement(): HTMLElement {
     return this.lyricsScroller;
+  }
+
+  get stageParent(): HTMLElement {
+    return this.stage;
+  }
+
+  get stageBar(): KaraokeOverlayBar {
+    const controls = this.artworkContainer;
+    return {
+      element: () => this.progressBar.element,
+      observeShown(onChange: (shown: boolean) => void): () => void {
+        const read = (): void => onChange(!controls.hasAttribute("data-controls-idle"));
+        const observer = new MutationObserver(read);
+        observer.observe(controls, { attributes: true, attributeFilter: ["data-controls-idle"] });
+        read();
+        return () => observer.disconnect();
+      },
+    };
+  }
+
+  setStageCard(card: KaraokeCard | null, heightPx: number): void {
+    if (card) {
+      this.shell.setAttribute("data-stage-card", card);
+      this.shell.style.setProperty("--blyrics-pip-card-height", `${heightPx}px`);
+      return;
+    }
+    this.shell.removeAttribute("data-stage-card");
+    this.shell.style.removeProperty("--blyrics-pip-card-height");
   }
 
   get videoId(): string | null {
@@ -561,8 +741,16 @@ export class PictureInPictureLyricsView {
     this.updatePlayPauseButton(detail.isPlaying);
 
     if (detail.videoId !== this.currentVideoId) {
-      this.showSong(detail);
+      const isModeSwitch = isCounterpartChange(this.counterpartPair, this.currentVideoId, detail.videoId);
+      if (isModeSwitch) this.recordModeSwitch(recordTrackChange(this.modeSwitch?.progress ?? null));
+      else {
+        this.endModeSwitch();
+        this.lastTrackChangeTime = this.pipWindow.performance.now();
+      }
+      this.showSong(detail, isModeSwitch);
+      this.modeObserver.refresh();
       if (this.holdTimer !== null) this.expireHold();
+      this.checkModeSwitchSettled();
     }
 
     const now = Date.now();
@@ -577,6 +765,12 @@ export class PictureInPictureLyricsView {
     this.lastPointerMoveTime = this.pipWindow.performance.now();
     this.artworkContainer.removeAttribute("data-controls-idle");
     if (this.controlsIdleTimer === null) this.scheduleControlsIdleCheck();
+  };
+
+  private readonly handlePointerLeave = (): void => {
+    if (this.controlsIdleTimer !== null) this.pipWindow.clearTimeout(this.controlsIdleTimer);
+    this.controlsIdleTimer = null;
+    this.artworkContainer.setAttribute("data-controls-idle", "true");
   };
 
   private scheduleControlsIdleCheck(): void {
@@ -594,13 +788,22 @@ export class PictureInPictureLyricsView {
 
   private readonly destroy = (): void => {
     this.lifecycleController.abort();
+    this.modeObserver.disconnect();
     this.artworkController?.abort();
     this.clearArtworkStaleTimer();
+    this.endModeSwitch();
+    this.cancelPendingResize();
     this.marquee.destroy();
     this.progressBar.destroy();
     if (this.controlsIdleTimer !== null) this.pipWindow.clearTimeout(this.controlsIdleTimer);
     this.releaseHold();
     if (this.artworkBusyTimer !== null) this.pipWindow.clearTimeout(this.artworkBusyTimer);
+    this.pendingVideo?.controller.abort();
+    this.clearVideoRetireTimer();
+    this.clearVideoDeferTimer();
+    this.setFaceTrack(0, null);
+    this.setFaceTrack(1, null);
+    this.setStageTrack(null);
     for (const row of this.headerRows) {
       if (row.busyTimer !== null) this.pipWindow.clearTimeout(row.busyTimer);
     }
@@ -626,6 +829,47 @@ export class PictureInPictureLyricsView {
     return button;
   }
 
+  private createCloseButton(): HTMLButtonElement {
+    const button = this.pipWindow.document.createElement("button");
+    const label = this.dependencies.translate("ui_close");
+    button.type = "button";
+    button.className = "blyrics-pip-artwork__control blyrics-pip-artwork__control--close";
+    button.setAttribute("aria-label", label);
+    button.title = label;
+    button.appendChild(createControlIcon(this.pipWindow.document, "close"));
+    button.addEventListener("click", () => this.pipWindow.close(), { signal: this.lifecycleController.signal });
+    return button;
+  }
+
+  private createModeButton(mode: PlaybackMode): HTMLButtonElement {
+    const button = this.pipWindow.document.createElement("button");
+    button.type = "button";
+    const label = this.dependencies.translate(PLAYBACK_MODE_LABEL_KEYS[mode]);
+    button.className = "blyrics-pip-mode-toggle__option";
+    button.setAttribute("aria-label", label);
+    button.title = label;
+    button.appendChild(createControlIcon(this.pipWindow.document, mode));
+    button.setAttribute("aria-pressed", "false");
+    button.addEventListener(
+      "click",
+      () => {
+        if (switchPlaybackMode(this.sourceDocument, mode)) this.resizeAfterModeSwitch();
+        else if (this.isSwitchSettled() && getSelectedPlaybackMode(this.sourceDocument) === mode)
+          this.resizeToContent();
+      },
+      { signal: this.lifecycleController.signal }
+    );
+    return button;
+  }
+
+  private readonly syncModeToggle = (): void => {
+    const selected = getSelectedPlaybackMode(this.sourceDocument);
+    this.modeToggle.hidden = selected === null || !canSwitchPlaybackMode(this.sourceDocument);
+    for (const mode of PLAYBACK_MODES) {
+      this.modeButtons[mode].setAttribute("aria-pressed", String(mode === selected));
+    }
+  };
+
   private activatePlayerControl(action: PlayerControlAction): void {
     sendTransport(this.sourceDocument, action);
   }
@@ -640,11 +884,12 @@ export class PictureInPictureLyricsView {
     );
   }
 
-  private showSong(detail: PlayerDetails): void {
+  private showSong(detail: PlayerDetails, isModeSwitch: boolean): void {
     if (this.currentVideoId === null) this.lyricsVideoId = detail.videoId;
+    if (!isModeSwitch) this.counterpartPair = null;
     this.currentVideoId = detail.videoId;
     this.lastVisibleMetadataCheck = Date.now();
-    this.setHeaderText(detail.song, detail.artist, true);
+    if (!isModeSwitch) this.setHeaderText(detail.song, detail.artist, true);
     this.clearAnimatedArtwork();
     this.loadArtwork(detail.videoId);
   }
@@ -659,8 +904,9 @@ export class PictureInPictureLyricsView {
     if (changed.length === 0) return;
 
     const isFirstPaint = !this.hasHeaderText;
+    const isInstant = isFirstPaint || this.isSwitchingMode;
     this.hasHeaderText = true;
-    const animating = changed.filter(row => isSongChange || row.text === "");
+    const animating = changed.filter(row => isInstant || isSongChange || row.text === "");
     this.headerRows.forEach((row, position) => {
       row.text = incoming[position];
     });
@@ -672,10 +918,10 @@ export class PictureInPictureLyricsView {
       }
       // Trailing the title only means something when the title is moving too.
       const delay = animating.length > 1 && row === this.headerRows[1] ? HEADER_ROW_STAGGER : 0;
-      this.swapRow(row, isFirstPaint, delay);
+      this.swapRow(row, isInstant, delay);
     }
     // Both rows have to be filled before measuring, since they share one cycle.
-    if (isFirstPaint) this.marquee.arm();
+    if (isInstant) this.armMarqueeWhenSettled();
   }
 
   // A correction still has to be seen arriving, so it crossfades. What it must not
@@ -703,7 +949,7 @@ export class PictureInPictureLyricsView {
     row.layers[1 - index].setAttribute("aria-hidden", "true");
   }
 
-  private swapRow(row: HeaderRow, isFirstPaint: boolean, delayMs: number): void {
+  private swapRow(row: HeaderRow, isInstant: boolean, delayMs: number): void {
     if (row.busyTimer !== null) this.pipWindow.clearTimeout(row.busyTimer);
     row.busyTimer = null;
     row.hasPendingCorrection = false;
@@ -711,7 +957,8 @@ export class PictureInPictureLyricsView {
 
     // Nothing to transition from on the first song in a window, so it just
     // appears, the same way the first cover does.
-    if (isFirstPaint) {
+    if (isInstant) {
+      row.element.removeAttribute("data-swapping");
       this.paintRow(row, row.index);
       return;
     }
@@ -804,11 +1051,13 @@ export class PictureInPictureLyricsView {
     const controller = new AbortController();
     this.artworkController = controller;
     this.fallbackArtworkUrl = getFallbackArtworkUrl(videoId);
+    this.pendingArtworkVideoId = videoId;
     this.clearArtworkStaleTimer();
     this.scheduleArtworkWipe(ARTWORK_STALE_GRACE);
 
     void this.dependencies.getArtworkMetadata(videoId, 250, controller.signal).then(metadata => {
       if (controller.signal.aborted || this.currentVideoId !== videoId) return;
+      if (metadata) this.counterpartPair = counterpartPair(metadata.id, metadata.counterpartVideoId);
       this.setHeaderText(
         metadata?.displayTitle || this.headerRows[0].text,
         metadata?.displayByline || metadata?.artist || this.headerRows[1].text
@@ -838,7 +1087,11 @@ export class PictureInPictureLyricsView {
 
     const letterboxedUrl = getLetterboxedArtworkUrl(videoId);
     const fallBack = (): void => {
-      if (url === letterboxedUrl) return;
+      if (url === letterboxedUrl) {
+        this.pendingArtworkVideoId = null;
+        this.checkModeSwitchSettled();
+        return;
+      }
       attempt.abort();
       this.setArtwork(url === this.fallbackArtworkUrl ? letterboxedUrl : this.fallbackArtworkUrl, videoId, songSignal);
     };
@@ -855,8 +1108,17 @@ export class PictureInPictureLyricsView {
       const isFirstArtwork = !this.artworkContainer.hasAttribute("data-has-art");
       this.artworkContainer.setAttribute("data-has-art", "true");
       this.shell.style.setProperty("--blyrics-pip-art", `url("${url}")`);
-      this.paintBackdrop(nextIndex, url, isFirstArtwork);
-      this.runArtworkSwap(nextIndex, isFirstArtwork);
+      this.paintBackdrop(url, isFirstArtwork);
+      this.committedCover = { url, letterboxed: url === letterboxedUrl };
+      this.pendingArtworkVideoId = null;
+      if (this.videoState === "on") {
+        const hiddenIndex = 1 - this.artworkIndex;
+        if (this.faceTracks[this.artworkIndex] !== null) this.syncFaceCover(this.artworkIndex);
+        this.syncFaceCover(hiddenIndex);
+      } else if (nextIndex !== this.artworkIndex) {
+        this.showCoverFace(nextIndex, isFirstArtwork);
+      }
+      this.checkModeSwitchSettled();
     };
 
     image.addEventListener("error", fallBack, { once: true, signal });
@@ -870,19 +1132,20 @@ export class PictureInPictureLyricsView {
     }
   }
 
-  // Rides the same index as the artwork faces so the wash and the cover are never
-  // a track apart. The outgoing layer keeps its image and stays opaque underneath.
-  private paintBackdrop(nextIndex: number, url: string, skipAnimation: boolean): void {
+  private paintBackdrop(url: string, skipAnimation: boolean): void {
+    const nextIndex = 1 - this.backdropIndex;
+    this.backdropIndex = nextIndex;
     this.backdropLayers[nextIndex].style.backgroundImage = `url("${url}")`;
     // The wash follows the cover. Written in the same task as the data-front flip
     // below: any state change that makes the animation newly match starts it.
-    if (skipAnimation) this.backdrop.setAttribute("data-first", "true");
+    if (skipAnimation || this.isSwitchingMode) this.backdrop.setAttribute("data-first", "true");
     else this.backdrop.removeAttribute("data-first");
     this.backdropLayers[nextIndex].setAttribute("data-front", "true");
     this.backdropLayers[1 - nextIndex].setAttribute("data-front", "false");
   }
 
-  private runArtworkSwap(nextIndex: number, skipAnimation: boolean): void {
+  private runArtworkSwap(nextIndex: number, requestedSkip: boolean): void {
+    const skipAnimation = requestedSkip || this.isSwitchingMode;
     const duration = ARTWORK_TRANSITION_DURATIONS[this.artworkTransition];
     const now = this.pipWindow.performance.now();
     const isBusy = this.artworkBusyUntil > now;
@@ -972,5 +1235,337 @@ export class PictureInPictureLyricsView {
 
   setProgressBarEnabled(enabled: unknown): void {
     this.progressBar.element.hidden = enabled === false;
+  }
+
+  // -- Music video ---------------------------------
+
+  setVideo(state: VideoMirrorState, track: MediaStreamTrack | null): void {
+    if (state !== "ad" && this.videoState === "ad") this.intermission.reset();
+    this.videoState = state;
+    this.videoTrack = track;
+    this.shell.setAttribute("data-video", state);
+    this.applyVideoPlan();
+  }
+
+  setStageActive(active: boolean): void {
+    if (active === this.isStageActive) return;
+    this.isStageActive = active;
+    if (active) this.shell.setAttribute("data-layout", "stage");
+    else this.shell.removeAttribute("data-layout");
+    if (active) this.syncStageTextScale();
+    this.applyVideoPlan();
+  }
+
+  private readonly applyVideoPlan = (): void => {
+    this.runVideoPlan();
+    this.checkModeSwitchSettled();
+  };
+
+  private runVideoPlan(): void {
+    this.clearVideoDeferTimer();
+    if (this.isStageActive) {
+      this.moveVideoToStage();
+      return;
+    }
+    this.setStageTrack(null);
+    const plan = planVideoSwap({
+      state: this.videoState,
+      track: this.videoTrack,
+      frontTrack: this.faceTracks[this.artworkIndex],
+      hasArt: this.artworkContainer.hasAttribute("data-has-art"),
+    });
+    if (plan.kind === "video" && this.pendingVideo?.track === plan.track) return;
+    this.cancelPendingVideo();
+    if (plan.kind === "stay") {
+      if (this.videoState !== "on") this.retireHiddenFaceVideo(true);
+      return;
+    }
+    if (plan.kind === "cover") {
+      this.showCoverFace(1 - this.artworkIndex, plan.skipAnimation);
+      return;
+    }
+    const busyMs = this.artworkBusyUntil - this.pipWindow.performance.now();
+    if (busyMs > 0 && !this.isSwitchingMode) {
+      this.videoDeferTimer = this.pipWindow.setTimeout(this.applyVideoPlan, busyMs);
+      return;
+    }
+    this.loadFaceVideo(plan.track, plan.skipAnimation);
+  }
+
+  private loadFaceVideo(track: MediaStreamTrack, skipAnimation: boolean): void {
+    const nextIndex = 1 - this.artworkIndex;
+    const video = this.faceVideos[nextIndex];
+    const controller = new AbortController();
+    this.pendingVideo = { track, controller };
+    this.clearVideoRetireTimer();
+    this.setFaceTrack(nextIndex, track);
+
+    const commit = (): void => {
+      if (controller.signal.aborted) return;
+      this.pendingVideo = null;
+      this.artworkContainer.setAttribute("data-video-face", "");
+      this.writeVideoAspect(video);
+      this.runArtworkSwap(nextIndex, skipAnimation);
+      this.retireHiddenFaceVideo(skipAnimation);
+      this.checkModeSwitchSettled();
+    };
+    if (video.readyState >= HTMLMediaElement.HAVE_CURRENT_DATA) commit();
+    else video.addEventListener("loadeddata", commit, { once: true, signal: controller.signal });
+  }
+
+  private moveVideoToStage(): void {
+    this.cancelPendingVideo();
+    this.clearVideoRetireTimer();
+    for (const index of [0, 1]) {
+      this.setFaceTrack(index, null);
+      this.syncFaceCover(index);
+    }
+    this.artworkContainer.removeAttribute("data-video-face");
+    this.setStageTrack(this.videoState === "on" ? this.videoTrack : null);
+  }
+
+  private setStageTrack(track: MediaStreamTrack | null): void {
+    if (this.stageTrack === track) return;
+    this.stageTrack = track;
+    this.playTrack(this.stageVideo, track);
+  }
+
+  private showCoverFace(nextIndex: number, skipAnimation: boolean): void {
+    this.clearVideoRetireTimer();
+    this.setFaceTrack(nextIndex, null);
+    this.syncFaceCover(nextIndex);
+    this.runArtworkSwap(nextIndex, skipAnimation);
+    this.retireHiddenFaceVideo(skipAnimation);
+  }
+
+  private retireHiddenFaceVideo(requestedImmediately: boolean): void {
+    const immediately = requestedImmediately || this.isSwitchingMode;
+    this.clearVideoRetireTimer();
+    const retire = (): void => {
+      this.videoRetireFrame = null;
+      const hiddenIndex = 1 - this.artworkIndex;
+      this.setFaceTrack(hiddenIndex, null);
+      this.syncFaceCover(hiddenIndex);
+      this.artworkContainer.toggleAttribute("data-video-face", this.faceTracks[this.artworkIndex] !== null);
+    };
+    if (immediately) {
+      retire();
+      return;
+    }
+    this.videoRetireTimer = this.pipWindow.setTimeout(() => {
+      this.videoRetireTimer = null;
+      this.videoRetireFrame = this.pipWindow.requestAnimationFrame(retire);
+    }, ARTWORK_TRANSITION_DURATIONS[this.artworkTransition]);
+  }
+
+  private clearVideoRetireTimer(): void {
+    if (this.videoRetireTimer !== null) this.pipWindow.clearTimeout(this.videoRetireTimer);
+    if (this.videoRetireFrame !== null) this.pipWindow.cancelAnimationFrame(this.videoRetireFrame);
+    this.videoRetireTimer = null;
+    this.videoRetireFrame = null;
+  }
+
+  private clearVideoDeferTimer(): void {
+    if (this.videoDeferTimer === null) return;
+    this.pipWindow.clearTimeout(this.videoDeferTimer);
+    this.videoDeferTimer = null;
+  }
+
+  private cancelPendingVideo(): void {
+    if (!this.pendingVideo) return;
+    this.pendingVideo.controller.abort();
+    this.pendingVideo = null;
+    this.setFaceTrack(1 - this.artworkIndex, null);
+  }
+
+  private writeVideoAspect(video: HTMLVideoElement): void {
+    const { videoWidth: width, videoHeight: height } = video;
+    const size = width > 0 && height > 0 ? { width, height } : null;
+    if (size?.width === this.videoSize?.width && size?.height === this.videoSize?.height) return;
+    this.videoSize = size;
+    if (size) this.shell.style.setProperty("--blyrics-pip-video-aspect", `${size.width} / ${size.height}`);
+    else this.shell.style.removeProperty("--blyrics-pip-video-aspect");
+    this.syncStageTextScale();
+  }
+
+  readonly syncStageTextScale = (): void => {
+    const win = this.pipWindow;
+    const sourceWindow = this.sourceDocument.defaultView ?? win;
+    const scale = stageTextScale({
+      viewport: { width: win.innerWidth, height: win.innerHeight },
+      screen: { width: sourceWindow.screen.width, height: sourceWindow.screen.height },
+      videoAspect: this.videoSize ? this.videoSize.width / this.videoSize.height : null,
+      sourceRemPx: Number.parseFloat(sourceWindow.getComputedStyle(this.sourceDocument.documentElement).fontSize),
+      remPx: Number.parseFloat(win.getComputedStyle(win.document.documentElement).fontSize),
+      baseFontPx: Number.parseFloat(win.getComputedStyle(this.stage).fontSize),
+    });
+    const value = String(scale);
+    if (this.shell.style.getPropertyValue("--blyrics-pip-karaoke-text-scale") === value) return;
+    this.shell.style.setProperty("--blyrics-pip-karaoke-text-scale", value);
+    this.stageTextScaleHandler?.();
+  };
+
+  onStageTextScaleChange(handler: () => void): void {
+    this.stageTextScaleHandler = handler;
+  }
+
+  private syncFaceCover(index: number): void {
+    const cover = this.committedCover;
+    const image = this.artworkImages[index];
+    if (!cover || image.src === cover.url) return;
+    image.toggleAttribute("data-letterboxed", cover.letterboxed);
+    image.src = cover.url;
+  }
+
+  private setFaceTrack(index: number, track: MediaStreamTrack | null): void {
+    if (this.faceTracks[index] === track) return;
+    this.faceTracks[index] = track;
+    const video = this.faceVideos[index];
+    video.hidden = track === null;
+    this.playTrack(video, track);
+  }
+
+  private playTrack(video: HTMLVideoElement, track: MediaStreamTrack | null): void {
+    if (!track) {
+      video.srcObject = null;
+      return;
+    }
+    const stream = new MediaStream([track]);
+    video.srcObject = stream;
+    video.play().catch((error: unknown) => {
+      if (error instanceof DOMException && error.name === "AbortError") return;
+      this.dependencies.log("music video playback failed", error);
+    });
+    const checkFirstFrame = (): void => {
+      if (video.srcObject !== stream || track.readyState !== "live") return;
+      if (video.readyState >= HTMLMediaElement.HAVE_CURRENT_DATA) return;
+      this.videoStallHandler?.();
+      this.pipWindow.setTimeout(checkFirstFrame, VIDEO_FIRST_FRAME_TIMEOUT);
+    };
+    this.pipWindow.setTimeout(checkFirstFrame, VIDEO_FIRST_FRAME_TIMEOUT);
+  }
+
+  onVideoStall(handler: () => void): void {
+    this.videoStallHandler = handler;
+  }
+
+  // -- Song and video switch -----------------------
+
+  get isSwitchingMode(): boolean {
+    return this.modeSwitch !== null;
+  }
+
+  noteModeFlip(expectsVideo: boolean): void {
+    const canStart = canFlipStartModeSwitch({
+      pair: this.counterpartPair,
+      currentVideoId: this.currentVideoId,
+      msSinceTrackChange: this.pipWindow.performance.now() - this.lastTrackChangeTime,
+    });
+    if (!this.modeSwitch && !canStart) return;
+    this.recordModeSwitch(recordFlip(this.modeSwitch?.progress ?? null, expectsVideo));
+    this.checkModeSwitchSettled();
+  }
+
+  private recordModeSwitch(progress: ModeSwitchProgress): void {
+    const pendingResize = this.pendingResize;
+    if (pendingResize && !pendingResize.sawModeSwitch) {
+      pendingResize.sawModeSwitch = true;
+      this.pipWindow.clearTimeout(pendingResize.limitTimer);
+      const remainingMs = MODE_SWITCH_RESIZE_FINAL_MS - (this.pipWindow.performance.now() - pendingResize.startedAt);
+      pendingResize.limitTimer = this.pipWindow.setTimeout(this.resizeToContent, Math.max(0, remainingMs));
+    }
+    if (this.modeSwitch) {
+      this.modeSwitch.progress = progress;
+      return;
+    }
+    this.modeSwitch = {
+      progress,
+      limitTimer: this.pipWindow.setTimeout(this.finishModeSwitch, MODE_SWITCH_LIMIT_MS),
+      settleFrame: null,
+    };
+    this.shell.setAttribute("data-instant", "");
+    if (this.artworkBusyTimer !== null) {
+      this.pipWindow.clearTimeout(this.artworkBusyTimer);
+      this.artworkBusyTimer = null;
+      this.shell.setAttribute("data-running", "false");
+    }
+    if (this.videoDeferTimer !== null) this.applyVideoPlan();
+  }
+
+  private shownVideo(): HTMLVideoElement | null {
+    if (this.stageTrack !== null) return this.stageVideo;
+    return this.faceTracks[this.artworkIndex] !== null ? this.faceVideos[this.artworkIndex] : null;
+  }
+
+  private modeSwitchSurface(): ModeSwitchSurface {
+    return {
+      showsVideo: (this.shownVideo()?.videoWidth ?? 0) > 0,
+      isArtworkPending: this.pendingArtworkVideoId !== null,
+      isVideoPending: this.pendingVideo !== null || this.videoDeferTimer !== null,
+    };
+  }
+
+  private checkModeSwitchSettled(): void {
+    const modeSwitch = this.modeSwitch;
+    if (!modeSwitch || modeSwitch.settleFrame !== null) return;
+    if (!isModeSwitchSettled(modeSwitch.progress, this.modeSwitchSurface())) return;
+    modeSwitch.settleFrame = this.pipWindow.requestAnimationFrame(() => {
+      modeSwitch.settleFrame = null;
+      if (this.modeSwitch !== modeSwitch) return;
+      if (!isModeSwitchSettled(modeSwitch.progress, this.modeSwitchSurface())) return;
+      this.finishModeSwitch();
+    });
+  }
+
+  private readonly finishModeSwitch = (): void => {
+    this.endModeSwitch();
+    if (this.pendingResize?.sawModeSwitch) this.resizeToContent();
+  };
+
+  private readonly endModeSwitch = (): void => {
+    const modeSwitch = this.modeSwitch;
+    if (!modeSwitch) return;
+    this.modeSwitch = null;
+    this.pipWindow.clearTimeout(modeSwitch.limitTimer);
+    if (modeSwitch.settleFrame !== null) this.pipWindow.cancelAnimationFrame(modeSwitch.settleFrame);
+    void this.shell.offsetWidth;
+    this.shell.removeAttribute("data-instant");
+  };
+
+  private isSwitchSettled(): boolean {
+    return this.modeSwitch === null && this.pendingResize === null;
+  }
+
+  private resizeAfterModeSwitch(): void {
+    this.cancelPendingResize();
+    this.pendingResize = {
+      limitTimer: this.pipWindow.setTimeout(this.resizeToContent, MODE_SWITCH_RESIZE_LIMIT_MS),
+      sawModeSwitch: false,
+      startedAt: this.pipWindow.performance.now(),
+    };
+  }
+
+  private cancelPendingResize(): void {
+    if (this.pendingResize) this.pipWindow.clearTimeout(this.pendingResize.limitTimer);
+    this.pendingResize = null;
+  }
+
+  private readonly resizeToContent = (): void => {
+    this.cancelPendingResize();
+    const win = this.pipWindow;
+    if (!win.navigator.userActivation?.isActive) {
+      this.dependencies.log("floating window resize skipped, the click's activation has lapsed");
+      return;
+    }
+    const { width, height } = this.contentSize();
+    try {
+      win.resizeTo(width + win.outerWidth - win.innerWidth, height + win.outerHeight - win.innerHeight);
+    } catch (error) {
+      this.dependencies.log("floating window resize was refused", error);
+    }
+  };
+
+  setIntermission(remainingS: number | null): void {
+    this.intermission.update(remainingS, this.headerRows[0].text, this.lastPlaybackSnapshot?.isPlaying !== false);
   }
 }
