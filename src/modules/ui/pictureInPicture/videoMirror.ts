@@ -49,6 +49,7 @@ export function createVideoMirror(options: VideoMirrorOptions): VideoMirror {
   let attachedEnabled = false;
   let lastRecaptureAt = Number.NEGATIVE_INFINITY;
 
+  const playerSwapObserver = new MutationObserver(() => reattachIfSwapped());
   const findPlayer = (): CapturableVideo | null => getPlayerVideo<CapturableVideo>(sourceDocument);
   const readVideoMode = (): boolean => isVideoModeShown(sourceDocument);
   let lastVideoMode = readVideoMode();
@@ -68,10 +69,13 @@ export function createVideoMirror(options: VideoMirrorOptions): VideoMirror {
     stopCapture();
     player = next;
     attachedEnabled = enabled;
+    playerSwapObserver.disconnect();
     if (!player) return;
+    if (player.parentElement) playerSwapObserver.observe(player.parentElement, { childList: true });
     attachment = new AbortController();
     const { signal } = attachment;
     player.addEventListener("loadstart", reattach, { signal });
+    player.addEventListener("emptied", reattachIfSwapped, { signal });
     if (!enabled) return;
     player.addEventListener("loadedmetadata", sync, { signal });
     player.addEventListener("resize", sync, { signal });
@@ -94,6 +98,10 @@ export function createVideoMirror(options: VideoMirrorOptions): VideoMirror {
   function reattach(): void {
     attach();
     sync();
+  }
+
+  function reattachIfSwapped(): void {
+    if (findPlayer() !== player) reattach();
   }
 
   function publish(next: VideoMirrorState): void {
@@ -153,7 +161,8 @@ export function createVideoMirror(options: VideoMirrorOptions): VideoMirror {
     },
     recapture(): void {
       const now = performance.now();
-      if (!stream || !player || player.readyState < HTMLMediaElement.HAVE_CURRENT_DATA || player.seeking) return;
+      const current = findPlayer();
+      if (!stream || !current || current.readyState < HTMLMediaElement.HAVE_CURRENT_DATA || current.seeking) return;
       if (now - lastRecaptureAt < RECAPTURE_COOLDOWN_MS) return;
       lastRecaptureAt = now;
       options.log("music video track sent no frames, capturing again");
@@ -162,6 +171,7 @@ export function createVideoMirror(options: VideoMirrorOptions): VideoMirror {
     },
     destroy(): void {
       observer.disconnect();
+      playerSwapObserver.disconnect();
       stopCapture();
     },
   };
