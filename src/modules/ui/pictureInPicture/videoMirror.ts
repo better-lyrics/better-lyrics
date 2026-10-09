@@ -69,8 +69,8 @@ export function createVideoMirror(options: VideoMirrorOptions): VideoMirror {
     stopCapture();
     player = next;
     attachedEnabled = enabled;
-    playerSwapObserver.disconnect();
     if (!player) return;
+    playerSwapObserver.disconnect();
     if (player.parentElement) playerSwapObserver.observe(player.parentElement, { childList: true });
     attachment = new AbortController();
     const { signal } = attachment;
