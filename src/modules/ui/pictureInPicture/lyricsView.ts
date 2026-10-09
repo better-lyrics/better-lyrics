@@ -330,6 +330,7 @@ export class PictureInPictureLyricsView {
   private videoRetireFrame: number | null = null;
   private videoDeferTimer: number | null = null;
   private videoStallHandler: (() => void) | null = null;
+  private stageTextScaleHandler: (() => void) | null = null;
   private committedCover: { readonly url: string; readonly letterboxed: boolean } | null = null;
   private videoSize: WindowSize | null = null;
   private textTransition: TextTransition = DEFAULT_TEXT_TRANSITION;
@@ -1398,8 +1399,15 @@ export class PictureInPictureLyricsView {
       remPx: Number.parseFloat(win.getComputedStyle(win.document.documentElement).fontSize),
       baseFontPx: Number.parseFloat(win.getComputedStyle(this.stage).fontSize),
     });
-    this.shell.style.setProperty("--blyrics-pip-karaoke-text-scale", String(scale));
+    const value = String(scale);
+    if (this.shell.style.getPropertyValue("--blyrics-pip-karaoke-text-scale") === value) return;
+    this.shell.style.setProperty("--blyrics-pip-karaoke-text-scale", value);
+    this.stageTextScaleHandler?.();
   };
+
+  onStageTextScaleChange(handler: () => void): void {
+    this.stageTextScaleHandler = handler;
+  }
 
   private syncFaceCover(index: number): void {
     const cover = this.committedCover;

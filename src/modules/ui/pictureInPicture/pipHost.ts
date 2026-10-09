@@ -578,6 +578,8 @@ export function createPictureInPictureHost(
     });
     const mirror = activeMirror;
     view.onVideoStall(() => mirror.recapture());
+    view.onStageTextScaleChange(relayoutStage);
+    pipWindow.document.fonts.addEventListener("loadingdone", relayoutStage);
     activeStage = createKaraokeStage({
       doc: pipWindow.document,
       win: pipWindow,
