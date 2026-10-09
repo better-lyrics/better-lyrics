@@ -1236,7 +1236,8 @@ body {
 .blyrics-pip-content {
   transition:
     opacity 380ms ease,
-    transform 620ms cubic-bezier(0.22, 1, 0.36, 1);
+    transform 620ms cubic-bezier(0.22, 1, 0.36, 1),
+    visibility 0s;
 }
 
 .blyrics-pip-shell[data-video="ad"] .blyrics-pip-art-col,
@@ -1244,9 +1245,11 @@ body {
   opacity: 0;
   transform: scale(0.97);
   pointer-events: none;
+  visibility: hidden;
   transition:
     opacity 300ms ease,
-    transform 380ms cubic-bezier(0.32, 0, 0.2, 1);
+    transform 380ms cubic-bezier(0.32, 0, 0.2, 1),
+    visibility 0s 300ms;
 }
 
 .blyrics-pip-intermission {
