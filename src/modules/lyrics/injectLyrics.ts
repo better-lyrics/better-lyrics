@@ -34,19 +34,45 @@ import { publishSecondaryViews } from "@modules/ui/secondaryViews";
 import { injectRomanization, injectTranslation, type LineData } from "@braccato/core";
 import { findBestLanguageMatch, langCodesMatch, languageMatchesAny } from "@utils";
 import { logCore } from "@core/logger";
+import { alignLineParts, containsKanji, type RubySegment } from "@modules/lyrics/furigana/furiganaAligner";
+import { injectFuriganaToLine } from "@modules/lyrics/furigana/furiganaDOM";
 
 export type { LineData };
+
+/**
+ * Returns LyricParts aligned 1-to-1 with lineData.parts (DOM elements).
+ * When @braccato/core builds lineData.parts, whitespace tokens are omitted.
+ * Deriving parts directly from lineData.parts ensures furiganaMap keys match lineData.parts indices.
+ */
+function getRenderedPartsForAlignment(
+  lineData: LineData,
+  itemFallback: { parts?: LyricPart[]; words: string; startTimeMs: number; durationMs: number }
+): LyricPart[] {
+  if (lineData.parts && lineData.parts.length > 0) {
+    return lineData.parts.map(p => ({
+      words: p.lyricElement.dataset.content || p.lyricElement.textContent || "",
+      startTimeMs: Math.round(p.time * 1000),
+      durationMs: Math.round(p.duration * 1000),
+    }));
+  }
+  return itemFallback.parts && itemFallback.parts.length > 0
+    ? itemFallback.parts
+    : [{ words: itemFallback.words, startTimeMs: itemFallback.startTimeMs, durationMs: itemFallback.durationMs }];
+}
 
 /**
  * What the translation and romanization passes put on one line. They inject straight into the main
  * view's elements and write nothing back to the `Lyric` objects, so a second view building from the
  * same lines would otherwise show neither.
  */
+type FuriganaMap = Record<number, RubySegment[]> | Map<number, RubySegment[]>;
+
 interface LyricLineDecoration {
   romanization?: string;
   timedRomanization?: LyricPart[];
   translation?: string;
   translationLanguage?: string;
+  furiganaMap?: FuriganaMap;
 }
 
 /**
@@ -269,6 +295,27 @@ async function processBatchTranslationsAndRomanizations(
     const scriptLanguage = scripts.detectScriptLanguage(item.words);
     const trustedLanguage =
       sourceLanguage && scriptLanguage && !langCodesMatch(sourceLanguage, scriptLanguage) ? undefined : sourceLanguage;
+
+    // -- Furigana --------------------------
+    if (AppState.isFuriganaEnabled && containsKanji(item.words)) {
+      const isJapanese =
+        !trustedLanguage || langCodesMatch(trustedLanguage, "ja") || scripts.detectScriptLanguage(item.words) === "ja";
+      const hasNativeRomanization = Boolean(item.romanization || item.timedRomanization);
+      if (isJapanese && hasNativeRomanization) {
+        const parts = getRenderedPartsForAlignment(lineData, item);
+        const furiganaMap = alignLineParts(
+          parts,
+          item.timedRomanization || null,
+          item.romanization || null,
+          item.words || null
+        );
+        const injected = injectFuriganaToLine(doc, lineData, furiganaMap);
+        if (injected) {
+          recordLyricDecoration(index, { furiganaMap: Object.fromEntries(furiganaMap) });
+          didInjectCachedContent = true;
+        }
+      }
+    }
 
     // --- Romanization ---
     const isLanguageDisabledForRomanization = !!trustedLanguage && isRomanizationDisabledForLang(trustedLanguage);
