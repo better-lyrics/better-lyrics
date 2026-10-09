@@ -1431,6 +1431,7 @@ body {
 }
 
 .blyrics-pip-shell[data-layout="stage"] #blyrics-karaoke .blyrics-karaoke__card-credit:not(:empty) {
+  margin-top: 0.125rem !important;
   display: -webkit-box;
   max-width: 100%;
   white-space: normal;
