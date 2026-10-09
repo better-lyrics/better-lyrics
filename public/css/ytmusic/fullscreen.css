@@ -93,7 +93,7 @@ ytmusic-player-page:not([blyrics-dfs], [blyrics-karaoke])[blyrics-video-mode] #a
   padding-bottom: 10px;
 }
 
-ytmusic-player-page[player-fullscreened] #song-media-window {
+ytmusic-player-page[player-fullscreened]:not([blyrics-dfs]) #song-media-window {
   visibility: hidden;
 }
 
