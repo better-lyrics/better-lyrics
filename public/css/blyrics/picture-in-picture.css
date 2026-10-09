@@ -1427,7 +1427,7 @@ body {
   white-space: nowrap;
 }
 
-.blyrics-pip-shell[data-layout="stage"] #blyrics-karaoke .blyrics-karaoke__card-credit {
+.blyrics-pip-shell[data-layout="stage"] #blyrics-karaoke .blyrics-karaoke__card-credit:not(:empty) {
   display: -webkit-box;
   max-width: 100%;
   white-space: normal;
