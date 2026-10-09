@@ -16,6 +16,11 @@ interface ViewLyrics {
   readonly noLyrics: boolean;
 }
 
+export function hasNoLyricsPlaceholder(): boolean {
+  const lyrics = AppState.parsedLyrics?.lyrics ?? null;
+  return lyrics !== null && lyrics.length > 0 && lyrics[0].words === t("lyrics_notFound");
+}
+
 export function currentViewLyrics(): ViewLyrics {
   const lyrics = AppState.parsedLyrics?.lyrics ?? null;
   const segmentMap = AppState.parsedLyrics?.segmentMap ?? null;
@@ -29,6 +34,6 @@ export function currentViewLyrics(): ViewLyrics {
     decorations: retimed?.decorations ?? AppState.lyricDecorations,
     language: AppState.lyricData?.language,
     songwriters: AppState.lyricData?.songwriters,
-    noLyrics: lyrics !== null && lyrics.length > 0 && lyrics[0].words === t("lyrics_notFound"),
+    noLyrics: hasNoLyricsPlaceholder(),
   };
 }

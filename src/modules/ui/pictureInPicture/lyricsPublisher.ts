@@ -1,5 +1,5 @@
 import { AppState } from "@core/appState";
-import { currentViewLyrics } from "@modules/lyrics/viewLyrics";
+import { currentViewLyrics, hasNoLyricsPlaceholder } from "@modules/lyrics/viewLyrics";
 import { sendLyrics, sendLyricsSynced } from "@modules/ui/pictureInPicture/bridge";
 
 /**
@@ -11,15 +11,14 @@ export function publishPictureInPictureLyrics(): void {
   const lyricData = AppState.lyricData;
   const isSettled = lyricData !== null && !lyricData.isProvisional;
   const syncType = isSettled ? lyricData.syncType : "none";
-  const viewLyrics = currentViewLyrics();
   sendLyricsSynced({
     videoId: isSettled ? AppState.lastLoadedVideoId : null,
-    suitsStage: syncType !== "none" || viewLyrics.noLyrics,
+    suitsStage: syncType !== "none" || hasNoLyricsPlaceholder(),
   });
   if (!AppState.isPictureInPictureOpen) return;
 
   sendLyrics({
-    ...viewLyrics,
+    ...currentViewLyrics(),
     syncType,
     title: lyricData?.song ?? "",
     artist: lyricData?.artist ?? "",
