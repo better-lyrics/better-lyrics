@@ -11,11 +11,15 @@ export function publishPictureInPictureLyrics(): void {
   const lyricData = AppState.lyricData;
   const isSettled = lyricData !== null && !lyricData.isProvisional;
   const syncType = isSettled ? lyricData.syncType : "none";
-  sendLyricsSynced({ videoId: isSettled ? AppState.lastLoadedVideoId : null, synced: syncType !== "none" });
+  const viewLyrics = currentViewLyrics();
+  sendLyricsSynced({
+    videoId: isSettled ? AppState.lastLoadedVideoId : null,
+    suitsStage: syncType !== "none" || viewLyrics.noLyrics,
+  });
   if (!AppState.isPictureInPictureOpen) return;
 
   sendLyrics({
-    ...currentViewLyrics(),
+    ...viewLyrics,
     syncType,
     title: lyricData?.song ?? "",
     artist: lyricData?.artist ?? "",

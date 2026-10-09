@@ -226,11 +226,11 @@ assert.equal(parseWindowFrame("0x900"), null, "an implausible value is no frame"
 
 // -- Synced lyrics at open -----------------------------------------
 
-const flag = { videoId: "abc", synced: false };
+const flag = { videoId: "abc", suitsStage: false };
 const known = { flag, currentVideoId: "abc", karaokeEnabled: true, videoMode: true };
 assert.equal(expectsSyncedLyrics(known), false, "a flag for this song is believed");
 assert.equal(
-  expectsSyncedLyrics({ ...known, flag: { videoId: "abc", synced: true } }),
+  expectsSyncedLyrics({ ...known, flag: { videoId: "abc", suitsStage: true } }),
   true,
   "a synced flag for this song is believed"
 );
@@ -240,7 +240,7 @@ assert.equal(
   "regression: a flag from the previous song does not shrink the stage to the slot"
 );
 assert.equal(
-  expectsSyncedLyrics({ ...known, flag: { videoId: null, synced: false } }),
+  expectsSyncedLyrics({ ...known, flag: { videoId: null, suitsStage: false } }),
   true,
   "lyrics still loading assume the stage"
 );
@@ -257,7 +257,7 @@ assert.equal(
   "an unknown song in song mode assumes nothing"
 );
 assert.equal(
-  expectsSyncedLyrics({ ...known, flag: { videoId: "abc", synced: true }, karaokeEnabled: false }),
+  expectsSyncedLyrics({ ...known, flag: { videoId: "abc", suitsStage: true }, karaokeEnabled: false }),
   true,
   "a known flag is reported as is, the size decides what karaoke does with it"
 );

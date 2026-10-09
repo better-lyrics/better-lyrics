@@ -74,7 +74,7 @@ export interface PictureInPictureLyricsPayload {
 
 export interface PictureInPictureLyricsSynced {
   readonly videoId: string | null;
-  readonly synced: boolean;
+  readonly suitsStage: boolean;
 }
 
 // Details cross as JSON strings, not objects. Gecko hands the page a dead wrapper for any object a

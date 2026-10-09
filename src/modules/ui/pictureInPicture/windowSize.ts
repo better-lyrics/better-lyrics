@@ -139,6 +139,6 @@ interface SyncedLyricsContext {
 }
 
 export function expectsSyncedLyrics({ flag, currentVideoId, karaokeEnabled, videoMode }: SyncedLyricsContext): boolean {
-  if (flag && flag.videoId !== null && flag.videoId === currentVideoId) return flag.synced;
+  if (flag && flag.videoId !== null && flag.videoId === currentVideoId) return flag.suitsStage;
   return karaokeEnabled && videoMode;
 }
