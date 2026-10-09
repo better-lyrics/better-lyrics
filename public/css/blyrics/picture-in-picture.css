@@ -1415,6 +1415,8 @@ body {
   overflow: hidden;
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 2;
+  padding-bottom: 0.12em;
+  margin-bottom: -0.12em;
 }
 
 .blyrics-pip-shell[data-layout="stage"] #blyrics-karaoke .blyrics-karaoke__card-artist {
