@@ -31,13 +31,14 @@ export default function initializePlayerBridge() {
   let observedVideoElement = null;
 
   const updateVideoAspectRatioVar = video => {
+    const style = document.documentElement.style;
     if (video && video.videoWidth > 0 && video.videoHeight > 0) {
-      document.documentElement.style.setProperty(
-        "--blyrics-video-aspect-ratio",
-        `${video.videoWidth} / ${video.videoHeight}`
-      );
-    } else {
-      document.documentElement.style.removeProperty("--blyrics-video-aspect-ratio");
+      const ratio = `${video.videoWidth} / ${video.videoHeight}`;
+      if (style.getPropertyValue("--blyrics-video-aspect-ratio") !== ratio) {
+        style.setProperty("--blyrics-video-aspect-ratio", ratio);
+      }
+    } else if (style.getPropertyValue("--blyrics-video-aspect-ratio")) {
+      style.removeProperty("--blyrics-video-aspect-ratio");
     }
   };
 
@@ -156,6 +157,7 @@ export default function initializePlayerBridge() {
         cachedContentRect = player.getVideoContentRect();
       }
       attachVideoListeners(player);
+      updateVideoAspectRatioVar(observedVideoElement);
     });
     playerResizeObserver.observe(player);
     attachVideoListeners(player);
@@ -165,6 +167,7 @@ export default function initializePlayerBridge() {
     const player = document.getElementById("movie_player");
     if (player) attachPlayer(player);
     else if (observedPlayer) detachPlayer();
+    updateVideoAspectRatioVar(observedVideoElement);
 
     // Intentionally unconditional. If the initial document_end snapshot races
     // isolated-world initialization, the next 1 Hz snapshot still initializes
