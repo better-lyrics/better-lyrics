@@ -1411,6 +1411,7 @@ body {
 }
 
 .blyrics-pip-shell[data-layout="stage"] #blyrics-karaoke .blyrics-karaoke__card-title {
+  font-size: min(1.4em, var(--blyrics-font-size));
   display: -webkit-box;
   overflow: hidden;
   -webkit-box-orient: vertical;
