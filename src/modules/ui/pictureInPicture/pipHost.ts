@@ -64,6 +64,10 @@ function hasTimedLyrics(payload: PictureInPictureLyricsPayload | null): boolean 
   return payload !== null && !payload.noLyrics && payload.syncType !== "none" && (payload.lyrics?.length ?? 0) > 0;
 }
 
+function suitsStage(payload: PictureInPictureLyricsPayload | null): boolean {
+  return hasTimedLyrics(payload) || payload?.noLyrics === true;
+}
+
 function hasSameNames(left: readonly string[] = [], right: readonly string[] = []): boolean {
   return left.length === right.length && left.every((name, index) => name === right[index]);
 }
@@ -173,7 +177,7 @@ export function createPictureInPictureHost(
     );
   }
 
-  const liveWindowSize = (): WindowSize => contentWindowSize(hasTimedLyrics(lyricsPayload));
+  const liveWindowSize = (): WindowSize => contentWindowSize(suitsStage(lyricsPayload));
 
   // -- Window frame --------------------------------------------
 
@@ -407,7 +411,7 @@ export function createPictureInPictureHost(
     const shown = shouldShowWindowStage({
       enabled: environment.karaokeEnabled() !== false,
       videoState: activeMirror?.state ?? "off",
-      synced: hasTimedLyrics(lyricsPayload),
+      synced: suitsStage(lyricsPayload),
     });
     if (shown === isStageShown) return;
     isStageShown = shown;
