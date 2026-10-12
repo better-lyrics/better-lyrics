@@ -51,7 +51,7 @@
         "@codemirror/lint": "^6.9.7",
         "@codemirror/search": "^6.7.2",
         "@codemirror/state": "^6.7.6",
-        "@codemirror/view": "^6.43.13",
+        "@codemirror/view": "^6.43.14",
         "@formkit/auto-animate": "^0.10.0",
         "@fsegurai/codemirror-theme-material-dark": "^6.2.7",
         "@plasmohq/edge-addons-api": "^2.0.0",
@@ -64,7 +64,7 @@
         "sortablejs": "^1.15.7"
     },
     "devDependencies": {
-        "@aws-sdk/client-s3": "^3.1146.0",
+        "@aws-sdk/client-s3": "^3.1148.0",
         "@biomejs/biome": "2.0.4",
         "@types/chrome": "^0.3.4",
         "@types/jsdom": "^30.0.0",
