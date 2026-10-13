@@ -166,7 +166,7 @@
     "description": "Shown in the floating lyrics window while YouTube Music plays an ad, above a countdown to the end of the ad"
   },
   "picture_in_picture_adUpNext": {
-    "message": "Then $SONG$",
+    "message": "Puis $SONG$",
     "description": "Shown in the floating lyrics window during an ad, naming the song that plays when the ad ends",
     "placeholders": {
       "song": {
@@ -240,7 +240,7 @@
     "description": "Toggle label, shown inside the floating lyrics window settings, for the seekable playback progress bar under the album art"
   },
   "options_display_pipVideo": {
-    "message": "Show music video",
+    "message": "Afficher le clip vidéo",
     "description": "Toggle label, shown inside the floating lyrics window settings, for playing the music video in the floating window while YouTube Music is in video mode"
   },
   "options_display_shadersPromo": {
@@ -432,11 +432,11 @@
     "description": "Installed themes button label"
   },
   "options_identity_backupTitle": {
-    "message": "Back up your identity",
+    "message": "Sauvegardez votre identité",
     "description": "Title of the identity backup warning"
   },
   "options_identity_backupBody": {
-    "message": "Your contributions and level are tied to this key. If you lose it, no one can restore it, including the Better Lyrics team. Never share it: anyone who has it can act as you.",
+    "message": "Vos contributions et votre niveau sont liés à cette clé. Si vous la perdez, personne ne pourra la récupérer, pas même l'équipe de Better Lyrics. Ne la partagez jamais : toute personne en sa possession peut agir en votre nom.",
     "description": "Body of the identity backup warning"
   },
   "options_identity_yourIdentity": {
@@ -552,7 +552,7 @@
     "description": "Status when nickname request fails"
   },
   "options_alert_refreshFailed": {
-    "message": "Could not refresh lyrics. Open YouTube Music and try again.",
+    "message": "Impossible d'actualiser les paroles. Ouvrez YouTube Music et réessayez.",
     "description": "Shown when the popup's Refresh lyrics button finds no YouTube Music tab or none of them responds"
   },
   "options_alert_importEmpty": {
@@ -608,43 +608,43 @@
     "description": "Identity load error message"
   },
   "editor_alert_nothingToSave": {
-    "message": "No styles to save as a theme",
+    "message": "Aucun style à enregistrer en tant que thème",
     "description": "Toast when the user saves an empty editor as a custom theme"
   },
   "editor_alert_saveDialogOpened": {
-    "message": "Theme file save dialog opened. Choose where to save your file",
+    "message": "Fenêtre de dialogue d'enregistrement du thème ouverte. Choisissez où enregistrer votre fichier",
     "description": "Toast after the browser save dialog opens for an exported theme file"
   },
   "editor_alert_downloadStarted": {
-    "message": "Theme file download started. Check your downloads folder",
+    "message": "Le téléchargement du thème a commencé. Vérifiez votre dossier de téléchargements",
     "description": "Toast after an exported theme file starts downloading without a save dialog"
   },
   "editor_alert_applyFailed": {
-    "message": "Could not apply theme",
+    "message": "Impossible d'appliquer le thème",
     "description": "Toast when applying a built-in or custom theme from the theme picker fails"
   },
   "editor_alert_saveFailed": {
-    "message": "Could not save your styles",
+    "message": "Impossible d'enregistrer vos styles",
     "description": "Toast when saving the custom CSS editor content fails"
   },
   "editor_alert_storageFull": {
-    "message": "Storage is full. Clear the lyrics cache in settings, then try again",
+    "message": "L'espace de stockage est plein. Videz le cache des paroles dans les paramètres, puis réessayez",
     "description": "Toast when saving the custom CSS editor content fails because extension storage is full"
   },
   "editor_prompt_saveMessage": {
-    "message": "Enter a name for this theme",
+    "message": "Saisissez un nom pour ce thème",
     "description": "Message in the save as theme dialog"
   },
   "editor_prompt_renameMessage": {
-    "message": "Enter a new name for this theme",
+    "message": "Saisissez un nouveau nom pour ce thème",
     "description": "Message in the rename theme dialog"
   },
   "editor_prompt_themeName": {
-    "message": "Theme name",
+    "message": "Nom du thème",
     "description": "Placeholder of the theme name field in the save and rename dialogs"
   },
   "editor_prompt_deleteMessage": {
-    "message": "Delete the theme $NAME$? This cannot be undone.",
+    "message": "Supprimer le thème $NAME$ ? Cette action est irréversible.",
     "description": "Message in the delete custom theme dialog",
     "placeholders": {
       "name": {
@@ -654,11 +654,11 @@
     }
   },
   "editor_alert_importFailed": {
-    "message": "Could not import the theme file. Try again",
+    "message": "Impossible d'importer le thème. Veuillez réessayer",
     "description": "Toast when importing a theme file fails"
   },
   "editor_alert_imported": {
-    "message": "Imported $NAME$",
+    "message": "$NAME$ importé",
     "description": "Toast after a theme file is imported into the editor",
     "placeholders": {
       "name": {
@@ -668,7 +668,7 @@
     }
   },
   "editor_alert_themeSaved": {
-    "message": "Saved theme: $NAME$",
+    "message": "Thème enregistré : $NAME$",
     "description": "Toast after the editor styles are saved as a custom theme",
     "placeholders": {
       "name": {
@@ -678,11 +678,11 @@
     }
   },
   "editor_alert_themeSaveFailed": {
-    "message": "Could not save the theme",
+    "message": "Impossible d'enregistrer le thème",
     "description": "Toast when saving a custom theme fails"
   },
   "editor_alert_themeRenamed": {
-    "message": "Renamed theme to $NAME$",
+    "message": "Thème renommé en $NAME$",
     "description": "Toast after a custom theme is renamed",
     "placeholders": {
       "name": {
@@ -692,7 +692,7 @@
     }
   },
   "editor_alert_themeNameTaken": {
-    "message": "A theme named $NAME$ already exists",
+    "message": "Un thème nommé $NAME$ existe déjà",
     "description": "Toast when a custom theme is renamed to a name another custom theme already uses",
     "placeholders": {
       "name": {
@@ -702,15 +702,15 @@
     }
   },
   "editor_alert_themeRenameFailed": {
-    "message": "Could not rename the theme",
+    "message": "Impossible de renommer le thème",
     "description": "Toast when renaming a custom theme fails"
   },
   "editor_alert_themeDeleted": {
-    "message": "Custom theme deleted",
+    "message": "Thème personnalisé supprimé",
     "description": "Toast after a custom theme is deleted"
   },
   "editor_alert_themeDeleteFailed": {
-    "message": "Could not delete the theme",
+    "message": "Impossible de supprimer le thème",
     "description": "Toast when deleting a custom theme fails"
   },
   "options_editor_saving": {
@@ -762,31 +762,31 @@
     "description": "Double-click to rename tooltip"
   },
   "options_editor_findReplaceTitle": {
-    "message": "Find and replace",
+    "message": "Rechercher et remplacer",
     "description": "Title of the modal shown when find and replace is used in the popup editor"
   },
   "options_editor_findReplaceFullscreenOnly": {
-    "message": "Find and replace is only available in the fullscreen editor.",
+    "message": "Rechercher et remplacer n'est possible que dans l'éditeur en plein écran.",
     "description": "Modal body explaining that find and replace needs the fullscreen editor"
   },
   "options_editor_findReplaceOpenHint": {
-    "message": "Open the fullscreen editor to use every editor feature.",
+    "message": "Ouvrez l'éditeur en plein écran pour profiter de toutes ses fonctionnalités.",
     "description": "Second line of the find and replace modal, pointing to the fullscreen editor"
   },
   "options_editor_openFullscreen": {
-    "message": "Open fullscreen editor",
+    "message": "Ouvrir l'éditeur en plein écran",
     "description": "Confirm button in the find and replace modal that opens the fullscreen editor"
   },
   "options_editor_close": {
-    "message": "Close",
+    "message": "Fermer",
     "description": "Cancel button that closes the find and replace modal"
   },
   "options_editor_notReady": {
-    "message": "Editor not initialized",
+    "message": "Éditeur non initialisé",
     "description": "Alert shown when an editor action runs before the editor has loaded"
   },
   "options_editor_nothingToExport": {
-    "message": "No styles to export",
+    "message": "Aucun style à exporter",
     "description": "Alert shown when exporting while the editor is empty"
   },
   "options_provider_betterLyrics": {
@@ -1170,7 +1170,7 @@
     "description": "Theme apply error"
   },
   "marketplace_alert_installed": {
-    "message": "Installed $NAME$",
+    "message": "$NAME$ installé",
     "description": "Toast after a Marketplace theme is installed; it has an Apply action",
     "placeholders": {
       "name": {
@@ -1180,7 +1180,7 @@
     }
   },
   "marketplace_alert_installedFrom": {
-    "message": "Installed $NAME$ from $SOURCE$",
+    "message": "$NAME$ de $SOURCE$ installé",
     "description": "Toast after a theme is installed from a GitHub repository URL; SOURCE is the repository, with the branch in parentheses when one was given",
     "placeholders": {
       "name": {
@@ -1194,7 +1194,7 @@
     }
   },
   "marketplace_alert_removed": {
-    "message": "Removed $NAME$",
+    "message": "$NAME$ retiré",
     "description": "Toast after an installed Marketplace theme is removed",
     "placeholders": {
       "name": {
@@ -1204,11 +1204,11 @@
     }
   },
   "marketplace_alert_storageFull": {
-    "message": "Storage is full. Remove some installed themes and try again.",
+    "message": "L'espace de stockage est plein. Supprimez quelques thèmes installés, puis réessayez.",
     "description": "Toast when a theme cannot be installed because extension storage is full"
   },
   "marketplace_alert_installFailed": {
-    "message": "Could not install $NAME$",
+    "message": "Impossible d'installer $NAME$",
     "description": "Toast when installing a Marketplace theme fails",
     "placeholders": {
       "name": {
@@ -1218,7 +1218,7 @@
     }
   },
   "marketplace_alert_removeFailed": {
-    "message": "Could not remove $NAME$",
+    "message": "Impossible de supprimer $NAME$",
     "description": "Toast when removing an installed Marketplace theme fails",
     "placeholders": {
       "name": {
@@ -1242,11 +1242,11 @@
     }
   },
   "marketplace_tooltipInstallsSingular": {
-    "message": "1 install",
+    "message": "1 installation",
     "description": "Tooltip on a theme's install count when it has exactly one install"
   },
   "marketplace_byline": {
-    "message": "By $AUTHOR$ · v$VERSION$",
+    "message": "Par $AUTHOR$ · v$VERSION$",
     "description": "Byline under a theme name: its creators and version",
     "placeholders": {
       "author": {
@@ -1260,7 +1260,7 @@
     }
   },
   "marketplace_themeActiveLabel": {
-    "message": "$TITLE$, active",
+    "message": "$TITLE$, actif",
     "description": "Accessible name of the currently applied theme in the installed themes menu",
     "placeholders": {
       "title": {
@@ -1270,7 +1270,7 @@
     }
   },
   "marketplace_tooltipInstalls": {
-    "message": "$COUNT$ installs",
+    "message": "$COUNT$ installations",
     "description": "Tooltip on a theme's install count",
     "placeholders": {
       "count": {
@@ -1280,7 +1280,7 @@
     }
   },
   "marketplace_tooltipRating": {
-    "message": "$AVERAGE$ average from $COUNT$ ratings",
+    "message": "Moyenne de $AVERAGE$ sur $COUNT$ avis",
     "description": "Tooltip on a theme's star rating",
     "placeholders": {
       "average": {
@@ -1294,7 +1294,7 @@
     }
   },
   "marketplace_tooltipOlderBuild": {
-    "message": "You're on v$CURRENT$. Latest is v$LATEST$",
+    "message": "Vous êtes sur la v$CURRENT$. La dernière version est v$LATEST$",
     "description": "Tooltip on the badge shown when an installed theme build is older than the latest one",
     "placeholders": {
       "current": {
@@ -1308,7 +1308,7 @@
     }
   },
   "marketplace_tooltipOlderBuildFloor": {
-    "message": "You're on v$CURRENT$. Latest v$LATEST$ needs Better Lyrics $FLOOR$+",
+    "message": "Vous êtes sur la v$CURRENT$. La dernière version v$LATEST$ nécessite Better Lyrics $FLOOR$+",
     "description": "Tooltip on the older build badge when the latest build needs a newer extension version",
     "placeholders": {
       "current": {
@@ -1326,7 +1326,7 @@
     }
   },
   "marketplace_installedFrom": {
-    "message": "Installed from $REPO$",
+    "message": "Installé depuis $REPO$",
     "description": "Tooltip on the GitHub badge of a theme installed from a repository URL",
     "placeholders": {
       "repo": {
@@ -1336,19 +1336,19 @@
     }
   },
   "marketplace_ricsBadge": {
-    "message": "This theme uses RICS",
+    "message": "Ce thème utilise RICS",
     "description": "Tooltip and accessible label on the RICS badge in the theme detail view"
   },
   "marketplace_urlValidating": {
-    "message": "Validating...",
+    "message": "Validation...",
     "description": "Install button text while a theme repository URL is being checked"
   },
   "marketplace_urlInstalling": {
-    "message": "Installing...",
+    "message": "Installation...",
     "description": "Install button text while a theme from a repository URL is being installed"
   },
   "marketplace_incompatibleConfirm": {
-    "message": "This theme needs Better Lyrics v$VERSION$+ and may not work on your version. Install anyway?",
+    "message": "Ce thème nécessite Better Lyrics v$VERSION$+ et risque de ne pas fonctionner avec votre version. Installer quand même ?",
     "description": "Confirm dialog before installing a theme that needs a newer extension version",
     "placeholders": {
       "version": {
@@ -1358,7 +1358,7 @@
     }
   },
   "marketplace_sortDescendingLabel": {
-    "message": "$LABEL$, descending. Activate to reverse.",
+    "message": "$LABEL$, décroissant. Activer pour inverser.",
     "description": "Accessible label of the selected sort chip when sorting in descending order",
     "placeholders": {
       "label": {
@@ -1368,7 +1368,7 @@
     }
   },
   "marketplace_sortAscendingLabel": {
-    "message": "$LABEL$, ascending. Activate to reverse.",
+    "message": "$LABEL$, croissant. Activer pour inverser.",
     "description": "Accessible label of the selected sort chip when sorting in ascending order",
     "placeholders": {
       "label": {
@@ -1378,7 +1378,7 @@
     }
   },
   "unison_sortAscendingClearLabel": {
-    "message": "$LABEL$, ascending. Activate to clear the sort.",
+    "message": "$LABEL$, croissant. Activer pour effacer le tri.",
     "description": "Accessible label of the selected Unison sort chip in ascending order, where activating it again removes the sort",
     "placeholders": {
       "label": {
@@ -1388,7 +1388,7 @@
     }
   },
   "marketplace_emptyStore": {
-    "message": "No themes available yet. Check back later",
+    "message": "Aucun thème n'est encore disponible. Revenez plus tard",
     "description": "Shown when the Marketplace registry has no themes"
   },
   "marketplace_loadFailed": {
