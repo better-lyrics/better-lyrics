@@ -472,7 +472,7 @@
     "description": "Label for the file picker button in the import identity modal"
   },
   "options_identityImport_or": {
-    "message": "or",
+    "message": "ou",
     "description": "Divider between file picker and paste textarea in the import identity modal"
   },
   "options_identityImport_pastePlaceholder": {
