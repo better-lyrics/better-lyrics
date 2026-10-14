@@ -1,6 +1,6 @@
 {
   "extensionName": {
-    "message": "Better Lyrics (Lyrics for YouTube Music)",
+    "message": "Better Lyrics (Testi per YouTube Music)",
     "description": "The name of the extension"
   },
   "extensionDescription": {
@@ -40,11 +40,11 @@
     "description": "Auto switch to lyrics tab setting label"
   },
   "options_general_clearCachedLyrics": {
-    "message": "Clear cached lyrics",
+    "message": "Elimina cache dei testi",
     "description": "Label for the clear cache action row"
   },
   "options_general_clearCachedLyricsHint": {
-    "message": "They download again as you play",
+    "message": "Vengono scaricati di nuovo mentre ascolti",
     "description": "Hint under the clear cached lyrics label"
   },
   "options_general_clearCache": {
@@ -56,7 +56,7 @@
     "description": "Total lyrics in cache label"
   },
   "options_general_storageUsed": {
-    "message": "Storage used",
+    "message": "Memoria utilizzata",
     "description": "Popup General tab: label under the total local storage size"
   },
   "options_general_segment": {
@@ -74,19 +74,19 @@
     }
   },
   "options_general_browseThemes": {
-    "message": "Browse themes",
+    "message": "Sfoglia i temi",
     "description": "Popup General tab: one-line description on the Theme Marketplace shortcut"
   },
   "options_general_whatsNew": {
-    "message": "What's new",
+    "message": "Novità",
     "description": "Popup General tab: shortcut to the latest release notes"
   },
   "options_general_whatsNewHint": {
-    "message": "Latest release notes",
+    "message": "Ultime note di rilascio",
     "description": "Popup General tab: one-line description on the What's new shortcut"
   },
   "options_display_fullscreenTab": {
-    "message": "Fullscreen",
+    "message": "Schermo intero",
     "description": "Header tab in Display for fullscreen settings"
   },
   "options_display_videoTab": {
@@ -162,11 +162,11 @@
     "description": "Accessible label for the next track button in the Picture-in-Picture lyrics window, used when the YouTube Music player bar exposes no label of its own"
   },
   "picture_in_picture_adPlaying": {
-    "message": "Ad playing",
+    "message": "Pubblicità in corso",
     "description": "Shown in the floating lyrics window while YouTube Music plays an ad, above a countdown to the end of the ad"
   },
   "picture_in_picture_adUpNext": {
-    "message": "Then $SONG$",
+    "message": "In arrivo: $SONG$",
     "description": "Shown in the floating lyrics window during an ad, naming the song that plays when the ad ends",
     "placeholders": {
       "song": {
@@ -240,7 +240,7 @@
     "description": "Toggle label, shown inside the floating lyrics window settings, for the seekable playback progress bar under the album art"
   },
   "options_display_pipVideo": {
-    "message": "Show music video",
+    "message": "Mostra video musicale",
     "description": "Toggle label, shown inside the floating lyrics window settings, for playing the music video in the floating window while YouTube Music is in video mode"
   },
   "options_display_shadersPromo": {
@@ -432,11 +432,11 @@
     "description": "Installed themes button label"
   },
   "options_identity_backupTitle": {
-    "message": "Back up your identity",
+    "message": "Esegui il backup della tua identità",
     "description": "Title of the identity backup warning"
   },
   "options_identity_backupBody": {
-    "message": "Your contributions and level are tied to this key. If you lose it, no one can restore it, including the Better Lyrics team. Never share it: anyone who has it can act as you.",
+    "message": "I tuoi contributi e il tuo livello sono legati a questa chiave. Se persa, non può essere recuperata, nemmeno dal team di Better Lyrics. Non condividerla mai: chiunque la possieda può agire come te.",
     "description": "Body of the identity backup warning"
   },
   "options_identity_yourIdentity": {
@@ -552,7 +552,7 @@
     "description": "Status when nickname request fails"
   },
   "options_alert_refreshFailed": {
-    "message": "Could not refresh lyrics. Open YouTube Music and try again.",
+    "message": "Impossibile aggiornare i testi. Apri YouTube Music e riprova.",
     "description": "Shown when the popup's Refresh lyrics button finds no YouTube Music tab or none of them responds"
   },
   "options_alert_importEmpty": {
@@ -608,43 +608,43 @@
     "description": "Identity load error message"
   },
   "editor_alert_nothingToSave": {
-    "message": "No styles to save as a theme",
+    "message": "Nessuno stile da salvare come tema",
     "description": "Toast when the user saves an empty editor as a custom theme"
   },
   "editor_alert_saveDialogOpened": {
-    "message": "Theme file save dialog opened. Choose where to save your file",
+    "message": "Finestra di salvataggio per il file del tema aperta. Scegli dove salvare il file",
     "description": "Toast after the browser save dialog opens for an exported theme file"
   },
   "editor_alert_downloadStarted": {
-    "message": "Theme file download started. Check your downloads folder",
+    "message": "Download per il file del tema iniziato. Controlla la tua cartella dei download",
     "description": "Toast after an exported theme file starts downloading without a save dialog"
   },
   "editor_alert_applyFailed": {
-    "message": "Could not apply theme",
+    "message": "Impossibile applicare il tema",
     "description": "Toast when applying a built-in or custom theme from the theme picker fails"
   },
   "editor_alert_saveFailed": {
-    "message": "Could not save your styles",
+    "message": "Impossibile salvare i tuoi stili",
     "description": "Toast when saving the custom CSS editor content fails"
   },
   "editor_alert_storageFull": {
-    "message": "Storage is full. Clear the lyrics cache in settings, then try again",
+    "message": "Memoria piena. Svuota la cache dei testi nelle impostazioni, e riprova",
     "description": "Toast when saving the custom CSS editor content fails because extension storage is full"
   },
   "editor_prompt_saveMessage": {
-    "message": "Enter a name for this theme",
+    "message": "Inserisci un nome per questo tema",
     "description": "Message in the save as theme dialog"
   },
   "editor_prompt_renameMessage": {
-    "message": "Enter a new name for this theme",
+    "message": "Inserisci un nuovo nome per questo tema",
     "description": "Message in the rename theme dialog"
   },
   "editor_prompt_themeName": {
-    "message": "Theme name",
+    "message": "Nome del tema",
     "description": "Placeholder of the theme name field in the save and rename dialogs"
   },
   "editor_prompt_deleteMessage": {
-    "message": "Delete the theme $NAME$? This cannot be undone.",
+    "message": "Vuoi eliminare il tema $NAME$? Non può essere annullato.",
     "description": "Message in the delete custom theme dialog",
     "placeholders": {
       "name": {
@@ -654,11 +654,11 @@
     }
   },
   "editor_alert_importFailed": {
-    "message": "Could not import the theme file. Try again",
+    "message": "Impossibile importare il file del tema. Riprova",
     "description": "Toast when importing a theme file fails"
   },
   "editor_alert_imported": {
-    "message": "Imported $NAME$",
+    "message": "Importato $NAME$",
     "description": "Toast after a theme file is imported into the editor",
     "placeholders": {
       "name": {
@@ -668,7 +668,7 @@
     }
   },
   "editor_alert_themeSaved": {
-    "message": "Saved theme: $NAME$",
+    "message": "Tema salvato: $NAME$",
     "description": "Toast after the editor styles are saved as a custom theme",
     "placeholders": {
       "name": {
@@ -678,11 +678,11 @@
     }
   },
   "editor_alert_themeSaveFailed": {
-    "message": "Could not save the theme",
+    "message": "Impossibile salvare il tema",
     "description": "Toast when saving a custom theme fails"
   },
   "editor_alert_themeRenamed": {
-    "message": "Renamed theme to $NAME$",
+    "message": "Tema rinominato in $NAME$",
     "description": "Toast after a custom theme is renamed",
     "placeholders": {
       "name": {
@@ -692,7 +692,7 @@
     }
   },
   "editor_alert_themeNameTaken": {
-    "message": "A theme named $NAME$ already exists",
+    "message": "Un tema chiamato $NAME$ esiste già",
     "description": "Toast when a custom theme is renamed to a name another custom theme already uses",
     "placeholders": {
       "name": {
@@ -702,15 +702,15 @@
     }
   },
   "editor_alert_themeRenameFailed": {
-    "message": "Could not rename the theme",
+    "message": "Impossibile rinominare il tema",
     "description": "Toast when renaming a custom theme fails"
   },
   "editor_alert_themeDeleted": {
-    "message": "Custom theme deleted",
+    "message": "Tema personalizzato eliminato",
     "description": "Toast after a custom theme is deleted"
   },
   "editor_alert_themeDeleteFailed": {
-    "message": "Could not delete the theme",
+    "message": "Impossibile eliminare il tema",
     "description": "Toast when deleting a custom theme fails"
   },
   "options_editor_saving": {
@@ -762,31 +762,31 @@
     "description": "Double-click to rename tooltip"
   },
   "options_editor_findReplaceTitle": {
-    "message": "Find and replace",
+    "message": "Trova e sostituisci",
     "description": "Title of the modal shown when find and replace is used in the popup editor"
   },
   "options_editor_findReplaceFullscreenOnly": {
-    "message": "Find and replace is only available in the fullscreen editor.",
+    "message": "Trova e sostituisci è disponibile solo nell'editor a schermo intero.",
     "description": "Modal body explaining that find and replace needs the fullscreen editor"
   },
   "options_editor_findReplaceOpenHint": {
-    "message": "Open the fullscreen editor to use every editor feature.",
+    "message": "Apri l'editor a schermo intero per utilizzare ogni funzione dell'editor.",
     "description": "Second line of the find and replace modal, pointing to the fullscreen editor"
   },
   "options_editor_openFullscreen": {
-    "message": "Open fullscreen editor",
+    "message": "Apri editor a schermo intero",
     "description": "Confirm button in the find and replace modal that opens the fullscreen editor"
   },
   "options_editor_close": {
-    "message": "Close",
+    "message": "Chiudi",
     "description": "Cancel button that closes the find and replace modal"
   },
   "options_editor_notReady": {
-    "message": "Editor not initialized",
+    "message": "Editor non inizializzato",
     "description": "Alert shown when an editor action runs before the editor has loaded"
   },
   "options_editor_nothingToExport": {
-    "message": "No styles to export",
+    "message": "Nessuno stile da esportare",
     "description": "Alert shown when exporting while the editor is empty"
   },
   "options_provider_betterLyrics": {
@@ -818,7 +818,7 @@
     "description": "YouTube provider name"
   },
   "options_provider_youtubeCaptions": {
-    "message": "YouTube captions",
+    "message": "Sottotitoli YouTube",
     "description": "YouTube Captions provider name"
   },
   "options_provider_binilyrics": {
@@ -1170,7 +1170,7 @@
     "description": "Theme apply error"
   },
   "marketplace_alert_installed": {
-    "message": "Installed $NAME$",
+    "message": "Installato $NAME$",
     "description": "Toast after a Marketplace theme is installed; it has an Apply action",
     "placeholders": {
       "name": {
@@ -1180,7 +1180,7 @@
     }
   },
   "marketplace_alert_installedFrom": {
-    "message": "Installed $NAME$ from $SOURCE$",
+    "message": "Installato $NAME$ da $SOURCE$",
     "description": "Toast after a theme is installed from a GitHub repository URL; SOURCE is the repository, with the branch in parentheses when one was given",
     "placeholders": {
       "name": {
@@ -1194,7 +1194,7 @@
     }
   },
   "marketplace_alert_removed": {
-    "message": "Removed $NAME$",
+    "message": "Rimosso $NAME$",
     "description": "Toast after an installed Marketplace theme is removed",
     "placeholders": {
       "name": {
@@ -1204,11 +1204,11 @@
     }
   },
   "marketplace_alert_storageFull": {
-    "message": "Storage is full. Remove some installed themes and try again.",
+    "message": "Memoria piena. Rimuovi qualche tema installato e riprova.",
     "description": "Toast when a theme cannot be installed because extension storage is full"
   },
   "marketplace_alert_installFailed": {
-    "message": "Could not install $NAME$",
+    "message": "Impossibile installare $NAME$",
     "description": "Toast when installing a Marketplace theme fails",
     "placeholders": {
       "name": {
@@ -1218,7 +1218,7 @@
     }
   },
   "marketplace_alert_removeFailed": {
-    "message": "Could not remove $NAME$",
+    "message": "Impossibile rimuovere $NAME$",
     "description": "Toast when removing an installed Marketplace theme fails",
     "placeholders": {
       "name": {
@@ -1242,11 +1242,11 @@
     }
   },
   "marketplace_tooltipInstallsSingular": {
-    "message": "1 install",
+    "message": "1 installazione",
     "description": "Tooltip on a theme's install count when it has exactly one install"
   },
   "marketplace_byline": {
-    "message": "By $AUTHOR$ · v$VERSION$",
+    "message": "Da $AUTHOR$ · v$VERSION$",
     "description": "Byline under a theme name: its creators and version",
     "placeholders": {
       "author": {
@@ -1260,7 +1260,7 @@
     }
   },
   "marketplace_themeActiveLabel": {
-    "message": "$TITLE$, active",
+    "message": "$TITLE$, attivo",
     "description": "Accessible name of the currently applied theme in the installed themes menu",
     "placeholders": {
       "title": {
@@ -1270,7 +1270,7 @@
     }
   },
   "marketplace_tooltipInstalls": {
-    "message": "$COUNT$ installs",
+    "message": "$COUNT$ installazioni",
     "description": "Tooltip on a theme's install count",
     "placeholders": {
       "count": {
@@ -1280,7 +1280,7 @@
     }
   },
   "marketplace_tooltipRating": {
-    "message": "$AVERAGE$ average from $COUNT$ ratings",
+    "message": "Media $AVERAGE$ da $COUNT$ recensioni",
     "description": "Tooltip on a theme's star rating",
     "placeholders": {
       "average": {
@@ -1294,7 +1294,7 @@
     }
   },
   "marketplace_tooltipOlderBuild": {
-    "message": "You're on v$CURRENT$. Latest is v$LATEST$",
+    "message": "Sei su v$CURRENT$. La versione più recente è v$LATEST$",
     "description": "Tooltip on the badge shown when an installed theme build is older than the latest one",
     "placeholders": {
       "current": {
@@ -1308,7 +1308,7 @@
     }
   },
   "marketplace_tooltipOlderBuildFloor": {
-    "message": "You're on v$CURRENT$. Latest v$LATEST$ needs Better Lyrics $FLOOR$+",
+    "message": "Sei su v$CURRENT$. La versione più recente v$LATEST$ richiede Better Lyrics $FLOOR$+",
     "description": "Tooltip on the older build badge when the latest build needs a newer extension version",
     "placeholders": {
       "current": {
@@ -1326,7 +1326,7 @@
     }
   },
   "marketplace_installedFrom": {
-    "message": "Installed from $REPO$",
+    "message": "Installato da $REPO$",
     "description": "Tooltip on the GitHub badge of a theme installed from a repository URL",
     "placeholders": {
       "repo": {
@@ -1336,19 +1336,19 @@
     }
   },
   "marketplace_ricsBadge": {
-    "message": "This theme uses RICS",
+    "message": "Questo tema usa RICS",
     "description": "Tooltip and accessible label on the RICS badge in the theme detail view"
   },
   "marketplace_urlValidating": {
-    "message": "Validating...",
+    "message": "Validazione in corso...",
     "description": "Install button text while a theme repository URL is being checked"
   },
   "marketplace_urlInstalling": {
-    "message": "Installing...",
+    "message": "Installazione in corso...",
     "description": "Install button text while a theme from a repository URL is being installed"
   },
   "marketplace_incompatibleConfirm": {
-    "message": "This theme needs Better Lyrics v$VERSION$+ and may not work on your version. Install anyway?",
+    "message": "Questo tema richiede Better Lyrics v$VERSION$+ e potrebbe non funzionare sulla tua versione. Lo vuoi installare lo stesso?",
     "description": "Confirm dialog before installing a theme that needs a newer extension version",
     "placeholders": {
       "version": {
@@ -1358,7 +1358,7 @@
     }
   },
   "marketplace_sortDescendingLabel": {
-    "message": "$LABEL$, descending. Activate to reverse.",
+    "message": "$LABEL$, decrescente. Attiva per invertire.",
     "description": "Accessible label of the selected sort chip when sorting in descending order",
     "placeholders": {
       "label": {
@@ -1368,7 +1368,7 @@
     }
   },
   "marketplace_sortAscendingLabel": {
-    "message": "$LABEL$, ascending. Activate to reverse.",
+    "message": "$LABEL$, ascendente. Attiva per invertire.",
     "description": "Accessible label of the selected sort chip when sorting in ascending order",
     "placeholders": {
       "label": {
@@ -1378,7 +1378,7 @@
     }
   },
   "unison_sortAscendingClearLabel": {
-    "message": "$LABEL$, ascending. Activate to clear the sort.",
+    "message": "$LABEL$, ascendente. Attiva per cancellare l'ordine.",
     "description": "Accessible label of the selected Unison sort chip in ascending order, where activating it again removes the sort",
     "placeholders": {
       "label": {
@@ -1388,15 +1388,15 @@
     }
   },
   "marketplace_emptyStore": {
-    "message": "No themes available yet. Check back later",
+    "message": "Nessun tema disponibile. Riprova più tardi",
     "description": "Shown when the Marketplace registry has no themes"
   },
   "marketplace_loadFailed": {
-    "message": "Could not load themes. Check your connection and try again",
+    "message": "Impossibile caricare temi. Controlla la tua connessione e riprova",
     "description": "Shown when the Marketplace theme list fails to load"
   },
   "marketplace_ratedAs": {
-    "message": "You rated this $RATING$/5 as $NAME$",
+    "message": "Hai valutato questo $RATING$/5 come $NAME$",
     "description": "Status under the rating stars after the user rated a theme",
     "placeholders": {
       "rating": {
@@ -1410,19 +1410,19 @@
     }
   },
   "marketplace_ratingSubmitting": {
-    "message": "Submitting...",
+    "message": "Invio...",
     "description": "Status while a theme rating is being sent"
   },
   "marketplace_ratingVerifying": {
-    "message": "Verifying...",
+    "message": "Verifica...",
     "description": "Status while the rating anti-abuse check runs"
   },
   "marketplace_ratingVerifyFailed": {
-    "message": "Verification failed. Try again",
+    "message": "Verifica non riuscita. Riprova",
     "description": "Status when the rating anti-abuse check fails"
   },
   "marketplace_urlInvalid": {
-    "message": "Invalid GitHub URL. Use github.com/user/repo or github.com/user/repo/tree/branch",
+    "message": "URL GitHub invalido. Use github.com/user/repo or github.com/user/repo/tree/branch",
     "description": "Error in the install from URL dialog when the URL is not a GitHub repository"
   },
   "marketplace_requiresVersion": {
@@ -1552,47 +1552,47 @@
     "description": "Label for language exclusions setting"
   },
   "options_about": {
-    "message": "About",
+    "message": "Informazioni",
     "description": "Footer button that opens the About page"
   },
   "options_about_tagline": {
-    "message": "Time-synced lyrics for YouTube Music.",
+    "message": "Testi sincronizzati per YouTube Music.",
     "description": "About page tagline under the product name"
   },
   "options_about_whatHeading": {
-    "message": "What it is",
+    "message": "Che cos'è",
     "description": "About page section heading"
   },
   "options_about_whatBody": {
-    "message": "Better Lyrics upgrades your YouTube Music experience by providing beautiful time-synced lyrics for your favorite songs.",
+    "message": "Better Lyrics migliora la tua esperienza su YouTube Music fornendo dei bellissimi testi sincronizzati per le tue canzoni preferite.",
     "description": "About page section body"
   },
   "options_about_doesHeading": {
-    "message": "What it does",
+    "message": "Cosa fa",
     "description": "About page section heading"
   },
   "options_about_does1": {
-    "message": "Lyrics that follow the song. Click any line to jump to it.",
+    "message": "Testi che seguono la canzone. Clicca su qualsiasi linea per saltare ad essa.",
     "description": "About page feature list item"
   },
   "options_about_does2": {
-    "message": "Translation and romanization for songs in other languages.",
+    "message": "Traduzione e romanizzazione di canzoni in altre lingue.",
     "description": "About page feature list item"
   },
   "options_about_does3": {
-    "message": "A full-screen view and a floating lyrics window.",
+    "message": "Una vista a schermo intero e una finestra dei testi fluttuante.",
     "description": "About page feature list item"
   },
   "options_about_does4": {
-    "message": "Unison: community lyrics anyone can submit, vote on and fix.",
+    "message": "Unison: testi di comunità che chiunque può inviare, votare e correggere.",
     "description": "About page feature list item"
   },
   "options_about_does5": {
-    "message": "Themes from the Marketplace, or your own in the built-in editor.",
+    "message": "Temi del Marketplace, o i tuoi nell'editor incluso.",
     "description": "About page feature list item"
   },
   "options_about_does6": {
-    "message": "Lyrics from many sources, in an order you choose.",
+    "message": "Testi da molte fonti, nell'ordine che più preferisci.",
     "description": "About page feature list item"
   },
   "options_about_openSourceHeading": {
@@ -1600,7 +1600,7 @@
     "description": "About page section heading"
   },
   "options_about_openSourceBody": {
-    "message": "GPL v3. Source on $GITHUB$. PRs welcome if you spot something to fix.",
+    "message": "GPL v3. Codice sorgente su $GITHUB$. PR ben accette se noti qualcosa da sistemare.",
     "description": "About page body; $GITHUB$ becomes a link to the repository",
     "placeholders": {
       "github": {
@@ -1614,7 +1614,7 @@
     "description": "About page section heading"
   },
   "options_about_communityDiscord": {
-    "message": "$DISCORD$ for questions and chat.",
+    "message": "$DISCORD$ per fare domande e per parlare.",
     "description": "About page list item; $DISCORD$ becomes a link to the Discord server",
     "placeholders": {
       "discord": {
@@ -1624,7 +1624,7 @@
     }
   },
   "options_about_communityIssue": {
-    "message": "$ISSUE$ if something is broken.",
+    "message": "$ISSUE$ se qualcosa è rotto.",
     "description": "About page list item; $ISSUE$ becomes a link to the issue tracker",
     "placeholders": {
       "issue": {
@@ -1634,7 +1634,7 @@
     }
   },
   "options_about_fileIssue": {
-    "message": "File an issue",
+    "message": "Segnala un problema",
     "description": "Link text in the About page that opens the issue tracker"
   },
   "options_about_discordLink": {
@@ -1642,31 +1642,31 @@
     "description": "Link text in the About page that opens the Discord server"
   },
   "options_about_supportHeading": {
-    "message": "Support the project",
+    "message": "Supporta il progetto",
     "description": "About page heading for the donation links"
   },
   "options_about_supportBody": {
-    "message": "Better Lyrics is a labor of love, and we fuss over it more than we'd like to admit... It's free, with no ads or tracking, and it always will be. If it's made your listening experience a little better, you can help keep it going! A star on GitHub helps too, and it's free :)",
+    "message": "Better Lyrics è un lavoro di passione, e ce ne preoccupiamo più di quanto vorremmo ammettere... È gratis, senza pubblicità o tracciamento, e sarà così per sempre. Se ti ha migliorato almeno un pochino la tua esperienza d'ascolto, puoi aiutarla a continuare! Anche una stella su GitHub aiuta, ed è gratis :)",
     "description": "About page note above the donation links, written in the makers' own voice"
   },
   "options_about_supportStar": {
-    "message": "Star us on GitHub",
+    "message": "Mettici una stella su GitHub",
     "description": "About page link to star the Better Lyrics repository on GitHub"
   },
   "options_about_supportCoffee": {
-    "message": "Buy us a coffee",
+    "message": "Offrici un caffè",
     "description": "About page link to the Buy Me a Coffee page"
   },
   "options_about_supportSponsors": {
-    "message": "Sponsor on GitHub",
+    "message": "Sponsorizza su GitHub",
     "description": "About page link to GitHub Sponsors"
   },
   "options_about_madeByHeading": {
-    "message": "Made by",
+    "message": "Realizzato da",
     "description": "About page section heading"
   },
   "options_about_madeByBody": {
-    "message": "$BOIDU$ and $ADALIE$, with thanks to the translators and everyone in the Better Lyrics community who has tested it, reported bugs and submitted lyrics!",
+    "message": "$BOIDU$ e $ADALIE$, con ringraziamenti ai traduttori e tutti coloro nella community di Better Lyrics che hanno testato, segnalato bug e inviato testi!",
     "description": "About page credits; the names become links",
     "placeholders": {
       "boidu": {
@@ -1680,7 +1680,7 @@
     }
   },
   "options_about_badgesBody": {
-    "message": "Special thanks to $KIYOSHI$ for the time and care behind every badge across Better Lyrics and Unison <3",
+    "message": "Un ringraziamento speciale a $KIYOSHI$ per il tempo e la cura dietro ogni badge in Better Lyrics e Unison <3",
     "description": "About page credit for the Unison badge artist; the name becomes a link",
     "placeholders": {
       "kiyoshi": {
@@ -1706,15 +1706,15 @@
     "description": "Search input placeholder"
   },
   "ui_close": {
-    "message": "Close",
+    "message": "Chiudi",
     "description": "Accessible label and button text that closes a dialog"
   },
   "ui_dropdownSearch": {
-    "message": "Search",
+    "message": "Cerca",
     "description": "Placeholder for the search box inside a long dropdown menu"
   },
   "ui_dropdownNoResults": {
-    "message": "No results",
+    "message": "Nessun risultato",
     "description": "Shown inside a dropdown menu when the search matches no option"
   },
   "options_romanization_hint": {
@@ -1946,7 +1946,7 @@
     "description": "Search input placeholder"
   },
   "unison_searchResults": {
-    "message": "“$query$” · $count$ results",
+    "message": "“$query$” · $count$ risultati",
     "description": "Search result count shown at the end of the Feed / My Submissions tab row",
     "placeholders": {
       "query": {
@@ -1960,7 +1960,7 @@
     }
   },
   "unison_searchResultsOne": {
-    "message": "“$query$” · 1 result",
+    "message": "“$query$” · 1 risultato",
     "description": "Search result count when there is exactly one result",
     "placeholders": {
       "query": {
@@ -2260,7 +2260,7 @@
     "description": "Link text for ISRC finder"
   },
   "unison_feedTabsLabel": {
-    "message": "Lyrics lists",
+    "message": "Elenco testi",
     "description": "Accessible name of the tab list that switches between the community feed and the user's own submissions"
   },
   "unison_tabFeed": {
@@ -2276,7 +2276,7 @@
     "description": "Empty state for my submissions tab"
   },
   "unison_emptyMineHint": {
-    "message": "Lyrics you submit show up here.",
+    "message": "I testi che invii appaiono qui.",
     "description": "Second line of the empty My Submissions tab, under the title and above the submit button"
   },
   "unison_noFilterResults": {
@@ -2694,7 +2694,7 @@
     }
   },
   "unison_rev_pendingTitle": {
-    "message": "Waiting for council review: $reason$",
+    "message": "Aspettando la revisione del consiglio: $reason$",
     "description": "Title for a saved edit that waits for review. $reason$ is a review reason, like 'Large text change'",
     "placeholders": {
       "reason": {
@@ -2704,7 +2704,7 @@
     }
   },
   "unison_rev_staysLive": {
-    "message": "Revision $rev$ stays live until the council decides.",
+    "message": "La revisione $rev$ resta disponibile finché non si ottiene una decisione dal consiglio.",
     "description": "Names the revision listeners keep seeing during review",
     "placeholders": {
       "rev": {
@@ -2714,7 +2714,7 @@
     }
   },
   "unison_rev_rejectedTitle": {
-    "message": "Revision $rev$ was rejected",
+    "message": "La revisione $rev$ è stata rifiutata",
     "description": "Title when the council rejected an edit",
     "placeholders": {
       "rev": {
@@ -2724,7 +2724,7 @@
     }
   },
   "unison_rev_councilNote": {
-    "message": "Council note: “$note$”",
+    "message": "Nota del consiglio: \"$note$\"",
     "description": "The note the council left when it rejected an edit",
     "placeholders": {
       "note": {
@@ -2734,47 +2734,47 @@
     }
   },
   "unison_rev_sealedHint": {
-    "message": "Every edit goes to council review before it goes live.",
+    "message": "Ogni modifica passa dalla revisione del consiglio prima di essere disponibile.",
     "description": "Explains what editing a sealed lyric means"
   },
   "unison_rev_status_live": {
-    "message": "Live",
+    "message": "Disponibile",
     "description": "Revision status: the version listeners see"
   },
   "unison_rev_status_pending": {
-    "message": "Pending",
+    "message": "In attesa",
     "description": "Revision status: waiting for council review"
   },
   "unison_rev_status_past": {
-    "message": "Past",
+    "message": "Passato",
     "description": "Revision status: was live before"
   },
   "unison_rev_status_superseded": {
-    "message": "Superseded",
+    "message": "Sostituito",
     "description": "Revision status: replaced by a newer save before review"
   },
   "unison_rev_status_rejected": {
-    "message": "Rejected",
+    "message": "Rifiutato",
     "description": "Revision status: the council rejected it"
   },
   "unison_rev_status_withdrawn": {
-    "message": "Withdrawn",
+    "message": "Ritirato",
     "description": "Revision status: the owner withdrew it"
   },
   "unison_rev_anchor": {
-    "message": "Anchor",
+    "message": "Ancora",
     "description": "Chip on the revision that edits are measured against"
   },
   "unison_rev_approved": {
-    "message": "Approved by the council",
+    "message": "Approvato dal consiglio",
     "description": "Revisions list reason for a council-approved revision"
   },
   "unison_rev_withinLimits": {
-    "message": "Within limits",
+    "message": "Entro certi limiti",
     "description": "Revisions list reason for an edit that went live without review"
   },
   "unison_rev_reverted": {
-    "message": "Reverted to revision $rev$",
+    "message": "Ripristinato alla revisione $rev$",
     "description": "Revisions list reason and success message for a revert",
     "placeholders": {
       "rev": {
@@ -2784,7 +2784,7 @@
     }
   },
   "unison_rev_driftValues": {
-    "message": "Text $text$% · Timing $timing$%",
+    "message": "Testo $text$% · Tempo $timing$%",
     "description": "How much text and timing an edit changed, as whole numbers",
     "placeholders": {
       "text": {
@@ -2798,27 +2798,27 @@
     }
   },
   "unison_rev_colStatus": {
-    "message": "Status",
+    "message": "Stato",
     "description": "Revisions list column header"
   },
   "unison_rev_colChange": {
-    "message": "Change",
+    "message": "Cambiamento",
     "description": "Revisions list column header (noun): how much an edit changed"
   },
   "unison_rev_colReason": {
-    "message": "Reason",
+    "message": "Motivo",
     "description": "Revisions list column header"
   },
   "unison_rev_colWhen": {
-    "message": "When",
+    "message": "Quando",
     "description": "Revisions list column header: relative time"
   },
   "unison_rev_revision": {
-    "message": "Revision",
+    "message": "Revisione",
     "description": "Column header and editor sidebar label"
   },
   "unison_rev_comparedWith": {
-    "message": "Compared with revision $rev$",
+    "message": "Paragonato alla revisione $rev$",
     "description": "Line above a diff. $rev$ is the compared revision",
     "placeholders": {
       "rev": {
@@ -2828,19 +2828,19 @@
     }
   },
   "unison_rev_legendAdded": {
-    "message": "Added",
+    "message": "Aggiunto",
     "description": "Diff legend: added lines or words"
   },
   "unison_rev_legendRemoved": {
-    "message": "Removed",
+    "message": "Rimosso",
     "description": "Diff legend: removed lines or words"
   },
   "unison_rev_legendTiming": {
-    "message": "Timing only",
+    "message": "Solo tempismo",
     "description": "Diff legend: lines whose timing changed but text did not"
   },
   "unison_rev_syllablesRetimed": {
-    "message": "Syllables retimed: $count$",
+    "message": "Sillabe re sincronizzate: $count$",
     "description": "Diff note: how many syllables of a line moved while the line start stayed",
     "placeholders": {
       "count": {
@@ -2850,15 +2850,15 @@
     }
   },
   "unison_rev_syllableTimingAdded": {
-    "message": "Syllable timing added",
+    "message": "Aggiunto tempismo delle sillabe",
     "description": "Diff note: a line that had only line timing now has syllable timing"
   },
   "unison_rev_syllableTimingRemoved": {
-    "message": "Syllable timing removed",
+    "message": "Rimosso tempismo delle sillabe",
     "description": "Diff note: a line that had syllable timing now has only line timing"
   },
   "unison_rev_unchangedLines": {
-    "message": "Unchanged lines: $count$",
+    "message": "Testi invariati: $count$",
     "description": "Collapsed part of a diff",
     "placeholders": {
       "count": {
@@ -2868,15 +2868,15 @@
     }
   },
   "unison_rev_headSection": {
-    "message": "Translations, romanization and credits",
+    "message": "Traduzioni, romanizzazioni e crediti",
     "description": "Label above the diff rows for text stored outside the lyric lines: translations, romanizations and credits"
   },
   "unison_rev_headCredits": {
-    "message": "Credits",
+    "message": "Crediti",
     "description": "Diff row label for a changed credit, such as a songwriter or singer name"
   },
   "unison_rev_headLine": {
-    "message": "line $line$",
+    "message": "riga $line$",
     "description": "Part of a diff row label that names the lyric line a translation or romanization belongs to, e.g. 'Translation · Spanish · line 3'",
     "placeholders": {
       "line": {
@@ -2886,15 +2886,15 @@
     }
   },
   "unison_rev_noDiff": {
-    "message": "No changes to show",
+    "message": "Nessun cambiamento da dimostrare",
     "description": "Diff area when there is nothing to compare"
   },
   "unison_rev_revertToThis": {
-    "message": "Revert to this",
+    "message": "Ripristina a questo",
     "description": "Button that starts a revert to a past revision"
   },
   "unison_rev_revertLive": {
-    "message": "Reverting goes live now as revision $rev$",
+    "message": "Il ripristino diventa disponibile come revisione $rev$",
     "description": "Note before a revert that skips review",
     "placeholders": {
       "rev": {
@@ -2904,11 +2904,11 @@
     }
   },
   "unison_rev_revertCheckFailed": {
-    "message": "Couldn't check whether reverting goes live or to council review",
+    "message": "Impossibile verificare se il ripristino deve passare dalla revisione del consiglio o diventa direttamente disponibile",
     "description": "Note on a past revision when the check of where a revert would land failed; the owner can still revert and the server decides"
   },
   "unison_rev_revertReview": {
-    "message": "Reverting goes to council review as revision $rev$",
+    "message": "Il ripristino passa alla revisione del consiglio come revisione $rev$",
     "description": "Note before a revert that needs review",
     "placeholders": {
       "rev": {
@@ -2918,11 +2918,11 @@
     }
   },
   "unison_rev_locked": {
-    "message": "Song and artist can't be edited.",
+    "message": "Brano e artista non possono essere modificati.",
     "description": "Editor note about fields that are locked"
   },
   "unison_rev_editsLeft": {
-    "message": "$remaining$ of $limit$ edits left today",
+    "message": "$remaining$ modifiche rimaste oggi su $limit$",
     "description": "Edits left in the last 24 hours",
     "placeholders": {
       "remaining": {
@@ -2936,15 +2936,15 @@
     }
   },
   "unison_rev_textChanged": {
-    "message": "Text changed",
+    "message": "Testo modificato",
     "description": "Meter label: how much of the text changed"
   },
   "unison_rev_timingChanged": {
-    "message": "Timing changed",
+    "message": "Tempismo modificato",
     "description": "Meter label: how much of the timing changed"
   },
   "unison_rev_textChangedSince": {
-    "message": "Text changed since revision $rev$",
+    "message": "Testo modificato dalla revisione $rev$",
     "description": "Meter label: how much of the text changed since an earlier revision that the limit is measured against. $rev$ is that revision",
     "placeholders": {
       "rev": {
@@ -2954,7 +2954,7 @@
     }
   },
   "unison_rev_timingChangedSince": {
-    "message": "Timing changed since revision $rev$",
+    "message": "Tempismo modificato dalla revisione $rev$",
     "description": "Meter label: how much of the timing changed since an earlier revision that the limit is measured against. $rev$ is that revision",
     "placeholders": {
       "rev": {
@@ -2964,7 +2964,7 @@
     }
   },
   "unison_rev_ofLimit": {
-    "message": "of $limit$% limit",
+    "message": "del limite $limit$%",
     "description": "Follows a bold percentage in a meter, like '8% of 15% limit'",
     "placeholders": {
       "limit": {
@@ -2974,7 +2974,7 @@
     }
   },
   "unison_rev_checkLine": {
-    "message": "Line $line$: $message$",
+    "message": "Linea $line$: $message$",
     "description": "A server check message tied to a line. $message$ comes from the server",
     "placeholders": {
       "line": {
@@ -2988,35 +2988,35 @@
     }
   },
   "unison_rev_checking": {
-    "message": "Checking your edit...",
+    "message": "Controllando la tua modifica...",
     "description": "Editor status while the server checks the edit"
   },
   "unison_rev_fixErrors": {
-    "message": "Fix the errors to save",
+    "message": "Correggi gli errori prima di salvare",
     "description": "Editor status when the edit has errors"
   },
   "unison_rev_limitReached": {
-    "message": "Edit limit reached",
+    "message": "Raggiunto limite di modifica",
     "description": "Shown when the daily edit limit is used up"
   },
   "unison_rev_noChanges": {
-    "message": "No changes from the live revision",
+    "message": "Nessun cambiamento rispetto alla revisione disponibile",
     "description": "Shown when an edit or revert would change nothing"
   },
   "unison_rev_goesLive": {
-    "message": "Goes live when you save",
+    "message": "Diventa disponibile quando salvi",
     "description": "Editor status when the edit skips review"
   },
   "unison_rev_submitForReview": {
-    "message": "Submit for review",
+    "message": "Invia per la revisione",
     "description": "Save button label when the edit needs review"
   },
   "unison_rev_noEdits": {
-    "message": "No edits yet",
+    "message": "Nessuna modifica al momento",
     "description": "Revisions page notice for a lyric that was never edited"
   },
   "unison_rev_error": {
-    "message": "Something went wrong. Try again.",
+    "message": "Qualcosa è andato storto. Riprova.",
     "description": "Fallback error for revision actions"
   },
   "options_display_karaoke": {
