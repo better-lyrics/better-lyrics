@@ -842,7 +842,14 @@ export class PictureInPictureLyricsView {
     button.setAttribute("aria-label", label);
     button.title = label;
     button.appendChild(createControlIcon(this.pipWindow.document, "close"));
-    button.addEventListener("click", () => this.pipWindow.close(), { signal: this.lifecycleController.signal });
+    button.addEventListener(
+      "click",
+      () => {
+        this.sourceDocument.defaultView?.focus();
+        this.pipWindow.close();
+      },
+      { signal: this.lifecycleController.signal }
+    );
     return button;
   }
 
