@@ -1,6 +1,6 @@
 {
   "extensionName": {
-    "message": "Better Lyrics (Lyrics for YouTube Music)",
+    "message": "Better Lyrics (Teksty dla YouTube Music)",
     "description": "The name of the extension"
   },
   "extensionDescription": {
@@ -40,7 +40,7 @@
     "description": "Auto switch to lyrics tab setting label"
   },
   "options_general_clearCachedLyrics": {
-    "message": "Clear cached lyrics",
+    "message": "Wyczyść teksty w pamięci podręcznej",
     "description": "Label for the clear cache action row"
   },
   "options_general_clearCachedLyricsHint": {
@@ -74,11 +74,11 @@
     }
   },
   "options_general_browseThemes": {
-    "message": "Browse themes",
+    "message": "Przeglądaj motywy",
     "description": "Popup General tab: one-line description on the Theme Marketplace shortcut"
   },
   "options_general_whatsNew": {
-    "message": "What's new",
+    "message": "Nowości",
     "description": "Popup General tab: shortcut to the latest release notes"
   },
   "options_general_whatsNewHint": {
@@ -118,15 +118,15 @@
     "description": "Label for the per-letter wave lyric animation toggle"
   },
   "options_display_letterWaveOff": {
-    "message": "Off",
+    "message": "Wyłącz",
     "description": "Spoken value of the letter wave three-way switch when the effect is off"
   },
   "options_display_letterWaveOn": {
-    "message": "On",
+    "message": "Włącz",
     "description": "Spoken value of the letter wave three-way switch when the effect is always on"
   },
   "options_display_letterWaveBadge": {
-    "message": "Experimental",
+    "message": "Eksperymentalne",
     "description": "Badge shown next to the letter wave setting marking it as experimental"
   },
   "options_display_letterWaveTooltip": {
@@ -156,6 +156,10 @@
   "picture_in_picture_pause": {
     "message": "Wstrzymaj",
     "description": "Accessible label for the pause button in the Picture-in-Picture lyrics window, used when the YouTube Music player bar exposes no label of its own"
+  },
+  "picture_in_picture_fitWindow": {
+    "message": "Fit window",
+    "description": "Tooltip and accessible label for the selected song/video button in the Picture-in-Picture lyrics window when the window size no longer matches its content; clicking it resizes the window to fit"
   },
   "picture_in_picture_next": {
     "message": "Następny",
