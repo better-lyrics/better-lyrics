@@ -1548,6 +1548,7 @@ export class PictureInPictureLyricsView {
     if (modeSwitch.settleFrame !== null) this.pipWindow.cancelAnimationFrame(modeSwitch.settleFrame);
     void this.shell.offsetWidth;
     this.shell.removeAttribute("data-instant");
+    this.syncFitHint();
   };
 
   private isSwitchSettled(): boolean {
@@ -1570,6 +1571,7 @@ export class PictureInPictureLyricsView {
 
   private readonly resizeToContent = (): void => {
     this.cancelPendingResize();
+    this.syncFitHint();
     const win = this.pipWindow;
     if (!win.navigator.userActivation?.isActive) {
       this.dependencies.log("floating window resize skipped, the click's activation has lapsed");

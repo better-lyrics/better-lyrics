@@ -31,6 +31,7 @@ const PIP_STRING_KEYS = [
   "picture_in_picture_play",
   "picture_in_picture_pause",
   "picture_in_picture_next",
+  "picture_in_picture_fitWindow",
   "picture_in_picture_adPlaying",
   "picture_in_picture_adUpNext",
   "unison_song",
