@@ -41,7 +41,7 @@ import type {
 import type { VideoMirrorState } from "@modules/ui/pictureInPicture/videoMirrorState";
 import { stageTextScale } from "@modules/ui/pictureInPicture/stageTextScale";
 import { planVideoSwap } from "@modules/ui/pictureInPicture/videoSwapPlan";
-import type { WindowSize } from "@modules/ui/pictureInPicture/windowSize";
+import { isWindowFitted, type WindowSize } from "@modules/ui/pictureInPicture/windowSize";
 
 interface DisplayMetadata {
   readonly title: string;
@@ -68,6 +68,7 @@ const WINDOW_CONTROL_ICONS = {
   close: controlIcons.pictureInPictureExit,
   song: controlIcons.musicNote,
   video: controlIcons.videoCamera,
+  fit: controlIcons.fitWindow,
 } as const;
 
 type WindowControlIcon = keyof typeof WINDOW_CONTROL_ICONS;
@@ -422,6 +423,9 @@ export class PictureInPictureLyricsView {
     const [songButton, videoButton] = PLAYBACK_MODES.map(mode => this.createModeButton(mode));
     this.modeButtons = { song: songButton, video: videoButton };
     this.modeToggle.append(songButton, videoButton);
+    for (const type of ["pointerenter", "focusin"]) {
+      this.modeToggle.addEventListener(type, this.syncFitHint, { signal: this.lifecycleController.signal });
+    }
     const artworkChrome = pipDocument.createElement("div");
     artworkChrome.className = "blyrics-pip-artwork__chrome";
     artworkChrome.append(this.modeToggle, this.createCloseButton());
@@ -515,6 +519,7 @@ export class PictureInPictureLyricsView {
       signal: this.lifecycleController.signal,
     });
     pipWindow.addEventListener("resize", this.syncStageTextScale, { signal: this.lifecycleController.signal });
+    pipWindow.addEventListener("resize", this.syncFitHint, { signal: this.lifecycleController.signal });
     this.syncStageTextScale();
     pipWindow.addEventListener("pagehide", this.destroy, { once: true });
     this.modeObserver = observePlaybackMode(sourceDocument, this.syncModeToggle);
@@ -844,11 +849,8 @@ export class PictureInPictureLyricsView {
   private createModeButton(mode: PlaybackMode): HTMLButtonElement {
     const button = this.pipWindow.document.createElement("button");
     button.type = "button";
-    const label = this.dependencies.translate(PLAYBACK_MODE_LABEL_KEYS[mode]);
     button.className = "blyrics-pip-mode-toggle__option";
-    button.setAttribute("aria-label", label);
-    button.title = label;
-    button.appendChild(createControlIcon(this.pipWindow.document, mode));
+    button.append(createControlIcon(this.pipWindow.document, mode), createControlIcon(this.pipWindow.document, "fit"));
     button.setAttribute("aria-pressed", "false");
     button.addEventListener(
       "click",
@@ -867,6 +869,22 @@ export class PictureInPictureLyricsView {
     this.modeToggle.hidden = selected === null || !canSwitchPlaybackMode(this.sourceDocument);
     for (const mode of PLAYBACK_MODES) {
       this.modeButtons[mode].setAttribute("aria-pressed", String(mode === selected));
+    }
+    this.syncFitHint();
+  };
+
+  private readonly syncFitHint = (): void => {
+    const { innerWidth: width, innerHeight: height } = this.pipWindow;
+    const canFit = this.isSwitchSettled() && !isWindowFitted({ width, height }, this.contentSize());
+    this.modeToggle.toggleAttribute("data-can-fit", canFit);
+    for (const mode of PLAYBACK_MODES) {
+      const button = this.modeButtons[mode];
+      const offersFit = canFit && button.getAttribute("aria-pressed") === "true";
+      const label = this.dependencies.translate(
+        offersFit ? "picture_in_picture_fitWindow" : PLAYBACK_MODE_LABEL_KEYS[mode]
+      );
+      button.setAttribute("aria-label", label);
+      button.title = label;
     }
   };
 

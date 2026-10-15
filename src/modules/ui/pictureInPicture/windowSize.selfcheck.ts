@@ -3,6 +3,7 @@ import {
   expectsSyncedLyrics,
   fitWindowSize,
   formatWindowFrame,
+  isWindowFitted,
   measureWindowFrame,
   parseWindowFrame,
   type WindowContent,
@@ -261,5 +262,14 @@ assert.equal(
   true,
   "a known flag is reported as is, the size decides what karaoke does with it"
 );
+
+// -- Fit hint ------------------------------------------
+
+const FITTED = { width: 720, height: 300 };
+assert.equal(isWindowFitted(FITTED, FITTED), true, "an exact match fits");
+assert.equal(isWindowFitted({ width: 722, height: 298 }, FITTED), true, "rounding within 2px still fits");
+assert.equal(isWindowFitted({ width: 723, height: 300 }, FITTED), false, "3px wider is out of fit");
+assert.equal(isWindowFitted({ width: 720, height: 296 }, FITTED), false, "4px shorter is out of fit");
+assert.equal(isWindowFitted({ width: 340, height: 720 }, FITTED), false, "a different layout is out of fit");
 
 console.log("windowSize self-check passed");

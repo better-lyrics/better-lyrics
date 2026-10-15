@@ -89,6 +89,14 @@ export function fitWindowSize(content: WindowContent): WindowSize {
   return content.layout === "vertical" ? verticalSlotSize(aspect) : horizontalSlotSize(aspect);
 }
 
+const FIT_TOLERANCE = 2;
+
+export function isWindowFitted(inner: WindowSize, content: WindowSize): boolean {
+  return (
+    Math.abs(inner.width - content.width) <= FIT_TOLERANCE && Math.abs(inner.height - content.height) <= FIT_TOLERANCE
+  );
+}
+
 // -- Window frame -----------------------------------------------------------------
 
 const MAX_FRAME_WIDTH = 32;

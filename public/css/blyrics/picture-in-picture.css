@@ -447,8 +447,27 @@ body {
 }
 
 .blyrics-pip-mode-toggle__option .blyrics-pip-artwork__control-icon {
+  grid-area: 1 / 1;
   width: 16px;
   height: 16px;
+  transition:
+    opacity 140ms ease,
+    transform 180ms cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.blyrics-pip-mode-toggle__option .blyrics-pip-artwork__control-icon--fit,
+.blyrics-pip-mode-toggle[data-can-fit]
+  .blyrics-pip-mode-toggle__option[aria-pressed="true"]:is(:hover, :focus-visible)
+  .blyrics-pip-artwork__control-icon:not(.blyrics-pip-artwork__control-icon--fit) {
+  opacity: 0;
+  transform: scale(0.6);
+}
+
+.blyrics-pip-mode-toggle[data-can-fit]
+  .blyrics-pip-mode-toggle__option[aria-pressed="true"]:is(:hover, :focus-visible)
+  .blyrics-pip-artwork__control-icon--fit {
+  opacity: 1;
+  transform: none;
 }
 
 .blyrics-pip-mode-toggle__option:hover {
@@ -1582,8 +1601,13 @@ body {
    scale settle, which is still motion and is exactly what was opted out of. */
 @media (prefers-reduced-motion: reduce) {
   .blyrics-pip-scroller[data-held],
-  .blyrics-pip-artwork {
+  .blyrics-pip-artwork,
+  .blyrics-pip-mode-toggle__option .blyrics-pip-artwork__control-icon {
     transition: none;
+  }
+
+  .blyrics-pip-mode-toggle__option .blyrics-pip-artwork__control-icon {
+    transform: none !important;
   }
 
   /* The header falls all the way back to what shipped before the marquee: a real
