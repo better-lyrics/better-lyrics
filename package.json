@@ -56,15 +56,15 @@
         "@fsegurai/codemirror-theme-material-dark": "^6.2.7",
         "@plasmohq/edge-addons-api": "^2.0.0",
         "codemirror-lang-rics": "^0.3.22",
-        "dompurify": "^3.4.16",
+        "dompurify": "^3.4.17",
         "fast-xml-parser": "^5.11.2",
         "fflate": "^0.8.3",
-        "marked": "^18.1.0",
+        "marked": "^18.1.1",
         "rics": "^0.3.22",
         "sortablejs": "^1.15.7"
     },
     "devDependencies": {
-        "@aws-sdk/client-s3": "^3.1149.0",
+        "@aws-sdk/client-s3": "^3.1150.0",
         "@biomejs/biome": "2.0.4",
         "@types/chrome": "^0.3.5",
         "@types/jsdom": "^30.0.0",
