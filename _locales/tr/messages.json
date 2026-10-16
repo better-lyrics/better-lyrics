@@ -44,7 +44,7 @@
     "description": "Label for the clear cache action row"
   },
   "options_general_clearCachedLyricsHint": {
-    "message": "They download again as you play",
+    "message": "Oynatırken şarkı sözleri tekrar indirilir",
     "description": "Hint under the clear cached lyrics label"
   },
   "options_general_clearCache": {
@@ -94,7 +94,7 @@
     "description": "Header tab in Display for video settings"
   },
   "options_display_disableFullscreen": {
-    "message": "Tam ekran modunu kapat",
+    "message": "Tam ekran modunu devre dışı bırak",
     "description": "Disable fullscreen mode setting label"
   },
   "options_display_autoHideCursor": {
@@ -158,7 +158,7 @@
     "description": "Accessible label for the pause button in the Picture-in-Picture lyrics window, used when the YouTube Music player bar exposes no label of its own"
   },
   "picture_in_picture_fitWindow": {
-    "message": "Fit window",
+    "message": "Pencereye sığdır",
     "description": "Tooltip and accessible label for the selected song/video button in the Picture-in-Picture lyrics window when the window size no longer matches its content; clicking it resizes the window to fit"
   },
   "picture_in_picture_next": {
@@ -166,11 +166,11 @@
     "description": "Accessible label for the next track button in the Picture-in-Picture lyrics window, used when the YouTube Music player bar exposes no label of its own"
   },
   "picture_in_picture_adPlaying": {
-    "message": "Ad playing",
+    "message": "Reklam oynatılıyor",
     "description": "Shown in the floating lyrics window while YouTube Music plays an ad, above a countdown to the end of the ad"
   },
   "picture_in_picture_adUpNext": {
-    "message": "Then $SONG$",
+    "message": "Ardından $SONG$",
     "description": "Shown in the floating lyrics window during an ad, naming the song that plays when the ad ends",
     "placeholders": {
       "song": {
@@ -244,7 +244,7 @@
     "description": "Toggle label, shown inside the floating lyrics window settings, for the seekable playback progress bar under the album art"
   },
   "options_display_pipVideo": {
-    "message": "Show music video",
+    "message": "Müzik videosunu göster",
     "description": "Toggle label, shown inside the floating lyrics window settings, for playing the music video in the floating window while YouTube Music is in video mode"
   },
   "options_display_shadersPromo": {
@@ -440,7 +440,7 @@
     "description": "Title of the identity backup warning"
   },
   "options_identity_backupBody": {
-    "message": "Your contributions and level are tied to this key. If you lose it, no one can restore it, including the Better Lyrics team. Never share it: anyone who has it can act as you.",
+    "message": "Katkılarınız ve seviyeniz bu anahtara bağlıdır. Eğer onu kaybederseniz, Better Lyrics ekibi de dahil olmak üzere hiç kimse onu geri getiremez. Anahtarınızı asla kimseyle paylaşmayın; ona sahip olan herkes sizin yerinize işlem yapabilir.",
     "description": "Body of the identity backup warning"
   },
   "options_identity_yourIdentity": {
@@ -556,7 +556,7 @@
     "description": "Status when nickname request fails"
   },
   "options_alert_refreshFailed": {
-    "message": "Could not refresh lyrics. Open YouTube Music and try again.",
+    "message": "Şarkı sözleri yenilenemedi. YouTube Music'i açıp tekrar deneyin.",
     "description": "Shown when the popup's Refresh lyrics button finds no YouTube Music tab or none of them responds"
   },
   "options_alert_importEmpty": {
@@ -584,7 +584,7 @@
     "description": "Cache clear failed message"
   },
   "options_alert_nothingToClear": {
-    "message": "Temizlenecek bir şey yok!",
+    "message": "Temizlenecek bir şey yok :/",
     "description": "Nothing to clear message"
   },
   "options_alert_exportFailed": {
@@ -612,43 +612,43 @@
     "description": "Identity load error message"
   },
   "editor_alert_nothingToSave": {
-    "message": "No styles to save as a theme",
+    "message": "Tema olarak kaydedilecek stil yok",
     "description": "Toast when the user saves an empty editor as a custom theme"
   },
   "editor_alert_saveDialogOpened": {
-    "message": "Theme file save dialog opened. Choose where to save your file",
+    "message": "Tema dosyası kaydetme diyaloğu açıldı. Dosyanızı nereye kaydedeceğinizi seçin",
     "description": "Toast after the browser save dialog opens for an exported theme file"
   },
   "editor_alert_downloadStarted": {
-    "message": "Theme file download started. Check your downloads folder",
+    "message": "Tema dosyası indirmesi başladı. İndirilenler klasörünüzü kontrol edin",
     "description": "Toast after an exported theme file starts downloading without a save dialog"
   },
   "editor_alert_applyFailed": {
-    "message": "Could not apply theme",
+    "message": "Tema uygulanamadı",
     "description": "Toast when applying a built-in or custom theme from the theme picker fails"
   },
   "editor_alert_saveFailed": {
-    "message": "Could not save your styles",
+    "message": "Stilleriniz kaydedilemedi",
     "description": "Toast when saving the custom CSS editor content fails"
   },
   "editor_alert_storageFull": {
-    "message": "Storage is full. Clear the lyrics cache in settings, then try again",
+    "message": "Depolama dolu. Ayarlardan şarkı sözü önbelleğini temizleyin, ardından tekrar deneyin",
     "description": "Toast when saving the custom CSS editor content fails because extension storage is full"
   },
   "editor_prompt_saveMessage": {
-    "message": "Enter a name for this theme",
+    "message": "Bu tema için bir ad girin",
     "description": "Message in the save as theme dialog"
   },
   "editor_prompt_renameMessage": {
-    "message": "Enter a new name for this theme",
+    "message": "Bu tema için yeni bir ad girin",
     "description": "Message in the rename theme dialog"
   },
   "editor_prompt_themeName": {
-    "message": "Theme name",
+    "message": "Tema adı",
     "description": "Placeholder of the theme name field in the save and rename dialogs"
   },
   "editor_prompt_deleteMessage": {
-    "message": "Delete the theme $NAME$? This cannot be undone.",
+    "message": "$NAME$ temasını sil? Bu işlem geri alınamaz.",
     "description": "Message in the delete custom theme dialog",
     "placeholders": {
       "name": {
@@ -658,11 +658,11 @@
     }
   },
   "editor_alert_importFailed": {
-    "message": "Could not import the theme file. Try again",
+    "message": "Tema dosyası içe aktarılamadı. Tekrar deneyin",
     "description": "Toast when importing a theme file fails"
   },
   "editor_alert_imported": {
-    "message": "Imported $NAME$",
+    "message": "$NAME$ içe aktarıldı",
     "description": "Toast after a theme file is imported into the editor",
     "placeholders": {
       "name": {
@@ -672,7 +672,7 @@
     }
   },
   "editor_alert_themeSaved": {
-    "message": "Saved theme: $NAME$",
+    "message": "Tema kaydedildi: $NAME$",
     "description": "Toast after the editor styles are saved as a custom theme",
     "placeholders": {
       "name": {
@@ -682,11 +682,11 @@
     }
   },
   "editor_alert_themeSaveFailed": {
-    "message": "Could not save the theme",
+    "message": "Tema kaydedilemedi",
     "description": "Toast when saving a custom theme fails"
   },
   "editor_alert_themeRenamed": {
-    "message": "Renamed theme to $NAME$",
+    "message": "Tema, $NAME$ olarak yeniden adlandırıldı",
     "description": "Toast after a custom theme is renamed",
     "placeholders": {
       "name": {
@@ -696,7 +696,7 @@
     }
   },
   "editor_alert_themeNameTaken": {
-    "message": "A theme named $NAME$ already exists",
+    "message": "$NAME$ adında bir tema zaten mevcut",
     "description": "Toast when a custom theme is renamed to a name another custom theme already uses",
     "placeholders": {
       "name": {
@@ -706,15 +706,15 @@
     }
   },
   "editor_alert_themeRenameFailed": {
-    "message": "Could not rename the theme",
+    "message": "Tema yeniden adlandırılamadı",
     "description": "Toast when renaming a custom theme fails"
   },
   "editor_alert_themeDeleted": {
-    "message": "Custom theme deleted",
+    "message": "Özel tema silindi",
     "description": "Toast after a custom theme is deleted"
   },
   "editor_alert_themeDeleteFailed": {
-    "message": "Could not delete the theme",
+    "message": "Tema silinemedi",
     "description": "Toast when deleting a custom theme fails"
   },
   "options_editor_saving": {
@@ -742,7 +742,7 @@
     "description": "Back to settings button label"
   },
   "options_editor_fullExperienceNote": {
-    "message": "İyi editör deneyimi için, ",
+    "message": "Tam editör deneyimi için, ",
     "description": "Full editor experience note prefix"
   },
   "options_editor_openInNewTabLink": {
@@ -766,31 +766,31 @@
     "description": "Double-click to rename tooltip"
   },
   "options_editor_findReplaceTitle": {
-    "message": "Find and replace",
+    "message": "Bul ve değiştir",
     "description": "Title of the modal shown when find and replace is used in the popup editor"
   },
   "options_editor_findReplaceFullscreenOnly": {
-    "message": "Find and replace is only available in the fullscreen editor.",
+    "message": "Bul ve değiştir, yalnızca tam ekran düzenleyicide kullanılabilir.",
     "description": "Modal body explaining that find and replace needs the fullscreen editor"
   },
   "options_editor_findReplaceOpenHint": {
-    "message": "Open the fullscreen editor to use every editor feature.",
+    "message": "Tüm düzenleyici özelliklerini kullanmak için tam ekran düzenleyiciyi açın.",
     "description": "Second line of the find and replace modal, pointing to the fullscreen editor"
   },
   "options_editor_openFullscreen": {
-    "message": "Open fullscreen editor",
+    "message": "Tam ekran düzenleyiciyi aç",
     "description": "Confirm button in the find and replace modal that opens the fullscreen editor"
   },
   "options_editor_close": {
-    "message": "Close",
+    "message": "Kapat",
     "description": "Cancel button that closes the find and replace modal"
   },
   "options_editor_notReady": {
-    "message": "Editor not initialized",
+    "message": "Düzenleyici başlatılmadı",
     "description": "Alert shown when an editor action runs before the editor has loaded"
   },
   "options_editor_nothingToExport": {
-    "message": "No styles to export",
+    "message": "Dışa aktarılacak stil yok",
     "description": "Alert shown when exporting while the editor is empty"
   },
   "options_provider_betterLyrics": {
@@ -894,7 +894,7 @@
     "description": "Header title"
   },
   "marketplace_subtitle": {
-    "message": "Topluluk temalarını keşfet ve indir",
+    "message": "Topluluk temalarını keşfet ve yükle",
     "description": "Header subtitle"
   },
   "marketplace_searchPlaceholder": {
@@ -966,7 +966,7 @@
     "description": "Filter for compatible themes"
   },
   "marketplace_installFromUrl": {
-    "message": "URL'den indir",
+    "message": "URL'den yükle",
     "description": "Install from URL button"
   },
   "marketplace_submitTheme": {
@@ -982,7 +982,7 @@
     "description": "Retry button"
   },
   "marketplace_noThemesMatch": {
-    "message": "Filtrelerinzle hiçbir tema eşleşmiyor",
+    "message": "Filtrelerinizle hiçbir tema eşleşmiyor",
     "description": "Empty state message"
   },
   "marketplace_grantPermission": {
@@ -990,11 +990,11 @@
     "description": "Grant permission button"
   },
   "marketplace_install": {
-    "message": "İndir",
+    "message": "Yükle",
     "description": "Install button"
   },
   "marketplace_remove": {
-    "message": "Sil",
+    "message": "Kaldır",
     "description": "Remove button"
   },
   "marketplace_apply": {
@@ -1014,7 +1014,7 @@
     "description": "GitHub badge text"
   },
   "marketplace_urlModalTitle": {
-    "message": "URL'den İndir",
+    "message": "URL'den yükle",
     "description": "URL install modal title"
   },
   "marketplace_urlModalMessage": {
@@ -1110,11 +1110,11 @@
     "description": "Show all shortcut"
   },
   "marketplace_shortcutsShowInstalled": {
-    "message": "İndirilenleri göster",
+    "message": "Kurulanları göster",
     "description": "Show installed shortcut"
   },
   "marketplace_shortcutsShowNotInstalled": {
-    "message": "İndirilmemişleri göster",
+    "message": "Kurulmayanları göster",
     "description": "Show not installed shortcut"
   },
   "marketplace_shortcutsToggleShaders": {
@@ -1174,7 +1174,7 @@
     "description": "Theme apply error"
   },
   "marketplace_alert_installed": {
-    "message": "Installed $NAME$",
+    "message": "$NAME$ yüklendi",
     "description": "Toast after a Marketplace theme is installed; it has an Apply action",
     "placeholders": {
       "name": {
@@ -1184,7 +1184,7 @@
     }
   },
   "marketplace_alert_installedFrom": {
-    "message": "Installed $NAME$ from $SOURCE$",
+    "message": "$SOURCE$ kaynağından $NAME$ yüklendi",
     "description": "Toast after a theme is installed from a GitHub repository URL; SOURCE is the repository, with the branch in parentheses when one was given",
     "placeholders": {
       "name": {
@@ -1198,7 +1198,7 @@
     }
   },
   "marketplace_alert_removed": {
-    "message": "Removed $NAME$",
+    "message": "$NAME$ kaldırıldı",
     "description": "Toast after an installed Marketplace theme is removed",
     "placeholders": {
       "name": {
@@ -1208,11 +1208,11 @@
     }
   },
   "marketplace_alert_storageFull": {
-    "message": "Storage is full. Remove some installed themes and try again.",
+    "message": "Depolama alanı dolu. Yüklü temalardan bazılarını kaldırın ve tekrar deneyin.",
     "description": "Toast when a theme cannot be installed because extension storage is full"
   },
   "marketplace_alert_installFailed": {
-    "message": "Could not install $NAME$",
+    "message": "$NAME$ yüklenemiyor",
     "description": "Toast when installing a Marketplace theme fails",
     "placeholders": {
       "name": {
@@ -1222,7 +1222,7 @@
     }
   },
   "marketplace_alert_removeFailed": {
-    "message": "Could not remove $NAME$",
+    "message": "$NAME$ kaldırılamıyor",
     "description": "Toast when removing an installed Marketplace theme fails",
     "placeholders": {
       "name": {
@@ -1246,11 +1246,11 @@
     }
   },
   "marketplace_tooltipInstallsSingular": {
-    "message": "1 install",
+    "message": "1 yüklenme",
     "description": "Tooltip on a theme's install count when it has exactly one install"
   },
   "marketplace_byline": {
-    "message": "By $AUTHOR$ · v$VERSION$",
+    "message": "$AUTHOR$ tarafından · v$VERSION$",
     "description": "Byline under a theme name: its creators and version",
     "placeholders": {
       "author": {
@@ -1264,7 +1264,7 @@
     }
   },
   "marketplace_themeActiveLabel": {
-    "message": "$TITLE$, active",
+    "message": "$TITLE$, etkin",
     "description": "Accessible name of the currently applied theme in the installed themes menu",
     "placeholders": {
       "title": {
@@ -1274,7 +1274,7 @@
     }
   },
   "marketplace_tooltipInstalls": {
-    "message": "$COUNT$ installs",
+    "message": "$COUNT$ yüklenme",
     "description": "Tooltip on a theme's install count",
     "placeholders": {
       "count": {
@@ -1284,7 +1284,7 @@
     }
   },
   "marketplace_tooltipRating": {
-    "message": "$AVERAGE$ average from $COUNT$ ratings",
+    "message": "$COUNT$ puanlamadan $AVERAGE$ ortalama",
     "description": "Tooltip on a theme's star rating",
     "placeholders": {
       "average": {
@@ -1298,7 +1298,7 @@
     }
   },
   "marketplace_tooltipOlderBuild": {
-    "message": "You're on v$CURRENT$. Latest is v$LATEST$",
+    "message": "Şu anda v$CURRENT$'desiniz. En son v$LATEST$'dir",
     "description": "Tooltip on the badge shown when an installed theme build is older than the latest one",
     "placeholders": {
       "current": {
@@ -1312,7 +1312,7 @@
     }
   },
   "marketplace_tooltipOlderBuildFloor": {
-    "message": "You're on v$CURRENT$. Latest v$LATEST$ needs Better Lyrics $FLOOR$+",
+    "message": "Şu anda v$CURRENT$'desiniz. En son v$LATEST$ için Better Lyrics $FLOOR$+ gerekiyor",
     "description": "Tooltip on the older build badge when the latest build needs a newer extension version",
     "placeholders": {
       "current": {
@@ -1330,7 +1330,7 @@
     }
   },
   "marketplace_installedFrom": {
-    "message": "Installed from $REPO$",
+    "message": "$REPO$'dan yüklendi",
     "description": "Tooltip on the GitHub badge of a theme installed from a repository URL",
     "placeholders": {
       "repo": {
@@ -1340,19 +1340,19 @@
     }
   },
   "marketplace_ricsBadge": {
-    "message": "This theme uses RICS",
+    "message": "Bu tema RICS kullanır",
     "description": "Tooltip and accessible label on the RICS badge in the theme detail view"
   },
   "marketplace_urlValidating": {
-    "message": "Validating...",
+    "message": "Doğrulanıyor...",
     "description": "Install button text while a theme repository URL is being checked"
   },
   "marketplace_urlInstalling": {
-    "message": "Installing...",
+    "message": "Yükleniyor...",
     "description": "Install button text while a theme from a repository URL is being installed"
   },
   "marketplace_incompatibleConfirm": {
-    "message": "This theme needs Better Lyrics v$VERSION$+ and may not work on your version. Install anyway?",
+    "message": "Bu tema, Better Lyrics v$VERSION$+ gerektirir; mevcut sürümünüzle çalışmayabilir. Yine de yüklensin mi?",
     "description": "Confirm dialog before installing a theme that needs a newer extension version",
     "placeholders": {
       "version": {
@@ -1362,7 +1362,7 @@
     }
   },
   "marketplace_sortDescendingLabel": {
-    "message": "$LABEL$, descending. Activate to reverse.",
+    "message": "$LABEL$, azalan. Tersine çevirmek için etkinleştirin.",
     "description": "Accessible label of the selected sort chip when sorting in descending order",
     "placeholders": {
       "label": {
@@ -1372,7 +1372,7 @@
     }
   },
   "marketplace_sortAscendingLabel": {
-    "message": "$LABEL$, ascending. Activate to reverse.",
+    "message": "$LABEL$, artan. Tersine çevirmek için etkinleştirin.",
     "description": "Accessible label of the selected sort chip when sorting in ascending order",
     "placeholders": {
       "label": {
@@ -1382,7 +1382,7 @@
     }
   },
   "unison_sortAscendingClearLabel": {
-    "message": "$LABEL$, ascending. Activate to clear the sort.",
+    "message": "$LABEL$, artan. Sıralamayı temizlemek için etkinleştirin.",
     "description": "Accessible label of the selected Unison sort chip in ascending order, where activating it again removes the sort",
     "placeholders": {
       "label": {
@@ -1392,15 +1392,15 @@
     }
   },
   "marketplace_emptyStore": {
-    "message": "No themes available yet. Check back later",
+    "message": "Henüz mevcut tema yok. Daha sonra tekrar kontrol edin",
     "description": "Shown when the Marketplace registry has no themes"
   },
   "marketplace_loadFailed": {
-    "message": "Could not load themes. Check your connection and try again",
+    "message": "Temalar yüklenemedi. Bağlantınızı kontrol edip tekrar deneyin",
     "description": "Shown when the Marketplace theme list fails to load"
   },
   "marketplace_ratedAs": {
-    "message": "You rated this $RATING$/5 as $NAME$",
+    "message": "Bunu $NAME$ olarak $RATING$/5 şeklinde puanladınız",
     "description": "Status under the rating stars after the user rated a theme",
     "placeholders": {
       "rating": {
@@ -1414,19 +1414,19 @@
     }
   },
   "marketplace_ratingSubmitting": {
-    "message": "Submitting...",
+    "message": "Gönderiliyor...",
     "description": "Status while a theme rating is being sent"
   },
   "marketplace_ratingVerifying": {
-    "message": "Verifying...",
+    "message": "Doğrulanıyor...",
     "description": "Status while the rating anti-abuse check runs"
   },
   "marketplace_ratingVerifyFailed": {
-    "message": "Verification failed. Try again",
+    "message": "Doğrulama başarısız. Tekrar deneyin",
     "description": "Status when the rating anti-abuse check fails"
   },
   "marketplace_urlInvalid": {
-    "message": "Invalid GitHub URL. Use github.com/user/repo or github.com/user/repo/tree/branch",
+    "message": "Geçersiz GitHub URL'si. github.com/user/repo veya github.com/user/repo/tree/branch biçimini kullanın",
     "description": "Error in the install from URL dialog when the URL is not a GitHub repository"
   },
   "marketplace_requiresVersion": {
@@ -1450,7 +1450,7 @@
     }
   },
   "blUpdate_storeDelay": {
-    "message": "mağaza kısa süreliğine gecikebilir",
+    "message": "Mağaza kısa süreliğine gecikebilir",
     "description": "Trailing note on the update banner for Chrome and Edge, whose store approval can lag the release"
   },
   "blUpdate_action": {
@@ -1540,7 +1540,7 @@
     "description": "Message shown during ad playback"
   },
   "lyrics_writtenBy": {
-    "message": "Written by",
+    "message": "Yazan",
     "description": "Label shown before the songwriter names after the last lyric line"
   },
   "lyrics_notFound": {
@@ -1556,55 +1556,55 @@
     "description": "Label for language exclusions setting"
   },
   "options_about": {
-    "message": "About",
+    "message": "Hakkında",
     "description": "Footer button that opens the About page"
   },
   "options_about_tagline": {
-    "message": "Time-synced lyrics for YouTube Music.",
+    "message": "YouTube Music için zaman senkronizasyonlu şarkı sözleri.",
     "description": "About page tagline under the product name"
   },
   "options_about_whatHeading": {
-    "message": "What it is",
+    "message": "Nedir",
     "description": "About page section heading"
   },
   "options_about_whatBody": {
-    "message": "Better Lyrics upgrades your YouTube Music experience by providing beautiful time-synced lyrics for your favorite songs.",
+    "message": "Better Lyrics, favori şarkılarınız için zamanla senkronize, estetik şarkı sözleri sunarak YouTube Music deneyiminizi geliştirir.",
     "description": "About page section body"
   },
   "options_about_doesHeading": {
-    "message": "What it does",
+    "message": "Ne yapar",
     "description": "About page section heading"
   },
   "options_about_does1": {
-    "message": "Lyrics that follow the song. Click any line to jump to it.",
+    "message": "Şarkıya eşlik eden sözler. İlgili kısma gitmek için herhangi bir satıra tıklayın.",
     "description": "About page feature list item"
   },
   "options_about_does2": {
-    "message": "Translation and romanization for songs in other languages.",
+    "message": "Diğer dillerdeki şarkılar için çeviri ve Latin harfleriyle yazım.",
     "description": "About page feature list item"
   },
   "options_about_does3": {
-    "message": "A full-screen view and a floating lyrics window.",
+    "message": "Tam ekran görünümü ve kayan şarkı sözleri penceresi.",
     "description": "About page feature list item"
   },
   "options_about_does4": {
-    "message": "Unison: community lyrics anyone can submit, vote on and fix.",
+    "message": "Unison: Herkesin şarkı sözlerini gönderebileceği, oylayabileceği ve düzeltebileceği bir topluluk platformu.",
     "description": "About page feature list item"
   },
   "options_about_does5": {
-    "message": "Themes from the Marketplace, or your own in the built-in editor.",
+    "message": "Mağazadan temalar, yada yerleşik düzenleyici içindeki kendi temalarınız.",
     "description": "About page feature list item"
   },
   "options_about_does6": {
-    "message": "Lyrics from many sources, in an order you choose.",
+    "message": "Birçok kaynaktan şarkı sözleri, sizin seçtiğiniz sırada.",
     "description": "About page feature list item"
   },
   "options_about_openSourceHeading": {
-    "message": "Open source",
+    "message": "Açık kaynak",
     "description": "About page section heading"
   },
   "options_about_openSourceBody": {
-    "message": "GPL v3. Source on $GITHUB$. PRs welcome if you spot something to fix.",
+    "message": "GPL v3. Kaynak kodu $GITHUB$'da. Düzeltilecek bir şeyler fark ederseniz PR'larınız kabulümüzdür.",
     "description": "About page body; $GITHUB$ becomes a link to the repository",
     "placeholders": {
       "github": {
@@ -1614,11 +1614,11 @@
     }
   },
   "options_about_communityHeading": {
-    "message": "Community",
+    "message": "Topluluk",
     "description": "About page section heading"
   },
   "options_about_communityDiscord": {
-    "message": "$DISCORD$ for questions and chat.",
+    "message": "Sorular ve sohbet için $DISCORD$.",
     "description": "About page list item; $DISCORD$ becomes a link to the Discord server",
     "placeholders": {
       "discord": {
@@ -1628,7 +1628,7 @@
     }
   },
   "options_about_communityIssue": {
-    "message": "$ISSUE$ if something is broken.",
+    "message": "Bir sorun varsa $ISSUE$.",
     "description": "About page list item; $ISSUE$ becomes a link to the issue tracker",
     "placeholders": {
       "issue": {
@@ -1638,7 +1638,7 @@
     }
   },
   "options_about_fileIssue": {
-    "message": "File an issue",
+    "message": "Sorun bildir",
     "description": "Link text in the About page that opens the issue tracker"
   },
   "options_about_discordLink": {
@@ -1646,31 +1646,31 @@
     "description": "Link text in the About page that opens the Discord server"
   },
   "options_about_supportHeading": {
-    "message": "Support the project",
+    "message": "Projeyi destekle",
     "description": "About page heading for the donation links"
   },
   "options_about_supportBody": {
-    "message": "Better Lyrics is a labor of love, and we fuss over it more than we'd like to admit... It's free, with no ads or tracking, and it always will be. If it's made your listening experience a little better, you can help keep it going! A star on GitHub helps too, and it's free :)",
+    "message": "Better Lyrics bir gönül işidir, ve itiraf etmek istediğimizden çok daha fazla üzerine titriyoruz... Ücretsizdir, reklam ya da izleyici yoktur, ve hep öyle kalacaktır. Eğer müzik dinleme deneyiminizi biraz olsun güzelleştirdiyse, devam etmesine destek olabilirsiniz! GitHub'da vereceğiniz bir yıldız da yardımcı olur, ve ücretsizdir :)",
     "description": "About page note above the donation links, written in the makers' own voice"
   },
   "options_about_supportStar": {
-    "message": "Star us on GitHub",
+    "message": "GitHub'da bizi yıldızlayın",
     "description": "About page link to star the Better Lyrics repository on GitHub"
   },
   "options_about_supportCoffee": {
-    "message": "Buy us a coffee",
+    "message": "Bize bir kahve alın",
     "description": "About page link to the Buy Me a Coffee page"
   },
   "options_about_supportSponsors": {
-    "message": "Sponsor on GitHub",
+    "message": "GitHub'da sponsor olun",
     "description": "About page link to GitHub Sponsors"
   },
   "options_about_madeByHeading": {
-    "message": "Made by",
+    "message": "Yapan",
     "description": "About page section heading"
   },
   "options_about_madeByBody": {
-    "message": "$BOIDU$ and $ADALIE$, with thanks to the translators and everyone in the Better Lyrics community who has tested it, reported bugs and submitted lyrics!",
+    "message": "$BOIDU$ ve $ADALIE$'ye, çevirmenlere ve Better Lyrics'i test eden, hata bildiren ve şarkı sözü gönderen topluluktaki herkese teşekkürler!",
     "description": "About page credits; the names become links",
     "placeholders": {
       "boidu": {
@@ -1684,7 +1684,7 @@
     }
   },
   "options_about_badgesBody": {
-    "message": "Special thanks to $KIYOSHI$ for the time and care behind every badge across Better Lyrics and Unison <3",
+    "message": "Better Lyrics ve Unison projelerindeki her rozet için harcadığı zaman ve gösterdiği özen için $KIYOSHI$'ye çok teşekkürler <3",
     "description": "About page credit for the Unison badge artist; the name becomes a link",
     "placeholders": {
       "kiyoshi": {
@@ -1710,15 +1710,15 @@
     "description": "Search input placeholder"
   },
   "ui_close": {
-    "message": "Close",
+    "message": "Kapat",
     "description": "Accessible label and button text that closes a dialog"
   },
   "ui_dropdownSearch": {
-    "message": "Search",
+    "message": "Ara",
     "description": "Placeholder for the search box inside a long dropdown menu"
   },
   "ui_dropdownNoResults": {
-    "message": "No results",
+    "message": "Sonuç yok",
     "description": "Shown inside a dropdown menu when the search matches no option"
   },
   "options_romanization_hint": {
@@ -1802,7 +1802,7 @@
     }
   },
   "theme_author_you": {
-    "message": "sizin tarafınızdan",
+    "message": "Sizden",
     "description": "Author label for custom user themes on theme selector button"
   },
   "symlink_installFailed": {
@@ -1950,7 +1950,7 @@
     "description": "Search input placeholder"
   },
   "unison_searchResults": {
-    "message": "“$query$” · $count$ results",
+    "message": "“$query$” · $count$ sonuç",
     "description": "Search result count shown at the end of the Feed / My Submissions tab row",
     "placeholders": {
       "query": {
@@ -1964,7 +1964,7 @@
     }
   },
   "unison_searchResultsOne": {
-    "message": "“$query$” · 1 result",
+    "message": "“$query$” · 1 sonuç",
     "description": "Search result count when there is exactly one result",
     "placeholders": {
       "query": {
@@ -2122,7 +2122,7 @@
     "description": "No search results message"
   },
   "unison_interactingAs": {
-    "message": "Etkileşimde bulunan:",
+    "message": "Etkileşimde bulunan",
     "description": "Identity label prefix"
   },
   "unison_loadMore": {
@@ -2230,11 +2230,11 @@
     "description": "Label for the optional submit-form field where the user lists other videos of the same song to link to this lyric"
   },
   "unison_additionalVideosHint": {
-    "message": "Optional. Other uploads of this song to link, videoIds or URLs separated by spaces or commas. Each is verified; ones that don't match are skipped.",
+    "message": "İsteğe bağlı. Bu şarkının başka yüklemelerini bağlantılamak için video ID'leri veya URL'leri boşluk ya da virgülle ayırarak girebilirsiniz. Her biri doğrulanır; eşleşmeyenler işleme alınmaz.",
     "description": "Hint text below the additional videos field on the submit form"
   },
   "unison_additionalVideosSkipped": {
-    "message": "Submitted, but these videos weren't linked: $videos$",
+    "message": "Gönderildi, ancak şu videolar bağlantılandırılmadı: $videos$",
     "description": "Feedback after submitting when some additional videos could not be linked. $videos$ is a comma-separated list of videoIds",
     "placeholders": {
       "videos": {
@@ -2244,11 +2244,11 @@
     }
   },
   "unison_additionalVideosInvalid": {
-    "message": "Some additional videos aren't valid video IDs or URLs. Fix or remove them to submit.",
+    "message": "Bazı ek videoların video ID'leri veya URL’leri geçerli değil. Gönderim yapabilmek için bunları düzeltin veya kaldırın.",
     "description": "Error shown on submit when the additional videos field contains entries that are not valid YouTube video IDs or URLs"
   },
   "unison_viewSubmittedLyrics": {
-    "message": "View lyrics",
+    "message": "Sözleri görüntüle",
     "description": "Button in the submit feedback that opens the lyric that was just submitted, shown when some additional videos could not be linked"
   },
   "unison_formatHint": {
@@ -2264,7 +2264,7 @@
     "description": "Link text for ISRC finder"
   },
   "unison_feedTabsLabel": {
-    "message": "Lyrics lists",
+    "message": "Şarkı sözü listeleri",
     "description": "Accessible name of the tab list that switches between the community feed and the user's own submissions"
   },
   "unison_tabFeed": {
@@ -2280,11 +2280,11 @@
     "description": "Empty state for my submissions tab"
   },
   "unison_emptyMineHint": {
-    "message": "Lyrics you submit show up here.",
+    "message": "Gönderdiğiniz şarkı sözleri burada görünür.",
     "description": "Second line of the empty My Submissions tab, under the title and above the submit button"
   },
   "unison_noFilterResults": {
-    "message": "Filtrelerinzle hiçbir şarkı sözü eşleşmiyor",
+    "message": "Filtrelerinizle hiçbir şarkı sözü eşleşmiyor",
     "description": "Empty state shown when the active sort/filter combination returns no entries"
   },
   "unison_noFeedYet": {
@@ -2432,11 +2432,11 @@
     "description": "Link on the Identity tab that opens the user's full Unison profile in a new tab"
   },
   "unison_changePicture": {
-    "message": "Change pfp",
+    "message": "PF değiştir",
     "description": "Link on the Identity tab, shown when the user has a Unison profile picture, that opens the Unison website where they can pick a different one"
   },
   "unison_addPicture": {
-    "message": "Add a pfp",
+    "message": "PF ekle",
     "description": "Link on the Identity tab, shown when the user has no Unison profile picture, that opens the Unison website where they can pick one"
   },
   "unison_submitted_this": {
@@ -2456,39 +2456,39 @@
     "description": "Plural noun used after numbers other than 1 in the Unison vote count (e.g. '5 votes')"
   },
   "unison_linkedVideos": {
-    "message": "Linked videos",
+    "message": "Bağlantılı videolar",
     "description": "Heading for the list of YouTube videos a Unison lyric is linked to, on the lyric detail page"
   },
   "unison_noLinkedVideos": {
-    "message": "No linked videos yet",
+    "message": "Henüz bağlantılı video yok",
     "description": "Shown under the linked-videos heading when a lyric has no linked videos"
   },
   "unison_videoPrimary": {
-    "message": "Primary",
+    "message": "Birincil",
     "description": "Badge marking the primary (home) video of a Unison lyric, which cannot be unlinked"
   },
   "unison_removeVideo": {
-    "message": "Remove",
+    "message": "Kaldır",
     "description": "Button that unlinks a video from a Unison lyric"
   },
   "unison_suggestedVideos": {
-    "message": "Suggested videos",
+    "message": "Önerilen videolar",
     "description": "Heading for the list of videos Unison suggests linking to a lyric"
   },
   "unison_noMatchingVideos": {
-    "message": "No matching videos found",
+    "message": "Eşleşen video bulunamadı",
     "description": "Suggested videos list when every suggestion is judged a different recording; those stay behind the other versions toggle below it"
   },
   "unison_noSuggestions": {
-    "message": "No suggestions right now",
+    "message": "Şu anda öneri yok",
     "description": "Shown under the suggested-videos heading when Unison has no suggestions"
   },
   "unison_linkConfirmTitle": {
-    "message": "Link this video?",
+    "message": "Bu videoyu bağla?",
     "description": "Title of the confirmation shown before linking a suggested video whose title differs from the lyric's song title"
   },
   "unison_linkConfirmBody": {
-    "message": "\"$video$\" isn't titled exactly \"$song$\". Check it's the same recording before linking, since remixes, live and sped-up versions usually need their own lyrics.",
+    "message": "\"$video$\", \"$song$\" ile birebir aynı ada sahip değil. Remix, canlı performans ve hızlandırılmış versiyonların genellikle kendi şarkı sözleri gerektiğinden, bağlantı kurmadan önce aynı kayıt olduğundan emin olun.",
     "description": "Body of the confirmation before linking a suggested video. $video$ is the suggested video's title, $song$ is the lyric's song title",
     "placeholders": {
       "video": {
@@ -2502,39 +2502,39 @@
     }
   },
   "unison_addVideo": {
-    "message": "Add",
+    "message": "Ekle",
     "description": "Button that links a suggested video to a Unison lyric"
   },
   "unison_linkVideoPlaceholder": {
-    "message": "Video ID or link",
+    "message": "Video ID'si veya URL'si",
     "description": "Placeholder and accessible label for the input on a Unison lyric's detail page where the owner types a videoId or YouTube URL to link"
   },
   "unison_linkVideoInvalid": {
-    "message": "That isn't a valid video ID or link",
+    "message": "Bu, geçerli bir video ID'si veya URL'si değil",
     "description": "Error shown when the owner tries to link a video whose ID or URL can't be parsed"
   },
   "unison_linkFailed": {
-    "message": "Couldn't link this video",
+    "message": "Bu video bağlantılandırılamadı",
     "description": "Generic error shown when linking a video to a Unison lyric fails"
   },
   "unison_unlinkFailed": {
-    "message": "Couldn't remove this video",
+    "message": "Bu video kaldırılamadı",
     "description": "Generic error shown when unlinking a video from a Unison lyric fails"
   },
   "unison_suggestMatchSameHint": {
-    "message": "Likely the same recording",
+    "message": "Muhtemelen aynı kayıt",
     "description": "Tooltip and accessible label for the lightbulb icon on a suggested video judged to be the same recording as the lyric; also marks videos added to the additional videos field automatically"
   },
   "unison_suggestMatchRelated": {
-    "message": "Might be a different version. Check before adding",
+    "message": "Farklı bir versiyon olabilir. Eklemeden önce kontrol edin.",
     "description": "Tooltip and accessible label for the question mark icon on a suggested video that may be a different version of the song (an edit or variant), asking the user to check before linking"
   },
   "unison_suggestMatchDifferentHint": {
-    "message": "A different version, or another song",
+    "message": "Farklı bir versiyon, veya başka şarkı",
     "description": "Tooltip and accessible label for the layers icon on a suggested video judged to be a different recording of the song, such as a remix or live version"
   },
   "unison_suggestOtherVersions": {
-    "message": "Show $count$ other versions",
+    "message": "$count$ diğer versiyonu göster",
     "description": "Toggle that reveals suggested videos judged to be different recordings, such as remixes or live versions. $count$ is how many are hidden",
     "placeholders": {
       "count": {
@@ -2544,35 +2544,35 @@
     }
   },
   "unison_suggestHideOtherVersions": {
-    "message": "Hide other versions",
+    "message": "Diğer versiyonları gizle",
     "description": "Label of the other versions toggle while it is open; clicking it hides the suggested videos judged to be different recordings again"
   },
   "unison_videosLoadFailed": {
-    "message": "Couldn't load videos",
+    "message": "Videolar yüklenemedi",
     "description": "Shown in place of the linked or suggested videos list when Unison could not load it; a retry button follows"
   },
   "unison_showMore": {
-    "message": "Show more",
+    "message": "Daha fazla göster",
     "description": "Button that reveals the rest of the suggested videos list beyond the first few"
   },
   "unison_error_linkCapReached": {
-    "message": "Link limit reached for this lyric",
+    "message": "Bu şarkı sözü için bağlantı sınırına ulaşıldı",
     "description": "Error shown when a lyric already has the maximum number of linked videos"
   },
   "unison_error_durationMismatch": {
-    "message": "That video's length doesn't match",
+    "message": "O videonun uzunluğu eşleşmiyor",
     "description": "Error shown when a video cannot be linked because its duration differs too much from the lyric"
   },
   "unison_error_videoUnverifiable": {
-    "message": "That video couldn't be verified",
+    "message": "O video doğrulanamadı",
     "description": "Error shown when a video cannot be linked because Unison could not fetch it"
   },
   "unison_error_cannotUnlinkPrimary": {
-    "message": "The primary video can't be removed",
+    "message": "Birincil video kaldırılamaz",
     "description": "Error shown when the user tries to unlink the primary video of a lyric"
   },
   "unison_rev_number": {
-    "message": "Revision $rev$",
+    "message": "Revizyon $rev$",
     "description": "Revision label. $rev$ is the revision number",
     "placeholders": {
       "rev": {
@@ -2582,11 +2582,11 @@
     }
   },
   "unison_rev_original": {
-    "message": "Original",
+    "message": "Orijinal",
     "description": "Label for revision 1 of a Unison lyric (the original upload), and for the untranslated lyrics option in the preview language picker"
   },
   "unison_rev_neverEdited": {
-    "message": "Uploaded $when$, never edited",
+    "message": "$when$ yüklendi, hiç düzenlenmedi",
     "description": "Revision bar text for a lyric with no edits. $when$ is a relative time",
     "placeholders": {
       "when": {
@@ -2596,7 +2596,7 @@
     }
   },
   "unison_rev_editedAgo": {
-    "message": "Edited $when$",
+    "message": "$when$ düzenlendi",
     "description": "Revision bar text for the live revision. $when$ is a relative time",
     "placeholders": {
       "when": {
@@ -2606,7 +2606,7 @@
     }
   },
   "unison_rev_pendingChip": {
-    "message": "Revision $rev$ pending",
+    "message": "Revizyon $rev$ beklemede",
     "description": "Chip for an edit waiting for council review",
     "placeholders": {
       "rev": {
@@ -2616,79 +2616,79 @@
     }
   },
   "unison_rev_revisions": {
-    "message": "Revisions",
+    "message": "Revizyonlar",
     "description": "Button and page title for the list of a lyric's revisions"
   },
   "unison_rev_editLyrics": {
-    "message": "Edit lyrics",
+    "message": "Sözleri düzenle",
     "description": "Button that opens the lyric editor"
   },
   "unison_rev_viewChanges": {
-    "message": "View changes",
+    "message": "Değişiklikleri görüntüle",
     "description": "Button that opens the diff of the pending edit, and link in the editor save bar that opens the Changes tab"
   },
   "unison_rev_changes": {
-    "message": "Changes",
+    "message": "Değişiklikler",
     "description": "Editor tab that lists what the edit changes compared with an earlier revision"
   },
   "unison_rev_changesTabs": {
-    "message": "Preview or changes",
+    "message": "Önizleme veya değişiklikler",
     "description": "Screen reader label for the editor tabs that switch between the lyric preview and the list of changes"
   },
   "unison_rev_details": {
-    "message": "Details",
+    "message": "Detaylar",
     "description": "Diff section label above changed song details: language, ISRC and album"
   },
   "unison_rev_updating": {
-    "message": "Updating",
+    "message": "Güncelleniyor",
     "description": "Shown while the list of changes refreshes after an edit"
   },
   "unison_rev_checkFailed": {
-    "message": "Couldn't check your edit",
+    "message": "Düzenlemeniz kontrol edilemedi",
     "description": "Editor save bar title when the edit check failed for a reason the server did not explain"
   },
   "unison_rev_checkFailedHint": {
-    "message": "Save turns back on once the check runs.",
+    "message": "Kontrol çalıştırıldıktan sonra kaydetme özelliği tekrar açılacaktır.",
     "description": "Editor save bar hint under the failed check title, followed by a Try again link"
   },
   "unison_rev_tryAgain": {
-    "message": "Try again",
+    "message": "Tekrar dene",
     "description": "Link or button that runs the edit check again after it failed"
   },
   "unison_rev_changesError": {
-    "message": "Couldn't load changes",
+    "message": "Değişiklikler yüklenemedi",
     "description": "Error title in the editor Changes tab when the edit check failed"
   },
   "unison_rev_changesErrorHint": {
-    "message": "Something went wrong. Your draft is safe, and the preview still works.",
+    "message": "Bir şeyler ters gitti. Taslağınız güvende, ve önizleme hâlâ çalışıyor.",
     "description": "Error hint in the editor Changes tab when the edit check failed"
   },
   "unison_rev_changesNeedParse": {
-    "message": "Changes return once the lyrics parse.",
+    "message": "Şarkı sözleri ayrıştırıldığında değişiklikler geri dönecektir.",
     "description": "Editor Changes tab while the lyrics have errors that stop them from being read"
   },
   "unison_rev_withdraw": {
-    "message": "Withdraw",
+    "message": "Geri Çek",
     "description": "Button that withdraws a pending edit before the council reviews it"
   },
   "unison_rev_reason_sealed": {
-    "message": "Sealed lyric",
+    "message": "Mühürlü şarkı sözü",
     "description": "Why an edit needs council review: the council approved (sealed) this lyric"
   },
   "unison_rev_reason_flagged": {
-    "message": "Flagged for review",
+    "message": "İnceleme için işaretlendi",
     "description": "Why an edit needs council review: an automatic check flagged it"
   },
   "unison_rev_reason_largeText": {
-    "message": "Large text change",
+    "message": "Büyük metin değişikliği",
     "description": "Why an edit needs council review: too much of the text changed"
   },
   "unison_rev_reason_largeTiming": {
-    "message": "Large timing change",
+    "message": "Büyük zamanlama değişikliği",
     "description": "Why an edit needs council review: too much of the timing changed"
   },
   "unison_rev_goesToReview": {
-    "message": "Goes to council review: $reason$",
+    "message": "İnceleme kuruluna gidecek: $reason$",
     "description": "Editor outcome before saving. $reason$ is a review reason, like 'Large text change'",
     "placeholders": {
       "reason": {
@@ -2698,7 +2698,7 @@
     }
   },
   "unison_rev_pendingTitle": {
-    "message": "Waiting for council review: $reason$",
+    "message": "İnceleme kurulu onayı bekleniyor: $reason$",
     "description": "Title for a saved edit that waits for review. $reason$ is a review reason, like 'Large text change'",
     "placeholders": {
       "reason": {
@@ -2708,7 +2708,7 @@
     }
   },
   "unison_rev_staysLive": {
-    "message": "Revision $rev$ stays live until the council decides.",
+    "message": "İnceleme kurulu karar verene kadar $rev$ numaralı revizyon yayında kalmaya devam eder.",
     "description": "Names the revision listeners keep seeing during review",
     "placeholders": {
       "rev": {
@@ -2718,7 +2718,7 @@
     }
   },
   "unison_rev_rejectedTitle": {
-    "message": "Revision $rev$ was rejected",
+    "message": "Revizyon $rev$ reddedildi",
     "description": "Title when the council rejected an edit",
     "placeholders": {
       "rev": {
@@ -2728,7 +2728,7 @@
     }
   },
   "unison_rev_councilNote": {
-    "message": "Council note: “$note$”",
+    "message": "Kurul notu: \"$note$\"",
     "description": "The note the council left when it rejected an edit",
     "placeholders": {
       "note": {
@@ -2738,47 +2738,47 @@
     }
   },
   "unison_rev_sealedHint": {
-    "message": "Every edit goes to council review before it goes live.",
+    "message": "Her düzenleme yayınlanmadan önce inceleme kurulu onayından geçer.",
     "description": "Explains what editing a sealed lyric means"
   },
   "unison_rev_status_live": {
-    "message": "Live",
+    "message": "Canlı",
     "description": "Revision status: the version listeners see"
   },
   "unison_rev_status_pending": {
-    "message": "Pending",
+    "message": "Beklemede",
     "description": "Revision status: waiting for council review"
   },
   "unison_rev_status_past": {
-    "message": "Past",
+    "message": "Geçmiş",
     "description": "Revision status: was live before"
   },
   "unison_rev_status_superseded": {
-    "message": "Superseded",
+    "message": "Geçersiz kılındı",
     "description": "Revision status: replaced by a newer save before review"
   },
   "unison_rev_status_rejected": {
-    "message": "Rejected",
+    "message": "Reddedildi",
     "description": "Revision status: the council rejected it"
   },
   "unison_rev_status_withdrawn": {
-    "message": "Withdrawn",
+    "message": "Geri Çekildi",
     "description": "Revision status: the owner withdrew it"
   },
   "unison_rev_anchor": {
-    "message": "Anchor",
+    "message": "Referans",
     "description": "Chip on the revision that edits are measured against"
   },
   "unison_rev_approved": {
-    "message": "Approved by the council",
+    "message": "Kurul tarafından onaylandı",
     "description": "Revisions list reason for a council-approved revision"
   },
   "unison_rev_withinLimits": {
-    "message": "Within limits",
+    "message": "Sınırlar dahilinde",
     "description": "Revisions list reason for an edit that went live without review"
   },
   "unison_rev_reverted": {
-    "message": "Reverted to revision $rev$",
+    "message": "$rev$ numaralı revizyona geri dönüldü",
     "description": "Revisions list reason and success message for a revert",
     "placeholders": {
       "rev": {
@@ -2788,7 +2788,7 @@
     }
   },
   "unison_rev_driftValues": {
-    "message": "Text $text$% · Timing $timing$%",
+    "message": "Metin %$text$ · Zamanlama %$timing$",
     "description": "How much text and timing an edit changed, as whole numbers",
     "placeholders": {
       "text": {
@@ -2802,27 +2802,27 @@
     }
   },
   "unison_rev_colStatus": {
-    "message": "Status",
+    "message": "Durum",
     "description": "Revisions list column header"
   },
   "unison_rev_colChange": {
-    "message": "Change",
+    "message": "Değiştir",
     "description": "Revisions list column header (noun): how much an edit changed"
   },
   "unison_rev_colReason": {
-    "message": "Reason",
+    "message": "Gerekçe",
     "description": "Revisions list column header"
   },
   "unison_rev_colWhen": {
-    "message": "When",
+    "message": "Zaman",
     "description": "Revisions list column header: relative time"
   },
   "unison_rev_revision": {
-    "message": "Revision",
+    "message": "Revizyon",
     "description": "Column header and editor sidebar label"
   },
   "unison_rev_comparedWith": {
-    "message": "Compared with revision $rev$",
+    "message": "$rev$ numaralı revizyon ile karşılaştırıldı",
     "description": "Line above a diff. $rev$ is the compared revision",
     "placeholders": {
       "rev": {
@@ -2832,19 +2832,19 @@
     }
   },
   "unison_rev_legendAdded": {
-    "message": "Added",
+    "message": "Eklendi",
     "description": "Diff legend: added lines or words"
   },
   "unison_rev_legendRemoved": {
-    "message": "Removed",
+    "message": "Kaldırıldı",
     "description": "Diff legend: removed lines or words"
   },
   "unison_rev_legendTiming": {
-    "message": "Timing only",
+    "message": "Yalnızca zamanlama",
     "description": "Diff legend: lines whose timing changed but text did not"
   },
   "unison_rev_syllablesRetimed": {
-    "message": "Syllables retimed: $count$",
+    "message": "Yeniden zamanlanan heceler: $count$",
     "description": "Diff note: how many syllables of a line moved while the line start stayed",
     "placeholders": {
       "count": {
@@ -2854,15 +2854,15 @@
     }
   },
   "unison_rev_syllableTimingAdded": {
-    "message": "Syllable timing added",
+    "message": "Hece zamanlaması eklendi",
     "description": "Diff note: a line that had only line timing now has syllable timing"
   },
   "unison_rev_syllableTimingRemoved": {
-    "message": "Syllable timing removed",
+    "message": "Hece zamanlaması kaldırıldı",
     "description": "Diff note: a line that had syllable timing now has only line timing"
   },
   "unison_rev_unchangedLines": {
-    "message": "Unchanged lines: $count$",
+    "message": "Değişmeyen satırlar: $count$",
     "description": "Collapsed part of a diff",
     "placeholders": {
       "count": {
@@ -2872,15 +2872,15 @@
     }
   },
   "unison_rev_headSection": {
-    "message": "Translations, romanization and credits",
+    "message": "Çeviriler, romanizasyon ve katkılar",
     "description": "Label above the diff rows for text stored outside the lyric lines: translations, romanizations and credits"
   },
   "unison_rev_headCredits": {
-    "message": "Credits",
+    "message": "Katkılar",
     "description": "Diff row label for a changed credit, such as a songwriter or singer name"
   },
   "unison_rev_headLine": {
-    "message": "line $line$",
+    "message": "$line$. satır",
     "description": "Part of a diff row label that names the lyric line a translation or romanization belongs to, e.g. 'Translation · Spanish · line 3'",
     "placeholders": {
       "line": {
@@ -2890,15 +2890,15 @@
     }
   },
   "unison_rev_noDiff": {
-    "message": "No changes to show",
+    "message": "Gösterilecek değişiklik yok",
     "description": "Diff area when there is nothing to compare"
   },
   "unison_rev_revertToThis": {
-    "message": "Revert to this",
+    "message": "Buna geri dön",
     "description": "Button that starts a revert to a past revision"
   },
   "unison_rev_revertLive": {
-    "message": "Reverting goes live now as revision $rev$",
+    "message": "Geri alma işlemi, $rev$ numaralı revizyon olarak hemen yayınlanır.",
     "description": "Note before a revert that skips review",
     "placeholders": {
       "rev": {
@@ -2908,11 +2908,11 @@
     }
   },
   "unison_rev_revertCheckFailed": {
-    "message": "Couldn't check whether reverting goes live or to council review",
+    "message": "Geri alma işleminin canlıya mı yoksa inceleme kuruluna mı gideceği kontrol edilemedi",
     "description": "Note on a past revision when the check of where a revert would land failed; the owner can still revert and the server decides"
   },
   "unison_rev_revertReview": {
-    "message": "Reverting goes to council review as revision $rev$",
+    "message": "Geri alma işlemi, $rev$ numaralı revizyon olarak inceleme kuruluna gönderilir.",
     "description": "Note before a revert that needs review",
     "placeholders": {
       "rev": {
@@ -2922,11 +2922,11 @@
     }
   },
   "unison_rev_locked": {
-    "message": "Song and artist can't be edited.",
+    "message": "Şarkı ve sanatçı düzenlenemez.",
     "description": "Editor note about fields that are locked"
   },
   "unison_rev_editsLeft": {
-    "message": "$remaining$ of $limit$ edits left today",
+    "message": "Bugün $limit$ hakkınızdan $remaining$ tanesi kaldı",
     "description": "Edits left in the last 24 hours",
     "placeholders": {
       "remaining": {
@@ -2940,15 +2940,15 @@
     }
   },
   "unison_rev_textChanged": {
-    "message": "Text changed",
+    "message": "Metin değiştirildi",
     "description": "Meter label: how much of the text changed"
   },
   "unison_rev_timingChanged": {
-    "message": "Timing changed",
+    "message": "Zamanlama değişti",
     "description": "Meter label: how much of the timing changed"
   },
   "unison_rev_textChangedSince": {
-    "message": "Text changed since revision $rev$",
+    "message": "$rev$ numaralı revizyondan bu yana değişen metin",
     "description": "Meter label: how much of the text changed since an earlier revision that the limit is measured against. $rev$ is that revision",
     "placeholders": {
       "rev": {
@@ -2958,7 +2958,7 @@
     }
   },
   "unison_rev_timingChangedSince": {
-    "message": "Timing changed since revision $rev$",
+    "message": "$rev$ numaralı revizyondan bu yana değişen zamanlama",
     "description": "Meter label: how much of the timing changed since an earlier revision that the limit is measured against. $rev$ is that revision",
     "placeholders": {
       "rev": {
@@ -2968,7 +2968,7 @@
     }
   },
   "unison_rev_ofLimit": {
-    "message": "of $limit$% limit",
+    "message": "/ %$limit$ sınır",
     "description": "Follows a bold percentage in a meter, like '8% of 15% limit'",
     "placeholders": {
       "limit": {
@@ -2978,7 +2978,7 @@
     }
   },
   "unison_rev_checkLine": {
-    "message": "Line $line$: $message$",
+    "message": "$line$. satır: $message$",
     "description": "A server check message tied to a line. $message$ comes from the server",
     "placeholders": {
       "line": {
@@ -2992,63 +2992,63 @@
     }
   },
   "unison_rev_checking": {
-    "message": "Checking your edit...",
+    "message": "Düzenlemeniz kontrol ediliyor...",
     "description": "Editor status while the server checks the edit"
   },
   "unison_rev_fixErrors": {
-    "message": "Fix the errors to save",
+    "message": "Kaydetmek için hataları düzeltin",
     "description": "Editor status when the edit has errors"
   },
   "unison_rev_limitReached": {
-    "message": "Edit limit reached",
+    "message": "Düzenleme sınırına ulaşıldı",
     "description": "Shown when the daily edit limit is used up"
   },
   "unison_rev_noChanges": {
-    "message": "No changes from the live revision",
+    "message": "Canlı revizyondan bu yana herhangi bir değişiklik yok",
     "description": "Shown when an edit or revert would change nothing"
   },
   "unison_rev_goesLive": {
-    "message": "Goes live when you save",
+    "message": "Kaydettiğinizde yayına girer",
     "description": "Editor status when the edit skips review"
   },
   "unison_rev_submitForReview": {
-    "message": "Submit for review",
+    "message": "İncelemeye gönder",
     "description": "Save button label when the edit needs review"
   },
   "unison_rev_noEdits": {
-    "message": "No edits yet",
+    "message": "Henüz düzenleme yapılmadı",
     "description": "Revisions page notice for a lyric that was never edited"
   },
   "unison_rev_error": {
-    "message": "Something went wrong. Try again.",
+    "message": "Bir şeyler ters gitti. Tekrar deneyin.",
     "description": "Fallback error for revision actions"
   },
   "options_display_karaoke": {
-    "message": "Karaoke subtitles",
+    "message": "Karaoke altyazıları",
     "description": "Toggle label for showing synced lyrics as subtitles over a music video in fullscreen"
   },
   "options_display_highResolutionVideo": {
-    "message": "Enable higher-resolution videos",
+    "message": "Yüksek çözünürlüklü videoları etkinleştir",
     "description": "Display settings toggle for enabling video resolutions above 1080p."
   },
   "options_display_highResolutionVideoInfo": {
-    "message": "Unlocks resolutions above 1080p when available. May affect seamless transitions between videos. Audio-only gapless playback is preserved. Only disable if you experience playback or transition issues.",
+    "message": "Mevcut olduğunda 1080p'nin üzerindeki çözünürlüklerin kilidini açar. Videolar arasındaki sorunsuz geçişleri etkileyebilir. Yalnızca sesin kesintisiz oynatılması korunur. Yalnızca oynatma veya geçiş sorunları yaşıyorsanız devre dışı bırakın.",
     "description": "Help tooltip explaining higher video resolutions and the possible effect on seamless video transitions."
   },
   "options_display_preferredVideoQuality": {
-    "message": "Preferred video quality",
+    "message": "Tercih edilen video kalitesi",
     "description": "Display settings label for the preferred video resolution selector."
   },
   "options_display_videoQualityLimit": {
-    "message": "Enable higher-resolution videos for 1440p, 4K, and 8K.",
+    "message": "1440p, 4K ve 8K çözünürlüklü videoları etkinleştirin.",
     "description": "Hint shown when resolutions above 1080p are disabled by the higher-resolution video toggle."
   },
   "options_display_videoQualityAuto": {
-    "message": "Auto",
+    "message": "Otomatik",
     "description": "Video quality choice that lets YouTube Music select the resolution automatically."
   },
   "options_display_videoQualityApplyHint": {
-    "message": "Higher-resolution playback changes apply to the next video or after refreshing. Preferred quality uses the closest available lower resolution.",
+    "message": "Daha yüksek çözünürlüklü oynatma değişiklikleri, bir sonraki videoda veya sayfa yenilendikten sonra geçerli olur. Tercih edilen kalite mevcut olan en yakın düşük çözünürlüğü kullanır.",
     "description": "Tooltip explaining when video playback changes take effect and how unavailable resolutions fall back."
   }
 }
