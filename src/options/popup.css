@@ -1225,10 +1225,10 @@ body.is-editing .cm-scroller { scrollbar-width: thin; scrollbar-color: var(--scr
   flex: none;
   border-radius: var(--radius-control);
   overflow: hidden;
-  transition: filter var(--duration-quick) ease-out, scale var(--duration-quick) ease-out;
+  transition: opacity var(--duration-quick) ease-out, scale var(--duration-quick) ease-out;
 }
 .about__coffee::after { content: ""; position: absolute; inset: 0; border-radius: inherit; box-shadow: inset 0 0 0 1px var(--card-edge-color-hover); pointer-events: none; }
-.about__coffee:hover { filter: brightness(1.05); }
+.about__coffee:hover { opacity: 0.9; }
 .about__coffee:active { scale: var(--scale-press); }
 .about__coffee:focus-visible { outline: var(--focus-ring); outline-offset: 2px; }
 .about__coffee img { display: block; width: auto; height: 32px; }

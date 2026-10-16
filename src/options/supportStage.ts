@@ -1,6 +1,6 @@
 import { createLyricsRenderer, type Lyric } from "@braccato/core";
 import { versionedStylesheetUrl } from "@core/extensionStylesheet";
-import { prefersReducedMotion } from "@/ui/motion";
+import { onReducedMotionChange, prefersReducedMotion } from "@/ui/motion";
 
 const SUPPORT_LINES = [
   "hi, it's boidu and adalie",
@@ -57,27 +57,43 @@ export function createSupportStage(mount: HTMLElement): SupportStage {
   let frame = 0;
   let elapsedMs = 0;
   let resumedAt = 0;
+  let visible = false;
 
   const tick = (now: number): void => {
     renderer.tick(((elapsedMs + now - resumedAt) % loopMs) / 1000, { isPlaying: true });
     frame = requestAnimationFrame(tick);
   };
 
+  const stop = (): void => {
+    if (!frame) return;
+    cancelAnimationFrame(frame);
+    frame = 0;
+    elapsedMs += performance.now() - resumedAt;
+  };
+
+  const start = (): void => {
+    if (prefersReducedMotion()) {
+      stop();
+      renderer.tick((lyrics[0].startTimeMs + lyrics[0].durationMs) / 1000, { isPlaying: false });
+      return;
+    }
+    if (frame) return;
+    resumedAt = performance.now();
+    frame = requestAnimationFrame(tick);
+  };
+
+  onReducedMotionChange(() => {
+    if (visible) start();
+  });
+
   return {
     play() {
-      if (prefersReducedMotion()) {
-        renderer.tick((lyrics[0].startTimeMs + lyrics[0].durationMs) / 1000, { isPlaying: false });
-        return;
-      }
-      if (frame) return;
-      resumedAt = performance.now();
-      frame = requestAnimationFrame(tick);
+      visible = true;
+      start();
     },
     pause() {
-      if (!frame) return;
-      cancelAnimationFrame(frame);
-      frame = 0;
-      elapsedMs += performance.now() - resumedAt;
+      visible = false;
+      stop();
     },
   };
 }
