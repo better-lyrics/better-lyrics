@@ -1232,6 +1232,9 @@ body.is-editing .cm-scroller { scrollbar-width: thin; scrollbar-color: var(--scr
 .about__coffee:active { scale: var(--scale-press); }
 .about__coffee:focus-visible { outline: var(--focus-ring); outline-offset: 2px; }
 .about__coffee img { display: block; width: auto; height: 32px; }
+@supports (corner-shape: superellipse(1.6)) {
+  .about__coffee, .about__coffee::after { corner-shape: superellipse(1.6); }
+}
 .about__sponsor { background: #21262d; box-shadow: inset 0 0 0 1px rgba(240, 246, 252, 0.1); color: #f0f6fc; }
 .about__sponsor:where(:not(:disabled)):hover { background: #292e36; color: #f0f6fc; }
 .about__sponsor svg, .about__sponsor:hover svg { color: #db61a2; }

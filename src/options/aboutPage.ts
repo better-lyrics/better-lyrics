@@ -98,7 +98,8 @@ export function observeSupportStage(root: ParentNode): void {
   const mount = root.querySelector<HTMLElement>("#support-stage");
   if (!mount) return;
   let stage: Promise<SupportStage> | null = null;
-  new IntersectionObserver(([entry]) => {
+  new IntersectionObserver(entries => {
+    const entry = entries[entries.length - 1];
     if (!entry.isIntersecting && !stage) return;
     stage ??= import("@/options/supportStage").then(({ createSupportStage }) => createSupportStage(mount));
     stage
