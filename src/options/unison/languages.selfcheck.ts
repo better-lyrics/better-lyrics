@@ -1,4 +1,7 @@
 import { strict as assert } from "node:assert";
+
+Object.defineProperty(globalThis.navigator, "language", { value: "en-US", configurable: true });
+
 import { EXTRA_LANGUAGE_CODES, languageName } from "@modules/unison/languageNames";
 import { extraLanguageOptions, languageOptionList, matchLanguageOption } from "@/options/unison/languages";
 

@@ -30,7 +30,7 @@ export function collectSizes(dir: string, minBytes = 10_000): SizeRow[] {
     .map(full => {
       const buf = readFileSync(full);
       return {
-        file: relative(dir, full),
+        file: relative(dir, full).replace(/\\/g, "/"),
         bytes: buf.length,
         gzip: gzipSync(buf, { level: 9 }).length,
         hash: createHash("md5").update(buf).digest("hex"),

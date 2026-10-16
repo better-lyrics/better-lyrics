@@ -1,5 +1,5 @@
 import type { LyricDecorations } from "@modules/lyrics/injectLyrics";
-import { injectRomanization, injectTranslation, type LyricsRenderer } from "@braccato/core";
+import { injectFurigana, injectRomanization, injectTranslation, type LyricsRenderer } from "@braccato/core";
 
 export function applyLyricDecorations(
   renderer: Pick<LyricsRenderer, "container" | "lines">,
@@ -17,6 +17,9 @@ export function applyLyricDecorations(
     }
     if (decoration.translation) {
       injectTranslation(doc, line.lyricElement, decoration.translation, decoration.translationLanguage);
+    }
+    if (decoration.furiganaMap) {
+      injectFurigana(doc, line, decoration.furiganaMap);
     }
   }
 }

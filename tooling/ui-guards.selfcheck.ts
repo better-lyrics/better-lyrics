@@ -59,7 +59,7 @@ const KNOWN: Record<string, Record<string, number>> = {
 for (const rule of RULES) {
   const found: Record<string, number> = {};
   for (const file of files) {
-    const path = relative(root, file);
+    const path = relative(root, file).replace(/\\/g, "/");
     if (!rule.appliesTo(path)) continue;
     const count = rule.count(readFileSync(file, "utf8"));
     if (count > 0) found[path] = count;

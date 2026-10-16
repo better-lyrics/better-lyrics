@@ -23,7 +23,7 @@ if (files.length === 0) {
 for (const file of files) {
   const label = relative(repoRoot, file);
   console.log(`Running ${label}`);
-  const result = spawnSync("npx", ["tsx", file], { stdio: "inherit", cwd: repoRoot });
+  const result = spawnSync("npx", ["tsx", file], { stdio: "inherit", cwd: repoRoot, shell: true });
   if (result.status !== 0) {
     console.error(`Self-check failed: ${label}`);
     process.exit(result.status ?? 1);
