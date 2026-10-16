@@ -8,6 +8,8 @@ import {
   SHADERS_SITE_URL,
 } from "@constants";
 import { t } from "@core/i18n";
+import { warnCore } from "@core/logger";
+import type { SupportStage } from "@/options/supportStage";
 
 const LINK_MARKER = "\u2063";
 
@@ -75,12 +77,32 @@ export function renderAboutLinks(root: ParentNode): void {
   }
   const externalLinks: Record<string, Link> = {
     shaders: { href: SHADERS_SITE_URL, text: t("lyrics_getShaders") },
-    star: { href: GITHUB_REPO_URL, text: t("options_about_supportStar") },
-    coffee: { href: BUY_ME_A_COFFEE_URL, text: t("options_about_supportCoffee") },
-    sponsors: { href: GITHUB_SPONSORS_URL, text: t("options_about_supportSponsors") },
   };
   for (const [name, link] of Object.entries(externalLinks)) {
     const el = root.querySelector<HTMLElement>(`[data-linked="${name}"]`);
     if (el) fillExternalLink(el, link);
   }
+  const supportLinks: Record<string, string> = {
+    coffee: BUY_ME_A_COFFEE_URL,
+    sponsors: GITHUB_SPONSORS_URL,
+    star: GITHUB_REPO_URL,
+  };
+  for (const [name, href] of Object.entries(supportLinks)) {
+    root.querySelector<HTMLAnchorElement>(`[data-support-link="${name}"]`)?.setAttribute("href", href);
+  }
+}
+
+// -- Support stage --------------------------
+
+export function observeSupportStage(root: ParentNode): void {
+  const mount = root.querySelector<HTMLElement>("#support-stage");
+  if (!mount) return;
+  let stage: Promise<SupportStage> | null = null;
+  new IntersectionObserver(([entry]) => {
+    if (!entry.isIntersecting && !stage) return;
+    stage ??= import("@/options/supportStage").then(({ createSupportStage }) => createSupportStage(mount));
+    stage
+      .then(loaded => (entry.isIntersecting ? loaded.play() : loaded.pause()))
+      .catch(error => warnCore("support stage failed:", error));
+  }).observe(mount);
 }

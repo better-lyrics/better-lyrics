@@ -395,14 +395,22 @@
 							<li data-linked="shaders"></li>
 						</ul>
 					</div>
-					<div class="about__section">
-						<h3 class="about__heading">__MSG_options_about_supportHeading__</h3>
-						<p class="about__body">__MSG_options_about_supportBody__</p>
-						<ul class="about__body about__list">
-							<li data-linked="star"></li>
-							<li data-linked="coffee"></li>
-							<li data-linked="sponsors"></li>
-						</ul>
+					<div class="about__section about__support">
+						<div class="about__stage" aria-hidden="true">
+							<span class="about__glow about__glow--red"></span>
+							<span class="about__glow about__glow--violet"></span>
+							<span class="about__glow about__glow--amber"></span>
+							<div class="about__stage-lyrics" id="support-stage"></div>
+						</div>
+						<div class="about__support-body">
+							<h3 class="about__heading about__support-heading"><span data-icon="chefHatHeart"></span>__MSG_options_about_supportHeading__</h3>
+							<p class="about__body">__MSG_options_about_supportBody__</p>
+							<div class="about__support-actions">
+								<a class="about__coffee" data-support-link="coffee" target="_blank" rel="noopener noreferrer"><img src="/images/buy-me-a-coffee.png" alt="__MSG_options_about_supportCoffee__"></a>
+								<a class="ui-button ui-button--header about__sponsor" data-support-link="sponsors" target="_blank" rel="noopener noreferrer"><span data-icon="heart"></span>__MSG_options_about_supportSponsors__</a>
+								<a class="ui-button ui-button--header ui-button--ghost about__star" data-support-link="star" target="_blank" rel="noopener noreferrer"><span data-icon="star"></span>__MSG_options_about_supportStar__</a>
+							</div>
+						</div>
 					</div>
 					<div class="about__section">
 						<h3 class="about__heading">__MSG_options_about_madeByHeading__</h3>

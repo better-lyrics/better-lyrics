@@ -54,7 +54,7 @@ import { normalizeVideoQualitySettings, type VideoQualitySettings } from "@modul
 import { syncVideoQualityControls, videoQualityOptions } from "@/options/videoQualityControls";
 import { mountDropdownField, setDropdownFieldValue } from "@/options/dropdownFields";
 import { TRANSLATION_LANGUAGES } from "@/options/translationLanguages";
-import { renderAboutLinks } from "@/options/aboutPage";
+import { observeSupportStage, renderAboutLinks } from "@/options/aboutPage";
 import { createModal, type Modal } from "@/ui/modal";
 import { initTabStrip, type TabStrip } from "@/ui/tabStrip";
 import { renderStatBar } from "@/ui/statBar";
@@ -735,6 +735,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   renderAppVersion(document.getElementById("app-version"));
   fitPopupToWindow();
   renderAboutLinks(document);
+  observeSupportStage(document);
   document.getElementById("jump-whats-new")?.setAttribute("href", `${GITHUB_REPO_URL}/releases/latest`);
   mountIcons(document);
   initRefreshLyricsButton(() => toast.error(t("options_alert_refreshFailed")));
