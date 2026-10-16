@@ -388,6 +388,10 @@
     "message": "Display furigana readings above Japanese kanji based on romaji pronunciation; only available for certain songs.",
     "description": "Furigana setting description"
   },
+  "options_badge_experimental": {
+    "message": "Experimental",
+    "description": "Badge indicating that a feature is experimental"
+  },
   "options_language_translate": {
     "message": "Translate song lyrics",
     "description": "Translate song lyrics setting label"

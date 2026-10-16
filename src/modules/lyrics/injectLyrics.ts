@@ -31,11 +31,10 @@ import {
 import { lyricsElementAdded, mainView } from "@modules/ui/mainLyricsView";
 import { disableNativeLyricsFocus } from "@modules/ui/nativeLyricsFocus";
 import { publishSecondaryViews } from "@modules/ui/secondaryViews";
-import { injectRomanization, injectTranslation, type LineData } from "@braccato/core";
+import { injectFurigana, injectRomanization, injectTranslation, type LineData, type RubySegment } from "@braccato/core";
+import { alignLineParts, containsKanji, isJapaneseLine, songHasKana } from "@braccato/furigana";
 import { findBestLanguageMatch, langCodesMatch, languageMatchesAny } from "@utils";
 import { logCore } from "@core/logger";
-import { alignLineParts, containsKanji, type RubySegment } from "@modules/lyrics/furigana/furiganaAligner";
-import { injectFuriganaToLine } from "@modules/lyrics/furigana/furiganaDOM";
 
 export type { LineData };
 
@@ -65,14 +64,12 @@ function getRenderedPartsForAlignment(
  * view's elements and write nothing back to the `Lyric` objects, so a second view building from the
  * same lines would otherwise show neither.
  */
-type FuriganaMap = Record<number, RubySegment[]> | Map<number, RubySegment[]>;
-
 interface LyricLineDecoration {
   romanization?: string;
   timedRomanization?: LyricPart[];
   translation?: string;
   translationLanguage?: string;
-  furiganaMap?: FuriganaMap;
+  furiganaMap?: Record<number, RubySegment[]>;
 }
 
 /**
@@ -284,6 +281,8 @@ async function processBatchTranslationsAndRomanizations(
   let sourceLanguage = data.language;
   let didInjectCachedContent = false;
 
+  const hasKanaInSong = AppState.isFuriganaEnabled && songHasKana(lyrics.map(l => l.words));
+
   // 1. Identify what needs to be translated/romanized
   lyrics.forEach((item, index) => {
     if (item.isInstrumental) return;
@@ -298,8 +297,10 @@ async function processBatchTranslationsAndRomanizations(
 
     // -- Furigana --------------------------
     if (AppState.isFuriganaEnabled && containsKanji(item.words)) {
-      const isJapanese =
-        !trustedLanguage || langCodesMatch(trustedLanguage, "ja") || scripts.detectScriptLanguage(item.words) === "ja";
+      const isJapanese = isJapaneseLine(item.words, {
+        declaredLanguage: sourceLanguage,
+        songHasKana: hasKanaInSong,
+      });
       const hasNativeRomanization = Boolean(item.romanization || item.timedRomanization);
       if (isJapanese && hasNativeRomanization) {
         const parts = getRenderedPartsForAlignment(lineData, item);
@@ -309,9 +310,9 @@ async function processBatchTranslationsAndRomanizations(
           item.romanization || null,
           item.words || null
         );
-        const injected = injectFuriganaToLine(doc, lineData, furiganaMap);
+        const injected = injectFurigana(doc, lineData, furiganaMap);
         if (injected) {
-          recordLyricDecoration(index, { furiganaMap: Object.fromEntries(furiganaMap) });
+          recordLyricDecoration(index, { furiganaMap });
           didInjectCachedContent = true;
         }
       }
