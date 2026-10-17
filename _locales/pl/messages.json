@@ -44,7 +44,7 @@
     "description": "Label for the clear cache action row"
   },
   "options_general_clearCachedLyricsHint": {
-    "message": "They download again as you play",
+    "message": "Pobierają się ponownie podczas odtwarzania",
     "description": "Hint under the clear cached lyrics label"
   },
   "options_general_clearCache": {
@@ -56,7 +56,7 @@
     "description": "Total lyrics in cache label"
   },
   "options_general_storageUsed": {
-    "message": "Storage used",
+    "message": "Pamięć użyta",
     "description": "Popup General tab: label under the total local storage size"
   },
   "options_general_segment": {
@@ -82,15 +82,15 @@
     "description": "Popup General tab: shortcut to the latest release notes"
   },
   "options_general_whatsNewHint": {
-    "message": "Latest release notes",
+    "message": "Informacje o najnowszej wersji",
     "description": "Popup General tab: one-line description on the What's new shortcut"
   },
   "options_display_fullscreenTab": {
-    "message": "Fullscreen",
+    "message": "Pełny ekran",
     "description": "Header tab in Display for fullscreen settings"
   },
   "options_display_videoTab": {
-    "message": "Video",
+    "message": "Filmik",
     "description": "Header tab in Display for video settings"
   },
   "options_display_disableFullscreen": {
@@ -106,7 +106,7 @@
     "description": "Show album art background setting label"
   },
   "options_display_fullscreenControls": {
-    "message": "Show player controls in fullscreen",
+    "message": "Pokaż ustawienia odtwarzacza w pełnym ekranie",
     "description": "Toggle label for the playback controls strip (progress bar, transport, like and dislike) shown under the album art in the fullscreen lyrics view"
   },
   "options_display_stylizedAnimations": {
@@ -114,7 +114,7 @@
     "description": "Show stylized animations setting label"
   },
   "options_display_letterWave": {
-    "message": "Letter wave",
+    "message": "Litery w płynie",
     "description": "Label for the per-letter wave lyric animation toggle"
   },
   "options_display_letterWaveOff": {
@@ -130,11 +130,11 @@
     "description": "Badge shown next to the letter wave setting marking it as experimental"
   },
   "options_display_letterWaveTooltip": {
-    "message": "Lyrics feel more alive with a gentle rolling motion across each letter as they're sung. Turn it off if lyrics scroll feels choppy on your device.",
+    "message": "Tekst piosenek jest bardziej żywy z łagodnym kroczącym ruchem w każdej literze, gdy są śpiewane. Wyłącz, jeśli przewijanie słów jest niezbyt płynne na twoim urządzeniu.",
     "description": "Tooltip explaining the letter wave animation and its performance impact"
   },
   "options_display_letterWaveTooltipStates": {
-    "message": "Auto stays off unless a theme turns it on. On and Off override any theme.",
+    "message": "Automatycznie wyłącza się, chyba, że motyw to włącza. Włączanie i wyłączanie manualnie będzie nadpisywało ustawienia motywu.",
     "description": "Appended to the letter wave tooltip, explaining the three switch states"
   },
   "options_display_passiveScroll": {
@@ -158,7 +158,7 @@
     "description": "Accessible label for the pause button in the Picture-in-Picture lyrics window, used when the YouTube Music player bar exposes no label of its own"
   },
   "picture_in_picture_fitWindow": {
-    "message": "Fit window",
+    "message": "Dopasuj do okna",
     "description": "Tooltip and accessible label for the selected song/video button in the Picture-in-Picture lyrics window when the window size no longer matches its content; clicking it resizes the window to fit"
   },
   "picture_in_picture_next": {
@@ -180,7 +180,7 @@
     }
   },
   "options_display_pipEnabled": {
-    "message": "Enable floating window",
+    "message": "Włącz pływające okno",
     "description": "Master toggle for the floating lyrics window feature, which turns it off everywhere including the YouTube Music minimize button"
   },
   "options_display_pipAutoRestore": {
@@ -192,55 +192,55 @@
     "description": "Help tooltip explaining what automatic floating-lyrics reopening does and why it waits for the first interaction"
   },
   "options_display_pipWindowLayout": {
-    "message": "Window layout",
+    "message": "Układ okna",
     "description": "Setting label, shown inside the floating lyrics window settings, for choosing whether the window opens wide or tall"
   },
   "options_pipWindowLayout_horizontal": {
-    "message": "Horizontal",
+    "message": "Poziomo",
     "description": "Floating lyrics window layout option: a wide window with the album art beside the lyrics"
   },
   "options_pipWindowLayout_vertical": {
-    "message": "Vertical",
+    "message": "Pionowo",
     "description": "Floating lyrics window layout option: a tall window with the album art above the lyrics"
   },
   "options_display_pipArtworkTransition": {
-    "message": "Album art transition",
+    "message": "Przejście okładki albumu",
     "description": "Setting label, shown inside the floating lyrics window settings, for choosing how album art changes between songs"
   },
   "options_pipTransition_shuffle": {
-    "message": "Shuffle",
+    "message": "Wymieszaj kolejność",
     "description": "Name of an album art transition where the artwork tilts back and the new cover is dealt in like a playing card"
   },
   "options_pipTransition_flip": {
-    "message": "Flip",
+    "message": "Odbijanie",
     "description": "Name of an album art transition where the artwork rotates like a card to reveal the new cover on its other side"
   },
   "options_pipTransition_push": {
-    "message": "Push",
+    "message": "Pchnięcie",
     "description": "Name of a transition, offered for both album art and song titles, where the new content slides in from the side and pushes the old out"
   },
   "options_pipTransition_crossfade": {
-    "message": "Crossfade",
+    "message": "Przenikanie",
     "description": "Name of a transition, offered for both album art and song titles, where the new content fades in over the old"
   },
   "options_pipTransition_spring": {
-    "message": "Spring",
+    "message": "Sprężynowe",
     "description": "Name of a song title transition where the words of the new title bounce up into place one after another"
   },
   "options_display_pipWindow": {
-    "message": "Floating lyrics window",
+    "message": "Okno pływającego tekstu",
     "description": "Label for the row that opens the settings for the floating lyrics window"
   },
   "options_display_pipTextTransition": {
-    "message": "Title transition",
+    "message": "Przejście tytułu",
     "description": "Setting label, shown inside the floating lyrics window settings, for choosing how the song title and artist change between songs"
   },
   "options_display_pipMarquee": {
-    "message": "Scroll long titles",
+    "message": "Przewijaj długie tytuły",
     "description": "Toggle label for whether a song title too long for the floating lyrics window scrolls across so it can be read in full"
   },
   "options_display_pipProgressBar": {
-    "message": "Show progress bar",
+    "message": "Wyświetl pasek czasu",
     "description": "Toggle label, shown inside the floating lyrics window settings, for the seekable playback progress bar under the album art"
   },
   "options_display_pipVideo": {
@@ -248,23 +248,23 @@
     "description": "Toggle label, shown inside the floating lyrics window settings, for playing the music video in the floating window while YouTube Music is in video mode"
   },
   "options_display_shadersPromo": {
-    "message": "Show link to Better Lyrics Shaders",
+    "message": "Wyświetl link do shaderów Better Lyrics",
     "description": "Toggle label for the Shaders companion link shown in the lyrics footer"
   },
   "options_display_unisonActions": {
-    "message": "Lyrics controls dock",
+    "message": "Dok sterowników tekstu",
     "description": "Display-section row label for the lyrics controls dock modal trigger"
   },
   "options_unisonModal_title": {
-    "message": "Lyrics controls dock",
+    "message": "Dok sterowników tekstu",
     "description": "Title of the lyrics controls dock settings modal"
   },
   "options_unisonModal_showPinned": {
-    "message": "Show controls dock",
+    "message": "Pokaż dok sterowników",
     "description": "Toggle label inside the lyrics controls dock modal for showing the floating dock"
   },
   "options_unisonModal_showPinned_hint": {
-    "message": "A floating dock to switch source, toggle translation and romanization, nudge sync, and vote on Unison lyrics",
+    "message": "Pływający dok przełączający źródło, tłumaczenie i romanizację, synchronizację i głos na teksty piosenek Unison",
     "description": "Hint text under the Show controls dock toggle"
   },
   "options_unisonModal_autoHide": {
@@ -304,11 +304,11 @@
     "description": "Tooltip for the bottom-right cell in the Unison position picker"
   },
   "options_unisonModal_controlsShown": {
-    "message": "Controls shown",
+    "message": "Sterowniki wyświetlone",
     "description": "Label above the toggles that pick which controls appear in the lyrics dock"
   },
   "options_unisonModal_controlSource": {
-    "message": "Source switcher",
+    "message": "Źródło",
     "description": "Toggle label for showing the lyrics source switcher control in the dock"
   },
   "options_unisonModal_controlPictureInPicture": {
@@ -316,51 +316,51 @@
     "description": "Toggle label for showing the control that opens the floating lyrics window in the dock"
   },
   "options_unisonModal_controlOffset": {
-    "message": "Sync offset",
+    "message": "Synchronizacja",
     "description": "Toggle label for showing the sync offset control in the dock"
   },
   "lyricsDock_chooseSource": {
-    "message": "Choose lyrics source",
+    "message": "Wybierz źródło tekstu",
     "description": "Accessible label for the lyrics dock button that opens the source provider dropdown"
   },
   "lyricsDock_refresh": {
-    "message": "Refresh lyrics",
+    "message": "Odśwież tekst",
     "description": "Accessible label for the lyrics dock button that re-fetches lyrics for the current song, bypassing the cache"
   },
   "lyricsDock_previousSource": {
-    "message": "Previous source",
+    "message": "Poprzednie źródło",
     "description": "Accessible label for the lyrics dock button that switches to the previous lyrics provider"
   },
   "lyricsDock_nextSource": {
-    "message": "Next source",
+    "message": "Następne źródło",
     "description": "Accessible label for the lyrics dock button that switches to the next lyrics provider"
   },
   "lyricsDock_offsetEarlier": {
-    "message": "Shift lyrics earlier",
+    "message": "Przesuń tekst wcześniej",
     "description": "Accessible label for the lyrics dock button that nudges sync timing earlier"
   },
   "lyricsDock_offsetLater": {
-    "message": "Shift lyrics later",
+    "message": "Przesuń tekst później",
     "description": "Accessible label for the lyrics dock button that nudges sync timing later"
   },
   "lyricsDock_offsetGlobal": {
-    "message": "Global",
+    "message": "Globalne",
     "description": "Label in the lyrics dock offset menu for the global offset applied to all songs and sync types"
   },
   "options_offsetModal_perSong": {
-    "message": "Per-song offsets",
+    "message": "Przesunięcia na piosenki",
     "description": "Heading in the offset settings modal for the section that manages saved per-song sync offsets"
   },
   "options_offsetModal_perSongClear": {
-    "message": "Clear all",
+    "message": "Wyczyść",
     "description": "Button in the offset settings modal that deletes every saved per-song sync offset"
   },
   "options_offsetModal_perSongCount": {
-    "message": "Saved offsets",
+    "message": "Zapisane przesunięcia",
     "description": "Label in the offset settings modal showing how many per-song sync offsets are stored"
   },
   "options_offsetModal_appliesTo": {
-    "message": "Applies to",
+    "message": "Dotyczy",
     "description": "Label in the offset settings modal preceding the list of sync types a given offset affects"
   },
   "options_language_displayLanguage": {
@@ -424,7 +424,7 @@
     "description": "Button to open the style editor if there are no styles"
   },
   "options_themes_edit": {
-    "message": "Edit",
+    "message": "Edytuj",
     "description": "Button to open the style editor"
   },
   "options_themes_marketplace": {
@@ -436,7 +436,7 @@
     "description": "Installed themes button label"
   },
   "options_identity_backupTitle": {
-    "message": "Back up your identity",
+    "message": "Utwórz kopię zapasową swojej tożsamości",
     "description": "Title of the identity backup warning"
   },
   "options_identity_backupBody": {
