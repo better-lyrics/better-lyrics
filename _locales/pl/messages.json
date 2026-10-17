@@ -440,7 +440,7 @@
     "description": "Title of the identity backup warning"
   },
   "options_identity_backupBody": {
-    "message": "Your contributions and level are tied to this key. If you lose it, no one can restore it, including the Better Lyrics team. Never share it: anyone who has it can act as you.",
+    "message": "Twój wkład i poziom są powiązane z tym kluczem. Jeśli go stracisz, nikt nie może go przywrócić, w tym zespół Better Lyrics. Nigdy go nie udostępniaj: każdy, kto go posiada, może utożsamić się w ciebie.",
     "description": "Body of the identity backup warning"
   },
   "options_identity_yourIdentity": {
@@ -448,7 +448,7 @@
     "description": "Your identity label"
   },
   "options_identity_unisonStats": {
-    "message": "Unison stats",
+    "message": "Statystyki Unison",
     "description": "Section title above the user's own Unison level, tier, rank and badges on the Identity tab"
   },
   "options_identity_loading": {
@@ -468,11 +468,11 @@
     "description": "Import key button label"
   },
   "options_identityImport_title": {
-    "message": "Import identity",
+    "message": "Importuj tożsamość",
     "description": "Title of the import identity modal"
   },
   "options_identityImport_chooseFile": {
-    "message": "Choose file",
+    "message": "Wybierz plik",
     "description": "Label for the file picker button in the import identity modal"
   },
   "options_identityImport_or": {
@@ -1174,7 +1174,7 @@
     "description": "Theme apply error"
   },
   "marketplace_alert_installed": {
-    "message": "Installed $NAME$",
+    "message": "Zainstalowano $NAME$",
     "description": "Toast after a Marketplace theme is installed; it has an Apply action",
     "placeholders": {
       "name": {
@@ -1184,7 +1184,7 @@
     }
   },
   "marketplace_alert_installedFrom": {
-    "message": "Installed $NAME$ from $SOURCE$",
+    "message": "Zainstalowano $NAME$ z $SOURCE$",
     "description": "Toast after a theme is installed from a GitHub repository URL; SOURCE is the repository, with the branch in parentheses when one was given",
     "placeholders": {
       "name": {
@@ -1198,7 +1198,7 @@
     }
   },
   "marketplace_alert_removed": {
-    "message": "Removed $NAME$",
+    "message": "Usunięto $NAME$",
     "description": "Toast after an installed Marketplace theme is removed",
     "placeholders": {
       "name": {
@@ -1208,11 +1208,11 @@
     }
   },
   "marketplace_alert_storageFull": {
-    "message": "Storage is full. Remove some installed themes and try again.",
+    "message": "Pamięć jest pełna. Usuń niektóre zainstalowane motywy i spróbuj ponownie.",
     "description": "Toast when a theme cannot be installed because extension storage is full"
   },
   "marketplace_alert_installFailed": {
-    "message": "Could not install $NAME$",
+    "message": "Błąd w instalacji $NAME$",
     "description": "Toast when installing a Marketplace theme fails",
     "placeholders": {
       "name": {
@@ -1222,7 +1222,7 @@
     }
   },
   "marketplace_alert_removeFailed": {
-    "message": "Could not remove $NAME$",
+    "message": "Błąd przy usuwaniu $NAME$",
     "description": "Toast when removing an installed Marketplace theme fails",
     "placeholders": {
       "name": {
@@ -1246,11 +1246,11 @@
     }
   },
   "marketplace_tooltipInstallsSingular": {
-    "message": "1 install",
+    "message": "1 instalacja",
     "description": "Tooltip on a theme's install count when it has exactly one install"
   },
   "marketplace_byline": {
-    "message": "By $AUTHOR$ · v$VERSION$",
+    "message": "Przez $AUTHOR$ · v$VERSION$",
     "description": "Byline under a theme name: its creators and version",
     "placeholders": {
       "author": {
@@ -1264,7 +1264,7 @@
     }
   },
   "marketplace_themeActiveLabel": {
-    "message": "$TITLE$, active",
+    "message": "$TITLE$, aktywne",
     "description": "Accessible name of the currently applied theme in the installed themes menu",
     "placeholders": {
       "title": {
@@ -1274,7 +1274,7 @@
     }
   },
   "marketplace_tooltipInstalls": {
-    "message": "$COUNT$ installs",
+    "message": "$COUNT$ instalacji",
     "description": "Tooltip on a theme's install count",
     "placeholders": {
       "count": {
@@ -1284,7 +1284,7 @@
     }
   },
   "marketplace_tooltipRating": {
-    "message": "$AVERAGE$ average from $COUNT$ ratings",
+    "message": "Średnio $AVERAGE$ z $COUNT$ ocen",
     "description": "Tooltip on a theme's star rating",
     "placeholders": {
       "average": {
@@ -1298,7 +1298,7 @@
     }
   },
   "marketplace_tooltipOlderBuild": {
-    "message": "You're on v$CURRENT$. Latest is v$LATEST$",
+    "message": "Korzystasz z v$CURRENT$. Najnowsze to v$LATEST$",
     "description": "Tooltip on the badge shown when an installed theme build is older than the latest one",
     "placeholders": {
       "current": {
@@ -1312,7 +1312,7 @@
     }
   },
   "marketplace_tooltipOlderBuildFloor": {
-    "message": "You're on v$CURRENT$. Latest v$LATEST$ needs Better Lyrics $FLOOR$+",
+    "message": "Korzystasz z v$CURRENT$. Najnowsza wersja (v$LATEST$) potrzebuje Better Lyrics $FLOOR$+",
     "description": "Tooltip on the older build badge when the latest build needs a newer extension version",
     "placeholders": {
       "current": {
@@ -1330,7 +1330,7 @@
     }
   },
   "marketplace_installedFrom": {
-    "message": "Installed from $REPO$",
+    "message": "Zainstalowano z $REPO$",
     "description": "Tooltip on the GitHub badge of a theme installed from a repository URL",
     "placeholders": {
       "repo": {
@@ -1340,19 +1340,19 @@
     }
   },
   "marketplace_ricsBadge": {
-    "message": "This theme uses RICS",
+    "message": "Ten motyw używa RICS",
     "description": "Tooltip and accessible label on the RICS badge in the theme detail view"
   },
   "marketplace_urlValidating": {
-    "message": "Validating...",
+    "message": "Weryfikowanie…",
     "description": "Install button text while a theme repository URL is being checked"
   },
   "marketplace_urlInstalling": {
-    "message": "Installing...",
+    "message": "Instalowanie...",
     "description": "Install button text while a theme from a repository URL is being installed"
   },
   "marketplace_incompatibleConfirm": {
-    "message": "This theme needs Better Lyrics v$VERSION$+ and may not work on your version. Install anyway?",
+    "message": "Ten motyw wymaga Better Lyrics v$VERSION$+ i może nie działać na Twojej wersji. Czy mimo to zainstalować?",
     "description": "Confirm dialog before installing a theme that needs a newer extension version",
     "placeholders": {
       "version": {
@@ -1362,7 +1362,7 @@
     }
   },
   "marketplace_sortDescendingLabel": {
-    "message": "$LABEL$, descending. Activate to reverse.",
+    "message": "$LABEL$, malejąco. Aktywuj, by odwrócić.",
     "description": "Accessible label of the selected sort chip when sorting in descending order",
     "placeholders": {
       "label": {
@@ -1372,7 +1372,7 @@
     }
   },
   "marketplace_sortAscendingLabel": {
-    "message": "$LABEL$, ascending. Activate to reverse.",
+    "message": "$LABEL$, rosnąco. Aktywuj, by odwrócić.",
     "description": "Accessible label of the selected sort chip when sorting in ascending order",
     "placeholders": {
       "label": {
