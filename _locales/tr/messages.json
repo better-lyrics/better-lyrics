@@ -444,7 +444,7 @@
     "description": "Body of the identity backup warning"
   },
   "options_identity_yourIdentity": {
-    "message": "İsminiz",
+    "message": "Kimliğiniz",
     "description": "Your identity label"
   },
   "options_identity_unisonStats": {
@@ -770,15 +770,15 @@
     "description": "Title of the modal shown when find and replace is used in the popup editor"
   },
   "options_editor_findReplaceFullscreenOnly": {
-    "message": "Bul ve değiştir, yalnızca tam ekran düzenleyicide kullanılabilir.",
+    "message": "Bul ve değiştir, yalnızca tam ekran editörde kullanılabilir.",
     "description": "Modal body explaining that find and replace needs the fullscreen editor"
   },
   "options_editor_findReplaceOpenHint": {
-    "message": "Tüm düzenleyici özelliklerini kullanmak için tam ekran düzenleyiciyi açın.",
+    "message": "Tüm editör özelliklerini kullanmak için tam ekran editörü açın.",
     "description": "Second line of the find and replace modal, pointing to the fullscreen editor"
   },
   "options_editor_openFullscreen": {
-    "message": "Tam ekran düzenleyiciyi aç",
+    "message": "Tam ekran editörü aç",
     "description": "Confirm button in the find and replace modal that opens the fullscreen editor"
   },
   "options_editor_close": {
@@ -1592,7 +1592,7 @@
     "description": "About page feature list item"
   },
   "options_about_does5": {
-    "message": "Mağazadan temalar, yada yerleşik düzenleyici içindeki kendi temalarınız.",
+    "message": "Mağazadan temalar, yada yerleşik editör içindeki kendi temalarınız.",
     "description": "About page feature list item"
   },
   "options_about_does6": {
