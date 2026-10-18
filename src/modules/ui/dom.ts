@@ -90,6 +90,28 @@ interface ActionButtonOptions {
   logoAlt?: string;
 }
 
+const SHIMMER_IN_VIEW_ATTR = "data-in-view";
+let shimmerObserver: IntersectionObserver | null = null;
+
+/**
+ * Lets the shimmer run only while its button is on screen. The animation moves a background every
+ * frame, which the main thread has to repaint, and the footer sits below the last line of most songs.
+ */
+function observeShimmerVisibility(button: HTMLElement): void {
+  if (typeof IntersectionObserver !== "function") {
+    button.setAttribute(SHIMMER_IN_VIEW_ATTR, "");
+    return;
+  }
+  // One button per footer and one footer per song, so the previous observer goes with its button.
+  shimmerObserver?.disconnect();
+  shimmerObserver = new IntersectionObserver(entries => {
+    for (const entry of entries) {
+      entry.target.toggleAttribute(SHIMMER_IN_VIEW_ATTR, entry.isIntersecting);
+    }
+  });
+  shimmerObserver.observe(button);
+}
+
 function createActionButton(options: ActionButtonOptions): HTMLElement {
   const { text, href, logoSrc, logoAlt } = options;
 
@@ -1154,6 +1176,7 @@ function createFooter(
       shadersButton.appendChild(shadersLabel);
 
       footer.insertBefore(shadersButton, discordLink);
+      observeShimmerVisibility(shadersButton);
     });
     footer.appendChild(discordLink);
 

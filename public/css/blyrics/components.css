@@ -168,6 +168,13 @@
     visibility: visible;
 }
 
+/* Hidden, the overlay stays in the layout, so its spinner and shimmer would otherwise keep
+   recalculating style on every frame of every song. */
+#blyrics-ad-overlay:not([active]):before,
+#blyrics-ad-overlay:not([active]):after {
+    animation-play-state: paused;
+}
+
 #blyrics-ad-overlay:before {
 	animation: blyrics-spin 1s linear infinite;
 	background: url(https://betterlyrics.org/icon-512.png);
@@ -285,6 +292,12 @@
 	.blyrics-footer__container.blyrics-footer__shaders > span {
 		animation: blyrics-shaders-shimmer 6s infinite cubic-bezier(0.45, 0.03, 0.52, 0.96);
 	}
+}
+
+/* Off screen, which is most of every song, the shimmer would still repaint on every frame. */
+.blyrics-footer__container.blyrics-footer__shaders:not([data-in-view]),
+.blyrics-footer__container.blyrics-footer__shaders:not([data-in-view]) > span {
+	animation-play-state: paused;
 }
 
 @keyframes blyrics-shaders-shimmer {
