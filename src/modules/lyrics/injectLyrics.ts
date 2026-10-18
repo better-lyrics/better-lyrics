@@ -281,7 +281,7 @@ async function processBatchTranslationsAndRomanizations(
   let sourceLanguage = data.language;
   let didInjectCachedContent = false;
 
-  const hasKanaInSong = AppState.isFuriganaEnabled && songHasKana(lyrics.map(l => l.words));
+  const hasKanaInSong = AppState.isFuriganaEnabled && songHasKana(lyrics.map(l => l.words ?? ""));
 
   // 1. Identify what needs to be translated/romanized
   lyrics.forEach((item, index) => {
