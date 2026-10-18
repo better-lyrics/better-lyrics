@@ -129,6 +129,12 @@ Leave font-family overrides unset for language-aware CJK defaults. If adding a f
 }
 ```
 
+`--blyrics-blur-amount` is the player bar's frost. On the player page it is skipped while
+`--blyrics-background-blur` is exactly its 100px default (a style container query in
+`general.css`): over that background the frost changes no pixel, and Chromium would otherwise re-blur
+the whole bar in every frame the lyrics scroll near it. A theme that sharpens the background gets the
+frost back automatically.
+
 ### Footer
 
 ```css

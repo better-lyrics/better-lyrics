@@ -51,6 +51,16 @@ ytmusic-app[blyrics-stylized] #layout[player-ui-state="PLAYER_PAGE_OPEN"] #playe
   opacity: 1 !important;
 }
 
+/* With the page background at its default 100px blur, the bar's 30px frost over it changes no pixel
+   (checked by screenshot diff), yet Chromium re-blurs the whole bar in every frame where the lyrics
+   change within three blur radii of it, which every scroll does: at 240 Hz that was about a quarter
+   of the lyric panel's GPU time. Skip the frost there; a theme that sharpens the background keeps it. */
+@container style(--blyrics-background-blur: 100px) {
+  #layout[player-ui-state="PLAYER_PAGE_OPEN"] #player-bar-background {
+    backdrop-filter: none;
+  }
+}
+
 ytmusic-app[blyrics-stylized] #layout[player-ui-state="PLAYER_PAGE_OPEN"] #guide-wrapper {
   background-color: transparent !important;
   border-color: transparent !important;
