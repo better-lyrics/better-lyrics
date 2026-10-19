@@ -213,8 +213,17 @@ export default function initializePlayerBridge() {
     }
   };
 
+  const handleSetVolume = event => {
+    const slider = document.querySelector("ytmusic-player-bar #volume-slider");
+    const level = Number(event.detail);
+    if (!slider || !Number.isFinite(level)) return;
+    slider.value = Math.min(100, Math.max(0, Math.round(level)));
+    slider.dispatchEvent(new CustomEvent("change", { bubbles: true }));
+  };
+
   document.addEventListener("blyrics-seek-to", handleSeek);
   document.addEventListener("blyrics-player-control", handlePlayerControl);
+  document.addEventListener("blyrics-set-volume", handleSetVolume);
 
   checkPlayerAndPublish();
   snapshotInterval = setInterval(checkPlayerAndPublish, PLAYER_SNAPSHOT_INTERVAL_MS);
@@ -224,6 +233,7 @@ export default function initializePlayerBridge() {
     window.removeEventListener("unload", stopPlayerBridge);
     document.removeEventListener("blyrics-seek-to", handleSeek);
     document.removeEventListener("blyrics-player-control", handlePlayerControl);
+    document.removeEventListener("blyrics-set-volume", handleSetVolume);
     document.documentElement.style.removeProperty("--blyrics-video-aspect-ratio");
   };
 }

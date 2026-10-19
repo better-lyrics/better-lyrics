@@ -4,14 +4,20 @@ import { attachTransportAnimation } from "@modules/ui/playerControls/controlAnim
 import { playerControlIcons } from "@modules/ui/playerControls/icons";
 import {
   canSwitchPlaybackMode,
+  applyControlLabel,
+  getRatingState,
   getSelectedPlaybackMode,
   observePlaybackMode,
+  observeRating,
   type PlaybackMode,
   type PlaybackModeObserver,
   sendTransport,
   switchPlaybackMode,
+  toggleLike,
 } from "@modules/ui/playerControls/playerBarControls";
 import { createProgressBar, type ProgressBarHandle } from "@modules/ui/playerControls/progressBar";
+import { createRatingButton, playLikeBurst } from "@modules/ui/playerControls/ratingButton";
+import { createVolumeControl, type VolumeControlHandle } from "@modules/ui/playerControls/volumeControl";
 import { cssTimeMs } from "@/ui/motion";
 import type { KaraokeCard, KaraokeOverlayBar } from "@modules/karaoke/overlay";
 import type { PlayerDetails } from "@core/appState";
@@ -298,6 +304,10 @@ export class PictureInPictureLyricsView {
   private readonly lyricsViewport: HTMLElement;
   private readonly lyricsScroller: HTMLElement;
   private readonly progressBar: ProgressBarHandle;
+  private readonly volumeControl: VolumeControlHandle;
+  private readonly likeButton: HTMLButtonElement;
+  private readonly stopRatingObserver: () => void;
+  private wasLiked: boolean | null = null;
   private readonly intermission: Intermission;
   private readonly stage: HTMLElement;
   private readonly stageVideo: HTMLVideoElement;
@@ -429,7 +439,18 @@ export class PictureInPictureLyricsView {
     const artworkChrome = pipDocument.createElement("div");
     artworkChrome.className = "blyrics-pip-artwork__chrome";
     artworkChrome.append(this.modeToggle, this.createCloseButton());
-    artworkControls.append(previousButton, this.playPauseButton, nextButton, artworkChrome);
+    this.likeButton = this.createLikeButton();
+    this.stopRatingObserver = observeRating(sourceDocument, this.syncLike);
+    this.syncLike();
+    this.volumeControl = createVolumeControl({ doc: pipDocument, sourceDoc: sourceDocument });
+    artworkControls.append(
+      previousButton,
+      this.playPauseButton,
+      nextButton,
+      artworkChrome,
+      this.likeButton,
+      this.volumeControl.element
+    );
     this.artworkContainer.append(artworkCard, this.artworkVideo, artworkControls);
 
     const content = pipDocument.createElement("section");
@@ -510,10 +531,12 @@ export class PictureInPictureLyricsView {
     sourceDocument.addEventListener(PLAYER_TIME_EVENT, this.handlePlayerTime, {
       signal: this.lifecycleController.signal,
     });
-    pipWindow.addEventListener("pointermove", this.handlePointerMove, {
-      passive: true,
-      signal: this.lifecycleController.signal,
-    });
+    for (const type of ["pointermove", "wheel"]) {
+      pipWindow.addEventListener(type, this.handlePointerActivity, {
+        passive: true,
+        signal: this.lifecycleController.signal,
+      });
+    }
     pipDocument.documentElement.addEventListener("pointerleave", this.handlePointerLeave, {
       passive: true,
       signal: this.lifecycleController.signal,
@@ -766,7 +789,7 @@ export class PictureInPictureLyricsView {
     }
   };
 
-  private readonly handlePointerMove = (): void => {
+  private readonly handlePointerActivity = (): void => {
     this.lastPointerMoveTime = this.pipWindow.performance.now();
     this.artworkContainer.removeAttribute("data-controls-idle");
     if (this.controlsIdleTimer === null) this.scheduleControlsIdleCheck();
@@ -799,6 +822,8 @@ export class PictureInPictureLyricsView {
     this.endModeSwitch();
     this.cancelPendingResize();
     this.marquee.destroy();
+    this.volumeControl.destroy();
+    this.stopRatingObserver();
     this.progressBar.destroy();
     if (this.controlsIdleTimer !== null) this.pipWindow.clearTimeout(this.controlsIdleTimer);
     this.releaseHold();
@@ -833,6 +858,29 @@ export class PictureInPictureLyricsView {
     attachTransportAnimation(button, action);
     return button;
   }
+
+  private createLikeButton(): HTMLButtonElement {
+    const button = createRatingButton(
+      this.pipWindow.document,
+      "like",
+      "",
+      "blyrics-pip-artwork__control blyrics-pip-artwork__control--like"
+    );
+    button.tabIndex = -1;
+    button.addEventListener("click", () => toggleLike(this.sourceDocument), {
+      signal: this.lifecycleController.signal,
+    });
+    return button;
+  }
+
+  private readonly syncLike = (): void => {
+    const liked = getRatingState(this.sourceDocument) === "LIKE";
+    this.likeButton.toggleAttribute("data-active", liked);
+    this.likeButton.setAttribute("aria-pressed", String(liked));
+    applyControlLabel(this.likeButton, this.sourceDocument, "like");
+    if (liked && this.wasLiked === false) playLikeBurst(this.likeButton);
+    this.wasLiked = liked;
+  };
 
   private createCloseButton(): HTMLButtonElement {
     const button = this.pipWindow.document.createElement("button");

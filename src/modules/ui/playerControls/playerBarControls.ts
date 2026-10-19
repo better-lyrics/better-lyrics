@@ -1,5 +1,6 @@
-import { AD_PLAYING_ATTR, PLAYER_BAR_SELECTOR, PLAYER_CONTROL_EVENT, SEEK_EVENT } from "@constants";
+import { AD_PLAYING_ATTR, PLAYER_BAR_SELECTOR, PLAYER_CONTROL_EVENT, SEEK_EVENT, SET_VOLUME_EVENT } from "@constants";
 import { observeResize } from "@modules/ui/layout/layoutWidth";
+import { clampVolume } from "@modules/ui/playerControls/volumeLevel";
 
 export type TransportAction = "previous" | "play-pause" | "next";
 export type RatingState = "LIKE" | "DISLIKE" | "INDIFFERENT";
@@ -25,6 +26,8 @@ const LIKE_RENDERER = `${PLAYER_BAR_SELECTOR} ytmusic-like-button-renderer#like-
 const BYLINE = `${PLAYER_BAR_SELECTOR} yt-formatted-string.byline`;
 const LIKE_BUTTON = `${PLAYER_BAR_SELECTOR} #button-shape-like button`;
 const DISLIKE_BUTTON = `${PLAYER_BAR_SELECTOR} #button-shape-dislike button`;
+const VOLUME_SLIDER = `${PLAYER_BAR_SELECTOR} #volume-slider`;
+const MUTE_BUTTON = `${PLAYER_BAR_SELECTOR} yt-icon-button.volume button`;
 const ACTION_MENU_TRIGGER = `${PLAYER_BAR_SELECTOR} ytmusic-menu-renderer [aria-label="Action menu"]`;
 const PLAYER_PAGE = "ytmusic-player-page";
 const PLAYER_VIDEO = "#movie_player video";
@@ -132,6 +135,44 @@ export function getPlayerBar(doc: Document): HTMLElement | null {
 
 export function isAdPlaying(doc: Document): boolean {
   return doc.querySelector(`${PLAYER_BAR_SELECTOR}[${AD_PLAYING_ATTR}]`) !== null;
+}
+
+// -- Volume --------------------------
+
+export function getVolume(doc: Document): number | null {
+  const raw = doc.querySelector(VOLUME_SLIDER)?.getAttribute("value");
+  if (raw == null || raw.trim() === "") return null;
+  const parsed = Number(raw);
+  if (!Number.isFinite(parsed)) return null;
+  return clampVolume(parsed);
+}
+
+export function setVolume(doc: Document, level: number): void {
+  doc.dispatchEvent(new CustomEvent(SET_VOLUME_EVENT, { detail: clampVolume(level) }));
+}
+
+const CONTROL_LABEL_SOURCES = { like: LIKE_BUTTON, mute: MUTE_BUTTON, volume: VOLUME_SLIDER } as const;
+
+export function getControlLabel(doc: Document, control: keyof typeof CONTROL_LABEL_SOURCES): string | null {
+  return doc.querySelector(CONTROL_LABEL_SOURCES[control])?.getAttribute("aria-label") || null;
+}
+
+export function applyControlLabel(target: Element, doc: Document, control: keyof typeof CONTROL_LABEL_SOURCES): void {
+  const label = getControlLabel(doc, control);
+  if (!label) target.removeAttribute("aria-label");
+  else if (target.getAttribute("aria-label") !== label) target.setAttribute("aria-label", label);
+}
+
+export function toggleMute(doc: Document): void {
+  doc.querySelector<HTMLElement>(MUTE_BUTTON)?.click();
+}
+
+export function observeVolume(doc: Document, onChange: () => void): () => void {
+  const playerBar = getPlayerBar(doc);
+  if (!playerBar) return () => {};
+  const observer = new MutationObserver(onChange);
+  observer.observe(playerBar, { subtree: true, childList: true, attributes: true, attributeFilter: ["value"] });
+  return () => observer.disconnect();
 }
 
 // -- Song and video toggle --------------------------

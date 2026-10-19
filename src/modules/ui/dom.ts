@@ -1748,12 +1748,12 @@ export function injectSongAttributes(title: string, artist: string, album?: stri
   songInfoWrapper.appendChild(titleElm);
   songInfoWrapper.appendChild(artistElm);
 
-  const row = wrapSongInfoWithActions(document, songInfoWrapper);
-  row.id = "blyrics-fs-info-row";
-  row.dir = "auto";
-
   const controls = createFullscreenControls(document);
   controls.element.id = "blyrics-fs-controls";
+
+  const row = wrapSongInfoWithActions(document, songInfoWrapper, controls.volumeElement);
+  row.id = "blyrics-fs-info-row";
+  row.dir = "auto";
 
   const column = document.createElement("div");
   column.id = "blyrics-fs-column";
