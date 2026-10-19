@@ -52,6 +52,7 @@ export const REPORT_MODAL = "blyrics-report-lyrics" as const;
 export const SEEK_EVENT = "blyrics-seek-to" as const;
 export const PLAYER_CONTROL_EVENT = "blyrics-player-control" as const;
 export const PLAYER_TIME_EVENT = "blyrics-send-player-time" as const;
+export const SET_VOLUME_EVENT = "blyrics-set-volume" as const;
 
 // Assets and Resources
 export const DISCORD_LOGO_SRC =

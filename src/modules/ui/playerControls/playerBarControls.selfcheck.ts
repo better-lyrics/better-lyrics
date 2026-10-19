@@ -2,15 +2,18 @@ import { strict as assert } from "node:assert";
 import {
   canSwitchPlaybackMode,
   getRatingState,
+  getVolume,
   getSelectedPlaybackMode,
   isVideoModeShown,
   isAdPlaying,
   type RatingState,
   seekTo,
   sendTransport,
+  setVolume,
   switchPlaybackMode,
   toggleDislike,
   toggleLike,
+  toggleMute,
   type TransportAction,
 } from "@modules/ui/playerControls/playerBarControls";
 
@@ -143,5 +146,33 @@ assert.equal(
   false,
   "regression: the toggle's selection never stands in for a video on screen"
 );
+
+const VOLUME_SLIDER = "ytmusic-player-bar #volume-slider";
+const MUTE_BUTTON = "ytmusic-player-bar yt-icon-button.volume button";
+const withSlider = (value: string): Document => fakeDoc({ [VOLUME_SLIDER]: el({ value }) });
+
+assert.deepEqual(getVolume(withSlider("62")), { level: 62, muted: false }, "reads the slider value attribute");
+assert.deepEqual(getVolume(withSlider("0")), { level: 0, muted: true }, "slider zero is muted");
+assert.deepEqual(getVolume(withSlider("140")), { level: 100, muted: false }, "clamps an out-of-range value");
+assert.equal(getVolume(withSlider("loud")), null, "a non-numeric value is unknown, not silent");
+assert.equal(getVolume(withSlider("")), null, "an empty value is unknown, not muted");
+assert.equal(getVolume(fakeDoc({})), null, "no slider is unknown");
+
+const volumeEvents = fakeDoc({});
+setVolume(volumeEvents, 37.6);
+setVolume(volumeEvents, -5);
+assert.deepEqual(
+  (volumeEvents as unknown as { events: { type: string; detail: unknown }[] }).events,
+  [
+    { type: "blyrics-set-volume", detail: 38 },
+    { type: "blyrics-set-volume", detail: 0 },
+  ],
+  "setVolume dispatches blyrics-set-volume with a clamped whole level"
+);
+
+const muteBtn = el({});
+toggleMute(fakeDoc({ [MUTE_BUTTON]: muteBtn }));
+assert.equal(muteBtn.clicks, 1, "toggleMute clicks the native mute button");
+toggleMute(fakeDoc({}));
 
 console.log("playerBarControls selfcheck passed");
