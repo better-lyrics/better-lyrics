@@ -1,4 +1,5 @@
 import { AppState } from "@core/appState";
+import { t } from "@core/i18n";
 import { logContent } from "@core/logger";
 import { setStorage } from "@core/storage";
 import { attachTransportAnimation } from "./controlAnimations";
@@ -15,6 +16,7 @@ import {
 } from "./playerBarControls";
 import type { PlaybackSnapshot } from "./playhead";
 import { createProgressBar } from "./progressBar";
+import { createVolumeControl, volumeLabels } from "./volumeControl";
 
 export interface FullscreenControlsHandle {
   element: HTMLElement;
@@ -123,6 +125,7 @@ export function createFullscreenControls(doc: Document): FullscreenControlsHandl
   element.append(progressSlot, transportSlot);
 
   let snapshot: PlaybackSnapshot | null = null;
+  const volume = createVolumeControl({ doc, sourceDoc: doc, labels: volumeLabels(t) });
   const progress = createProgressBar({
     doc,
     getSnapshot: () => snapshot,
@@ -132,6 +135,7 @@ export function createFullscreenControls(doc: Document): FullscreenControlsHandl
       AppState.endTimeMode = mode;
       setStorage({ endTimeMode: mode });
     },
+    endAccessory: volume.element,
   });
   progressSlot.appendChild(progress.element);
 
@@ -189,6 +193,7 @@ export function createFullscreenControls(doc: Document): FullscreenControlsHandl
   return {
     element,
     destroy() {
+      volume.destroy();
       progress.destroy();
       stopRatingObserver();
       element.remove();

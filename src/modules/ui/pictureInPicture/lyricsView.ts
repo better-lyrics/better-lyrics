@@ -12,6 +12,7 @@ import {
   switchPlaybackMode,
 } from "@modules/ui/playerControls/playerBarControls";
 import { createProgressBar, type ProgressBarHandle } from "@modules/ui/playerControls/progressBar";
+import { createVolumeControl, type VolumeControlHandle, volumeLabels } from "@modules/ui/playerControls/volumeControl";
 import { cssTimeMs } from "@/ui/motion";
 import type { KaraokeCard, KaraokeOverlayBar } from "@modules/karaoke/overlay";
 import type { PlayerDetails } from "@core/appState";
@@ -298,6 +299,7 @@ export class PictureInPictureLyricsView {
   private readonly lyricsViewport: HTMLElement;
   private readonly lyricsScroller: HTMLElement;
   private readonly progressBar: ProgressBarHandle;
+  private readonly volumeControl: VolumeControlHandle;
   private readonly intermission: Intermission;
   private readonly stage: HTMLElement;
   private readonly stageVideo: HTMLVideoElement;
@@ -466,6 +468,11 @@ export class PictureInPictureLyricsView {
 
     this.showSearching();
 
+    this.volumeControl = createVolumeControl({
+      doc: pipDocument,
+      sourceDoc: sourceDocument,
+      labels: volumeLabels(key => dependencies.translate(key)),
+    });
     this.progressBar = createProgressBar({
       doc: pipDocument,
       getSnapshot: () => this.lastPlaybackSnapshot,
@@ -473,6 +480,7 @@ export class PictureInPictureLyricsView {
         sourceDocument.dispatchEvent(new CustomEvent(SEEK_EVENT, { detail: seconds }));
         dependencies.resetScrollResume();
       },
+      endAccessory: this.volumeControl.element,
     });
     this.progressBar.element.classList.add("blyrics-pip-progress");
 
@@ -799,6 +807,7 @@ export class PictureInPictureLyricsView {
     this.endModeSwitch();
     this.cancelPendingResize();
     this.marquee.destroy();
+    this.volumeControl.destroy();
     this.progressBar.destroy();
     if (this.controlsIdleTimer !== null) this.pipWindow.clearTimeout(this.controlsIdleTimer);
     this.releaseHold();
