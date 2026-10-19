@@ -84,8 +84,6 @@ export function createVolumeControl({ doc, sourceDoc, labels }: VolumeControlOpt
   let dragging = false;
   let open = false;
   let closeTimer = 0;
-  let frame = 0;
-  let pendingLevel: number | null = null;
   let lastPointerType = "";
   let openAtPress = false;
   let wheelDelta = 0;
@@ -103,13 +101,7 @@ export function createVolumeControl({ doc, sourceDoc, labels }: VolumeControlOpt
   const commit = (next: number): void => {
     level = clampVolume(next);
     render();
-    pendingLevel = level;
-    if (frame) return;
-    frame = win.requestAnimationFrame(() => {
-      frame = 0;
-      if (pendingLevel !== null) setVolume(sourceDoc, pendingLevel);
-      pendingLevel = null;
-    });
+    setVolume(sourceDoc, level);
   };
 
   const setOpen = (next: boolean): void => {
@@ -224,7 +216,7 @@ export function createVolumeControl({ doc, sourceDoc, labels }: VolumeControlOpt
   // -- Sync with YouTube Music --------------------------
 
   const stopObserving = observeVolume(sourceDoc, () => {
-    if (dragging || pendingLevel !== null) return;
+    if (dragging) return;
     const state = getVolume(sourceDoc);
     if (!state || state.level === level) return;
     level = state.level;
@@ -238,8 +230,6 @@ export function createVolumeControl({ doc, sourceDoc, labels }: VolumeControlOpt
     destroy(): void {
       stopObserving();
       cancelClose();
-      win.cancelAnimationFrame(frame);
-      if (pendingLevel !== null) setVolume(sourceDoc, pendingLevel);
       element.remove();
     },
   };
