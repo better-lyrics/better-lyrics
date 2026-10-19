@@ -68,6 +68,7 @@
 		- [Structure](#structure)
 		- [Control Buttons](#control-buttons)
 		- [Progress Bar](#progress-bar)
+		- [Volume](#volume)
 		- [Hiding the Controls](#hiding-the-controls)
 	- [21. Best Practices for Modifying CSS](#21-best-practices-for-modifying-css)
 	- [22. Importing/Exporting Styles](#22-importingexporting-styles)
@@ -1697,6 +1698,11 @@ In fullscreen (audio) mode, Better Lyrics adds a column under the album art with
 │       └── .blyrics-fs-more             (quick-actions trigger)
 └── #blyrics-fs-controls
     ├── .blyrics-progress                (seek bar and times)
+    │   └── .blyrics-progress__times     (+ .blyrics-progress__times--accessory with the volume control)
+    │       ├── .blyrics-progress__elapsed
+    │       └── .blyrics-progress__end-group
+    │           ├── .blyrics-volume      (see Volume)
+    │           └── .blyrics-progress__end
     └── .blyrics-fs-transport-slot
         ├── .blyrics-fs-like
         ├── previous / .blyrics-fs-play / next   (.blyrics-fs-disc)
@@ -1744,6 +1750,32 @@ The seek bar is `.blyrics-progress`. The filled portion is `.blyrics-progress__f
   opacity: 0.7;
 }
 ```
+
+### Volume
+
+The speaker icon left of the end time is `.blyrics-volume`. Hovering it opens a slider that grows to the left, and a click mutes. The floating window has the same control. In fullscreen it hides during ads with the rest of the controls.
+
+| Hook | Meaning |
+|------|---------|
+| `.blyrics-volume[data-open]` | The slider is showing |
+| `.blyrics-volume[data-muted]` | Sound is muted |
+| `.blyrics-volume[data-level]` | `high`, `low` or `muted` |
+| `.blyrics-volume__button` / `.blyrics-volume__icon[data-tier]` | Speaker button and its three icons |
+| `.blyrics-volume__bar` / `__fill` / `__knob` | Slider track, fill and handle |
+
+Variables on `.blyrics-volume`:
+
+```css
+.blyrics-volume {
+  --blyrics-volume-width: 96px;        /* slider length when open */
+  --blyrics-volume-rest-opacity: 0.6;  /* speaker opacity while closed, default 0.4 */
+  --blyrics-volume-knob-size: 10px;    /* handle diameter, default 8px */
+}
+```
+
+Better Lyrics sets `--blyrics-volume-level` (0 to 1) whenever the volume changes. Read it, but don't set it.
+
+Dim the speaker with `opacity`, not a translucent `color`. The icon has overlapping fill and stroke, so a translucent colour shows a lighter outline.
 
 ### Hiding the Controls
 

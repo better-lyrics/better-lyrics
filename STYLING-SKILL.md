@@ -518,6 +518,12 @@ Shared with the floating window, which scopes it under `.blyrics-pip-progress`.
 | `.blyrics-progress__times` | Row holding the elapsed and end times |
 | `.blyrics-progress__elapsed` | Elapsed time |
 | `.blyrics-progress__end[data-mode]` | End time; `total` shows the duration, `remaining` shows the time left, click toggles |
+| `.blyrics-progress__end-group` | End time plus the volume control |
+| `.blyrics-volume[data-open][data-muted][data-level]` | Volume pill; `data-level` is `high`, `low` or `muted` |
+| `.blyrics-volume__button` / `.blyrics-volume__icon[data-tier]` | Speaker button and its three stacked icons |
+| `.blyrics-volume__bar` / `__fill` / `__knob` | Volume slider |
+
+Variables on `.blyrics-volume`: `--blyrics-volume-width`, `--blyrics-volume-rest-opacity`, `--blyrics-volume-knob-size`. Better Lyrics sets `--blyrics-volume-level` at runtime, so treat it as read only.
 
 ### Press Feedback and Like Burst
 
