@@ -16,6 +16,7 @@ import {
   toggleLike,
 } from "@modules/ui/playerControls/playerBarControls";
 import { createProgressBar, type ProgressBarHandle } from "@modules/ui/playerControls/progressBar";
+import { createRatingButton, playLikeBurst } from "@modules/ui/playerControls/ratingButton";
 import { createVolumeControl, type VolumeControlHandle } from "@modules/ui/playerControls/volumeControl";
 import { cssTimeMs } from "@/ui/motion";
 import type { KaraokeCard, KaraokeOverlayBar } from "@modules/karaoke/overlay";
@@ -70,8 +71,6 @@ const WINDOW_CONTROL_ICONS = {
   next: playerControlIcons.next,
   play: playerControlIcons.play,
   pause: playerControlIcons.pause,
-  like: playerControlIcons.like,
-  likeFilled: playerControlIcons.likeFilled,
   close: controlIcons.pictureInPictureExit,
   song: controlIcons.musicNote,
   video: controlIcons.videoCamera,
@@ -308,6 +307,7 @@ export class PictureInPictureLyricsView {
   private readonly volumeControl: VolumeControlHandle;
   private readonly likeButton: HTMLButtonElement;
   private readonly stopRatingObserver: () => void;
+  private wasLiked: boolean | null = null;
   private readonly intermission: Intermission;
   private readonly stage: HTMLElement;
   private readonly stageVideo: HTMLVideoElement;
@@ -858,12 +858,13 @@ export class PictureInPictureLyricsView {
   }
 
   private createLikeButton(): HTMLButtonElement {
-    const document = this.pipWindow.document;
-    const button = document.createElement("button");
-    button.type = "button";
+    const button = createRatingButton(
+      this.pipWindow.document,
+      "like",
+      "",
+      "blyrics-pip-artwork__control blyrics-pip-artwork__control--like"
+    );
     button.tabIndex = -1;
-    button.className = "blyrics-pip-artwork__control blyrics-pip-artwork__control--like";
-    button.append(createControlIcon(document, "like"), createControlIcon(document, "likeFilled"));
     button.addEventListener("click", () => toggleLike(this.sourceDocument), {
       signal: this.lifecycleController.signal,
     });
@@ -875,6 +876,8 @@ export class PictureInPictureLyricsView {
     this.likeButton.toggleAttribute("data-active", liked);
     this.likeButton.setAttribute("aria-pressed", String(liked));
     applyControlLabel(this.likeButton, this.sourceDocument, "like");
+    if (liked && this.wasLiked === false) playLikeBurst(this.likeButton);
+    this.wasLiked = liked;
   };
 
   private createCloseButton(): HTMLButtonElement {

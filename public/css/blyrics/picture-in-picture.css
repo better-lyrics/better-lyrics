@@ -511,7 +511,7 @@ body {
   --blyrics-pip-control-size: 28px;
 }
 
-.blyrics-pip-artwork__control--like .blyrics-pip-artwork__control-icon {
+.blyrics-pip-artwork__control--like .blyrics-fs-rate-icon {
   width: 15px;
   height: 15px;
 }
@@ -531,14 +531,8 @@ body {
 }
 
 .blyrics-pip-artwork__control-icon--pause,
-.blyrics-pip-artwork__control--play-pause[data-playing] .blyrics-pip-artwork__control-icon--play,
-.blyrics-pip-artwork__control-icon--likeFilled,
-.blyrics-pip-artwork__control--like[data-active] .blyrics-pip-artwork__control-icon--like {
+.blyrics-pip-artwork__control--play-pause[data-playing] .blyrics-pip-artwork__control-icon--play {
   display: none;
-}
-
-.blyrics-pip-artwork__control--like[data-active] .blyrics-pip-artwork__control-icon--likeFilled {
-  display: block;
 }
 
 /* -- Volume on the artwork --------------------------------------------------- */
