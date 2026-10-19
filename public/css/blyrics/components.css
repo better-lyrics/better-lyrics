@@ -1432,22 +1432,6 @@ ytmusic-player-page:not([is-mweb-modernization-enabled]) #side-panel.blyrics-has
 }
 
 /* -- Volume ---------------------------------------------------------------- */
-.blyrics-progress__times--accessory {
-  align-items: center;
-  gap: 8px;
-}
-
-.blyrics-progress__times--accessory .blyrics-progress__elapsed {
-  flex: 0 0 auto;
-}
-
-.blyrics-progress__end-group {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  min-width: 0;
-}
-
 .blyrics-volume {
   --blyrics-volume-height: 22px;
   --blyrics-volume-icon-size: 16px;
@@ -1456,12 +1440,15 @@ ytmusic-player-page:not([is-mweb-modernization-enabled]) #side-panel.blyrics-has
   --blyrics-volume-rest-opacity: 0.4;
   --blyrics-volume-gap: 4px;
   --blyrics-volume-inset: calc(var(--blyrics-volume-height) / 2 - 2px);
+  --blyrics-volume-open-width: calc(
+    var(--blyrics-volume-width) + var(--blyrics-volume-inset) + var(--blyrics-volume-gap) +
+      var(--blyrics-volume-knob-size) / 2
+  );
 
   display: flex;
   align-items: center;
   min-width: 0;
   height: var(--blyrics-volume-height);
-  margin-block: calc((1lh - var(--blyrics-volume-height)) / 2);
   border-radius: 999px;
   transition: background 180ms ease;
 }
@@ -1526,10 +1513,7 @@ ytmusic-player-page:not([is-mweb-modernization-enabled]) #side-panel.blyrics-has
 }
 
 .blyrics-volume[data-open] .blyrics-volume__track {
-  width: calc(
-    var(--blyrics-volume-width) + var(--blyrics-volume-inset) + var(--blyrics-volume-gap) +
-      var(--blyrics-volume-knob-size) / 2
-  );
+  width: var(--blyrics-volume-open-width);
   padding: 0 calc(var(--blyrics-volume-gap) + var(--blyrics-volume-knob-size) / 2) 0 var(--blyrics-volume-inset);
   opacity: 1;
 }
@@ -1647,8 +1631,6 @@ ytmusic-player-page[player-fullscreened]:not([blyrics-dfs], [blyrics-karaoke]) #
 .blyrics-fs-info-actions .blyrics-volume {
   --blyrics-volume-height: var(--blyrics-fs-action-size);
   --blyrics-volume-icon-size: var(--blyrics-fs-action-glyph);
-
-  margin: 0;
 }
 
 .blyrics-fs-info-actions .blyrics-fs-more {

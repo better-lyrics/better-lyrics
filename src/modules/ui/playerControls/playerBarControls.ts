@@ -157,6 +157,12 @@ export function setVolume(doc: Document, level: number): void {
   doc.dispatchEvent(new CustomEvent(SET_VOLUME_EVENT, { detail: clampVolume(level) }));
 }
 
+const CONTROL_LABEL_SOURCES = { like: LIKE_BUTTON, mute: MUTE_BUTTON, volume: VOLUME_SLIDER } as const;
+
+export function getControlLabel(doc: Document, control: keyof typeof CONTROL_LABEL_SOURCES): string | null {
+  return doc.querySelector(CONTROL_LABEL_SOURCES[control])?.getAttribute("aria-label") || null;
+}
+
 export function toggleMute(doc: Document): void {
   doc.querySelector<HTMLElement>(MUTE_BUTTON)?.click();
 }

@@ -519,7 +519,6 @@ Shared with the floating window, which scopes it under `.blyrics-pip-progress`.
 | `.blyrics-progress__times` | Row holding the elapsed and end times |
 | `.blyrics-progress__elapsed` | Elapsed time |
 | `.blyrics-progress__end[data-mode]` | End time; `total` shows the duration, `remaining` shows the time left, click toggles |
-| `.blyrics-progress__end-group` | Floating window only: end time plus the volume control |
 | `.blyrics-volume[data-open][data-muted][data-level]` | Volume pill; `data-level` is `high`, `low` or `muted` |
 | `.blyrics-volume__button` / `.blyrics-volume__icon` | Speaker button and its icon; parts `[data-part]`: `wave-low`, `wave-high`, `mute` |
 | `.blyrics-volume__bar` / `__fill` / `__knob` | Volume slider |
@@ -617,10 +616,12 @@ With "Show music video" on and YouTube Music in video mode, the floating window 
 │       │   └── .blyrics-pip-artwork__face           (front and back)
 │       │       └── video.blyrics-pip-artwork__music-video
 │       └── .blyrics-pip-artwork__controls
-│           └── .blyrics-pip-artwork__chrome
-│               ├── .blyrics-pip-mode-toggle
-│               │   └── button.blyrics-pip-mode-toggle__option   (song, video)
-│               └── button.blyrics-pip-artwork__control.blyrics-pip-artwork__control--close
+│           ├── .blyrics-pip-artwork__chrome
+│           │   ├── .blyrics-pip-mode-toggle
+│           │   │   └── button.blyrics-pip-mode-toggle__option   (song, video)
+│           │   └── button.blyrics-pip-artwork__control.blyrics-pip-artwork__control--close
+│           ├── button.blyrics-pip-artwork__control.blyrics-pip-artwork__control--like   ([data-active] when liked)
+│           └── .blyrics-volume                     (same pill as fullscreen)
 ├── .blyrics-pip-stage
 │   ├── video.blyrics-pip-stage__video
 │   └── #blyrics-karaoke                            (same tree as fullscreen karaoke)

@@ -10,7 +10,6 @@ interface ProgressBarOptions {
   onSeek: (seconds: number) => void;
   initialEndMode?: EndTimeMode;
   onEndModeChange?: (mode: EndTimeMode) => void;
-  endAccessory?: HTMLElement;
 }
 
 export interface ProgressBarHandle {
@@ -24,7 +23,7 @@ const SEEK_LATCH_TIMEOUT_MS = 2000;
 const JUMP_GLIDE_THRESHOLD_S = 0.75;
 
 export function createProgressBar(options: ProgressBarOptions): ProgressBarHandle {
-  const { doc, getSnapshot, onSeek, initialEndMode, onEndModeChange, endAccessory } = options;
+  const { doc, getSnapshot, onSeek, initialEndMode, onEndModeChange } = options;
   const win = doc.defaultView ?? window;
 
   const element = doc.createElement("div");
@@ -52,15 +51,7 @@ export function createProgressBar(options: ProgressBarOptions): ProgressBarHandl
   endTime.type = "button";
   endTime.className = "blyrics-progress__end";
   endTime.dataset.mode = initialEndMode ?? "total";
-  if (endAccessory) {
-    const endGroup = doc.createElement("div");
-    endGroup.className = "blyrics-progress__end-group";
-    endGroup.append(endAccessory, endTime);
-    times.classList.add("blyrics-progress__times--accessory");
-    times.append(elapsed, endGroup);
-  } else {
-    times.append(elapsed, endTime);
-  }
+  times.append(elapsed, endTime);
 
   element.append(bar, times);
 

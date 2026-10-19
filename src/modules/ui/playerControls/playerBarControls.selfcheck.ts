@@ -1,6 +1,7 @@
 import { strict as assert } from "node:assert";
 import {
   canSwitchPlaybackMode,
+  getControlLabel,
   getRatingState,
   getVolume,
   getSelectedPlaybackMode,
@@ -174,5 +175,17 @@ const muteBtn = el({});
 toggleMute(fakeDoc({ [MUTE_BUTTON]: muteBtn }));
 assert.equal(muteBtn.clicks, 1, "toggleMute clicks the native mute button");
 toggleMute(fakeDoc({}));
+
+assert.equal(
+  getControlLabel(fakeDoc({ [MUTE_BUTTON]: el({ "aria-label": "Stummschalten" }) }), "mute"),
+  "Stummschalten",
+  "reads the native, localized label"
+);
+assert.equal(
+  getControlLabel(fakeDoc({ [VOLUME_SLIDER]: el({ "aria-label": "" }) }), "volume"),
+  null,
+  "an empty label is missing"
+);
+assert.equal(getControlLabel(fakeDoc({}), "like"), null, "no native control means no label");
 
 console.log("playerBarControls selfcheck passed");

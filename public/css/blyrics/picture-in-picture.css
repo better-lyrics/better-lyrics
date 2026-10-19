@@ -257,7 +257,8 @@ body {
   justify-items: center;
 }
 
-.blyrics-pip-shell:not([data-layout="stage"]) .blyrics-pip-artwork__control:not(.blyrics-pip-artwork__control--close) {
+.blyrics-pip-shell:not([data-layout="stage"])
+  .blyrics-pip-artwork__control:not(.blyrics-pip-artwork__control--close, .blyrics-pip-artwork__control--like) {
   --blyrics-pip-transport-edge: calc((100% - var(--blyrics-pip-control-size) * 3.25) / 4 - 4px);
 
   grid-area: 2 / 1;
@@ -270,6 +271,18 @@ body {
 
 .blyrics-pip-shell:not([data-layout="stage"]) .blyrics-pip-artwork__control--next {
   margin-inline-end: var(--blyrics-pip-transport-edge);
+  justify-self: end;
+}
+
+.blyrics-pip-shell:not([data-layout="stage"]) .blyrics-pip-artwork__control--like {
+  grid-area: 3 / 1;
+  align-self: end;
+  justify-self: start;
+}
+
+.blyrics-pip-shell:not([data-layout="stage"]) .blyrics-pip-artwork__controls .blyrics-volume {
+  grid-area: 3 / 1;
+  align-self: end;
   justify-self: end;
 }
 
@@ -494,6 +507,15 @@ body {
   outline-offset: 1px;
 }
 
+.blyrics-pip-artwork__control--like {
+  --blyrics-pip-control-size: 28px;
+}
+
+.blyrics-pip-artwork__control--like .blyrics-pip-artwork__control-icon {
+  width: 15px;
+  height: 15px;
+}
+
 .blyrics-pip-artwork__control--close {
   --blyrics-pip-control-size: 28px;
 
@@ -509,8 +531,65 @@ body {
 }
 
 .blyrics-pip-artwork__control-icon--pause,
-.blyrics-pip-artwork__control--play-pause[data-playing] .blyrics-pip-artwork__control-icon--play {
+.blyrics-pip-artwork__control--play-pause[data-playing] .blyrics-pip-artwork__control-icon--play,
+.blyrics-pip-artwork__control-icon--likeFilled,
+.blyrics-pip-artwork__control--like[data-active] .blyrics-pip-artwork__control-icon--like {
   display: none;
+}
+
+.blyrics-pip-artwork__control--like[data-active] .blyrics-pip-artwork__control-icon--likeFilled {
+  display: block;
+}
+
+/* -- Volume on the artwork --------------------------------------------------- */
+.blyrics-pip-artwork__controls .blyrics-volume {
+  --blyrics-volume-height: 28px;
+  --blyrics-volume-icon-size: 21px;
+  --blyrics-volume-width: 60px;
+  --blyrics-volume-rest-opacity: 1;
+
+  position: relative;
+}
+
+.blyrics-pip-artwork__controls .blyrics-volume::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: var(--blyrics-pip-control-tint);
+  backdrop-filter: var(--blyrics-pip-control-backdrop);
+  pointer-events: none;
+}
+
+.blyrics-pip-artwork__controls .blyrics-volume > * {
+  position: relative;
+}
+
+.blyrics-pip-artwork__controls .blyrics-volume[data-open] {
+  background: none;
+}
+
+.blyrics-pip-artwork__controls .blyrics-volume[data-muted] .blyrics-volume__button {
+  opacity: 1;
+}
+
+.blyrics-pip-shell[data-layout="stage"] .blyrics-pip-artwork__control--like {
+  order: -1;
+}
+
+.blyrics-pip-shell[data-layout="stage"] .blyrics-pip-artwork__controls .blyrics-volume {
+  flex-direction: row-reverse;
+  transition:
+    background 180ms ease,
+    margin 260ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.blyrics-pip-shell[data-layout="stage"] .blyrics-pip-artwork__controls .blyrics-volume[data-open] {
+  margin-right: calc(var(--blyrics-volume-open-width) * -1);
+}
+
+.blyrics-pip-shell[data-layout="stage"] .blyrics-pip-artwork__controls .blyrics-volume[data-open] .blyrics-volume__track {
+  padding: 0 var(--blyrics-volume-inset) 0 calc(var(--blyrics-volume-gap) + var(--blyrics-volume-knob-size) / 2);
 }
 
 .blyrics-pip-artwork__control--play-pause[data-playing] .blyrics-pip-artwork__control-icon--pause {
@@ -1780,12 +1859,6 @@ body {
   font-size: 10px;
 }
 
-.blyrics-pip-progress .blyrics-volume {
-  --blyrics-volume-height: 20px;
-  --blyrics-volume-icon-size: 14px;
-  --blyrics-volume-width: 60px;
-}
-
 .blyrics-pip-progress .blyrics-progress__knob {
   width: 18px;
   height: 18px;
@@ -1844,7 +1917,7 @@ body {
     font-size: 12px;
   }
 
-  .blyrics-pip-progress .blyrics-volume {
+  .blyrics-pip-artwork__controls .blyrics-volume {
     --blyrics-volume-width: 104px;
   }
 

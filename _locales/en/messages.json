@@ -182,22 +182,6 @@
       }
     }
   },
-  "player_controls_volume": {
-    "message": "Volume",
-    "description": "Accessible name of the volume slider in the fullscreen player controls and the floating lyrics window"
-  },
-  "player_controls_mute": {
-    "message": "Mute",
-    "description": "Accessible name of the speaker button beside the end time when sound is on; pressing it mutes"
-  },
-  "player_controls_unmute": {
-    "message": "Unmute",
-    "description": "Accessible name of the speaker button beside the end time when sound is muted; pressing it unmutes"
-  },
-  "player_controls_muted": {
-    "message": "Muted",
-    "description": "Value read out by screen readers for the volume slider when sound is muted"
-  },
   "options_display_pipEnabled": {
     "message": "Enable floating window",
     "description": "Master toggle for the floating lyrics window feature, which turns it off everywhere including the YouTube Music minimize button"

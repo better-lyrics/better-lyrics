@@ -1,21 +1,13 @@
 import { logContent } from "@core/logger";
 import { parseSvgString } from "@modules/ui/lyricsDock/icons";
 import { volumeIcon } from "./icons";
-import { getVolume, observeVolume, setVolume, toggleMute } from "./playerBarControls";
+import { getControlLabel, getVolume, observeVolume, setVolume, toggleMute } from "./playerBarControls";
 import { pctFromClientX } from "./playhead";
 import { clampVolume, VOLUME_KEY_STEP, VOLUME_WHEEL_STEP, volumeTier } from "./volumeLevel";
-
-interface VolumeControlLabels {
-  volume: string;
-  mute: string;
-  unmute: string;
-  muted: string;
-}
 
 interface VolumeControlOptions {
   doc: Document;
   sourceDoc: Document;
-  labels: VolumeControlLabels;
 }
 
 export interface VolumeControlHandle {
@@ -33,16 +25,7 @@ const KEY_STEPS: Record<string, number> = {
   ArrowDown: -VOLUME_KEY_STEP,
 };
 
-export function volumeLabels(translate: (key: string) => string): VolumeControlLabels {
-  return {
-    volume: translate("player_controls_volume"),
-    mute: translate("player_controls_mute"),
-    unmute: translate("player_controls_unmute"),
-    muted: translate("player_controls_muted"),
-  };
-}
-
-export function createVolumeControl({ doc, sourceDoc, labels }: VolumeControlOptions): VolumeControlHandle {
+export function createVolumeControl({ doc, sourceDoc }: VolumeControlOptions): VolumeControlHandle {
   const win = doc.defaultView ?? window;
 
   const element = doc.createElement("div");
@@ -65,7 +48,6 @@ export function createVolumeControl({ doc, sourceDoc, labels }: VolumeControlOpt
   bar.className = "blyrics-volume__bar";
   bar.tabIndex = 0;
   bar.setAttribute("role", "slider");
-  bar.setAttribute("aria-label", labels.volume);
   bar.setAttribute("aria-valuemin", "0");
   bar.setAttribute("aria-valuemax", "100");
   const fill = doc.createElement("div");
@@ -84,14 +66,19 @@ export function createVolumeControl({ doc, sourceDoc, labels }: VolumeControlOpt
   let openAtPress = false;
   let wheelDelta = 0;
 
+  const syncLabels = (): void => {
+    bar.setAttribute("aria-label", getControlLabel(sourceDoc, "volume") ?? "");
+    button.setAttribute("aria-label", getControlLabel(sourceDoc, "mute") ?? "");
+  };
+
   const render = (): void => {
     const tier = volumeTier(level);
     element.dataset.level = tier;
     element.toggleAttribute("data-muted", tier === "muted");
     element.style.setProperty("--blyrics-volume-level", String(level / 100));
     bar.setAttribute("aria-valuenow", String(level));
-    bar.setAttribute("aria-valuetext", tier === "muted" ? labels.muted : `${level}%`);
-    button.setAttribute("aria-label", tier === "muted" ? labels.unmute : labels.mute);
+    bar.setAttribute("aria-valuetext", `${level}%`);
+    syncLabels();
   };
 
   const commit = (next: number): void => {
@@ -147,6 +134,7 @@ export function createVolumeControl({ doc, sourceDoc, labels }: VolumeControlOpt
 
   // -- Mute --------------------------
 
+  button.addEventListener("focus", syncLabels);
   button.addEventListener("pointerdown", event => {
     lastPointerType = event.pointerType;
     openAtPress = open;

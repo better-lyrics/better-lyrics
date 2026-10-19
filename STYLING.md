@@ -1750,7 +1750,7 @@ The seek bar is `.blyrics-progress`. The filled portion is `.blyrics-progress__f
 
 ### Volume
 
-The speaker icon is `.blyrics-volume`. Hovering it opens a slider that grows to the left, and a click mutes. In fullscreen it sits left of the quick-actions button, in `.blyrics-fs-info-actions`, and stays usable during ads. In the floating window it sits left of the end time, inside `.blyrics-progress__end-group`, and the times row gets `.blyrics-progress__times--accessory`.
+The speaker icon is `.blyrics-volume`. Hovering it opens a slider that grows to the left, and a click mutes. In fullscreen it sits left of the quick-actions button, in `.blyrics-fs-info-actions`, and stays usable during ads. In the floating window it sits on the artwork overlay, in the bottom-right corner across from the like button (`.blyrics-pip-artwork__control--like`), and shows with the other artwork controls. Over the music video it sits at the end of the transport row instead and opens to the right.
 
 | Hook | Meaning |
 |------|---------|
@@ -2041,6 +2041,7 @@ The hover controls on the artwork have a song and video toggle and a close butto
 | `.blyrics-pip-mode-toggle` | Song and video pill. It is `hidden` when YouTube Music offers no switch for the current track, and it is not shown in windows under 130px tall |
 | `.blyrics-pip-mode-toggle__option` | One option; the current one has `[aria-pressed="true"]` |
 | `.blyrics-pip-artwork__control--close` | Closes the window |
+| `.blyrics-pip-artwork__control--like` | Likes the song; `[data-active]` when liked |
 
 The control discs and the pill share two variables, set on `.blyrics-pip-artwork__controls`:
 
