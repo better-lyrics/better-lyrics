@@ -1455,7 +1455,7 @@ ytmusic-player-page:not([is-mweb-modernization-enabled]) #side-panel.blyrics-has
   --blyrics-volume-knob-size: 8px;
   --blyrics-volume-rest-opacity: 0.4;
   --blyrics-volume-gap: 4px;
-  --blyrics-volume-inset: calc((var(--blyrics-volume-height) - var(--blyrics-volume-icon-size)) / 2 + 2px);
+  --blyrics-volume-inset: calc(var(--blyrics-volume-height) / 2 - 2px);
 
   display: flex;
   align-items: center;
@@ -1637,6 +1637,7 @@ ytmusic-player-page[player-fullscreened]:not([blyrics-dfs], [blyrics-karaoke]) #
   display: flex;
   flex: 0 0 auto;
   align-items: center;
+  gap: 8px;
 }
 
 .blyrics-fs-info-actions .blyrics-volume {
