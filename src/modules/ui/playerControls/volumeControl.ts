@@ -24,6 +24,8 @@ export interface VolumeControlHandle {
 }
 
 const CLOSE_DELAY_MS = 350;
+const WHEEL_NOTCH_PX = 100;
+const WHEEL_LINE_PX = 33;
 const TIERS: VolumeTier[] = ["high", "low", "muted"];
 const KEY_STEPS: Record<string, number> = {
   ArrowRight: VOLUME_KEY_STEP,
@@ -76,7 +78,7 @@ export function createVolumeControl({ doc, sourceDoc, labels }: VolumeControlOpt
   knob.className = "blyrics-volume__knob";
   bar.append(fill, knob);
   track.appendChild(bar);
-  element.append(button, track);
+  element.append(track, button);
 
   let level = getVolume(sourceDoc)?.level ?? 100;
   let dragging = false;
@@ -86,6 +88,7 @@ export function createVolumeControl({ doc, sourceDoc, labels }: VolumeControlOpt
   let pendingLevel: number | null = null;
   let lastPointerType = "";
   let openAtPress = false;
+  let wheelDelta = 0;
 
   const render = (): void => {
     const tier = volumeTier(level);
@@ -136,7 +139,9 @@ export function createVolumeControl({ doc, sourceDoc, labels }: VolumeControlOpt
     cancelClose();
     setOpen(true);
   });
-  element.addEventListener("pointerleave", scheduleClose);
+  element.addEventListener("pointerleave", event => {
+    if (event.pointerType !== "touch") scheduleClose();
+  });
   element.addEventListener("focusin", () => {
     cancelClose();
     setOpen(true);
@@ -147,8 +152,9 @@ export function createVolumeControl({ doc, sourceDoc, labels }: VolumeControlOpt
   });
   element.addEventListener("keydown", event => {
     if (event.key !== "Escape" || !open) return;
-    setOpen(false);
+    event.stopPropagation();
     button.focus();
+    setOpen(false);
   });
 
   // -- Mute --------------------------
@@ -188,6 +194,7 @@ export function createVolumeControl({ doc, sourceDoc, labels }: VolumeControlOpt
   };
   bar.addEventListener("pointerup", endDrag);
   bar.addEventListener("pointercancel", endDrag);
+  bar.addEventListener("lostpointercapture", endDrag);
   bar.addEventListener("keydown", event => {
     const step = KEY_STEPS[event.key];
     if (event.key === "Home") commit(0);
@@ -201,7 +208,15 @@ export function createVolumeControl({ doc, sourceDoc, labels }: VolumeControlOpt
     event => {
       if (event.deltaY === 0) return;
       event.preventDefault();
-      commit(level + (event.deltaY < 0 ? VOLUME_WHEEL_STEP : -VOLUME_WHEEL_STEP));
+      cancelClose();
+      setOpen(true);
+      wheelDelta += event.deltaMode === event.DOM_DELTA_LINE ? event.deltaY * WHEEL_LINE_PX : event.deltaY;
+      const notches = Math.trunc(wheelDelta / WHEEL_NOTCH_PX);
+      if (notches !== 0) {
+        wheelDelta -= notches * WHEEL_NOTCH_PX;
+        commit(level - notches * VOLUME_WHEEL_STEP);
+      }
+      if (!element.matches(":hover")) scheduleClose();
     },
     { passive: false }
   );
@@ -224,6 +239,7 @@ export function createVolumeControl({ doc, sourceDoc, labels }: VolumeControlOpt
       stopObserving();
       cancelClose();
       win.cancelAnimationFrame(frame);
+      if (pendingLevel !== null) setVolume(sourceDoc, pendingLevel);
       element.remove();
     },
   };

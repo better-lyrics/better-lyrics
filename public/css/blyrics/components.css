@@ -1460,7 +1460,6 @@ ytmusic-player-page:not([is-mweb-modernization-enabled]) #side-panel.blyrics-has
   );
 
   display: flex;
-  flex-direction: row-reverse;
   align-items: center;
   min-width: 0;
   height: var(--blyrics-volume-height);
@@ -1552,11 +1551,10 @@ ytmusic-player-page:not([is-mweb-modernization-enabled]) #side-panel.blyrics-has
 
 .blyrics-volume__fill {
   position: absolute;
-  inset: 0;
+  inset: 0 auto 0 0;
+  width: calc(var(--blyrics-volume-level, 1) * 100%);
   border-radius: inherit;
   background: #fff;
-  transform: scaleX(var(--blyrics-volume-level, 1));
-  transform-origin: left center;
 }
 
 .blyrics-volume__knob {
