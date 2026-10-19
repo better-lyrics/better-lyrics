@@ -1695,14 +1695,11 @@ In fullscreen (audio) mode, Better Lyrics adds a column under the album art with
 ├── #blyrics-fs-info-row
 │   ├── #blyrics-song-info               (title, artist, album)
 │   └── .blyrics-fs-info-actions
+│       ├── .blyrics-volume              (see Volume)
 │       └── .blyrics-fs-more             (quick-actions trigger)
 └── #blyrics-fs-controls
     ├── .blyrics-progress                (seek bar and times)
-    │   └── .blyrics-progress__times     (+ .blyrics-progress__times--accessory with the volume control)
-    │       ├── .blyrics-progress__elapsed
-    │       └── .blyrics-progress__end-group
-    │           ├── .blyrics-volume      (see Volume)
-    │           └── .blyrics-progress__end
+    │   └── .blyrics-progress__times
     └── .blyrics-fs-transport-slot
         ├── .blyrics-fs-like
         ├── previous / .blyrics-fs-play / next   (.blyrics-fs-disc)
@@ -1753,7 +1750,7 @@ The seek bar is `.blyrics-progress`. The filled portion is `.blyrics-progress__f
 
 ### Volume
 
-The speaker icon left of the end time is `.blyrics-volume`. Hovering it opens a slider that grows to the left, and a click mutes. The floating window has the same control. In fullscreen it hides during ads with the rest of the controls.
+The speaker icon is `.blyrics-volume`. Hovering it opens a slider that grows to the left, and a click mutes. In fullscreen it sits left of the quick-actions button, in `.blyrics-fs-info-actions`, and stays usable during ads. In the floating window it sits left of the end time, inside `.blyrics-progress__end-group`, and the times row gets `.blyrics-progress__times--accessory`.
 
 | Hook | Meaning |
 |------|---------|

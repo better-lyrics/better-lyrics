@@ -1633,7 +1633,16 @@ ytmusic-player-page[player-fullscreened]:not([blyrics-dfs], [blyrics-karaoke]) #
 }
 
 .blyrics-fs-info-actions {
+  display: flex;
   flex: 0 0 auto;
+  align-items: center;
+}
+
+.blyrics-fs-info-actions .blyrics-volume {
+  --blyrics-volume-height: 3.25rem;
+  --blyrics-volume-icon-size: 18px;
+
+  margin: 0;
 }
 
 #blyrics-fs-controls {

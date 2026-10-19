@@ -20,6 +20,7 @@ import { createVolumeControl, volumeLabels } from "./volumeControl";
 
 export interface FullscreenControlsHandle {
   element: HTMLElement;
+  volumeElement: HTMLElement;
   destroy: () => void;
   setSnapshot(snapshot: PlaybackSnapshot | null): void;
 }
@@ -102,14 +103,14 @@ function playLikeBurst(button: HTMLButtonElement): void {
   win.setTimeout(() => burst.remove(), 540);
 }
 
-export function wrapSongInfoWithActions(doc: Document, songInfo: HTMLElement): HTMLElement {
+export function wrapSongInfoWithActions(doc: Document, songInfo: HTMLElement, volumeElement: HTMLElement): HTMLElement {
   const row = doc.createElement("div");
   row.className = "blyrics-fs-info-row";
   const actions = doc.createElement("div");
   actions.className = "blyrics-fs-info-actions";
   const moreButton = iconButton(doc, playerControlIcons.more, "Quick actions", "blyrics-fs-disc blyrics-fs-more");
   moreButton.addEventListener("click", () => openQuickActions(doc, moreButton));
-  actions.appendChild(moreButton);
+  actions.append(volumeElement, moreButton);
   row.append(songInfo, actions);
   return row;
 }
@@ -135,7 +136,6 @@ export function createFullscreenControls(doc: Document): FullscreenControlsHandl
       AppState.endTimeMode = mode;
       setStorage({ endTimeMode: mode });
     },
-    endAccessory: volume.element,
   });
   progressSlot.appendChild(progress.element);
 
@@ -192,6 +192,7 @@ export function createFullscreenControls(doc: Document): FullscreenControlsHandl
 
   return {
     element,
+    volumeElement: volume.element,
     destroy() {
       volume.destroy();
       progress.destroy();

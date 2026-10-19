@@ -466,6 +466,7 @@ Injected under the album art in fullscreen (audio) mode: song info, a seekable p
 │   │       └── span#blyrics-album
 │   │           └── a.blyrics-song-link      (album, links to the album page)
 │   └── .blyrics-fs-info-actions
+│       ├── .blyrics-volume                          (volume pill)
 │       └── button.blyrics-fs-disc.blyrics-fs-more   (quick-actions trigger)
 └── #blyrics-fs-controls
     ├── .blyrics-progress                    (see Progress Bar)
@@ -486,7 +487,7 @@ Injected under the album art in fullscreen (audio) mode: song info, a seekable p
 | `#blyrics-fs-info-row` / `.blyrics-fs-info-row` | Song info plus the quick-actions trigger |
 | `#blyrics-song-info` | Title/artist/album block, also present outside fullscreen |
 | `.blyrics-song-link` | Artist and album links inside the info block; `color: inherit`, underline on hover |
-| `.blyrics-fs-info-actions` | Wrapper for the quick-actions trigger |
+| `.blyrics-fs-info-actions` | Wrapper for the volume pill and the quick-actions trigger |
 | `#blyrics-fs-controls` | Controls strip: progress bar above the transport row |
 | `.blyrics-fs-disc` | Round control button base, shared by transport, rating, and more |
 | `.blyrics-fs-more` | Quick-actions trigger |
@@ -518,7 +519,7 @@ Shared with the floating window, which scopes it under `.blyrics-pip-progress`.
 | `.blyrics-progress__times` | Row holding the elapsed and end times |
 | `.blyrics-progress__elapsed` | Elapsed time |
 | `.blyrics-progress__end[data-mode]` | End time; `total` shows the duration, `remaining` shows the time left, click toggles |
-| `.blyrics-progress__end-group` | End time plus the volume control |
+| `.blyrics-progress__end-group` | Floating window only: end time plus the volume control |
 | `.blyrics-volume[data-open][data-muted][data-level]` | Volume pill; `data-level` is `high`, `low` or `muted` |
 | `.blyrics-volume__button` / `.blyrics-volume__icon[data-tier]` | Speaker button and its three stacked icons |
 | `.blyrics-volume__bar` / `__fill` / `__knob` | Volume slider |
