@@ -1757,7 +1757,8 @@ The speaker icon is `.blyrics-volume`. Hovering it opens a slider that grows to 
 | `.blyrics-volume[data-open]` | The slider is showing |
 | `.blyrics-volume[data-muted]` | Sound is muted |
 | `.blyrics-volume[data-level]` | `high`, `low` or `muted` |
-| `.blyrics-volume__button` / `.blyrics-volume__icon[data-tier]` | Speaker button and its three icons |
+| `.blyrics-volume__button` / `.blyrics-volume__icon` | Speaker button and its icon |
+| `.blyrics-volume__icon [data-part]` | Icon parts that fade in and out: `wave-low`, `wave-high`, `mute` |
 | `.blyrics-volume__bar` / `__fill` / `__knob` | Slider track, fill and handle |
 
 Variables on `.blyrics-volume`:
