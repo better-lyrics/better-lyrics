@@ -1,9 +1,9 @@
 import { logContent } from "@core/logger";
 import { parseSvgString } from "@modules/ui/lyricsDock/icons";
-import { volumeIcons } from "./icons";
+import { volumeIcon } from "./icons";
 import { getVolume, observeVolume, setVolume, toggleMute } from "./playerBarControls";
 import { pctFromClientX } from "./playhead";
-import { clampVolume, VOLUME_KEY_STEP, VOLUME_WHEEL_STEP, type VolumeTier, volumeTier } from "./volumeLevel";
+import { clampVolume, VOLUME_KEY_STEP, VOLUME_WHEEL_STEP, volumeTier } from "./volumeLevel";
 
 interface VolumeControlLabels {
   volume: string;
@@ -26,7 +26,6 @@ export interface VolumeControlHandle {
 const CLOSE_DELAY_MS = 350;
 const WHEEL_NOTCH_PX = 100;
 const WHEEL_LINE_PX = 33;
-const TIERS: VolumeTier[] = ["high", "low", "muted"];
 const KEY_STEPS: Record<string, number> = {
   ArrowRight: VOLUME_KEY_STEP,
   ArrowUp: VOLUME_KEY_STEP,
@@ -52,15 +51,12 @@ export function createVolumeControl({ doc, sourceDoc, labels }: VolumeControlOpt
   const button = doc.createElement("button");
   button.type = "button";
   button.className = "blyrics-volume__button";
-  for (const tier of TIERS) {
-    const svg = parseSvgString(volumeIcons[tier]);
-    if (!svg) {
-      logContent("failed to parse volume icon", tier);
-      continue;
-    }
-    svg.classList.add("blyrics-volume__icon");
-    svg.setAttribute("data-tier", tier);
-    button.appendChild(svg);
+  const icon = parseSvgString(volumeIcon);
+  if (icon) {
+    icon.classList.add("blyrics-volume__icon");
+    button.appendChild(icon);
+  } else {
+    logContent("failed to parse volume icon");
   }
 
   const track = doc.createElement("div");

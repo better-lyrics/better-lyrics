@@ -1,4 +1,4 @@
-export type VolumeTier = "high" | "low" | "muted";
+type VolumeTier = "high" | "low" | "muted";
 
 export const VOLUME_KEY_STEP = 5;
 export const VOLUME_WHEEL_STEP = 4;

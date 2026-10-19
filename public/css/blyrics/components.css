@@ -1495,17 +1495,18 @@ ytmusic-player-page:not([is-mweb-modernization-enabled]) #side-panel.blyrics-has
 }
 
 .blyrics-volume__icon {
-  grid-area: 1 / 1;
   width: var(--blyrics-volume-icon-size);
   height: var(--blyrics-volume-icon-size);
-  opacity: 0;
+}
+
+.blyrics-volume__icon [data-part] {
   transition: opacity 160ms ease;
 }
 
-.blyrics-volume[data-level="high"] .blyrics-volume__icon[data-tier="high"],
-.blyrics-volume[data-level="low"] .blyrics-volume__icon[data-tier="low"],
-.blyrics-volume[data-level="muted"] .blyrics-volume__icon[data-tier="muted"] {
-  opacity: 1;
+.blyrics-volume[data-level="muted"] .blyrics-volume__icon [data-part^="wave"],
+.blyrics-volume[data-level="low"] .blyrics-volume__icon [data-part="wave-high"],
+.blyrics-volume:not([data-level="muted"]) .blyrics-volume__icon [data-part="mute"] {
+  opacity: 0;
 }
 
 .blyrics-volume__track {
@@ -1634,6 +1635,9 @@ ytmusic-player-page[player-fullscreened]:not([blyrics-dfs], [blyrics-karaoke]) #
 }
 
 .blyrics-fs-info-actions {
+  --blyrics-fs-action-size: 28px;
+  --blyrics-fs-action-glyph: 18px;
+
   display: flex;
   flex: 0 0 auto;
   align-items: center;
@@ -1641,10 +1645,20 @@ ytmusic-player-page[player-fullscreened]:not([blyrics-dfs], [blyrics-karaoke]) #
 }
 
 .blyrics-fs-info-actions .blyrics-volume {
-  --blyrics-volume-height: 26px;
-  --blyrics-volume-icon-size: 20px;
+  --blyrics-volume-height: var(--blyrics-fs-action-size);
+  --blyrics-volume-icon-size: var(--blyrics-fs-action-glyph);
 
   margin: 0;
+}
+
+.blyrics-fs-info-actions .blyrics-fs-more {
+  width: var(--blyrics-fs-action-size);
+  height: var(--blyrics-fs-action-size);
+}
+
+.blyrics-fs-info-actions .blyrics-fs-more svg {
+  width: calc(var(--blyrics-fs-action-glyph) * 0.92);
+  height: calc(var(--blyrics-fs-action-glyph) * 0.92);
 }
 
 #blyrics-fs-controls {
@@ -1677,11 +1691,6 @@ html[blyrics-no-fs-controls] .blyrics-fs-info-actions {
 
 #blyrics-fs-controls .blyrics-progress {
   width: 100%;
-}
-
-.blyrics-fs-more {
-  width: 2.75rem;
-  height: 2.75rem;
 }
 
 .blyrics-fs-disc {

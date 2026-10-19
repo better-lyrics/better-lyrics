@@ -1,5 +1,3 @@
-import type { VolumeTier } from "./volumeLevel";
-
 export const playerControlIcons = {
   previous: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><g fill="none"><path d="M24 0v24H0V0z"/><path fill="currentColor" d="m20.43 5.865.078.699.072.767.036.448.051.75.03.55.038.894.019.641.012.675.004.707-.004.707-.012.675-.019.641-.024.606-.028.569-.05.78-.035.47-.09.986-.079.698a1.332 1.332 0 0 1-1.844 1.065l-.49-.213-.846-.386-.62-.298-.458-.226-.748-.381-.538-.283-.566-.306-.594-.329-.619-.353-.615-.36-.582-.349-.809-.5-.73-.47-.443-.292-.406-.274-.54-.373-.587-.42-.43-.319a1.332 1.332 0 0 1 .002-2.13l.325-.242.422-.306.517-.363.607-.414.694-.458.51-.327.546-.342.581-.355.617-.366.32-.186c.208-.12.412-.237.613-.349l.588-.326.563-.304.793-.414.725-.365.442-.215.597-.283.802-.362.355-.154a1.332 1.332 0 0 1 1.846 1.065ZM6 5a1 1 0 0 1 .993.883L7 6v12a1 1 0 0 1-.883.993L6 19H5a1 1 0 0 1-.993-.883L4 18V6a1 1 0 0 1 .883-.993L5 5z"/></g></svg>`,
   play: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><g fill="none" fill-rule="evenodd"><path d="M24 0v24H0V0z"/><path fill="currentColor" d="M5.669 4.76a1.469 1.469 0 0 1 2.04-1.177c1.062.454 3.442 1.533 6.462 3.276 3.021 1.744 5.146 3.267 6.069 3.958.788.591.79 1.763.001 2.356-.914.687-3.013 2.19-6.07 3.956-3.06 1.766-5.412 2.832-6.464 3.28-.906.387-1.92-.2-2.038-1.177-.138-1.142-.396-3.735-.396-7.237 0-3.5.257-6.092.396-7.235"/></g></svg>`,
@@ -12,12 +10,4 @@ export const playerControlIcons = {
   more: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="currentColor" d="M12 8c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"/></svg>`,
 } as const;
 
-const SPEAKER = `<path fill="currentColor" d="M9.88 6 Q11 5 11 6.50 L11 17.50 Q11 19 9.88 18 L7.62 16 Q6.50 15 5 15 L4.50 15 Q3 15 3 13.50 L3 10.50 Q3 9 4.50 9 L5 9 Q6.50 9 7.62 8Z"/>`;
-const VOLUME_SVG = (body: string): string =>
-  `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${SPEAKER}${body}</svg>`;
-
-export const volumeIcons: Record<VolumeTier, string> = {
-  high: VOLUME_SVG(`<path d="M15 9.5a3.5 3.5 0 0 1 0 5"/><path d="M18 7a7 7 0 0 1 0 10"/>`),
-  low: VOLUME_SVG(`<path d="M15 9.5a3.5 3.5 0 0 1 0 5"/>`),
-  muted: VOLUME_SVG(`<path d="m16 10 4 4m0-4-4 4"/>`),
-};
+export const volumeIcon = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path fill="currentColor" d="M9.88 6 Q11 5 11 6.50 L11 17.50 Q11 19 9.88 18 L7.62 16 Q6.50 15 5 15 L4.50 15 Q3 15 3 13.50 L3 10.50 Q3 9 4.50 9 L5 9 Q6.50 9 7.62 8Z"/><path data-part="wave-low" d="M15 9.5a3.5 3.5 0 0 1 0 5"/><path data-part="wave-high" d="M18 7a7 7 0 0 1 0 10"/><path data-part="mute" d="m16 10 4 4m0-4-4 4"/></svg>`;
