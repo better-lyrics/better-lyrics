@@ -1,7 +1,7 @@
 import { logContent } from "@core/logger";
 import { parseSvgString } from "@modules/ui/lyricsDock/icons";
 import { volumeIcon } from "./icons";
-import { getControlLabel, getVolume, observeVolume, setVolume, toggleMute } from "./playerBarControls";
+import { applyControlLabel, getVolume, observeVolume, setVolume, toggleMute } from "./playerBarControls";
 import { pctFromClientX } from "./playhead";
 import { clampVolume, VOLUME_KEY_STEP, VOLUME_WHEEL_STEP, volumeTier } from "./volumeLevel";
 
@@ -58,7 +58,7 @@ export function createVolumeControl({ doc, sourceDoc }: VolumeControlOptions): V
   track.appendChild(bar);
   element.append(track, button);
 
-  let level = getVolume(sourceDoc)?.level ?? 100;
+  let level = getVolume(sourceDoc) ?? 100;
   let dragging = false;
   let open = false;
   let closeTimer = 0;
@@ -67,8 +67,8 @@ export function createVolumeControl({ doc, sourceDoc }: VolumeControlOptions): V
   let wheelDelta = 0;
 
   const syncLabels = (): void => {
-    bar.setAttribute("aria-label", getControlLabel(sourceDoc, "volume") ?? "");
-    button.setAttribute("aria-label", getControlLabel(sourceDoc, "mute") ?? "");
+    applyControlLabel(bar, sourceDoc, "volume");
+    applyControlLabel(button, sourceDoc, "mute");
   };
 
   const render = (): void => {
@@ -201,10 +201,14 @@ export function createVolumeControl({ doc, sourceDoc }: VolumeControlOptions): V
 
   const stopObserving = observeVolume(sourceDoc, () => {
     if (dragging) return;
-    const state = getVolume(sourceDoc);
-    if (!state || state.level === level) return;
-    level = state.level;
-    render();
+    const next = getVolume(sourceDoc);
+    if (next === null) return;
+    if (next !== level) {
+      level = next;
+      render();
+    } else {
+      syncLabels();
+    }
   });
 
   render();

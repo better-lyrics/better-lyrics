@@ -4,7 +4,7 @@ import { attachTransportAnimation } from "@modules/ui/playerControls/controlAnim
 import { playerControlIcons } from "@modules/ui/playerControls/icons";
 import {
   canSwitchPlaybackMode,
-  getControlLabel,
+  applyControlLabel,
   getRatingState,
   getSelectedPlaybackMode,
   observePlaybackMode,
@@ -874,7 +874,7 @@ export class PictureInPictureLyricsView {
     const liked = getRatingState(this.sourceDocument) === "LIKE";
     this.likeButton.toggleAttribute("data-active", liked);
     this.likeButton.setAttribute("aria-pressed", String(liked));
-    this.likeButton.setAttribute("aria-label", getControlLabel(this.sourceDocument, "like") ?? "");
+    applyControlLabel(this.likeButton, this.sourceDocument, "like");
   };
 
   private createCloseButton(): HTMLButtonElement {

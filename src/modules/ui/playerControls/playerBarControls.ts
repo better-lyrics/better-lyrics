@@ -139,18 +139,12 @@ export function isAdPlaying(doc: Document): boolean {
 
 // -- Volume --------------------------
 
-interface VolumeState {
-  level: number;
-  muted: boolean;
-}
-
-export function getVolume(doc: Document): VolumeState | null {
+export function getVolume(doc: Document): number | null {
   const raw = doc.querySelector(VOLUME_SLIDER)?.getAttribute("value");
   if (raw == null || raw.trim() === "") return null;
   const parsed = Number(raw);
   if (!Number.isFinite(parsed)) return null;
-  const level = clampVolume(parsed);
-  return { level, muted: level === 0 };
+  return clampVolume(parsed);
 }
 
 export function setVolume(doc: Document, level: number): void {
@@ -163,15 +157,21 @@ export function getControlLabel(doc: Document, control: keyof typeof CONTROL_LAB
   return doc.querySelector(CONTROL_LABEL_SOURCES[control])?.getAttribute("aria-label") || null;
 }
 
+export function applyControlLabel(target: Element, doc: Document, control: keyof typeof CONTROL_LABEL_SOURCES): void {
+  const label = getControlLabel(doc, control);
+  if (!label) target.removeAttribute("aria-label");
+  else if (target.getAttribute("aria-label") !== label) target.setAttribute("aria-label", label);
+}
+
 export function toggleMute(doc: Document): void {
   doc.querySelector<HTMLElement>(MUTE_BUTTON)?.click();
 }
 
 export function observeVolume(doc: Document, onChange: () => void): () => void {
-  const slider = doc.querySelector(VOLUME_SLIDER);
-  if (!slider) return () => {};
+  const playerBar = getPlayerBar(doc);
+  if (!playerBar) return () => {};
   const observer = new MutationObserver(onChange);
-  observer.observe(slider, { attributes: true, attributeFilter: ["value"] });
+  observer.observe(playerBar, { subtree: true, childList: true, attributes: true, attributeFilter: ["value"] });
   return () => observer.disconnect();
 }
 

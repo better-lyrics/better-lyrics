@@ -152,9 +152,9 @@ const VOLUME_SLIDER = "ytmusic-player-bar #volume-slider";
 const MUTE_BUTTON = "ytmusic-player-bar yt-icon-button.volume button";
 const withSlider = (value: string): Document => fakeDoc({ [VOLUME_SLIDER]: el({ value }) });
 
-assert.deepEqual(getVolume(withSlider("62")), { level: 62, muted: false }, "reads the slider value attribute");
-assert.deepEqual(getVolume(withSlider("0")), { level: 0, muted: true }, "slider zero is muted");
-assert.deepEqual(getVolume(withSlider("140")), { level: 100, muted: false }, "clamps an out-of-range value");
+assert.equal(getVolume(withSlider("62")), 62, "reads the slider value attribute");
+assert.equal(getVolume(withSlider("0")), 0, "slider zero reads as zero");
+assert.equal(getVolume(withSlider("140")), 100, "clamps an out-of-range value");
 assert.equal(getVolume(withSlider("loud")), null, "a non-numeric value is unknown, not silent");
 assert.equal(getVolume(withSlider("")), null, "an empty value is unknown, not muted");
 assert.equal(getVolume(fakeDoc({})), null, "no slider is unknown");
