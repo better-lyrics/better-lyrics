@@ -1449,15 +1449,13 @@ ytmusic-player-page:not([is-mweb-modernization-enabled]) #side-panel.blyrics-has
 }
 
 .blyrics-volume {
-  --blyrics-volume-height: 26px;
+  --blyrics-volume-height: 22px;
   --blyrics-volume-icon-size: 16px;
   --blyrics-volume-width: clamp(72px, 7vw, 104px);
   --blyrics-volume-knob-size: 8px;
   --blyrics-volume-rest-opacity: 0.4;
   --blyrics-volume-gap: 4px;
-  --blyrics-volume-inset: calc(
-    (var(--blyrics-volume-height) - var(--blyrics-volume-icon-size)) / 2 + var(--blyrics-volume-knob-size) / 2
-  );
+  --blyrics-volume-inset: calc((var(--blyrics-volume-height) - var(--blyrics-volume-icon-size)) / 2 + 2px);
 
   display: flex;
   align-items: center;
@@ -1527,8 +1525,11 @@ ytmusic-player-page:not([is-mweb-modernization-enabled]) #side-panel.blyrics-has
 }
 
 .blyrics-volume[data-open] .blyrics-volume__track {
-  width: calc(var(--blyrics-volume-width) + var(--blyrics-volume-inset) + var(--blyrics-volume-gap));
-  padding: 0 var(--blyrics-volume-gap) 0 var(--blyrics-volume-inset);
+  width: calc(
+    var(--blyrics-volume-width) + var(--blyrics-volume-inset) + var(--blyrics-volume-gap) +
+      var(--blyrics-volume-knob-size) / 2
+  );
+  padding: 0 calc(var(--blyrics-volume-gap) + var(--blyrics-volume-knob-size) / 2) 0 var(--blyrics-volume-inset);
   opacity: 1;
 }
 
@@ -1639,7 +1640,7 @@ ytmusic-player-page[player-fullscreened]:not([blyrics-dfs], [blyrics-karaoke]) #
 }
 
 .blyrics-fs-info-actions .blyrics-volume {
-  --blyrics-volume-height: 3.25rem;
+  --blyrics-volume-height: 26px;
   --blyrics-volume-icon-size: 18px;
 
   margin: 0;

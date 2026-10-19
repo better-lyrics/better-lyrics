@@ -1781,7 +1781,7 @@ body {
 }
 
 .blyrics-pip-progress .blyrics-volume {
-  --blyrics-volume-height: 22px;
+  --blyrics-volume-height: 20px;
   --blyrics-volume-icon-size: 14px;
   --blyrics-volume-width: 60px;
 }
