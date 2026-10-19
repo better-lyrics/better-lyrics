@@ -1431,6 +1431,169 @@ ytmusic-player-page:not([is-mweb-modernization-enabled]) #side-panel.blyrics-has
   color: #fff;
 }
 
+/* -- Volume ---------------------------------------------------------------- */
+.blyrics-progress__times--accessory {
+  align-items: center;
+  gap: 8px;
+}
+
+.blyrics-progress__times--accessory .blyrics-progress__elapsed {
+  flex: 0 0 auto;
+}
+
+.blyrics-progress__end-group {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  min-width: 0;
+}
+
+.blyrics-volume {
+  --blyrics-volume-height: 26px;
+  --blyrics-volume-icon-size: 16px;
+  --blyrics-volume-width: clamp(72px, 7vw, 104px);
+  --blyrics-volume-knob-size: 8px;
+  --blyrics-volume-rest-opacity: 0.4;
+  --blyrics-volume-gap: 4px;
+  --blyrics-volume-inset: calc(
+    (var(--blyrics-volume-height) - var(--blyrics-volume-icon-size)) / 2 + var(--blyrics-volume-knob-size) / 2
+  );
+
+  display: flex;
+  flex-direction: row-reverse;
+  align-items: center;
+  min-width: 0;
+  height: var(--blyrics-volume-height);
+  margin-block: calc((1lh - var(--blyrics-volume-height)) / 2);
+  border-radius: 999px;
+  transition: background 180ms ease;
+}
+
+.blyrics-volume[data-open] {
+  background: rgb(255 255 255 / 10%);
+}
+
+.blyrics-volume__button {
+  display: grid;
+  flex: 0 0 auto;
+  width: var(--blyrics-volume-height);
+  height: var(--blyrics-volume-height);
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  place-items: center;
+  background: none;
+  color: #fff;
+  opacity: var(--blyrics-volume-rest-opacity);
+  cursor: pointer;
+  transition: opacity 140ms ease;
+}
+
+.blyrics-volume[data-muted] .blyrics-volume__button {
+  opacity: 0.6;
+}
+
+.blyrics-volume[data-open] .blyrics-volume__button {
+  opacity: 1;
+}
+
+.blyrics-volume__icon {
+  grid-area: 1 / 1;
+  width: var(--blyrics-volume-icon-size);
+  height: var(--blyrics-volume-icon-size);
+  opacity: 0;
+  transition: opacity 160ms ease;
+}
+
+.blyrics-volume[data-level="high"] .blyrics-volume__icon[data-tier="high"],
+.blyrics-volume[data-level="low"] .blyrics-volume__icon[data-tier="low"],
+.blyrics-volume[data-level="muted"] .blyrics-volume__icon[data-tier="muted"] {
+  opacity: 1;
+}
+
+.blyrics-volume__track {
+  display: flex;
+  box-sizing: border-box;
+  flex: 0 1 auto;
+  align-items: center;
+  align-self: stretch;
+  width: 0;
+  min-width: 0;
+  overflow: hidden;
+  opacity: 0;
+  transition:
+    width 260ms cubic-bezier(0.22, 1, 0.36, 1),
+    padding 260ms cubic-bezier(0.22, 1, 0.36, 1),
+    opacity 200ms ease;
+}
+
+.blyrics-volume[data-open] .blyrics-volume__track {
+  width: calc(var(--blyrics-volume-width) + var(--blyrics-volume-inset) + var(--blyrics-volume-gap));
+  padding: 0 var(--blyrics-volume-gap) 0 var(--blyrics-volume-inset);
+  opacity: 1;
+}
+
+.blyrics-volume__bar {
+  position: relative;
+  flex: 1;
+  min-width: 0;
+  height: 4px;
+  border-radius: 999px;
+  background: rgb(255 255 255 / 22%);
+  cursor: pointer;
+  touch-action: none;
+}
+
+.blyrics-volume__bar::before {
+  content: "";
+  position: absolute;
+  inset: -11px 0;
+}
+
+.blyrics-volume__fill {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: #fff;
+  transform: scaleX(var(--blyrics-volume-level, 1));
+  transform-origin: left center;
+}
+
+.blyrics-volume__knob {
+  position: absolute;
+  top: 50%;
+  left: calc(var(--blyrics-volume-level, 1) * 100%);
+  width: var(--blyrics-volume-knob-size);
+  height: var(--blyrics-volume-knob-size);
+  margin: calc(var(--blyrics-volume-knob-size) / -2) 0 0 calc(var(--blyrics-volume-knob-size) / -2);
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: var(--blyrics-progress-dot-shadow);
+  transition: transform 150ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.blyrics-volume__bar:hover .blyrics-volume__knob,
+.blyrics-volume__bar.dragging .blyrics-volume__knob {
+  transform: scale(1.25);
+}
+
+.blyrics-volume__button:focus,
+.blyrics-volume__bar:focus {
+  outline: none;
+}
+
+.blyrics-volume__button:focus-visible,
+.blyrics-volume__bar:focus-visible {
+  outline: 2px solid rgb(255 255 255 / 40%);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .blyrics-volume__track {
+    transition: opacity 200ms ease;
+  }
+}
+
 /* -- Fullscreen player controls -------------------------------------------- */
 /* Enhanced fullscreen only; the column sits under the album art in #main-panel. */
 #blyrics-fs-column {

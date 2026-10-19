@@ -1780,6 +1780,12 @@ body {
   font-size: 10px;
 }
 
+.blyrics-pip-progress .blyrics-volume {
+  --blyrics-volume-height: 22px;
+  --blyrics-volume-icon-size: 14px;
+  --blyrics-volume-width: 60px;
+}
+
 .blyrics-pip-progress .blyrics-progress__knob {
   width: 18px;
   height: 18px;
@@ -1836,6 +1842,10 @@ body {
 
   .blyrics-pip-progress .blyrics-progress__times {
     font-size: 12px;
+  }
+
+  .blyrics-pip-progress .blyrics-volume {
+    --blyrics-volume-width: 104px;
   }
 
   .blyrics-pip-header__title {
