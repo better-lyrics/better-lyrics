@@ -1,8 +1,8 @@
 import { AppState } from "@core/appState";
 import { logContent } from "@core/logger";
 import { setStorage } from "@core/storage";
-import { attachTransportAnimation } from "./controlAnimations";
-import { playerControlIcons } from "./icons";
+import { attachTransportAnimation } from "@modules/ui/playerControls/controlAnimations";
+import { playerControlIcons } from "@modules/ui/playerControls/icons";
 import {
   getRatingState,
   isAdPlaying,
@@ -12,11 +12,11 @@ import {
   sendTransport,
   toggleDislike,
   toggleLike,
-} from "./playerBarControls";
-import type { PlaybackSnapshot } from "./playhead";
-import { createProgressBar } from "./progressBar";
-import { createRatingButton, playLikeBurst } from "./ratingButton";
-import { createVolumeControl } from "./volumeControl";
+} from "@modules/ui/playerControls/playerBarControls";
+import type { PlaybackSnapshot } from "@modules/ui/playerControls/playhead";
+import { createProgressBar } from "@modules/ui/playerControls/progressBar";
+import { createRatingButton, playLikeBurst } from "@modules/ui/playerControls/ratingButton";
+import { createVolumeControl } from "@modules/ui/playerControls/volumeControl";
 
 export interface FullscreenControlsHandle {
   element: HTMLElement;

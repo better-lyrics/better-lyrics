@@ -1,6 +1,6 @@
 import { logContent } from "@core/logger";
 import { parseSvgString } from "@modules/ui/lyricsDock/icons";
-import { playerControlIcons } from "./icons";
+import { playerControlIcons } from "@modules/ui/playerControls/icons";
 
 function ratingLayer(doc: Document, modifier: string, svg: string): HTMLElement {
   const layer = doc.createElement("span");

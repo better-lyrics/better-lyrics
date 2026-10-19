@@ -1,6 +1,6 @@
 import { AD_PLAYING_ATTR, PLAYER_BAR_SELECTOR, PLAYER_CONTROL_EVENT, SEEK_EVENT, SET_VOLUME_EVENT } from "@constants";
 import { observeResize } from "@modules/ui/layout/layoutWidth";
-import { clampVolume } from "./volumeLevel";
+import { clampVolume } from "@modules/ui/playerControls/volumeLevel";
 
 export type TransportAction = "previous" | "play-pause" | "next";
 export type RatingState = "LIKE" | "DISLIKE" | "INDIFFERENT";

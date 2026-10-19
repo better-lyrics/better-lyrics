@@ -1,9 +1,15 @@
 import { logContent } from "@core/logger";
 import { parseSvgString } from "@modules/ui/lyricsDock/icons";
-import { volumeIcon } from "./icons";
-import { applyControlLabel, getVolume, observeVolume, setVolume, toggleMute } from "./playerBarControls";
-import { pctFromClientX } from "./playhead";
-import { clampVolume, VOLUME_KEY_STEP, VOLUME_WHEEL_STEP, volumeTier } from "./volumeLevel";
+import { volumeIcon } from "@modules/ui/playerControls/icons";
+import {
+  applyControlLabel,
+  getVolume,
+  observeVolume,
+  setVolume,
+  toggleMute,
+} from "@modules/ui/playerControls/playerBarControls";
+import { pctFromClientX } from "@modules/ui/playerControls/playhead";
+import { clampVolume, VOLUME_KEY_STEP, VOLUME_WHEEL_STEP, volumeTier } from "@modules/ui/playerControls/volumeLevel";
 
 interface VolumeControlOptions {
   doc: Document;

@@ -531,10 +531,12 @@ export class PictureInPictureLyricsView {
     sourceDocument.addEventListener(PLAYER_TIME_EVENT, this.handlePlayerTime, {
       signal: this.lifecycleController.signal,
     });
-    pipWindow.addEventListener("pointermove", this.handlePointerMove, {
-      passive: true,
-      signal: this.lifecycleController.signal,
-    });
+    for (const type of ["pointermove", "wheel"]) {
+      pipWindow.addEventListener(type, this.handlePointerActivity, {
+        passive: true,
+        signal: this.lifecycleController.signal,
+      });
+    }
     pipDocument.documentElement.addEventListener("pointerleave", this.handlePointerLeave, {
       passive: true,
       signal: this.lifecycleController.signal,
@@ -787,7 +789,7 @@ export class PictureInPictureLyricsView {
     }
   };
 
-  private readonly handlePointerMove = (): void => {
+  private readonly handlePointerActivity = (): void => {
     this.lastPointerMoveTime = this.pipWindow.performance.now();
     this.artworkContainer.removeAttribute("data-controls-idle");
     if (this.controlsIdleTimer === null) this.scheduleControlsIdleCheck();
