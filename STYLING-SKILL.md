@@ -129,6 +129,12 @@ Leave font-family overrides unset for language-aware CJK defaults. If adding a f
 }
 ```
 
+`--blyrics-blur-amount` is the player bar's frost. On the player page it is skipped while
+`--blyrics-background-blur` is exactly its 100px default (a style container query in
+`general.css`): over that background the frost changes no pixel, and Chromium would otherwise re-blur
+the whole bar in every frame the lyrics scroll near it. A theme that sharpens the background gets the
+frost back automatically.
+
 ### Footer
 
 ```css
@@ -466,6 +472,7 @@ Injected under the album art in fullscreen (audio) mode: song info, a seekable p
 │   │       └── span#blyrics-album
 │   │           └── a.blyrics-song-link      (album, links to the album page)
 │   └── .blyrics-fs-info-actions
+│       ├── .blyrics-volume                          (volume pill)
 │       └── button.blyrics-fs-disc.blyrics-fs-more   (quick-actions trigger)
 └── #blyrics-fs-controls
     ├── .blyrics-progress                    (see Progress Bar)
@@ -486,7 +493,7 @@ Injected under the album art in fullscreen (audio) mode: song info, a seekable p
 | `#blyrics-fs-info-row` / `.blyrics-fs-info-row` | Song info plus the quick-actions trigger |
 | `#blyrics-song-info` | Title/artist/album block, also present outside fullscreen |
 | `.blyrics-song-link` | Artist and album links inside the info block; `color: inherit`, underline on hover |
-| `.blyrics-fs-info-actions` | Wrapper for the quick-actions trigger |
+| `.blyrics-fs-info-actions` | Wrapper for the volume pill and the quick-actions trigger |
 | `#blyrics-fs-controls` | Controls strip: progress bar above the transport row |
 | `.blyrics-fs-disc` | Round control button base, shared by transport, rating, and more |
 | `.blyrics-fs-more` | Quick-actions trigger |
@@ -518,6 +525,11 @@ Shared with the floating window, which scopes it under `.blyrics-pip-progress`.
 | `.blyrics-progress__times` | Row holding the elapsed and end times |
 | `.blyrics-progress__elapsed` | Elapsed time |
 | `.blyrics-progress__end[data-mode]` | End time; `total` shows the duration, `remaining` shows the time left, click toggles |
+| `.blyrics-volume[data-open][data-muted][data-level]` | Volume pill; `data-level` is `high`, `low` or `muted` |
+| `.blyrics-volume__button` / `.blyrics-volume__icon` | Speaker button and its icon; parts `[data-part]`: `wave-low`, `wave-high`, `mute` |
+| `.blyrics-volume__bar` / `__fill` / `__knob` | Volume slider |
+
+Variables on `.blyrics-volume`: `--blyrics-volume-width`, `--blyrics-volume-rest-opacity`, `--blyrics-volume-knob-size`. Better Lyrics sets `--blyrics-volume-level` at runtime, so treat it as read only.
 
 ### Press Feedback and Like Burst
 
@@ -610,10 +622,12 @@ With "Show music video" on and YouTube Music in video mode, the floating window 
 │       │   └── .blyrics-pip-artwork__face           (front and back)
 │       │       └── video.blyrics-pip-artwork__music-video
 │       └── .blyrics-pip-artwork__controls
-│           └── .blyrics-pip-artwork__chrome
-│               ├── .blyrics-pip-mode-toggle
-│               │   └── button.blyrics-pip-mode-toggle__option   (song, video)
-│               └── button.blyrics-pip-artwork__control.blyrics-pip-artwork__control--close
+│           ├── .blyrics-pip-artwork__chrome
+│           │   ├── .blyrics-pip-mode-toggle
+│           │   │   └── button.blyrics-pip-mode-toggle__option   (song, video)
+│           │   └── button.blyrics-pip-artwork__control.blyrics-pip-artwork__control--close
+│           ├── button.blyrics-pip-artwork__control.blyrics-pip-artwork__control--like   ([data-active] when liked)
+│           └── .blyrics-volume                     (same pill as fullscreen)
 ├── .blyrics-pip-stage
 │   ├── video.blyrics-pip-stage__video
 │   └── #blyrics-karaoke                            (same tree as fullscreen karaoke)
