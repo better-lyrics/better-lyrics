@@ -1136,9 +1136,14 @@ function initNicknameModal(): void {
 }
 
 async function handleExportIdentity(): Promise<void> {
+  const downloadsGranted = requestDownloadsPermission();
   try {
     const [displayName, exportData, { keyId }] = await Promise.all([getDisplayName(), exportIdentity(), getIdentity()]);
-    const outcome = await downloadIdentityFile(exportData, `better-lyrics-identity-${displayName}.json`);
+    const outcome = await downloadIdentityFile(
+      exportData,
+      `better-lyrics-identity-${displayName}.json`,
+      await downloadsGranted
+    );
     notifyDownloadOutcome(outcome);
     if (outcome.kind === "downloads") await rememberPendingBackup(outcome.downloadId, keyId);
   } catch (error) {
@@ -1149,9 +1154,14 @@ async function handleExportIdentity(): Promise<void> {
 
 type DownloadOutcome = { kind: "downloads"; downloadId: number } | { kind: "anchor" } | { kind: "failed" };
 
-async function downloadIdentityFile(content: string, filename: string): Promise<DownloadOutcome> {
-  const hasPermission = await chrome.permissions.contains({ permissions: ["downloads"] });
-  const granted = hasPermission || (await chrome.permissions.request({ permissions: ["downloads"] }));
+function requestDownloadsPermission(): Promise<boolean> {
+  return chrome.permissions.request({ permissions: ["downloads"] }).catch(error => {
+    warnCore("Downloads permission request failed:", error);
+    return false;
+  });
+}
+
+async function downloadIdentityFile(content: string, filename: string, granted: boolean): Promise<DownloadOutcome> {
   const url = URL.createObjectURL(new Blob([content], { type: "application/json" }));
   if (granted && chrome.downloads) {
     try {
