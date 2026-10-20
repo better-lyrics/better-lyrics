@@ -289,6 +289,7 @@ export function createLyricsWrapper(): HTMLElement {
     const fragment = range.cloneContents();
 
     fragment.querySelectorAll(`.${WORD_HIGHLIGHT_CLASS}`).forEach(el => el.remove());
+    fragment.querySelectorAll("rt").forEach(el => el.remove());
 
     const lineElements = fragment.querySelectorAll(`.${LINE_CLASS}`);
 

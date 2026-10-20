@@ -31,11 +31,33 @@ import {
 import { lyricsElementAdded, mainView } from "@modules/ui/mainLyricsView";
 import { disableNativeLyricsFocus } from "@modules/ui/nativeLyricsFocus";
 import { publishSecondaryViews } from "@modules/ui/secondaryViews";
-import { injectRomanization, injectTranslation, type LineData } from "@braccato/core";
+import { injectFurigana, injectRomanization, injectTranslation, type LineData, type RubySegment } from "@braccato/core";
+import { alignLineParts, containsKanji, isJapaneseLine, songHasKana } from "@braccato/furigana";
 import { findBestLanguageMatch, langCodesMatch, languageMatchesAny } from "@utils";
 import { logCore } from "@core/logger";
 
 export type { LineData };
+
+/**
+ * Returns LyricParts aligned 1-to-1 with lineData.parts (DOM elements).
+ * When @braccato/core builds lineData.parts, whitespace tokens are omitted.
+ * Deriving parts directly from lineData.parts ensures furiganaMap keys match lineData.parts indices.
+ */
+function getRenderedPartsForAlignment(
+  lineData: LineData,
+  itemFallback: { parts?: LyricPart[]; words: string; startTimeMs: number; durationMs: number }
+): LyricPart[] {
+  if (lineData.parts && lineData.parts.length > 0) {
+    return lineData.parts.map(p => ({
+      words: p.lyricElement.dataset.content || p.lyricElement.textContent || "",
+      startTimeMs: Math.round(p.time * 1000),
+      durationMs: Math.round(p.duration * 1000),
+    }));
+  }
+  return itemFallback.parts && itemFallback.parts.length > 0
+    ? itemFallback.parts
+    : [{ words: itemFallback.words, startTimeMs: itemFallback.startTimeMs, durationMs: itemFallback.durationMs }];
+}
 
 /**
  * What the translation and romanization passes put on one line. They inject straight into the main
@@ -47,6 +69,7 @@ interface LyricLineDecoration {
   timedRomanization?: LyricPart[];
   translation?: string;
   translationLanguage?: string;
+  furiganaMap?: Record<number, RubySegment[]>;
 }
 
 /**
@@ -258,6 +281,8 @@ async function processBatchTranslationsAndRomanizations(
   let sourceLanguage = data.language;
   let didInjectCachedContent = false;
 
+  const hasKanaInSong = AppState.isFuriganaEnabled && songHasKana(lyrics.map(l => l.words ?? ""));
+
   // 1. Identify what needs to be translated/romanized
   lyrics.forEach((item, index) => {
     if (item.isInstrumental) return;
@@ -269,6 +294,29 @@ async function processBatchTranslationsAndRomanizations(
     const scriptLanguage = scripts.detectScriptLanguage(item.words);
     const trustedLanguage =
       sourceLanguage && scriptLanguage && !langCodesMatch(sourceLanguage, scriptLanguage) ? undefined : sourceLanguage;
+
+    // -- Furigana --------------------------
+    if (AppState.isFuriganaEnabled && containsKanji(item.words)) {
+      const isJapanese = isJapaneseLine(item.words, {
+        declaredLanguage: sourceLanguage,
+        songHasKana: hasKanaInSong,
+      });
+      const hasNativeRomanization = Boolean(item.romanization || item.timedRomanization);
+      if (isJapanese && hasNativeRomanization) {
+        const parts = getRenderedPartsForAlignment(lineData, item);
+        const furiganaMap = alignLineParts(
+          parts,
+          item.timedRomanization || null,
+          item.romanization || null,
+          item.words || null
+        );
+        const injected = injectFurigana(doc, lineData, furiganaMap);
+        if (injected) {
+          recordLyricDecoration(index, { furiganaMap });
+          didInjectCachedContent = true;
+        }
+      }
+    }
 
     // --- Romanization ---
     const isLanguageDisabledForRomanization = !!trustedLanguage && isRomanizationDisabledForLang(trustedLanguage);

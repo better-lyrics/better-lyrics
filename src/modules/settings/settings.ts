@@ -254,7 +254,6 @@ export function listenForPopupMessages(): void {
       applyLoggingSetting();
       hideCursorOnIdle();
       handleSettings();
-      loadTranslationSettings();
       loadLyricOffsetSettings();
       loadPassiveScrollSetting();
       loadKaraokeSettings(syncKaraoke);
@@ -274,7 +273,9 @@ export function listenForPopupMessages(): void {
         }
       );
       getAndApplyCustomStyles();
-      reloadLyrics();
+      loadTranslationSettings(() => {
+        reloadLyrics();
+      });
     } else if (request.action === "reloadLyrics") {
       reloadLyrics();
       sendResponse({ success: true });
@@ -424,10 +425,11 @@ export function hideDockOnIdleInFullscreen(): void {
 /**
  * Loads translation and romanization settings from storage and updates AppState.
  */
-export function loadTranslationSettings(): void {
+export function loadTranslationSettings(callback?: () => void): void {
   getStorage(
     {
       isTranslateEnabled: false,
+      isFuriganaEnabled: false,
       isRomanizationEnabled: false,
       translationLanguage: "en",
       romanizationDisabledLanguages: [],
@@ -435,10 +437,12 @@ export function loadTranslationSettings(): void {
     },
     items => {
       AppState.isTranslateEnabled = items.isTranslateEnabled;
+      AppState.isFuriganaEnabled = items.isFuriganaEnabled ?? false;
       AppState.isRomanizationEnabled = items.isRomanizationEnabled;
       AppState.translationLanguage = items.translationLanguage || "en";
       AppState.romanizationDisabledLanguages = items.romanizationDisabledLanguages || [];
       AppState.translationDisabledLanguages = items.translationDisabledLanguages || [];
+      callback?.();
     }
   );
 }
