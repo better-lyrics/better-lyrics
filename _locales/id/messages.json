@@ -118,7 +118,7 @@
     "description": "Label for the per-letter wave lyric animation toggle"
   },
   "options_display_fullscreenControlsTooltipStates": {
-    "message": "Auto hides the controls while the player bar is showing. On keeps them visible.",
+    "message": "Otomatis sembunyikan kontrol ketika bar pemutar sedang tampil. Jika on maka akan tetap terlihat.",
     "description": "Tooltip for the fullscreen player controls three-way switch, explaining the Auto and On states"
   },
   "options_display_letterWaveOff": {
