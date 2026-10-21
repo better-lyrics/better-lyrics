@@ -1,4 +1,5 @@
 import type { LyricDecorations, SyncType } from "@modules/lyrics/injectLyrics";
+import type { LyricContributor } from "@modules/lyrics/providers/shared";
 import type { Lyric } from "@braccato/core";
 import type { PictureInPictureSongMetadata } from "@modules/ui/pictureInPicture/types";
 import { warnGeneral } from "@core/logger";
@@ -49,6 +50,7 @@ export interface PictureInPictureLyricsPayload {
   readonly noLyrics: boolean;
   readonly language?: string | null;
   readonly songwriters?: readonly string[];
+  readonly contributors?: readonly LyricContributor[];
   readonly syncType: SyncType;
   readonly title: string;
   readonly artist: string;

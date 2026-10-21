@@ -37,6 +37,8 @@ import { AppState } from "@core/appState";
 import { getBrowserVendor } from "@core/browser";
 import { versionedStylesheetUrl } from "@core/extensionStylesheet";
 import { t } from "@core/i18n";
+import { I18N_SLOT } from "@core/i18nSlot";
+import { createContributorCredit } from "@modules/lyrics/contributorCredit";
 import type { LyricContributor } from "@modules/lyrics/providers/shared";
 import type { ThumbnailElement } from "@modules/lyrics/requestSniffer/NextResponse";
 import { getArtworkMetadata } from "@modules/lyrics/requestSniffer/requestSniffer";
@@ -384,7 +386,13 @@ export function addFooter(
   } else {
     footerLink.textContent = source || HOMEPAGE_DOMAIN;
   }
-  appendContributors(footerLink, contributors);
+  const credit = createContributorCredit(
+    document,
+    contributors,
+    `${FOOTER_CLASS}__contributor`,
+    t("theme_author_prefix", I18N_SLOT)
+  );
+  if (credit.length > 0) footerLink.after(document.createTextNode(" · "), ...credit);
 
   AppState.currentProviderKey = providerKey ?? null;
   void loadSavedOffset(AppState.lastLoadedVideoId, AppState.currentProviderKey);
@@ -405,30 +413,6 @@ export function addFooter(
   }
 
   updateNoLyricsSuppression();
-}
-
-function appendContributors(footerLink: HTMLAnchorElement, contributors: LyricContributor[]): void {
-  const named = contributors.filter(contributor => typeof contributor.name === "string" && contributor.name);
-  if (named.length === 0) return;
-
-  const marker = "\u0000";
-  const [before, after = ""] = t("theme_author_prefix", marker).split(marker);
-  const nodes: Node[] = [document.createTextNode(` · ${before}`)];
-  named.forEach((contributor, index) => {
-    if (index > 0) nodes.push(document.createTextNode(", "));
-    if (typeof contributor.href !== "string" || !contributor.href.startsWith("https://")) {
-      nodes.push(document.createTextNode(contributor.name));
-      return;
-    }
-    const link = document.createElement("a");
-    link.className = `${FOOTER_CLASS}__contributor`;
-    link.href = contributor.href;
-    link.target = "_blank";
-    link.textContent = contributor.name;
-    nodes.push(link);
-  });
-  if (after) nodes.push(document.createTextNode(after));
-  footerLink.after(...nodes);
 }
 
 const unisonControlsRegistry = {

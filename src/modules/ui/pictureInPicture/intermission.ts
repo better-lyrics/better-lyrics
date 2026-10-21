@@ -1,6 +1,6 @@
 import { formatTime } from "@modules/ui/playerControls/timeFormat";
 import { type CountdownState, nextCountdown } from "@modules/ui/pictureInPicture/intermissionCountdown";
-import { splitUpNext } from "@modules/ui/pictureInPicture/intermissionText";
+import { splitAtSlot } from "@core/i18nSlot";
 
 export interface Intermission {
   readonly element: HTMLElement;
@@ -53,7 +53,7 @@ export function createIntermission(doc: Document, strings: IntermissionStrings):
 
   element.append(row, count, bar, next);
 
-  const upNext = splitUpNext(strings.upNext);
+  const upNext = splitAtSlot(strings.upNext);
   const reducedMotion = doc.defaultView?.matchMedia("(prefers-reduced-motion: reduce)") ?? null;
   let shownText: string | null = null;
   let shownTitle: string | null = null;

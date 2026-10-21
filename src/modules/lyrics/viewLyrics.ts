@@ -1,6 +1,7 @@
 import { AppState } from "@core/appState";
 import { t } from "@core/i18n";
 import type { LyricDecorations } from "@modules/lyrics/injectLyrics";
+import type { LyricContributor } from "@modules/lyrics/providers/shared";
 import { retimeToSegmentMap } from "@modules/lyrics/segmentMap";
 import type { Lyric } from "@braccato/core";
 
@@ -13,6 +14,7 @@ interface ViewLyrics {
   readonly decorations: LyricDecorations;
   readonly language: string | null | undefined;
   readonly songwriters: readonly string[] | undefined;
+  readonly contributors: readonly LyricContributor[] | undefined;
   readonly noLyrics: boolean;
 }
 
@@ -34,6 +36,7 @@ export function currentViewLyrics(): ViewLyrics {
     decorations: retimed?.decorations ?? AppState.lyricDecorations,
     language: AppState.lyricData?.language,
     songwriters: AppState.lyricData?.songwriters,
+    contributors: AppState.lyricData?.contributors,
     noLyrics: hasNoLyricsPlaceholder(),
   };
 }
