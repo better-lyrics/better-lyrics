@@ -1307,7 +1307,7 @@ Creates styled footer elements including a Discord button with hover effects.
 
 ### Lyrics Contributors
 
-Some providers credit the people who made the sync (Spicy Lyrics names its uploader and maker). Their names follow the source link as `a.blyrics-footer__contributor` links ("Source: Spicy Lyrics · By A, B"). They are direct children of `.blyrics-footer__container`, so they pick up the footer link color. To hide them, set `.blyrics-footer__contributor { display: none; }`; the "· By" text stays, so prefer restyling over hiding.
+Some providers credit the people who made the sync (Spicy Lyrics names its uploader and maker). Their names follow the source link as `a.blyrics-footer__contributor` links ("Source: Spicy Lyrics · By A, B"). They are direct children of `.blyrics-footer__container`, so they pick up the footer link color. The karaoke end card shows the same credit after the source as `a.blyrics-karaoke-contributor`, inside `.blyrics-karaoke-source`. Restyle them rather than hiding them: the "· By" text stays when the links are hidden.
 
 ### Songwriter Credits
 

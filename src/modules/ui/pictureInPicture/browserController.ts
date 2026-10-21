@@ -12,7 +12,7 @@ import { getArtworkMetadata } from "@modules/lyrics/requestSniffer/requestSniffe
 import { resumeAllAutoscroll } from "@braccato/core";
 import { onSignal, sendInit, sendMetadata } from "@modules/ui/pictureInPicture/bridge";
 import { createGatedToggle } from "@modules/ui/pictureInPicture/controller";
-import { AD_UP_NEXT_SLOT } from "@modules/ui/pictureInPicture/intermissionText";
+import { I18N_SLOT } from "@core/i18nSlot";
 import { publishPictureInPictureLyrics } from "@modules/ui/pictureInPicture/lyricsPublisher";
 import { DEFAULT_ARTWORK_TRANSITION, DEFAULT_TEXT_TRANSITION } from "@modules/ui/pictureInPicture/lyricsView";
 import { createPictureInPictureHost } from "@modules/ui/pictureInPicture/pipHost";
@@ -37,7 +37,10 @@ const PIP_STRING_KEYS = [
   "unison_song",
   "options_display_videoTab",
   "ui_close",
+  "theme_author_prefix",
 ] as const;
+
+const SLOTTED_STRING_KEYS: ReadonlySet<string> = new Set(["picture_in_picture_adUpNext", "theme_author_prefix"]);
 let hasInitializedAutoRestore = false;
 let hasAttemptedAutoRestore = false;
 let hasMirroredMiniPlayer = false;
@@ -180,7 +183,7 @@ export function publishPictureInPictureResources(): void {
   getStorage(PIP_SETTING_DEFAULTS, items => {
     sendInit({
       strings: Object.fromEntries(
-        PIP_STRING_KEYS.map(key => [key, key === "picture_in_picture_adUpNext" ? t(key, AD_UP_NEXT_SLOT) : t(key)])
+        PIP_STRING_KEYS.map(key => [key, SLOTTED_STRING_KEYS.has(key) ? t(key, I18N_SLOT) : t(key)])
       ),
       lyricsStylesheetUrl: versionedStylesheetUrl(LYRIC_STYLESHEET_PATH),
       pipStylesheetUrl: versionedStylesheetUrl(STYLESHEET_PATH),
