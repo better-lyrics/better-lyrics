@@ -408,14 +408,18 @@ export function addFooter(
 }
 
 function appendContributors(footerLink: HTMLAnchorElement, contributors: LyricContributor[]): void {
-  const linkable = contributors.filter(contributor => contributor.href.startsWith("https://"));
-  if (linkable.length === 0) return;
+  const named = contributors.filter(contributor => typeof contributor.name === "string" && contributor.name);
+  if (named.length === 0) return;
 
   const marker = "\u0000";
   const [before, after = ""] = t("theme_author_prefix", marker).split(marker);
   const nodes: Node[] = [document.createTextNode(` · ${before}`)];
-  linkable.forEach((contributor, index) => {
+  named.forEach((contributor, index) => {
     if (index > 0) nodes.push(document.createTextNode(", "));
+    if (typeof contributor.href !== "string" || !contributor.href.startsWith("https://")) {
+      nodes.push(document.createTextNode(contributor.name));
+      return;
+    }
     const link = document.createElement("a");
     link.className = `${FOOTER_CLASS}__contributor`;
     link.href = contributor.href;

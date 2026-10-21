@@ -61,7 +61,7 @@ export function fillTtml(
     contributors,
   };
 
-  const isRichsynced = timingType ? timingType === "syllable" : isWordSynced;
+  const isRichsynced = timingType === "syllable" ? true : timingType === "line" ? false : isWordSynced;
   if (isRichsynced) {
     providerParameters.sourceMap[richsyncKey].lyricSourceResult = result;
     providerParameters.sourceMap[syncedKey].lyricSourceResult = null;
