@@ -146,6 +146,7 @@
 #blyrics-karaoke .blyrics-karaoke-contributor {
     color: inherit;
     text-decoration: none;
+    pointer-events: auto;
 }
 
 /* -- Title card --------------------------------------------- */
