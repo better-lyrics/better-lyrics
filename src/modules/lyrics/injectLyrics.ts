@@ -215,7 +215,8 @@ function injectLyrics(
       data.providerKey,
       data.videoId,
       unisonData,
-      syncType === "none"
+      syncType === "none",
+      data.contributors
     );
   } else {
     addNoLyricsButton(data.song, data.artist, data.album, data.duration, data.videoId);

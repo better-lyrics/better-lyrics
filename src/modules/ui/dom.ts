@@ -37,6 +37,7 @@ import { AppState } from "@core/appState";
 import { getBrowserVendor } from "@core/browser";
 import { versionedStylesheetUrl } from "@core/extensionStylesheet";
 import { t } from "@core/i18n";
+import type { LyricContributor } from "@modules/lyrics/providers/shared";
 import type { ThumbnailElement } from "@modules/lyrics/requestSniffer/NextResponse";
 import { getArtworkMetadata } from "@modules/lyrics/requestSniffer/requestSniffer";
 import { measureWidth, type ObserverHandle, observeLayoutWidth, observeResize } from "@modules/ui/layout/layoutWidth";
@@ -345,7 +346,8 @@ export function addFooter(
   providerKey?: string,
   videoId?: string,
   unisonData?: UnisonData,
-  showRequestButton = false
+  showRequestButton = false,
+  contributors: LyricContributor[] = []
 ): void {
   if (document.getElementsByClassName(FOOTER_CLASS).length !== 0) {
     document.getElementsByClassName(FOOTER_CLASS)[0].remove();
@@ -382,6 +384,7 @@ export function addFooter(
   } else {
     footerLink.textContent = source || HOMEPAGE_DOMAIN;
   }
+  appendContributors(footerLink, contributors);
 
   AppState.currentProviderKey = providerKey ?? null;
   void loadSavedOffset(AppState.lastLoadedVideoId, AppState.currentProviderKey);
@@ -402,6 +405,26 @@ export function addFooter(
   }
 
   updateNoLyricsSuppression();
+}
+
+function appendContributors(footerLink: HTMLAnchorElement, contributors: LyricContributor[]): void {
+  const linkable = contributors.filter(contributor => contributor.href.startsWith("https://"));
+  if (linkable.length === 0) return;
+
+  const marker = "\u0000";
+  const [before, after = ""] = t("theme_author_prefix", marker).split(marker);
+  const nodes: Node[] = [document.createTextNode(` · ${before}`)];
+  linkable.forEach((contributor, index) => {
+    if (index > 0) nodes.push(document.createTextNode(", "));
+    const link = document.createElement("a");
+    link.className = `${FOOTER_CLASS}__contributor`;
+    link.href = contributor.href;
+    link.target = "_blank";
+    link.textContent = contributor.name;
+    nodes.push(link);
+  });
+  if (after) nodes.push(document.createTextNode(after));
+  footerLink.after(...nodes);
 }
 
 const unisonControlsRegistry = {

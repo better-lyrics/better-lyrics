@@ -9,7 +9,7 @@ const SOURCE_LOCALE = "en";
 
 // -- Protected terms --------------------------
 // Better Lyrics product names and endpoints that must appear verbatim in every
-// locale. Third-party brands (Musixmatch, LRClib, YouTube, Genius, BiniLyrics)
+// locale. Third-party brands (Musixmatch, LRClib, YouTube, Genius, BiniLyrics, Spicy Lyrics)
 // are intentionally excluded: translators may transliterate those freely.
 const PROTECTED_TERMS = ["Better Lyrics", "Unison", "Portato", "Legato", "boidu.dev"];
 

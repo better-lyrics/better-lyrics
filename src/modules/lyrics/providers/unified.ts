@@ -1,4 +1,10 @@
-import { CUBEY_LYRICS_API_URL, CUBEY_LYRICS_API_URL_TURNSTILE, HOMEPAGE_URL, LOG_PREFIX } from "@constants";
+import {
+  CUBEY_LYRICS_API_URL,
+  CUBEY_LYRICS_API_URL_TURNSTILE,
+  HOMEPAGE_URL,
+  LOG_PREFIX,
+  SPICY_LYRICS_URL,
+} from "@constants";
 import { getLocalStorage } from "@core/storage";
 import { LRCParser, lrcFixers, parseLRC, parseQRC, PlainParser, QRCParser } from "@braccato/parsers";
 import { type LyricSourceKey, type LyricSourceResult, type ProviderParameters, saveLyricsToCache } from "./shared";
@@ -199,6 +205,16 @@ export function prewarmAuthenticationToken(): void {
     });
 }
 
+interface SpicyContributor {
+  username: string;
+  url: string;
+}
+
+interface SpicyAttribution {
+  uploader: SpicyContributor;
+  maker?: SpicyContributor;
+}
+
 // Managed keys for this provider
 const MANAGED_KEYS = [
   "musixmatch-richsync",
@@ -211,6 +227,8 @@ const MANAGED_KEYS = [
   "bLyrics-synced",
   "binimum-richsynced",
   "binimum-synced",
+  "spicy-richsynced",
+  "spicy-synced",
   "metadata",
 ] as const;
 
@@ -571,23 +589,33 @@ async function processStreamData(event: string, data: any, params: ProviderParam
           syncedKey: "binimum-synced",
           source: "BiniLyrics",
           sourceHref: "https://lyrics-api.binimum.org/",
+          timingType: results.timingType ?? null,
         });
-
-        const timingType: "syllable" | "line" | null = results.timingType ?? null;
-        if (timingType === "syllable") {
-          if (!sourceMap["binimum-richsynced"].lyricSourceResult) {
-            sourceMap["binimum-richsynced"].lyricSourceResult = sourceMap["binimum-synced"].lyricSourceResult;
-            sourceMap["binimum-synced"].lyricSourceResult = null;
-          }
-        } else if (timingType === "line") {
-          if (!sourceMap["binimum-synced"].lyricSourceResult) {
-            sourceMap["binimum-synced"].lyricSourceResult = sourceMap["binimum-richsynced"].lyricSourceResult;
-          }
-          sourceMap["binimum-richsynced"].lyricSourceResult = null;
-        }
 
         resolveWaiter(params, "binimum-richsynced");
         resolveWaiter(params, "binimum-synced");
+      }
+    }
+
+    // Spicy Lyrics (community TTML)
+    if (provider === "spicy") {
+      if (results.lyrics) {
+        const attribution: SpicyAttribution | null = results.attribution ?? null;
+        fillTtml(results.lyrics, params, {
+          richsyncKey: "spicy-richsynced",
+          syncedKey: "spicy-synced",
+          source: "Spicy Lyrics",
+          sourceHref: SPICY_LYRICS_URL,
+          timingType: results.timingType ?? null,
+          contributors: attribution
+            ? [attribution.uploader, attribution.maker]
+                .filter(person => person !== undefined)
+                .map(person => ({ name: person.username, href: person.url }))
+            : undefined,
+        });
+
+        resolveWaiter(params, "spicy-richsynced");
+        resolveWaiter(params, "spicy-synced");
       }
     }
   }
