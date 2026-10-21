@@ -162,8 +162,11 @@
 									<label class="ui-switch"><input type="checkbox" role="switch" class="ui-switch__input" id="albumArt" aria-labelledby="albumArt-label"><span class="ui-switch__track" aria-hidden="true"></span></label>
 								</div>
 								<div class="ui-row">
-									<span class="ui-row__label" id="isFullscreenControlsEnabled-label">__MSG_options_display_fullscreenControls__</span>
-									<label class="ui-switch"><input type="checkbox" role="switch" class="ui-switch__input" id="isFullscreenControlsEnabled" aria-labelledby="isFullscreenControlsEnabled-label"><span class="ui-switch__track" aria-hidden="true"></span></label>
+									<span class="ui-row__label">
+										<span id="fullscreenControlsLabel">__MSG_options_display_fullscreenControls__</span>
+										<span class="setting-help" tabindex="0" data-tooltip="__MSG_options_display_fullscreenControlsTooltipStates__" aria-label="__MSG_options_display_fullscreenControlsTooltipStates__">?</span>
+									</span>
+									<button type="button" class="ui-switch ui-switch--tri" id="fullscreenControlsSwitch" data-state="auto" role="slider" aria-labelledby="fullscreenControlsLabel" aria-valuemin="0" aria-valuemax="2" aria-valuenow="1"></button>
 								</div>
 								<div class="ui-row">
 									<span class="ui-row__label" id="isKaraokeEnabled-label">__MSG_options_display_karaoke__</span>

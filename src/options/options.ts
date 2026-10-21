@@ -39,6 +39,7 @@ import {
 } from "@core/storage";
 import { KARAOKE_DEFAULTS } from "@modules/karaoke/defaults";
 import { syncTypeColors } from "@modules/ui/lyricsDock/icons";
+import { type FullscreenControlsPref, migrateFullscreenControlsPref } from "@modules/settings/fullscreenControls";
 import { migrateLetterWavePref, type LetterWavePref } from "@modules/settings/letterWave";
 import { mergePreferredProviders } from "@modules/lyrics/providers/providerList";
 import { fetchOwnGamification, renderIdentityStats } from "@modules/unison/gamificationRender";
@@ -87,7 +88,7 @@ interface Options extends VideoQualitySettings {
   isAlbumArtEnabled: boolean;
   isShadersPromoEnabled: boolean;
   isFullScreenDisabled: boolean;
-  isFullscreenControlsEnabled: boolean;
+  fullscreenControlsPref: FullscreenControlsPref;
   isStylizedAnimationsEnabled: boolean;
   letterWavePref: LetterWavePref;
   isPassiveScrollEnabled: boolean;
@@ -159,9 +160,9 @@ const getOptionsFromForm = (): Options => {
     isAlbumArtEnabled: (document.getElementById("albumArt") as HTMLInputElement).checked,
     isShadersPromoEnabled: (document.getElementById("isShadersPromoEnabled") as HTMLInputElement).checked,
     isFullScreenDisabled: (document.getElementById("isFullScreenDisabled") as HTMLInputElement).checked,
-    isFullscreenControlsEnabled: (document.getElementById("isFullscreenControlsEnabled") as HTMLInputElement).checked,
+    fullscreenControlsPref: getTriSwitchState("fullscreenControlsSwitch"),
     isStylizedAnimationsEnabled: (document.getElementById("isStylizedAnimationsEnabled") as HTMLInputElement).checked,
-    letterWavePref: getLetterWaveSwitchState(),
+    letterWavePref: getTriSwitchState("letterWaveSwitch"),
     isPassiveScrollEnabled: (document.getElementById("isPassiveScrollEnabled") as HTMLInputElement).checked,
     isPictureInPictureEnabled: (document.getElementById("isPictureInPictureEnabled") as HTMLInputElement).checked,
     isPictureInPictureAutoRestoreEnabled: (
@@ -346,7 +347,7 @@ const restoreOptions = (): void => {
     isShadersPromoEnabled: true,
     isCursorAutoHideEnabled: true,
     isFullScreenDisabled: false,
-    isFullscreenControlsEnabled: true,
+    fullscreenControlsPref: "auto",
     isStylizedAnimationsEnabled: true,
     letterWavePref: "auto",
     isPassiveScrollEnabled: true,
@@ -401,6 +402,7 @@ const restoreOptions = (): void => {
   const readKeys = [
     ...Object.keys(defaultOptions),
     "isLetterWaveEnabled",
+    "isFullscreenControlsEnabled",
     "isUnisonPinnedDockEnabled",
     "unisonPinnedDockPosition",
     "isUnisonAutoHideInFullscreenEnabled",
@@ -411,6 +413,7 @@ const restoreOptions = (): void => {
       ...defaultOptions,
       ...(raw as Options),
       letterWavePref: migrateLetterWavePref(raw),
+      fullscreenControlsPref: migrateFullscreenControlsPref(raw),
       isControlsDockEnabled:
         raw.isControlsDockEnabled ?? raw.isUnisonPinnedDockEnabled ?? defaultOptions.isControlsDockEnabled,
       controlsDockPosition:
@@ -441,12 +444,11 @@ const setOptionsInForm = (items: Options): void => {
   (document.getElementById("autoSwitch") as HTMLInputElement).checked = items.isAutoSwitchEnabled;
   (document.getElementById("cursorAutoHide") as HTMLInputElement).checked = items.isCursorAutoHideEnabled;
   (document.getElementById("isFullScreenDisabled") as HTMLInputElement).checked = items.isFullScreenDisabled;
-  (document.getElementById("isFullscreenControlsEnabled") as HTMLInputElement).checked =
-    items.isFullscreenControlsEnabled;
+  setTriSwitchState("fullscreenControlsSwitch", items.fullscreenControlsPref);
   (document.getElementById("isStylizedAnimationsEnabled") as HTMLInputElement).checked =
     items.isStylizedAnimationsEnabled;
   syncFullscreenDependents();
-  setLetterWaveSwitchState(items.letterWavePref);
+  setTriSwitchState("letterWaveSwitch", items.letterWavePref);
   (document.getElementById("isPassiveScrollEnabled") as HTMLInputElement).checked = items.isPassiveScrollEnabled;
   (document.getElementById("isPictureInPictureEnabled") as HTMLInputElement).checked = items.isPictureInPictureEnabled;
   (document.getElementById("isPictureInPictureAutoRestoreEnabled") as HTMLInputElement).checked =
@@ -641,38 +643,40 @@ function syncFullscreenDependents(): void {
   dependents?.toggleAttribute("inert", muted);
 }
 
-// -- Letter wave switch --------------------------
+// -- Tri-state switches --------------------------
 
-const LETTER_WAVE_ORDER: LetterWavePref[] = ["off", "auto", "on"];
+type TriSwitchState = "off" | "auto" | "on";
 
-const LETTER_WAVE_STATE_KEYS: Record<LetterWavePref, string> = {
+const TRI_SWITCH_ORDER: TriSwitchState[] = ["off", "auto", "on"];
+
+const TRI_SWITCH_STATE_KEYS: Record<TriSwitchState, string> = {
   off: "options_display_letterWaveOff",
   auto: "options_display_videoQualityAuto",
   on: "options_display_letterWaveOn",
 };
 
-function getLetterWaveSwitchState(): LetterWavePref {
-  const state = document.getElementById("letterWaveSwitch")?.dataset.state;
+function getTriSwitchState(id: string): TriSwitchState {
+  const state = document.getElementById(id)?.dataset.state;
   return state === "on" || state === "off" || state === "auto" ? state : "auto";
 }
 
-function setLetterWaveSwitchState(pref: LetterWavePref): void {
-  const el = document.getElementById("letterWaveSwitch");
+function setTriSwitchState(id: string, state: TriSwitchState): void {
+  const el = document.getElementById(id);
   if (!el) return;
-  el.dataset.state = pref;
-  el.setAttribute("aria-valuenow", String(LETTER_WAVE_ORDER.indexOf(pref)));
-  el.setAttribute("aria-valuetext", t(LETTER_WAVE_STATE_KEYS[pref]));
+  el.dataset.state = state;
+  el.setAttribute("aria-valuenow", String(TRI_SWITCH_ORDER.indexOf(state)));
+  el.setAttribute("aria-valuetext", t(TRI_SWITCH_STATE_KEYS[state]));
 }
 
-function initLetterWaveSwitch(): void {
-  const el = document.getElementById("letterWaveSwitch");
+function initTriSwitch(id: string): void {
+  const el = document.getElementById(id);
   if (!el) return;
 
   const step = (delta: number, wrap: boolean): void => {
-    const count = LETTER_WAVE_ORDER.length;
-    const current = LETTER_WAVE_ORDER.indexOf(getLetterWaveSwitchState());
+    const count = TRI_SWITCH_ORDER.length;
+    const current = TRI_SWITCH_ORDER.indexOf(getTriSwitchState(id));
     const next = wrap ? (current + delta + count) % count : Math.min(count - 1, Math.max(0, current + delta));
-    setLetterWaveSwitchState(LETTER_WAVE_ORDER[next]);
+    setTriSwitchState(id, TRI_SWITCH_ORDER[next]);
     saveOptions();
   };
 
@@ -741,7 +745,8 @@ document.addEventListener("DOMContentLoaded", async () => {
   initRefreshLyricsButton(() => toast.error(t("options_alert_refreshFailed")));
   mountDropdownFields();
   initTooltips(document.body);
-  initLetterWaveSwitch();
+  initTriSwitch("letterWaveSwitch");
+  initTriSwitch("fullscreenControlsSwitch");
   document.getElementById("isFullScreenDisabled")?.addEventListener("change", syncFullscreenDependents);
   restoreOptions();
   initPopupCards();

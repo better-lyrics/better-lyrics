@@ -42,6 +42,7 @@ export const PICTURE_IN_PICTURE_TOGGLE_SELECTOR = "[data-blyrics-picture-in-pict
 export const LYRICS_LOADER_ID = "blyrics-loader" as const;
 export const LYRICS_DISABLED_ATTR = "blyrics-dfs" as const;
 export const FULLSCREEN_CONTROLS_DISABLED_ATTR = "blyrics-no-fs-controls" as const;
+export const FULLSCREEN_CONTROLS_PINNED_ATTR = "blyrics-fs-controls-pinned" as const;
 export const KARAOKE_ACTIVE_ATTR = "blyrics-karaoke" as const;
 export const DISABLE_EFFECTS_STYLE_ID = "blyrics-disable-effects" as const;
 export const HIDDEN_CLASS = "blyrics-hidden" as const;

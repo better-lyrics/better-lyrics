@@ -1656,8 +1656,8 @@ ytmusic-player-page[player-fullscreened]:not([blyrics-dfs], [blyrics-karaoke]) #
   transition: opacity 320ms cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-#layout[player-fullscreened]:not([blyrics-dfs])[show-fullscreen-controls] #blyrics-fs-controls,
-#layout[player-fullscreened]:not([blyrics-dfs])[show-fullscreen-controls] .blyrics-fs-info-actions {
+html:not([blyrics-fs-controls-pinned]) #layout[player-fullscreened]:not([blyrics-dfs])[show-fullscreen-controls] #blyrics-fs-controls,
+html:not([blyrics-fs-controls-pinned]) #layout[player-fullscreened]:not([blyrics-dfs])[show-fullscreen-controls] .blyrics-fs-info-actions {
   opacity: 0;
   pointer-events: none;
 }

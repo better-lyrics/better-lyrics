@@ -511,6 +511,7 @@ Injected under the album art in fullscreen (audio) mode: song info, a seekable p
 | `.blyrics-fs-disc[data-menu-open]` | The quick-actions menu is open; keeps the trigger's hover background |
 | `#blyrics-fs-controls[data-ad]` | An ad is playing; the controls strip is hidden |
 | `html[blyrics-no-fs-controls]` | Fullscreen-controls setting is off; hides `#blyrics-fs-controls` and `.blyrics-fs-info-actions` |
+| `html[blyrics-fs-controls-pinned]` | Fullscreen-controls setting is On; the controls stay visible while the player bar shows |
 
 ### Progress Bar
 
