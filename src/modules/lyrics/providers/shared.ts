@@ -73,6 +73,7 @@ export interface LyricSourceResult {
 export interface LyricContributor {
   name: string;
   href: string;
+  role: "maker" | "uploader";
 }
 
 export type LyricsArray = Lyric[];
