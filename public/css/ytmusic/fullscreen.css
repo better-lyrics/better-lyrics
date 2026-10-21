@@ -67,9 +67,9 @@ ytmusic-player-page:not([is-mweb-modernization-enabled])[player-fullscreened]:no
   margin: 0 auto;
 }
 
-ytmusic-player-page:not([blyrics-dfs], [blyrics-karaoke])[blyrics-video-mode]:not([player-ui-state=MINIPLAYER]) #movie_player,
-ytmusic-player-page:not([blyrics-dfs], [blyrics-karaoke])[blyrics-video-mode]:not([player-ui-state=MINIPLAYER]) #song-media-window,
-ytmusic-player-page:not([blyrics-dfs], [blyrics-karaoke])[blyrics-video-mode]:not([player-ui-state=MINIPLAYER]) #player.ytmusic-player-page {
+ytmusic-player-page:not([blyrics-dfs], [blyrics-karaoke])[blyrics-video-mode]:not([player-ui-state=MINIPLAYER]):not([is-mweb-modernization-enabled]) #movie_player,
+ytmusic-player-page:not([blyrics-dfs], [blyrics-karaoke])[blyrics-video-mode]:not([player-ui-state=MINIPLAYER]):not([is-mweb-modernization-enabled]) #song-media-window,
+ytmusic-player-page:not([blyrics-dfs], [blyrics-karaoke])[blyrics-video-mode]:not([player-ui-state=MINIPLAYER]):not([is-mweb-modernization-enabled]) #player.ytmusic-player-page {
   aspect-ratio: var(--blyrics-video-aspect-ratio);
   height: auto;
   min-height: 0;
@@ -101,7 +101,7 @@ ytmusic-player-page[player-fullscreened]:not([blyrics-dfs]) #song-media-window {
    available vertical space. Without this, tall videos like 4:3 overflow on
    wide screens: the bottom is hidden by the player bar in non-fullscreen, or
    pushes the song-info off-screen in fullscreen. */
-ytmusic-player-page:not([blyrics-dfs], [blyrics-karaoke])[blyrics-video-mode]:not([player-fullscreened]):not([player-ui-state=MINIPLAYER]) #player.ytmusic-player-page {
+ytmusic-player-page:not([blyrics-dfs], [blyrics-karaoke])[blyrics-video-mode]:not([player-fullscreened]):not([player-ui-state=MINIPLAYER]):not([is-mweb-modernization-enabled]) #player.ytmusic-player-page {
   width: min(
     100%,
     calc((100vh - 80px - var(--ytmusic-player-page-vertical-padding) - var(--ytmusic-nav-bar-height) - var(--ytmusic-player-bar-height)) * (var(--blyrics-video-aspect-ratio)))
