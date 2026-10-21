@@ -1777,7 +1777,7 @@ Dim the speaker with `opacity`, not a translucent `color`. The icon has overlapp
 
 ### Hiding the Controls
 
-The controls strip is `#blyrics-fs-controls`. It hides on its own during ads (`[data-ad]`) and when the fullscreen-controls setting is off (`html[blyrics-no-fs-controls]`). To hide it from your theme:
+The controls strip is `#blyrics-fs-controls`. It hides on its own during ads (`[data-ad]`) and when the fullscreen-controls setting is off (`html[blyrics-no-fs-controls]`). In Auto it also fades out while YouTube Music shows the player bar; when the setting is On, `html[blyrics-fs-controls-pinned]` is set and it stays visible. To hide it from your theme:
 
 ```css
 #blyrics-fs-controls {
