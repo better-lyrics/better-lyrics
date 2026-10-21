@@ -238,7 +238,7 @@ You can:
 
 Please be mindful of quality when contributing, since these lyrics are served to everyone using the extension.
 
-Other providers (Musixmatch, BiniLyrics, etc.) have their own external catalogs and contribution channels; corrections submitted there will flow back into Better Lyrics automatically once those upstream databases update.
+Other providers (Musixmatch, BiniLyrics, Spicy Lyrics, etc.) have their own external catalogs and contribution channels; corrections submitted there will flow back into Better Lyrics automatically once those upstream databases update.
 
 ### How do I report a bug?
 
@@ -280,20 +280,22 @@ Available providers (default priority order):
 | --- | --------------------- | ---------- |
 | 1   | Better Lyrics         | Syllable   |
 | 2   | Unison                | Syllable   |
-| 3   | BiniLyrics            | Syllable   |
-| 4   | Unison                | Word       |
-| 5   | Better Lyrics Portato | Word       |
-| 6   | Musixmatch            | Word       |
-| 7   | Better Lyrics         | Line       |
-| 8   | Unison                | Line       |
-| 9   | YouTube Captions      | Line       |
-| 10  | BiniLyrics            | Line       |
-| 11  | LRCLib                | Line       |
-| 12  | Better Lyrics Legato  | Line       |
-| 13  | Musixmatch            | Line       |
-| 14  | YouTube               | Unsynced   |
-| 15  | Unison                | Unsynced   |
-| 16  | LRCLib                | Unsynced   |
+| 3   | Spicy Lyrics          | Syllable   |
+| 4   | BiniLyrics            | Syllable   |
+| 5   | Unison                | Word       |
+| 6   | Better Lyrics Portato | Word       |
+| 7   | Musixmatch            | Word       |
+| 8   | Better Lyrics         | Line       |
+| 9   | Unison                | Line       |
+| 10  | Spicy Lyrics          | Line       |
+| 11  | YouTube Captions      | Line       |
+| 12  | BiniLyrics            | Line       |
+| 13  | LRCLib                | Line       |
+| 14  | Better Lyrics Legato  | Line       |
+| 15  | Musixmatch            | Line       |
+| 16  | YouTube               | Unsynced   |
+| 17  | Unison                | Unsynced   |
+| 18  | LRCLib                | Unsynced   |
 
 Adding custom providers isn't currently supported.
 
