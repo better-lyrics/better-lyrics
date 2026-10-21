@@ -43,7 +43,7 @@
         "node": ">=22.12"
     },
     "dependencies": {
-        "@braccato/core": "1.16.10",
+        "@braccato/core": "1.16.11",
         "@braccato/highlight": "0.3.2",
         "@braccato/parsers": "0.4.0",
         "@codemirror/autocomplete": "^6.20.3",
