@@ -841,6 +841,10 @@
     "message": "BiniLyrics",
     "description": "BiniLyrics provider name"
   },
+  "options_provider_spicylyrics": {
+    "message": "Spicy Lyrics",
+    "description": "Spicy Lyrics provider name"
+  },
 
   "options_syncType_syllable": {
     "message": "Syllable",

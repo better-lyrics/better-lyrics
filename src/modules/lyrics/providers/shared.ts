@@ -67,6 +67,12 @@ export interface LyricSourceResult {
   duration?: number;
   songwriters?: string[];
   unisonData?: UnisonData;
+  contributors?: LyricContributor[];
+}
+
+export interface LyricContributor {
+  name: string;
+  href: string;
 }
 
 export type LyricsArray = Lyric[];
@@ -150,6 +156,8 @@ export function initProviders(): void {
 const sourceKeyToFillFn = {
   "binimum-richsynced": (p: ProviderParameters) => unified(p, "binimum-richsynced"),
   "binimum-synced": (p: ProviderParameters) => unified(p, "binimum-synced"),
+  "spicy-richsynced": (p: ProviderParameters) => unified(p, "spicy-richsynced"),
+  "spicy-synced": (p: ProviderParameters) => unified(p, "spicy-synced"),
   "bLyrics-richsynced": (p: ProviderParameters) => unified(p, "bLyrics-richsynced"),
   "bLyrics-synced": (p: ProviderParameters) => unified(p, "bLyrics-synced"),
   "unison-richsynced": unison,

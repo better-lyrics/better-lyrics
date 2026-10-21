@@ -148,6 +148,8 @@ frost back automatically.
 }
 ```
 
+Sync credits from providers that name contributors (Spicy Lyrics) render after the source link as `a.blyrics-footer__contributor`, direct children of `.blyrics-footer__container`.
+
 ### Songwriter Credits
 
 ```css

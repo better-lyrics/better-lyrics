@@ -368,6 +368,7 @@ const restoreOptions = (): void => {
     preferredProviderList: [
       "bLyrics-richsynced",
       "unison-richsynced",
+      "spicy-richsynced",
       "binimum-richsynced",
       "unison-wordsynced",
       "portato-richsynced",
@@ -375,6 +376,7 @@ const restoreOptions = (): void => {
       "yt-captions",
       "bLyrics-synced",
       "unison-synced",
+      "spicy-synced",
       "binimum-synced",
       "lrclib-synced",
       "legato-synced",
@@ -495,6 +497,7 @@ const setOptionsInForm = (items: Options): void => {
   const defaultProviderOrder = [
     "bLyrics-richsynced",
     "unison-richsynced",
+    "spicy-richsynced",
     "binimum-richsynced",
     "unison-wordsynced",
     "portato-richsynced",
@@ -502,6 +505,7 @@ const setOptionsInForm = (items: Options): void => {
     "yt-captions",
     "bLyrics-synced",
     "unison-synced",
+    "spicy-synced",
     "binimum-synced",
     "lrclib-synced",
     "legato-synced",
@@ -529,6 +533,8 @@ interface ProviderInfo {
 const getProviderIdToInfoMap = (): { [key: string]: ProviderInfo } => ({
   "binimum-richsynced": { name: t("options_provider_binilyrics"), syncType: "syllable" },
   "binimum-synced": { name: t("options_provider_binilyrics"), syncType: "line" },
+  "spicy-richsynced": { name: t("options_provider_spicylyrics"), syncType: "syllable" },
+  "spicy-synced": { name: t("options_provider_spicylyrics"), syncType: "line" },
   "musixmatch-richsync": {
     name: t("options_provider_musixmatch"),
     syncType: "word",
