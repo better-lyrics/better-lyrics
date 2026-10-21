@@ -40,7 +40,7 @@
     "description": "Auto switch to lyrics tab setting label"
   },
   "options_general_clearCachedLyrics": {
-    "message": "Clear cached lyrics",
+    "message": "Borrar letras en caché",
     "description": "Label for the clear cache action row"
   },
   "options_general_clearCachedLyricsHint": {
@@ -56,7 +56,7 @@
     "description": "Total lyrics in cache label"
   },
   "options_general_storageUsed": {
-    "message": "Storage used",
+    "message": "Almacenamiento utilizado",
     "description": "Popup General tab: label under the total local storage size"
   },
   "options_general_segment": {
@@ -74,11 +74,11 @@
     }
   },
   "options_general_browseThemes": {
-    "message": "Browse themes",
+    "message": "Explorar temas",
     "description": "Popup General tab: one-line description on the Theme Marketplace shortcut"
   },
   "options_general_whatsNew": {
-    "message": "What's new",
+    "message": "Novedades",
     "description": "Popup General tab: shortcut to the latest release notes"
   },
   "options_general_whatsNewHint": {
