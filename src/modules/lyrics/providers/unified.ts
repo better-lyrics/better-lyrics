@@ -608,9 +608,12 @@ async function processStreamData(event: string, data: any, params: ProviderParam
           sourceHref: SPICY_LYRICS_URL,
           timingType: results.timingType ?? null,
           contributors: attribution
-            ? [attribution.uploader, attribution.maker]
-                .filter(person => person !== undefined)
-                .map(person => ({ name: person.username, href: person.url }))
+            ? [
+                { name: attribution.uploader.username, href: attribution.uploader.url, role: "uploader" },
+                ...(attribution.maker
+                  ? [{ name: attribution.maker.username, href: attribution.maker.url, role: "maker" as const }]
+                  : []),
+              ]
             : undefined,
         });
 

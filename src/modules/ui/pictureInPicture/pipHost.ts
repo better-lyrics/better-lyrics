@@ -1,5 +1,5 @@
 import { DISABLE_EFFECTS_STYLE_ID, FOOTER_CLASS, PLAYER_TIME_EVENT } from "@constants";
-import { I18N_SLOT } from "@core/i18nSlot";
+import { translateContributorCreditLabels } from "@modules/lyrics/contributorCredit";
 import type { PlayerDetails } from "@core/appState";
 import { CUSTOM_THEME_STYLE_ID } from "@braccato/core/constants";
 import { applyLyricDecorations } from "@modules/lyrics/lyricDecorations";
@@ -592,7 +592,7 @@ export function createPictureInPictureHost(
         bar: view.stageBar,
         onCardChange: (card, heightPx) => view.setStageCard(card, heightPx),
       },
-      contributorByline: environment.view.translate("theme_author_prefix", I18N_SLOT),
+      contributorLabels: translateContributorCreditLabels(key => environment.view.translate(key)),
       isVisible: () => isStageShown,
       isAdPlaying: () => isAdPlaying(document),
       get log() {

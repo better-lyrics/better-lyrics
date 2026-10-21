@@ -28,7 +28,7 @@ import {
   PictureInPictureHeaderMarquee,
 } from "@modules/ui/pictureInPicture/headerMarquee";
 import { createIntermission, type Intermission } from "@modules/ui/pictureInPicture/intermission";
-import { I18N_SLOT } from "@core/i18nSlot";
+import { AD_UP_NEXT_SLOT } from "@modules/ui/pictureInPicture/intermissionText";
 import {
   canFlipStartModeSwitch,
   type CounterpartPair,
@@ -504,7 +504,7 @@ export class PictureInPictureLyricsView {
     content.append(header, this.lyricsViewport);
     this.intermission = createIntermission(pipDocument, {
       adPlaying: dependencies.translate("picture_in_picture_adPlaying"),
-      upNext: dependencies.translate("picture_in_picture_adUpNext", I18N_SLOT),
+      upNext: dependencies.translate("picture_in_picture_adUpNext", AD_UP_NEXT_SLOT),
     });
     this.stage = pipDocument.createElement("div");
     this.stage.className = "blyrics-pip-stage";

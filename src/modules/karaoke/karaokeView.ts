@@ -1,6 +1,6 @@
 import { AppState } from "@core/appState";
 import { t } from "@core/i18n";
-import { I18N_SLOT } from "@core/i18nSlot";
+import { translateContributorCreditLabels } from "@modules/lyrics/contributorCredit";
 import { type LogSink, logCore } from "@core/logger";
 import { type ObserverHandle, observeResize } from "@modules/ui/layout/layoutWidth";
 import type { LyricDecorations } from "@modules/lyrics/injectLyrics";
@@ -40,8 +40,8 @@ function createMainPageStage(): KaraokeStage {
       },
       bar: mainPageBar,
     },
-    get contributorByline(): string {
-      return t("theme_author_prefix", I18N_SLOT);
+    get contributorLabels() {
+      return translateContributorCreditLabels(key => t(key));
     },
     isVisible: isKaraokeActive,
     isAdPlaying: () => isAdPlaying(document),

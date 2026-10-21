@@ -37,8 +37,7 @@ import { AppState } from "@core/appState";
 import { getBrowserVendor } from "@core/browser";
 import { versionedStylesheetUrl } from "@core/extensionStylesheet";
 import { t } from "@core/i18n";
-import { I18N_SLOT } from "@core/i18nSlot";
-import { createContributorCredit } from "@modules/lyrics/contributorCredit";
+import { createContributorCredit, translateContributorCreditLabels } from "@modules/lyrics/contributorCredit";
 import type { LyricContributor } from "@modules/lyrics/providers/shared";
 import type { ThumbnailElement } from "@modules/lyrics/requestSniffer/NextResponse";
 import { getArtworkMetadata } from "@modules/lyrics/requestSniffer/requestSniffer";
@@ -390,7 +389,7 @@ export function addFooter(
     document,
     contributors,
     `${FOOTER_CLASS}__contributor`,
-    t("theme_author_prefix", I18N_SLOT)
+    translateContributorCreditLabels(key => t(key))
   );
   if (credit.length > 0) footerLink.after(document.createTextNode(" · "), ...credit);
 

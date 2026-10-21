@@ -3,6 +3,7 @@ import { applyLyricDecorations } from "@modules/lyrics/lyricDecorations";
 import type { LyricDecorations } from "@modules/lyrics/injectLyrics";
 import { createLyricsRenderer, type Lyric, type LyricsRenderer, type TickOptions } from "@braccato/core";
 import { decorateEndCard } from "@modules/karaoke/endCard";
+import type { ContributorCreditLabels } from "@modules/lyrics/contributorCredit";
 import type { LyricContributor } from "@modules/lyrics/providers/shared";
 import { createKaraokeOverlay, type KaraokeOverlayOptions } from "@modules/karaoke/overlay";
 
@@ -10,7 +11,7 @@ interface KaraokeStageOptions {
   readonly doc: Document;
   readonly win: Window;
   readonly overlay: KaraokeOverlayOptions;
-  readonly contributorByline: string;
+  readonly contributorLabels: ContributorCreditLabels;
   readonly isVisible: () => boolean;
   readonly isAdPlaying: () => boolean;
   readonly log: LogSink;
@@ -71,7 +72,7 @@ export function createKaraokeStage(options: KaraokeStageOptions): KaraokeStage {
       firstSungLineStartS = firstSung?.time ?? Number.POSITIVE_INFINITY;
       hasIntroNote = renderer.lines[0]?.lyricElement.dataset.instrumental === "true";
       overlay.setTitleCard({ title, artist, songwriters: songwriters ?? [] });
-      decorateEndCard(renderer.container, providerKey, contributors, options.contributorByline);
+      decorateEndCard(renderer.container, providerKey, contributors, options.contributorLabels);
     },
 
     setLanguage(language: string | null | undefined): void {

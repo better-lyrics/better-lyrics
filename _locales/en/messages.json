@@ -845,6 +845,14 @@
     "message": "Spicy Lyrics",
     "description": "Spicy Lyrics provider name"
   },
+  "lyrics_syncedBy": {
+    "message": "Synced by",
+    "description": "Label in the lyrics footer and karaoke end card, before the name of the person who made the timed lyrics"
+  },
+  "lyrics_syncedAndUploadedBy": {
+    "message": "Synced and uploaded by",
+    "description": "Label in the lyrics footer and karaoke end card, before the name of one person who both made and uploaded the timed lyrics"
+  },
 
   "options_syncType_syllable": {
     "message": "Syllable",
