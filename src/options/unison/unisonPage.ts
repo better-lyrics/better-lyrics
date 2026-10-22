@@ -43,6 +43,7 @@ import { bindLyricsFileDrop, LYRICS_FILE_READING_EVENT } from "@/options/unison/
 import { createFeedback, fillFeedback } from "@/options/unison/feedback";
 import { activeSyncChip, applyFormatChip, applySyncChip, isSyncChip } from "@/options/unison/feedSyncFilter";
 import { type IconKey, svgIcon } from "@/options/unison/icons";
+import { bindDetectedField, type DetectedField } from "@/options/unison/detectedField";
 import { createLanguageDropdown } from "@/options/unison/languageDropdown";
 import { matchLanguageOption } from "@/options/unison/languages";
 import { renderPreviewInto } from "@/options/unison/lyricsPreview";
@@ -106,6 +107,9 @@ let previewHead: HTMLElement;
 let lyricsTextarea: HTMLTextAreaElement;
 let submitLanguageDropdown: Dropdown;
 let submitFormatDropdown: Dropdown;
+let submitLanguageField: DetectedField;
+let submitFormatField: DetectedField;
+let submitIsrcField: DetectedField;
 let lyricsField: ReadableLyricsField;
 let composerLink: HTMLAnchorElement;
 
@@ -488,14 +492,9 @@ function detectTtmlLanguage(text: string): string | null {
   return match ? match[1] : null;
 }
 
-function autoDetectLanguage(): void {
-  if (submitLanguageDropdown.getValue()) return;
-  const text = lyricsTextarea.value;
-  if (!text.trim()) return;
+function detectLanguageOption(text: string): string | null {
   const lang = detectTtmlLanguage(text);
-  if (!lang) return;
-  const matched = matchLanguageOption(lang);
-  if (matched) submitLanguageDropdown.setValue(matched);
+  return lang ? matchLanguageOption(lang) : null;
 }
 
 const ttmlMetaParser = new XMLParser({ ignoreAttributes: false, removeNSPrefix: true });
@@ -526,13 +525,6 @@ function detectTtmlIsrc(text: string): string | null {
     warnUnison("Failed to read TTML metadata", error);
     return null;
   }
-}
-
-function autoDetectIsrc(): void {
-  const isrcInput = document.getElementById("unison-field-isrc") as HTMLInputElement;
-  if (isrcInput.value.trim()) return;
-  const isrc = detectTtmlIsrc(lyricsTextarea.value);
-  if (isrc) isrcInput.value = isrc;
 }
 
 function clearFeedTabCache(cache: FeedTabCache): void {
@@ -1951,6 +1943,15 @@ function setupSubmitForm(): void {
   );
   document.getElementById("unison-field-format-mount")?.appendChild(submitFormatDropdown.root);
 
+  const isrcInput = document.getElementById("unison-field-isrc") as HTMLInputElement;
+  submitLanguageField = bindDetectedField(submitLanguageDropdown.getValue, submitLanguageDropdown.setValue, "");
+  submitFormatField = bindDetectedField(submitFormatDropdown.getValue, submitFormatDropdown.setValue, "auto");
+  submitIsrcField = bindDetectedField(
+    () => isrcInput.value.trim(),
+    value => (isrcInput.value = value),
+    ""
+  );
+
   const durationField = document.getElementById("unison-field-duration") as HTMLInputElement | null;
   durationField?.addEventListener("blur", () => {
     if (!durationField.value.trim()) return;
@@ -1989,7 +1990,7 @@ function setupSubmitForm(): void {
   attachScrollFade(lyricsEditor.wrap, lyricsTextarea);
   lyricsField = bindReadableLyricsField(lyricsTextarea, lyricsEditor);
 
-  updatePreview();
+  runLyricsChecks();
 
   lyricsTextarea.addEventListener("input", scheduleLyricsChecks);
 
@@ -2007,9 +2008,11 @@ function runLyricsChecks(): void {
   cancelLyricsChecks();
   lastCheckedLyrics = lyricsTextarea.value;
   updatePreview();
-  autoDetectFormat();
-  autoDetectLanguage();
-  autoDetectIsrc();
+  const text = lyricsTextarea.value;
+  const hasText = text.trim() !== "";
+  submitFormatField.apply(hasText ? detectFormat(text) : null);
+  submitLanguageField.apply(hasText ? detectLanguageOption(text) : null);
+  submitIsrcField.apply(hasText ? detectTtmlIsrc(text) : null);
 }
 
 function cancelLyricsChecks(): void {
@@ -2186,13 +2189,6 @@ function parseDurationInput(value: string): number {
   const normalized = value.replace(",", ".").trim();
   const num = Number(normalized);
   return Number.isFinite(num) ? Math.round(num) : 0;
-}
-
-function autoDetectFormat(): void {
-  if (submitFormatDropdown.getValue() !== "auto") return;
-  const text = lyricsTextarea.value;
-  if (!text.trim()) return;
-  submitFormatDropdown.setValue(detectFormat(text));
 }
 
 function updatePreview(): void {
