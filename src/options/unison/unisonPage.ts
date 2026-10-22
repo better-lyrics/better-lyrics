@@ -1927,11 +1927,15 @@ function setupSubmitForm(): void {
     leading: { value: "", label: t("unison_languageUnspecified") },
     value: "",
     variant: "stretch",
-    onChange: ignoreChange,
+    onChange: () => submitLanguageField.edited(),
   });
   document.getElementById("unison-field-language-mount")?.appendChild(submitLanguageDropdown.root);
 
-  submitFormatDropdown = createDropdown({ label: t("unison_format"), onChange: ignoreChange, variant: "stretch" });
+  submitFormatDropdown = createDropdown({
+    label: t("unison_format"),
+    onChange: () => submitFormatField.edited(),
+    variant: "stretch",
+  });
   submitFormatDropdown.setOptions(
     [
       { value: "auto", label: t("unison_autoDetect") },
@@ -1951,6 +1955,7 @@ function setupSubmitForm(): void {
     value => (isrcInput.value = value),
     ""
   );
+  isrcInput.addEventListener("input", () => submitIsrcField.edited());
 
   const durationField = document.getElementById("unison-field-duration") as HTMLInputElement | null;
   durationField?.addEventListener("blur", () => {
@@ -2030,8 +2035,6 @@ function scheduleLyricsChecks(): void {
   lyricsChecksTimer = setTimeout(runLyricsChecks, UNISON_LYRICS_PREVIEW_DEBOUNCE_MS);
 }
 
-function ignoreChange(): void {}
-
 function setupNavButtons(): void {
   const navBtn = document.getElementById("unison-submit-nav-btn");
   navBtn?.addEventListener("click", () => navigateTo({ submit: "true" }));
@@ -2053,6 +2056,7 @@ function prefillSubmitForm(params: URLSearchParams): void {
     if (value && el) el.value = param === "duration" ? String(parseDurationInput(value)) : value;
   }
 
+  if (params.get("isrc")) submitIsrcField.edited();
   updateComposerLink();
   void refreshSubmitSuggestions();
 }

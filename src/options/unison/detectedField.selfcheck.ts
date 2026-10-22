@@ -11,7 +11,11 @@ function field(initial: string, unset = "") {
     },
     unset
   );
-  return { state, apply: bound.apply, type: (value: string) => (state.value = value) };
+  const edit = (value: string) => {
+    state.value = value;
+    bound.edited();
+  };
+  return { state, apply: bound.apply, edit };
 }
 
 // -- Happy paths --------------------------
@@ -41,23 +45,40 @@ function field(initial: string, unset = "") {
 {
   const { state, apply } = field("USER00000001");
   apply("USUM71900001");
-  assert.equal(state.value, "USER00000001", "never overwrites a value the user typed");
+  assert.equal(state.value, "USER00000001", "never overwrites a value present before detection");
 }
 
 {
-  const { state, apply, type } = field("");
+  const { state, apply, edit } = field("");
   apply("USUM71900001");
-  type("USER00000001");
+  edit("USER00000001");
   apply("GBAYE0000351");
   assert.equal(state.value, "USER00000001", "a value typed over our fill belongs to the user");
 }
 
 {
-  const { state, apply, type } = field("");
+  const { state, apply, edit } = field("");
   apply("USUM71900001");
-  type("");
+  edit("");
   apply("GBAYE0000351");
   assert.equal(state.value, "GBAYE0000351", "clearing the field hands it back to detection");
+}
+
+{
+  const { state, apply, edit } = field("", "");
+  apply(null);
+  edit("fr");
+  apply("fr");
+  apply("es");
+  assert.equal(state.value, "fr", "a user pick that later matches detection stays the user's");
+}
+
+{
+  const { state, apply, edit } = field("");
+  apply("USUM71900001");
+  edit("USUM71900001");
+  apply("GBAYE0000351");
+  assert.equal(state.value, "USUM71900001", "re-entering the detected value by hand claims it");
 }
 
 // -- Regressions --------------------------
@@ -89,9 +110,11 @@ function field(initial: string, unset = "") {
 }
 
 {
-  const { state, apply } = field("lrc", "auto");
+  const { state, apply, edit } = field("auto", "auto");
+  edit("lrc");
   apply(null);
-  assert.equal(state.value, "lrc", "no detection leaves a user-picked dropdown alone");
+  apply("ttml");
+  assert.equal(state.value, "lrc", "a user-picked dropdown ignores detection");
 }
 
 // -- Invariants --------------------------
