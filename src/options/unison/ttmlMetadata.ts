@@ -34,7 +34,7 @@ function metaValues(metadata: XmlNode[], ...keys: string[]): string[] {
 }
 
 export function readTtmlMetadata(text: string): TtmlSongMetadata {
-  if (!/<tt[\s>]/.test(text)) return NO_METADATA;
+  if (!/<(?:[\w.-]+:)?tt[\s>]/.test(text)) return NO_METADATA;
 
   let doc: XmlNode;
   try {

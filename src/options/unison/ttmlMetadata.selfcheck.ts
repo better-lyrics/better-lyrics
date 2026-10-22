@@ -62,6 +62,18 @@ const EMPTY = { song: null, artist: null, album: null, isrc: null };
 
 // -- Edge cases --------------------------
 
+{
+  const text =
+    '<tt:tt xmlns:tt="http://www.w3.org/ns/ttml" xmlns:ttm="http://www.w3.org/ns/ttml#metadata">' +
+    '<tt:head><tt:metadata><ttm:title>Prefixed</ttm:title><ttm:meta key="isrc" value="USUM71900001"/></tt:metadata></tt:head>' +
+    "<tt:body/></tt:tt>";
+  assert.deepEqual(
+    readTtmlMetadata(text),
+    { song: "Prefixed", artist: null, album: null, isrc: "USUM71900001" },
+    "reads TTML with a prefixed root"
+  );
+}
+
 assert.deepEqual(readTtmlMetadata(""), EMPTY, "empty text");
 assert.deepEqual(readTtmlMetadata("[00:01.00] plain lrc line"), EMPTY, "LRC has no TTML metadata");
 assert.deepEqual(readTtmlMetadata(ttml("")), EMPTY, "TTML without metadata");
