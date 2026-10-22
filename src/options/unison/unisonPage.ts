@@ -46,6 +46,7 @@ import { type IconKey, svgIcon } from "@/options/unison/icons";
 import { bindDetectedField, type DetectedField } from "@/options/unison/detectedField";
 import { createLanguageDropdown } from "@/options/unison/languageDropdown";
 import { matchLanguageOption } from "@/options/unison/languages";
+import { readTtmlMetadata, type TtmlSongMetadata } from "@/options/unison/ttmlMetadata";
 import { renderPreviewInto } from "@/options/unison/lyricsPreview";
 import { detectFormat } from "@/options/unison/lyricsPreviewLines";
 import { searchResultsMessage, splitSearchResultsMessage } from "@/options/unison/searchResultsLabel";
@@ -68,7 +69,6 @@ import { isTextEntry } from "@/ui/textEntry";
 import { createSyncIcon, createSyncTag, syncTypeForLyric } from "@/ui/syncTag";
 import { initTooltips } from "@/ui/tooltip";
 import { attachEditor, highlightInto } from "@braccato/highlight";
-import { XMLParser } from "fast-xml-parser";
 
 // -- Icons --------------------------
 
@@ -109,7 +109,7 @@ let submitLanguageDropdown: Dropdown;
 let submitFormatDropdown: Dropdown;
 let submitLanguageField: DetectedField;
 let submitFormatField: DetectedField;
-let submitIsrcField: DetectedField;
+let submitMetadataFields: Record<keyof TtmlSongMetadata, DetectedField>;
 let lyricsField: ReadableLyricsField;
 let composerLink: HTMLAnchorElement;
 
@@ -495,36 +495,6 @@ function detectTtmlLanguage(text: string): string | null {
 function detectLanguageOption(text: string): string | null {
   const lang = detectTtmlLanguage(text);
   return lang ? matchLanguageOption(lang) : null;
-}
-
-const ttmlMetaParser = new XMLParser({ ignoreAttributes: false, removeNSPrefix: true });
-
-function findIsrcMeta(node: unknown): string | null {
-  if (!node || typeof node !== "object") return null;
-  for (const [key, child] of Object.entries(node)) {
-    if (key === "meta") {
-      for (const meta of [child].flat()) {
-        if (String(meta?.["@_key"]).toLowerCase() !== "isrc") continue;
-        const value = String(meta["@_value"] ?? "")
-          .toUpperCase()
-          .replace(/[\s-]/g, "");
-        if (/^[A-Z]{2}[A-Z0-9]{3}\d{7}$/.test(value)) return value;
-      }
-    }
-    const found = findIsrcMeta(child);
-    if (found) return found;
-  }
-  return null;
-}
-
-function detectTtmlIsrc(text: string): string | null {
-  if (!/isrc/i.test(text)) return null;
-  try {
-    return findIsrcMeta(ttmlMetaParser.parse(text));
-  } catch (error) {
-    warnUnison("Failed to read TTML metadata", error);
-    return null;
-  }
 }
 
 function clearFeedTabCache(cache: FeedTabCache): void {
@@ -1947,15 +1917,14 @@ function setupSubmitForm(): void {
   );
   document.getElementById("unison-field-format-mount")?.appendChild(submitFormatDropdown.root);
 
-  const isrcInput = document.getElementById("unison-field-isrc") as HTMLInputElement;
   submitLanguageField = bindDetectedField(submitLanguageDropdown.getValue, submitLanguageDropdown.setValue, "");
   submitFormatField = bindDetectedField(submitFormatDropdown.getValue, submitFormatDropdown.setValue, "auto");
-  submitIsrcField = bindDetectedField(
-    () => isrcInput.value.trim(),
-    value => (isrcInput.value = value),
-    ""
-  );
-  isrcInput.addEventListener("input", () => submitIsrcField.edited());
+  submitMetadataFields = {
+    song: bindDetectedInput("unison-field-song"),
+    artist: bindDetectedInput("unison-field-artist"),
+    album: bindDetectedInput("unison-field-album"),
+    isrc: bindDetectedInput("unison-field-isrc"),
+  };
 
   const durationField = document.getElementById("unison-field-duration") as HTMLInputElement | null;
   durationField?.addEventListener("blur", () => {
@@ -2017,7 +1986,23 @@ function runLyricsChecks(): void {
   const hasText = text.trim() !== "";
   submitFormatField.apply(hasText ? detectFormat(text) : null);
   submitLanguageField.apply(hasText ? detectLanguageOption(text) : null);
-  submitIsrcField.apply(hasText ? detectTtmlIsrc(text) : null);
+  const metadata = hasText ? readTtmlMetadata(text) : null;
+  submitMetadataFields.isrc.apply(metadata?.isrc ?? null);
+  const songChanged = (["song", "artist", "album"] as const)
+    .map(key => submitMetadataFields[key].apply(metadata?.[key] ?? null))
+    .some(Boolean);
+  if (songChanged) void refreshSubmitSuggestions();
+}
+
+function bindDetectedInput(id: string): DetectedField {
+  const input = document.getElementById(id) as HTMLInputElement;
+  const field = bindDetectedField(
+    () => input.value.trim(),
+    value => (input.value = value),
+    ""
+  );
+  input.addEventListener("input", () => field.edited());
+  return field;
 }
 
 function cancelLyricsChecks(): void {
@@ -2056,7 +2041,9 @@ function prefillSubmitForm(params: URLSearchParams): void {
     if (value && el) el.value = param === "duration" ? String(parseDurationInput(value)) : value;
   }
 
-  if (params.get("isrc")) submitIsrcField.edited();
+  for (const [key, field] of Object.entries(submitMetadataFields)) {
+    if (params.get(key)) field.edited();
+  }
   updateComposerLink();
   void refreshSubmitSuggestions();
 }
