@@ -127,3 +127,11 @@ function field(initial: string, unset = "") {
   apply(null);
   assert.equal(state.writes, 2, "writes only when the value changes");
 }
+
+{
+  const { apply, edit } = field("");
+  assert.equal(apply("USUM71900001"), true, "reports a fill");
+  assert.equal(apply("USUM71900001"), false, "reports no change for the same detection");
+  edit("USER00000001");
+  assert.equal(apply("GBAYE0000351"), false, "reports no change while the user owns the field");
+}

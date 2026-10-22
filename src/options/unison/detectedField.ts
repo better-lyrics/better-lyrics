@@ -1,5 +1,5 @@
 export interface DetectedField {
-  apply(detected: string | null): void;
+  apply(detected: string | null): boolean;
   edited(): void;
 }
 
@@ -10,9 +10,11 @@ export function bindDetectedField(read: () => string, write: (value: string) => 
     apply(detected) {
       const current = read();
       userOwned ??= current !== unset && current !== detected;
-      if (userOwned) return;
+      if (userOwned) return false;
       const next = detected ?? unset;
-      if (next !== current) write(next);
+      if (next === current) return false;
+      write(next);
+      return true;
     },
     edited() {
       userOwned = read() !== unset;
