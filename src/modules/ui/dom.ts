@@ -37,6 +37,8 @@ import { AppState } from "@core/appState";
 import { getBrowserVendor } from "@core/browser";
 import { versionedStylesheetUrl } from "@core/extensionStylesheet";
 import { t } from "@core/i18n";
+import { createContributorCredit, translateContributorCreditLabels } from "@modules/lyrics/contributorCredit";
+import type { LyricContributor } from "@modules/lyrics/providers/shared";
 import type { ThumbnailElement } from "@modules/lyrics/requestSniffer/NextResponse";
 import { getArtworkMetadata } from "@modules/lyrics/requestSniffer/requestSniffer";
 import { measureWidth, type ObserverHandle, observeLayoutWidth, observeResize } from "@modules/ui/layout/layoutWidth";
@@ -345,7 +347,8 @@ export function addFooter(
   providerKey?: string,
   videoId?: string,
   unisonData?: UnisonData,
-  showRequestButton = false
+  showRequestButton = false,
+  contributors: LyricContributor[] = []
 ): void {
   if (document.getElementsByClassName(FOOTER_CLASS).length !== 0) {
     document.getElementsByClassName(FOOTER_CLASS)[0].remove();
@@ -382,6 +385,13 @@ export function addFooter(
   } else {
     footerLink.textContent = source || HOMEPAGE_DOMAIN;
   }
+  const credit = createContributorCredit(
+    document,
+    contributors,
+    `${FOOTER_CLASS}__contributor`,
+    translateContributorCreditLabels(key => t(key))
+  );
+  if (credit.length > 0) footerLink.after(document.createTextNode(" · "), ...credit);
 
   AppState.currentProviderKey = providerKey ?? null;
   void loadSavedOffset(AppState.lastLoadedVideoId, AppState.currentProviderKey);

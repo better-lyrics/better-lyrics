@@ -1,5 +1,6 @@
 import { AppState } from "@core/appState";
 import { t } from "@core/i18n";
+import { translateContributorCreditLabels } from "@modules/lyrics/contributorCredit";
 import { type LogSink, logCore } from "@core/logger";
 import { type ObserverHandle, observeResize } from "@modules/ui/layout/layoutWidth";
 import type { LyricDecorations } from "@modules/lyrics/injectLyrics";
@@ -38,6 +39,9 @@ function createMainPageStage(): KaraokeStage {
         return t("lyrics_writtenBy");
       },
       bar: mainPageBar,
+    },
+    get contributorLabels() {
+      return translateContributorCreditLabels(key => t(key));
     },
     isVisible: isKaraokeActive,
     isAdPlaying: () => isAdPlaying(document),
@@ -93,6 +97,7 @@ function publishKaraokeLyrics(): void {
       lyrics: view.lyrics,
       language: view.language,
       songwriters: view.songwriters,
+      contributors: view.contributors,
       title: lyricData.song,
       artist: lyricData.artist,
       providerKey: AppState.currentProviderKey,

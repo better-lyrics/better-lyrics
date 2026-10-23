@@ -1,11 +1,19 @@
 import { HOMEPAGE_DOMAIN, HOMEPAGE_ICON_URL, PROVIDER_CONFIGS } from "@constants";
 import { parseSvgString, syncTypeColors, syncTypeIcons } from "@modules/ui/lyricsDock/icons";
 import { CREDITS_CLASS } from "@braccato/core/constants";
+import { type ContributorCreditLabels, createContributorCredit } from "@modules/lyrics/contributorCredit";
+import type { LyricContributor } from "@modules/lyrics/providers/shared";
 
 const SOURCE_CLASS = "blyrics-karaoke-source";
+const CONTRIBUTOR_CLASS = "blyrics-karaoke-contributor";
 const ICON_SIZE_PX = 16;
 
-export function decorateEndCard(container: HTMLElement | null, providerKey: string | null): void {
+export function decorateEndCard(
+  container: HTMLElement | null,
+  providerKey: string | null,
+  contributors: readonly LyricContributor[] | undefined,
+  contributorLabels: ContributorCreditLabels
+): void {
   const credits = container?.querySelector<HTMLElement>(`:scope > .${CREDITS_CLASS}`);
   if (!credits) return;
 
@@ -27,6 +35,13 @@ export function decorateEndCard(container: HTMLElement | null, providerKey: stri
       icon.style.color = syncTypeColors[provider.syncType];
       source.append(icon);
     }
+  }
+
+  const credit = createContributorCredit(doc, contributors, CONTRIBUTOR_CLASS, contributorLabels);
+  if (credit.length > 0) {
+    const contributorLine = doc.createElement("span");
+    contributorLine.append("· ", ...credit);
+    source.append(contributorLine);
   }
 
   credits.append(source);
