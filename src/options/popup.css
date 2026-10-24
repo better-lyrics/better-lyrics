@@ -876,6 +876,11 @@ body.options-page {
   -webkit-font-smoothing: antialiased;
 }
 
+@media (hover: none) {
+  html { width: 100%; min-width: 0; max-width: none; }
+  body.options-page { height: 100dvh; }
+}
+
 .pop__head { flex: none; padding: 0 var(--page-pad); }
 
 .pop__body {
