@@ -765,6 +765,8 @@ document.getElementById("options")?.addEventListener("change", event => {
 
 // -- Drag sorting --------------------------
 
+const TOUCH_DRAG_DELAY_MS = 200;
+
 function sortableWhenVisible(list: HTMLElement, options: Sortable.Options): void {
   const observer = new IntersectionObserver(entries => {
     if (!entries.some(entry => entry.isIntersecting)) return;
@@ -808,6 +810,8 @@ document.addEventListener("DOMContentLoaded", () => {
     animation: 150,
     ghostClass: "dragging",
     forceFallback: true,
+    delay: TOUCH_DRAG_DELAY_MS,
+    delayOnTouchOnly: true,
     filter: ".checkbox-container",
     preventOnFilter: false,
     onUpdate: saveOptions,
@@ -1668,6 +1672,8 @@ function setupUnisonActionsModal(): void {
       animation: 150,
       ghostClass: "dragging",
       forceFallback: true,
+      delay: TOUCH_DRAG_DELAY_MS,
+      delayOnTouchOnly: true,
       onUpdate: debouncedSaveOptions,
     });
   }
