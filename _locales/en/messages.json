@@ -2209,6 +2209,14 @@
     "message": "ISRC lookup tool",
     "description": "Link text for ISRC finder"
   },
+  "unison_detectedFromLyrics": {
+    "message": "Lyrics have",
+    "description": "Shown under a Unison form field when the pasted lyrics file carries a different value for it, followed by that value and a Use button"
+  },
+  "unison_detectedUse": {
+    "message": "Use",
+    "description": "Button that copies the value found in the lyrics file into the form field above it"
+  },
   "unison_feedTabsLabel": {
     "message": "Lyrics lists",
     "description": "Accessible name of the tab list that switches between the community feed and the user's own submissions"

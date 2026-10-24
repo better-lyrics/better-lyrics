@@ -44,6 +44,7 @@ import { createFeedback, fillFeedback } from "@/options/unison/feedback";
 import { activeSyncChip, applyFormatChip, applySyncChip, isSyncChip } from "@/options/unison/feedSyncFilter";
 import { type IconKey, svgIcon } from "@/options/unison/icons";
 import { bindDetectedField, type DetectedField } from "@/options/unison/detectedField";
+import { bindDetectedInput } from "@/options/unison/detectedInput";
 import { createLanguageDropdown } from "@/options/unison/languageDropdown";
 import { matchLanguageOption } from "@/options/unison/languages";
 import { readTtmlMetadata, type TtmlSongMetadata } from "@/options/unison/ttmlMetadata";
@@ -1920,18 +1921,19 @@ function setupSubmitForm(): void {
   submitLanguageField = bindDetectedField(submitLanguageDropdown.getValue, submitLanguageDropdown.setValue, "");
   submitFormatField = bindDetectedField(submitFormatDropdown.getValue, submitFormatDropdown.setValue, "auto");
   submitMetadataFields = {
-    song: bindDetectedInput("unison-field-song"),
-    artist: bindDetectedInput("unison-field-artist"),
-    album: bindDetectedInput("unison-field-album"),
-    isrc: bindDetectedInput("unison-field-isrc"),
-    videoId: bindDetectedInput("unison-field-videoId"),
-    duration: bindDetectedInput("unison-field-duration"),
+    song: bindDetectedInput(document.getElementById("unison-field-song") as HTMLInputElement),
+    artist: bindDetectedInput(document.getElementById("unison-field-artist") as HTMLInputElement),
+    album: bindDetectedInput(document.getElementById("unison-field-album") as HTMLInputElement),
+    isrc: bindDetectedInput(document.getElementById("unison-field-isrc") as HTMLInputElement),
+    videoId: bindDetectedInput(document.getElementById("unison-field-videoId") as HTMLInputElement),
+    duration: bindDetectedInput(document.getElementById("unison-field-duration") as HTMLInputElement),
   };
 
   const durationField = document.getElementById("unison-field-duration") as HTMLInputElement | null;
   durationField?.addEventListener("blur", () => {
     if (!durationField.value.trim()) return;
     durationField.value = String(parseDurationInput(durationField.value));
+    submitMetadataFields.duration.edited();
   });
 
   const composerHint = document.getElementById("unison-composer-hint");
@@ -2002,17 +2004,6 @@ function runLyricsChecks(): void {
     .map(key => submitMetadataFields[key].apply(detected[key]))
     .some(Boolean);
   if (suggestionInputChanged) void refreshSubmitSuggestions();
-}
-
-function bindDetectedInput(id: string): DetectedField {
-  const input = document.getElementById(id) as HTMLInputElement;
-  const field = bindDetectedField(
-    () => input.value.trim(),
-    value => (input.value = value),
-    ""
-  );
-  input.addEventListener("input", () => field.edited());
-  return field;
 }
 
 function cancelLyricsChecks(): void {

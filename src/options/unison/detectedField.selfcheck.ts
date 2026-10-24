@@ -135,3 +135,114 @@ function field(initial: string, unset = "") {
   edit("USER00000001");
   assert.equal(apply("GBAYE0000351"), false, "reports no change while the user owns the field");
 }
+
+// -- Offers --------------------------
+
+{
+  const state = { value: "" };
+  const bound = bindDetectedField(
+    () => state.value,
+    value => (state.value = value),
+    ""
+  );
+  assert.equal(bound.offer(), null, "no offer before any detection");
+  bound.apply("USUM71900001");
+  assert.equal(bound.offer(), null, "no offer while detection owns the field");
+  state.value = "USER00000001";
+  bound.edited();
+  assert.equal(bound.offer(), "USUM71900001", "regression #165: typing over our fill offers it back");
+  bound.apply("GBAYE0000351");
+  assert.equal(bound.offer(), "GBAYE0000351", "regression #165: offers a detection the user's value blocks");
+  bound.use();
+  assert.equal(state.value, "GBAYE0000351", "use writes the offered value");
+  assert.equal(bound.offer(), null, "no offer once used");
+  bound.apply("USUM71900001");
+  assert.equal(state.value, "USUM71900001", "use hands the field back to detection");
+}
+
+{
+  const state = { value: "USER00000001" };
+  const bound = bindDetectedField(
+    () => state.value,
+    value => (state.value = value),
+    ""
+  );
+  bound.apply("USUM71900001");
+  assert.equal(bound.offer(), "USUM71900001", "offers over a value present before detection");
+  state.value = "USUM71900001";
+  bound.edited();
+  assert.equal(bound.offer(), null, "no offer once the user types the detected value");
+  bound.apply(null);
+  assert.equal(bound.offer(), null, "no offer when lyrics lose the value");
+}
+
+{
+  const state = { value: "USER00000001", writes: 0 };
+  const bound = bindDetectedField(
+    () => state.value,
+    value => {
+      state.value = value;
+      state.writes++;
+    },
+    ""
+  );
+  bound.use();
+  assert.equal(state.writes, 0, "use without an offer writes nothing");
+}
+
+// -- Seeding --------------------------
+
+{
+  const state = { value: "", writes: 0 };
+  const bound = bindDetectedField(
+    () => state.value,
+    value => {
+      state.value = value;
+      state.writes++;
+    },
+    ""
+  );
+  bound.seed("USUM71900001");
+  assert.equal(state.writes, 0, "seed never writes");
+  assert.equal(bound.offer(), "USUM71900001", "seed treats a stored blank as the user's value");
+  bound.apply("GBAYE0000351");
+  assert.equal(state.value, "", "a seeded user value survives later detections");
+  assert.equal(bound.offer(), "GBAYE0000351", "and keeps offering the latest one");
+}
+
+{
+  const state = { value: "USUM71900001" };
+  const bound = bindDetectedField(
+    () => state.value,
+    value => (state.value = value),
+    ""
+  );
+  bound.seed("USUM71900001");
+  assert.equal(bound.offer(), null, "regression #167: a stored value matching the lyrics is not offered");
+  bound.apply("GBAYE0000351");
+  assert.equal(state.value, "GBAYE0000351", "regression #167: a stored value matching the lyrics follows edits");
+}
+
+{
+  const state = { value: "AEA2M2510103" };
+  const bound = bindDetectedField(
+    () => state.value,
+    value => (state.value = value),
+    ""
+  );
+  bound.seed("AEA2M2510102");
+  assert.equal(state.value, "AEA2M2510103", "regression #167: a stored mismatch is kept");
+  assert.equal(bound.offer(), "AEA2M2510102", "regression #167: and the lyrics value is offered");
+}
+
+{
+  const state = { value: "" };
+  const bound = bindDetectedField(
+    () => state.value,
+    value => (state.value = value),
+    ""
+  );
+  bound.seed(null);
+  bound.apply("USUM71900001");
+  assert.equal(state.value, "USUM71900001", "a blank field seeded with no detection follows the lyrics");
+}
