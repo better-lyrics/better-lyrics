@@ -1990,13 +1990,18 @@ function runLyricsChecks(): void {
   submitLanguageField.apply(hasText ? detectLanguageOption(text) : null);
   const metadata = hasText ? readTtmlMetadata(text) : null;
   submitMetadataFields.isrc.apply(metadata?.isrc ?? null);
-  submitMetadataFields.videoId.apply(metadata?.videoId ?? null);
   const durationSeconds = parseDurationInput(metadata?.duration ?? "");
-  submitMetadataFields.duration.apply(durationSeconds > 0 ? String(durationSeconds) : null);
-  const songChanged = (["song", "artist", "album"] as const)
-    .map(key => submitMetadataFields[key].apply(metadata?.[key] ?? null))
+  const detected = {
+    song: metadata?.song ?? null,
+    artist: metadata?.artist ?? null,
+    album: metadata?.album ?? null,
+    videoId: metadata?.videoId ?? null,
+    duration: durationSeconds > 0 ? String(durationSeconds) : null,
+  };
+  const suggestionInputChanged = (Object.keys(detected) as (keyof typeof detected)[])
+    .map(key => submitMetadataFields[key].apply(detected[key]))
     .some(Boolean);
-  if (songChanged) void refreshSubmitSuggestions();
+  if (suggestionInputChanged) void refreshSubmitSuggestions();
 }
 
 function bindDetectedInput(id: string): DetectedField {
