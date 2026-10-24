@@ -5,11 +5,11 @@ const NAMESPACES =
   'xmlns="http://www.w3.org/ns/ttml" xmlns:ttm="http://www.w3.org/ns/ttml#metadata" ' +
   'xmlns:composer="https://composer.betterlyrics.org/ttml" xmlns:amll="http://www.example.com/ns/amll"';
 
-function ttml(metadata: string, body = '<p begin="0:00.000" end="0:01.000">hi</p>'): string {
-  return `<tt ${NAMESPACES} xml:lang="en"><head><metadata>${metadata}</metadata></head><body><div>${body}</div></body></tt>`;
+function ttml(metadata: string, body = '<p begin="0:00.000" end="0:01.000">hi</p>', bodyAttributes = ""): string {
+  return `<tt ${NAMESPACES} xml:lang="en"><head><metadata>${metadata}</metadata></head><body${bodyAttributes}><div>${body}</div></body></tt>`;
 }
 
-const EMPTY = { song: null, artist: null, album: null, isrc: null };
+const EMPTY = { song: null, artist: null, album: null, isrc: null, videoId: null, duration: null };
 
 // -- Happy paths --------------------------
 
@@ -22,7 +22,7 @@ const EMPTY = { song: null, artist: null, album: null, isrc: null };
   );
   assert.deepEqual(
     readTtmlMetadata(text),
-    { song: "Lain opening", artist: null, album: "Lain opening", isrc: "USQX91700001" },
+    { ...EMPTY, song: "Lain opening", album: "Lain opening", isrc: "USQX91700001" },
     "regression unison#163: reads the title and album Composer exports"
   );
 }
@@ -45,7 +45,7 @@ const EMPTY = { song: null, artist: null, album: null, isrc: null };
   );
   assert.deepEqual(
     readTtmlMetadata(text),
-    { song: "It Aint Nun", artist: "CHRIST DILLINGER, Acid Souljah", album: "It Aint Nun LP", isrc: null },
+    { ...EMPTY, song: "It Aint Nun", artist: "CHRIST DILLINGER, Acid Souljah", album: "It Aint Nun LP" },
     "reads AMLL metadata"
   );
 }
@@ -60,7 +60,24 @@ const EMPTY = { song: null, artist: null, album: null, isrc: null };
   assert.equal(readTtmlMetadata(text).isrc, "USUM71900001", "normalises ISRC case, spaces and dashes");
 }
 
+{
+  const text = ttml('<composer:meta key="ytVideoId" value="dQw4w9WgXcQ"/>', undefined, ' dur="3:12.345"');
+  assert.equal(readTtmlMetadata(text).videoId, "dQw4w9WgXcQ", "reads the Composer YouTube video ID");
+  assert.equal(readTtmlMetadata(text).duration, "3:12.345", "reads the body duration");
+}
+
 // -- Edge cases --------------------------
+
+{
+  const metadata = readTtmlMetadata(ttml("<ttm:title>No source</ttm:title>"));
+  assert.equal(metadata.videoId, null, "missing video ID");
+  assert.equal(metadata.duration, null, "missing body duration");
+}
+
+{
+  const text = ttml('<composer:meta key="ytVideoId" value="not a video id"/>');
+  assert.equal(readTtmlMetadata(text).videoId, null, "rejects a malformed video ID");
+}
 
 {
   const text =
@@ -69,7 +86,7 @@ const EMPTY = { song: null, artist: null, album: null, isrc: null };
     "<tt:body/></tt:tt>";
   assert.deepEqual(
     readTtmlMetadata(text),
-    { song: "Prefixed", artist: null, album: null, isrc: "USUM71900001" },
+    { ...EMPTY, song: "Prefixed", isrc: "USUM71900001" },
     "reads TTML with a prefixed root"
   );
 }

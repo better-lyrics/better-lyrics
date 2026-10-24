@@ -1924,6 +1924,8 @@ function setupSubmitForm(): void {
     artist: bindDetectedInput("unison-field-artist"),
     album: bindDetectedInput("unison-field-album"),
     isrc: bindDetectedInput("unison-field-isrc"),
+    videoId: bindDetectedInput("unison-field-videoId"),
+    duration: bindDetectedInput("unison-field-duration"),
   };
 
   const durationField = document.getElementById("unison-field-duration") as HTMLInputElement | null;
@@ -1988,6 +1990,9 @@ function runLyricsChecks(): void {
   submitLanguageField.apply(hasText ? detectLanguageOption(text) : null);
   const metadata = hasText ? readTtmlMetadata(text) : null;
   submitMetadataFields.isrc.apply(metadata?.isrc ?? null);
+  submitMetadataFields.videoId.apply(metadata?.videoId ?? null);
+  const durationSeconds = parseDurationInput(metadata?.duration ?? "");
+  submitMetadataFields.duration.apply(durationSeconds > 0 ? String(durationSeconds) : null);
   const songChanged = (["song", "artist", "album"] as const)
     .map(key => submitMetadataFields[key].apply(metadata?.[key] ?? null))
     .some(Boolean);
@@ -2177,9 +2182,12 @@ function updateComposerLink(): void {
 }
 
 function parseDurationInput(value: string): number {
-  const normalized = value.replace(",", ".").trim();
-  const num = Number(normalized);
-  return Number.isFinite(num) ? Math.round(num) : 0;
+  const seconds = value
+    .replace(",", ".")
+    .trim()
+    .split(":")
+    .reduce((total, part) => total * 60 + Number(part), 0);
+  return Number.isFinite(seconds) ? Math.round(seconds) : 0;
 }
 
 function updatePreview(): void {

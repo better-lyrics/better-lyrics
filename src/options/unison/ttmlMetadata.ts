@@ -6,10 +6,20 @@ export interface TtmlSongMetadata {
   artist: string | null;
   album: string | null;
   isrc: string | null;
+  videoId: string | null;
+  duration: string | null;
 }
 
-const NO_METADATA: TtmlSongMetadata = { song: null, artist: null, album: null, isrc: null };
+const NO_METADATA: TtmlSongMetadata = {
+  song: null,
+  artist: null,
+  album: null,
+  isrc: null,
+  videoId: null,
+  duration: null,
+};
 const ISRC_PATTERN = /^[A-Z]{2}[A-Z0-9]{3}\d{7}$/;
+const VIDEO_ID_PATTERN = /^[\w-]{11}$/;
 
 const parser = new XMLParser({ ignoreAttributes: false, removeNSPrefix: true, parseTagValue: false });
 
@@ -44,7 +54,8 @@ export function readTtmlMetadata(text: string): TtmlSongMetadata {
     return NO_METADATA;
   }
 
-  const head = (doc.tt as XmlNode | undefined)?.head as XmlNode | undefined;
+  const tt = doc.tt as XmlNode | undefined;
+  const head = tt?.head as XmlNode | undefined;
   const metadata = asList(head?.metadata).filter((block): block is XmlNode => !!block && typeof block === "object");
 
   const title = metadata
@@ -54,11 +65,15 @@ export function readTtmlMetadata(text: string): TtmlSongMetadata {
   const isrc = metaValues(metadata, "isrc")
     .map(value => value.toUpperCase().replace(/[\s-]/g, ""))
     .find(value => ISRC_PATTERN.test(value));
+  const videoId = metaValues(metadata, "ytvideoid")[0];
+  const duration = String((tt?.body as XmlNode | undefined)?.["@_dur"] ?? "").trim();
 
   return {
     song: title ?? metaValues(metadata, "musicname")[0] ?? null,
     artist: metaValues(metadata, "artists").join(", ") || null,
     album: metaValues(metadata, "album")[0] ?? null,
     isrc: isrc ?? null,
+    videoId: videoId && VIDEO_ID_PATTERN.test(videoId) ? videoId : null,
+    duration: duration || null,
   };
 }
