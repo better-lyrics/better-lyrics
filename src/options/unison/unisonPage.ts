@@ -1932,7 +1932,9 @@ function setupSubmitForm(): void {
   const durationField = document.getElementById("unison-field-duration") as HTMLInputElement | null;
   durationField?.addEventListener("blur", () => {
     if (!durationField.value.trim()) return;
-    durationField.value = String(parseDurationInput(durationField.value));
+    const normalized = String(parseDurationInput(durationField.value));
+    if (normalized === durationField.value) return;
+    durationField.value = normalized;
     submitMetadataFields.duration.edited();
   });
 
