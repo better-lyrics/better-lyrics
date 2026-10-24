@@ -923,6 +923,33 @@
   color: rgba(165, 180, 252, 0.75);
 }
 
+.unison-detected-hint__value {
+  color: var(--text-muted);
+  overflow-wrap: anywhere;
+}
+
+.unison-detected-hint__use {
+  padding: 2px 0;
+  border: 0;
+  background: none;
+  font: inherit;
+  cursor: pointer;
+}
+
+.unison-detected-hint .unison-detected-hint__use {
+  color: rgb(165, 180, 252);
+}
+
+.unison-detected-hint .unison-detected-hint__use:hover {
+  color: rgb(189, 200, 255);
+}
+
+.unison-detected-hint__use:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+
 .unison-input--mono {
   font-variant-numeric: tabular-nums;
   letter-spacing: 0.02em;
