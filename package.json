@@ -1,7 +1,7 @@
 {
     "type": "module",
     "name": "better-lyrics",
-    "version": "3.0.1.1",
+    "version": "3.0.1",
     "description": "Enhance YouTube Music with beautiful time-synced lyrics, multilingual support, real-time translations and more",
     "scripts": {
         "generate:locales": "tsx tooling/generate-locales.ts",
@@ -43,15 +43,15 @@
         "node": ">=22.12"
     },
     "dependencies": {
-        "@braccato/core": "1.16.11",
+        "@braccato/core": "1.16.13",
         "@braccato/highlight": "0.3.2",
         "@braccato/parsers": "0.4.0",
-        "@codemirror/autocomplete": "^6.20.3",
+        "@codemirror/autocomplete": "^6.20.4",
         "@codemirror/commands": "^6.11.1",
         "@codemirror/lint": "^6.9.7",
         "@codemirror/search": "^6.7.2",
         "@codemirror/state": "^6.7.6",
-        "@codemirror/view": "^6.43.14",
+        "@codemirror/view": "^6.43.15",
         "@formkit/auto-animate": "^0.10.0",
         "@fsegurai/codemirror-theme-material-dark": "^6.2.7",
         "@plasmohq/edge-addons-api": "^2.0.0",
@@ -64,7 +64,7 @@
         "sortablejs": "^1.15.7"
     },
     "devDependencies": {
-        "@aws-sdk/client-s3": "^3.1152.0",
+        "@aws-sdk/client-s3": "^3.1154.0",
         "@biomejs/biome": "2.0.4",
         "@types/chrome": "^0.3.5",
         "@types/jsdom": "^30.0.0",
