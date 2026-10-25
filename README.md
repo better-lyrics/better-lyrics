@@ -194,6 +194,18 @@ The simplest path is to grab a pre-built ZIP from the [releases page](https://gi
 >
 > Firefox unloads temporary add-ons when the browser is closed. For a permanent install, use the [signed Firefox Add-on listing](https://addons.mozilla.org/en-US/firefox/addon/better-lyrics/).
 
+### Safari (community port)
+
+There's no official Safari build, but [Tzu-Hsien Chao](https://github.com/danny900714) maintains a port at [danny900714/better-lyrics-safari](https://github.com/danny900714/better-lyrics-safari). It takes each Better Lyrics release, applies a small Safari patch, and publishes the build to a Homebrew tap. You'll need macOS 14 or later on an Apple silicon Mac.
+
+```shell
+brew install danny900714/tap/better-lyrics
+```
+
+> [!WARNING]
+>
+> I don't maintain this port, and new releases come out automatically, so I can't check each one. Apple hasn't notarized the app either, which is why the cask removes the macOS quarantine flag when it installs. Take a look at the repo and make sure you're comfortable with it before installing. If you hit a Safari-specific bug, open an issue on the [port's repository](https://github.com/danny900714/better-lyrics-safari/issues) instead of here.
+
 ## FAQ
 
 ### Why can't I see the lyrics?
@@ -299,7 +311,7 @@ Adding custom providers isn't currently supported.
 
 ### Can I use Better Lyrics on other browsers?
 
-Right now, Better Lyrics is available for Chrome, Firefox, and Edge (and other Chromium-based browsers like Brave, Opera, Arc, etc.). If there's enough demand, I might consider porting it to other browsers.
+Right now, Better Lyrics is officially available for Chrome, Firefox, and Edge (and other Chromium-based browsers like Brave, Opera, Arc, etc.). There's also an unofficial [community Safari port](#safari-community-port) that I don't maintain.
 
 ### Can I use Better Lyrics on other music streaming services?
 
