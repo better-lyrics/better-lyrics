@@ -1,6 +1,6 @@
 import { UNISON_API_BASE_URL, UNISON_PICTURE_URL } from "@constants";
 import { t } from "@core/i18n";
-import { getIdentity } from "@core/keyIdentity";
+import { generatePetName, getIdentity } from "@core/keyIdentity";
 import { warnUnison } from "@core/logger";
 import {
   absoluteAssetUrl,
@@ -107,9 +107,9 @@ function assetUrl(path: string): string {
 
 // -- Primitives --------------------------
 
-export function profileUrl(handle: string | undefined, keyId: string): string {
-  return handle
-    ? `${UNISON_API_BASE_URL}/u/${encodeURIComponent(handle)}`
+export function profileUrl(displayName: string | undefined, keyId: string): string {
+  return displayName && displayName !== generatePetName(keyId)
+    ? `${UNISON_API_BASE_URL}/u/${encodeURIComponent(displayName)}`
     : `${UNISON_API_BASE_URL}/curator/${encodeURIComponent(keyId)}`;
 }
 
