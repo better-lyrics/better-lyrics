@@ -107,10 +107,8 @@ function assetUrl(path: string): string {
 
 // -- Primitives --------------------------
 
-export function profileUrl(handle: string | undefined, keyId: string): string {
-  return handle
-    ? `${UNISON_API_BASE_URL}/u/${encodeURIComponent(handle)}`
-    : `${UNISON_API_BASE_URL}/curator/${encodeURIComponent(keyId)}`;
+export function profileUrl(keyId: string): string {
+  return `${UNISON_API_BASE_URL}/curator/${encodeURIComponent(keyId)}`;
 }
 
 function ringCircle(className: string, pct: number | null): SVGCircleElement {
@@ -322,7 +320,6 @@ export function appendInlineProfile(row: HTMLElement, nameEl: HTMLElement, submi
 export async function renderIdentityStats(
   container: HTMLElement,
   user: UserGamification,
-  handle: string | undefined,
   avatarUrl: string | null
 ): Promise<void> {
   const catalogue = await loadCatalogue();
@@ -347,7 +344,7 @@ export async function renderIdentityStats(
   const strip = catalogue ? buildFeaturedStrip(catalogue, user) : null;
   if (strip) foot.appendChild(strip);
   foot.appendChild(buildOutboundLink(UNISON_PICTURE_URL, t(avatarUrl ? "unison_changePicture" : "unison_addPicture")));
-  foot.appendChild(buildOutboundLink(profileUrl(handle, user.keyId), t("unison_viewProfile")));
+  foot.appendChild(buildOutboundLink(profileUrl(user.keyId), t("unison_viewProfile")));
   stats.appendChild(foot);
 
   container.replaceChildren(stats);
