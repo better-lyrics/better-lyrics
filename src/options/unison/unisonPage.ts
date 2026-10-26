@@ -1139,7 +1139,7 @@ function createUploaderCell(submitter: UnisonSubmitter): HTMLElement {
 
   const link = document.createElement("a");
   link.className = "unison-uploader-link";
-  link.href = profileUrl(submitter.keyId);
+  link.href = profileUrl(submitter.displayName, submitter.keyId);
   link.target = "_blank";
   link.rel = "noreferrer noopener";
   link.textContent = submitter.displayName || generatePetName(submitter.keyId);

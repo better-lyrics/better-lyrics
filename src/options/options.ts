@@ -1333,7 +1333,7 @@ async function renderOwnIdentityStats(): Promise<void> {
   const render = ++identityStatsRender;
   const [user, profile] = await Promise.all([fetchOwnGamification(), getResolvedProfile()]);
   const next = document.createElement("div");
-  if (user) await renderIdentityStats(next, user, profile?.avatarUrl ?? null);
+  if (user) await renderIdentityStats(next, user, profile?.displayName, profile?.avatarUrl ?? null);
   if (render !== identityStatsRender) return;
   statsEl.replaceChildren(...next.childNodes);
   statsWrap.hidden = !user;
