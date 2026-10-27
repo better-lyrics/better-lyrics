@@ -93,7 +93,8 @@ ytmusic-player-page:not([blyrics-dfs], [blyrics-karaoke])[blyrics-video-mode] #a
   padding-bottom: 10px;
 }
 
-ytmusic-player-page[player-fullscreened]:not([blyrics-dfs]) #song-media-window {
+/* Hide only the buttons: #song-media-window itself is YTM's click-to-pause surface. */
+ytmusic-player-page[player-fullscreened]:not([blyrics-dfs]) #song-media-window .top-row-buttons {
   visibility: hidden;
 }
 
