@@ -26,12 +26,15 @@ export const ytmHost: LyricsRendererHost = {
     // A missing state is the pre-navigation case: the panel is up but YouTube Music has not written
     // the attribute yet, and treating that as closed would drop the first lyrics of the song.
     const playerState = document.getElementById(PLAYER_PAGE_ID)?.getAttribute(PLAYER_UI_STATE_ATTRIBUTE);
-    return (
+    const stateAllowsLyrics =
       !playerState ||
       playerState === "PLAYER_PAGE_OPEN" ||
       playerState === "FULLSCREEN" ||
-      playerState === "MINIPLAYER_IN_PLAYER_PAGE"
-    );
+      playerState === "MINIPLAYER_IN_PLAYER_PAGE";
+    if (!stateAllowsLyrics) return false;
+
+    const tabRenderer = document.querySelector(TAB_RENDERER_SELECTOR);
+    return !tabRenderer || tabRenderer.checkVisibility({ visibilityProperty: true });
   },
   isLoaderActive,
   syncAdState(): boolean {
