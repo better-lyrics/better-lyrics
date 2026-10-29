@@ -191,6 +191,7 @@ blyrics-line-scroll-above-duration = calc(750ms + log(var(--blyrics-line-scroll-
 | `blyrics-swipe-duration-ratio` | `1.6` | Rich-sync swipe duration as a multiple of word duration |
 | `blyrics-long-word-threshold` | `1500` | Duration (ms) above which `data-long-word` is set |
 | `blyrics-letter-wave` | `true` | Experimental, on by default. Split words into per-letter spans and float each letter as it is sung, over the word wobble. Tune with `--blyrics-letter-wave-*`; long words also get a per-letter scale swell. Disable with `blyrics-letter-wave = false` |
+| `blyrics-composited-highlight` | `true` | Run the karaoke sweep and glow on the compositor through the `.blyrics-sweep-*` layers inside each overlay. Set to `false` for a theme that drives the highlight through `--lyric-transition-amount-*` or `--blyrics-highlight-glow-filter-*`, which the composited overlay does not read |
 | `blyrics-hide-instrumental-only` | `false` | Treat "[Instrumental Only]" as no lyrics (enables fullscreen effect) |
 | `blyrics-hide-credits` | `false` | Never build the songwriter credits line |
 | `blyrics-passive-scroll-enabled` | `true` | Unsynced auto-scroll: enable/disable entirely (overrides user setting) |
@@ -319,15 +320,22 @@ Lyric timing is driven by `element.animate()`.
 
 ## Animation System
 
-Every timed word has a real `.blyrics-word-highlight` overlay with `background-clip: text`. A row's overlays sit in `.blyrics-highlight-run`, an `aria-hidden` copy laid over the visible text so both share one layout and wrap the same way:
+Every timed word has a real `.blyrics-word-highlight` overlay. A row's overlays sit in `.blyrics-highlight-run`, an `aria-hidden` copy laid over the visible text so both share one layout and wrap the same way.
+
+By default the overlay is composited (`.blyrics-word-highlight--sweep`): it holds a `.blyrics-sweep-mask` with a static soft-edged mask over a `.blyrics-sweep-text` copy of the word, and the engine translates the two against each other so only the edge moves; a `.blyrics-sweep-glow` repeats the pair with a `text-shadow` the engine fades by opacity. Everything in it runs on the compositor, so the overlay's text colour comes from `--blyrics-lyric-active-color` and the glow from `--blyrics-highlight-glow-radius-*` and `--blyrics-glow-color`. Words that can fragment across lines (long or wrap-broken words, bidi-sensitive rows) and image highlights keep the gradient overlay below.
+
+The gradient overlay, and the whole engine with `blyrics-composited-highlight = false`, uses `background-clip: text` driven by the custom properties:
 
 ```css
+/* blyrics-composited-highlight = false; */
 .blyrics--word.blyrics-word-highlight {
   color: transparent;
   background-image: linear-gradient(90deg, var(--blyrics-lyric-active-color) ..., transparent ...);
   background-clip: text;
 }
 ```
+
+Set that knob when a theme replaces the karaoke effect through `--lyric-transition-amount-*` or `--blyrics-highlight-glow-filter-*`; on the composited overlay those are not read.
 
 Timing uses the Web Animations API:
 
@@ -894,7 +902,7 @@ On by default. Each letter of a word floats in turn as it is sung, on top of the
 }
 ```
 
-It layers on the word wobble rather than replacing it, so the default `scaleX` pop stays. To make the letters carry all the motion instead, set the word wobble to identity (`--blyrics-word-wobble-transform-*: translateY(0)`). It follows `--blyrics-animate-word-wobble`, so reduced motion turns it off. The split multiplies the DOM per character and reruns the karaoke sweep per letter, so a theme that does not want the cost turns it off with `blyrics-letter-wave = false`.
+It layers on the word wobble rather than replacing it, so the default `scaleX` pop stays. To make the letters carry all the motion instead, set the word wobble to identity (`--blyrics-word-wobble-transform-*: translateY(0)`). It follows `--blyrics-animate-word-wobble`, so reduced motion turns it off. The split multiplies the DOM per character (three copies of every letter with the composited highlight), so a theme that does not want the cost turns it off with `blyrics-letter-wave = false`.
 
 ### 17. Per-Word State (Karaoke)
 
