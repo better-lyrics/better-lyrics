@@ -23,7 +23,9 @@ const chromeStub: Record<string, unknown> = {
 Object.assign(globalThis, { chrome: chromeStub });
 
 const {
+  DOWNLOAD_IDENTITY_FILE_ACTION,
   initIdentityBackupWatcher,
+  initIdentityFileDownloads,
   isIdentityBackedUp,
   markIdentityBackedUp,
   readBackedUpKeyId,
@@ -175,6 +177,95 @@ const useIdentity = (keyId: string): void => {
     "every settled export leaves no pending entry behind"
   );
   assert.deepEqual(errors, [], "no watcher errors");
+}
+
+{
+  type MessageListener = (request: unknown, sender: unknown, sendResponse: (response: unknown) => void) => unknown;
+  const messageListeners: MessageListener[] = [];
+  const downloadCalls: { url: string; filename: string; saveAs?: boolean }[] = [];
+  let startDownload: () => Promise<number> = async () => 50;
+  chromeStub.runtime = { onMessage: { addListener: (listener: MessageListener) => messageListeners.push(listener) } };
+  Object.assign(chromeStub.downloads as object, {
+    download: (options: { url: string; filename: string; saveAs?: boolean }) => {
+      downloadCalls.push(options);
+      return startDownload();
+    },
+  });
+  const revoked: string[] = [];
+  const revokeObjectURL = URL.revokeObjectURL.bind(URL);
+  URL.revokeObjectURL = url => {
+    revoked.push(url);
+    revokeObjectURL(url);
+  };
+  const errors: unknown[] = [];
+  initIdentityFileDownloads(error => errors.push(error));
+
+  const send = async (request: unknown): Promise<{ keptOpen: unknown; response: unknown }> => {
+    let resolveResponse: (response: unknown) => void = () => undefined;
+    const response = new Promise<unknown>(resolve => {
+      resolveResponse = resolve;
+    });
+    const keptOpen = messageListeners[0](request, {}, resolveResponse);
+    return { keptOpen, response: keptOpen === true ? await response : undefined };
+  };
+  const request = (filename: string) => ({
+    action: DOWNLOAD_IDENTITY_FILE_ACTION,
+    content: '{"keyId":"k"}',
+    filename,
+    keyId: TWIN_KEY,
+  });
+
+  const unrelated = await send({ action: "applyStyles" });
+  assert.equal(unrelated.keptOpen, undefined, "other messages are left to other listeners");
+  assert.equal(downloadCalls.length, 0, "other messages start no download");
+  assert.equal((await send({ ...request("x.json"), keyId: 1 })).keptOpen, undefined, "a malformed request is ignored");
+
+  const completed = await send(request("a.json"));
+  assert.equal(completed.keptOpen, true, "the reply is sent after the save dialog closes");
+  assert.deepEqual(completed.response, { downloadId: 50 }, "the popup gets the download id");
+  const blobUrl = downloadCalls[0].url;
+  assert.ok(blobUrl.startsWith("blob:"), "a context with object URLs downloads a blob");
+  assert.equal(downloadCalls[0].saveAs, true, "the save dialog is always shown");
+  assert.equal(downloadCalls[0].filename, "a.json", "the filename passes through");
+  assert.deepEqual(
+    session.data["identityBackupPending:50"],
+    { downloadId: 50, keyId: TWIN_KEY },
+    "the background records the pending backup itself"
+  );
+  assert.deepEqual(revoked, [], "regression: the blob outlives the resolved download call");
+  downloadListeners[0]({ id: 50, state: { current: "in_progress" } });
+  assert.deepEqual(revoked, [], "an in-progress download keeps its blob");
+  downloadListeners[0]({ id: 50, state: { current: "complete" } });
+  assert.deepEqual(revoked, [blobUrl], "a finished download releases its blob");
+  downloadListeners[0]({ id: 50, state: { current: "complete" } });
+  assert.equal(revoked.length, 1, "a blob is released once");
+
+  startDownload = async () => 51;
+  await send(request("b.json"));
+  downloadListeners[0]({ id: 51, state: { current: "interrupted" } });
+  assert.deepEqual(revoked, [blobUrl, downloadCalls[1].url], "an interrupted download releases its blob");
+
+  startDownload = async () => {
+    throw new Error("Download canceled by the user");
+  };
+  const cancelled = await send(request("c.json"));
+  assert.deepEqual(cancelled.response, { failed: true }, "a cancelled dialog reports failure");
+  assert.equal(revoked.at(-1), downloadCalls[2].url, "a rejected download releases its blob at once");
+  assert.equal(errors.length, 1, "the rejection is reported");
+
+  const createObjectURL = URL.createObjectURL;
+  Object.defineProperty(URL, "createObjectURL", { value: undefined, configurable: true, writable: true });
+  startDownload = async () => 52;
+  const fromWorker = await send(request("d.json"));
+  Object.defineProperty(URL, "createObjectURL", { value: createObjectURL, configurable: true, writable: true });
+  assert.deepEqual(fromWorker.response, { downloadId: 52 }, "a service worker still downloads");
+  const dataUrl = downloadCalls[3].url;
+  assert.ok(dataUrl.startsWith("data:application/json"), "a context without object URLs downloads a data URL");
+  assert.equal(decodeURIComponent(dataUrl.split(",")[1]), '{"keyId":"k"}', "the data URL carries the file content");
+  const releasedBefore = revoked.length;
+  downloadListeners[0]({ id: 52, state: { current: "complete" } });
+  assert.equal(revoked.length, releasedBefore, "a data URL has nothing to release");
+  await flush();
 }
 
 console.log("identityBackup self-check passed");
