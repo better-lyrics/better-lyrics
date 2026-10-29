@@ -72,11 +72,13 @@ import {
   renderAppVersion,
 } from "@/options/popupShell";
 import {
+  DOWNLOAD_IDENTITY_FILE_ACTION,
+  type IdentityFileRequest,
+  type IdentityFileResult,
   isIdentityBackedUp,
   markIdentityBackedUp,
   onBackupFlagChanged,
   readBackedUpKeyId,
-  rememberPendingBackup,
 } from "@/options/identityBackup";
 import { attachDeclaredScrollFades, attachScrollFade } from "@/ui/scrollFade";
 import { createSyncIcon, createSyncTag, syncTypeLabel } from "@/ui/syncTag";
@@ -1147,21 +1149,22 @@ function initNicknameModal(): void {
 async function handleExportIdentity(): Promise<void> {
   const downloadsGranted = requestDownloadsPermission();
   try {
-    const [displayName, exportData, { keyId }] = await Promise.all([getDisplayName(), exportIdentity(), getIdentity()]);
-    const outcome = await downloadIdentityFile(
-      exportData,
-      `better-lyrics-identity-${displayName}.json`,
-      await downloadsGranted
-    );
-    notifyDownloadOutcome(outcome);
-    if (outcome.kind === "downloads") await rememberPendingBackup(outcome.downloadId, keyId);
+    const [displayName, content, { keyId }] = await Promise.all([getDisplayName(), exportIdentity(), getIdentity()]);
+    const filename = `better-lyrics-identity-${displayName}.json`;
+    if (!(await downloadsGranted)) {
+      downloadWithAnchor(content, filename);
+      toast.success(t("options_alert_downloadInitiated"));
+      return;
+    }
+    const request: IdentityFileRequest = { action: DOWNLOAD_IDENTITY_FILE_ACTION, content, filename, keyId };
+    const result: IdentityFileResult = await chrome.runtime.sendMessage(request);
+    if ("downloadId" in result) toast.info(t("options_alert_fileSaveDialogOpened"));
+    else toast.error(t("options_alert_fileSaveFailed"));
   } catch (error) {
     errorCore("Failed to export identity:", error);
     toast.error(t("options_alert_exportFailed"));
   }
 }
-
-type DownloadOutcome = { kind: "downloads"; downloadId: number } | { kind: "anchor" } | { kind: "failed" };
 
 function requestDownloadsPermission(): Promise<boolean> {
   return chrome.permissions.request({ permissions: ["downloads"] }).catch(error => {
@@ -1170,19 +1173,8 @@ function requestDownloadsPermission(): Promise<boolean> {
   });
 }
 
-async function downloadIdentityFile(content: string, filename: string, granted: boolean): Promise<DownloadOutcome> {
+function downloadWithAnchor(content: string, filename: string): void {
   const url = URL.createObjectURL(new Blob([content], { type: "application/json" }));
-  if (granted && chrome.downloads) {
-    try {
-      const downloadId = await chrome.downloads.download({ url, filename, saveAs: true });
-      return { kind: "downloads", downloadId };
-    } catch (error) {
-      errorCore("Identity download failed:", error);
-      return { kind: "failed" };
-    } finally {
-      URL.revokeObjectURL(url);
-    }
-  }
   const anchor = document.createElement("a");
   anchor.href = url;
   anchor.download = filename;
@@ -1190,13 +1182,6 @@ async function downloadIdentityFile(content: string, filename: string, granted: 
   anchor.click();
   anchor.remove();
   setTimeout(() => URL.revokeObjectURL(url), 100);
-  return { kind: "anchor" };
-}
-
-function notifyDownloadOutcome(outcome: DownloadOutcome): void {
-  if (outcome.kind === "downloads") toast.info(t("options_alert_fileSaveDialogOpened"));
-  else if (outcome.kind === "anchor") toast.success(t("options_alert_downloadInitiated"));
-  else toast.error(t("options_alert_fileSaveFailed"));
 }
 
 async function syncBackupWarning(): Promise<void> {
