@@ -3,12 +3,15 @@ import { applyLyricDecorations } from "@modules/lyrics/lyricDecorations";
 import type { LyricDecorations } from "@modules/lyrics/injectLyrics";
 import { createLyricsRenderer, type Lyric, type LyricsRenderer, type TickOptions } from "@braccato/core";
 import { decorateEndCard } from "@modules/karaoke/endCard";
+import type { ContributorCreditLabels } from "@modules/lyrics/contributorCredit";
+import type { LyricContributor } from "@modules/lyrics/providers/shared";
 import { createKaraokeOverlay, type KaraokeOverlayOptions } from "@modules/karaoke/overlay";
 
 interface KaraokeStageOptions {
   readonly doc: Document;
   readonly win: Window;
   readonly overlay: KaraokeOverlayOptions;
+  readonly contributorLabels: ContributorCreditLabels;
   readonly isVisible: () => boolean;
   readonly isAdPlaying: () => boolean;
   readonly log: LogSink;
@@ -18,6 +21,7 @@ interface KaraokeStageLyrics {
   readonly lyrics: Lyric[];
   readonly language?: string | null;
   readonly songwriters?: readonly string[];
+  readonly contributors?: readonly LyricContributor[];
   readonly title: string;
   readonly artist: string;
   readonly providerKey: string | null;
@@ -62,13 +66,13 @@ export function createKaraokeStage(options: KaraokeStageOptions): KaraokeStage {
   }
 
   return {
-    build({ lyrics, language, songwriters, title, artist, providerKey }: KaraokeStageLyrics): void {
+    build({ lyrics, language, songwriters, contributors, title, artist, providerKey }: KaraokeStageLyrics): void {
       renderer.setLyrics(lyrics, { mount: overlay.ensureMount(), language, songwriters });
       const firstSung = renderer.lines.find(line => line.lyricElement.dataset.instrumental !== "true");
       firstSungLineStartS = firstSung?.time ?? Number.POSITIVE_INFINITY;
       hasIntroNote = renderer.lines[0]?.lyricElement.dataset.instrumental === "true";
       overlay.setTitleCard({ title, artist, songwriters: songwriters ?? [] });
-      decorateEndCard(renderer.container, providerKey);
+      decorateEndCard(renderer.container, providerKey, contributors, options.contributorLabels);
     },
 
     setLanguage(language: string | null | undefined): void {

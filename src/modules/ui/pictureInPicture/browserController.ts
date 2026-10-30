@@ -13,6 +13,7 @@ import { resumeAllAutoscroll } from "@braccato/core";
 import { onSignal, sendInit, sendMetadata } from "@modules/ui/pictureInPicture/bridge";
 import { createGatedToggle } from "@modules/ui/pictureInPicture/controller";
 import { AD_UP_NEXT_SLOT } from "@modules/ui/pictureInPicture/intermissionText";
+import { CONTRIBUTOR_CREDIT_LABEL_KEYS } from "@modules/lyrics/contributorCredit";
 import { publishPictureInPictureLyrics } from "@modules/ui/pictureInPicture/lyricsPublisher";
 import { DEFAULT_ARTWORK_TRANSITION, DEFAULT_TEXT_TRANSITION } from "@modules/ui/pictureInPicture/lyricsView";
 import { createPictureInPictureHost } from "@modules/ui/pictureInPicture/pipHost";
@@ -37,6 +38,7 @@ const PIP_STRING_KEYS = [
   "unison_song",
   "options_display_videoTab",
   "ui_close",
+  ...Object.values(CONTRIBUTOR_CREDIT_LABEL_KEYS),
 ] as const;
 let hasInitializedAutoRestore = false;
 let hasAttemptedAutoRestore = false;

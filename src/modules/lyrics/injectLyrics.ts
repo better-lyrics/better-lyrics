@@ -11,7 +11,7 @@ import {
 import { AppState } from "@core/appState";
 import { t } from "@core/i18n";
 import { applySegmentMapToLyrics, type LyricSourceResultWithMeta } from "@modules/lyrics/lyrics";
-import type { LyricPart } from "@modules/lyrics/providers/shared";
+import type { LyricContributor, LyricPart } from "@modules/lyrics/providers/shared";
 import { createScriptClassifier, type ScriptClassifier } from "@modules/lyrics/nonLatinScript";
 import {
   getRomanizationFromCache,
@@ -87,6 +87,7 @@ export interface LyricsData {
   hasNonLatin: boolean;
   language?: string | null;
   songwriters?: readonly string[];
+  contributors?: readonly LyricContributor[];
   song: string;
   artist: string;
   /** YouTube's own lines, shown while the synced providers are still being asked. */
@@ -195,6 +196,7 @@ function injectLyrics(
     tabSelector,
     hasNonLatin: lyrics.some(item => !!item.words && scripts.hasNonLatinScript(item.words)),
     songwriters: data.songwriters,
+    contributors: data.contributors,
     song: data.song,
     artist: data.artist,
     isProvisional: keepLoaderVisible,
@@ -215,7 +217,8 @@ function injectLyrics(
       data.providerKey,
       data.videoId,
       unisonData,
-      syncType === "none"
+      syncType === "none",
+      data.contributors
     );
   } else {
     addNoLyricsButton(data.song, data.artist, data.album, data.duration, data.videoId);
