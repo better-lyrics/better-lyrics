@@ -219,6 +219,12 @@ export const MUSIC_NOTES = "♪𝅘𝅥𝅮𝅘𝅥𝅯𝅘𝅥𝅰𝅘𝅥𝅱𝅘𝅥𝅲" as const;
 export const LYRICS_CACHE_TTL_MS = 7 * 24 * 60 * 60 * 1000;
 export const LYRICS_NEGATIVE_CACHE_TTL_MS = 30 * 60 * 1000;
 export const UNISON_NEGATIVE_CACHE_TTL_MS = 5 * 60 * 1000;
+/** A Unison copy a live lookup confirmed this recently is not looked up again. */
+export const UNISON_RECENTLY_VALIDATED_MS = 30_000;
+/** How many songs' given-out Unison answers are remembered for upgrades. */
+export const UNISON_MAX_SERVED_ENTRIES = 50;
+/** How long to wait for a better-ranked provider before showing the best one so far. */
+export const LYRICS_SELECTION_QUIET_MS = 150;
 export const UNISON_MAX_VIDEOS_PER_LYRIC = 20;
 
 export const ARTWORK_MIN_SIZE_PX = 1440;
