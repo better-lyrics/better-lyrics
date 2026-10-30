@@ -4,7 +4,7 @@
  */
 
 import { FETCH_LYRICS_LOG, LYRICS_TAB_HIDDEN_LOG, SEEK_EVENT, SERVER_ERROR_LOG, TAB_HEADER_CLASS } from "@constants";
-import { AppState, type PlayerDetails } from "@core/appState";
+import { AppState, type PlayerDetails, reloadLyrics } from "@core/appState";
 import { t } from "@core/i18n";
 import { type LineData, type LyricsData, processLyrics } from "@modules/lyrics/injectLyrics";
 import { stringSimilarity } from "@modules/lyrics/lyricParseUtils";
@@ -24,8 +24,8 @@ import {
   unisonRanksAbove,
 } from "@modules/lyrics/providerPin";
 import { getLyrics, type LyricSourceKey, newSourceMap, providerPriority } from "./providers/shared";
-import { setUnisonListeners } from "./providers/unison";
-import { createSelection, type Selection } from "./selection";
+import { setUnisonListeners } from "@modules/lyrics/providers/unison";
+import { createSelection, type Selection } from "@modules/lyrics/selection";
 import { awaitUnifiedStream } from "./providers/unified";
 import type { YTLyricSourceResult } from "./providers/yt";
 import { getSongAlbum, getSongMetadata, type SegmentMap } from "./requestSniffer/requestSniffer";
@@ -477,6 +477,11 @@ export async function createLyrics(detail: PlayerDetails, signal: AbortSignal): 
       signal,
       selection,
       refreshUnison: async () => {
+        // The saved pin was decided from the previous Unison answer, so decide it again.
+        if (pinnedProvider && (isUnisonKey(pinnedProvider) || unisonRanksAbove(providerPriority, pinnedProvider))) {
+          reloadLyrics();
+          return;
+        }
         const unisonKeys = orderedProviders.filter(isUnisonKey);
         for (const key of unisonKeys) {
           sourceMap[key].filled = false;
@@ -486,7 +491,6 @@ export async function createLyrics(detail: PlayerDetails, signal: AbortSignal): 
       },
     };
 
-    // Every provider is asked at once; the selection shows the best answer as they come in.
     await Promise.allSettled(orderedProviders.map(run));
     if (signal.aborted) return;
 

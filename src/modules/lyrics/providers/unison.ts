@@ -1,4 +1,11 @@
-import { LOG_PREFIX_UNISON, LYRICS_CACHE_TTL_MS, UNISON_API_URL, UNISON_NEGATIVE_CACHE_TTL_MS } from "@/core/constants";
+import {
+  LOG_PREFIX_UNISON,
+  LYRICS_CACHE_TTL_MS,
+  UNISON_API_URL,
+  UNISON_MAX_SERVED_ENTRIES,
+  UNISON_NEGATIVE_CACHE_TTL_MS,
+  UNISON_RECENTLY_VALIDATED_MS,
+} from "@/core/constants";
 import { getTransientStorage, setTransientStorage } from "@core/storage";
 import { getIdentity, signPayload } from "@/core/keyIdentity";
 import { LRCParser, parseLRC, PlainParser } from "@braccato/parsers";
@@ -152,8 +159,6 @@ interface UnisonListeners {
 }
 
 const UNISON_CACHE_VERSION = 1;
-const RECENTLY_VALIDATED_MS = 30_000;
-const MAX_SERVED_ENTRIES = 50;
 const UNISON_KEYS = ["unison-richsynced", "unison-wordsynced", "unison-synced", "unison-plain"] as const;
 
 const streams = new Map<string, StreamState>();
@@ -184,7 +189,7 @@ async function writeCached(videoId: string, lookup: UnisonLookup, validated: boo
 }
 
 function recentlyValidated(cached: CachedUnison | null): boolean {
-  return !!cached?.validatedAt && Date.now() - cached.validatedAt < RECENTLY_VALIDATED_MS;
+  return !!cached?.validatedAt && Date.now() - cached.validatedAt < UNISON_RECENTLY_VALIDATED_MS;
 }
 
 function sameLyrics(a: UnisonLookup, b: UnisonLookup): boolean {
@@ -356,7 +361,7 @@ async function revalidate(videoId: string): Promise<void> {
 function rememberServed(videoId: string, entry: ServedUnison): void {
   served.delete(videoId);
   served.set(videoId, entry);
-  if (served.size > MAX_SERVED_ENTRIES) {
+  if (served.size > UNISON_MAX_SERVED_ENTRIES) {
     const oldest = served.keys().next().value;
     if (oldest !== undefined) served.delete(oldest);
   }
