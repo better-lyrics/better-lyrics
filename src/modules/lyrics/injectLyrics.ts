@@ -104,11 +104,16 @@ export interface LyricsData {
  * @param data.language - Language code for the lyrics
  * @param data.lyrics - Array of lyric lines
  */
+/**
+ * @param replacing - Swaps these lyrics into the view already showing this song instead of clearing
+ *   it first, so a renderer that swaps in place keeps the lines that did not change.
+ */
 export function processLyrics(
   doc: Document,
   data: LyricSourceResultWithMeta,
   keepLoaderVisible = false,
-  signal?: AbortSignal
+  signal?: AbortSignal,
+  replacing = false
 ): void {
   const lyrics = data.lyrics;
   if (!lyrics || lyrics.length === 0) {
@@ -125,11 +130,13 @@ export function processLyrics(
   // The previous song's container, not the one this injection builds: injectLyrics creates that
   // one later. cleanup() drops both this reference and the element together, so a null here means
   // there is nothing on screen to clear.
-  if (!mainView.clearOnScreenLyrics()) {
+  if (!replacing && !mainView.clearOnScreenLyrics()) {
     logCore(LYRICS_TAB_NOT_DISABLED_LOG);
   }
+  // Translations still in flight for the lyrics being replaced must not land on these.
+  if (replacing) AppState.currentInjectionId++;
 
-  injectLyrics(doc, data, keepLoaderVisible, signal);
+  injectLyrics(doc, data, keepLoaderVisible, signal, replacing);
 }
 
 /**
@@ -148,17 +155,18 @@ function injectLyrics(
   doc: Document,
   data: LyricSourceResultWithMeta,
   keepLoaderVisible = false,
-  signal?: AbortSignal
+  signal?: AbortSignal,
+  replacing = false
 ): void {
   const injectionId = AppState.currentInjectionId;
   const isStale = () => AppState.currentInjectionId !== injectionId;
 
   const lyrics = data.lyrics!;
   const scripts = createScriptClassifier(lyrics.map(item => item.words));
-  cleanup();
+  cleanup(replacing);
   disableNativeLyricsFocus();
 
-  const lyricsWrapper = createLyricsWrapper();
+  const lyricsWrapper = createLyricsWrapper(replacing);
   lyricsWrapper.removeAttribute("is-empty");
 
   if (AppState.isTranslateEnabled) {
