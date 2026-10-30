@@ -8,8 +8,7 @@
  * upgrades them: a better-ranked arrival replaces them, a worse-ranked one is ignored.
  */
 
-/** How long to wait for a better-ranked provider before showing the best one so far. */
-const SELECTION_QUIET_MS = 150;
+import { LYRICS_SELECTION_QUIET_MS } from "@constants";
 
 export type Verdict<R> = { kind: "pending" } | { kind: "rejected" } | { kind: "displayable"; result: R };
 
@@ -33,7 +32,7 @@ export interface Selection<K, R> {
 
 export function createSelection<K, R>(options: SelectionOptions<K, R>): Selection<K, R> {
   const { order, display } = options;
-  const quietMs = options.quietMs ?? SELECTION_QUIET_MS;
+  const quietMs = options.quietMs ?? LYRICS_SELECTION_QUIET_MS;
   const setTimer = options.setTimer ?? ((fn, ms) => setTimeout(fn, ms));
   const clearTimer = options.clearTimer ?? (handle => clearTimeout(handle as ReturnType<typeof setTimeout>));
 
