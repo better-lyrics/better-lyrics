@@ -59,12 +59,12 @@
         "dompurify": "^3.4.17",
         "fast-xml-parser": "^5.11.2",
         "fflate": "^0.8.3",
-        "marked": "^18.1.1",
+        "marked": "^18.1.2",
         "rics": "^0.3.22",
         "sortablejs": "^1.15.7"
     },
     "devDependencies": {
-        "@aws-sdk/client-s3": "^3.1156.0",
+        "@aws-sdk/client-s3": "^3.1157.0",
         "@biomejs/biome": "2.0.4",
         "@types/chrome": "^0.3.6",
         "@types/jsdom": "^30.0.0",
