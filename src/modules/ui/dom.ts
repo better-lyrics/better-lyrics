@@ -264,7 +264,7 @@ let adStateObserver: MutationObserver | null = null;
  *
  * @returns The lyrics wrapper element
  */
-export function createLyricsWrapper(): HTMLElement {
+export function createLyricsWrapper(keepContents = false): HTMLElement {
   const tabRenderer = document.querySelector(TAB_RENDERER_SELECTOR) as HTMLElement;
 
   tabRenderer.removeEventListener("scroll", scrollEventHandler);
@@ -274,7 +274,7 @@ export function createLyricsWrapper(): HTMLElement {
 
   if (existingWrapper) {
     existingWrapper.dataset.extensionRoot = "true";
-    existingWrapper.replaceChildren();
+    if (!keepContents) existingWrapper.replaceChildren();
     return existingWrapper;
   }
 
@@ -512,6 +512,13 @@ function setDockSuppression(reason: DockSuppressionReason, suppressed: boolean):
   if (suppressed) dockSuppressionReasons.add(reason);
   else dockSuppressionReasons.delete(reason);
   applyDockSuppression();
+}
+
+/** Repaints the vote controls when the shown Unison lyric's details change without a reload. */
+export function refreshShownUnisonData(unisonData: UnisonData): void {
+  if (AppState.currentUnisonData?.lyricsId !== unisonData.lyricsId) return;
+  if (AppState.currentUnisonData !== unisonData) Object.assign(AppState.currentUnisonData, unisonData);
+  refreshUnisonControls(AppState.currentUnisonData);
 }
 
 function refreshUnisonControls(unisonData: UnisonData): void {
@@ -1610,13 +1617,15 @@ export async function injectHeadTags(): Promise<void> {
 
 /**
  * Cleans up this elements and resets state when switching songs.
+ *
+ * @param keepView - Leaves the lyric view standing for lyrics about to be swapped into it.
  */
-export function cleanup(): void {
+export function cleanup(keepView = false): void {
   // The side panel's view only, even though on Chromium the floating window's is in the same
   // registry: clearing it from here would go around its own renderer and leave the container it
   // built standing in the floating document. It drops the song off the publish this function ends
   // with instead.
-  mainView.clear();
+  if (!keepView) mainView.clear();
   setFullscreenNoLyricsState(false);
 
   if (lyricsObserver) {
@@ -1653,7 +1662,7 @@ export function cleanup(): void {
     buttonContainer.remove();
   }
 
-  clearLyrics();
+  if (!keepView) clearLyrics();
   publishSecondaryViews();
 }
 
