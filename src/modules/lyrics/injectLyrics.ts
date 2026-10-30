@@ -189,6 +189,8 @@ function injectLyrics(
     noLyrics,
     language: data.language,
     songwriters: data.songwriters,
+    // Lyrics for the song on screen swap into its view, so an upgrade keeps the lines that match.
+    songKey: data.videoId,
   });
 
   const syncType: SyncType = mainView.syncType;
