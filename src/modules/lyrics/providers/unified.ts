@@ -570,22 +570,8 @@ async function processStreamData(event: string, data: any, params: ProviderParam
           richsyncKey: "binimum-richsynced",
           syncedKey: "binimum-synced",
           source: "BiniLyrics",
-          sourceHref: "https://lyrics-api.binimum.org/",
+          sourceHref: "https://binimum.org/",
         });
-
-        const timingType: "syllable" | "line" | null = results.timingType ?? null;
-        if (timingType === "syllable") {
-          if (!sourceMap["binimum-richsynced"].lyricSourceResult) {
-            sourceMap["binimum-richsynced"].lyricSourceResult = sourceMap["binimum-synced"].lyricSourceResult;
-            sourceMap["binimum-synced"].lyricSourceResult = null;
-          }
-        } else if (timingType === "line") {
-          if (!sourceMap["binimum-synced"].lyricSourceResult) {
-            sourceMap["binimum-synced"].lyricSourceResult = sourceMap["binimum-richsynced"].lyricSourceResult;
-          }
-          sourceMap["binimum-richsynced"].lyricSourceResult = null;
-        }
-
         resolveWaiter(params, "binimum-richsynced");
         resolveWaiter(params, "binimum-synced");
       }
