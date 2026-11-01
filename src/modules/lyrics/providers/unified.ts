@@ -570,7 +570,7 @@ async function processStreamData(event: string, data: any, params: ProviderParam
           richsyncKey: "binimum-richsynced",
           syncedKey: "binimum-synced",
           source: "BiniLyrics",
-          sourceHref: "https://lyrics-api.binimum.org/",
+          sourceHref: "https://binimum.org/",
         });
         resolveWaiter(params, "binimum-richsynced");
         resolveWaiter(params, "binimum-synced");
