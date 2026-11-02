@@ -24,16 +24,26 @@ function isNamed(contributor: LyricContributor | undefined): contributor is Lyri
   return typeof contributor?.name === "string" && contributor.name.length > 0;
 }
 
-function contributorNode(doc: Document, contributor: LyricContributor, linkClass: string): Node {
+function creditNode(doc: Document, label: string, contributor: LyricContributor, linkClass: string): Node {
+  const labelSpan = doc.createElement("span");
+  labelSpan.className = `${linkClass}-label`;
+  labelSpan.textContent = `${label} `;
+  const nameSpan = doc.createElement("span");
+  nameSpan.className = `${linkClass}-name`;
+  nameSpan.textContent = contributor.name;
+
   if (typeof contributor.href !== "string" || !contributor.href.startsWith("https://")) {
-    return doc.createTextNode(contributor.name);
+    const credit = doc.createElement("span");
+    credit.className = linkClass;
+    credit.append(labelSpan, nameSpan);
+    return credit;
   }
   const link = doc.createElement("a");
   link.className = linkClass;
   link.href = contributor.href;
   link.target = "_blank";
   link.rel = "noopener";
-  link.textContent = contributor.name;
+  link.append(labelSpan, nameSpan);
   return link;
 }
 
@@ -45,15 +55,14 @@ export function createContributorCredit(
 ): Node[] {
   const maker = contributors?.find(contributor => contributor.role === "maker");
   const uploader = contributors?.find(contributor => contributor.role === "uploader");
-  const credited = (label: string, contributor: LyricContributor): Node[] => [
-    doc.createTextNode(`${label} `),
-    contributorNode(doc, contributor, linkClass),
-  ];
-
   if (isNamed(maker) && isNamed(uploader)) {
-    return [...credited(labels.syncedBy, maker), doc.createTextNode(" · "), ...credited(labels.uploadedBy, uploader)];
+    return [
+      creditNode(doc, labels.syncedBy, maker, linkClass),
+      doc.createTextNode(" · "),
+      creditNode(doc, labels.uploadedBy, uploader, linkClass),
+    ];
   }
-  if (isNamed(uploader)) return credited(labels.syncedAndUploadedBy, uploader);
-  if (isNamed(maker)) return credited(labels.syncedBy, maker);
+  if (isNamed(uploader)) return [creditNode(doc, labels.syncedAndUploadedBy, uploader, linkClass)];
+  if (isNamed(maker)) return [creditNode(doc, labels.syncedBy, maker, linkClass)];
   return [];
 }
