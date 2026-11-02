@@ -50,13 +50,14 @@ const seed = (items: Record<string, unknown>): void => {
     "blyrics_abcdefghijk_bLyrics-richsynced": entry,
     "blyrics_abcdefghijk_lrclib-synced": entry,
     "blyrics_zyxwvutsrqp_yt-lyrics": entry,
+    blyrics_zyxwvutsrqp_unison: entry,
     blyrics_featured_themes: { themes: [] },
     blyrics_stableReleaseCheck: { checkedAt: 1 },
     userIdentity: { keyId: "k" },
   });
   const info = await getUpdatedCacheInfo();
   assert.equal(info.count, 2, "counts unique songs across lyric cache keys");
-  assert.equal(info.size, JSON.stringify(entry).length * 3, "size covers only lyric cache keys");
+  assert.equal(info.size, JSON.stringify(entry).length * 4, "size covers only lyric cache keys");
 
   await clearLyricCache();
   assert.deepEqual(
@@ -140,6 +141,11 @@ const seed = (items: Record<string, unknown>): void => {
 {
   assert.equal(storageCategoryForKey("blyrics_abcdefghijk_bLyrics-richsynced"), "lyrics");
   assert.equal(storageCategoryForKey("blyrics_abcdefghijk_metadata"), "lyrics", "metadata belongs to the lyric cache");
+  assert.equal(
+    storageCategoryForKey("blyrics_abcdefghijk_unison"),
+    "lyrics",
+    "Unison's per-song entry belongs to the lyric cache"
+  );
   assert.equal(storageCategoryForKey("storeTheme:abc"), "themes");
   assert.equal(storageCategoryForKey("storeThemeIndex"), "themes");
   assert.equal(storageCategoryForKey("customThemes"), "themes");

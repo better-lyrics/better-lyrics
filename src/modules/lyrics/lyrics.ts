@@ -23,7 +23,7 @@ import {
   unisonOverride,
   unisonRanksAbove,
 } from "@modules/lyrics/providerPin";
-import { getLyrics, type LyricSourceKey, newSourceMap, providerPriority } from "./providers/shared";
+import { getLyrics, type LyricSourceKey, newSourceMap, providerPriority, settledLyrics } from "./providers/shared";
 import { setUnisonListeners } from "@modules/lyrics/providers/unison";
 import { createSelection, type Selection } from "@modules/lyrics/selection";
 import { awaitUnifiedStream } from "./providers/unified";
@@ -483,6 +483,9 @@ export async function createLyrics(detail: PlayerDetails, signal: AbortSignal): 
           return;
         }
         const unisonKeys = orderedProviders.filter(isUnisonKey);
+        // A request still finishing would be joined instead of refilled, and report the old lyrics.
+        await Promise.allSettled(unisonKeys.map(key => settledLyrics(providerParameters, key)));
+        if (signal.aborted) return;
         for (const key of unisonKeys) {
           sourceMap[key].filled = false;
           selection.report(key, { kind: "pending" });

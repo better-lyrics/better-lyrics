@@ -244,6 +244,11 @@ export function getLyrics(
   return request;
 }
 
+/** Resolves once any request already made for this source has finished, without starting one. */
+export function settledLyrics(providerParameters: ProviderParameters, sourceName: LyricSourceKey): Promise<unknown> {
+  return inFlight.get(providerParameters.sourceMap[sourceName]) ?? Promise.resolve();
+}
+
 async function fetchLyrics(
   providerParameters: ProviderParameters,
   sourceName: LyricSourceKey
