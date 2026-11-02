@@ -123,6 +123,7 @@ export const TRANSLATE_IN_ROMAJI = function (lang: string, text: string): string
 export const CUBEY_LYRICS_API_URL_TURNSTILE = "https://lyrics.api.dacubeking.com/" as const;
 
 export const CUBEY_LYRICS_API_URL = "https://lyrics.api.dacubeking.com/" as const;
+export const SPICY_LYRICS_URL = "https://spicylyrics.org/" as const;
 
 // Supported Romanization Languages
 // Display names are fallback only - use getLanguageDisplayName() from @core/i18n for UI
@@ -449,35 +450,37 @@ export const PROVIDER_CONFIGS: ProviderConfig[] = [
     syncType: "syllable",
     priority: 1,
   },
-  { key: "binimum-richsynced", displayName: "BiniLyrics", syncType: "syllable", priority: 2 },
+  { key: "spicy-richsynced", displayName: "Spicy Lyrics", syncType: "syllable", priority: 2 },
+  { key: "binimum-richsynced", displayName: "BiniLyrics", syncType: "syllable", priority: 3 },
   {
     key: "unison-wordsynced",
     displayName: "Unison",
     syncType: "word",
-    priority: 3,
+    priority: 4,
   },
-  { key: "portato-richsynced", displayName: "Better Lyrics Portato", syncType: "word", priority: 4 },
-  { key: "musixmatch-richsync", displayName: "Musixmatch", syncType: "word", priority: 5 },
-  { key: "bLyrics-synced", displayName: "Better Lyrics", syncType: "line", priority: 6 },
+  { key: "portato-richsynced", displayName: "Better Lyrics Portato", syncType: "word", priority: 5 },
+  { key: "musixmatch-richsync", displayName: "Musixmatch", syncType: "word", priority: 6 },
+  { key: "bLyrics-synced", displayName: "Better Lyrics", syncType: "line", priority: 7 },
   {
     key: "unison-synced",
     displayName: "Unison",
     syncType: "line",
-    priority: 7,
+    priority: 8,
   },
-  { key: "yt-captions", displayName: "YouTube Captions", syncType: "line", priority: 8 },
-  { key: "binimum-synced", displayName: "BiniLyrics", syncType: "line", priority: 9 },
-  { key: "lrclib-synced", displayName: "LRCLib", syncType: "line", priority: 10 },
-  { key: "legato-synced", displayName: "Better Lyrics Legato", syncType: "line", priority: 11 },
-  { key: "musixmatch-synced", displayName: "Musixmatch", syncType: "line", priority: 12 },
-  { key: "yt-lyrics", displayName: "YouTube", syncType: "unsynced", priority: 13 },
+  { key: "spicy-synced", displayName: "Spicy Lyrics", syncType: "line", priority: 9 },
+  { key: "yt-captions", displayName: "YouTube Captions", syncType: "line", priority: 10 },
+  { key: "binimum-synced", displayName: "BiniLyrics", syncType: "line", priority: 11 },
+  { key: "lrclib-synced", displayName: "LRCLib", syncType: "line", priority: 12 },
+  { key: "legato-synced", displayName: "Better Lyrics Legato", syncType: "line", priority: 13 },
+  { key: "musixmatch-synced", displayName: "Musixmatch", syncType: "line", priority: 14 },
+  { key: "yt-lyrics", displayName: "YouTube", syncType: "unsynced", priority: 15 },
   {
     key: "unison-plain",
     displayName: "Unison",
     syncType: "unsynced",
-    priority: 14,
+    priority: 16,
   },
-  { key: "lrclib-plain", displayName: "LRCLib", syncType: "unsynced", priority: 15 },
+  { key: "lrclib-plain", displayName: "LRCLib", syncType: "unsynced", priority: 17 },
 ] as const;
 
 export const LYRIC_SOURCE_KEYS = PROVIDER_CONFIGS.map(p => p.key);

@@ -1155,7 +1155,23 @@ ytmusic-player-page:not([is-mweb-modernization-enabled]) #side-panel.blyrics-has
 	text-underline-offset: 2px;
 }
 
-.blyrics-footer__container:hover > a {
+.blyrics-footer__container > a:hover {
+	text-decoration: underline;
+}
+
+.blyrics-footer__container > .blyrics-footer__contributor {
+	color: inherit;
+}
+
+.blyrics-footer__container > .blyrics-footer__contributor:hover {
+	text-decoration: none;
+}
+
+.blyrics-footer__contributor-name {
+	color: var(--blyrics-footer-link-color);
+}
+
+.blyrics-footer__contributor:hover > .blyrics-footer__contributor-name {
 	text-decoration: underline;
 }
 

@@ -1305,6 +1305,10 @@ In fullscreen mode this block sits above a full set of playback controls. See [F
 
 Creates styled footer elements including a Discord button with hover effects.
 
+### Lyrics Contributors
+
+Some providers credit the people behind a sync. Spicy Lyrics names a maker, who synced the lyrics, and an uploader, who reviewed and uploaded them. Each credit follows the source link as one `a.blyrics-footer__contributor` link holding a `.blyrics-footer__contributor-label` ("Synced by", "Uploaded by", or "Synced and uploaded by") and a `.blyrics-footer__contributor-name` ("Source: Spicy Lyrics · Synced by A · Uploaded by B"). The whole phrase is clickable; the label keeps the footer text color and only the name takes the link color and hover underline. The karaoke end card shows the same credit after the source as `a.blyrics-karaoke-contributor` with `-label` and `-name` children, inside `.blyrics-karaoke-source`.
+
 ### Songwriter Credits
 
 When the lyrics name their songwriters, a `.blyrics-credits` line ("Written by A, B & C") follows the last lyric, before the footer. It stays dim while the song plays. When the last line ends, it brightens, takes the scroll focus, and the container gets `data-credits-focused`. Seeking back gives the focus to the lines again. Unsynced lyrics show the credits at full strength from the start.
