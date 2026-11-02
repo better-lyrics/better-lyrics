@@ -152,6 +152,13 @@ export function processLyrics(
  * @param [data.source] - Source attribution for lyrics
  * @param [data.sourceHref] - URL for source link
  */
+/** Names the lyrics on screen in the logs, so a later swap can say what it replaced. */
+let shownLyricsLabel: string | null = null;
+
+function lyricsLabel(data: LyricSourceResultWithMeta): string {
+  return data.providerKey ? `${data.source} [${data.providerKey}]` : String(data.source);
+}
+
 function injectLyrics(
   doc: Document,
   data: LyricSourceResultWithMeta,
@@ -184,6 +191,10 @@ function injectLyrics(
     flushLoader(allZero && !noLyrics);
   }
 
+  const previousContainer = replacing ? mainView.container : null;
+  const previousLines = new Set(replacing ? mainView.lines.map(line => line.lyricElement) : []);
+  const previousLabel = shownLyricsLabel;
+
   mainView.setLyrics(lyrics, {
     mount: lyricsWrapper,
     loaderVisible: keepLoaderVisible,
@@ -196,6 +207,21 @@ function injectLyrics(
 
   const syncType: SyncType = mainView.syncType;
   const lines: readonly LineData[] = mainView.lines;
+
+  const label = lyricsLabel(data);
+  shownLyricsLabel = label;
+  if (!replacing) {
+    logCore(
+      `Set up lyrics from ${label}: ${lines.length} lines, sync ${syncType}${keepLoaderVisible ? " (provisional)" : ""}`
+    );
+  } else if (previousContainer !== null && mainView.container === previousContainer) {
+    const kept = lines.filter(line => previousLines.has(line.lyricElement)).length;
+    logCore(`Swapped lyrics from ${previousLabel} to ${label} in place: kept ${kept} of ${lines.length} lines`);
+  } else {
+    logCore(
+      `Replaced lyrics from ${previousLabel} with ${label} by rebuilding the view: ${lines.length} lines, sync ${syncType}`
+    );
+  }
 
   const tabSelector = document.getElementsByClassName(TAB_HEADER_CLASS)[1] as HTMLElement;
 
