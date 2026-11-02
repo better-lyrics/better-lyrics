@@ -17,10 +17,7 @@ interface FillTtmlOptions {
   cacheAllowed?: boolean;
   unisonData?: UnisonData;
   contributors?: LyricContributor[];
-  timingType?: TtmlTimingType | null;
 }
-
-type TtmlTimingType = "syllable" | "line";
 
 export function fillTtml(
   responseString: string,
@@ -34,7 +31,7 @@ export function fillTtml(
     unisonData: undefined,
   }
 ) {
-  const { richsyncKey, syncedKey, source, sourceHref, cacheAllowed, unisonData, contributors, timingType } = options;
+  const { richsyncKey, syncedKey, source, sourceHref, cacheAllowed, unisonData, contributors } = options;
 
   const { lyrics, isWordSynced, language } = parseTTMLContent(responseString, {
     songDurationMs: providerParameters.duration * 1000,
@@ -61,8 +58,7 @@ export function fillTtml(
     contributors,
   };
 
-  const isRichsynced = timingType === "syllable" ? true : timingType === "line" ? false : isWordSynced;
-  if (isRichsynced) {
+  if (isWordSynced) {
     providerParameters.sourceMap[richsyncKey].lyricSourceResult = result;
     providerParameters.sourceMap[syncedKey].lyricSourceResult = null;
   } else {

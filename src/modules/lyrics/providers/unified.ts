@@ -588,10 +588,8 @@ async function processStreamData(event: string, data: any, params: ProviderParam
           richsyncKey: "binimum-richsynced",
           syncedKey: "binimum-synced",
           source: "BiniLyrics",
-          sourceHref: "https://lyrics-api.binimum.org/",
-          timingType: results.timingType ?? null,
+          sourceHref: "https://binimum.org/",
         });
-
         resolveWaiter(params, "binimum-richsynced");
         resolveWaiter(params, "binimum-synced");
       }
@@ -606,7 +604,6 @@ async function processStreamData(event: string, data: any, params: ProviderParam
           syncedKey: "spicy-synced",
           source: "Spicy Lyrics",
           sourceHref: SPICY_LYRICS_URL,
-          timingType: results.timingType ?? null,
           contributors: attribution
             ? [
                 { name: attribution.uploader.username, href: attribution.uploader.url, role: "uploader" },
