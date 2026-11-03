@@ -26,7 +26,8 @@
       "https://unison.boidu.dev/*",
       "https://blrcunison.vercel.app/*",
       "https://unison.prjktla.my.id/*",
-      "https://openlyryc.pages.dev/*"
+      "https://openlyryc.pages.dev/*",
+      "https://composer.betterlyrics.org/*"
     ]
   },
   "optional_permissions": [
@@ -65,7 +66,8 @@
         "https://unison.boidu.dev/*",
         "https://blrcunison.vercel.app/*",
         "https://unison.prjktla.my.id/*",
-        "https://openlyryc.pages.dev/*"
+        "https://openlyryc.pages.dev/*",
+        "https://composer.betterlyrics.org/*"
       ],
       "resources": [
         "pages/auth.html"
