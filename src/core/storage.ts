@@ -212,7 +212,8 @@ export async function setPersistentStorage(key: string, value: any): Promise<voi
 }
 
 const LYRIC_CACHE_PREFIX = "blyrics_";
-const LYRIC_CACHE_SUFFIXES = [...LYRIC_SOURCE_KEYS, "metadata"].map(sourceKey => `_${sourceKey}`);
+// Unison keeps one entry per song for its four sources.
+const LYRIC_CACHE_SUFFIXES = [...LYRIC_SOURCE_KEYS, "metadata", "unison"].map(sourceKey => `_${sourceKey}`);
 
 function parseLyricCacheKey(key: string): { videoId: string; source: string } | null {
   if (!key.startsWith(LYRIC_CACHE_PREFIX)) return null;
