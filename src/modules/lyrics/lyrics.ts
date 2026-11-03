@@ -444,21 +444,22 @@ export async function createLyrics(detail: PlayerDetails, signal: AbortSignal): 
         selection.report(provider, { kind: "rejected" });
         return;
       }
-      const ytLyrics =
-        sourceLyrics.source === "Unison" ? null : ((await ytLyricsPromise) as YTLyricSourceResult | null);
-      if (ytLyrics !== null && provider !== "yt-lyrics") {
-        const lyricText = sourceLyrics.lyrics.map(lyric => lyric.words + "\n").join("");
-        const matchAmount = stringSimilarity(lyricText.toLowerCase(), ytLyrics.text.toLowerCase());
-        if (matchAmount < 0.5) {
-          logCore(
-            `Got lyrics from ${sourceLyrics.source}, but they don't match YT lyrics. Rejecting: Match: ${matchAmount}%`
-          );
-          selection.report(provider, { kind: "rejected" });
-          return;
-        }
-      }
       if (signal.aborted) return;
       selection.report(provider, { kind: "displayable", result: sourceLyrics });
+
+      // Checked against YouTube's own lyrics after showing rather than before, since that lookup is
+      // the slowest step. A mismatch is withdrawn, and the next best source takes its place.
+      if (sourceLyrics.source === "Unison" || provider === "yt-lyrics") return;
+      const ytLyrics = (await ytLyricsPromise) as YTLyricSourceResult | null;
+      if (ytLyrics === null || signal.aborted) return;
+      const lyricText = sourceLyrics.lyrics.map(lyric => lyric.words + "\n").join("");
+      const matchAmount = stringSimilarity(lyricText.toLowerCase(), ytLyrics.text.toLowerCase());
+      if (matchAmount < 0.5) {
+        logCore(
+          `Got lyrics from ${sourceLyrics.source}, but they don't match YT lyrics. Rejecting: Match: ${matchAmount}%`
+        );
+        selection.report(provider, { kind: "rejected" });
+      }
     };
 
     const run = async (provider: LyricSourceKey): Promise<void> => {
