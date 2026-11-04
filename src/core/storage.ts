@@ -273,9 +273,9 @@ function unisonCacheProvider(item: unknown): ProviderConfig | undefined {
   const value = (item as { value?: unknown } | null)?.value;
   if (typeof value !== "string") return undefined;
   try {
-    const data = JSON.parse(decompressString(value))?.lookup?.data;
-    if (!data?.lyrics) return undefined;
-    const syncType = syncTypeForLyric(data.syncType, data.format);
+    const cachedLyric = JSON.parse(decompressString(value))?.lookup?.data;
+    if (!cachedLyric?.lyrics) return undefined;
+    const syncType = syncTypeForLyric(cachedLyric.syncType, cachedLyric.format);
     return PROVIDER_CONFIGS.find(config => config.key.startsWith("unison-") && config.syncType === syncType);
   } catch {
     return undefined;
