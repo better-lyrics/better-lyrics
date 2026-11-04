@@ -67,7 +67,8 @@ import { renderSortChip } from "@/ui/sortIcon";
 import { initTabStrip, type TabStrip } from "@/ui/tabStrip";
 import { attachScrollFade } from "@/ui/scrollFade";
 import { isTextEntry } from "@/ui/textEntry";
-import { createSyncIcon, createSyncTag, syncTypeForLyric } from "@/ui/syncTag";
+import { createSyncIcon, createSyncTag } from "@/ui/syncTag";
+import { syncTypeForLyric } from "@modules/unison/syncType";
 import { initTooltips } from "@/ui/tooltip";
 import { attachEditor, highlightInto } from "@braccato/highlight";
 

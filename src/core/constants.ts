@@ -441,7 +441,7 @@ export const IDENTITY_ACTIONS = [
   "Belt",
 ] as const;
 
-interface ProviderConfig {
+export interface ProviderConfig {
   key: LyricSourceKey;
   displayName: string;
   syncType: SyncType;

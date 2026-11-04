@@ -12,7 +12,8 @@ const messages: Record<string, string> = {
 };
 Object.assign(globalThis, { chrome: { i18n: { getMessage: (key: string) => messages[key] ?? "" } } });
 
-const { syncTypeForLyric, syncTypeLabel, syncTypeTooltip } = await import("@/ui/syncTag");
+const { syncTypeLabel, syncTypeTooltip } = await import("@/ui/syncTag");
+const { syncTypeForLyric } = await import("@modules/unison/syncType");
 
 // -- Happy paths --------------------------
 {

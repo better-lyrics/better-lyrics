@@ -1,15 +1,6 @@
 import { type SyncType } from "@constants";
 import { t } from "@core/i18n";
 import { parseSvgString, syncTypeIcons } from "@modules/ui/lyricsDock/icons";
-import { type UnisonSyncType } from "@modules/unison/types";
-
-// -- Rule --------------------------
-
-export function syncTypeForLyric(sync: UnisonSyncType, format: string | undefined): SyncType {
-  if (sync === "plain") return "unsynced";
-  if (sync === "linesync") return "line";
-  return format?.toLowerCase() === "ttml" ? "syllable" : "word";
-}
 
 // -- Labels --------------------------
 
