@@ -174,10 +174,10 @@ class ImportManager {
       logEditor(`Parsed theme settings:`, parsedSettings);
       await saveCustomCss(undefined, { fields: parsedSettings });
       this.performImportCSS(applyThemeSettingsToCSS(await loadCustomCSS(true), parsedSettings), filename, true);
-    } catch (err) {
-      errorEditor("Error importing theme settings:", err);
-      showAlert("Unable to import theme settings");
-      throw new Error(`Theme settings import failed: ${err}`);
+    } catch (error) {
+      errorEditor("Import failed:", error);
+      toast.error(t("editor_alert_importFailed"));
+      throw new Error(`Theme settings import failed: ${error}`);
     }
   }
 }

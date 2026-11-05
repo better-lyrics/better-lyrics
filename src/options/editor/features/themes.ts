@@ -31,6 +31,7 @@ import THEMES, {
   setCustomThemeSavedSettings,
   ThemeNameTakenError,
 } from "../../themes";
+import { SAVE_CUSTOM_THEME_DEBOUNCE, SAVE_DEBOUNCE_DELAY } from "@/options/editor/constants";
 import { fillThemeSettings } from "../../options";
 import { editorStateManager } from "../core/state";
 import type { ThemeCardOptions } from "../types";
@@ -57,7 +58,7 @@ import {
   themeSettingsFieldEditorInputs,
   themeSourceBadge,
 } from "../ui/dom";
-import { showAlert, showConfirm, showModal, showPrompt } from "../ui/feedback";
+import { showConfirm, showModal, showPrompt } from "../ui/feedback";
 import {
   applyStoreThemeComplete,
   applyThemeSettingsToCSS,

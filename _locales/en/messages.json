@@ -871,6 +871,9 @@
     "message": "Color",
     "description": "Color setting field type"
   },
+  "options_themeSettings_importError": {
+
+  },
 
   "options_themeFile_import": {
     "message": "Import Theme File",
@@ -895,6 +898,10 @@
   "options_themeFile_settings": {
     "message": "Theme settings",
     "description": "Option label for importing/exporting theme settings"
+  },
+  "options_themeFile_notFound": {
+    "message": "Theme file operation interface not found!",
+    "description": "Alert when there's no interface for theme file operation"
   },
 
   "options_provider_betterLyrics": {
