@@ -1,6 +1,6 @@
 import type { Lyric } from "@braccato/parsers";
 import { getLanguageDisplayName, t } from "@core/i18n";
-import { createDropdownSelect, type DropdownOption, type DropdownSelect } from "@/options/unison/dropdownSelect";
+import { createDropdown, type Dropdown, type DropdownOption } from "@/ui/dropdown";
 import { parseSvgMarkup } from "@/options/unison/icons";
 import {
   ORIGINAL_VIEW,
@@ -21,7 +21,7 @@ interface PreviewState {
   text: string;
   showEmpty: boolean;
   view: string;
-  select?: DropdownSelect;
+  select?: Dropdown;
 }
 
 const previewStates = new WeakMap<HTMLElement, PreviewState>();
@@ -74,9 +74,12 @@ function renderPreview(container: HTMLElement, head: HTMLElement | undefined, st
   const options = viewOptions(lyrics);
   const view = options.some(option => option.value === state.view) ? state.view : ORIGINAL_VIEW;
   if (head && options.length > 1) {
-    state.select ??= createDropdownSelect(t("unison_preview"), value => {
-      state.view = value;
-      renderPreview(container, head, state);
+    state.select ??= createDropdown({
+      label: t("unison_preview"),
+      onChange: value => {
+        state.view = value;
+        renderPreview(container, head, state);
+      },
     });
     if (state.select.root.parentElement !== head) head.appendChild(state.select.root);
     state.select.setOptions(options, view);

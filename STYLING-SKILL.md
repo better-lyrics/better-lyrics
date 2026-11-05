@@ -206,6 +206,8 @@ blyrics-line-scroll-above-duration = calc(750ms + log(var(--blyrics-line-scroll-
 
 **PiP scroll timing**: PiP defaults `--blyrics-scroll-timing-offset` to `0s` (at zero specificity), so a line moves only once the next one starts. A `:root` value doesn't reach it; override under `.blyrics-pip-shell .blyrics-container`.
 
+**PiP lyrics swap**: a new set of lyrics (new song, or another source from the dock) fades the old lines out and rises the on-screen lines in one after another. A source switch in the same song holds the old lyrics, dimmed, with `.blyrics-pip-scroller[data-held]` (default `opacity: 0.35`) until the next ones land; the loader shows only after 250ms. The fading copy is `.blyrics-pip-lyrics__exit`. The rise ends at the theme's own line opacity and adds to its `filter`, so dimmed or blurred lines don't snap. Reduced motion turns both into a short fade. PiP only. `.blyrics-pip-lyrics[data-revealing]` while lines rise. Tunable on `.blyrics-pip-lyrics`, read once per swap: `--blyrics-pip-lyrics-hold-delay` (250ms), `-exit-duration` (200ms), `-reveal-duration` (500ms), `-reveal-delay` (120ms), `-reveal-stagger` (40ms), `-reveal-lines` (all on screen, `0` = no rise), `-reveal-distance` (12px), `-reveal-blur` (3px), `-reveal-easing` (`cubic-bezier(0.22, 1, 0.36, 1)`); all prefixed `--blyrics-pip-lyrics`.
+
 ## Dynamic Properties
 
 Properties set by JS at runtime on individual elements:
@@ -574,6 +576,7 @@ With the "Karaoke subtitles" option on (the default) and a music video in fullsc
 | `--blyrics-font-size` | Sets the karaoke lyric size, as elsewhere |
 | `--blyrics-scale` / `--blyrics-active-scale` | Forced to `1` on `#blyrics-karaoke .blyrics-container`; no line scaling in karaoke |
 | `--blyrics-stage-opacity` | Set by the engine; stage line `opacity` reads it with `!important` |
+| `ytmusic-player-page[video-mode][blyrics-karaoke] :is(#player, .html5-video-player)` | Background is `transparent !important`, so bars around a non-matching video show the theme or album art backdrop; set `#000 !important` to restore black |
 
 Never set `opacity` on stage lines. It is overridden, so a theme cannot show a hidden line or hold a leaving one.
 

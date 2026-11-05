@@ -1544,7 +1544,7 @@ export function addNoLyricsButton(
     buttonContainer.appendChild(createRequestSyncedButton({ videoId, song, artist }));
   }
 
-  lyricsWrapper.appendChild(buttonContainer);
+  (document.getElementsByClassName(LYRICS_CLASS)[0] ?? lyricsWrapper).appendChild(buttonContainer);
 }
 
 function buildUnisonSubmitUrl(song: string, artist: string, album: string, duration: number, videoId: string): URL {

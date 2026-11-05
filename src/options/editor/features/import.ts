@@ -1,9 +1,15 @@
 import { saveCustomCss } from "@core/customCss";
+import { t } from "@core/i18n";
 import { editorStateManager } from "../core/state";
-import { showAlert } from "../ui/feedback";
-import { applyThemeSettingsToCSS, broadcastRICSToTabs, loadCustomCSS, showSyncSuccess } from "./storage";
+import {
+  applyThemeSettingsToCSS,
+  broadcastRICSToTabs,
+  loadCustomCSS,
+  showSyncSuccess,
+} from "@/options/editor/features/storage";
 import { hideThemeName, updateThemeSelectorButton } from "./themes";
 import { errorEditor, logEditor } from "@core/logger";
+import { toast } from "@/ui/toast";
 import type { ThemeSettingField } from "@/options/themes";
 
 export const generateDefaultFilename = (filetype: string): string => {
@@ -51,12 +57,12 @@ const downloadFile = (content: string, defaultFilename: string): void => {
         saveAs: true,
       })
       .then(() => {
-        showAlert("Theme file save dialog opened. Choose where to save your file.");
+        toast.info(t("editor_alert_saveDialogOpened"));
         URL.revokeObjectURL(url);
       })
       .catch(error => {
-        errorEditor("Error saving file:", error);
-        showAlert("Error saving file. Please try again.");
+        errorEditor("Theme file save failed:", error);
+        toast.error(t("options_alert_fileSaveFailed"));
         URL.revokeObjectURL(url);
       });
   } else {
@@ -78,7 +84,7 @@ const fallbackSaveMethod = (content: string, defaultFilename: string): void => {
 
   setTimeout(() => URL.revokeObjectURL(url), 100);
 
-  showAlert("Theme file download initiated. Check your downloads folder.");
+  toast.success(t("editor_alert_downloadStarted"));
 };
 
 class ImportManager {
@@ -97,7 +103,7 @@ class ImportManager {
       }
     } catch (error) {
       errorEditor("Import failed:", error);
-      showAlert("Error importing theme file! Please try again.");
+      toast.error(t("editor_alert_importFailed"));
       throw error;
     }
   }
@@ -148,11 +154,10 @@ class ImportManager {
         }
 
         logEditor(` Step 5: Sending update message`);
-        showSyncSuccess(result.strategy, result.wasRetry);
         await broadcastRICSToTabs(css, result.strategy);
 
         logEditor(` Import completed successfully`);
-        showAlert(`Theme file "${filename}" imported successfully!`);
+        toast.success(t("editor_alert_imported", filename));
       } finally {
         editorStateManager.setIsSaving(false);
         editorStateManager.resetSaveCount();

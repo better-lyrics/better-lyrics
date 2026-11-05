@@ -2,16 +2,15 @@ import { formatCreators } from "@core/customCss";
 import { t } from "@core/i18n";
 import { formatTimeAgo } from "@core/relativeTime";
 import { getLocalStorage, getSyncStorage } from "@core/storage";
-import autoAnimate, { type AnimationController } from "@formkit/auto-animate";
-import DOMPurify from "dompurify";
-import { marked } from "marked";
+import type { AnimationController } from "@formkit/auto-animate";
 import { applyStoreThemeComplete } from "../editor/features/storage";
 import type { AllThemeStats, InstalledStoreTheme, StoreTheme, ThemeStats } from "./types";
 
 let gridAnimationController: AnimationController | null = null;
+let gridAnimationGeneration = 0;
 
 import { getDisplayName, hasCertificate } from "@core/keyIdentity";
-import { type AlertAction, showAlert, showConfirm } from "../editor/ui/feedback";
+import { showConfirm } from "../editor/ui/feedback";
 import { fetchAllStats, fetchUserRatings, submitRating, trackInstall } from "./themeStoreApi";
 import {
   applyStoreTheme,
@@ -29,6 +28,7 @@ import {
   performSilentUpdates,
   refreshUrlThemesMetadata,
   removeTheme,
+  ThemeStorageFullError,
 } from "./themeStoreManager";
 import {
   checkUrlInstallPermissions,
@@ -42,11 +42,17 @@ import {
 } from "./themeStoreService";
 import { cleanupTurnstile, getTurnstileToken } from "./turnstile";
 import { errorStore, warnStore } from "@core/logger";
+import { attachDeclaredScrollFades, attachScrollFade } from "@/ui/scrollFade";
+import { isTextEntry } from "@/ui/textEntry";
+import { type ActionMenu, type ActionMenuItem, createActionMenu } from "@/ui/actionMenu";
+import { type CreateModalOptions, createModal, isAnyModalOpen, type Modal } from "@/ui/modal";
+import { renderSortChip } from "@/ui/sortIcon";
+import { toast } from "@/ui/toast";
 
-let detailModalOverlay: HTMLElement | null = null;
-let urlModalOverlay: HTMLElement | null = null;
-let urlPermissionModalOverlay: HTMLElement | null = null;
-let shortcutsModalOverlay: HTMLElement | null = null;
+let detailModal: Modal | null = null;
+let urlModal: Modal | null = null;
+let urlPermissionModal: Modal | null = null;
+let shortcutsModal: Modal | null = null;
 let currentDetailTheme: StoreTheme | null = null;
 let currentSlideIndex = 0;
 let storeThemesCache: StoreTheme[] = [];
@@ -55,6 +61,11 @@ let userRatingsCache: Record<string, number> = {};
 let userInstallsCache: Record<string, boolean> = {};
 let urlOnlyThemeCards: Map<string, HTMLElement> = new Map();
 let installOperationInProgress = false;
+
+function bindModal(id: string, options?: CreateModalOptions): Modal | null {
+  const overlay = document.getElementById(id);
+  return overlay ? createModal(overlay, options) : null;
+}
 
 function getUrlOnlyThemes(installedThemes: InstalledStoreTheme[], marketplaceIds: Set<string>): InstalledStoreTheme[] {
   return installedThemes.filter(t => t.source === "url" && !marketplaceIds.has(t.id));
@@ -113,9 +124,15 @@ function setActionButtonContent(button: HTMLElement, text: string, shortcut?: st
   button.appendChild(document.createTextNode(text));
   if (shortcut) {
     const kbd = document.createElement("kbd");
+    kbd.className = "ui-kbd ui-kbd--small";
     kbd.textContent = shortcut;
     button.appendChild(kbd);
   }
+}
+
+function setInstallButtonState(button: HTMLElement, installed: boolean, shortcut?: string): void {
+  button.className = `ui-button ui-button--header store-card-btn ${installed ? "ui-button--danger-tint store-card-btn-remove" : "ui-button--success-tint store-card-btn-install"}`;
+  setActionButtonContent(button, t(installed ? "marketplace_remove" : "marketplace_install"), shortcut);
 }
 
 interface FilterState {
@@ -461,38 +478,6 @@ function getTestStats(): AllThemeStats {
   return stats;
 }
 
-marked.setOptions({
-  breaks: true,
-  gfm: true,
-});
-
-const renderer = new marked.Renderer();
-renderer.link = ({ href, text }) => {
-  return `<a href="${href}" target="_blank" rel="noopener noreferrer">${text}</a>`;
-};
-renderer.image = ({ href, title, text }) => {
-  const src = href.replace(
-    /^https?:\/\/github\.com\/([^/]+\/[^/]+)\/blob\/(.+)/,
-    "https://raw.githubusercontent.com/$1/$2"
-  );
-  const titleAttr = title ? ` title="${title}"` : "";
-  return `<img src="${src}" alt="${text}"${titleAttr} />`;
-};
-marked.use({ renderer });
-
-function parseMarkdown(text: string): DocumentFragment {
-  // https://marked.js.org/#usage
-  const content = text.replace(/^[\u200B\u200C\u200D\u200E\u200F\uFEFF]/, "");
-  const html = marked.parse(content, { async: false }) as string;
-
-  const sanitized = DOMPurify.sanitize(html.trim());
-
-  const parser = new DOMParser();
-  const doc = parser.parseFromString(`<template>${sanitized}</template>`, "text/html");
-  const template = doc.querySelector("template");
-  return template ? template.content : document.createDocumentFragment();
-}
-
 function createShaderIcon(): SVGSVGElement {
   const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
   svg.setAttribute("viewBox", "0 0 24 24");
@@ -532,7 +517,7 @@ function createGitHubIcon(): SVGSVGElement {
 function createGitHubBadge(className: string, title: string): HTMLSpanElement {
   const badge = document.createElement("span");
   badge.className = className;
-  badge.title = title;
+  badge.dataset.tooltip = title;
   badge.appendChild(createGitHubIcon());
   badge.appendChild(document.createTextNode(t("marketplace_githubBadge")));
   return badge;
@@ -609,6 +594,10 @@ function createCommitIcon(): SVGSVGElement {
   return svg;
 }
 
+function installsTooltip(count: number): string {
+  return count === 1 ? t("marketplace_tooltipInstallsSingular") : t("marketplace_tooltipInstalls", String(count));
+}
+
 function formatNumber(num: number): string {
   if (num >= 1000000) return (num / 1000000).toFixed(1) + "M";
   if (num >= 1000) return (num / 1000).toFixed(1) + "K";
@@ -616,8 +605,8 @@ function formatNumber(num: number): string {
 }
 
 export async function initStoreUI(): Promise<void> {
-  detailModalOverlay = document.getElementById("detail-modal-overlay");
-  urlModalOverlay = document.getElementById("url-modal-overlay");
+  detailModal = bindModal("detail-modal-overlay");
+  urlModal = bindModal("url-modal-overlay");
 
   setupDetailModalListeners();
   setupUrlModalListeners();
@@ -629,16 +618,16 @@ export async function initStoreUI(): Promise<void> {
 }
 
 export async function initMarketplaceUI(): Promise<void> {
-  detailModalOverlay = document.getElementById("detail-modal-overlay");
-  urlModalOverlay = document.getElementById("url-modal-overlay");
-  urlPermissionModalOverlay = document.getElementById("url-permission-modal-overlay");
-  shortcutsModalOverlay = document.getElementById("shortcuts-modal-overlay");
+  detailModal = bindModal("detail-modal-overlay");
+  urlModal = bindModal("url-modal-overlay");
+  urlPermissionModal = bindModal("url-permission-modal-overlay", { onClose: () => settleUrlPermission(false) });
+  shortcutsModal = bindModal("shortcuts-modal-overlay");
+  attachDeclaredScrollFades();
 
   setupMarketplaceListeners();
   setupDetailModalListeners();
   setupUrlModalListeners();
   setupUrlPermissionModalListeners();
-  setupShortcutsModalListeners();
   setupMarketplaceKeyboardListeners();
 
   await loadUserRatings();
@@ -666,68 +655,11 @@ function setupMarketplaceListeners(): void {
   setupMarketplaceFilters();
 }
 
-function createSortIcon(direction: "desc" | "asc"): SVGSVGElement {
-  const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
-  svg.setAttribute("width", "16");
-  svg.setAttribute("height", "16");
-  svg.setAttribute("viewBox", "0 0 640 640");
-  svg.setAttribute("aria-hidden", "true");
-  svg.classList.add("sort-direction-icon");
-
-  const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
-  path.setAttribute("fill", "currentColor");
-
-  if (direction === "desc") {
-    path.setAttribute(
-      "d",
-      "m278.6 438.6l-96 96c-12.5 12.5-32.8 12.5-45.3 0l-96-96c-12.5-12.5-12.5-32.8 0-45.3s32.8-12.5 45.3 0l41.4 41.4V128c0-17.7 14.3-32 32-32s32 14.3 32 32v306.7l41.4-41.4c12.5-12.5 32.8-12.5 45.3 0s12.5 32.8 0 45.3zM352 544c-17.7 0-32-14.3-32-32s14.3-32 32-32h32c17.7 0 32 14.3 32 32s-14.3 32-32 32zm0-128c-17.7 0-32-14.3-32-32s14.3-32 32-32h96c17.7 0 32 14.3 32 32s-14.3 32-32 32zm0-128c-17.7 0-32-14.3-32-32s14.3-32 32-32h160c17.7 0 32 14.3 32 32s-14.3 32-32 32zm0-128c-17.7 0-32-14.3-32-32s14.3-32 32-32h224c17.7 0 32 14.3 32 32s-14.3 32-32 32z"
-    );
-  } else {
-    path.setAttribute(
-      "d",
-      "M352 96c-17.7 0-32 14.3-32 32s14.3 32 32 32h32c17.7 0 32-14.3 32-32s-14.3-32-32-32zm0 128c-17.7 0-32 14.3-32 32s14.3 32 32 32h96c17.7 0 32-14.3 32-32s-14.3-32-32-32zm0 128c-17.7 0-32 14.3-32 32s14.3 32 32 32h160c17.7 0 32-14.3 32-32s-14.3-32-32-32zm0 128c-17.7 0-32 14.3-32 32s14.3 32 32 32h224c17.7 0 32-14.3 32-32s-14.3-32-32-32zM182.6 105.4c-12.5-12.5-32.8-12.5-45.3 0l-96 96c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0l41.4-41.4V512c0 17.7 14.3 32 32 32s32-14.3 32-32V205.3l41.4 41.4c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3l-96-96z"
-    );
-  }
-
-  svg.appendChild(path);
-  return svg;
-}
-
 function updateSortChipsUI(animate = true): void {
-  const sortChips = document.querySelectorAll(".marketplace-filter-chip--sort");
-
-  sortChips.forEach(chip => {
-    const label = chip as HTMLLabelElement;
-    const input = label.querySelector("input") as HTMLInputElement;
-    const iconContainer = label.querySelector(".marketplace-filter-chip__icon");
-    const labelSpan = label.querySelector(".marketplace-filter-chip__label");
-
-    if (!iconContainer || !labelSpan) return;
-
-    const isSelected = input.checked;
-    const labelDesc = label.dataset.labelDesc || "";
-    const labelAsc = label.dataset.labelAsc || "";
-
-    iconContainer.replaceChildren();
-
-    if (isSelected) {
-      const icon = createSortIcon(currentFilters.sortDirection);
-      if (animate) {
-        icon.classList.add("sort-direction-icon--animate");
-      }
-      iconContainer.appendChild(icon);
-      labelSpan.textContent = currentFilters.sortDirection === "desc" ? labelDesc : labelAsc;
-      label.setAttribute("aria-pressed", "true");
-      label.setAttribute(
-        "aria-label",
-        `${labelSpan.textContent}, ${currentFilters.sortDirection === "desc" ? "descending" : "ascending"}. Click to reverse.`
-      );
-    } else {
-      labelSpan.textContent = labelDesc;
-      label.setAttribute("aria-pressed", "false");
-      label.removeAttribute("aria-label");
-    }
-  });
+  for (const chip of document.querySelectorAll<HTMLLabelElement>(".marketplace-filter-chip--sort")) {
+    const selected = Boolean(chip.querySelector("input")?.checked);
+    renderSortChip(chip, { selected, direction: currentFilters.sortDirection, animate });
+  }
 }
 
 function setupMarketplaceFilters(): void {
@@ -747,7 +679,7 @@ function setupMarketplaceFilters(): void {
     const input = label.querySelector("input") as HTMLInputElement;
 
     label.addEventListener("click", e => {
-      e.preventDefault();
+      if (!(e.target instanceof HTMLInputElement)) e.preventDefault();
       const newSortBy = input.value as FilterState["sortBy"];
 
       if (currentFilters.sortBy === newSortBy) {
@@ -823,60 +755,12 @@ function setSentinelVisible(visible: boolean): void {
   sentinel.style.display = visible ? "" : "none";
 }
 
-function setupShortcutsModalListeners(): void {
-  const closeBtn = document.getElementById("shortcuts-modal-close");
-  closeBtn?.addEventListener("click", closeShortcutsModal);
-
-  shortcutsModalOverlay?.addEventListener("click", e => {
-    if (e.target === shortcutsModalOverlay) closeShortcutsModal();
-  });
-}
-
 function openShortcutsModal(): void {
-  if (shortcutsModalOverlay) {
-    document.documentElement.style.overflow = "hidden";
-    document.body.style.overflow = "hidden";
-    shortcutsModalOverlay.style.display = "flex";
-    requestAnimationFrame(() => {
-      shortcutsModalOverlay?.classList.add("active");
-    });
-  }
-}
-
-function closeShortcutsModal(): void {
-  if (shortcutsModalOverlay) {
-    const modal = shortcutsModalOverlay.querySelector(".modal");
-    modal?.classList.add("closing");
-    shortcutsModalOverlay.classList.remove("active");
-
-    setTimeout(() => {
-      if (shortcutsModalOverlay) {
-        shortcutsModalOverlay.style.display = "none";
-        modal?.classList.remove("closing");
-      }
-      document.documentElement.style.overflow = "";
-      document.body.style.overflow = "";
-    }, 200);
-  }
-}
-
-function isAnyModalOpen(): boolean {
-  return (
-    detailModalOverlay?.classList.contains("active") ||
-    urlModalOverlay?.classList.contains("active") ||
-    urlPermissionModalOverlay?.classList.contains("active") ||
-    shortcutsModalOverlay?.classList.contains("active") ||
-    false
-  );
+  shortcutsModal?.open();
 }
 
 function isInputFocused(): boolean {
-  const activeElement = document.activeElement;
-  return (
-    activeElement instanceof HTMLInputElement ||
-    activeElement instanceof HTMLTextAreaElement ||
-    (activeElement instanceof HTMLElement && activeElement.isContentEditable)
-  );
+  return isTextEntry(document.activeElement);
 }
 
 function setSortFilter(value: "rating" | "downloads" | "newest", toggleDirection = false): void {
@@ -919,7 +803,7 @@ function toggleCheckboxFilter(id: string, filterKey: "hasShaders" | "versionComp
 function setupMarketplaceKeyboardListeners(): void {
   document.addEventListener("keydown", e => {
     if (e.key === "/") {
-      if (isInputFocused()) return;
+      if (isInputFocused() || isAnyModalOpen()) return;
       e.preventDefault();
       const searchInput = document.getElementById("store-search-input") as HTMLInputElement;
       searchInput?.focus();
@@ -928,25 +812,12 @@ function setupMarketplaceKeyboardListeners(): void {
     }
 
     if (e.key === "Escape") {
-      if (shortcutsModalOverlay?.classList.contains("active")) {
-        e.preventDefault();
-        closeShortcutsModal();
-      } else if (urlPermissionModalOverlay?.classList.contains("active")) {
-        e.preventDefault();
-        closeUrlPermissionModal(false);
-      } else if (detailModalOverlay?.classList.contains("active")) {
-        e.preventDefault();
-        closeDetailModal();
-      } else if (urlModalOverlay?.classList.contains("active")) {
-        e.preventDefault();
-        closeUrlModal();
-      } else if (isInputFocused()) {
-        (document.activeElement as HTMLElement)?.blur();
-      }
+      if (e.defaultPrevented || isAnyModalOpen()) return;
+      if (isInputFocused()) (document.activeElement as HTMLElement)?.blur();
       return;
     }
 
-    if (detailModalOverlay?.classList.contains("active")) {
+    if (detailModal?.isTopmost()) {
       if (e.key === "ArrowLeft") {
         e.preventDefault();
         navigateSlide(-1);
@@ -1046,7 +917,7 @@ async function loadMarketplace(): Promise<void> {
     if (storeThemesCache.length === 0) {
       const emptyMsg = document.createElement("p");
       emptyMsg.className = "store-empty";
-      emptyMsg.textContent = "No themes available yet. Check back later!";
+      emptyMsg.textContent = t("marketplace_emptyStore");
       grid.appendChild(emptyMsg);
       return;
     }
@@ -1059,8 +930,14 @@ async function loadMarketplace(): Promise<void> {
 
     await applyFiltersToGrid();
 
-    gridAnimationController = autoAnimate(grid, { duration: 200, easing: "cubic-bezier(0.2, 0, 0, 1)" });
-    gridAnimationController.enable();
+    const generation = ++gridAnimationGeneration;
+    import("@formkit/auto-animate")
+      .then(({ default: autoAnimate }) => {
+        if (generation !== gridAnimationGeneration || !grid.isConnected || gridAnimationController) return;
+        gridAnimationController = autoAnimate(grid, { duration: 200, easing: "cubic-bezier(0.2, 0, 0, 1)" });
+        gridAnimationController.enable();
+      })
+      .catch(err => warnStore("Grid animation unavailable:", err));
 
     openThemeFromUrlParam();
   } catch (err) {
@@ -1069,7 +946,7 @@ async function loadMarketplace(): Promise<void> {
     if (error) {
       error.style.display = "flex";
       const errorMsg = error.querySelector(".store-error-message");
-      if (errorMsg) errorMsg.textContent = `Failed to load themes: ${err}`;
+      if (errorMsg) errorMsg.textContent = t("marketplace_loadFailed");
     }
   }
 }
@@ -1085,6 +962,7 @@ function openThemeFromUrlParam(): void {
 }
 
 async function refreshMarketplace(): Promise<void> {
+  gridAnimationGeneration++;
   if (gridAnimationController) {
     gridAnimationController.disable();
     gridAnimationController = null;
@@ -1137,7 +1015,7 @@ async function checkForThemeUpdates(): Promise<void> {
     const updatedIds = await performSilentUpdates(storeThemes);
 
     if (updatedIds.length > 0) {
-      updateYourThemesDropdown();
+      refreshYourThemesMenu();
     }
   } catch (err) {
     warnStore("Update check failed:", err);
@@ -1146,28 +1024,7 @@ async function checkForThemeUpdates(): Promise<void> {
 
 function setupKeyboardListeners(): void {
   document.addEventListener("keydown", e => {
-    if (e.key === "Escape") {
-      const dropdown = document.getElementById("your-themes-dropdown");
-      if (dropdown?.classList.contains("active")) {
-        e.preventDefault();
-        e.stopPropagation();
-        toggleYourThemesDropdown(false);
-        return;
-      }
-
-      if (detailModalOverlay?.classList.contains("active")) {
-        e.preventDefault();
-        e.stopPropagation();
-        closeDetailModal();
-      } else if (urlModalOverlay?.classList.contains("active")) {
-        e.preventDefault();
-        e.stopPropagation();
-        closeUrlModal();
-      }
-      return;
-    }
-
-    if (detailModalOverlay?.classList.contains("active")) {
+    if (detailModal?.isTopmost()) {
       if (e.key === "ArrowLeft") {
         e.preventDefault();
         navigateSlide(-1);
@@ -1184,9 +1041,9 @@ function setupThemeChangeListener(): void {
     if (area === "sync" && changes.themeName) {
       const newThemeName = changes.themeName.newValue as string | undefined;
       if (!newThemeName || !newThemeName.startsWith("store:")) {
-        clearActiveStoreTheme().then(() => updateYourThemesDropdown());
+        clearActiveStoreTheme().then(refreshYourThemesMenu);
       } else {
-        updateYourThemesDropdown();
+        refreshYourThemesMenu();
       }
     }
   });
@@ -1348,13 +1205,6 @@ function matchesInstallFilter(themeId: string, installedIds: Set<string>, filter
 }
 
 function setupDetailModalListeners(): void {
-  const closeBtn = document.getElementById("detail-modal-close");
-  closeBtn?.addEventListener("click", closeDetailModal);
-
-  detailModalOverlay?.addEventListener("click", e => {
-    if (e.target === detailModalOverlay) closeDetailModal();
-  });
-
   const prevBtn = document.getElementById("detail-prev-btn");
   const nextBtn = document.getElementById("detail-next-btn");
   prevBtn?.addEventListener("click", () => navigateSlide(-1));
@@ -1362,16 +1212,6 @@ function setupDetailModalListeners(): void {
 }
 
 function setupUrlModalListeners(): void {
-  const closeBtn = document.getElementById("url-modal-close");
-  closeBtn?.addEventListener("click", closeUrlModal);
-
-  urlModalOverlay?.addEventListener("click", e => {
-    if (e.target === urlModalOverlay) closeUrlModal();
-  });
-
-  const cancelBtn = document.getElementById("url-modal-cancel");
-  cancelBtn?.addEventListener("click", closeUrlModal);
-
   const installBtn = document.getElementById("url-modal-install");
   installBtn?.addEventListener("click", handleUrlInstall);
 
@@ -1383,17 +1223,13 @@ function setupUrlModalListeners(): void {
 
 let urlPermissionResolve: ((granted: boolean) => void) | null = null;
 
+function settleUrlPermission(granted: boolean): void {
+  const resolve = urlPermissionResolve;
+  urlPermissionResolve = null;
+  resolve?.(granted);
+}
+
 function setupUrlPermissionModalListeners(): void {
-  const closeBtn = document.getElementById("url-permission-modal-close");
-  closeBtn?.addEventListener("click", () => closeUrlPermissionModal(false));
-
-  urlPermissionModalOverlay?.addEventListener("click", e => {
-    if (e.target === urlPermissionModalOverlay) closeUrlPermissionModal(false);
-  });
-
-  const cancelBtn = document.getElementById("url-permission-modal-cancel");
-  cancelBtn?.addEventListener("click", () => closeUrlPermissionModal(false));
-
   const grantBtn = document.getElementById("url-permission-modal-grant");
   grantBtn?.addEventListener("click", async () => {
     const granted = await requestUrlInstallPermissions();
@@ -1402,40 +1238,18 @@ function setupUrlPermissionModalListeners(): void {
 }
 
 function openUrlPermissionModal(): Promise<boolean> {
+  if (!urlPermissionModal) return Promise.resolve(false);
+  settleUrlPermission(false);
+  const modal = urlPermissionModal;
   return new Promise(resolve => {
     urlPermissionResolve = resolve;
-
-    if (urlPermissionModalOverlay) {
-      document.documentElement.style.overflow = "hidden";
-      document.body.style.overflow = "hidden";
-      urlPermissionModalOverlay.style.display = "flex";
-      requestAnimationFrame(() => {
-        urlPermissionModalOverlay?.classList.add("active");
-      });
-    }
+    modal.open();
   });
 }
 
 function closeUrlPermissionModal(granted: boolean): void {
-  if (urlPermissionModalOverlay) {
-    const modal = urlPermissionModalOverlay.querySelector(".modal");
-    modal?.classList.add("closing");
-    urlPermissionModalOverlay.classList.remove("active");
-
-    setTimeout(() => {
-      if (urlPermissionModalOverlay) {
-        urlPermissionModalOverlay.style.display = "none";
-        modal?.classList.remove("closing");
-      }
-      document.documentElement.style.overflow = "";
-      document.body.style.overflow = "";
-    }, 200);
-  }
-
-  if (urlPermissionResolve) {
-    urlPermissionResolve(granted);
-    urlPermissionResolve = null;
-  }
+  settleUrlPermission(granted);
+  urlPermissionModal?.close();
 }
 
 interface UrlThemeInfo {
@@ -1451,7 +1265,7 @@ function createStoreThemeCard(
   activeThemeId?: string | null
 ): HTMLElement {
   const card = document.createElement("div");
-  card.className = "store-card";
+  card.className = "ui-tile store-card";
   card.dataset.themeId = theme.id;
   if (urlThemeInfo) {
     card.dataset.urlTheme = "true";
@@ -1481,16 +1295,15 @@ function createStoreThemeCard(
 
   const author = document.createElement("div");
   author.className = "store-card-author";
-  author.textContent = `By ${formatCreators(theme.creators)}`;
+  author.textContent = t("theme_author_prefix", formatCreators(theme.creators));
 
   const actionBtn = document.createElement("button");
-  actionBtn.className = `store-card-btn ${isInstalled ? "store-card-btn-remove" : "store-card-btn-install"}`;
-  actionBtn.textContent = isInstalled ? t("marketplace_remove") : t("marketplace_install");
+  setInstallButtonState(actionBtn, isInstalled);
 
   // Incompatible themes stay installable: the button is never disabled, but it carries a hint
   // and the install handler confirms with the user first.
   if (!isCompatible && !isInstalled) {
-    actionBtn.title = `Requires Better Lyrics v${themeFloorVersion(theme)}+`;
+    actionBtn.dataset.tooltip = t("marketplace_requiresVersion", themeFloorVersion(theme));
   }
 
   actionBtn.addEventListener("click", async e => {
@@ -1504,7 +1317,7 @@ function createStoreThemeCard(
   });
 
   const applyBtn = document.createElement("button");
-  applyBtn.className = "store-card-btn store-card-btn-apply";
+  applyBtn.className = "ui-button ui-button--header ui-button--accent-tint store-card-btn store-card-btn-apply";
   const isActive = activeThemeId === theme.id;
   if (isActive) {
     applyBtn.textContent = t("marketplace_active");
@@ -1553,7 +1366,7 @@ function createStoreThemeCard(
     if (stats.installs > 0) {
       const installStat = document.createElement("span");
       installStat.className = "store-card-stat";
-      installStat.title = `${stats.installs} installs`;
+      installStat.dataset.tooltip = installsTooltip(stats.installs);
       installStat.appendChild(createDownloadIcon());
       installStat.appendChild(document.createTextNode(formatNumber(stats.installs)));
       statsRow.appendChild(installStat);
@@ -1562,7 +1375,7 @@ function createStoreThemeCard(
     if (stats.ratingCount > 0) {
       const ratingStat = document.createElement("span");
       ratingStat.className = "store-card-stat";
-      ratingStat.title = `${stats.rating.toFixed(1)} average from ${stats.ratingCount} ratings`;
+      ratingStat.dataset.tooltip = t("marketplace_tooltipRating", [stats.rating.toFixed(1), String(stats.ratingCount)]);
       ratingStat.appendChild(createStarIcon());
       ratingStat.appendChild(document.createTextNode(stats.rating.toFixed(1)));
       statsRow.appendChild(ratingStat);
@@ -1577,19 +1390,19 @@ function createStoreThemeCard(
   });
 
   if (theme.hasShaders) {
-    card.appendChild(createShaderBadge("store-card-badge"));
+    card.appendChild(createShaderBadge("ui-badge ui-badge--accent-solid store-card-badge"));
   }
 
   if (urlThemeInfo) {
-    const title = urlThemeInfo.sourceUrl || `Installed from ${urlThemeInfo.repo}`;
-    card.appendChild(createGitHubBadge("store-card-badge store-card-badge-url", title));
+    const title = urlThemeInfo.sourceUrl || t("marketplace_installedFrom", urlThemeInfo.repo);
+    card.appendChild(createGitHubBadge("ui-badge store-card-badge store-card-badge-url", title));
   }
 
   if (!isCompatible) {
     const floor = themeFloorVersion(theme);
     const incompatBadge = document.createElement("span");
-    incompatBadge.className = "store-card-badge-warn";
-    incompatBadge.title = `Requires Better Lyrics v${floor} or higher`;
+    incompatBadge.className = "ui-badge ui-badge--warning store-card-badge-warn";
+    incompatBadge.dataset.tooltip = t("marketplace_requiresVersion", floor);
 
     const warnIcon = document.createElementNS("http://www.w3.org/2000/svg", "svg");
     warnIcon.setAttribute("viewBox", "0 0 24 24");
@@ -1636,9 +1449,10 @@ function createOlderBuildBadge(
   latestMinVersion?: string
 ): HTMLSpanElement {
   const badge = document.createElement("span");
-  badge.className = "store-card-badge-older";
-  const floorHint = latestMinVersion ? ` needs Better Lyrics ${latestMinVersion}+` : "";
-  badge.title = `You're on v${resolvedVersion}. Latest v${latestVersion}${floorHint}`;
+  badge.className = "ui-badge ui-badge--info store-card-badge-older";
+  badge.dataset.tooltip = latestMinVersion
+    ? t("marketplace_tooltipOlderBuildFloor", [resolvedVersion, latestVersion, latestMinVersion])
+    : t("marketplace_tooltipOlderBuild", [resolvedVersion, latestVersion]);
   badge.appendChild(createInfoIcon());
   badge.appendChild(document.createTextNode(`v${resolvedVersion}`));
   return badge;
@@ -1654,10 +1468,15 @@ async function confirmIncompatibleInstall(theme: StoreTheme): Promise<boolean> {
   const floor = themeFloorVersion(theme);
   return showConfirm(
     t("marketplace_install"),
-    `This theme needs Better Lyrics v${floor}+ and may not work on your version. Install anyway?`,
+    t("marketplace_incompatibleConfirm", floor),
     false,
     t("marketplace_install")
   );
+}
+
+function themeActionFailedMessage(err: unknown, removing: boolean, title: string): string {
+  if (err instanceof ThemeStorageFullError) return t("marketplace_alert_storageFull");
+  return t(removing ? "marketplace_alert_removeFailed" : "marketplace_alert_installFailed", title);
 }
 
 async function handleThemeAction(theme: StoreTheme, button: HTMLButtonElement): Promise<void> {
@@ -1675,19 +1494,17 @@ async function handleThemeAction(theme: StoreTheme, button: HTMLButtonElement): 
         card.remove();
         urlOnlyThemeCards.delete(theme.id);
       } else {
-        button.className = "store-card-btn store-card-btn-install";
-        button.textContent = t("marketplace_install");
+        setInstallButtonState(button, false);
         const cardApplyBtn = card?.querySelector(".store-card-btn-apply") as HTMLButtonElement | null;
         if (cardApplyBtn) cardApplyBtn.style.display = "none";
       }
-      showAlert(`Removed ${theme.title}`);
+      showRemovedToast(theme);
     } else {
       if (!(await confirmIncompatibleInstall(theme))) {
         return;
       }
       const installedTheme = await installTheme(theme, { source: "marketplace" });
-      button.className = "store-card-btn store-card-btn-remove";
-      button.textContent = t("marketplace_remove");
+      setInstallButtonState(button, true);
 
       const cardApplyBtn = card?.querySelector(".store-card-btn-apply") as HTMLButtonElement | null;
       if (cardApplyBtn) {
@@ -1696,11 +1513,7 @@ async function handleThemeAction(theme: StoreTheme, button: HTMLButtonElement): 
         cardApplyBtn.textContent = t("marketplace_apply");
       }
 
-      const applyAction: AlertAction = {
-        label: t("marketplace_apply"),
-        callback: () => handleApplyTheme(installedTheme),
-      };
-      showAlert(`Installed ${theme.title}`, applyAction);
+      showInstalledToast(t("marketplace_alert_installed", theme.title), installedTheme);
 
       if (!isUrlTheme && !userInstallsCache[theme.id]) {
         trackInstall(theme.id)
@@ -1718,22 +1531,45 @@ async function handleThemeAction(theme: StoreTheme, button: HTMLButtonElement): 
       }
     }
 
-    updateYourThemesDropdown();
+    refreshYourThemesMenu();
   } catch (err) {
     errorStore("Action failed:", err);
-    button.className = `store-card-btn ${isRemoveButton ? "store-card-btn-remove" : "store-card-btn-install"}`;
-    button.textContent = isRemoveButton ? t("marketplace_remove") : t("marketplace_install");
-    showAlert(`Failed: ${err}`);
+    setInstallButtonState(button, isRemoveButton);
+    toast.error(themeActionFailedMessage(err, isRemoveButton, theme.title));
   } finally {
     button.disabled = false;
   }
+}
+
+let parseMarkdown: ((text: string) => DocumentFragment) | null = null;
+
+function renderDescription(descEl: HTMLElement, theme: StoreTheme): void {
+  if (parseMarkdown) {
+    descEl.style.visibility = "";
+    descEl.replaceChildren(parseMarkdown(theme.description));
+    return;
+  }
+  descEl.style.visibility = "hidden";
+  const isCurrent = () => currentDetailTheme?.id === theme.id;
+  import("@/options/store/markdown")
+    .then(module => {
+      parseMarkdown = module.parseMarkdown;
+      if (isCurrent()) descEl.replaceChildren(module.parseMarkdown(theme.description));
+    })
+    .catch(err => {
+      errorStore("Failed to render theme description:", err);
+      if (isCurrent()) descEl.textContent = theme.description;
+    })
+    .finally(() => {
+      if (isCurrent()) descEl.style.visibility = "";
+    });
 }
 
 async function openDetailModal(theme: StoreTheme, urlThemeInfo?: UrlThemeInfo): Promise<void> {
   currentDetailTheme = theme;
   currentSlideIndex = 0;
 
-  if (!detailModalOverlay) return;
+  if (!detailModal) return;
 
   const titleEl = document.getElementById("detail-title");
   const authorEl = document.getElementById("detail-author");
@@ -1745,15 +1581,15 @@ async function openDetailModal(theme: StoreTheme, urlThemeInfo?: UrlThemeInfo): 
   if (titleEl) {
     titleEl.replaceChildren(document.createTextNode(theme.title));
     if (theme.hasShaders) {
-      titleEl.appendChild(createShaderBadge("detail-shader-badge"));
+      titleEl.appendChild(createShaderBadge("ui-badge ui-badge--accent-solid"));
     }
     if (urlThemeInfo) {
-      const title = urlThemeInfo.sourceUrl || `Installed from ${urlThemeInfo.repo}`;
-      titleEl.appendChild(createGitHubBadge("detail-url-badge", title));
+      const title = urlThemeInfo.sourceUrl || t("marketplace_installedFrom", urlThemeInfo.repo);
+      titleEl.appendChild(createGitHubBadge("ui-badge", title));
     }
   }
-  if (authorEl) authorEl.textContent = `By ${formatCreators(theme.creators)} · v${theme.version}`;
-  if (descEl) descEl.replaceChildren(parseMarkdown(theme.description));
+  if (authorEl) authorEl.textContent = t("marketplace_byline", [formatCreators(theme.creators), theme.version]);
+  if (descEl) renderDescription(descEl, theme);
 
   const statsEl = document.getElementById("detail-stats");
   const ratingSectionEl = document.getElementById("detail-rating-section");
@@ -1772,7 +1608,7 @@ async function openDetailModal(theme: StoreTheme, urlThemeInfo?: UrlThemeInfo): 
         if (themeStats.installs > 0) {
           const installStat = document.createElement("span");
           installStat.className = "detail-stat";
-          installStat.title = `${themeStats.installs} downloads`;
+          installStat.dataset.tooltip = installsTooltip(themeStats.installs);
           installStat.appendChild(createDownloadIcon());
           installStat.appendChild(document.createTextNode(formatNumber(themeStats.installs)));
           statsRow.appendChild(installStat);
@@ -1910,7 +1746,7 @@ async function openDetailModal(theme: StoreTheme, urlThemeInfo?: UrlThemeInfo): 
     };
 
     if (existingUserRating) {
-      ratingStatusEl.textContent = `You rated ${existingUserRating} star${existingUserRating > 1 ? "s" : ""} as ${displayName}`;
+      ratingStatusEl.textContent = t("marketplace_ratedAs", [String(existingUserRating), displayName]);
       ratingStatusEl.className = "detail-rating-status";
     } else {
       ratingStatusEl.textContent = "";
@@ -1933,32 +1769,32 @@ async function openDetailModal(theme: StoreTheme, urlThemeInfo?: UrlThemeInfo): 
         updateStarDisplay(rating, false);
         currentRating = rating;
 
-        ratingStatusEl.textContent = "Submitting...";
+        ratingStatusEl.textContent = t("marketplace_ratingSubmitting");
         ratingStatusEl.className = "detail-rating-status";
 
         let turnstileToken: string | undefined;
         try {
           const isCertified = await hasCertificate();
           if (!isCertified) {
-            ratingStatusEl.textContent = "Verifying...";
+            ratingStatusEl.textContent = t("marketplace_ratingVerifying");
             turnstileToken = await getTurnstileToken();
           }
         } catch (turnstileError) {
           errorStore("Turnstile verification failed:", turnstileError);
           currentRating = previousRating;
           updateStarDisplay(previousRating, false);
-          ratingStatusEl.textContent = "Verification failed. Please try again.";
+          ratingStatusEl.textContent = t("marketplace_ratingVerifyFailed");
           ratingStatusEl.className = "detail-rating-status error";
           cleanupTurnstile();
           return;
         }
 
-        ratingStatusEl.textContent = "Submitting...";
+        ratingStatusEl.textContent = t("marketplace_ratingSubmitting");
 
         const { success, data: ratingData, error } = await submitRating(theme.id, rating, turnstileToken);
         if (success && ratingData) {
           await saveUserRating(theme.id, rating);
-          ratingStatusEl.textContent = `You rated ${rating} star${rating > 1 ? "s" : ""} as ${displayName}`;
+          ratingStatusEl.textContent = t("marketplace_ratedAs", [String(rating), displayName]);
           ratingStatusEl.className = "detail-rating-status success";
 
           if (storeStatsCache[theme.id]) {
@@ -2033,14 +1869,13 @@ async function openDetailModal(theme: StoreTheme, urlThemeInfo?: UrlThemeInfo): 
       } catch (err) {
         errorStore("Failed to apply theme:", err);
         detailApplyBtn.disabled = false;
-        showAlert(`${t("marketplace_applyFailed")}: ${err}`);
+        toast.error(t("marketplace_applyFailed"));
       }
     };
   }
 
   if (actionBtn) {
-    actionBtn.className = `store-card-btn ${initialInstalled ? "store-card-btn-remove" : "store-card-btn-install"}`;
-    setActionButtonContent(actionBtn, initialInstalled ? t("marketplace_remove") : t("marketplace_install"), "I");
+    setInstallButtonState(actionBtn, initialInstalled, "I");
     actionBtn.onclick = async () => {
       if (installOperationInProgress) return;
       installOperationInProgress = true;
@@ -2049,9 +1884,8 @@ async function openDetailModal(theme: StoreTheme, urlThemeInfo?: UrlThemeInfo): 
       try {
         if (isRemoveButton) {
           await removeTheme(theme.id);
-          actionBtn.className = "store-card-btn store-card-btn-install";
-          setActionButtonContent(actionBtn, t("marketplace_install"), "I");
-          showAlert(`Removed ${theme.title}`);
+          setInstallButtonState(actionBtn, false, "I");
+          showRemovedToast(theme);
           updateRatingEnabled?.(false);
           updateDetailApplyBtn(false, false);
         } else {
@@ -2059,15 +1893,10 @@ async function openDetailModal(theme: StoreTheme, urlThemeInfo?: UrlThemeInfo): 
             return;
           }
           const installedTheme = await installTheme(theme, { source: "marketplace" });
-          actionBtn.className = "store-card-btn store-card-btn-remove";
-          setActionButtonContent(actionBtn, t("marketplace_remove"), "I");
+          setInstallButtonState(actionBtn, true, "I");
           updateDetailApplyBtn(true, false);
 
-          const applyAction: AlertAction = {
-            label: t("marketplace_apply"),
-            callback: () => handleApplyTheme(installedTheme),
-          };
-          showAlert(`Installed ${theme.title}`, applyAction);
+          showInstalledToast(t("marketplace_alert_installed", theme.title), installedTheme);
 
           if (!isUrlTheme) {
             updateRatingEnabled?.(true);
@@ -2087,12 +1916,12 @@ async function openDetailModal(theme: StoreTheme, urlThemeInfo?: UrlThemeInfo): 
             }
           }
         }
-        updateYourThemesDropdown();
+        refreshYourThemesMenu();
         await refreshStoreCards();
       } catch (err) {
-        actionBtn.className = `store-card-btn ${isRemoveButton ? "store-card-btn-remove" : "store-card-btn-install"}`;
-        setActionButtonContent(actionBtn, isRemoveButton ? t("marketplace_remove") : t("marketplace_install"), "I");
-        showAlert(`Failed: ${err}`);
+        errorStore("Action failed:", err);
+        setInstallButtonState(actionBtn, isRemoveButton, "I");
+        toast.error(themeActionFailedMessage(err, isRemoveButton, theme.title));
       } finally {
         installOperationInProgress = false;
         actionBtn.disabled = false;
@@ -2114,7 +1943,7 @@ async function openDetailModal(theme: StoreTheme, urlThemeInfo?: UrlThemeInfo): 
           ? await fetchRegistryShaderConfig(theme.registryPath ?? `themes/${theme.id}`)
           : await fetchThemeShaderConfig(theme.repo);
         if (!shaderConfig) {
-          showAlert(t("marketplace_shaderFetchFailed"));
+          toast.error(t("marketplace_shaderFetchFailed"));
           return;
         }
         const blob = new Blob([JSON.stringify(shaderConfig, null, 2)], { type: "application/json" });
@@ -2127,7 +1956,8 @@ async function openDetailModal(theme: StoreTheme, urlThemeInfo?: UrlThemeInfo): 
         document.body.removeChild(a);
         URL.revokeObjectURL(url);
       } catch (err) {
-        showAlert(`Failed to download: ${err}`);
+        errorStore("Shader config download failed:", err);
+        toast.error(t("marketplace_shaderFetchFailed"));
       }
     };
   }
@@ -2144,29 +1974,7 @@ async function openDetailModal(theme: StoreTheme, urlThemeInfo?: UrlThemeInfo): 
 
   initSlideshow();
 
-  document.documentElement.style.overflow = "hidden";
-  document.body.style.overflow = "hidden";
-  detailModalOverlay.style.display = "flex";
-  requestAnimationFrame(() => {
-    detailModalOverlay?.classList.add("active");
-  });
-}
-
-function closeDetailModal(): void {
-  if (detailModalOverlay) {
-    const modal = detailModalOverlay.querySelector(".detail-modal");
-    modal?.classList.add("closing");
-    detailModalOverlay.classList.remove("active");
-
-    setTimeout(() => {
-      if (detailModalOverlay) {
-        detailModalOverlay.style.display = "none";
-        modal?.classList.remove("closing");
-      }
-      document.documentElement.style.overflow = "";
-      document.body.style.overflow = "";
-    }, 200);
-  }
+  detailModal.open();
 }
 
 let slideshowImages: HTMLImageElement[] = [];
@@ -2247,38 +2055,18 @@ function goToSlide(index: number): void {
 }
 
 function openUrlModal(): void {
-  if (urlModalOverlay) {
-    const input = document.getElementById("url-modal-input") as HTMLInputElement;
-    if (input) input.value = "";
+  if (!urlModal) return;
+  const input = document.getElementById("url-modal-input") as HTMLInputElement;
+  if (input) input.value = "";
 
-    const error = document.getElementById("url-modal-error");
-    if (error) error.style.display = "none";
+  const error = document.getElementById("url-modal-error");
+  if (error) error.style.display = "none";
 
-    document.documentElement.style.overflow = "hidden";
-    document.body.style.overflow = "hidden";
-    urlModalOverlay.style.display = "flex";
-    requestAnimationFrame(() => {
-      urlModalOverlay?.classList.add("active");
-      input?.focus();
-    });
-  }
+  urlModal.open();
 }
 
 function closeUrlModal(): void {
-  if (urlModalOverlay) {
-    const modal = urlModalOverlay.querySelector(".modal");
-    modal?.classList.add("closing");
-    urlModalOverlay.classList.remove("active");
-
-    setTimeout(() => {
-      if (urlModalOverlay) {
-        urlModalOverlay.style.display = "none";
-        modal?.classList.remove("closing");
-      }
-      document.documentElement.style.overflow = "";
-      document.body.style.overflow = "";
-    }, 200);
-  }
+  urlModal?.close();
 }
 
 async function handleUrlInstall(): Promise<void> {
@@ -2300,7 +2088,7 @@ async function handleUrlInstall(): Promise<void> {
   const parsed = parseGitHubRepoUrl(url);
   if (!parsed) {
     if (error) {
-      error.textContent = "Invalid GitHub URL. Use format: github.com/user/repo or github.com/user/repo/tree/branch";
+      error.textContent = t("marketplace_urlInvalid");
       error.style.display = "block";
     }
     return;
@@ -2309,7 +2097,7 @@ async function handleUrlInstall(): Promise<void> {
   const { repo, branch } = parsed;
 
   installBtn.disabled = true;
-  installBtn.textContent = "Checking permissions...";
+  installBtn.textContent = t("options_nickname_status_checking");
   if (error) error.style.display = "none";
 
   try {
@@ -2329,14 +2117,14 @@ async function handleUrlInstall(): Promise<void> {
       if (inputEl) inputEl.value = url;
     }
 
-    installBtn.textContent = "Validating...";
+    installBtn.textContent = t("marketplace_urlValidating");
 
     const validation = await validateThemeRepo(repo, branch);
     if (!validation.valid) {
       throw new Error(validation.errors.join("; "));
     }
 
-    installBtn.textContent = "Installing...";
+    installBtn.textContent = t("marketplace_urlInstalling");
 
     const theme = await fetchFullTheme(repo, branch);
     const sourceUrl = branch ? `https://github.com/${repo}/tree/${branch}` : `https://github.com/${repo}`;
@@ -2348,13 +2136,9 @@ async function handleUrlInstall(): Promise<void> {
     const installedTheme = await installTheme(theme, installOptions);
 
     const branchInfo = branch ? ` (${branch})` : "";
-    const applyAction: AlertAction = {
-      label: t("marketplace_apply"),
-      callback: () => handleApplyTheme(installedTheme),
-    };
-    showAlert(`Installed ${theme.title} from ${repo}${branchInfo}`, applyAction);
+    showInstalledToast(t("marketplace_alert_installedFrom", [theme.title, `${repo}${branchInfo}`]), installedTheme);
     closeUrlModal();
-    updateYourThemesDropdown();
+    refreshYourThemesMenu();
     urlOnlyThemeCards.clear();
     await applyFiltersToGrid();
     await refreshStoreCards();
@@ -2370,76 +2154,78 @@ async function handleUrlInstall(): Promise<void> {
   }
 }
 
-async function updateYourThemesDropdown(): Promise<void> {
-  const dropdown = document.getElementById("your-themes-dropdown");
-  if (!dropdown) return;
+let yourThemesMenu: ActionMenu | null = null;
 
+function refreshYourThemesMenu(): void {
+  void yourThemesMenu?.refresh();
+}
+
+function createYourThemesRow(theme: InstalledStoreTheme, isActive: boolean): HTMLElement {
+  const row = document.createElement("span");
+  row.className = "your-themes-item";
+
+  const info = document.createElement("span");
+  info.className = "your-themes-item-info";
+
+  const titleRow = document.createElement("span");
+  titleRow.className = "your-themes-item-title-row";
+  const title = document.createElement("span");
+  title.className = "your-themes-item-title";
+  title.textContent = theme.title;
+  titleRow.appendChild(title);
+  if (theme.source === "url") {
+    titleRow.appendChild(createGitHubBadge("ui-badge", theme.sourceUrl || t("marketplace_installedFrom", theme.repo)));
+  }
+
+  const meta = document.createElement("span");
+  meta.className = "your-themes-item-meta";
+  meta.textContent = t("marketplace_byline", [formatCreators(theme.creators), theme.version]);
+  info.append(titleRow, meta);
+  row.appendChild(info);
+
+  if (isActive) {
+    const active = document.createElement("span");
+    active.className = "ui-badge ui-badge--success";
+    active.textContent = t("marketplace_active");
+    row.appendChild(active);
+  }
+  return row;
+}
+
+async function yourThemesItems(): Promise<ActionMenuItem[]> {
   const installed = await getInstalledStoreThemes();
   const storedActiveThemeId = await getActiveStoreTheme();
-
   const syncData = await getSyncStorage<{ themeName?: string }>(["themeName"]);
   const currentThemeName = syncData.themeName;
-  const isStoreThemeActive = currentThemeName?.startsWith("store:");
-  const activeThemeId = isStoreThemeActive ? currentThemeName?.slice(6) : null;
+  const activeThemeId = currentThemeName?.startsWith("store:") ? currentThemeName.slice(6) : null;
 
   if (storedActiveThemeId && storedActiveThemeId !== activeThemeId) {
     await clearActiveStoreTheme();
   }
 
-  dropdown.replaceChildren();
+  return installed.map(theme => {
+    const isActive = theme.id === activeThemeId;
+    return {
+      label: isActive ? t("marketplace_themeActiveLabel", theme.title) : theme.title,
+      key: theme.id,
+      content: createYourThemesRow(theme, isActive),
+      onSelect: () => void handleApplyTheme(theme),
+    };
+  });
+}
 
-  if (installed.length === 0) {
-    const empty = document.createElement("div");
-    empty.className = "your-themes-empty";
-    empty.textContent = t("marketplace_noThemesInstalled");
-    dropdown.appendChild(empty);
-    return;
-  }
+const installToastId = (themeId: string): string => `install:${themeId}`;
 
-  for (const theme of installed) {
-    const item = document.createElement("div");
-    item.className = `your-themes-item ${theme.id === activeThemeId ? "active" : ""}`;
+function showInstalledToast(message: string, installedTheme: InstalledStoreTheme): void {
+  toast.success(message, {
+    id: installToastId(installedTheme.id),
+    action: { label: t("marketplace_apply"), onClick: () => void handleApplyTheme(installedTheme) },
+  });
+}
 
-    const info = document.createElement("div");
-    info.className = "your-themes-item-info";
-
-    const titleRow = document.createElement("div");
-    titleRow.className = "your-themes-item-title-row";
-
-    const title = document.createElement("span");
-    title.className = "your-themes-item-title";
-    title.textContent = theme.title;
-
-    titleRow.appendChild(title);
-
-    if (theme.source === "url") {
-      const badgeTitle = theme.sourceUrl || `Installed from ${theme.repo}`;
-      const badge = createGitHubBadge("your-themes-item-url-badge", badgeTitle);
-      titleRow.appendChild(badge);
-    }
-
-    const meta = document.createElement("span");
-    meta.className = "your-themes-item-meta";
-    meta.textContent = `By ${formatCreators(theme.creators)} · v${theme.version}`;
-
-    info.appendChild(titleRow);
-    info.appendChild(meta);
-
-    const applyBtn = document.createElement("button");
-    applyBtn.className = "your-themes-item-apply";
-    applyBtn.textContent = theme.id === activeThemeId ? t("marketplace_active") : t("marketplace_apply");
-    applyBtn.disabled = theme.id === activeThemeId;
-    applyBtn.addEventListener("click", async e => {
-      e.stopPropagation();
-      await handleApplyTheme(theme);
-    });
-
-    item.appendChild(info);
-    item.appendChild(applyBtn);
-    item.addEventListener("click", () => handleApplyTheme(theme));
-
-    dropdown.appendChild(item);
-  }
+function showRemovedToast(theme: StoreTheme): void {
+  toast.dismiss(installToastId(theme.id));
+  toast.success(t("marketplace_alert_removed", theme.title));
 }
 
 async function handleApplyTheme(theme: InstalledStoreTheme): Promise<boolean> {
@@ -2459,9 +2245,8 @@ async function handleApplyTheme(theme: InstalledStoreTheme): Promise<boolean> {
       throw new Error("Failed to apply theme");
     }
 
-    showAlert(`Applied ${theme.title}`);
-    updateYourThemesDropdown();
-    toggleYourThemesDropdown(false);
+    toast.success(t("builtin_applied", theme.title));
+    yourThemesMenu?.close();
     await refreshStoreCards();
 
     const detailApplyBtn = document.getElementById("detail-apply-btn") as HTMLButtonElement | null;
@@ -2478,27 +2263,8 @@ async function handleApplyTheme(theme: InstalledStoreTheme): Promise<boolean> {
     return true;
   } catch (err) {
     errorStore("Failed to apply theme:", err);
-    showAlert(`${t("marketplace_applyFailed")}: ${err}`);
+    toast.error(t("marketplace_applyFailed"));
     return false;
-  }
-}
-
-function toggleYourThemesDropdown(show?: boolean): void {
-  const dropdown = document.getElementById("your-themes-dropdown");
-  const btn = document.getElementById("your-themes-btn");
-
-  if (!dropdown || !btn) return;
-
-  const isVisible = dropdown.classList.contains("active");
-  const shouldShow = show !== undefined ? show : !isVisible;
-
-  if (shouldShow) {
-    dropdown.classList.add("active");
-    btn.classList.add("active");
-    updateYourThemesDropdown();
-  } else {
-    dropdown.classList.remove("active");
-    btn.classList.remove("active");
   }
 }
 
@@ -2542,8 +2308,7 @@ async function refreshStoreCards(): Promise<void> {
     const btn = card.querySelector(".store-card-btn:not(.store-card-btn-apply)") as HTMLButtonElement;
     if (btn) {
       const isInstalled = installedIds.has(themeId);
-      btn.className = `store-card-btn ${isInstalled ? "store-card-btn-remove" : "store-card-btn-install"}`;
-      btn.textContent = isInstalled ? t("marketplace_remove") : t("marketplace_install");
+      setInstallButtonState(btn, isInstalled);
     }
 
     const applyBtn = card.querySelector(".store-card-btn-apply") as HTMLButtonElement;
@@ -2563,16 +2328,11 @@ async function refreshStoreCards(): Promise<void> {
 
 export function setupYourThemesButton(): void {
   const btn = document.getElementById("your-themes-btn");
-  btn?.addEventListener("click", e => {
-    e.stopPropagation();
-    toggleYourThemesDropdown();
-  });
-
-  document.addEventListener("click", e => {
-    const dropdown = document.getElementById("your-themes-dropdown");
-    const btn = document.getElementById("your-themes-btn");
-    if (dropdown && btn && !dropdown.contains(e.target as Node) && !btn.contains(e.target as Node)) {
-      toggleYourThemesDropdown(false);
-    }
+  if (!btn) return;
+  yourThemesMenu = createActionMenu(btn, {
+    label: t("options_themes_installedThemes"),
+    className: "your-themes-menu",
+    emptyLabel: t("marketplace_noThemesInstalled"),
+    items: yourThemesItems,
   });
 }

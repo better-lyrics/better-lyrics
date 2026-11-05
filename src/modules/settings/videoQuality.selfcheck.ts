@@ -7,7 +7,7 @@ import {
   VIDEO_QUALITY_SETTINGS_EVENT,
 } from "@modules/settings/videoQuality";
 import type { VideoQualityPlayer } from "@modules/settings/videoQualityPlayer";
-import { syncVideoQualityControls } from "@/options/videoQualityControls";
+import { videoQualityControlState } from "@/options/videoQualityState";
 
 import { VIDEO_QUALITY_REQUEST_EVENT } from "@modules/settings/videoQuality";
 
@@ -75,25 +75,23 @@ assert.equal(api.preloadVideoByPlayerVars, otherWrapper, "cleanup must not overw
 const frozenApi = Object.freeze({ loadVideoByPlayerVars: original });
 assert.doesNotThrow(() => patchVideoQualityPlayer(frozenApi, () => defaults)());
 
-const dom = new JSDOM(`<ytmusic-player><video></video></ytmusic-player><video id="unrelated-video"></video>
-  <input id="isHighResolutionVideoEnabled" type="checkbox" checked>
-  <select id="preferredVideoQuality"><option value="auto">Auto</option><option value="hd2160">4K</option><option value="hd1080">1080p</option></select>
-  <span id="videoQualityLimitHint" hidden></span>`);
+{
+  const all = ["auto", "hd2160", "hd1080"];
+  const off = videoQualityControlState(false, "hd2160", all);
+  assert.equal(off.value, "hd1080", "a >1080 choice falls back to 1080p when high resolution is off");
+  assert.deepEqual(off.allowed, ["auto", "hd1080"], "4K is not selectable when high resolution is off");
+  assert.equal(off.showLimitHint, true, "limit hint shows when high resolution is off");
+  const on = videoQualityControlState(true, "hd2160", all);
+  assert.equal(on.value, "hd2160", "value is kept when high resolution is on");
+  assert.deepEqual(on.allowed, all, "every quality is selectable when high resolution is on");
+  assert.equal(on.showLimitHint, false, "limit hint hides when high resolution is on");
+  assert.equal(videoQualityControlState(false, "auto", all).value, "auto", "auto survives high resolution off");
+  assert.deepEqual(videoQualityControlState(false, "hd1080", []).allowed, [], "empty list stays empty");
+}
+
+const dom = new JSDOM(`<ytmusic-player><video></video></ytmusic-player><video id="unrelated-video"></video>`);
 const doc = dom.window.document;
 const video = doc.querySelector("ytmusic-player video")!;
-const toggle = doc.getElementById("isHighResolutionVideoEnabled") as HTMLInputElement;
-const select = doc.getElementById("preferredVideoQuality") as HTMLSelectElement;
-select.value = "hd2160";
-toggle.checked = false;
-syncVideoQualityControls(doc);
-assert.equal(select.value, "hd1080");
-assert.equal(select.options[1].disabled, true);
-assert.equal(select.options[2].disabled, false);
-assert.equal(doc.getElementById("videoQualityLimitHint")?.hidden, false);
-toggle.checked = true;
-syncVideoQualityControls(doc);
-assert.equal(select.options[1].disabled, false);
-
 Object.assign(globalThis, { MutationObserver: dom.window.MutationObserver, Event: dom.window.Event });
 let qualityCalls: string[] = [];
 let qualities = ["hd2160", "hd1080", "auto"];

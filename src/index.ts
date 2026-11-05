@@ -47,7 +47,7 @@ import {
 } from "@modules/ui/pictureInPicture/browserController";
 import { subscribeToCustomStyles } from "@modules/ui/styleInjector";
 import { applyLoggingSetting } from "@modules/settings/settings";
-import { logCore } from "@core/logger";
+import { logCore, logError } from "@core/logger";
 import { startVideoQualitySettingsBridge } from "@modules/settings/videoQualityBridge";
 
 /**
@@ -80,7 +80,7 @@ async function modify(isDisposed: () => boolean): Promise<void> {
   loadDockSettings(hideDockOnIdleInFullscreen);
   subscribeToCustomStyles();
   await purgeExpiredKeys();
-  await saveCacheInfo();
+  await saveCacheInfo().catch(error => logError("Failed to save cache info:", error));
   listenForPopupMessages();
   lyricReloader();
   initializeLyrics();

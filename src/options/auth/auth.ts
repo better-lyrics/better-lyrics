@@ -82,10 +82,16 @@ const STATUS_ICON_TEMPLATE = new DOMParser().parseFromString(STATUS_ICON_MARKUP,
 function showError(messageKey: string, state: "error" | "warning" = "error"): void {
   const error = document.getElementById("auth-error");
   if (!error) return;
-  error.dataset.state = state;
-  const icon = STATUS_ICON_TEMPLATE.cloneNode(true);
-  const text = document.createTextNode(t(messageKey));
-  error.replaceChildren(icon, text);
+  const callout = document.createElement("div");
+  callout.className = `ui-callout ui-callout--${state === "error" ? "danger" : "warning"}`;
+  const icon = document.createElement("span");
+  icon.className = "ui-callout__icon";
+  icon.append(STATUS_ICON_TEMPLATE.cloneNode(true));
+  const text = document.createElement("span");
+  text.className = "ui-callout__text";
+  text.textContent = t(messageKey);
+  callout.append(icon, text);
+  error.replaceChildren(callout);
 }
 
 async function bindDynamicText(params: RequestParams): Promise<void> {

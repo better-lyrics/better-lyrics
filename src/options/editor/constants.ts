@@ -1,0 +1,2 @@
+export const SAVE_DEBOUNCE_DELAY = 1000;
+export const SAVE_CUSTOM_THEME_DEBOUNCE = 2000;

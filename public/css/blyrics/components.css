@@ -210,6 +210,7 @@
 /* No lyrics button container */
 .blyrics-no-lyrics-button-container {
 	display: flex;
+	flex-wrap: wrap;
 	justify-content: flex-start;
 	opacity: 0.9;
 	z-index: 1;
@@ -328,8 +329,8 @@
    .blyrics-user-scrolling on hover; we don't want that on the footer. Pin the
    resting scale rather than clearing the transform, or the footer grows to 1
    from the .blyrics-container > div default of 0.95 on every hover. */
-.blyrics-container > .blyrics-footer:hover,
-.blyrics-user-scrolling > .blyrics-footer:hover {
+.blyrics-container > :is(.blyrics-footer, .blyrics-no-lyrics-button-container):hover,
+.blyrics-user-scrolling > :is(.blyrics-footer, .blyrics-no-lyrics-button-container):hover {
 	transform: scale(var(--blyrics-scale));
 }
 

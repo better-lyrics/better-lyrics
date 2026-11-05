@@ -11,6 +11,8 @@ import {
   formatTimingDelta,
   splitDiffRows,
   statusLabel,
+  type SyllableLineChange,
+  syllableChange,
   unchangedLines,
 } from "@modules/unison/revisions";
 import type { DiffRow, RevisionStatus } from "@modules/unison/types";
@@ -52,9 +54,18 @@ interface ButtonOptions {
 export function createButton({ label, icon, primary = false, active = false }: ButtonOptions): HTMLButtonElement {
   const button = document.createElement("button");
   button.type = "button";
-  button.className = primary ? "unison-submit-btn" : "unison-vote-btn";
-  button.classList.toggle("unison-vote-btn--active", active);
+  button.className = primary ? "ui-button ui-button--header ui-button--accent" : "ui-button ui-button--header";
+  button.classList.toggle("ui-button--accent-tint", active);
   setButtonContent(button, label, icon);
+  return button;
+}
+
+export function createBackButton(label: string, onClick: () => void): HTMLButtonElement {
+  const button = document.createElement("button");
+  button.type = "button";
+  button.className = "ui-button ui-button--compact unison-back-btn";
+  button.append(svgIcon("back"), label);
+  button.addEventListener("click", onClick);
   return button;
 }
 
@@ -82,19 +93,28 @@ export function createLoadingLine(): HTMLElement {
 
 // -- Chips --------------------------
 
+const STATUS_TONE: Record<RevisionStatus, string> = {
+  live: "ui-badge--success",
+  pending: "ui-badge--warning",
+  rejected: "ui-badge--danger",
+  past: "",
+  superseded: "ui-badge--muted",
+  withdrawn: "ui-badge--muted",
+};
+
 export function createStatusChip(
   status: RevisionStatus,
   label: string = messageText(statusLabel(status))
 ): HTMLElement {
   const chip = document.createElement("span");
-  chip.className = `unison-badge unison-rev-chip--${status}`;
+  chip.className = `ui-badge ${STATUS_TONE[status]}`;
   chip.textContent = label;
   return chip;
 }
 
 export function createAnchorChip(): HTMLElement {
   const chip = document.createElement("span");
-  chip.className = "unison-badge unison-badge--format";
+  chip.className = "ui-badge ui-badge--accent";
   chip.textContent = t("unison_rev_anchor");
   return chip;
 }
@@ -208,7 +228,7 @@ function createDiffSection(title: string, rows: DiffRow[]): HTMLElement {
   return section;
 }
 
-function createDiffRow(row: DiffRow): HTMLElement {
+function createDiffRow(row: DiffRow): Node {
   if (row.kind === "gap") {
     const gap = document.createElement("div");
     gap.className = "unison-rev-diff-gap";
@@ -222,8 +242,23 @@ function createDiffRow(row: DiffRow): HTMLElement {
 
   let lead = row.startMs === null ? "" : formatDiffTime(row.startMs);
   if ("head" in row && row.head) lead = diffHeadLabel(row.head).map(messageText).join(" · ");
+  if (row.kind === "timing" && row.syllables) {
+    return createSyllableLines({ ...row.syllables, text: row.text }, lead, formatTimingDelta(row.deltaMs));
+  }
   if (row.kind === "timing") return createDiffLine(row.kind, lead, row.text, formatTimingDelta(row.deltaMs));
+  if (row.kind === "syllable") return createSyllableLines(row, lead);
   return createDiffLine(row.kind, lead, row.kind === "word" ? row.parts : row.text);
+}
+
+function createSyllableLines(change: SyllableLineChange, lead: string, delta?: string): Node {
+  const lines = document.createDocumentFragment();
+  const changed = syllableChange(change);
+  changed.forEach((line, index) => {
+    const isLast = index === changed.length - 1;
+    const tag = [isLast ? delta : undefined, line.note ? messageText(line.note) : undefined].filter(Boolean).join(", ");
+    lines.appendChild(createDiffLine(line.kind, lead, line.content, tag || undefined));
+  });
+  return lines;
 }
 
 function createDiffLine(kind: DiffLineKind, lead: string, content: string | DiffParts, timing?: string): HTMLElement {

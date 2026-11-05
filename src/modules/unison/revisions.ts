@@ -9,6 +9,7 @@ import type {
   PreviewResult,
   RevisionStatus,
   RevisionSummary,
+  SyllableChange,
 } from "@modules/unison/types";
 
 // -- Messages --------------------------
@@ -175,6 +176,31 @@ export function fieldChange(row: FieldDiffRow): {
       ["+", after],
     ],
   };
+}
+
+interface SyllableLine {
+  kind: "del" | "add" | "timing";
+  content: string;
+  note: RevisionMessage | null;
+}
+
+export type SyllableLineChange = SyllableChange & { text: string };
+
+function syllableNote(row: SyllableLineChange): RevisionMessage | null {
+  if (row.before === null) return message("unison_rev_syllableTimingAdded");
+  if (row.after === null) return message("unison_rev_syllableTimingRemoved");
+  return row.moved > 0 ? message("unison_rev_syllablesRetimed", row.moved) : null;
+}
+
+export function syllableChange(row: SyllableLineChange): SyllableLine[] {
+  const before = row.before ?? row.text;
+  const after = row.after ?? row.text;
+  const note = syllableNote(row);
+  if (before === after) return [{ kind: "timing", content: after, note }];
+  return [
+    { kind: "del", content: before, note: null },
+    { kind: "add", content: after, note },
+  ];
 }
 
 export function diffHeadLabel(head: DiffHead): RevisionMessage[] {

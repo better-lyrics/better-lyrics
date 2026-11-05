@@ -3,7 +3,9 @@
 import {
   DOCK_CONTROL_ORDER_DEFAULT,
   DOCK_DEFAULT_POSITION,
+  GITHUB_REPO_URL,
   ROMANIZATION_LANGUAGES,
+  type SyncType,
   THEME_SETTINGS_TYPES,
   UNISON_API_BASE_URL,
   UNISON_PICTURE_URL,
@@ -12,19 +14,31 @@ import { attachHoldRepeat } from "@core/holdRepeat";
 import { getLanguageDisplayName, initI18n, loadLocaleOverride, SUPPORTED_LOCALES, t } from "@core/i18n";
 import {
   exportIdentity,
+  forgetDisplayName,
   getDisplayName,
+  getIdentity,
+  getLastKnownDisplayName,
   getResolvedProfile,
   importIdentity,
   invalidateDisplayName,
   signPayload,
 } from "@core/keyIdentity";
-import { clearAllOffsets, getOffsetInfo } from "@core/storage";
+import {
+  clearAllOffsets,
+  clearLyricCache,
+  getOffsetInfo,
+  getStorageBreakdown,
+  type StorageBreakdown,
+  type StorageCategory,
+} from "@core/storage";
 import { KARAOKE_DEFAULTS } from "@modules/karaoke/defaults";
-import { parseSvgString, syncTypeColors } from "@modules/ui/lyricsDock/icons";
+import { syncTypeColors } from "@modules/ui/lyricsDock/icons";
 import { migrateLetterWavePref, type LetterWavePref } from "@modules/settings/letterWave";
 import { mergePreferredProviders } from "@modules/lyrics/providers/providerList";
 import { fetchOwnGamification, renderIdentityStats } from "@modules/unison/gamificationRender";
-import Sortable from "sortablejs";
+import type Sortable from "sortablejs";
+import { initializeThemes } from "@/options/editor/themesUi";
+import { openEditCSS, openOptions } from "@/options/editor/ui/dom";
 import { showModal } from "./editor/ui/feedback";
 import {
   applyThemeSettingsToCSS,
@@ -49,7 +63,35 @@ import type { ThemeSettingField } from "./themes";
 import { getStorageStrategy, saveCustomCss } from "@/core/customCss";
 
 import { normalizeVideoQualitySettings, type VideoQualitySettings } from "@modules/settings/videoQuality";
-import { syncVideoQualityControls } from "@/options/videoQualityControls";
+import { syncVideoQualityControls, videoQualityOptions } from "@/options/videoQualityControls";
+import { mountDropdownField, setDropdownFieldValue } from "@/options/dropdownFields";
+import { TRANSLATION_LANGUAGES } from "@/options/translationLanguages";
+import { renderAboutLinks } from "@/options/aboutPage";
+import { createModal, type Modal } from "@/ui/modal";
+import { initTabStrip, type TabStrip } from "@/ui/tabStrip";
+import { renderStatBar } from "@/ui/statBar";
+import { toast } from "@/ui/toast";
+import {
+  fitPopupToWindow,
+  flashSaved,
+  initAboutToggle,
+  initPopupCards,
+  initPopupTabs,
+  initRefreshLyricsButton,
+  mountIcons,
+  pageCard,
+  renderAppVersion,
+} from "@/options/popupShell";
+import {
+  isIdentityBackedUp,
+  markIdentityBackedUp,
+  onBackupFlagChanged,
+  readBackedUpKeyId,
+  rememberPendingBackup,
+} from "@/options/identityBackup";
+import { attachDeclaredScrollFades, attachScrollFade } from "@/ui/scrollFade";
+import { createSyncIcon, createSyncTag, syncTypeLabel } from "@/ui/syncTag";
+import { initTooltips } from "@/ui/tooltip";
 
 interface Options extends VideoQualitySettings {
   isLogsEnabled: boolean;
@@ -112,7 +154,7 @@ const getOptionsFromForm = (): Options => {
   const providerElems = document.getElementById("providers-list")!.children;
   for (let i = 0; i < providerElems.length; i++) {
     let id = providerElems[i].id.slice(2);
-    if (!(providerElems[i].children[1].children[0] as HTMLInputElement).checked) {
+    if (!providerElems[i].querySelector<HTMLInputElement>(".provider-checkbox")?.checked) {
       id = "d_" + id;
     }
     preferredProviderList.push(id);
@@ -122,7 +164,7 @@ const getOptionsFromForm = (): Options => {
     ...normalizeVideoQualitySettings({
       isHighResolutionVideoEnabled: (document.getElementById("isHighResolutionVideoEnabled") as HTMLInputElement)
         .checked,
-      preferredVideoQuality: (document.getElementById("preferredVideoQuality") as HTMLSelectElement).value,
+      preferredVideoQuality: (document.getElementById("preferredVideoQuality") as HTMLInputElement).value,
     }),
     isLogsEnabled: (document.getElementById("logs") as HTMLInputElement).checked,
     isAutoSwitchEnabled: (document.getElementById("autoSwitch") as HTMLInputElement).checked,
@@ -137,9 +179,9 @@ const getOptionsFromForm = (): Options => {
     isPictureInPictureAutoRestoreEnabled: (
       document.getElementById("isPictureInPictureAutoRestoreEnabled") as HTMLInputElement
     ).checked,
-    pipWindowLayout: (document.getElementById("pipWindowLayout") as HTMLSelectElement).value,
-    pipArtworkTransition: (document.getElementById("pipArtworkTransition") as HTMLSelectElement).value,
-    pipTextTransition: (document.getElementById("pipTextTransition") as HTMLSelectElement).value,
+    pipWindowLayout: (document.getElementById("pipWindowLayout") as HTMLInputElement).value,
+    pipArtworkTransition: (document.getElementById("pipArtworkTransition") as HTMLInputElement).value,
+    pipTextTransition: (document.getElementById("pipTextTransition") as HTMLInputElement).value,
     pipMarqueeEnabled: (document.getElementById("pipMarqueeEnabled") as HTMLInputElement).checked,
     pipProgressBarEnabled: (document.getElementById("pipProgressBarEnabled") as HTMLInputElement).checked,
     isKaraokeEnabled: (document.getElementById("isKaraokeEnabled") as HTMLInputElement).checked,
@@ -150,7 +192,7 @@ const getOptionsFromForm = (): Options => {
     preferredProviderList: preferredProviderList,
     romanizationDisabledLanguages: romanizationDisabledLanguages,
     translationDisabledLanguages: translationDisabledLanguages,
-    uiLanguage: (document.getElementById("uiLanguage") as HTMLSelectElement).value,
+    uiLanguage: (document.getElementById("uiLanguage") as HTMLInputElement).value,
     isControlsDockEnabled: (document.getElementById("isUnisonPinnedDockEnabled") as HTMLInputElement).checked,
     controlsDockPosition: getSelectedUnisonPosition(),
     isControlsDockAutoHideInFullscreenEnabled: (
@@ -199,6 +241,7 @@ function setDockControlsOrderInForm(order: string[]): void {
 // Function to save options to Chrome storage
 const saveOptionsToStorage = (options: Options): void => {
   chrome.storage.sync.set(options, () => {
+    if (!chrome.runtime.lastError) flashSaved();
     chrome.tabs.query({ url: "https://music.youtube.com/*" }, tabs => {
       tabs.forEach(tab => {
         chrome.tabs.sendMessage(tab.id!, {
@@ -210,63 +253,31 @@ const saveOptionsToStorage = (options: Options): void => {
   });
 };
 
-// Function to show save confirmation message
-const _showSaveConfirmation = (): void => {
-  const status = document.getElementById("status")!;
-  status.textContent = "Options saved. Refresh tab to apply changes.";
-  status.classList.add("active");
-  setTimeout(hideSaveConfirmation, 4000);
+const reloadYouTubeMusicLyrics = async (): Promise<void> => {
+  const tabs = await chrome.tabs.query({ url: "https://music.youtube.com/*" });
+  const results = await Promise.allSettled(
+    tabs.flatMap(tab => (tab.id == null ? [] : [chrome.tabs.sendMessage(tab.id, { action: "reloadLyrics" })]))
+  );
+  for (const result of results) {
+    if (result.status === "rejected") warnCore("reloadLyrics send failed:", result.reason);
+  }
 };
 
-// Function to hide save confirmation message
-const hideSaveConfirmation = (): void => {
-  const status = document.getElementById("status")!;
-  status.classList.remove("active");
-  setTimeout(() => {
-    status.textContent = "";
-  }, 200);
-};
-
-// Function to show alert message
-const showAlert = (message: string): void => {
-  const status = document.getElementById("status")!;
-  status.innerText = message;
-  status.classList.add("active");
-
-  setTimeout(() => {
-    status.classList.remove("active");
-    setTimeout(() => {
-      status.innerText = "";
-    }, 200);
-  }, 2000);
-};
-
-// Function to clear transient lyrics
-const clearTransientLyrics = (callback?: () => void): void => {
-  chrome.tabs.query({ url: "https://music.youtube.com/*" }, tabs => {
-    if (tabs.length === 0) {
-      updateCacheInfo(null);
-      showAlert(t("options_alert_cacheCleared"));
-      if (callback && typeof callback === "function") callback();
+const clearTransientLyrics = async (): Promise<void> => {
+  try {
+    const before = await renderCacheStats();
+    if (before.lyrics.songs === 0 && before.bytes.lyrics === 0) {
+      toast.info(t("options_alert_nothingToClear"));
       return;
     }
-
-    let completedTabs = 0;
-    tabs.forEach(tab => {
-      chrome.tabs.sendMessage(tab.id!, { action: "clearCache" }, response => {
-        completedTabs++;
-        if (completedTabs === tabs.length) {
-          if (response?.success) {
-            updateCacheInfo(null);
-            showAlert(t("options_alert_cacheCleared"));
-          } else {
-            showAlert(t("options_alert_cacheClearFailed"));
-          }
-          if (callback && typeof callback === "function") callback();
-        }
-      });
-    });
-  });
+    await clearLyricCache();
+    await renderCacheStats();
+    await reloadYouTubeMusicLyrics();
+    toast.success(t("options_alert_cacheCleared"));
+  } catch (error) {
+    errorCore("Failed to clear cached lyrics:", error);
+    toast.error(t("options_alert_cacheClearFailed"));
+  }
 };
 
 const _formatBytes = (bytes: number, decimals = 2): string => {
@@ -281,42 +292,62 @@ const _formatBytes = (bytes: number, decimals = 2): string => {
   return `${parseFloat((bytes / k ** i).toFixed(dm))} ${sizes[i]}`;
 };
 
-// Function to subscribe to cache info updates
-const subscribeToCacheInfo = (): void => {
-  chrome.storage.sync.get("cacheInfo", items => {
-    //@ts-ignore -- I'm lazy someone fix this
-    updateCacheInfo(items);
-  });
+// -- Cache stats --------------------------
 
-  chrome.storage.onChanged.addListener((changes, area) => {
-    if (area === "sync" && changes.cacheInfo) {
-      updateCacheInfo({
-        cacheInfo: changes.cacheInfo.newValue as {
-          count: number;
-          size: number;
-        },
-      });
-    }
-  });
+const STORAGE_SEGMENTS: { category: StorageCategory; key: string; color: string }[] = [
+  { category: "lyrics", key: "unison_lyrics", color: "var(--stat-step-1)" },
+  { category: "themes", key: "options_tab_themes", color: "var(--stat-step-2)" },
+  { category: "offsets", key: "options_offsetModal_perSongCount", color: "var(--stat-step-3)" },
+  { category: "other", key: "unison_report_other", color: "var(--stat-step-4)" },
+];
+const SYNC_TYPES: SyncType[] = ["syllable", "word", "line", "unsynced"];
+
+const renderCacheStats = async (): Promise<StorageBreakdown> => {
+  const breakdown = await getStorageBreakdown();
+  document.getElementById("lyrics-count")!.textContent = breakdown.lyrics.songs.toLocaleString();
+  document.getElementById("storage-size")!.textContent = _formatBytes(breakdown.totalBytes);
+  renderStatBar(
+    document.getElementById("lyrics-bar")!,
+    SYNC_TYPES.map(type => ({
+      value: breakdown.lyrics.bySyncType[type],
+      color: `var(--sync-${type})`,
+      label: t("options_general_segment", [syncTypeLabel(type), breakdown.lyrics.bySyncType[type].toLocaleString()]),
+      tone: `var(--sync-${type})`,
+      icon: createSyncIcon(type),
+    }))
+  );
+  renderStatBar(
+    document.getElementById("storage-bar")!,
+    STORAGE_SEGMENTS.map(({ category, key, color }) => ({
+      value: breakdown.bytes[category],
+      color,
+      label: t("options_general_segment", [t(key), _formatBytes(breakdown.bytes[category])]),
+    }))
+  );
+  return breakdown;
 };
 
-// Function to update cache info
-const updateCacheInfo = (items: { cacheInfo: { count: number; size: number } } | null): void => {
-  if (!items) {
-    showAlert(t("options_alert_nothingToClear"));
-    return;
-  }
-  const cacheInfo = items.cacheInfo || { count: 0, size: 0 };
-  const cacheCount = document.getElementById("lyrics-count")!;
-  const cacheSize = document.getElementById("cache-size")!;
+let cacheStatsRefreshQueued = false;
 
-  cacheCount.textContent = cacheInfo.count.toString();
-  cacheSize.textContent = _formatBytes(cacheInfo.size);
+const refreshCacheStats = (): void => {
+  if (cacheStatsRefreshQueued) return;
+  cacheStatsRefreshQueued = true;
+  setTimeout(() => {
+    cacheStatsRefreshQueued = false;
+    renderCacheStats().catch(error => errorCore("Failed to read cache stats:", error));
+  }, 0);
+};
+
+const subscribeToCacheStats = (): void => {
+  refreshCacheStats();
+  chrome.storage.onChanged.addListener((_changes, area) => {
+    if (area === "local") refreshCacheStats();
+  });
 };
 
 // Function to restore user options
 const restoreOptions = (): void => {
-  subscribeToCacheInfo();
+  subscribeToCacheStats();
 
   const defaultOptions: Options = {
     isHighResolutionVideoEnabled: true,
@@ -414,7 +445,7 @@ const setOptionsInForm = (items: Options): void => {
   const videoSettings = normalizeVideoQualitySettings(items);
   (document.getElementById("isHighResolutionVideoEnabled") as HTMLInputElement).checked =
     videoSettings.isHighResolutionVideoEnabled;
-  (document.getElementById("preferredVideoQuality") as HTMLSelectElement).value = videoSettings.preferredVideoQuality;
+  setDropdownFieldValue("preferredVideoQuality", videoSettings.preferredVideoQuality);
   syncVideoQualityControls(document);
   (document.getElementById("logs") as HTMLInputElement).checked = items.isLogsEnabled;
   (document.getElementById("albumArt") as HTMLInputElement).checked = items.isAlbumArtEnabled;
@@ -426,21 +457,22 @@ const setOptionsInForm = (items: Options): void => {
     items.isFullscreenControlsEnabled;
   (document.getElementById("isStylizedAnimationsEnabled") as HTMLInputElement).checked =
     items.isStylizedAnimationsEnabled;
+  syncFullscreenDependents();
   setLetterWaveSwitchState(items.letterWavePref);
   (document.getElementById("isPassiveScrollEnabled") as HTMLInputElement).checked = items.isPassiveScrollEnabled;
   (document.getElementById("isPictureInPictureEnabled") as HTMLInputElement).checked = items.isPictureInPictureEnabled;
   (document.getElementById("isPictureInPictureAutoRestoreEnabled") as HTMLInputElement).checked =
     items.isPictureInPictureAutoRestoreEnabled;
-  (document.getElementById("pipWindowLayout") as HTMLSelectElement).value = items.pipWindowLayout;
-  (document.getElementById("pipArtworkTransition") as HTMLSelectElement).value = items.pipArtworkTransition;
-  (document.getElementById("pipTextTransition") as HTMLSelectElement).value = items.pipTextTransition;
+  setDropdownFieldValue("pipWindowLayout", items.pipWindowLayout);
+  setDropdownFieldValue("pipArtworkTransition", items.pipArtworkTransition);
+  setDropdownFieldValue("pipTextTransition", items.pipTextTransition);
   (document.getElementById("pipMarqueeEnabled") as HTMLInputElement).checked = items.pipMarqueeEnabled;
   (document.getElementById("pipProgressBarEnabled") as HTMLInputElement).checked = items.pipProgressBarEnabled;
   (document.getElementById("isKaraokeEnabled") as HTMLInputElement).checked = items.isKaraokeEnabled;
   (document.getElementById("translate") as HTMLInputElement).checked = items.isTranslateEnabled;
-  (document.getElementById("translationLanguage") as HTMLInputElement).value = items.translationLanguage;
+  setDropdownFieldValue("translationLanguage", items.translationLanguage);
   (document.getElementById("isRomanizationEnabled") as HTMLInputElement).checked = items.isRomanizationEnabled;
-  (document.getElementById("uiLanguage") as HTMLSelectElement).value = items.uiLanguage;
+  setDropdownFieldValue("uiLanguage", items.uiLanguage);
   (document.getElementById("isUnisonPinnedDockEnabled") as HTMLInputElement).checked = items.isControlsDockEnabled;
   (document.getElementById("isUnisonAutoHideInFullscreenEnabled") as HTMLInputElement).checked =
     items.isControlsDockAutoHideInFullscreenEnabled;
@@ -496,7 +528,6 @@ const setOptionsInForm = (items: Options): void => {
     providersListElem.appendChild(providerElem);
   }
 };
-type SyncType = "syllable" | "word" | "line" | "unsynced";
 
 interface ProviderInfo {
   name: string;
@@ -540,31 +571,6 @@ const getProviderIdToInfoMap = (): { [key: string]: ProviderInfo } => ({
   "lrclib-plain": { name: t("options_provider_lrclib"), syncType: "unsynced" },
 });
 
-const getSyncTypeConfig = (): {
-  [key in SyncType]: { label: string; icon: string; tooltip: string };
-} => ({
-  syllable: {
-    label: t("options_syncType_syllable"),
-    tooltip: t("options_syncType_syllable_tooltip"),
-    icon: `<svg width="16" height="16" viewBox="0 0 1024 1024" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><rect x="636" y="239" width="389.981" height="233.271" rx="48" fill-opacity="0.5"/><path d="M0 335C0 289.745 0 267.118 14.0589 253.059C28.1177 239 50.7452 239 96 239H213C243.17 239 258.255 239 267.627 248.373C277 257.745 277 272.83 277 303V408C277 438.17 277 453.255 267.627 462.627C258.255 472 243.17 472 213 472H96C50.7452 472 28.1177 472 14.0589 457.941C0 443.882 0 421.255 0 376V335Z"/><path d="M337 304C337 273.83 337 258.745 346.373 249.373C355.745 240 370.83 240 401 240H460C505.255 240 527.882 240 541.941 254.059C556 268.118 556 290.745 556 336V377C556 422.255 556 444.882 541.941 458.941C527.882 473 505.255 473 460 473H401C370.83 473 355.745 473 346.373 463.627C337 454.255 337 439.17 337 409V304Z" fill-opacity="0.5"/><rect y="552.271" width="1024" height="233" rx="48" fill-opacity="0.5"/></svg>`,
-  },
-  word: {
-    label: t("options_syncType_word"),
-    tooltip: t("options_syncType_word_tooltip"),
-    icon: `<svg width="16" height="16" viewBox="0 0 1024 1024" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><rect x="636" y="239" width="389.981" height="233.271" rx="48" fill-opacity="0.5"/><path d="M0 335C0 289.745 0 267.118 14.0589 253.059C28.1177 239 50.7452 239 96 239H213C243.17 239 258.255 239 267.627 248.373C277 257.745 277 272.83 277 303V408C277 438.17 277 453.255 267.627 462.627C258.255 472 243.17 472 213 472H96C50.7452 472 28.1177 472 14.0589 457.941C0 443.882 0 421.255 0 376V335Z"/><path d="M337 304C337 273.83 337 258.745 346.373 249.373C355.745 240 370.83 240 401 240H460C505.255 240 527.882 240 541.941 254.059C556 268.118 556 290.745 556 336V377C556 422.255 556 444.882 541.941 458.941C527.882 473 505.255 473 460 473H401C370.83 473 355.745 473 346.373 463.627C337 454.255 337 439.17 337 409V304Z"/><rect y="552.271" width="1024" height="233" rx="48" fill-opacity="0.5"/></svg>`,
-  },
-  line: {
-    label: t("options_syncType_line"),
-    tooltip: t("options_syncType_line_tooltip"),
-    icon: `<svg width="16" height="16" viewBox="0 0 1024 1024" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><rect x="636" y="239" width="389.981" height="233.271" rx="48"/><path d="M0 335C0 289.745 0 267.118 14.0589 253.059C28.1177 239 50.7452 239 96 239H213C243.17 239 258.255 239 267.627 248.373C277 257.745 277 272.83 277 303V408C277 438.17 277 453.255 267.627 462.627C258.255 472 243.17 472 213 472H96C50.7452 472 28.1177 472 14.0589 457.941C0 443.882 0 421.255 0 376V335Z"/><path d="M337 304C337 273.83 337 258.745 346.373 249.373C355.745 240 370.83 240 401 240H460C505.255 240 527.882 240 541.941 254.059C556 268.118 556 290.745 556 336V377C556 422.255 556 444.882 541.941 458.941C527.882 473 505.255 473 460 473H401C370.83 473 355.745 473 346.373 463.627C337 454.255 337 439.17 337 409V304Z"/><rect y="552.271" width="1024" height="233" rx="48" fill-opacity="0.5"/></svg>`,
-  },
-  unsynced: {
-    label: t("options_syncType_unsynced"),
-    tooltip: t("options_syncType_unsynced_tooltip"),
-    icon: `<svg width="16" height="16" viewBox="0 0 1024 1024" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><rect x="636" y="239" width="389.981" height="233.271" rx="48" fill-opacity="0.5"/><path d="M0 335C0 289.745 0 267.118 14.0589 253.059C28.1177 239 50.7452 239 96 239H213C243.17 239 258.255 239 267.627 248.373C277 257.745 277 272.83 277 303V408C277 438.17 277 453.255 267.627 462.627C258.255 472 243.17 472 213 472H96C50.7452 472 28.1177 472 14.0589 457.941C0 443.882 0 421.255 0 376V335Z" fill-opacity="0.5"/><path d="M337 304C337 273.83 337 258.745 346.373 249.373C355.745 240 370.83 240 401 240H460C505.255 240 527.882 240 541.941 254.059C556 268.118 556 290.745 556 336V377C556 422.255 556 444.882 541.941 458.941C527.882 473 505.255 473 460 473H401C370.83 473 355.745 473 346.373 463.627C337 454.255 337 439.17 337 409V304Z" fill-opacity="0.5"/><rect y="552.271" width="1024" height="233" rx="48" fill-opacity="0.5"/></svg>`,
-  },
-});
-
 function createProviderElem(providerId: string, checked = true): HTMLLIElement | null {
   const providerIdToInfoMap = getProviderIdToInfoMap();
   if (!Object.hasOwn(providerIdToInfoMap, providerId)) {
@@ -573,10 +579,9 @@ function createProviderElem(providerId: string, checked = true): HTMLLIElement |
   }
 
   const providerInfo = providerIdToInfoMap[providerId];
-  const syncConfig = getSyncTypeConfig()[providerInfo.syncType];
 
   const liElem = document.createElement("li");
-  liElem.classList.add("sortable-item");
+  liElem.classList.add("ui-row", "sortable-item");
   liElem.id = "p-" + providerId;
 
   const handleElem = document.createElement("span");
@@ -586,16 +591,22 @@ function createProviderElem(providerId: string, checked = true): HTMLLIElement |
   const labelElem = document.createElement("label");
   labelElem.classList.add("checkbox-container");
 
+  const switchElem = document.createElement("span");
+  switchElem.className = "ui-switch ui-switch--compact";
+
   const checkboxElem = document.createElement("input");
-  checkboxElem.classList.add("provider-checkbox");
+  checkboxElem.className = "ui-switch__input provider-checkbox";
   checkboxElem.type = "checkbox";
+  checkboxElem.setAttribute("role", "switch");
   checkboxElem.checked = checked;
   checkboxElem.id = "p-" + providerId + "-checkbox";
-  labelElem.appendChild(checkboxElem);
 
-  const checkmarkElem = document.createElement("span");
-  checkmarkElem.classList.add("checkmark");
-  labelElem.appendChild(checkmarkElem);
+  const trackElem = document.createElement("span");
+  trackElem.className = "ui-switch__track";
+  trackElem.setAttribute("aria-hidden", "true");
+
+  switchElem.append(checkboxElem, trackElem);
+  labelElem.appendChild(switchElem);
 
   const textElem = document.createElement("span");
   textElem.classList.add("provider-name");
@@ -604,15 +615,7 @@ function createProviderElem(providerId: string, checked = true): HTMLLIElement |
 
   liElem.appendChild(labelElem);
 
-  const tagElem = document.createElement("span");
-  tagElem.classList.add("sync-tag", `sync-tag--${providerInfo.syncType}`);
-  tagElem.dataset.tooltip = syncConfig.tooltip;
-  const svgDoc = new DOMParser().parseFromString(syncConfig.icon, "image/svg+xml");
-  tagElem.appendChild(svgDoc.documentElement);
-  const tagLabel = document.createElement("span");
-  tagLabel.textContent = syncConfig.label;
-  tagElem.appendChild(tagLabel);
-  liElem.appendChild(tagElem);
+  liElem.appendChild(createSyncTag(providerInfo.syncType));
 
   const styleFromCheckState = () => {
     if (checkboxElem.checked) {
@@ -632,14 +635,32 @@ function createProviderElem(providerId: string, checked = true): HTMLLIElement |
   return liElem;
 }
 
+// -- Scroll fades --------------------------
+
+function initPopupScrollFades(): void {
+  const body = document.getElementById("options");
+  if (body) attachScrollFade(body);
+  attachDeclaredScrollFades();
+}
+
+// -- Fullscreen dependents --------------------------
+
+function syncFullscreenDependents(): void {
+  const master = document.getElementById("isFullScreenDisabled") as HTMLInputElement | null;
+  const dependents = document.querySelector("[data-fs-deps]");
+  const muted = master?.checked ?? false;
+  dependents?.toggleAttribute("data-muted", muted);
+  dependents?.toggleAttribute("inert", muted);
+}
+
 // -- Letter wave switch --------------------------
 
 const LETTER_WAVE_ORDER: LetterWavePref[] = ["off", "auto", "on"];
 
-const LETTER_WAVE_STATE_LABELS: Record<LetterWavePref, string> = {
-  off: "Off",
-  auto: "Auto",
-  on: "On",
+const LETTER_WAVE_STATE_KEYS: Record<LetterWavePref, string> = {
+  off: "options_display_letterWaveOff",
+  auto: "options_display_videoQualityAuto",
+  on: "options_display_letterWaveOn",
 };
 
 function getLetterWaveSwitchState(): LetterWavePref {
@@ -652,7 +673,7 @@ function setLetterWaveSwitchState(pref: LetterWavePref): void {
   if (!el) return;
   el.dataset.state = pref;
   el.setAttribute("aria-valuenow", String(LETTER_WAVE_ORDER.indexOf(pref)));
-  el.setAttribute("aria-valuetext", LETTER_WAVE_STATE_LABELS[pref]);
+  el.setAttribute("aria-valuetext", t(LETTER_WAVE_STATE_KEYS[pref]));
 }
 
 function initLetterWaveSwitch(): void {
@@ -682,153 +703,114 @@ function initLetterWaveSwitch(): void {
   });
 }
 
-// -- Display Language Dropdown --------------------------
+// -- Dropdown fields --------------------------
 
-function populateLanguageDropdown(): void {
-  const select = document.getElementById("uiLanguage") as HTMLSelectElement | undefined;
-  if (!select) return;
-
-  const browserLang = chrome.i18n.getUILanguage();
-  const autoOption = document.createElement("option");
-  autoOption.value = "auto";
-  autoOption.textContent = `${t("options_language_displayLanguageAuto")} (${browserLang})`;
-  select.appendChild(autoOption);
-
-  for (const locale of SUPPORTED_LOCALES) {
-    const option = document.createElement("option");
-    option.value = locale.code;
-    option.textContent = locale.nativeName;
-    select.appendChild(option);
-  }
-
-  select.addEventListener("change", () => {
+function mountDropdownFields(): void {
+  mountDropdownField("preferredVideoQuality", t("options_display_preferredVideoQuality"), videoQualityOptions());
+  mountDropdownField("translationLanguage", t("options_language_translationLanguage"), [...TRANSLATION_LANGUAGES]);
+  mountDropdownField("uiLanguage", t("options_language_displayLanguage"), [
+    { value: "auto", label: `${t("options_language_displayLanguageAuto")} (${chrome.i18n.getUILanguage()})` },
+    ...SUPPORTED_LOCALES.map(locale => ({ value: locale.code, label: locale.nativeName })),
+  ]);
+  document.getElementById("uiLanguage")?.addEventListener("change", () => {
     saveOptions();
-    location.hash = "language-content";
+    location.hash = "language-content/display-language";
     location.reload();
   });
-}
-
-function restoreActiveTab(): void {
-  if (!location.hash) return;
-
-  const target = `#${location.hash.slice(1)}`;
-  const targetBtn = document.querySelector(`.tab[data-target="${target}"]`);
-  const targetContent = document.querySelector(target);
-  if (!targetBtn || !targetContent) return;
-
-  document.querySelectorAll(".tab").forEach(btn => btn.classList.remove("active"));
-  document.querySelectorAll(".tab-content").forEach(content => content.classList.remove("active"));
-  targetBtn.classList.add("active");
-  targetContent.classList.add("active");
+  mountDropdownField("pipWindowLayout", t("options_display_pipWindowLayout"), [
+    { value: "horizontal", label: t("options_pipWindowLayout_horizontal") },
+    { value: "vertical", label: t("options_pipWindowLayout_vertical") },
+  ]);
+  mountDropdownField("pipArtworkTransition", t("options_display_pipArtworkTransition"), [
+    { value: "shuffle", label: t("options_pipTransition_shuffle") },
+    { value: "flip", label: t("options_pipTransition_flip") },
+    { value: "push", label: t("options_pipTransition_push") },
+    { value: "crossfade", label: t("options_pipTransition_crossfade") },
+  ]);
+  mountDropdownField("pipTextTransition", t("options_display_pipTextTransition"), [
+    { value: "spring", label: t("options_pipTransition_spring") },
+    { value: "push", label: t("options_pipTransition_push") },
+    { value: "crossfade", label: t("options_pipTransition_crossfade") },
+  ]);
 }
 
 // Event listeners
-document.addEventListener("DOMContentLoaded", async () => {
+const localeReady = new Promise<void>(resolve => {
+  document.addEventListener("DOMContentLoaded", () => resolve(), { once: true });
+}).then(async () => {
   await loadLocaleOverride();
   initI18n();
-  populateLanguageDropdown();
-  initTabScrollIndicators();
-  initSettingHelpTooltips();
+});
+
+document.addEventListener("DOMContentLoaded", async () => {
+  await localeReady;
+  renderAppVersion(document.getElementById("app-version"));
+  fitPopupToWindow();
+  renderAboutLinks(document);
+  document.getElementById("jump-whats-new")?.setAttribute("href", `${GITHUB_REPO_URL}/releases/latest`);
+  mountIcons(document);
+  initRefreshLyricsButton(() => toast.error(t("options_alert_refreshFailed")));
+  mountDropdownFields();
+  initTooltips(document.body);
   initLetterWaveSwitch();
+  document.getElementById("isFullScreenDisabled")?.addEventListener("change", syncFullscreenDependents);
   restoreOptions();
-  restoreActiveTab();
+  initPopupCards();
+  initPopupScrollFades();
+  initPopupTabs(page => pageCard(page)?.place(true));
+  initAboutToggle(page => pageCard(page)?.place(true));
   checkForStableRelease();
 });
-document.querySelectorAll("#options input, #options select").forEach(element => {
-  element.addEventListener("change", () => {
-    syncVideoQualityControls(document);
-    saveOptions();
-  });
+
+document.getElementById("options")?.addEventListener("change", event => {
+  const target = event.target as HTMLElement;
+  if (!target.matches("input, select") || target.closest("[data-no-autosave]")) return;
+  syncVideoQualityControls(document);
+  saveOptions();
 });
 
-// Tab switcher
-const tabButtons = document.querySelectorAll(".tab");
-const tabContents = document.querySelectorAll(".tab-content");
+// -- Drag sorting --------------------------
 
-tabButtons.forEach(button => {
-  button.addEventListener("click", () => {
-    tabButtons.forEach(btn => btn.classList.remove("active"));
-    tabContents.forEach(content => content.classList.remove("active"));
-
-    button.classList.add("active");
-    const target = button.getAttribute("data-target")!;
-    document.querySelector(target)!.classList.add("active");
-    history.replaceState(null, "", target);
+function sortableWhenVisible(list: HTMLElement, options: Sortable.Options): void {
+  const observer = new IntersectionObserver(entries => {
+    if (!entries.some(entry => entry.isIntersecting)) return;
+    observer.disconnect();
+    import("sortablejs")
+      .then(({ default: SortableList }) => new SortableList(list, options))
+      .catch(err => errorCore("Failed to load drag sorting:", err));
   });
-});
-
-// -- Tab scroll fade indicators --------------------------
-
-function initTabScrollIndicators(): void {
-  const container = document.querySelector(".tab-container") as HTMLElement;
-  if (!container) return;
-
-  const wrapper = document.createElement("div");
-  wrapper.className = "tab-scroll-wrapper";
-  container.parentNode!.insertBefore(wrapper, container);
-  wrapper.appendChild(container);
-
-  function update(): void {
-    const { scrollLeft, scrollWidth, clientWidth } = container;
-    const overflow = scrollWidth - clientWidth;
-
-    if (overflow <= 2) {
-      delete container.dataset.scrollLeft;
-      delete container.dataset.scrollRight;
-      return;
-    }
-
-    if (scrollLeft > 2) {
-      container.dataset.scrollLeft = "";
-    } else {
-      delete container.dataset.scrollLeft;
-    }
-
-    if (scrollLeft < overflow - 2) {
-      container.dataset.scrollRight = "";
-    } else {
-      delete container.dataset.scrollRight;
-    }
-  }
-
-  container.addEventListener("scroll", update);
-  update();
+  observer.observe(list);
 }
 
-// -- Setting help tooltips --------------------------
+// -- CSS editor --------------------------
 
-const TOOLTIP_GAP = 8;
+function setupLazyCodeEditor(initialContentReady: Promise<void>): void {
+  document.getElementById("back-btn")?.addEventListener("click", openOptions);
+  const button = document.getElementById("edit-css-btn");
+  if (!button) return;
+  let isRequested = false;
 
-// A modal body counts as a boundary even though it does not clip: a tooltip that runs past its top
-// covers the modal title, which is the thing the tooltip is explaining.
-function getBoundaryTop(element: HTMLElement): number {
-  for (let ancestor = element.parentElement; ancestor; ancestor = ancestor.parentElement) {
-    const clips = !getComputedStyle(ancestor)
-      .overflow.split(" ")
-      .every(axis => axis === "visible");
-
-    if (clips || ancestor.classList.contains("modal-body")) {
-      return ancestor.getBoundingClientRect().top;
+  button.addEventListener("click", async () => {
+    openEditCSS();
+    if (isRequested) return;
+    isRequested = true;
+    button.setAttribute("aria-busy", "true");
+    try {
+      const [{ mountCodeEditor }] = await Promise.all([import("@/options/editor/codeEditor"), initialContentReady]);
+      mountCodeEditor();
+    } catch (err) {
+      isRequested = false;
+      errorCore("Failed to load the CSS editor:", err);
+      openOptions();
+      toast.error(t("unison_rev_error"));
+    } finally {
+      button.removeAttribute("aria-busy");
     }
-  }
-  return 0;
-}
-
-function initSettingHelpTooltips(): void {
-  for (const help of document.querySelectorAll<HTMLElement>(".setting-help")) {
-    const place = (): void => {
-      const height = parseFloat(getComputedStyle(help, "::after").height) || 0;
-      const spaceAbove = help.getBoundingClientRect().top - getBoundaryTop(help);
-      help.dataset.tooltipPlacement = spaceAbove >= height + TOOLTIP_GAP ? "top" : "bottom";
-    };
-
-    help.addEventListener("pointerenter", place);
-    help.addEventListener("focus", place);
-  }
+  });
 }
 
 document.addEventListener("DOMContentLoaded", () => {
-  new Sortable(document.getElementById("providers-list")!, {
+  sortableWhenVisible(document.getElementById("providers-list")!, {
     animation: 150,
     ghostClass: "dragging",
     forceFallback: true,
@@ -839,6 +821,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
   initStoreUI();
   setupYourThemesButton();
+  const themesReady = localeReady.then(initializeThemes).catch(err => errorCore("Failed to initialize themes:", err));
+  setupLazyCodeEditor(themesReady);
   initLangExclusionsModal();
 
   document.getElementById("browse-themes-btn")?.addEventListener("click", () => {
@@ -907,8 +891,9 @@ function initThemeSettings() {
 
   themeSettingsModalClose?.addEventListener("click", () => closeThemeSettings());
 
-  themeSettingsApplyBtn?.addEventListener("click", async () =>
-    await saveCustomCss(undefined, { ...(await loadThemeSettings()), saved: changedFields })
+  themeSettingsApplyBtn?.addEventListener(
+    "click",
+    async () => await saveCustomCss(undefined, { ...(await loadThemeSettings()), saved: changedFields })
   );
 
   themeSettingsOkBtn?.addEventListener("click", async () => {
@@ -1158,8 +1143,20 @@ async function initIdentityUI(): Promise<void> {
   const displayNameEl = document.getElementById("identity-display-name");
   if (!displayNameEl) return;
 
+  const warnSlot = document.getElementById("identity-warn-slot");
+  if (warnSlot) warnSlot.style.transition = "none";
+  await syncBackupWarning();
+  requestAnimationFrame(() => warnSlot?.style.removeProperty("transition"));
+  onBackupFlagChanged(() => void syncBackupWarning());
+
   try {
-    displayNameEl.textContent = await getDisplayName();
+    const lastKnown = await getLastKnownDisplayName();
+    displayNameEl.textContent = lastKnown;
+    getDisplayName()
+      .then(current => {
+        if (displayNameEl.textContent === lastKnown) displayNameEl.textContent = current;
+      })
+      .catch(error => errorCore("Failed to resolve the display name:", error));
   } catch (error) {
     errorCore("Failed to load identity:", error);
     displayNameEl.textContent = t("options_alert_identityLoadError");
@@ -1235,54 +1232,38 @@ interface NicknameMutationResponse {
   };
 }
 
+let nicknameModal: Modal | undefined;
+
 function getNicknameModalElements() {
   const overlay = document.getElementById("nickname-modal-overlay");
-  const closeBtn = document.getElementById("nickname-modal-close");
-  const cancelBtn = document.getElementById("nickname-modal-cancel");
   const saveBtn = document.getElementById("nickname-modal-save") as HTMLButtonElement | null;
   const resetBtn = document.getElementById("nickname-modal-reset") as HTMLButtonElement | null;
   const input = document.getElementById("nickname-modal-input") as HTMLInputElement | null;
   const status = document.getElementById("nickname-modal-status");
-  return { overlay, closeBtn, cancelBtn, saveBtn, resetBtn, input, status };
+  return { overlay, saveBtn, resetBtn, input, status };
 }
 
 function openNicknameModal(): void {
-  const { overlay, input, saveBtn } = getNicknameModalElements();
-  if (!overlay || !input || !saveBtn) return;
+  const { input, saveBtn } = getNicknameModalElements();
+  if (!nicknameModal || !input || !saveBtn) return;
   const display = document.getElementById("identity-display-name");
   input.value = display?.textContent ?? "";
   saveBtn.disabled = true;
-  overlay.classList.add("active");
-  setTimeout(() => {
-    input.focus();
-    input.select();
-  }, 100);
+  nicknameModal.open();
+  input.select();
 }
 
 function closeNicknameModal(): void {
-  const { overlay } = getNicknameModalElements();
-  overlay?.classList.remove("active");
+  nicknameModal?.close();
 }
 
 function initNicknameModal(): void {
-  const { overlay, closeBtn, cancelBtn, saveBtn, resetBtn, input, status } = getNicknameModalElements();
-  if (!overlay || !closeBtn || !cancelBtn || !saveBtn || !resetBtn || !input || !status) return;
+  const { overlay, saveBtn, resetBtn, input, status } = getNicknameModalElements();
+  if (!overlay || !saveBtn || !resetBtn || !input || !status) return;
+  nicknameModal = createModal(overlay);
 
   const editBtn = document.getElementById("nickname-edit-btn");
   editBtn?.addEventListener("click", openNicknameModal);
-
-  closeBtn.addEventListener("click", closeNicknameModal);
-  cancelBtn.addEventListener("click", closeNicknameModal);
-
-  overlay.addEventListener("click", e => {
-    if (e.target === overlay) closeNicknameModal();
-  });
-
-  document.addEventListener("keydown", e => {
-    if (e.key === "Escape" && overlay.classList.contains("active")) {
-      closeNicknameModal();
-    }
-  });
 
   let checkSeq = 0;
   let debounceTimer: ReturnType<typeof setTimeout> | null = null;
@@ -1446,7 +1427,7 @@ function initNicknameModal(): void {
         invalidateDisplayName(responseDisplayName);
         resolvedDisplayName = responseDisplayName;
       } else {
-        invalidateDisplayName();
+        await forgetDisplayName();
         resolvedDisplayName = await getDisplayName();
       }
       applyDisplayName(resolvedDisplayName);
@@ -1465,68 +1446,56 @@ function initNicknameModal(): void {
 
 async function handleExportIdentity(): Promise<void> {
   try {
-    const displayName = await getDisplayName();
-    const exportData = await exportIdentity();
-    const filename = `better-lyrics-identity-${displayName}.json`;
-
-    chrome.permissions.contains({ permissions: ["downloads"] }, hasPermission => {
-      if (hasPermission) {
-        downloadIdentityFile(exportData, filename);
-      } else {
-        chrome.permissions.request({ permissions: ["downloads"] }, granted => {
-          if (granted) {
-            downloadIdentityFile(exportData, filename);
-          } else {
-            fallbackDownloadIdentity(exportData, filename);
-          }
-        });
-      }
-    });
+    const [displayName, exportData, { keyId }] = await Promise.all([getDisplayName(), exportIdentity(), getIdentity()]);
+    const outcome = await downloadIdentityFile(exportData, `better-lyrics-identity-${displayName}.json`);
+    notifyDownloadOutcome(outcome);
+    if (outcome.kind === "downloads") await rememberPendingBackup(outcome.downloadId, keyId);
   } catch (error) {
     errorCore("Failed to export identity:", error);
-    showAlert(t("options_alert_exportFailed"));
+    toast.error(t("options_alert_exportFailed"));
   }
 }
 
-function downloadIdentityFile(content: string, filename: string): void {
-  const blob = new Blob([content], { type: "application/json" });
-  const url = URL.createObjectURL(blob);
+type DownloadOutcome = { kind: "downloads"; downloadId: number } | { kind: "anchor" } | { kind: "failed" };
 
-  if (chrome.downloads) {
-    chrome.downloads
-      .download({
-        url: url,
-        filename: filename,
-        saveAs: true,
-      })
-      .then(() => {
-        showAlert(t("options_alert_fileSaveDialogOpened"));
-        URL.revokeObjectURL(url);
-      })
-      .catch(() => {
-        showAlert(t("options_alert_fileSaveFailed"));
-        URL.revokeObjectURL(url);
-      });
-  } else {
-    fallbackDownloadIdentity(content, filename);
+async function downloadIdentityFile(content: string, filename: string): Promise<DownloadOutcome> {
+  const hasPermission = await chrome.permissions.contains({ permissions: ["downloads"] });
+  const granted = hasPermission || (await chrome.permissions.request({ permissions: ["downloads"] }));
+  const url = URL.createObjectURL(new Blob([content], { type: "application/json" }));
+  if (granted && chrome.downloads) {
+    try {
+      const downloadId = await chrome.downloads.download({ url, filename, saveAs: true });
+      return { kind: "downloads", downloadId };
+    } catch (error) {
+      errorCore("Identity download failed:", error);
+      return { kind: "failed" };
+    } finally {
+      URL.revokeObjectURL(url);
+    }
   }
-}
-
-function fallbackDownloadIdentity(content: string, filename: string): void {
-  const blob = new Blob([content], { type: "application/json" });
-  const url = URL.createObjectURL(blob);
-
-  const a = document.createElement("a");
-  a.href = url;
-  a.download = filename;
-
-  document.body.appendChild(a);
-  a.click();
-  document.body.removeChild(a);
-
+  const anchor = document.createElement("a");
+  anchor.href = url;
+  anchor.download = filename;
+  document.body.appendChild(anchor);
+  anchor.click();
+  anchor.remove();
   setTimeout(() => URL.revokeObjectURL(url), 100);
+  return { kind: "anchor" };
+}
 
-  showAlert(t("options_alert_downloadInitiated"));
+function notifyDownloadOutcome(outcome: DownloadOutcome): void {
+  if (outcome.kind === "downloads") toast.info(t("options_alert_fileSaveDialogOpened"));
+  else if (outcome.kind === "anchor") toast.success(t("options_alert_downloadInitiated"));
+  else toast.error(t("options_alert_fileSaveFailed"));
+}
+
+async function syncBackupWarning(): Promise<void> {
+  const slot = document.getElementById("identity-warn-slot");
+  if (!slot) return;
+  const [{ keyId }, stored] = await Promise.all([getIdentity(), readBackedUpKeyId()]);
+  const backedUp = isIdentityBackedUp(stored, keyId);
+  slot.toggleAttribute("data-backed-up", backedUp);
+  slot.toggleAttribute("inert", backedUp);
 }
 
 async function handleImportIdentity(): Promise<void> {
@@ -1535,38 +1504,37 @@ async function handleImportIdentity(): Promise<void> {
 
 // -- Import Identity Modal --------------------------
 
+let importIdentityModal: Modal | undefined;
+
 function getImportIdentityModalElements() {
   const overlay = document.getElementById("import-identity-modal-overlay");
-  const closeBtn = document.getElementById("import-identity-modal-close");
   const fileBtn = document.getElementById("import-identity-file-btn");
-  const cancelBtn = document.getElementById("import-identity-cancel");
   const confirmBtn = document.getElementById("import-identity-confirm");
   const textarea = document.getElementById("import-identity-textarea") as HTMLTextAreaElement | null;
-  return { overlay, closeBtn, fileBtn, cancelBtn, confirmBtn, textarea };
+  return { overlay, fileBtn, confirmBtn, textarea };
 }
 
 function openImportIdentityModal(): void {
-  const { overlay, textarea } = getImportIdentityModalElements();
-  if (!overlay || !textarea) return;
+  const { textarea } = getImportIdentityModalElements();
+  if (!importIdentityModal || !textarea) return;
   textarea.value = "";
-  overlay.classList.add("active");
-  setTimeout(() => textarea.focus(), 100);
+  importIdentityModal.open();
 }
 
 function closeImportIdentityModal(): void {
-  const { overlay } = getImportIdentityModalElements();
-  overlay?.classList.remove("active");
+  importIdentityModal?.close();
 }
 
 async function importIdentityFromJson(json: string): Promise<void> {
   try {
-    await importIdentity(json);
-    await updateIdentityDisplay();
-    showAlert(t("options_alert_importSuccess"));
+    const imported = await importIdentity(json);
+    await markIdentityBackedUp(imported.keyId);
+    await Promise.all([updateIdentityDisplay(), syncBackupWarning()]);
+    toast.success(t("options_alert_importSuccess"));
     closeImportIdentityModal();
   } catch (err) {
     const message = err instanceof Error ? err.message : "Invalid identity file";
-    showAlert(message);
+    toast.error(message);
   }
 }
 
@@ -1598,28 +1566,16 @@ function triggerIdentityFilePicker(): void {
 }
 
 function initImportIdentityModal(): void {
-  const { overlay, closeBtn, fileBtn, cancelBtn, confirmBtn, textarea } = getImportIdentityModalElements();
-  if (!overlay || !closeBtn || !fileBtn || !cancelBtn || !confirmBtn || !textarea) return;
-
-  closeBtn.addEventListener("click", closeImportIdentityModal);
-  cancelBtn.addEventListener("click", closeImportIdentityModal);
-
-  overlay.addEventListener("click", e => {
-    if (e.target === overlay) closeImportIdentityModal();
-  });
-
-  document.addEventListener("keydown", e => {
-    if (e.key === "Escape" && overlay.classList.contains("active")) {
-      closeImportIdentityModal();
-    }
-  });
+  const { overlay, fileBtn, confirmBtn, textarea } = getImportIdentityModalElements();
+  if (!overlay || !fileBtn || !confirmBtn || !textarea) return;
+  importIdentityModal = createModal(overlay);
 
   fileBtn.addEventListener("click", triggerIdentityFilePicker);
 
   confirmBtn.addEventListener("click", async () => {
     const json = textarea.value.trim();
     if (!json) {
-      showAlert(t("options_alert_importEmpty"));
+      toast.error(t("options_alert_importEmpty"));
       return;
     }
     await importIdentityFromJson(json);
@@ -1645,7 +1601,7 @@ function initImportIdentityModal(): void {
       textarea.value = await file.text();
     } catch (err) {
       const message = err instanceof Error ? err.message : "Failed to read file";
-      showAlert(message);
+      toast.error(message);
     }
   });
 }
@@ -1671,6 +1627,17 @@ async function renderOwnIdentityStats(): Promise<void> {
   if (render !== identityStatsRender) return;
   statsEl.replaceChildren(...next.childNodes);
   statsWrap.hidden = !user;
+  syncIdentityStatsTab(Boolean(user));
+}
+
+function syncIdentityStatsTab(hasStats: boolean): void {
+  const tab = document.getElementById("identity-stats-tab");
+  const page = document.getElementById("identity-content");
+  if (!tab || !page) return;
+  tab.hidden = !hasStats;
+  const card = pageCard(page);
+  if (!hasStats && tab.getAttribute("aria-selected") === "true") card?.select("identity", { instant: true });
+  card?.place(true);
 }
 
 function watchPictureChanges(): void {
@@ -1693,63 +1660,50 @@ let translationDisabledLanguages: string[] = [];
 let activeExclusionTab: "romanization" | "translation" = "romanization";
 
 function updateExclusionsConfigVisibility(): void {
-  const romanizationToggle = document.getElementById("isRomanizationEnabled") as HTMLInputElement;
-  const translateToggle = document.getElementById("translate") as HTMLInputElement;
-  const configContainer = document.getElementById("romanization-config-container");
-  if (!configContainer) return;
-
-  const shouldShow = romanizationToggle?.checked || translateToggle?.checked;
-  configContainer.style.display = shouldShow ? "flex" : "none";
+  const romanization = (document.getElementById("isRomanizationEnabled") as HTMLInputElement | null)?.checked;
+  const translate = (document.getElementById("translate") as HTMLInputElement | null)?.checked;
+  const romanizationRow = document.getElementById("romanization-exclusions-btn");
+  const translationRow = document.getElementById("translation-exclusions-btn");
+  if (romanizationRow) romanizationRow.hidden = !romanization;
+  if (translationRow) translationRow.hidden = !translate;
 }
 
 function initLangExclusionsModal(): void {
   const romanizationToggle = document.getElementById("isRomanizationEnabled") as HTMLInputElement;
   const translateToggle = document.getElementById("translate") as HTMLInputElement;
-  const configBtn = document.getElementById("romanization-config-btn");
   const modalOverlay = document.getElementById("lang-exclusions-modal-overlay");
-  const modalClose = document.getElementById("lang-exclusions-modal-close");
   const romanizationSearchInput = document.getElementById("romanization-search") as HTMLInputElement;
   const translationSearchInput = document.getElementById("translation-search") as HTMLInputElement;
   const resetBtn = document.getElementById("lang-exclusions-reset-btn");
-  const tabButtons = modalOverlay?.querySelectorAll(".modal-tab");
 
-  if (!configBtn || !modalOverlay) return;
+  if (!modalOverlay) return;
+  langExclusionsModal = createModal(modalOverlay, {
+    onClose: clearExclusionSearch,
+    initialFocus: () => (activeExclusionTab === "romanization" ? romanizationSearchInput : translationSearchInput),
+  });
 
   romanizationToggle?.addEventListener("change", updateExclusionsConfigVisibility);
   translateToggle?.addEventListener("change", updateExclusionsConfigVisibility);
 
-  configBtn.addEventListener("click", () => {
-    modalOverlay.classList.add("active");
-    const tabName = t(activeExclusionTab === "romanization" ? "options_romanization_tab" : "options_translation_tab");
-    if (resetBtn) resetBtn.textContent = t("options_resetToDefault", tabName);
-    if (activeExclusionTab === "romanization") {
-      romanizationSearchInput?.focus();
-    } else {
-      translationSearchInput?.focus();
-    }
-  });
+  const openExclusions = (tab: "romanization" | "translation"): void => {
+    switchExclusionTab(tab);
+    langExclusionsModal?.open();
+  };
+  document
+    .getElementById("romanization-exclusions-btn")
+    ?.addEventListener("click", () => openExclusions("romanization"));
+  document.getElementById("translation-exclusions-btn")?.addEventListener("click", () => openExclusions("translation"));
 
-  modalClose?.addEventListener("click", closeLangExclusionsModal);
-
-  modalOverlay.addEventListener("click", e => {
-    if (e.target === modalOverlay) {
-      closeLangExclusionsModal();
-    }
-  });
-
-  document.addEventListener("keydown", e => {
-    if (e.key === "Escape" && modalOverlay.classList.contains("active")) {
-      closeLangExclusionsModal();
-    }
-  });
-
-  // Tab switching
-  tabButtons?.forEach(btn => {
-    btn.addEventListener("click", () => {
-      const tab = (btn as HTMLElement).dataset.tab as "romanization" | "translation";
-      switchExclusionTab(tab);
+  const tablist = document.getElementById("lang-exclusions-tablist");
+  if (tablist) {
+    exclusionTabs = initTabStrip(tablist, {
+      onChange: tab => switchExclusionTab(tab.dataset.tab === "translation" ? "translation" : "romanization"),
     });
-  });
+    tablist.addEventListener("click", event => {
+      if (event.detail === 0 || !(event.target as Element).closest(".ui-segmented__tab")) return;
+      (document.getElementById(`${activeExclusionTab}-search`) as HTMLInputElement | null)?.focus();
+    });
+  }
 
   romanizationSearchInput?.addEventListener("input", () => {
     filterLanguagePills("romanization-pills-container", romanizationSearchInput.value);
@@ -1779,43 +1733,37 @@ function initLangExclusionsModal(): void {
     }
     saveOptions();
     closeLangExclusionsModal();
-    showAlert(t("options_romanization_resetSuccess", tabName));
+    toast.success(t("options_romanization_resetSuccess", tabName));
   });
 }
+
+let exclusionTabs: TabStrip | undefined;
 
 function switchExclusionTab(tab: "romanization" | "translation"): void {
   activeExclusionTab = tab;
 
-  const tabButtons = document.querySelectorAll("#lang-exclusions-modal-overlay .modal-tab");
-  const tabContents = document.querySelectorAll(".lang-exclusions-tab-content");
+  const button = exclusionTabs?.tabs.find(candidate => candidate.dataset.tab === tab);
+  if (exclusionTabs && button && exclusionTabs.selected() !== button) exclusionTabs.select(button, { notify: false });
+  for (const content of document.querySelectorAll(".lang-exclusions-tab-content")) {
+    content.classList.toggle("is-active", content.id === `${tab}-tab-content`);
+  }
+
   const resetBtn = document.getElementById("lang-exclusions-reset-btn");
-
-  tabButtons.forEach(btn => {
-    const btnTab = (btn as HTMLElement).dataset.tab;
-    btn.classList.toggle("active", btnTab === tab);
-  });
-
-  tabContents.forEach(content => {
-    const contentId = content.id;
-    content.classList.toggle("active", contentId === `${tab}-tab-content`);
-  });
-
   if (resetBtn) {
     const tabName = t(tab === "romanization" ? "options_romanization_tab" : "options_translation_tab");
     resetBtn.textContent = t("options_resetToDefault", tabName);
   }
-
-  // Focus the search input of the active tab
-  const searchInput = document.getElementById(`${tab}-search`) as HTMLInputElement;
-  searchInput?.focus();
 }
 
+let langExclusionsModal: Modal | undefined;
+
 function closeLangExclusionsModal(): void {
-  const modalOverlay = document.getElementById("lang-exclusions-modal-overlay");
+  langExclusionsModal?.close();
+}
+
+function clearExclusionSearch(): void {
   const romanizationSearchInput = document.getElementById("romanization-search") as HTMLInputElement;
   const translationSearchInput = document.getElementById("translation-search") as HTMLInputElement;
-
-  modalOverlay?.classList.remove("active");
 
   if (romanizationSearchInput) {
     romanizationSearchInput.value = "";
@@ -1827,76 +1775,50 @@ function closeLangExclusionsModal(): void {
   }
 }
 
-let romanizationPillsDelegated = false;
+function createLanguageChip(langCode: string, included: boolean): HTMLLabelElement {
+  const langName = getLanguageDisplayName(langCode);
+  const chip = document.createElement("label");
+  chip.className = "ui-chip";
+  chip.dataset.langCode = langCode;
+  chip.dataset.langName = langName.toLowerCase();
+  const input = document.createElement("input");
+  input.type = "checkbox";
+  input.checked = included;
+  const label = document.createElement("span");
+  label.textContent = langName;
+  chip.append(input, label);
+  return chip;
+}
+
+function bindLanguageChips(container: HTMLElement, toggle: (langCode: string) => void): void {
+  if (container.dataset.bound) return;
+  container.dataset.bound = "true";
+  container.addEventListener("change", event => {
+    const code = (event.target as HTMLElement).closest<HTMLElement>("[data-lang-code]")?.dataset.langCode;
+    if (code) toggle(code);
+  });
+}
 
 function renderRomanizationLanguagePills(): void {
   const container = document.getElementById("romanization-pills-container");
   if (!container) return;
-
-  if (!romanizationPillsDelegated) {
-    container.addEventListener("click", e => {
-      const pill = (e.target as HTMLElement).closest("[data-lang-code]") as HTMLElement | null;
-      if (pill?.dataset.langCode) {
-        toggleRomanizationLanguage(pill.dataset.langCode);
-      }
-    });
-    romanizationPillsDelegated = true;
-  }
-
-  container.replaceChildren();
-
-  for (const langCode of Object.keys(ROMANIZATION_LANGUAGES)) {
-    const langName = getLanguageDisplayName(langCode);
-    const isDisabled = romanizationDisabledLanguages.includes(langCode);
-
-    const pill = document.createElement("div");
-    pill.className = `lang-pill${isDisabled ? " disabled" : ""}`;
-    pill.dataset.langCode = langCode;
-    pill.dataset.langName = langName.toLowerCase();
-    pill.textContent = langName;
-
-    container.appendChild(pill);
-  }
+  bindLanguageChips(container, toggleRomanizationLanguage);
+  container.replaceChildren(
+    ...Object.keys(ROMANIZATION_LANGUAGES).map(code =>
+      createLanguageChip(code, !romanizationDisabledLanguages.includes(code))
+    )
+  );
 }
-
-function getTranslationLanguagesFromSelect(): string[] {
-  const select = document.getElementById("translationLanguage") as HTMLSelectElement;
-  if (!select) return [];
-  return Array.from(select.options)
-    .map(opt => opt.value)
-    .filter(Boolean);
-}
-
-let translationPillsDelegated = false;
 
 function renderTranslationLanguagePills(): void {
   const container = document.getElementById("translation-pills-container");
   if (!container) return;
-
-  if (!translationPillsDelegated) {
-    container.addEventListener("click", e => {
-      const pill = (e.target as HTMLElement).closest("[data-lang-code]") as HTMLElement | null;
-      if (pill?.dataset.langCode) {
-        toggleTranslationLanguage(pill.dataset.langCode);
-      }
-    });
-    translationPillsDelegated = true;
-  }
-
-  container.replaceChildren();
-
-  for (const langCode of getTranslationLanguagesFromSelect()) {
-    const langName = getLanguageDisplayName(langCode);
-    const isDisabled = translationDisabledLanguages.includes(langCode);
-
-    const pill = document.createElement("div");
-    pill.className = `lang-pill${isDisabled ? " disabled" : ""}`;
-    pill.dataset.langCode = langCode;
-    pill.dataset.langName = langName.toLowerCase();
-    pill.textContent = langName;
-
-    container.appendChild(pill);
-  }
+  bindLanguageChips(container, toggleTranslationLanguage);
+  container.replaceChildren(
+    ...TRANSLATION_LANGUAGES.map(({ value }) =>
+      createLanguageChip(value, !translationDisabledLanguages.includes(value))
+    )
+  );
 }
 
 function toggleRomanizationLanguage(langCode: string): void {
@@ -1907,7 +1829,6 @@ function toggleRomanizationLanguage(langCode: string): void {
     romanizationDisabledLanguages.splice(index, 1);
   }
   saveOptions();
-  renderRomanizationLanguagePills();
 }
 
 function toggleTranslationLanguage(langCode: string): void {
@@ -1918,7 +1839,6 @@ function toggleTranslationLanguage(langCode: string): void {
     translationDisabledLanguages.splice(index, 1);
   }
   saveOptions();
-  renderTranslationLanguagePills();
 }
 
 function filterLanguagePills(containerId: string, query: string): void {
@@ -1926,32 +1846,47 @@ function filterLanguagePills(containerId: string, query: string): void {
   if (!container) return;
 
   const normalizedQuery = query.toLowerCase().trim();
-  const pills = container.querySelectorAll(".lang-pill");
-
-  pills.forEach(pill => {
-    const langName = (pill as HTMLElement).dataset.langName || "";
-    const langCode = (pill as HTMLElement).dataset.langCode || "";
-    const matches = langName.includes(normalizedQuery) || langCode.includes(normalizedQuery);
-    pill.classList.toggle("lang-pill-hidden", !matches);
-  });
+  for (const chip of container.querySelectorAll<HTMLElement>("[data-lang-code]")) {
+    const langName = chip.dataset.langName || "";
+    const langCode = chip.dataset.langCode || "";
+    chip.hidden = !(langName.includes(normalizedQuery) || langCode.includes(normalizedQuery));
+  }
 }
 
 function setUnisonPositionInForm(position: string): void {
   const frame = document.getElementById("unison-position-frame");
   if (!frame) return;
   frame.querySelectorAll<HTMLElement>(".position-cell").forEach(cell => {
-    if (cell.dataset.pos === position) {
-      cell.dataset.selected = "true";
-    } else {
-      delete cell.dataset.selected;
-    }
+    const selected = cell.dataset.pos === position;
+    if (selected) cell.dataset.selected = "true";
+    else delete cell.dataset.selected;
+    cell.setAttribute("aria-checked", String(selected));
+    cell.tabIndex = selected ? 0 : -1;
   });
+}
+
+const POSITION_GRID_COLUMNS = 3;
+const POSITION_KEY_STEPS: Record<string, number> = {
+  ArrowLeft: -1,
+  ArrowRight: 1,
+  ArrowUp: -POSITION_GRID_COLUMNS,
+  ArrowDown: POSITION_GRID_COLUMNS,
+};
+
+function choosePosition(cell: HTMLElement, focus: boolean): void {
+  if (!cell.dataset.pos) return;
+  setUnisonPositionInForm(cell.dataset.pos);
+  if (focus) cell.focus();
+  saveOptions();
 }
 
 function syncUnisonModalDependentState(enabled: boolean): void {
   const body = document.getElementById("unison-actions-modal-body");
   if (!body) return;
   body.dataset.pinnedDisabled = enabled ? "false" : "true";
+  for (const row of body.querySelectorAll<HTMLElement>(".unison-modal-row--dependent")) {
+    row.inert = !enabled;
+  }
 }
 
 function resetDockSettings(): void {
@@ -1972,31 +1907,33 @@ function resetDockSettings(): void {
 function setupUnisonActionsModal(): void {
   const openBtn = document.getElementById("unison-actions-btn");
   const overlay = document.getElementById("unison-actions-modal-overlay");
-  const closeBtn = document.getElementById("unison-actions-modal-close");
   const frame = document.getElementById("unison-position-frame");
   const pinnedToggle = document.getElementById("isUnisonPinnedDockEnabled") as HTMLInputElement | null;
   const autoHideToggle = document.getElementById("isUnisonAutoHideInFullscreenEnabled") as HTMLInputElement | null;
 
-  if (!openBtn || !overlay || !closeBtn || !frame || !pinnedToggle || !autoHideToggle) return;
+  if (!openBtn || !overlay || !frame || !pinnedToggle || !autoHideToggle) return;
 
-  const closeModal = (): void => overlay.classList.remove("active");
-
-  openBtn.addEventListener("click", () => overlay.classList.add("active"));
-  closeBtn.addEventListener("click", closeModal);
-
-  overlay.addEventListener("click", e => {
-    if (e.target === overlay) closeModal();
-  });
-
-  document.addEventListener("keydown", e => {
-    if (e.key === "Escape" && overlay.classList.contains("active")) closeModal();
-  });
+  const modal = createModal(overlay);
+  openBtn.addEventListener("click", () => modal.open());
 
   frame.addEventListener("click", e => {
     const cell = (e.target as HTMLElement).closest<HTMLElement>(".position-cell");
-    if (!cell?.dataset.pos) return;
-    setUnisonPositionInForm(cell.dataset.pos);
-    saveOptions();
+    if (cell) choosePosition(cell, false);
+  });
+  frame.addEventListener("keydown", e => {
+    if (frame.closest<HTMLElement>("[inert]")) return;
+    const cells = Array.from(frame.querySelectorAll<HTMLElement>(".position-cell"));
+    const current = cells.indexOf(document.activeElement as HTMLElement);
+    if (current < 0) return;
+    if (e.key === " " || e.key === "Enter") {
+      e.preventDefault();
+      choosePosition(cells[current], true);
+      return;
+    }
+    const step = POSITION_KEY_STEPS[e.key];
+    if (!step) return;
+    e.preventDefault();
+    choosePosition(cells[(current + step + cells.length) % cells.length], true);
   });
 
   pinnedToggle.addEventListener("change", () => {
@@ -2021,7 +1958,7 @@ function setupUnisonActionsModal(): void {
 
   const picker = document.querySelector<HTMLElement>(".controls-shown-picker");
   if (picker) {
-    new Sortable(picker, {
+    sortableWhenVisible(picker, {
       animation: 150,
       ghostClass: "dragging",
       forceFallback: true,
@@ -2047,18 +1984,10 @@ function setOffsetDisplay(id: string, value: number): void {
 function initPictureInPictureModal(): void {
   const openBtn = document.getElementById("pip-settings-btn");
   const overlay = document.getElementById("pip-modal-overlay");
-  const closeBtn = document.getElementById("pip-modal-close");
-  if (!openBtn || !overlay || !closeBtn) return;
+  if (!openBtn || !overlay) return;
 
-  const close = (): void => overlay.classList.remove("active");
-  openBtn.addEventListener("click", () => overlay.classList.add("active"));
-  closeBtn.addEventListener("click", close);
-  overlay.addEventListener("click", event => {
-    if (event.target === overlay) close();
-  });
-  document.addEventListener("keydown", event => {
-    if (event.key === "Escape" && overlay.classList.contains("active")) close();
-  });
+  const modal = createModal(overlay);
+  openBtn.addEventListener("click", () => modal.open());
 
   for (const control of overlay.querySelectorAll("input, select")) {
     control.addEventListener("change", saveOptions);
@@ -2077,25 +2006,17 @@ function syncPictureInPictureModalDependentState(enabled: boolean): void {
 function initOffsetModal(): void {
   const openBtn = document.getElementById("offset-settings-btn");
   const overlay = document.getElementById("offset-modal-overlay");
-  const closeBtn = document.getElementById("offset-modal-close");
-  if (!openBtn || !overlay || !closeBtn) return;
+  if (!openBtn || !overlay) return;
 
   const offsetCount = document.getElementById("offset-count");
   const refreshOffsetCount = async (): Promise<void> => {
     if (offsetCount) offsetCount.textContent = String((await getOffsetInfo()).count);
   };
 
-  const close = (): void => overlay.classList.remove("active");
+  const modal = createModal(overlay);
   openBtn.addEventListener("click", () => {
-    overlay.classList.add("active");
+    modal.open();
     void refreshOffsetCount();
-  });
-  closeBtn.addEventListener("click", close);
-  overlay.addEventListener("click", event => {
-    if (event.target === overlay) close();
-  });
-  document.addEventListener("keydown", event => {
-    if (event.key === "Escape" && overlay.classList.contains("active")) close();
   });
 
   document.getElementById("offset-modal-reset")?.addEventListener("click", () => {
@@ -2115,7 +2036,6 @@ function initOffsetModal(): void {
     richsyncOffsetTrim: ["syllable", "word"],
     lineOffsetTrim: ["line"],
   };
-  const syncConfig = getSyncTypeConfig();
   for (const applies of document.querySelectorAll<HTMLElement>("#offset-modal-overlay .offset-applies")) {
     const types = applies.dataset.offsetScope ? offsetApplies[applies.dataset.offsetScope] : undefined;
     if (!types) continue;
@@ -2123,10 +2043,10 @@ function initOffsetModal(): void {
       const chip = document.createElement("span");
       chip.className = "offset-applies__chip";
       chip.style.color = syncTypeColors[type];
-      const icon = parseSvgString(syncConfig[type].icon);
+      const icon = createSyncIcon(type);
       if (icon) chip.appendChild(icon);
       const name = document.createElement("span");
-      name.textContent = syncConfig[type].label;
+      name.textContent = syncTypeLabel(type);
       chip.appendChild(name);
       applies.appendChild(chip);
     }

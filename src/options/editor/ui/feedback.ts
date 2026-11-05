@@ -1,217 +1,66 @@
-import type { ModalOptions } from "../types";
+import { t } from "@core/i18n";
+import { createModal, type Modal } from "@/ui/modal";
+import type { ModalOptions } from "@/options/editor/types";
 import {
   modalCancelBtn,
-  modalCloseBtn,
   modalConfirmBtn,
   modalInput,
   modalMessage,
   modalOverlay,
   modalTitle,
-} from "./dom";
+} from "@/options/editor/ui/dom";
 
-let alertTimeoutId: ReturnType<typeof setTimeout> | null = null;
-let alertKeyHandler: ((e: KeyboardEvent) => void) | null = null;
-const ALERT_DURATION = 2000;
-const ALERT_DURATION_WITH_ACTION = 5000;
+let dialog: Modal | undefined;
+let settle: ((value: string | null) => void) | undefined;
 
-export interface AlertAction {
-  label: string;
-  callback: () => void;
+function settleWith(value: string | null): void {
+  const resolve = settle;
+  settle = undefined;
+  resolve?.(value);
 }
 
-function cleanupAlertKeyHandler(): void {
-  if (alertKeyHandler) {
-    document.removeEventListener("keydown", alertKeyHandler);
-    alertKeyHandler = null;
-  }
+function confirmDialog(): Modal {
+  if (dialog) return dialog;
+  const modal = createModal(modalOverlay, {
+    onClose: () => settleWith(null),
+    initialFocus: () => {
+      if (!modalInput.hidden) return modalInput;
+      return modalConfirmBtn.classList.contains("ui-button--danger") ? modalCancelBtn : modalConfirmBtn;
+    },
+  });
+  const confirm = (): void => {
+    settleWith(modalInput.hidden ? "confirmed" : modalInput.value);
+    modal.close();
+  };
+  modalConfirmBtn.addEventListener("click", confirm);
+  modalInput.addEventListener("keydown", event => {
+    if (event.key !== "Enter" || event.isComposing) return;
+    event.preventDefault();
+    confirm();
+  });
+  dialog = modal;
+  return modal;
 }
-
-function createToastContent(status: HTMLElement, message: string, action?: AlertAction): void {
-  const textContainer = document.createElement("span");
-  textContainer.className = "toast-text";
-  textContainer.textContent = message;
-  status.appendChild(textContainer);
-
-  const actionWrapper = document.createElement("div");
-  actionWrapper.className = "toast-action-wrapper";
-  status.appendChild(actionWrapper);
-
-  if (action) {
-    const triggerAction = () => {
-      if (alertTimeoutId) {
-        clearTimeout(alertTimeoutId);
-        alertTimeoutId = null;
-      }
-      cleanupAlertKeyHandler();
-      action.callback();
-    };
-
-    const actionBtn = document.createElement("button");
-    actionBtn.className = "toast-action";
-    actionBtn.appendChild(document.createTextNode(action.label));
-    const kbd = document.createElement("kbd");
-    kbd.textContent = "Enter";
-    actionBtn.appendChild(kbd);
-    actionBtn.addEventListener("click", triggerAction);
-    actionWrapper.appendChild(actionBtn);
-
-    alertKeyHandler = (e: KeyboardEvent) => {
-      if (e.key === "Enter" && status.classList.contains("active")) {
-        e.preventDefault();
-        triggerAction();
-      }
-    };
-    document.addEventListener("keydown", alertKeyHandler);
-  }
-}
-
-export const showAlert = (message: string, action?: AlertAction): void => {
-  const status = document.getElementById("status-css");
-  if (!status) return;
-
-  const isAlreadyActive = status.classList.contains("active");
-
-  cleanupAlertKeyHandler();
-
-  if (isAlreadyActive && status.children.length > 0) {
-    status.classList.add("exiting");
-    setTimeout(() => {
-      status.classList.remove("exiting");
-      status.replaceChildren();
-      createToastContent(status, message, action);
-    }, 150);
-  } else {
-    status.replaceChildren();
-    createToastContent(status, message, action);
-  }
-
-  status.classList.add("active");
-
-  if (alertTimeoutId) {
-    clearTimeout(alertTimeoutId);
-  }
-
-  const baseDuration = action ? ALERT_DURATION_WITH_ACTION : ALERT_DURATION;
-  const duration = isAlreadyActive ? baseDuration * 1.5 : baseDuration;
-
-  alertTimeoutId = setTimeout(() => {
-    status.classList.remove("active");
-    cleanupAlertKeyHandler();
-    setTimeout(() => {
-      status.replaceChildren();
-    }, 200);
-    alertTimeoutId = null;
-  }, duration);
-};
 
 export function showModal(options: ModalOptions): Promise<string | null> {
+  const modal = confirmDialog();
+  settleWith(null);
+  modalTitle.textContent = options.title;
+  if (typeof options.message === "string") modalMessage.textContent = options.message;
+  else if (Array.isArray(options.message)) modalMessage.replaceChildren(...options.message);
+  else modalMessage.replaceChildren(options.message);
+  modalConfirmBtn.textContent = options.confirmText || t("options_modal_confirm");
+  modalCancelBtn.textContent = options.cancelText || t("options_modal_cancel");
+  modalConfirmBtn.classList.toggle("ui-button--danger", Boolean(options.confirmDanger));
+  modalConfirmBtn.classList.toggle("ui-button--primary", !options.confirmDanger);
+  modalInput.hidden = !options.showInput;
+  modalInput.placeholder = options.inputPlaceholder || "";
+  modalInput.value = options.inputValue || "";
+
   return new Promise(resolve => {
-    modalTitle.textContent = options.title;
-    if (typeof options.message === "string") {
-      modalMessage.textContent = options.message;
-    } else if (Array.isArray(options.message)) {
-      modalMessage.replaceChildren(...options.message);
-    } else {
-      modalMessage.replaceChildren(options.message);
-    }
-    modalConfirmBtn.textContent = options.confirmText || "Confirm";
-    modalCancelBtn.textContent = options.cancelText || "Cancel";
-
-    if (options.confirmDanger) {
-      modalConfirmBtn.classList.add("modal-btn-danger");
-      modalConfirmBtn.classList.remove("modal-btn-primary");
-    } else {
-      modalConfirmBtn.classList.add("modal-btn-primary");
-      modalConfirmBtn.classList.remove("modal-btn-danger");
-    }
-
-    if (options.showInput) {
-      modalInput.style.display = "block";
-      modalInput.placeholder = options.inputPlaceholder || "";
-      modalInput.value = options.inputValue || "";
-      modalMessage.style.marginBottom = "1rem";
-    } else {
-      modalInput.style.display = "none";
-      modalMessage.style.marginBottom = "0";
-    }
-
-    modalOverlay.style.display = "flex";
-
-    requestAnimationFrame(() => {
-      modalOverlay.classList.add("active");
-    });
-
-    if (options.showInput) {
-      setTimeout(() => {
-        modalInput.focus();
-        modalInput.select();
-      }, 100);
-    }
-
-    const cleanup = (withAnimation = true) => {
-      if (withAnimation) {
-        const modal = modalOverlay.querySelector(".modal");
-        if (modal) {
-          modal.classList.add("closing");
-        }
-        modalOverlay.classList.remove("active");
-
-        setTimeout(() => {
-          modalOverlay.style.display = "none";
-          if (modal) {
-            modal.classList.remove("closing");
-          }
-        }, 200);
-      } else {
-        modalOverlay.classList.remove("active");
-        modalOverlay.style.display = "none";
-      }
-
-      modalConfirmBtn.onclick = null;
-      modalCancelBtn.onclick = null;
-      modalCloseBtn.onclick = null;
-      modalOverlay.onclick = null;
-      modalInput.onkeydown = null;
-      document.onkeydown = null;
-    };
-
-    const handleConfirm = () => {
-      const value = options.showInput ? modalInput.value : "confirmed";
-      cleanup();
-      resolve(value);
-    };
-
-    const handleCancel = () => {
-      cleanup();
-      resolve(null);
-    };
-
-    modalConfirmBtn.onclick = handleConfirm;
-    modalCancelBtn.onclick = handleCancel;
-    modalCloseBtn.onclick = handleCancel;
-
-    modalOverlay.onclick = e => {
-      if (e.target === modalOverlay) {
-        handleCancel();
-      }
-    };
-
-    modalInput.onkeydown = e => {
-      if (e.key === "Enter") {
-        e.preventDefault();
-        handleConfirm();
-      } else if (e.key === "Escape") {
-        e.preventDefault();
-        handleCancel();
-      }
-    };
-
-    document.onkeydown = e => {
-      if (e.key === "Escape" && modalOverlay.classList.contains("active")) {
-        e.preventDefault();
-        handleCancel();
-      }
-    };
+    settle = resolve;
+    modal.open();
+    if (options.showInput) modalInput.select();
   });
 }
 
@@ -220,7 +69,7 @@ export async function showPrompt(
   message: string | Node | Node[],
   defaultValue = "",
   placeholder = "",
-  confirmText = "OK"
+  confirmText?: string
 ): Promise<string | null> {
   return showModal({
     title,
@@ -243,7 +92,7 @@ export async function showConfirm(
     title,
     message,
     showInput: false,
-    confirmText: confirmText || (danger ? "Delete" : "OK"),
+    confirmText: confirmText || (danger ? t("unison_delete") : undefined),
     cancelText,
     confirmDanger: danger,
   });

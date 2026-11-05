@@ -36,6 +36,7 @@ import {
   revisionReason,
   splitDiffRows,
   statusLabel,
+  syllableChange,
   unchangedLines,
 } from "@modules/unison/revisions";
 import type {
@@ -497,6 +498,83 @@ const REASONS: PendingReason[] = ["sealed", "flagged", "large_text_drift", "larg
   assert.equal(countDiffChanges([gap, same, headGap]), 0, "unchanged lines and gaps are not changes");
   assert.equal(countDiffChanges([gap, same, add, timing, headGap, field]), 3);
   assert.equal(countDiffChanges([field]), 1, "a field row counts on its own");
+}
+
+// -- Syllable rows --------------------------
+
+{
+  const merged: DiffRow = {
+    kind: "syllable",
+    lineNo: 2,
+    startMs: 2_000,
+    text: "from champagne",
+    before: "from cham·p·a·gne",
+    after: "from cham·pagne",
+    moved: 0,
+  };
+  const retimed: DiffRow = {
+    kind: "syllable",
+    lineNo: 3,
+    startMs: 5_000,
+    text: "So tell me",
+    before: "So tell me",
+    after: "So tell me",
+    moved: 2,
+  };
+  const notesOf = (row: Extract<DiffRow, { kind: "syllable" }>) =>
+    syllableChange(row).map(line => (line.note ? keyOf(line.note) : null));
+
+  assert.deepEqual(
+    syllableChange(merged).map(({ kind, content }) => [kind, content]),
+    [
+      ["del", "from cham·p·a·gne"],
+      ["add", "from cham·pagne"],
+    ],
+    "a re-split line shows its old and new split"
+  );
+  assert.deepEqual(notesOf(merged), [null, null], "a pure re-split needs no note");
+
+  const [retime] = syllableChange(retimed);
+  assert.equal(syllableChange(retimed).length, 1, "a retime with the same split is one line");
+  assert.deepEqual([retime.kind, retime.content], ["timing", "So tell me"]);
+  assert.equal(retime.note && keyOf(retime.note), "unison_rev_syllablesRetimed");
+  assert.deepEqual(retime.note && "subs" in retime.note ? retime.note.subs : null, ["2"]);
+
+  const lost = syllableChange({ ...merged, before: "from champagne", after: null });
+  assert.deepEqual(
+    lost.map(({ kind, content }) => [kind, content]),
+    [["timing", "from champagne"]],
+    "a line that lost syllable timing keeps its text as one timing line"
+  );
+  assert.deepEqual(notesOf({ ...merged, before: "from champagne", after: null }), ["unison_rev_syllableTimingRemoved"]);
+
+  assert.deepEqual(
+    syllableChange({ ...merged, before: null }).map(({ kind, content }) => [kind, content]),
+    [
+      ["del", "from champagne"],
+      ["add", "from cham·pagne"],
+    ],
+    "a line that gained syllable timing falls back to its text on the old side"
+  );
+  assert.deepEqual(notesOf({ ...merged, before: null }), [null, "unison_rev_syllableTimingAdded"]);
+
+  assert.equal(countDiffChanges([merged, retimed, { kind: "gap", count: 4 }]), 2, "syllable rows count as changes");
+
+  const movedSyllables = { before: "So tell me", after: "So tell me", moved: 1 };
+  const movedLine: DiffRow = {
+    kind: "timing",
+    lineNo: 4,
+    startMs: 8_300,
+    deltaMs: 300,
+    text: "So tell me",
+    syllables: movedSyllables,
+  };
+  assert.equal(countDiffChanges([movedLine]), 1, "a moved line with a syllable change is one change");
+  assert.deepEqual(
+    syllableChange({ ...movedSyllables, text: "So tell me" }).map(({ kind, content }) => [kind, content]),
+    [["timing", "So tell me"]],
+    "a moved line's syllable change reads like a syllable row"
+  );
 }
 
 // -- Field rows --------------------------

@@ -1,4 +1,5 @@
 import { initI18n, loadLocaleOverride } from "@core/i18n";
+import "@braccato/highlight/highlight.css";
 import { initUnisonPage } from "@/options/unison/unisonPage";
 
 function initialize(): void {

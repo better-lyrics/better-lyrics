@@ -34,6 +34,7 @@ import { materialDark } from "@fsegurai/codemirror-theme-material-dark";
 import { colorHighlighter, colorHighlighterStyles, ricsLanguage, ricsLinter } from "codemirror-lang-rics";
 import { rainbowBrackets } from "../features/syntax";
 import { onChange } from "../features/themes";
+import { editorStateManager } from "@/options/editor/core/state";
 
 // -- Custom Keybindings ----------------------------
 
@@ -46,8 +47,6 @@ interface EditorOptions {
   enableSearch?: boolean;
 }
 
-export const SAVE_DEBOUNCE_DELAY = 1000;
-export const SAVE_CUSTOM_THEME_DEBOUNCE = 2000;
 export const BRACKET_NESTING_LEVELS = 7;
 
 const RICS_LINTER_DELAY = 150;
@@ -97,8 +96,7 @@ export function createEditorState(initialContents: string, options: EditorOption
     materialDark,
     rainbowBrackets(),
     EditorView.updateListener.of(update => {
-      let text = update.state.doc.toString();
-      if (update.docChanged && !text.startsWith("Loading")) {
+      if (update.docChanged && editorStateManager.hasLoadedContent()) {
         onChange();
       }
     }),

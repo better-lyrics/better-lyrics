@@ -243,3 +243,17 @@
         transition-duration: 0ms !important;
     }
 }
+
+/* -- Video frame -------------------------------------------- */
+
+ytmusic-player-page[video-mode][blyrics-karaoke] :is(#player, .html5-video-player) {
+    background: transparent !important;
+}
+
+ytmusic-player-page[video-mode][blyrics-karaoke] :is(.html5-video-container, video.html5-main-video) {
+    width: 100% !important;
+    height: 100% !important;
+    top: 0 !important;
+    left: 0 !important;
+    object-fit: contain !important;
+}

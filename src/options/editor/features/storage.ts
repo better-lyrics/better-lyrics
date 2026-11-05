@@ -8,10 +8,11 @@ import type { InstalledStoreTheme } from "@/options/store/types";
 import type { ThemeSettingField } from "@/options/themes";
 import { fillThemeSettings } from "@/options/options";
 import { editorStateManager } from "../core/state";
-import { syncIndicator } from "../ui/dom";
 import { ricsCompiler } from "./compiler";
 import { setThemeName, showThemeName, themeSourceToEditorSource } from "./themes";
+import { t } from "@core/i18n";
 import { errorEditor, logEditor, warnEditor } from "@core/logger";
+import { toast } from "@/ui/toast";
 
 interface CSSStorageData {
   cssStorageType?: "sync" | "local" | "chunked";
@@ -302,37 +303,37 @@ export async function loadThemeSettings(): Promise<ThemeSavedSettingFields> {
   return {};
 }
 
-export function showSyncSuccess(strategy: "local" | "sync" | "chunked", wasRetry?: boolean): void {
-  let message = "Saved!";
-  if (strategy === "local") {
-    message = wasRetry ? "Saved (Large CSS - Local)" : "Saved (Local)";
-  } else if (strategy === "chunked") {
-    message = wasRetry ? "Saved (Very Large - Chunked)" : "Saved (Chunked)";
+const SAVE_TOAST_ID = "editor-save";
+let saveToastOpen = false;
+let latestSave = 0;
+
+export function showSyncSaving(): number {
+  latestSave++;
+  if (!saveToastOpen) {
+    saveToastOpen = true;
+    toast.loading(t("options_editor_saving"), { id: SAVE_TOAST_ID });
   }
-
-  syncIndicator.innerText = message;
-  syncIndicator.classList.add("success");
-
-  setTimeout(() => {
-    syncIndicator.style.display = "none";
-    syncIndicator.innerText = "Saving...";
-    syncIndicator.classList.remove("success");
-  }, 1000);
+  return latestSave;
 }
 
-export function showSyncError(error: any): void {
-  let errorMessage = "Something went wrong!";
-  if (error.message?.includes("quota") || error.message?.includes("QUOTA_BYTES")) {
-    errorMessage = "Storage full! Go to Settings → Clear lyrics cache, then try again.";
-  }
+export function showSyncSuccess(save: number): void {
+  if (!saveToastOpen || save !== latestSave) return;
+  saveToastOpen = false;
+  toast.success(t("options_nickname_status_saved"), { id: SAVE_TOAST_ID });
+}
 
-  syncIndicator.innerText = errorMessage;
-  syncIndicator.classList.add("error");
-  setTimeout(() => {
-    syncIndicator.style.display = "none";
-    syncIndicator.innerText = "Saving...";
-    syncIndicator.classList.remove("error");
-  }, 7000);
+export function cancelSyncSaving(save: number): void {
+  if (!saveToastOpen || save !== latestSave) return;
+  saveToastOpen = false;
+  toast.dismiss(SAVE_TOAST_ID);
+}
+
+export function showSyncError(error: unknown, save: number): void {
+  if (save !== latestSave) return;
+  saveToastOpen = false;
+  const message = error instanceof Error ? error.message : "";
+  const storageFull = message.includes("quota") || message.includes("QUOTA_BYTES");
+  toast.error(t(storageFull ? "editor_alert_storageFull" : "editor_alert_saveFailed"), { id: SAVE_TOAST_ID });
 }
 
 export async function broadcastRICSToTabs(ricsSource: string, strategy: "local" | "sync" | "chunked"): Promise<void> {
@@ -564,7 +565,6 @@ class StorageManager {
 
       const result = await saveCustomCss(themeContent, { fields: newTheme.settings, saved: newTheme.savedSettings });
       if (result.success && result.strategy) {
-        showSyncSuccess(result.strategy, result.wasRetry);
         await broadcastRICSToTabs(modThemeContent, result.strategy);
         logEditor("Store theme update synced to customCSS");
       }

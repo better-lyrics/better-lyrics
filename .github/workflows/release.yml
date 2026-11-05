@@ -19,6 +19,7 @@ jobs:
       pull-requests: write
     outputs:
       version: ${{ github.event.inputs.version }}
+      previous_stable: ${{ steps.prev.outputs.tag }}
     steps:
       - name: ⛔ Validate Version Format
         run: |
@@ -53,6 +54,16 @@ jobs:
         with:
           fetch-depth: 0
           token: ${{ steps.app-token.outputs.token }}
+
+      - name: Find previous stable tag
+        id: prev
+        env:
+          VERSION: ${{ github.event.inputs.version }}
+        run: |
+          TAG=$( { git tag --list 'v*' | grep -E '^v[0-9]+\.[0-9]+\.[0-9]+$' | grep -vx "v$VERSION"; echo "v$VERSION"; } \
+            | sort -V \
+            | awk -v current="v$VERSION" '$0 == current { print previous; exit } { previous = $0 }')
+          echo "tag=$TAG" >> "$GITHUB_OUTPUT"
 
       - name: Use Node.js
         uses: actions/setup-node@v3
@@ -304,3 +315,5 @@ jobs:
           # Mark as pre-release if it's a canary build
           prerelease: ${{ github.event.inputs.is_canary == 'true' }}
           draft: true
+          generateReleaseNotes: true
+          generateReleaseNotesPreviousTag: ${{ github.event.inputs.is_canary == 'false' && needs.release.outputs.previous_stable || '' }}

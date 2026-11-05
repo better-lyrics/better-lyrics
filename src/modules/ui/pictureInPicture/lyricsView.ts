@@ -4,6 +4,7 @@ import { attachTransportAnimation } from "@modules/ui/playerControls/controlAnim
 import { playerControlIcons } from "@modules/ui/playerControls/icons";
 import { sendTransport } from "@modules/ui/playerControls/playerBarControls";
 import { createProgressBar, type ProgressBarHandle } from "@modules/ui/playerControls/progressBar";
+import { cssTimeMs } from "@/ui/motion";
 import type { PlayerDetails } from "@core/appState";
 import { createHeaderLine, fillHeaderLayer, getHeaderLayers, PictureInPictureHeaderMarquee } from "./headerMarquee";
 import type { PictureInPicturePlaybackSnapshot, PictureInPictureViewDependencies } from "./types";
@@ -66,6 +67,56 @@ const MARQUEE_REARM_DELAY = 700;
 // where the next cover is prefetched and decodes at once, never blinks. Past
 // this the metadata poll is genuinely slow and stale art is the worse lie.
 const ARTWORK_STALE_GRACE = 600;
+
+const LYRICS_MOTION_DEFAULTS = {
+  holdDelay: 250,
+  exitDuration: 200,
+  revealDuration: 500,
+  revealDelay: 120,
+  revealStagger: 40,
+  revealLines: Number.POSITIVE_INFINITY,
+  revealDistance: "12px",
+  revealBlur: "3px",
+  revealEasing: "cubic-bezier(0.22, 1, 0.36, 1)",
+} as const;
+
+interface LyricsMotion {
+  holdDelay: number;
+  exitDuration: number;
+  revealDuration: number;
+  revealDelay: number;
+  revealStagger: number;
+  revealLines: number;
+  revealDistance: string;
+  revealBlur: string;
+  revealEasing: string;
+}
+
+const LYRICS_LOADER_ENTER_DELAY = 100;
+const REDUCED_MOTION_LYRICS_DURATION = 150;
+const LYRICS_EXIT_CLASS = "blyrics-pip-lyrics__exit";
+const LYRICS_HELD_ATTRIBUTE = "data-held";
+const LYRICS_REVEALING_ATTRIBUTE = "data-revealing";
+const LYRICS_SWAPPING_ATTRIBUTE = "data-swapping";
+const LYRICS_REVEAL_OVERSCAN = 0.5;
+
+function readLyricsMotion(style: CSSStyleDeclaration): LyricsMotion {
+  const read = (name: string) => style.getPropertyValue(`--blyrics-pip-lyrics-${name}`).trim();
+  const time = (name: string, fallback: number) => cssTimeMs(read(name), fallback);
+  const text = (name: string, fallback: string) => read(name) || fallback;
+  const lines = Number.parseInt(read("reveal-lines"), 10);
+  return {
+    holdDelay: time("hold-delay", LYRICS_MOTION_DEFAULTS.holdDelay),
+    exitDuration: time("exit-duration", LYRICS_MOTION_DEFAULTS.exitDuration),
+    revealDuration: time("reveal-duration", LYRICS_MOTION_DEFAULTS.revealDuration),
+    revealDelay: time("reveal-delay", LYRICS_MOTION_DEFAULTS.revealDelay),
+    revealStagger: time("reveal-stagger", LYRICS_MOTION_DEFAULTS.revealStagger),
+    revealLines: Number.isNaN(lines) ? LYRICS_MOTION_DEFAULTS.revealLines : Math.max(0, lines),
+    revealDistance: text("reveal-distance", LYRICS_MOTION_DEFAULTS.revealDistance),
+    revealBlur: text("reveal-blur", LYRICS_MOTION_DEFAULTS.revealBlur),
+    revealEasing: text("reveal-easing", LYRICS_MOTION_DEFAULTS.revealEasing),
+  };
+}
 
 function getArtworkUrl(url: string): string {
   if (/w\d+-h\d+/.test(url)) return url.replace(/w\d+-h\d+/, `w${ARTWORK_SIZE}-h${ARTWORK_SIZE}`);
@@ -182,6 +233,11 @@ export class PictureInPictureLyricsView {
   private lastPointerMoveTime = 0;
   private fallbackArtworkUrl = "";
   private isSearching = false;
+  private viewportContent: HTMLElement | null = null;
+  private lyricsVideoId: string | null = null;
+  private holdTimer: number | null = null;
+  private onHoldExpired: (() => void) | null = null;
+  private revealCount = 0;
   private lastPlaybackSnapshot: PictureInPicturePlaybackSnapshot | null = null;
   private artworkTransition: ArtworkTransition = DEFAULT_ARTWORK_TRANSITION;
   private artworkIndex = 0;
@@ -320,6 +376,10 @@ export class PictureInPictureLyricsView {
     return this.lyricsScroller;
   }
 
+  get videoId(): string | null {
+    return this.currentVideoId;
+  }
+
   get playbackSnapshot(): PictureInPicturePlaybackSnapshot | null {
     return this.lastPlaybackSnapshot;
   }
@@ -332,15 +392,82 @@ export class PictureInPictureLyricsView {
    * Puts the scroller back on screen in place of the loader, and hands back the element the built
    * lyrics container mounts into.
    */
-  prepareLyricsMount(): HTMLElement {
+  prepareLyricsMount(animate = false): HTMLElement {
     this.isSearching = false;
-    this.lyricsViewport.replaceChildren(this.lyricsScroller);
+    this.lyricsVideoId = this.currentVideoId;
+    this.swapViewportContent(this.lyricsScroller, animate);
+    this.lyricsScroller.toggleAttribute(LYRICS_SWAPPING_ATTRIBUTE, animate);
+    this.releaseHold();
     this.shell.setAttribute("aria-busy", "false");
     return this.lyricsScroller;
   }
 
+  holdLyrics(onExpired: () => void): boolean {
+    if (this.viewportContent !== this.lyricsScroller || this.lyricsVideoId !== this.currentVideoId) return false;
+    this.onHoldExpired = onExpired;
+    if (this.holdTimer === null) {
+      this.lyricsScroller.setAttribute(LYRICS_HELD_ATTRIBUTE, "");
+      this.holdTimer = this.pipWindow.setTimeout(this.expireHold, this.lyricsMotion().holdDelay);
+    }
+    return true;
+  }
+
+  revealLyrics(container: HTMLElement | null): void {
+    this.lyricsScroller.removeAttribute(LYRICS_SWAPPING_ATTRIBUTE);
+    if (!container) return;
+    if (this.prefersReducedMotion) {
+      container.animate([{ opacity: 0 }, { opacity: 1 }], {
+        duration: REDUCED_MOTION_LYRICS_DURATION,
+        easing: "ease-in-out",
+      });
+      return;
+    }
+
+    const motion = this.lyricsMotion();
+    const bounds = this.lyricsViewport.getBoundingClientRect();
+    const visible = [...container.children]
+      .filter(child => {
+        const rect = child.getBoundingClientRect();
+        return rect.bottom > bounds.top && rect.top < bounds.bottom + bounds.height * LYRICS_REVEAL_OVERSCAN;
+      })
+      .slice(0, motion.revealLines);
+    if (visible.length === 0) return;
+
+    this.lyricsViewport.setAttribute(LYRICS_REVEALING_ATTRIBUTE, "");
+    const finished = visible.map((child, index) => {
+      const timing: KeyframeAnimationOptions = {
+        duration: motion.revealDuration,
+        delay: motion.revealDelay + index * motion.revealStagger,
+        easing: motion.revealEasing,
+        fill: "backwards",
+      };
+      const restingOpacity = this.pipWindow.getComputedStyle(child).opacity;
+      child.animate([{ opacity: 0 }, { opacity: restingOpacity }], timing);
+      return child.animate(
+        [
+          { translate: `0 ${motion.revealDistance}`, filter: `blur(${motion.revealBlur})` },
+          { translate: "0 0", filter: "blur(0)" },
+        ],
+        { ...timing, composite: "add" }
+      ).finished;
+    });
+
+    const reveal = ++this.revealCount;
+    void Promise.allSettled(finished).then(() => {
+      if (reveal === this.revealCount) this.lyricsViewport.removeAttribute(LYRICS_REVEALING_ATTRIBUTE);
+    });
+  }
+
+  afterNextFrame(callback: () => void): void {
+    this.pipWindow.requestAnimationFrame(() => this.pipWindow.setTimeout(callback, 0));
+  }
+
+  private lyricsMotion(): LyricsMotion {
+    return readLyricsMotion(this.pipWindow.getComputedStyle(this.lyricsViewport));
+  }
+
   // Called from the sync loop, so it has to no-op once the loader is already up.
-  showSearching(): void {
+  showSearching(animate = false): void {
     if (this.isSearching) return;
     this.isSearching = true;
 
@@ -358,8 +485,63 @@ export class PictureInPictureLyricsView {
     label.textContent = this.dependencies.translate("lyrics_searching");
 
     loader.append(mark, label);
-    this.lyricsViewport.replaceChildren(loader);
+    this.swapViewportContent(loader, animate);
+    this.releaseHold();
+    if (animate) {
+      loader.animate([{ opacity: 0 }, { opacity: 1 }], {
+        duration: this.prefersReducedMotion ? REDUCED_MOTION_LYRICS_DURATION : this.lyricsMotion().exitDuration,
+        delay: this.prefersReducedMotion ? 0 : LYRICS_LOADER_ENTER_DELAY,
+        easing: "ease-in-out",
+        fill: "backwards",
+      });
+    }
     this.shell.setAttribute("aria-busy", "true");
+  }
+
+  private swapViewportContent(next: HTMLElement, animate: boolean): void {
+    const previous = this.viewportContent;
+    const isRetiring = this.lyricsViewport.querySelector(`.${LYRICS_EXIT_CLASS}`) !== null;
+    if (animate && previous && !isRetiring) this.retireViewportContent(previous);
+    if (previous !== next) {
+      previous?.remove();
+      this.lyricsViewport.prepend(next);
+    }
+    this.viewportContent = next;
+  }
+
+  private retireViewportContent(content: HTMLElement): void {
+    const exitOpacity = this.pipWindow.getComputedStyle(content).opacity;
+    const ghost = content.cloneNode(true) as HTMLElement;
+    ghost.classList.add(LYRICS_EXIT_CLASS);
+    ghost.inert = true;
+    ghost.setAttribute("aria-hidden", "true");
+    this.lyricsViewport.append(ghost);
+    ghost.scrollTop = content.scrollTop;
+
+    const animation = ghost.animate([{ opacity: exitOpacity }, { opacity: 0 }], {
+      duration: this.prefersReducedMotion ? REDUCED_MOTION_LYRICS_DURATION : this.lyricsMotion().exitDuration,
+      easing: "ease-in-out",
+      fill: "forwards",
+    });
+    animation.finished.then(
+      () => ghost.remove(),
+      () => ghost.remove()
+    );
+  }
+
+  private readonly expireHold = (): void => {
+    const onExpired = this.onHoldExpired;
+    if (this.holdTimer !== null) this.pipWindow.clearTimeout(this.holdTimer);
+    this.holdTimer = null;
+    onExpired?.();
+    this.releaseHold();
+  };
+
+  private releaseHold(): void {
+    if (this.holdTimer !== null) this.pipWindow.clearTimeout(this.holdTimer);
+    this.holdTimer = null;
+    this.onHoldExpired = null;
+    this.lyricsScroller.removeAttribute(LYRICS_HELD_ATTRIBUTE);
   }
 
   private readonly handlePlayerTime = (event: Event): void => {
@@ -380,6 +562,7 @@ export class PictureInPictureLyricsView {
 
     if (detail.videoId !== this.currentVideoId) {
       this.showSong(detail);
+      if (this.holdTimer !== null) this.expireHold();
     }
 
     const now = Date.now();
@@ -416,6 +599,7 @@ export class PictureInPictureLyricsView {
     this.marquee.destroy();
     this.progressBar.destroy();
     if (this.controlsIdleTimer !== null) this.pipWindow.clearTimeout(this.controlsIdleTimer);
+    this.releaseHold();
     if (this.artworkBusyTimer !== null) this.pipWindow.clearTimeout(this.artworkBusyTimer);
     for (const row of this.headerRows) {
       if (row.busyTimer !== null) this.pipWindow.clearTimeout(row.busyTimer);
@@ -457,6 +641,7 @@ export class PictureInPictureLyricsView {
   }
 
   private showSong(detail: PlayerDetails): void {
+    if (this.currentVideoId === null) this.lyricsVideoId = detail.videoId;
     this.currentVideoId = detail.videoId;
     this.lastVisibleMetadataCheck = Date.now();
     this.setHeaderText(detail.song, detail.artist, true);

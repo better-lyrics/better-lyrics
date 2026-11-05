@@ -58,26 +58,54 @@ interface IdentityExport {
 const STORAGE_KEY = "userIdentity";
 const REGISTERED_KEY = "identityRegistered";
 const CERTIFICATE_KEY = "keyCertificate";
+const DISPLAY_NAME_KEY = "identityDisplayName";
 const ECDSA_PARAMS: EcKeyGenParams = { name: "ECDSA", namedCurve: "P-256" };
 const HASH_ALGORITHM = "SHA-256";
 
-let cachedIdentity: KeyIdentity | null = null;
+let cachedIdentity: Promise<KeyIdentity> | null = null;
+let importCount = 0;
+let identityCommits: Promise<unknown> = Promise.resolve();
+
+function queueIdentityCommit<T>(commit: () => Promise<T>): Promise<T> {
+  const run = identityCommits.then(commit);
+  identityCommits = Promise.allSettled([run]);
+  return run;
+}
 
 // -- Public API -------------------------------
 
-export async function getIdentity(): Promise<KeyIdentity> {
+export async function getStoredKeyId(): Promise<string | null> {
+  return (await loadFromStorage())?.keyId ?? null;
+}
+
+export function getIdentity(): Promise<KeyIdentity> {
   if (cachedIdentity) return cachedIdentity;
+  const pending: Promise<KeyIdentity> = loadOrCreateIdentity().catch(error => {
+    if (cachedIdentity === pending) cachedIdentity = null;
+    throw error;
+  });
+  cachedIdentity = pending;
+  return pending;
+}
 
+async function loadOrCreateIdentity(): Promise<KeyIdentity> {
+  const importsAtStart = importCount;
+  const importedMeanwhile = (): boolean => importCount !== importsAtStart;
   const stored = await loadFromStorage();
-  if (stored) {
-    cachedIdentity = stored;
-    return stored;
-  }
+  if (importedMeanwhile()) return getIdentity();
+  if (stored) return stored;
 
-  const identity = await generateKeyIdentity();
-  await saveToStorage(identity);
-  cachedIdentity = identity;
-  return identity;
+  const generated = await generateKeyIdentity();
+  const storedMeanwhile = await loadFromStorage();
+  if (importedMeanwhile()) return getIdentity();
+  if (storedMeanwhile) return storedMeanwhile;
+
+  const saved = await queueIdentityCommit(async () => {
+    if (importedMeanwhile()) return false;
+    await saveToStorage(generated);
+    return true;
+  });
+  return saved ? generated : getIdentity();
 }
 
 export async function signRating(themeId: string, rating: number): Promise<SignedRating> {
@@ -200,18 +228,28 @@ export async function importIdentity(json: string): Promise<KeyIdentity> {
     createdAt: Date.now(),
   };
 
+  importCount++;
+  const committed = queueIdentityCommit(() => commitImportedIdentity(identity, parsed.certificate));
+  cachedIdentity = committed;
+  try {
+    await committed;
+  } catch (error) {
+    if (cachedIdentity === committed) cachedIdentity = null;
+    throw error;
+  }
+  invalidateDisplayName();
+
+  return identity;
+}
+
+async function commitImportedIdentity(identity: KeyIdentity, certificate: string | undefined): Promise<KeyIdentity> {
   await saveToStorage(identity);
   await chrome.storage.local.remove(REGISTERED_KEY);
-
-  if (parsed.certificate) {
-    await setCertificate(parsed.certificate);
+  if (certificate) {
+    await setCertificate(certificate);
   } else {
     await clearCertificate();
   }
-
-  cachedIdentity = identity;
-  invalidateDisplayName();
-
   return identity;
 }
 
@@ -238,6 +276,7 @@ async function fetchResolvedProfile(): Promise<ResolvedProfile | null> {
       };
       if (json.success && typeof json.data?.displayName === "string") {
         const avatarUrl = json.data.avatarUrl;
+        rememberDisplayName(signed.payload.keyId, json.data.displayName);
         return { displayName: json.data.displayName, avatarUrl: typeof avatarUrl === "string" ? avatarUrl : null };
       }
     }
@@ -267,18 +306,43 @@ export async function getDisplayName(): Promise<string> {
   const resolved = await getResolvedDisplayName();
   if (resolved !== null) return resolved;
   if (lastSavedDisplayName !== null) return lastSavedDisplayName;
+  return getLastKnownDisplayName();
+}
+
+export async function getLastKnownDisplayName(): Promise<string> {
   const { keyId } = await getIdentity();
+  const result = await getLocalStorage<{ [DISPLAY_NAME_KEY]?: { keyId?: unknown; displayName?: unknown } }>([
+    DISPLAY_NAME_KEY,
+  ]);
+  const remembered = result[DISPLAY_NAME_KEY];
+  if (remembered?.keyId === keyId && typeof remembered.displayName === "string") return remembered.displayName;
   return generatePetName(keyId);
+}
+
+function rememberDisplayName(keyId: string, displayName: string): void {
+  chrome.storage.local
+    .set({ [DISPLAY_NAME_KEY]: { keyId, displayName } })
+    .catch(err => warnCore("Failed to remember the display name:", err));
 }
 
 export function invalidateDisplayName(newValue?: string): void {
   lastSavedDisplayName = newValue ?? null;
+  if (newValue !== undefined) {
+    getIdentity()
+      .then(({ keyId }) => rememberDisplayName(keyId, newValue))
+      .catch(err => warnCore("Failed to remember the display name:", err));
+  }
   if (newValue === undefined) {
     cachedResolvedProfile = null;
     return;
   }
   const base = cachedResolvedProfile ?? fetchResolvedProfile();
   rememberResolvedProfile(base.then(profile => profile && { ...profile, displayName: newValue }));
+}
+
+export async function forgetDisplayName(): Promise<void> {
+  invalidateDisplayName();
+  await chrome.storage.local.remove(DISPLAY_NAME_KEY).catch(err => warnCore("Failed to forget the display name:", err));
 }
 
 export async function isKeyRegistered(): Promise<boolean> {

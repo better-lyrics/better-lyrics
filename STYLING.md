@@ -75,6 +75,7 @@
 	- [24. Karaoke Subtitles](#24-karaoke-subtitles)
 		- [Karaoke Structure](#karaoke-structure)
 		- [Styling the Plate](#styling-the-plate)
+		- [Bars Around the Video](#bars-around-the-video)
 		- [Stage Lines](#stage-lines)
 
 ## 1. Introduction to CSS and Better Lyrics
@@ -450,6 +451,39 @@ The Picture-in-Picture window also defaults `--blyrics-scroll-timing-offset` to 
 ```css
 .blyrics-pip-shell .blyrics-container {
   --blyrics-scroll-timing-offset: 0.2s;
+}
+```
+
+#### Switching lyrics in the Picture-in-Picture window
+
+When the Picture-in-Picture window gets a new set of lyrics (a new song, or a different source picked from the lyrics dock), the old lines fade out and the lines on screen rise into place one after another. Switching source within the same song keeps the old lyrics up, dimmed, while the next ones load, and the loader only appears if they take longer than 250ms. While they wait, the old lyrics have `data-held` on `.blyrics-pip-scroller`, so you can change how far they dim:
+
+```css
+.blyrics-pip-scroller[data-held] {
+  opacity: 0.5;
+}
+```
+
+The lines fading out are a short-lived copy marked `.blyrics-pip-lyrics__exit`, and `.blyrics-pip-lyrics` has `data-revealing` while lines are still rising. Each rising line ends at the opacity your theme gives it, and the blur is added on top of its own `filter`, so lines you dim or blur keep that look when the rise ends. With reduced motion on, both steps become a short fade. None of this applies to the side panel or fullscreen.
+
+You can retune the motion with these variables on `.blyrics-pip-lyrics`. They're read when a swap starts, so changing them mid-swap does nothing until the next one:
+
+| Variable | Default | What it does |
+|----------|---------|--------------|
+| `--blyrics-pip-lyrics-hold-delay` | `250ms` | How long old lyrics stay up, dimmed, before the loader replaces them |
+| `--blyrics-pip-lyrics-exit-duration` | `200ms` | Fade-out of the old lines (and fade-in of the loader) |
+| `--blyrics-pip-lyrics-reveal-duration` | `500ms` | How long each line takes to rise |
+| `--blyrics-pip-lyrics-reveal-delay` | `120ms` | Wait before the first line starts rising |
+| `--blyrics-pip-lyrics-reveal-stagger` | `40ms` | Gap between one line and the next |
+| `--blyrics-pip-lyrics-reveal-lines` | All on screen | Most lines that rise; the rest appear at once. `0` turns the rise off |
+| `--blyrics-pip-lyrics-reveal-distance` | `12px` | How far below its place a line starts |
+| `--blyrics-pip-lyrics-reveal-blur` | `3px` | Blur a line starts with |
+| `--blyrics-pip-lyrics-reveal-easing` | `cubic-bezier(0.22, 1, 0.36, 1)` | Easing for the rise |
+
+```css
+.blyrics-pip-lyrics {
+  --blyrics-pip-lyrics-reveal-stagger: 70ms;
+  --blyrics-pip-lyrics-reveal-blur: 0px;
 }
 ```
 
@@ -1838,6 +1872,16 @@ Each backdrop can also be styled on its own: the intro card is `.blyrics-karaoke
 ```
 
 The lyric size comes from `--blyrics-font-size`, the same as everywhere else. Line scaling is turned off inside karaoke: `--blyrics-scale` and `--blyrics-active-scale` are forced to `1` on `#blyrics-karaoke .blyrics-container`, so sung and waiting lines keep the same size.
+
+### Bars Around the Video
+
+When a video's shape doesn't match the screen, YouTube Music fills the leftover space with black bars. In karaoke those bars are transparent, so they show whatever is behind the player: your theme's background, or the album art backdrop if that option is on. The video keeps its full frame. To bring the black back:
+
+```css
+ytmusic-player-page[video-mode][blyrics-karaoke] :is(#player, .html5-video-player) {
+  background: #000 !important;
+}
+```
 
 ### Stage Lines
 

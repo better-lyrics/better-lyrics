@@ -10,6 +10,7 @@ import {
   createDiffView,
   createLoadingLine,
 } from "@/options/unison/revisions/revisionUi";
+import { initTabStrip } from "@/ui/tabStrip";
 
 // -- Types --------------------------
 
@@ -39,7 +40,6 @@ interface ChangesTabs {
 
 type TabName = "preview" | "changes";
 
-const TAB_ORDER: TabName[] = ["preview", "changes"];
 const HEAD_TABS_CLASS = "unison-detail-col-head--tabs";
 const HEAD_CHANGES_CLASS = "unison-detail-col-head--changes";
 
@@ -52,15 +52,17 @@ export function mountChangesTabs(surface: ChangesSurface, host: RevisionHost, ha
   const previewTab = createTab("preview", t("unison_preview"), preview.id);
   const changesTab = createTab("changes", t("unison_rev_changes"), "unison-rev-changes");
   const badge = document.createElement("span");
-  badge.className = "unison-rev-count";
+  badge.className = "ui-badge ui-badge--count unison-rev-count";
   changesTab.appendChild(badge);
   const tabs = { preview: previewTab, changes: changesTab };
 
   const tablist = document.createElement("div");
-  tablist.className = "unison-rev-tabs";
-  tablist.setAttribute("role", "tablist");
+  tablist.className = "ui-tabs unison-rev-tabs";
   tablist.setAttribute("aria-label", t("unison_rev_changesTabs"));
-  tablist.append(previewTab, changesTab);
+  const bar = document.createElement("span");
+  bar.className = "ui-tabs__bar";
+  bar.setAttribute("aria-hidden", "true");
+  tablist.append(bar, previewTab, changesTab);
 
   const panel = document.createElement("div");
   panel.id = "unison-rev-changes";
@@ -74,7 +76,8 @@ export function mountChangesTabs(surface: ChangesSurface, host: RevisionHost, ha
   lyricsHead.classList.add(HEAD_TABS_CLASS);
   preview.setAttribute("role", "tabpanel");
   preview.setAttribute("aria-labelledby", previewTab.id);
-  preview.after(panel);
+  const previewPane = preview.closest<HTMLElement>(".ui-frame") ?? preview;
+  previewPane.after(panel);
 
   let active: TabName = "preview";
   let supported = true;
@@ -84,24 +87,26 @@ export function mountChangesTabs(surface: ChangesSurface, host: RevisionHost, ha
   let diffView: HTMLElement | null = null;
 
   const teardown = (): void => {
+    strip.destroy();
     previewHead.replaceChildren(...originalHead);
     previewHead.classList.remove(HEAD_TABS_CLASS, HEAD_CHANGES_CLASS);
     lyricsHead.classList.remove(HEAD_TABS_CLASS);
     preview.removeAttribute("role");
     preview.removeAttribute("aria-labelledby");
-    preview.hidden = false;
+    previewPane.hidden = false;
     panel.remove();
   };
   host.onLeave(teardown);
 
+  const strip = initTabStrip(tablist, {
+    variant: "underline",
+    onChange: tab => select(tab.dataset.tab === "changes" ? "changes" : "preview"),
+  });
+
   const show = (next: TabName): void => {
     active = next;
-    for (const name of TAB_ORDER) {
-      const selected = name === next;
-      tabs[name].setAttribute("aria-selected", String(selected));
-      tabs[name].tabIndex = selected ? 0 : -1;
-    }
-    preview.hidden = next !== "preview";
+    strip.select(tabs[next], { notify: false });
+    previewPane.hidden = next !== "preview";
     panel.hidden = next !== "changes";
     previewHead.classList.toggle(HEAD_CHANGES_CLASS, next === "changes");
   };
@@ -110,19 +115,6 @@ export function mountChangesTabs(surface: ChangesSurface, host: RevisionHost, ha
     show(next);
     handlers.tabChange();
   };
-
-  tablist.addEventListener("click", event => {
-    const tab = (event.target as Element).closest<HTMLElement>("[role=tab]");
-    if (tab?.dataset.tab === "preview" || tab?.dataset.tab === "changes") select(tab.dataset.tab);
-  });
-
-  tablist.addEventListener("keydown", event => {
-    const target = targetTabIndex(event.key, TAB_ORDER.indexOf(active), TAB_ORDER.length - 1);
-    if (target === null) return;
-    event.preventDefault();
-    select(TAB_ORDER[target]);
-    tabs[TAB_ORDER[target]].focus();
-  });
 
   const count = (): number => {
     const diff = state.preview?.diff;
@@ -134,7 +126,7 @@ export function mountChangesTabs(surface: ChangesSurface, host: RevisionHost, ha
     badge.classList.toggle("unison-rev-count--bare", state.loading || state.failed);
     if (state.loading) {
       const spinner = document.createElement("span");
-      spinner.className = "unison-rev-spin";
+      spinner.className = "ui-spinner unison-rev-spin";
       spinner.setAttribute("role", "img");
       spinner.setAttribute("aria-label", t("unison_rev_updating"));
       badge.replaceChildren(spinner);
@@ -241,28 +233,12 @@ export function mountChangesTabs(surface: ChangesSurface, host: RevisionHost, ha
   };
 }
 
-function targetTabIndex(key: string, current: number, last: number): number | null {
-  switch (key) {
-    case "ArrowLeft":
-      return current === 0 ? last : current - 1;
-    case "ArrowRight":
-      return current === last ? 0 : current + 1;
-    case "Home":
-      return 0;
-    case "End":
-      return last;
-    default:
-      return null;
-  }
-}
-
 function createTab(name: TabName, label: string, controls: string): HTMLButtonElement {
   const tab = document.createElement("button");
   tab.type = "button";
   tab.id = `unison-rev-tab-${name}`;
-  tab.className = "unison-feed-tab unison-rev-tab";
+  tab.className = "ui-tabs__tab unison-rev-tab";
   tab.dataset.tab = name;
-  tab.setAttribute("role", "tab");
   tab.setAttribute("aria-controls", controls);
   tab.textContent = label;
   return tab;

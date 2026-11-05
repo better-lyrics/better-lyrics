@@ -1,0 +1,171 @@
+/* -- Design tokens ------------------------------------------------------------
+   Values locked in docs/mockups (2026-09-30 / 2026-10-01). Components read these; never hardcode the literals. */
+
+:root {
+  /* -- Spacing -- */
+  --page-pad: 24px;
+  --card-pad: 8px;
+  --row-pad: 12px;
+  --text-inset: calc(var(--card-pad) + var(--row-pad));
+  --row-height: 44px;
+  --card-head-height: 48px;
+  --popup-width: 560px;
+
+  /* -- Radii -- */
+  --radius-tab-strip: 1rem;
+  --radius-tab: 0.75rem;
+  --radius-card: 1.5rem;
+  --radius-card-fallback: 0.75rem;
+  --radius-row: 1rem;
+  --radius-control: 0.75rem;
+  --radius-menu: 1rem;
+  --radius-option: 0.75rem;
+
+  /* -- Page -- */
+  --page-bg: #1a1a1c;
+  --font-sans: "Satoshi", Avenir, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell,
+    "Open Sans", "Helvetica Neue", sans-serif;
+
+  /* -- Surfaces -- */
+  --card-bg: rgba(255, 255, 255, 0.05);
+  --card-edge: 1px solid rgba(255, 255, 255, 0.1);
+  --card-bg-hover: rgba(255, 255, 255, 0.08);
+  --card-edge-color-hover: rgba(255, 255, 255, 0.2);
+  --card-surface: #333437;
+  --pane-bg: rgba(255, 255, 255, 0.03);
+  --pane-edge: inset 0 0 0 1px rgba(255, 255, 255, 0.08);
+  --raised-bg: rgba(255, 255, 255, 0.05);
+  --raised-bg-hover: rgba(255, 255, 255, 0.09);
+  --raised-edge: inset 0 0 0 1px rgba(255, 255, 255, 0.08), inset rgba(255, 255, 255, 0.06) 0 1px 0 0;
+  --button-bg: rgba(255, 255, 255, 0.06);
+  --button-bg-hover: rgba(255, 255, 255, 0.1);
+  --button-primary-bg: rgba(255, 255, 255, 0.15);
+  --button-primary-bg-hover: rgba(255, 255, 255, 0.2);
+  --menu-bg: #333437;
+  --menu-edge: 1px solid rgba(255, 255, 255, 0.1);
+  --menu-shadow: rgba(0, 0, 0, 0.45) 0 18px 40px -12px, inset rgba(255, 255, 255, 0.06) 0 1px 0 0;
+  --toast-bg: #36373b;
+  --toast-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.08), var(--menu-shadow);
+  --divider: rgba(255, 255, 255, 0.06);
+  --divider-strong: rgba(255, 255, 255, 0.08);
+
+  /* -- Fields: lift off the page (today's submit page values); surfaces that are lighter re-scope these -- */
+  --field-bg: rgba(255, 255, 255, 0.025);
+  --field-bg-focus: rgba(255, 255, 255, 0.15);
+  --field-edge: inset 0 0 0 1px rgba(255, 255, 255, 0.1);
+  --field-edge-focus: inset 0 0 0 1px rgba(255, 255, 255, 0.2);
+
+  /* -- Text -- */
+  --text-strong: #fff;
+  --text: rgba(255, 255, 255, 0.85);
+  --text-muted: rgba(255, 255, 255, 0.55);
+  --text-label: rgba(255, 255, 255, 0.5);
+  --text-faint: rgba(255, 255, 255, 0.4);
+
+  /* -- Type scale: every font-size reads one of these; base is row labels and modal body -- */
+  --font-size-4xs: 0.5625rem;
+  --font-size-3xs: 0.625rem;
+  --font-size-2xs: 0.6875rem;
+  --font-size-xs: 0.75rem;
+  --font-size-sm: 0.8125rem;
+  --font-size-md: 0.875rem;
+  --font-size-base: 0.9375rem;
+  --font-size-lg: 1rem;
+  --font-size-xl: 1.125rem;
+  --font-size-2xl: 1.25rem;
+  --font-size-3xl: 1.5rem;
+  --font-size-4xl: 1.75rem;
+
+  /* -- Motion -- */
+  --duration-quick: 150ms;
+  --duration-fast: 250ms;
+  --duration-slow: 400ms;
+  --duration-spin: 600ms;
+  --ease-smooth-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --distance-base: 8px;
+  --distance-toast: 14px;
+  --blur-small: 2px;
+  --scale-press: 0.96;
+  --scale-menu-open: 0.97;
+  --scale-menu-close: 0.99;
+  --scale-modal-open: 0.96;
+  --scale-modal-close: 0.98;
+  --tooltip-delay: 200ms;
+  --tooltip-skip-delay: 300ms;
+
+  /* -- Focus -- */
+  --focus-ring: 2px solid rgba(255, 255, 255, 0.4);
+
+  /* -- Switch -- */
+  --switch-off: rgba(255, 255, 255, 0.1);
+  --switch-mid: rgba(255, 255, 255, 0.28);
+  --switch-on: rgba(255, 255, 255, 0.5);
+  --switch-thumb: #fff;
+  --switch-thumb-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.25);
+  --radius-switch: 0.375rem;
+
+  /* -- Scroll fades (mask on the inner scroller, never the surface) -- */
+  --fade-top-size: 40px;
+  --fade-bottom-size: 56px;
+  --fade-inline-size: 24px;
+  --pane-fade-top-size: 72px;
+  --pane-fade-bottom-size: 96px;
+
+  /* -- Scrollbars (where a scroll fade cannot replace them) -- */
+  --scrollbar-thumb: rgba(255, 255, 255, 0.15);
+
+  /* -- Sync type tints -- */
+  --sync-syllable: #fcd34d;
+  --sync-syllable-bg: rgba(252, 211, 77, 0.15);
+  --sync-word: #93c5fd;
+  --sync-word-bg: rgba(96, 165, 250, 0.15);
+  --sync-line: #86efac;
+  --sync-line-bg: rgba(74, 222, 128, 0.15);
+  --sync-unsynced: rgba(255, 255, 255, 0.5);
+  --sync-unsynced-bg: rgba(255, 255, 255, 0.05);
+
+  /* -- Stats: neutral steps for monochrome breakdown bars, strongest first -- */
+  --stat-step-1: rgba(255, 255, 255, 0.75);
+  --stat-step-2: rgba(255, 255, 255, 0.45);
+  --stat-step-3: rgba(255, 255, 255, 0.28);
+  --stat-step-4: rgba(255, 255, 255, 0.16);
+
+  /* -- Layers: portalled menus sit above page modals (max 100000), tooltips above menus.
+     Keep these at 6 digits or fewer: the CSS minifier rounds longer custom property numbers, which made both equal. -- */
+  --z-sticky: 5;
+  --z-modal: 999990;
+  --z-toast: 999997;
+  --z-menu: 999998;
+  --z-tooltip: 999999;
+
+  /* -- Accent -- */
+  --accent: rgb(99, 102, 241);
+
+  /* -- Callout: tints sit on a darker base so they stay clean on lighter page backdrops -- */
+  --callout-base: rgba(0, 0, 0, 0.2);
+
+  /* -- Warning -- */
+  --warning: #f5b942;
+
+  /* -- Pending (awaiting review; paler than --warning on purpose) -- */
+  --pending: rgb(254, 240, 138);
+
+  /* -- Info -- */
+  --info: rgb(125, 211, 252);
+
+  /* -- Danger -- */
+  --danger: rgb(239, 68, 68);
+  --danger-hover: rgb(220, 38, 38);
+
+  /* -- Success -- */
+  --success: rgb(34, 197, 94);
+  --success-text: color-mix(in srgb, var(--success) 50%, #fff);
+}
+
+.ui-card,
+.ui-menu,
+.ui-tile,
+.ui-modal__surface {
+  --field-bg: rgba(0, 0, 0, 0.05);
+  --field-bg-focus: rgba(0, 0, 0, 0.1);
+}

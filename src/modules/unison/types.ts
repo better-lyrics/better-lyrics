@@ -17,6 +17,8 @@ export interface UnisonSubmitter {
   avatarUrl?: string | null;
 }
 
+export type UnisonActor = Omit<UnisonSubmitter, "reputation">;
+
 export interface UnisonFulfillment {
   demand: number;
   requestCount: number;
@@ -61,6 +63,7 @@ export interface UnisonSearchEntry {
   voteCount: number;
   confidence: UnisonConfidence;
   matchScore: number;
+  submitter?: UnisonActor;
 }
 
 export interface UnisonFeedEntry {
@@ -81,6 +84,7 @@ export interface UnisonFeedEntry {
   createdAt: number;
   marks?: Mark[];
   userVote?: 1 | -1 | null;
+  submitter?: UnisonActor;
 }
 
 export interface LinkedVideo {
@@ -246,12 +250,26 @@ export interface DiffHead {
   line: number | null;
 }
 
+export interface SyllableChange {
+  before: string | null;
+  after: string | null;
+  moved: number;
+}
+
 export type DiffRow =
   | { kind: "same"; lineNo: number; startMs: number | null; text: string; head?: DiffHead }
   | { kind: "add"; lineNo: number; startMs: number | null; text: string; head?: DiffHead }
   | { kind: "del"; lineNo: number; startMs: number | null; text: string; head?: DiffHead }
   | { kind: "word"; lineNo: number; startMs: number | null; parts: Array<["=" | "+" | "-", string]>; head?: DiffHead }
-  | { kind: "timing"; lineNo: number; startMs: number; deltaMs: number; text: string }
+  | {
+      kind: "timing";
+      lineNo: number;
+      startMs: number;
+      deltaMs: number;
+      text: string;
+      syllables?: SyllableChange;
+    }
+  | ({ kind: "syllable"; lineNo: number; startMs: number | null; text: string } & SyllableChange)
   | { kind: "gap"; count: number; section?: "head" }
   | { kind: "field"; field: "language" | "isrc" | "album"; before: string | null; after: string | null };
 

@@ -212,6 +212,13 @@ export async function deleteCustomTheme(name: string): Promise<void> {
   await chrome.storage.local.set({ customThemes: filtered });
 }
 
+export class ThemeNameTakenError extends Error {
+  constructor(name: string) {
+    super(`Theme "${name}" already exists`);
+    this.name = "ThemeNameTakenError";
+  }
+}
+
 export async function renameCustomTheme(oldName: string, newName: string): Promise<void> {
   const customThemes = await getCustomThemes();
   const theme = customThemes.find(t => t.name === oldName);
@@ -222,7 +229,7 @@ export async function renameCustomTheme(oldName: string, newName: string): Promi
 
   const nameExists = customThemes.some(t => t.name === newName && t.name !== oldName);
   if (nameExists) {
-    throw new Error(`Theme "${newName}" already exists`);
+    throw new ThemeNameTakenError(newName);
   }
 
   theme.name = newName;

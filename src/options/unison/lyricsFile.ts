@@ -35,16 +35,17 @@ function readLyricsFile(file: File, textarea: HTMLTextAreaElement, onLoad: (text
 }
 
 export function bindLyricsFileDrop(textarea: HTMLTextAreaElement, onLoad: (text: string) => void): void {
+  const setDragover = (active: boolean): void => {
+    textarea.closest(".ui-frame")?.classList.toggle("is-dragover", active);
+  };
   textarea.addEventListener("dragover", event => {
     event.preventDefault();
-    textarea.classList.add("unison-textarea--dragover");
+    setDragover(true);
   });
-  textarea.addEventListener("dragleave", () => {
-    textarea.classList.remove("unison-textarea--dragover");
-  });
+  textarea.addEventListener("dragleave", () => setDragover(false));
   textarea.addEventListener("drop", event => {
     event.preventDefault();
-    textarea.classList.remove("unison-textarea--dragover");
+    setDragover(false);
     const file = event.dataTransfer?.files[0];
     if (file) readLyricsFile(file, textarea, onLoad);
   });

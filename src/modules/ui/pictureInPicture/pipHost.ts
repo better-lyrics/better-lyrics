@@ -108,6 +108,7 @@ export function createPictureInPictureHost(
   let builtLines: readonly Lyric[] | null = null;
   let builtSongwriters: readonly string[] | undefined;
   let clonedFooterSource: Element | null = null;
+  let buildCount = 0;
   let syncFrame: number | null = null;
   let styleObserver: MutationObserver | null = null;
 
@@ -189,7 +190,7 @@ export function createPictureInPictureHost(
   /**
    * Builds the window's own lyrics DOM from the lines that crossed the bridge.
    */
-  function buildLyrics(): void {
+  function buildLyrics(animate = false): void {
     const view = activeView;
     const renderer = activeRenderer;
     if (!view || !renderer) return;
@@ -197,26 +198,50 @@ export function createPictureInPictureHost(
     const lines = lyricsPayload?.lyrics ?? null;
     builtLines = lines;
     builtSongwriters = lyricsPayload?.songwriters;
-    // The container the copy hung off is about to go, so the next sync makes a fresh one.
-    clonedFooterSource = null;
+    const build = ++buildCount;
 
     if (!lines || lines.length === 0) {
-      renderer.clear();
-      view.showSearching();
+      clonedFooterSource = null;
+      const showLoader = (): void => {
+        view.showSearching(animate);
+        renderer.clear();
+      };
+      if (!animate || !view.holdLyrics(showLoader)) showLoader();
       return;
     }
 
-    renderer.setLyrics([...lines], {
-      mount: view.prepareLyricsMount(),
-      loaderVisible: false,
-      noLyrics: lyricsPayload?.noLyrics === true,
-      language: lyricsPayload?.language,
-      songwriters: lyricsPayload?.songwriters,
-    });
-    applyDecorations();
-    syncSourceFooter();
-    // The decorations and the footer both land after the build measured itself, and both add height.
-    measureLyrics();
+    const payload = lyricsPayload;
+    const videoId = view.videoId;
+    const mount = view.prepareLyricsMount(animate);
+    const mountLyrics = (): void => {
+      if (build !== buildCount || activeView !== view) return;
+      if (videoId !== null && view.videoId !== videoId) {
+        builtLines = null;
+        view.showSearching();
+        renderer.clear();
+        return;
+      }
+      // The container the copy hung off is about to go, so the next sync makes a fresh one.
+      clonedFooterSource = null;
+      renderer.setLyrics([...lines], {
+        mount,
+        loaderVisible: false,
+        noLyrics: payload?.noLyrics === true,
+        language: payload?.language,
+        songwriters: payload?.songwriters,
+      });
+      applyDecorations();
+      syncSourceFooter();
+      // The decorations and the footer both land after the build measured itself, and both add height.
+      measureLyrics();
+      if (animate) {
+        tickLyrics(false);
+        view.revealLyrics(renderer.container);
+      }
+    };
+
+    if (animate) view.afterNextFrame(mountLyrics);
+    else mountLyrics();
   }
 
   /**
@@ -262,7 +287,7 @@ export function createPictureInPictureHost(
    * panel's driver does. Nothing here reads the opener's document: the snapshot and the seek are
    * the only two things that still cross.
    */
-  function tickLyrics(): void {
+  function tickLyrics(smoothScroll = true): void {
     const view = activeView;
     const renderer = activeRenderer;
     if (!view || !renderer) return;
@@ -284,7 +309,7 @@ export function createPictureInPictureHost(
     renderer.tick(currentTime, {
       eventCreationTime: wallTime,
       isPlaying: snapshot.isPlaying,
-      smoothScroll: true,
+      smoothScroll,
       globalLyricOffset: payload.globalLyricOffset,
       lyricOffset: payload.lyricOffset,
       richsyncOffsetTrim: payload.richsyncOffsetTrim,
@@ -321,7 +346,7 @@ export function createPictureInPictureHost(
     // window is animating and restart the line it is part way through. A theme change republishes
     // them too, and the rebuild that one wants is decided where the theme arrives instead.
     if (!hasSameLines(builtLines, payload.lyrics) || !hasSameNames(builtSongwriters, payload.songwriters)) {
-      buildLyrics();
+      buildLyrics(true);
       return;
     }
     activeRenderer?.setLanguage(payload.language);

@@ -20,6 +20,7 @@ import {
   performUrlThemeUpdates,
   setActiveStoreTheme,
 } from "./store/themeStoreManager";
+import { initIdentityBackupWatcher } from "@/options/identityBackup";
 import { fetchAllStoreThemes } from "./store/themeStoreService";
 import { logBackground, warnBackground } from "@core/logger";
 import type { ThemeSettingField } from "./themes";
@@ -165,3 +166,4 @@ chrome.runtime.onMessage.addListener(request => {
 });
 
 initBackgroundAuth();
+initIdentityBackupWatcher(error => warnBackground("Identity backup watcher failed:", error));

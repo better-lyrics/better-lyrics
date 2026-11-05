@@ -29,9 +29,9 @@ import THEMES, {
   renameCustomTheme,
   saveCustomTheme,
   setCustomThemeSavedSettings,
+  ThemeNameTakenError,
 } from "../../themes";
 import { fillThemeSettings } from "../../options";
-import { SAVE_CUSTOM_THEME_DEBOUNCE, SAVE_DEBOUNCE_DELAY } from "../core/editor";
 import { editorStateManager } from "../core/state";
 import type { ThemeCardOptions } from "../types";
 import {
@@ -40,7 +40,6 @@ import {
   editThemeBtn,
   modifyThemeSettingsBtn,
   returnThemeSettings,
-  syncIndicator,
   themeModalGrid,
   themeModalOverlay,
   themeNameDisplay,
@@ -63,11 +62,15 @@ import {
   applyStoreThemeComplete,
   applyThemeSettingsToCSS,
   broadcastRICSToTabs,
+  cancelSyncSaving,
   loadThemeSettings,
   showSyncError,
+  showSyncSaving,
   showSyncSuccess,
-} from "./storage";
+} from "@/options/editor/features/storage";
 import { errorEditor, logEditor, warnEditor } from "@core/logger";
+import { createModal, type Modal } from "@/ui/modal";
+import { toast } from "@/ui/toast";
 
 const preloadedImages = new Set<string>();
 
@@ -913,7 +916,7 @@ class ThemeManager {
       }
     } catch (error) {
       errorEditor("Failed to apply theme:", error);
-      showAlert("Error applying theme! Please try again.");
+      toast.error(t("editor_alert_applyFailed"));
       throw error;
     }
   }
@@ -943,7 +946,7 @@ class ThemeManager {
 
       await this.saveTheme(selectedTheme.css, { fields: selectedTheme.settings, saved: selectedTheme.savedSettings });
 
-      showAlert(`Applied custom theme: ${selectedTheme.name}`);
+      toast.success(t("builtin_applied", selectedTheme.name));
     });
   }
 
@@ -981,13 +984,13 @@ class ThemeManager {
       });
 
       if (success) {
-        showAlert(t("symlink_applied", theme.name));
+        toast.success(t("symlink_applied", theme.name));
         return;
       }
     }
 
     warnEditor(`Marketplace install failed for ${theme.storeId}`);
-    showAlert(t("symlink_installFailed"));
+    toast.error(t("symlink_installFailed"));
   }
 
   private async applyBundledFallback(selectedTheme: Theme): Promise<void> {
@@ -1012,7 +1015,7 @@ class ThemeManager {
 
       await this.saveTheme(themeContent);
 
-      showAlert(t("builtin_applied", selectedTheme.name));
+      toast.success(t("builtin_applied", selectedTheme.name));
     });
   }
 
@@ -1027,7 +1030,6 @@ class ThemeManager {
         throw new Error(`Failed to save theme: ${result.error?.message || "Unknown error"}`);
       }
 
-      showSyncSuccess(result.strategy, result.wasRetry);
       fillThemeSettings();
       await broadcastRICSToTabs(css, result.strategy);
     } finally {
@@ -1067,7 +1069,7 @@ async function applyStoreThemeToEditor(
     });
   } catch (error) {
     errorEditor("Failed to apply marketplace theme:", error);
-    showAlert("Error applying marketplace theme! Please try again.");
+    toast.error(t("marketplace_applyFailed"));
   }
 }
 
@@ -1177,10 +1179,8 @@ function debounceSaveCustomTheme() {
       const isCustom = editorStateManager.getIsCustomTheme();
 
       if (themeName && isCustom) {
-        const currentEditor = editorStateManager.getEditor();
-        if (!currentEditor) return;
-
-        const css = currentEditor.state.doc.toString();
+        const css = editorStateManager.getContent();
+        if (css === null) return;
         const cleanCss = css.replace(/^\/\*.*?\*\/\n\n/s, "").trim();
 
         try {
@@ -1195,22 +1195,23 @@ function debounceSaveCustomTheme() {
 }
 
 function debounceSave() {
-  syncIndicator.style.display = "block";
+  showSyncSaving();
   editorStateManager.clearSaveTimeout();
   editorStateManager.setSaveTimeout(window.setTimeout(saveToStorage, SAVE_DEBOUNCE_DELAY));
 }
 
 export async function saveToStorage(isTheme = false) {
   logEditor("saveToStorage called, isTheme:", isTheme);
-  const currentEditor = editorStateManager.getEditor();
-  if (!currentEditor) {
+  const save = showSyncSaving();
+  const css = editorStateManager.getContent();
+  if (css === null) {
     errorEditor("Cannot save: editor not initialized");
+    cancelSyncSaving(save);
     return;
   }
 
   editorStateManager.incrementSaveCount();
   editorStateManager.setIsSaving(true);
-  const css = currentEditor.state.doc.toString();
   logEditor("saveToStorage CSS length:", css.length);
 
   const isCustom = editorStateManager.getIsCustomTheme();
@@ -1223,7 +1224,7 @@ export async function saveToStorage(isTheme = false) {
     .then(result => {
       logEditor("saveCustomCss result:", result);
       if (result.success && result.strategy) {
-        showSyncSuccess(result.strategy, result.wasRetry);
+        showSyncSuccess(save);
         broadcastRICSToTabs(css, result.strategy);
       } else {
         throw result.error;
@@ -1231,7 +1232,7 @@ export async function saveToStorage(isTheme = false) {
     })
     .catch(err => {
       console.error("Error saving to storage:", err);
-      showSyncError(err);
+      showSyncError(err, save);
     })
     .finally(() => {
       editorStateManager.setIsSaving(false);
@@ -1300,8 +1301,10 @@ export async function updateThemeSelectorButton(): Promise<void> {
   // -- Apply all at once (no async gap) --------------------------
   if (themePreviewName) themePreviewName.textContent = displayName;
   if (themePreviewAuthor) themePreviewAuthor.textContent = authorText;
-  if (themePreviewCard)
-    themePreviewCard.style.setProperty("--theme-img-url", bgUrl ? `url("${bgUrl}")` : "transparent");
+  if (themePreviewCard) {
+    themePreviewCard.style.setProperty("--theme-img-url", bgUrl ? `url("${bgUrl}")` : "none");
+    themePreviewCard.toggleAttribute("data-image", Boolean(bgUrl));
+  }
 
   if (themePreviewBadge) {
     themePreviewBadge.replaceChildren();
@@ -1399,7 +1402,8 @@ function createModalSection(
 
   if (withBrowseLink) {
     const browse = document.createElement("button");
-    browse.className = "section-browse-link";
+    browse.type = "button";
+    browse.className = "ui-button ui-button--ghost ui-button--compact";
     browse.appendChild(createMarketplaceIcon());
     browse.appendChild(document.createTextNode(t("theme_modal_browse")));
     browse.addEventListener("click", () => {
@@ -1425,7 +1429,7 @@ function createMarketplaceCard(
   rank?: number
 ): HTMLElement {
   const card = document.createElement("div");
-  card.className = "theme-card";
+  card.className = "ui-tile theme-card";
   card.setAttribute("data-type", "store");
 
   if (storedThemeName === `${STORE_THEME_PREFIX}${storeId}`) {
@@ -1483,16 +1487,16 @@ async function selectMarketplaceTheme(storeId: string, fallbackTitle: string): P
         source: installed.source ?? "marketplace",
       });
       if (applied) {
-        showAlert(t("symlink_applied", installed.title || fallbackTitle));
+        toast.success(t("symlink_applied", installed.title || fallbackTitle));
         return;
       }
     }
 
     warnEditor(`Marketplace apply failed for ${storeId}`);
-    showAlert(t("symlink_installFailed"));
+    toast.error(t("symlink_installFailed"));
   } catch (error) {
     errorEditor("Failed to apply marketplace theme:", error);
-    showAlert(t("symlink_installFailed"));
+    toast.error(t("symlink_installFailed"));
   }
 }
 
@@ -1553,7 +1557,7 @@ async function populateThemeModal(): Promise<void> {
 
 function createThemeCard(options: ThemeCardOptions, storedThemeName?: string): HTMLElement {
   const card = document.createElement("div");
-  card.className = "theme-card";
+  card.className = "ui-tile theme-card";
 
   const isStoreThemeActive = editorStateManager.getIsStoreTheme();
   const isSymlinkedActive = options.storeId && storedThemeName === `${STORE_THEME_PREFIX}${options.storeId}`;
@@ -1600,35 +1604,17 @@ async function selectTheme(isCustom: boolean, index: number, themeName: string) 
   }
 }
 
+let themeModal: Modal | undefined;
+
 export function openThemeModal() {
-  if (themeModalOverlay) {
-    populateThemeModal();
-    themeModalOverlay.style.display = "flex";
-    requestAnimationFrame(() => {
-      if (themeModalOverlay) {
-        themeModalOverlay.classList.add("active");
-      }
-    });
-  }
+  if (!themeModalOverlay) return;
+  themeModal ??= createModal(themeModalOverlay);
+  populateThemeModal();
+  themeModal.open();
 }
 
-export function closeThemeModal() {
-  if (themeModalOverlay) {
-    const modal = themeModalOverlay.querySelector(".theme-modal");
-    if (modal) {
-      modal.classList.add("closing");
-    }
-    themeModalOverlay.classList.remove("active");
-
-    setTimeout(() => {
-      if (themeModalOverlay) {
-        themeModalOverlay.style.display = "none";
-        if (modal) {
-          modal.classList.remove("closing");
-        }
-      }
-    }, 200);
-  }
+function closeThemeModal() {
+  themeModal?.close();
 }
 
 export async function setThemeName() {
@@ -1681,19 +1667,22 @@ export async function setThemeName() {
 }
 
 export async function handleSaveTheme() {
-  const currentEditor = editorStateManager.getEditor();
-  if (!currentEditor) {
-    showAlert("Editor not initialized!");
+  const css = editorStateManager.getContent();
+  if (css === null) {
+    toast.error(t("options_editor_notReady"));
     return;
   }
-
-  const css = currentEditor.state.doc.toString();
   if (!css || css.trim() === "") {
-    showAlert("No CSS to save as theme!");
+    toast.info(t("editor_alert_nothingToSave"));
     return;
   }
 
-  const themeName = await showPrompt("Save as Theme", "Enter a name for this theme:", "", "Theme name");
+  const themeName = await showPrompt(
+    t("options_editor_saveAsTheme"),
+    t("editor_prompt_saveMessage"),
+    "",
+    t("editor_prompt_themeName")
+  );
   if (!themeName || themeName.trim() === "" || themeName.trim().startsWith(STORE_THEME_PREFIX)) {
     return;
   }
@@ -1709,10 +1698,10 @@ export async function handleSaveTheme() {
 
     showThemeName(themeName.trim(), "custom");
     updateThemeSelectorButton();
-    showAlert(`Saved custom theme: ${themeName.trim()}`);
+    toast.success(t("editor_alert_themeSaved", themeName.trim()));
   } catch (error) {
-    console.error("Error saving theme:", error);
-    showAlert("Failed to save theme!");
+    errorEditor("Error saving theme:", error);
+    toast.error(t("editor_alert_themeSaveFailed"));
   }
 }
 
@@ -1722,7 +1711,12 @@ export async function handleRenameTheme() {
 
   if (!themeName || !isCustom) return;
 
-  const newName = await showPrompt("Rename Theme", "Enter a new name for this theme:", themeName, "Theme name");
+  const newName = await showPrompt(
+    t("options_editor_renameTheme"),
+    t("editor_prompt_renameMessage"),
+    themeName,
+    t("editor_prompt_themeName")
+  );
   if (!newName || newName.trim() === "" || newName.trim() === themeName) {
     return;
   }
@@ -1735,11 +1729,14 @@ export async function handleRenameTheme() {
 
     showThemeName(newName.trim(), "custom");
     updateThemeSelectorButton();
-    showAlert(`Theme renamed to: ${newName.trim()}`);
-  } catch (error: any) {
-    console.error("Error renaming theme:", error);
-    const errorMsg = error.message || "Failed to rename theme!";
-    showAlert(errorMsg);
+    toast.success(t("editor_alert_themeRenamed", newName.trim()));
+  } catch (error) {
+    errorEditor("Error renaming theme:", error);
+    toast.error(
+      error instanceof ThemeNameTakenError
+        ? t("editor_alert_themeNameTaken", newName.trim())
+        : t("editor_alert_themeRenameFailed")
+    );
   }
 }
 
@@ -1749,13 +1746,14 @@ export async function handleDeleteTheme() {
 
   if (!themeName || !isCustom) return;
 
+  const NAME_SLOT = "@@name@@";
+  const [before, after = ""] = t("editor_prompt_deleteMessage", NAME_SLOT).split(NAME_SLOT);
   const message = document.createDocumentFragment();
-  message.append("Are you sure you want to delete the theme ");
   const code = document.createElement("code");
   code.textContent = themeName;
-  message.append(code, "?");
+  message.append(before, code, after);
 
-  const confirmed = await showConfirm("Delete Theme", message, true);
+  const confirmed = await showConfirm(t("options_editor_deleteTheme"), message, true);
   if (!confirmed) return;
 
   try {
@@ -1767,9 +1765,9 @@ export async function handleDeleteTheme() {
 
     hideThemeName();
     updateThemeSelectorButton();
-    showAlert("Custom theme deleted!");
+    toast.success(t("editor_alert_themeDeleted"));
   } catch (error) {
-    console.error("Error deleting theme:", error);
-    showAlert("Failed to delete theme!");
+    errorEditor("Error deleting theme:", error);
+    toast.error(t("editor_alert_themeDeleteFailed"));
   }
 }

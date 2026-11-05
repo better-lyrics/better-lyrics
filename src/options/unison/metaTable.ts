@@ -7,6 +7,7 @@ export function appendMetaRow(
 ): HTMLTableCellElement {
   const tr = document.createElement("tr");
   const th = document.createElement("th");
+  th.className = "ui-section-label";
   th.textContent = label;
   const td = document.createElement("td");
   if (typeof value === "string") {

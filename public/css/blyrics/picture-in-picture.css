@@ -542,6 +542,21 @@ body {
   scroll-padding-block: var(--blyrics-pip-lyrics-fade-top) var(--blyrics-pip-lyrics-fade-bottom);
 }
 
+.blyrics-pip-scroller[data-swapping] {
+  visibility: hidden;
+}
+
+.blyrics-pip-scroller[data-held] {
+  opacity: 0.35;
+  transition: opacity 250ms ease;
+}
+
+.blyrics-pip-lyrics__exit {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
 .blyrics-pip-lyrics .blyrics-container {
   --blyrics-font-size: clamp(1rem, 5cqw, 2.4rem) !important;
   --blyrics-translated-font-size: clamp(0.675rem, 2.5cqw, 1.5rem) !important;
@@ -550,9 +565,18 @@ body {
   margin: 0 !important;
   margin-block: 0 !important;
   margin-inline: 0 !important;
-  padding: 0.5rem 0 60cqh !important;
-  padding-block: 0.5rem 60cqh !important;
+  padding: max(0.5rem, var(--blyrics-padding-top, 0px)) 0 60cqh !important;
+  padding-block: max(0.5rem, var(--blyrics-padding-top, 0px)) 60cqh !important;
   padding-inline: 0 !important;
+  overflow: visible !important;
+}
+
+.blyrics-pip-lyrics .blyrics-container[data-no-lyrics="true"] {
+  display: flex;
+  min-height: 100%;
+  flex-direction: column;
+  justify-content: center;
+  padding-block: 0 !important;
 }
 
 :where(.blyrics-pip-lyrics .blyrics-container) {
@@ -603,13 +627,13 @@ body {
   min-height: 100%;
   align-items: center;
   justify-content: center;
-  gap: clamp(8px, 2.5vw, 12px);
+  gap: clamp(0.5rem, 2.5cqw, 0.875rem);
 }
 
 .blyrics-pip-loader__mark {
   flex: 0 0 auto;
-  width: clamp(14px, 4.5vw, 19px);
-  height: clamp(14px, 4.5vw, 19px);
+  width: clamp(1rem, 4.5cqw, 1.5rem);
+  height: clamp(1rem, 4.5cqw, 1.5rem);
   background: url("https://betterlyrics.org/icon-512.png") 50% / cover;
   animation: blyrics-spin 1.5s linear infinite;
 }
@@ -620,7 +644,7 @@ body {
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
-  font-size: clamp(10px, 2.4vw, 12px);
+  font-size: clamp(0.8125rem, 3.4cqw, 1.125rem);
   font-weight: 700;
   line-height: 1.4;
   animation: blyrics-shimmer 3s linear infinite;
@@ -1009,6 +1033,10 @@ body {
    or rotation. Deliberately not the crossfade preset: that one carries a 1.06
    scale settle, which is still motion and is exactly what was opted out of. */
 @media (prefers-reduced-motion: reduce) {
+  .blyrics-pip-scroller[data-held] {
+    transition: none;
+  }
+
   /* The header falls all the way back to what shipped before the marquee: a real
      ellipsis and a plain crossfade. Script has to rebuild the rows as single
      text nodes to go with this, since no rule can undo the word boxes and

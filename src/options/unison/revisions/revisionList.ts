@@ -24,6 +24,7 @@ import {
   type RevisionHost,
   bindButtonAction,
   createAnchorChip,
+  createBackButton,
   createButton,
   createDiffLegend,
   createDiffView,
@@ -90,11 +91,7 @@ export function renderRevisionsPage(
 function createPageHead(entry: UnisonLyricsEntry, host: RevisionHost, isOwner: boolean): HTMLElement {
   const id = String(entry.id);
 
-  const back = document.createElement("button");
-  back.type = "button";
-  back.className = "unison-back-btn";
-  back.append(svgIcon("back"), t("unison_back"));
-  back.addEventListener("click", () => host.leave({ id }));
+  const back = createBackButton(t("unison_back"), () => host.leave({ id }));
 
   const title = document.createElement("h2");
   title.className = "unison-section-title";
@@ -121,7 +118,7 @@ function createPageHead(entry: UnisonLyricsEntry, host: RevisionHost, isOwner: b
 
 function createTableHead(): HTMLElement {
   const row = document.createElement("div");
-  row.className = "unison-rev-table__row unison-rev-table__head";
+  row.className = "unison-rev-table__row ui-section-label unison-rev-table__head";
   for (const key of COLUMN_KEYS) {
     const cell = document.createElement("span");
     cell.textContent = t(key);
@@ -203,7 +200,7 @@ function createRevisionItem(rev: RevisionSummary, ctx: ListContext, open: boolea
   when.textContent = formatTimeAgo(rev.createdAt * 1000);
 
   const chevron = svgIcon("chevron");
-  chevron.classList.add("unison-rev-chev");
+  chevron.classList.add("ui-row__chevron");
 
   const row = document.createElement("button");
   row.type = "button";
