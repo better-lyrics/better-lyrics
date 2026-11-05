@@ -46,8 +46,37 @@ export function menuLeft(input: MenuLeftInput): number {
   return Math.max(VIEWPORT_MARGIN_PX, Math.min(left, maxLeft));
 }
 
+interface Box {
+  left: number;
+  top: number;
+  right: number;
+  bottom: number;
+}
+
+export function unscaledBox(rect: Box, layout: { width: number; height: number }): Box {
+  const centerX = (rect.left + rect.right) / 2;
+  const centerY = (rect.top + rect.bottom) / 2;
+  return {
+    left: centerX - layout.width / 2,
+    top: centerY - layout.height / 2,
+    right: centerX + layout.width / 2,
+    bottom: centerY + layout.height / 2,
+  };
+}
+
+interface MeasurableTrigger {
+  offsetWidth: number;
+  offsetHeight: number;
+  getBoundingClientRect(): Box;
+}
+
+export function triggerBox(trigger: MeasurableTrigger): Box & { width: number } {
+  const width = trigger.offsetWidth;
+  return { ...unscaledBox(trigger.getBoundingClientRect(), { width, height: trigger.offsetHeight }), width };
+}
+
 export function positionMenu(menu: HTMLElement, trigger: HTMLElement): void {
-  const rect = trigger.getBoundingClientRect();
+  const rect = triggerBox(trigger);
   menu.style.maxHeight = "";
   const horizontal = {
     triggerLeft: rect.left,

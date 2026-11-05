@@ -1,5 +1,6 @@
 <!DOCTYPE html><html lang="en-US"><head><meta charset="utf-8">
 		<meta name="color-scheme" content="dark">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
 		<title>Better Lyrics Settings</title>
 		<link rel="stylesheet" href="/fonts/fonts.css">
 		<link rel="stylesheet" href="../ui/tokens.css">
@@ -15,7 +16,7 @@
 		<nav id="navbar">
 			<h1>
 				<img src="/images/icons/icon-48.png" alt="Better Lyrics" width="24" height="24">
-				<div class="heading">Better Lyrics <span id="app-version">3.0.0 4</span></div>
+				<div class="heading">Better Lyrics <span id="app-version">3.0.1-canary 2</span></div>
 			</h1>
 			<div class="nav-container">
 				<a class="ui-button ui-button--header ui-button--icon" href="https://github.com/better-lyrics/better-lyrics" target="_blank">
@@ -162,8 +163,11 @@
 									<label class="ui-switch"><input type="checkbox" role="switch" class="ui-switch__input" id="albumArt" aria-labelledby="albumArt-label"><span class="ui-switch__track" aria-hidden="true"></span></label>
 								</div>
 								<div class="ui-row">
-									<span class="ui-row__label" id="isFullscreenControlsEnabled-label">__MSG_options_display_fullscreenControls__</span>
-									<label class="ui-switch"><input type="checkbox" role="switch" class="ui-switch__input" id="isFullscreenControlsEnabled" aria-labelledby="isFullscreenControlsEnabled-label"><span class="ui-switch__track" aria-hidden="true"></span></label>
+									<span class="ui-row__label">
+										<span id="fullscreenControlsLabel">__MSG_options_display_fullscreenControls__</span>
+										<span class="setting-help" tabindex="0" data-tooltip="__MSG_options_display_fullscreenControlsTooltipStates__" aria-label="__MSG_options_display_fullscreenControlsTooltipStates__">?</span>
+									</span>
+									<button type="button" class="ui-switch ui-switch--tri" id="fullscreenControlsSwitch" data-state="auto" role="slider" aria-labelledby="fullscreenControlsLabel" aria-valuemin="0" aria-valuemax="2" aria-valuenow="1"></button>
 								</div>
 								<div class="ui-row">
 									<span class="ui-row__label" id="isKaraokeEnabled-label">__MSG_options_display_karaoke__</span>
@@ -473,14 +477,22 @@
 							<li data-linked="shaders"></li>
 						</ul>
 					</div>
-					<div class="about__section">
-						<h3 class="about__heading">__MSG_options_about_supportHeading__</h3>
-						<p class="about__body">__MSG_options_about_supportBody__</p>
-						<ul class="about__body about__list">
-							<li data-linked="star"></li>
-							<li data-linked="coffee"></li>
-							<li data-linked="sponsors"></li>
-						</ul>
+					<div class="about__section about__support">
+						<div class="about__stage" aria-hidden="true">
+							<span class="about__glow about__glow--red"></span>
+							<span class="about__glow about__glow--violet"></span>
+							<span class="about__glow about__glow--amber"></span>
+							<div class="about__stage-lyrics" id="support-stage"></div>
+						</div>
+						<div class="about__support-body">
+							<h3 class="about__heading about__support-heading"><span data-icon="chefHatHeart"></span>__MSG_options_about_supportHeading__</h3>
+							<p class="about__body">__MSG_options_about_supportBody__</p>
+							<div class="about__support-actions">
+								<a class="about__coffee" data-support-link="coffee" target="_blank" rel="noopener noreferrer"><img src="/images/buy-me-a-coffee.png" alt="__MSG_options_about_supportCoffee__"></a>
+								<a class="ui-button ui-button--header about__sponsor" data-support-link="sponsors" target="_blank" rel="noopener noreferrer"><span data-icon="heart"></span>__MSG_options_about_supportSponsors__</a>
+								<a class="ui-button ui-button--header ui-button--ghost about__star" data-support-link="star" target="_blank" rel="noopener noreferrer"><span data-icon="star"></span>__MSG_options_about_supportStar__</a>
+							</div>
+						</div>
 					</div>
 					<div class="about__section">
 						<h3 class="about__heading">__MSG_options_about_madeByHeading__</h3>
@@ -705,6 +717,13 @@
 						<span id="pipProgressBarEnabled-label">__MSG_options_display_pipProgressBar__</span>
 						<label class="ui-switch">
 							<input type="checkbox" role="switch" class="ui-switch__input" id="pipProgressBarEnabled" aria-labelledby="pipProgressBarEnabled-label">
+							<span class="ui-switch__track" aria-hidden="true"></span>
+						</label>
+					</div>
+					<div class="container pip-modal-row--dependent">
+						<span id="pipVideoEnabled-label">__MSG_options_display_pipVideo__</span>
+						<label class="ui-switch">
+							<input type="checkbox" role="switch" class="ui-switch__input" id="pipVideoEnabled" aria-labelledby="pipVideoEnabled-label">
 							<span class="ui-switch__track" aria-hidden="true"></span>
 						</label>
 					</div>

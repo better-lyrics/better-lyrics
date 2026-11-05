@@ -8,6 +8,7 @@
   --row-pad: 12px;
   --text-inset: calc(var(--card-pad) + var(--row-pad));
   --row-height: 44px;
+  --control-height: 38px;
   --card-head-height: 48px;
   --popup-width: 560px;
 

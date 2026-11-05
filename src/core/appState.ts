@@ -58,6 +58,7 @@ interface AppStateType {
   currentProviderKey: string | null;
   manualProviderKey: LyricSourceKey | null;
   availableProviderKeys: LyricSourceKey[];
+  availableUnisonLyricsId: number | null;
   isControlsDockEnabled: boolean;
   controlsDockPosition: string;
   isControlsDockAutoHideInFullscreenEnabled: boolean;
@@ -107,6 +108,7 @@ export const AppState: AppStateType = {
   currentProviderKey: null,
   manualProviderKey: null,
   availableProviderKeys: [],
+  availableUnisonLyricsId: null,
   isControlsDockEnabled: true,
   controlsDockPosition: DOCK_DEFAULT_POSITION,
   isControlsDockAutoHideInFullscreenEnabled: true,
@@ -132,6 +134,7 @@ export function reloadLyrics(): void {
 export async function refreshCurrentSong(): Promise<void> {
   const videoId = AppState.lastLoadedVideoId;
   AppState.availableProviderKeys = [];
+  AppState.availableUnisonLyricsId = null;
   if (videoId) {
     resetUnifiedStream(videoId);
     await clearSongCache(videoId);
@@ -144,6 +147,7 @@ export function handleModifications(detail: PlayerDetails): void {
     AppState.lyricOffset = 0;
     AppState.manualProviderKey = null;
     AppState.availableProviderKeys = [];
+    AppState.availableUnisonLyricsId = null;
   }
 
   if (AppState.lyricInjectionPromise) {

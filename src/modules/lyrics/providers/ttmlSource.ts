@@ -1,6 +1,11 @@
 import { parseTTMLContent, TTMLParser } from "@braccato/parsers";
 import { HOMEPAGE_DOMAIN, HOMEPAGE_URL } from "@constants";
-import type { LyricSourceKey, LyricSourceResult, ProviderParameters } from "@modules/lyrics/providers/shared";
+import type {
+  LyricContributor,
+  LyricSourceKey,
+  LyricSourceResult,
+  ProviderParameters,
+} from "@modules/lyrics/providers/shared";
 import type { UnisonData } from "@modules/lyrics/providers/unison";
 import { logCore } from "@core/logger";
 
@@ -11,6 +16,7 @@ interface FillTtmlOptions {
   sourceHref: string;
   cacheAllowed?: boolean;
   unisonData?: UnisonData;
+  contributors?: LyricContributor[];
 }
 
 export function fillTtml(
@@ -25,7 +31,7 @@ export function fillTtml(
     unisonData: undefined,
   }
 ) {
-  const { richsyncKey, syncedKey, source, sourceHref, cacheAllowed, unisonData } = options;
+  const { richsyncKey, syncedKey, source, sourceHref, cacheAllowed, unisonData, contributors } = options;
 
   const { lyrics, isWordSynced, language } = parseTTMLContent(responseString, {
     songDurationMs: providerParameters.duration * 1000,
@@ -49,6 +55,7 @@ export function fillTtml(
     sourceHref,
     songwriters: TTMLParser.metadata(responseString).songwriters,
     unisonData,
+    contributors,
   };
 
   if (isWordSynced) {

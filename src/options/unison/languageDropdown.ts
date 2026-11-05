@@ -1,5 +1,5 @@
 import { t } from "@core/i18n";
-import { languageOptionList } from "@/options/unison/languages";
+import { extraLanguageOptions, languageOptionList } from "@/options/unison/languages";
 import { createDropdown, type Dropdown, type DropdownOption } from "@/ui/dropdown";
 
 export function createLanguageDropdown(opts: {
@@ -14,7 +14,10 @@ export function createLanguageDropdown(opts: {
     onChange: opts.onChange,
     variant: opts.variant,
     searchPlaceholder: t("options_searchLanguages"),
+    searchExtras: extraLanguageOptions,
   });
-  dropdown.setOptions(languageOptionList({ leading: opts.leading, current: opts.value }), opts.value);
-  return dropdown;
+  const showValue = (value: string): void =>
+    dropdown.setOptions(languageOptionList({ leading: opts.leading, current: value }), value);
+  showValue(opts.value);
+  return { ...dropdown, setValue: showValue };
 }

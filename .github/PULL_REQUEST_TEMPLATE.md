@@ -21,6 +21,21 @@ Fixes # (issue)
 | ------------------ | ------------------ |
 | [Paste Image Here] | [Paste Image Here] |
 
+## Authorship
+
+Please tick one.
+
+- [ ] I wrote this change myself. An AI agent may have assisted, but I understand every line and have tested it.
+- [ ] This PR was opened by an AI agent, disclosed below.
+
+If an agent opened it, keep this line in the description and fill in both placeholders:
+
+> Opened by `<model name>` working on behalf of `@<github-handle>`.
+
+Outside contributors: AI-generated pull requests are not accepted — please
+[open a feature request](https://github.com/better-lyrics/better-lyrics/issues/new/choose) instead.
+See [CONTRIBUTING.md](../CONTRIBUTING.md#ai-generated-code-policy).
+
 ## Checklist
 
 - [ ] I have performed a self-review of my code

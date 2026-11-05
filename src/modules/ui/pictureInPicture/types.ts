@@ -1,7 +1,10 @@
+import type { WindowSize } from "@modules/ui/pictureInPicture/windowSize";
+
 export interface DocumentPictureInPictureWindowOptions {
   readonly width: number;
   readonly height: number;
   readonly disallowReturnToOpener?: boolean;
+  readonly preferInitialWindowPlacement?: boolean;
 }
 
 export interface DocumentPictureInPicture<TWindow = Window> {
@@ -14,6 +17,8 @@ export interface DocumentPictureInPicture<TWindow = Window> {
 // Narrowed to what the view reads, so the MAIN world can satisfy it from a serialized bridge
 // payload rather than the full sniffed record.
 export interface PictureInPictureSongMetadata {
+  readonly id: string;
+  readonly counterpartVideoId: string | null;
   readonly displayTitle: string;
   readonly displayByline: string;
   readonly artist: string;
@@ -21,7 +26,7 @@ export interface PictureInPictureSongMetadata {
 }
 
 export interface PictureInPictureViewDependencies {
-  readonly translate: (key: string) => string;
+  readonly translate: (key: string, substitutions?: string) => string;
   readonly getArtworkMetadata: (
     videoId: string,
     maxCheckCount?: number,
@@ -64,6 +69,8 @@ export interface PictureInPictureHostEnvironment {
   readonly textTransition: () => unknown;
   readonly marqueeEnabled: () => unknown;
   readonly progressBarEnabled: () => unknown;
+  readonly videoEnabled: () => unknown;
+  readonly karaokeEnabled: () => unknown;
   // Read at request time, so it only shapes the next window rather than resizing an open one.
   readonly windowLayout: () => unknown;
   readonly windowTitle: () => string;
@@ -77,7 +84,7 @@ export interface PictureInPictureHostEnvironment {
 
 export interface PictureInPictureControllerDependencies<TWindow> {
   readonly host: object;
-  readonly windowLayout: () => unknown;
+  readonly windowSize: () => WindowSize;
   readonly loadStylesheet: () => Promise<string>;
   readonly renderLoadingShell: (pipWindow: TWindow) => void;
   readonly injectStylesheet: (pipWindow: TWindow, stylesheet: string) => void;

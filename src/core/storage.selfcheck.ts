@@ -50,13 +50,14 @@ const seed = (items: Record<string, unknown>): void => {
     "blyrics_abcdefghijk_bLyrics-richsynced": entry,
     "blyrics_abcdefghijk_lrclib-synced": entry,
     "blyrics_zyxwvutsrqp_yt-lyrics": entry,
+    blyrics_zyxwvutsrqp_unison: entry,
     blyrics_featured_themes: { themes: [] },
     blyrics_stableReleaseCheck: { checkedAt: 1 },
     userIdentity: { keyId: "k" },
   });
   const info = await getUpdatedCacheInfo();
   assert.equal(info.count, 2, "counts unique songs across lyric cache keys");
-  assert.equal(info.size, JSON.stringify(entry).length * 3, "size covers only lyric cache keys");
+  assert.equal(info.size, JSON.stringify(entry).length * 4, "size covers only lyric cache keys");
 
   await clearLyricCache();
   assert.deepEqual(
@@ -140,6 +141,11 @@ const seed = (items: Record<string, unknown>): void => {
 {
   assert.equal(storageCategoryForKey("blyrics_abcdefghijk_bLyrics-richsynced"), "lyrics");
   assert.equal(storageCategoryForKey("blyrics_abcdefghijk_metadata"), "lyrics", "metadata belongs to the lyric cache");
+  assert.equal(
+    storageCategoryForKey("blyrics_abcdefghijk_unison"),
+    "lyrics",
+    "Unison's per-song entry belongs to the lyric cache"
+  );
   assert.equal(storageCategoryForKey("storeTheme:abc"), "themes");
   assert.equal(storageCategoryForKey("storeThemeIndex"), "themes");
   assert.equal(storageCategoryForKey("customThemes"), "themes");
@@ -211,6 +217,31 @@ const seed = (items: Record<string, unknown>): void => {
     summarizeLyricCache({ "blyrics_aaaaaaaaaaa_lrclib-synced": missingPlain }).songs,
     0,
     "uncompressed misses are misses too"
+  );
+}
+
+// -- Lyric cache summary: Unison --------------------------
+{
+  const unison = (lookup: object) => ({
+    type: "transient",
+    value: compressString(JSON.stringify({ version: 1, lookup, validatedAt: null })),
+    expiry: 0,
+  });
+  const found = (syncType: string, format: string) =>
+    unison({ found: true, data: { syncType, format, lyrics: "<tt></tt>" } });
+  const lrc = { type: "transient", value: compressString(JSON.stringify({ version: 1, lyrics: [] })), expiry: 0 };
+  const summary = summarizeLyricCache({
+    blyrics_aaaaaaaaaaa_unison: found("richsync", "ttml"),
+    "blyrics_aaaaaaaaaaa_musixmatch-richsync": lrc,
+    "blyrics_aaaaaaaaaaa_lrclib-synced": lrc,
+    blyrics_bbbbbbbbbbb_unison: found("richsync", "lrc"),
+    blyrics_ccccccccccc_unison: unison({ found: false }),
+  });
+  assert.equal(summary.songs, 2, "a Unison-only song counts, a Unison miss does not");
+  assert.deepEqual(
+    summary.bySyncType,
+    { syllable: 1, word: 1, line: 0, unsynced: 0 },
+    "regression: a song's Unison TTML outranks its word and line entries"
   );
 }
 

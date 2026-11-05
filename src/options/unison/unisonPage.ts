@@ -1,5 +1,6 @@
 import { UNISON_API_BASE_URL, UNISON_LYRICS_PREVIEW_DEBOUNCE_MS, UNISON_MAX_VIDEOS_PER_LYRIC } from "@constants";
-import { getLanguageDisplayName, t } from "@core/i18n";
+import { t } from "@core/i18n";
+import { languageName } from "@modules/unison/languageNames";
 import { formatTimeAgo } from "@core/relativeTime";
 import {
   DEFAULT_FEED_FILTERS,
@@ -42,8 +43,11 @@ import { bindLyricsFileDrop, LYRICS_FILE_READING_EVENT } from "@/options/unison/
 import { createFeedback, fillFeedback } from "@/options/unison/feedback";
 import { activeSyncChip, applyFormatChip, applySyncChip, isSyncChip } from "@/options/unison/feedSyncFilter";
 import { type IconKey, svgIcon } from "@/options/unison/icons";
+import { bindDetectedField, type DetectedField } from "@/options/unison/detectedField";
+import { bindDetectedInput } from "@/options/unison/detectedInput";
 import { createLanguageDropdown } from "@/options/unison/languageDropdown";
 import { matchLanguageOption } from "@/options/unison/languages";
+import { readTtmlMetadata, type TtmlSongMetadata } from "@/options/unison/ttmlMetadata";
 import { renderPreviewInto } from "@/options/unison/lyricsPreview";
 import { detectFormat } from "@/options/unison/lyricsPreviewLines";
 import { searchResultsMessage, splitSearchResultsMessage } from "@/options/unison/searchResultsLabel";
@@ -63,10 +67,10 @@ import { renderSortChip } from "@/ui/sortIcon";
 import { initTabStrip, type TabStrip } from "@/ui/tabStrip";
 import { attachScrollFade } from "@/ui/scrollFade";
 import { isTextEntry } from "@/ui/textEntry";
-import { createSyncIcon, createSyncTag, syncTypeForLyric } from "@/ui/syncTag";
+import { createSyncIcon, createSyncTag } from "@/ui/syncTag";
+import { syncTypeForLyric } from "@modules/unison/syncType";
 import { initTooltips } from "@/ui/tooltip";
 import { attachEditor, highlightInto } from "@braccato/highlight";
-import { XMLParser } from "fast-xml-parser";
 
 // -- Icons --------------------------
 
@@ -105,6 +109,9 @@ let previewHead: HTMLElement;
 let lyricsTextarea: HTMLTextAreaElement;
 let submitLanguageDropdown: Dropdown;
 let submitFormatDropdown: Dropdown;
+let submitLanguageField: DetectedField;
+let submitFormatField: DetectedField;
+let submitMetadataFields: Record<keyof TtmlSongMetadata, DetectedField>;
 let lyricsField: ReadableLyricsField;
 let composerLink: HTMLAnchorElement;
 
@@ -487,51 +494,9 @@ function detectTtmlLanguage(text: string): string | null {
   return match ? match[1] : null;
 }
 
-function autoDetectLanguage(): void {
-  if (submitLanguageDropdown.getValue()) return;
-  const text = lyricsTextarea.value;
-  if (!text.trim()) return;
+function detectLanguageOption(text: string): string | null {
   const lang = detectTtmlLanguage(text);
-  if (!lang) return;
-  const matched = matchLanguageOption(lang);
-  if (matched) submitLanguageDropdown.setValue(matched);
-}
-
-const ttmlMetaParser = new XMLParser({ ignoreAttributes: false, removeNSPrefix: true });
-
-function findIsrcMeta(node: unknown): string | null {
-  if (!node || typeof node !== "object") return null;
-  for (const [key, child] of Object.entries(node)) {
-    if (key === "meta") {
-      for (const meta of [child].flat()) {
-        if (String(meta?.["@_key"]).toLowerCase() !== "isrc") continue;
-        const value = String(meta["@_value"] ?? "")
-          .toUpperCase()
-          .replace(/[\s-]/g, "");
-        if (/^[A-Z]{2}[A-Z0-9]{3}\d{7}$/.test(value)) return value;
-      }
-    }
-    const found = findIsrcMeta(child);
-    if (found) return found;
-  }
-  return null;
-}
-
-function detectTtmlIsrc(text: string): string | null {
-  if (!/isrc/i.test(text)) return null;
-  try {
-    return findIsrcMeta(ttmlMetaParser.parse(text));
-  } catch (error) {
-    warnUnison("Failed to read TTML metadata", error);
-    return null;
-  }
-}
-
-function autoDetectIsrc(): void {
-  const isrcInput = document.getElementById("unison-field-isrc") as HTMLInputElement;
-  if (isrcInput.value.trim()) return;
-  const isrc = detectTtmlIsrc(lyricsTextarea.value);
-  if (isrc) isrcInput.value = isrc;
+  return lang ? matchLanguageOption(lang) : null;
 }
 
 function clearFeedTabCache(cache: FeedTabCache): void {
@@ -1085,7 +1050,7 @@ function renderDetail(entry: UnisonLyricsEntry, view: AbortSignal, isOwn: boolea
   appendMetaRow(metaTable, t("unison_format"), t(`unison_format_${entry.format}`));
   appendMetaRow(metaTable, t("unison_sync"), createSyncTag(syncTypeForLyric(entry.syncType, entry.format)));
   if (entry.album) appendMetaRow(metaTable, t("unison_album"), entry.album);
-  if (entry.language) appendMetaRow(metaTable, t("unison_language"), getLanguageDisplayName(entry.language));
+  if (entry.language) appendMetaRow(metaTable, t("unison_language"), languageName(entry.language));
   if (entry.isrc) appendMetaRow(metaTable, "ISRC", entry.isrc);
   if (entry.submitter) appendMetaRow(metaTable, t("unison_uploadedBy"), createUploaderCell(entry.submitter));
 
@@ -1688,7 +1653,7 @@ function createManualVideoLinkForm(onLink: (videoId: string) => Promise<string |
 
   const addBtn = document.createElement("button");
   addBtn.type = "submit";
-  addBtn.className = "ui-button ui-button--compact";
+  addBtn.className = "ui-button";
   addBtn.textContent = t("unison_addVideo");
 
   const error = document.createElement("p");
@@ -1934,11 +1899,15 @@ function setupSubmitForm(): void {
     leading: { value: "", label: t("unison_languageUnspecified") },
     value: "",
     variant: "stretch",
-    onChange: ignoreChange,
+    onChange: () => submitLanguageField.edited(),
   });
   document.getElementById("unison-field-language-mount")?.appendChild(submitLanguageDropdown.root);
 
-  submitFormatDropdown = createDropdown({ label: t("unison_format"), onChange: ignoreChange, variant: "stretch" });
+  submitFormatDropdown = createDropdown({
+    label: t("unison_format"),
+    onChange: () => submitFormatField.edited(),
+    variant: "stretch",
+  });
   submitFormatDropdown.setOptions(
     [
       { value: "auto", label: t("unison_autoDetect") },
@@ -1950,10 +1919,24 @@ function setupSubmitForm(): void {
   );
   document.getElementById("unison-field-format-mount")?.appendChild(submitFormatDropdown.root);
 
+  submitLanguageField = bindDetectedField(submitLanguageDropdown.getValue, submitLanguageDropdown.setValue, "");
+  submitFormatField = bindDetectedField(submitFormatDropdown.getValue, submitFormatDropdown.setValue, "auto");
+  submitMetadataFields = {
+    song: bindDetectedInput(document.getElementById("unison-field-song") as HTMLInputElement),
+    artist: bindDetectedInput(document.getElementById("unison-field-artist") as HTMLInputElement),
+    album: bindDetectedInput(document.getElementById("unison-field-album") as HTMLInputElement),
+    isrc: bindDetectedInput(document.getElementById("unison-field-isrc") as HTMLInputElement),
+    videoId: bindDetectedInput(document.getElementById("unison-field-videoId") as HTMLInputElement),
+    duration: bindDetectedInput(document.getElementById("unison-field-duration") as HTMLInputElement),
+  };
+
   const durationField = document.getElementById("unison-field-duration") as HTMLInputElement | null;
   durationField?.addEventListener("blur", () => {
     if (!durationField.value.trim()) return;
-    durationField.value = String(parseDurationInput(durationField.value));
+    const normalized = String(parseDurationInput(durationField.value));
+    if (normalized === durationField.value) return;
+    durationField.value = normalized;
+    submitMetadataFields.duration.edited();
   });
 
   const composerHint = document.getElementById("unison-composer-hint");
@@ -1988,7 +1971,7 @@ function setupSubmitForm(): void {
   attachScrollFade(lyricsEditor.wrap, lyricsTextarea);
   lyricsField = bindReadableLyricsField(lyricsTextarea, lyricsEditor);
 
-  updatePreview();
+  runLyricsChecks();
 
   lyricsTextarea.addEventListener("input", scheduleLyricsChecks);
 
@@ -2006,9 +1989,24 @@ function runLyricsChecks(): void {
   cancelLyricsChecks();
   lastCheckedLyrics = lyricsTextarea.value;
   updatePreview();
-  autoDetectFormat();
-  autoDetectLanguage();
-  autoDetectIsrc();
+  const text = lyricsTextarea.value;
+  const hasText = text.trim() !== "";
+  submitFormatField.apply(hasText ? detectFormat(text) : null);
+  submitLanguageField.apply(hasText ? detectLanguageOption(text) : null);
+  const metadata = hasText ? readTtmlMetadata(text) : null;
+  submitMetadataFields.isrc.apply(metadata?.isrc ?? null);
+  const durationSeconds = parseDurationInput(metadata?.duration ?? "");
+  const detected = {
+    song: metadata?.song ?? null,
+    artist: metadata?.artist ?? null,
+    album: metadata?.album ?? null,
+    videoId: metadata?.videoId ?? null,
+    duration: durationSeconds > 0 ? String(durationSeconds) : null,
+  };
+  const suggestionInputChanged = (Object.keys(detected) as (keyof typeof detected)[])
+    .map(key => submitMetadataFields[key].apply(detected[key]))
+    .some(Boolean);
+  if (suggestionInputChanged) void refreshSubmitSuggestions();
 }
 
 function cancelLyricsChecks(): void {
@@ -2025,8 +2023,6 @@ function scheduleLyricsChecks(): void {
   clearTimeout(lyricsChecksTimer);
   lyricsChecksTimer = setTimeout(runLyricsChecks, UNISON_LYRICS_PREVIEW_DEBOUNCE_MS);
 }
-
-function ignoreChange(): void {}
 
 function setupNavButtons(): void {
   const navBtn = document.getElementById("unison-submit-nav-btn");
@@ -2049,6 +2045,9 @@ function prefillSubmitForm(params: URLSearchParams): void {
     if (value && el) el.value = param === "duration" ? String(parseDurationInput(value)) : value;
   }
 
+  for (const [key, field] of Object.entries(submitMetadataFields)) {
+    if (params.get(key)) field.edited();
+  }
   updateComposerLink();
   void refreshSubmitSuggestions();
 }
@@ -2182,16 +2181,12 @@ function updateComposerLink(): void {
 }
 
 function parseDurationInput(value: string): number {
-  const normalized = value.replace(",", ".").trim();
-  const num = Number(normalized);
-  return Number.isFinite(num) ? Math.round(num) : 0;
-}
-
-function autoDetectFormat(): void {
-  if (submitFormatDropdown.getValue() !== "auto") return;
-  const text = lyricsTextarea.value;
-  if (!text.trim()) return;
-  submitFormatDropdown.setValue(detectFormat(text));
+  const seconds = value
+    .replace(",", ".")
+    .trim()
+    .split(":")
+    .reduce((total, part) => total * 60 + Number(part), 0);
+  return Number.isFinite(seconds) ? Math.round(seconds) : 0;
 }
 
 function updatePreview(): void {

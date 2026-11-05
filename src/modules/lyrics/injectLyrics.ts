@@ -11,7 +11,7 @@ import {
 import { AppState } from "@core/appState";
 import { t } from "@core/i18n";
 import { applySegmentMapToLyrics, type LyricSourceResultWithMeta } from "@modules/lyrics/lyrics";
-import type { LyricPart } from "@modules/lyrics/providers/shared";
+import type { LyricContributor, LyricPart } from "@modules/lyrics/providers/shared";
 import { createScriptClassifier, type ScriptClassifier } from "@modules/lyrics/nonLatinScript";
 import {
   getRomanizationFromCache,
@@ -87,6 +87,7 @@ export interface LyricsData {
   hasNonLatin: boolean;
   language?: string | null;
   songwriters?: readonly string[];
+  contributors?: readonly LyricContributor[];
   song: string;
   artist: string;
   /** YouTube's own lines, shown while the synced providers are still being asked. */
@@ -104,11 +105,16 @@ export interface LyricsData {
  * @param data.language - Language code for the lyrics
  * @param data.lyrics - Array of lyric lines
  */
+/**
+ * @param replacing - Swaps these lyrics into the view already showing this song instead of clearing
+ *   it first, so a renderer that swaps in place keeps the lines that did not change.
+ */
 export function processLyrics(
   doc: Document,
   data: LyricSourceResultWithMeta,
   keepLoaderVisible = false,
-  signal?: AbortSignal
+  signal?: AbortSignal,
+  replacing = false
 ): void {
   const lyrics = data.lyrics;
   if (!lyrics || lyrics.length === 0) {
@@ -125,11 +131,13 @@ export function processLyrics(
   // The previous song's container, not the one this injection builds: injectLyrics creates that
   // one later. cleanup() drops both this reference and the element together, so a null here means
   // there is nothing on screen to clear.
-  if (!mainView.clearOnScreenLyrics()) {
+  if (!replacing && !mainView.clearOnScreenLyrics()) {
     logCore(LYRICS_TAB_NOT_DISABLED_LOG);
   }
+  // Translations still in flight for the lyrics being replaced must not land on these.
+  if (replacing) AppState.currentInjectionId++;
 
-  injectLyrics(doc, data, keepLoaderVisible, signal);
+  injectLyrics(doc, data, keepLoaderVisible, signal, replacing);
 }
 
 /**
@@ -144,21 +152,29 @@ export function processLyrics(
  * @param [data.source] - Source attribution for lyrics
  * @param [data.sourceHref] - URL for source link
  */
+/** Names the lyrics on screen in the logs, so a later swap can say what it replaced. */
+let shownLyricsLabel: string | null = null;
+
+function lyricsLabel(data: LyricSourceResultWithMeta): string {
+  return data.providerKey ? `${data.source} [${data.providerKey}]` : String(data.source);
+}
+
 function injectLyrics(
   doc: Document,
   data: LyricSourceResultWithMeta,
   keepLoaderVisible = false,
-  signal?: AbortSignal
+  signal?: AbortSignal,
+  replacing = false
 ): void {
   const injectionId = AppState.currentInjectionId;
   const isStale = () => AppState.currentInjectionId !== injectionId;
 
   const lyrics = data.lyrics!;
   const scripts = createScriptClassifier(lyrics.map(item => item.words));
-  cleanup();
+  cleanup(replacing);
   disableNativeLyricsFocus();
 
-  const lyricsWrapper = createLyricsWrapper();
+  const lyricsWrapper = createLyricsWrapper(replacing);
   lyricsWrapper.removeAttribute("is-empty");
 
   if (AppState.isTranslateEnabled) {
@@ -175,16 +191,37 @@ function injectLyrics(
     flushLoader(allZero && !noLyrics);
   }
 
+  const previousContainer = replacing ? mainView.container : null;
+  const previousLines = new Set(replacing ? mainView.lines.map(line => line.lyricElement) : []);
+  const previousLabel = shownLyricsLabel;
+
   mainView.setLyrics(lyrics, {
     mount: lyricsWrapper,
     loaderVisible: keepLoaderVisible,
     noLyrics,
     language: data.language,
     songwriters: data.songwriters,
+    // Lyrics for the song on screen swap into its view, so an upgrade keeps the lines that match.
+    songKey: data.videoId,
   });
 
   const syncType: SyncType = mainView.syncType;
   const lines: readonly LineData[] = mainView.lines;
+
+  const label = lyricsLabel(data);
+  shownLyricsLabel = label;
+  if (!replacing) {
+    logCore(
+      `Set up lyrics from ${label}: ${lines.length} lines, sync ${syncType}${keepLoaderVisible ? " (provisional)" : ""}`
+    );
+  } else if (previousContainer !== null && mainView.container === previousContainer) {
+    const kept = lines.filter(line => previousLines.has(line.lyricElement)).length;
+    logCore(`Swapped lyrics from ${previousLabel} to ${label} in place: kept ${kept} of ${lines.length} lines`);
+  } else {
+    logCore(
+      `Replaced lyrics from ${previousLabel} with ${label} by rebuilding the view: ${lines.length} lines, sync ${syncType}`
+    );
+  }
 
   const tabSelector = document.getElementsByClassName(TAB_HEADER_CLASS)[1] as HTMLElement;
 
@@ -195,6 +232,7 @@ function injectLyrics(
     tabSelector,
     hasNonLatin: lyrics.some(item => !!item.words && scripts.hasNonLatinScript(item.words)),
     songwriters: data.songwriters,
+    contributors: data.contributors,
     song: data.song,
     artist: data.artist,
     isProvisional: keepLoaderVisible,
@@ -215,7 +253,8 @@ function injectLyrics(
       data.providerKey,
       data.videoId,
       unisonData,
-      syncType === "none"
+      syncType === "none",
+      data.contributors
     );
   } else {
     addNoLyricsButton(data.song, data.artist, data.album, data.duration, data.videoId);

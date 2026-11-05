@@ -1,6 +1,6 @@
 import { UNISON_REVISION_PREVIEW_RETRY_MAX_MS, UNISON_REVISION_PREVIEW_RETRY_MS } from "@constants";
-import { getLanguageDisplayName } from "@core/i18n";
 import { UnisonErrorCode } from "@modules/unison/errorCodes";
+import { languageName } from "@modules/unison/languageNames";
 import type {
   DiffHead,
   DiffRow,
@@ -154,7 +154,7 @@ export function countDiffChanges(rows: DiffRow[]): number {
 
 function fieldValueText(field: FieldDiffRow["field"], value: string): string {
   if (field !== "language") return value;
-  const name = getLanguageDisplayName(value);
+  const name = languageName(value);
   return name === value ? value : `${name} (${value})`;
 }
 
@@ -206,7 +206,7 @@ export function syllableChange(row: SyllableLineChange): SyllableLine[] {
 export function diffHeadLabel(head: DiffHead): RevisionMessage[] {
   const label = [message(HEAD_KIND_KEY[head.kind])];
   if (head.kind === "credit") return label;
-  if (head.lang) label.push({ text: getLanguageDisplayName(head.lang) });
+  if (head.lang) label.push({ text: languageName(head.lang) });
   if (head.line !== null) label.push(message("unison_rev_headLine", head.line));
   return label;
 }

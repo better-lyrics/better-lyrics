@@ -27,6 +27,12 @@ export const SUPPORTED_LOCALES = LOCALE_CODES.map(code => ({
   nativeName: getNativeName(code),
 }));
 
+const RETIRED_LOCALES: Record<string, string> = { pt: "pt_BR" };
+
+export function resolveUiLanguage(saved: string): string {
+  return RETIRED_LOCALES[saved] ?? saved;
+}
+
 // -- Locale Override Engine --------------------------
 
 interface MessageEntry {
@@ -39,7 +45,7 @@ let overrideMessages: Record<string, MessageEntry> | null = null;
 export async function loadLocaleOverride(): Promise<void> {
   try {
     const items = await chrome.storage.sync.get({ uiLanguage: "auto" });
-    const locale = items.uiLanguage as string | undefined;
+    const locale = resolveUiLanguage(items.uiLanguage as string);
 
     if (!locale || locale === "auto") {
       overrideMessages = null;
@@ -91,7 +97,7 @@ export function t(key: string, substitutions?: string | string[]): string {
 export function getLanguageDisplayName(langCode: string): string {
   try {
     const displayCode = DISPLAY_CODE_MAP[langCode] ?? langCode;
-    const displayNames = new Intl.DisplayNames([navigator.language], { type: "language" });
+    const displayNames = new Intl.DisplayNames([navigator.language], { type: "language", fallback: "none" });
     return displayNames.of(displayCode) ?? langCode;
   } catch (e) {
     warnCore(`Failed to get display name for "${langCode}":`, e);

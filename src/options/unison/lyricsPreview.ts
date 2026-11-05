@@ -1,5 +1,6 @@
 import type { Lyric } from "@braccato/parsers";
-import { getLanguageDisplayName, t } from "@core/i18n";
+import { t } from "@core/i18n";
+import { languageName } from "@modules/unison/languageNames";
 import { createDropdown, type Dropdown, type DropdownOption } from "@/ui/dropdown";
 import { parseSvgMarkup } from "@/options/unison/icons";
 import {
@@ -32,7 +33,7 @@ function viewOptions(lyrics: Lyric[]): DropdownOption[] {
     options.push({ value: ROMANIZATION_VIEW, label: t("options_romanization_tab") });
   }
   for (const lang of translationLanguages(lyrics)) {
-    options.push({ value: lang, label: getLanguageDisplayName(lang) });
+    options.push({ value: lang, label: languageName(lang) });
   }
   return options;
 }

@@ -10,6 +10,12 @@ export function quickDurationMs(): number {
   return cssTimeMs(getComputedStyle(document.documentElement).getPropertyValue("--duration-quick"), QUICK_FALLBACK_MS);
 }
 
+const REDUCED_MOTION_QUERY = "(prefers-reduced-motion: reduce)";
+
 export function prefersReducedMotion(): boolean {
-  return matchMedia("(prefers-reduced-motion: reduce)").matches;
+  return matchMedia(REDUCED_MOTION_QUERY).matches;
+}
+
+export function onReducedMotionChange(listener: () => void): void {
+  matchMedia(REDUCED_MOTION_QUERY).addEventListener("change", listener);
 }

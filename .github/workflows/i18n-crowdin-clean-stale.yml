@@ -1,0 +1,36 @@
+name: i18n Crowdin Stale Cleanup
+
+on:
+  push:
+    branches: [master]
+    paths:
+      - "_locales/en/messages.json"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: crowdin-clean-stale
+  cancel-in-progress: false
+
+jobs:
+  clean-stale:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Use Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22.x"
+
+      - name: Delete Crowdin translations that hold an older English string
+        env:
+          CROWDIN_TOKEN: ${{ secrets.CROWDIN_TOKEN }}
+          CROWDIN_PROJECT: better-lyrics
+        run: npx --yes tsx@4.23.15 tooling/crowdin-delete-stale.ts --apply

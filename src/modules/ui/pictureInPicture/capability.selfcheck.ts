@@ -1,11 +1,25 @@
 import { strict as assert } from "node:assert";
-import { getPictureInPictureCapability } from "./capability";
-import { createGatedToggle, PictureInPictureController } from "./controller";
+import { getPictureInPictureCapability } from "@modules/ui/pictureInPicture/capability";
+import { createGatedToggle, PictureInPictureController } from "@modules/ui/pictureInPicture/controller";
 import type {
   DocumentPictureInPicture,
   DocumentPictureInPictureWindowOptions,
   PictureInPictureControllerDependencies,
-} from "./types";
+} from "@modules/ui/pictureInPicture/types";
+import { fitWindowSize, type WindowContent } from "@modules/ui/pictureInPicture/windowSize";
+
+function songModeContent(layout: unknown): WindowContent {
+  return {
+    layout,
+    videoEnabled: true,
+    videoMode: false,
+    adPlaying: false,
+    videoWidth: 0,
+    videoHeight: 0,
+    karaokeEnabled: false,
+    syncedLyrics: false,
+  };
+}
 
 class FakeWindow {
   private pageHideListener: (() => void) | null = null;
@@ -49,7 +63,7 @@ function createDependencies(
 ): PictureInPictureControllerDependencies<FakeWindow> {
   return {
     host: { documentPictureInPicture: api },
-    windowLayout: () => undefined,
+    windowSize: () => fitWindowSize(songModeContent(undefined)),
     loadStylesheet,
     renderLoadingShell: () => undefined,
     injectStylesheet,
@@ -92,7 +106,7 @@ const retryController = new PictureInPictureController(
 retryController.toggle();
 assert.deepEqual(
   retryApi.requests,
-  [{ width: 720, height: 300, disallowReturnToOpener: true }],
+  [{ width: 720, height: 300, disallowReturnToOpener: true, preferInitialWindowPlacement: true }],
   "Given a controller click, When a PiP window is requested, Then requestWindow receives exact dimensions synchronously"
 );
 await settle();
@@ -257,13 +271,37 @@ const verticalController = new PictureInPictureController({
     () => Promise.resolve(".pip {}"),
     () => undefined
   ),
-  windowLayout: () => "vertical",
+  windowSize: () => fitWindowSize(songModeContent("vertical")),
 });
 verticalController.toggle();
 assert.deepEqual(
   verticalApi.requests,
-  [{ width: 340, height: 720, disallowReturnToOpener: true }],
+  [{ width: 340, height: 720, disallowReturnToOpener: true, preferInitialWindowPlacement: true }],
   "Given the vertical layout setting, When a PiP window is requested, Then it asks for portrait dimensions"
+);
+
+const stageApi = new FakeApi([Promise.resolve(new FakeWindow())]);
+const stageController = new PictureInPictureController({
+  ...createDependencies(
+    stageApi,
+    () => Promise.resolve(".pip {}"),
+    () => undefined
+  ),
+  windowSize: () =>
+    fitWindowSize({
+      ...songModeContent("horizontal"),
+      videoMode: true,
+      videoWidth: 1920,
+      videoHeight: 1080,
+      karaokeEnabled: true,
+      syncedLyrics: true,
+    }),
+});
+stageController.toggle();
+assert.deepEqual(
+  stageApi.requests,
+  [{ width: 640, height: 360, disallowReturnToOpener: true, preferInitialWindowPlacement: true }],
+  "Given a music video with karaoke, When a PiP window is requested, Then it asks for the stage size in the same call"
 );
 
 console.log("Picture-in-Picture controller selfcheck passed");

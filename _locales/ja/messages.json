@@ -40,11 +40,11 @@
     "description": "Auto switch to lyrics tab setting label"
   },
   "options_general_clearCachedLyrics": {
-    "message": "Clear cached lyrics",
+    "message": "キャッシュされた歌詞をクリア",
     "description": "Label for the clear cache action row"
   },
   "options_general_clearCachedLyricsHint": {
-    "message": "They download again as you play",
+    "message": "再生中に再度ダウンロードします",
     "description": "Hint under the clear cached lyrics label"
   },
   "options_general_clearCache": {
@@ -56,7 +56,7 @@
     "description": "Total lyrics in cache label"
   },
   "options_general_storageUsed": {
-    "message": "Storage used",
+    "message": "使用中のストレージ",
     "description": "Popup General tab: label under the total local storage size"
   },
   "options_general_segment": {
@@ -74,23 +74,23 @@
     }
   },
   "options_general_browseThemes": {
-    "message": "Browse themes",
+    "message": "テーマをブラウズ",
     "description": "Popup General tab: one-line description on the Theme Marketplace shortcut"
   },
   "options_general_whatsNew": {
-    "message": "What's new",
+    "message": "新着情報",
     "description": "Popup General tab: shortcut to the latest release notes"
   },
   "options_general_whatsNewHint": {
-    "message": "Latest release notes",
+    "message": "最新のリリース ノート",
     "description": "Popup General tab: one-line description on the What's new shortcut"
   },
   "options_display_fullscreenTab": {
-    "message": "Fullscreen",
+    "message": "フルスクリーン",
     "description": "Header tab in Display for fullscreen settings"
   },
   "options_display_videoTab": {
-    "message": "Video",
+    "message": "動画",
     "description": "Header tab in Display for video settings"
   },
   "options_display_disableFullscreen": {
@@ -106,7 +106,7 @@
     "description": "Show album art background setting label"
   },
   "options_display_fullscreenControls": {
-    "message": "Show player controls in fullscreen",
+    "message": "プレイヤーコントロールを全画面表示で表示",
     "description": "Toggle label for the playback controls strip (progress bar, transport, like and dislike) shown under the album art in the fullscreen lyrics view"
   },
   "options_display_stylizedAnimations": {
@@ -117,24 +117,28 @@
     "message": "Letter wave",
     "description": "Label for the per-letter wave lyric animation toggle"
   },
+  "options_display_fullscreenControlsTooltipStates": {
+    "message": "Auto hides the controls while the player bar is showing. On keeps them visible.",
+    "description": "Tooltip for the fullscreen player controls three-way switch, explaining the Auto and On states"
+  },
   "options_display_letterWaveOff": {
-    "message": "Off",
+    "message": "オフ",
     "description": "Spoken value of the letter wave three-way switch when the effect is off"
   },
   "options_display_letterWaveOn": {
-    "message": "On",
+    "message": "オン",
     "description": "Spoken value of the letter wave three-way switch when the effect is always on"
   },
   "options_display_letterWaveBadge": {
-    "message": "Experimental",
+    "message": "実験的",
     "description": "Badge shown next to the letter wave setting marking it as experimental"
   },
   "options_display_letterWaveTooltip": {
-    "message": "Lyrics feel more alive with a gentle rolling motion across each letter as they're sung. Turn it off if lyrics scroll feels choppy on your device.",
+    "message": "歌詞は、それぞれの文字を横切る穏やかな回転運動で、より生き生きと感じます。 端末で歌詞のスクロールが不安定になった場合はOFFにしてください。",
     "description": "Tooltip explaining the letter wave animation and its performance impact"
   },
   "options_display_letterWaveTooltipStates": {
-    "message": "Auto stays off unless a theme turns it on. On and Off override any theme.",
+    "message": "テーマがオンにならない限り、自動はオフになります。オンとオフはテーマを上書きします。",
     "description": "Appended to the letter wave tooltip, explaining the three switch states"
   },
   "options_display_passiveScroll": {
@@ -157,12 +161,30 @@
     "message": "一時停止",
     "description": "Accessible label for the pause button in the Picture-in-Picture lyrics window, used when the YouTube Music player bar exposes no label of its own"
   },
+  "picture_in_picture_fitWindow": {
+    "message": "Fit window",
+    "description": "Tooltip and accessible label for the selected song/video button in the Picture-in-Picture lyrics window when the window size no longer matches its content; clicking it resizes the window to fit"
+  },
   "picture_in_picture_next": {
     "message": "次",
     "description": "Accessible label for the next track button in the Picture-in-Picture lyrics window, used when the YouTube Music player bar exposes no label of its own"
   },
+  "picture_in_picture_adPlaying": {
+    "message": "Ad playing",
+    "description": "Shown in the floating lyrics window while YouTube Music plays an ad, above a countdown to the end of the ad"
+  },
+  "picture_in_picture_adUpNext": {
+    "message": "Then $SONG$",
+    "description": "Shown in the floating lyrics window during an ad, naming the song that plays when the ad ends",
+    "placeholders": {
+      "song": {
+        "content": "$1",
+        "example": "Never Gonna Give You Up"
+      }
+    }
+  },
   "options_display_pipEnabled": {
-    "message": "Enable floating window",
+    "message": "フローティングウィンドウを有効にする",
     "description": "Master toggle for the floating lyrics window feature, which turns it off everywhere including the YouTube Music minimize button"
   },
   "options_display_pipAutoRestore": {
@@ -170,23 +192,23 @@
     "description": "Setting label for automatically reopening the floating lyrics window after page load"
   },
   "options_display_pipAutoRestoreTooltip": {
-    "message": "Keeps the floating lyrics window from closing for good when you reload or move between songs and pages. Browsers only let a floating window open right after you interact with the page, so it reopens on your first click or key press instead of instantly.",
+    "message": "曲やページ間を再読み込みまたは移動した際に、フローティング歌詞ウィンドウが閉じないようにします。 ブラウザーは、ページとやり取りした直後にフローティングウィンドウを開かせます。 一度クリックするかキーを押すと再び開きます。",
     "description": "Help tooltip explaining what automatic floating-lyrics reopening does and why it waits for the first interaction"
   },
   "options_display_pipWindowLayout": {
-    "message": "Window layout",
+    "message": "ウィンドウレイアウト",
     "description": "Setting label, shown inside the floating lyrics window settings, for choosing whether the window opens wide or tall"
   },
   "options_pipWindowLayout_horizontal": {
-    "message": "Horizontal",
+    "message": "水平",
     "description": "Floating lyrics window layout option: a wide window with the album art beside the lyrics"
   },
   "options_pipWindowLayout_vertical": {
-    "message": "Vertical",
+    "message": "垂直",
     "description": "Floating lyrics window layout option: a tall window with the album art above the lyrics"
   },
   "options_display_pipArtworkTransition": {
-    "message": "Album art transition",
+    "message": "アルバムアートの切り替え",
     "description": "Setting label, shown inside the floating lyrics window settings, for choosing how album art changes between songs"
   },
   "options_pipTransition_shuffle": {
@@ -222,8 +244,12 @@
     "description": "Toggle label for whether a song title too long for the floating lyrics window scrolls across so it can be read in full"
   },
   "options_display_pipProgressBar": {
-    "message": "Show progress bar",
+    "message": "プログレスバーを表示",
     "description": "Toggle label, shown inside the floating lyrics window settings, for the seekable playback progress bar under the album art"
+  },
+  "options_display_pipVideo": {
+    "message": "Show music video",
+    "description": "Toggle label, shown inside the floating lyrics window settings, for playing the music video in the floating window while YouTube Music is in video mode"
   },
   "options_display_shadersPromo": {
     "message": "Better Lyricsシェーダーへのリンクを表示",
@@ -402,7 +428,7 @@
     "description": "Button to open the style editor if there are no styles"
   },
   "options_themes_edit": {
-    "message": "Edit",
+    "message": "編集",
     "description": "Button to open the style editor"
   },
   "options_themes_marketplace": {
@@ -426,7 +452,7 @@
     "description": "Your identity label"
   },
   "options_identity_unisonStats": {
-    "message": "Unison Stats",
+    "message": "Unison統計",
     "description": "Section title above the user's own Unison level, tier, rank and badges on the Identity tab"
   },
   "options_identity_loading": {
@@ -534,7 +560,7 @@
     "description": "Status when nickname request fails"
   },
   "options_alert_refreshFailed": {
-    "message": "Could not refresh lyrics. Open YouTube Music and try again.",
+    "message": "歌詞を更新できませんでした。YouTubeの音楽を開いて再度お試し下さい。",
     "description": "Shown when the popup's Refresh lyrics button finds no YouTube Music tab or none of them responds"
   },
   "options_alert_importEmpty": {
@@ -590,39 +616,39 @@
     "description": "Identity load error message"
   },
   "editor_alert_nothingToSave": {
-    "message": "No styles to save as a theme",
+    "message": "テーマとして保存するスタイルはありません",
     "description": "Toast when the user saves an empty editor as a custom theme"
   },
   "editor_alert_saveDialogOpened": {
-    "message": "Theme file save dialog opened. Choose where to save your file",
+    "message": "テーマファイルの保存ダイアログが開きました。ファイルの保存先を選択してください",
     "description": "Toast after the browser save dialog opens for an exported theme file"
   },
   "editor_alert_downloadStarted": {
-    "message": "Theme file download started. Check your downloads folder",
+    "message": "テーマファイルのダウンロードが開始されました。ダウンロードフォルダを確認してください",
     "description": "Toast after an exported theme file starts downloading without a save dialog"
   },
   "editor_alert_applyFailed": {
-    "message": "Could not apply theme",
+    "message": "テーマを適用できませんでした",
     "description": "Toast when applying a built-in or custom theme from the theme picker fails"
   },
   "editor_alert_saveFailed": {
-    "message": "Could not save your styles",
+    "message": "スタイルを保存できませんでした",
     "description": "Toast when saving the custom CSS editor content fails"
   },
   "editor_alert_storageFull": {
-    "message": "Storage is full. Clear the lyrics cache in settings, then try again",
+    "message": "ストレージがいっぱいです。設定中の歌詞のキャッシュをクリアして、もう一度やり直してください",
     "description": "Toast when saving the custom CSS editor content fails because extension storage is full"
   },
   "editor_prompt_saveMessage": {
-    "message": "Enter a name for this theme",
+    "message": "テーマの名前を入力してください",
     "description": "Message in the save as theme dialog"
   },
   "editor_prompt_renameMessage": {
-    "message": "Enter a new name for this theme",
+    "message": "このテーマの新しい名前を入力してください",
     "description": "Message in the rename theme dialog"
   },
   "editor_prompt_themeName": {
-    "message": "Theme name",
+    "message": "テーマ名",
     "description": "Placeholder of the theme name field in the save and rename dialogs"
   },
   "editor_prompt_deleteMessage": {
@@ -800,7 +826,7 @@
     "description": "YouTube provider name"
   },
   "options_provider_youtubeCaptions": {
-    "message": "YouTube Captions",
+    "message": "YouTube captions",
     "description": "YouTube Captions provider name"
   },
   "options_provider_binilyrics": {
@@ -1428,7 +1454,7 @@
     }
   },
   "blUpdate_storeDelay": {
-    "message": "store may lag briefly",
+    "message": "The store may lag briefly",
     "description": "Trailing note on the update banner for Chrome and Edge, whose store approval can lag the release"
   },
   "blUpdate_action": {
@@ -1526,7 +1552,7 @@
     "description": "Message when no lyrics are available"
   },
   "lyrics_resumeAutoscroll": {
-    "message": "Resume Autoscroll",
+    "message": "Resume autoscroll",
     "description": "Resume Autoscroll button label"
   },
   "options_language_exclusions": {
@@ -1648,7 +1674,7 @@
     "description": "About page section heading"
   },
   "options_about_madeByBody": {
-    "message": "$BOIDU$ and $ADALIE$, with thanks to everyone in the Better Lyrics community who has tested it and reported bugs.",
+    "message": "$BOIDU$ and $ADALIE$, with thanks to the translators and everyone in the Better Lyrics community who has tested it, reported bugs and submitted lyrics!",
     "description": "About page credits; the names become links",
     "placeholders": {
       "boidu": {
@@ -1672,7 +1698,7 @@
     }
   },
   "options_language_exclusionsTitle": {
-    "message": "Language Exclusions",
+    "message": "Language exclusions",
     "description": "Modal title for language exclusions"
   },
   "options_romanization_tab": {
@@ -1798,11 +1824,11 @@
     }
   },
   "theme_modal_section_featured": {
-    "message": "Featured Themes",
+    "message": "Featured themes",
     "description": "Section title for featured themes (top marketplace picks and built-ins) in the theme chooser modal"
   },
   "theme_modal_section_all": {
-    "message": "All Themes",
+    "message": "All themes",
     "description": "Section title for the user's installed marketplace themes in the theme chooser modal"
   },
   "theme_modal_browse": {
@@ -2378,7 +2404,7 @@
     }
   },
   "unison_xpToNext": {
-    "message": "$xp$ XP to Level $level$",
+    "message": "$xp$ XP to level $level$",
     "description": "Explains how much experience remains before the next Unison level. $xp$ is a positive integer, $level$ is the next level number",
     "placeholders": {
       "xp": {
@@ -2406,15 +2432,15 @@
     }
   },
   "unison_viewProfile": {
-    "message": "View full profile",
+    "message": "View profile",
     "description": "Link on the Identity tab that opens the user's full Unison profile in a new tab"
   },
   "unison_changePicture": {
-    "message": "Change picture",
+    "message": "Change pfp",
     "description": "Link on the Identity tab, shown when the user has a Unison profile picture, that opens the Unison website where they can pick a different one"
   },
   "unison_addPicture": {
-    "message": "Add a picture",
+    "message": "Add a pfp",
     "description": "Link on the Identity tab, shown when the user has no Unison profile picture, that opens the Unison website where they can pick one"
   },
   "unison_submitted_this": {

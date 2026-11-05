@@ -4,7 +4,6 @@ import {
   LYRICS_NEGATIVE_CACHE_TTL_MS,
   PROVIDER_CONFIGS,
   PROVIDER_SWITCHED_LOG,
-  UNISON_NEGATIVE_CACHE_TTL_MS,
 } from "@constants";
 import { getTransientStorage, setTransientStorage } from "@core/storage";
 import unified from "./unified";
@@ -67,6 +66,13 @@ export interface LyricSourceResult {
   duration?: number;
   songwriters?: string[];
   unisonData?: UnisonData;
+  contributors?: LyricContributor[];
+}
+
+export interface LyricContributor {
+  name: string;
+  href: string;
+  role: "maker" | "uploader";
 }
 
 export type LyricsArray = Lyric[];
@@ -150,6 +156,8 @@ export function initProviders(): void {
 const sourceKeyToFillFn = {
   "binimum-richsynced": (p: ProviderParameters) => unified(p, "binimum-richsynced"),
   "binimum-synced": (p: ProviderParameters) => unified(p, "binimum-synced"),
+  "spicy-richsynced": (p: ProviderParameters) => unified(p, "spicy-richsynced"),
+  "spicy-synced": (p: ProviderParameters) => unified(p, "spicy-synced"),
   "bLyrics-richsynced": (p: ProviderParameters) => unified(p, "bLyrics-richsynced"),
   "bLyrics-synced": (p: ProviderParameters) => unified(p, "bLyrics-synced"),
   "unison-richsynced": unison,
@@ -184,13 +192,20 @@ export function newSourceMap(): SourceMapType {
   }));
 }
 
+/** Unison keeps one cache entry per song (see unison.ts) so a changed lyric can move between its keys. */
+const usesPerKeyCache = (provider: LyricSourceKey) => !provider.startsWith("unison");
+
 export async function saveLyricsToCache(providerParameters: ProviderParameters, provider: LyricSourceKey) {
   let source = providerParameters.sourceMap[provider];
+  if (!usesPerKeyCache(provider)) return;
   if (source.filled && !source.resultCached && !source.lyricSourceResult && provider !== "metadata") {
     source.resultCached = true;
     const cacheKey = `blyrics_${providerParameters.videoId}_${provider}`;
-    const negativeTtl = provider.startsWith("unison") ? UNISON_NEGATIVE_CACHE_TTL_MS : LYRICS_NEGATIVE_CACHE_TTL_MS;
-    await setTransientStorage(cacheKey, JSON.stringify({ version: LYRIC_CACHE_VERSION, missing: true }), negativeTtl);
+    await setTransientStorage(
+      cacheKey,
+      JSON.stringify({ version: LYRIC_CACHE_VERSION, missing: true }),
+      LYRICS_NEGATIVE_CACHE_TTL_MS
+    );
     return;
   }
 
@@ -210,11 +225,31 @@ export async function saveLyricsToCache(providerParameters: ProviderParameters, 
   }
 }
 
+const inFlight = new WeakMap<LyricSource, Promise<LyricSourceResult | null>>();
+
 /**
  * @param providerParameters
  * @param sourceName
  */
-export async function getLyrics(
+export function getLyrics(
+  providerParameters: ProviderParameters,
+  sourceName: LyricSourceKey
+): Promise<LyricSourceResult | null> {
+  // Providers are asked concurrently, so a second ask for the same source joins the first.
+  const lyricSource = providerParameters.sourceMap[sourceName];
+  const pending = inFlight.get(lyricSource);
+  if (pending) return pending;
+  const request = fetchLyrics(providerParameters, sourceName).finally(() => inFlight.delete(lyricSource));
+  inFlight.set(lyricSource, request);
+  return request;
+}
+
+/** Resolves once any request already made for this source has finished, without starting one. */
+export function settledLyrics(providerParameters: ProviderParameters, sourceName: LyricSourceKey): Promise<unknown> {
+  return inFlight.get(providerParameters.sourceMap[sourceName]) ?? Promise.resolve();
+}
+
+async function fetchLyrics(
   providerParameters: ProviderParameters,
   sourceName: LyricSourceKey
 ): Promise<LyricSourceResult | null> {
@@ -222,7 +257,7 @@ export async function getLyrics(
   if (!lyricSource.filled) {
     // Check cache first
     const cacheKey = `blyrics_${providerParameters.videoId}_${sourceName}`;
-    const cachedData = await getTransientStorage(cacheKey);
+    const cachedData = usesPerKeyCache(sourceName) ? await getTransientStorage(cacheKey) : null;
     if (cachedData) {
       const data = JSON.parse(cachedData);
       if (data && data.version && data.version === LYRIC_CACHE_VERSION) {

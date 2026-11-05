@@ -1,6 +1,6 @@
 {
   "extensionName": {
-    "message": "Better Lyrics (Lyrics for YouTube Music)",
+    "message": "Better Lyrics (Teksty dla YouTube Music)",
     "description": "The name of the extension"
   },
   "extensionDescription": {
@@ -40,11 +40,11 @@
     "description": "Auto switch to lyrics tab setting label"
   },
   "options_general_clearCachedLyrics": {
-    "message": "Clear cached lyrics",
+    "message": "Wyczyść teksty w pamięci podręcznej",
     "description": "Label for the clear cache action row"
   },
   "options_general_clearCachedLyricsHint": {
-    "message": "They download again as you play",
+    "message": "Pobierają się ponownie podczas odtwarzania",
     "description": "Hint under the clear cached lyrics label"
   },
   "options_general_clearCache": {
@@ -56,7 +56,7 @@
     "description": "Total lyrics in cache label"
   },
   "options_general_storageUsed": {
-    "message": "Storage used",
+    "message": "Pamięć użyta",
     "description": "Popup General tab: label under the total local storage size"
   },
   "options_general_segment": {
@@ -74,23 +74,23 @@
     }
   },
   "options_general_browseThemes": {
-    "message": "Browse themes",
+    "message": "Przeglądaj motywy",
     "description": "Popup General tab: one-line description on the Theme Marketplace shortcut"
   },
   "options_general_whatsNew": {
-    "message": "What's new",
+    "message": "Nowości",
     "description": "Popup General tab: shortcut to the latest release notes"
   },
   "options_general_whatsNewHint": {
-    "message": "Latest release notes",
+    "message": "Informacje o najnowszej wersji",
     "description": "Popup General tab: one-line description on the What's new shortcut"
   },
   "options_display_fullscreenTab": {
-    "message": "Fullscreen",
+    "message": "Pełny ekran",
     "description": "Header tab in Display for fullscreen settings"
   },
   "options_display_videoTab": {
-    "message": "Video",
+    "message": "Filmik",
     "description": "Header tab in Display for video settings"
   },
   "options_display_disableFullscreen": {
@@ -106,7 +106,7 @@
     "description": "Show album art background setting label"
   },
   "options_display_fullscreenControls": {
-    "message": "Show player controls in fullscreen",
+    "message": "Pokaż ustawienia odtwarzacza w pełnym ekranie",
     "description": "Toggle label for the playback controls strip (progress bar, transport, like and dislike) shown under the album art in the fullscreen lyrics view"
   },
   "options_display_stylizedAnimations": {
@@ -114,27 +114,31 @@
     "description": "Show stylized animations setting label"
   },
   "options_display_letterWave": {
-    "message": "Letter wave",
+    "message": "Litery w płynie",
     "description": "Label for the per-letter wave lyric animation toggle"
   },
+  "options_display_fullscreenControlsTooltipStates": {
+    "message": "Auto hides the controls while the player bar is showing. On keeps them visible.",
+    "description": "Tooltip for the fullscreen player controls three-way switch, explaining the Auto and On states"
+  },
   "options_display_letterWaveOff": {
-    "message": "Off",
+    "message": "Wyłącz",
     "description": "Spoken value of the letter wave three-way switch when the effect is off"
   },
   "options_display_letterWaveOn": {
-    "message": "On",
+    "message": "Włącz",
     "description": "Spoken value of the letter wave three-way switch when the effect is always on"
   },
   "options_display_letterWaveBadge": {
-    "message": "Experimental",
+    "message": "Eksperymentalne",
     "description": "Badge shown next to the letter wave setting marking it as experimental"
   },
   "options_display_letterWaveTooltip": {
-    "message": "Lyrics feel more alive with a gentle rolling motion across each letter as they're sung. Turn it off if lyrics scroll feels choppy on your device.",
+    "message": "Tekst piosenek jest bardziej żywy z łagodnym kroczącym ruchem w każdej literze, gdy są śpiewane. Wyłącz, jeśli przewijanie słów jest niezbyt płynne na twoim urządzeniu.",
     "description": "Tooltip explaining the letter wave animation and its performance impact"
   },
   "options_display_letterWaveTooltipStates": {
-    "message": "Auto stays off unless a theme turns it on. On and Off override any theme.",
+    "message": "Automatycznie wyłącza się, chyba, że motyw to włącza. Włączanie i wyłączanie manualnie będzie nadpisywało ustawienia motywu.",
     "description": "Appended to the letter wave tooltip, explaining the three switch states"
   },
   "options_display_passiveScroll": {
@@ -157,12 +161,30 @@
     "message": "Wstrzymaj",
     "description": "Accessible label for the pause button in the Picture-in-Picture lyrics window, used when the YouTube Music player bar exposes no label of its own"
   },
+  "picture_in_picture_fitWindow": {
+    "message": "Dopasuj do okna",
+    "description": "Tooltip and accessible label for the selected song/video button in the Picture-in-Picture lyrics window when the window size no longer matches its content; clicking it resizes the window to fit"
+  },
   "picture_in_picture_next": {
     "message": "Następny",
     "description": "Accessible label for the next track button in the Picture-in-Picture lyrics window, used when the YouTube Music player bar exposes no label of its own"
   },
+  "picture_in_picture_adPlaying": {
+    "message": "Reklama",
+    "description": "Shown in the floating lyrics window while YouTube Music plays an ad, above a countdown to the end of the ad"
+  },
+  "picture_in_picture_adUpNext": {
+    "message": "Następnie $SONG$",
+    "description": "Shown in the floating lyrics window during an ad, naming the song that plays when the ad ends",
+    "placeholders": {
+      "song": {
+        "content": "$1",
+        "example": "Never Gonna Give You Up"
+      }
+    }
+  },
   "options_display_pipEnabled": {
-    "message": "Enable floating window",
+    "message": "Włącz pływające okno",
     "description": "Master toggle for the floating lyrics window feature, which turns it off everywhere including the YouTube Music minimize button"
   },
   "options_display_pipAutoRestore": {
@@ -174,75 +196,79 @@
     "description": "Help tooltip explaining what automatic floating-lyrics reopening does and why it waits for the first interaction"
   },
   "options_display_pipWindowLayout": {
-    "message": "Window layout",
+    "message": "Układ okna",
     "description": "Setting label, shown inside the floating lyrics window settings, for choosing whether the window opens wide or tall"
   },
   "options_pipWindowLayout_horizontal": {
-    "message": "Horizontal",
+    "message": "Poziomo",
     "description": "Floating lyrics window layout option: a wide window with the album art beside the lyrics"
   },
   "options_pipWindowLayout_vertical": {
-    "message": "Vertical",
+    "message": "Pionowo",
     "description": "Floating lyrics window layout option: a tall window with the album art above the lyrics"
   },
   "options_display_pipArtworkTransition": {
-    "message": "Album art transition",
+    "message": "Przejście okładki albumu",
     "description": "Setting label, shown inside the floating lyrics window settings, for choosing how album art changes between songs"
   },
   "options_pipTransition_shuffle": {
-    "message": "Shuffle",
+    "message": "Wymieszaj kolejność",
     "description": "Name of an album art transition where the artwork tilts back and the new cover is dealt in like a playing card"
   },
   "options_pipTransition_flip": {
-    "message": "Flip",
+    "message": "Odbijanie",
     "description": "Name of an album art transition where the artwork rotates like a card to reveal the new cover on its other side"
   },
   "options_pipTransition_push": {
-    "message": "Push",
+    "message": "Pchnięcie",
     "description": "Name of a transition, offered for both album art and song titles, where the new content slides in from the side and pushes the old out"
   },
   "options_pipTransition_crossfade": {
-    "message": "Crossfade",
+    "message": "Przenikanie",
     "description": "Name of a transition, offered for both album art and song titles, where the new content fades in over the old"
   },
   "options_pipTransition_spring": {
-    "message": "Spring",
+    "message": "Sprężynowe",
     "description": "Name of a song title transition where the words of the new title bounce up into place one after another"
   },
   "options_display_pipWindow": {
-    "message": "Floating lyrics window",
+    "message": "Okno pływającego tekstu",
     "description": "Label for the row that opens the settings for the floating lyrics window"
   },
   "options_display_pipTextTransition": {
-    "message": "Title transition",
+    "message": "Przejście tytułu",
     "description": "Setting label, shown inside the floating lyrics window settings, for choosing how the song title and artist change between songs"
   },
   "options_display_pipMarquee": {
-    "message": "Scroll long titles",
+    "message": "Przewijaj długie tytuły",
     "description": "Toggle label for whether a song title too long for the floating lyrics window scrolls across so it can be read in full"
   },
   "options_display_pipProgressBar": {
-    "message": "Show progress bar",
+    "message": "Wyświetl pasek czasu",
     "description": "Toggle label, shown inside the floating lyrics window settings, for the seekable playback progress bar under the album art"
   },
+  "options_display_pipVideo": {
+    "message": "Pokaż teledysk",
+    "description": "Toggle label, shown inside the floating lyrics window settings, for playing the music video in the floating window while YouTube Music is in video mode"
+  },
   "options_display_shadersPromo": {
-    "message": "Show link to Better Lyrics Shaders",
+    "message": "Wyświetl link do shaderów Better Lyrics",
     "description": "Toggle label for the Shaders companion link shown in the lyrics footer"
   },
   "options_display_unisonActions": {
-    "message": "Lyrics controls dock",
+    "message": "Dok sterowników tekstu",
     "description": "Display-section row label for the lyrics controls dock modal trigger"
   },
   "options_unisonModal_title": {
-    "message": "Lyrics controls dock",
+    "message": "Dok sterowników tekstu",
     "description": "Title of the lyrics controls dock settings modal"
   },
   "options_unisonModal_showPinned": {
-    "message": "Show controls dock",
+    "message": "Pokaż dok sterowników",
     "description": "Toggle label inside the lyrics controls dock modal for showing the floating dock"
   },
   "options_unisonModal_showPinned_hint": {
-    "message": "A floating dock to switch source, toggle translation and romanization, nudge sync, and vote on Unison lyrics",
+    "message": "Pływający dok przełączający źródło, tłumaczenie i romanizację, synchronizację i głos na teksty piosenek Unison",
     "description": "Hint text under the Show controls dock toggle"
   },
   "options_unisonModal_autoHide": {
@@ -282,11 +308,11 @@
     "description": "Tooltip for the bottom-right cell in the Unison position picker"
   },
   "options_unisonModal_controlsShown": {
-    "message": "Controls shown",
+    "message": "Sterowniki wyświetlone",
     "description": "Label above the toggles that pick which controls appear in the lyrics dock"
   },
   "options_unisonModal_controlSource": {
-    "message": "Source switcher",
+    "message": "Źródło",
     "description": "Toggle label for showing the lyrics source switcher control in the dock"
   },
   "options_unisonModal_controlPictureInPicture": {
@@ -294,51 +320,51 @@
     "description": "Toggle label for showing the control that opens the floating lyrics window in the dock"
   },
   "options_unisonModal_controlOffset": {
-    "message": "Sync offset",
+    "message": "Synchronizacja",
     "description": "Toggle label for showing the sync offset control in the dock"
   },
   "lyricsDock_chooseSource": {
-    "message": "Choose lyrics source",
+    "message": "Wybierz źródło tekstu",
     "description": "Accessible label for the lyrics dock button that opens the source provider dropdown"
   },
   "lyricsDock_refresh": {
-    "message": "Refresh lyrics",
+    "message": "Odśwież tekst",
     "description": "Accessible label for the lyrics dock button that re-fetches lyrics for the current song, bypassing the cache"
   },
   "lyricsDock_previousSource": {
-    "message": "Previous source",
+    "message": "Poprzednie źródło",
     "description": "Accessible label for the lyrics dock button that switches to the previous lyrics provider"
   },
   "lyricsDock_nextSource": {
-    "message": "Next source",
+    "message": "Następne źródło",
     "description": "Accessible label for the lyrics dock button that switches to the next lyrics provider"
   },
   "lyricsDock_offsetEarlier": {
-    "message": "Shift lyrics earlier",
+    "message": "Przesuń tekst wcześniej",
     "description": "Accessible label for the lyrics dock button that nudges sync timing earlier"
   },
   "lyricsDock_offsetLater": {
-    "message": "Shift lyrics later",
+    "message": "Przesuń tekst później",
     "description": "Accessible label for the lyrics dock button that nudges sync timing later"
   },
   "lyricsDock_offsetGlobal": {
-    "message": "Global",
+    "message": "Globalne",
     "description": "Label in the lyrics dock offset menu for the global offset applied to all songs and sync types"
   },
   "options_offsetModal_perSong": {
-    "message": "Per-song offsets",
+    "message": "Przesunięcia na piosenki",
     "description": "Heading in the offset settings modal for the section that manages saved per-song sync offsets"
   },
   "options_offsetModal_perSongClear": {
-    "message": "Clear all",
+    "message": "Wyczyść",
     "description": "Button in the offset settings modal that deletes every saved per-song sync offset"
   },
   "options_offsetModal_perSongCount": {
-    "message": "Saved offsets",
+    "message": "Zapisane przesunięcia",
     "description": "Label in the offset settings modal showing how many per-song sync offsets are stored"
   },
   "options_offsetModal_appliesTo": {
-    "message": "Applies to",
+    "message": "Dotyczy",
     "description": "Label in the offset settings modal preceding the list of sync types a given offset affects"
   },
   "options_language_displayLanguage": {
@@ -402,7 +428,7 @@
     "description": "Button to open the style editor if there are no styles"
   },
   "options_themes_edit": {
-    "message": "Edit",
+    "message": "Edytuj",
     "description": "Button to open the style editor"
   },
   "options_themes_marketplace": {
@@ -414,11 +440,11 @@
     "description": "Installed themes button label"
   },
   "options_identity_backupTitle": {
-    "message": "Back up your identity",
+    "message": "Utwórz kopię zapasową swojej tożsamości",
     "description": "Title of the identity backup warning"
   },
   "options_identity_backupBody": {
-    "message": "Your contributions and level are tied to this key. If you lose it, no one can restore it, including the Better Lyrics team. Never share it: anyone who has it can act as you.",
+    "message": "Twój wkład i poziom są powiązane z tym kluczem. Jeśli go stracisz, nikt nie może go przywrócić, w tym zespół Better Lyrics. Nigdy go nie udostępniaj: każdy, kto go posiada, może utożsamić się w ciebie.",
     "description": "Body of the identity backup warning"
   },
   "options_identity_yourIdentity": {
@@ -426,7 +452,7 @@
     "description": "Your identity label"
   },
   "options_identity_unisonStats": {
-    "message": "Unison Stats",
+    "message": "Statystyki Unison",
     "description": "Section title above the user's own Unison level, tier, rank and badges on the Identity tab"
   },
   "options_identity_loading": {
@@ -446,11 +472,11 @@
     "description": "Import key button label"
   },
   "options_identityImport_title": {
-    "message": "Import Identity",
+    "message": "Importuj tożsamość",
     "description": "Title of the import identity modal"
   },
   "options_identityImport_chooseFile": {
-    "message": "Choose File",
+    "message": "Wybierz plik",
     "description": "Label for the file picker button in the import identity modal"
   },
   "options_identityImport_or": {
@@ -800,7 +826,7 @@
     "description": "YouTube provider name"
   },
   "options_provider_youtubeCaptions": {
-    "message": "YouTube Captions",
+    "message": "YouTube captions",
     "description": "YouTube Captions provider name"
   },
   "options_provider_binilyrics": {
@@ -1152,7 +1178,7 @@
     "description": "Theme apply error"
   },
   "marketplace_alert_installed": {
-    "message": "Installed $NAME$",
+    "message": "Zainstalowano $NAME$",
     "description": "Toast after a Marketplace theme is installed; it has an Apply action",
     "placeholders": {
       "name": {
@@ -1162,7 +1188,7 @@
     }
   },
   "marketplace_alert_installedFrom": {
-    "message": "Installed $NAME$ from $SOURCE$",
+    "message": "Zainstalowano $NAME$ z $SOURCE$",
     "description": "Toast after a theme is installed from a GitHub repository URL; SOURCE is the repository, with the branch in parentheses when one was given",
     "placeholders": {
       "name": {
@@ -1176,7 +1202,7 @@
     }
   },
   "marketplace_alert_removed": {
-    "message": "Removed $NAME$",
+    "message": "Usunięto $NAME$",
     "description": "Toast after an installed Marketplace theme is removed",
     "placeholders": {
       "name": {
@@ -1186,11 +1212,11 @@
     }
   },
   "marketplace_alert_storageFull": {
-    "message": "Storage is full. Remove some installed themes and try again.",
+    "message": "Pamięć jest pełna. Usuń niektóre zainstalowane motywy i spróbuj ponownie.",
     "description": "Toast when a theme cannot be installed because extension storage is full"
   },
   "marketplace_alert_installFailed": {
-    "message": "Could not install $NAME$",
+    "message": "Błąd w instalacji $NAME$",
     "description": "Toast when installing a Marketplace theme fails",
     "placeholders": {
       "name": {
@@ -1200,7 +1226,7 @@
     }
   },
   "marketplace_alert_removeFailed": {
-    "message": "Could not remove $NAME$",
+    "message": "Błąd przy usuwaniu $NAME$",
     "description": "Toast when removing an installed Marketplace theme fails",
     "placeholders": {
       "name": {
@@ -1224,11 +1250,11 @@
     }
   },
   "marketplace_tooltipInstallsSingular": {
-    "message": "1 install",
+    "message": "1 instalacja",
     "description": "Tooltip on a theme's install count when it has exactly one install"
   },
   "marketplace_byline": {
-    "message": "By $AUTHOR$ · v$VERSION$",
+    "message": "Przez $AUTHOR$ · v$VERSION$",
     "description": "Byline under a theme name: its creators and version",
     "placeholders": {
       "author": {
@@ -1242,7 +1268,7 @@
     }
   },
   "marketplace_themeActiveLabel": {
-    "message": "$TITLE$, active",
+    "message": "$TITLE$, aktywne",
     "description": "Accessible name of the currently applied theme in the installed themes menu",
     "placeholders": {
       "title": {
@@ -1252,7 +1278,7 @@
     }
   },
   "marketplace_tooltipInstalls": {
-    "message": "$COUNT$ installs",
+    "message": "$COUNT$ instalacji",
     "description": "Tooltip on a theme's install count",
     "placeholders": {
       "count": {
@@ -1262,7 +1288,7 @@
     }
   },
   "marketplace_tooltipRating": {
-    "message": "$AVERAGE$ average from $COUNT$ ratings",
+    "message": "Średnio $AVERAGE$ z $COUNT$ ocen",
     "description": "Tooltip on a theme's star rating",
     "placeholders": {
       "average": {
@@ -1276,7 +1302,7 @@
     }
   },
   "marketplace_tooltipOlderBuild": {
-    "message": "You're on v$CURRENT$. Latest is v$LATEST$",
+    "message": "Korzystasz z v$CURRENT$. Najnowsze to v$LATEST$",
     "description": "Tooltip on the badge shown when an installed theme build is older than the latest one",
     "placeholders": {
       "current": {
@@ -1290,7 +1316,7 @@
     }
   },
   "marketplace_tooltipOlderBuildFloor": {
-    "message": "You're on v$CURRENT$. Latest v$LATEST$ needs Better Lyrics $FLOOR$+",
+    "message": "Korzystasz z v$CURRENT$. Najnowsza wersja (v$LATEST$) potrzebuje Better Lyrics $FLOOR$+",
     "description": "Tooltip on the older build badge when the latest build needs a newer extension version",
     "placeholders": {
       "current": {
@@ -1308,7 +1334,7 @@
     }
   },
   "marketplace_installedFrom": {
-    "message": "Installed from $REPO$",
+    "message": "Zainstalowano z $REPO$",
     "description": "Tooltip on the GitHub badge of a theme installed from a repository URL",
     "placeholders": {
       "repo": {
@@ -1318,19 +1344,19 @@
     }
   },
   "marketplace_ricsBadge": {
-    "message": "This theme uses RICS",
+    "message": "Ten motyw używa RICS",
     "description": "Tooltip and accessible label on the RICS badge in the theme detail view"
   },
   "marketplace_urlValidating": {
-    "message": "Validating...",
+    "message": "Weryfikowanie…",
     "description": "Install button text while a theme repository URL is being checked"
   },
   "marketplace_urlInstalling": {
-    "message": "Installing...",
+    "message": "Instalowanie...",
     "description": "Install button text while a theme from a repository URL is being installed"
   },
   "marketplace_incompatibleConfirm": {
-    "message": "This theme needs Better Lyrics v$VERSION$+ and may not work on your version. Install anyway?",
+    "message": "Ten motyw wymaga Better Lyrics v$VERSION$+ i może nie działać na Twojej wersji. Czy mimo to zainstalować?",
     "description": "Confirm dialog before installing a theme that needs a newer extension version",
     "placeholders": {
       "version": {
@@ -1340,7 +1366,7 @@
     }
   },
   "marketplace_sortDescendingLabel": {
-    "message": "$LABEL$, descending. Activate to reverse.",
+    "message": "$LABEL$, malejąco. Aktywuj, by odwrócić.",
     "description": "Accessible label of the selected sort chip when sorting in descending order",
     "placeholders": {
       "label": {
@@ -1350,7 +1376,7 @@
     }
   },
   "marketplace_sortAscendingLabel": {
-    "message": "$LABEL$, ascending. Activate to reverse.",
+    "message": "$LABEL$, rosnąco. Aktywuj, by odwrócić.",
     "description": "Accessible label of the selected sort chip when sorting in ascending order",
     "placeholders": {
       "label": {
@@ -1428,7 +1454,7 @@
     }
   },
   "blUpdate_storeDelay": {
-    "message": "store may lag briefly",
+    "message": "The store may lag briefly",
     "description": "Trailing note on the update banner for Chrome and Edge, whose store approval can lag the release"
   },
   "blUpdate_action": {
@@ -1526,7 +1552,7 @@
     "description": "Message when no lyrics are available"
   },
   "lyrics_resumeAutoscroll": {
-    "message": "Resume Autoscroll",
+    "message": "Resume autoscroll",
     "description": "Resume Autoscroll button label"
   },
   "options_language_exclusions": {
@@ -1648,7 +1674,7 @@
     "description": "About page section heading"
   },
   "options_about_madeByBody": {
-    "message": "$BOIDU$ and $ADALIE$, with thanks to everyone in the Better Lyrics community who has tested it and reported bugs.",
+    "message": "$BOIDU$ and $ADALIE$, with thanks to the translators and everyone in the Better Lyrics community who has tested it, reported bugs and submitted lyrics!",
     "description": "About page credits; the names become links",
     "placeholders": {
       "boidu": {
@@ -1798,11 +1824,11 @@
     }
   },
   "theme_modal_section_featured": {
-    "message": "Featured Themes",
+    "message": "Featured themes",
     "description": "Section title for featured themes (top marketplace picks and built-ins) in the theme chooser modal"
   },
   "theme_modal_section_all": {
-    "message": "All Themes",
+    "message": "All themes",
     "description": "Section title for the user's installed marketplace themes in the theme chooser modal"
   },
   "theme_modal_browse": {
@@ -2378,7 +2404,7 @@
     }
   },
   "unison_xpToNext": {
-    "message": "$xp$ XP to Level $level$",
+    "message": "$xp$ XP to level $level$",
     "description": "Explains how much experience remains before the next Unison level. $xp$ is a positive integer, $level$ is the next level number",
     "placeholders": {
       "xp": {
@@ -2406,15 +2432,15 @@
     }
   },
   "unison_viewProfile": {
-    "message": "View full profile",
+    "message": "View profile",
     "description": "Link on the Identity tab that opens the user's full Unison profile in a new tab"
   },
   "unison_changePicture": {
-    "message": "Change picture",
+    "message": "Change pfp",
     "description": "Link on the Identity tab, shown when the user has a Unison profile picture, that opens the Unison website where they can pick a different one"
   },
   "unison_addPicture": {
-    "message": "Add a picture",
+    "message": "Add a pfp",
     "description": "Link on the Identity tab, shown when the user has no Unison profile picture, that opens the Unison website where they can pick one"
   },
   "unison_submitted_this": {

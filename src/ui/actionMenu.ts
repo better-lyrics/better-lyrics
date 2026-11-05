@@ -1,4 +1,4 @@
-import { positionMenu } from "@/ui/menuPlacement";
+import { positionMenu, triggerBox } from "@/ui/menuPlacement";
 import { prefersReducedMotion, quickDurationMs } from "@/ui/motion";
 import { attachScrollFade } from "@/ui/scrollFade";
 
@@ -117,7 +117,7 @@ export function createActionMenu(
     menu.classList.remove("is-closing");
     render(entries);
     document.body.appendChild(menu);
-    menu.style.minWidth = `${trigger.getBoundingClientRect().width}px`;
+    menu.style.minWidth = `${triggerBox(trigger).width}px`;
     positionMenu(menu, trigger);
     if (state !== "open") {
       state = "open";

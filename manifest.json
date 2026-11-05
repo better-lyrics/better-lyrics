@@ -1,6 +1,6 @@
 {
   "manifest_version": 3,
-  "version": "3.0.0.4",
+  "version": "3.0.1.2",
   "default_locale": "en",
   "name": "Better Lyrics (Lyrics for YouTube Music)",
   "description": "__MSG_extensionDescription__",
@@ -24,7 +24,10 @@
     "matches": [
       "https://unison.betterlyrics.org/*",
       "https://unison.boidu.dev/*",
-      "https://blrcunison.vercel.app/*"
+      "https://blrcunison.vercel.app/*",
+      "https://unison.prjktla.my.id/*",
+      "https://openlyryc.pages.dev/*",
+      "https://composer.betterlyrics.org/*"
     ]
   },
   "optional_permissions": [
@@ -32,7 +35,7 @@
   ],
   "optional_host_permissions": [],
   "content_security_policy": {
-    "extension_pages": "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://api.fontshare.com https://fonts.googleapis.com; font-src 'self' data: https://cdn.fontshare.com https://fonts.gstatic.com; img-src 'self' data: https://blrcunison.vercel.app https://boidu.dev https://betterlyrics.org https://raw.githubusercontent.com https://placehold.co https://cdn.betterlyrics.org https://cdn.discordapp.com https://*.googleusercontent.com https://i.ytimg.com; connect-src https://unison.betterlyrics.org https://unison.boidu.dev https://raw.githubusercontent.com https://api.github.com https://themes.betterlyrics.org; frame-src https://themes.betterlyrics.org;"
+    "extension_pages": "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://api.fontshare.com https://fonts.googleapis.com; font-src 'self' data: https://cdn.fontshare.com https://fonts.gstatic.com; img-src 'self' data: https://openlyryc.pages.dev https://blrcunison.vercel.app https://unison.prjktla.my.id https://boidu.dev https://betterlyrics.org https://raw.githubusercontent.com https://placehold.co https://cdn.betterlyrics.org https://cdn.discordapp.com https://*.googleusercontent.com https://i.ytimg.com; connect-src https://unison.betterlyrics.org https://unison.boidu.dev https://raw.githubusercontent.com https://api.github.com https://themes.betterlyrics.org; frame-src https://themes.betterlyrics.org;"
   },
   "options_ui": {
     "page": "src/options/options.html",
@@ -61,7 +64,10 @@
       "matches": [
         "https://unison.betterlyrics.org/*",
         "https://unison.boidu.dev/*",
-        "https://blrcunison.vercel.app/*"
+        "https://blrcunison.vercel.app/*",
+        "https://unison.prjktla.my.id/*",
+        "https://openlyryc.pages.dev/*",
+        "https://composer.betterlyrics.org/*"
       ],
       "resources": [
         "pages/auth.html"
@@ -141,5 +147,5 @@
   "action": {
     "default_popup": "src/options/options.html"
   },
-  "version_name": "3.0.0 4"
+  "version_name": "3.0.1-canary 2"
 }

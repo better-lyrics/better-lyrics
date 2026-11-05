@@ -36,3 +36,32 @@ jobs:
 
       - name: Check product and brand names in translations
         run: node --experimental-strip-types tooling/check-i18n-brand.ts
+
+      - name: Check placeholders and empty messages in translations
+        if: ${{ !cancelled() }}
+        run: node --experimental-strip-types tooling/check-i18n-format.ts
+
+  stale-check:
+    if: github.event_name == 'workflow_dispatch' || github.event.pull_request.head.ref == 'chore/i18n'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout base
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Overlay translations from the PR
+        if: github.event_name == 'pull_request_target'
+        run: |
+          git fetch --no-tags --depth=1 origin "refs/pull/${{ github.event.pull_request.number }}/head"
+          rm -rf _locales
+          git checkout FETCH_HEAD -- _locales
+
+      - name: Use Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22.x"
+
+      - name: Check translations for leftover English
+        run: node --experimental-strip-types tooling/check-i18n-stale.ts

@@ -57,6 +57,9 @@ hr { border: none; border-bottom: 1px solid rgba(255, 255, 255, 0.1); }
 .ui-button--accent:not(:disabled):hover { background: color-mix(in srgb, var(--accent) 85%, #000); color: #fff; }
 .ui-button:disabled { opacity: 0.5; cursor: not-allowed; }
 .ui-button:disabled:active { scale: none; }
+.ui-button--ghost { background: transparent; box-shadow: none; color: var(--text-muted); }
+.ui-button--ghost:hover { background: var(--button-bg); color: var(--text-strong); }
+.ui-button:is([aria-pressed="true"], [aria-current="page"]) { background: var(--button-bg-hover); color: var(--text-strong); }
 .ui-button--success-tint { --tint: var(--success); }
 .ui-button--danger-tint { --tint: var(--danger); }
 .ui-button--accent-tint { --tint: var(--accent); }
@@ -80,9 +83,6 @@ hr { border: none; border-bottom: 1px solid rgba(255, 255, 255, 0.1); }
   box-shadow: none;
   color: inherit;
 }
-.ui-button--ghost { background: transparent; box-shadow: none; color: var(--text-muted); }
-.ui-button--ghost:hover { background: var(--button-bg); color: var(--text-strong); }
-.ui-button:is([aria-pressed="true"], [aria-current="page"]) { background: var(--button-bg-hover); color: var(--text-strong); }
 .ui-button--compact { height: 30px; padding: 0 12px 0 10px; gap: 6px; font-size: var(--font-size-sm); }
 .ui-button--header {
   height: 34px;
@@ -99,7 +99,7 @@ hr { border: none; border-bottom: 1px solid rgba(255, 255, 255, 0.1); }
 /* -- Field -- */
 .ui-field {
   box-sizing: border-box;
-  height: 38px;
+  height: var(--control-height);
   padding: 0 12px;
   border: none;
   border-radius: var(--radius-control);
@@ -669,7 +669,7 @@ button.ui-row:hover .ui-row__chevron { color: rgba(255, 255, 255, 0.7); transfor
   cursor: pointer;
   transition: background var(--duration-quick) ease-out, scale var(--duration-quick) ease-out;
 }
-.ui-dropdown--stretch .ui-dropdown__trigger { width: 100%; height: 38px; }
+.ui-dropdown--stretch .ui-dropdown__trigger { width: 100%; height: var(--control-height); }
 .ui-dropdown--chip .ui-dropdown__trigger { height: 26px; font-size: var(--font-size-sm); border-radius: 0.625rem; }
 .ui-dropdown__trigger:hover, .ui-dropdown__trigger[aria-expanded="true"] { background: var(--raised-bg-hover); }
 .ui-dropdown__trigger:active { scale: var(--scale-press); }

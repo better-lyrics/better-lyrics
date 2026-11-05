@@ -24,7 +24,7 @@
     "description": "Sources settings tab label"
   },
   "options_tab_identity": {
-    "message": "신원",
+    "message": "계정",
     "description": "Identity settings tab label"
   },
   "options_tab_themes": {
@@ -40,11 +40,11 @@
     "description": "Auto switch to lyrics tab setting label"
   },
   "options_general_clearCachedLyrics": {
-    "message": "Clear cached lyrics",
+    "message": "가사 캐시 지우기",
     "description": "Label for the clear cache action row"
   },
   "options_general_clearCachedLyricsHint": {
-    "message": "They download again as you play",
+    "message": "재생하면 다시 다운로드됩니다",
     "description": "Hint under the clear cached lyrics label"
   },
   "options_general_clearCache": {
@@ -56,7 +56,7 @@
     "description": "Total lyrics in cache label"
   },
   "options_general_storageUsed": {
-    "message": "Storage used",
+    "message": "사용 중인 저장 공간",
     "description": "Popup General tab: label under the total local storage size"
   },
   "options_general_segment": {
@@ -74,23 +74,23 @@
     }
   },
   "options_general_browseThemes": {
-    "message": "Browse themes",
+    "message": "테마 탐색",
     "description": "Popup General tab: one-line description on the Theme Marketplace shortcut"
   },
   "options_general_whatsNew": {
-    "message": "What's new",
+    "message": "새로운 기능",
     "description": "Popup General tab: shortcut to the latest release notes"
   },
   "options_general_whatsNewHint": {
-    "message": "Latest release notes",
+    "message": "최신 릴리스 노트",
     "description": "Popup General tab: one-line description on the What's new shortcut"
   },
   "options_display_fullscreenTab": {
-    "message": "Fullscreen",
+    "message": "전체 화면",
     "description": "Header tab in Display for fullscreen settings"
   },
   "options_display_videoTab": {
-    "message": "Video",
+    "message": "동영상",
     "description": "Header tab in Display for video settings"
   },
   "options_display_disableFullscreen": {
@@ -117,12 +117,16 @@
     "message": "글자 물결 효과",
     "description": "Label for the per-letter wave lyric animation toggle"
   },
+  "options_display_fullscreenControlsTooltipStates": {
+    "message": "Auto hides the controls while the player bar is showing. On keeps them visible.",
+    "description": "Tooltip for the fullscreen player controls three-way switch, explaining the Auto and On states"
+  },
   "options_display_letterWaveOff": {
-    "message": "Off",
+    "message": "끔",
     "description": "Spoken value of the letter wave three-way switch when the effect is off"
   },
   "options_display_letterWaveOn": {
-    "message": "On",
+    "message": "켬",
     "description": "Spoken value of the letter wave three-way switch when the effect is always on"
   },
   "options_display_letterWaveBadge": {
@@ -157,9 +161,27 @@
     "message": "정지",
     "description": "Accessible label for the pause button in the Picture-in-Picture lyrics window, used when the YouTube Music player bar exposes no label of its own"
   },
+  "picture_in_picture_fitWindow": {
+    "message": "창에 맞춤",
+    "description": "Tooltip and accessible label for the selected song/video button in the Picture-in-Picture lyrics window when the window size no longer matches its content; clicking it resizes the window to fit"
+  },
   "picture_in_picture_next": {
     "message": "다음",
     "description": "Accessible label for the next track button in the Picture-in-Picture lyrics window, used when the YouTube Music player bar exposes no label of its own"
+  },
+  "picture_in_picture_adPlaying": {
+    "message": "광고 재생 중",
+    "description": "Shown in the floating lyrics window while YouTube Music plays an ad, above a countdown to the end of the ad"
+  },
+  "picture_in_picture_adUpNext": {
+    "message": "이후 $SONG$",
+    "description": "Shown in the floating lyrics window during an ad, naming the song that plays when the ad ends",
+    "placeholders": {
+      "song": {
+        "content": "$1",
+        "example": "Never Gonna Give You Up"
+      }
+    }
   },
   "options_display_pipEnabled": {
     "message": "플로팅 창 켜기",
@@ -224,6 +246,10 @@
   "options_display_pipProgressBar": {
     "message": "진행 막대 표시",
     "description": "Toggle label, shown inside the floating lyrics window settings, for the seekable playback progress bar under the album art"
+  },
+  "options_display_pipVideo": {
+    "message": "뮤직 비디오 표시",
+    "description": "Toggle label, shown inside the floating lyrics window settings, for playing the music video in the floating window while YouTube Music is in video mode"
   },
   "options_display_shadersPromo": {
     "message": "Better Lyrics Shaders 링크 표시",
@@ -414,11 +440,11 @@
     "description": "Installed themes button label"
   },
   "options_identity_backupTitle": {
-    "message": "Back up your identity",
+    "message": "계정 백업",
     "description": "Title of the identity backup warning"
   },
   "options_identity_backupBody": {
-    "message": "Your contributions and level are tied to this key. If you lose it, no one can restore it, including the Better Lyrics team. Never share it: anyone who has it can act as you.",
+    "message": "기여와 레벨이 이 키에 묶여 있습니다. 이를 분실하면 Better Lyrics 팀을 포함해 누구도 복원할 수 없습니다. 절대 공유하지 마세요. 키를 가지고 있는 누구나 당신인 척할 수 있습니다.",
     "description": "Body of the identity backup warning"
   },
   "options_identity_yourIdentity": {
@@ -534,7 +560,7 @@
     "description": "Status when nickname request fails"
   },
   "options_alert_refreshFailed": {
-    "message": "Could not refresh lyrics. Open YouTube Music and try again.",
+    "message": "가사를 새로고침할 수 없습니다. YouTube Music을 열고 다시 시도하세요.",
     "description": "Shown when the popup's Refresh lyrics button finds no YouTube Music tab or none of them responds"
   },
   "options_alert_importEmpty": {
@@ -590,43 +616,43 @@
     "description": "Identity load error message"
   },
   "editor_alert_nothingToSave": {
-    "message": "No styles to save as a theme",
+    "message": "테마로 저장할 스타일이 없습니다",
     "description": "Toast when the user saves an empty editor as a custom theme"
   },
   "editor_alert_saveDialogOpened": {
-    "message": "Theme file save dialog opened. Choose where to save your file",
+    "message": "테마 파일 저장 대화 상자를 열었습니다. 파일을 저장할 곳을 선택하세요",
     "description": "Toast after the browser save dialog opens for an exported theme file"
   },
   "editor_alert_downloadStarted": {
-    "message": "Theme file download started. Check your downloads folder",
+    "message": "테마 파일 다운로드를 시작했습니다. 다운로드 폴더를 확인하세요",
     "description": "Toast after an exported theme file starts downloading without a save dialog"
   },
   "editor_alert_applyFailed": {
-    "message": "Could not apply theme",
+    "message": "테마를 적용할 수 없습니다",
     "description": "Toast when applying a built-in or custom theme from the theme picker fails"
   },
   "editor_alert_saveFailed": {
-    "message": "Could not save your styles",
+    "message": "스타일을 저장할 수 없습니다",
     "description": "Toast when saving the custom CSS editor content fails"
   },
   "editor_alert_storageFull": {
-    "message": "Storage is full. Clear the lyrics cache in settings, then try again",
+    "message": "저장 공간이 가득 찼습니다. 설정에서 가사 캐시를 지우고, 다시 시도하세요",
     "description": "Toast when saving the custom CSS editor content fails because extension storage is full"
   },
   "editor_prompt_saveMessage": {
-    "message": "Enter a name for this theme",
+    "message": "이 테마의 이름을 입력하세요",
     "description": "Message in the save as theme dialog"
   },
   "editor_prompt_renameMessage": {
-    "message": "Enter a new name for this theme",
+    "message": "이 테마의 새 이름을 입력하세요",
     "description": "Message in the rename theme dialog"
   },
   "editor_prompt_themeName": {
-    "message": "Theme name",
+    "message": "테마 이름",
     "description": "Placeholder of the theme name field in the save and rename dialogs"
   },
   "editor_prompt_deleteMessage": {
-    "message": "Delete the theme $NAME$? This cannot be undone.",
+    "message": "$NAME$ 테마를 삭제하시겠습니까? 되돌릴 수 없습니다.",
     "description": "Message in the delete custom theme dialog",
     "placeholders": {
       "name": {
@@ -636,11 +662,11 @@
     }
   },
   "editor_alert_importFailed": {
-    "message": "Could not import the theme file. Try again",
+    "message": "테마 파일을 가져올 수 없습니다. 다시 시도하세요",
     "description": "Toast when importing a theme file fails"
   },
   "editor_alert_imported": {
-    "message": "Imported $NAME$",
+    "message": "$NAME$ 가져오기 완료",
     "description": "Toast after a theme file is imported into the editor",
     "placeholders": {
       "name": {
@@ -650,7 +676,7 @@
     }
   },
   "editor_alert_themeSaved": {
-    "message": "Saved theme: $NAME$",
+    "message": "테마를 저장했습니다: $NAME$",
     "description": "Toast after the editor styles are saved as a custom theme",
     "placeholders": {
       "name": {
@@ -660,11 +686,11 @@
     }
   },
   "editor_alert_themeSaveFailed": {
-    "message": "Could not save the theme",
+    "message": "테마를 저장할 수 없습니다",
     "description": "Toast when saving a custom theme fails"
   },
   "editor_alert_themeRenamed": {
-    "message": "Renamed theme to $NAME$",
+    "message": "테마의 이름을 변경했습니다: $NAME$",
     "description": "Toast after a custom theme is renamed",
     "placeholders": {
       "name": {
@@ -674,7 +700,7 @@
     }
   },
   "editor_alert_themeNameTaken": {
-    "message": "A theme named $NAME$ already exists",
+    "message": "이름이 $NAME$인 테마가 이미 존재합니다",
     "description": "Toast when a custom theme is renamed to a name another custom theme already uses",
     "placeholders": {
       "name": {
@@ -684,15 +710,15 @@
     }
   },
   "editor_alert_themeRenameFailed": {
-    "message": "Could not rename the theme",
+    "message": "테마의 이름을 변경할 수 없습니다",
     "description": "Toast when renaming a custom theme fails"
   },
   "editor_alert_themeDeleted": {
-    "message": "Custom theme deleted",
+    "message": "커스텀 테마를 삭제했습니다",
     "description": "Toast after a custom theme is deleted"
   },
   "editor_alert_themeDeleteFailed": {
-    "message": "Could not delete the theme",
+    "message": "테마를 삭제할 수 없습니다",
     "description": "Toast when deleting a custom theme fails"
   },
   "options_editor_saving": {
@@ -744,31 +770,31 @@
     "description": "Double-click to rename tooltip"
   },
   "options_editor_findReplaceTitle": {
-    "message": "Find and replace",
+    "message": "찾기 및 바꾸기",
     "description": "Title of the modal shown when find and replace is used in the popup editor"
   },
   "options_editor_findReplaceFullscreenOnly": {
-    "message": "Find and replace is only available in the fullscreen editor.",
+    "message": "찾기 및 바꾸기는 전체 화면 편집기에서만 이용할 수 있습니다.",
     "description": "Modal body explaining that find and replace needs the fullscreen editor"
   },
   "options_editor_findReplaceOpenHint": {
-    "message": "Open the fullscreen editor to use every editor feature.",
+    "message": "편집기의 모든 기능을 이용하려면 전체 화면 편집기를 여세요.",
     "description": "Second line of the find and replace modal, pointing to the fullscreen editor"
   },
   "options_editor_openFullscreen": {
-    "message": "Open fullscreen editor",
+    "message": "전체 화면 편집기 열기",
     "description": "Confirm button in the find and replace modal that opens the fullscreen editor"
   },
   "options_editor_close": {
-    "message": "Close",
+    "message": "닫기",
     "description": "Cancel button that closes the find and replace modal"
   },
   "options_editor_notReady": {
-    "message": "Editor not initialized",
+    "message": "편집기가 초기화되지 않음",
     "description": "Alert shown when an editor action runs before the editor has loaded"
   },
   "options_editor_nothingToExport": {
-    "message": "No styles to export",
+    "message": "내보낼 스타일 없음",
     "description": "Alert shown when exporting while the editor is empty"
   },
   "options_provider_betterLyrics": {
@@ -1152,7 +1178,7 @@
     "description": "Theme apply error"
   },
   "marketplace_alert_installed": {
-    "message": "Installed $NAME$",
+    "message": "$NAME$ 설치 완료",
     "description": "Toast after a Marketplace theme is installed; it has an Apply action",
     "placeholders": {
       "name": {
@@ -1162,7 +1188,7 @@
     }
   },
   "marketplace_alert_installedFrom": {
-    "message": "Installed $NAME$ from $SOURCE$",
+    "message": "$SOURCE$에서 $NAME$ 설치 완료",
     "description": "Toast after a theme is installed from a GitHub repository URL; SOURCE is the repository, with the branch in parentheses when one was given",
     "placeholders": {
       "name": {
@@ -1176,7 +1202,7 @@
     }
   },
   "marketplace_alert_removed": {
-    "message": "Removed $NAME$",
+    "message": "$NAME$ 제거 완료",
     "description": "Toast after an installed Marketplace theme is removed",
     "placeholders": {
       "name": {
@@ -1186,11 +1212,11 @@
     }
   },
   "marketplace_alert_storageFull": {
-    "message": "Storage is full. Remove some installed themes and try again.",
+    "message": "저장 공간이 가득 찼습니다. 설치한 테마 일부를 지우고, 다시 시도하세요.",
     "description": "Toast when a theme cannot be installed because extension storage is full"
   },
   "marketplace_alert_installFailed": {
-    "message": "Could not install $NAME$",
+    "message": "$NAME$ 테마를 설치할 수 없습니다",
     "description": "Toast when installing a Marketplace theme fails",
     "placeholders": {
       "name": {
@@ -1200,7 +1226,7 @@
     }
   },
   "marketplace_alert_removeFailed": {
-    "message": "Could not remove $NAME$",
+    "message": "$NAME$ 테마를 제거할 수 없습니다",
     "description": "Toast when removing an installed Marketplace theme fails",
     "placeholders": {
       "name": {
@@ -1224,11 +1250,11 @@
     }
   },
   "marketplace_tooltipInstallsSingular": {
-    "message": "1 install",
+    "message": "1회 설치",
     "description": "Tooltip on a theme's install count when it has exactly one install"
   },
   "marketplace_byline": {
-    "message": "By $AUTHOR$ · v$VERSION$",
+    "message": "$AUTHOR$ 제작 · v$VERSION$",
     "description": "Byline under a theme name: its creators and version",
     "placeholders": {
       "author": {
@@ -1242,7 +1268,7 @@
     }
   },
   "marketplace_themeActiveLabel": {
-    "message": "$TITLE$, active",
+    "message": "$TITLE$, 활성",
     "description": "Accessible name of the currently applied theme in the installed themes menu",
     "placeholders": {
       "title": {
@@ -1252,7 +1278,7 @@
     }
   },
   "marketplace_tooltipInstalls": {
-    "message": "$COUNT$ installs",
+    "message": "$COUNT$회 설치",
     "description": "Tooltip on a theme's install count",
     "placeholders": {
       "count": {
@@ -1262,7 +1288,7 @@
     }
   },
   "marketplace_tooltipRating": {
-    "message": "$AVERAGE$ average from $COUNT$ ratings",
+    "message": "평가 $COUNT$건의 평점 $AVERAGE$점",
     "description": "Tooltip on a theme's star rating",
     "placeholders": {
       "average": {
@@ -1276,7 +1302,7 @@
     }
   },
   "marketplace_tooltipOlderBuild": {
-    "message": "You're on v$CURRENT$. Latest is v$LATEST$",
+    "message": "현재 버전이 v$CURRENT$입니다. 최신 버전은 v$LATEST$입니다",
     "description": "Tooltip on the badge shown when an installed theme build is older than the latest one",
     "placeholders": {
       "current": {
@@ -1290,7 +1316,7 @@
     }
   },
   "marketplace_tooltipOlderBuildFloor": {
-    "message": "You're on v$CURRENT$. Latest v$LATEST$ needs Better Lyrics $FLOOR$+",
+    "message": "현재 버전이 v$CURRENT$입니다. 최신 버전인 v$LATEST$에는 Better Lyrics $FLOOR$ 이상이 필요합니다",
     "description": "Tooltip on the older build badge when the latest build needs a newer extension version",
     "placeholders": {
       "current": {
@@ -1308,7 +1334,7 @@
     }
   },
   "marketplace_installedFrom": {
-    "message": "Installed from $REPO$",
+    "message": "$REPO$에서 설치 완료",
     "description": "Tooltip on the GitHub badge of a theme installed from a repository URL",
     "placeholders": {
       "repo": {
@@ -1318,19 +1344,19 @@
     }
   },
   "marketplace_ricsBadge": {
-    "message": "This theme uses RICS",
+    "message": "테마에서 RICS를 사용합니다",
     "description": "Tooltip and accessible label on the RICS badge in the theme detail view"
   },
   "marketplace_urlValidating": {
-    "message": "Validating...",
+    "message": "검증 중...",
     "description": "Install button text while a theme repository URL is being checked"
   },
   "marketplace_urlInstalling": {
-    "message": "Installing...",
+    "message": "설치 중...",
     "description": "Install button text while a theme from a repository URL is being installed"
   },
   "marketplace_incompatibleConfirm": {
-    "message": "This theme needs Better Lyrics v$VERSION$+ and may not work on your version. Install anyway?",
+    "message": "이 테마는 Better Lyrics v$VERSION$ 이상이 필요하며 이 버전에서는 동작하지 않을 수 있습니다. 그래도 설치하시겠습니까?",
     "description": "Confirm dialog before installing a theme that needs a newer extension version",
     "placeholders": {
       "version": {
@@ -1340,7 +1366,7 @@
     }
   },
   "marketplace_sortDescendingLabel": {
-    "message": "$LABEL$, descending. Activate to reverse.",
+    "message": "$LABEL$, 내림차순, 눌러서 반전.",
     "description": "Accessible label of the selected sort chip when sorting in descending order",
     "placeholders": {
       "label": {
@@ -1350,7 +1376,7 @@
     }
   },
   "marketplace_sortAscendingLabel": {
-    "message": "$LABEL$, ascending. Activate to reverse.",
+    "message": "$LABEL$, 오름차순, 눌러서 반전.",
     "description": "Accessible label of the selected sort chip when sorting in ascending order",
     "placeholders": {
       "label": {
@@ -1360,7 +1386,7 @@
     }
   },
   "unison_sortAscendingClearLabel": {
-    "message": "$LABEL$, ascending. Activate to clear the sort.",
+    "message": "$LABEL$, 오름차순, 눌러서 정렬 지우기.",
     "description": "Accessible label of the selected Unison sort chip in ascending order, where activating it again removes the sort",
     "placeholders": {
       "label": {
@@ -1370,15 +1396,15 @@
     }
   },
   "marketplace_emptyStore": {
-    "message": "No themes available yet. Check back later",
+    "message": "아직 이용할 수 있는 테마가 없습니다. 나중에 다시 확인하세요",
     "description": "Shown when the Marketplace registry has no themes"
   },
   "marketplace_loadFailed": {
-    "message": "Could not load themes. Check your connection and try again",
+    "message": "테마를 불러올 수 없습니다. 연결을 확인한 후 다시 시도하세요",
     "description": "Shown when the Marketplace theme list fails to load"
   },
   "marketplace_ratedAs": {
-    "message": "You rated this $RATING$/5 as $NAME$",
+    "message": "$NAME$ 계정으로 $RATING$/5 평점을 주었습니다",
     "description": "Status under the rating stars after the user rated a theme",
     "placeholders": {
       "rating": {
@@ -1392,19 +1418,19 @@
     }
   },
   "marketplace_ratingSubmitting": {
-    "message": "Submitting...",
+    "message": "제출 중...",
     "description": "Status while a theme rating is being sent"
   },
   "marketplace_ratingVerifying": {
-    "message": "Verifying...",
+    "message": "검증 중...",
     "description": "Status while the rating anti-abuse check runs"
   },
   "marketplace_ratingVerifyFailed": {
-    "message": "Verification failed. Try again",
+    "message": "검증에 실패했습니다. 다시 시도하세요",
     "description": "Status when the rating anti-abuse check fails"
   },
   "marketplace_urlInvalid": {
-    "message": "Invalid GitHub URL. Use github.com/user/repo or github.com/user/repo/tree/branch",
+    "message": "잘못된 GitHub URL입니다. github.com/user/repo 또는 github.com/user/repo/tree/branch 형식을 사용하세요",
     "description": "Error in the install from URL dialog when the URL is not a GitHub repository"
   },
   "marketplace_requiresVersion": {
@@ -1534,55 +1560,55 @@
     "description": "Label for language exclusions setting"
   },
   "options_about": {
-    "message": "About",
+    "message": "정보",
     "description": "Footer button that opens the About page"
   },
   "options_about_tagline": {
-    "message": "Time-synced lyrics for YouTube Music.",
+    "message": "YouTube Music용 싱크 가사.",
     "description": "About page tagline under the product name"
   },
   "options_about_whatHeading": {
-    "message": "What it is",
+    "message": "소개",
     "description": "About page section heading"
   },
   "options_about_whatBody": {
-    "message": "Better Lyrics upgrades your YouTube Music experience by providing beautiful time-synced lyrics for your favorite songs.",
+    "message": "Better Lyrics는 즐겨 듣는 곡의 미려한 싱크 가사를 제공하여 YouTube Music 경험을 업그레이드합니다.",
     "description": "About page section body"
   },
   "options_about_doesHeading": {
-    "message": "What it does",
+    "message": "기능",
     "description": "About page section heading"
   },
   "options_about_does1": {
-    "message": "Lyrics that follow the song. Click any line to jump to it.",
+    "message": "곡을 따라 흐르는 가사. 아무 행이나 눌러 이동.",
     "description": "About page feature list item"
   },
   "options_about_does2": {
-    "message": "Translation and romanization for songs in other languages.",
+    "message": "다른 언어로 쓰인 곡의 번역과 로마자 표기 제공.",
     "description": "About page feature list item"
   },
   "options_about_does3": {
-    "message": "A full-screen view and a floating lyrics window.",
+    "message": "전체 화면 보기와 플로팅 가사 창.",
     "description": "About page feature list item"
   },
   "options_about_does4": {
-    "message": "Unison: community lyrics anyone can submit, vote on and fix.",
+    "message": "Unison: 누구나 제출, 투표, 수정할 수 있는 커뮤니티 가사.",
     "description": "About page feature list item"
   },
   "options_about_does5": {
-    "message": "Themes from the Marketplace, or your own in the built-in editor.",
+    "message": "마켓플레이스에서 받거나 스스로 내장 편집기에서 만들 수 있는 테마.",
     "description": "About page feature list item"
   },
   "options_about_does6": {
-    "message": "Lyrics from many sources, in an order you choose.",
+    "message": "다양한 출처의 가사를, 원하는 순서대로 표시.",
     "description": "About page feature list item"
   },
   "options_about_openSourceHeading": {
-    "message": "Open source",
+    "message": "오픈 소스",
     "description": "About page section heading"
   },
   "options_about_openSourceBody": {
-    "message": "GPL v3. Source on $GITHUB$. PRs welcome if you spot something to fix.",
+    "message": "GPL v3. $GITHUB$에 소스 공개. 고칠 점을 찾으셨다면 PR을 환영합니다.",
     "description": "About page body; $GITHUB$ becomes a link to the repository",
     "placeholders": {
       "github": {
@@ -1592,11 +1618,11 @@
     }
   },
   "options_about_communityHeading": {
-    "message": "Community",
+    "message": "커뮤니티",
     "description": "About page section heading"
   },
   "options_about_communityDiscord": {
-    "message": "$DISCORD$ for questions and chat.",
+    "message": "$DISCORD$에서 질문하고 채팅하기.",
     "description": "About page list item; $DISCORD$ becomes a link to the Discord server",
     "placeholders": {
       "discord": {
@@ -1606,7 +1632,7 @@
     }
   },
   "options_about_communityIssue": {
-    "message": "$ISSUE$ if something is broken.",
+    "message": "무언가 문제가 있다면 $ISSUE$.",
     "description": "About page list item; $ISSUE$ becomes a link to the issue tracker",
     "placeholders": {
       "issue": {
@@ -1616,7 +1642,7 @@
     }
   },
   "options_about_fileIssue": {
-    "message": "File an issue",
+    "message": "이슈 제보하기",
     "description": "Link text in the About page that opens the issue tracker"
   },
   "options_about_discordLink": {
@@ -1624,31 +1650,31 @@
     "description": "Link text in the About page that opens the Discord server"
   },
   "options_about_supportHeading": {
-    "message": "Support the project",
+    "message": "프로젝트 지원",
     "description": "About page heading for the donation links"
   },
   "options_about_supportBody": {
-    "message": "Better Lyrics is a labor of love, and we fuss over it more than we'd like to admit... It's free, with no ads or tracking, and it always will be. If it's made your listening experience a little better, you can help keep it going! A star on GitHub helps too, and it's free :)",
+    "message": "Better Lyrics에 사랑을 담아 만들었고, 사실 조금 과할 정도로 신경을 쏟고 있습니다... 서비스는 광고나 추적 없이 무료로 제공되며, 앞으로도 계속 그럴 것입니다. Better Lyrics 덕분에 청취 경험이 조금이라도 나아졌다면, 프로젝트를 계속 유지될 수 있게 도와주세요! GitHub에서 별을 눌러주셔도 큰 도움이 되며, 무료로 누를 수 있습니다 :)",
     "description": "About page note above the donation links, written in the makers' own voice"
   },
   "options_about_supportStar": {
-    "message": "Star us on GitHub",
+    "message": "GitHub에서 별 누르기",
     "description": "About page link to star the Better Lyrics repository on GitHub"
   },
   "options_about_supportCoffee": {
-    "message": "Buy us a coffee",
+    "message": "커피 한 잔 사 주기",
     "description": "About page link to the Buy Me a Coffee page"
   },
   "options_about_supportSponsors": {
-    "message": "Sponsor on GitHub",
+    "message": "GitHub에서 후원하기",
     "description": "About page link to GitHub Sponsors"
   },
   "options_about_madeByHeading": {
-    "message": "Made by",
+    "message": "만든이",
     "description": "About page section heading"
   },
   "options_about_madeByBody": {
-    "message": "$BOIDU$ and $ADALIE$, with thanks to everyone in the Better Lyrics community who has tested it and reported bugs.",
+    "message": "$BOIDU$, $ADALIE$에게서, 번역자분들과 Better Lyrics 커뮤니티 내에서 테스트하고, 버그를 제보하고, 가사를 제출하신 모든 분들께 감사드립니다!",
     "description": "About page credits; the names become links",
     "placeholders": {
       "boidu": {
@@ -1662,7 +1688,7 @@
     }
   },
   "options_about_badgesBody": {
-    "message": "Special thanks to $KIYOSHI$ for the time and care behind every badge across Better Lyrics and Unison <3",
+    "message": "Better Lyrics와 Unison의 모든 배지에 시간과 공을 들여주신 $KIYOSHI$ 님께 특별히 감사드립니다 <3",
     "description": "About page credit for the Unison badge artist; the name becomes a link",
     "placeholders": {
       "kiyoshi": {
@@ -1688,15 +1714,15 @@
     "description": "Search input placeholder"
   },
   "ui_close": {
-    "message": "Close",
+    "message": "닫기",
     "description": "Accessible label and button text that closes a dialog"
   },
   "ui_dropdownSearch": {
-    "message": "Search",
+    "message": "검색",
     "description": "Placeholder for the search box inside a long dropdown menu"
   },
   "ui_dropdownNoResults": {
-    "message": "No results",
+    "message": "결과 없음",
     "description": "Shown inside a dropdown menu when the search matches no option"
   },
   "options_romanization_hint": {
@@ -1770,7 +1796,7 @@
     }
   },
   "theme_author_prefix": {
-    "message": "by $AUTHOR$",
+    "message": "$AUTHOR$ 제작",
     "description": "Author prefix shown on theme selector button",
     "placeholders": {
       "author": {
@@ -1780,7 +1806,7 @@
     }
   },
   "theme_author_you": {
-    "message": "by You",
+    "message": "내가 제작",
     "description": "Author label for custom user themes on theme selector button"
   },
   "symlink_installFailed": {
@@ -1928,7 +1954,7 @@
     "description": "Search input placeholder"
   },
   "unison_searchResults": {
-    "message": "“$query$” · $count$ results",
+    "message": "“$query$” · 결과 $count$개",
     "description": "Search result count shown at the end of the Feed / My Submissions tab row",
     "placeholders": {
       "query": {
@@ -1942,7 +1968,7 @@
     }
   },
   "unison_searchResultsOne": {
-    "message": "“$query$” · 1 result",
+    "message": "“$query$” · 결과 1개",
     "description": "Search result count when there is exactly one result",
     "placeholders": {
       "query": {
@@ -2208,11 +2234,11 @@
     "description": "Label for the optional submit-form field where the user lists other videos of the same song to link to this lyric"
   },
   "unison_additionalVideosHint": {
-    "message": "Optional. Other uploads of this song to link, videoIds or URLs separated by spaces or commas. Each is verified; ones that don't match are skipped.",
+    "message": "선택. 이 곡의 다른 업로드 링크, videoId, URL을 공백이나 쉼표로 구분합니다. 각각 검증 과정을 거치며, 맞지 않는 동영상은 건너뜁니다.",
     "description": "Hint text below the additional videos field on the submit form"
   },
   "unison_additionalVideosSkipped": {
-    "message": "Submitted, but these videos weren't linked: $videos$",
+    "message": "제출했지만 일부 동영상을 연결할 수 없습니다: $videos$",
     "description": "Feedback after submitting when some additional videos could not be linked. $videos$ is a comma-separated list of videoIds",
     "placeholders": {
       "videos": {
@@ -2242,7 +2268,7 @@
     "description": "Link text for ISRC finder"
   },
   "unison_feedTabsLabel": {
-    "message": "Lyrics lists",
+    "message": "가사 목록",
     "description": "Accessible name of the tab list that switches between the community feed and the user's own submissions"
   },
   "unison_tabFeed": {
@@ -2258,7 +2284,7 @@
     "description": "Empty state for my submissions tab"
   },
   "unison_emptyMineHint": {
-    "message": "Lyrics you submit show up here.",
+    "message": "제출한 가사가 여기에 나타납니다.",
     "description": "Second line of the empty My Submissions tab, under the title and above the submit button"
   },
   "unison_noFilterResults": {
@@ -2450,7 +2476,7 @@
     "description": "Button that unlinks a video from a Unison lyric"
   },
   "unison_suggestedVideos": {
-    "message": "Suggested videos",
+    "message": "제안된 동영상",
     "description": "Heading for the list of videos Unison suggests linking to a lyric"
   },
   "unison_noMatchingVideos": {
@@ -2458,15 +2484,15 @@
     "description": "Suggested videos list when every suggestion is judged a different recording; those stay behind the other versions toggle below it"
   },
   "unison_noSuggestions": {
-    "message": "No suggestions right now",
+    "message": "현재 제안 없음",
     "description": "Shown under the suggested-videos heading when Unison has no suggestions"
   },
   "unison_linkConfirmTitle": {
-    "message": "Link this video?",
+    "message": "이 동영상을 연결하시겠습니까?",
     "description": "Title of the confirmation shown before linking a suggested video whose title differs from the lyric's song title"
   },
   "unison_linkConfirmBody": {
-    "message": "\"$video$\" isn't titled exactly \"$song$\". Check it's the same recording before linking, since remixes, live and sped-up versions usually need their own lyrics.",
+    "message": "\"$video$\", \"$song$\" 제목이 완전히 일치하지 않습니다. 리믹스, 라이브, 스페드 업 버전이면 보통 별도의 가사가 필요하므로, 연결하기 전에 음원이 같은지 확인하세요.",
     "description": "Body of the confirmation before linking a suggested video. $video$ is the suggested video's title, $song$ is the lyric's song title",
     "placeholders": {
       "video": {
@@ -2500,15 +2526,15 @@
     "description": "Generic error shown when unlinking a video from a Unison lyric fails"
   },
   "unison_suggestMatchSameHint": {
-    "message": "Likely the same recording",
+    "message": "동일한 녹음으로 추정됩니다",
     "description": "Tooltip and accessible label for the lightbulb icon on a suggested video judged to be the same recording as the lyric; also marks videos added to the additional videos field automatically"
   },
   "unison_suggestMatchRelated": {
-    "message": "Might be a different version. Check before adding",
+    "message": "다른 버전일 수도 있습니다. 추가하기 전에 확인하세요",
     "description": "Tooltip and accessible label for the question mark icon on a suggested video that may be a different version of the song (an edit or variant), asking the user to check before linking"
   },
   "unison_suggestMatchDifferentHint": {
-    "message": "A different version, or another song",
+    "message": "다른 버전이거나, 다른 곡입니다",
     "description": "Tooltip and accessible label for the layers icon on a suggested video judged to be a different recording of the song, such as a remix or live version"
   },
   "unison_suggestOtherVersions": {
@@ -2534,7 +2560,7 @@
     "description": "Button that reveals the rest of the suggested videos list beyond the first few"
   },
   "unison_error_linkCapReached": {
-    "message": "Link limit reached for this lyric",
+    "message": "이 가사의 연결 제한에 도달했습니다",
     "description": "Error shown when a lyric already has the maximum number of linked videos"
   },
   "unison_error_durationMismatch": {
@@ -2614,7 +2640,7 @@
     "description": "Screen reader label for the editor tabs that switch between the lyric preview and the list of changes"
   },
   "unison_rev_details": {
-    "message": "Details",
+    "message": "상세",
     "description": "Diff section label above changed song details: language, ISRC and album"
   },
   "unison_rev_updating": {
@@ -2626,7 +2652,7 @@
     "description": "Editor save bar title when the edit check failed for a reason the server did not explain"
   },
   "unison_rev_checkFailedHint": {
-    "message": "Save turns back on once the check runs.",
+    "message": "확인이 끝나면 저장이 다시 활성화됩니다.",
     "description": "Editor save bar hint under the failed check title, followed by a Try again link"
   },
   "unison_rev_tryAgain": {
@@ -2638,11 +2664,11 @@
     "description": "Error title in the editor Changes tab when the edit check failed"
   },
   "unison_rev_changesErrorHint": {
-    "message": "Something went wrong. Your draft is safe, and the preview still works.",
+    "message": "문제가 발생했습니다. 초안은 저장되었으며, 미리보기는 여전히 이용할 수 있습니다.",
     "description": "Error hint in the editor Changes tab when the edit check failed"
   },
   "unison_rev_changesNeedParse": {
-    "message": "Changes return once the lyrics parse.",
+    "message": "가사 파싱이 끝나면 변경 사항이 반영됩니다.",
     "description": "Editor Changes tab while the lyrics have errors that stop them from being read"
   },
   "unison_rev_withdraw": {
@@ -2654,19 +2680,19 @@
     "description": "Why an edit needs council review: the council approved (sealed) this lyric"
   },
   "unison_rev_reason_flagged": {
-    "message": "Flagged for review",
+    "message": "검토 필요로 표시됨",
     "description": "Why an edit needs council review: an automatic check flagged it"
   },
   "unison_rev_reason_largeText": {
-    "message": "Large text change",
+    "message": "대규모 텍스트 변경",
     "description": "Why an edit needs council review: too much of the text changed"
   },
   "unison_rev_reason_largeTiming": {
-    "message": "Large timing change",
+    "message": "대규모 타이밍 변경",
     "description": "Why an edit needs council review: too much of the timing changed"
   },
   "unison_rev_goesToReview": {
-    "message": "Goes to council review: $reason$",
+    "message": "심의 예정: $reason$",
     "description": "Editor outcome before saving. $reason$ is a review reason, like 'Large text change'",
     "placeholders": {
       "reason": {
@@ -2676,7 +2702,7 @@
     }
   },
   "unison_rev_pendingTitle": {
-    "message": "Waiting for council review: $reason$",
+    "message": "심의 대기 중: $reason$",
     "description": "Title for a saved edit that waits for review. $reason$ is a review reason, like 'Large text change'",
     "placeholders": {
       "reason": {
@@ -2686,7 +2712,7 @@
     }
   },
   "unison_rev_staysLive": {
-    "message": "Revision $rev$ stays live until the council decides.",
+    "message": "심의에서 결정을 마칠 때까지 리비전 $rev$의 가사를 유지합니다.",
     "description": "Names the revision listeners keep seeing during review",
     "placeholders": {
       "rev": {
@@ -2696,7 +2722,7 @@
     }
   },
   "unison_rev_rejectedTitle": {
-    "message": "Revision $rev$ was rejected",
+    "message": "리비전 $rev$ 거부됨",
     "description": "Title when the council rejected an edit",
     "placeholders": {
       "rev": {
@@ -2706,7 +2732,7 @@
     }
   },
   "unison_rev_councilNote": {
-    "message": "Council note: “$note$”",
+    "message": "심의회 노트: “$note$”",
     "description": "The note the council left when it rejected an edit",
     "placeholders": {
       "note": {
@@ -2716,7 +2742,7 @@
     }
   },
   "unison_rev_sealedHint": {
-    "message": "Every edit goes to council review before it goes live.",
+    "message": "모든 편집이 활성화되기 전 심의를 거칩니다.",
     "description": "Explains what editing a sealed lyric means"
   },
   "unison_rev_status_live": {
@@ -2748,15 +2774,15 @@
     "description": "Chip on the revision that edits are measured against"
   },
   "unison_rev_approved": {
-    "message": "Approved by the council",
+    "message": "심의회에서 승인",
     "description": "Revisions list reason for a council-approved revision"
   },
   "unison_rev_withinLimits": {
-    "message": "Within limits",
+    "message": "한도 이내",
     "description": "Revisions list reason for an edit that went live without review"
   },
   "unison_rev_reverted": {
-    "message": "Reverted to revision $rev$",
+    "message": "리비전 $rev$의 가사로 되돌렸습니다",
     "description": "Revisions list reason and success message for a revert",
     "placeholders": {
       "rev": {
@@ -2766,7 +2792,7 @@
     }
   },
   "unison_rev_driftValues": {
-    "message": "Text $text$% · Timing $timing$%",
+    "message": "텍스트 $text$% · 타이밍 $timing$%",
     "description": "How much text and timing an edit changed, as whole numbers",
     "placeholders": {
       "text": {
@@ -2800,7 +2826,7 @@
     "description": "Column header and editor sidebar label"
   },
   "unison_rev_comparedWith": {
-    "message": "Compared with revision $rev$",
+    "message": "리비전 $rev$ 비교",
     "description": "Line above a diff. $rev$ is the compared revision",
     "placeholders": {
       "rev": {
@@ -2822,7 +2848,7 @@
     "description": "Diff legend: lines whose timing changed but text did not"
   },
   "unison_rev_syllablesRetimed": {
-    "message": "Syllables retimed: $count$",
+    "message": "타이밍을 변경한 음절: $count$",
     "description": "Diff note: how many syllables of a line moved while the line start stayed",
     "placeholders": {
       "count": {
@@ -2832,15 +2858,15 @@
     }
   },
   "unison_rev_syllableTimingAdded": {
-    "message": "Syllable timing added",
+    "message": "음절 타이밍 추가",
     "description": "Diff note: a line that had only line timing now has syllable timing"
   },
   "unison_rev_syllableTimingRemoved": {
-    "message": "Syllable timing removed",
+    "message": "음절 타이밍 제거",
     "description": "Diff note: a line that had syllable timing now has only line timing"
   },
   "unison_rev_unchangedLines": {
-    "message": "Unchanged lines: $count$",
+    "message": "변경되지 않은 행: $count$",
     "description": "Collapsed part of a diff",
     "placeholders": {
       "count": {
@@ -2850,15 +2876,15 @@
     }
   },
   "unison_rev_headSection": {
-    "message": "Translations, romanization and credits",
+    "message": "번역, 로마자 표기, 크레딧",
     "description": "Label above the diff rows for text stored outside the lyric lines: translations, romanizations and credits"
   },
   "unison_rev_headCredits": {
-    "message": "Credits",
+    "message": "크레딧",
     "description": "Diff row label for a changed credit, such as a songwriter or singer name"
   },
   "unison_rev_headLine": {
-    "message": "line $line$",
+    "message": "$line$행",
     "description": "Part of a diff row label that names the lyric line a translation or romanization belongs to, e.g. 'Translation · Spanish · line 3'",
     "placeholders": {
       "line": {
@@ -2872,11 +2898,11 @@
     "description": "Diff area when there is nothing to compare"
   },
   "unison_rev_revertToThis": {
-    "message": "Revert to this",
+    "message": "여기로 되돌리기",
     "description": "Button that starts a revert to a past revision"
   },
   "unison_rev_revertLive": {
-    "message": "Reverting goes live now as revision $rev$",
+    "message": "리비전 $rev$의 가사로 바로 되돌립니다",
     "description": "Note before a revert that skips review",
     "placeholders": {
       "rev": {
@@ -2886,11 +2912,11 @@
     }
   },
   "unison_rev_revertCheckFailed": {
-    "message": "Couldn't check whether reverting goes live or to council review",
+    "message": "되돌리기를 즉시 적용할지 심의를 거칠지 확인할 수 없습니다",
     "description": "Note on a past revision when the check of where a revert would land failed; the owner can still revert and the server decides"
   },
   "unison_rev_revertReview": {
-    "message": "Reverting goes to council review as revision $rev$",
+    "message": "리비전 $rev$의 가사로 되돌리는 요청이 심의에 들어갑니다",
     "description": "Note before a revert that needs review",
     "placeholders": {
       "rev": {
@@ -2900,11 +2926,11 @@
     }
   },
   "unison_rev_locked": {
-    "message": "Song and artist can't be edited.",
+    "message": "곡 및 아티스트는 편집할 수 없습니다.",
     "description": "Editor note about fields that are locked"
   },
   "unison_rev_editsLeft": {
-    "message": "$remaining$ of $limit$ edits left today",
+    "message": "오늘 편집 한도가 $remaining$/$limit$회 남았습니다",
     "description": "Edits left in the last 24 hours",
     "placeholders": {
       "remaining": {
@@ -2918,15 +2944,15 @@
     }
   },
   "unison_rev_textChanged": {
-    "message": "Text changed",
+    "message": "텍스트 변경",
     "description": "Meter label: how much of the text changed"
   },
   "unison_rev_timingChanged": {
-    "message": "Timing changed",
+    "message": "타이밍 변경",
     "description": "Meter label: how much of the timing changed"
   },
   "unison_rev_textChangedSince": {
-    "message": "Text changed since revision $rev$",
+    "message": "리비전 $rev$부터 바뀐 텍스트",
     "description": "Meter label: how much of the text changed since an earlier revision that the limit is measured against. $rev$ is that revision",
     "placeholders": {
       "rev": {
@@ -2936,7 +2962,7 @@
     }
   },
   "unison_rev_timingChangedSince": {
-    "message": "Timing changed since revision $rev$",
+    "message": "리비전 $rev$부터 바뀐 타이밍",
     "description": "Meter label: how much of the timing changed since an earlier revision that the limit is measured against. $rev$ is that revision",
     "placeholders": {
       "rev": {
@@ -2946,7 +2972,7 @@
     }
   },
   "unison_rev_ofLimit": {
-    "message": "of $limit$% limit",
+    "message": "/ $limit$% 한도",
     "description": "Follows a bold percentage in a meter, like '8% of 15% limit'",
     "placeholders": {
       "limit": {
@@ -2956,7 +2982,7 @@
     }
   },
   "unison_rev_checkLine": {
-    "message": "Line $line$: $message$",
+    "message": "$line$행: $message$",
     "description": "A server check message tied to a line. $message$ comes from the server",
     "placeholders": {
       "line": {

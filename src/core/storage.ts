@@ -2,9 +2,11 @@ import {
   LYRIC_SOURCE_KEYS,
   OFFSET_STORAGE_PREFIX,
   PROVIDER_CONFIGS,
+  type ProviderConfig,
   STORAGE_TRANSIENT_SET_LOG,
   type SyncType,
 } from "@constants";
+import { syncTypeForLyric } from "@modules/unison/syncType";
 import { truncateSource } from "@utils";
 import { compileWithDetails } from "rics";
 import { compressString, decompressString, isCompressed } from "./compression";
@@ -212,7 +214,8 @@ export async function setPersistentStorage(key: string, value: any): Promise<voi
 }
 
 const LYRIC_CACHE_PREFIX = "blyrics_";
-const LYRIC_CACHE_SUFFIXES = [...LYRIC_SOURCE_KEYS, "metadata"].map(sourceKey => `_${sourceKey}`);
+// Unison keeps one entry per song for its four sources.
+const LYRIC_CACHE_SUFFIXES = [...LYRIC_SOURCE_KEYS, "metadata", "unison"].map(sourceKey => `_${sourceKey}`);
 
 function parseLyricCacheKey(key: string): { videoId: string; source: string } | null {
   if (!key.startsWith(LYRIC_CACHE_PREFIX)) return null;
@@ -253,9 +256,7 @@ export function storageCategoryForKey(key: string): StorageCategory {
   return "other";
 }
 
-const PROVIDER_BY_KEY = new Map<string, (typeof PROVIDER_CONFIGS)[number]>(
-  PROVIDER_CONFIGS.map(config => [config.key, config])
-);
+const PROVIDER_BY_KEY = new Map<string, ProviderConfig>(PROVIDER_CONFIGS.map(config => [config.key, config]));
 const MISS_PAYLOAD_MAX_CHARS = 512;
 
 function isMissEntry(item: unknown): boolean {
@@ -268,6 +269,24 @@ function isMissEntry(item: unknown): boolean {
   }
 }
 
+function unisonCacheProvider(item: unknown): ProviderConfig | undefined {
+  const value = (item as { value?: unknown } | null)?.value;
+  if (typeof value !== "string") return undefined;
+  try {
+    const cachedLyric = JSON.parse(decompressString(value))?.lookup?.data;
+    if (!cachedLyric?.lyrics) return undefined;
+    const syncType = syncTypeForLyric(cachedLyric.syncType, cachedLyric.format);
+    return PROVIDER_CONFIGS.find(config => config.key.startsWith("unison-") && config.syncType === syncType);
+  } catch {
+    return undefined;
+  }
+}
+
+function cachedProvider(source: string, item: unknown): ProviderConfig | undefined {
+  if (source === "unison") return unisonCacheProvider(item);
+  return isMissEntry(item) ? undefined : PROVIDER_BY_KEY.get(source);
+}
+
 export interface LyricCacheSummary {
   songs: number;
   bySyncType: Record<SyncType, number>;
@@ -277,8 +296,9 @@ export function summarizeLyricCache(items: Record<string, unknown>): LyricCacheS
   const best = new Map<string, { priority: number; syncType: SyncType }>();
   for (const [key, item] of Object.entries(items)) {
     const parsed = parseLyricCacheKey(key);
-    const provider = parsed && PROVIDER_BY_KEY.get(parsed.source);
-    if (!parsed || !provider || isExpired((item as { expiry?: number } | null)?.expiry) || isMissEntry(item)) continue;
+    if (!parsed || isExpired((item as { expiry?: number } | null)?.expiry)) continue;
+    const provider = cachedProvider(parsed.source, item);
+    if (!provider) continue;
     const current = best.get(parsed.videoId);
     if (!current || provider.priority < current.priority) {
       best.set(parsed.videoId, { priority: provider.priority, syncType: provider.syncType });

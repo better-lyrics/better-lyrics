@@ -8,13 +8,13 @@ Better Lyrics upgrades your YouTube Music™ experience by providing beautiful t
 
 <p align="left">
  <a aria-label="License" href="https://www.gnu.org/licenses/gpl-3.0.en.html"><img src="https://img.shields.io/badge/license-GPL_v3-blue.svg" alt=""/></a>
- <img src="https://img.shields.io/badge/version-3.0.0 4-blue.svg" alt=""/>
+ <img src="https://img.shields.io/badge/version-3.0.1-blue.svg" alt=""/>
 
  <img src="https://img.shields.io/badge/status-active-brightgreen.svg" alt=""/>
  <a aria-label="Better Stack Badge" href="https://better-lyrics-status.boidu.dev"><img height="20" src="https://uptime.betterstack.com/status-badges/v2/monitor/1dqoz.svg" alt="Better Stack Badge" /></a>
 
  <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
-<img src="https://img.shields.io/badge/all_contributors-21-orange.svg" alt=""/>
+<img src="https://img.shields.io/badge/all_contributors-23-orange.svg" alt=""/>
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
  <a aria-label="Crowdin" href="https://crowdin.com/project/better-lyrics"><img alt="Crowdin" src="https://badges.crowdin.net/better-lyrics/localized.svg"></a>
  <a aria-label="Graphite" href="https://graphite.com/?utm_source=github&utm_medium=readme&utm_campaign=better-lyrics"><img height="20" src="https://img.shields.io/badge/Code_Review-Graphite-black?logo=Graphite&logoColor=white" alt="Graphite" /></a>
@@ -194,6 +194,18 @@ The simplest path is to grab a pre-built ZIP from the [releases page](https://gi
 >
 > Firefox unloads temporary add-ons when the browser is closed. For a permanent install, use the [signed Firefox Add-on listing](https://addons.mozilla.org/en-US/firefox/addon/better-lyrics/).
 
+### Safari (community port)
+
+There's no official Safari build, but [Tzu-Hsien Chao](https://github.com/danny900714) maintains a port at [danny900714/better-lyrics-safari](https://github.com/danny900714/better-lyrics-safari). It takes each Better Lyrics release, applies a small Safari patch, and publishes the build to a Homebrew tap. You'll need macOS 14 or later on an Apple silicon Mac.
+
+```shell
+brew install danny900714/tap/better-lyrics
+```
+
+> [!WARNING]
+>
+> I don't maintain this port, and new releases come out automatically, so I can't check each one. Apple hasn't notarized the app either, which is why the cask removes the macOS quarantine flag when it installs. Take a look at the repo and make sure you're comfortable with it before installing. If you hit a Safari-specific bug, open an issue on the [port's repository](https://github.com/danny900714/better-lyrics-safari/issues) instead of here.
+
 ## FAQ
 
 ### Why can't I see the lyrics?
@@ -238,7 +250,7 @@ You can:
 
 Please be mindful of quality when contributing, since these lyrics are served to everyone using the extension.
 
-Other providers (Musixmatch, BiniLyrics, etc.) have their own external catalogs and contribution channels; corrections submitted there will flow back into Better Lyrics automatically once those upstream databases update.
+Other providers (Musixmatch, BiniLyrics, Spicy Lyrics, etc.) have their own external catalogs and contribution channels; corrections submitted there will flow back into Better Lyrics automatically once those upstream databases update.
 
 ### How do I report a bug?
 
@@ -280,26 +292,28 @@ Available providers (default priority order):
 | --- | --------------------- | ---------- |
 | 1   | Better Lyrics         | Syllable   |
 | 2   | Unison                | Syllable   |
-| 3   | BiniLyrics            | Syllable   |
-| 4   | Unison                | Word       |
-| 5   | Better Lyrics Portato | Word       |
-| 6   | Musixmatch            | Word       |
-| 7   | Better Lyrics         | Line       |
-| 8   | Unison                | Line       |
-| 9   | YouTube Captions      | Line       |
-| 10  | BiniLyrics            | Line       |
-| 11  | LRCLib                | Line       |
-| 12  | Better Lyrics Legato  | Line       |
-| 13  | Musixmatch            | Line       |
-| 14  | YouTube               | Unsynced   |
-| 15  | Unison                | Unsynced   |
-| 16  | LRCLib                | Unsynced   |
+| 3   | Spicy Lyrics          | Syllable   |
+| 4   | BiniLyrics            | Syllable   |
+| 5   | Unison                | Word       |
+| 6   | Better Lyrics Portato | Word       |
+| 7   | Musixmatch            | Word       |
+| 8   | Better Lyrics         | Line       |
+| 9   | Unison                | Line       |
+| 10  | Spicy Lyrics          | Line       |
+| 11  | YouTube Captions      | Line       |
+| 12  | BiniLyrics            | Line       |
+| 13  | LRCLib                | Line       |
+| 14  | Better Lyrics Legato  | Line       |
+| 15  | Musixmatch            | Line       |
+| 16  | YouTube               | Unsynced   |
+| 17  | Unison                | Unsynced   |
+| 18  | LRCLib                | Unsynced   |
 
 Adding custom providers isn't currently supported.
 
 ### Can I use Better Lyrics on other browsers?
 
-Right now, Better Lyrics is available for Chrome, Firefox, and Edge (and other Chromium-based browsers like Brave, Opera, Arc, etc.). If there's enough demand, I might consider porting it to other browsers.
+Right now, Better Lyrics is officially available for Chrome, Firefox, and Edge (and other Chromium-based browsers like Brave, Opera, Arc, etc.). There's also an unofficial [community Safari port](#safari-community-port) that I don't maintain.
 
 ### Can I use Better Lyrics on other music streaming services?
 
@@ -402,6 +416,10 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/MeDustyy"><img src="https://avatars.githubusercontent.com/u/58863601?v=4?s=100" width="100px;" alt="Oleksandr"/><br /><sub><b>Oleksandr</b></sub></a><br /><a href="#ideas-MeDustyy" title="Ideas, Planning, & Feedback">🤔</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/llc1123"><img src="https://avatars.githubusercontent.com/u/5478730?v=4?s=100" width="100px;" alt="粒粒橙"/><br /><sub><b>粒粒橙</b></sub></a><br /><a href="https://github.com/better-lyrics/better-lyrics/commits?author=llc1123" title="Code">💻</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://portfolio-website-liart-nu-45.vercel.app/"><img src="https://avatars.githubusercontent.com/u/152849669?v=4?s=100" width="100px;" alt="Aditya Sai prem"/><br /><sub><b>Aditya Sai prem</b></sub></a><br /><a href="https://github.com/better-lyrics/better-lyrics/commits?author=Adityuhh11" title="Code">💻</a></td>
+    </tr>
+    <tr>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/snowyukitty"><img src="https://avatars.githubusercontent.com/u/270071858?v=4?s=100" width="100px;" alt="snowyukitty"/><br /><sub><b>snowyukitty</b></sub></a><br /><a href="https://github.com/better-lyrics/better-lyrics/commits?author=snowyukitty" title="Code">💻</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/tommyorwhat"><img src="https://avatars.githubusercontent.com/u/111241986?v=4?s=100" width="100px;" alt="Tommy"/><br /><sub><b>Tommy</b></sub></a><br /><a href="#design-tommyorwhat" title="Design">🎨</a> <a href="https://github.com/better-lyrics/better-lyrics/commits?author=tommyorwhat" title="Code">💻</a></td>
     </tr>
   </tbody>
 </table>

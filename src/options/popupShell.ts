@@ -150,6 +150,9 @@ const SLOT_ICONS: Record<string, { svg: () => SVGElement | null; className?: str
   unisonNote: { svg: () => svgIcon("unisonNote"), className: "ui-jump__icon" },
   sparkles: { svg: () => svgIcon("sparkles"), className: "ui-jump__icon" },
   arrowUpRight: { svg: () => svgIcon("arrowUpRight"), className: "ui-jump__arrow" },
+  chefHatHeart: { svg: () => svgIcon("chefHatHeart") },
+  heart: { svg: () => svgIcon("heart") },
+  star: { svg: () => svgIcon("star") },
 };
 
 export function mountIcons(root: ParentNode): void {

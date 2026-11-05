@@ -40,7 +40,7 @@
     "description": "Auto switch to lyrics tab setting label"
   },
   "options_general_clearCachedLyrics": {
-    "message": "Clear cached lyrics",
+    "message": "Borrar letras en caché",
     "description": "Label for the clear cache action row"
   },
   "options_general_clearCachedLyricsHint": {
@@ -56,7 +56,7 @@
     "description": "Total lyrics in cache label"
   },
   "options_general_storageUsed": {
-    "message": "Storage used",
+    "message": "Almacenamiento utilizado",
     "description": "Popup General tab: label under the total local storage size"
   },
   "options_general_segment": {
@@ -74,11 +74,11 @@
     }
   },
   "options_general_browseThemes": {
-    "message": "Browse themes",
+    "message": "Explorar temas",
     "description": "Popup General tab: one-line description on the Theme Marketplace shortcut"
   },
   "options_general_whatsNew": {
-    "message": "What's new",
+    "message": "Novedades",
     "description": "Popup General tab: shortcut to the latest release notes"
   },
   "options_general_whatsNewHint": {
@@ -116,6 +116,10 @@
   "options_display_letterWave": {
     "message": "Flujo de letras",
     "description": "Label for the per-letter wave lyric animation toggle"
+  },
+  "options_display_fullscreenControlsTooltipStates": {
+    "message": "Auto hides the controls while the player bar is showing. On keeps them visible.",
+    "description": "Tooltip for the fullscreen player controls three-way switch, explaining the Auto and On states"
   },
   "options_display_letterWaveOff": {
     "message": "apagado",
@@ -157,9 +161,27 @@
     "message": "Pausar",
     "description": "Accessible label for the pause button in the Picture-in-Picture lyrics window, used when the YouTube Music player bar exposes no label of its own"
   },
+  "picture_in_picture_fitWindow": {
+    "message": "Fit window",
+    "description": "Tooltip and accessible label for the selected song/video button in the Picture-in-Picture lyrics window when the window size no longer matches its content; clicking it resizes the window to fit"
+  },
   "picture_in_picture_next": {
     "message": "Siguiente",
     "description": "Accessible label for the next track button in the Picture-in-Picture lyrics window, used when the YouTube Music player bar exposes no label of its own"
+  },
+  "picture_in_picture_adPlaying": {
+    "message": "Ad playing",
+    "description": "Shown in the floating lyrics window while YouTube Music plays an ad, above a countdown to the end of the ad"
+  },
+  "picture_in_picture_adUpNext": {
+    "message": "Then $SONG$",
+    "description": "Shown in the floating lyrics window during an ad, naming the song that plays when the ad ends",
+    "placeholders": {
+      "song": {
+        "content": "$1",
+        "example": "Never Gonna Give You Up"
+      }
+    }
   },
   "options_display_pipEnabled": {
     "message": "Activa ventana flotante",
@@ -224,6 +246,10 @@
   "options_display_pipProgressBar": {
     "message": "Mostrar la barra de progreso",
     "description": "Toggle label, shown inside the floating lyrics window settings, for the seekable playback progress bar under the album art"
+  },
+  "options_display_pipVideo": {
+    "message": "Show music video",
+    "description": "Toggle label, shown inside the floating lyrics window settings, for playing the music video in the floating window while YouTube Music is in video mode"
   },
   "options_display_shadersPromo": {
     "message": "Mostrar enlace a Shaders de Better Lyrics",
@@ -1648,7 +1674,7 @@
     "description": "About page section heading"
   },
   "options_about_madeByBody": {
-    "message": "$BOIDU$ and $ADALIE$, with thanks to everyone in the Better Lyrics community who has tested it and reported bugs.",
+    "message": "$BOIDU$ and $ADALIE$, with thanks to the translators and everyone in the Better Lyrics community who has tested it, reported bugs and submitted lyrics!",
     "description": "About page credits; the names become links",
     "placeholders": {
       "boidu": {

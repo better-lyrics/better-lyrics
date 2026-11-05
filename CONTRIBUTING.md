@@ -8,11 +8,32 @@ Thanks for your interest in contributing! This guide covers both code and transl
 
 Exception: Typo fixes and small documentation updates can be submitted directly.
 
+## AI-Generated Code Policy
+
+**We do not accept AI-generated pull requests from outside contributors.** If you prompted an agent
+to produce a change and are not in a position to defend every line of it on review, do not open a
+pull request.
+
+This is not an objection to the tools. It is that reviewing a patch nobody on either side
+understands costs more than writing the change ourselves, and this codebase has a lot of load-bearing
+context an agent cannot infer: the MAIN/ISOLATED content script split, the UI guard baselines, and a
+renderer that lives in a [separate repository](https://github.com/better-lyrics/braccato).
+
+**Instead, [open a feature request](https://github.com/better-lyrics/better-lyrics/issues/new/choose).**
+A clear description of the problem, what you expected, and why it matters is genuinely more useful to
+us than a patch, and costs you less. Bug reports with reproduction steps are always welcome.
+
+If you do use an agent as an assistant on a change you wrote, understand, and have tested yourself,
+say so in the PR description. Undisclosed agent-authored PRs are closed without review.
+
+Maintainers running agents against this repo should read [AGENTS.md](AGENTS.md), which covers the
+verification gates and the attribution required on agent-authored PRs.
+
 ## Development Setup
 
 ### Prerequisites
 
-- Node.js 18+
+- Node.js 22.12+ (see `engines` in `package.json`)
 - npm
 
 ### Getting Started

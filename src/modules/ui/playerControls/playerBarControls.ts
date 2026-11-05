@@ -1,8 +1,14 @@
-import { AD_PLAYING_ATTR, PLAYER_BAR_SELECTOR, PLAYER_CONTROL_EVENT, SEEK_EVENT } from "@constants";
+import { AD_PLAYING_ATTR, PLAYER_BAR_SELECTOR, PLAYER_CONTROL_EVENT, SEEK_EVENT, SET_VOLUME_EVENT } from "@constants";
 import { observeResize } from "@modules/ui/layout/layoutWidth";
+import { clampVolume } from "@modules/ui/playerControls/volumeLevel";
 
 export type TransportAction = "previous" | "play-pause" | "next";
 export type RatingState = "LIKE" | "DISLIKE" | "INDIFFERENT";
+export type PlaybackMode = "song" | "video";
+export interface PlaybackModeObserver {
+  refresh(): void;
+  disconnect(): void;
+}
 interface BylineRun {
   text: string;
   href: string | null;
@@ -20,7 +26,17 @@ const LIKE_RENDERER = `${PLAYER_BAR_SELECTOR} ytmusic-like-button-renderer#like-
 const BYLINE = `${PLAYER_BAR_SELECTOR} yt-formatted-string.byline`;
 const LIKE_BUTTON = `${PLAYER_BAR_SELECTOR} #button-shape-like button`;
 const DISLIKE_BUTTON = `${PLAYER_BAR_SELECTOR} #button-shape-dislike button`;
+const VOLUME_SLIDER = `${PLAYER_BAR_SELECTOR} #volume-slider`;
+const MUTE_BUTTON = `${PLAYER_BAR_SELECTOR} yt-icon-button.volume button`;
 const ACTION_MENU_TRIGGER = `${PLAYER_BAR_SELECTOR} ytmusic-menu-renderer [aria-label="Action menu"]`;
+const PLAYER_PAGE = "ytmusic-player-page";
+const PLAYER_VIDEO = "#movie_player video";
+export const VIDEO_MODE_ATTR = "video-mode";
+const AV_TOGGLE = "#av-id > ytmusic-av-toggle";
+const AV_HAS_VIDEO_ATTR = "selected-item-has-video";
+const AV_DISABLED_ATTR = "toggle-disabled";
+const AV_VIDEO_SELECTED_ATTR = "is-video-playback-mode-selected";
+const AV_BUTTONS = { song: ".song-button", video: ".video-button" } as const;
 
 export function sendTransport(doc: Document, action: TransportAction): void {
   doc.dispatchEvent(new CustomEvent(PLAYER_CONTROL_EVENT, { detail: action }));
@@ -119,6 +135,98 @@ export function getPlayerBar(doc: Document): HTMLElement | null {
 
 export function isAdPlaying(doc: Document): boolean {
   return doc.querySelector(`${PLAYER_BAR_SELECTOR}[${AD_PLAYING_ATTR}]`) !== null;
+}
+
+// -- Volume --------------------------
+
+export function getVolume(doc: Document): number | null {
+  const raw = doc.querySelector(VOLUME_SLIDER)?.getAttribute("value");
+  if (raw == null || raw.trim() === "") return null;
+  const parsed = Number(raw);
+  if (!Number.isFinite(parsed)) return null;
+  return clampVolume(parsed);
+}
+
+export function setVolume(doc: Document, level: number): void {
+  doc.dispatchEvent(new CustomEvent(SET_VOLUME_EVENT, { detail: clampVolume(level) }));
+}
+
+const CONTROL_LABEL_SOURCES = { like: LIKE_BUTTON, mute: MUTE_BUTTON, volume: VOLUME_SLIDER } as const;
+
+export function getControlLabel(doc: Document, control: keyof typeof CONTROL_LABEL_SOURCES): string | null {
+  return doc.querySelector(CONTROL_LABEL_SOURCES[control])?.getAttribute("aria-label") || null;
+}
+
+export function applyControlLabel(target: Element, doc: Document, control: keyof typeof CONTROL_LABEL_SOURCES): void {
+  const label = getControlLabel(doc, control);
+  if (!label) target.removeAttribute("aria-label");
+  else if (target.getAttribute("aria-label") !== label) target.setAttribute("aria-label", label);
+}
+
+export function toggleMute(doc: Document): void {
+  doc.querySelector<HTMLElement>(MUTE_BUTTON)?.click();
+}
+
+export function observeVolume(doc: Document, onChange: () => void): () => void {
+  const playerBar = getPlayerBar(doc);
+  if (!playerBar) return () => {};
+  const observer = new MutationObserver(onChange);
+  observer.observe(playerBar, { subtree: true, childList: true, attributes: true, attributeFilter: ["value"] });
+  return () => observer.disconnect();
+}
+
+// -- Song and video toggle --------------------------
+
+export function getPlayerPage(doc: Document): Element | null {
+  return doc.querySelector(PLAYER_PAGE);
+}
+
+export function getPlayerVideo<TVideo extends HTMLVideoElement = HTMLVideoElement>(doc: Document): TVideo | null {
+  return doc.querySelector<TVideo>(PLAYER_VIDEO);
+}
+
+export function isVideoModeShown(doc: Document): boolean {
+  return getPlayerPage(doc)?.hasAttribute(VIDEO_MODE_ATTR) ?? false;
+}
+
+export function getSelectedPlaybackMode(doc: Document): PlaybackMode | null {
+  const toggle = doc.querySelector(AV_TOGGLE);
+  if (!toggle) return null;
+  return toggle.getAttribute(AV_VIDEO_SELECTED_ATTR) === "true" ? "video" : "song";
+}
+
+export function canSwitchPlaybackMode(doc: Document): boolean {
+  const toggle = doc.querySelector(AV_TOGGLE);
+  return toggle !== null && toggle.hasAttribute(AV_HAS_VIDEO_ATTR) && !toggle.hasAttribute(AV_DISABLED_ATTR);
+}
+
+export function switchPlaybackMode(doc: Document, mode: PlaybackMode): boolean {
+  if (!canSwitchPlaybackMode(doc) || getSelectedPlaybackMode(doc) === mode) return false;
+  const button = doc.querySelector(AV_TOGGLE)?.querySelector<HTMLElement>(AV_BUTTONS[mode]);
+  if (!button) return false;
+  button.click();
+  return true;
+}
+
+export function observePlaybackMode(doc: Document, onChange: () => void): PlaybackModeObserver {
+  const observer = new MutationObserver(onChange);
+  let observed: Element | null = null;
+  const refresh = (): void => {
+    const toggle = doc.querySelector(AV_TOGGLE);
+    if (toggle !== observed) {
+      observer.disconnect();
+      observed = toggle;
+      if (toggle) {
+        observer.observe(toggle, {
+          attributes: true,
+          attributeFilter: [AV_HAS_VIDEO_ATTR, AV_DISABLED_ATTR, AV_VIDEO_SELECTED_ATTR],
+        });
+      }
+    }
+    onChange();
+  };
+  refresh();
+  return { refresh, disconnect: () => observer.disconnect() };
 }
 
 export function openQuickActions(doc: Document, anchor?: HTMLElement): void {

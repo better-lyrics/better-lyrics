@@ -18,6 +18,7 @@ import {
 } from "@modules/unison/revisions";
 import type { FieldCheck, PreviewResult, RevisionDraft, UnisonLyricsEntry } from "@modules/unison/types";
 import { previewRevision, saveRevision } from "@modules/unison/unisonApi";
+import { bindDetectedInput } from "@/options/unison/detectedInput";
 import { svgIcon } from "@/options/unison/icons";
 import { createLanguageDropdown } from "@/options/unison/languageDropdown";
 import { bindLyricsFileDrop, createLyricsFileInput, LYRICS_FILE_READING_EVENT } from "@/options/unison/lyricsFile";
@@ -26,6 +27,7 @@ import { detectFormat } from "@/options/unison/lyricsPreviewLines";
 import { appendMetaRow } from "@/options/unison/metaTable";
 import { mountChangesTabs } from "@/options/unison/revisions/revisionChanges";
 import { bindReadableLyricsField } from "@/options/unison/readableLyricsField";
+import { readTtmlMetadata } from "@/options/unison/ttmlMetadata";
 import {
   type RevisionHost,
   createBackButton,
@@ -121,6 +123,11 @@ export function renderRevisionEditor(entry: UnisonLyricsEntry, surface: EditorSu
     rate: createRateLine(),
   };
   const formatCell = renderSidebar(entry, surface.meta, host, controls);
+  const isrcField = bindDetectedInput(controls.isrcInput);
+  const albumField = bindDetectedInput(controls.albumInput);
+  const initialMetadata = readTtmlMetadata(textarea.value);
+  isrcField.seed(initialMetadata.isrc);
+  albumField.seed(initialMetadata.album);
 
   const bar = createSaveBar();
   surface.savebar.replaceChildren(bar.root);
@@ -258,6 +265,9 @@ export function renderRevisionEditor(entry: UnisonLyricsEntry, surface: EditorSu
   const renderLyricsPreview = (): void => {
     formatCell.textContent = t(`unison_format_${detectFormat(textarea.value)}`);
     renderPreviewInto(surface.preview, textarea.value, false, surface.previewHead);
+    const metadata = readTtmlMetadata(textarea.value);
+    const filled = [isrcField.apply(metadata.isrc), albumField.apply(metadata.album)];
+    if (filled.some(Boolean)) schedulePreview();
   };
   host.onLeave(() => clearTimeout(renderTimer));
   textarea.addEventListener("input", () => {
@@ -265,8 +275,10 @@ export function renderRevisionEditor(entry: UnisonLyricsEntry, surface: EditorSu
     renderTimer = setTimeout(renderLyricsPreview, UNISON_LYRICS_PREVIEW_DEBOUNCE_MS);
     schedulePreview();
   });
-  controls.isrcInput.addEventListener("input", schedulePreview);
-  controls.albumInput.addEventListener("input", schedulePreview);
+  for (const input of [controls.isrcInput, controls.albumInput]) {
+    input.addEventListener("input", schedulePreview);
+    input.addEventListener("change", schedulePreview);
+  }
 
   const setSaving = (value: boolean): void => {
     saving = value;

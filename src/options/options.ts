@@ -11,7 +11,14 @@ import {
   UNISON_PICTURE_URL,
 } from "@constants";
 import { attachHoldRepeat } from "@core/holdRepeat";
-import { getLanguageDisplayName, initI18n, loadLocaleOverride, SUPPORTED_LOCALES, t } from "@core/i18n";
+import {
+  getLanguageDisplayName,
+  initI18n,
+  loadLocaleOverride,
+  resolveUiLanguage,
+  SUPPORTED_LOCALES,
+  t,
+} from "@core/i18n";
 import {
   exportIdentity,
   forgetDisplayName,
@@ -33,13 +40,14 @@ import {
 } from "@core/storage";
 import { KARAOKE_DEFAULTS } from "@modules/karaoke/defaults";
 import { syncTypeColors } from "@modules/ui/lyricsDock/icons";
+import { type FullscreenControlsPref, migrateFullscreenControlsPref } from "@modules/settings/fullscreenControls";
 import { migrateLetterWavePref, type LetterWavePref } from "@modules/settings/letterWave";
 import { mergePreferredProviders } from "@modules/lyrics/providers/providerList";
 import { fetchOwnGamification, renderIdentityStats } from "@modules/unison/gamificationRender";
 import type Sortable from "sortablejs";
 import { initializeThemes } from "@/options/editor/themesUi";
 import { openEditCSS, openOptions } from "@/options/editor/ui/dom";
-import { showModal } from "./editor/ui/feedback";
+import { showModal } from "@/options/editor/ui/feedback";
 import {
   applyThemeSettingsToCSS,
   broadcastRICSToTabs,
@@ -47,8 +55,8 @@ import {
   loadCustomCSS,
   loadThemeSettings,
 } from "./editor/features/storage";
-import { initStoreUI, setupYourThemesButton } from "./store/store";
-import { checkForStableRelease } from "./updateNotice";
+import { initStoreUI, setupYourThemesButton } from "@/options/store/store";
+import { checkForStableRelease } from "@/options/updateNotice";
 import { errorCore, warnCore } from "@core/logger";
 import {
   themeSettingsApplyBtn,
@@ -66,7 +74,7 @@ import { normalizeVideoQualitySettings, type VideoQualitySettings } from "@modul
 import { syncVideoQualityControls, videoQualityOptions } from "@/options/videoQualityControls";
 import { mountDropdownField, setDropdownFieldValue } from "@/options/dropdownFields";
 import { TRANSLATION_LANGUAGES } from "@/options/translationLanguages";
-import { renderAboutLinks } from "@/options/aboutPage";
+import { observeSupportStage, renderAboutLinks } from "@/options/aboutPage";
 import { createModal, type Modal } from "@/ui/modal";
 import { initTabStrip, type TabStrip } from "@/ui/tabStrip";
 import { renderStatBar } from "@/ui/statBar";
@@ -83,11 +91,13 @@ import {
   renderAppVersion,
 } from "@/options/popupShell";
 import {
+  DOWNLOAD_IDENTITY_FILE_ACTION,
+  type IdentityFileRequest,
+  type IdentityFileResult,
   isIdentityBackedUp,
   markIdentityBackedUp,
   onBackupFlagChanged,
   readBackedUpKeyId,
-  rememberPendingBackup,
 } from "@/options/identityBackup";
 import { attachDeclaredScrollFades, attachScrollFade } from "@/ui/scrollFade";
 import { createSyncIcon, createSyncTag, syncTypeLabel } from "@/ui/syncTag";
@@ -99,7 +109,7 @@ interface Options extends VideoQualitySettings {
   isAlbumArtEnabled: boolean;
   isShadersPromoEnabled: boolean;
   isFullScreenDisabled: boolean;
-  isFullscreenControlsEnabled: boolean;
+  fullscreenControlsPref: FullscreenControlsPref;
   isStylizedAnimationsEnabled: boolean;
   letterWavePref: LetterWavePref;
   isPassiveScrollEnabled: boolean;
@@ -110,6 +120,7 @@ interface Options extends VideoQualitySettings {
   pipTextTransition: string;
   pipMarqueeEnabled: boolean;
   pipProgressBarEnabled: boolean;
+  pipVideoEnabled: boolean;
   isKaraokeEnabled: boolean;
   isTranslateEnabled: boolean;
   translationLanguage: string;
@@ -171,9 +182,9 @@ const getOptionsFromForm = (): Options => {
     isAlbumArtEnabled: (document.getElementById("albumArt") as HTMLInputElement).checked,
     isShadersPromoEnabled: (document.getElementById("isShadersPromoEnabled") as HTMLInputElement).checked,
     isFullScreenDisabled: (document.getElementById("isFullScreenDisabled") as HTMLInputElement).checked,
-    isFullscreenControlsEnabled: (document.getElementById("isFullscreenControlsEnabled") as HTMLInputElement).checked,
+    fullscreenControlsPref: getTriSwitchState("fullscreenControlsSwitch"),
     isStylizedAnimationsEnabled: (document.getElementById("isStylizedAnimationsEnabled") as HTMLInputElement).checked,
-    letterWavePref: getLetterWaveSwitchState(),
+    letterWavePref: getTriSwitchState("letterWaveSwitch"),
     isPassiveScrollEnabled: (document.getElementById("isPassiveScrollEnabled") as HTMLInputElement).checked,
     isPictureInPictureEnabled: (document.getElementById("isPictureInPictureEnabled") as HTMLInputElement).checked,
     isPictureInPictureAutoRestoreEnabled: (
@@ -184,6 +195,7 @@ const getOptionsFromForm = (): Options => {
     pipTextTransition: (document.getElementById("pipTextTransition") as HTMLInputElement).value,
     pipMarqueeEnabled: (document.getElementById("pipMarqueeEnabled") as HTMLInputElement).checked,
     pipProgressBarEnabled: (document.getElementById("pipProgressBarEnabled") as HTMLInputElement).checked,
+    pipVideoEnabled: (document.getElementById("pipVideoEnabled") as HTMLInputElement).checked,
     isKaraokeEnabled: (document.getElementById("isKaraokeEnabled") as HTMLInputElement).checked,
     isTranslateEnabled: (document.getElementById("translate") as HTMLInputElement).checked,
     translationLanguage: (document.getElementById("translationLanguage") as HTMLInputElement).value,
@@ -358,7 +370,7 @@ const restoreOptions = (): void => {
     isShadersPromoEnabled: true,
     isCursorAutoHideEnabled: true,
     isFullScreenDisabled: false,
-    isFullscreenControlsEnabled: true,
+    fullscreenControlsPref: "auto",
     isStylizedAnimationsEnabled: true,
     letterWavePref: "auto",
     isPassiveScrollEnabled: true,
@@ -369,6 +381,7 @@ const restoreOptions = (): void => {
     pipTextTransition: "spring",
     pipMarqueeEnabled: true,
     pipProgressBarEnabled: true,
+    pipVideoEnabled: true,
     ...KARAOKE_DEFAULTS,
     isTranslateEnabled: false,
     translationLanguage: "en",
@@ -376,6 +389,7 @@ const restoreOptions = (): void => {
     preferredProviderList: [
       "bLyrics-richsynced",
       "unison-richsynced",
+      "spicy-richsynced",
       "binimum-richsynced",
       "unison-wordsynced",
       "portato-richsynced",
@@ -383,6 +397,7 @@ const restoreOptions = (): void => {
       "yt-captions",
       "bLyrics-synced",
       "unison-synced",
+      "spicy-synced",
       "binimum-synced",
       "lrclib-synced",
       "legato-synced",
@@ -413,6 +428,7 @@ const restoreOptions = (): void => {
   const readKeys = [
     ...Object.keys(defaultOptions),
     "isLetterWaveEnabled",
+    "isFullscreenControlsEnabled",
     "isUnisonPinnedDockEnabled",
     "unisonPinnedDockPosition",
     "isUnisonAutoHideInFullscreenEnabled",
@@ -423,6 +439,7 @@ const restoreOptions = (): void => {
       ...defaultOptions,
       ...(raw as Options),
       letterWavePref: migrateLetterWavePref(raw),
+      fullscreenControlsPref: migrateFullscreenControlsPref(raw),
       isControlsDockEnabled:
         raw.isControlsDockEnabled ?? raw.isUnisonPinnedDockEnabled ?? defaultOptions.isControlsDockEnabled,
       controlsDockPosition:
@@ -453,12 +470,11 @@ const setOptionsInForm = (items: Options): void => {
   (document.getElementById("autoSwitch") as HTMLInputElement).checked = items.isAutoSwitchEnabled;
   (document.getElementById("cursorAutoHide") as HTMLInputElement).checked = items.isCursorAutoHideEnabled;
   (document.getElementById("isFullScreenDisabled") as HTMLInputElement).checked = items.isFullScreenDisabled;
-  (document.getElementById("isFullscreenControlsEnabled") as HTMLInputElement).checked =
-    items.isFullscreenControlsEnabled;
+  setTriSwitchState("fullscreenControlsSwitch", items.fullscreenControlsPref);
   (document.getElementById("isStylizedAnimationsEnabled") as HTMLInputElement).checked =
     items.isStylizedAnimationsEnabled;
   syncFullscreenDependents();
-  setLetterWaveSwitchState(items.letterWavePref);
+  setTriSwitchState("letterWaveSwitch", items.letterWavePref);
   (document.getElementById("isPassiveScrollEnabled") as HTMLInputElement).checked = items.isPassiveScrollEnabled;
   (document.getElementById("isPictureInPictureEnabled") as HTMLInputElement).checked = items.isPictureInPictureEnabled;
   (document.getElementById("isPictureInPictureAutoRestoreEnabled") as HTMLInputElement).checked =
@@ -468,11 +484,12 @@ const setOptionsInForm = (items: Options): void => {
   setDropdownFieldValue("pipTextTransition", items.pipTextTransition);
   (document.getElementById("pipMarqueeEnabled") as HTMLInputElement).checked = items.pipMarqueeEnabled;
   (document.getElementById("pipProgressBarEnabled") as HTMLInputElement).checked = items.pipProgressBarEnabled;
+  (document.getElementById("pipVideoEnabled") as HTMLInputElement).checked = items.pipVideoEnabled;
   (document.getElementById("isKaraokeEnabled") as HTMLInputElement).checked = items.isKaraokeEnabled;
   (document.getElementById("translate") as HTMLInputElement).checked = items.isTranslateEnabled;
   setDropdownFieldValue("translationLanguage", items.translationLanguage);
   (document.getElementById("isRomanizationEnabled") as HTMLInputElement).checked = items.isRomanizationEnabled;
-  setDropdownFieldValue("uiLanguage", items.uiLanguage);
+  setDropdownFieldValue("uiLanguage", resolveUiLanguage(items.uiLanguage));
   (document.getElementById("isUnisonPinnedDockEnabled") as HTMLInputElement).checked = items.isControlsDockEnabled;
   (document.getElementById("isUnisonAutoHideInFullscreenEnabled") as HTMLInputElement).checked =
     items.isControlsDockAutoHideInFullscreenEnabled;
@@ -503,6 +520,7 @@ const setOptionsInForm = (items: Options): void => {
   const defaultProviderOrder = [
     "bLyrics-richsynced",
     "unison-richsynced",
+    "spicy-richsynced",
     "binimum-richsynced",
     "unison-wordsynced",
     "portato-richsynced",
@@ -510,6 +528,7 @@ const setOptionsInForm = (items: Options): void => {
     "yt-captions",
     "bLyrics-synced",
     "unison-synced",
+    "spicy-synced",
     "binimum-synced",
     "lrclib-synced",
     "legato-synced",
@@ -537,6 +556,8 @@ interface ProviderInfo {
 const getProviderIdToInfoMap = (): { [key: string]: ProviderInfo } => ({
   "binimum-richsynced": { name: t("options_provider_binilyrics"), syncType: "syllable" },
   "binimum-synced": { name: t("options_provider_binilyrics"), syncType: "line" },
+  "spicy-richsynced": { name: t("options_provider_spicylyrics"), syncType: "syllable" },
+  "spicy-synced": { name: t("options_provider_spicylyrics"), syncType: "line" },
   "musixmatch-richsync": {
     name: t("options_provider_musixmatch"),
     syncType: "word",
@@ -653,38 +674,40 @@ function syncFullscreenDependents(): void {
   dependents?.toggleAttribute("inert", muted);
 }
 
-// -- Letter wave switch --------------------------
+// -- Tri-state switches --------------------------
 
-const LETTER_WAVE_ORDER: LetterWavePref[] = ["off", "auto", "on"];
+type TriSwitchState = "off" | "auto" | "on";
 
-const LETTER_WAVE_STATE_KEYS: Record<LetterWavePref, string> = {
+const TRI_SWITCH_ORDER: TriSwitchState[] = ["off", "auto", "on"];
+
+const TRI_SWITCH_STATE_KEYS: Record<TriSwitchState, string> = {
   off: "options_display_letterWaveOff",
   auto: "options_display_videoQualityAuto",
   on: "options_display_letterWaveOn",
 };
 
-function getLetterWaveSwitchState(): LetterWavePref {
-  const state = document.getElementById("letterWaveSwitch")?.dataset.state;
+function getTriSwitchState(id: string): TriSwitchState {
+  const state = document.getElementById(id)?.dataset.state;
   return state === "on" || state === "off" || state === "auto" ? state : "auto";
 }
 
-function setLetterWaveSwitchState(pref: LetterWavePref): void {
-  const el = document.getElementById("letterWaveSwitch");
+function setTriSwitchState(id: string, state: TriSwitchState): void {
+  const el = document.getElementById(id);
   if (!el) return;
-  el.dataset.state = pref;
-  el.setAttribute("aria-valuenow", String(LETTER_WAVE_ORDER.indexOf(pref)));
-  el.setAttribute("aria-valuetext", t(LETTER_WAVE_STATE_KEYS[pref]));
+  el.dataset.state = state;
+  el.setAttribute("aria-valuenow", String(TRI_SWITCH_ORDER.indexOf(state)));
+  el.setAttribute("aria-valuetext", t(TRI_SWITCH_STATE_KEYS[state]));
 }
 
-function initLetterWaveSwitch(): void {
-  const el = document.getElementById("letterWaveSwitch");
+function initTriSwitch(id: string): void {
+  const el = document.getElementById(id);
   if (!el) return;
 
   const step = (delta: number, wrap: boolean): void => {
-    const count = LETTER_WAVE_ORDER.length;
-    const current = LETTER_WAVE_ORDER.indexOf(getLetterWaveSwitchState());
+    const count = TRI_SWITCH_ORDER.length;
+    const current = TRI_SWITCH_ORDER.indexOf(getTriSwitchState(id));
     const next = wrap ? (current + delta + count) % count : Math.min(count - 1, Math.max(0, current + delta));
-    setLetterWaveSwitchState(LETTER_WAVE_ORDER[next]);
+    setTriSwitchState(id, TRI_SWITCH_ORDER[next]);
     saveOptions();
   };
 
@@ -747,12 +770,14 @@ document.addEventListener("DOMContentLoaded", async () => {
   renderAppVersion(document.getElementById("app-version"));
   fitPopupToWindow();
   renderAboutLinks(document);
+  observeSupportStage(document);
   document.getElementById("jump-whats-new")?.setAttribute("href", `${GITHUB_REPO_URL}/releases/latest`);
   mountIcons(document);
   initRefreshLyricsButton(() => toast.error(t("options_alert_refreshFailed")));
   mountDropdownFields();
   initTooltips(document.body);
-  initLetterWaveSwitch();
+  initTriSwitch("letterWaveSwitch");
+  initTriSwitch("fullscreenControlsSwitch");
   document.getElementById("isFullScreenDisabled")?.addEventListener("change", syncFullscreenDependents);
   restoreOptions();
   initPopupCards();
@@ -770,6 +795,8 @@ document.getElementById("options")?.addEventListener("change", event => {
 });
 
 // -- Drag sorting --------------------------
+
+const TOUCH_DRAG_DELAY_MS = 200;
 
 function sortableWhenVisible(list: HTMLElement, options: Sortable.Options): void {
   const observer = new IntersectionObserver(entries => {
@@ -814,6 +841,8 @@ document.addEventListener("DOMContentLoaded", () => {
     animation: 150,
     ghostClass: "dragging",
     forceFallback: true,
+    delay: TOUCH_DRAG_DELAY_MS,
+    delayOnTouchOnly: true,
     filter: ".checkbox-container",
     preventOnFilter: false,
     onUpdate: saveOptions,
@@ -1445,34 +1474,34 @@ function initNicknameModal(): void {
 }
 
 async function handleExportIdentity(): Promise<void> {
+  const downloadsGranted = requestDownloadsPermission();
   try {
-    const [displayName, exportData, { keyId }] = await Promise.all([getDisplayName(), exportIdentity(), getIdentity()]);
-    const outcome = await downloadIdentityFile(exportData, `better-lyrics-identity-${displayName}.json`);
-    notifyDownloadOutcome(outcome);
-    if (outcome.kind === "downloads") await rememberPendingBackup(outcome.downloadId, keyId);
+    const [displayName, content, { keyId }] = await Promise.all([getDisplayName(), exportIdentity(), getIdentity()]);
+    const filename = `better-lyrics-identity-${displayName}.json`;
+    if (!(await downloadsGranted)) {
+      downloadWithAnchor(content, filename);
+      toast.success(t("options_alert_downloadInitiated"));
+      return;
+    }
+    const request: IdentityFileRequest = { action: DOWNLOAD_IDENTITY_FILE_ACTION, content, filename, keyId };
+    const result: IdentityFileResult = await chrome.runtime.sendMessage(request);
+    if ("downloadId" in result) toast.info(t("options_alert_fileSaveDialogOpened"));
+    else toast.error(t("options_alert_fileSaveFailed"));
   } catch (error) {
     errorCore("Failed to export identity:", error);
     toast.error(t("options_alert_exportFailed"));
   }
 }
 
-type DownloadOutcome = { kind: "downloads"; downloadId: number } | { kind: "anchor" } | { kind: "failed" };
+function requestDownloadsPermission(): Promise<boolean> {
+  return chrome.permissions.request({ permissions: ["downloads"] }).catch(error => {
+    warnCore("Downloads permission request failed:", error);
+    return false;
+  });
+}
 
-async function downloadIdentityFile(content: string, filename: string): Promise<DownloadOutcome> {
-  const hasPermission = await chrome.permissions.contains({ permissions: ["downloads"] });
-  const granted = hasPermission || (await chrome.permissions.request({ permissions: ["downloads"] }));
+function downloadWithAnchor(content: string, filename: string): void {
   const url = URL.createObjectURL(new Blob([content], { type: "application/json" }));
-  if (granted && chrome.downloads) {
-    try {
-      const downloadId = await chrome.downloads.download({ url, filename, saveAs: true });
-      return { kind: "downloads", downloadId };
-    } catch (error) {
-      errorCore("Identity download failed:", error);
-      return { kind: "failed" };
-    } finally {
-      URL.revokeObjectURL(url);
-    }
-  }
   const anchor = document.createElement("a");
   anchor.href = url;
   anchor.download = filename;
@@ -1480,13 +1509,6 @@ async function downloadIdentityFile(content: string, filename: string): Promise<
   anchor.click();
   anchor.remove();
   setTimeout(() => URL.revokeObjectURL(url), 100);
-  return { kind: "anchor" };
-}
-
-function notifyDownloadOutcome(outcome: DownloadOutcome): void {
-  if (outcome.kind === "downloads") toast.info(t("options_alert_fileSaveDialogOpened"));
-  else if (outcome.kind === "anchor") toast.success(t("options_alert_downloadInitiated"));
-  else toast.error(t("options_alert_fileSaveFailed"));
 }
 
 async function syncBackupWarning(): Promise<void> {
@@ -1962,6 +1984,8 @@ function setupUnisonActionsModal(): void {
       animation: 150,
       ghostClass: "dragging",
       forceFallback: true,
+      delay: TOUCH_DRAG_DELAY_MS,
+      delayOnTouchOnly: true,
       onUpdate: debouncedSaveOptions,
     });
   }

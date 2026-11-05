@@ -1,8 +1,21 @@
-import { CUBEY_LYRICS_API_URL, CUBEY_LYRICS_API_URL_TURNSTILE, HOMEPAGE_URL, LOG_PREFIX } from "@constants";
+import {
+  CUBEY_LYRICS_API_URL,
+  CUBEY_LYRICS_API_URL_TURNSTILE,
+  HOMEPAGE_URL,
+  LOG_PREFIX,
+  SPICY_LYRICS_URL,
+} from "@constants";
 import { getLocalStorage } from "@core/storage";
 import { LRCParser, lrcFixers, parseLRC, parseQRC, PlainParser, QRCParser } from "@braccato/parsers";
 import { type LyricSourceKey, type LyricSourceResult, type ProviderParameters, saveLyricsToCache } from "./shared";
 import { fillTtml } from "@modules/lyrics/providers/ttmlSource";
+import {
+  beginUnisonStream,
+  endUnisonStream,
+  handleUnisonStreamEvent,
+  shouldStreamUnison,
+} from "@modules/lyrics/providers/unison";
+import { getIdentity } from "@/core/keyIdentity";
 import { errorCore, logCore, warnCore } from "@core/logger";
 
 const JWT_RENEWAL_THRESHOLD_SECONDS = 60 * 60;
@@ -199,6 +212,16 @@ export function prewarmAuthenticationToken(): void {
     });
 }
 
+interface SpicyContributor {
+  username: string;
+  url: string;
+}
+
+interface SpicyAttribution {
+  uploader: SpicyContributor;
+  maker?: SpicyContributor;
+}
+
 // Managed keys for this provider
 const MANAGED_KEYS = [
   "musixmatch-richsync",
@@ -211,6 +234,8 @@ const MANAGED_KEYS = [
   "bLyrics-synced",
   "binimum-richsynced",
   "binimum-synced",
+  "spicy-richsynced",
+  "spicy-synced",
   "metadata",
 ] as const;
 
@@ -308,9 +333,19 @@ async function startStream(providerParameters: ProviderParameters, retryCount = 
   body.append("alwaysFetchMetadata", String(alwaysFetchMetadata));
   const isrc = findIsrc(audioTrackData);
   if (isrc) body.append("isrc", isrc);
+  const streamsUnison = await shouldStreamUnison(videoId);
+  if (streamsUnison) {
+    body.append("unison", "1");
+    const keyId = await getIdentity().then(
+      identity => identity.keyId,
+      () => null
+    );
+    if (keyId) body.append("unisonKeyId", keyId);
+  }
   body.append("token", jwt);
 
   let completedNormally = false;
+  if (streamsUnison) beginUnisonStream(videoId);
   try {
     const response = await fetch(CUBEY_LYRICS_API_URL + "v2/lyrics", {
       method: "POST",
@@ -380,6 +415,7 @@ async function startStream(providerParameters: ProviderParameters, retryCount = 
     });
     resolveAllWaiters(videoId);
     activeStreams.delete(videoId);
+    if (streamsUnison) endUnisonStream(videoId);
   }
 }
 
@@ -414,6 +450,15 @@ async function processStreamData(event: string, data: any, params: ProviderParam
   const { sourceMap } = params;
   const durationMs = params.duration * 1000;
 
+  // Every provider has reported; Unison events can still follow before the stream closes.
+  if (event === "done") {
+    for (const key of MANAGED_KEYS) {
+      if (!sourceMap[key].filled) sourceMap[key].filled = true;
+      resolveWaiter(params, key);
+    }
+    return;
+  }
+
   if (event === "metadata") {
     if (data.album && !params.album) params.album = data.album;
     if (data.song && params.song !== data.song) params.song = data.song;
@@ -440,6 +485,12 @@ async function processStreamData(event: string, data: any, params: ProviderParam
     const results = data.results;
 
     if (!results) return;
+
+    // Unison runs on its own state; its waiters read the local Unison cache rather than this sourceMap.
+    if (provider === "unison") {
+      await handleUnisonStreamEvent(params.videoId, results);
+      return;
+    }
 
     // Musixmatch
     if (provider === "musixmatch") {
@@ -570,24 +621,34 @@ async function processStreamData(event: string, data: any, params: ProviderParam
           richsyncKey: "binimum-richsynced",
           syncedKey: "binimum-synced",
           source: "BiniLyrics",
-          sourceHref: "https://lyrics-api.binimum.org/",
+          sourceHref: "https://binimum.org/",
         });
-
-        const timingType: "syllable" | "line" | null = results.timingType ?? null;
-        if (timingType === "syllable") {
-          if (!sourceMap["binimum-richsynced"].lyricSourceResult) {
-            sourceMap["binimum-richsynced"].lyricSourceResult = sourceMap["binimum-synced"].lyricSourceResult;
-            sourceMap["binimum-synced"].lyricSourceResult = null;
-          }
-        } else if (timingType === "line") {
-          if (!sourceMap["binimum-synced"].lyricSourceResult) {
-            sourceMap["binimum-synced"].lyricSourceResult = sourceMap["binimum-richsynced"].lyricSourceResult;
-          }
-          sourceMap["binimum-richsynced"].lyricSourceResult = null;
-        }
-
         resolveWaiter(params, "binimum-richsynced");
         resolveWaiter(params, "binimum-synced");
+      }
+    }
+
+    // Spicy Lyrics (community TTML)
+    if (provider === "spicy") {
+      if (results.lyrics) {
+        const attribution: SpicyAttribution | null = results.attribution ?? null;
+        fillTtml(results.lyrics, params, {
+          richsyncKey: "spicy-richsynced",
+          syncedKey: "spicy-synced",
+          source: "Spicy Lyrics",
+          sourceHref: SPICY_LYRICS_URL,
+          contributors: attribution
+            ? [
+                { name: attribution.uploader.username, href: attribution.uploader.url, role: "uploader" },
+                ...(attribution.maker
+                  ? [{ name: attribution.maker.username, href: attribution.maker.url, role: "maker" as const }]
+                  : []),
+              ]
+            : undefined,
+        });
+
+        resolveWaiter(params, "spicy-richsynced");
+        resolveWaiter(params, "spicy-synced");
       }
     }
   }
