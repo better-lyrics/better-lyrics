@@ -1,16 +1,20 @@
+import { THEME_SETTINGS_TYPES } from "@constants";
 import { buildStoreThemeContent, saveCustomCss } from "@core/customCss";
 import { getAppliedStoreThemeId, getLocalStorage, getSyncStorage } from "@core/storage";
 import {
   fetchFullTheme,
   fetchRegistryShaderConfig,
+  fetchRegistryThemeSettings,
   fetchSingleStoreTheme,
   fetchThemeCSS,
   fetchThemeMetadata,
+  fetchThemeSettings,
   fetchThemeShaderConfig,
   resolveRegistryInstallUrls,
 } from "./themeStoreService";
 import type { InstalledStoreTheme, StoreTheme, ThemeSource } from "./types";
 import { logStore, warnStore } from "@core/logger";
+import type { ThemeSettingField } from "../themes";
 
 async function fetchCssFromUrl(url: string): Promise<string> {
   const response = await fetch(url);
@@ -133,10 +137,12 @@ export class ThemeStorageFullError extends Error {
 export async function installTheme(theme: StoreTheme, options: InstallOptions = {}): Promise<InstalledStoreTheme> {
   await ensureMigrated();
 
+  const installed = await getInstalledTheme(theme.id);
   const isRegistryTheme = !!theme.commit && options.source !== "url";
 
   let css: string;
   let shaderConfig: Record<string, unknown> | null = null;
+  let settings: Record<string, ThemeSettingField> | null = null;
 
   if (isRegistryTheme) {
     // Authoritative resolution happens here at install time: ask store-api /resolve
@@ -144,6 +150,9 @@ export async function installTheme(theme: StoreTheme, options: InstallOptions = 
     // that path rather than reusing the listing-time URLs.
     const installUrls = await resolveRegistryInstallUrls(theme);
     css = await fetchCssFromUrl(installUrls.cssUrl);
+    if (theme.hasSettings) {
+      settings = await fetchRegistryThemeSettings(installUrls.registryPath);
+    }
     if (theme.hasShaders) {
       shaderConfig = await fetchRegistryShaderConfig(installUrls.registryPath);
     }
@@ -151,8 +160,19 @@ export async function installTheme(theme: StoreTheme, options: InstallOptions = 
     const branch = options.branch;
     const cssResult = await fetchThemeCSS(theme.repo, branch);
     css = cssResult.css;
+    if (theme.hasSettings) {
+      settings = await fetchThemeSettings(theme.repo, branch);
+    }
     if (theme.hasShaders) {
       shaderConfig = await fetchThemeShaderConfig(theme.repo, branch);
+    }
+  }
+
+  if (settings && installed?.savedSettings) {
+    for (const key in installed.savedSettings) {
+      if (!(key in settings)) {
+        delete installed.savedSettings[key];
+      }
     }
   }
 
@@ -163,6 +183,8 @@ export async function installTheme(theme: StoreTheme, options: InstallOptions = 
     creators: theme.creators,
     css,
     shaderConfig: shaderConfig || undefined,
+    settings: settings || undefined,
+    savedSettings: installed?.savedSettings || undefined,
     installedAt: Date.now(),
     version: theme.version,
     source: options.source,
@@ -173,6 +195,7 @@ export async function installTheme(theme: StoreTheme, options: InstallOptions = 
     imageUrls: theme.imageUrls,
     minVersion: theme.minVersion,
     hasShaders: theme.hasShaders,
+    hasSettings: theme.hasSettings,
     tags: theme.tags,
     commit: theme.commit,
   };
@@ -207,6 +230,59 @@ export async function removeTheme(themeId: string): Promise<void> {
   const activeTheme = await getActiveStoreTheme();
   if (activeTheme === themeId) {
     await clearActiveStoreTheme();
+  }
+}
+
+export async function setSavedThemeSettings(themeId: string, savedSettings: Record<string, any>): Promise<void> {
+  await ensureMigrated();
+
+  const installed = await getInstalledTheme(themeId);
+  if (!installed) {
+    throw new Error(`Cannot save settings: theme "${themeId}" is not installed`);
+  }
+
+  // check if the theme has settings and validate the value of the gonna-be-saved settings
+  if (installed.settings) {
+    for (const field in savedSettings) {
+      if (!(field in installed.settings)) {
+        delete savedSettings[field];
+        continue;
+      }
+
+      if (typeof savedSettings[field] !== typeof THEME_SETTINGS_TYPES[installed.settings[field].type]) {
+        delete savedSettings[field];
+      }
+    }
+  }
+
+  const updatedTheme = { ...installed, savedSettings };
+
+  try {
+    await chrome.storage.local.set({ [getThemeStorageKey(themeId)]: updatedTheme });
+  } catch (err) {
+    if (err instanceof Error && err.message.includes("QUOTA")) {
+      throw new Error(
+        `Cannot save theme settings: storage is full. Please remove some installed themes and try again.`
+      );
+    }
+    throw err;
+  }
+}
+
+export async function removeSavedThemeSettings(themeId: string): Promise<void> {
+  await ensureMigrated();
+
+  const installed = await getInstalledTheme(themeId);
+  if (!installed) {
+    throw new Error(`Cannot remove theme settings: theme "${themeId}" is not installed`);
+  }
+
+  delete installed.savedSettings;
+
+  try {
+    await chrome.storage.local.set({ [getThemeStorageKey(themeId)]: installed });
+  } catch (err) {
+    throw new Error(`Cannot remove theme settings: ${err}`);
   }
 }
 
@@ -294,7 +370,7 @@ async function syncAppliedThemeCss(theme: InstalledStoreTheme): Promise<void> {
 
   await setActiveStoreTheme(theme.id);
 
-  const result = await saveCustomCss(buildStoreThemeContent(theme.title, theme.creators, theme.css));
+  const result = await saveCustomCss(buildStoreThemeContent(theme.title, theme.creators, theme.css), theme.hasSettings ? { fields: theme.settings, saved: theme.savedSettings } : undefined);
   if (!result.success) {
     warnStore(`Failed to re-apply theme after update: ${theme.title}`, result.error);
     return;

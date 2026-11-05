@@ -320,6 +320,84 @@
 						</div>
 					</div>
 				</div>
+			</div>
+		</div>
+		<div class="tab-content" id="themes-content">
+			<div class="settings-group">
+				<h2>
+					<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+						<path fill-rule="evenodd" d="M20.599 1.5c-.376 0-.743.111-1.055.32l-5.08 3.385a18.747 18.747 0 0 0-3.471 2.987 10.04 10.04 0 0 1 4.815 4.815 18.748 18.748 0 0 0 2.987-3.472l3.386-5.079A1.902 1.902 0 0 0 20.599 1.5Zm-8.3 14.025a18.76 18.76 0 0 0 1.896-1.207 8.026 8.026 0 0 0-4.513-4.513A18.75 18.75 0 0 0 8.475 11.7l-.278.5a5.26 5.26 0 0 1 3.601 3.602l.502-.278ZM6.75 13.5A3.75 3.75 0 0 0 3 17.25a1.5 1.5 0 0 1-1.601 1.497.75.75 0 0 0-.7 1.123 5.25 5.25 0 0 0 9.8-2.62 3.75 3.75 0 0 0-3.75-3.75Z" clip-rule="evenodd"></path>
+					</svg>
+
+					__MSG_options_themes_title__
+				</h2>
+				<p>__MSG_options_themes_description__</p>
+				<div class="theme-preview-card" id="theme-preview-card">
+					<div class="theme-preview-info">
+						<div class="theme-preview-header">
+							<span class="theme-preview-name" id="theme-preview-name">__MSG_options_themes_chooseTheme__</span>
+							<span class="theme-preview-badge" id="theme-preview-badge"></span>
+						</div>
+						<span class="theme-preview-author" id="theme-preview-author"></span>
+					</div>
+					<div style="display: flex; flex-direction: row; gap: .5rem;">
+						<button class="theme-preview-change-btn" id="theme-settings-btn" style="display: none; padding: 8px 12px">
+							<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="currentColor" d="M19.14 12.94a7 7 0 0 0-.01-1.88l2.03-1.58a.5.5 0 0 0 .12-.61l-1.92-3.32a.5.5 0 0 0-.59-.22l-2.39.96q-.74-.57-1.62-.94l-.36-2.54a.5.5 0 0 0-.48-.41h-3.84a.5.5 0 0 0-.47.41l-.36 2.54q-.88.37-1.62.94l-2.39-.96a.5.5 0 0 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58a6 6 0 0 0-.02 1.88l-2.03 1.58a.5.5 0 0 0-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96q.74.57 1.62.94l.36 2.54a.5.5 0 0 0 .48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54a7 7 0 0 0 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6"></path></svg>
+						</button>
+						<button class="theme-preview-change-btn" id="theme-selector-btn">
+							<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M22 12.698c-.002 1.47-.013 2.718-.096 3.743c-.097 1.19-.296 2.184-.74 3.009a4.2 4.2 0 0 1-.73.983c-.833.833-1.893 1.21-3.237 1.39C15.884 22 14.2 22 12.053 22h-.106c-2.148 0-3.83 0-5.144-.177c-1.343-.18-2.404-.557-3.236-1.39c-.738-.738-1.12-1.656-1.322-2.795c-.2-1.12-.236-2.512-.243-4.241Q1.999 12.737 2 12v-.054c0-2.148 0-3.83.177-5.144c.18-1.343.557-2.404 1.39-3.236s1.893-1.21 3.236-1.39c1.168-.157 2.67-.175 4.499-.177a.697.697 0 1 1 0 1.396c-1.855.002-3.234.018-4.313.163c-1.189.16-1.906.464-2.436.994S3.72 5.8 3.56 6.99C3.397 8.2 3.395 9.788 3.395 12v.784l.932-.814a2.14 2.14 0 0 1 2.922.097l3.99 3.99a1.86 1.86 0 0 0 2.385.207l.278-.195a2.79 2.79 0 0 1 3.471.209l2.633 2.37c.265-.557.423-1.288.507-2.32c.079-.972.09-2.152.091-3.63a.698.698 0 0 1 1.396 0" opacity=".66"></path><path fill-rule="evenodd" d="M17.5 11c-2.121 0-3.182 0-3.841-.659S13 8.621 13 6.5s0-3.182.659-3.841S15.379 2 17.5 2s3.182 0 3.841.659S22 4.379 22 6.5s0 3.182-.659 3.841S19.621 11 17.5 11m2.212-6.712a.983.983 0 0 1 0 1.39l-.058.058a.24.24 0 0 1-.211.067a1.6 1.6 0 0 1-.81-.436a1.6 1.6 0 0 1-.436-.81a.24.24 0 0 1 .067-.211l.058-.058a.983.983 0 0 1 1.39 0M17.35 8.04a3 3 0 0 1-.296.279a1.6 1.6 0 0 1-.303.187c-.09.043-.188.076-.381.14l-1.021.34a.265.265 0 0 1-.335-.335l.34-1.02c.064-.194.097-.291.14-.382q.077-.163.187-.303c.062-.08.134-.152.279-.296l1.799-1.799c.043-.043.118-.023.138.035a1.98 1.98 0 0 0 1.217 1.217c.058.02.078.095.035.138z" clip-rule="evenodd"></path></svg>
+							__MSG_options_themes_change__
+						</button>
+					</div>
+				</div>
+				<div class="container">
+					<span>__MSG_options_themes_customStyles__</span>
+					<button class="small-btn" id="edit-css-btn">
+						<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor">
+							<path d="M13.488 2.513a1.75 1.75 0 0 0-2.475 0L6.75 6.774a2.75 2.75 0 0 0-.596.892l-.848 2.047a.75.75 0 0 0 .98.98l2.047-.848a2.75 2.75 0 0 0 .892-.596l4.261-4.262a1.75 1.75 0 0 0 0-2.474Z"></path>
+							<path d="M4.75 3.5c-.69 0-1.25.56-1.25 1.25v6.5c0 .69.56 1.25 1.25 1.25h6.5c.69 0 1.25-.56 1.25-1.25V9A.75.75 0 0 1 14 9v2.25A2.75 2.75 0 0 1 11.25 14h-6.5A2.75 2.75 0 0 1 2 11.25v-6.5A2.75 2.75 0 0 1 4.75 2H7a.75.75 0 0 1 0 1.5H4.75Z"></path>
+						</svg>
+						<span id="edit-css-btn-text">__MSG_options_themes_create__</span>
+					</button>
+				</div>
+				<div class="store-buttons-row">
+					<button class="small-btn" id="browse-themes-btn">
+						<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+							<path d="M5.223 2.25c-.497 0-.974.198-1.325.55l-1.3 1.298A3.75 3.75 0 0 0 7.5 9.75c.627.47 1.406.75 2.25.75.844 0 1.624-.28 2.25-.75.626.47 1.406.75 2.25.75.844 0 1.623-.28 2.25-.75a3.75 3.75 0 0 0 4.902-5.652l-1.3-1.299a1.875 1.875 0 0 0-1.325-.549H5.223Z"></path>
+							<path fill-rule="evenodd" d="M3 20.25v-8.755c1.42.674 3.08.673 4.5 0A5.234 5.234 0 0 0 9.75 12c.804 0 1.568-.182 2.25-.506a5.234 5.234 0 0 0 2.25.506c.804 0 1.567-.182 2.25-.506 1.42.674 3.08.675 4.5.001v8.755h.75a.75.75 0 0 1 0 1.5H2.25a.75.75 0 0 1 0-1.5H3Zm3-6a.75.75 0 0 1 .75-.75h3a.75.75 0 0 1 .75.75v3a.75.75 0 0 1-.75.75h-3a.75.75 0 0 1-.75-.75v-3Zm8.25-.75a.75.75 0 0 0-.75.75v5.25c0 .414.336.75.75.75h3a.75.75 0 0 0 .75-.75v-5.25a.75.75 0 0 0-.75-.75h-3Z" clip-rule="evenodd"></path>
+						</svg>
+						__MSG_options_themes_marketplace__
+					</button>
+					<div class="your-themes-container">
+						<button class="small-btn" id="your-themes-btn">
+							<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="installed-icon">
+								<path fill="currentColor" fill-rule="evenodd" d="M17.5 11c-2.121 0-3.182 0-3.841-.659S13 8.621 13 6.5s0-3.182.659-3.841S15.379 2 17.5 2s3.182 0 3.841.659S22 4.379 22 6.5s0 3.182-.659 3.841S19.621 11 17.5 11m-1.455-2.784c-.765-.67-1.545-1.564-1.545-2.418c0-1.773 1.65-2.435 3-1.065c1.35-1.37 3-.708 3 1.065c0 .854-.78 1.747-1.545 2.418c-.596.523-.894.784-1.455.784c-.56 0-.859-.261-1.455-.784" clip-rule="evenodd"></path><path fill="currentColor" d="M21.904 16.441c.083-1.024.094-2.274.096-3.743a.697.697 0 1 0-1.396 0c-.001 1.477-.012 2.658-.091 3.63c-.084 1.032-.242 1.763-.507 2.32l-2.633-2.37a2.79 2.79 0 0 0-3.471-.21l-.277.196a1.86 1.86 0 0 1-2.386-.207l-3.99-3.99a2.14 2.14 0 0 0-2.922-.097l-.931.814V12c0-2.212 0-3.801.163-5.01c.16-1.19.464-1.907.994-2.437S5.8 3.72 6.99 3.56c1.079-.145 2.458-.161 4.313-.163a.699.699 0 0 0 0-1.396c-1.829.002-3.33.02-4.499.177c-1.343.18-2.404.557-3.236 1.39s-1.21 1.893-1.39 3.236C2 8.116 2 9.8 2 11.947V12q0 .736.002 1.396c.007 1.729.044 3.121.243 4.24c.203 1.14.584 2.058 1.322 2.796c.832.833 1.893 1.21 3.236 1.39C8.116 22 9.8 22 11.947 22h.106c2.148 0 3.83 0 5.144-.177c1.344-.18 2.404-.557 3.236-1.39a4.2 4.2 0 0 0 .73-.983c.445-.825.644-1.82.74-3.009" opacity="0.66"></path>
+							</svg>
+							<span>__MSG_options_themes_installedThemes__</span>
+							<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="chevron-icon">
+								<path fill-rule="evenodd" d="M5.22 8.22a.75.75 0 0 1 1.06 0L10 11.94l3.72-3.72a.75.75 0 1 1 1.06 1.06l-4.25 4.25a.75.75 0 0 1-1.06 0L5.22 9.28a.75.75 0 0 1 0-1.06Z" clip-rule="evenodd"></path>
+							</svg>
+						</button>
+						<div id="your-themes-dropdown"></div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="tab-content" id="identity-content">
+			<div class="settings-group">
+				<h2>
+					<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+						<path d="M10.95 19.55q.5.3 1.05.288t1.05-.313l4.55-2.775q-1.25-.875-2.675-1.312T12 15t-2.937.438t-2.713 1.287zM12 13q1.45 0 2.475-1.025T15.5 9.5t-1.025-2.475T12 6T9.525 7.025T8.5 9.5t1.025 2.475T12 13m-1.05 8.875l-7-4.3q-.45-.275-.7-.725T3 15.875v-7.75q0-.525.25-.975t.7-.725l7-4.3q.5-.3 1.05-.3t1.05.3l7 4.3q.45.275.7.725t.25.975v7.75q0 .525-.25.975t-.7.725l-7 4.3q-.5.3-1.05.3t-1.05-.3"></path>
+					</svg>
+					__MSG_options_identity_title__
+				</h2>
+				<p>__MSG_options_identity_description__</p>
+				<div class="identity-warning" role="note">
+					<svg class="identity-warning__icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" width="14" height="14" aria-hidden="true">
+						<path fill-rule="evenodd" d="M6.701 2.252a1.5 1.5 0 0 1 2.598 0l5.196 9.001A1.5 1.5 0 0 1 13.196 13.5H2.804a1.5 1.5 0 0 1-1.299-2.247l5.196-9.001ZM8 5.5a.75.75 0 0 1 .75.75v3a.75.75 0 0 1-1.5 0v-3A.75.75 0 0 1 8 5.5Zm0 6.5a.75.75 0 1 0 0-1.5.75.75 0 0 0 0 1.5Z" clip-rule="evenodd"></path>
+					</svg>
+					<p class="identity-warning__text">__MSG_options_identity_warning__</p>
+				</div>
 			</section>
 			<section class="page tab-content" id="identity-content" role="tabpanel" aria-labelledby="identity-tab">
 				<div class="ui-card">
@@ -809,6 +887,66 @@
 			</div>
 		</div>
 
+		<div id="theme-settings-modal-overlay" class="modal-overlay">
+			<div class="modal theme-settings-modal">
+				<div class="modal-header">
+					<h3 id="theme-settings-modal-title" class="modal-title">__MSG_options_themeSettings_title__</h3>
+					<button id="theme-settings-modal-close" class="modal-close-btn" aria-label="Close">
+						<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+							<path d="M6.28 5.22a.75.75 0 0 0-1.06 1.06L8.94 10l-3.72 3.72a.75.75 0 1 0 1.06 1.06L10 11.06l3.72 3.72a.75.75 0 1 0 1.06-1.06L11.06 10l3.72-3.72a.75.75 0 0 0-1.06-1.06L10 8.94 6.28 5.22Z"></path>
+						</svg>
+					</button>
+				</div>
+				<div class="modal-body">
+					<div class="theme-settings-container container">
+						<span>__MSG_options_themeSettings_livePreview__</span>
+						<label>
+							<input type="checkbox" id="themeSettingsLivePreview">
+							<span class="checkmark"></span>
+						</label>
+					</div>
+					<div id="theme-settings-fields" class="theme-settings-modal-fields"></div>
+				</div>
+				<div class="modal-footer">
+					<button id="theme-settings-cancel-btn" class="modal-btn modal-btn-secondary">
+						__MSG_options_modal_cancel__
+					</button>
+					<button id="theme-settings-ok-btn" class="modal-btn modal-btn-secondary">
+						__MSG_options_modal_ok__
+					</button>
+					<button id="theme-settings-apply-btn" class="modal-btn modal-btn-primary">
+						__MSG_options_themeSettings_apply__
+					</button>
+				</div>
+			</div>
+		</div>
+
+		<div id="theme-file-modal-overlay" class="modal-overlay">
+			<div class="modal theme-file-modal">
+				<div class="modal-header">
+					<h3 id="theme-file-modal-title" class="modal-title">__MSG_options_themeFile_import__</h3>
+					<button id="theme-file-modal-close" class="modal-close-btn" aria-label="Close">
+						<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+							<path d="M6.28 5.22a.75.75 0 0 0-1.06 1.06L8.94 10l-3.72 3.72a.75.75 0 1 0 1.06 1.06L10 11.06l3.72 3.72a.75.75 0 1 0 1.06-1.06L11.06 10l3.72-3.72a.75.75 0 0 0-1.06-1.06L10 8.94 6.28 5.22Z"></path>
+						</svg>
+					</button>
+				</div>
+				<div class="modal-body">
+					<span id="theme-file-select" style="font-size: .9rem;">__MSG_options_themeFile_selectImport__</span>
+					<div id="theme-file-selections">
+						<button id="theme-file-code" class="theme-file-selection" style="font-size: 1.125rem">
+							<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><path fill="currentColor" d="m8.82 12 1.48-1.47q.3-.3.3-.7t-.3-.7-.71-.3-.72.3L6.7 11.3q-.15.15-.21.33t-.07.37.07.38.21.32l2.17 2.17q.3.3.72.3t.71-.3.3-.7-.3-.7zm6.35 0-1.47 1.47q-.3.3-.3.7t.3.7.71.3.71-.3l2.18-2.17q.15-.15.21-.32t.07-.38-.07-.37-.21-.33l-2.17-2.17q-.16-.16-.34-.23t-.38-.07-.37.07-.34.23q-.3.3-.3.7t.3.7zM5 21q-.82 0-1.41-.59T3 19V5q0-.82.59-1.41T5 3h14q.83 0 1.41.59T21 5v14q0 .83-.59 1.41T19 21zm0-2h14V5H5zM5 5v14z"/></svg>
+							__MSG_options_themeFile_code__
+						</button>
+						<button id="theme-file-settings" class="theme-file-selection" style="font-size: 1.125rem">
+							<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"><path d="M10.3 4.3c.5-1.7 3-1.7 3.4 0a1.7 1.7 0 0 0 2.5 1c1.6-.9 3.4 1 2.4 2.5a1.7 1.7 0 0 0 1 2.5c1.8.5 1.8 3 0 3.4a1.7 1.7 0 0 0-1 2.5c1 1.6-.8 3.4-2.4 2.4a1.7 1.7 0 0 0-2.5 1c-.5 1.8-3 1.8-3.4 0a1.7 1.7 0 0 0-2.5-1c-1.6 1-3.4-.8-2.4-2.4a1.7 1.7 0 0 0-1-2.5c-1.8-.5-1.8-3 0-3.4a1.7 1.7 0 0 0 1-2.5c-1-1.6.8-3.4 2.4-2.4 1 .6 2.2 0 2.5-1"/><path d="M9 12a3 3 0 1 0 6 0 3 3 0 0 0-6 0"/></g></svg>
+							__MSG_options_themeFile_settings__
+						</button>
+					</div>
+				</div>
+			</div>
+		</div>
+
 		<div id="css">
 			<div id="theme-name-display" class="theme-name-display">
 				<div class="theme-name-container">
@@ -843,6 +981,41 @@
 			</div>
 			<div id="editor-container">
 				<div id="editor"></div>
+				<div id="theme-settings" style="height: 270px; overflow: auto; display: none">
+					<div id="theme-settings-editor">
+						<div id="theme-settings-editor-header">
+							<div>
+								<h1 id="theme-settings-editor-title">__MSG_options_themeSettings_title__</h1>
+								<span id="theme-settings-editor-total">0 / 50</span>
+							</div>
+							<button id="add-settings-field-btn" class="small-btn">
+								<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24">
+									<path fill="currentColor" d="M18 13h-5v5a1 1 0 0 1-2 0v-5H6a1 1 0 0 1 0-2h5V6a1 1 0 0 1 2 0v5h5a1 1 0 0 1 0 2"/>
+								</svg>
+								<span>__MSG_options_themeSettings_addField__</span>
+							</button>
+						</div>
+						<div id="theme-settings-editor-fields"></div>
+					</div>
+					<div id="theme-settings-field-editor" style="display: none;">
+						<div id="theme-settings-field-editor-header">
+							<button id="return-theme-settings-btn" class="icon-btn no-dropdown" style="margin: 0;">
+								<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+									<path fill="currentColor" d="m7.83 13 4.9 4.9q.3.3.28.7t-.31.7q-.3.27-.7.29t-.7-.29l-6.6-6.6q-.15-.15-.21-.33T4.43 12t.06-.37.21-.33l6.6-6.6q.28-.27.69-.27t.71.27q.3.3.3.71t-.3.72L7.83 11H19q.43 0 .71.29T20 12t-.29.71T19 13z"/>
+								</svg>
+							</button>
+							<span id="theme-settings-field-editor-title">__MSG_options_themeSettings_addField__</span>
+						</div>
+						<div id="theme-settings-field-editor-inputs"></div>
+						<div id="theme-settings-field-editor-actions">
+							<button id="add-theme-settings-btn" class="icon-btn no-dropdown" style="margin: 0;">
+								<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+									<path fill="currentColor" d="M18 13h-5v5a1 1 0 0 1-2 0v-5H6a1 1 0 0 1 0-2h5V6a1 1 0 0 1 2 0v5h5a1 1 0 0 1 0 2"/>
+								</svg>
+							</button>
+						</div>
+					</div>
+				</div>
 			</div>
 			<div class="ie-utils-container">
 				<div class="ie-utils">
@@ -864,6 +1037,13 @@
 						<button id="editor-popout-button" type="button" class="ui-button ui-button--header ui-button--icon" data-tooltip="__MSG_options_editor_openInNewTab__" aria-label="__MSG_options_editor_openInNewTab__">
 						<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.75" stroke="currentColor">
 							<path stroke-linecap="round" stroke-linejoin="round" d="M13.5 6H5.25A2.25 2.25 0 0 0 3 8.25v10.5A2.25 2.25 0 0 0 5.25 21h10.5A2.25 2.25 0 0 0 18 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25"></path>
+						</svg>
+					</button>
+					<button id="modify-theme-settings-btn" class="icon-btn" data-tooltip="__MSG_options_editor_modifyThemeSettings__">
+						<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24">
+							<g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2">
+								<path d="M10.3 4.3c.5-1.7 3-1.7 3.4 0a1.7 1.7 0 0 0 2.5 1c1.6-.9 3.4 1 2.4 2.5a1.7 1.7 0 0 0 1 2.5c1.8.5 1.8 3 0 3.4a1.7 1.7 0 0 0-1 2.5c1 1.6-.8 3.4-2.4 2.4a1.7 1.7 0 0 0-2.5 1c-.5 1.8-3 1.8-3.4 0a1.7 1.7 0 0 0-2.5-1c-1.6 1-3.4-.8-2.4-2.4a1.7 1.7 0 0 0-1-2.5c-1.8-.5-1.8-3 0-3.4a1.7 1.7 0 0 0 1-2.5c-1-1.6.8-3.4 2.4-2.4 1 .6 2.2 0 2.5-1"/><path d="M9 12a3 3 0 1 0 6 0 3 3 0 0 0-6 0"/>
+							</g>
 						</svg>
 					</button>
 				</div>
