@@ -1,3 +1,4 @@
+import { PROGRESS_PAINT_STEPS_PER_DEVICE_PX } from "@constants";
 import { measureWidth, observeLayoutWidth } from "@modules/ui/layout/layoutWidth";
 import { clamp01, easeOutCubic, interpolate, pctFromClientX, type PlaybackSnapshot } from "./playhead";
 import { formatRemaining, formatTime } from "./timeFormat";
@@ -21,7 +22,6 @@ const GLIDE_MS = 260;
 const SEEK_LATCH_TOLERANCE_S = 1;
 const SEEK_LATCH_TIMEOUT_MS = 2000;
 const JUMP_GLIDE_THRESHOLD_S = 0.75;
-const PAINT_STEPS_PER_DEVICE_PX = 4;
 
 export function createProgressBar(options: ProgressBarOptions): ProgressBarHandle {
   const { doc, getSnapshot, onSeek, initialEndMode, onEndModeChange } = options;
@@ -91,7 +91,7 @@ export function createProgressBar(options: ProgressBarOptions): ProgressBarHandl
 
   const paint = (currentS: number, durationS: number): void => {
     const pct = durationS > 0 ? clamp01(currentS / durationS) : 0;
-    const step = 1 / (PAINT_STEPS_PER_DEVICE_PX * (win.devicePixelRatio || 1));
+    const step = 1 / (PROGRESS_PAINT_STEPS_PER_DEVICE_PX * (win.devicePixelRatio || 1));
     const knobPx = Math.round((pct * barWidth) / step) * step;
     const fillValue = `scaleX(${barWidth > 0 ? knobPx / barWidth : pct})`;
     const knobValue = `translateX(${knobPx}px)`;

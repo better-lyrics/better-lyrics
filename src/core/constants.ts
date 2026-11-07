@@ -46,6 +46,7 @@ export const FULLSCREEN_CONTROLS_PINNED_ATTR = "blyrics-fs-controls-pinned" as c
 export const KARAOKE_ACTIVE_ATTR = "blyrics-karaoke" as const;
 export const THEMESONG_ACTIVE_ATTR = "blyrics-themesong" as const;
 export const THEMESONG_CONTAINER_ID = "ThemeSong-MainContainer" as const;
+export const PROGRESS_PAINT_STEPS_PER_DEVICE_PX = 4;
 export const DISABLE_EFFECTS_STYLE_ID = "blyrics-disable-effects" as const;
 export const HIDDEN_CLASS = "blyrics-hidden" as const;
 export const REPORT_MODAL = "blyrics-report-lyrics" as const;

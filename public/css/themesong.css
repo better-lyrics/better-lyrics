@@ -6,7 +6,6 @@
   object-fit: contain !important;
 }
 
-/* The id inside :is() never matches; it keeps the specificity of the old :root:has(#ThemeSong-MainContainer) gate */
 :root:is([blyrics-themesong], #ThemeSong-MainContainer) {
   --blyrics-text-color: var(--ts-primary-text-color);
   --blyrics-footer-text-color: var(--ts-secondary-text-color);
