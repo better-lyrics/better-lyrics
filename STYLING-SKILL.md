@@ -192,6 +192,7 @@ blyrics-line-scroll-above-duration = calc(750ms + log(var(--blyrics-line-scroll-
 | `blyrics-swipe-lead-ratio` | `0.1` | Rich-sync swipe lead as a fraction of word duration |
 | `blyrics-swipe-duration-ratio` | `1.6` | Rich-sync swipe duration as a multiple of word duration |
 | `blyrics-long-word-threshold` | `1500` | Duration (ms) above which `data-long-word` is set |
+| `blyrics-long-word-wrap-threshold` | `10` | Characters per break point; words longer than twice this get `.blyrics-word-group-long` and wrap inside |
 | `blyrics-letter-wave` | `true` | Experimental, on by default. Split words into per-letter spans and float each letter as it is sung, over the word wobble. Tune with `--blyrics-letter-wave-*`; long words also get a per-letter scale swell. Disable with `blyrics-letter-wave = false` |
 | `blyrics-hide-instrumental-only` | `false` | Treat "[Instrumental Only]" as no lyrics (enables fullscreen effect) |
 | `blyrics-hide-credits` | `false` | Never build the songwriter credits line |
@@ -299,6 +300,7 @@ Lyric timing is driven by `element.animate()`.
 | `.blyrics-highlight-run` | `aria-hidden` layer over a text row that holds the word overlays |
 | `.blyrics-bidi-sensitive` | Applied to rows containing RTL script; makes word wrappers inline-flow for correct bidi wrapping |
 | `.blyrics-word-group` | Word/syllable group; `inline-block` for LTR-only rows and `display: contents` inside `.blyrics-bidi-sensitive` |
+| `.blyrics-word-group-long` | Word group longer than twice `blyrics-long-word-wrap-threshold`; group and `.blyrics--word` spans are `display: inline` so the word wraps |
 | `.blyrics--word` | Word span |
 | `.blyrics-word-highlight` | Real active-color overlay; every timed word has one |
 | `.blyrics-line-synced-word` | Zero-duration line-synced word; fades in without rich-sync swipe |
@@ -929,6 +931,7 @@ A line-synced word, which has no duration of its own, is `active` from its start
 9. **Prefer structural selectors** such as `.blyrics-line-main`, `.blyrics-word-group`, and data attributes; use `.blyrics--active` only for current-line affordances
 10. **Pick the right clock** - `.blyrics--active` for anything tied to scrolling, `.blyrics--animating` for anything that must hold while a line is still being sung. Dimming past lines off `.blyrics--active` alone will dim them roughly half a second early
 11. **Respect RTL inline flow** - do not force `.blyrics-bidi-sensitive .blyrics-word-group` or `.blyrics-bidi-sensitive .blyrics--word` back to `inline-block`; word wobble transforms should be treated as unavailable on RTL-sensitive rows
+12. **Long words drop transforms** - `.blyrics-word-group-long` makes `.blyrics--word` inline, and browsers ignore `transform` on inline boxes, so per-syllable animations and the word wobble stop there. Raise `blyrics-long-word-wrap-threshold` (for example `1000`) to restore both at the cost of long words overflowing instead of wrapping, or set `.blyrics-word-group-long .blyrics--word:not(.blyrics-bidi-sensitive *) { display: inline-block; }` to restore per-syllable animations while keeping the wrap
 
 ## Do NOT Modify
 

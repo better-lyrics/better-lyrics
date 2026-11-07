@@ -404,6 +404,7 @@ The following options are avalible:
 | `blyrics-swipe-lead-ratio`            | `0.1`         | Rich-sync swipe starts this fraction of word duration before the word time.                                                                |
 | `blyrics-swipe-duration-ratio`        | `1.6`         | Rich-sync swipe lasts this multiple of word duration.                                                                                      |
 | `blyrics-long-word-threshold`         | `1500`        | Duration threshold (in ms) above which words get `data-long-word="true"`. Useful for glow effects on held notes.                           |
+| `blyrics-long-word-wrap-threshold`    | `10`          | Characters per break point in long words. A word longer than twice this gets `.blyrics-word-group-long` and can wrap inside itself. See [Long Words](#long-words). Reloads lyrics. |
 | `blyrics-letter-wave`                 | `true`        | Experimental, on by default. Split every word into per-letter spans and float each letter up as it is sung, layered on top of the word wobble. Tune with the `--blyrics-letter-wave-*` variables; words past `blyrics-long-word-threshold` also get a per-letter scale swell. Disable with `blyrics-letter-wave = false`. |
 | `blyrics-hide-instrumental-only`      | `false`       | Treat "[Instrumental Only]" as no lyrics (enables fullscreen effect).                                                                      |
 | `blyrics-hide-credits`                | `false`       | Set to `true` to never build the songwriter credits line. See [Songwriter Credits](#songwriter-credits).                                  |
@@ -588,6 +589,7 @@ The lyrics use a hierarchical structure with specific class names:
 - `.blyrics-highlight-run` - An `aria-hidden` copy of a text row's runs, positioned over the visible text; it holds the `.blyrics-word-highlight` overlays
 - `.blyrics-bidi-sensitive` - Applied to lyric text rows that contain RTL script; changes word wrappers to inline text flow for correct browser bidi and wrapping
 - `.blyrics-word-group` - Word group; syllable-synced parts for one word stay together. It is `inline-block` for LTR-only rows and `display: contents` inside `.blyrics-bidi-sensitive`
+- `.blyrics-word-group-long` - Added to a `.blyrics-word-group` whose word is longer than twice `blyrics-long-word-wrap-threshold`. The group and its `.blyrics--word` spans become `display: inline` so the word can wrap. See [Long Words](#long-words)
 - `.blyrics--word` - Each word within a line (a `<span>`)
 - `.blyrics-word-highlight` - Real active-color overlay for a timed word; every timed word has one
 - `.blyrics-background-lyric` - Background vocal word group or timed word
@@ -663,7 +665,7 @@ Example:
 
 - **Inactive Scale**: The element is scaled by `--blyrics-scale` for inactive lyrics
 - **Text Layout**: Uses normal inline text flow, not flexbox or CSS `order`
-- **Word Grouping**: Syllable-synced parts inside a word stay in one `.blyrics-word-group`. In LTR-only rows it is an unbreakable inline box; in RTL-sensitive rows it becomes `display: contents` so browser bidi can order and wrap the line correctly
+- **Word Grouping**: Syllable-synced parts inside a word stay in one `.blyrics-word-group`. In LTR-only rows it is an unbreakable inline box; in RTL-sensitive rows it becomes `display: contents` so browser bidi can order and wrap the line correctly. Long words are the exception, see [Long Words](#long-words)
 - **Background Vocals**: Primary lyric background vocals are moved to `.blyrics-background-line`; timed romanization does not split background parts onto a separate line
 - **Transform Origin**: Set to `left center` for proper scaling animation
 
@@ -725,6 +727,28 @@ Every word uses the `.blyrics--word` class:
 - **Wrapped Words**: A word past the wrap threshold carries `<wbr>` points in both copies, so the overlay wraps exactly like the visible text
 - **Line-Synced Words**: Zero-duration line-synced words get `.blyrics-line-synced-word` and fade in without the rich-sync swipe
 - **RTL-Sensitive Words**: Rows containing RTL script use `.blyrics-bidi-sensitive`; their `.blyrics--word` spans compute to `display: inline` and their `.blyrics-word-group` wrappers compute to `display: contents`
+
+#### Long Words
+
+A word longer than twice `blyrics-long-word-wrap-threshold` (default `10`, so more than 20 characters) gets `.blyrics-word-group-long` on its group. Think `Oh-oh-oh-oh-oh-oh-oh-oh`. The group and its `.blyrics--word` spans switch to `display: inline`, and the engine adds `<wbr>` break points every `blyrics-long-word-wrap-threshold` characters, so the word can wrap instead of overflowing the line.
+
+Browsers ignore `transform` on inline elements. Inside a long group, a custom per-syllable animation that moves `.blyrics--word` does nothing, and neither does the built-in word wobble, which moves the whole group. There are two ways to keep transforms working.
+
+Raise the threshold so no word counts as long. Every group stays an unbreakable `inline-block`, so per-syllable animations and the word wobble both work. The cost is that a word wider than the lyrics panel overflows instead of wrapping:
+
+```css
+/* blyrics-long-word-wrap-threshold = 1000; */
+```
+
+Or keep the wrapping and make the syllables atomic again. They still wrap between each other, and per-syllable animations work. The word wobble still does not, because the group stays inline:
+
+```css
+.blyrics-word-group-long .blyrics--word:not(.blyrics-bidi-sensitive *) {
+  display: inline-block;
+}
+```
+
+The cost is that one syllable can no longer break in the middle. Leave RTL-sensitive rows inline, see [Supporting Right-to-Left (RTL) Languages](#11-supporting-right-to-left-rtl-languages).
 
 #### Word Data Attributes
 
