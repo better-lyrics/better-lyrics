@@ -21,6 +21,7 @@ const GLIDE_MS = 260;
 const SEEK_LATCH_TOLERANCE_S = 1;
 const SEEK_LATCH_TIMEOUT_MS = 2000;
 const JUMP_GLIDE_THRESHOLD_S = 0.75;
+const PAINT_STEPS_PER_DEVICE_PX = 4;
 
 export function createProgressBar(options: ProgressBarOptions): ProgressBarHandle {
   const { doc, getSnapshot, onSeek, initialEndMode, onEndModeChange } = options;
@@ -81,13 +82,32 @@ export function createProgressBar(options: ProgressBarOptions): ProgressBarHandl
     return pctFromClientX(rect.left, rect.width, clientX);
   };
 
+  let paintedFill = "";
+  let paintedKnob = "";
+
+  const setText = (node: HTMLElement, text: string): void => {
+    if (node.textContent !== text) node.textContent = text;
+  };
+
   const paint = (currentS: number, durationS: number): void => {
     const pct = durationS > 0 ? clamp01(currentS / durationS) : 0;
-    fill.style.transform = `scaleX(${pct})`;
-    knob.style.transform = `translateX(${pct * barWidth}px)`;
-    elapsed.textContent = formatTime(currentS);
-    endTime.textContent =
-      endTime.dataset.mode === "remaining" ? formatRemaining(currentS, durationS) : formatTime(durationS);
+    const step = 1 / (PAINT_STEPS_PER_DEVICE_PX * (win.devicePixelRatio || 1));
+    const knobPx = Math.round((pct * barWidth) / step) * step;
+    const fillValue = `scaleX(${barWidth > 0 ? knobPx / barWidth : pct})`;
+    const knobValue = `translateX(${knobPx}px)`;
+    if (fillValue !== paintedFill) {
+      fill.style.transform = fillValue;
+      paintedFill = fillValue;
+    }
+    if (knobValue !== paintedKnob) {
+      knob.style.transform = knobValue;
+      paintedKnob = knobValue;
+    }
+    setText(elapsed, formatTime(currentS));
+    setText(
+      endTime,
+      endTime.dataset.mode === "remaining" ? formatRemaining(currentS, durationS) : formatTime(durationS)
+    );
   };
 
   const liveTarget = (snapshot: PlaybackSnapshot | null, now: number): number => {
