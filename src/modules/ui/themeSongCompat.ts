@@ -15,3 +15,9 @@ export function observeThemeSong(): void {
   themeSongObserver = new MutationObserver(syncThemeSongAttr);
   themeSongObserver.observe(document.body, { childList: true });
 }
+
+export function disposeThemeSongObserver(): void {
+  themeSongObserver?.disconnect();
+  themeSongObserver = null;
+  document.documentElement.removeAttribute(THEMESONG_ACTIVE_ATTR);
+}

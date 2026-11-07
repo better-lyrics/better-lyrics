@@ -28,7 +28,7 @@ import {
   setupFullscreenPlayerBarReveal,
   unmountDock,
 } from "@modules/ui/dom";
-import { observeThemeSong } from "@modules/ui/themeSongCompat";
+import { disposeThemeSongObserver, observeThemeSong } from "@modules/ui/themeSongCompat";
 import {
   disableInertWhenFullscreen,
   enableLyricsTab,
@@ -142,6 +142,7 @@ function init(): () => void {
     unmountDock();
     cleanupPlayerBarReveal();
     disposeKaraoke();
+    disposeThemeSongObserver();
   };
 }
 
