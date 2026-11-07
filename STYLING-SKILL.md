@@ -931,7 +931,7 @@ A line-synced word, which has no duration of its own, is `active` from its start
 9. **Prefer structural selectors** such as `.blyrics-line-main`, `.blyrics-word-group`, and data attributes; use `.blyrics--active` only for current-line affordances
 10. **Pick the right clock** - `.blyrics--active` for anything tied to scrolling, `.blyrics--animating` for anything that must hold while a line is still being sung. Dimming past lines off `.blyrics--active` alone will dim them roughly half a second early
 11. **Respect RTL inline flow** - do not force `.blyrics-bidi-sensitive .blyrics-word-group` or `.blyrics-bidi-sensitive .blyrics--word` back to `inline-block`; word wobble transforms should be treated as unavailable on RTL-sensitive rows
-12. **Long words drop transforms** - `.blyrics-word-group-long` makes `.blyrics--word` inline, and browsers ignore `transform` on inline boxes, so per-syllable animations and the word wobble stop there. Raise `blyrics-long-word-wrap-threshold` (for example `1000`) to restore both at the cost of long words overflowing instead of wrapping, or set `.blyrics-word-group-long .blyrics--word:not(.blyrics-bidi-sensitive *) { display: inline-block; }` to restore per-syllable animations while keeping the wrap
+12. **Long words drop transforms** - `.blyrics-word-group-long` makes `.blyrics--word` inline, and browsers ignore `transform` on inline boxes, so per-syllable animations and the word wobble stop there. Raising `blyrics-long-word-wrap-threshold` (say to `1000`) brings both back, but long words overflow instead of wrapping. To keep the wrap, set `.blyrics-word-group-long .blyrics--word:not(.blyrics-bidi-sensitive *) { display: inline-block; }`; that brings back per-syllable animations only
 
 ## Do NOT Modify
 

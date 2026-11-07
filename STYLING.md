@@ -730,17 +730,17 @@ Every word uses the `.blyrics--word` class:
 
 #### Long Words
 
-A word longer than twice `blyrics-long-word-wrap-threshold` (default `10`, so more than 20 characters) gets `.blyrics-word-group-long` on its group. Think `Oh-oh-oh-oh-oh-oh-oh-oh`. The group and its `.blyrics--word` spans switch to `display: inline`, and the engine adds `<wbr>` break points every `blyrics-long-word-wrap-threshold` characters, so the word can wrap instead of overflowing the line.
+A word longer than twice `blyrics-long-word-wrap-threshold` (default `10`, so anything over 20 characters, like `Oh-oh-oh-oh-oh-oh-oh-oh`) gets `.blyrics-word-group-long` on its group. The group and its `.blyrics--word` spans switch to `display: inline`, and the engine puts a `<wbr>` break point every `blyrics-long-word-wrap-threshold` characters, so the word wraps instead of running off the line.
 
-Browsers ignore `transform` on inline elements. Inside a long group, a custom per-syllable animation that moves `.blyrics--word` does nothing, and neither does the built-in word wobble, which moves the whole group. There are two ways to keep transforms working.
+Browsers ignore `transform` on inline elements. So inside a long group, a per-syllable animation on `.blyrics--word` does nothing. Neither does the built-in word wobble, since it moves the whole group. You can fix this two ways.
 
-Raise the threshold so no word counts as long. Every group stays an unbreakable `inline-block`, so per-syllable animations and the word wobble both work. The cost is that a word wider than the lyrics panel overflows instead of wrapping:
+Raise the threshold so no word counts as long. Every group stays an unbreakable `inline-block`, and both per-syllable animations and the wobble work again. A word wider than the lyrics panel will overflow instead of wrapping:
 
 ```css
 /* blyrics-long-word-wrap-threshold = 1000; */
 ```
 
-Or keep the wrapping and make the syllables atomic again. They still wrap between each other, and per-syllable animations work. The word wobble still does not, because the group stays inline:
+Or keep the wrapping and make the syllables atomic again. They still wrap between each other and per-syllable animations work, but the wobble stays off because the group is still inline:
 
 ```css
 .blyrics-word-group-long .blyrics--word:not(.blyrics-bidi-sensitive *) {
@@ -748,7 +748,7 @@ Or keep the wrapping and make the syllables atomic again. They still wrap betwee
 }
 ```
 
-The cost is that one syllable can no longer break in the middle. Leave RTL-sensitive rows inline, see [Supporting Right-to-Left (RTL) Languages](#11-supporting-right-to-left-rtl-languages).
+With this rule, one syllable can no longer break in the middle. Leave RTL-sensitive rows inline, see [Supporting Right-to-Left (RTL) Languages](#11-supporting-right-to-left-rtl-languages).
 
 #### Word Data Attributes
 
