@@ -216,14 +216,12 @@ JavaScript controls animation timing with the Web Animations API, but the visual
 | `--blyrics-lyric-highlight-fade-in-easing`    | `ease`                            | Line-synced highlight fade-in easing                                                         |
 | `--blyrics-lyric-highlight-fade-out-easing`   | `ease`                            | Highlight fade-out easing                                                                    |
 | `--blyrics-highlight-swipe-easing`            | `linear`                          | Rich-sync swipe easing                                                                       |
-| `--blyrics-highlight-swipe-start-from`        | `-0.2`                            | Swipe gradient start value before animation                                                  |
-| `--blyrics-highlight-swipe-end-from`          | `-0.1`                            | Swipe gradient end value before animation                                                    |
-| `--blyrics-highlight-swipe-start-to`          | `1.4`                             | Swipe gradient start value after animation                                                   |
-| `--blyrics-highlight-swipe-end-to`            | `1.5`                             | Swipe gradient end value after animation                                                     |
-| `--blyrics-highlight-glow-radius-from`     | `0.8rem`                          | Glow blur radius at the start of the pulse; color stays `var(--blyrics-glow-color)` and resolves per word |
-| `--blyrics-highlight-glow-radius-to`       | `0`                               | Glow blur radius at the end of the pulse                                                     |
-| `--blyrics-highlight-glow-filter-from`     | (unset)                           | Optional full override of the glow start filter; when set, its color resolves once at the container (one color for all words) |
-| `--blyrics-highlight-glow-filter-to`       | (unset)                           | Optional full override of the glow end filter                                               |
+| `--blyrics-highlight-swipe-start-from`        | `-0.2`                            | Where the swipe's lit edge starts, in widths of the word                                     |
+| `--blyrics-highlight-swipe-end-from`          | `-0.1`                            | Not used; the soft edge's width comes from the two `-to` values                              |
+| `--blyrics-highlight-swipe-start-to`          | `1.4`                             | Where the swipe's lit edge ends, in widths of the word                                       |
+| `--blyrics-highlight-swipe-end-to`            | `1.5`                             | Sets the soft edge's width as `end-to - start-to` (a tenth of the word by default)           |
+| `--blyrics-highlight-glow-radius-from`     | `0.8rem`                          | Radius of the glow's halo, a `text-shadow` in `var(--blyrics-glow-color)` that resolves per word; a second halo at 0.4 times this takes over as the glow fades |
+| `--blyrics-highlight-glow-radius-to`       | `0`                               | `0` fades the glow out; any other value holds the wide halo on                               |
 | `--blyrics-highlight-glow-duration-ratio`     | `1.2`                             | Glow duration multiplier relative to word duration                                           |
 | `--blyrics-highlight-glow-min-duration`       | `1.2s`                            | Minimum glow duration                                                                        |
 | `--blyrics-highlight-glow-easing`             | `ease`                            | Glow easing                                                                                  |
@@ -282,15 +280,15 @@ Animation effect flags use `1`/`0` values:
 | -------- | ------------- | ----------- |
 | `--blyrics-animate-line-scale` | `1` | Enable line scale animation |
 | `--blyrics-animate-word-wobble` | `1` | Enable word wobble animation |
-| `--blyrics-animate-highlight-swipe` | `1` | Enable rich-sync gradient swipe |
+| `--blyrics-animate-highlight-swipe` | `1` | Enable rich-sync swipe |
 | `--blyrics-animate-highlight-glow` | `1` | Enable highlight glow |
 | `--blyrics-animate-highlight-fade` | `1` | Enable animated line-synced highlight fade and highlight fade-out; rich-sync word-timed fade-in is always instant |
 | `--blyrics-animate-scroll` | `1` | Enable smooth WAAPI scroll animation |
 | `--blyrics-animate-instrumental` | `1` | Enable instrumental fill travel, wave flattening, and wave oscillation |
 
-The default CSS includes a `prefers-reduced-motion: reduce` block that disables the vestibular triggers (zoom-on-active line scale, translateX word wobble, and instrumental fill / wave motion) and flattens the active/inactive scale delta to `1`. Smooth scroll remains enabled as the position indicator for synced lyrics, but the engine suppresses side-specific line-scroll differential effects so every visible line uses the shared scroll duration, easing, and offsets. The karaoke gradient swipe on richsync lyrics and the highlight glow stay on because they are gradient / drop-shadow fills rather than movement; and the line-synced highlight fade-in / highlight fade-out are opacity transitions, not motion.
+The default CSS includes a `prefers-reduced-motion: reduce` block that disables the vestibular triggers (zoom-on-active line scale, translateX word wobble, and instrumental fill / wave motion) and flattens the active/inactive scale delta to `1`. Smooth scroll remains enabled as the position indicator for synced lyrics, but the engine suppresses side-specific line-scroll differential effects so every visible line uses the shared scroll duration, easing, and offsets. The karaoke swipe on richsync lyrics and the highlight glow stay on because they are a moving edge of color and a fading halo rather than movement of the text; and the line-synced highlight fade-in / highlight fade-out are opacity transitions, not motion.
 
-Scroll smoothing uses per-line `translate` animations. When the lyrics pane autoscrolls, JS finds the lyric lines visible in the previous or current viewport and sets input variables on those lines: `--blyrics-line-scroll-relative-index` (`0` active, positive below, negative above), `--blyrics-line-scroll-abs-relative-index`, `--blyrics-line-scroll-side`, `--blyrics-line-scroll-delta-px`, and `--blyrics-line-scroll-distance-px`. Visible lyric lines also receive inline `will-change: transform, translate` so text rasterization does not shift when a scroll animation starts.
+Scroll smoothing uses per-line `translate` animations. When the lyrics pane autoscrolls, JS finds the lyric lines visible in the previous or current viewport and sets input variables on those lines: `--blyrics-line-scroll-relative-index` (`0` active, positive below, negative above), `--blyrics-line-scroll-abs-relative-index`, `--blyrics-line-scroll-side`, `--blyrics-line-scroll-delta-px`, and `--blyrics-line-scroll-distance-px`. Visible lyric lines also receive inline `will-change: transform, translate` so text rasterization does not shift when a scroll animation starts. A line still moving from an earlier scroll, or from making room for a translation, carries that motion into the next one as a single animation, so while a line scrolls or slides that animation replaces any `translate` a theme sets on the line itself.
 
 Side-specific knobs are relative to scroll direction. On a downward scroll, lines above the active line use `above` settings and lines below use `below` settings. On an upward scroll, those sides swap so the animation can mirror the movement direction. The numeric `--blyrics-line-scroll-relative-index` does not swap; it always describes real line position, with negative values above the active line and positive values below it.
 
@@ -587,11 +585,12 @@ The lyrics use a hierarchical structure with specific class names:
 - `.blyrics-background-line` - Background vocal row, shown below the main row when background vocals are present
 - `.blyrics-bidi-run` - Inline text-flow wrapper that lets the browser apply native bidi ordering across timed word spans
 - `.blyrics-highlight-run` - An `aria-hidden` copy of a text row's runs, positioned over the visible text; it holds the `.blyrics-word-highlight` overlays
+- `.blyrics-sweep-context` - Present in a row with words that flow inline without letters (joining scripts such as Arabic, words mixing directions, long words with the letter wave off); it holds the sweep for those words, see [The highlight sweep](#the-highlight-sweep)
 - `.blyrics-bidi-sensitive` - Applied to lyric text rows that contain RTL script; changes word wrappers to inline text flow for correct browser bidi and wrapping
 - `.blyrics-word-group` - Word group; syllable-synced parts for one word stay together. It is `inline-block` for LTR-only rows and `display: contents` inside `.blyrics-bidi-sensitive`
 - `.blyrics-word-group-long` - Added to a `.blyrics-word-group` whose word is longer than twice `blyrics-long-word-wrap-threshold`. The group and its `.blyrics--word` spans become `display: inline` so the word can wrap. See [Long Words](#long-words)
 - `.blyrics--word` - Each word within a line (a `<span>`)
-- `.blyrics-word-highlight` - Real active-color overlay for a timed word; every timed word has one
+- `.blyrics-word-highlight` - Real active-color overlay for a timed word; every timed word has one. Its swipe and glow are drawn by `.blyrics-sweep-*` elements, see [The highlight sweep](#the-highlight-sweep)
 - `.blyrics-background-lyric` - Background vocal word group or timed word
 
 Example:
@@ -601,7 +600,11 @@ Example:
   <div class="blyrics-line-main" dir="auto">
     <span class="blyrics-bidi-run blyrics-highlight-run" dir="auto" aria-hidden="true">
       <span class="blyrics-word-group">
-        <span class="blyrics--word blyrics-word-highlight" data-time="10.259" data-duration="0.42" data-content="Hello" data-word-state="active">Hello</span>
+        <span class="blyrics--word blyrics-word-highlight blyrics-sweep-cell blyrics-word-highlight--sweep" data-time="10.259" data-duration="0.42" data-content="Hello" data-word-state="active">
+          <span class="blyrics-sweep-mask">
+            <span class="blyrics-sweep-text">Hello<span class="blyrics-sweep-glow blyrics-sweep-glow--wide">Hello</span><span class="blyrics-sweep-glow blyrics-sweep-glow--tight">Hello</span></span>
+          </span>
+        </span>
       </span>
       text
     </span>
@@ -723,7 +726,7 @@ Every word uses the `.blyrics--word` class:
 ```
 
 - **Color**: Set to inactive color initially
-- **Active Overlay**: Every timed word has a real `.blyrics-word-highlight`. A row's overlays sit in a `.blyrics-highlight-run`, an `aria-hidden` copy of the run laid over the visible text so both share one layout
+- **Active Overlay**: Every timed word has a real `.blyrics-word-highlight`. A row's overlays sit in a `.blyrics-highlight-run`, an `aria-hidden` copy of the run laid over the visible text so both share one layout. The swipe and glow inside it are described in [The highlight sweep](#the-highlight-sweep)
 - **Wrapped Words**: A word past the wrap threshold carries `<wbr>` points in both copies, so the overlay wraps exactly like the visible text
 - **Line-Synced Words**: Zero-duration line-synced words get `.blyrics-line-synced-word` and fade in without the rich-sync swipe
 - **RTL-Sensitive Words**: Rows containing RTL script use `.blyrics-bidi-sensitive`; their `.blyrics--word` spans compute to `display: inline` and their `.blyrics-word-group` wrappers compute to `display: contents`
@@ -818,45 +821,31 @@ Use `--blyrics-animate-word-wobble: 0` to disable the wobble effect.
 
 ### Implementing the Swipe (Karaoke) Transition
 
-#### Defining Custom Properties
+#### The highlight sweep
 
-Two custom properties control the swipe transition:
+The swipe runs on the compositor, so it keeps moving while the page is busy. Each overlay, or each letter of a lettered word that wraps, is a sweep cell holding a `.blyrics-sweep-mask`: a fixed soft-edged mask over a `.blyrics-sweep-text` copy of the text. The engine slides the mask one way and the text the other by the same distance, so the letters stay put and only the edge moves across them. The glow's two halos, `.blyrics-sweep-glow--wide` and `.blyrics-sweep-glow--tight`, are copies of the text inside the same mask, with clear glyphs and a `text-shadow`; the engine crossfades them by opacity to stand in for a glow that shrinks as it fades.
 
-```css
-@property --lyric-transition-amount-start {
-  syntax: "<number>";
-  inherits: false;
-  initial-value: 0;
-}
-
-@property --lyric-transition-amount-end {
-  syntax: "<number>";
-  inherits: false;
-  initial-value: 0;
-}
+```html
+<span class="blyrics--word blyrics-word-highlight blyrics-sweep-cell blyrics-word-highlight--sweep">
+  <span class="blyrics-sweep-mask">
+    <span class="blyrics-sweep-text">
+      Hello
+      <span class="blyrics-sweep-glow blyrics-sweep-glow--wide">Hello</span>
+      <span class="blyrics-sweep-glow blyrics-sweep-glow--tight">Hello</span>
+    </span>
+  </span>
+</span>
 ```
 
-#### The highlight overlay
+With the letter wave on, the text and each halo hold `.blyrics--letter` spans. A lettered word that flows inline (a long word, or one in a `.blyrics-bidi-sensitive` row) puts a cell in each letter instead: `.blyrics--letter.blyrics-sweep-cell`. A word that flows inline without letters keeps its overlay text only for layout, with `.blyrics-word-highlight--context` and clear text; its cells are `.blyrics-sweep-window` elements in the row's `.blyrics-sweep-context`, one over each box the word breaks into, each holding a `.blyrics-sweep-clone` copy of the row with the word marked `.blyrics-sweep-target`.
 
-The swipe effect runs on each word's `.blyrics-word-highlight` overlay with `background-clip: text`. A row's overlays sit in a `.blyrics-highlight-run`, an `aria-hidden` layer that is `position: absolute` over the visible text, so the active copy and the inactive text share one layout:
+To style it:
 
-```css
-.blyrics--word.blyrics-word-highlight {
-  color: transparent;
-  background-image: linear-gradient(
-    90deg,
-    var(--blyrics-lyric-active-color) calc(100% * var(--lyric-transition-amount-start)),
-    #00000000 calc(100% * var(--lyric-transition-amount-end) + 1px)
-  );
-  background-clip: text;
-  opacity: 0;
-  pointer-events: none;
-  --lyric-transition-amount-start: var(--blyrics-highlight-swipe-start-from, -0.2);
-  --lyric-transition-amount-end: var(--blyrics-highlight-swipe-end-from, -0.1);
-}
-```
+- **Color**: the swept text is `--blyrics-lyric-active-color`, and the halos are `--blyrics-glow-color`. Both resolve per word, so they can be set on `.blyrics-word-highlight` selectors such as `[data-long-word]`.
+- **Edge**: `--blyrics-highlight-swipe-start-from` and `--blyrics-highlight-swipe-start-to` set where the lit edge starts and ends, in widths of the word, and `--blyrics-highlight-swipe-end-to` minus `--blyrics-highlight-swipe-start-to` sets how wide the soft edge is. The edge is fixed, so it does not grow or shrink during the swipe.
+- **Glow**: `--blyrics-highlight-glow-radius-from` sets the halo radius. Each word's or letter's glow starts when the edge reaches it.
 
-This creates an overlay using `background-clip: text` with a gradient that reveals the active color progressively. Rich-synced words animate the gradient and make the active overlay visible instantly at the word start time; they do not fade in. Line-synced words (`.blyrics-line-synced-word`) skip the gradient swipe and fade the fully highlighted overlay in word by word.
+The sweep has no custom properties to read. Earlier versions animated `--lyric-transition-amount-start` and `--lyric-transition-amount-end` behind a `background-clip: text` gradient; those are gone, so a theme that drew its own sweep from them no longer moves. Rich-synced words make the overlay visible instantly at the word start time; they do not fade in. Line-synced words (`.blyrics-line-synced-word`) skip the swipe and fade the fully lit overlay in word by word.
 
 #### Timing Model
 
@@ -867,9 +856,9 @@ The swipe and glow are driven by `element.animate()`:
 - With the default ratios, the swipe reaches the end of the word at `wordStart + wordDuration`; the remaining `0.5 * wordDuration` is the tail moving past the word
 - Rich-sync word-timed opacity becomes visible instantly at `wordStart`; `--blyrics-lyric-highlight-fade-in-duration` is not used for rich-sync fade-in
 - Line-synced opacity fade-in starts at its generated word time and uses `--blyrics-lyric-highlight-fade-in-duration`
-- Glow starts at `wordStart` and lasts `max(wordDuration * --blyrics-highlight-glow-duration-ratio, --blyrics-highlight-glow-min-duration)`
+- Glow starts when the swipe's edge reaches each word or letter (at `wordStart` for line-synced words) and lasts `max(wordDuration * --blyrics-highlight-glow-duration-ratio, --blyrics-highlight-glow-min-duration)`
 - Fade-out uses `--blyrics-lyric-highlight-fade-out-duration`
-- `--blyrics-animate-highlight-swipe: 0` keeps rich-sync timing in JS but makes each word fully highlighted instantly at `wordStart` instead of moving the gradient
+- `--blyrics-animate-highlight-swipe: 0` keeps rich-sync timing in JS but makes each word fully highlighted instantly at `wordStart` instead of moving the edge
 
 
 ## 6. Creating Animation Effects
@@ -894,15 +883,6 @@ Most lyric timing uses the Web Animations API, but the same conceptual effects r
   }
 }
 
-@keyframes blyrics-glow {
-  0% {
-    filter: drop-shadow(0 0 0.8rem var(--blyrics-glow-color));
-  }
-  to {
-    filter: drop-shadow(0 0 0rem var(--blyrics-glow-color));
-  }
-}
-
 @keyframes blyrics-spin {
   0% {
     transform: translateY(-50%) rotate(0deg);
@@ -924,11 +904,10 @@ Most lyric timing uses the Web Animations API, but the same conceptual effects r
 
 These animations create:
 - **blyrics-wobble**: Subtle horizontal movement and scale for active lyrics (includes `scaleX(1.025)` for emphasis)
-- **blyrics-glow**: Drop shadow glow effect that fades out (uses `filter: drop-shadow` for better compatibility with `background-clip: text`)
 - **blyrics-spin**: Rotating animation for the loading spinner
 - **blyrics-shimmer**: Shimmer animation for loading text
 
-Theme authors should prefer CSS variables and stable structural selectors. The default line scale, word swipe, word glow, instrumental fill, and lyric scroll smoothing are all run with `element.animate()`.
+Theme authors should prefer CSS variables and stable structural selectors. The default line scale, word swipe, word glow, instrumental fill, and lyric scroll smoothing are all run with `element.animate()`. The word glow is no longer a `drop-shadow` keyframe: it is two halo copies with a fixed `text-shadow`, crossfaded by opacity (see [The highlight sweep](#the-highlight-sweep)).
 
 ## 7. Modifying YouTube Music's Layout
 
@@ -2095,26 +2074,15 @@ The control discs and the pill share two variables, set on `.blyrics-pip-artwork
 
 The stage layout uses more `--blyrics-pip-*` variables to place the transport, the plate and the progress row (`-stage-width`, `-stage-height`, `-progress-inset`, `-progress-height`, `-plate-gap`, `-plate-overhang`, `-plate-top`, `-frame-bottom-gap`, `-header-bottom`, `-transport-margin`, `-transport-y`, `-karaoke-font-size`, `-karaoke-translated-font-size`). They are internal. Each is derived from the others, so changing one can push the controls into the lines. The normal layout also has internal variables for its artwork minimum: `--blyrics-pip-artwork-aspect`, `-artwork-min-height`, `-artwork-min-width`, `-chrome-height` and `-transport-edge`.
 
-## Optional image highlights and HDR
+## Optional instrumental image
 
-The renderer supports theme-provided image fills. They are disabled by default. A theme opts in
-with `/* blyrics-image-highlights = true; */` and supplies one CSS image URL through
-`--blyrics-highlight-image` on `.blyrics-container`. This works with SDR textures too; the
-renderer does not enable HDR or choose a brightness on its own.
+A theme can paint the instrumental note with an image. It is off by default. A theme opts in with
+`/* blyrics-image-highlights = true; */` and supplies one CSS image URL through
+`--blyrics-highlight-image` on `.blyrics-container`. This works with SDR textures and HDR gain-map
+images alike; the renderer does not enable HDR or choose a brightness on its own, so HDR media
+queries and `dynamic-range-limit` belong to the theme. The note keeps its ordinary fill until the
+image loads, and forced colors keep system colors.
 
-The bundled **HDR** theme supplies a gain-map JPEG only inside HDR-display and CSS-support
-queries. Select it in the theme picker to enable brighter lyrics, the instrumental note, and
-image-colored glow.
-`--dynamic-range` controls the display-dependent brightness ceiling (the default is 70% standard,
-30% no-limit). Glow follows the normal per-word duration, easing and blur radius settings, with
-`--blyrics-image-glow-opacity-from` and `--blyrics-image-glow-opacity-to` controlling its strength.
-
-The glow blurs a separate copy after its karaoke mask, preserving the sharp fill and leaving room
-at word edges without padding changes. Letter masks and motion share the renderer's clock.
-For fragmented long words and bidi-sensitive inline runs, a parallel text run keeps the halo
-aligned with every wrapped fragment. Joining-script and mixed-direction word groups use
-whole-word sweeps to preserve native text shaping. Forced colors retain system text
-colors. Missing note images fall back to the ordinary note fill.
-
-A display's HDR headroom and browser compositing affect the observed brightness. Screenshots
-can check animation and clipping, but cannot establish the monitor's emitted luminance.
+Words no longer take an image fill: the setting, `--blyrics-image-glow-opacity-from` and
+`--blyrics-image-glow-opacity-to` used to paint the karaoke sweep and its glow with the image, and
+that went with the gradient sweep. The bundled HDR theme, which relied on it, has been removed.
