@@ -31,6 +31,19 @@ assert.deepEqual(
   "translation falls back to the original line"
 );
 
+const severalGroups = parseLyrics(
+  `<tt xmlns="http://www.w3.org/ns/ttml" xmlns:ttm="http://www.w3.org/ns/ttml#metadata"><body><div><p begin="1.0" end="4.0"><span begin="1.0" end="2.0">Walk on</span><span ttm:role="x-bg"><span begin="2.0" end="3.0">(slow down)</span></span><span ttm:role="x-bg"><span begin="3.0" end="4.0">(come back)</span></span></p></div></body></tt>`
+);
+assert.deepEqual(
+  previewLines(severalGroups, ORIGINAL_VIEW),
+  [
+    { text: "Walk on", isBackground: false },
+    { text: "(slow down)", isBackground: true },
+    { text: "(come back)", isBackground: true },
+  ],
+  "each background vocal group gets its own preview line"
+);
+
 const lrc = parseLyrics("[ar: X]\n[00:01.00]Hello there\n[00:03.00]World");
 assert.deepEqual(
   previewLines(lrc, ORIGINAL_VIEW).map(line => line.text),

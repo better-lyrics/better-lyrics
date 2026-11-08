@@ -28,6 +28,7 @@ import {
   setupFullscreenPlayerBarReveal,
   unmountDock,
 } from "@modules/ui/dom";
+import { disposeThemeSongObserver, observeThemeSong } from "@modules/ui/themeSongCompat";
 import {
   disableInertWhenFullscreen,
   enableLyricsTab,
@@ -59,6 +60,7 @@ async function modify(isDisposed: () => boolean): Promise<void> {
   applyLoggingSetting();
   await injectHeadTags();
   if (isDisposed()) return;
+  observeThemeSong();
   await loadLocaleOverride();
   if (isDisposed()) return;
   injectI18nCssVars();
@@ -140,6 +142,7 @@ function init(): () => void {
     unmountDock();
     cleanupPlayerBarReveal();
     disposeKaraoke();
+    disposeThemeSongObserver();
   };
 }
 

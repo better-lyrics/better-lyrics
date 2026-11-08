@@ -54,11 +54,15 @@ export function previewLines(lyrics: Lyric[], view: string): PreviewLine[] {
     if (view === ROMANIZATION_VIEW) return [{ text: line.romanization ?? original, isBackground: false }];
     if (view !== ORIGINAL_VIEW) return [{ text: translationOf(line, view) ?? original, isBackground: false }];
     const lines: PreviewLine[] = [{ text: original, isBackground: false }];
-    const backgroundText = background
-      .map(part => part.words)
-      .join("")
-      .trim();
-    if (backgroundText) lines.push({ text: backgroundText, isBackground: true });
+    const groups = new Map<number, string>();
+    for (const part of background) {
+      const group = part.backgroundGroup ?? 0;
+      groups.set(group, (groups.get(group) ?? "") + part.words);
+    }
+    for (const [, words] of [...groups].sort(([a], [b]) => a - b)) {
+      const backgroundText = words.trim();
+      if (backgroundText) lines.push({ text: backgroundText, isBackground: true });
+    }
     return lines;
   });
 }
