@@ -443,11 +443,18 @@ export async function createLyrics(detail: PlayerDetails, signal: AbortSignal): 
     let hasYtMatch = false;
 
     // A source the listener picked by hand is shown whatever the checks say; they only withhold the rest.
-    const isManualPick = (provider: LyricSourceKey) => pinnedProvider !== null && keepsPin(pinnedProvider, provider);
-    let pickOverrodeCheck = false;
+    let savedOverridingPick = false;
     const withhold = (provider: LyricSourceKey): boolean => {
-      if (isManualPick(provider)) {
-        pickOverrodeCheck = true;
+      if (pinnedProvider && keepsPin(pinnedProvider, provider)) {
+        // Picking the top source saves no pin, since it normally shows by itself. One that only shows
+        // because the pick overrode a check has to be remembered, or it is withheld again next time.
+        if (!savedOverridingPick && pinnedProvider === AppState.manualProviderKey) {
+          savedOverridingPick = true;
+          void saveProviderPin(detail.videoId, {
+            key: pinnedProvider,
+            unisonLyricsId: AppState.availableUnisonLyricsId,
+          });
+        }
         return false;
       }
       selection.report(provider, { kind: "rejected" });
@@ -548,20 +555,6 @@ export async function createLyrics(detail: PlayerDetails, signal: AbortSignal): 
       pinnedVariants(providerPriority, pinnedProvider).every(key => sourceMap[key]?.filled)
     ) {
       void saveProviderPin(detail.videoId, null);
-    }
-
-    // Picking the top source saves no pin, since it normally shows by itself. One that only shows
-    // because the pick overrode a check has to be remembered, or it is withheld again next time.
-    if (
-      pickOverrodeCheck &&
-      pinnedProvider &&
-      pinnedProvider === AppState.manualProviderKey &&
-      keepsPin(pinnedProvider, selection.displayedKey ?? undefined)
-    ) {
-      void saveProviderPin(detail.videoId, {
-        key: pinnedProvider,
-        unisonLyricsId: AppState.availableUnisonLyricsId,
-      });
     }
 
     if (!hasShownLyrics) {
