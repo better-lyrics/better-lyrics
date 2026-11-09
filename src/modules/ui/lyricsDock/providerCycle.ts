@@ -4,7 +4,8 @@ import type { LyricSourceKey } from "@modules/lyrics/providers/shared";
 
 export function selectProvider(key: LyricSourceKey): void {
   const pinned = pinForPick(key, AppState.availableProviderKeys);
-  AppState.manualProviderKey = pinned;
+  // Held for this song even when no pin is saved, so the pick still overrides the checks on reload.
+  AppState.manualProviderKey = key;
   const videoId = AppState.lastLoadedVideoId;
   const saved = videoId
     ? saveProviderPin(videoId, pinned && { key: pinned, unisonLyricsId: AppState.availableUnisonLyricsId })

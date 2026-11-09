@@ -442,14 +442,25 @@ export async function createLyrics(detail: PlayerDetails, signal: AbortSignal): 
     const ytMismatches = new Map<LyricSourceKey, LyricSourceResult>();
     let hasYtMatch = false;
 
+    // A source the listener picked by hand is shown whatever the checks say; they only withhold the rest.
+    const isManualPick = (provider: LyricSourceKey) => pinnedProvider !== null && keepsPin(pinnedProvider, provider);
+    let pickOverrodeCheck = false;
+    const withhold = (provider: LyricSourceKey): boolean => {
+      if (isManualPick(provider)) {
+        pickOverrodeCheck = true;
+        return false;
+      }
+      selection.report(provider, { kind: "rejected" });
+      return true;
+    };
+
     const evaluate = async (provider: LyricSourceKey): Promise<void> => {
       const sourceLyrics = sourceMap[provider].lyricSourceResult as LyricSourceResult | null;
       if (!sourceLyrics?.lyrics || sourceLyrics.lyrics.length === 0) {
         selection.report(provider, { kind: "rejected" });
         return;
       }
-      if (hideInstrumentalOnly.getBooleanValue() && isInstrumentalOnly(sourceLyrics.lyrics)) {
-        selection.report(provider, { kind: "rejected" });
+      if (hideInstrumentalOnly.getBooleanValue() && isInstrumentalOnly(sourceLyrics.lyrics) && withhold(provider)) {
         return;
       }
       if (signal.aborted) return;
@@ -464,9 +475,12 @@ export async function createLyrics(detail: PlayerDetails, signal: AbortSignal): 
         hasYtMatch = true;
         return;
       }
-      logCore(`Got lyrics from ${sourceLyrics.source}, but they don't match YT lyrics. Rejecting.`);
       ytMismatches.set(provider, sourceLyrics);
-      selection.report(provider, { kind: "rejected" });
+      const withheld = withhold(provider);
+      logCore(
+        `Got lyrics from ${sourceLyrics.source}, but they don't match YT lyrics. ` +
+          (withheld ? "Rejecting." : "Keeping them, as this source was picked manually.")
+      );
     };
 
     // When no source matches YouTube's lyrics, the fault is more likely YouTube's (a truncated or
@@ -534,6 +548,20 @@ export async function createLyrics(detail: PlayerDetails, signal: AbortSignal): 
       pinnedVariants(providerPriority, pinnedProvider).every(key => sourceMap[key]?.filled)
     ) {
       void saveProviderPin(detail.videoId, null);
+    }
+
+    // Picking the top source saves no pin, since it normally shows by itself. One that only shows
+    // because the pick overrode a check has to be remembered, or it is withheld again next time.
+    if (
+      pickOverrodeCheck &&
+      pinnedProvider &&
+      pinnedProvider === AppState.manualProviderKey &&
+      keepsPin(pinnedProvider, selection.displayedKey ?? undefined)
+    ) {
+      void saveProviderPin(detail.videoId, {
+        key: pinnedProvider,
+        unisonLyricsId: AppState.availableUnisonLyricsId,
+      });
     }
 
     if (!hasShownLyrics) {
