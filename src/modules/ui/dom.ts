@@ -98,13 +98,13 @@ let shimmerObserver: IntersectionObserver | null = null;
 /**
  * Lets the shimmer run only while its button is on screen. The animation moves a background every
  * frame, which the main thread has to repaint, and the footer sits below the last line of most songs.
+ * There is one footer at a time, so a new button replaces the previous observer.
  */
 function observeShimmerVisibility(button: HTMLElement): void {
   if (typeof IntersectionObserver !== "function") {
     button.setAttribute(SHIMMER_IN_VIEW_ATTR, "");
     return;
   }
-  // One button per footer and one footer per song, so the previous observer goes with its button.
   shimmerObserver?.disconnect();
   shimmerObserver = new IntersectionObserver(entries => {
     for (const entry of entries) {
@@ -1670,6 +1670,8 @@ export function cleanup(keepView = false): void {
   if (blyricsFooter) {
     blyricsFooter.remove();
   }
+  shimmerObserver?.disconnect();
+  shimmerObserver = null;
 
   // The dock persists across re-injections (updated in place by addFooter) so a
   // provider switch or toggle never tears it out of the DOM. It is removed only when

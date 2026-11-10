@@ -346,7 +346,7 @@ Timing uses the Web Animations API:
 - Lyric line scale and scroll smoothing also use `element.animate()`
 - Scroll smoothing uses per-line `translate`, not container `transform`; JS automatically animates lines visible in the previous or current viewport and provides relative index, absolute relative index, signed scroll delta, and absolute scroll distance as CSS variables
 - Visible lyric lines receive inline `will-change: transform, translate` before scroll animations start
-- Per-line scroll effects can overlap with additive Web Animations (`composite: "add"`); new lyric groups scroll immediately while earlier animations continue; line durations control visual motion independently of lookahead
+- Per-line scroll effects can overlap: new lyric groups scroll immediately, and a line still moving gets one animation that carries its remaining motion and replaces the old one (no additive composition), so it also replaces any theme `translate` on the line while it moves; line durations control visual motion independently of lookahead
 - The instrumental wave morphs between `--blyrics-instrumental-wave-path-high` and `--blyrics-instrumental-wave-path-low`; both must use the same path commands in the same order with the same argument counts, or the ripple snaps at the halfway point instead of morphing
 - Visual keyframe values, effect enable flags, durations, and easing are CSS variables; JS still owns scheduling, pause/resume, seeking, and cancellation
 - `prefers-reduced-motion: reduce` keeps smooth scroll enabled but disables side-specific line-scroll differential effects

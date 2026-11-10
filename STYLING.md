@@ -312,7 +312,7 @@ blyrics-line-scroll-above-duration = calc(
 */
 ```
 
-The engine animates the individual `translate` property instead of `transform`, so this effect can run alongside the existing line-scale transform animation. Per-line scroll effects can overlap: a new scroll starts as soon as an ungrouped lyric reaches its scroll time, even while earlier line animations are running. Overlapping scroll effects are composed with additive Web Animations (`composite: "add"`), so this behavior expects modern browser support for additive `element.animate()` effects.
+The engine animates the individual `translate` property instead of `transform`, so this effect can run alongside the existing line-scale transform animation. Per-line scroll effects can overlap: a new scroll starts as soon as an ungrouped lyric reaches its scroll time, even while earlier line animations are running. A line still moving when the next scroll starts gets one new animation that begins where the line is and carries its remaining motion, so overlapping scrolls replace each other rather than adding up.
 
 ### Layout
 
