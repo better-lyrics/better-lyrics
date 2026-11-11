@@ -242,12 +242,16 @@ export async function createLyrics(detail: PlayerDetails, signal: AbortSignal): 
 
     const isSoftReload = AppState.lastLoadedVideoId === videoId && AppState.lyricData != null;
 
-    // Lyrics this song already has on screen are swapped for the refetched ones rather than torn
-    // down first. Clearing the lines collapses the panel, and the browser clamps its scroll to the top
-    // until the next tick brings it back.
+    // On a switch to the song's other version, the lines on screen are swapped for the refetched ones
+    // rather than torn down first. Clearing them collapses the panel, and the browser clamps its scroll
+    // to the top until the next tick brings it back. Only then, though: a same-song reload counts as an
+    // A/V switch above too, and one that turned translations or romanization off has to rebuild, as a
+    // swap keeps the lines that still carry them.
+    const isCounterpartSwitch =
+      !!matchingSong?.counterpartVideoId && matchingSong.counterpartVideoId === AppState.lastLoadedVideoId;
     let keepsLinesOnScreen = false;
     if (isAVSwitch && segmentMap) {
-      keepsLinesOnScreen = true;
+      keepsLinesOnScreen = isCounterpartSwitch;
       applySegmentMapToLyrics(AppState.lyricData, mainView.lines, segmentMap);
       AppState.suppressZeroTime = Date.now() + 5000;
       AppState.areLyricsTicking = true; // Keep lyrics ticking while new lyrics are fetched.
