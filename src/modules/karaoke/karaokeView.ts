@@ -54,7 +54,6 @@ function createMainPageStage(): KaraokeStage {
 let stage = createMainPageStage();
 
 let builtFrom: object | null = null;
-let builtSegmentMap: object | null = null;
 let builtLanguage: string | null | undefined;
 let decorationSignature = "";
 let wasActive = false;
@@ -63,7 +62,6 @@ let wasLayout = false;
 function clearKaraokeLyrics(): void {
   stage.clear();
   builtFrom = null;
-  builtSegmentMap = null;
   decorationSignature = "";
 }
 
@@ -90,8 +88,7 @@ function publishKaraokeLyrics(): void {
     return;
   }
 
-  const segmentMap = source.segmentMap ?? null;
-  const rebuilt = source !== builtFrom || segmentMap !== builtSegmentMap;
+  const rebuilt = source !== builtFrom;
   if (rebuilt) {
     stage.build({
       lyrics: view.lyrics,
@@ -103,7 +100,6 @@ function publishKaraokeLyrics(): void {
       providerKey: AppState.currentProviderKey,
     });
     builtFrom = source;
-    builtSegmentMap = segmentMap;
     builtLanguage = view.language;
     decorationSignature = "";
   } else if (view.language !== builtLanguage) {
