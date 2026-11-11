@@ -45,9 +45,6 @@ npm run build       # full multi-browser build
 Also available: `npm run check:i18n-brand` (protected product terms must survive translation
 verbatim), `npm run build:ci` (adds sourcemap patching + R2 upload), `npm run knip:fix`.
 
-`tooling/check-packaged-hdr-theme.ts` asserts against `dist/` and is deliberately *not* part of
-`selfcheck` — run `npm run build` first, then `npx tsx tooling/check-packaged-hdr-theme.ts`.
-
 ## Tests are self-checks
 
 There is no test runner. `npm run selfcheck` discovers every `**/*.selfcheck.ts` under `src/` and
@@ -130,8 +127,7 @@ Versions are 4-digit (`3.0.0.4`) in `package.json` and `manifest.json`, with a h
 
 Read [STYLING-SKILL.md](STYLING-SKILL.md) first — it is the condensed, agent-facing CSS-variable
 reference. [STYLING.md](STYLING.md) is the exhaustive version and is excluded from Biome, so do not
-reformat it. Bundled themes live in `public/css/themes/`; `HDR.css` carries an opt-in theme-settings
-directive that the packaged-theme check verifies survives the build byte for byte.
+reformat it. Bundled themes live in `public/css/themes/`.
 
 ## Attribution for agent-authored PRs
 

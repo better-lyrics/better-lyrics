@@ -56,12 +56,12 @@ Leave font-family overrides unset for language-aware CJK defaults. If adding a f
   --blyrics-lyric-highlight-fade-in-easing: ease;
   --blyrics-lyric-highlight-fade-out-easing: ease;
   --blyrics-highlight-swipe-easing: linear;
-  --blyrics-highlight-swipe-start-from: -0.2;
-  --blyrics-highlight-swipe-end-from: -0.1;
-  --blyrics-highlight-swipe-start-to: 1.4;
-  --blyrics-highlight-swipe-end-to: 1.5;
-  --blyrics-highlight-glow-radius-from: 0.8rem;
-  --blyrics-highlight-glow-radius-to: 0;
+  --blyrics-highlight-swipe-start-from: -0.2; /* lit edge start, in word widths */
+  --blyrics-highlight-swipe-end-from: -0.1; /* not used */
+  --blyrics-highlight-swipe-start-to: 1.4; /* lit edge end, in word widths */
+  --blyrics-highlight-swipe-end-to: 1.5; /* soft edge width = end-to - start-to */
+  --blyrics-highlight-glow-radius-from: 0.8rem; /* halo radius */
+  --blyrics-highlight-glow-radius-to: 0; /* 0 fades the glow out; anything else holds it */
   --blyrics-highlight-glow-duration-ratio: 1.2;
   --blyrics-highlight-glow-min-duration: 1.2s;
   --blyrics-highlight-glow-easing: ease;
@@ -243,9 +243,11 @@ Lyric timing is driven by `element.animate()`.
 │   │   ├── .blyrics-bidi-run.blyrics-highlight-run (span, aria-hidden overlay)
 │   │   │   └── .blyrics-word-group (span)
 │   │   │       └── .blyrics--word.blyrics-word-highlight (span) [data-content] [data-time] [data-duration] [data-long-word] [data-word-state]
-│   │   └── .blyrics-bidi-run (span)
-│   │       └── .blyrics-word-group (span)
-│   │           └── .blyrics--word (span) [data-content] [data-time] [data-duration] [data-long-word] [data-word-state]
+│   │   │           └── .blyrics-sweep-mask > .blyrics-sweep-text (word copy + .blyrics-sweep-glow halos)
+│   │   ├── .blyrics-bidi-run (span)
+│   │   │   └── .blyrics-word-group (span)
+│   │   │       └── .blyrics--word (span) [data-content] [data-time] [data-duration] [data-long-word] [data-word-state]
+│   │   └── .blyrics-sweep-context (span, only for words that flow inline without letters)
 │   ├── .blyrics-background-line (div, only when primary background vocals are present)
 │   │   ├── .blyrics-bidi-run.blyrics-highlight-run (span, aria-hidden overlay)
 │   │   │   └── .blyrics-word-group.blyrics-background-lyric
@@ -303,6 +305,10 @@ Lyric timing is driven by `element.animate()`.
 | `.blyrics-word-group-long` | Word group longer than twice `blyrics-long-word-wrap-threshold`; group and `.blyrics--word` spans are `display: inline` so the word wraps |
 | `.blyrics--word` | Word span |
 | `.blyrics-word-highlight` | Real active-color overlay; every timed word has one |
+| `.blyrics-sweep-mask` / `.blyrics-sweep-text` | The swipe: a fixed soft-edged mask over a copy of the text, slid against each other |
+| `.blyrics-sweep-glow--wide` / `--tight` | The glow's two halos, inside the sweep text, crossfaded by opacity |
+| `.blyrics-sweep-cell` | Holds one sweep: an overlay, or a `.blyrics--letter` of a lettered word that flows inline |
+| `.blyrics-sweep-context` | Row layer holding `.blyrics-sweep-window` cells for words that flow inline without letters (Arabic, mixed direction); their overlay is `.blyrics-word-highlight--context` with clear text |
 | `.blyrics-line-synced-word` | Zero-duration line-synced word; fades in without rich-sync swipe |
 | `.blyrics--active` | Line is selected for scrolling. Runs on the **scroll clock**, which leads audio by `--blyrics-scroll-timing-offset` (0.5s default) |
 | `.blyrics--animating` | Line's animations are live. Runs on the **audio clock**, so it survives until the line's last word actually finishes |
@@ -323,15 +329,11 @@ Lyric timing is driven by `element.animate()`.
 
 ## Animation System
 
-Every timed word has a real `.blyrics-word-highlight` overlay with `background-clip: text`. A row's overlays sit in `.blyrics-highlight-run`, an `aria-hidden` copy laid over the visible text so both share one layout and wrap the same way:
+Every timed word has a real `.blyrics-word-highlight` overlay. A row's overlays sit in `.blyrics-highlight-run`, an `aria-hidden` copy laid over the visible text so both share one layout and wrap the same way.
 
-```css
-.blyrics--word.blyrics-word-highlight {
-  color: transparent;
-  background-image: linear-gradient(90deg, var(--blyrics-lyric-active-color) ..., transparent ...);
-  background-clip: text;
-}
-```
+The swipe runs on the compositor. Each overlay (or each letter of a lettered word that wraps) holds a `.blyrics-sweep-mask`, a fixed soft-edged mask, over a `.blyrics-sweep-text` copy of the text; the engine slides them against each other so only the edge moves. The glow is two `.blyrics-sweep-glow` copies inside that text with clear glyphs and a `text-shadow`, crossfaded by opacity. Words that flow inline without letters draw their sweep from `.blyrics-sweep-window` cells in the row's `.blyrics-sweep-context`, each holding a `.blyrics-sweep-clone` copy of the row with the word marked `.blyrics-sweep-target`.
+
+Style it through variables: the swept text is `--blyrics-lyric-active-color` and the halos `--blyrics-glow-color`, both resolved per word; `--blyrics-highlight-swipe-start-from` / `-start-to` place the edge and `-end-to` minus `-start-to` sets its width. There are no `--lyric-transition-amount-*` properties any more, so a theme cannot draw its own sweep from them.
 
 Timing uses the Web Animations API:
 
@@ -340,11 +342,11 @@ Timing uses the Web Animations API:
 - Rich-sync word-timed highlights become visible instantly at `wordStart`; they do not use the highlight fade-in duration
 - Line-synced `.blyrics-line-synced-word` skips swipe and fades in at word time
 - `--blyrics-animate-highlight-swipe: 0` keeps rich-sync timing but makes each word fully highlighted instantly instead of fading like line-synced lyrics
-- Glow lasts `max(wordDuration * --blyrics-highlight-glow-duration-ratio, --blyrics-highlight-glow-min-duration)`
+- Glow starts when the edge reaches each word or letter and lasts `max(wordDuration * --blyrics-highlight-glow-duration-ratio, --blyrics-highlight-glow-min-duration)`
 - Lyric line scale and scroll smoothing also use `element.animate()`
 - Scroll smoothing uses per-line `translate`, not container `transform`; JS automatically animates lines visible in the previous or current viewport and provides relative index, absolute relative index, signed scroll delta, and absolute scroll distance as CSS variables
 - Visible lyric lines receive inline `will-change: transform, translate` before scroll animations start
-- Per-line scroll effects can overlap with additive Web Animations (`composite: "add"`); new lyric groups scroll immediately while earlier animations continue; line durations control visual motion independently of lookahead
+- Per-line scroll effects can overlap: new lyric groups scroll immediately, and a line still moving gets one animation that carries its remaining motion and replaces the old one (no additive composition), so it also replaces any theme `translate` on the line while it moves; line durations control visual motion independently of lookahead
 - The instrumental wave morphs between `--blyrics-instrumental-wave-path-high` and `--blyrics-instrumental-wave-path-low`; both must use the same path commands in the same order with the same argument counts, or the ripple snaps at the halfway point instead of morphing
 - Visual keyframe values, effect enable flags, durations, and easing are CSS variables; JS still owns scheduling, pause/resume, seeking, and cancellation
 - `prefers-reduced-motion: reduce` keeps smooth scroll enabled but disables side-specific line-scroll differential effects
@@ -874,7 +876,7 @@ Target sustained notes for special effects:
 }
 ```
 
-`--blyrics-glow-color` resolves per word, so different long words can glow different colors. Tune the blur with `--blyrics-highlight-glow-radius-from` / `--blyrics-highlight-glow-radius-to` while keeping per-word color. Overriding the full `--blyrics-highlight-glow-filter-from` / `--blyrics-highlight-glow-filter-to` instead resolves the color once at the container, so every word shares one glow color.
+`--blyrics-glow-color` resolves per word, so different long words can glow different colors. Tune the halo with `--blyrics-highlight-glow-radius-from`; `--blyrics-highlight-glow-radius-to: 0` lets it fade out. The glow is a `text-shadow` on copies of the text, so `--blyrics-highlight-glow-filter-*` no longer changes it.
 
 ### 15. Pause Behavior
 
@@ -898,7 +900,7 @@ On by default. Each letter of a word floats in turn as it is sung, on top of the
 }
 ```
 
-It layers on the word wobble rather than replacing it, so the default `scaleX` pop stays. To make the letters carry all the motion instead, set the word wobble to identity (`--blyrics-word-wobble-transform-*: translateY(0)`). It follows `--blyrics-animate-word-wobble`, so reduced motion turns it off. The split multiplies the DOM per character and reruns the karaoke sweep per letter, so a theme that does not want the cost turns it off with `blyrics-letter-wave = false`.
+It layers on the word wobble rather than replacing it, so the default `scaleX` pop stays. To make the letters carry all the motion instead, set the word wobble to identity (`--blyrics-word-wobble-transform-*: translateY(0)`). It follows `--blyrics-animate-word-wobble`, so reduced motion turns it off. The split multiplies the DOM per character, three times over with the glow's two copies, so a theme that does not want the cost turns it off with `blyrics-letter-wave = false`.
 
 ### 17. Per-Word State (Karaoke)
 
@@ -937,7 +939,7 @@ A line-synced word, which has no duration of its own, is `active` from its start
 
 - `--noto-sans-universal` - International font fallback chain
 - `--blyrics-gradient-stops` - Complex fullscreen gradient
-- Core animation variables such as `--lyric-transition-amount-start` and `--lyric-transition-amount-end` unless you are replacing the karaoke highlight effect
+- The `.blyrics-sweep-*` layers inside the highlight overlay; the engine sizes and slides them, so restyle the sweep through its variables
 - Core DOM structure expectations
 - YouTube Music element selectors (unless intentional)
 

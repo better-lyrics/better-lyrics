@@ -24,11 +24,6 @@ const themes: Theme[] = [
     path: "Default.css",
   },
   {
-    name: "HDR",
-    author: "BetterLyrics",
-    path: "HDR.css",
-  },
-  {
     name: "Spotlight",
     author: "BetterLyrics",
     link: "https://twitter.com/boidushya",
