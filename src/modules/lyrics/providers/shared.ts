@@ -119,7 +119,7 @@ const defaultPreferredProviderList: LyricSourceKey[] = [...PROVIDER_CONFIGS]
   .sort((a, b) => a.priority - b.priority)
   .map(p => p.key) as LyricSourceKey[];
 
-function isLyricSourceKey(provider: string): provider is LyricSourceKey {
+export function isLyricSourceKey(provider: string): provider is LyricSourceKey {
   return (LYRIC_SOURCE_KEYS as readonly string[]).includes(provider);
 }
 
@@ -164,8 +164,6 @@ const sourceKeyToFillFn = {
   "unison-wordsynced": unison,
   "unison-synced": unison,
   "unison-plain": unison,
-  "musixmatch-richsync": (p: ProviderParameters) => unified(p, "musixmatch-richsync"),
-  "musixmatch-synced": (p: ProviderParameters) => unified(p, "musixmatch-synced"),
   "lrclib-synced": (p: ProviderParameters) => unified(p, "lrclib-synced"),
   "lrclib-plain": (p: ProviderParameters) => unified(p, "lrclib-plain"),
   "yt-captions": ytCaptions,
