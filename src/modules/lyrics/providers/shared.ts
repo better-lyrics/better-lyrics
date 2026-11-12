@@ -119,7 +119,7 @@ const defaultPreferredProviderList: LyricSourceKey[] = [...PROVIDER_CONFIGS]
   .sort((a, b) => a.priority - b.priority)
   .map(p => p.key) as LyricSourceKey[];
 
-function isLyricSourceKey(provider: string): provider is LyricSourceKey {
+export function isLyricSourceKey(provider: string): provider is LyricSourceKey {
   return (LYRIC_SOURCE_KEYS as readonly string[]).includes(provider);
 }
 
