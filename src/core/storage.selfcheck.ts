@@ -173,7 +173,7 @@ const seed = (items: Record<string, unknown>): void => {
     "blyrics_aaaaaaaaaaa_bLyrics-richsynced": missing,
     "blyrics_aaaaaaaaaaa_lrclib-synced": found,
     blyrics_aaaaaaaaaaa_metadata: found,
-    "blyrics_bbbbbbbbbbb_musixmatch-richsync": found,
+    "blyrics_bbbbbbbbbbb_portato-richsynced": found,
     "blyrics_bbbbbbbbbbb_yt-lyrics": found,
     "blyrics_ccccccccccc_bLyrics-richsynced": missing,
     "blyrics_ddddddddddd_yt-lyrics": found,
@@ -232,7 +232,7 @@ const seed = (items: Record<string, unknown>): void => {
   const lrc = { type: "transient", value: compressString(JSON.stringify({ version: 1, lyrics: [] })), expiry: 0 };
   const summary = summarizeLyricCache({
     blyrics_aaaaaaaaaaa_unison: found("richsync", "ttml"),
-    "blyrics_aaaaaaaaaaa_musixmatch-richsync": lrc,
+    "blyrics_aaaaaaaaaaa_portato-richsynced": lrc,
     "blyrics_aaaaaaaaaaa_lrclib-synced": lrc,
     blyrics_bbbbbbbbbbb_unison: found("richsync", "lrc"),
     blyrics_ccccccccccc_unison: unison({ found: false }),

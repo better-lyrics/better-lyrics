@@ -164,8 +164,6 @@ const sourceKeyToFillFn = {
   "unison-wordsynced": unison,
   "unison-synced": unison,
   "unison-plain": unison,
-  "musixmatch-richsync": (p: ProviderParameters) => unified(p, "musixmatch-richsync"),
-  "musixmatch-synced": (p: ProviderParameters) => unified(p, "musixmatch-synced"),
   "lrclib-synced": (p: ProviderParameters) => unified(p, "lrclib-synced"),
   "lrclib-plain": (p: ProviderParameters) => unified(p, "lrclib-plain"),
   "yt-captions": ytCaptions,
