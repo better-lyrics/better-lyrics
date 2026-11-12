@@ -10,6 +10,7 @@ import type {
   ThemeValidationResult,
 } from "./types";
 import { warnStore } from "@core/logger";
+import type { ThemeSettingField } from "../themes";
 
 const EXTENSION_VERSION = chrome.runtime.getManifest().version;
 
@@ -166,6 +167,19 @@ async function checkRegistryFileExists(basePath: string, file: string): Promise<
   }
 }
 
+export async function fetchRegistryThemeSettings(basePath: string): Promise<Record<string, ThemeSettingField> | null> {
+  const url = getRegistryFileUrl(basePath, "settings.json");
+
+  try {
+    const response = await fetchWithTimeout(url, { cache: "no-store" });
+    if (!response.ok) return null;
+    return response.json();
+  } catch (err) {
+    warnStore("Failed to fetch registry theme settings:", err);
+    return null;
+  }
+}
+
 export async function fetchRegistryShaderConfig(basePath: string): Promise<Record<string, unknown> | null> {
   const url = getRegistryFileUrl(basePath, "shader.json");
 
@@ -212,6 +226,7 @@ async function resolveRegistryPathAuthoritative(
 interface RegistryFileUrls {
   cssUrl: string;
   shaderUrl?: string;
+  settingsUrl?: string;
   registryPath: string;
   integrity?: string;
 }
@@ -223,12 +238,14 @@ interface RegistryFileUrls {
 async function deriveRegistryFileUrls(
   basePath: string,
   hasShaders: boolean,
+  hasSettings: boolean,
   integrity?: string
 ): Promise<RegistryFileUrls> {
   const hasRics = await checkRegistryFileExists(basePath, "style.rics");
   const cssUrl = hasRics ? getRegistryFileUrl(basePath, "style.rics") : getRegistryFileUrl(basePath, "style.css");
   const shaderUrl = hasShaders ? getRegistryFileUrl(basePath, "shader.json") : undefined;
-  return { cssUrl, shaderUrl, registryPath: basePath, integrity };
+  const settingsUrl = hasSettings ? getRegistryFileUrl(basePath, "settings.json") : undefined;
+  return { cssUrl, shaderUrl, settingsUrl, registryPath: basePath, integrity };
 }
 
 /**
@@ -248,7 +265,7 @@ export async function resolveRegistryInstallUrls(theme: StoreTheme): Promise<Reg
   };
 
   const { path: basePath, integrity } = await resolveRegistryPathAuthoritative(lockEntry);
-  return deriveRegistryFileUrls(basePath, theme.hasShaders, integrity);
+  return deriveRegistryFileUrls(basePath, theme.hasShaders, theme.hasSettings, integrity);
 }
 
 async function fetchFullThemeFromRegistry(lockEntry: LockfileEntry): Promise<StoreTheme> {
@@ -263,7 +280,11 @@ async function fetchFullThemeFromRegistry(lockEntry: LockfileEntry): Promise<Sto
 
   const description = descriptionMd ?? metadata.description ?? "";
 
-  const { cssUrl, shaderUrl } = await deriveRegistryFileUrls(basePath, metadata.hasShaders);
+  const { cssUrl, shaderUrl, settingsUrl } = await deriveRegistryFileUrls(
+    basePath,
+    metadata.hasShaders,
+    metadata.hasSettings
+  );
 
   const imageUrls: string[] = [];
   const safeImages = metadata.images ? filterSafeImageFilenames(metadata.images) : [];
@@ -293,6 +314,7 @@ async function fetchFullThemeFromRegistry(lockEntry: LockfileEntry): Promise<Sto
     imageUrls: allImageUrls,
     cssUrl,
     shaderUrl,
+    settingsUrl,
     version: metadata.version ?? lockEntry.version,
     commit: lockEntry.commit,
     locked: lockEntry.locked,
@@ -338,6 +360,26 @@ export async function fetchThemeCSS(repo: string, branchOverride?: string): Prom
   }
 
   return { css: await cssResponse.text(), isRics: false };
+}
+
+export async function fetchThemeSettings(
+  repo: string,
+  branchOverride?: string
+): Promise<Record<string, ThemeSettingField> | null> {
+  const branch = branchOverride ?? (await getDefaultBranch(repo));
+  const url = getRawGitHubUrl(repo, branch, "settings.json");
+
+  const exists = await checkFileExists(url);
+  if (!exists) return null;
+
+  try {
+    const response = await fetchWithTimeout(url, { cache: "no-store" });
+    if (!response.ok) return null;
+    return response.json();
+  } catch (err) {
+    warnStore("Failed to fetch theme settings:", err);
+    return null;
+  }
 }
 
 async function checkFileExists(url: string): Promise<boolean> {
@@ -400,6 +442,7 @@ export async function fetchFullTheme(repo: string, branchOverride?: string): Pro
   const cssUrl = hasRics ? ricsUrl : `${baseUrl}style.css`;
 
   const shaderUrl = metadata.hasShaders ? `${baseUrl}shader.json` : undefined;
+  const settingsUrl = metadata.hasSettings ? `${baseUrl}settings.json` : undefined;
 
   const imageUrls: string[] = [];
   const safeImages = metadata.images ? filterSafeImageFilenames(metadata.images) : [];
@@ -426,6 +469,7 @@ export async function fetchFullTheme(repo: string, branchOverride?: string): Pro
     imageUrls: allImageUrls,
     cssUrl,
     shaderUrl,
+    settingsUrl
   };
 }
 
