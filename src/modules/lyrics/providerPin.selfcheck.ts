@@ -2,6 +2,7 @@ import { strict as assert } from "node:assert";
 import type { LyricSourceKey } from "@modules/lyrics/providers/shared";
 import {
   keepsPin,
+  loadProviderPin,
   orderByPin,
   pinnedVariants,
   pinWithVote,
@@ -87,8 +88,6 @@ assert.equal(pinForPick("bLyrics-richsynced", priority), null, "picking the top 
 assert.equal(pinForPick("lrclib-synced", []), "lrclib-synced", "no known providers still pins the pick");
 assert.equal(pinForPick("lrclib-synced", ["lrclib-synced"]), null, "only provider available unpins");
 
-console.log("providerPin self-check passed");
-
 // -- Downvoting Unison --------------------------
 
 assert.equal(pinWithVote("unison-richsynced", -1), null, "a downvoted Unison lyric suspends its pin");
@@ -162,3 +161,34 @@ assert.equal(unisonRanksAbove(full, "portato-richsynced"), true, "Unison syllabl
 assert.equal(unisonRanksAbove(full, "bLyrics-richsynced"), false, "nothing ranks above the top provider");
 assert.equal(unisonRanksAbove(priority, "yt-lyrics"), false, "Unison disabled never ranks above");
 assert.equal(unisonRanksAbove(full, "unison-plain"), false, "a Unison pin is never overridden by Unison");
+
+// -- Saved pins --------------------------
+{
+  const pins: Record<string, unknown> = {
+    blyricsProviderPin_aaaaaaaaaaa: {
+      type: "transient",
+      value: { key: "lrclib-synced", unisonLyricsId: null },
+      expiry: 0,
+    },
+    blyricsProviderPin_bbbbbbbbbbb: {
+      type: "transient",
+      value: { key: "discontinued-richsync", unisonLyricsId: null },
+      expiry: 0,
+    },
+  };
+  Object.assign(globalThis, {
+    chrome: { storage: { local: { get: async (key: string) => ({ [key]: pins[key] }) } } },
+  });
+  assert.deepEqual(
+    await loadProviderPin("aaaaaaaaaaa"),
+    { key: "lrclib-synced", unisonLyricsId: null },
+    "a pin to a current provider loads"
+  );
+  assert.equal(
+    await loadProviderPin("bbbbbbbbbbb"),
+    null,
+    "regression: a pin to a removed provider is ignored instead of crashing the lookup"
+  );
+}
+
+console.log("providerPin self-check passed");
