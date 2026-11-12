@@ -167,7 +167,7 @@ const seed = (items: Record<string, unknown>): void => {
     "blyrics_aaaaaaaaaaa_bLyrics-richsynced": missing,
     "blyrics_aaaaaaaaaaa_lrclib-synced": found,
     blyrics_aaaaaaaaaaa_metadata: found,
-    "blyrics_bbbbbbbbbbb_musixmatch-richsync": found,
+    "blyrics_bbbbbbbbbbb_portato-richsynced": found,
     "blyrics_bbbbbbbbbbb_yt-lyrics": found,
     "blyrics_ccccccccccc_bLyrics-richsynced": missing,
     "blyrics_ddddddddddd_yt-lyrics": found,
