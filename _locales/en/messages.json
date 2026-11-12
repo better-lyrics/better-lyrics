@@ -821,10 +821,6 @@
     "message": "Better Lyrics Unison",
     "description": "Better Lyrics Unison provider name"
   },
-  "options_provider_musixmatch": {
-    "message": "Musixmatch",
-    "description": "Musixmatch provider name"
-  },
   "options_provider_lrclib": {
     "message": "LRClib",
     "description": "LRClib provider name"

@@ -32,6 +32,7 @@ const {
   clearLyricCache,
   getStorageBreakdown,
   getUpdatedCacheInfo,
+  purgeExpiredKeys,
   refreshCacheInfo,
   storageCategoryForKey,
   summarizeLyricCache,
@@ -167,7 +168,7 @@ const seed = (items: Record<string, unknown>): void => {
     "blyrics_aaaaaaaaaaa_bLyrics-richsynced": missing,
     "blyrics_aaaaaaaaaaa_lrclib-synced": found,
     blyrics_aaaaaaaaaaa_metadata: found,
-    "blyrics_bbbbbbbbbbb_musixmatch-richsync": found,
+    "blyrics_bbbbbbbbbbb_portato-richsynced": found,
     "blyrics_bbbbbbbbbbb_yt-lyrics": found,
     "blyrics_ccccccccccc_bLyrics-richsynced": missing,
     "blyrics_ddddddddddd_yt-lyrics": found,
@@ -250,6 +251,23 @@ const seed = (items: Record<string, unknown>): void => {
   const empty = await getStorageBreakdown();
   assert.equal(empty.totalBytes, 0);
   assert.equal(empty.lyrics.songs, 0);
+}
+
+// -- Startup purge --------------------------
+{
+  seed({
+    "blyrics_abcdefghijk_bLyrics-richsynced": entry,
+    "blyrics_abcdefghijk_discontinued-synced": entry,
+    "blyrics_ab_defghijk_discontinued-richsync": entry,
+    blyrics_featured_themes: { themes: [] },
+    blyrics_stableReleaseCheck: { checkedAt: 1 },
+  });
+  await purgeExpiredKeys();
+  assert.deepEqual(
+    Object.keys(local).sort(),
+    ["blyrics_abcdefghijk_bLyrics-richsynced", "blyrics_featured_themes", "blyrics_stableReleaseCheck"],
+    "drops cached lyrics from providers that no longer exist, keeps everything else"
+  );
 }
 
 console.log("storage self-check passed");
