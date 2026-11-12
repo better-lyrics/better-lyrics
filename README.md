@@ -238,7 +238,7 @@ You can:
 
 Please be mindful of quality when contributing, since these lyrics are served to everyone using the extension.
 
-Other providers (BiniLyrics, LRCLib, etc.) have their own external catalogs and contribution channels; corrections submitted there will flow back into Better Lyrics automatically once those upstream databases update.
+Other providers (BiniLyrics, etc.) have their own external catalogs and contribution channels; corrections submitted there will flow back into Better Lyrics automatically once those upstream databases update.
 
 ### How do I report a bug?
 
