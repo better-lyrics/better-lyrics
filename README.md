@@ -238,7 +238,7 @@ You can:
 
 Please be mindful of quality when contributing, since these lyrics are served to everyone using the extension.
 
-Other providers (Musixmatch, BiniLyrics, etc.) have their own external catalogs and contribution channels; corrections submitted there will flow back into Better Lyrics automatically once those upstream databases update.
+Other providers (BiniLyrics, LRCLib, etc.) have their own external catalogs and contribution channels; corrections submitted there will flow back into Better Lyrics automatically once those upstream databases update.
 
 ### How do I report a bug?
 
@@ -283,17 +283,15 @@ Available providers (default priority order):
 | 3   | BiniLyrics            | Syllable   |
 | 4   | Unison                | Word       |
 | 5   | Better Lyrics Portato | Word       |
-| 6   | Musixmatch            | Word       |
-| 7   | Better Lyrics         | Line       |
-| 8   | Unison                | Line       |
-| 9   | YouTube Captions      | Line       |
-| 10  | BiniLyrics            | Line       |
-| 11  | LRCLib                | Line       |
-| 12  | Better Lyrics Legato  | Line       |
-| 13  | Musixmatch            | Line       |
-| 14  | YouTube               | Unsynced   |
-| 15  | Unison                | Unsynced   |
-| 16  | LRCLib                | Unsynced   |
+| 6   | Better Lyrics         | Line       |
+| 7   | Unison                | Line       |
+| 8   | YouTube Captions      | Line       |
+| 9   | BiniLyrics            | Line       |
+| 10  | LRCLib                | Line       |
+| 11  | Better Lyrics Legato  | Line       |
+| 12  | YouTube               | Unsynced   |
+| 13  | Unison                | Unsynced   |
+| 14  | LRCLib                | Unsynced   |
 
 Adding custom providers isn't currently supported.
 
@@ -355,7 +353,7 @@ For a complete overview, please read our full [**Privacy Policy**](PRIVACY.md).
 
 ## Trademarks
 
-YouTube Music™, YouTube™, Google™, and Chrome™ are trademarks of Google LLC. Firefox® is a trademark of the Mozilla Foundation. Microsoft Edge is a trademark of Microsoft Corporation. Musixmatch® is a trademark of Musixmatch S.p.A. Use of these trademarks is subject to their respective owners' guidelines.
+YouTube Music™, YouTube™, Google™, and Chrome™ are trademarks of Google LLC. Firefox® is a trademark of the Mozilla Foundation. Microsoft Edge is a trademark of Microsoft Corporation. Use of these trademarks is subject to their respective owners' guidelines.
 
 ## Star History
 

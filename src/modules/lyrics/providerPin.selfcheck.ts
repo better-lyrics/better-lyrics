@@ -10,13 +10,13 @@ import {
   pinForPick,
 } from "@modules/lyrics/providerPin";
 
-const priority: LyricSourceKey[] = ["bLyrics-richsynced", "musixmatch-richsync", "lrclib-synced", "yt-lyrics"];
+const priority: LyricSourceKey[] = ["bLyrics-richsynced", "portato-richsynced", "lrclib-synced", "yt-lyrics"];
 
 // -- Ordering --------------------------
 
 assert.deepEqual(
   orderByPin(priority, "lrclib-synced"),
-  ["lrclib-synced", "bLyrics-richsynced", "musixmatch-richsync", "yt-lyrics"],
+  ["lrclib-synced", "bLyrics-richsynced", "portato-richsynced", "yt-lyrics"],
   "pinned provider goes first, the rest keep priority order"
 );
 assert.equal(orderByPin(priority, null), priority, "regression: never picking a provider leaves the order untouched");
@@ -26,7 +26,7 @@ assert.deepEqual(orderByPin([], "lrclib-synced"), [], "empty priority stays empt
 assert.notEqual(orderByPin(priority, "yt-lyrics"), priority, "a reorder returns a new array");
 assert.deepEqual(
   priority,
-  ["bLyrics-richsynced", "musixmatch-richsync", "lrclib-synced", "yt-lyrics"],
+  ["bLyrics-richsynced", "portato-richsynced", "lrclib-synced", "yt-lyrics"],
   "priority is never mutated"
 );
 
@@ -36,7 +36,7 @@ const full: LyricSourceKey[] = [
   "bLyrics-richsynced",
   "unison-richsynced",
   "unison-wordsynced",
-  "musixmatch-richsync",
+  "portato-richsynced",
   "bLyrics-synced",
   "unison-synced",
   "yt-lyrics",
@@ -51,7 +51,7 @@ assert.deepEqual(
     "unison-wordsynced",
     "unison-synced",
     "bLyrics-richsynced",
-    "musixmatch-richsync",
+    "portato-richsynced",
     "bLyrics-synced",
     "yt-lyrics",
   ],
@@ -68,8 +68,8 @@ assert.deepEqual(
   "family fallback applies to every provider"
 );
 assert.deepEqual(
-  orderByPin(full, "musixmatch-richsync").slice(0, 2),
-  ["musixmatch-richsync", "bLyrics-richsynced"],
+  orderByPin(full, "portato-richsynced").slice(0, 2),
+  ["portato-richsynced", "bLyrics-richsynced"],
   "a provider with one enabled variant has no siblings"
 );
 
@@ -109,20 +109,20 @@ assert.equal(pinWithVote(null, -1), null, "no pin stays no pin");
 
 // -- New Unison lyric overrides --------------------------
 
-const musixmatchPin = { key: "musixmatch-richsync" as const, unisonLyricsId: null };
+const portatoPin = { key: "portato-richsynced" as const, unisonLyricsId: null };
 
 assert.equal(
-  unisonOverride(full, musixmatchPin, { key: "unison-richsynced", lyricsId: 7 }),
+  unisonOverride(full, portatoPin, { key: "unison-richsynced", lyricsId: 7 }),
   "unison-richsynced",
   "a Unison lyric that appeared after the pick and ranks above it wins"
 );
 assert.equal(
-  unisonOverride(full, { key: "musixmatch-richsync", unisonLyricsId: 7 }, { key: "unison-richsynced", lyricsId: 7 }),
+  unisonOverride(full, { key: "portato-richsynced", unisonLyricsId: 7 }, { key: "unison-richsynced", lyricsId: 7 }),
   null,
   "the Unison lyric the user already moved away from never overrides"
 );
 assert.equal(
-  unisonOverride(full, { key: "musixmatch-richsync", unisonLyricsId: 7 }, { key: "unison-richsynced", lyricsId: 8 }),
+  unisonOverride(full, { key: "portato-richsynced", unisonLyricsId: 7 }, { key: "unison-richsynced", lyricsId: 8 }),
   "unison-richsynced",
   "a replaced Unison lyric counts as new"
 );
@@ -141,9 +141,9 @@ assert.equal(
   null,
   "a Unison pin already follows Unison"
 );
-assert.equal(unisonOverride(full, musixmatchPin, null), null, "no Unison lyric, no override");
+assert.equal(unisonOverride(full, portatoPin, null), null, "no Unison lyric, no override");
 assert.equal(
-  unisonOverride(priority, musixmatchPin, { key: "unison-richsynced", lyricsId: 7 }),
+  unisonOverride(priority, portatoPin, { key: "unison-richsynced", lyricsId: 7 }),
   null,
   "Unison disabled by the user never overrides"
 );
@@ -155,10 +155,10 @@ assert.deepEqual(
   ["unison-richsynced", "unison-wordsynced", "unison-synced", "unison-plain"],
   "every enabled Unison variant counts as the pinned provider"
 );
-assert.deepEqual(pinnedVariants(full, "musixmatch-richsync"), ["musixmatch-richsync"], "single variant provider");
+assert.deepEqual(pinnedVariants(full, "portato-richsynced"), ["portato-richsynced"], "single variant provider");
 assert.deepEqual(pinnedVariants(priority, "unison-synced"), [], "a disabled provider has no variants");
 
-assert.equal(unisonRanksAbove(full, "musixmatch-richsync"), true, "Unison syllable ranks above a word pin");
+assert.equal(unisonRanksAbove(full, "portato-richsynced"), true, "Unison syllable ranks above a word pin");
 assert.equal(unisonRanksAbove(full, "bLyrics-richsynced"), false, "nothing ranks above the top provider");
 assert.equal(unisonRanksAbove(priority, "yt-lyrics"), false, "Unison disabled never ranks above");
 assert.equal(unisonRanksAbove(full, "unison-plain"), false, "a Unison pin is never overridden by Unison");
