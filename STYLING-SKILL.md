@@ -114,6 +114,7 @@ Leave font-family overrides unset for language-aware CJK defaults. If adding a f
   --blyrics-video-panel-size: 30%;               /* lyrics container width (video mode) */
   --blyrics-fullscreen-panel-size: 66%;          /* lyrics container width (fullscreen audio) */
   --blyrics-fullscreen-video-panel-size: 25%;    /* lyrics container width (fullscreen video) */
+  --blyrics-album-art-size: 400px;               /* max album art width (audio mode) */
 }
 ```
 

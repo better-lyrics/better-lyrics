@@ -67,6 +67,14 @@ ytmusic-player-page:not([is-mweb-modernization-enabled])[player-fullscreened]:no
   margin: 0 auto;
 }
 
+/* #blyrics-fs-column copies the art's width in px, so with min-width: auto it holds
+   #main-panel at whatever width the art had when the column was last built. Each song
+   rebuilds the column and the art lands on a new size. A fixed floor keeps it stable. */
+ytmusic-player-page:not([is-mweb-modernization-enabled])[player-fullscreened]:not([blyrics-dfs], [blyrics-karaoke]):not([blyrics-video-mode])
+#main-panel.ytmusic-player-page {
+  min-width: min(var(--blyrics-album-art-size), 50%);
+}
+
 ytmusic-player-page:not([blyrics-dfs], [blyrics-karaoke])[blyrics-video-mode]:not([player-ui-state=MINIPLAYER]):not([is-mweb-modernization-enabled]) #movie_player,
 ytmusic-player-page:not([blyrics-dfs], [blyrics-karaoke])[blyrics-video-mode]:not([player-ui-state=MINIPLAYER]):not([is-mweb-modernization-enabled]) #song-media-window,
 ytmusic-player-page:not([blyrics-dfs], [blyrics-karaoke])[blyrics-video-mode]:not([player-ui-state=MINIPLAYER]):not([is-mweb-modernization-enabled]) #player.ytmusic-player-page {

@@ -152,7 +152,7 @@ ytmusic-player-page:not([is-mweb-modernization-enabled]):not([blyrics-video-mode
 
 ytmusic-player-page:not([is-mweb-modernization-enabled]):not([blyrics-video-mode]):not([video-mode])
 #player.ytmusic-player-page {
-  max-width: 400px;
+  max-width: var(--blyrics-album-art-size);
 }
 
 /*Hide Yt's lyrics*/
