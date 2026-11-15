@@ -861,6 +861,12 @@ async function initIdentityUI(): Promise<void> {
   void renderOwnIdentityStats();
   watchPictureChanges();
 
+  chrome.runtime
+    .getPlatformInfo()
+    .then(info => {
+      extensionDownloadsHang = info.os === "android";
+    })
+    .catch(error => warnCore("Platform lookup failed:", error));
   document.getElementById("export-identity-btn")?.addEventListener("click", handleExportIdentity);
   document.getElementById("import-identity-btn")?.addEventListener("click", handleImportIdentity);
   initImportIdentityModal();
@@ -1140,8 +1146,10 @@ function initNicknameModal(): void {
   });
 }
 
+let extensionDownloadsHang = false;
+
 async function handleExportIdentity(): Promise<void> {
-  const downloadsGranted = requestDownloadsPermission();
+  const downloadsGranted = extensionDownloadsHang ? Promise.resolve(false) : requestDownloadsPermission();
   try {
     const [displayName, content, { keyId }] = await Promise.all([getDisplayName(), exportIdentity(), getIdentity()]);
     const filename = `better-lyrics-identity-${displayName}.json`;
