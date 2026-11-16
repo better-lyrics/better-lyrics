@@ -866,8 +866,8 @@ async function initIdentityUI(): Promise<void> {
     .then(info => {
       extensionDownloadsHang = info.os === "android";
     })
-    .catch(error => warnCore("Platform lookup failed:", error));
-  document.getElementById("export-identity-btn")?.addEventListener("click", handleExportIdentity);
+    .catch(error => warnCore("Platform lookup failed:", error))
+    .finally(() => document.getElementById("export-identity-btn")?.addEventListener("click", handleExportIdentity));
   document.getElementById("import-identity-btn")?.addEventListener("click", handleImportIdentity);
   initImportIdentityModal();
 }
