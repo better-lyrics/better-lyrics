@@ -327,6 +327,7 @@ The engine animates the individual `translate` property instead of `transform`, 
 | `--blyrics-video-panel-size`            | `30%`         | Size of lyrics panel (not fullscreen, video mode)                                              |
 | `--blyrics-fullscreen-panel-size`       | `66%`         | Size of lyrics panel (fullscreen, audio only)                                                  |
 | `--blyrics-fullscreen-video-panel-size` | `25%`         | Size of lyrics panel (fullscreen, video mode)                                                  |
+| `--blyrics-album-art-size`              | `400px`       | Maximum album art width (audio only)                                                           |
 
 ### Effects
 
