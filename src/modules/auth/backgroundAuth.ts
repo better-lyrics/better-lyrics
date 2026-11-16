@@ -227,7 +227,7 @@ export function initBackgroundAuth(): void {
     });
   });
 
-  chrome.windows.onRemoved.addListener(closedWindowId => {
+  chrome.windows?.onRemoved.addListener(closedWindowId => {
     for (const [requestId, slot] of pending) {
       if (slot.windowId === closedWindowId && !slot.resolved) {
         slot.windowId = null;
