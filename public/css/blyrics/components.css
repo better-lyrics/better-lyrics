@@ -466,6 +466,7 @@
 	line-height: 1.5;
 	color: var(--blyrics-footer-text-color);
 	text-align: left;
+	text-decoration: none;
 	cursor: pointer;
 	transition: background-color 0.15s ease-out;
 }

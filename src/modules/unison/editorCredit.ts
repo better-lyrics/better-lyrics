@@ -99,6 +99,21 @@ function createWording(names: string[]): HTMLElement {
 }
 
 export function createEditorCredit(editors: UnisonActor[]): HTMLElement {
+  return editors.length === 1 ? createProfileLink(editors[0]) : createCardTrigger(editors);
+}
+
+function createProfileLink(editor: UnisonActor): HTMLElement {
+  const line = document.createElement("a");
+  line.className = CREDIT;
+  line.href = profileUrl(editor.displayName, editor.keyId);
+  line.target = "_blank";
+  line.rel = "noopener";
+  line.append(createStack([editor]), createWording([editorName(editor)]));
+  line.addEventListener("click", event => event.stopPropagation());
+  return line;
+}
+
+function createCardTrigger(editors: UnisonActor[]): HTMLElement {
   const line = document.createElement("button");
   line.type = "button";
   line.className = CREDIT;
