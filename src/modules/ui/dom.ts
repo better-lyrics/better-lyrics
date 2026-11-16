@@ -56,7 +56,7 @@ import { getResumeScrollElement } from "@modules/ui/resumeScrollButton";
 import { getRequest, setRequest } from "@modules/unison/lyricsRequestTracker";
 import { sealMarks } from "@modules/unison/gamification";
 import { closeEditorCredit, createEditorCredit } from "@modules/unison/editorCredit";
-import { appendInlineProfile, buildSeal } from "@modules/unison/gamificationRender";
+import { appendInlineProfile, buildSeal, profileUrl } from "@modules/unison/gamificationRender";
 import type { UnisonLyricsRequest } from "@modules/unison/types";
 import { requestLyrics } from "@modules/unison/unisonApi";
 import { reflow, toMs } from "@braccato/core/util";
@@ -1031,7 +1031,14 @@ function createSubmitterBlock(
   handleEl.className = `${FOOTER_CLASS}__author-name`;
   handleEl.textContent = submitter.displayName ?? generatePetName(submitter.keyId);
 
-  appendInlineProfile(authorRow, handleEl, submitter);
+  const profileLink = document.createElement("a");
+  profileLink.className = `${FOOTER_CLASS}__unison-profile`;
+  profileLink.href = profileUrl(submitter.displayName, submitter.keyId);
+  profileLink.target = "_blank";
+  profileLink.rel = "noopener";
+  profileLink.addEventListener("click", event => event.stopPropagation());
+
+  appendInlineProfile(authorRow, handleEl, submitter, profileLink);
   authorBlock.appendChild(authorRow);
 
   const seals = sealMarks(marks);

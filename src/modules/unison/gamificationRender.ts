@@ -289,7 +289,12 @@ export function createOutboundIcon(): SVGElement {
 
 // -- Inline profile (footer + uploader) --------------------------
 
-export function appendInlineProfile(row: HTMLElement, nameEl: HTMLElement, submitter: InlineSubmitter): void {
+export function appendInlineProfile(
+  row: HTMLElement,
+  nameEl: HTMLElement,
+  submitter: InlineSubmitter,
+  link?: HTMLAnchorElement
+): void {
   const ring = document.createElement("span");
   ring.className = `${GAM}__ring ${GAM}__ring-slot`;
   const tier = document.createElement("span");
@@ -297,7 +302,12 @@ export function appendInlineProfile(row: HTMLElement, nameEl: HTMLElement, submi
   const featured = document.createElement("span");
   featured.className = `${GAM}__featured-slot-outer`;
 
-  row.append(ring, nameEl, tier, featured);
+  if (link) {
+    link.append(ring, nameEl);
+    row.append(link, tier, featured);
+  } else {
+    row.append(ring, nameEl, tier, featured);
+  }
 
   void Promise.all([loadCatalogue(), fetchUserGamification(submitter.keyId)]).then(([catalogue, user]) => {
     const level = user?.level ?? submitter.level;

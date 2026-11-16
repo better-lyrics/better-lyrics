@@ -402,6 +402,20 @@
 	color: var(--blyrics-footer-link-color);
 }
 
+.blyrics-footer__unison-profile {
+	display: inline-flex;
+	align-items: center;
+	gap: 10px;
+	color: inherit;
+	text-decoration: none;
+}
+
+@media (hover: hover) {
+	.blyrics-footer__unison-profile:hover .blyrics-footer__author-name {
+		text-decoration: underline;
+	}
+}
+
 .blyrics-footer__unison-author-label {
 	font-size: 11px;
 	color: var(--blyrics-footer-text-color);
