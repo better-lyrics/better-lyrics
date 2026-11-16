@@ -55,6 +55,7 @@ import type { PlaybackSnapshot } from "@modules/ui/playerControls/playhead";
 import { getResumeScrollElement } from "@modules/ui/resumeScrollButton";
 import { getRequest, setRequest } from "@modules/unison/lyricsRequestTracker";
 import { sealMarks } from "@modules/unison/gamification";
+import { closeEditorCredit, createEditorCredit } from "@modules/unison/editorCredit";
 import { appendInlineProfile, buildSeal } from "@modules/unison/gamificationRender";
 import type { UnisonLyricsRequest } from "@modules/unison/types";
 import { requestLyrics } from "@modules/unison/unisonApi";
@@ -627,7 +628,7 @@ function createUnisonFooterCard(unisonData: UnisonData): HTMLElement {
   unisonCard.className = `${FOOTER_CLASS}__container ${FOOTER_CLASS}__unison-card`;
 
   if (unisonData.submitter) {
-    unisonCard.appendChild(createSubmitterBlock(unisonData.submitter, unisonData.marks));
+    unisonCard.appendChild(createSubmitterBlock(unisonData.submitter, unisonData.marks, unisonData.editors));
     const divider = document.createElement("div");
     divider.className = `${FOOTER_CLASS}__unison-divider`;
     unisonCard.appendChild(divider);
@@ -916,6 +917,7 @@ export function mountDock(position: string): void {
 
   dock.dataset.position = position;
   closeSourceMenu();
+  closeEditorCredit();
 
   dockControlsSwapFinalize?.();
 
@@ -947,6 +949,7 @@ export function refreshDockSources(): void {
   }
 
   closeSourceMenu();
+  closeEditorCredit();
   const widthFrom = oldSlot.offsetWidth;
   oldSlot.replaceWith(newSlot);
   const widthTo = newSlot.offsetWidth;
@@ -1015,7 +1018,8 @@ export function updateDockPosition(position: string): void {
 
 function createSubmitterBlock(
   submitter: NonNullable<UnisonData["submitter"]>,
-  marks: UnisonData["marks"]
+  marks: UnisonData["marks"],
+  editors: UnisonData["editors"]
 ): HTMLElement {
   const authorBlock = document.createElement("div");
   authorBlock.className = `${FOOTER_CLASS}__unison-author`;
@@ -1039,6 +1043,7 @@ function createSubmitterBlock(
     subLabel.textContent = t("unison_submitted_this");
     authorBlock.appendChild(subLabel);
   }
+  if (editors?.length) authorBlock.appendChild(createEditorCredit(editors));
   return authorBlock;
 }
 
@@ -1225,6 +1230,7 @@ export function renderLoader(small = false): void {
     return;
   }
   closeSourceMenu();
+  closeEditorCredit();
   setDockSuppression("loading", true);
   if (!small) {
     cleanup();
@@ -1670,6 +1676,7 @@ export function cleanup(keepView = false): void {
   if (blyricsFooter) {
     blyricsFooter.remove();
   }
+  closeEditorCredit();
   shimmerObserver?.disconnect();
   shimmerObserver = null;
 
