@@ -1607,16 +1607,17 @@ When the Unison provider is active, an extra card is appended to the lyrics foot
 | ----- | ------- |
 | `.blyrics-footer__unison-author` | Column with author row plus subtitle |
 | `.blyrics-footer__unison-author-row` | Row holding the author name and the trust tier pill |
+| `.blyrics-footer__unison-profile` | Link around the level ring and the name. Opens the submitter's Unison profile in a new tab |
 | `.blyrics-footer__author-name` | The submitter handle. Generated from their public key as a deterministic pet name |
 | `.blyrics-footer__unison-author-label` | Small "submitted this" label below the author row |
 
 ### Editor Credit
 
-When other people's suggested edits to the lyric went live, a credit line shows under "submitted this" with up to three faces. Hover or click it to open a card that lists the editors; each row opens that person's Unison profile in a new tab. The card is added to the page body, outside the footer, so the footer never clips it.
+When other people's suggested edits to the lyric went live, a credit line shows under "submitted this" with up to three faces. Hover or click it to open a card that lists the editors; each row opens that person's Unison profile in a new tab. The card is added to the page body, outside the footer, so the footer never clips it. With one editor, the line links straight to that person's profile instead, with no card.
 
 | Class | Purpose |
 | ----- | ------- |
-| `.blyrics-footer__credit` | The credit line. A button holding the faces and the wording |
+| `.blyrics-footer__credit` | The credit line. A button holding the faces and the wording, or a link to the profile when there is one editor |
 | `.blyrics-footer__credit-stack` | Row of up to three overlapping faces |
 | `.blyrics-footer__credit-avatar` | Wrapper around each face. Lifts on hover |
 | `.blyrics-footer__credit-face` | Face image. `--empty` when the person has no picture |
