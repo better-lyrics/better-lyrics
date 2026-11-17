@@ -145,7 +145,7 @@ function createCardTrigger(editors: UnisonActor[]): HTMLElement {
     event.stopPropagation();
     viewOf(line).clearTimeout(hoverTimer);
     if (isOpen()) closeEditorCredit();
-    else showCard(line, editors, intent);
+    else showCard(line, editors, intent, event.detail === 0);
   });
   line.addEventListener("keydown", event => {
     if (event.key === "Escape" && isOpen()) {
@@ -191,7 +191,7 @@ function createCard(editors: UnisonActor[]): HTMLElement {
   return card;
 }
 
-function showCard(trigger: HTMLButtonElement, editors: UnisonActor[], intent: HoverIntent): void {
+function showCard(trigger: HTMLButtonElement, editors: UnisonActor[], intent: HoverIntent, focusCard = false): void {
   if (!trigger.isConnected) return;
   closeEditorCredit();
   const doc = trigger.ownerDocument;
@@ -202,10 +202,17 @@ function showCard(trigger: HTMLButtonElement, editors: UnisonActor[], intent: Ho
   card.addEventListener("mouseleave", intent.leave);
   card.addEventListener("click", event => event.stopPropagation());
   card.addEventListener("keydown", event => {
-    if (event.key !== "Escape") return;
-    event.stopPropagation();
+    if (event.key === "Escape") {
+      event.stopPropagation();
+      closeEditorCredit();
+      return;
+    }
+    if (event.key !== "Tab") return;
+    const links = card.querySelectorAll("a");
+    const edge = event.shiftKey ? links[0] : links[links.length - 1];
+    if (doc.activeElement !== edge) return;
+    if (event.shiftKey) event.preventDefault();
     closeEditorCredit();
-    trigger.focus();
   });
   const onOutsidePointer = (event: PointerEvent) => {
     const target = event.target as Node;
@@ -224,6 +231,7 @@ function showCard(trigger: HTMLButtonElement, editors: UnisonActor[], intent: Ho
   positionMenu(card, trigger);
   trigger.setAttribute("aria-expanded", "true");
   view.requestAnimationFrame(() => card.classList.add("is-open"));
+  if (focusCard) card.querySelector("a")?.focus({ preventScroll: true });
 
   openCredit = {
     trigger,
@@ -241,6 +249,7 @@ export function closeEditorCredit(): void {
   const { trigger, card, teardown } = openCredit;
   openCredit = null;
   teardown();
+  const hadFocus = card.contains(card.ownerDocument.activeElement);
   trigger.setAttribute("aria-expanded", "false");
   card.classList.remove("is-open");
   card.classList.add("is-closing");
@@ -250,4 +259,5 @@ export function closeEditorCredit(): void {
     CLOSE_FALLBACK_MS
   );
   view.setTimeout(() => card.remove(), closeMs);
+  if (hadFocus && trigger.isConnected) trigger.focus();
 }
