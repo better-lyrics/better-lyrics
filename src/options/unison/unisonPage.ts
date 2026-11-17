@@ -265,7 +265,7 @@ function routeFromParams(): void {
       void loadEditor(id, view);
       return;
     }
-    void loadDetailById(id, view, params.get("mine") === "1");
+    void loadDetailById(id, view);
     return;
   }
 
@@ -708,9 +708,8 @@ async function loadMySubmissions(): Promise<void> {
     if (token !== cache.requestId) return;
 
     const realEntries = result.success ? result.data.entries : [];
-    const stubEntries =
-      IS_DEV && cursor === undefined ? [{ entry: DEV_STUB_SUBMISSION, mine: true }, ...devFixtures.feed()] : [];
-    const entries = [...stubEntries, ...realEntries.map(entry => ({ entry, mine: true }))];
+    const stubEntries = IS_DEV && cursor === undefined ? [DEV_STUB_SUBMISSION, ...devFixtures.feed()] : [];
+    const entries = [...stubEntries, ...realEntries];
 
     if (entries.length === 0) {
       if (cursor === undefined && result.success) {
@@ -721,8 +720,8 @@ async function loadMySubmissions(): Promise<void> {
       return;
     }
 
-    for (const { entry, mine } of entries) {
-      appendToTab("mine", createLyricsCard(entry, { fromMine: mine }));
+    for (const entry of entries) {
+      appendToTab("mine", createLyricsCard(entry));
     }
 
     cache.cursor = result.success ? result.data.nextCursor : undefined;
@@ -863,16 +862,11 @@ function formatScoreNumber(score: number): string {
 
 // -- Lyrics Card --------------------------
 
-interface LyricsCardOptions {
-  fromMine?: boolean;
-}
-
-function createLyricsCard(entry: UnisonSearchEntry | UnisonFeedEntry, options: LyricsCardOptions = {}): HTMLElement {
+function createLyricsCard(entry: UnisonSearchEntry | UnisonFeedEntry): HTMLElement {
   const card = document.createElement("a");
   card.className = "ui-tile unison-card";
 
   const navParams: Record<string, string> = { id: String(entry.id) };
-  if (options.fromMine) navParams.mine = "1";
   const cardUrl = new URL(window.location.pathname, window.location.origin);
   for (const [key, value] of Object.entries(navParams)) {
     cardUrl.searchParams.set(key, value);
@@ -1006,16 +1000,17 @@ function renderDetailSkeleton(): void {
   detailLyrics.appendChild(lyricsSkel);
 }
 
-async function loadDetailById(id: number, view: AbortSignal, isOwn: boolean = false): Promise<void> {
+async function loadDetailById(id: number, view: AbortSignal): Promise<void> {
   renderDetailSkeleton();
   if (IS_DEV && id === DEV_STUB_LYRICS_ENTRY.id) {
-    renderDetail(DEV_STUB_LYRICS_ENTRY, view, isOwn);
+    const { keyId } = await getIdentity();
+    await renderDetail({ ...DEV_STUB_LYRICS_ENTRY, submitter: { ...DEV_STUB_BASE.submitter, keyId } }, view);
     return;
   }
   const result = await getLyricsById(id);
   if (view.aborted) return;
   if (result.success && result.data) {
-    renderDetail(result.data, view, isOwn);
+    await renderDetail(result.data, view);
   }
 }
 
@@ -1024,11 +1019,13 @@ async function loadDetailByVideoId(videoId: string, view: AbortSignal): Promise<
   const result = await getLyricsByVideoId(videoId);
   if (view.aborted) return;
   if (result.success && result.data) {
-    renderDetail(result.data, view);
+    await renderDetail(result.data, view);
   }
 }
 
-function renderDetail(entry: UnisonLyricsEntry, view: AbortSignal, isOwn: boolean = false): void {
+async function renderDetail(entry: UnisonLyricsEntry, view: AbortSignal): Promise<void> {
+  const isOwn = await isOwnerOf(entry);
+  if (view.aborted) return;
   detailMeta.replaceChildren();
   detailPreview.replaceChildren();
   detailLyrics.replaceChildren();
@@ -1752,15 +1749,14 @@ async function renderOwnerVideoTools(entry: UnisonLyricsEntry, view: AbortSignal
 // -- Revisions --------------------------
 
 function revisionHost(view: AbortSignal): RevisionHost {
-  const mine = new URLSearchParams(window.location.search).get("mine");
   return {
     navigate: (params, options) => {
-      if (!view.aborted) navigateTo(mine ? { ...params, mine } : params, options);
+      if (!view.aborted) navigateTo(params, options);
     },
     leave: fallback => {
       if (view.aborted) return;
       if (window.history.state?.inApp) window.history.back();
-      else navigateTo(mine ? { ...fallback, mine } : fallback, { replace: true });
+      else navigateTo(fallback, { replace: true });
     },
     isCurrent: () => !view.aborted,
     onLeave: callback => view.addEventListener("abort", callback, { once: true }),

@@ -990,8 +990,8 @@ export const devFixtures = {
     return fixtures().some(lyric => lyric.id === id);
   },
 
-  feed(): Array<{ entry: UnisonFeedEntry; mine: boolean }> {
-    return fixtures().map(lyric => ({ entry: feedEntry(lyric), mine: lyric.ownedByMe }));
+  feed(): UnisonFeedEntry[] {
+    return fixtures().map(feedEntry);
   },
 
   async lyrics(id: number): Promise<FixtureResult<UnisonLyricsEntry | null>> {
