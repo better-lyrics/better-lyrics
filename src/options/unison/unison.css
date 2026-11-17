@@ -476,8 +476,8 @@
   height: var(--size);
   overflow: hidden;
   border-radius: 50%;
-  background: rgba(255, 255, 255, 0.06) center / cover;
-  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.1);
+  background: var(--raised-bg) center / cover;
+  box-shadow: var(--field-edge);
 }
 
 .unison-editors__face + .unison-editors__face {
@@ -494,7 +494,7 @@
 
 .unison-editors__face--empty {
   box-shadow: none;
-  color: rgba(255, 255, 255, 0.28);
+  color: var(--text-faint);
 }
 
 .unison-editors__face--empty svg {
