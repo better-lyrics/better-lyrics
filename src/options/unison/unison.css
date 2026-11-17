@@ -451,6 +451,69 @@
   gap: 9px;
 }
 
+.unison-editors {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: flex-end;
+  gap: 6px 8px;
+  padding-inline-start: 24px;
+  text-align: right;
+}
+
+.unison-editors__stack {
+  --size: 20px;
+  --overlap: 6px;
+  --gap: 1.5px;
+  display: inline-flex;
+  flex: none;
+}
+
+.unison-editors__face {
+  display: grid;
+  place-items: center;
+  width: var(--size);
+  height: var(--size);
+  overflow: hidden;
+  border-radius: 50%;
+  background: var(--raised-bg) center / cover;
+  box-shadow: var(--field-edge);
+}
+
+.unison-editors__face + .unison-editors__face {
+  margin-left: calc(var(--overlap) * -1);
+}
+
+.unison-editors__face:not(:last-child) {
+  mask: radial-gradient(
+    circle at calc(100% + var(--size) / 2 - var(--overlap)) 50%,
+    transparent calc(var(--size) / 2 + var(--gap) - 0.5px),
+    #000 calc(var(--size) / 2 + var(--gap))
+  );
+}
+
+.unison-editors__face--empty {
+  box-shadow: none;
+  color: var(--text-faint);
+}
+
+.unison-editors__face--empty svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.unison-editors__names {
+  flex: 0 1 auto;
+  min-width: 0;
+  line-height: 20px;
+  text-wrap: pretty;
+}
+
+.unison-editors__names .unison-uploader-link {
+  white-space: normal;
+}
+
 .unison-uploader-link {
   min-width: 0;
   overflow: hidden;

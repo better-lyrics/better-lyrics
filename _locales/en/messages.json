@@ -821,10 +821,6 @@
     "message": "Better Lyrics Unison",
     "description": "Better Lyrics Unison provider name"
   },
-  "options_provider_musixmatch": {
-    "message": "Musixmatch",
-    "description": "Musixmatch provider name"
-  },
   "options_provider_lrclib": {
     "message": "LRClib",
     "description": "LRClib provider name"
@@ -1894,6 +1890,25 @@
   "unison_title": {
     "message": "Unison",
     "description": "Unison branding title"
+  },
+  "unison_credit_one": {
+    "message": "with help from $FIRST$",
+    "description": "Footer credit under the lyrics for one person whose suggested edit went live",
+    "placeholders": { "first": { "content": "$1", "example": "Mirelle" } }
+  },
+  "unison_credit_two": {
+    "message": "with help from $FIRST$ and $SECOND$",
+    "description": "Footer credit under the lyrics for two people whose suggested edits went live",
+    "placeholders": { "first": { "content": "$1", "example": "Mirelle" }, "second": { "content": "$2", "example": "Cass" } }
+  },
+  "unison_credit_many": {
+    "message": "with help from $FIRST$, $SECOND$ and $COUNT$ more",
+    "description": "Footer credit for three or more people whose suggested edits went live; COUNT is how many are not named",
+    "placeholders": { "first": { "content": "$1", "example": "Mirelle" }, "second": { "content": "$2", "example": "Cass" }, "count": { "content": "$3", "example": "3" } }
+  },
+  "unison_credit_title": {
+    "message": "With help from",
+    "description": "Heading of the list of people whose suggested edits went live, opened from the footer credit"
   },
   "unison_subtitle": {
     "message": "Community Lyrics",

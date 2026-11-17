@@ -10,7 +10,7 @@ import {
 } from "@constants";
 import { AppState } from "@core/appState";
 import { t } from "@core/i18n";
-import { applySegmentMapToLyrics, type LyricSourceResultWithMeta } from "@modules/lyrics/lyrics";
+import type { LyricSourceResultWithMeta } from "@modules/lyrics/lyrics";
 import type { LyricContributor, LyricPart } from "@modules/lyrics/providers/shared";
 import { createScriptClassifier, type ScriptClassifier } from "@modules/lyrics/nonLatinScript";
 import {
@@ -261,10 +261,6 @@ function injectLyrics(
   }
 
   void processBatchTranslationsAndRomanizations(doc, data, lines, scripts, isStale, signal);
-
-  if (data.segmentMap) {
-    applySegmentMapToLyrics(lyricsData, lines, data.segmentMap);
-  }
 
   AppState.areLyricsTicking = true;
   mainView.relayout();

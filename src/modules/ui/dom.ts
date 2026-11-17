@@ -55,7 +55,8 @@ import type { PlaybackSnapshot } from "@modules/ui/playerControls/playhead";
 import { getResumeScrollElement } from "@modules/ui/resumeScrollButton";
 import { getRequest, setRequest } from "@modules/unison/lyricsRequestTracker";
 import { sealMarks } from "@modules/unison/gamification";
-import { appendInlineProfile, buildSeal } from "@modules/unison/gamificationRender";
+import { closeEditorCredit, createEditorCredit } from "@modules/unison/editorCredit";
+import { appendInlineProfile, buildSeal, profileUrl } from "@modules/unison/gamificationRender";
 import type { UnisonLyricsRequest } from "@modules/unison/types";
 import { requestLyrics } from "@modules/unison/unisonApi";
 import { reflow, toMs } from "@braccato/core/util";
@@ -90,6 +91,28 @@ interface ActionButtonOptions {
   href: string;
   logoSrc?: string;
   logoAlt?: string;
+}
+
+const SHIMMER_IN_VIEW_ATTR = "data-in-view";
+let shimmerObserver: IntersectionObserver | null = null;
+
+/**
+ * Lets the shimmer run only while its button is on screen. The animation moves a background every
+ * frame, which the main thread has to repaint, and the footer sits below the last line of most songs.
+ * There is one footer at a time, so a new button replaces the previous observer.
+ */
+function observeShimmerVisibility(button: HTMLElement): void {
+  if (typeof IntersectionObserver !== "function") {
+    button.setAttribute(SHIMMER_IN_VIEW_ATTR, "");
+    return;
+  }
+  shimmerObserver?.disconnect();
+  shimmerObserver = new IntersectionObserver(entries => {
+    for (const entry of entries) {
+      entry.target.toggleAttribute(SHIMMER_IN_VIEW_ATTR, entry.isIntersecting);
+    }
+  });
+  shimmerObserver.observe(button);
 }
 
 function createActionButton(options: ActionButtonOptions): HTMLElement {
@@ -418,6 +441,7 @@ const unisonControlsRegistry = {
   upvotes: [] as HTMLButtonElement[],
   downvotes: [] as HTMLButtonElement[],
   scoreLineRefs: [] as ScoreLineRefs[],
+  editorCredits: [] as EditorCreditSlot[],
 };
 
 let unisonDockObserver: IntersectionObserver | null = null;
@@ -519,6 +543,7 @@ export function refreshShownUnisonData(unisonData: UnisonData): void {
   if (AppState.currentUnisonData?.lyricsId !== unisonData.lyricsId) return;
   if (AppState.currentUnisonData !== unisonData) Object.assign(AppState.currentUnisonData, unisonData);
   refreshUnisonControls(AppState.currentUnisonData);
+  for (const slot of unisonControlsRegistry.editorCredits) showEditorCredit(slot, AppState.currentUnisonData.editors);
 }
 
 function refreshUnisonControls(unisonData: UnisonData): void {
@@ -537,6 +562,7 @@ function clearUnisonControlsRegistry(): void {
   unisonControlsRegistry.upvotes.length = 0;
   unisonControlsRegistry.downvotes.length = 0;
   unisonControlsRegistry.scoreLineRefs.length = 0;
+  unisonControlsRegistry.editorCredits.length = 0;
 }
 
 type VoteUpdateData = NonNullable<Awaited<ReturnType<typeof byId>>>;
@@ -605,7 +631,7 @@ function createUnisonFooterCard(unisonData: UnisonData): HTMLElement {
   unisonCard.className = `${FOOTER_CLASS}__container ${FOOTER_CLASS}__unison-card`;
 
   if (unisonData.submitter) {
-    unisonCard.appendChild(createSubmitterBlock(unisonData.submitter, unisonData.marks));
+    unisonCard.appendChild(createSubmitterBlock(unisonData.submitter, unisonData.marks, unisonData.editors));
     const divider = document.createElement("div");
     divider.className = `${FOOTER_CLASS}__unison-divider`;
     unisonCard.appendChild(divider);
@@ -894,6 +920,7 @@ export function mountDock(position: string): void {
 
   dock.dataset.position = position;
   closeSourceMenu();
+  closeEditorCredit();
 
   dockControlsSwapFinalize?.();
 
@@ -925,6 +952,7 @@ export function refreshDockSources(): void {
   }
 
   closeSourceMenu();
+  closeEditorCredit();
   const widthFrom = oldSlot.offsetWidth;
   oldSlot.replaceWith(newSlot);
   const widthTo = newSlot.offsetWidth;
@@ -993,7 +1021,8 @@ export function updateDockPosition(position: string): void {
 
 function createSubmitterBlock(
   submitter: NonNullable<UnisonData["submitter"]>,
-  marks: UnisonData["marks"]
+  marks: UnisonData["marks"],
+  editors: UnisonData["editors"]
 ): HTMLElement {
   const authorBlock = document.createElement("div");
   authorBlock.className = `${FOOTER_CLASS}__unison-author`;
@@ -1005,7 +1034,14 @@ function createSubmitterBlock(
   handleEl.className = `${FOOTER_CLASS}__author-name`;
   handleEl.textContent = submitter.displayName ?? generatePetName(submitter.keyId);
 
-  appendInlineProfile(authorRow, handleEl, submitter);
+  const profileLink = document.createElement("a");
+  profileLink.className = `${FOOTER_CLASS}__unison-profile`;
+  profileLink.href = profileUrl(submitter.displayName, submitter.keyId);
+  profileLink.target = "_blank";
+  profileLink.rel = "noopener";
+  profileLink.addEventListener("click", event => event.stopPropagation());
+
+  appendInlineProfile(authorRow, handleEl, submitter, profileLink);
   authorBlock.appendChild(authorRow);
 
   const seals = sealMarks(marks);
@@ -1017,7 +1053,28 @@ function createSubmitterBlock(
     subLabel.textContent = t("unison_submitted_this");
     authorBlock.appendChild(subLabel);
   }
+  const slot: EditorCreditSlot = { block: authorBlock, credit: null, shown: "[]" };
+  showEditorCredit(slot, editors);
+  unisonControlsRegistry.editorCredits.push(slot);
   return authorBlock;
+}
+
+interface EditorCreditSlot {
+  block: HTMLElement;
+  credit: HTMLElement | null;
+  shown: string;
+}
+
+function showEditorCredit(slot: EditorCreditSlot, editors: UnisonData["editors"]): void {
+  const shown = JSON.stringify(editors ?? []);
+  if (shown === slot.shown) return;
+  if (slot.credit) closeEditorCredit();
+  const credit = editors?.length ? createEditorCredit(editors) : null;
+  if (slot.credit && credit) slot.credit.replaceWith(credit);
+  else if (credit) slot.block.appendChild(credit);
+  else slot.credit?.remove();
+  slot.credit = credit;
+  slot.shown = shown;
 }
 
 function createScoreLine(): { scoreLine: HTMLElement; scoreLineRefs: ScoreLineRefs } {
@@ -1171,6 +1228,7 @@ function createFooter(
       shadersButton.appendChild(shadersLabel);
 
       footer.insertBefore(shadersButton, discordLink);
+      observeShimmerVisibility(shadersButton);
     });
     footer.appendChild(discordLink);
 
@@ -1202,6 +1260,7 @@ export function renderLoader(small = false): void {
     return;
   }
   closeSourceMenu();
+  closeEditorCredit();
   setDockSuppression("loading", true);
   if (!small) {
     cleanup();
@@ -1647,6 +1706,9 @@ export function cleanup(keepView = false): void {
   if (blyricsFooter) {
     blyricsFooter.remove();
   }
+  closeEditorCredit();
+  shimmerObserver?.disconnect();
+  shimmerObserver = null;
 
   // The dock persists across re-injections (updated in place by addFooter) so a
   // provider switch or toggle never tears it out of the DOM. It is removed only when

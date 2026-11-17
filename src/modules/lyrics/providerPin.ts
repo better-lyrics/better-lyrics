@@ -1,7 +1,7 @@
 import { PROVIDER_CONFIGS, PROVIDER_PIN_STORAGE_PREFIX } from "@constants";
 import { logError } from "@core/logger";
 import { getTransientStorage, setPersistentStorage } from "@core/storage";
-import type { LyricSourceKey } from "@modules/lyrics/providers/shared";
+import { isLyricSourceKey, type LyricSourceKey } from "@modules/lyrics/providers/shared";
 
 function pinKey(videoId: string): string {
   return `${PROVIDER_PIN_STORAGE_PREFIX}${videoId}`;
@@ -71,7 +71,7 @@ export function unisonOverride(
 
 export async function loadProviderPin(videoId: string): Promise<ProviderPin | null> {
   const saved = await getTransientStorage(pinKey(videoId));
-  return saved && typeof saved.key === "string" ? (saved as ProviderPin) : null;
+  return saved && typeof saved.key === "string" && isLyricSourceKey(saved.key) ? (saved as ProviderPin) : null;
 }
 
 export async function saveProviderPin(videoId: string, pin: ProviderPin | null): Promise<void> {

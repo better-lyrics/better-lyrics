@@ -80,14 +80,20 @@ function runAnimationEngine(now: number, force = false): void {
   }
 }
 
-function animationFrameLoop(now: number): void {
-  runAnimationEngine(now);
-  animationFrameRequest = requestAnimationFrame(animationFrameLoop);
+/**
+ * Ticks on the engine's own interval from a timer rather than a standing requestAnimationFrame. A
+ * standing frame request makes the main thread produce a frame on every vsync, and once the lyric
+ * animations run on the compositor those frames have nothing to do but recalculate style for every
+ * running animation. A tick that changes the DOM schedules its own frame.
+ */
+function animationFrameLoop(): void {
+  runAnimationEngine(performance.now());
+  animationFrameRequest = window.setTimeout(animationFrameLoop, ANIMATION_ENGINE_INTERVAL_MS);
 }
 
 function startAnimationFrameLoop(): void {
   if (animationFrameRequest !== null) return;
-  animationFrameRequest = requestAnimationFrame(animationFrameLoop);
+  animationFrameRequest = window.setTimeout(animationFrameLoop, ANIMATION_ENGINE_INTERVAL_MS);
 }
 
 async function requestWakeLock(): Promise<void> {

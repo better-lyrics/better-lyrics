@@ -6,7 +6,7 @@ import {
   SPICY_LYRICS_URL,
 } from "@constants";
 import { getLocalStorage } from "@core/storage";
-import { LRCParser, lrcFixers, parseLRC, parseQRC, PlainParser, QRCParser } from "@braccato/parsers";
+import { LRCParser, parseLRC, parseQRC, PlainParser, QRCParser } from "@braccato/parsers";
 import { type LyricSourceKey, type LyricSourceResult, type ProviderParameters, saveLyricsToCache } from "./shared";
 import { fillTtml } from "@modules/lyrics/providers/ttmlSource";
 import {
@@ -224,8 +224,6 @@ interface SpicyAttribution {
 
 // Managed keys for this provider
 const MANAGED_KEYS = [
-  "musixmatch-richsync",
-  "musixmatch-synced",
   "lrclib-synced",
   "lrclib-plain",
   "legato-synced",
@@ -490,41 +488,6 @@ async function processStreamData(event: string, data: any, params: ProviderParam
     if (provider === "unison") {
       await handleUnisonStreamEvent(params.videoId, results);
       return;
-    }
-
-    // Musixmatch
-    if (provider === "musixmatch") {
-      if (results.wordByWord) {
-        const lyrics = parseLRC(results.wordByWord, durationMs);
-        lrcFixers(lyrics);
-        sourceMap["musixmatch-richsync"].lyricSourceResult = {
-          lyrics,
-          songwriters: LRCParser.metadata(results.wordByWord).songwriters,
-          source: "Musixmatch",
-          sourceHref: "https://www.musixmatch.com",
-          musicVideoSynced: false,
-          album: params.album || "",
-          artist: params.artist,
-          song: params.song,
-          duration: params.duration,
-          cacheAllowed: true,
-        };
-        sourceMap["musixmatch-richsync"].filled = true;
-        resolveWaiter(params, "musixmatch-richsync");
-      }
-
-      if (results.synced) {
-        const lyrics = parseLRC(results.synced, durationMs);
-        sourceMap["musixmatch-synced"].lyricSourceResult = {
-          lyrics,
-          songwriters: LRCParser.metadata(results.synced).songwriters,
-          source: "Musixmatch",
-          sourceHref: "https://www.musixmatch.com",
-          musicVideoSynced: false,
-        };
-        sourceMap["musixmatch-synced"].filled = true;
-        resolveWaiter(params, "musixmatch-synced");
-      }
     }
 
     // LRCLib

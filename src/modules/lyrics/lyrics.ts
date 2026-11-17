@@ -29,7 +29,7 @@ import { agreeingKeys, lyricsMatch } from "@modules/lyrics/sourceAgreement";
 import { awaitUnifiedStream } from "./providers/unified";
 import type { YTLyricSourceResult } from "./providers/yt";
 import { getSongAlbum, getSongMetadata, type SegmentMap } from "./requestSniffer/requestSniffer";
-import { getSegmentMapTimeShiftMs } from "@modules/lyrics/segmentMap";
+import { getSegmentMapTimeShiftMs, retimeToSegmentMap } from "@modules/lyrics/segmentMap";
 import { clearCache as clearTranslationCache } from "./translation";
 import { mainView } from "@modules/ui/mainLyricsView";
 import { resetPlaybackClock, resumeAllAutoscroll } from "@braccato/core";
@@ -81,20 +81,19 @@ export type LyricSourceResultWithMeta = LyricSourceResult & {
   album: string;
   duration: number;
   videoId: string;
-  segmentMap: SegmentMap | null;
   providerKey?: string;
 };
 
 /**
- * What a view needs to build its own lyric DOM from scratch: the parsed lines, the language the
- * translation and romanization passes key off, and the timing context. The attribution and dock
- * fields of {@link LyricSourceResultWithMeta} stay out; those are host chrome, not lyrics.
+ * What a view needs to build its own lyric DOM from scratch: the parsed lines, already timed to the
+ * version of the song that is playing, and the language the translation and romanization passes key
+ * off. The attribution and dock fields of {@link LyricSourceResultWithMeta} stay out; those are host
+ * chrome, not lyrics.
  */
 export interface ParsedLyrics {
   lyrics: Lyric[];
   language?: string | null;
   musicVideoSynced?: boolean | null;
-  segmentMap: SegmentMap | null;
 }
 
 /**
@@ -110,16 +109,11 @@ function retainParsedLyrics(data: LyricSourceResultWithMeta): void {
     lyrics: data.lyrics,
     language: data.language,
     musicVideoSynced: data.musicVideoSynced,
-    segmentMap: data.segmentMap,
   };
   publishSecondaryViews();
 }
 
-export function applySegmentMapToLyrics(
-  lyricData: LyricsData | null,
-  lines: readonly LineData[],
-  segmentMap: SegmentMap
-) {
+function applySegmentMapToLyrics(lyricData: LyricsData | null, lines: readonly LineData[], segmentMap: SegmentMap) {
   if (segmentMap && lyricData) {
     lyricData.isMusicVideoSynced = !lyricData.isMusicVideoSynced;
     // We're sync lyrics using segment map
@@ -248,7 +242,16 @@ export async function createLyrics(detail: PlayerDetails, signal: AbortSignal): 
 
     const isSoftReload = AppState.lastLoadedVideoId === videoId && AppState.lyricData != null;
 
+    // On a switch to the song's other version, the lines on screen are swapped for the refetched ones
+    // rather than torn down first. Clearing them collapses the panel, and the browser clamps its scroll
+    // to the top until the next tick brings it back. Only then, though: a same-song reload counts as an
+    // A/V switch above too, and one that turned translations or romanization off has to rebuild, as a
+    // swap keeps the lines that still carry them.
+    const isCounterpartSwitch =
+      !!matchingSong?.counterpartVideoId && matchingSong.counterpartVideoId === AppState.lastLoadedVideoId;
+    let keepsLinesOnScreen = false;
     if (isAVSwitch && segmentMap) {
+      keepsLinesOnScreen = isCounterpartSwitch;
       applySegmentMapToLyrics(AppState.lyricData, mainView.lines, segmentMap);
       AppState.suppressZeroTime = Date.now() + 5000;
       AppState.areLyricsTicking = true; // Keep lyrics ticking while new lyrics are fetched.
@@ -342,7 +345,6 @@ export async function createLyrics(detail: PlayerDetails, signal: AbortSignal): 
               duration: providerParameters.duration,
               videoId: providerParameters.videoId,
               album: providerParameters.album || "",
-              segmentMap: null,
             };
 
             processLyrics(document, lyricsWithMeta, true, signal);
@@ -396,10 +398,18 @@ export async function createLyrics(detail: PlayerDetails, signal: AbortSignal): 
         album: providerParameters.album || "",
         duration: providerParameters.duration,
         videoId: providerParameters.videoId,
-        segmentMap: songSegmentMap,
         providerKey: provider,
         ...sourceLyrics,
       };
+
+      // Re-timed here, before anything is built, so the silences the other version opens can be
+      // filled with instrumental lines, and every view builds from the same lines. Unsynced lines
+      // have no timing to move. The outro is filled to the length of what is playing, which is not
+      // the provider's duration once the video id was swapped for its audio counterpart.
+      if (songSegmentMap !== null && sourceLyrics.lyrics.some(line => line.startTimeMs !== 0)) {
+        lyricsWithMeta.lyrics = retimeToSegmentMap(sourceLyrics.lyrics, songSegmentMap, duration * 1000);
+        lyricsWithMeta.musicVideoSynced = isMusicVideo;
+      }
 
       recordAvailableProviders(sourceMap);
       AppState.lastLoadedVideoId = detail.videoId;
@@ -432,7 +442,7 @@ export async function createLyrics(detail: PlayerDetails, signal: AbortSignal): 
       order: orderedProviders,
       display: (provider, sourceLyrics) => {
         ytLyricsEarlyInjectAbortController.abort("Lyrics are ready");
-        show(provider, sourceLyrics, hasShownLyrics);
+        show(provider, sourceLyrics, hasShownLyrics || keepsLinesOnScreen);
         hasShownLyrics = true;
       },
       displayNone: showNotFound,

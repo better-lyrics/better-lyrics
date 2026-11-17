@@ -372,7 +372,6 @@ const restoreOptions = (): void => {
       "binimum-richsynced",
       "unison-wordsynced",
       "portato-richsynced",
-      "musixmatch-richsync",
       "yt-captions",
       "bLyrics-synced",
       "unison-synced",
@@ -380,7 +379,6 @@ const restoreOptions = (): void => {
       "binimum-synced",
       "lrclib-synced",
       "legato-synced",
-      "musixmatch-synced",
       "yt-lyrics",
       "unison-plain",
       "lrclib-plain",
@@ -501,7 +499,6 @@ const setOptionsInForm = (items: Options): void => {
     "binimum-richsynced",
     "unison-wordsynced",
     "portato-richsynced",
-    "musixmatch-richsync",
     "yt-captions",
     "bLyrics-synced",
     "unison-synced",
@@ -509,7 +506,6 @@ const setOptionsInForm = (items: Options): void => {
     "binimum-synced",
     "lrclib-synced",
     "legato-synced",
-    "musixmatch-synced",
     "yt-lyrics",
     "unison-plain",
     "lrclib-plain",
@@ -535,14 +531,6 @@ const getProviderIdToInfoMap = (): { [key: string]: ProviderInfo } => ({
   "binimum-synced": { name: t("options_provider_binilyrics"), syncType: "line" },
   "spicy-richsynced": { name: t("options_provider_spicylyrics"), syncType: "syllable" },
   "spicy-synced": { name: t("options_provider_spicylyrics"), syncType: "line" },
-  "musixmatch-richsync": {
-    name: t("options_provider_musixmatch"),
-    syncType: "word",
-  },
-  "musixmatch-synced": {
-    name: t("options_provider_musixmatch"),
-    syncType: "line",
-  },
   "unison-richsynced": { name: t("options_provider_betterLyricsUnison"), syncType: "syllable" },
   "unison-wordsynced": { name: t("options_provider_betterLyricsUnison"), syncType: "word" },
   "unison-synced": { name: t("options_provider_betterLyricsUnison"), syncType: "line" },
@@ -873,7 +861,13 @@ async function initIdentityUI(): Promise<void> {
   void renderOwnIdentityStats();
   watchPictureChanges();
 
-  document.getElementById("export-identity-btn")?.addEventListener("click", handleExportIdentity);
+  chrome.runtime
+    .getPlatformInfo()
+    .then(info => {
+      extensionDownloadsHang = info.os === "android";
+    })
+    .catch(error => warnCore("Platform lookup failed:", error))
+    .finally(() => document.getElementById("export-identity-btn")?.addEventListener("click", handleExportIdentity));
   document.getElementById("import-identity-btn")?.addEventListener("click", handleImportIdentity);
   initImportIdentityModal();
 }
@@ -1152,8 +1146,10 @@ function initNicknameModal(): void {
   });
 }
 
+let extensionDownloadsHang = false;
+
 async function handleExportIdentity(): Promise<void> {
-  const downloadsGranted = requestDownloadsPermission();
+  const downloadsGranted = extensionDownloadsHang ? Promise.resolve(false) : requestDownloadsPermission();
   try {
     const [displayName, content, { keyId }] = await Promise.all([getDisplayName(), exportIdentity(), getIdentity()]);
     const filename = `better-lyrics-identity-${displayName}.json`;

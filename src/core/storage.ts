@@ -232,6 +232,12 @@ export function isLyricCacheKey(key: string): boolean {
   return parseLyricCacheKey(key) !== null;
 }
 
+const LYRIC_CACHE_KEY_SHAPE = /^blyrics_[\w-]{11}_[a-zA-Z-]+$/;
+
+function isRetiredLyricCacheKey(key: string): boolean {
+  return LYRIC_CACHE_KEY_SHAPE.test(key) && !isLyricCacheKey(key);
+}
+
 // -- Storage breakdown --------------------------
 
 export type StorageCategory = "lyrics" | "themes" | "offsets" | "other";
@@ -424,7 +430,7 @@ export async function purgeExpiredKeys(): Promise<void> {
     Object.keys(result).forEach(key => {
       if (key.startsWith("blyrics_")) {
         const item = result[key] as TransientStorageItem;
-        if (isExpired(item.expiry, now)) {
+        if (isExpired(item.expiry, now) || isRetiredLyricCacheKey(key)) {
           keysToRemove.push(key);
         }
       }
