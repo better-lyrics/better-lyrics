@@ -441,6 +441,7 @@ const unisonControlsRegistry = {
   upvotes: [] as HTMLButtonElement[],
   downvotes: [] as HTMLButtonElement[],
   scoreLineRefs: [] as ScoreLineRefs[],
+  editorCredits: [] as EditorCreditSlot[],
 };
 
 let unisonDockObserver: IntersectionObserver | null = null;
@@ -542,6 +543,7 @@ export function refreshShownUnisonData(unisonData: UnisonData): void {
   if (AppState.currentUnisonData?.lyricsId !== unisonData.lyricsId) return;
   if (AppState.currentUnisonData !== unisonData) Object.assign(AppState.currentUnisonData, unisonData);
   refreshUnisonControls(AppState.currentUnisonData);
+  for (const slot of unisonControlsRegistry.editorCredits) showEditorCredit(slot, AppState.currentUnisonData.editors);
 }
 
 function refreshUnisonControls(unisonData: UnisonData): void {
@@ -560,6 +562,7 @@ function clearUnisonControlsRegistry(): void {
   unisonControlsRegistry.upvotes.length = 0;
   unisonControlsRegistry.downvotes.length = 0;
   unisonControlsRegistry.scoreLineRefs.length = 0;
+  unisonControlsRegistry.editorCredits.length = 0;
 }
 
 type VoteUpdateData = NonNullable<Awaited<ReturnType<typeof byId>>>;
@@ -1050,8 +1053,28 @@ function createSubmitterBlock(
     subLabel.textContent = t("unison_submitted_this");
     authorBlock.appendChild(subLabel);
   }
-  if (editors?.length) authorBlock.appendChild(createEditorCredit(editors));
+  const slot: EditorCreditSlot = { block: authorBlock, credit: null, shown: "[]" };
+  showEditorCredit(slot, editors);
+  unisonControlsRegistry.editorCredits.push(slot);
   return authorBlock;
+}
+
+interface EditorCreditSlot {
+  block: HTMLElement;
+  credit: HTMLElement | null;
+  shown: string;
+}
+
+function showEditorCredit(slot: EditorCreditSlot, editors: UnisonData["editors"]): void {
+  const shown = JSON.stringify(editors ?? []);
+  if (shown === slot.shown) return;
+  if (slot.credit) closeEditorCredit();
+  const credit = editors?.length ? createEditorCredit(editors) : null;
+  if (slot.credit && credit) slot.credit.replaceWith(credit);
+  else if (credit) slot.block.appendChild(credit);
+  else slot.credit?.remove();
+  slot.credit = credit;
+  slot.shown = shown;
 }
 
 function createScoreLine(): { scoreLine: HTMLElement; scoreLineRefs: ScoreLineRefs } {
