@@ -77,18 +77,19 @@ export function triggerBox(trigger: MeasurableTrigger): Box & { width: number } 
 
 export function positionMenu(menu: HTMLElement, trigger: HTMLElement): void {
   const rect = triggerBox(trigger);
+  const view = trigger.ownerDocument.defaultView ?? window;
   menu.style.maxHeight = "";
   const horizontal = {
     triggerLeft: rect.left,
     triggerRight: rect.right,
     menuWidth: menu.offsetWidth,
-    viewportWidth: window.innerWidth,
+    viewportWidth: view.innerWidth,
   };
   const { placement, top, maxHeight } = menuPlacement({
     triggerTop: rect.top,
     triggerBottom: rect.bottom,
     menuHeight: menu.offsetHeight,
-    viewportHeight: window.innerHeight,
+    viewportHeight: view.innerHeight,
   });
   menu.dataset.side = menuSide(horizontal);
   menu.dataset.placement = placement;

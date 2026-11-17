@@ -41,6 +41,7 @@ export interface UnisonLyricsEntry {
   voteCount: number;
   confidence: UnisonConfidence;
   submitter?: UnisonSubmitter;
+  editors?: UnisonActor[];
   fulfilled?: UnisonFulfillment;
   marks?: Mark[];
   userVote?: 1 | -1 | null;

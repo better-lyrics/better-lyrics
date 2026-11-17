@@ -28,7 +28,6 @@ interface InlineSubmitter {
 let cataloguePromise: Promise<BadgeCatalogue | null> | null = null;
 const svgCache = new Map<string, Promise<string | null>>();
 const gamificationCache = new Map<string, Promise<UserGamification | null>>();
-const svgParser = new DOMParser();
 
 function loadCatalogue(): Promise<BadgeCatalogue | null> {
   if (!cataloguePromise) {
@@ -87,7 +86,7 @@ function fetchSvgMarkup(url: string): Promise<string | null> {
 async function inlineSvg(url: string, className: string, label?: string): Promise<SVGElement | null> {
   const markup = await fetchSvgMarkup(url);
   if (!markup) return null;
-  const svg = svgParser.parseFromString(markup, "image/svg+xml").documentElement as unknown as SVGElement;
+  const svg = new DOMParser().parseFromString(markup, "image/svg+xml").documentElement as unknown as SVGElement;
   if (svg.nodeName.toLowerCase() !== "svg") return null;
   svg.classList.add(className);
   if (label) {
@@ -267,7 +266,11 @@ function buildOutboundLink(href: string, label: string): HTMLAnchorElement {
   link.target = "_blank";
   link.rel = "noreferrer noopener";
   link.textContent = label;
+  link.appendChild(createOutboundIcon());
+  return link;
+}
 
+export function createOutboundIcon(): SVGElement {
   const icon = document.createElementNS(SVG_NS, "svg");
   icon.setAttribute("viewBox", "0 0 24 24");
   icon.setAttribute("fill", "none");
@@ -281,13 +284,17 @@ function buildOutboundLink(href: string, label: string): HTMLAnchorElement {
     path.setAttribute("d", d);
     icon.appendChild(path);
   }
-  link.appendChild(icon);
-  return link;
+  return icon;
 }
 
 // -- Inline profile (footer + uploader) --------------------------
 
-export function appendInlineProfile(row: HTMLElement, nameEl: HTMLElement, submitter: InlineSubmitter): void {
+export function appendInlineProfile(
+  row: HTMLElement,
+  nameEl: HTMLElement,
+  submitter: InlineSubmitter,
+  link?: HTMLAnchorElement
+): void {
   const ring = document.createElement("span");
   ring.className = `${GAM}__ring ${GAM}__ring-slot`;
   const tier = document.createElement("span");
@@ -295,7 +302,12 @@ export function appendInlineProfile(row: HTMLElement, nameEl: HTMLElement, submi
   const featured = document.createElement("span");
   featured.className = `${GAM}__featured-slot-outer`;
 
-  row.append(ring, nameEl, tier, featured);
+  if (link) {
+    link.append(ring, nameEl);
+    row.append(link, tier, featured);
+  } else {
+    row.append(ring, nameEl, tier, featured);
+  }
 
   void Promise.all([loadCatalogue(), fetchUserGamification(submitter.keyId)]).then(([catalogue, user]) => {
     const level = user?.level ?? submitter.level;

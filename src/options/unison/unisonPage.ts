@@ -9,6 +9,7 @@ import {
   type ReportReason,
   type SuggestedVideo,
   type SuggestedVideoMatchLevel,
+  type UnisonActor,
   type UnisonConfidence,
   type UnisonFeedEntry,
   type UnisonFormat,
@@ -35,6 +36,7 @@ import {
   unlinkVideo,
 } from "@modules/unison/unisonApi";
 import { UnisonErrorCode } from "@modules/unison/errorCodes";
+import { createAvatar } from "@modules/unison/avatar";
 import { appendInlineProfile, profileUrl } from "@modules/unison/gamificationRender";
 import { generatePetName, getDisplayName, getIdentity } from "@/core/keyIdentity";
 import { warnUnison } from "@core/logger";
@@ -1053,6 +1055,7 @@ function renderDetail(entry: UnisonLyricsEntry, view: AbortSignal, isOwn: boolea
   if (entry.language) appendMetaRow(metaTable, t("unison_language"), languageName(entry.language));
   if (entry.isrc) appendMetaRow(metaTable, "ISRC", entry.isrc);
   if (entry.submitter) appendMetaRow(metaTable, t("unison_uploadedBy"), createUploaderCell(entry.submitter));
+  if (entry.editors?.length) appendMetaRow(metaTable, t("unison_credit_title"), createEditorsCell(entry.editors));
 
   const scoreRow = document.createElement("div");
   scoreRow.className = "unison-detail-score-row";
@@ -1132,6 +1135,39 @@ function createConfidenceBadge(confidence: UnisonConfidence): HTMLElement {
   badge.appendChild(iconWrap);
   badge.appendChild(label);
   return badge;
+}
+
+const EDITOR_FACES_MAX = 5;
+
+function createEditorsCell(editors: UnisonActor[]): HTMLElement {
+  const cell = document.createElement("span");
+  cell.className = "unison-editors";
+
+  const stack = document.createElement("span");
+  stack.className = "unison-editors__stack";
+  for (const editor of editors.slice(0, EDITOR_FACES_MAX)) {
+    stack.appendChild(createAvatar(editor.avatarUrl, "unison-editors__face"));
+  }
+
+  const names = document.createElement("span");
+  names.className = "unison-editors__names";
+  const links = editors.map(editor => {
+    const link = document.createElement("a");
+    link.className = "unison-uploader-link";
+    link.href = profileUrl(editor.displayName, editor.keyId);
+    link.target = "_blank";
+    link.rel = "noreferrer noopener";
+    link.textContent = editor.displayName || generatePetName(editor.keyId);
+    return link;
+  });
+  let next = 0;
+  const list = new Intl.ListFormat(navigator.language, { type: "conjunction" });
+  for (const part of list.formatToParts(links.map(link => link.textContent ?? ""))) {
+    names.append(part.type === "element" ? links[next++] : part.value);
+  }
+
+  cell.append(stack, names);
+  return cell;
 }
 
 function createUploaderCell(submitter: UnisonSubmitter): HTMLElement {

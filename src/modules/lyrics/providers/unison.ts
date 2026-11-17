@@ -12,7 +12,7 @@ import { LRCParser, parseLRC, PlainParser } from "@braccato/parsers";
 import type { LyricSourceResult, ProviderParameters } from "./shared";
 import { fillTtml } from "@modules/lyrics/providers/ttmlSource";
 import { warnUnison } from "@core/logger";
-import type { Mark } from "@modules/unison/types";
+import type { Mark, UnisonActor } from "@modules/unison/types";
 
 interface SubmitterInfo {
   keyId: string;
@@ -34,6 +34,7 @@ interface UnisonResponse {
   effectiveScore: number;
   voteCount: number;
   submitter?: SubmitterInfo;
+  editors?: UnisonActor[];
   marks?: Mark[];
   userVote: 1 | -1 | null;
 }
@@ -60,6 +61,7 @@ export interface UnisonData {
   effectiveScore: number;
   lyricsId: number;
   submitter?: SubmitterInfo;
+  editors?: UnisonActor[];
   marks?: Mark[];
 }
 
@@ -204,6 +206,7 @@ function toUnisonData(data: UnisonResponse): UnisonData {
     effectiveScore: data.effectiveScore,
     lyricsId: data.id,
     submitter: data.submitter,
+    editors: data.editors,
     marks: data.marks,
   };
 }

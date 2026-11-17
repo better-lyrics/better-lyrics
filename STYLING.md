@@ -1607,8 +1607,33 @@ When the Unison provider is active, an extra card is appended to the lyrics foot
 | ----- | ------- |
 | `.blyrics-footer__unison-author` | Column with author row plus subtitle |
 | `.blyrics-footer__unison-author-row` | Row holding the author name and the trust tier pill |
+| `.blyrics-footer__unison-profile` | Link around the level ring and the name. Opens the submitter's Unison profile in a new tab |
 | `.blyrics-footer__author-name` | The submitter handle. Generated from their public key as a deterministic pet name |
 | `.blyrics-footer__unison-author-label` | Small "submitted this" label below the author row |
+
+### Editor Credit
+
+When other people's suggested edits to the lyric went live, a credit line shows under "submitted this" with up to three faces. Hover or click it to open a card that lists the editors; each row opens that person's Unison profile in a new tab. The card is added to the page body, outside the footer, so the footer never clips it. With one editor, the line links straight to that person's profile instead, with no card.
+
+| Class | Purpose |
+| ----- | ------- |
+| `.blyrics-footer__credit` | The credit line. A button holding the faces and the wording, or a link to the profile when there is one editor |
+| `.blyrics-footer__credit-stack` | Row of up to three overlapping faces |
+| `.blyrics-footer__credit-avatar` | Wrapper around each face. Lifts on hover |
+| `.blyrics-footer__credit-face` | Face image. `--empty` when the person has no picture |
+| `.blyrics-footer__credit-card` | The card that lists the editors |
+| `.blyrics-footer__credit-name` | Name in a card row |
+| `.blyrics-footer__credit-go` | Outbound arrow at the end of a card row |
+
+| Variable | Default Value | Description |
+| -------- | ------------- | ----------- |
+| `--blyrics-credit-open-dur` | `250ms` | Card open duration |
+| `--blyrics-credit-close-dur` | `150ms` | Card close duration |
+| `--blyrics-credit-ease` | `cubic-bezier(0.22, 1, 0.36, 1)` | Card open and close easing |
+| `--blyrics-credit-lift` | `-3px` | How far the hovered face lifts |
+| `--blyrics-credit-hover-dur` | `320ms` | Face lift duration |
+| `--blyrics-credit-ease-in` | `cubic-bezier(0.22, 1, 0.36, 1)` | Face lift easing |
+| `--blyrics-credit-ease-out` | `cubic-bezier(0.34, 3.85, 0.64, 1)` | Spring easing when the faces settle back |
 
 ### Trust Tier Pill
 

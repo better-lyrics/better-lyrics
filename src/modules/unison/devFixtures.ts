@@ -14,6 +14,7 @@ import type {
   SuggestedVideo,
   UnisonFeedEntry,
   UnisonFormat,
+  UnisonActor,
   UnisonLyricsEntry,
   UnisonSubmission,
 } from "@modules/unison/types";
@@ -46,6 +47,7 @@ interface FixtureLyric {
   videoId: string;
   ownedByMe: boolean;
   sealed: boolean;
+  editors: UnisonActor[];
   revisions: FixtureRevision[];
 }
 
@@ -83,6 +85,7 @@ interface LyricSpec {
   videoId?: string;
   ownedByMe: boolean;
   sealed?: boolean;
+  editors?: UnisonActor[];
   revisions: RevisionSpec[];
 }
 
@@ -110,6 +113,12 @@ const SOMEONE_ELSE = {
   keyId: "d3f1c7a0b5e24c6f8a9b0c1d2e3f4a5b6c7d8e9f0a1b2c3d4e5f6a7b8c9d0e1f",
   displayName: "SomeoneElse",
 };
+const EDITORS: UnisonActor[] = [
+  { keyId: "a1".repeat(32), displayName: "Mirelle", tier: "elite", level: 14, avatarUrl: null },
+  { keyId: "b2".repeat(32), displayName: "Cass", level: 6, avatarUrl: null },
+  { keyId: "c3".repeat(32), displayName: "Oduya", tier: "lyricist", level: 9, avatarUrl: null },
+  { keyId: "d4".repeat(32), displayName: "Tamsin", level: 3, avatarUrl: null },
+];
 
 // -- Lyrics --------------------------
 
@@ -624,6 +633,7 @@ function buildLyric(spec: LyricSpec, now: number): FixtureLyric {
     videoId: spec.videoId ?? "dQw4w9WgXcQ",
     ownedByMe: spec.ownedByMe,
     sealed: spec.sealed ?? false,
+    editors: spec.editors ?? [],
     revisions,
   };
 }
@@ -648,6 +658,7 @@ function buildFixtures(): FixtureLyric[] {
       language: "en",
       isrc: "USEE17000514",
       ownedByMe: true,
+      editors: EDITORS.slice(0, 1),
       revisions: [
         { lyrics: lrc, status: "past", daysAgo: 30 },
         { lyrics: toLrc(graceLines(1)), status: "past", daysAgo: 20, anchor: true, reviewed: true },
@@ -733,6 +744,7 @@ function buildFixtures(): FixtureLyric[] {
       language: "en",
       isrc: null,
       ownedByMe: false,
+      editors: EDITORS,
       revisions: [
         { lyrics: lrc, status: "past", daysAgo: 25, anchor: true },
         { lyrics: toLrc(graceLines(1)), status: "past", daysAgo: 14 },
@@ -944,6 +956,7 @@ function lyricsEntry(lyric: FixtureLyric, myKeyId: string): UnisonLyricsEntry {
     submitter: lyric.ownedByMe
       ? { keyId: myKeyId, reputation: 1.2, displayName: ME.displayName }
       : { keyId: SOMEONE_ELSE.keyId, reputation: 0.8, displayName: SOMEONE_ELSE.displayName },
+    ...(lyric.editors.length ? { editors: lyric.editors } : {}),
     marks: lyric.sealed ? [{ type: "seal", label: "Committee sealed", icon: "" }] : [],
     revision: {
       revNo: live.revNo,

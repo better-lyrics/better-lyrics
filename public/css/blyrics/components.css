@@ -402,6 +402,24 @@
 	color: var(--blyrics-footer-link-color);
 }
 
+.blyrics-footer__unison-profile {
+	display: inline-flex;
+	align-items: center;
+	gap: 10px;
+	margin: -4px -6px;
+	padding: 4px 6px;
+	border-radius: 8px;
+	color: inherit;
+	text-decoration: none;
+	transition: background-color 0.15s ease-out;
+}
+
+@media (hover: hover) {
+	.blyrics-footer__unison-profile:hover {
+		background-color: rgba(255, 255, 255, 0.06);
+	}
+}
+
 .blyrics-footer__unison-author-label {
 	font-size: 11px;
 	color: var(--blyrics-footer-text-color);
@@ -435,6 +453,262 @@
 .blyrics-footer__unison-score-line > strong {
 	color: var(--blyrics-footer-link-color);
 	font-weight: 500;
+}
+
+/* -- Editor credit ---------------------------- */
+
+.blyrics-footer,
+.blyrics-footer__credit-card {
+	--blyrics-credit-open-dur: 250ms;
+	--blyrics-credit-close-dur: 150ms;
+	--blyrics-credit-ease: cubic-bezier(0.22, 1, 0.36, 1);
+	--blyrics-credit-lift: -3px;
+	--blyrics-credit-hover-dur: 320ms;
+	--blyrics-credit-ease-in: cubic-bezier(0.22, 1, 0.36, 1);
+	--blyrics-credit-ease-out: cubic-bezier(0.34, 3.85, 0.64, 1);
+}
+
+.blyrics-footer__credit {
+	position: relative;
+	align-self: flex-start;
+	display: inline-flex;
+	align-items: center;
+	gap: 8px;
+	margin: -4px -6px;
+	padding: 4px 6px;
+	border: none;
+	border-radius: 8px;
+	background: none;
+	font: inherit;
+	font-size: 11px;
+	line-height: 1.5;
+	color: var(--blyrics-footer-text-color);
+	text-align: left;
+	text-decoration: none;
+	cursor: pointer;
+	transition: background-color 0.15s ease-out;
+}
+
+.blyrics-footer__credit::after {
+	content: "";
+	position: absolute;
+	inset: -6px -4px;
+}
+
+@media (hover: hover) {
+	.blyrics-footer__credit:hover {
+		background-color: rgba(255, 255, 255, 0.06);
+	}
+}
+
+.blyrics-footer__credit[aria-expanded="true"] {
+	background-color: rgba(255, 255, 255, 0.06);
+}
+
+.blyrics-footer__credit:focus-visible {
+	outline: 2px solid rgba(255, 255, 255, 0.4);
+	outline-offset: 2px;
+}
+
+.blyrics-footer__credit b {
+	font-weight: 600;
+	color: var(--blyrics-footer-link-color);
+}
+
+.blyrics-footer__credit-stack {
+	--size: 20px;
+	--overlap: 6px;
+	--gap: 1.5px;
+	position: relative;
+	z-index: 1;
+	display: inline-flex;
+	align-items: center;
+}
+
+.blyrics-footer__credit-avatar {
+	width: var(--size);
+	height: var(--size);
+	transform-origin: center;
+	transform: translateY(var(--shift, 0px)) scale(var(--scale-active, 1));
+	transition: transform var(--blyrics-credit-hover-dur) var(--blyrics-credit-ease-in);
+}
+
+.blyrics-footer__credit-avatar + .blyrics-footer__credit-avatar {
+	margin-left: calc(var(--overlap) * -1);
+}
+
+.blyrics-footer__credit-avatar:not(:last-child) .blyrics-footer__credit-face {
+	mask: radial-gradient(
+		circle at calc(100% + var(--size) / 2 - var(--overlap)) 50%,
+		transparent calc(var(--size) / 2 + var(--gap) - 0.5px),
+		#000 calc(var(--size) / 2 + var(--gap))
+	);
+}
+
+.blyrics-footer__credit-face {
+	display: block;
+	box-sizing: border-box;
+	width: 100%;
+	height: 100%;
+	border-radius: 999px;
+	background-color: rgba(255, 255, 255, 0.1);
+	background-position: center;
+	background-size: cover;
+	outline: 1px solid rgba(255, 255, 255, 0.1);
+	outline-offset: -1px;
+}
+
+.blyrics-footer__credit-face--empty {
+	display: grid;
+	place-items: center;
+	color: rgba(255, 255, 255, 0.55);
+}
+
+.blyrics-footer__credit-face--empty svg {
+	width: 62%;
+	height: 62%;
+}
+
+.blyrics-footer__credit-card {
+	position: fixed;
+	z-index: 2147483000;
+	display: flex;
+	flex-direction: column;
+	box-sizing: border-box;
+	width: 248px;
+	padding: 6px;
+	border: 1px solid rgba(255, 255, 255, 0.1);
+	border-radius: 14px;
+	background-color: #333437;
+	box-shadow:
+		rgba(0, 0, 0, 0.45) 0 18px 40px -12px,
+		inset rgba(255, 255, 255, 0.06) 0 1px 0 0;
+	font-family: var(--blyrics-footer-font-family);
+	line-height: 1.4;
+	color: rgba(255, 255, 255, 0.92);
+	cursor: default;
+	transform-origin: top left;
+	transform: scale(0.97);
+	opacity: 0;
+	pointer-events: none;
+	transition:
+		transform var(--blyrics-credit-open-dur) var(--blyrics-credit-ease),
+		opacity var(--blyrics-credit-open-dur) var(--blyrics-credit-ease);
+}
+
+.blyrics-footer__credit-card[data-side="end"] {
+	transform-origin: top right;
+}
+
+.blyrics-footer__credit-card[data-placement="above"] {
+	transform-origin: bottom left;
+}
+
+.blyrics-footer__credit-card[data-placement="above"][data-side="end"] {
+	transform-origin: bottom right;
+}
+
+.blyrics-footer__credit-card.is-open {
+	transform: scale(1);
+	opacity: 1;
+	pointer-events: auto;
+}
+
+.blyrics-footer__credit-card.is-closing {
+	transform: scale(0.99);
+	opacity: 0;
+	pointer-events: none;
+	transition-duration: var(--blyrics-credit-close-dur);
+}
+
+.blyrics-footer__credit-card h4 {
+	margin: 0;
+	padding: 6px 8px 4px;
+	font-size: 11px;
+	font-weight: 500;
+	color: rgba(255, 255, 255, 0.5);
+}
+
+.blyrics-footer__credit-card ul {
+	min-height: 0;
+	max-height: 236px;
+	margin: 0;
+	padding: 0;
+	list-style: none;
+	overflow-y: auto;
+	overscroll-behavior: contain;
+	scrollbar-width: none;
+}
+
+.blyrics-footer__credit-card a {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	box-sizing: border-box;
+	min-height: 40px;
+	padding: 6px 8px;
+	border-radius: 8px;
+	font-size: 13px;
+	font-weight: 600;
+	color: rgba(255, 255, 255, 0.92);
+	text-decoration: none;
+	transition: background-color 0.15s ease-out;
+}
+
+.blyrics-footer__credit-card a:focus-visible {
+	outline: 2px solid rgba(255, 255, 255, 0.4);
+	outline-offset: -2px;
+}
+
+.blyrics-footer__credit-card .blyrics-footer__credit-face {
+	flex: none;
+	width: 28px;
+	height: 28px;
+}
+
+.blyrics-footer__credit-name {
+	min-width: 0;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+.blyrics-footer__credit-go {
+	flex: none;
+	width: 14px;
+	height: 14px;
+	margin-left: auto;
+	color: rgba(255, 255, 255, 0.35);
+	opacity: 0;
+	transition: opacity 0.15s ease-out;
+}
+
+@media (hover: hover) {
+	.blyrics-footer__credit-card a:hover {
+		background-color: rgba(255, 255, 255, 0.06);
+	}
+
+	.blyrics-footer__credit-card a:hover .blyrics-footer__credit-go {
+		opacity: 1;
+	}
+}
+
+.blyrics-footer__credit-card a:focus-visible .blyrics-footer__credit-go {
+	opacity: 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.blyrics-footer__credit-avatar {
+		transform: none;
+		transition: none;
+	}
+
+	.blyrics-footer__credit-card,
+	.blyrics-footer__credit-card.is-open,
+	.blyrics-footer__credit-card.is-closing {
+		transform: none;
+		transition: opacity var(--blyrics-credit-close-dur) linear;
+	}
 }
 
 .blyrics-gam__ring {
