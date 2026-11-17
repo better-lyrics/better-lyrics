@@ -195,6 +195,7 @@ function showCard(trigger: HTMLButtonElement, editors: UnisonActor[], intent: Ho
   if (!trigger.isConnected) return;
   closeEditorCredit();
   const doc = trigger.ownerDocument;
+  const view = viewOf(trigger);
   const card = createCard(editors);
 
   card.addEventListener("mouseenter", intent.enter);
@@ -210,17 +211,28 @@ function showCard(trigger: HTMLButtonElement, editors: UnisonActor[], intent: Ho
     const target = event.target as Node;
     if (!card.contains(target) && !trigger.contains(target)) closeEditorCredit();
   };
+  const onViewportChange = (event: Event) => {
+    if (event.target instanceof Node && card.contains(event.target)) return;
+    if (!trigger.isConnected) closeEditorCredit();
+    else positionMenu(card, trigger);
+  };
   doc.addEventListener("pointerdown", onOutsidePointer, true);
+  view.addEventListener("resize", onViewportChange);
+  view.addEventListener("scroll", onViewportChange, { capture: true, passive: true });
 
   doc.body.appendChild(card);
   positionMenu(card, trigger);
   trigger.setAttribute("aria-expanded", "true");
-  viewOf(trigger).requestAnimationFrame(() => card.classList.add("is-open"));
+  view.requestAnimationFrame(() => card.classList.add("is-open"));
 
   openCredit = {
     trigger,
     card,
-    teardown: () => doc.removeEventListener("pointerdown", onOutsidePointer, true),
+    teardown: () => {
+      doc.removeEventListener("pointerdown", onOutsidePointer, true);
+      view.removeEventListener("resize", onViewportChange);
+      view.removeEventListener("scroll", onViewportChange, { capture: true });
+    },
   };
 }
 
