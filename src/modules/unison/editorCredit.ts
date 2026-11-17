@@ -192,6 +192,7 @@ function createCard(editors: UnisonActor[]): HTMLElement {
 }
 
 function showCard(trigger: HTMLButtonElement, editors: UnisonActor[], intent: HoverIntent): void {
+  if (!trigger.isConnected) return;
   closeEditorCredit();
   const doc = trigger.ownerDocument;
   const card = createCard(editors);
