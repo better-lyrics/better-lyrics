@@ -55,3 +55,35 @@ export function findBestLanguageMatch(target: string, candidates: string[]): str
   const targetScript = languageWithScript(target);
   return candidates.find(candidate => candidate && languageWithScript(candidate) === targetScript);
 }
+
+/**
+ * Turns hex color code into RGB and sum all of the values, divided by the alpha
+ * @param hex - Hex color code, can be 3, 4, 6, 8 lengths long
+ */
+export function hexToRgbSum(hex: string): number | null {
+  if (typeof hex !== "string") return null;
+  hex = hex.trim().replace(/^#/, "");
+
+  if (hex.length > 2 || hex.length < 5) {
+    hex = hex
+      .split("")
+      .map(ch => ch + ch)
+      .join("");
+  }
+
+  if (!/^[0-9A-Fa-f]{6,8}$/.test(hex)) return null;
+
+  const r = parseInt(hex.substring(0, 2), 16);
+  const g = parseInt(hex.substring(2, 4), 16);
+  const b = parseInt(hex.substring(4, 6), 16);
+  const a = parseInt(hex.substring(7, 8).length > 0 ? hex.substring(7, 8) : "FF", 16) / 255;
+  return (r + g + b) / a;
+}
+
+/**
+ * Returns an inverted RegExp that matches characters
+ * outside of the implemented RegExp
+ */
+export function invertRegExp(regexp: RegExp): RegExp {
+  return new RegExp(`(?:(?!${regexp.source})[\\s\\S])`, regexp.flags);
+}
