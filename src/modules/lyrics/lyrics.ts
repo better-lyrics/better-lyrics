@@ -32,7 +32,7 @@ import { getSongAlbum, getSongMetadata, type SegmentMap } from "./requestSniffer
 import { getSegmentMapTimeShiftMs, retimeToSegmentMap } from "@modules/lyrics/segmentMap";
 import { clearCache as clearTranslationCache } from "./translation";
 import { mainView } from "@modules/ui/mainLyricsView";
-import { resetPlaybackClock, resumeAllAutoscroll } from "@braccato/core";
+import { resetPlaybackClock, resumeAllAutoscroll } from "@modules/ui/lyricsRenderer";
 import { registerThemeSetting } from "@braccato/core/themeSettings";
 import { logCore } from "@core/logger";
 

@@ -28,6 +28,7 @@ import {
   PictureInPictureHeaderMarquee,
 } from "@modules/ui/pictureInPicture/headerMarquee";
 import { createIntermission, type Intermission } from "@modules/ui/pictureInPicture/intermission";
+import { copyRendererCanvases, rendererCanvas } from "@modules/ui/lyricsRenderer";
 import { AD_UP_NEXT_SLOT } from "@modules/ui/pictureInPicture/intermissionText";
 import {
   canFlipStartModeSwitch,
@@ -640,9 +641,12 @@ export class PictureInPictureLyricsView {
       })
       .slice(0, motion.revealLines);
     if (visible.length === 0) return;
+    // The WebGL renderer draws every line on one canvas, so the lines rise in together.
+    const canvas = rendererCanvas(container);
+    const targets: Element[] = canvas ? [canvas] : visible;
 
     this.lyricsViewport.setAttribute(LYRICS_REVEALING_ATTRIBUTE, "");
-    const finished = visible.map((child, index) => {
+    const finished = targets.map((child, index) => {
       const timing: KeyframeAnimationOptions = {
         duration: motion.revealDuration,
         delay: motion.revealDelay + index * motion.revealStagger,
@@ -720,6 +724,7 @@ export class PictureInPictureLyricsView {
   private retireViewportContent(content: HTMLElement): void {
     const exitOpacity = this.pipWindow.getComputedStyle(content).opacity;
     const ghost = content.cloneNode(true) as HTMLElement;
+    copyRendererCanvases(content, ghost);
     ghost.classList.add(LYRICS_EXIT_CLASS);
     ghost.inert = true;
     ghost.setAttribute("aria-hidden", "true");

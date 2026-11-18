@@ -9,7 +9,6 @@ export {
   LYRICS_WRAPPER_ID,
   ROMANIZED_LYRICS_CLASS,
   TRANSLATED_LYRICS_CLASS,
-  WORD_HIGHLIGHT_CLASS,
 } from "@braccato/core/constants";
 
 // DOM Class Names
@@ -189,6 +188,14 @@ export const BL_AUTH_SITE_PORT_NAME = "bl-auth-site" as const;
 export const INITIALIZE_LOG =
   "%c[BetterLyrics] Loaded Successfully. Logs are enabled by default. You can disable them in the extension options." as const;
 export const GENERAL_ERROR_LOG = "[BetterLyrics] Error:" as const;
+
+// Lyrics renderer
+/** The theme setting that picks the renderer: `webgl` (the default) or `dom`. */
+export const RENDERER_SETTING = "blyrics-renderer" as const;
+export const RENDERER_WASM_LOAD_FAILED_LOG =
+  "[BetterLyrics] The WebGL lyrics renderer could not load; lyrics are drawn with the DOM renderer:" as const;
+export const RENDERER_FALLBACK_LOG =
+  "[BetterLyrics] The WebGL lyrics renderer could not start here; lyrics are drawn with the DOM renderer:" as const;
 
 // Lyrics Fetch and Processing Logs
 export const FETCH_LYRICS_LOG = "[BetterLyrics] Fetching lyrics for:" as const;

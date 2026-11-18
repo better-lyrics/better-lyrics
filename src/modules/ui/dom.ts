@@ -31,7 +31,6 @@ import {
   type SyncType,
   TAB_RENDERER_SELECTOR,
   TRANSLATED_LYRICS_CLASS,
-  WORD_HIGHLIGHT_CLASS,
 } from "@constants";
 import { AppState } from "@core/appState";
 import { getBrowserVendor } from "@core/browser";
@@ -313,7 +312,9 @@ export function createLyricsWrapper(keepContents = false): HTMLElement {
     const range = selection.getRangeAt(0);
     const fragment = range.cloneContents();
 
-    fragment.querySelectorAll(`.${WORD_HIGHLIGHT_CLASS}`).forEach(el => el.remove());
+    // The DOM renderer draws each line twice, its highlight copy hidden from assistive tech; the
+    // copy is what a reader selected, once.
+    fragment.querySelectorAll('[aria-hidden="true"]').forEach(el => el.remove());
 
     const lineElements = fragment.querySelectorAll(`.${LINE_CLASS}`);
 

@@ -151,6 +151,14 @@ const config = {
     const shouldBuildSourcemaps = isDevelopment || process.env.SOURCEMAPS_ENABLED === "true";
 
     rspackConfig.plugins.push(emitRendererStyles, versionStylesheetImports);
+    // @braccato/core-rs's WebAssembly is inlined into the scripts that import it, so it compiles from
+    // bytes already in memory: fetching it by extension URL from a content script works, but Chrome
+    // logs every such fetch as an unsafe load. Its loader's own default, a `new URL(...,
+    // import.meta.url)`, is never taken, so the bundler need not emit a copy for it either.
+    rspackConfig.module.rules.push(
+      { test: /braccato_core_rs_bg\.wasm$/, type: "asset/inline" },
+      { test: /braccato_core_rs\.js$/, parser: { url: false } }
+    );
 
     if (!isDevelopment) {
       console.log(
