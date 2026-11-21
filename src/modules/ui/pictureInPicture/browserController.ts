@@ -10,6 +10,7 @@ import { t } from "@core/i18n";
 import { getStorage } from "@core/storage";
 import { getArtworkMetadata } from "@modules/lyrics/requestSniffer/requestSniffer";
 import { resumeAllAutoscroll } from "@modules/ui/lyricsRenderer";
+import { rendererWasmDataUrl } from "@modules/ui/webglRendererWasm";
 import { onSignal, sendInit, sendMetadata } from "@modules/ui/pictureInPicture/bridge";
 import { createGatedToggle } from "@modules/ui/pictureInPicture/controller";
 import { AD_UP_NEXT_SLOT } from "@modules/ui/pictureInPicture/intermissionText";
@@ -197,6 +198,7 @@ export function publishPictureInPictureResources(): void {
       karaokeEnabled: items.isKaraokeEnabled !== false,
       windowLayout: String(items.pipWindowLayout),
       logsEnabled: items.isLogsEnabled !== false,
+      rendererWasm: rendererWasmDataUrl(),
     });
   });
 }

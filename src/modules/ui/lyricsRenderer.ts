@@ -29,25 +29,33 @@ import { logCore } from "@core/logger";
 
 // -- Loading the renderer --------------------------
 
-let wasmBytes: (() => BufferSource) | null = null;
+let wasmDataUrl: string | null = null;
 let loadFailed = false;
 
 /**
- * Hands the renderer its WebAssembly. Only the contexts that hand it over can draw lyrics (see
- * webglRendererWasm.ts), so no other bundle carries the bytes. It compiles synchronously, on the
- * first call that needs it: the module is small enough for the main thread, and it means lyrics
- * never wait on it.
+ * Hands the renderer its WebAssembly as the data URL the build inlines. Only the contexts that hand
+ * it over can draw lyrics: the content script and the options page import it (webglRendererWasm.ts),
+ * and the page world, which draws Firefox's Picture-in-Picture, is sent it over the bridge, so no
+ * bundle but theirs carries the bytes. It compiles synchronously: the module is small enough for the
+ * main thread, and lyrics never wait on it.
  */
-export function provideWebglRenderer(bytes: () => BufferSource): void {
-  wasmBytes ??= bytes;
+export function provideRendererWasm(dataUrl: string): void {
+  wasmDataUrl ??= dataUrl;
   ensureLoaded();
+}
+
+function decodeDataUrl(dataUrl: string): Uint8Array {
+  const binary = atob(dataUrl.slice(dataUrl.indexOf(",") + 1));
+  const bytes = new Uint8Array(binary.length);
+  for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
+  return bytes;
 }
 
 function ensureLoaded(): boolean {
   if (isLoaded()) return true;
-  if (wasmBytes === null || loadFailed) return false;
+  if (wasmDataUrl === null || loadFailed) return false;
   try {
-    loadSync(wasmBytes());
+    loadSync(decodeDataUrl(wasmDataUrl));
     return true;
   } catch (error) {
     // A policy that forbids WebAssembly.
