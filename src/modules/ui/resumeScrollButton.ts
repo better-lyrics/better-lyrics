@@ -1,5 +1,5 @@
 import { t } from "@core/i18n";
-import { resumeAllAutoscroll } from "@braccato/core";
+import { resumeAllAutoscroll } from "@modules/ui/lyricsRenderer";
 
 /**
  * Gets or creates the resume autoscroll button element.

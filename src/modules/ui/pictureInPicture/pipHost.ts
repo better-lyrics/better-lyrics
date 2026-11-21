@@ -3,7 +3,8 @@ import { translateContributorCreditLabels } from "@modules/lyrics/contributorCre
 import type { PlayerDetails } from "@core/appState";
 import { CUSTOM_THEME_STYLE_ID } from "@braccato/core/constants";
 import { applyLyricDecorations } from "@modules/lyrics/lyricDecorations";
-import { createLyricsRenderer, type Lyric, type LyricsRenderer } from "@braccato/core";
+import type { Lyric, LyricsRenderer } from "@braccato/core";
+import { createLyricsView } from "@modules/ui/lyricsRenderer";
 import { VIDEO_QUALITY_BOOST_EVENT } from "@modules/settings/videoQuality";
 import { shouldShowWindowStage } from "@modules/karaoke/gate";
 import { createKaraokeStage, type KaraokeStage } from "@modules/karaoke/stage";
@@ -599,7 +600,7 @@ export function createPictureInPictureHost(
         return environment.view.log;
       },
     });
-    activeRenderer = createLyricsRenderer({
+    activeRenderer = createLyricsView({
       document: pipWindow.document,
       window: pipWindow,
       host: createPictureInPictureLyricsHost(activeView, environment.view, () => isStageShown),

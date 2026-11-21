@@ -31,7 +31,6 @@ import {
   type SyncType,
   TAB_RENDERER_SELECTOR,
   TRANSLATED_LYRICS_CLASS,
-  WORD_HIGHLIGHT_CLASS,
 } from "@constants";
 import { AppState } from "@core/appState";
 import { getBrowserVendor } from "@core/browser";
@@ -312,8 +311,6 @@ export function createLyricsWrapper(keepContents = false): HTMLElement {
 
     const range = selection.getRangeAt(0);
     const fragment = range.cloneContents();
-
-    fragment.querySelectorAll(`.${WORD_HIGHLIGHT_CLASS}`).forEach(el => el.remove());
 
     const lineElements = fragment.querySelectorAll(`.${LINE_CLASS}`);
 

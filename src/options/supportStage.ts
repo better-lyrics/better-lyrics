@@ -1,4 +1,6 @@
-import { createLyricsRenderer, type Lyric } from "@braccato/core";
+import type { Lyric } from "@braccato/core";
+import { createLyricsView } from "@modules/ui/lyricsRenderer";
+import { loadWebglRenderer } from "@modules/ui/webglRendererWasm";
 import { versionedStylesheetUrl } from "@core/extensionStylesheet";
 import { onReducedMotionChange, prefersReducedMotion } from "@/ui/motion";
 
@@ -50,7 +52,8 @@ function linkRendererStylesheets(): void {
 
 export function createSupportStage(mount: HTMLElement): SupportStage {
   linkRendererStylesheets();
-  const renderer = createLyricsRenderer({ document, window, host: { getScrollElement: () => mount } });
+  loadWebglRenderer();
+  const renderer = createLyricsView({ document, window, host: { getScrollElement: () => mount } });
   const { lyrics, loopMs } = timedLines();
   renderer.setLyrics(lyrics, { mount });
 

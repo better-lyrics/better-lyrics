@@ -156,6 +156,10 @@ export function subscribeToCustomStyles(): void {
           css = decompressStyles(css);
         }
         applyCustomStyles(compileRicsToStyles(css));
+      } else {
+        // Emptied, or moved to chunks: whatever is stored now is the theme, nothing included, so a
+        // setting the last theme declared does not outlive it.
+        await getAndApplyCustomStyles();
       }
     }
 

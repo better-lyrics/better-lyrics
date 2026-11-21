@@ -1,5 +1,6 @@
 import type { LyricDecorations } from "@modules/lyrics/injectLyrics";
-import { injectRomanization, injectTranslation, type LyricsRenderer } from "@braccato/core";
+import type { LyricsRenderer } from "@braccato/core";
+import { injectRomanization, injectTranslation } from "@modules/ui/lyricsRenderer";
 
 export function applyLyricDecorations(
   renderer: Pick<LyricsRenderer, "container" | "lines">,

@@ -25,6 +25,8 @@ export interface PictureInPictureInitPayload {
   readonly karaokeEnabled: boolean;
   readonly windowLayout: string;
   readonly logsEnabled: boolean;
+  /** The lyrics renderer's WebAssembly as a data URL: the page world's bundle does not carry it. */
+  readonly rendererWasm: string;
 }
 
 export type PictureInPictureSignal =
