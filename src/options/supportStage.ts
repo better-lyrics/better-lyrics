@@ -50,10 +50,9 @@ function linkRendererStylesheets(): void {
   }
 }
 
-export async function createSupportStage(mount: HTMLElement): Promise<SupportStage> {
+export function createSupportStage(mount: HTMLElement): SupportStage {
   linkRendererStylesheets();
-  // Drawn by the renderer the side panel uses, so it waits for that renderer to load.
-  await loadWebglRenderer();
+  loadWebglRenderer();
   const renderer = createLyricsView({ document, window, host: { getScrollElement: () => mount } });
   const { lyrics, loopMs } = timedLines();
   renderer.setLyrics(lyrics, { mount });

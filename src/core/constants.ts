@@ -190,12 +190,13 @@ export const INITIALIZE_LOG =
 export const GENERAL_ERROR_LOG = "[BetterLyrics] Error:" as const;
 
 // Lyrics renderer
-/** The theme setting that picks the renderer: `webgl` (the default) or `dom`. */
-export const RENDERER_SETTING = "blyrics-renderer" as const;
-export const RENDERER_WASM_LOAD_FAILED_LOG =
-  "[BetterLyrics] The WebGL lyrics renderer could not load; lyrics are drawn with the DOM renderer:" as const;
-export const RENDERER_FALLBACK_LOG =
-  "[BetterLyrics] The WebGL lyrics renderer could not start here; lyrics are drawn with the DOM renderer:" as const;
+export const RENDERER_WASM_LOAD_FAILED_LOG = "[BetterLyrics] The lyrics renderer could not load:" as const;
+export const RENDERER_UNAVAILABLE_LOG =
+  "[BetterLyrics] No WebGL2 here, so lyrics cannot be drawn; asking for hardware acceleration" as const;
+export const ERROR_CLASS = "blyrics--error" as const;
+/** The message shown in place of the lyrics where they cannot be drawn. */
+export const RENDERER_UNAVAILABLE_CLASS = "blyrics-renderer-unavailable" as const;
+export const RENDERER_UNAVAILABLE_HINT_CLASS = "blyrics-renderer-unavailable-hint" as const;
 
 // Lyrics Fetch and Processing Logs
 export const FETCH_LYRICS_LOG = "[BetterLyrics] Fetching lyrics for:" as const;

@@ -114,7 +114,7 @@ async function modify(isDisposed: () => boolean): Promise<void> {
  * Entry point for the BetterLyrics extension.
  */
 function init(): () => void {
-  void loadWebglRenderer();
+  loadWebglRenderer();
   const cleanupVideoQualitySettings = startVideoQualitySettingsBridge();
   let disposed = false;
   let modifyStarted = false;

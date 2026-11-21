@@ -1,179 +1,232 @@
 import {
-  createLyricsRenderer as createDomRenderer,
-  injectRomanization as injectDomRomanization,
-  injectTranslation as injectDomTranslation,
+  canvasFor,
+  createLyricsRenderer,
+  injectRomanization as injectRendererRomanization,
+  injectTranslation as injectRendererTranslation,
+  isLoaded,
   type LineData,
   type LyricPart,
   type LyricsRenderer,
   type LyricsRendererOptions,
-  resetPlaybackClock as resetDomPlaybackClock,
-  resumeAllAutoscroll as resumeDomAutoscroll,
+  loadSync,
+  ownsLine,
+  resetPlaybackClock as resetRendererPlaybackClock,
+  resumeAllAutoscroll as resumeRendererAutoscroll,
+  snapshotCanvas,
 } from "@braccato/core";
-import { parseThemeConfig, registerThemeSetting, setThemeSettings } from "@braccato/core/themeSettings";
+import { parseThemeConfig, setThemeSettings } from "@braccato/core/themeSettings";
 import {
-  canvasFor as webglCanvasFor,
-  createLyricsRenderer as createWebglRenderer,
-  injectRomanization as injectWebglRomanization,
-  injectTranslation as injectWebglTranslation,
-  isLoaded as isWebglLoaded,
-  load as loadWebgl,
-  ownsLine as webglOwnsLine,
-  resetPlaybackClock as resetWebglPlaybackClock,
-  resumeAllAutoscroll as resumeWebglAutoscroll,
-  snapshotCanvas as snapshotWebglCanvas,
-} from "@braccato/core-rs";
-import { RENDERER_FALLBACK_LOG, RENDERER_SETTING, RENDERER_WASM_LOAD_FAILED_LOG } from "@constants";
+  ERROR_CLASS,
+  LYRICS_CLASS,
+  RENDERER_UNAVAILABLE_CLASS,
+  RENDERER_UNAVAILABLE_HINT_CLASS,
+  RENDERER_UNAVAILABLE_LOG,
+  RENDERER_WASM_LOAD_FAILED_LOG,
+} from "@constants";
+import { getBrowserVendor } from "@core/browser";
+import { t } from "@core/i18n";
 import { logCore } from "@core/logger";
 
-// -- Which renderer --------------------------
+// -- Loading the renderer --------------------------
+
+let wasmBytes: (() => BufferSource) | null = null;
+let loadFailed = false;
 
 /**
- * Lyrics are drawn by `@braccato/core-rs` (WebGL2) unless the theme asks for the DOM renderer with
- * `blyrics-renderer = dom;`. That renderer styles the lyrics through `--blyrics-*` custom properties
- * only, so a theme whose rules restyle the line elements themselves (filters, keyframes, per-line
- * opacity) needs the DOM renderer, and says so this way. Changing it rebuilds the lyrics.
+ * Hands the renderer its WebAssembly. Only the contexts that hand it over can draw lyrics (see
+ * webglRendererWasm.ts), so no other bundle carries the bytes. It compiles synchronously, on the
+ * first call that needs it: the module is small enough for the main thread, and it means lyrics
+ * never wait on it.
  */
-const rendererSetting = registerThemeSetting(RENDERER_SETTING, "webgl", true);
-
-type RendererKind = "dom" | "webgl";
-
-function wantsWebgl(): boolean {
-  return rendererSetting.getStringValue().trim().toLowerCase() !== "dom";
+export function provideWebglRenderer(bytes: () => BufferSource): void {
+  wasmBytes ??= bytes;
+  ensureLoaded();
 }
 
-// -- Loading the WebGL renderer --------------------------
+function ensureLoaded(): boolean {
+  if (isLoaded()) return true;
+  if (wasmBytes === null || loadFailed) return false;
+  try {
+    loadSync(wasmBytes());
+    return true;
+  } catch (error) {
+    // A policy that forbids WebAssembly.
+    loadFailed = true;
+    logCore(RENDERER_WASM_LOAD_FAILED_LOG, error);
+    return false;
+  }
+}
 
-let loading: Promise<void> | null = null;
-let unavailable = false;
+// -- Browsers it cannot draw in --------------------------
+
+const webgl2InDocument = new WeakMap<Document, boolean>();
+
+/** Whether `doc` can make a WebGL2 context, which the renderer needs. Asked once per document. */
+function hasWebgl2(doc: Document): boolean {
+  let has = webgl2InDocument.get(doc);
+  if (has === undefined) {
+    const context = doc.createElement("canvas").getContext("webgl2");
+    has = context !== null;
+    context?.getExtension("WEBGL_lose_context")?.loseContext();
+    webgl2InDocument.set(doc, has);
+  }
+  return has;
+}
+
+/** Where to turn hardware acceleration back on, in this browser's own words. */
+function hardwareAccelerationHint(): string {
+  switch (getBrowserVendor()) {
+    case "firefox":
+      return t("lyrics_rendererUnavailableHintFirefox");
+    case "edge":
+      return t("lyrics_rendererUnavailableHintEdge");
+    default:
+      return t("lyrics_rendererUnavailableHintChromium");
+  }
+}
 
 /**
- * Starts compiling the WebGL renderer from `bytes`, once. Only the contexts that hand it over can draw
- * with it (see webglRendererWasm.ts), so the page world, which never does, keeps the DOM renderer and
- * its bundle stays free of the wasm. Compiling takes milliseconds, well before the first lyrics
- * arrive; lyrics handed over before it is done, or where it failed (a policy that forbids
- * WebAssembly), are drawn by the DOM renderer.
+ * What a view shows where the renderer cannot draw: without WebGL2, which in practice means
+ * hardware acceleration is off. Drawing lyrics without it is not supported, so the view says how to
+ * turn it on and shows nothing else.
  */
-export function provideWebglRenderer(bytes: () => BufferSource): Promise<void> {
-  if (loading !== null) return loading;
-  loading = Promise.resolve()
-    .then(() => loadWebgl(bytes()))
-    .catch(error => {
-      unavailable = true;
-      logCore(RENDERER_WASM_LOAD_FAILED_LOG, error);
-    });
-  return loading;
-}
-
-function chooseKind(): RendererKind {
-  return wantsWebgl() && !unavailable && isWebglLoaded() ? "webgl" : "dom";
+function createUnavailableView(doc: Document): LyricsRenderer {
+  let container: HTMLElement | null = null;
+  return {
+    setLyrics(_lyrics, lyricsOptions) {
+      const mount = lyricsOptions?.mount;
+      if (!mount) return;
+      container = doc.createElement("div");
+      container.className = LYRICS_CLASS;
+      const message = doc.createElement("div");
+      message.className = `${ERROR_CLASS} ${RENDERER_UNAVAILABLE_CLASS}`;
+      message.textContent = t("lyrics_rendererUnavailable");
+      const hint = doc.createElement("p");
+      hint.className = RENDERER_UNAVAILABLE_HINT_CLASS;
+      hint.textContent = hardwareAccelerationHint();
+      container.replaceChildren(message, hint);
+      mount.replaceChildren(container);
+    },
+    setLanguage() {},
+    setTheme: () => false,
+    tick: () => "ok",
+    relayout() {},
+    clear() {
+      container?.remove();
+      container = null;
+    },
+    destroy() {
+      container?.remove();
+      container = null;
+    },
+    noteUserScroll() {},
+    noteVisibilityChange() {},
+    resumeAutoscroll() {},
+    clearOnScreenLyrics: () => false,
+    scheduleLyricPositionUpdate() {},
+    retickFromPlaybackClock: () => "ok",
+    get container() {
+      return container;
+    },
+    lines: [],
+    syncType: "none",
+    renderer: null,
+  };
 }
 
 // -- The view --------------------------
 
 /**
- * A lyrics view that draws with whichever renderer the theme and the browser allow, behind the
- * `LyricsRenderer` interface both share. The renderer is chosen when lyrics are handed over, so a
- * change of theme takes effect with the next build, which a renderer change asks for.
+ * A lyrics view drawn by braccato's renderer, or, where the browser has no WebGL2, one that says how
+ * to turn hardware acceleration on.
  *
- * The WebGL renderer's `lines` are records over its own song rather than the DOM renderer's render
- * state. They carry what this extension reads and writes (`lyricElement`, `time`, `duration`,
- * `parts`), which is why they are handed out as `LineData`.
+ * The renderer's `lines` are records over its own song: they carry what this extension reads and
+ * writes (`lyricElement`, `time`, `duration`, `parts`), which is why they are handed out as
+ * `LineData`.
  */
 export function createLyricsView(options: LyricsRendererOptions): LyricsRenderer {
-  let kind: RendererKind = "dom";
-  let active: LyricsRenderer = createDomRenderer(options);
-  let mount = options.mount;
+  let active: LyricsRenderer | null = null;
   let themeCss: string | null = null;
 
-  function createRenderer(next: RendererKind): LyricsRenderer {
-    const created =
-      next === "webgl"
-        ? (createWebglRenderer({ ...options, mount }) as unknown as LyricsRenderer)
-        : createDomRenderer({ ...options, mount });
-    if (themeCss !== null) created.setTheme(themeCss);
-    return created;
-  }
-
-  function switchTo(next: RendererKind): void {
-    if (next === kind) return;
-    active.destroy();
-    kind = next;
-    active = createRenderer(next);
+  function current(): LyricsRenderer {
+    if (active !== null) return active;
+    if (ensureLoaded() && hasWebgl2(options.document)) {
+      active = createLyricsRenderer(options);
+    } else {
+      logCore(RENDERER_UNAVAILABLE_LOG);
+      active = createUnavailableView(options.document);
+    }
+    if (themeCss !== null) active.setTheme(themeCss);
+    return active;
   }
 
   return {
     setLyrics(lyrics, lyricsOptions) {
-      mount = lyricsOptions?.mount ?? mount;
-      switchTo(chooseKind());
       try {
-        active.setLyrics(lyrics, lyricsOptions);
+        current().setLyrics(lyrics, lyricsOptions);
       } catch (error) {
-        if (kind !== "webgl") throw error;
-        // No WebGL2 in this document, or the context was refused: the DOM renderer draws instead.
-        logCore(RENDERER_FALLBACK_LOG, error);
-        unavailable = true;
-        switchTo("dom");
-        active.setLyrics(lyrics, lyricsOptions);
+        // The renderer could not make its context after all; anything else is a bug.
+        if (!String(error).toLowerCase().includes("webgl2")) throw error;
+        logCore(RENDERER_UNAVAILABLE_LOG, error);
+        active?.destroy();
+        active = createUnavailableView(options.document);
+        active.setLyrics(lyrics, { ...lyricsOptions, mount: lyricsOptions?.mount ?? options.mount });
       }
     },
     setTheme(css) {
       themeCss = css;
-      // The settings registry is this extension's as well as the DOM renderer's, and the WebGL
-      // renderer reads its own copy of the comments, so it is filled here whichever is drawing.
+      // The settings registry is this extension's, and the renderer reads its own copy of the
+      // comments, so it is filled here.
       const settingsChanged = setThemeSettings(parseThemeConfig(css));
-      const rendererChanged = active.setTheme(css);
+      const rendererChanged = active?.setTheme(css) ?? false;
       return settingsChanged || rendererChanged;
     },
-    setLanguage: language => active.setLanguage(language),
-    tick: (currentTimeS, tickOptions) => active.tick(currentTimeS, tickOptions),
-    relayout: measureLines => active.relayout(measureLines),
-    clear: () => active.clear(),
-    destroy: () => active.destroy(),
-    noteUserScroll: () => active.noteUserScroll(),
-    noteVisibilityChange: () => active.noteVisibilityChange(),
-    resumeAutoscroll: () => active.resumeAutoscroll(),
-    clearOnScreenLyrics: () => active.clearOnScreenLyrics(),
-    scheduleLyricPositionUpdate: (isTicking, retick) => active.scheduleLyricPositionUpdate(isTicking, retick),
-    retickFromPlaybackClock: buildOptions => active.retickFromPlaybackClock(buildOptions),
+    setLanguage: language => active?.setLanguage(language),
+    tick: (currentTimeS, tickOptions) => active?.tick(currentTimeS, tickOptions) ?? "lyrics-missing",
+    relayout: measureLines => active?.relayout(measureLines),
+    clear: () => active?.clear(),
+    destroy: () => active?.destroy(),
+    noteUserScroll: () => active?.noteUserScroll(),
+    noteVisibilityChange: () => active?.noteVisibilityChange(),
+    resumeAutoscroll: () => active?.resumeAutoscroll(),
+    clearOnScreenLyrics: () => active?.clearOnScreenLyrics() ?? false,
+    scheduleLyricPositionUpdate: (isTicking, retick) => active?.scheduleLyricPositionUpdate(isTicking, retick),
+    retickFromPlaybackClock: buildOptions => active?.retickFromPlaybackClock(buildOptions) ?? "lyrics-missing",
     get container() {
-      return active.container;
+      return active?.container ?? null;
     },
     get lines() {
-      return active.lines;
+      return active?.lines ?? [];
     },
     get syncType() {
-      return active.syncType;
+      return active?.syncType ?? "none";
+    },
+    get renderer() {
+      return active?.renderer ?? null;
     },
   };
 }
 
 // -- Song-wide operations --------------------------
 
-/** Clears the playback history both renderers keep, as a new song should. */
+/** Clears the renderer's playback history, as a new song should. */
 export function resetPlaybackClock(): void {
-  resetDomPlaybackClock();
-  if (isWebglLoaded()) resetWebglPlaybackClock();
+  if (isLoaded()) resetRendererPlaybackClock();
 }
 
-/** Resumes autoscroll in every view of either renderer. */
+/** Resumes autoscroll in every view. */
 export function resumeAllAutoscroll(): void {
-  resumeDomAutoscroll();
-  if (isWebglLoaded()) resumeWebglAutoscroll();
+  if (isLoaded()) resumeRendererAutoscroll();
 }
 
 // -- Decorations --------------------------
 
-function isWebglLine(lyricElement: HTMLElement): boolean {
-  return isWebglLoaded() && webglOwnsLine(lyricElement);
-}
-
-/** Hangs a translation on a line built by either renderer. */
+/** Hangs a translation on a line the renderer built. */
 export function injectTranslation(doc: Document, lyricElement: HTMLElement, text: string, language?: string | null) {
-  if (isWebglLine(lyricElement)) injectWebglTranslation(doc, lyricElement, text, language);
-  else injectDomTranslation(doc, lyricElement, text, language);
+  if (isLoaded() && ownsLine(lyricElement)) injectRendererTranslation(doc, lyricElement, text, language);
 }
 
-/** Hangs a romanization on a line built by either renderer. */
+/** Hangs a romanization on a line the renderer built. */
 export function injectRomanization(
   doc: Document,
   lyricElement: HTMLElement,
@@ -181,27 +234,28 @@ export function injectRomanization(
   text: string,
   timedRomanization: LyricPart[] | null = null
 ) {
-  if (isWebglLine(lyricElement)) injectWebglRomanization(doc, lyricElement, lineData, text, timedRomanization);
-  else injectDomRomanization(doc, lyricElement, lineData, text, timedRomanization);
+  if (isLoaded() && ownsLine(lyricElement)) {
+    injectRendererRomanization(doc, lyricElement, lineData, text, timedRomanization);
+  }
 }
 
-// -- What a WebGL view shows --------------------------
+// -- What a view shows --------------------------
 
-/** The canvas a WebGL view draws `container`'s lines on, or null for a DOM view. */
+/** The canvas a view draws `container`'s lines on, or null where it draws none. */
 export function rendererCanvas(container: HTMLElement): HTMLCanvasElement | null {
-  return isWebglLoaded() ? webglCanvasFor(container) : null;
+  return isLoaded() ? canvasFor(container) : null;
 }
 
 /**
- * Copies what the WebGL views inside `source` show onto the matching canvases of `clone`, a deep
- * clone of it: a WebGL canvas clones blank.
+ * Copies what the views inside `source` show onto the matching canvases of `clone`, a deep clone of
+ * it: a WebGL canvas clones blank.
  */
 export function copyRendererCanvases(source: HTMLElement, clone: HTMLElement): void {
-  if (!isWebglLoaded()) return;
+  if (!isLoaded()) return;
   const originals = source.querySelectorAll("canvas");
   const copies = clone.querySelectorAll("canvas");
   originals.forEach((canvas, index) => {
-    const snapshot = snapshotWebglCanvas(canvas);
+    const snapshot = snapshotCanvas(canvas);
     if (snapshot) copies[index]?.replaceWith(snapshot);
   });
 }

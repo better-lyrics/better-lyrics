@@ -312,10 +312,6 @@ export function createLyricsWrapper(keepContents = false): HTMLElement {
     const range = selection.getRangeAt(0);
     const fragment = range.cloneContents();
 
-    // The DOM renderer draws each line twice, its highlight copy hidden from assistive tech; the
-    // copy is what a reader selected, once.
-    fragment.querySelectorAll('[aria-hidden="true"]').forEach(el => el.remove());
-
     const lineElements = fragment.querySelectorAll(`.${LINE_CLASS}`);
 
     if (lineElements.length === 0) {

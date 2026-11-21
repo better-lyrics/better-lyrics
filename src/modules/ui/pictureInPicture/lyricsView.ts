@@ -641,7 +641,7 @@ export class PictureInPictureLyricsView {
       })
       .slice(0, motion.revealLines);
     if (visible.length === 0) return;
-    // The WebGL renderer draws every line on one canvas, so the lines rise in together.
+    // The renderer draws every line on one canvas, so the lines rise in together.
     const canvas = rendererCanvas(container);
     const targets: Element[] = canvas ? [canvas] : visible;
 

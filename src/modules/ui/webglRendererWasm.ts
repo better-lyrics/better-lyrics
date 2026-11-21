@@ -1,15 +1,15 @@
-import rendererWasm from "@braccato/core-rs/wasm";
+import rendererWasm from "@braccato/core/wasm";
 import { provideWebglRenderer } from "@modules/ui/lyricsRenderer";
 
-// -- The WebGL renderer's wasm --------------------------
+// -- The lyrics renderer's wasm --------------------------
 
 /**
- * Hands the WebGL lyrics renderer its WebAssembly, which the build inlines into whatever imports this
- * module (see extension.config.js). Imported only by the contexts that draw with it, the content
+ * Hands the lyrics renderer its WebAssembly, which the build inlines into whatever imports this
+ * module (see extension.config.js). Imported only by the contexts that draw lyrics, the content
  * script and the options page, so no other bundle carries the bytes.
  */
-export function loadWebglRenderer(): Promise<void> {
-  return provideWebglRenderer(() => {
+export function loadWebglRenderer(): void {
+  provideWebglRenderer(() => {
     const binary = atob(rendererWasm.slice(rendererWasm.indexOf(",") + 1));
     const bytes = new Uint8Array(binary.length);
     for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
