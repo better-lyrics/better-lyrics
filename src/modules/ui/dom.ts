@@ -1714,7 +1714,8 @@ export function cleanup(keepView = false): void {
   clearUnisonControlsRegistry();
   AppState.currentUnisonData = null;
 
-  getResumeScrollElement().setAttribute("autoscroll-hidden", "true");
+  // Lyrics swapped into a view that stays keep its autoscroll paused, and so need the button.
+  if (!keepView) getResumeScrollElement().setAttribute("autoscroll-hidden", "true");
 
   const buttonContainer = document.querySelector(".blyrics-no-lyrics-button-container");
   if (buttonContainer) {

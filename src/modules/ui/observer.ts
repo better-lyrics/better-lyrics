@@ -4,7 +4,6 @@ import {
   LYRICS_TAB_CLICKED_LOG,
   LYRICS_WRAPPER_ID,
   SONG_SWITCHED_LOG,
-  TAB_CONTENT_CLASS,
   TAB_HEADER_CLASS,
   TAB_RENDERER_SELECTOR,
 } from "@constants";
@@ -236,7 +235,7 @@ export function disableInertWhenFullscreen(): void {
             (mutation.target as HTMLElement).removeAttribute("inert");
             const tabSelector = document.getElementsByClassName(TAB_HEADER_CLASS)[1] as HTMLElement;
             if (tabSelector && tabSelector.getAttribute("aria-selected") !== "true") {
-              tabSelector.click();
+              selectLyricsTab(tabSelector);
               currentTab = 1;
               if (AppState.areLyricsLoaded) {
                 AppState.areLyricsTicking = true;
@@ -252,6 +251,18 @@ export function disableInertWhenFullscreen(): void {
 
 let currentTab = 0;
 let scrollPositions = [0, 0, 0];
+let isSelectingLyricsTab = false;
+
+/**
+ * Opens the lyrics tab for the extension itself. Its callers load and tick the lyrics on their own,
+ * so this must not run what a reader's click on the tab does (see lyricReloader).
+ */
+function selectLyricsTab(tab: HTMLElement): void {
+  isSelectingLyricsTab = true;
+  tab.click();
+  isSelectingLyricsTab = false;
+  getResumeScrollElement().classList.remove("blyrics-hidden");
+}
 
 /**
  * Sets up tab click handlers and manages scroll positions between tabs.
@@ -262,15 +273,20 @@ export function lyricReloader(): void {
     return;
   }
 
-  const tabs = document.getElementsByClassName(TAB_CONTENT_CLASS);
+  // The whole tab rather than its label: a click on the padding or from the keyboard lands on the tab.
+  const tabs = document.getElementsByClassName(TAB_HEADER_CLASS);
 
   const [tab1, tab2, tab3] = Array.from(tabs);
 
   if (tab1 !== undefined && tab2 !== undefined && tab3 !== undefined) {
     hasInitializedLyricReloader = true;
 
+    // In the capture phase, to save the leaving tab's scroll before YouTube Music switches tabs.
+    const onReaderClick = (tab: Element, handle: () => void) =>
+      tab.addEventListener("click", () => !isSelectingLyricsTab && handle(), { capture: true });
+
     for (let i = 0; i < tabs.length; i++) {
-      tabs[i].addEventListener("click", () => {
+      onReaderClick(tabs[i], () => {
         const tabRenderer = document.querySelector(TAB_RENDERER_SELECTOR) as HTMLElement;
         scrollPositions[currentTab] = tabRenderer.scrollTop;
         tabRenderer.scrollTop = scrollPositions[i];
@@ -285,11 +301,11 @@ export function lyricReloader(): void {
           // stop ticking immediately
           AppState.areLyricsTicking = false;
         }
+        getResumeScrollElement().classList.toggle("blyrics-hidden", i !== 1);
       });
     }
 
-    tab2.addEventListener("click", () => {
-      getResumeScrollElement().classList.remove("blyrics-hidden");
+    onReaderClick(tab2, () => {
       if (!AppState.areLyricsLoaded) {
         logCore(LYRICS_TAB_CLICKED_LOG);
         cleanup();
@@ -298,13 +314,7 @@ export function lyricReloader(): void {
       }
     });
 
-    const onNonLyricTabClick = () => {
-      getResumeScrollElement().classList.add("blyrics-hidden");
-    };
-
-    tab1.addEventListener("click", onNonLyricTabClick);
-    tab1.addEventListener("click", revealQueueAutoplaySection);
-    tab3.addEventListener("click", onNonLyricTabClick);
+    onReaderClick(tab1, revealQueueAutoplaySection);
   } else {
     setTimeout(() => lyricReloader(), 1000);
   }
@@ -439,9 +449,8 @@ export function initializeLyrics(): void {
         AppState.lyricInjectionFailed = false;
         if (tabSelector.getAttribute("aria-selected") !== "true") {
           onAutoSwitchEnabled(() => {
-            tabSelector.click();
+            selectLyricsTab(tabSelector);
             logCore(AUTO_SWITCH_ENABLED_LOG);
-            getResumeScrollElement().classList.remove("blyrics-hidden");
           });
         }
         handleModifications(detail);
