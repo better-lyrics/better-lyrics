@@ -30,7 +30,7 @@ Some effects have no equivalent:
 - custom keyframes
 - rotated text
 
-Don't fake them. Tell the user they are not possible yet and suggest asking in the [Better Lyrics Discord](https://discord.gg/UsHE3d5fWF), so they can be added to the renderer. To move an older theme over, run `npx create-bl-theme@latest migrate --write`: it writes the distance lists from the theme's line rules and lists the rest.
+Don't fake them. Tell the user they are not possible yet and suggest asking in the [Better Lyrics Discord](https://discord.gg/UsHE3d5fWF), so they can be added to the renderer. To move an older theme over, run `npx create-bl-theme@beta migrate --write`: it writes the distance lists from the theme's line rules and lists the rest.
 
 ## Quick Reference: CSS Variables
 
