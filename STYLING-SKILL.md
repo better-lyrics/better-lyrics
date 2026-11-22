@@ -15,14 +15,14 @@ Better Lyrics draws lyrics with braccato's WebGL renderer (`@braccato/core` 2). 
   - paint on lyric elements: `opacity`, `filter`, `transform`, `color`, `text-shadow`, `background`, `border`, `box-shadow`, `-webkit-text-stroke`, `mix-blend-mode`;
   - `animation`, `transition` and `@keyframes` on lyric elements;
   - `::before` / `::after` on lyric elements;
-  - `:hover` on lines.
+  - `:hover` on lines, except the hovered line's opacity, blur and scale (see [Effects](#effects)).
 - **Never set:** `.blyrics--active`, `.blyrics--animating`, `.blyrics--paused` and `[data-word-state]`, so nothing keyed off them applies. `.blyrics-user-scrolling` is still set on the container.
 - **Spacing:** the space around a line is `--blyrics-padding`. The renderer sets lines' and words' own `padding` and `margin`.
 
 Fading and blurring lines around the sung one is done with lists (see [Effects](#effects)). Everything outside the lyrics (YouTube Music's layout, the background, the footer, the loader, the player) is ordinary DOM and styles as usual.
 
 Some effects have no equivalent:
-- hover styles on lines
+- hover styles beyond the hovered line's opacity, blur and scale
 - shadows, strokes, backgrounds or borders on lyrics
 - filters other than blur
 - per-word opacity or styles keyed off a word's state
@@ -157,6 +157,20 @@ Leave font-family overrides unset for language-aware CJK defaults. If adding a f
 - The last value holds beyond the end: `1 0.5` dims every other line, and a trailing `0` hides the rest.
 - Blurs are `px` or `rem` and mean what `blur()` means.
 - The renderer interpolates between lines as the view scrolls, and eases the effects off while the reader scrolls.
+
+The line under the mouse can take its own opacity, blur and scale, as a `:hover` rule once gave it:
+
+```css
+.blyrics-container {
+  --blyrics-line-hover-opacity: 1;      /* replaces the distance opacity */
+  --blyrics-line-hover-blur: 0;         /* replaces the distance blur */
+  --blyrics-line-hover-scale: 1.02;     /* replaces the line's scale */
+  --blyrics-line-hover-duration: 0.2s;  /* default */
+  --blyrics-line-hover-easing: ease;    /* default */
+}
+```
+
+Leave one unset to keep the line's own value. Touch input has no hover.
 
 `--blyrics-blur-amount` is the player bar's frost. On the player page it is skipped while
 `--blyrics-background-blur` is exactly its 100px default (a style container query in

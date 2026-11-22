@@ -99,7 +99,7 @@ If you're new to CSS, don't worry! This guide will walk you through the main com
 > **Lyrics are drawn on a canvas.** Better Lyrics renders lyrics with braccato's WebGL renderer. The lyric lines are still in the page, laid out but invisible, and a canvas draws them.
 >
 > - **Still works:** the `--blyrics-*` variables, the comment knobs, selectors that scope those variables (such as `[data-agent="v2"]`), and layout properties like `font-*`, `letter-spacing` and `text-align`.
-> - **No longer shows:** paint on lines and words (`opacity`, `filter`, `transform`, `color`, shadows, backgrounds, animations and transitions, `::before`/`::after`).
+> - **No longer shows:** paint on lines and words (`opacity`, `filter`, `transform`, `color`, shadows, backgrounds, animations and transitions, `::before`/`::after`, `:hover`). The hovered line's opacity, blur and scale are `--blyrics-line-hover-opacity`, `--blyrics-line-hover-blur` and `--blyrics-line-hover-scale`.
 > - **Never set:** `.blyrics--active`, `.blyrics--animating`, `.blyrics--paused` and `[data-word-state]`.
 >
 > Sections 5 and 6 below still describe the old DOM renderer in places. Fading and blurring lines around the sung one is now `--blyrics-line-opacity[-before|-after]` and `--blyrics-line-blur[-before|-after]`, lists of values for the sung line and then 1, 2, 3… lines away (see [the theme guide](STYLING-SKILL.md#effects)). Run `npx create-bl-theme@latest migrate --write` to convert an older theme. If your design needs an effect that has no variable, ask in the [Better Lyrics Discord](https://discord.gg/UsHE3d5fWF) so it can be added to the renderer.
