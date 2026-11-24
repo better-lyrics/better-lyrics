@@ -476,6 +476,10 @@ export function scrollEventHandler(): void {
   if (!tabSelector || tabSelector.getAttribute("aria-selected") !== "true" || !AppState.areLyricsTicking) {
     return;
   }
+  // YouTube Music scrolls the panel to the top on a song change, before the player snapshot that
+  // stops the old lyrics ticking arrives. The URL has the new song by then.
+  const urlVideoId = new URLSearchParams(window.location.search).get("v");
+  if (urlVideoId !== null && urlVideoId !== AppState.lastVideoId) return;
 
   mainView.noteUserScroll();
 }
