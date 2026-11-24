@@ -69,7 +69,6 @@ function ensureLoaded(): boolean {
 
 const webgl2InDocument = new WeakMap<Document, boolean>();
 
-/** Whether `doc` can make a WebGL2 context, which the renderer needs. Asked once per document. */
 function hasWebgl2(doc: Document): boolean {
   let has = webgl2InDocument.get(doc);
   if (has === undefined) {
@@ -81,7 +80,6 @@ function hasWebgl2(doc: Document): boolean {
   return has;
 }
 
-/** Where to turn hardware acceleration back on, in this browser's own words. */
 function hardwareAccelerationHint(): string {
   switch (getBrowserVendor()) {
     case "firefox":
@@ -217,24 +215,20 @@ export function createLyricsView(options: LyricsRendererOptions): LyricsRenderer
 
 // -- Song-wide operations --------------------------
 
-/** Clears the renderer's playback history, as a new song should. */
 export function resetPlaybackClock(): void {
   if (isLoaded()) resetRendererPlaybackClock();
 }
 
-/** Resumes autoscroll in every view. */
 export function resumeAllAutoscroll(): void {
   if (isLoaded()) resumeRendererAutoscroll();
 }
 
 // -- Decorations --------------------------
 
-/** Hangs a translation on a line the renderer built. */
 export function injectTranslation(doc: Document, lyricElement: HTMLElement, text: string, language?: string | null) {
   if (isLoaded() && ownsLine(lyricElement)) injectRendererTranslation(doc, lyricElement, text, language);
 }
 
-/** Hangs a romanization on a line the renderer built. */
 export function injectRomanization(
   doc: Document,
   lyricElement: HTMLElement,
