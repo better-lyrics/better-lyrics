@@ -47,6 +47,7 @@ import {
   publishPictureInPictureResources,
 } from "@modules/ui/pictureInPicture/browserController";
 import { subscribeToCustomStyles } from "@modules/ui/styleInjector";
+import { loadWebglRenderer } from "@modules/ui/webglRendererWasm";
 import { applyLoggingSetting } from "@modules/settings/settings";
 import { logCore, logError } from "@core/logger";
 import { startVideoQualitySettingsBridge } from "@modules/settings/videoQualityBridge";
@@ -113,6 +114,7 @@ async function modify(isDisposed: () => boolean): Promise<void> {
  * Entry point for the BetterLyrics extension.
  */
 function init(): () => void {
+  loadWebglRenderer();
   const cleanupVideoQualitySettings = startVideoQualitySettingsBridge();
   let disposed = false;
   let modifyStarted = false;

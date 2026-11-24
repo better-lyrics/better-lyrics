@@ -1,6 +1,7 @@
 import { AppState } from "@core/appState";
 import { ytmHost } from "@modules/ui/lyricsHost";
-import { createLyricsRenderer, type LyricsRenderer, type TickOptions } from "@braccato/core";
+import type { LyricsRenderer, TickOptions } from "@braccato/core";
+import { createLyricsView } from "@modules/ui/lyricsRenderer";
 
 // -- The side panel's view --------------------------
 
@@ -11,7 +12,7 @@ import { createLyricsRenderer, type LyricsRenderer, type TickOptions } from "@br
  * Handed out without `destroy`, because destruction is final and there is no path back: this view
  * lives for as long as the tab does, and seven modules can reach it.
  */
-export const mainView: Omit<LyricsRenderer, "destroy"> = createLyricsRenderer({ document, window, host: ytmHost });
+export const mainView: Omit<LyricsRenderer, "destroy"> = createLyricsView({ document, window, host: ytmHost });
 
 // -- Tick options --------------------------
 

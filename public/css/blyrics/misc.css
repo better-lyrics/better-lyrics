@@ -64,3 +64,14 @@
 	padding-top: var(--blyrics-padding) !important;
 	word-break: break-word;
 }
+
+/* In place of the lyrics where the browser cannot draw them (no WebGL2). */
+.blyrics-renderer-unavailable-hint {
+	color: var(--blyrics-error-color);
+	font-family: var(--blyrics-font-family, var(--blyrics-default-font-family));
+	font-size: 1.6rem;
+	line-height: 1.5;
+	margin: 0;
+	max-width: 48ch;
+	opacity: var(--blyrics-error-opacity);
+}

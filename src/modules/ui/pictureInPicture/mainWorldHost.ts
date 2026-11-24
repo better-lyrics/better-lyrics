@@ -9,6 +9,7 @@ import {
 import { createLogSink, type LogSink, warnGeneral } from "@core/logger";
 import type { PictureInPictureController } from "@modules/ui/pictureInPicture/controller";
 import { createPictureInPictureHost } from "@modules/ui/pictureInPicture/pipHost";
+import { provideRendererWasm } from "@modules/ui/lyricsRenderer";
 import type { PictureInPictureSongMetadata } from "@modules/ui/pictureInPicture/types";
 
 const IGNORED_AUTO_RESTORE_KEYS = new Set(["Escape", "Alt", "Control", "Meta", "Shift"]);
@@ -141,6 +142,7 @@ export function startPictureInPicturePageHost(): () => void {
 
   const unsubscribeInit = onInit(payload => {
     resources = payload;
+    provideRendererWasm(payload.rendererWasm);
     pageLog = createLogSink(LOG_PREFIX, payload.logsEnabled);
     if (!controller) {
       controller = createController();

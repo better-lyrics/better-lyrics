@@ -31,7 +31,8 @@ import {
 import { lyricsElementAdded, mainView } from "@modules/ui/mainLyricsView";
 import { disableNativeLyricsFocus } from "@modules/ui/nativeLyricsFocus";
 import { publishSecondaryViews } from "@modules/ui/secondaryViews";
-import { injectRomanization, injectTranslation, type LineData } from "@braccato/core";
+import type { LineData } from "@braccato/core";
+import { injectRomanization, injectTranslation } from "@modules/ui/lyricsRenderer";
 import { findBestLanguageMatch, langCodesMatch, languageMatchesAny } from "@utils";
 import { logCore } from "@core/logger";
 

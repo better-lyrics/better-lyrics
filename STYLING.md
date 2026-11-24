@@ -95,6 +95,15 @@ The extension lets you modify the CSS in real-time, so you can see the changes i
 
 If you're new to CSS, don't worry! This guide will walk you through the main components of the Better Lyrics CSS and explain how they work.
 
+> [!IMPORTANT]
+> **Lyrics are drawn on a canvas.** Better Lyrics renders lyrics with braccato's WebGL renderer. The lyric lines are still in the page, laid out but invisible, and a canvas draws them.
+>
+> - **Still works:** the `--blyrics-*` variables, the comment knobs, selectors that scope those variables (such as `[data-agent="v2"]`), and layout properties like `font-*`, `letter-spacing` and `text-align`.
+> - **No longer shows:** paint on lines and words (`opacity`, `filter`, `transform`, `color`, shadows, backgrounds, animations and transitions, `::before`/`::after`, `:hover`). The hovered line's opacity, blur and scale are `--blyrics-line-hover-opacity`, `--blyrics-line-hover-blur` and `--blyrics-line-hover-scale`.
+> - **Never set:** `.blyrics--active`, `.blyrics--animating`, `.blyrics--paused` and `[data-word-state]`.
+>
+> Sections 5 and 6 below still describe the old DOM renderer in places. Fading and blurring lines around the sung one is now `--blyrics-line-opacity[-before|-after]` and `--blyrics-line-blur[-before|-after]`, lists of values for the sung line and then 1, 2, 3… lines away (see [the theme guide](STYLING-SKILL.md#effects)). Run `npx create-bl-theme@beta migrate --write` to convert an older theme. If your design needs an effect that has no variable, ask in the [Better Lyrics Discord](https://discord.gg/UsHE3d5fWF) so it can be added to the renderer.
+
 ## 2. Understanding the CSS Structure
 
 The Better Lyrics styling system consists of several modular CSS files, organized into directories:
@@ -574,6 +583,9 @@ Use `data-loader-visible` to adjust styles when the loader is active:
 
 ## 5. Styling Individual Lyric Lines
 
+> [!NOTE]
+> With the WebGL renderer, the selectors in this section scope variables and layout. The paint and state classes they use (`opacity`, `filter`, `.blyrics--active` and so on) do not show; see the note in [section 1](#1-introduction-to-css-and-better-lyrics).
+
 Lyric lines are rendered as normal block and inline text so the browser can wrap at natural whitespace. Timed words are still represented by spans, and animation timing is driven by the Web Animations API.
 
 ### Base Structure
@@ -863,6 +875,9 @@ The swipe and glow are driven by `element.animate()`:
 
 
 ## 6. Creating Animation Effects
+
+> [!NOTE]
+> With the WebGL renderer, keyframes and transitions on lyric elements do not run. Shape the built-in effects with their variables (`--blyrics-word-wobble-transform-*`, `--blyrics-letter-wave-*`, `--blyrics-highlight-*`, `--blyrics-scale-transition-duration`).
 
 Most lyric timing uses the Web Animations API, but the same conceptual effects remain:
 

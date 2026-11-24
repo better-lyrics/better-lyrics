@@ -31,7 +31,6 @@ import {
   type SyncType,
   TAB_RENDERER_SELECTOR,
   TRANSLATED_LYRICS_CLASS,
-  WORD_HIGHLIGHT_CLASS,
 } from "@constants";
 import { AppState } from "@core/appState";
 import { getBrowserVendor } from "@core/browser";
@@ -312,8 +311,6 @@ export function createLyricsWrapper(keepContents = false): HTMLElement {
 
     const range = selection.getRangeAt(0);
     const fragment = range.cloneContents();
-
-    fragment.querySelectorAll(`.${WORD_HIGHLIGHT_CLASS}`).forEach(el => el.remove());
 
     const lineElements = fragment.querySelectorAll(`.${LINE_CLASS}`);
 
@@ -1717,7 +1714,8 @@ export function cleanup(keepView = false): void {
   clearUnisonControlsRegistry();
   AppState.currentUnisonData = null;
 
-  getResumeScrollElement().setAttribute("autoscroll-hidden", "true");
+  // Lyrics swapped into a view that stays keep its autoscroll paused, and so need the button.
+  if (!keepView) getResumeScrollElement().setAttribute("autoscroll-hidden", "true");
 
   const buttonContainer = document.querySelector(".blyrics-no-lyrics-button-container");
   if (buttonContainer) {
