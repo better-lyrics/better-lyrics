@@ -96,11 +96,11 @@ function hardwareAccelerationHint(): string {
  * hardware acceleration is off. Drawing lyrics without it is not supported, so the view says how to
  * turn it on and shows nothing else.
  */
-function createUnavailableView(doc: Document): LyricsRenderer {
+function createUnavailableView(doc: Document, defaultMount?: HTMLElement): LyricsRenderer {
   let container: HTMLElement | null = null;
   return {
     setLyrics(_lyrics, lyricsOptions) {
-      const mount = lyricsOptions?.mount;
+      const mount = lyricsOptions?.mount ?? defaultMount;
       if (!mount) return;
       container = doc.createElement("div");
       container.className = LYRICS_CLASS;
@@ -160,7 +160,7 @@ export function createLyricsView(options: LyricsRendererOptions): LyricsRenderer
       active = createLyricsRenderer(options);
     } else {
       logCore(RENDERER_UNAVAILABLE_LOG);
-      active = createUnavailableView(options.document);
+      active = createUnavailableView(options.document, options.mount);
     }
     if (themeCss !== null) active.setTheme(themeCss);
     return active;
@@ -175,8 +175,8 @@ export function createLyricsView(options: LyricsRendererOptions): LyricsRenderer
         if (!String(error).toLowerCase().includes("webgl2")) throw error;
         logCore(RENDERER_UNAVAILABLE_LOG, error);
         active?.destroy();
-        active = createUnavailableView(options.document);
-        active.setLyrics(lyrics, { ...lyricsOptions, mount: lyricsOptions?.mount ?? options.mount });
+        active = createUnavailableView(options.document, options.mount);
+        active.setLyrics(lyrics, lyricsOptions);
       }
     },
     setTheme(css) {
