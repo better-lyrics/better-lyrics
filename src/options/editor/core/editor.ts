@@ -97,7 +97,7 @@ export function createEditorState(initialContents: string, options: EditorOption
     rainbowBrackets(),
     EditorView.updateListener.of(update => {
       if (update.docChanged && editorStateManager.hasLoadedContent()) {
-        onChange(update.state.doc.toString());
+        onChange();
       }
     }),
   ];
