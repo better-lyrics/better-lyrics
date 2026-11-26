@@ -12,25 +12,28 @@ Better Lyrics draws lyrics with braccato's WebGL renderer (`@braccato/core` 2). 
   - selectors that scope variables (colours resolve per element, so `[data-agent="v2"] { --blyrics-lyric-active-color: … }` colours just those lines);
   - layout properties on lines: `font-*`, `letter-spacing`, `line-height`, `text-align`.
 - **Does not show:**
-  - paint on lyric elements: `opacity`, `filter`, `transform`, `color`, `text-shadow`, `background`, `border`, `box-shadow`, `-webkit-text-stroke`, `mix-blend-mode`;
+  - paint on lyric elements: `opacity`, `filter`, `transform`, `color`, `text-shadow`, `background`, `border`, `box-shadow`, `-webkit-text-stroke`, `mix-blend-mode`. The variables in [Effects](#effects) stand in for the common cases;
   - `animation`, `transition` and `@keyframes` on lyric elements;
-  - `::before` / `::after` on lyric elements;
-  - `:hover` on lines, except the hovered line's opacity, blur and scale (see [Effects](#effects)).
+  - `::before` / `::after` on lyric elements. They take up no room either, on instrumental and no-lyrics lines too. The instrumental icon and the no-lyrics message have variables (see [Instrumental and no lyrics](#instrumental-and-no-lyrics));
+  - `:hover` on lines, except what the hover variables cover (see [Effects](#effects)).
 - **Never set:** `.blyrics--active`, `.blyrics--animating`, `.blyrics--paused` and `[data-word-state]`, so nothing keyed off them applies. `.blyrics-user-scrolling` is still set on the container.
 - **Spacing:** the space around a line is `--blyrics-padding`. The renderer sets lines' and words' own `padding` and `margin`.
 
 Fading and blurring lines around the sung one is done with lists (see [Effects](#effects)). Everything outside the lyrics (YouTube Music's layout, the background, the footer, the loader, the player) is ordinary DOM and styles as usual.
 
 Some effects have no equivalent:
-- hover styles beyond the hovered line's opacity, blur and scale
-- shadows, strokes, backgrounds or borders on lyrics
-- filters other than blur
-- per-word opacity or styles keyed off a word's state
-- pseudo-element decorations
+- hover styles beyond the hovered line's opacity, blur, scale, word colour, text shadow and box, and the other lines' opacity
+- text shadows that change with a word's state or while the reader scrolls
+- strokes, gradients and images on lyrics, and boxes other than a solid one behind a line or the romanization's
+- filters other than blur, saturate and brightness
+- per-word opacity other than sung words in the sung line, or other styles keyed off a word's state
+- pseudo-element decorations other than the instrumental icon and the no-lyrics message
 - custom keyframes
-- rotated text
+- rotated or skewed text
 
-Don't fake them. Tell the user they are not possible yet and suggest asking in the [Better Lyrics Discord](https://discord.gg/UsHE3d5fWF), so they can be added to the renderer. To move an older theme over, run `npx create-bl-theme@beta migrate --write`: it writes the distance lists from the theme's line rules and lists the rest.
+Don't fake them. Tell the user they are not possible yet and suggest asking in the [Better Lyrics Discord](https://discord.gg/UsHE3d5fWF), so they can be added to the renderer.
+
+To move an older theme over, run `npx create-bl-theme@beta migrate --write`. It writes the variables below from the theme's own rules and lists what it could not convert. Running it again updates its block in place. `npx create-bl-theme@beta perf` lists the effects a theme turns on and what each costs to draw.
 
 ## Quick Reference: CSS Variables
 
@@ -45,6 +48,8 @@ Don't fake them. Tell the user they are not possible yet and suggest asking in t
   --blyrics-translated-opacity: 0.6;
 }
 ```
+
+A colour variable set to something that is not a colour counts as unset, so it falls back to its default rather than to transparent. Use `transparent` to draw nothing.
 
 ### Typography
 
@@ -117,6 +122,8 @@ Leave font-family overrides unset for language-aware CJK defaults. If adding a f
 }
 ```
 
+Every easing variable also takes `linear()`, so spring curves can be written directly: `--blyrics-word-wobble-easing: linear(0, 0.6 20%, 1.08 40%, 0.98 65%, 1);`.
+
 ### Layout
 
 ```css
@@ -153,30 +160,101 @@ Leave font-family overrides unset for language-aware CJK defaults. If adding a f
 }
 ```
 
-- `--blyrics-line-opacity` and `--blyrics-line-blur` set both sides at once.
+- `--blyrics-line-opacity`, `--blyrics-line-blur`, `--blyrics-line-saturate` and `--blyrics-line-brightness` set both sides at once; `-before` and `-after` set one side.
 - The last value holds beyond the end: `1 0.5` dims every other line, and a trailing `0` hides the rest.
-- Blurs are `px` or `rem` and mean what `blur()` means.
+- Blurs are `px` or `rem` and mean what `blur()` means. Saturations and brightnesses are numbers, `1` for unchanged, and mean what `saturate()` and `brightness()` mean: `--blyrics-line-saturate: 1 0.8` and `--blyrics-line-brightness: 1 0.6` replace `filter: saturate(80%) brightness(.6)` on the other lines.
 - The renderer interpolates between lines as the view scrolls, and eases the effects off while the reader scrolls.
-
-The line under the mouse can take its own opacity, blur and scale, as a `:hover` rule once gave it:
-
-```css
-.blyrics-container {
-  --blyrics-line-hover-opacity: 1;      /* replaces the distance opacity */
-  --blyrics-line-hover-blur: 0;         /* replaces the distance blur */
-  --blyrics-line-hover-scale: 1.02;     /* replaces the line's scale */
-  --blyrics-line-hover-duration: 0.2s;  /* default */
-  --blyrics-line-hover-easing: ease;    /* default */
-}
-```
-
-Leave one unset to keep the line's own value. Touch input has no hover.
+- They are read once from `.blyrics-container`, so per-line selectors do not scope them, but `.blyrics-container[data-sync="richsync"]` or `[data-sync="synced"]` does.
 
 `--blyrics-blur-amount` is the player bar's frost. On the player page it is skipped while
 `--blyrics-background-blur` is exactly its 100px default (a style container query in
 `general.css`): over that background the frost changes no pixel, and Chromium would otherwise re-blur
 the whole bar in every frame the lyrics scroll near it. A theme that sharpens the background gets the
 frost back automatically.
+
+The line under the mouse can take its own look, as a `:hover` rule once gave it:
+
+```css
+.blyrics-container {
+  --blyrics-line-hover-opacity: 1;                           /* replaces the distance opacity */
+  --blyrics-line-hover-blur: 0;                              /* replaces the distance blur */
+  --blyrics-line-hover-scale: 1.02;                          /* replaces the line's scale */
+  --blyrics-line-hover-color: rgb(255 255 255 / 0.75);       /* the words' colour before they are sung */
+  --blyrics-line-hover-bg-color: rgb(255 255 255 / 0.1);     /* the line's box, below */
+  --blyrics-line-hover-border-color: rgb(255 255 255 / 0.1);
+  --blyrics-line-hover-duration: 0.2s;                       /* default */
+  --blyrics-line-hover-easing: ease;                         /* default */
+  --blyrics-line-opacity-browsing: 0.5; /* every other line, while the pointer is over the lyrics or the reader scrolls */
+}
+```
+
+- Leave one unset to keep the line's own value. Touch input has no hover.
+- `--blyrics-line-hover-color` replaces the hovered line's `--blyrics-lyric-inactive-color`. The sung part, translations and romanizations keep theirs. It applies to the sung line too when that is hovered.
+- `--blyrics-line-opacity-browsing` applies to every line but the sung and hovered ones, eased over the hover duration. It is unset by default.
+- The hovered line's text shadow is `--blyrics-line-hover-text-shadow` (below).
+
+#### Words
+
+```css
+.blyrics--word {
+  --blyrics-word-past-opacity: 0.7;               /* a sung word, while its line is still sung; default 1 */
+  --blyrics-word-rest-transform: translateY(3px); /* the Apple Music lift; default none */
+  --blyrics-word-rise-extra-duration: 0.2s;       /* default */
+  --blyrics-word-rise-easing: ease;               /* default */
+}
+```
+
+- `--blyrics-word-past-opacity` fades a word-synced word once it is sung, over `--blyrics-lyric-highlight-fade-out-duration`. It returns to full as the line ends.
+- `--blyrics-word-rest-transform` (translations and scales) is the pose word-synced words wait in until the sung line reaches them. They rise out of it over their own duration plus `--blyrics-word-rise-extra-duration`.
+- Both are read per word, so selectors scope them.
+
+#### Text shadows
+
+`text-shadow` syntax, drawn once with the line under its text. They are read per element, on lines, words, translations and romanizations, so selectors scope them:
+
+```css
+.blyrics--line, .blyrics--translated {
+  --blyrics-text-shadow: 0 0.3rem 0.5rem rgb(0 0 0 / 0.15);           /* at rest */
+  --blyrics-active-text-shadow: 0 0 1rem rgb(255 255 255 / 0.4);      /* while sung; none for none */
+  --blyrics-line-hover-text-shadow: 0 0 0.5rem rgb(255 255 255 / 0.3); /* while hovered */
+}
+```
+
+The active shadow eases in and out with the line's scale transition, and the hover one over the hover duration, winning over the active one. They cross-fade rather than move from one offset to another.
+
+#### Boxes behind lines
+
+```css
+.blyrics--line {
+  --blyrics-line-bg-color: rgb(255 255 255 / 0.06);     /* default transparent */
+  --blyrics-line-border-color: rgb(255 255 255 / 0.1);  /* a border inside the box's edge; default transparent */
+  --blyrics-line-border-width: 1px;                     /* default */
+  border-radius: 1rem;                                  /* the box's corners */
+}
+```
+
+The box covers the line's whole box, padding included, and scales, fades and blurs with the line. It is read per line, so `.blyrics-container[data-layout="stage"] > .blyrics--line` gives only the stage view's lines a box. Only solid colours are drawn. The hovered line's box is `--blyrics-line-hover-bg-color` / `--blyrics-line-hover-border-color`.
+
+`--blyrics-romanized-bg-color` is the box behind a romanization (`transparent` draws none), with `.blyrics--romanized`'s own `padding` and `border-radius`.
+
+#### Instrumental and no lyrics
+
+```css
+.blyrics-container {
+  --blyrics-instrumental-icon: dots;         /* note (default), dots, or a string such as "♫" */
+  --blyrics-instrumental-pulse-scale: 1.05;  /* swells to this and back while the instrumental plays; default 1 */
+  --blyrics-instrumental-pulse-duration: 1.5s; /* one swell; default */
+  --blyrics-no-lyrics-text: "No lyrics found"; /* replaces Better Lyrics' own message */
+  --blyrics-no-lyrics-icon: "♫";               /* drawn above the message */
+}
+
+.blyrics-container[data-no-lyrics="true"] .blyrics-no-lyrics-icon { font-size: 6rem; }
+```
+
+- `dots` are Apple Music's three dots, lit one after another. A string fills from the bottom and glows like the note.
+- The no-lyrics icon is a real `.blyrics-no-lyrics-icon` element, `4em` by default. Its size and colour are its own `font-size` and `color`. The message takes the line's style.
+- They are read once from `.blyrics-container`.
+- A theme that hides Better Lyrics' message to draw its own in a pseudo-element shows Better Lyrics' message instead. Use `--blyrics-no-lyrics-text`.
 
 ### Footer
 
@@ -231,7 +309,8 @@ blyrics-swipe-duration-ratio = 1.6;
 | `blyrics-swipe-duration-ratio` | `1.6` | Rich-sync swipe duration as a multiple of word duration |
 | `blyrics-long-word-threshold` | `1500` | Duration (ms) above which `data-long-word` is set |
 | `blyrics-long-word-wrap-threshold` | `10` | Characters per break point; words longer than twice this get `.blyrics-word-group-long` and wrap inside |
-| `blyrics-letter-wave` | `true` | Experimental, on by default. Split words into per-letter spans and float each letter as it is sung, over the word wobble. Tune with `--blyrics-letter-wave-*`; long words also get a per-letter scale swell. Disable with `blyrics-letter-wave = false` |
+| `blyrics-letter-wave` | `true` | Experimental, on by default. Split words into per-letter spans and float each letter as it is sung, over the word wobble. Tune with `--blyrics-letter-wave-*`; long words also get a per-letter scale swell. `long` waves only held words (`[data-long-word]`), and the rest move as one piece. Disable with `blyrics-letter-wave = false` |
+| `blyrics-long-word-max-letters` | none | Words of more than this many letters are never held, however long they are sung |
 | `blyrics-hide-instrumental-only` | `false` | Treat "[Instrumental Only]" as no lyrics (enables fullscreen effect) |
 | `blyrics-hide-credits` | `false` | Never build the songwriter credits line |
 | `blyrics-passive-scroll-enabled` | `true` | Unsynced auto-scroll: enable/disable entirely (overrides user setting) |
@@ -266,6 +345,7 @@ The lines are laid out in this DOM but drawn on a canvas beside it. Use it to sc
 ```
 .blyrics-container.brs-layout [data-sync] [data-loader-visible] [data-no-lyrics] [data-credits-focused] [data-layout]
 ├── .blyrics--line (div) [data-agent] [data-line-number] [data-direction] [lang]
+│   ├── .blyrics-no-lyrics-icon (span, no-lyrics line only, when --blyrics-no-lyrics-icon is set)
 │   ├── .blyrics-line-main (div)
 │   │   └── .blyrics-bidi-run (span)
 │   │       └── .blyrics-word-group (span)
@@ -275,7 +355,7 @@ The lines are laid out in this DOM but drawn on a canvas beside it. Use it to sc
 │   │   └── … .blyrics-word-group.blyrics-background-lyric
 │   ├── .blyrics--romanized.blyrics-content-line
 │   └── .blyrics--translated.blyrics-content-line
-├── .blyrics--instrumental.blyrics--line [data-instrumental="true"] (the note is drawn on the canvas)
+├── .blyrics--instrumental.blyrics--line [data-instrumental="true"] (the icon is drawn on the canvas)
 ├── p.blyrics-credits
 └── .blyrics-footer (ordinary DOM: styles as usual)
 ```
@@ -810,12 +890,17 @@ ytmusic-player-page::before {
 
 ### 13. Instrumental Customization
 
-The renderer draws the note in the lyric colours: unfilled in `--blyrics-lyric-inactive-color`, filling with `--blyrics-lyric-active-color`. Scope those to `.blyrics--instrumental` to colour it differently. `--blyrics-animate-instrumental: 0` stops its motion.
+The renderer draws the icon in the lyric colours: unfilled in `--blyrics-lyric-inactive-color`, filling with `--blyrics-lyric-active-color`. Scope those to `.blyrics--instrumental` to colour it differently. `--blyrics-animate-instrumental: 0` stops its motion. `--blyrics-instrumental-icon` swaps the note for Apple Music's dots or a string, and `--blyrics-instrumental-pulse-scale` makes it swell (see [Instrumental and no lyrics](#instrumental-and-no-lyrics)).
 
 ```css
 .blyrics--instrumental {
   --blyrics-lyric-inactive-color: rgba(255, 255, 255, 0.3);
   --blyrics-lyric-active-color: rgba(255, 255, 255, 1);
+}
+
+.blyrics-container {
+  --blyrics-instrumental-icon: "♫";
+  --blyrics-instrumental-pulse-scale: 1.05;
 }
 ```
 
@@ -852,9 +937,29 @@ On by default. Each letter of a word floats in turn as it is sung, on top of the
 
 It layers on the word wobble rather than replacing it, so the default `scaleX` pop stays. To make the letters carry all the motion instead, set the word wobble to identity (`--blyrics-word-wobble-transform-*: translateY(0)`). It follows `--blyrics-animate-word-wobble`, so reduced motion turns it off.
 
+`/* blyrics-letter-wave = long; */` waves only held words. Held words can do more, and the wobble has two more controls:
+
+```css
+.blyrics-container {
+  --blyrics-letter-wave-spread: 0.04em; /* the outermost letters move this far out at their crest; default 0 */
+  --blyrics-letter-wave-glow: 0.8;      /* each letter's glow up to 1 + this as bright at its crest; default 0 */
+  --blyrics-word-wobble-scope: syllable;    /* each syllable wobbles on its own; default word */
+  --blyrics-word-wobble-duration-ratio: 0.5; /* the wobble lasts --blyrics-wobble-duration plus this many times the syllable's duration; default 0 */
+}
+```
+
+The last two apply to every word, not only held ones.
+
 ### 17. Per-Word State (Karaoke)
 
-Not available: the renderer sets no `[data-word-state]`, and styles on single words do not show. Each word goes from `--blyrics-lyric-inactive-color` to `--blyrics-lyric-active-color` as the swipe crosses it; `--blyrics-animate-highlight-swipe: 0` makes that switch instant instead of swept.
+The renderer sets no `[data-word-state]`, and styles on single words do not show. Each word goes from `--blyrics-lyric-inactive-color` to `--blyrics-lyric-active-color` as the swipe crosses it; `--blyrics-animate-highlight-swipe: 0` makes that switch instant instead of swept. Two variables cover the common karaoke states (see [Words](#words)):
+
+```css
+.blyrics--word {
+  --blyrics-word-past-opacity: 0.7;               /* sung words dim while their line is still sung */
+  --blyrics-word-rest-transform: translateY(3px); /* words to come wait lower, and rise as they are sung */
+}
+```
 
 ## Best Practices
 
