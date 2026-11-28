@@ -11,7 +11,7 @@ import {
 import { AppState } from "@core/appState";
 import { t } from "@core/i18n";
 import type { LyricSourceResultWithMeta } from "@modules/lyrics/lyrics";
-import type { LyricContributor, LyricPart } from "@modules/lyrics/providers/shared";
+import type { Lyric, LyricContributor, LyricPart } from "@modules/lyrics/providers/shared";
 import { createScriptClassifier, type ScriptClassifier } from "@modules/lyrics/nonLatinScript";
 import {
   getRomanizationFromCache,
@@ -32,7 +32,7 @@ import { lyricsElementAdded, mainView } from "@modules/ui/mainLyricsView";
 import { disableNativeLyricsFocus } from "@modules/ui/nativeLyricsFocus";
 import { publishSecondaryViews } from "@modules/ui/secondaryViews";
 import type { LineData } from "@braccato/core";
-import { injectRomanization, injectTranslation } from "@modules/ui/lyricsRenderer";
+import { clearDecorations, injectRomanization, injectTranslation } from "@modules/ui/lyricsRenderer";
 import { findBestLanguageMatch, langCodesMatch, languageMatchesAny } from "@utils";
 import { logCore } from "@core/logger";
 
@@ -294,12 +294,19 @@ async function processBatchTranslationsAndRomanizations(
   let sourceLanguage = data.language;
   let didInjectCachedContent = false;
 
+  // Lyrics that bring their own romanization or translation are authored as a whole: a line left
+  // without one is meant to be (an English line in a Korean song), so the machine does not fill it in.
+  const hasOwnRomanization = lyrics.some(item => !!item.romanization?.trim() || !!item.timedRomanization?.length);
+  const hasOwnTranslation = lyrics.some(item => ownTranslation(item, targetTranslationLang) !== null);
+
   // 1. Identify what needs to be translated/romanized
   lyrics.forEach((item, index) => {
     if (item.isInstrumental) return;
 
     const lineData = linesData[index];
     const lyricElement = lineData.lyricElement;
+    let isRomanized = false;
+    let isTranslated = false;
 
     // Authoring tools stamp a default xml:lang on every file, so a language the script contradicts cannot veto.
     const scriptLanguage = scripts.detectScriptLanguage(item.words);
@@ -315,7 +322,7 @@ async function processBatchTranslationsAndRomanizations(
       if (item.romanization) {
         romanizedResult = item.romanization;
         timedRomanization = item.timedRomanization || null;
-      } else {
+      } else if (!hasOwnRomanization) {
         romanizedResult = getRomanizationFromCache(item.words);
       }
 
@@ -326,9 +333,10 @@ async function processBatchTranslationsAndRomanizations(
             romanization: romanizedResult,
             timedRomanization: timedRomanization ?? undefined,
           });
+          isRomanized = true;
           didInjectCachedContent = true;
         }
-      } else {
+      } else if (!hasOwnRomanization) {
         const shouldRomanize =
           (sourceLanguage && languageMatchesAny(sourceLanguage, ROMANIZATION_LANGUAGES)) ||
           scripts.hasNonLatinScript(item.words);
@@ -348,15 +356,11 @@ async function processBatchTranslationsAndRomanizations(
       let translationResult: string | null = null;
       let translationLanguage = targetTranslationLang;
 
-      const matchedLang =
-        item.translations && findBestLanguageMatch(targetTranslationLang, Object.keys(item.translations));
-      if (item.translations && matchedLang) {
-        translationResult = item.translations[matchedLang];
-        translationLanguage = matchedLang;
-      } else if (item.translation && findBestLanguageMatch(targetTranslationLang, [item.translation.lang])) {
-        translationResult = item.translation.text;
-        translationLanguage = item.translation.lang;
-      } else {
+      const own = ownTranslation(item, targetTranslationLang);
+      if (own) {
+        translationResult = own.text;
+        translationLanguage = own.lang;
+      } else if (!hasOwnTranslation) {
         const cached = getTranslationFromCache(item.words, targetTranslationLang);
         if (cached && !isTranslationDisabledForLang(cached.originalLanguage)) {
           translationResult = cached.translatedText;
@@ -366,10 +370,21 @@ async function processBatchTranslationsAndRomanizations(
       if (translationResult && !isSameText(translationResult, item.words)) {
         injectTranslation(doc, lyricElement, translationResult, translationLanguage);
         recordLyricDecoration(index, { translation: translationResult, translationLanguage });
+        isTranslated = true;
         didInjectCachedContent = true;
-      } else if (sourceLanguage !== targetTranslationLang || scripts.hasNonLatinScript(item.words) || !sourceLanguage) {
+      } else if (
+        !hasOwnTranslation &&
+        (sourceLanguage !== targetTranslationLang || scripts.hasNonLatinScript(item.words) || !sourceLanguage)
+      ) {
         translationBatch.push({ index, text: item.words });
       }
+    }
+
+    // A line this pass leaves bare may still carry what was hung on the line it replaced in a swap:
+    // @braccato/core 2.0.0-beta.9 hands a changed line the decorations of the line paired into its
+    // place. One still waiting on a batch is cleared too: what it carries is for other text.
+    if (!isRomanized || !isTranslated) {
+      clearDecorations(lyricElement, { romanization: !isRomanized, translation: !isTranslated });
     }
   });
 
@@ -452,6 +467,14 @@ async function processBatchTranslationsAndRomanizations(
   }
 
   await Promise.all(promises);
+}
+
+/** The lyric's own translation into `targetLanguage`, if its source gave one. */
+function ownTranslation(item: Lyric, targetLanguage: string): { text: string; lang: string } | null {
+  const matchedLang = item.translations && findBestLanguageMatch(targetLanguage, Object.keys(item.translations));
+  if (item.translations && matchedLang) return { text: item.translations[matchedLang], lang: matchedLang };
+  if (item.translation && findBestLanguageMatch(targetLanguage, [item.translation.lang])) return item.translation;
+  return null;
 }
 
 /**

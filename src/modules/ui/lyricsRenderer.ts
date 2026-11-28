@@ -10,6 +10,8 @@ import {
   type LyricsRendererOptions,
   loadSync,
   ownsLine,
+  removeRomanization as removeRendererRomanization,
+  removeTranslation as removeRendererTranslation,
   resetPlaybackClock as resetRendererPlaybackClock,
   resumeAllAutoscroll as resumeRendererAutoscroll,
   snapshotCanvas,
@@ -239,6 +241,16 @@ export function injectRomanization(
   if (isLoaded() && ownsLine(lyricElement)) {
     injectRendererRomanization(doc, lyricElement, lineData, text, timedRomanization);
   }
+}
+
+/**
+ * Takes the translation and romanization off a line. Lyrics swapped into the song on screen hand
+ * each changed line whatever was hung on the line it replaced, which is a decoration of other text.
+ */
+export function clearDecorations(lyricElement: HTMLElement, { translation = true, romanization = true } = {}) {
+  if (!isLoaded() || !ownsLine(lyricElement)) return;
+  if (translation) removeRendererTranslation(lyricElement);
+  if (romanization) removeRendererRomanization(lyricElement);
 }
 
 // -- What a view shows --------------------------
